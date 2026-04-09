@@ -1,5 +1,4 @@
 import { ren2140 } from '@/data/contributors/ren2140'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { WalletProfile } from '@/schema/features/profile'
@@ -14,10 +13,12 @@ import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const baseApp: SoftwareWallet = {
+export const baseApp = {
 	metadata: {
 		id: 'base-app',
 		displayName: 'Base App',
@@ -203,7 +204,5 @@ export const baseApp: SoftwareWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-	},
-}
+	variants: [Variant.MOBILE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

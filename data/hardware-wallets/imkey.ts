@@ -1,5 +1,4 @@
 import { mako } from '@/data/contributors/mako'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { FirmwareType } from '@/schema/features/security/firmware'
@@ -21,9 +20,11 @@ import {
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const imkeyWallet: HardwareWallet = {
+export const imkeyWallet = {
 	metadata: {
 		id: 'imkey',
 		displayName: 'imKey',
@@ -208,5 +209,5 @@ export const imkeyWallet: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: { [Variant.HARDWARE]: true },
-}
+	variants: [Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

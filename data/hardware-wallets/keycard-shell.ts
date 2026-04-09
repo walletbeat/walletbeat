@@ -1,5 +1,4 @@
 import { phift } from '@/data/contributors/phift'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
@@ -25,9 +24,11 @@ import { featureSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const keycardShell: HardwareWallet = {
+export const keycardShell = {
 	metadata: {
 		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
@@ -264,7 +265,5 @@ export const keycardShell: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: {
-		[Variant.HARDWARE]: true,
-	},
-}
+	variants: [Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

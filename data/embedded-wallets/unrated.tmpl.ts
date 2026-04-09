@@ -1,11 +1,12 @@
 import { exampleContributor } from '@/data/contributors/example'
-import type { EmbeddedWallet } from '@/data/embedded-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const unratedEmbeddedTemplate: EmbeddedWallet = {
+export const unratedEmbeddedTemplate = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated embedded wallet template',
@@ -80,7 +81,5 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.EMBEDDED]: true,
-	},
-}
+	variants: [Variant.EMBEDDED] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

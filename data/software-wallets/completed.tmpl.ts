@@ -19,7 +19,6 @@ import {
 	exampleSecurityAuditor,
 	exampleWalletDevelopmentCompany,
 } from '@/data/entities/example'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -83,7 +82,9 @@ import {
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 /**
  * Default transaction display showing all 6 basic fields.
@@ -178,7 +179,7 @@ const recentAudit: SecurityAudit = {
 	variantsScope: { [Variant.BROWSER]: true, [Variant.MOBILE]: true },
 }
 
-export const completedTemplate: SoftwareWallet = {
+export const completedTemplate = {
 	metadata: {
 		id: 'completed',
 		displayName: 'Completed wallet template',
@@ -696,8 +697,5 @@ export const completedTemplate: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.BROWSER]: true,
-		[Variant.MOBILE]: true,
-	},
-}
+	variants: [Variant.BROWSER, Variant.MOBILE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

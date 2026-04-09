@@ -1,12 +1,12 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { notApplicableWalletIntegration } from '@/schema/features/ecosystem/integration'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -22,71 +22,74 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
+import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
-export const ledgerWalletMetadata: WalletMetadata = {
-	id: 'ledger',
-	displayName: 'Ledger Wallet',
-	tableName: 'Ledger',
-	blurb: paragraph(`
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
+export const ledger = {
+	metadata: {
+		id: 'ledger',
+		displayName: 'Ledger Wallet',
+		tableName: 'Ledger',
+		blurb: paragraph(`
 			Ledger Wallet is a self-custodial wallet built by Ledger. It
 			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
 		`),
-	contributors: [nconsigny, patrickalphac, mattmatt],
-	hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
-	hardwareWalletModels: [
-		{
-			id: 'ledger-stax',
-			name: 'Ledger Stax',
-			isFlagship: true,
-			url: 'https://shop.ledger.com/products/ledger-stax',
+		contributors: [nconsigny, patrickalphac, mattmatt],
+		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'ledger-stax',
+				name: 'Ledger Stax',
+				isFlagship: true,
+				url: 'https://shop.ledger.com/products/ledger-stax',
+			},
+			{
+				id: 'ledger-nano-s',
+				name: 'Ledger Nano S',
+				isFlagship: false,
+				url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
+			},
+			{
+				id: 'ledger-nano-s-plus',
+				name: 'Ledger Nano S+',
+				isFlagship: false,
+				url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
+			},
+			{
+				id: 'ledger-nano-x',
+				name: 'Ledger Nano X',
+				isFlagship: false,
+				url: 'https://shop.ledger.com/products/ledger-nano-x',
+			},
+			{
+				id: 'ledger-flex',
+				name: 'Ledger Flex',
+				isFlagship: false,
+				url: 'https://shop.ledger.com/products/ledger-flex',
+			},
+		],
+		iconExtension: 'svg',
+		lastUpdated: '2025-03-12',
+		urls: {
+			docs: ['https://developers.ledger.com/'],
+			repositories: ['https://github.com/LedgerHQ/'],
+			socials: {
+				facebook: 'https://web.facebook.com/Ledger/',
+				instagram: 'https://www.instagram.com/ledger/',
+				linkedin: 'https://www.linkedin.com/company/ledgerhq/',
+				reddit: 'https://www.reddit.com/r/ledgerwallet/',
+				tiktok: 'https://www.tiktok.com/@ledger',
+				x: 'https://x.com/Ledger',
+			},
+			websites: ['https://www.ledger.com/'],
 		},
-		{
-			id: 'ledger-nano-s',
-			name: 'Ledger Nano S',
-			isFlagship: false,
-			url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
-		},
-		{
-			id: 'ledger-nano-s-plus',
-			name: 'Ledger Nano S+',
-			isFlagship: false,
-			url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
-		},
-		{
-			id: 'ledger-nano-x',
-			name: 'Ledger Nano X',
-			isFlagship: false,
-			url: 'https://shop.ledger.com/products/ledger-nano-x',
-		},
-		{
-			id: 'ledger-flex',
-			name: 'Ledger Flex',
-			isFlagship: false,
-			url: 'https://shop.ledger.com/products/ledger-flex',
-		},
-	],
-	iconExtension: 'svg',
-	lastUpdated: '2025-03-12',
-	urls: {
-		docs: ['https://developers.ledger.com/'],
-		repositories: ['https://github.com/LedgerHQ/'],
-		socials: {
-			facebook: 'https://web.facebook.com/Ledger/',
-			instagram: 'https://www.instagram.com/ledger/',
-			linkedin: 'https://www.linkedin.com/company/ledgerhq/',
-			reddit: 'https://www.reddit.com/r/ledgerwallet/',
-			tiktok: 'https://www.tiktok.com/@ledger',
-			x: 'https://x.com/Ledger',
-		},
-		websites: ['https://www.ledger.com/'],
 	},
-}
-export const ledgerWallet: HardwareWallet = {
-	metadata: ledgerWalletMetadata,
 	features: {
 		accountSupport: null,
+		addressResolution: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://support.ledger.com/article/360018444599-zd',
 			requiresManufacturerConsent: {
@@ -106,6 +109,12 @@ export const ledgerWallet: HardwareWallet = {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 			},
 		}),
+		chainAbstraction: null,
+		chainConfigurability: null,
+		ecosystem: {
+			delegation: null,
+		},
+		integration: notApplicableWalletIntegration,
 		licensing: null,
 		monetization: {
 			ref: [
@@ -134,6 +143,7 @@ export const ledgerWallet: HardwareWallet = {
 				crashReports: null,
 				usage: null,
 			},
+			appIsolation: null,
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://ledger.com/privacy-policy',
@@ -166,11 +176,14 @@ export const ledgerWallet: HardwareWallet = {
 			}),
 			duressResistance: null,
 			firmware: null,
+			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
+			passkeyVerification: null,
 			publicSecurityAudits: null,
+			scamAlerts: null,
 			secureElement: supported({
 				ref: [
 					{
@@ -184,26 +197,31 @@ export const ledgerWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation:
-							"Independent video demonstration of Ledger's signing implementation on a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
+				[Variant.DESKTOP]: null,
+				[Variant.HARDWARE]: {
+					ref: [
+						{
+							explanation:
+								"Independent video demonstration of Ledger's signing implementation on a Safe.",
+							url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
+						},
+					],
+					calldataDecoded: noCalldataDecoding,
+					dataExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
 					},
-				],
-				calldataDecoded: noCalldataDecoding,
-				dataExtraction: {
-					[DataExtraction.EYES]: true,
-					[DataExtraction.HASHES]: false,
-					[DataExtraction.QRCODE]: false,
+					detailsDisplayed: displaysFullTransactionDetails,
+					messageSigningLegibility: null,
 				},
-				detailsDisplayed: displaysFullTransactionDetails,
-				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},
 		selfSovereignty: {
 			interoperability: null,
+			permissionsManagement: null,
+			transactionSubmission: null,
 		},
 		transparency: {
 			maintenance: null,
@@ -211,17 +229,5 @@ export const ledgerWallet: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: {
-		HARDWARE: true,
-	},
-}
-
-// add entries for
-
-// For Ledger I need :
-
-// Ledger nano S : @https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device
-// Ledger nano S + :  @https://shop.ledger.com/products/ledger-nano-s-plus
-// Ledger nano X : @https://shop.ledger.com/products/ledger-nano-x
-// Ledger flex : @https://shop.ledger.com/products/ledger-flex
-// flagship : Ledger stax : @https://shop.ledger.com/products/ledger-stax
+	variants: [Variant.DESKTOP, Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

@@ -1,4 +1,3 @@
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -7,12 +6,14 @@ import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { iamkio } from '../contributors/iamkio'
 import { kernal7702Contract } from '../wallet-contracts/kernal-7702'
 
-export const pillarx: SoftwareWallet = {
+export const pillarx = {
 	metadata: {
 		id: 'pillarx',
 		displayName: 'PillarX',
@@ -155,8 +156,5 @@ export const pillarx: SoftwareWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.MOBILE, Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

@@ -5,11 +5,16 @@ import { completedTemplate } from '@/data/software-wallets/completed.tmpl'
 import { mapAttributesGetter } from '@/schema/attribute-groups'
 import { Rating } from '@/schema/attributes'
 import { softwareLadders } from '@/schema/ladders'
-import { rateWallet } from '@/schema/wallet'
+import { rateWallet, sliceCanonicalWalletForType } from '@/schema/wallet'
+import { WalletType } from '@/schema/wallet-types'
 
 describe('completed.tmpl', () => {
 	it('rates PASS or EXEMPT on all attributes, never UNRATED', () => {
-		const rated = rateWallet(attributeGroupById, softwareLadders, completedTemplate)
+		const rated = rateWallet(
+			attributeGroupById,
+			softwareLadders,
+			sliceCanonicalWalletForType(completedTemplate, WalletType.SOFTWARE)!,
+		)
 
 		mapAttributesGetter(rated.overall, getter => {
 			const evalAttr = getter(rated.overall)

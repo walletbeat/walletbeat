@@ -1,6 +1,5 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -50,8 +49,10 @@ import {
 } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { mdParagraph, paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
@@ -70,7 +71,7 @@ const metamaskTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
 
-export const metamask: SoftwareWallet = {
+export const metamask = {
 	metadata: {
 		id: 'metamask',
 		displayName: 'MetaMask',
@@ -611,8 +612,5 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.MOBILE, Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

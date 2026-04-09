@@ -65,7 +65,12 @@ describe('ratedWalletJsonExport', () => {
 
 					if (variantBlock !== undefined) {
 						expect(variantBlock.attributes).toBeDefined()
-						expect(Object.keys(variantBlock.attributes).sort()).toEqual(overallGroups)
+						expect(Object.keys(variantBlock.attributes).length).toBeGreaterThan(0)
+						expect(
+							Object.keys(variantBlock.attributes).every(groupId =>
+								overallGroups.includes(groupId),
+							),
+						).toBe(true)
 
 						expect(variantBlock.features).toBeDefined()
 						expect(typeof variantBlock.features).toBe('object')

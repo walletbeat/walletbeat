@@ -1,6 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { mako } from '@/data/contributors/mako'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import {
@@ -37,13 +36,15 @@ import {
 } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
 import { imToken } from '../entities/imtoken'
 
-export const imtoken: SoftwareWallet = {
+export const imtoken = {
 	metadata: {
 		id: 'imtoken',
 		displayName: 'imToken',
@@ -366,7 +367,5 @@ export const imtoken: SoftwareWallet = {
 			},*/
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-	},
-}
+	variants: [Variant.MOBILE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

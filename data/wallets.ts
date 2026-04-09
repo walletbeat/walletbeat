@@ -1,40 +1,29 @@
-import { type BaseWallet, type RatedWallet, type WalletMetadata } from '@/schema/wallet'
+import { completeWalletFeatures } from '@/schema/features'
+import { allWalletLadders } from '@/schema/ladders'
+import {
+	type CanonicalWallet,
+	type RatedWallet,
+	rateWallet,
+	type WalletMetadata,
+} from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import {
-	assertNonEmptyArray,
-	type NonEmptyArray,
-	nonEmptyMap,
-	setUnion,
-} from '@/types/utils/non-empty'
+import { nonEmptySetFromArray } from '@/types/utils/non-empty'
 
-import { type AttributeGroupId } from './attribute-groups'
-import { embeddedWallets, ratedEmbeddedWallets, unratedEmbeddedWallet } from './embedded-wallets'
-import {
-	hardwareWallets,
-	isValidHardwareWalletName,
-	ratedHardwareWallets,
-	unratedHardwareWallet,
-} from './hardware-wallets'
-import {
-	isValidSoftwareWalletName,
-	ratedSoftwareWallets,
-	softwareWallets,
-	unratedSoftwareWallet,
-} from './software-wallets'
-
-/** Set of all known wallets. */
-export const allWallets = {
-	...softwareWallets,
-	...hardwareWallets,
-	...embeddedWallets,
-} as const satisfies Record<string, BaseWallet<AttributeGroupId>>
+import { attributeGroupById } from './attribute-groups'
+import { canonicalWallets } from './canonical-wallets'
+import { ratedEmbeddedWallets, unratedEmbeddedWallet } from './embedded-wallets'
+import { ratedHardwareWallets, unratedHardwareWallet } from './hardware-wallets'
+import { ratedSoftwareWallets, unratedSoftwareWallet } from './software-wallets'
 
 /** A valid wallet name. */
-export type WalletName = keyof typeof allWallets
+export type WalletName = keyof typeof canonicalWallets
+
+/** Set of all known wallets. */
+export const allWallets: Record<WalletName, CanonicalWallet> = canonicalWallets
 
 /** Type predicate for WalletName. */
 export function isValidWalletName(name: string): name is WalletName {
-	return isValidSoftwareWalletName(name) || isValidHardwareWalletName(name)
+	return Object.prototype.hasOwnProperty.call(allWallets, name)
 }
 
 /** Assert that `name` is a valid `WalletName`. */
@@ -48,12 +37,12 @@ export function assertValidWalletName(name: string): WalletName {
 	return name
 }
 
-/** All rated wallet entries keyed by their source-data key. */
-export const allRatedWalletEntries = {
-	...ratedSoftwareWallets,
-	...ratedHardwareWallets,
-	...ratedEmbeddedWallets,
-} as const satisfies Record<WalletName, RatedWallet<string>>
+/** All rated wallet slices keyed by wallet type and public wallet slug. */
+export const ratedWalletsByType = {
+	[WalletType.SOFTWARE]: ratedSoftwareWallets,
+	[WalletType.HARDWARE]: ratedHardwareWallets,
+	[WalletType.EMBEDDED]: ratedEmbeddedWallets,
+} as const satisfies Record<WalletType, Partial<Record<WalletName, RatedWallet<string>>>>
 
 export interface DisplayRatedWallet extends Omit<RatedWallet<string>, 'types' | 'stagesByType'> {
 	stagesByType: RatedWallet<string>['stagesByType']
@@ -61,93 +50,100 @@ export interface DisplayRatedWallet extends Omit<RatedWallet<string>, 'types' | 
 	walletsByType: Partial<Record<WalletType, RatedWallet<string>>>
 }
 
-const walletTypePriority = [WalletType.SOFTWARE, WalletType.HARDWARE, WalletType.EMBEDDED] as const
-
-const walletsBySlug = Object.values(allRatedWalletEntries).reduce<
-	Record<string, RatedWallet<string>[]>
->(
-	(acc, wallet) => ({
-		...acc,
-		[wallet.metadata.id]: [...(acc[wallet.metadata.id] ?? []), wallet],
-	}),
-	{},
-)
-
-const displayWalletForEntries = (
-	wallets: NonEmptyArray<RatedWallet<string>>,
-): DisplayRatedWallet => {
-	const walletsByType = wallets.reduce<DisplayRatedWallet['walletsByType']>(
-		(acc, wallet) => ({
-			...acc,
-			...Object.fromEntries(
-				Object.values(WalletType)
-					.filter(walletType => wallet.types[walletType] === true)
-					.map(walletType => [walletType, wallet] as const),
-			),
+export const canonicalRatedWallets = Object.fromEntries(
+	Object.entries(allWallets).map(([name, wallet]) => [
+		name,
+		rateWallet(attributeGroupById, allWalletLadders, {
+			metadata: wallet.metadata,
+			features: completeWalletFeatures(wallet.features),
+			overrides: wallet.overrides,
+			variants: nonEmptySetFromArray(wallet.variants),
 		}),
-		{},
-	)
-	const primaryWallet =
-		walletTypePriority
-			.map(walletType => walletsByType[walletType])
-			.find(wallet => wallet !== undefined) ?? wallets[0]
-
-	return {
-		...primaryWallet,
-		stagesByType: {
-			[WalletType.SOFTWARE]:
-				walletsByType[WalletType.SOFTWARE]?.stagesByType[WalletType.SOFTWARE] ?? null,
-			[WalletType.HARDWARE]:
-				walletsByType[WalletType.HARDWARE]?.stagesByType[WalletType.HARDWARE] ?? null,
-			[WalletType.EMBEDDED]:
-				walletsByType[WalletType.EMBEDDED]?.stagesByType[WalletType.EMBEDDED] ?? null,
-		},
-		types: setUnion(nonEmptyMap(wallets, wallet => wallet.types)),
-		walletsByType,
-	}
-}
-
-const displayWalletForType = (wallet: RatedWallet<string>): DisplayRatedWallet => {
-	const aggregateWallet = allRatedWalletsBySlug[wallet.metadata.id]
-
-	return {
-		...wallet,
-		stagesByType: aggregateWallet.stagesByType,
-		types: aggregateWallet.types,
-		walletsByType: aggregateWallet.walletsByType,
-	}
-}
+	]),
+) satisfies Record<WalletName, RatedWallet<string>>
 
 /** Canonical display wallets keyed by public wallet slug (`metadata.id`). */
 export const allRatedWalletsBySlug: Record<string, DisplayRatedWallet> = Object.fromEntries(
-	Object.entries(walletsBySlug).map(([slug, wallets]) => [
-		slug,
-		displayWalletForEntries(assertNonEmptyArray(wallets)),
-	]),
+	Object.keys(allWallets).map(walletName => {
+		const ratedWallet = canonicalRatedWallets[walletName]
+
+		return [
+			walletName,
+			{
+				...ratedWallet,
+				stagesByType: {
+					[WalletType.SOFTWARE]:
+						ratedWalletsByType[WalletType.SOFTWARE][walletName]?.stagesByType[
+							WalletType.SOFTWARE
+						] ?? null,
+					[WalletType.HARDWARE]:
+						ratedWalletsByType[WalletType.HARDWARE][walletName]?.stagesByType[
+							WalletType.HARDWARE
+						] ?? null,
+					[WalletType.EMBEDDED]:
+						ratedWalletsByType[WalletType.EMBEDDED][walletName]?.stagesByType[
+							WalletType.EMBEDDED
+						] ?? null,
+				},
+				walletsByType: {
+					[WalletType.SOFTWARE]: ratedWalletsByType[WalletType.SOFTWARE][walletName],
+					[WalletType.HARDWARE]: ratedWalletsByType[WalletType.HARDWARE][walletName],
+					[WalletType.EMBEDDED]: ratedWalletsByType[WalletType.EMBEDDED][walletName],
+				},
+			},
+		]
+	}),
 )
 
 /** All canonical display wallets keyed by public wallet slug (`metadata.id`). */
 export const allRatedWallets = allRatedWalletsBySlug
 
 export const displayRatedSoftwareWallets: Record<string, DisplayRatedWallet> = Object.fromEntries(
-	Object.entries(ratedSoftwareWallets).map(([name, wallet]) => [
-		name,
-		displayWalletForType(wallet),
-	]),
+	Object.entries(ratedSoftwareWallets).map(([name, wallet]) => {
+		const aggregateWallet = allRatedWalletsBySlug[name]
+
+		return [
+			name,
+			{
+				...wallet,
+				stagesByType: aggregateWallet.stagesByType,
+				types: aggregateWallet.types,
+				walletsByType: aggregateWallet.walletsByType,
+			},
+		]
+	}),
 )
 
 export const displayRatedHardwareWallets: Record<string, DisplayRatedWallet> = Object.fromEntries(
-	Object.entries(ratedHardwareWallets).map(([name, wallet]) => [
-		name,
-		displayWalletForType(wallet),
-	]),
+	Object.entries(ratedHardwareWallets).map(([name, wallet]) => {
+		const aggregateWallet = allRatedWalletsBySlug[name]
+
+		return [
+			name,
+			{
+				...wallet,
+				stagesByType: aggregateWallet.stagesByType,
+				types: aggregateWallet.types,
+				walletsByType: aggregateWallet.walletsByType,
+			},
+		]
+	}),
 )
 
 export const displayRatedEmbeddedWallets: Record<string, DisplayRatedWallet> = Object.fromEntries(
-	Object.entries(ratedEmbeddedWallets).map(([name, wallet]) => [
-		name,
-		displayWalletForType(wallet),
-	]),
+	Object.entries(ratedEmbeddedWallets).map(([name, wallet]) => {
+		const aggregateWallet = allRatedWalletsBySlug[name]
+
+		return [
+			name,
+			{
+				...wallet,
+				stagesByType: aggregateWallet.stagesByType,
+				types: aggregateWallet.types,
+				walletsByType: aggregateWallet.walletsByType,
+			},
+		]
+	}),
 )
 
 /** Check if a string is a valid wallet slug (metadata.id). */
@@ -188,7 +184,5 @@ export function representativeWalletForType(walletType: WalletType) {
  * Get wallet metadata by ID, or undefined if not found.
  */
 export function getWalletMetadataById(id: string): WalletMetadata | undefined {
-	const wallet = Object.values(allWallets).find(w => w.metadata.id === id)
-
-	return wallet?.metadata
+	return isValidWalletName(id) ? allWallets[id].metadata : undefined
 }

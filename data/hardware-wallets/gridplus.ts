@@ -1,7 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import {
 	AppConnectionMethod,
@@ -36,10 +35,12 @@ import { notSupported, supported } from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const gridplusWallet: HardwareWallet = {
+export const gridplusWallet = {
 	metadata: {
 		id: 'gridplus',
 		displayName: 'GridPlus Wallet',
@@ -282,7 +283,5 @@ export const gridplusWallet: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: {
-		[Variant.HARDWARE]: true,
-	},
-}
+	variants: [Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

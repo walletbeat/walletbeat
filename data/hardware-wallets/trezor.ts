@@ -1,7 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
@@ -24,10 +23,12 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const trezorWallet: HardwareWallet = {
+export const trezorWallet = {
 	metadata: {
 		id: 'trezor',
 		displayName: 'Trezor Wallet',
@@ -202,10 +203,8 @@ export const trezorWallet: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: {
-		[Variant.HARDWARE]: true,
-	},
-}
+	variants: [Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet
 
 // Flagship : Trezor safe 5 : @https://trezor.io/trezor-safe-5
 // Trezor safe 3 : @https://trezor.io/trezor-safe-3

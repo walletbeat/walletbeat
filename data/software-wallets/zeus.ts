@@ -1,5 +1,4 @@
 import { greekfetacheese } from '@/data/contributors/greekfetacheese'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -32,9 +31,11 @@ import {
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const zeus: SoftwareWallet = {
+export const zeus = {
 	metadata: {
 		id: 'zeus',
 		displayName: 'Zeus',
@@ -384,7 +385,5 @@ export const zeus: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.DESKTOP]: true,
-	},
-}
+	variants: [Variant.DESKTOP] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

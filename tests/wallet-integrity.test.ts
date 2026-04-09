@@ -6,7 +6,8 @@ import { AttributeGroupId } from '@/data/attribute-groups'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
-import type { BaseWallet } from '@/schema/wallet'
+import { getVariants } from '@/schema/variants'
+import type { BaseWallet, CanonicalWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
@@ -17,7 +18,7 @@ import { getRepositoryRoot } from './utils/codebase'
 
 describe('wallets', () => {
 	const walletMaps: {
-		walletMap: { [K: string]: BaseWallet<AttributeGroupId> }
+		walletMap: { [K: string]: BaseWallet<AttributeGroupId> | CanonicalWallet }
 		walletType: WalletType | null
 		walletMapName: string
 		dataSubdir: string
@@ -37,25 +38,34 @@ describe('wallets', () => {
 		// TODO: Add embedded wallets here once we have some.
 	]
 
-	for (const { walletMap, walletMapName } of walletMaps) {
+	for (const { walletMap, walletMapName, walletType } of walletMaps) {
 		describe(walletMapName, () => {
 			for (const walletKey of Object.keys(walletMap)) {
 				it(`is the only wallet map that has key ${walletKey}`, () => {
 					for (const {
 						walletMap: otherWalletMap,
+						walletType: otherWalletType,
 						walletMapName: otherWalletMapName,
 					} of walletMaps) {
 						if (walletMapName === otherWalletMapName) {
 							continue
 						}
 
-						expect(otherWalletMap[walletKey]).toBeUndefined()
-
 						if (typeof walletKey !== 'string' || !isValidWalletName(walletKey)) {
 							throw new Error('unexpected wallet key')
 						}
 
-						expect(allWallets[walletKey]).toBe(walletMap[walletKey])
+						expect(allWallets[walletKey].metadata.id).toBe(walletMap[walletKey]?.metadata.id)
+
+						const otherWallet = otherWalletMap[walletKey]
+
+						if (otherWallet === undefined) {
+							continue
+						}
+
+						expect(otherWallet.metadata.id).toBe(walletMap[walletKey]?.metadata.id)
+						expect(otherWalletType).not.toBeNull()
+						expect(otherWalletType).not.toBe(walletType)
 					}
 				})
 			}
@@ -183,7 +193,7 @@ describe('wallets', () => {
 							await captureFileObj.save({
 								verifyExisting: true,
 								walletId,
-								walletVariants: wallet.variants,
+								walletVariants: getVariants(wallet.variants),
 							})
 						} catch (e) {
 							throw new Error(`${getErrorMessage(e)} (run \`pnpm fix\` to fix this automatically)`)

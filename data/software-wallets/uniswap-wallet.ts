@@ -1,12 +1,13 @@
 import { ren2140 } from '@/data/contributors/ren2140'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const uniswapWallet: SoftwareWallet = {
+export const uniswapWallet = {
 	metadata: {
 		id: 'uniswap-wallet',
 		displayName: 'Uniswap Wallet',
@@ -117,8 +118,5 @@ export const uniswapWallet: SoftwareWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.MOBILE, Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

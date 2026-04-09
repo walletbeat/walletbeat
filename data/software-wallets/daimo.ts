@@ -1,6 +1,5 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { appConnectionNotSupported } from '@/schema/features/privacy/app-isolation'
@@ -30,7 +29,9 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { mdParagraph, paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { binance } from '../entities/binance'
 import { daimoInc } from '../entities/daimo'
@@ -40,7 +41,7 @@ import { openExchangeRates } from '../entities/open-exchange-rates'
 import { pimlico } from '../entities/pimlico'
 import { veridise } from '../entities/veridise'
 
-export const daimo: SoftwareWallet = {
+export const daimo = {
 	metadata: {
 		id: 'daimo',
 		displayName: 'Daimo',
@@ -468,7 +469,5 @@ export const daimo: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-	},
-}
+	variants: [Variant.MOBILE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

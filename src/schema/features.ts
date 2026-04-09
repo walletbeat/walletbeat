@@ -176,6 +176,58 @@ export interface WalletBaseFeatures {
 	monetization: VariantFeature<Monetization>
 }
 
+export type WalletFeatures = WalletBaseFeatures & {
+	security: WalletBaseFeatures['security'] & {
+		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
+		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
+		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
+		firmware: VariantFeature<FirmwareSupport>
+		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
+		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
+		userSafety: VariantFeature<UserSafetySupport>
+		secureElement: VariantFeature<Support<SecureElementSupport>>
+	}
+	privacy: WalletBaseFeatures['privacy'] & {
+		appIsolation: VariantFeature<Nullable<AppIsolation>>
+		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>
+	}
+	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
+		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
+		interoperability: VariantFeature<InteroperabilitySupport>
+	}
+	transparency: WalletBaseFeatures['transparency'] & {
+		reputation: VariantFeature<ReputationSupport>
+		maintenance: VariantFeature<MaintenanceSupport>
+	}
+	ecosystem: {
+		delegation: VariantFeature<DelegationHandling>
+	}
+	chainConfigurability: VariantFeature<Support<WithRef<Nullable<ChainConfigurability>>>>
+	integration: WalletIntegration
+	addressResolution: VariantFeature<Nullable<WithRef<AddressResolution>>>
+	chainAbstraction: VariantFeature<Nullable<ChainAbstraction>>
+	appConnectionSupport: VariantFeature<AppConnectionSupport>
+}
+
+export type CanonicalWalletFeatures = WalletBaseFeatures & {
+	security: WalletBaseFeatures['security'] & Partial<WalletFeatures['security']>
+	privacy: WalletBaseFeatures['privacy'] & Partial<WalletFeatures['privacy']>
+	selfSovereignty: WalletBaseFeatures['selfSovereignty'] &
+		Partial<WalletFeatures['selfSovereignty']>
+	transparency: WalletBaseFeatures['transparency'] & Partial<WalletFeatures['transparency']>
+} & Partial<
+		Pick<
+			WalletFeatures,
+			| 'ecosystem'
+			| 'chainConfigurability'
+			| 'integration'
+			| 'addressResolution'
+			| 'chainAbstraction'
+			| 'appConnectionSupport'
+		>
+	>
+
 /**
  * A set of features for any software wallet.
  *
@@ -303,6 +355,49 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	}
 }
 
+export function completeWalletFeatures(features: WalletBaseFeatures): WalletFeatures {
+	const softwareFeatures = isWalletSoftwareFeatures(features) ? features : null
+	const hardwareFeatures = isWalletHardwareFeatures(features) ? features : null
+
+	return {
+		...features,
+		security: {
+			...features.security,
+			scamAlerts: softwareFeatures?.security.scamAlerts ?? null,
+			hardwareWalletSupport: softwareFeatures?.security.hardwareWalletSupport ?? null,
+			passkeyVerification: softwareFeatures?.security.passkeyVerification ?? null,
+			firmware: hardwareFeatures?.security.firmware ?? null,
+			supplyChainDIY: hardwareFeatures?.security.supplyChainDIY ?? null,
+			supplyChainFactory: hardwareFeatures?.security.supplyChainFactory ?? null,
+			userSafety: hardwareFeatures?.security.userSafety ?? null,
+			secureElement: hardwareFeatures?.security.secureElement ?? null,
+		},
+		privacy: {
+			...features.privacy,
+			appIsolation: softwareFeatures?.privacy.appIsolation ?? null,
+			hardwarePrivacy: hardwareFeatures?.privacy.hardwarePrivacy ?? null,
+		},
+		selfSovereignty: {
+			transactionSubmission: softwareFeatures?.selfSovereignty.transactionSubmission ?? null,
+			permissionsManagement: softwareFeatures?.selfSovereignty.permissionsManagement ?? null,
+			interoperability: hardwareFeatures?.selfSovereignty.interoperability ?? null,
+		},
+		transparency: {
+			...features.transparency,
+			reputation: hardwareFeatures?.transparency.reputation ?? null,
+			maintenance: hardwareFeatures?.transparency.maintenance ?? null,
+		},
+		ecosystem: softwareFeatures?.ecosystem ?? {
+			delegation: null,
+		},
+		chainConfigurability: softwareFeatures?.chainConfigurability ?? null,
+		integration: softwareFeatures?.integration ?? notApplicableWalletIntegration,
+		addressResolution: softwareFeatures?.addressResolution ?? null,
+		chainAbstraction: softwareFeatures?.chainAbstraction ?? null,
+		appConnectionSupport: hardwareFeatures?.appConnectionSupport ?? null,
+	}
+}
+
 /**
  * A set of features about a specific wallet variant.
  * All features are resolved to a single variant here.
@@ -381,6 +476,7 @@ export function resolveFeatures(
 	expectedVariants: AtLeastOneTrueVariant,
 	variant: Variant,
 ): ResolvedFeatures {
+	const completeFeatures = completeWalletFeatures(features)
 	const resolveFeat = <F>(
 		featureName: string,
 		feature: VariantFeature<F>,
@@ -400,64 +496,32 @@ export function resolveFeatures(
 	}
 	const baseFeat = <F>(
 		featureName: string,
-		featureFn: (baseFeatures: WalletBaseFeatures) => VariantFeature<F>,
+		featureFn: (baseFeatures: WalletFeatures) => VariantFeature<F>,
 	): ResolvedFeature<F> =>
-		resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
-
-	const softwareFeat = <F>(
-		featureName: string,
-		featureFn: (softwareFeatures: WalletSoftwareFeatures) => VariantFeature<F>,
-	): ResolvedFeature<F> => {
-		if (!isWalletSoftwareFeatures(features)) {
-			return null
-		}
-
-		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
-	}
-	const hardwareFeat = <F>(
-		featureName: string,
-		featureFn: (hardwareFeatures: WalletHardwareFeatures) => VariantFeature<F>,
-	): ResolvedFeature<F> => {
-		if (!isWalletHardwareFeatures(features)) {
-			return null
-		}
-
-		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
-	}
-
-	const embeddedFeat = <F>(
-		featureName: string,
-		featureFn: (embeddedFeatures: WalletEmbeddedFeatures) => VariantFeature<F>,
-	): ResolvedFeature<F> => {
-		if (!isWalletEmbeddedFeatures(features)) {
-			return null
-		}
-
-		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
-	}
+		resolveFeat<F>(featureName, featureFn(completeFeatures), expectedVariants, variant)
 
 	return {
 		variant,
 		type: variantToWalletType(variant),
-		profile: features.profile,
+		profile: completeFeatures.profile,
 		security: {
 			scamAlerts: nullable(
-				softwareFeat('security.scamAlerts', features => features.security.scamAlerts),
+				baseFeat('security.scamAlerts', features => features.security.scamAlerts),
 			),
 			publicSecurityAudits:
-				features.security.publicSecurityAudits === null
+				completeFeatures.security.publicSecurityAudits === null
 					? null
-					: features.security.publicSecurityAudits.filter(
+					: completeFeatures.security.publicSecurityAudits.filter(
 							audit =>
 								audit.variantsScope === 'ALL_VARIANTS' || audit.variantsScope[variant] === true,
 						),
 			lightClient: {
-				ethereumL1: softwareFeat(
+				ethereumL1: baseFeat(
 					'security.lightClient.ethereumL1',
 					features => features.security.lightClient.ethereumL1,
 				),
 			},
-			hardwareWalletSupport: softwareFeat(
+			hardwareWalletSupport: baseFeat(
 				'security.hardwareWalletSupport',
 				features => features.security.hardwareWalletSupport,
 			),
@@ -465,30 +529,25 @@ export function resolveFeatures(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
 			),
-			passkeyVerification:
-				embeddedFeat(
-					'security.passkeyVerification',
-					features => features.security.passkeyVerification,
-				) ??
-				softwareFeat(
-					'security.passkeyVerification',
-					features => features.security.passkeyVerification,
-				),
-			bugBountyProgram: hardwareFeat(
+			passkeyVerification: baseFeat(
+				'security.passkeyVerification',
+				features => features.security.passkeyVerification,
+			),
+			bugBountyProgram: baseFeat(
 				'bugBountyProgram',
 				features => features.security.bugBountyProgram,
 			),
-			firmware: hardwareFeat('security.firmware', features => features.security.firmware),
+			firmware: baseFeat('security.firmware', features => features.security.firmware),
 			keysHandling: baseFeat('security.keysHandling', features => features.security.keysHandling),
-			supplyChainDIY: hardwareFeat(
+			supplyChainDIY: baseFeat(
 				'security.supplyChainDIY',
 				features => features.security.supplyChainDIY,
 			),
-			supplyChainFactory: hardwareFeat(
+			supplyChainFactory: baseFeat(
 				'security.supplyChainFactory',
 				features => features.security.supplyChainFactory,
 			),
-			userSafety: hardwareFeat('security.userSafety', features => features.security.userSafety),
+			userSafety: baseFeat('security.userSafety', features => features.security.userSafety),
 			accountRecovery: baseFeat(
 				'security.accountRecovery',
 				features => features.security.accountRecovery,
@@ -511,7 +570,7 @@ export function resolveFeatures(
 				features => features.privacy.dataCollection,
 			),
 			privacyPolicy: baseFeat('privacy.privacyPolicy', features => features.privacy.privacyPolicy),
-			hardwarePrivacy: hardwareFeat(
+			hardwarePrivacy: baseFeat(
 				'privacy.hardwarePrivacy',
 				features => features.privacy.hardwarePrivacy,
 			),
@@ -520,21 +579,21 @@ export function resolveFeatures(
 				features => features.privacy.transactionPrivacy,
 			),
 			appIsolation: nullable(
-				softwareFeat('privacy.appIsolation', features => features.privacy.appIsolation),
+				baseFeat('privacy.appIsolation', features => features.privacy.appIsolation),
 			),
 		},
 		selfSovereignty: {
 			transactionSubmission: nullable(
-				softwareFeat(
+				baseFeat(
 					'selfSovereignty.transactionSubmission',
 					features => features.selfSovereignty.transactionSubmission,
 				),
 			),
-			permissionsManagement: softwareFeat(
+			permissionsManagement: baseFeat(
 				'selfSovereignty.permissionsManagement',
 				features => features.selfSovereignty.permissionsManagement,
 			),
-			interoperability: hardwareFeat(
+			interoperability: baseFeat(
 				'selfSovereignty.interoperability',
 				features => features.selfSovereignty.interoperability,
 			),
@@ -543,34 +602,29 @@ export function resolveFeatures(
 			operationFees: nullable(
 				baseFeat('transparency.operationFees', features => features.transparency.operationFees),
 			),
-			reputation: hardwareFeat(
-				'transparency.reputation',
-				features => features.transparency.reputation,
-			),
-			maintenance: hardwareFeat(
+			reputation: baseFeat('transparency.reputation', features => features.transparency.reputation),
+			maintenance: baseFeat(
 				'transparency.maintenance',
 				features => features.transparency.maintenance,
 			),
 		},
-		chainAbstraction: nullable(
-			softwareFeat('chainAbstraction', features => features.chainAbstraction),
-		),
+		chainAbstraction: nullable(baseFeat('chainAbstraction', features => features.chainAbstraction)),
 		chainConfigurability: nullable<Support<WithRef<ChainConfigurability>>>(
-			softwareFeat('chainConfigurability', features => features.chainConfigurability),
+			baseFeat('chainConfigurability', features => features.chainConfigurability),
 		),
 		accountSupport: baseFeat('accountSupport', features => features.accountSupport),
 		multiAddress: baseFeat('multiAddress', features => features.multiAddress),
 		integration: resolveWalletIntegrationFeatures(
-			isWalletSoftwareFeatures(features) ? features.integration : notApplicableWalletIntegration,
+			completeFeatures.integration,
 			expectedVariants,
 			variant,
 		),
 		addressResolution: nullable(
-			softwareFeat('addressResolution', features => features.addressResolution),
+			baseFeat('addressResolution', features => features.addressResolution),
 		),
-		licensing: resolveWalletLicense(features.licensing, expectedVariants, variant),
+		licensing: resolveWalletLicense(completeFeatures.licensing, expectedVariants, variant),
 		monetization: baseFeat('monetization', features => features.monetization),
-		appConnectionSupport: hardwareFeat(
+		appConnectionSupport: baseFeat(
 			'appConnectionSupport',
 			features => features.appConnectionSupport,
 		),

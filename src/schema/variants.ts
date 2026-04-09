@@ -1,8 +1,11 @@
 import {
+	isNonEmptyArray,
+	type NonEmptyArray,
 	nonEmptyEntries,
 	nonEmptyKeySet,
 	type NonEmptyRecord,
 	type NonEmptySet,
+	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
 
@@ -62,8 +65,12 @@ function isAtLeastOneVariant<T>(value: VariantFeature<T>): value is AtLeastOneVa
 /**
  * Returns a set of variants populated in `value`.
  */
-export function getVariants(value: AtLeastOneVariant<unknown>): NonEmptySet<Variant> {
-	return nonEmptyKeySet(value)
+export function getVariants(
+	value: AtLeastOneVariant<unknown> | NonEmptyArray<Variant>,
+): NonEmptySet<Variant> {
+	return Array.isArray(value) && isNonEmptyArray(value)
+		? nonEmptySetFromArray(value)
+		: nonEmptyKeySet(value)
 }
 
 /**

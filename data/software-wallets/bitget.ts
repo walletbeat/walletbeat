@@ -1,4 +1,3 @@
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -20,12 +19,14 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 
-export const bitget: SoftwareWallet = {
+export const bitget = {
 	metadata: {
 		id: 'bitget',
 		displayName: 'Bitget Wallet',
@@ -227,8 +228,5 @@ export const bitget: SoftwareWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.MOBILE, Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

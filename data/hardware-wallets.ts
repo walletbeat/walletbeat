@@ -1,21 +1,15 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
-import type { WalletHardwareFeatures } from '@/schema/features'
 import { allWalletLadders } from '@/schema/ladders'
-import { type AtLeastOneTrueVariant, Variant } from '@/schema/variants'
-import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
+import {
+	type BaseWallet,
+	type RatedWallet,
+	rateWallet,
+	sliceCanonicalWalletForType,
+} from '@/schema/wallet'
+import { WalletType } from '@/schema/wallet-types'
 
 import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
-import { bitboxWallet } from './hardware-wallets/bitbox'
-import { cypherockWallet } from './hardware-wallets/cypherock'
-import { fireflyWallet } from './hardware-wallets/firefly'
-import { gridplusWallet } from './hardware-wallets/gridplus'
-import { imkeyWallet } from './hardware-wallets/imkey'
-import { keycardShell } from './hardware-wallets/keycard-shell'
-import { keystoneWallet } from './hardware-wallets/keystone'
-import { ledgerWallet } from './hardware-wallets/ledger'
-import { ngrave } from './hardware-wallets/ngrave'
-import { onekeyWallet } from './hardware-wallets/onekey'
-import { trezorWallet } from './hardware-wallets/trezor'
+import { canonicalWallets } from './canonical-wallets'
 import { unratedHardwareTemplate } from './hardware-wallets/unrated.tmpl'
 
 export const hardwareWalletAttributeGroupIds = [
@@ -33,33 +27,22 @@ export const hardwareWalletAttributeTree = attributeTreeForIds(
 	hardwareWalletAttributeGroupIds,
 ) satisfies AttributeTree<HardwareAttributeGroupId>
 
-/**
- * The interface used to describe hardware wallets.
- * This should only be used for data entry and in attribute rating logic,
- * never in UI code. UI code should only deal with fully-rated wallet data.
- * See `RatedWallet` instead.
- */
-export type HardwareWallet = BaseWallet<HardwareAttributeGroupId> & {
-	features: WalletHardwareFeatures
-	variants: AtLeastOneTrueVariant & {
-		[Variant.HARDWARE]: true
-	}
-}
-
 /** Set of all known hardware wallets. */
-export const hardwareWallets = {
-	bitbox: bitboxWallet,
-	cypherock: cypherockWallet,
-	firefly: fireflyWallet,
-	gridplus: gridplusWallet,
-	imkey: imkeyWallet,
-	keycardShell: keycardShell,
-	keystone: keystoneWallet,
-	ledger: ledgerWallet,
-	ngrave: ngrave,
-	onekey: onekeyWallet,
-	trezor: trezorWallet,
-} as const satisfies Record<string, HardwareWallet>
+export const hardwareWallets = Object.entries(canonicalWallets).reduce<
+	Record<string, BaseWallet<HardwareAttributeGroupId>>
+>((acc, [name, wallet]) => {
+	const hardwareWallet = sliceCanonicalWalletForType<HardwareAttributeGroupId>(
+		wallet,
+		WalletType.HARDWARE,
+	)
+
+	return hardwareWallet === null
+		? acc
+		: {
+				...acc,
+				[name]: hardwareWallet,
+			}
+}, {})
 
 /** A valid hardware wallet name. */
 export type HardwareWalletName = keyof typeof hardwareWallets
@@ -88,7 +71,7 @@ export function mapHardwareWallets<T>(fn: (wallet: RatedWallet<string>, index: n
 export const unratedHardwareWallet = rateWallet<HardwareAttributeGroupId>(
 	hardwareWalletAttributeTree,
 	allWalletLadders,
-	unratedHardwareTemplate,
+	sliceCanonicalWalletForType(unratedHardwareTemplate, WalletType.HARDWARE)!,
 )
 
 export type HardwareModel = {
@@ -104,7 +87,7 @@ export type HardwareModel = {
 
 export const allHardwareModels = Object.values(hardwareWallets)
 	.flatMap(
-		(wallet: HardwareWallet) =>
+		wallet =>
 			wallet.metadata.hardwareWalletModels?.map(
 				(model): HardwareModel => ({
 					id: `${wallet.metadata.id}.${model.id}`,

@@ -108,6 +108,70 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 ---
 
+### Type: `WalletFeatures`
+
+```typescript
+type WalletFeatures = WalletBaseFeatures & {
+	security: WalletBaseFeatures['security'] & {
+		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
+		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
+		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
+		firmware: VariantFeature<FirmwareSupport>
+		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
+		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
+		userSafety: VariantFeature<UserSafetySupport>
+		secureElement: VariantFeature<Support<SecureElementSupport>>
+	}
+	privacy: WalletBaseFeatures['privacy'] & {
+		appIsolation: VariantFeature<Nullable<AppIsolation>>
+		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>
+	}
+	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
+		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
+		interoperability: VariantFeature<InteroperabilitySupport>
+	}
+	transparency: WalletBaseFeatures['transparency'] & {
+		reputation: VariantFeature<ReputationSupport>
+		maintenance: VariantFeature<MaintenanceSupport>
+	}
+	ecosystem: {
+		delegation: VariantFeature<DelegationHandling>
+	}
+	chainConfigurability: VariantFeature<Support<WithRef<Nullable<ChainConfigurability>>>>
+	integration: WalletIntegration
+	addressResolution: VariantFeature<Nullable<WithRef<AddressResolution>>>
+	chainAbstraction: VariantFeature<Nullable<ChainAbstraction>>
+	appConnectionSupport: VariantFeature<AppConnectionSupport>
+}
+```
+
+---
+
+### Type: `CanonicalWalletFeatures`
+
+```typescript
+type CanonicalWalletFeatures = WalletBaseFeatures & {
+	security: WalletBaseFeatures['security'] & Partial<WalletFeatures['security']>
+	privacy: WalletBaseFeatures['privacy'] & Partial<WalletFeatures['privacy']>
+	selfSovereignty: WalletBaseFeatures['selfSovereignty'] &
+		Partial<WalletFeatures['selfSovereignty']>
+	transparency: WalletBaseFeatures['transparency'] & Partial<WalletFeatures['transparency']>
+} & Partial<
+		Pick<
+			WalletFeatures,
+			| 'ecosystem'
+			| 'chainConfigurability'
+			| 'integration'
+			| 'addressResolution'
+			| 'chainAbstraction'
+			| 'appConnectionSupport'
+		>
+	>
+```
+
+---
+
 ### Type: `WalletSoftwareFeatures`
 
 A set of features for any software wallet.

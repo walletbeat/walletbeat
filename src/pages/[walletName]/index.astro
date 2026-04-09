@@ -1,12 +1,9 @@
 ---
 // Types/constants
+import { attributeGroupById } from '@/data/attribute-groups'
 import { allRatedWallets, assertValidWalletSlug } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { allWalletLadders } from '@/schema/ladders'
-import { WalletType } from '@/schema/wallet-types'
-import { softwareWalletAttributeTree } from '@/data/software-wallets'
-import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
-import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
 
 // Functions
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
@@ -26,17 +23,6 @@ assertValidWalletSlug(walletName)
 
 // Data
 const wallet = allRatedWallets[walletName]
-
-const attributeTree =
-	wallet.walletsByType[WalletType.SOFTWARE] !== undefined
-		? softwareWalletAttributeTree
-		: wallet.walletsByType[WalletType.HARDWARE] !== undefined
-			? hardwareWalletAttributeTree
-			: wallet.walletsByType[WalletType.EMBEDDED] !== undefined
-				? embeddedWalletAttributeTree
-				: (() => {
-						throw new Error('Invalid wallet type')
-					})()
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -66,6 +52,11 @@ import WalletPage from '@/views/WalletPage.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletPage {wallet} ladders={allWalletLadders} attributeTree={attributeTree} client:load />
+		<WalletPage
+			{wallet}
+			ladders={allWalletLadders}
+			attributeTree={attributeGroupById}
+			client:load
+		/>
 	</main>
 </Layout>

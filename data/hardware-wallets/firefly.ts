@@ -1,6 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	noCalldataDecoding,
@@ -9,9 +8,11 @@ import {
 import { notSupported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const fireflyWallet: HardwareWallet = {
+export const fireflyWallet = {
 	metadata: {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
@@ -98,7 +99,5 @@ export const fireflyWallet: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: {
-		[Variant.HARDWARE]: true,
-	},
-}
+	variants: [Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

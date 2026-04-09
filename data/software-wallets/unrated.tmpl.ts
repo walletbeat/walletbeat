@@ -1,12 +1,13 @@
 import { exampleContributor } from '@/data/contributors/example'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const unratedTemplate: SoftwareWallet = {
+export const unratedTemplate = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated wallet template',
@@ -118,9 +119,5 @@ export const unratedTemplate: SoftwareWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: true,
-	},
-}
+	variants: [Variant.MOBILE, Variant.BROWSER, Variant.DESKTOP] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

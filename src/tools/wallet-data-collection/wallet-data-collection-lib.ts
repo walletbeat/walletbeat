@@ -25,7 +25,7 @@ import {
 	userInfoName,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
-import { type Variant, variantEnum } from '@/schema/variants'
+import { getVariants, type Variant, variantEnum } from '@/schema/variants'
 import { WalletType, walletTypes } from '@/schema/wallet-types'
 import { getErrorMessage } from '@/types/errors'
 import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
@@ -398,7 +398,7 @@ export function getSaveOptions(opts: GlobalOptions): SaveOptions {
 	return {
 		verifyExisting: false,
 		walletId: opts.id,
-		walletVariants: allWallets[opts.id].variants,
+		walletVariants: getVariants(allWallets[opts.id].variants),
 	}
 }
 
@@ -1455,7 +1455,7 @@ export async function handleLintFix(): Promise<void> {
 					throw new Error(`invalid capture filename: "${filename}"`)
 				}
 
-				if (wallet.variants[variant] === undefined) {
+				if (getVariants(wallet.variants)[variant] === undefined) {
 					throw new Error(
 						`Variant '${variant}' found in file '${filename}' for wallet '${walletId}' is not defined in allWallets[${walletId}].variants.`,
 					)
@@ -1467,7 +1467,7 @@ export async function handleLintFix(): Promise<void> {
 				const saveOptions: SaveOptions = {
 					verifyExisting: false,
 					walletId,
-					walletVariants: wallet.variants,
+					walletVariants: getVariants(wallet.variants),
 				}
 
 				const filesChanged = await captureFile.save(saveOptions)

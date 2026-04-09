@@ -1,6 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -14,11 +13,13 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
 
-export const nufi: SoftwareWallet = {
+export const nufi = {
 	metadata: {
 		id: 'nufi',
 		displayName: 'NuFi',
@@ -210,7 +211,5 @@ export const nufi: SoftwareWallet = {
 			operationFees: null,
 		},
 	},
-	variants: {
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

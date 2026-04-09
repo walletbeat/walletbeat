@@ -1,10 +1,15 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
-import type { WalletEmbeddedFeatures } from '@/schema/features'
 import { allWalletLadders } from '@/schema/ladders'
-import { type AtLeastOneTrueVariant, Variant } from '@/schema/variants'
-import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
+import {
+	type BaseWallet,
+	type RatedWallet,
+	rateWallet,
+	sliceCanonicalWalletForType,
+} from '@/schema/wallet'
+import { WalletType } from '@/schema/wallet-types'
 
 import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
+import { canonicalWallets } from './canonical-wallets'
 import { unratedEmbeddedTemplate } from './embedded-wallets/unrated.tmpl'
 
 export const embeddedWalletAttributeGroupIds = [
@@ -22,20 +27,21 @@ export const embeddedWalletAttributeTree = attributeTreeForIds(
 	embeddedWalletAttributeGroupIds,
 ) satisfies AttributeTree<EmbeddedAttributeGroupId>
 
-/**
- * The interface used to describe embedded wallets.
- * This should only be used for data entry and in attribute rating logic,
- * never in UI code. UI code should only deal with fully-rated wallet data.
- * See `RatedWallet` instead.
- */
-export type EmbeddedWallet = BaseWallet<EmbeddedAttributeGroupId> & {
-	features: WalletEmbeddedFeatures
-	variants: AtLeastOneTrueVariant & {
-		[Variant.EMBEDDED]: true
-	}
-}
+export const embeddedWallets = Object.entries(canonicalWallets).reduce<
+	Record<string, BaseWallet<EmbeddedAttributeGroupId>>
+>((acc, [name, wallet]) => {
+	const embeddedWallet = sliceCanonicalWalletForType<EmbeddedAttributeGroupId>(
+		wallet,
+		WalletType.EMBEDDED,
+	)
 
-export const embeddedWallets: Record<string, EmbeddedWallet> = {}
+	return embeddedWallet === null
+		? acc
+		: {
+				...acc,
+				[name]: embeddedWallet,
+			}
+}, {})
 
 export const ratedEmbeddedWallets = Object.fromEntries(
 	Object.entries(embeddedWallets).map(([name, wallet]) => [
@@ -48,5 +54,5 @@ export const ratedEmbeddedWallets = Object.fromEntries(
 export const unratedEmbeddedWallet = rateWallet(
 	embeddedWalletAttributeTree,
 	allWalletLadders,
-	unratedEmbeddedTemplate,
+	sliceCanonicalWalletForType(unratedEmbeddedTemplate, WalletType.EMBEDDED)!,
 )

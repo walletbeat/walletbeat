@@ -1,5 +1,4 @@
 import { exampleContributor } from '@/data/contributors/example'
-import type { HardwareWallet } from '@/data/hardware-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -10,10 +9,12 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const unratedHardwareTemplate: HardwareWallet = {
+export const unratedHardwareTemplate = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated hardware wallet template',
@@ -122,7 +123,5 @@ export const unratedHardwareTemplate: HardwareWallet = {
 			reputation: null,
 		},
 	},
-	variants: {
-		[Variant.HARDWARE]: true,
-	},
-}
+	variants: [Variant.HARDWARE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

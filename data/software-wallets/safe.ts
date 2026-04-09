@@ -1,7 +1,6 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { ackee } from '@/data/entities/ackee'
 import { certora } from '@/data/entities/certora'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -23,9 +22,11 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // 
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const safe: SoftwareWallet = {
+export const safe = {
 	metadata: {
 		id: 'safe',
 		displayName: 'Safe',
@@ -317,8 +318,5 @@ export const safe: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.MOBILE, Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

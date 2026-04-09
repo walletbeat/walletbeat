@@ -2,7 +2,6 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -58,8 +57,10 @@ import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
@@ -195,7 +196,7 @@ const scamAlertsAndSendTxWarningRefs: WithRef<{}>['ref'] = [
 	},
 ]
 
-export const ambire: SoftwareWallet = {
+export const ambire = {
 	metadata: {
 		id: 'ambire',
 		displayName: 'Ambire',
@@ -731,7 +732,5 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.BROWSER]: true,
-	},
-}
+	variants: [Variant.BROWSER] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

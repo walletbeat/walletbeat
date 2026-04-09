@@ -1,5 +1,4 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -10,9 +9,11 @@ import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { CanonicalWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-export const gemwallet: SoftwareWallet = {
+export const gemwallet = {
 	metadata: {
 		id: 'gemwallet',
 		displayName: 'Gem Wallet',
@@ -202,7 +203,5 @@ export const gemwallet: SoftwareWallet = {
 			},
 		},
 	},
-	variants: {
-		[Variant.MOBILE]: true,
-	},
-}
+	variants: [Variant.MOBILE] satisfies NonEmptyArray<Variant>,
+} satisfies CanonicalWallet

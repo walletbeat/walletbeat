@@ -7,6 +7,7 @@ import {
 	type NonEmptyArray,
 	nonEmptyRemap,
 	type NonEmptySet,
+	nonEmptySetFromArray,
 	setItems,
 	setUnion,
 } from '@/types/utils/non-empty'
@@ -26,7 +27,12 @@ import {
 	type WalletNameStrings,
 } from './attributes'
 import type { WalletDeveloper } from './entity'
-import { type ResolvedFeatures, resolveFeatures, type WalletBaseFeatures } from './features'
+import {
+	type CanonicalWalletFeatures,
+	type ResolvedFeatures,
+	resolveFeatures,
+	type WalletBaseFeatures,
+} from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
 import type { Ladders } from './ladders'
@@ -44,7 +50,7 @@ import {
 	Variant,
 	variantEnum,
 } from './variants'
-import { mapWalletTypes, WalletType, walletTypesOf } from './wallet-types'
+import { mapWalletTypes, variantToWalletType, WalletType, walletTypesOf } from './wallet-types'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -198,7 +204,7 @@ export interface AttributeOverride {
 }
 
 /** Per-wallet overrides for attributes. */
-export interface WalletOverrides<_AttributeGroupId extends string> {
+export interface WalletOverrides<_AttributeGroupId extends string = string> {
 	attributes: Dict<{
 		[attrGroup in keyof EvaluationTree<_AttributeGroupId>]?: {
 			[_ in keyof EvaluationTree<_AttributeGroupId>[attrGroup]]?: AttributeOverride
@@ -212,7 +218,7 @@ export interface WalletOverrides<_AttributeGroupId extends string> {
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export interface BaseWallet<_AttributeGroupId extends string> {
+export interface BaseWallet<_AttributeGroupId extends string = string> {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
@@ -223,10 +229,17 @@ export interface BaseWallet<_AttributeGroupId extends string> {
 	features: WalletBaseFeatures
 
 	/** Overrides for specific attributes. */
-	overrides?: WalletOverrides<_AttributeGroupId>
+	overrides?: WalletOverrides<string>
 }
 
-export interface ResolvedWallet<_AttributeGroupId extends string> {
+export interface CanonicalWallet {
+	metadata: WalletMetadata
+	variants: NonEmptyArray<Variant>
+	features: CanonicalWalletFeatures
+	overrides?: WalletOverrides<string>
+}
+
+export interface ResolvedWallet<_AttributeGroupId extends string = string> {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
@@ -279,7 +292,7 @@ export enum VariantSpecificity {
 }
 
 /** A fully-rated wallet ready for display. */
-export interface RatedWallet<_AttributeGroupId extends string> {
+export interface RatedWallet<_AttributeGroupId extends string = string> {
 	/** Wallet metadata. */
 	metadata: WalletMetadata
 
@@ -316,7 +329,23 @@ export interface RatedWallet<_AttributeGroupId extends string> {
 	stagesByType: Record<WalletType, WalletLadderEvaluation<_AttributeGroupId> | null>
 
 	/** Overrides for specific attributes. */
-	overrides?: WalletOverrides<_AttributeGroupId>
+	overrides?: WalletOverrides<string>
+}
+
+export function sliceCanonicalWalletForType<_AttributeGroupId extends string>(
+	wallet: CanonicalWallet,
+	walletType: WalletType,
+): BaseWallet<_AttributeGroupId> | null {
+	const variants = wallet.variants.filter(variant => variantToWalletType(variant) === walletType)
+
+	return !isNonEmptyArray(variants)
+		? null
+		: {
+				metadata: wallet.metadata,
+				variants: nonEmptySetFromArray(variants),
+				features: wallet.features,
+				overrides: wallet.overrides,
+			}
 }
 
 function resolveVariant<_AttributeGroupId extends string>(
