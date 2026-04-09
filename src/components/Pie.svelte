@@ -375,6 +375,7 @@
 				--slice-scale: 1;
 				--slice-strokeColor: transparent;
 				--slice-strokeWidth: 0px;
+				--slice-offset: 0;
 
 				display: grid;
 
@@ -407,8 +408,6 @@
 				}
 
 				.slice-shape {
-					--slice-offset: 0;
-
 					--slice-labelRadius: calc(var(--pie-labelSize) / 2);
 					--slice-labelR: clamp(
 						/* Geometric mean of the inner and outer radii (with label radius carved out) */
