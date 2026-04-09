@@ -245,8 +245,8 @@
 </script>
 
 
-{#snippet sliceSnippet(slice: ComputedSlice)}
-	{#snippet slicePathSnippet(slice: ComputedSlice)}
+{#snippet Slice(slice: ComputedSlice)}
+	{#snippet SliceContent(slice: ComputedSlice)}
 		<div
 			class="slice"
 			role="button"
@@ -294,15 +294,15 @@
 			class="slice-link"
 			href={slice.href}
 		>
-			{@render slicePathSnippet(slice)}
+			{@render SliceContent(slice)}
 		</a>
 	{:else}
-		{@render slicePathSnippet(slice)}
+		{@render SliceContent(slice)}
 	{/if}
 
 	{#if slice.children?.length}
 		{#each slice.children as childSlice (childSlice.id)}
-			{@render sliceSnippet(childSlice)}
+			{@render Slice(childSlice)}
 		{/each}
 	{/if}
 {/snippet}
@@ -325,7 +325,7 @@
 	>
 		<div class="slices" data-stack>
 			{#each computedSlices as slice (slice.id)}
-				{@render sliceSnippet(slice)}
+				{@render Slice(slice)}
 			{/each}
 		</div>
 		<div class="center" data-stack>
