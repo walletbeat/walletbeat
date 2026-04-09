@@ -245,7 +245,10 @@
 	<svelte:element
 		this={slice.href ? 'a' : 'div'}
 		href={slice.href}
+
 		class="slice"
+		title={slice.titleText}
+
 		role="button"
 		tabindex="0"
 		aria-label={slice.titleText}
