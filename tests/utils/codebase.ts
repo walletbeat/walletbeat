@@ -244,7 +244,7 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 
 		const perEntryPromises = dirEntries.map(async entry => {
 			const fullPath = path.join(dir, entry.name)
-			const rootRelativePath = path.relative(root, fullPath)
+			const rootRelativePath = normalizePath(path.relative(root, fullPath))
 
 			if (shouldIgnore(rootRelativePath)) {
 				return
