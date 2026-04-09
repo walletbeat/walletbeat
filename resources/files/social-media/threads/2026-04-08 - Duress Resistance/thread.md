@@ -15,6 +15,15 @@ If you're forced to hand over access, encryption won't save you.
 
 ![Wrench attack](./XKCD.png)
 
+---
+
+These attacks are more common than you think.
+And they're getting more frequent.
+
+It's not just Ethereum. Bitcoin, crypto broadly, this happens across almost every community.
+
+Jameson Lopp has been tracking them since 2014:
+https://github.com/jlopp/physical-bitcoin-attacks
 
 ---
 
