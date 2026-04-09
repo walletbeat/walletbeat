@@ -1063,8 +1063,10 @@
 											{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
 											{@const maxStages = ladderEvaluation.ladder.stages.length}
 											{#if stageIndex >= 0}
-												<span class="pie-center-stage-label" style:--pie-center-color={stageToColor(stageIndex, maxStages)}>
-													{stage.label}
+												<span
+													class="pie-center-stage-label"
+												>
+													{stageIndex}
 												</span>
 											{:else}
 												<span>❔</span>
