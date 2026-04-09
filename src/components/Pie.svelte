@@ -276,11 +276,16 @@
 			style:--slice-innerSweep={slice.computed.innerSweep}
 			style:--slice-fill={slice.color}
 			style:--slice-opacity={slice.opacity ?? 1}
-			class:highlighted={highlightedSliceId === slice.id}
 			data-slice-id={slice.id}
+			class:highlighted={highlightedSliceId === slice.id}
 			data-stack
 		>
-			<span class="label" aria-hidden="true">{slice.arcLabel}</span>
+			<div
+				class="slice-shape"
+				data-stack
+			>
+				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
+			</div>
 		</div>
 	{/snippet}
 
@@ -351,7 +356,7 @@
 
 	.container {
 		--highlight-color: rgba(255, 255, 255, 1);
-		--highlight-stroke-width: 2;
+		--highlight-strokeWidth: 2;
 		--hover-brightness: 1.1;
 		--hover-scale: 1.05;
 
@@ -371,6 +376,9 @@
 		transition-duration: 0.4s;
 
 		.pie {
+			--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+			--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+
 			position: relative;
 			display: grid;
 			max-width: 100%;
@@ -384,114 +392,136 @@
 			}
 
 			.slice {
+				--slice-brightness: 1;
 				--slice-scale: 1;
-				--slice-offset: 0;
+				--slice-strokeColor: transparent;
+				--slice-strokeWidth: 0px;
 
-				--slice-labelRadius: calc(var(--pie-labelSize) / 2);
-				--slice-labelR: clamp(
-					/* Geometric mean of the inner and outer radii (with label radius carved out) */
-					pow(
-						(
-							(var(--slice-outerR) - var(--slice-labelRadius))
-							* (var(--slice-innerR) + var(--slice-labelRadius))
-						),
-						0.5
-					),
+				display: grid;
 
-					/* Centroid of the trimmed annular sector (with inner radius adjusted by label radius) */
-					(
-						2 / 3
-						* (
-							(
-								pow(var(--slice-outerR), 3)
-								- pow(var(--slice-innerR), 3)
-							)
-							/ (
-								pow(var(--slice-outerR), 2)
-								- pow(var(--slice-innerR), 2)
-							)
-						)
-						* (
-							sin(var(--slice-totalAngle) * 1deg / 2)
-							/ (var(--slice-totalAngle) * pi/180 / 2)
-						)
-					),
+				filter: brightness(var(--slice-brightness));
 
-					/* Outer radius minus label radius */
-					var(--slice-outerR) - var(--slice-labelRadius)
-				);
+				pointer-events: none;
+				transition-property: filter;
+				will-change: filter;
 
-				background-color: var(--slice-fill);
-				clip-path: shape(
-					from
-						calc(var(--pie-originX) + sin(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
-						calc(var(--pie-originY) - cos(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px)),
-					arc to
-						calc(var(--pie-originX) + sin(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
-						calc(var(--pie-originY) - cos(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
-						of calc(var(--slice-outerR) * 1px) var(--slice-outerSweep) var(--slice-arcSize),
-					line to
-						calc(var(--pie-originX) + sin(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
-						calc(var(--pie-originY) - cos(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px)),
-					arc to
-						calc(var(--pie-originX) + sin(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
-						calc(var(--pie-originY) - cos(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
-						of calc(var(--slice-innerR) * 1px) var(--slice-innerSweep) var(--slice-arcSize),
-					close
-				);
-
-				transform-origin: var(--pie-originX) var(--pie-originY);
-				transform:
-					rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
-					scale(var(--slice-scale))
-					translateY(calc(var(--slice-offset) * -1px))
-				;
-				opacity: var(--slice-opacity);
-
-				will-change: transform;
-				transition-property:
-					clip-path,
-					transform,
-					opacity
-				;
-
-				&:hover,
-				&:focus-within {
-					filter: brightness(var(--hover-brightness));
-					--slice-scale: var(--hover-scale);
-					opacity: 1;
+				> * {
+					pointer-events: auto;
 				}
 
+				:is([data-stack] > &) > * {
+					grid-area: inherit;
+				}
+
+				&:hover,
 				&:focus-within,
 				&.highlighted {
-					z-index: 2;
-					opacity: 1;
+					--slice-brightness: var(--hover-brightness);
+					--slice-scale: var(--hover-scale);
+					--slice-strokeColor: var(--highlight-color);
+					--slice-strokeWidth: var(--highlight-strokeWidth);
 				}
 
 				&:focus-within {
 					outline: none;
 				}
 
-				> .label {
-					position: absolute;
-					left: var(--pie-originX);
-					top: var(--pie-originY);
-					display: inline-block;
-					white-space: nowrap;
-					text-align: center;
-					line-height: 1;
-					color: currentColor;
-					font-size: calc(var(--pie-labelSize) * 1px);
-					translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
-					rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
-					transition-property: translate, rotate, filter;
-				}
-				&:not(:hover, :focus) > .label {
-					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
+				.slice-shape {
+					--slice-offset: 0;
+
+					--slice-labelRadius: calc(var(--pie-labelSize) / 2);
+					--slice-labelR: clamp(
+						/* Geometric mean of the inner and outer radii (with label radius carved out) */
+						pow(
+							(
+								(var(--slice-outerR) - var(--slice-labelRadius))
+								* (var(--slice-innerR) + var(--slice-labelRadius))
+							),
+							0.5
+						),
+
+						/* Centroid of the trimmed annular sector (with inner radius adjusted by label radius) */
+						(
+							2 / 3
+							* (
+								(
+									pow(var(--slice-outerR), 3)
+									- pow(var(--slice-innerR), 3)
+								)
+								/ (
+									pow(var(--slice-outerR), 2)
+									- pow(var(--slice-innerR), 2)
+								)
+							)
+							* (
+								sin(var(--slice-totalAngle) * 1deg / 2)
+								/ (var(--slice-totalAngle) * pi/180 / 2)
+							)
+						),
+
+						/* Outer radius minus label radius */
+						var(--slice-outerR) - var(--slice-labelRadius)
+					);
+
+					background-color: var(--slice-fill);
+					clip-path: shape(
+						from
+							calc(var(--pie-originX) + sin(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
+							calc(var(--pie-originY) - cos(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px)),
+						arc to
+							calc(var(--pie-originX) + sin(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
+							calc(var(--pie-originY) - cos(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
+							of calc(var(--slice-outerR) * 1px) var(--slice-outerSweep) var(--slice-arcSize),
+						line to
+							calc(var(--pie-originX) + sin(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
+							calc(var(--pie-originY) - cos(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px)),
+						arc to
+							calc(var(--pie-originX) + sin(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
+							calc(var(--pie-originY) - cos(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
+							of calc(var(--slice-innerR) * 1px) var(--slice-innerSweep) var(--slice-arcSize),
+						close
+					);
+
+					transform-origin: var(--pie-originX) var(--pie-originY);
+					transform:
+						rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
+						scale(var(--slice-scale))
+						translateY(calc(var(--slice-offset) * -1px))
+					;
+					opacity: var(--slice-opacity);
+
+					will-change: transform;
+					transition-property:
+						clip-path,
+						transform,
+						opacity
+					;
+
+					&:hover,
+					&:focus-within,
+					.slice.highlighted & {
+						opacity: 1;
+					}
+
+					> .label {
+						position: absolute;
+						left: var(--pie-originX);
+						top: var(--pie-originY);
+						display: inline-block;
+						white-space: nowrap;
+						text-align: center;
+						line-height: 1;
+						color: currentColor;
+						font-size: calc(var(--pie-labelSize) * 1px);
+						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
+						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
+						transition-property: translate, rotate, filter;
+					}
 				}
 
-				--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-				--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+				&:not(:hover, :focus-within) > .slice-shape > .label {
+					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
+				}
 			}
 
 			> .center {
