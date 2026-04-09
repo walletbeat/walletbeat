@@ -186,6 +186,14 @@ a {
 			text-decoration: none;
 		}
 	}
+
+	&[data-link='contents'] {
+		display: contents;
+
+		> * {
+			grid-area: inherit;
+		}
+	}
 }
 
 hr {

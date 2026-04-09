@@ -278,11 +278,9 @@
 			style:--slice-opacity={slice.opacity ?? 1}
 			data-slice-id={slice.id}
 			class:highlighted={highlightedSliceId === slice.id}
-			data-stack
 		>
 			<div
 				class="slice-shape"
-				data-stack
 			>
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			</div>
@@ -293,6 +291,7 @@
 		<a
 			class="slice-link"
 			href={slice.href}
+			data-link="contents"
 		>
 			{@render SliceContent(slice)}
 		</a>
@@ -383,14 +382,6 @@
 			display: grid;
 			max-width: 100%;
 
-			.slice-link {
-				display: contents;
-
-				:is([data-stack] > &) > * {
-					grid-area: inherit;
-				}
-			}
-
 			.slice {
 				--slice-brightness: 1;
 				--slice-scale: 1;
@@ -403,10 +394,6 @@
 
 				> * {
 					pointer-events: auto;
-				}
-
-				:is([data-stack] > &) > * {
-					grid-area: inherit;
 				}
 
 				&:hover,
