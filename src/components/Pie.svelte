@@ -309,7 +309,7 @@
 
 <div
 	{...restProps}
-	class="container {'class' in restProps ? restProps.class : ''}"
+	class="pie-container {'class' in restProps ? restProps.class : ''}"
 	data-layout={layout}
 	style:--pie-radius={radius}
 	style:--pie-padding={padding}
@@ -354,7 +354,7 @@
 		initial-value: 0;
 	}
 
-	.container {
+	.pie-container {
 		--highlight-color: rgba(255, 255, 255, 1);
 		--highlight-strokeWidth: 1.5px;
 		--hover-brightness: 1.1;

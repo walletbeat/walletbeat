@@ -1655,7 +1655,7 @@
 				}
 			}
 
-			> :global(*) {
+			> :global(.pie-container) {
 				transition-property: translate, scale, opacity;
 				transition-duration: 0.5s;
 				translate: var(--translate);
