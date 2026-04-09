@@ -19,6 +19,86 @@ type CssCommentedBlock = {
 	comment: string
 	selectorHeader: string
 	body: string
+	/** When true, `docMarkdown` is appended to any existing entry (subsection inside a larger rule). */
+	nested?: boolean
+}
+
+const joinDocMarkdown = (previous: string | undefined, next: string): string => {
+	const p = previous?.trim() ?? ''
+	const n = next.trim()
+
+	if (p.length === 0) {
+		return n
+	}
+
+	if (n.length === 0) {
+		return p
+	}
+
+	return `${p}\n\n---\n\n${n}`
+}
+
+// Parses documentation comments that sit immediately before a nested selector block inside `{ … }`.
+const findNestedCommentedBlocksInBody = (body: string): CssCommentedBlock[] => {
+	const out: CssCommentedBlock[] = []
+	let i = 0
+
+	while (i < body.length) {
+		const commentStart = body.indexOf('/**', i)
+
+		if (commentStart === -1) {
+			break
+		}
+
+		const commentEnd = body.indexOf('*/', commentStart + 3)
+
+		if (commentEnd === -1) {
+			break
+		}
+
+		const comment = body.slice(commentStart, commentEnd + 2)
+		let pos = commentEnd + 2
+
+		while (pos < body.length && /\s/.test(body[pos])) {
+			pos += 1
+		}
+
+		const braceStart = body.indexOf('{', pos)
+
+		if (braceStart === -1) {
+			break
+		}
+
+		const selectorHeader = body.slice(pos, braceStart).trim()
+		let depth = 0
+		let cursor = braceStart
+		let braceEnd = -1
+
+		for (; cursor < body.length; cursor += 1) {
+			if (body[cursor] === '{') {
+				depth += 1
+			} else if (body[cursor] === '}') {
+				depth -= 1
+
+				if (depth === 0) {
+					braceEnd = cursor
+					break
+				}
+			}
+		}
+
+		if (braceEnd === -1) {
+			break
+		}
+
+		const nestedBody = body.slice(braceStart + 1, braceEnd)
+
+		out.push({ comment, selectorHeader, body: nestedBody, nested: true })
+		out.push(...findNestedCommentedBlocksInBody(nestedBody))
+		i = braceEnd + 1
+	}
+
+	return out
 }
 
 const parseCommentBlock = (rawComment: string): CssAttributeDoc => {
@@ -131,11 +211,14 @@ const findCommentedBlocks = (css: string): CssCommentedBlock[] => {
 			break
 		}
 
+		const innerBody = css.slice(braceStart + 1, braceEnd)
+
 		blocks.push({
 			comment,
 			selectorHeader,
-			body: css.slice(braceStart + 1, braceEnd),
+			body: innerBody,
 		})
+		blocks.push(...findNestedCommentedBlocksInBody(innerBody))
 
 		index = braceEnd + 1
 	}
@@ -226,23 +309,33 @@ export const parseCssAttributes = (css: string): Map<string, CssAttributeEntry> 
 				...existing.doc,
 				...doc,
 			}
-			existing.docMarkdown = docMarkdown
+			existing.docMarkdown =
+				block.nested === true ? joinDocMarkdown(existing.docMarkdown, docMarkdown) : docMarkdown
 			existing.sourceSelector = `[${name}]`
 		}
 
 		for (const name of nestedAttributeNames) {
-			if (entries.has(name)) {
+			const existingNested = entries.get(name)
+
+			if (existingNested === undefined) {
+				entries.set(name, {
+					name,
+					doc: { ...doc },
+					docMarkdown,
+					values: new Set<string>(),
+					cssVariables: new Set<string>(),
+					sourceSelector: `[${name}]`,
+				})
 				continue
 			}
 
-			entries.set(name, {
-				name,
-				doc: { ...doc },
-				docMarkdown,
-				values: new Set<string>(),
-				cssVariables: new Set<string>(),
-				sourceSelector: `[${name}]`,
-			})
+			if (block.nested === true) {
+				existingNested.doc = {
+					...existingNested.doc,
+					...doc,
+				}
+				existingNested.docMarkdown = joinDocMarkdown(existingNested.docMarkdown, docMarkdown)
+			}
 		}
 
 		for (const tokenMatch of blockText.matchAll(/\[(data-[a-z0-9-]+)[~]?='([^']+)'\]/g)) {
