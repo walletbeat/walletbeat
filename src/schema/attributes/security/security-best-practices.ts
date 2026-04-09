@@ -28,12 +28,20 @@ import {
 	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
 import { isSupported } from '@/schema/features/support'
-import { type AtLeastOneVariant } from '@/schema/variants'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
-import { isNonEmptyArray } from '@/types/utils/non-empty'
+import {
+	ContentType,
+	isTypographicContent,
+	markdown,
+	mdParagraph,
+	mdSentence,
+	paragraph,
+	sentence,
+} from '@/types/content'
+import { isNonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -823,8 +831,50 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityBestPracticesValue>>) =>
-		pickWorstRating<SecurityBestPracticesValue>(perVariant),
+	aggregate: (
+		perVariant: AtLeastOneVariant<Evaluation<SecurityBestPracticesValue>>,
+	): Evaluation<SecurityBestPracticesValue> => {
+		const worst = pickWorstRating<SecurityBestPracticesValue>(perVariant)
+		const entries = nonEmptyEntries<Variant, Evaluation<SecurityBestPracticesValue>>(perVariant)
+
+		if (entries.length === 1) {
+			return worst
+		}
+
+		const variantLabel = (variant: Variant): string => {
+			switch (variant) {
+				case Variant.BROWSER:
+					return 'Browser extension'
+				case Variant.MOBILE:
+					return 'Mobile app'
+				case Variant.DESKTOP:
+					return 'Desktop app'
+				default:
+					return variant
+			}
+		}
+
+		const combinedDetails = entries
+			.map(([variant, evaluation]) => {
+				if (!isTypographicContent(evaluation.details)) {
+					return null
+				}
+
+				const text =
+					evaluation.details.contentType === ContentType.TEXT
+						? evaluation.details.text
+						: evaluation.details.markdown
+
+				return `**${variantLabel(variant as Variant)}:** ${text}`
+			})
+			.filter(line => line !== null)
+			.join('\n\n')
+
+		return {
+			...worst,
+			details: markdown(combinedDetails),
+		}
+	},
 	exempted: (
 		ctx: EvaluationContext<SecurityBestPracticesValue>,
 		_metadata: WalletMetadata,
@@ -854,7 +904,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 
 		const subEvaluations: Array<Evaluation<SecurityBestPracticesValue>> = []
 
-		if (feature.browser !== 'NOT_A_BROWSER_EXTENSION') {
+		if (ctx.features.variant === Variant.BROWSER && feature.browser !== 'NOT_A_BROWSER_EXTENSION') {
 			const browser = ctx.popRefs<BrowserSecurityBestPractices>(feature.browser)
 
 			subEvaluations.push(
@@ -867,7 +917,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			)
 		}
 
-		if (feature.mobile !== 'NOT_A_MOBILE_APP') {
+		if (ctx.features.variant === Variant.MOBILE && feature.mobile !== 'NOT_A_MOBILE_APP') {
 			const mobile = ctx.popRefs<MobileSecurityBestPractices>(feature.mobile)
 
 			subEvaluations.push(
@@ -877,7 +927,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			)
 		}
 
-		if (feature.desktop !== 'NOT_A_DESKTOP_APP') {
+		if (ctx.features.variant === Variant.DESKTOP && feature.desktop !== 'NOT_A_DESKTOP_APP') {
 			const desktop = ctx.popRefs<SecurityBestPracticesBase>(feature.desktop)
 
 			subEvaluations.push(
