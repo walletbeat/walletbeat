@@ -67,7 +67,7 @@
 		"notifications"
 	],
 	"short_name": "__MSG_appShortName__",
-	"version": "1.6.3",
+	"version": "1.6.4",
 	"web_accessible_resources": [
 		{
 			"matches": ["<all_urls>"],

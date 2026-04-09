@@ -1,7 +1,7 @@
 {
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"manifest_version": 3,
-	"version": "2.19.18",
+	"version": "2.19.19",
 	"name": "__MSG_appName__",
 	"short_name": "Bitget Wallet",
 	"description": "__MSG_appDescription__",

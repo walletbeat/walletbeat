@@ -3,7 +3,7 @@
 	"name": "Ambire Web3 Wallet",
 	"short_name": "Ambire",
 	"author": "https://www.ambire.com",
-	"version": "6.1.5",
+	"version": "6.2.5",
 	"manifest_version": 3,
 	"permissions": [
 		"storage",

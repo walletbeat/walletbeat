@@ -1,9 +1,6 @@
 {
 	"contentScripts": "NONE",
-	"externallyConnectable": {
-		"extensionIds": "ANY",
-		"pageMatches": "NONE"
-	},
+	"externallyConnectable": { "extensionIds": "ANY", "pageMatches": "NONE" },
 	"hostPermissions": "UNRESTRICTED",
 	"permissions": [
 		"storage",

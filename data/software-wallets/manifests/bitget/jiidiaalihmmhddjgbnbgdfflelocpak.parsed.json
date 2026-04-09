@@ -1,9 +1,6 @@
 {
 	"contentScripts": "HTTP_AND_HTTPS",
-	"externallyConnectable": {
-		"extensionIds": "ANY",
-		"pageMatches": "HTTPS_ONLY"
-	},
+	"externallyConnectable": { "extensionIds": "ANY", "pageMatches": "HTTPS_ONLY" },
 	"hostPermissions": "HTTP_AND_HTTPS",
 	"permissions": [
 		"storage",
