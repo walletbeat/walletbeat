@@ -1050,42 +1050,36 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<image
-											href={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+										<img
+											src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
 											width="40"
 											height="40"
-											x="-20"
-											y="-20"
+											alt=""
 										/>
 									{:else if summaryVisualization === SummaryVisualization.Stage}
 										{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
 											{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
 											{@const maxStages = ladderEvaluation.ladder.stages.length}
 											{#if stageIndex >= 0}
-												<text fill={stageToColor(stageIndex, maxStages)}>
+												<span class="pie-center-stage-label" style:--pie-center-color={stageToColor(stageIndex, maxStages)}>
 													{stage.label}
-												</text>
+												</span>
 											{:else}
-												<text>❔</text>
+												<span>❔</span>
 											{/if}
 										{:else}
-											<text>❔</text>
+											<span>❔</span>
 										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
-										<text>
+										<span>
 											{formatScore(score)}
-										</text>
+										</span>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
-										<circle
-											r="4"
-											fill={scoreToColor(score === null ? null : score.score)}
-										>
-											{#if score !== null && score.hasUnratedComponent}
-												<title>
-													*contains unrated components
-												</title>
-											{/if}
-										</circle>
+										<span
+											class="pie-center-dot"
+											style:--pie-center-color={scoreToColor(score === null ? null : score.score)}
+											title={score !== null && score.hasUnratedComponent ? '*contains unrated components' : undefined}
+										></span>
 									{/if}
 								{/snippet}
 							</Pie>
@@ -1282,28 +1276,19 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<text
-											font-size="24"
-											text-anchor="middle"
-											dominant-baseline="central"
-										>
+										<span class="pie-center-icon">
 											{attrGroup.icon}
-										</text>
+										</span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
-										<text>
+										<span>
 											{formatScore(groupScore)}
-										</text>
+										</span>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
-										<circle
-											r="4"
-											fill={scoreToColor(groupScore === null ? null : groupScore.score)}
-										>
-											{#if groupScore !== null && groupScore.hasUnratedComponent}
-												<title>
-													*contains unrated components
-												</title>
-											{/if}
-										</circle>
+										<span
+											class="pie-center-dot"
+											style:--pie-center-color={scoreToColor(groupScore === null ? null : groupScore.score)}
+											title={groupScore !== null && groupScore.hasUnratedComponent ? '*contains unrated components' : undefined}
+										></span>
 									{/if}
 								{/snippet}
 							</Pie>
@@ -1583,6 +1568,23 @@
 
 	.eip-tooltip-content {
 		width: 34rem;
+	}
+
+	.pie-center-stage-label {
+		color: var(--pie-center-color);
+	}
+
+	.pie-center-dot {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background-color: var(--pie-center-color);
+	}
+
+	.pie-center-icon {
+		font-size: 24px;
+		line-height: 1;
 	}
 
 	button:has([data-badge]) {
