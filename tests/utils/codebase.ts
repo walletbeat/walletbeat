@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 
@@ -117,6 +118,31 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 
 export function normalizePath(p: string): string {
 	return path.normalize(p).replaceAll(path.sep, '/')
+}
+
+/**
+ * On Windows, git represents symlinks as regular text files containing
+ * the symlink target path (when core.symlinks=false). This function returns
+ * the set of normalized paths that are stored as symlinks (mode 120000) in git,
+ * so they can be reclassified correctly on Windows.
+ */
+function getGitSymlinkPaths(root: string): Set<string> {
+	try {
+		const output = execSync('git ls-files -s', { cwd: root, encoding: 'utf8' })
+		const symlinks = new Set<string>()
+
+		for (const line of output.split('\n')) {
+			const match = /^120000 \S+ \d+\t(.+)$/.exec(line)
+
+			if (match) {
+				symlinks.add(normalizePath(match[1]))
+			}
+		}
+
+		return symlinks
+	} catch {
+		return new Set()
+	}
 }
 
 export type IndexedFileData = object
@@ -239,6 +265,10 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 
 	const root = options.root ?? getRepositoryRoot()
 
+	// On Windows, git represents symlinks as regular stub files when core.symlinks=false.
+	// Pre-load the set of git symlinks so we can reclassify them correctly.
+	const gitSymlinks = process.platform === 'win32' ? getGitSymlinkPaths(root) : new Set<string>()
+
 	const crawl = async (dir: string): Promise<void> => {
 		const dirEntries = await concurrencyLimit(() => fs.readdir(dir, { withFileTypes: true }))
 
@@ -273,10 +303,43 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 					entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
 				}
 			} else if (entry.isFile()) {
-				const raw = await concurrencyLimit(() => fs.readFile(fullPath))
-				const contents = raw.toString('utf8')
+				// On Windows, git symlinks are stored as stub text files containing
+				// the target path. Reclassify them as SYMLINK entries so they are
+				// treated consistently with real symlinks on Unix.
+				if (gitSymlinks.has(rootRelativePath)) {
+					const stubContent = (await concurrencyLimit(() => fs.readFile(fullPath, 'utf8'))).trim()
 
-				entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
+					// A valid symlink stub is a single-line relative path.
+					// If the content has newlines, the stub was replaced with real file content.
+					if (!stubContent.includes('\n')) {
+						const rawTarget = stubContent
+						const selfRelativeTarget = path.join(path.dirname(rootRelativePath), rawTarget)
+						const rootRelativeTarget = path.relative(root, selfRelativeTarget)
+						const absoluteTarget = normalizePath(path.resolve(root, rootRelativeTarget))
+
+						entryData = {
+							type: CodebaseEntryType.SYMLINK,
+							path: rootRelativePath,
+							rawTarget,
+							selfRelativeTarget,
+							rootRelativeTarget,
+							absoluteTarget,
+						}
+					} else {
+						const raw = await concurrencyLimit(() => fs.readFile(fullPath))
+						const contents = raw.toString('utf8').replaceAll('\r\n', '\n')
+
+						entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
+					}
+				} else {
+					const raw = await concurrencyLimit(() => fs.readFile(fullPath))
+
+					// Normalize CRLF → LF in contents so line-ending checks reflect
+					// what is stored in git, not what git's autocrlf added on checkout.
+					const contents = raw.toString('utf8').replaceAll('\r\n', '\n')
+
+					entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
+				}
 			} else {
 				entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
 			}
