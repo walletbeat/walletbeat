@@ -1,6 +1,9 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { ren2140 } from '@/data/contributors/ren2140'
 import { WalletProfile } from '@/schema/features/profile'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { notSupported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -15,9 +18,9 @@ export const uniswapWallet: SoftwareWallet = {
 			The self-custody wallet for swapping, sending, bridging,
 			and exploring apps across 16+ networks.
 		`),
-		contributors: [ren2140],
+		contributors: [ren2140, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2026-04-02',
+		lastUpdated: '2026-04-11',
 		urls: {
 			docs: ['https://docs.uniswap.org/'],
 			extensions: [
@@ -87,7 +90,18 @@ export const uniswapWallet: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: true,
+						[BasicUnlockMechanism.PASSWORD]: false,
+						[BasicUnlockMechanism.BIOMETRIC]: false,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
