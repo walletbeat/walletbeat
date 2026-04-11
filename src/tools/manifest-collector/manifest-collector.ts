@@ -1,16 +1,17 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
-import * as prettier from 'prettier'
-
 import { allWallets, assertValidWalletName, type WalletName } from '@/data/wallets'
 import { getExtensionId } from '@/schema/extension-url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
-import { parseBrowserExtensionManifest } from './browser-ext-manifest-parser'
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
-import { checkParsedManifests } from './manifest-checker'
-import { parseAndroidManifest, parseIosPlist } from './mobile-manifest-parser'
+import {
+	checkParsedManifests,
+	computeAndroidParsed,
+	computeBrowserExtParsed,
+	computeIosParsed,
+} from './manifest-collector-lib'
 
 const REPO_ROOT = getRepositoryRoot()
 
@@ -166,14 +167,9 @@ for (const { id, extensionIds, androidManifestXml, iosInfoPlist } of targets) {
 		fs.writeFileSync(outPath, JSON.stringify(rawManifest, null, '\t') + '\n')
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
-		const parsed = parseBrowserExtensionManifest(rawManifest)
 		const parsedPath = path.join(manifestDir, `${extensionId}.parsed.json`)
-		const parsedConfig = (await prettier.resolveConfig(parsedPath)) ?? {}
 
-		fs.writeFileSync(
-			parsedPath,
-			await prettier.format(JSON.stringify(parsed), { ...parsedConfig, parser: 'json' }),
-		)
+		fs.writeFileSync(parsedPath, await computeBrowserExtParsed(rawManifest, parsedPath))
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, parsedPath)}\n`)
 	}
 
@@ -186,17 +182,9 @@ for (const { id, extensionIds, androidManifestXml, iosInfoPlist } of targets) {
 		fs.writeFileSync(outPath, xmlText)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
-		const permissions = parseAndroidManifest(xmlText)
 		const androidParsedPath = path.join(manifestDir, 'android.parsed.json')
-		const androidParsedConfig = (await prettier.resolveConfig(androidParsedPath)) ?? {}
 
-		fs.writeFileSync(
-			androidParsedPath,
-			await prettier.format(JSON.stringify({ usesPermissions: [...permissions] }), {
-				...androidParsedConfig,
-				parser: 'json',
-			}),
-		)
+		fs.writeFileSync(androidParsedPath, await computeAndroidParsed(xmlText, androidParsedPath))
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, androidParsedPath)}\n`)
 	}
 
@@ -209,17 +197,9 @@ for (const { id, extensionIds, androidManifestXml, iosInfoPlist } of targets) {
 		fs.writeFileSync(outPath, plistText)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
-		const usageDescriptions = parseIosPlist(plistText)
 		const iosParsedPath = path.join(manifestDir, 'ios.parsed.json')
-		const iosParsedConfig = (await prettier.resolveConfig(iosParsedPath)) ?? {}
 
-		fs.writeFileSync(
-			iosParsedPath,
-			await prettier.format(JSON.stringify({ usageDescriptions: [...usageDescriptions] }), {
-				...iosParsedConfig,
-				parser: 'json',
-			}),
-		)
+		fs.writeFileSync(iosParsedPath, await computeIosParsed(plistText, iosParsedPath))
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, iosParsedPath)}\n`)
 	}
 }
