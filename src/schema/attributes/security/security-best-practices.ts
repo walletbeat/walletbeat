@@ -578,8 +578,8 @@ function getUnnecessaryPermissionLists(manifest: MobileAppManifest): {
 			: manifest.ios.usageDescriptions.filter(p => iosPermissionRatings[p] === Rating.FAIL)
 
 	return {
-		androidList: badAndroid.map(p => p.replace('android.permission.', '')).join(', '),
-		iosList: badIos.join(', '),
+		androidList: badAndroid.map(p => `\`${p.replace('android.permission.', '')}\``).join(', '),
+		iosList: badIos.map(p => `\`${p}\``).join(', '),
 	}
 }
 
@@ -613,7 +613,7 @@ function evaluateMobileApp(
 				'{{WALLET_NAME}} requests high-risk OS permissions that are not necessary for a wallet.',
 			),
 		},
-		details: paragraph(
+		details: mdParagraph(
 			`{{WALLET_NAME}}'s mobile app declares high-risk OS permissions not required for wallet functionality, increasing the attack surface.${androidList.length > 0 ? ` Unnecessary Android permissions: ${androidList}.` : ''}${iosList.length > 0 ? ` Unnecessary iOS permissions: ${iosList}.` : ''}`,
 		),
 		howToImprove: mdParagraph(
