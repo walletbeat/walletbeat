@@ -5,7 +5,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
@@ -19,35 +18,38 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SecurityAuditsValue = Value & {
+export type SecurityAuditsMetadata = {
 	securityAudits: SecurityAudit[]
 }
 
-function noAudits(ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<SecurityAuditsValue> {
-	return ctx.build({
-		value: {
+const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'no_audits',
 			rating: Rating.FAIL,
 			displayName: 'No security audits',
 			shortExplanation: sentence('{{WALLET_NAME}} has not undergone security auditing.'),
-			securityAudits: [],
+			metadata: {
+				securityAudits: [],
+			},
 		},
 		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
 	})
-}
 
 function audited(
-	ctx: EvaluationContext<SecurityAuditsValue>,
+	ctx: EvaluationContext<SecurityAuditsMetadata>,
 	audits: NonEmptyArray<SecurityAudit>,
 	auditedInLastYear: boolean,
 	hasUnaddressedFlaws: boolean,
-): Evaluation<SecurityAuditsValue> {
+): Evaluation<SecurityAuditsMetadata> {
 	ctx.addRef(...audits)
 
 	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
-		SecurityAuditsValue,
+		Evaluation<SecurityAuditsMetadata>['outcome'],
 		'rating' | 'displayName' | 'shortExplanation'
-	> & { howToImprove: Evaluation<SecurityAuditsValue>['howToImprove'] } => {
+	> & {
+		howToImprove: Evaluation<SecurityAuditsMetadata>['howToImprove']
+	} => {
 		if (!auditedInLastYear && hasUnaddressedFlaws) {
 			return {
 				rating: Rating.FAIL,
@@ -96,12 +98,14 @@ function audited(
 	})()
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
 			rating,
 			displayName,
 			shortExplanation,
-			securityAudits: audits,
+			metadata: {
+				securityAudits: audits,
+			},
 		},
 		details: securityAuditsDetailsContent({
 			auditedInLastYear,
@@ -119,7 +123,7 @@ const sampleSecurityAudit: SecurityAudit = {
 	variantsScope: 'ALL_VARIANTS',
 }
 
-export const securityAudits: Attribute<SecurityAuditsValue> = {
+export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 	id: 'securityAudits',
 	icon: '\u{1f50f}', // Locked with Pen
 	displayName: 'Security audits',
@@ -216,7 +220,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<SecurityAuditsValue> => {
+	evaluate: (
+		ctx: EvaluationContext<SecurityAuditsMetadata>,
+	): Evaluation<SecurityAuditsMetadata> => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.VERIFIABLE,
@@ -257,17 +263,17 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 
 		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsValue>>) => {
-		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant)
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsMetadata>>) => {
+		const worstEvaluation = pickWorstRating<SecurityAuditsMetadata>(perVariant)
 		const allAudits: SecurityAudit[] = []
 		const auditsIdSet = new Set<string>()
 
 		for (const evaluation of Object.values(perVariant)) {
-			if (!evaluation) {
+			if (!evaluation?.outcome.metadata?.securityAudits) {
 				continue
 			}
 
-			for (const audit of evaluation.value.securityAudits) {
+			for (const audit of evaluation.outcome.metadata.securityAudits) {
 				const auditId = securityAuditId(audit)
 
 				if (!auditsIdSet.has(auditId)) {
@@ -276,7 +282,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 				}
 			}
 		}
-		worstEvaluation.value.securityAudits = allAudits
+		worstEvaluation.outcome.metadata = {
+			securityAudits: allAudits,
+		}
 
 		return worstEvaluation
 	},

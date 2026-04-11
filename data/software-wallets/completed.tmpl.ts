@@ -38,6 +38,7 @@ import {
 } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
+import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -180,7 +181,7 @@ const recentAudit: SecurityAudit = {
 		date: '2025-12-01',
 	},
 	unpatchedFlaws: 'NONE_FOUND',
-	variantsScope: { [Variant.BROWSER]: true },
+	variantsScope: { [Variant.BROWSER]: true, [Variant.MOBILE]: true },
 }
 
 export const completedTemplate: SoftwareWallet = {
@@ -358,21 +359,17 @@ export const completedTemplate: SoftwareWallet = {
 				usage: notSupported,
 			},
 			appIsolation: {
-				[Variant.BROWSER]: {
-					createInAppConnectionFlow: supported({
-						ref: refTodo,
-					}),
-					erc7846WalletConnect: notSupported,
-					ethAccounts: supported({
-						ref: refTodo,
-						defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
-					}),
-					useAppSpecificLastConnectedAddresses: supported({
-						ref: refTodo,
-					}),
-				},
-				[Variant.MOBILE]: null,
-				[Variant.DESKTOP]: null,
+				createInAppConnectionFlow: supported({
+					ref: refTodo,
+				}),
+				erc7846WalletConnect: notSupported,
+				ethAccounts: supported({
+					ref: refTodo,
+					defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+				}),
+				useAppSpecificLastConnectedAddresses: supported({
+					ref: refTodo,
+				}),
 			},
 			dataCollection: {
 				[UserFlow.INSTALL]: {
@@ -534,6 +531,26 @@ export const completedTemplate: SoftwareWallet = {
 				}),
 			},
 			bugBountyProgram: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: true,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: supported({
+					ref: refTodo,
+					actions: {
+						[DuressAction.DECOY_WALLET]: true,
+						[DuressAction.ONCHAIN_LOCKDOWN]: true,
+						[DuressAction.SELF_DESTRUCT]: false,
+						[DuressAction.WIPE_AND_FORWARD]: false,
+					},
+				}),
+			},
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
@@ -703,5 +720,6 @@ export const completedTemplate: SoftwareWallet = {
 	},
 	variants: {
 		[Variant.BROWSER]: true,
+		[Variant.MOBILE]: true,
 	},
 }

@@ -99,6 +99,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {

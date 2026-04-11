@@ -147,6 +147,7 @@ export const trezorWallet: HardwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {

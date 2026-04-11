@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -23,21 +22,23 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwareWalletSupportValue = Value & {
+export type HardwareWalletSupportMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
 function noHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletSupportValue>,
+	ctx: EvaluationContext<HardwareWalletSupportMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletSupportValue> {
+): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_hardware_wallet_support',
 			rating: Rating.FAIL,
 			displayName: 'No hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} does not support hardware wallets.'),
-			hardwareWalletSupport,
+			metadata: {
+				hardwareWalletSupport,
+			},
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} does not support hardware wallets.
@@ -52,18 +53,18 @@ function noHardwareWalletSupport(
 }
 
 function indirectHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletSupportValue>,
+	ctx: EvaluationContext<HardwareWalletSupportMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletSupportValue> {
+): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'indirect_hardware_wallet_support',
 			rating: Rating.PARTIAL,
 			displayName: 'Indirect hardware wallet support',
 			shortExplanation: sentence(`
 				Using a hardware wallet with {{WALLET_NAME}} requires additional software.
 			`),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
@@ -84,16 +85,16 @@ function indirectHardwareWalletSupport(
 }
 
 function directHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletSupportValue>,
+	ctx: EvaluationContext<HardwareWalletSupportMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletSupportValue> {
+): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'direct_hardware_wallet_support',
 			rating: Rating.PASS,
 			displayName: 'Supports hardware wallets',
 			shortExplanation: sentence('{{WALLET_NAME}} supports hardware wallets.'),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}`,
@@ -101,7 +102,7 @@ function directHardwareWalletSupport(
 	})
 }
 
-export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
+export const hardwareWalletSupport: Attribute<HardwareWalletSupportMetadata> = {
 	id: 'hardwareWalletSupport',
 	icon: '\u{1F5DD}', // Key emoji
 	displayName: 'Hardware wallet support',
@@ -191,8 +192,8 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<HardwareWalletSupportValue>,
-	): Evaluation<HardwareWalletSupportValue> => {
+		ctx: EvaluationContext<HardwareWalletSupportMetadata>,
+	): Evaluation<HardwareWalletSupportMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivial self-test.
 
 		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
@@ -252,5 +253,5 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 
 		return result
 	},
-	aggregate: pickWorstRating<HardwareWalletSupportValue>,
+	aggregate: pickWorstRating<HardwareWalletSupportMetadata>,
 }

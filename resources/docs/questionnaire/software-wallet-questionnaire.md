@@ -93,6 +93,22 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 - **Can users connect a hardware wallet to sign transactions?** (yes / no)
 - **Which hardware wallets are supported?** Please list ALL supported.
 
+### Duress Resistance
+
+- **Which authentication mechanism(s) does your mobile wallet support before granting access?** (check all that apply)
+  - [ ] PIN code
+  - [ ] Password / passphrase
+  - [ ] Biometric (Face ID, fingerprint)
+  - [ ] Swipe pattern
+  - [ ] None (no lock screen)
+
+- **Does your wallet support a dedicated duress mode** (a separate duress PIN or passphrase that, when entered, triggers a protective action)? (yes / no)
+  - If yes, what action(s) does it trigger? (check all that apply)
+    - [ ] Decoy wallet — opens a separate wallet with different accounts and balances
+    - [ ] Self-destruct — wipes the wallet, preventing access to funds
+    - [ ] Onchain lockdown — freezes the smart contract to prevent unauthorized transfers
+    - [ ] Wipe and forward — wipes the wallet and forwards all funds to a pre-configured safe address
+
 ---
 
 ## Privacy

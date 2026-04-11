@@ -1,19 +1,33 @@
 import { describe, expect, it } from 'vitest'
 
 import { attributeTree } from '@/schema/attribute-groups'
-import { type Attribute, Rating, ratingToText, type Value } from '@/schema/attributes'
+import { type Evaluation, type OutcomeMetadata, Rating, ratingToText } from '@/schema/attributes'
 
 import { warmupHarperLinter } from './utils/grammar'
+
+function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
+	if (typeof e !== 'object' || e === null || !('outcome' in e)) {
+		return false
+	}
+
+	const outcome = (e as { outcome: unknown }).outcome
+
+	return (
+		typeof outcome === 'object' &&
+		outcome !== null &&
+		'id' in outcome &&
+		'rating' in outcome &&
+		typeof (outcome as { id: unknown }).id === 'string' &&
+		(outcome as { rating: unknown }).rating !== undefined
+	)
+}
 
 await warmupHarperLinter()
 
 describe('attribute', () => {
 	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
-			for (const [attributeName, attributeAny] of Object.entries(attributeGroup.attributes)) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attributes inherit from `Attribute<Value>`.
-				const attribute = attributeAny as Attribute<Value>
-
+			for (const [attributeName, attribute] of Object.entries(attributeGroup.attributes)) {
 				describe(`attribute ${attribute.displayName}`, () => {
 					it('has well-formed lowerCamelCase ID', () => {
 						expect(attribute.id).toMatch(/^[a-z]+([A-Z][a-z]*)*/)
@@ -39,12 +53,14 @@ describe('attribute', () => {
 							}
 
 							describe('example ratings', () => {
-								// eslint-disable-next-line prefer-const -- Can't use const on exampleRatings.
-								for (let { rating, exampleRatings } of [
+								for (const row of [
 									{ rating: Rating.PASS, exampleRatings: ratingScale.pass },
 									{ rating: Rating.PARTIAL, exampleRatings: ratingScale.partial },
 									{ rating: Rating.FAIL, exampleRatings: ratingScale.fail },
 								]) {
+									let { exampleRatings } = row
+									const { rating } = row
+
 									if (exampleRatings === undefined) {
 										continue
 									}
@@ -59,10 +75,17 @@ describe('attribute', () => {
 
 									describe(ratingToText(rating).toLowerCase(), () => {
 										for (const exampleRating of exampleRatings) {
-											for (const sampleEvaluation of exampleRating.sampleEvaluations) {
-												describe(sampleEvaluation.value.id, () => {
+											const sampleEvaluations = exampleRating.sampleEvaluations
+											const evaluations = sampleEvaluations.filter(isSampleEvaluation)
+
+											expect(evaluations.length).toBe(sampleEvaluations.length)
+
+											for (const sampleEvaluation of evaluations) {
+												const { id, rating: sampleRating } = sampleEvaluation.outcome
+
+												describe(id, () => {
 													it('matches the correct rating', () => {
-														expect(sampleEvaluation.value.rating).eq(rating)
+														expect(sampleRating).eq(rating)
 													})
 												})
 											}

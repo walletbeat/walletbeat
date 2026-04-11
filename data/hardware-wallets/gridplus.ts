@@ -200,6 +200,7 @@ export const gridplusWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: {
 				// Source: gridplus team responses fileverse document
 				type: FirmwareType.FAIL,

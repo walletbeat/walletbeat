@@ -9,7 +9,7 @@ import type {
 	AttributeGroup,
 	EvaluatedAttribute,
 	EvaluatedGroup,
-	Value,
+	OutcomeMetadata,
 	ValueSet,
 	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
@@ -218,8 +218,8 @@ function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
 	return serializeFeatureValue(features)
 }
 
-function serializeAttribute<V extends Value>(
-	evaluatedAttribute: EvaluatedAttribute<V>,
+function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
+	evaluatedAttribute: EvaluatedAttribute<_OutcomeMetadata>,
 	evalStrings: WalletNameAndPseudonymStrings,
 ): AttributeExportBlock {
 	const { attribute, evaluation } = evaluatedAttribute
@@ -236,9 +236,9 @@ function serializeAttribute<V extends Value>(
 	}
 
 	const ratingBlock: RatingJsonExport = {
-		rating: evaluation.value.rating,
+		rating: evaluation.outcome.rating,
 		shortExplanation: renderTypographicContentToString(
-			evaluation.value.shortExplanation,
+			evaluation.outcome.shortExplanation,
 			evalStrings,
 		),
 		details: renderContentToText(evaluation.details, evalStrings, {

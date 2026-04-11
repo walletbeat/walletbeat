@@ -32,6 +32,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/profile.ts`](#srcschemafeaturesprofilets)
 - [`src/schema/features/security/account-recovery.ts`](#srcschemafeaturessecurityaccount-recoveryts)
 - [`src/schema/features/security/bug-bounty-program.ts`](#srcschemafeaturessecuritybug-bounty-programts)
+- [`src/schema/features/security/duress-resistance.ts`](#srcschemafeaturessecurityduress-resistancets)
 - [`src/schema/features/security/firmware.ts`](#srcschemafeaturessecurityfirmwarets)
 - [`src/schema/features/security/hardware-wallet-support.ts`](#srcschemafeaturessecurityhardware-wallet-supportts)
 - [`src/schema/features/security/keys-handling.ts`](#srcschemafeaturessecuritykeys-handlingts)
@@ -88,6 +89,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `lightClient` (object): Light clients.
     - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
   - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
+  - `duressResistance` (`VariantFeature<DuressResistance>`): Duress resistance features, covering both basic lock-screen protection and dedicated duress-PIN mechanisms (decoy wallet or self-destruct-and-forward).
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
   - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
@@ -236,6 +238,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
   - `accountRecovery` (`ResolvedFeature<AccountRecovery>`)
+  - `duressResistance` (`ResolvedFeature<DuressResistance>`)
 - `privacy` (object)
   - `analytics` (object)
     - `usage` (`ResolvedFeature<Support<WalletAnalytics>>`)
@@ -2092,6 +2095,61 @@ A record of bug bounty program support
 ```typescript
 type BugBountyProgramImplementation = WithRef<BugBountyProgramSupport>
 ```
+
+---
+
+## `src/schema/features/security/duress-resistance.ts`
+
+### Enum: `BasicUnlockMechanism`
+
+Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is a prerequisite for any meaningful duress resistance.
+
+- `PIN` = `'PIN'`: A numeric PIN code entered on-device or in-app.
+- `PASSWORD` = `'PASSWORD'`: An alphanumeric password or passphrase.
+- `BIOMETRIC` = `'BIOMETRIC'`: Biometric authentication (Face ID, fingerprint, etc.).
+- `PATTERN` = `'PATTERN'`: A drawn swipe pattern.
+
+---
+
+### Interface: `BasicUnlock`
+
+Information about how the wallet locks itself against unauthorized access.
+
+- `mechanisms` (`Record<BasicUnlockMechanism, boolean>`): Which unlock mechanisms the wallet supports. Set each mechanism to `true` if supported, `false` if not.
+
+---
+
+### Enum: `DuressAction`
+
+The action triggered when a duress PIN or passphrase is entered.
+
+Requires a dedicated duress credential (PIN, passphrase, etc.) that is distinct from the normal unlock credential.
+
+Note: This enum is not limited to decoy wallets. As more wallets implement different forms of duress actions, new variants should be added here.
+
+- `DECOY_WALLET` = `'DECOY_WALLET'`: Opens a decoy wallet with a separate set of accounts, hiding the real wallet.
+- `SELF_DESTRUCT` = `'SELF_DESTRUCT'`: Wipes wallet data, preventing access to funds or private keys.
+- `ONCHAIN_LOCKDOWN` = `'ONCHAIN_LOCKDOWN'`: Freezes the smart contract onchain, preventing unauthorized transfers.
+- `WIPE_AND_FORWARD` = `'WIPE_AND_FORWARD'`: Wipes wallet data and forwards all funds to a pre-configured safe address.
+
+---
+
+### Interface: `DuressMode`
+
+Information about a wallet's duress mode.
+
+- `actions` (`Record<DuressAction, boolean>`): Which actions are triggered when duress credentials are entered. Set each action to `true` if triggered, `false` if not.
+
+---
+
+### Interface: `DuressResistance`
+
+Duress resistance features of a wallet.
+
+Covers the full spectrum from basic lock-screen protection through full duress-pin-triggered decoy wallets or self-destruct mechanisms. This feature helps protect users against "wrench attacks" — physical coercion to hand over funds.
+
+- `basicUnlock` (`WithRef<BasicUnlock> | 'NO_LOCK_MECHANISM'`): The basic unlock mechanism protecting the wallet from unauthorized access. Set to 'NO_LOCK_MECHANISM' if the wallet has no lock screen at all. A non-null value is a prerequisite for any meaningful duress resistance.
+- `duressMode` (`Support<WithRef<DuressMode>>`): A dedicated duress mode triggered by a separate duress credential. Use `notSupported` when the wallet has no duress mode. Use `supported({ action: ..., ref: ... })` when a duress mode exists.
 
 ---
 

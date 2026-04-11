@@ -21,8 +21,8 @@ import {
 import {
 	type Attribute,
 	type EvaluatedAttribute,
+	type OutcomeMetadata,
 	Rating,
-	type Value,
 	type WalletNameAndPseudonymStrings,
 	type WalletNameStrings,
 } from './attributes'
@@ -300,39 +300,39 @@ export interface ResolvedWallet {
 	attributes: EvaluationTree
 }
 
-/** Whether a Value is specific to a variant within the same wallet. */
+/** Whether an outcome is specific to a variant within the same wallet. */
 export enum VariantSpecificity {
 	/**
-	 * The value for this attribute is not assessed for this variant.
+	 * The outcome for this attribute is not assessed for this variant.
 	 */
 	EXEMPT_FOR_THIS_VARIANT = 'EXEMPT_FOR_THIS_VARIANT',
 
 	/**
-	 * The value for this attribute is only assessed for this variant.
+	 * The outcome for this attribute is only assessed for this variant.
 	 * This can happen either because the wallet only has one variant,
-	 * or because the values for this attribute on all other variants
+	 * or because the outcomes for this attribute on all other variants
 	 * are EXEMPT.
 	 */
 	ONLY_ASSESSED_FOR_THIS_VARIANT = 'ONLY_ASSESSED_FOR_THIS_VARIANT',
 
 	/**
-	 * The value is not specific to a variant. All variants of the wallet have
-	 * the same value (or EXEMPT) for this attribute.
+	 * The outcome is not specific to a variant. All variants of the wallet have
+	 * the same outcome (or EXEMPT) for this attribute.
 	 */
 	ALL_SAME = 'ALL_SAME',
 
 	/**
-	 * The value is specific to this variant.
+	 * The outcome is specific to this variant.
 	 * This implies that the wallet has other non-EXEMPT variants, and all such
-	 * other variants have a value different from the one for the current
+	 * other variants have an outcome different from the one for the current
 	 * variant.
 	 */
 	UNIQUE_TO_VARIANT = 'UNIQUE_TO_VARIANT',
 
 	/**
-	 * The value is shared with at least one other variant, but not all.
+	 * The outcome is shared with at least one other variant, but not all.
 	 * This implies that the wallet has other non-EXEMPT variants, and that at
-	 * least one of them shares the same value, and that at least another one
+	 * least one of them shares the same outcome, and that at least another one
 	 * of them does not.
 	 */
 	NOT_UNIVERSAL = 'NOT_UNIVERSAL',
@@ -407,14 +407,16 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 
 			mapAttributesGetter(
 				evalTree,
-				<V extends Value>(getter: (tree: EvaluationTree) => EvaluatedAttribute<V> | undefined) => {
+				<_OutcomeMetadata extends OutcomeMetadata>(
+					getter: (tree: EvaluationTree) => EvaluatedAttribute<_OutcomeMetadata> | undefined,
+				) => {
 					const currentVariantEval = getter(evalTree)
 
 					if (currentVariantEval === undefined) {
 						return
 					}
 
-					if (currentVariantEval.evaluation.value.rating === Rating.EXEMPT) {
+					if (currentVariantEval.evaluation.outcome.rating === Rating.EXEMPT) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.EXEMPT_FOR_THIS_VARIANT,
@@ -432,7 +434,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 						return
 					}
 
-					const currentVariantEvalId = currentVariantEval.evaluation.value.id
+					const currentVariantEvalId = currentVariantEval.evaluation.outcome.id
 					let allOthersExempt = true
 					let foundDifferentValue = false
 					let foundSameValue = false
@@ -450,13 +452,13 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 							continue
 						}
 
-						if (versusEval.evaluation.value.rating === Rating.EXEMPT) {
+						if (versusEval.evaluation.outcome.rating === Rating.EXEMPT) {
 							continue
 						}
 
 						allOthersExempt = false
 
-						if (versusEval.evaluation.value.id === currentVariantEvalId) {
+						if (versusEval.evaluation.outcome.id === currentVariantEvalId) {
 							foundSameValue = true
 						} else {
 							foundDifferentValue = true
@@ -524,10 +526,10 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
  * @returns Whether the evaluation of the given attribute is unique to the
  *          given variant within the given wallet.
  */
-export function attributeVariantSpecificity<V extends Value>(
+export function attributeVariantSpecificity<_OutcomeMetadata extends OutcomeMetadata>(
 	ratedWallet: RatedWallet,
 	variant: Variant,
-	attribute: Attribute<V>,
+	attribute: Attribute<_OutcomeMetadata>,
 ): VariantSpecificity {
 	const variantSpecificityMap = ratedWallet.variantSpecificity[variant]
 

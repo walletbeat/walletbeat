@@ -2,10 +2,11 @@ import {
 	type Attribute,
 	type Evaluation,
 	EvaluationContext,
+	type EvaluationScaffold,
 	exampleRating,
 	exampleRatingUnimplemented,
+	type Outcome,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	collectedByDefault,
@@ -39,18 +40,20 @@ import {
 } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
-export type AddressCorrelationValue = Value & {
+export type AddressCorrelationMetadata = {
 	worstLeak: WalletAddressLinkableBy | null
 }
 
-const uncorrelated = {
+const uncorrelated: EvaluationScaffold<AddressCorrelationMetadata>['outcome'] = {
 	id: 'no_correlation',
 	rating: Rating.PASS,
 	icon: '\u{26d3}', // Broken chain
 	displayName: 'Wallet address is kept private',
 	shortExplanation: sentence('{{WALLET_NAME}} keeps your wallet address private.'),
-	worstLeak: null,
-} as const
+	metadata: {
+		worstLeak: null,
+	},
+}
 
 export interface WalletAddressLinkableTo {
 	info: UserInfo
@@ -63,9 +66,9 @@ export type WalletAddressLinkableBy = WalletAddressLinkableTo & {
 }
 
 function linkable(
-	ctx: EvaluationContext<AddressCorrelationValue>,
+	ctx: EvaluationContext<AddressCorrelationMetadata>,
 	linkables: NonEmptyArray<WalletAddressLinkableBy>,
-): Evaluation<AddressCorrelationValue> {
+): Evaluation<AddressCorrelationMetadata> {
 	const worstLeak = nonEmptyFirst(
 		linkables,
 		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) =>
@@ -108,7 +111,7 @@ function linkable(
 	})()
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `address_and_${worstLeak.info}`,
 			rating,
 			displayName: `Wallet address linkable to ${userInfoName(worstLeak.info).short}`,
@@ -117,7 +120,9 @@ function linkable(
 					? `{{WALLET_NAME}} publishes your ${userInfoName(worstLeak.info).short} onchain.`
 					: `{{WALLET_NAME}} allows ${worstLeak.by.name} to link your wallet address with your ${userInfoName(worstLeak.info).short}.`,
 			),
-			worstLeak,
+			metadata: {
+				worstLeak,
+			},
 		},
 		details: addressCorrelationDetailsContent({ linkables }),
 		howToImprove: paragraph(howToImprove),
@@ -201,7 +206,7 @@ export function linkableToWalletAddress<T extends UserInfo>(
 	return linkables
 }
 
-export const addressCorrelation: Attribute<AddressCorrelationValue> = {
+export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 	id: 'addressCorrelation',
 	icon: '\u{1f517}', // Link
 	displayName: 'Wallet address privacy',
@@ -259,8 +264,9 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 					This is treated as a partial rating because users may mitigate
 					against this by forcing wallet requests to be proxied on their own.
 				`),
-				(value: AddressCorrelationValue) =>
-					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.IP_ADDRESS,
+				(outcome: Outcome<AddressCorrelationMetadata>) =>
+					outcome.rating === Rating.PARTIAL &&
+					outcome.metadata.worstLeak?.info === PersonalInfo.IP_ADDRESS,
 			),
 			exampleRating(
 				paragraph(`
@@ -270,8 +276,9 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 					pseudonym for each of their wallet address to mitigate this privacy
 					issue.
 				`),
-				(value: AddressCorrelationValue) =>
-					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.PSEUDONYM,
+				outcome =>
+					outcome.rating === Rating.PARTIAL &&
+					outcome.metadata.worstLeak?.info === PersonalInfo.PSEUDONYM,
 			),
 		],
 		pass: [
@@ -293,8 +300,8 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<AddressCorrelationValue>,
-	): Evaluation<AddressCorrelationValue> => {
+		ctx: EvaluationContext<AddressCorrelationMetadata>,
+	): Evaluation<AddressCorrelationMetadata> => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
@@ -341,11 +348,11 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		}
 
 		return ctx.build({
-			value: uncorrelated,
+			outcome: uncorrelated,
 			details: paragraph(
 				'{{WALLET_NAME}} does not allow any external provider to link your wallet address to any personal information.',
 			),
 		})
 	},
-	aggregate: pickWorstRating<AddressCorrelationValue>,
+	aggregate: pickWorstRating<AddressCorrelationMetadata>,
 }

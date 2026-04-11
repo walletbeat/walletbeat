@@ -70,6 +70,7 @@ export const fireflyWallet: HardwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: notSupported,
+			duressResistance: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {

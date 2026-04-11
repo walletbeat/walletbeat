@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -27,8 +26,6 @@ import { nonEmptySet, setItems } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
-
-export type BugBountyProgramValue = Value
 
 function getCoverageDescription(breadth: AtLeastOneCoverageBreadth): string {
 	const items = setItems(breadth)
@@ -102,11 +99,9 @@ function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
 	return ''
 }
 
-function noBugBountyProgram(
-	ctx: EvaluationContext<BugBountyProgramValue>,
-): Evaluation<BugBountyProgramValue> {
-	return ctx.build({
-		value: {
+const noBugBountyProgram: (typeof bugBountyProgram)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'no_bug_bounty_program',
 			rating: Rating.FAIL,
 			displayName: 'No bug bounty program',
@@ -121,12 +116,8 @@ function noBugBountyProgram(
 			'{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.',
 		),
 	})
-}
 
-function bugBountyAvailable(
-	ctx: EvaluationContext<BugBountyProgramValue>,
-	support: BugBountyProgramSupport,
-): Evaluation<BugBountyProgramValue> {
+function bugBountyAvailable(ctx: EvaluationContext, support: BugBountyProgramSupport): Evaluation {
 	const rewardInfo = getRewardDescription(support)
 	const rewardDetailsInfo = getRewardDetailsDescription(support)
 	const coverageInfo =
@@ -169,7 +160,7 @@ function bugBountyAvailable(
 			: 'No bug bounty program has been announced or is publicly available.'
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: isActive ? 'bug_bounty_available' : 'bug_bounty_not_available',
 			rating: rating,
 			displayName: isActive ? 'Bug bounty program available' : 'Bug bounty program inactive',
@@ -218,7 +209,7 @@ function getLegalProtectionDescription(legalProtection: LegalProtection): string
 	return `**Legal Protection**: The program provides ${protectionType} protections for security researchers conducting good faith security research.`
 }
 
-export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
+export const bugBountyProgram: Attribute = {
 	id: 'bugBountyProgram',
 	icon: '\u{1F41B}', // Bug emoji
 	displayName: 'Bug Bounty Program',
@@ -345,9 +336,8 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) =>
-		pickWorstRating<BugBountyProgramValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<BugBountyProgramValue>): Evaluation<BugBountyProgramValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation>) => pickWorstRating(perVariant),
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({ referenceCountsAs: Verifiability.VERIFIABLE }),
 		)
@@ -355,11 +345,11 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 		// This attribute is only applicable for hardware wallets
 		// For software wallets, we exempt them from this attribute
 		if (ctx.features.type !== WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is only applicable for hardware wallets.'), null)
+			return exempt(ctx, sentence('This attribute is only applicable for hardware wallets.'))
 		}
 
 		if (ctx.features.security.bugBountyProgram === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(ctx.features.security.bugBountyProgram)) {

@@ -1,44 +1,19 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	type Value,
-} from '@/schema/attributes'
+import { type Attribute, Rating } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import {
-	type HardwarePrivacySupport,
-	HardwarePrivacyType,
-} from '@/schema/features/privacy/hardware-privacy'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwarePrivacyValue = Value & {
+export type HardwarePrivacyMetadata = {
 	phoningHome: HardwarePrivacyType
 	inspectableRemoteCalls: HardwarePrivacyType
 	wirelessPrivacy: HardwarePrivacyType
 }
 
-function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
-	const ratings = [features.phoningHome, features.inspectableRemoteCalls, features.wirelessPrivacy]
-	const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
-
-	if (passCount === 3) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 1) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
+export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 	id: 'hardwarePrivacy',
 	icon: '🔒',
 	displayName: 'Hardware Privacy',
@@ -70,13 +45,13 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				sentence(
 					'The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.',
 				),
-				(v: HardwarePrivacyValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some hardware privacy sub-criteria.'),
-				(v: HardwarePrivacyValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
@@ -84,13 +59,12 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				sentence(
 					'The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.',
 				),
-				(v: HardwarePrivacyValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyValue>>) =>
-		pickWorstRating<HardwarePrivacyValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<HardwarePrivacyValue>): Evaluation<HardwarePrivacyValue> => {
+	aggregate: pickWorstRating,
+	evaluate: ctx => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
@@ -112,15 +86,25 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 			})
 		}
 
-		const rating = evaluateHardwarePrivacy(hwPrivacy)
+		const ratings = [
+			hwPrivacy.phoningHome,
+			hwPrivacy.inspectableRemoteCalls,
+			hwPrivacy.wirelessPrivacy,
+		]
+		const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
+		const rating = passCount === 3 ? Rating.PASS : passCount >= 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'hardware_privacy',
 				rating,
 				displayName: 'Hardware Privacy',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} hardware privacy.`),
-				...hwPrivacy, // TODO: Filter fields
+				metadata: {
+					phoningHome: hwPrivacy.phoningHome,
+					inspectableRemoteCalls: hwPrivacy.inspectableRemoteCalls,
+					wirelessPrivacy: hwPrivacy.wirelessPrivacy,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} hardware privacy evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

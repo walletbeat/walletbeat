@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { AddressCorrelationValue, WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
+	import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -22,13 +22,11 @@
 
 
 	// Props
-	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
 	const {
 		wallet,
 		linkables,
 	}: {
 		wallet: RatedWallet
-		value: AddressCorrelationValue
 		linkables?: NonEmptyArray<WalletAddressLinkableBy> | undefined
 	} = $props()
 

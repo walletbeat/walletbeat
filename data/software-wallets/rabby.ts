@@ -424,6 +424,7 @@ export const rabby: SoftwareWallet = {
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [

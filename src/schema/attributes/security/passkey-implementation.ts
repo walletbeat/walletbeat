@@ -1,39 +1,31 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	exampleRating,
-	Rating,
-	type Value,
-} from '@/schema/attributes'
+import { type Attribute, EvaluationContext, exampleRating, Rating } from '@/schema/attributes'
 import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
 import { isSupported } from '@/schema/features/support'
-import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type PasskeyImplementationValue = Value & {
+export type PasskeyImplementationMetadata = {
 	library: PasskeyVerificationLibrary | null
 	libraryUrl?: string
 }
 
-function noPasskeyImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
-): Evaluation<PasskeyImplementationValue> {
-	return ctx.build({
-		value: {
+const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'no_passkey_implementation',
 			rating: Rating.FAIL,
 			displayName: 'No passkey implementation',
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} does not implement passkeys or does not use a recognized verification library.',
 			),
-			library: null,
+			metadata: {
+				library: null,
+			},
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} either does not implement passkeys or does not use a recognized verification library for P256/R1 curve operations. Passkeys provide a more secure authentication method than traditional passwords, but proper implementation is crucial for security.',
@@ -42,22 +34,23 @@ function noPasskeyImplementation(
 			'{{WALLET_NAME}} should implement passkeys using a well-audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) 159K gas.',
 		),
 	})
-}
 
 function otherPasskeyImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'other_passkey_implementation',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic passkey implementation',
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} implements passkeys with a less common verification library.',
 			),
-			library: PasskeyVerificationLibrary.OTHER,
-			libraryUrl: support.libraryUrl,
+			metadata: {
+				library: PasskeyVerificationLibrary.OTHER,
+				libraryUrl: support.libraryUrl,
+			},
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} implements passkeys using a less common verification library. While this provides better security than no passkey support, using a well-audited and widely recognized library would provide stronger security guarantees.',
@@ -69,22 +62,24 @@ function otherPasskeyImplementation(
 }
 
 function freshCryptoLibImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'fresh_crypto_lib_implementation',
 			rating: Rating.PARTIAL,
 			displayName: 'outdated passkey verification implementation',
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).',
 			),
-			library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
-			libraryUrl:
-				support.libraryUrl !== undefined && support.libraryUrl !== ''
-					? support.libraryUrl
-					: 'https://github.com/rdubois-crypto/FreshCryptoLib',
+			metadata: {
+				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
+				libraryUrl:
+					support.libraryUrl !== undefined && support.libraryUrl !== ''
+						? support.libraryUrl
+						: 'https://github.com/rdubois-crypto/FreshCryptoLib',
+			},
 		},
 		details: mdParagraph(
 			'{{WALLET_NAME}} implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib). While this is a well-regarded library, it has not undergone as extensive auditing and testing as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).',
@@ -96,22 +91,24 @@ function freshCryptoLibImplementation(
 }
 
 function smoothCryptoLibImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'smooth_crypto_lib_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation: Smooth Crypto Lib',
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).',
 			),
-			library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
-			libraryUrl:
-				support.libraryUrl !== undefined && support.libraryUrl !== ''
-					? support.libraryUrl
-					: 'https://github.com/get-smooth/crypto-lib',
+			metadata: {
+				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
+				libraryUrl:
+					support.libraryUrl !== undefined && support.libraryUrl !== ''
+						? support.libraryUrl
+						: 'https://github.com/get-smooth/crypto-lib',
+			},
 		},
 		details: mdParagraph(
 			'{{WALLET_NAME}} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), at 159K this the most gas-efficient ( and [triple audited](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) verification library for P256/R1 curve operations.',
@@ -121,22 +118,24 @@ function smoothCryptoLibImplementation(
 }
 
 function daimoP256VerifierImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'daimo_p256_verifier_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation (Daimo P256 verifier)',
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier).',
 			),
-			library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
-			libraryUrl:
-				support.libraryUrl !== undefined && support.libraryUrl !== ''
-					? support.libraryUrl
-					: 'https://github.com/daimo-eth/p256-verifier',
+			metadata: {
+				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
+				libraryUrl:
+					support.libraryUrl !== undefined && support.libraryUrl !== ''
+						? support.libraryUrl
+						: 'https://github.com/daimo-eth/p256-verifier',
+			},
 		},
 		details: mdParagraph(
 			'{{WALLET_NAME}} implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier), a well-audited verification library for P256/R1 curve operations. Costs 330K gas.',
@@ -146,22 +145,24 @@ function daimoP256VerifierImplementation(
 }
 
 function openZeppelinP256VerifierImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'open_zeppelin_p256_verifier_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation (OpenZeppelin P256 verifier)',
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} implements passkeys using [OpenZeppelin P256 verifier.](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)',
 			),
-			library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
-			libraryUrl:
-				support.libraryUrl !== undefined && support.libraryUrl !== ''
-					? support.libraryUrl
-					: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+			metadata: {
+				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
+				libraryUrl:
+					support.libraryUrl !== undefined && support.libraryUrl !== ''
+						? support.libraryUrl
+						: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+			},
 		},
 		details: mdParagraph(
 			'{{WALLET_NAME}} implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol), a well-audited verification library for P256/R1 curve operations from the respected OpenZeppelin team. This implementation provides strong security guarantees and has been [thoroughly reviewed.](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/audits/2024-10-v5.1.pdf)',
@@ -171,20 +172,22 @@ function openZeppelinP256VerifierImplementation(
 }
 
 function webAuthnSolImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'web_authn_sol_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation (WebAuthn.sol)',
 			shortExplanation: mdSentence('{{WALLET_NAME}} implements passkeys using WebAuthn.sol.'),
-			library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
-			libraryUrl:
-				support.libraryUrl !== undefined && support.libraryUrl !== ''
-					? support.libraryUrl
-					: 'https://github.com/base/webauthn-sol',
+			metadata: {
+				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
+				libraryUrl:
+					support.libraryUrl !== undefined && support.libraryUrl !== ''
+						? support.libraryUrl
+						: 'https://github.com/base/webauthn-sol',
+			},
 		},
 		details: mdParagraph(
 			"{{WALLET_NAME}} implements passkeys using WebAuthn.sol from Base, a Solidity library for verifying WebAuthn authentication assertions. It builds on Daimo's WebAuthn.sol. This library is optimized for Ethereum layer 2 rollup chains but will work on all EVM chains. Signature verification always attempts to use the RIP-7212 precompile and, if this fails, falls back to using FreshCryptoLib. The library has been [audited](https://github.com/coinbase/smart-wallet/tree/main/audits)",
@@ -192,7 +195,7 @@ function webAuthnSolImplementation(
 	})
 }
 
-export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
+export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 	id: 'passkeyImplementation',
 	icon: '\u{1fac6}', // Fingerprint
 	displayName: 'Passkey implementation',
@@ -319,11 +322,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) =>
-		pickWorstRating<PasskeyImplementationValue>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<PasskeyImplementationValue>,
-	): Evaluation<PasskeyImplementationValue> => {
+	aggregate: pickWorstRating,
+	evaluate: ctx => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 		const passkeyVerification = ctx.features.security.passkeyVerification
 
@@ -337,7 +337,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 
 		const withoutRefs = ctx.popRefs<PasskeyVerificationSupport>(passkeyVerification)
 
-		const result = ((): Evaluation<PasskeyImplementationValue> => {
+		const result = (() => {
 			switch (withoutRefs.library) {
 				case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
 					return smoothCryptoLibImplementation(ctx, withoutRefs)

@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import { isSupported, notSupported } from '@/schema/features/support'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
@@ -15,13 +14,9 @@ import {
 } from '../../features/self-sovereignty/chain-configurability'
 import { pickWorstRating, unrated } from '../common'
 
-export type L1ProviderIndependence = Value
-
-function supportsSelfHostedNode(
-	ctx: EvaluationContext<L1ProviderIndependence>,
-): Evaluation<L1ProviderIndependence> {
-	return ctx.build({
-		value: {
+const supportsSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'support_self_hosted_node',
 			rating: Rating.PASS,
 			icon: '\u{1f3e1}', // House with garden
@@ -34,13 +29,10 @@ function supportsSelfHostedNode(
 			{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with Ethereum mainnet.
 		`),
 	})
-}
 
-function supportsSelfHostedNodeAfterRequests(
-	ctx: EvaluationContext<L1ProviderIndependence>,
-): Evaluation<L1ProviderIndependence> {
-	return ctx.build({
-		value: {
+const supportsSelfHostedNodeAfterRequests: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'self_hosted_node_after_requests',
 			rating: Rating.PARTIAL,
 			displayName: 'Partially supports self-hosted nodes',
@@ -57,14 +49,13 @@ function supportsSelfHostedNodeAfterRequests(
 			or should avoid making any such requests until the user can access the RPC endpoint configuration options.
 		`),
 	})
-}
 
 function supportsSelfHostedNodeButCannotDoBasicOperations(
-	ctx: EvaluationContext<L1ProviderIndependence>,
+	ctx: EvaluationContext,
 	support: SelfHostedNodeL1BasicOperationsSupport,
-): Evaluation<L1ProviderIndependence> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'self_hosted_node_not_sufficient',
 			rating: Rating.FAIL,
 			displayName: 'Relies on non-Ethereum services',
@@ -91,11 +82,9 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 	})
 }
 
-function noSelfHostedNode(
-	ctx: EvaluationContext<L1ProviderIndependence>,
-): Evaluation<L1ProviderIndependence> {
-	return ctx.build({
-		value: {
+const noSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'no_self_hosted_node',
 			rating: Rating.FAIL,
 			icon: '\u{1f3da}', // Derelict house
@@ -111,9 +100,8 @@ function noSelfHostedNode(
 			'{{WALLET_NAME}} should let the user configure the endpoint used for Ethereum mainnet.',
 		),
 	})
-}
 
-export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
+export const l1ProviderIndependence: Attribute = {
 	id: 'l1ProviderIndependence',
 	icon: '\u{1f3e0}', // House
 	displayName: 'L1 provider independence',
@@ -208,11 +196,9 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<L1ProviderIndependence>,
-	): Evaluation<L1ProviderIndependence> => {
+	evaluate: ctx => {
 		if (ctx.features.chainConfigurability === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(ctx.features.chainConfigurability)) {
@@ -263,5 +249,5 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 
 		return noSelfHostedNode(ctx)
 	},
-	aggregate: pickWorstRating<L1ProviderIndependence>,
+	aggregate: pickWorstRating,
 }

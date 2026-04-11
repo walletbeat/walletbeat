@@ -8,7 +8,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -29,14 +28,14 @@ import { exempt, pickWorstRating, unrated } from '../common'
 
 type ResolvedSupport = Record<BrowserIntegrationEip, Support>
 
-export type BrowserIntegrationValue = Value & {
+export type BrowserIntegrationMetadata = {
 	support?: ResolvedSupport
 }
 
 function browserIntegrationSupport(
-	ctx: EvaluationContext<BrowserIntegrationValue>,
+	ctx: EvaluationContext<BrowserIntegrationMetadata>,
 	support: WithRef<ResolvedSupport>,
-): Evaluation<BrowserIntegrationValue> {
+): Evaluation<BrowserIntegrationMetadata> {
 	const withoutRefs = ctx.popRefs<ResolvedSupport>(support)
 
 	const supported: BrowserIntegrationEip[] = Object.entries(withoutRefs)
@@ -49,11 +48,11 @@ function browserIntegrationSupport(
 
 	if (supported.length === 0) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_support',
 				rating: Rating.FAIL,
 				displayName: 'No browser integration',
-				support,
+				metadata: { support },
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not integrate with the browser in a standard way.',
 				),
@@ -70,14 +69,14 @@ function browserIntegrationSupport(
 	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `support_${supported.join('_')}`,
 			rating,
 			displayName:
 				unsupported.length === 0
 					? 'Fully-compliant browser integration'
 					: 'Partially-compliant browser integration',
-			support,
+			metadata: { support },
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} supports ${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for web browser integration.`,
 			),
@@ -98,7 +97,7 @@ function browserIntegrationSupport(
 	})
 }
 
-export const browserIntegration: Attribute<BrowserIntegrationValue> = {
+export const browserIntegration: Attribute<BrowserIntegrationMetadata> = {
 	id: 'browserIntegration',
 	icon: '\u{1f310}', // Globe with Meridians
 	displayName: 'Browser integration',
@@ -169,8 +168,8 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		),
 	},
 	evaluate: (
-		ctx: EvaluationContext<BrowserIntegrationValue>,
-	): Evaluation<BrowserIntegrationValue> => {
+		ctx: EvaluationContext<BrowserIntegrationMetadata>,
+	): Evaluation<BrowserIntegrationMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test using tool.
 
 		if (ctx.features.type !== WalletType.SOFTWARE || ctx.features.variant !== Variant.BROWSER) {
@@ -196,5 +195,5 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 
 		return browserIntegrationSupport(ctx, browserIntegrationEips)
 	},
-	aggregate: pickWorstRating<BrowserIntegrationValue>,
+	aggregate: pickWorstRating<BrowserIntegrationMetadata>,
 }

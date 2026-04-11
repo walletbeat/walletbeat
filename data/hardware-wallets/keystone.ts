@@ -128,6 +128,7 @@ export const keystoneWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,

@@ -39,43 +39,43 @@ Wallet data is located in the top-level `/data` directory. All files are written
 ```
 /data
 ├── contributors          ← You will need to add a file here
-│   ├── 0xh3rman.ts         if this is your first time contributing!
-│   ├── example.ts        ← Use this as an example.
-│   ├── gabrielkerekes.ts
-│   ├── jiojosbg.ts
-│   └── [...]
+│   ├── 0xh3rman.ts         if this is your first time contributing!
+│   ├── example.ts        ← Use this as an example.
+│   ├── gabrielkerekes.ts
+│   ├── jiojosbg.ts
+│   └── [...]
 ├── eips                  ← You do not need to touch this.
 ├── entities              ← Data about entities related to wallets
-│   ├── ackee.ts            (wallet development companies, security auditors,
-│   ├── ambire.ts           RPC providers, transaction simulation services,
-│   ├── biconomy.ts         bundlers, swap quote services,
-│   ├── binance.ts          hardware wallet manufacturers, etc.) all goes here.
-│   ├── cantina.ts
-│   ├── certik.ts
-│   └── [...]
+│   ├── ackee.ts            (wallet development companies, security auditors,
+│   ├── ambire.ts           RPC providers, transaction simulation services,
+│   ├── biconomy.ts         bundlers, swap quote services,
+│   ├── binance.ts          hardware wallet manufacturers, etc.) all goes here.
+│   ├── cantina.ts
+│   ├── certik.ts
+│   └── [...]
 ├── software-wallets      ← Data about software wallets goes here.
-│   ├── ambire.ts           You will most likely add or edit a file in this
-│   ├── elytro.ts           directory!
-│   ├── rabby.ts
-│   ├── [...]
-│   ├── metamask.ts
-│   ├── unrated.tmpl.ts   ← If adding a new software wallet, copy this file as template.
-│   └── [...]
+│   ├── ambire.ts           You will most likely add or edit a file in this
+│   ├── elytro.ts           directory!
+│   ├── rabby.ts
+│   ├── [...]
+│   ├── metamask.ts
+│   ├── unrated.tmpl.ts   ← If adding a new software wallet, copy this file as template.
+│   └── [...]
 ├── software-wallets.ts   ← The list of all known software wallets goes here.
 ├── hardware-wallets      ← Data about hardware wallets goes here.
-│   ├── bitbox.ts           Same idea as software wallets.
-│   ├── cypherock.ts
-│   ├── firefly.ts
-│   ├── gridplus.ts
-│   ├── unrated.tmpl.ts   ← If adding a new hardware wallet, copy this file as template.
-│   └── [...]
+│   ├── bitbox.ts           Same idea as software wallets.
+│   ├── cypherock.ts
+│   ├── firefly.ts
+│   ├── gridplus.ts
+│   ├── unrated.tmpl.ts   ← If adding a new hardware wallet, copy this file as template.
+│   └── [...]
 ├── hardware-wallets.ts   ← The list of all known hardware wallets goes here.
 ├── embedded-wallets      ← Data about embedded wallets goes here.
 ├── embedded-wallets.ts   ← The list of all known embedded wallets goes here.
 ├── wallet-contracts      ← Data about smart wallets' smart contracts goes here.
-│   ├── ambire-account.ts
-│   ├── metamask-7702-delegator.ts
-│   └── [...]
+│   ├── ambire-account.ts
+│   ├── metamask-7702-delegator.ts
+│   └── [...]
 └── wallets.ts            ← You do not need to touch this.
 ```
 

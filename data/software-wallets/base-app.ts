@@ -19,7 +19,7 @@ import type { CalendarDate } from '@/types/date'
 
 export const baseApp: SoftwareWallet = {
 	metadata: {
-		id: 'baseApp',
+		id: 'base-app',
 		displayName: 'Base App',
 		tableName: 'Base App',
 		blurb: paragraph(`
@@ -161,6 +161,7 @@ export const baseApp: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
