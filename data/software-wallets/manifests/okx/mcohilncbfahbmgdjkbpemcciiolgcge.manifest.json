@@ -128,7 +128,7 @@
 			"matches": ["https://*/*"]
 		}
 	],
-	"version": "3.98.14",
+	"version": "3.99.0",
 	"sandbox": {
 		"pages": ["sandbox.html", "ses.html", "ses-sandbox.html"]
 	},

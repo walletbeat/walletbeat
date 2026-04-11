@@ -5,7 +5,6 @@ import {
 	exampleRating,
 	type ExemptEvaluation,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	passkeyLibraryName,
@@ -45,7 +44,7 @@ import { isNonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SecurityBestPracticesValue = Value
+export type SecurityBestPracticesValue = null
 
 function keyStoragePass(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
@@ -57,7 +56,7 @@ function keyStoragePass(
 			: 'Keys are stored in a hardware security module or secure enclave.'
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'key_storage_pass',
 			rating: Rating.PASS,
 			displayName: 'Secure key storage',
@@ -79,7 +78,7 @@ function keyStoragePartial(
 			: 'Keys are stored in OS-sandboxed storage without additional encryption. Other processes are blocked from reading them, but the keys are not encrypted at rest.'
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'key_storage_partial',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial key storage protection',
@@ -98,7 +97,7 @@ function keyStorageFail(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 ): Evaluation<SecurityBestPracticesValue> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'key_storage_fail',
 			rating: Rating.FAIL,
 			displayName: 'Weak key storage',
@@ -139,7 +138,7 @@ function evaluateSecureRng(
 		case SecureRngSource.OS_CSPRNG:
 		case SecureRngSource.HARDWARE_ENTROPY:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'rng_pass',
 					rating: Rating.PASS,
 					displayName: 'Secure random number generation',
@@ -153,7 +152,7 @@ function evaluateSecureRng(
 			})
 		case SecureRngSource.LIBRARY_RNG:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'rng_partial',
 					rating: Rating.PARTIAL,
 					displayName: 'Unverified RNG quality',
@@ -170,7 +169,7 @@ function evaluateSecureRng(
 			})
 		default:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'rng_fail',
 					rating: Rating.FAIL,
 					displayName: 'Unknown or insecure RNG',
@@ -196,7 +195,7 @@ function evaluateContentScripts(
 		case HostPermissionScope.NONE:
 		case HostPermissionScope.HTTPS_ONLY:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'content_scripts_pass',
 					rating: Rating.PASS,
 					displayName: 'Minimal content script injection',
@@ -210,7 +209,7 @@ function evaluateContentScripts(
 			})
 		case HostPermissionScope.HTTP_AND_HTTPS:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'content_scripts_partial',
 					rating: Rating.PARTIAL,
 					displayName: 'Content scripts injected into HTTP pages',
@@ -227,7 +226,7 @@ function evaluateContentScripts(
 			})
 		case HostPermissionScope.UNRESTRICTED:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'content_scripts_fail',
 					rating: Rating.FAIL,
 					displayName: 'Unrestricted content script injection',
@@ -251,7 +250,7 @@ function evaluateExternallyConnectable(
 ): Evaluation<SecurityBestPracticesValue> {
 	if (manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'externally_connectable_pass',
 				rating: Rating.PASS,
 				displayName: 'No external message connections',
@@ -272,7 +271,7 @@ function evaluateExternallyConnectable(
 		pageMatches === HostPermissionScope.UNRESTRICTED
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'externally_connectable_fail',
 				rating: Rating.FAIL,
 				displayName: 'Unrestricted external message connections',
@@ -295,7 +294,7 @@ function evaluateExternallyConnectable(
 
 	if (pageMatches === HostPermissionScope.HTTP_AND_HTTPS) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'externally_connectable_partial',
 				rating: Rating.PARTIAL,
 				displayName: 'External connections allowed from HTTP pages',
@@ -313,7 +312,7 @@ function evaluateExternallyConnectable(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'externally_connectable_pass',
 			rating: Rating.PASS,
 			displayName: 'Restricted external message connections',
@@ -413,7 +412,7 @@ function evaluateBrowserPermissions(
 
 	if (badPerms.length > 0) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'browser_permissions_fail',
 				rating: Rating.FAIL,
 				displayName: 'Dangerous browser permissions declared',
@@ -431,7 +430,7 @@ function evaluateBrowserPermissions(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'browser_permissions_pass',
 			rating: Rating.PASS,
 			displayName: 'No dangerous browser permissions',
@@ -458,7 +457,7 @@ function evaluateBrowserExtension(
 
 	if (minimalPermissions && lockedDownAccessibleResources) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'browser_extension_pass',
 				rating: Rating.PASS,
 				displayName: 'Browser extension is hardened',
@@ -474,7 +473,7 @@ function evaluateBrowserExtension(
 
 	if (!minimalPermissions && !lockedDownAccessibleResources) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'browser_extension_fail',
 				rating: Rating.FAIL,
 				displayName: 'Browser extension lacks hardening',
@@ -492,7 +491,7 @@ function evaluateBrowserExtension(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'browser_extension_partial',
 			rating: Rating.PARTIAL,
 			displayName: 'Browser extension partially hardened',
@@ -593,7 +592,7 @@ function evaluateMobileApp(
 
 	if (minimalPermissions) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'mobile_app_pass',
 				rating: Rating.PASS,
 				displayName: 'Mobile app requests minimal permissions',
@@ -606,7 +605,7 @@ function evaluateMobileApp(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'mobile_app_fail',
 			rating: Rating.FAIL,
 			displayName: 'Mobile app requests high-risk permissions',
@@ -635,7 +634,7 @@ function evaluatePasskeySubEval(
 		case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
 		case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'passkey_pass',
 					rating: Rating.PASS,
 					displayName: 'Audited passkey verification',
@@ -650,7 +649,7 @@ function evaluatePasskeySubEval(
 		case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
 		case PasskeyVerificationLibrary.OTHER:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'passkey_partial',
 					rating: Rating.PARTIAL,
 					displayName: 'Suboptimal passkey verification',
@@ -667,7 +666,7 @@ function evaluatePasskeySubEval(
 			})
 		default:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'passkey_fail',
 					rating: Rating.FAIL,
 					displayName: 'No recognized passkey verification',
@@ -885,7 +884,6 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				sentence(
 					'Hardware wallets handle key security through dedicated physical security mechanisms.',
 				),
-				null,
 			)
 		}
 
@@ -899,7 +897,19 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 		const feature = ctx.features.security.securityBestPractices
 
 		if (feature === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
+		}
+
+		if (ctx.features.variant === Variant.BROWSER && feature.browser === 'NOT_A_BROWSER_EXTENSION') {
+			return exempt(ctx, sentence('This wallet does not have a browser extension variant.'))
+		}
+
+		if (ctx.features.variant === Variant.MOBILE && feature.mobile === 'NOT_A_MOBILE_APP') {
+			return exempt(ctx, sentence('This wallet does not have a mobile app variant.'))
+		}
+
+		if (ctx.features.variant === Variant.DESKTOP && feature.desktop === 'NOT_A_DESKTOP_APP') {
+			return exempt(ctx, sentence('This wallet does not have a desktop app variant.'))
 		}
 
 		const subEvaluations: Array<Evaluation<SecurityBestPracticesValue>> = []
@@ -937,7 +947,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 		}
 
 		if (!isNonEmptyArray(subEvaluations)) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const passkeyVerification = ctx.features.security.passkeyVerification
