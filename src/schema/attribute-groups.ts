@@ -66,6 +66,10 @@ import {
 } from './attributes/security/hardware-wallet-support'
 import { scamPrevention, type ScamPreventionMetadata } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsMetadata } from './attributes/security/security-audits'
+import {
+	securityBestPractices,
+	type SecurityBestPracticesValue,
+} from './attributes/security/security-best-practices'
 import { supplyChainDIY, type SupplyChainDIYMetadata } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
@@ -98,8 +102,6 @@ import type { ResolvedFeatures } from './features'
 import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore } from './score'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
-import type { SecurityBestPracticesValue } from './attributes/security/security-best-practices'
-import type { SecurityBestPracticesData } from './features/security/security-best-practices'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
@@ -108,6 +110,7 @@ type SecurityValues = Dict<{
 	chainVerification: null
 	transactionLegibility: null
 	hardwareWalletSupport: HardwareWalletSupportMetadata
+	securityBestPractices: SecurityBestPracticesValue
 	bugBountyProgram: null
 	supplyChainDIY: SupplyChainDIYMetadata
 	supplyChainFactory: SupplyChainFactoryMetadata
@@ -356,7 +359,6 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	accountRecovery: EvaluatedAttribute<AccountRecoveryMetadata>
 	duressResistance: EvaluatedAttribute
 	securityBestPractices: EvaluatedAttribute<SecurityBestPracticesValue>
-
 }
 
 /** Evaluated privacy attributes for a single wallet. */
