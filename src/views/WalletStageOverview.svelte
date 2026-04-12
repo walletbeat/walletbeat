@@ -3,8 +3,12 @@
 ">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
-	import { softwareLadders } from '@/schema/ladders'
-	import { StageCriterionRating, stageCriterionRatings, type WalletLadder, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import {
+		StageCriterionRating,
+		stageCriterionRatings,
+		type WalletLadderEvaluation,
+		type WalletStage,
+	} from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
@@ -60,21 +64,8 @@
 
 
 	// Derived
-	let ladderType = $derived(
-		!ladderEvaluation ?
-			null
-		:
-			Object.entries(wallet.ladders)
-				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0]
-			?? null
-	)
-
 	let ladderDefinition = $derived(
-		ladderType ?
-			softwareLadders[ladderType] as WalletLadder<_AttributeGroupId>
-		:
-			null
+		ladderEvaluation?.ladder ?? null
 	)
 
 	let currentStageIndex = $derived(

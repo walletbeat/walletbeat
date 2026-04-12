@@ -2,9 +2,9 @@
 // Types/constants
 import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { attributeGroupById } from '@/data/attribute-groups'
 import { representativeWalletForType } from '@/data/wallets'
 import { softwareLadders } from '@/schema/ladders'
+import { softwareWalletAttributeTree, ratedSoftwareWallets } from '@/data/software-wallets'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
@@ -23,7 +23,7 @@ const { attrGroupId } = Astro.params
 // Data
 const attrGroup = getAttributeGroupById(
 	attrGroupId,
-	attributeGroupById,
+	softwareWalletAttributeTree,
 	representativeWalletForType(WalletType.SOFTWARE).overall,
 )
 
@@ -35,7 +35,6 @@ if (!attrGroup) {
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import WalletTable from '@/views/WalletTable.svelte'
-import { ratedSoftwareWallets, softwareWalletAttributeTree } from '@/data/software-wallets'
 ---
 
 <Layout

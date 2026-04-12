@@ -45,7 +45,7 @@
 		summaryVisualization?: SummaryVisualization
 	} = $props()
 
-	const attributeGroups = $derived(
+	const attributeGroupList = $derived(
 		Object.values(attributeTree)
 	)
 
@@ -54,7 +54,7 @@
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
 
 	let attributeActiveFilters = $state(
-		new SvelteSet<{ id: string, label: string, filterFunction: (attr: any) => boolean }>()
+		new SvelteSet<{ id: string, label: string, filterFunction: (item: { attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }) => boolean }>()
 	)
 
 	// (Derived)
@@ -70,9 +70,9 @@
 			})
 		)
 	)
-	
+
 	const allAttributes = $derived(
-		attributeGroups
+		attributeGroupList
 			.flatMap(attrGroup => (
 				attrGroup.attributes
 					.map(({ attribute }) => ({
@@ -83,7 +83,7 @@
 			))
 	)
 
-	let filteredAttributes = $state<Array<{ attributeGroupId: string, attributeId: string, attribute: any }>>(
+	let filteredAttributes = $state<Array<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>(
 		[]
 	)
 
@@ -91,7 +91,7 @@
 		let filtered = (
 			wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE]) ?
 				// Filter attribute groups to only include non-exempt attributes
-				attributeGroups
+				attributeGroupList
 					.map(attrGroup => ({
 						...attrGroup,
 						attributes: (
@@ -105,7 +105,7 @@
 						attrGroup.attributes.length > 0
 					))
 			:
-				attributeGroups
+				attributeGroupList
 		)
 
 		// Filter by stage if any stage filters are active
@@ -206,7 +206,7 @@
 
 	const attributesExemptForAllWallets = $derived(
 		new Set(
-			attributeGroups.flatMap(attrGroup =>
+			attributeGroupList.flatMap(attrGroup =>
 				attrGroup.attributes
 					.map(({ attribute }) => attribute.id)
 					.filter(attributeId => {
@@ -245,7 +245,7 @@
 	let toggleFilterById: ComponentProps<typeof Filters<RatedWallet<_AttributeGroupId>>>['toggleFilterById'] = $state()
 	let toggleFilter: ComponentProps<typeof Filters<RatedWallet<_AttributeGroupId>>>['toggleFilter'] = $state()
 
-	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: any }>>['toggleFilterById'] = $state()
+	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>['toggleFilterById'] = $state()
 
 	const toggleRowExpanded = (id: string) => {
 		if (expandedRowIds.has(id))
@@ -930,8 +930,8 @@
 				{:else}
 					{@const selectedSliceId =
 						selectedAttribute ?
-							attributeGroups.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id]) ?
-								`attrGroup_${attributeGroups.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id])!.id}__attr_${selectedAttribute}`
+							attributeGroupList.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id]) ?
+								`attrGroup_${attributeGroupList.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id])!.id}__attr_${selectedAttribute}`
 							:
 								undefined
 						:
@@ -1117,7 +1117,7 @@
 											undefined
 									: selectedAttribute ?
 										(() => {
-											const g = attributeGroups.find(
+											const g = attributeGroupList.find(
 												gr => isRatedEvaluationTreeGroup(gr.id, wallet.overall)
 													&& selectedAttribute! in wallet.overall[gr.id],
 											)
@@ -1135,9 +1135,9 @@
 
 								{@const displayedGroup = (
 									activeEntityId?.walletId === wallet.metadata.id ?
-										attributeGroups.find(g => g.id === activeEntityId!.attributeGroupId)
+										attributeGroupList.find(g => g.id === activeEntityId!.attributeGroupId)
 									: selectedAttribute ?
-										attributeGroups.find(
+										attributeGroupList.find(
 											g => isRatedEvaluationTreeGroup(g.id, wallet.overall)
 												&& selectedAttribute! in wallet.overall[g.id],
 										)

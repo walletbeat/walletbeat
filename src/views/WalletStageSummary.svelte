@@ -3,12 +3,10 @@
 ">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
-	import { softwareLadders, type Ladders, WalletLadderType } from '@/schema/ladders'
 	import {
 		StageCriterionRating,
 		stageCriterionRatings,
 		type StageEvaluatableWallet,
-		type WalletLadder,
 		type WalletLadderEvaluation,
 		type WalletStage,
 	} from '@/schema/stages'
@@ -21,13 +19,11 @@
 	// Props
 	const {
 		wallet,
-		ladders,
 		stage,
 		ladderEvaluation,
 		showNextStageCriteria = true,
 	}: {
 		wallet: RatedWallet<_AttributeGroupId>
-		ladders?: Ladders<_AttributeGroupId>
 		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 		showNextStageCriteria?: boolean
@@ -43,23 +39,8 @@
 		overrides: wallet.overrides,
 	})
 
-	const ladderType = $derived(
-		ladderEvaluation ?
-			Object.entries(wallet.ladders)
-				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0]
-			?? null
-		:
-			null
-	)
-
 	const ladderDefinition = $derived(
-		ladders && ladderType === WalletLadderType.SOFTWARE ?
-			// Hydrated `ladders` props lose `evaluate`; use module ladder. Generic widens software ladder for callers.
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- intentional variance bridge
-			(softwareLadders[WalletLadderType.SOFTWARE] as unknown as WalletLadder<_AttributeGroupId>)
-		:
-			null
+		ladderEvaluation?.ladder ?? null
 	)
 
 	const stage0 = $derived(

@@ -6,9 +6,10 @@
 	import {
 		type Attribute,
 		type EvaluatedAttribute,
-		type EvaluatedGroup,
 		type ExampleRating,
+		type OutcomeMetadata,
 		Rating,
+		normalizeExampleRatings,
 		ratingIcons,
 		ratingToColor,
 		Verifiability,
@@ -16,8 +17,7 @@
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
 	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
 	import { type Ladders } from '@/schema/ladders'
-	import type { OutcomeMetadata } from '@/schema/attributes'
-	import type { AttributeTree } from '@/schema/attribute-groups'
+	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
 	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
 	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
@@ -155,10 +155,12 @@
 	})
 
 	const evalTree = $derived(
-		selectedVariant &&
-			wallet.variants[selectedVariant]?.attributes
-		||
-			wallet.overall
+		(
+			selectedVariant &&
+				wallet.variants[selectedVariant]?.attributes
+			||
+				wallet.overall
+		) satisfies EvaluationTree<_AttributeGroupId>
 	)
 
 	const attrToRelevantVariants = $derived.by(() => {
@@ -226,14 +228,12 @@
 			'@type': 'FAQPage',
 			mainEntity: (
 				evalTree ?
-					Object.entries(attributeTree)
-						.flatMap(([attrGroupId, attrGroup]) => (
+					Object.values(attributeTree)
+						.flatMap(attrGroup => (
 							attrGroup.attributes
 								.map(({ attribute }) => ({
 									evalAttr: (
-										evalTree[attrGroupId][attribute.id] as
-											| EvaluatedAttribute<any>
-											| undefined
+										evalTree[attrGroup.id][attribute.id]
 									),
 									attribute,
 								}))
@@ -515,8 +515,8 @@
 			</section>
 		{/if}
 
-		{#each evalTree ? Object.entries(attributeTree) : [] as [attrGroupId, attrGroup]}
-			{@const evalGroup = evalTree?.[attrGroupId]}
+		{#each evalTree ? Object.values(attributeTree) : [] as attrGroup}
+			{@const evalGroup = evalTree[attrGroup.id]}
 
 			{#if evalGroup}
 				{@render attributeGroupSnippet({
@@ -540,14 +540,14 @@
 	attrGroup,
 	evalGroup,
 }: {
-	attrGroup: AttributeGroup<any, any>
-	evalGroup: EvaluatedGroup<any>
+	attrGroup: AttributeGroup<_AttributeGroupId>
+	evalGroup: EvaluationTree<_AttributeGroupId>[_AttributeGroupId]
 })}
 	{@const attributes = attrGroup.attributes
 		.map(({ attribute, weight }) => ({
 			attribute,
 			weight,
-			evalAttr: evalGroup[attribute.id] as EvaluatedAttribute<any> | undefined,
+			evalAttr: evalGroup[attribute.id],
 		}))
 		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT)
 		.map(({ attribute, evalAttr }) => ({
@@ -716,8 +716,8 @@
 	evalAttr,
 }: {
 	attrGroupId: string
-	attribute: Attribute<any>
-	evalAttr: EvaluatedAttribute<any>
+	attribute: Attribute<OutcomeMetadata>
+	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
 
@@ -1090,10 +1090,10 @@
 												.map(({ rating, label, exampleRatings }) => ({
 													rating,
 													label,
-													exampleRatings: [exampleRatings].flat() as ExampleRating<any>[],
+													exampleRatings: normalizeExampleRatings(exampleRatings),
 												}))
 												.filter(
-													(item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<any>> } => item.exampleRatings.length > 0,
+													(item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<OutcomeMetadata>> } => item.exampleRatings.length > 0,
 												)
 										) as { rating, label, exampleRatings }}
 											<li

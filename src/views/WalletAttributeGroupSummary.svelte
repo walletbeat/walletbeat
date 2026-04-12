@@ -22,7 +22,7 @@
 		isInTooltip = false,
 	}: {
 		wallet: RatedWallet
-		attributeGroup: AttributeGroup<AttributeGroupId, any>,
+		attributeGroup: AttributeGroup<AttributeGroupId>,
 		summaryType?: WalletAttributeGroupSummaryType
 		isInTooltip?: boolean
 	} = $props()
