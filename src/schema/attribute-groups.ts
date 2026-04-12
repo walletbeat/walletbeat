@@ -57,7 +57,7 @@ export type _AttributeWithWeight<_OutcomeMetadata extends OutcomeMetadata> = {
 }
 
 export type AttributeTree<_AttributeGroupId extends string> = {
-	[__AttributeGroupId in _AttributeGroupId]: AttributeGroup<__AttributeGroupId>
+	[K in _AttributeGroupId]: AttributeGroup<K>
 }
 
 /** Evaluated attributes for a single wallet. Each group has only its own attribute IDs. */
@@ -68,7 +68,7 @@ export type EvaluationTree<_AttributeGroupId extends string> = Record<
 
 /** Rate a wallet's attributes based on its features and metadata. */
 export function evaluateAttributes<_AttributeGroupId extends string>(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
 	features: ResolvedFeatures,
 	walletMetadata: WalletMetadata,
 ): EvaluationTree<_AttributeGroupId> {
@@ -102,7 +102,7 @@ export function evaluateAttributes<_AttributeGroupId extends string>(
 
 	// @ts-expect-error -- Group lists heterogeneous attribute outcome metadata; each row is still `Attribute<OutcomeMetadata>`.
 	return Object.fromEntries(
-		Object.entries(attributeGroupById).map(([attrGroupId, attrGroup]) => [
+		Object.entries(attributeTree).map(([attrGroupId, attrGroup]) => [
 			attrGroupId,
 			Object.fromEntries(
 				attrGroup.attributes.map(({ attribute }) => [attribute.id, evaluate(attribute)]),
@@ -116,18 +116,18 @@ export function evaluateAttributes<_AttributeGroupId extends string>(
  * a single non-per-variant tree of evaluated attributes.
  */
 export function aggregateAttributes<_AttributeGroupId extends string>(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
-	perVariant: AtLeastOneVariant<EvaluationTree<_AttributeGroupId>>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	perVariantTree: AtLeastOneVariant<EvaluationTree<_AttributeGroupId>>,
 ): EvaluationTree<_AttributeGroupId> {
 	const aggregate = (
 		getter: (tree: EvaluationTree<_AttributeGroupId>) => EvaluatedAttribute<OutcomeMetadata>,
 	): EvaluatedAttribute<OutcomeMetadata> => {
 		const attr = getter(
-			nonEmptyGet(nonEmptyValues<Variant, EvaluationTree<_AttributeGroupId>>(perVariant)),
+			nonEmptyGet(nonEmptyValues<Variant, EvaluationTree<_AttributeGroupId>>(perVariantTree)),
 		)
 
 		const evaluations = nonEmptyRemap(
-			perVariant,
+			perVariantTree,
 			(_, tree: EvaluationTree<_AttributeGroupId>) => getter(tree).evaluation,
 		)
 
@@ -139,7 +139,7 @@ export function aggregateAttributes<_AttributeGroupId extends string>(
 
 	// @ts-expect-error -- Heterogeneous attribute metadata per group; shape matches EvaluationTree.
 	return Object.fromEntries(
-		Object.entries(attributeGroupById).map(([attrGroupId, attrGroup]) => [
+		Object.entries(attributeTree).map(([attrGroupId, attrGroup]) => [
 			attrGroupId,
 			Object.fromEntries(
 				attrGroup.attributes.map(({ attribute }) => [
@@ -152,36 +152,32 @@ export function aggregateAttributes<_AttributeGroupId extends string>(
 	)
 }
 
-type EvaluatedGroupFromAttributeGroup<__AttributeGroup extends AttributeGroup<string>> =
-	__AttributeGroup extends AttributeGroup<infer _AttributeGroupId>
+type EvaluatedGroupFromAttributeGroup<AttrGroup extends AttributeGroup<string>> =
+	AttrGroup extends AttributeGroup<infer _AttributeGroupId>
 		? {
-				[_AttributeWithWeight in __AttributeGroup['attributes'][number] as _AttributeWithWeight['attribute']['id']]: EvaluatedAttribute<any>
+				[AttributeWithWeight in AttrGroup['attributes'][number] as AttributeWithWeight['attribute']['id']]: EvaluatedAttribute<any>
 			}
 		: never
 
 /**
  * Iterate over all non-exempt attribute groups in a tree, calling `fn` with each group.
  */
-export function mapNonExemptAttributeGroupsInTree<
-	R,
-	_AttributeGroupId extends string,
-	_OutcomeMetadata extends OutcomeMetadata,
->(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
-	evaluationTree: EvaluationTree<_AttributeGroupId>,
+export function mapNonExemptAttributeGroupsInTree<R, _AttributeGroupId extends string>(
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	evalTree: EvaluationTree<_AttributeGroupId>,
 	fn: (
 		attrGroup: AttributeGroup<_AttributeGroupId>,
 		evalGroup: EvaluatedGroupFromAttributeGroup<typeof attrGroup>,
 	) => R,
 ): R[] {
-	return Object.values(attributeGroupById)
+	return Object.values(attributeTree)
 		.filter(attrGroup => {
-			const evalGroup = evaluationTree[attrGroup.id]
+			const evalGroup = evalTree[attrGroup.id]
 
 			return evalGroup !== undefined && numNonExemptGroupAttributes(evalGroup) > 0
 		})
 		.map((attrGroup): R => {
-			const evalGroup = evaluationTree[attrGroup.id]
+			const evalGroup = evalTree[attrGroup.id]
 
 			return fn(attrGroup, evalGroup)
 		})
@@ -206,7 +202,9 @@ export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
 /**
  * Return the number of non-exempt attributes in an evaluated attribute group.
  */
-export function numNonExemptGroupAttributes(evalGroup: EvaluatedGroup<any>): number {
+export function numNonExemptGroupAttributes<Vs extends ValueSet>(
+	evalGroup: EvaluatedGroup<Vs>,
+): number {
 	return Object.values(evalGroup).filter(
 		(evalAttr): boolean => evalAttr.evaluation.outcome.rating !== Rating.EXEMPT,
 	).length
@@ -246,11 +244,11 @@ export function getEvaluationFromOtherTree<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
 	evalAttr: EvaluatedAttribute<_OutcomeMetadata>,
-	otherTree: EvaluationTree<_AttributeGroupId>,
+	otherEvalTree: EvaluationTree<_AttributeGroupId>,
 ): EvaluatedAttribute<_OutcomeMetadata> {
-	const otherEvalAttr = getAttributeFromTree(attributeGroupById, otherTree, evalAttr.attribute)
+	const otherEvalAttr = getAttributeFromTree(attributeTree, otherEvalTree, evalAttr.attribute)
 
 	if (otherEvalAttr === null) {
 		throw new Error(
@@ -264,7 +262,7 @@ export function getEvaluationFromOtherTree<
 /**
  * Calculate a score for an attribute group based on its weights and evaluations.
  * @param attrGroup The attribute group (weights are in attributes array).
- * @param evaluations The evaluations to score.
+ * @param evaluatedGroup The evaluated attributes for this group (not a full EvaluationTree).
  * @returns A score between 0.0 (lowest) and 1.0 (highest) or null if exempt.
  */
 export function calculateAttributeGroupScore<
@@ -308,18 +306,18 @@ export function calculateAttributeGroupScore<
 
 /**
  * Calculate the overall wallet score by averaging all attribute group scores.
- * @param evaluationTree The evaluation tree to score.
+ * @param evalTree The evaluation tree to score.
  * @param attrGroupPredicate A predicate determining whether the given attribute group should be scored.
  * @returns The overall score between 0.0 (lowest) and 1.0 (highest), or null if no scores.
  */
 export const calculateOverallScore = <_AttributeGroupId extends string>(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
-	evaluationTree: EvaluationTree<_AttributeGroupId>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	evalTree: EvaluationTree<_AttributeGroupId>,
 	attrGroupPredicate: (attrGroup: AttributeGroup<_AttributeGroupId>) => boolean,
 ): MaybeUnratedScore => {
 	const scores = mapNonExemptAttributeGroupsInTree(
-		attributeGroupById,
-		evaluationTree,
+		attributeTree,
+		evalTree,
 		(
 			attrGroup: AttributeGroup<_AttributeGroupId>,
 			evalGroup: EvaluatedGroupFromAttributeGroup<typeof attrGroup>,
@@ -351,7 +349,7 @@ export const calculateOverallScore = <_AttributeGroupId extends string>(
  * @returns Formatted title text showing icon and score (if enabled) or just display name.
  */
 export const formatAttributeGroupTitleText = (
-	attrGroup: AttributeGroup<any>,
+	attrGroup: AttributeGroup<string>,
 	groupScore: MaybeUnratedScore,
 	showScores: boolean,
 ) =>
@@ -371,21 +369,21 @@ export const formatAttributeGroupTitleText = (
  */
 export function getAttributeGroupById<_AttributeGroupId extends string>(
 	id: string,
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
-	evaluationTree: EvaluationTree<_AttributeGroupId>,
-): AttributeGroup<any> | null {
-	const hasAttributeGroup = (id: string): id is _AttributeGroupId => id in attributeGroupById
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	evalTree: EvaluationTree<_AttributeGroupId>,
+): AttributeGroup<_AttributeGroupId> | null {
+	const hasAttributeGroup = (id: string): id is _AttributeGroupId => id in attributeTree
 
 	if (!hasAttributeGroup(id)) {
 		return null
 	}
 
-	const attrGroup = attributeGroupById[id]
+	const attrGroup = attributeTree[id]
 
 	if (
 		!mapNonExemptAttributeGroupsInTree(
-			attributeGroupById,
-			evaluationTree,
+			attributeTree,
+			evalTree,
 			(attrGroupInTree, _evalGroup) => attrGroup.id === attrGroupInTree.id,
 		).some(val => val)
 	) {
@@ -399,15 +397,12 @@ export function getAttributeFromTree<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
-	evaluationTree: EvaluationTree<_AttributeGroupId>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	evalTree: EvaluationTree<_AttributeGroupId>,
 	attribute: Attribute<_OutcomeMetadata>,
 ): EvaluatedAttribute<_OutcomeMetadata> | null {
-	const evalAttrs = mapNonExemptAttributeGroupsInTree(
-		attributeGroupById,
-		evaluationTree,
-		(_, evalGroup) =>
-			evaluatedAttributes(evalGroup).find(evalAttr => evalAttr.attribute.id === attribute.id),
+	const evalAttrs = mapNonExemptAttributeGroupsInTree(attributeTree, evalTree, (_, evalGroup) =>
+		evaluatedAttributes(evalGroup).find(evalAttr => evalAttr.attribute.id === attribute.id),
 	).filter(v => v !== undefined)
 
 	switch (evalAttrs.length) {

@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeGroupById } from '@/data/attribute-groups'
-import { allRatedWallets } from '@/data/wallets'
+import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
+import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
+import { softwareWalletAttributeTree } from '@/data/software-wallets'
+import {
+	allRatedWallets,
+	isEmbeddedRatedWallet,
+	isHardwareRatedWallet,
+	isSoftwareRatedWallet,
+} from '@/data/wallets'
 import {
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
@@ -18,11 +25,32 @@ import { grammarLint, warmupHarperLinter } from './utils/grammar'
 await warmupHarperLinter()
 
 const SITE_URL = 'http://localhost:4321'
+const markdownForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRatedWallets]) =>
+	isSoftwareRatedWallet(wallet)
+		? walletPageMarkdown(softwareWalletAttributeTree, wallet, SITE_URL)
+		: isHardwareRatedWallet(wallet)
+			? walletPageMarkdown(hardwareWalletAttributeTree, wallet, SITE_URL)
+			: isEmbeddedRatedWallet(wallet)
+				? walletPageMarkdown(embeddedWalletAttributeTree, wallet, SITE_URL)
+				: (() => {
+						throw new Error('Wallet has no recognized type')
+					})()
+
+const attributeTreeForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRatedWallets]) =>
+	isSoftwareRatedWallet(wallet)
+		? softwareWalletAttributeTree
+		: isHardwareRatedWallet(wallet)
+			? hardwareWalletAttributeTree
+			: isEmbeddedRatedWallet(wallet)
+				? embeddedWalletAttributeTree
+				: (() => {
+						throw new Error('Wallet has no recognized type')
+					})()
 
 describe('walletPageMarkdown', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
-			const md = walletPageMarkdown(attributeGroupById, wallet, SITE_URL)
+			const md = markdownForWallet(wallet)
 
 			it('produces non-empty output', () => {
 				expect(md.length).toBeGreaterThan(100)
@@ -50,7 +78,7 @@ describe('walletPageMarkdown', () => {
 
 			it('contains each non-exempt attribute group heading', () => {
 				const groupNames: string[] = mapNonExemptAttributeGroupsInTree(
-					attributeGroupById,
+					attributeTreeForWallet(wallet),
 					wallet.overall,
 					(attrGroup, _evalGroup): string => attrGroup.displayName,
 				)
@@ -62,7 +90,7 @@ describe('walletPageMarkdown', () => {
 
 			it('contains a correct heading for every non-exempt attribute', () => {
 				const headings = mapNonExemptAttributeGroupsInTree(
-					attributeGroupById,
+					attributeTreeForWallet(wallet),
 					wallet.overall,
 					(_attrGroup, evalGroup) =>
 						mapNonExemptGroupAttributes(
@@ -79,7 +107,7 @@ describe('walletPageMarkdown', () => {
 
 			it('includes at least one URL for every attribute that has references', () => {
 				const urlSetsToCheck: string[][] = mapNonExemptAttributeGroupsInTree(
-					attributeGroupById,
+					attributeTreeForWallet(wallet),
 					wallet.overall,
 					(_attrGroup, evalGroup) =>
 						mapNonExemptGroupAttributes(evalGroup, evalAttr => {

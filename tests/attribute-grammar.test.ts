@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { attributeGroupById } from '@/data/attribute-groups'
+import { attributeTree } from '@/data/attribute-groups'
 import type { TypographicContent } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
 
@@ -15,7 +15,7 @@ const normalizeRatings = (ratings: unknown): { description: TypographicContent }
 	(Array.isArray(ratings) ? ratings : [ratings]).filter(hasDescription)
 
 describe('attribute', () => {
-	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeGroupById)) {
+	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
 			for (const { attribute } of attributeGroup.attributes) {
 				describe(`attribute ${attribute.displayName}`, () => {

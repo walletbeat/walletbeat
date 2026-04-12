@@ -10,7 +10,7 @@ export enum AttributeGroupId {
 	Maintenance = 'maintenance',
 }
 
-export const attributeGroups = [
+const attributeGroupDefinitions = [
 	{
 		id: AttributeGroupId.Security,
 		displayName: 'Security',
@@ -247,11 +247,11 @@ export const attributeGroups = [
 	},
 ] as const satisfies readonly AttributeGroup<AttributeGroupId>[]
 
-export const attributeGroupById = Object.fromEntries(
-	attributeGroups.map(attrGroup => [attrGroup.id, attrGroup] as const),
+export const attributeTree = Object.fromEntries(
+	attributeGroupDefinitions.map(attrGroup => [attrGroup.id, attrGroup] as const),
 ) satisfies {
-	[K in (typeof attributeGroups)[number]['id']]: Extract<
-		(typeof attributeGroups)[number],
+	[K in (typeof attributeGroupDefinitions)[number]['id']]: Extract<
+		(typeof attributeGroupDefinitions)[number],
 		{ readonly id: K }
 	>
 }
@@ -259,17 +259,17 @@ export const attributeGroupById = Object.fromEntries(
 /**
  * Build a narrowed attribute tree that contains only the given group ids.
  *
- * @param ids Tuple of `AttributeGroupId` keys that must exist on `attributeGroupById`.
+ * @param ids Tuple of `AttributeGroupId` keys that must exist on `attributeTree`.
  *   The `number extends Ids['length'] ? never` constraint rejects plain `string[]`
  *   so callers must pass a fixed-length tuple (preserves literal union keys for `Pick`).
- * @returns The same shape as `attributeGroupById` but restricted to those keys.
+ * @returns The same shape as `attributeTree` but restricted to those keys.
  */
-export const attributeTreeForIds = <const Ids extends readonly (keyof typeof attributeGroupById)[]>(
+export const attributeTreeForIds = <const Ids extends readonly (keyof typeof attributeTree)[]>(
 	ids: Ids & (number extends Ids['length'] ? never : unknown),
-): Pick<typeof attributeGroupById, Ids[number]> => {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- each id is in Ids; values are attributeGroupById[id]
-	return Object.fromEntries(ids.map(id => [id, attributeGroupById[id]] as const)) as Pick<
-		typeof attributeGroupById,
+): Pick<typeof attributeTree, Ids[number]> => {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- each id is in Ids; values are attributeTree[id]
+	return Object.fromEntries(ids.map(id => [id, attributeTree[id]] as const)) as Pick<
+		typeof attributeTree,
 		Ids[number]
 	>
 }

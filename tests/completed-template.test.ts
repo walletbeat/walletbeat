@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeGroupById } from '@/data/attribute-groups'
+import { softwareWalletAttributeTree } from '@/data/software-wallets'
 import { completedTemplate } from '@/data/software-wallets/completed.tmpl'
 import { mapAttributesGetter } from '@/schema/attribute-groups'
 import { Rating } from '@/schema/attributes'
@@ -9,7 +9,7 @@ import { rateWallet } from '@/schema/wallet'
 
 describe('completed.tmpl', () => {
 	it('rates PASS or EXEMPT on all attributes, never UNRATED', () => {
-		const rated = rateWallet(attributeGroupById, softwareLadders, completedTemplate)
+		const rated = rateWallet(softwareWalletAttributeTree, softwareLadders, completedTemplate)
 
 		mapAttributesGetter(rated.overall, getter => {
 			const evalAttr = getter(rated.overall)

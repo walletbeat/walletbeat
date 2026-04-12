@@ -23,7 +23,7 @@ import NewsPaperIcon from 'lucide-static/icons/newspaper.svg?raw'
 import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 // Constants
-import { attributeGroupById } from '@/data/attribute-groups'
+import { attributeTree } from '@/data/attribute-groups'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
@@ -102,7 +102,7 @@ export const defaultNavigationItems = [
 				title: 'By Rating',
 				icon: ChartPieIcon,
 				children: mapNonExemptAttributeGroupsInTree(
-					attributeGroupById,
+					attributeTree,
 					representativeWalletForType(WalletType.SOFTWARE).overall,
 					(attrGroup, _evalGroup) => ({
 						id: `software-${attrGroup.id}`,
@@ -143,7 +143,7 @@ export const defaultNavigationItems = [
 				icon: ChartPieIcon,
 				children: [
 					...mapNonExemptAttributeGroupsInTree(
-						attributeGroupById,
+						attributeTree,
 						representativeWalletForType(WalletType.HARDWARE).overall,
 						(attrGroup, _evalGroup) => ({
 							id: `hardware-${attrGroup.id}`,
@@ -179,7 +179,7 @@ export const defaultNavigationItems = [
 				icon: ChartPieIcon,
 				children: [
 					...mapNonExemptAttributeGroupsInTree(
-						attributeGroupById,
+						attributeTree,
 						representativeWalletForType(WalletType.EMBEDDED).overall,
 						(attrGroup, _evalGroup) => ({
 							id: `embedded-${attrGroup.id}`,

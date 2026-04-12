@@ -27,7 +27,7 @@ interface ObjectConstructor {
 		obj: T,
 	): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>
 
-	fromEntries<const A extends ReadonlyArray<readonly [PropertyKey, any]>>(
+	fromEntries<const A extends ReadonlyArray<readonly [PropertyKey, unknown]>>(
 		entries: A,
 	): (
 		A[number] extends infer E
@@ -51,6 +51,7 @@ interface Array<T> {
 	): S[]
 }
 
+/** Augment the built-in readonly array interface with tuple-preserving overloads. */
 interface ReadonlyArray<T> {
 	map<const Arr extends readonly { readonly id: PropertyKey }[]>(
 		this: Arr,

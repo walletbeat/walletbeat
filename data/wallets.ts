@@ -1,9 +1,18 @@
+import type { AttributeTree } from '@/schema/attribute-groups'
 import { type BaseWallet, type RatedWallet, type WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 
 import { type AttributeGroupId } from './attribute-groups'
-import { embeddedWallets, ratedEmbeddedWallets, unratedEmbeddedWallet } from './embedded-wallets'
 import {
+	type EmbeddedAttributeGroupId,
+	embeddedWalletAttributeTree,
+	embeddedWallets,
+	ratedEmbeddedWallets,
+	unratedEmbeddedWallet,
+} from './embedded-wallets'
+import {
+	type HardwareAttributeGroupId,
+	hardwareWalletAttributeTree,
 	hardwareWallets,
 	isValidHardwareWalletName,
 	ratedHardwareWallets,
@@ -12,6 +21,8 @@ import {
 import {
 	isValidSoftwareWalletName,
 	ratedSoftwareWallets,
+	type SoftwareAttributeGroupId,
+	softwareWalletAttributeTree,
 	softwareWallets,
 	unratedSoftwareWallet,
 } from './software-wallets'
@@ -77,6 +88,48 @@ export function representativeWalletForType(walletType: WalletType) {
 			return unratedHardwareWallet
 		case WalletType.EMBEDDED:
 			return unratedEmbeddedWallet
+	}
+}
+
+export function isSoftwareRatedWallet(
+	wallet: RatedWallet<string>,
+): wallet is RatedWallet<SoftwareAttributeGroupId> {
+	return wallet.types[WalletType.SOFTWARE] === true
+}
+
+export function isHardwareRatedWallet(
+	wallet: RatedWallet<string>,
+): wallet is RatedWallet<HardwareAttributeGroupId> {
+	return wallet.types[WalletType.HARDWARE] === true
+}
+
+export function isEmbeddedRatedWallet(
+	wallet: RatedWallet<string>,
+): wallet is RatedWallet<EmbeddedAttributeGroupId> {
+	return wallet.types[WalletType.EMBEDDED] === true
+}
+
+export function walletAttributeTree(
+	wallet: Pick<RatedWallet<SoftwareAttributeGroupId>, 'types'>,
+): typeof softwareWalletAttributeTree
+export function walletAttributeTree(
+	wallet: Pick<RatedWallet<HardwareAttributeGroupId>, 'types'>,
+): typeof hardwareWalletAttributeTree
+export function walletAttributeTree(
+	wallet: Pick<RatedWallet<EmbeddedAttributeGroupId>, 'types'>,
+): typeof embeddedWalletAttributeTree
+export function walletAttributeTree(
+	wallet: Pick<RatedWallet<string>, 'types'>,
+): AttributeTree<string> {
+	switch (true) {
+		case wallet.types[WalletType.SOFTWARE] === true:
+			return softwareWalletAttributeTree
+		case wallet.types[WalletType.HARDWARE] === true:
+			return hardwareWalletAttributeTree
+		case wallet.types[WalletType.EMBEDDED] === true:
+			return embeddedWalletAttributeTree
+		default:
+			throw new Error('Invalid wallet type')
 	}
 }
 

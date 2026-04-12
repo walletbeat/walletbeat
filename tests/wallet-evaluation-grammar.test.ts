@@ -1,8 +1,8 @@
 import { describe } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
-import { attributeGroupById, AttributeGroupId } from '@/data/attribute-groups'
-import { allRatedWallets } from '@/data/wallets'
+import { AttributeGroupId } from '@/data/attribute-groups'
+import { allRatedWallets, walletAttributeTree } from '@/data/wallets'
 import {
 	type AttributeGroup,
 	mapNonExemptAttributeGroupsInTree,
@@ -87,51 +87,55 @@ describe('evaluations', () => {
 					variantName: variantToName(resolvedWallet.variant, true),
 				})),
 		]) {
-			mapNonExemptAttributeGroupsInTree(attributeGroupById, evalTree, (attrGroup, evalGroup) => {
-				mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend OutcomeMetadata.
-					const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<OutcomeMetadata>
+			mapNonExemptAttributeGroupsInTree(
+				walletAttributeTree(ratedWallet),
+				evalTree,
+				(attrGroup, evalGroup) => {
+					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend OutcomeMetadata.
+						const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<OutcomeMetadata>
 
-					addEvaluation(attrGroup, genericEvalAttr.attribute, {
-						name: `${ratedWallet.metadata.displayName} ${variantName} rating`,
-						evaluation: genericEvalAttr.evaluation,
-					})
-					const ratingScale = genericEvalAttr.attribute.ratingScale
+						addEvaluation(attrGroup, genericEvalAttr.attribute, {
+							name: `${ratedWallet.metadata.displayName} ${variantName} rating`,
+							evaluation: genericEvalAttr.evaluation,
+						})
+						const ratingScale = genericEvalAttr.attribute.ratingScale
 
-					switch (ratingScale.display) {
-						case 'simple':
-							break
-						case 'fail-pass':
-						// Fall through
-						case 'pass-fail':
-							for (const row of [
-								{ rating: Rating.PASS, exampleRatings: ratingScale.pass },
-								{ rating: Rating.PARTIAL, exampleRatings: ratingScale.partial },
-								{ rating: Rating.FAIL, exampleRatings: ratingScale.fail },
-							]) {
-								let { exampleRatings } = row
-								const { rating } = row
+						switch (ratingScale.display) {
+							case 'simple':
+								break
+							case 'fail-pass':
+							// Fall through
+							case 'pass-fail':
+								for (const row of [
+									{ rating: Rating.PASS, exampleRatings: ratingScale.pass },
+									{ rating: Rating.PARTIAL, exampleRatings: ratingScale.partial },
+									{ rating: Rating.FAIL, exampleRatings: ratingScale.fail },
+								]) {
+									let { exampleRatings } = row
+									const { rating } = row
 
-								if (exampleRatings === undefined) {
-									continue
-								}
+									if (exampleRatings === undefined) {
+										continue
+									}
 
-								if (!Array.isArray(exampleRatings)) {
-									exampleRatings = [exampleRatings]
-								}
+									if (!Array.isArray(exampleRatings)) {
+										exampleRatings = [exampleRatings]
+									}
 
-								for (const exampleRating of exampleRatings) {
-									for (const sampleEvaluation of exampleRating.sampleEvaluations) {
-										addEvaluation(attrGroup, genericEvalAttr.attribute, {
-											name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.outcome.id}`,
-											evaluation: sampleEvaluation,
-										})
+									for (const exampleRating of exampleRatings) {
+										for (const sampleEvaluation of exampleRating.sampleEvaluations) {
+											addEvaluation(attrGroup, genericEvalAttr.attribute, {
+												name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.outcome.id}`,
+												evaluation: sampleEvaluation,
+											})
+										}
 									}
 								}
-							}
-					}
-				})
-			})
+						}
+					})
+				},
+			)
 		}
 	}
 

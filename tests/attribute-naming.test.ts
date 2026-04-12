@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeGroupById } from '@/data/attribute-groups'
+import { attributeTree } from '@/data/attribute-groups'
 
 describe('attribute', () => {
-	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeGroupById)) {
+	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
 			it('has the correct ID', () => {
 				expect(attributeGroupName).toBe(attributeGroup.id)

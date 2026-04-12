@@ -310,7 +310,7 @@ export interface RatedWallet<_AttributeGroupId extends string> {
 }
 
 function resolveVariant<_AttributeGroupId extends string>(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
 	wallet: BaseWallet<_AttributeGroupId>,
 	variant: Variant,
 ): ResolvedWallet<_AttributeGroupId> | null {
@@ -325,7 +325,7 @@ function resolveVariant<_AttributeGroupId extends string>(
 			metadata: wallet.metadata,
 			variant,
 			features: resolvedFeatures,
-			attributes: evaluateAttributes(attributeGroupById, resolvedFeatures, wallet.metadata),
+			attributes: evaluateAttributes(attributeTree, resolvedFeatures, wallet.metadata),
 		}
 	} catch (e) {
 		throw prefixError(`Wallet ${wallet.metadata.id}`, e)
@@ -333,13 +333,13 @@ function resolveVariant<_AttributeGroupId extends string>(
 }
 
 export function rateWallet<_AttributeGroupId extends string>(
-	attributeGroupById: AttributeTree<_AttributeGroupId>,
+	attributeTree: AttributeTree<_AttributeGroupId>,
 	walletLadders: Ladders<_AttributeGroupId>,
 	wallet: BaseWallet<_AttributeGroupId>,
 ): RatedWallet<_AttributeGroupId> {
 	const perVariantWallets = Object.fromEntries(
 		variantEnum.items
-			.map(variant => [variant, resolveVariant(attributeGroupById, wallet, variant)] as const)
+			.map(variant => [variant, resolveVariant(attributeTree, wallet, variant)] as const)
 			.filter(
 				(entry): entry is [(typeof entry)[0], NonNullable<(typeof entry)[1]>] => entry[1] !== null,
 			),
@@ -381,12 +381,12 @@ export function rateWallet<_AttributeGroupId extends string>(
 			let foundDifferentValue = false
 			let foundSameValue = false
 
-			for (const [versusVariant, versusTree] of Object.entries(perVariantTree)) {
+			for (const [versusVariant, versusEvalTree] of Object.entries(perVariantTree)) {
 				if (versusVariant === variant) {
 					continue
 				}
 
-				const versusEval = getter(versusTree)
+				const versusEval = getter(versusEvalTree)
 
 				if (versusEval === undefined) {
 					continue
@@ -431,7 +431,7 @@ export function rateWallet<_AttributeGroupId extends string>(
 		types: walletTypesOf(wallet),
 		variants: perVariantWallets,
 		variantSpecificity,
-		overall: aggregateAttributes(attributeGroupById, perVariantTree),
+		overall: aggregateAttributes(attributeTree, perVariantTree),
 		overrides: wallet.overrides,
 	}
 
@@ -514,18 +514,19 @@ export function getAttributeOverride<_AttributeGroupId extends string>(
 		return null
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access -- Safe because we just checked the property exists.
-	const attributeGroup = (ratedWallet.overrides.attributes as any)[attrGroup] as
-		| Record<string, AttributeOverride | undefined> // Safe because all attribute group overrides are structured this way.
-		| undefined
+	const attributeGroup = ratedWallet.overrides.attributes[attrGroup]
 
-	if (attributeGroup === undefined || !Object.hasOwn(attributeGroup, attrId)) {
+	if (attributeGroup === undefined) {
 		return null
 	}
 
-	const override = attributeGroup[attrId]
+	for (const [overrideAttrId, override] of Object.entries(attributeGroup)) {
+		if (overrideAttrId === attrId) {
+			return override ?? null
+		}
+	}
 
-	return override ?? null
+	return null
 }
 
 export function getVariantResolvedWallet<_AttributeGroupId extends string>(

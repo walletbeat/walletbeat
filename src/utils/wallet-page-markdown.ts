@@ -49,13 +49,13 @@ export function walletBlurbText(wallet: { metadata: WalletMetadata }): string {
  * Generate a clean markdown page for a wallet, following the llms.txt convention
  * of providing LLM-friendly content at `{walletUrl}/index.html.md`.
  *
- * @param attributeGroupById Attribute tree for this wallet class; must match the shape of `wallet.overall`.
+ * @param attributeTree Attribute tree for this wallet class; must match the shape of `wallet.overall`.
  * @param wallet The fully-rated wallet to render.
  * @param siteUrl The site root URL without trailing slash (e.g. "https://wallet.page").
  */
-export function walletPageMarkdown(
-	attributeGroupById: AttributeTree<string>,
-	wallet: RatedWallet<string>,
+export function walletPageMarkdown<_AttributeGroupId extends string>(
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	wallet: RatedWallet<_AttributeGroupId>,
 	siteUrl: string,
 ): string {
 	const { metadata } = wallet
@@ -169,7 +169,9 @@ export function walletPageMarkdown(
 						const displayName = criterion.displayName
 						const attrLink =
 							attributeId !== null
-								? `[${displayName}](${siteUrl}/${metadata.id}#${slugifyCamelCase(attributeId)})`
+								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, {
+										attributeAnchor: slugifyCamelCase(attributeId),
+									})})`
 								: displayName
 						const bullet =
 							descForBullet !== ''
@@ -189,7 +191,7 @@ export function walletPageMarkdown(
 	const isMultiVariant = !hasSingleVariant(wallet.variants)
 
 	const groupLines = mapNonExemptAttributeGroupsInTree(
-		attributeGroupById,
+		attributeTree,
 		wallet.overall,
 		(attrGroup, evalGroup): string[] => {
 			// TODO: https://github.com/walletbeat/walletbeat/issues/547
@@ -216,11 +218,12 @@ export function walletPageMarkdown(
 					if (isVariantSpecific) {
 						const perVariantParts: string[] = []
 
-						for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet<string>>(
-							wallet.variants,
-						)) {
+						for (const [variant, resolved] of nonEmptyEntries<
+							Variant,
+							ResolvedWallet<_AttributeGroupId>
+						>(wallet.variants)) {
 							const variantEvalAttr = getAttributeFromTree(
-								attributeGroupById,
+								attributeTree,
 								resolved.attributes,
 								attribute,
 							)

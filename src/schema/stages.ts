@@ -1,4 +1,4 @@
-import { attributeGroupById } from '@/data/attribute-groups'
+import { attributeTree } from '@/data/attribute-groups'
 import { type Content, type Paragraph, type Sentence, sentence } from '@/types/content'
 import { getErrorMessage } from '@/types/errors'
 import {
@@ -328,7 +328,7 @@ export function variantsMustPassAttribute<
 	const evaluateFunction = stageCriterionEvaluationPerVariant(
 		variants,
 		(variantWallet): StageCriterionEvaluation => {
-			const evalAttr = getAttributeFromTree(attributeGroupById, variantWallet.attributes, attribute)
+			const evalAttr = getAttributeFromTree(attributeTree, variantWallet.attributes, attribute)
 
 			if (evalAttr === null) {
 				throw new Error(

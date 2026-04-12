@@ -1,7 +1,15 @@
 import type { APIRoute, GetStaticPaths } from 'astro'
 
-import { attributeGroupById } from '@/data/attribute-groups'
-import { allRatedWallets, isValidWalletName } from '@/data/wallets'
+import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
+import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
+import { softwareWalletAttributeTree } from '@/data/software-wallets'
+import {
+	allRatedWallets,
+	isEmbeddedRatedWallet,
+	isHardwareRatedWallet,
+	isSoftwareRatedWallet,
+	isValidWalletName,
+} from '@/data/wallets'
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
 import { ratedWalletJsonExport } from '@/utils/wallet-json-export'
 
@@ -18,7 +26,15 @@ export const GET: APIRoute = ({ params }) => {
 	}
 
 	const wallet = allRatedWallets[walletName]
-	const payload = ratedWalletJsonExport(attributeGroupById, wallet)
+	const payload = isSoftwareRatedWallet(wallet)
+		? ratedWalletJsonExport(softwareWalletAttributeTree, wallet)
+		: isHardwareRatedWallet(wallet)
+			? ratedWalletJsonExport(hardwareWalletAttributeTree, wallet)
+			: isEmbeddedRatedWallet(wallet)
+				? ratedWalletJsonExport(embeddedWalletAttributeTree, wallet)
+				: (() => {
+						throw new Error('Wallet has no recognized type')
+					})()
 
 	return new Response(JSON.stringify(payload), {
 		headers: { 'Content-Type': 'application/json; charset=utf-8' },

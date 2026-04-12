@@ -267,13 +267,13 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 
 function serializeEvaluationTree<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,
-	tree: EvaluationTree<_AttributeGroupId>,
+	evalTree: EvaluationTree<_AttributeGroupId>,
 	evalStrings: WalletNameAndPseudonymStrings,
 ): AttributeGroupsExport {
 	const result: AttributeGroupsExport = {}
 
 	const pairs: [_AttributeGroupId, Record<string, AttributeExportBlock>][] =
-		mapNonExemptAttributeGroupsInTree(attributeTree, tree, (attrGroup, evalGroup) => {
+		mapNonExemptAttributeGroupsInTree(attributeTree, evalTree, (attrGroup, evalGroup) => {
 			const entries = mapNonExemptGroupAttributes(
 				evalGroup,
 				evalAttr => [evalAttr.attribute.id, serializeAttribute(evalAttr, evalStrings)] as const,
@@ -352,9 +352,9 @@ function computeStageBreakdown<_AttributeGroupId extends string>(
 	return result
 }
 
-export function ratedWalletJsonExport(
-	attributeTree: AttributeTree<string>,
-	wallet: RatedWallet<string>,
+export function ratedWalletJsonExport<_AttributeGroupId extends string>(
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	wallet: RatedWallet<_AttributeGroupId>,
 ): RatedWalletJsonExport {
 	const { metadata } = wallet
 	const evalStrings = getWalletEvalStrings(wallet)

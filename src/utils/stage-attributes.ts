@@ -1,4 +1,4 @@
-import { attributeGroupById } from '@/data/attribute-groups'
+import { attributeTree } from '@/data/attribute-groups'
 import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
 import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
 import {
@@ -24,7 +24,7 @@ export const stagesById = new Map(
  * Map of attribute IDs to attribute objects.
  */
 export const attributesById = new Map(
-	Object.values(attributeGroupById)
+	Object.values(attributeTree)
 		.flatMap(attrGroup => attrGroup.attributes.map(({ attribute }) => attribute))
 		.map(attr => [attr.id, attr] as const),
 )

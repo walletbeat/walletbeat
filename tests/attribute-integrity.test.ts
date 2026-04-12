@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeGroupById } from '@/data/attribute-groups'
+import { attributeTree } from '@/data/attribute-groups'
 import { type Evaluation, type OutcomeMetadata, Rating, ratingToText } from '@/schema/attributes'
 
 import { warmupHarperLinter } from './utils/grammar'
@@ -25,7 +25,7 @@ function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
 await warmupHarperLinter()
 
 describe('attribute', () => {
-	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeGroupById)) {
+	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
 			for (const { attribute } of attributeGroup.attributes) {
 				describe(`attribute ${attribute.displayName}`, () => {
