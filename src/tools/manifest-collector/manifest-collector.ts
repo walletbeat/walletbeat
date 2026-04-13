@@ -6,8 +6,8 @@ import { getExtensionId } from '@/schema/extension-url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
+import { checkParsedManifests } from './manifest-checker'
 import {
-	checkParsedManifests,
 	computeAndroidParsed,
 	computeBrowserExtParsed,
 	computeIosParsed,
