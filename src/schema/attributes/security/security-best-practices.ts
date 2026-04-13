@@ -7,6 +7,11 @@ import {
 	Rating,
 } from '@/schema/attributes'
 import {
+	KeyGenerationLocation,
+	type KeysHandlingSupport,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import {
 	passkeyLibraryName,
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
@@ -684,6 +689,79 @@ function evaluatePasskeySubEval(
 	}
 }
 
+function evaluateKeysHandling(
+	ctx: EvaluationContext<SecurityBestPracticesValue>,
+	keysHandling: KeysHandlingSupport,
+): Evaluation<SecurityBestPracticesValue> {
+	switch (keysHandling.keyGeneration) {
+		case KeyGenerationLocation.FULLY_ON_USER_DEVICE:
+		case KeyGenerationLocation.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE:
+			break // OK
+		case KeyGenerationLocation.FULLY_OFF_USER_DEVICE:
+			return ctx.build({
+				outcome: {
+					id: 'key_off_device',
+					displayName: 'Key generated off-device',
+					rating: Rating.FAIL,
+					shortExplanation: sentence(`
+						When generating a key with {{WALLET_NAME}}, the key is generated
+						by an external service which can use this to rug your account.
+					`),
+				},
+				details: markdown(`
+					Key generation with {{WALLET_NAME}} occurs off-device. This means
+					your private key is not confined to your device, and the service
+					that has your private key can take over your account.
+
+					**"Not your keys, not your coins."**
+				`),
+			})
+	}
+
+	switch (keysHandling.multipartyKeyReconstruction) {
+		case MultiPartyKeyReconstruction.NON_MULTIPARTY:
+		case MultiPartyKeyReconstruction.ON_USER_DEVICE:
+		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE:
+			break // OK
+		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE:
+			return ctx.build({
+				outcome: {
+					id: 'multiparty_reconstructed_without_user_device',
+					rating: Rating.FAIL,
+					displayName: 'MPC key reconstructed without user',
+					shortExplanation: sentence(`
+						{{WALLET_NAME}} uses MPC, but the key reconstruction process can
+						occur without requiring the user's device.
+					`),
+				},
+				details: markdown(`
+					{{WALLET_NAME}} uses multi-party computation. However, the key can be
+					reconstructed by external services without your device being involved,
+					allowing those services to conspire to take over your account.
+
+					**"Not your keys, not your coins."**
+				`),
+				howToImprove: mdParagraph(
+					"{{WALLET_NAME}} should ensure the user's device is always required for key reconstruction.",
+				),
+			})
+	}
+
+	return ctx.build({
+		outcome: {
+			id: 'keys_handling_pass',
+			rating: Rating.PASS,
+			displayName: 'Secure key generation and handling',
+			shortExplanation: sentence(
+				"{{WALLET_NAME}} generates and handles key material securely on the user's device.",
+			),
+		},
+		details: paragraph(
+			"Keys are generated on the user's device and cannot be reconstructed by external services without user involvement.",
+		),
+	})
+}
+
 export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	id: 'securityBestPractices',
 	icon: '\u{1f510}', // Locked with key
@@ -828,6 +906,32 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 					KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_WEAK_KDF,
 				),
 			),
+			exampleRating(
+				paragraph(`
+					The private key of the user's account resides on an external server.
+				`),
+				evaluateKeysHandling(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
+						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+					},
+				),
+			),
+			exampleRating(
+				paragraph(`
+					The wallet uses an MPC key which can be reconstructed by external
+					services without the user's involvement.
+				`),
+				evaluateKeysHandling(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						keyGeneration: KeyGenerationLocation.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE,
+						multipartyKeyReconstruction:
+							MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE,
+					},
+				),
+			),
 		],
 	},
 	aggregate: (
@@ -894,70 +998,82 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	): Evaluation<SecurityBestPracticesValue> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
-		const feature = ctx.features.security.securityBestPractices
+		const { securityBestPractices, keysHandling, passkeyVerification } = ctx.features.security
 
-		if (feature === null) {
+		if (securityBestPractices === null || keysHandling === null || passkeyVerification === null) {
 			return unrated(ctx)
 		}
 
-		if (ctx.features.variant === Variant.BROWSER && feature.browser === 'NOT_A_BROWSER_EXTENSION') {
-			return exempt(ctx, sentence('This wallet does not have a browser extension variant.'))
-		}
-
-		if (ctx.features.variant === Variant.MOBILE && feature.mobile === 'NOT_A_MOBILE_APP') {
-			return exempt(ctx, sentence('This wallet does not have a mobile app variant.'))
-		}
-
-		if (ctx.features.variant === Variant.DESKTOP && feature.desktop === 'NOT_A_DESKTOP_APP') {
-			return exempt(ctx, sentence('This wallet does not have a desktop app variant.'))
-		}
-
+		const { variant } = ctx.features
 		const subEvaluations: Array<Evaluation<SecurityBestPracticesValue>> = []
 
-		if (ctx.features.variant === Variant.BROWSER && feature.browser !== 'NOT_A_BROWSER_EXTENSION') {
-			const browser = ctx.popRefs<BrowserSecurityBestPractices>(feature.browser)
+		if (securityBestPractices !== null) {
+			if (
+				variant === Variant.BROWSER &&
+				securityBestPractices.browser === 'NOT_A_BROWSER_EXTENSION'
+			) {
+				return exempt(ctx, sentence('This wallet does not have a browser extension variant.'))
+			}
 
-			subEvaluations.push(
-				evaluateKeyStorage(ctx, browser.keyStorageMechanism),
-				evaluateSecureRng(ctx, browser.secureRng),
-				evaluateBrowserExtension(ctx, browser.browserExtensionHardening),
-				evaluateContentScripts(ctx, browser.browserExtensionHardening),
-				evaluateExternallyConnectable(ctx, browser.browserExtensionHardening),
-				evaluateBrowserPermissions(ctx, browser.browserExtensionHardening),
-			)
+			if (variant === Variant.MOBILE && securityBestPractices.mobile === 'NOT_A_MOBILE_APP') {
+				return exempt(ctx, sentence('This wallet does not have a mobile app variant.'))
+			}
+
+			if (variant === Variant.DESKTOP && securityBestPractices.desktop === 'NOT_A_DESKTOP_APP') {
+				return exempt(ctx, sentence('This wallet does not have a desktop app variant.'))
+			}
+
+			if (
+				variant === Variant.BROWSER &&
+				securityBestPractices.browser !== 'NOT_A_BROWSER_EXTENSION'
+			) {
+				const browser = ctx.popRefs<BrowserSecurityBestPractices>(securityBestPractices.browser)
+
+				subEvaluations.push(
+					evaluateKeyStorage(ctx, browser.keyStorageMechanism),
+					evaluateSecureRng(ctx, browser.secureRng),
+					evaluateBrowserExtension(ctx, browser.browserExtensionHardening),
+					evaluateContentScripts(ctx, browser.browserExtensionHardening),
+					evaluateExternallyConnectable(ctx, browser.browserExtensionHardening),
+					evaluateBrowserPermissions(ctx, browser.browserExtensionHardening),
+				)
+			}
+
+			if (variant === Variant.MOBILE && securityBestPractices.mobile !== 'NOT_A_MOBILE_APP') {
+				const mobile = ctx.popRefs<MobileSecurityBestPractices>(securityBestPractices.mobile)
+
+				subEvaluations.push(
+					evaluateKeyStorage(ctx, mobile.keyStorageMechanism),
+					evaluateSecureRng(ctx, mobile.secureRng),
+					evaluateMobileApp(ctx, mobile.mobileAppHardening),
+				)
+			}
+
+			if (variant === Variant.DESKTOP && securityBestPractices.desktop !== 'NOT_A_DESKTOP_APP') {
+				const desktop = ctx.popRefs<SecurityBestPracticesBase>(securityBestPractices.desktop)
+
+				subEvaluations.push(
+					evaluateKeyStorage(ctx, desktop.keyStorageMechanism),
+					evaluateSecureRng(ctx, desktop.secureRng),
+				)
+			}
 		}
 
-		if (ctx.features.variant === Variant.MOBILE && feature.mobile !== 'NOT_A_MOBILE_APP') {
-			const mobile = ctx.popRefs<MobileSecurityBestPractices>(feature.mobile)
-
-			subEvaluations.push(
-				evaluateKeyStorage(ctx, mobile.keyStorageMechanism),
-				evaluateSecureRng(ctx, mobile.secureRng),
-				evaluateMobileApp(ctx, mobile.mobileAppHardening),
-			)
+		if (keysHandling !== null) {
+			ctx.addRef(keysHandling)
+			subEvaluations.push(evaluateKeysHandling(ctx, keysHandling))
 		}
 
-		if (ctx.features.variant === Variant.DESKTOP && feature.desktop !== 'NOT_A_DESKTOP_APP') {
-			const desktop = ctx.popRefs<SecurityBestPracticesBase>(feature.desktop)
+		if (passkeyVerification !== null && isSupported(passkeyVerification)) {
+			const passkeySupport = ctx.popRefs(passkeyVerification)
 
-			subEvaluations.push(
-				evaluateKeyStorage(ctx, desktop.keyStorageMechanism),
-				evaluateSecureRng(ctx, desktop.secureRng),
-			)
+			subEvaluations.push(evaluatePasskeySubEval(ctx, passkeySupport))
 		}
 
 		if (!isNonEmptyArray(subEvaluations)) {
 			return unrated(ctx)
 		}
 
-		const passkeyVerification = ctx.features.security.passkeyVerification
-
-		if (passkeyVerification !== null && isSupported(passkeyVerification)) {
-			const passkeySupport = ctx.popRefs<PasskeyVerificationSupport>(passkeyVerification)
-
-			subEvaluations.push(evaluatePasskeySubEval(ctx, passkeySupport))
-		}
-
-		return pickWorstRating<SecurityBestPracticesValue>(subEvaluations)
+		return pickWorstRating(subEvaluations)
 	},
 }
