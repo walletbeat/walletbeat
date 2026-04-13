@@ -735,15 +735,14 @@ function evaluateKeysHandling(
 					`),
 				},
 				details: markdown(`
-					{{WALLET_NAME}} uses multi-party computation. However, the key can be
-					reconstructed by external services without your device being involved,
-					allowing those services to conspire to take over your account.
+					{{WALLET_NAME}} uses multi-party computation to derive the account's
+					private key. However, this key can be reconstructed by external
+					services without your device being involved. This allows these
+					external services to conspire to reconstruct your private key, and
+					take over your account.
 
 					**"Not your keys, not your coins."**
 				`),
-				howToImprove: mdParagraph(
-					"{{WALLET_NAME}} should ensure the user's device is always required for key reconstruction.",
-				),
 			})
 	}
 
@@ -1065,7 +1064,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 		}
 
 		if (passkeyVerification !== null && isSupported(passkeyVerification)) {
-			const passkeySupport = ctx.popRefs(passkeyVerification)
+			const passkeySupport = ctx.popRefs<PasskeyVerificationSupport>(passkeyVerification)
 
 			subEvaluations.push(evaluatePasskeySubEval(ctx, passkeySupport))
 		}
