@@ -215,10 +215,10 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 			),
 			exampleRating(
 				paragraph(`
-					The wallet splits the recovery secret into two pieces required for
-					recovery. However, the secret reconstitution process happens on
-					servers owned by the wallet provider, putting them in a position
-					to obtain a copy of the recovery secret and take over the account.
+					The wallet provider is listed as an optional guardian, and only
+					one guardian is required to initiate recovery. This lets the
+					wallet provider trigger recovery on their own and take over the
+					account.
 				`),
 				evaluateAccountUnruggability(
 					EvaluationContext.forTest(() => accountUnruggability),
@@ -230,16 +230,16 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 								descriptionMarkdown: '',
 								requiredGuardians: [],
 								optionalGuardians: [
-									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
 									{
-										type: GuardianType.USER_EXTERNAL_ACCOUNT,
-										entity: exampleSecurityAuditor,
-										description: '',
+										type: GuardianType.WALLET_PROVIDER,
+										entity: exampleWalletDevelopmentCompany,
+										description: 'Wallet developer storage cloud',
 									},
+									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
 								],
-								optionalGuardiansMinimumConfigurable: 2,
-								optionalGuardiansMinimumNeededForRecovery: 2,
-								secretReconstitution: exampleWalletDevelopmentCompany,
+								optionalGuardiansMinimumConfigurable: 1,
+								optionalGuardiansMinimumNeededForRecovery: 1,
+								secretReconstitution: 'CLIENT_SIDE',
 							},
 						}),
 					},
