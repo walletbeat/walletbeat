@@ -89,28 +89,6 @@ contract WalletbeatTestErc1155 is ERC1155 {
     }
 
     /**
-     * @notice Enforces soulbound behavior by preventing token transfers
-     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
-     * on any other transfer attempt.
-     */
-    function _beforeTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual override {
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
-
-        if (from == address(0) || to == address(0)) {
-            return;
-        }
-
-        revert WalletbeatTestErc1155__Soulbound();
-    }
-
-    /**
      * @notice Returns the base data URI prefix used when constructing token metadata URIs
      * @dev Overrides the default empty string so that `uri()` produces a self-contained
      * `data:application/json;base64,` URI with no external dependencies.
