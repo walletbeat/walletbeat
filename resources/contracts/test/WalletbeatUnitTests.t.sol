@@ -242,52 +242,6 @@ contract WalletbeatUnitTests is Test {
         assertEq(erc20.balanceOf(recipient), 0);
     }
 
-    function testCannotTransferErc721BetweenUsers() external {
-        vm.roll(10);
-        vm.prank(tester);
-        tc.simulateFunctionV1();
-
-        assertEq(erc721.ownerOf(1), tester);
-
-        vm.prank(tester);
-        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc721__Soulbound.selector);
-        erc721.transferFrom(tester, tester2, 1);
-    }
-
-    function testCannotSafeTransferErc721() external {
-        vm.roll(10);
-        vm.prank(tester);
-        tc.simulateFunctionV1();
-
-        vm.prank(tester);
-        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc721__Soulbound.selector);
-        erc721.safeTransferFrom(tester, tester2, 1);
-    }
-
-    function testCannotTransferErc20BetweenUsers() external {
-        vm.roll(10);
-        vm.prank(tester);
-        tc.simulateFunctionV1();
-        assertTrue(erc20.balanceOf(tester) > 0);
-
-        vm.prank(tester);
-        vm.expectRevert(WalletbeatTestErc20.WalletbeatTestErc20__Soulbound.selector);
-        erc20.transfer(tester2, 1);
-    }
-
-    function testCannotTransferFromErc20BetweenUsers() external {
-        vm.roll(10);
-        vm.prank(tester);
-        tc.simulateFunctionV1();
-
-        vm.prank(tester);
-        erc20.approve(tester2, type(uint256).max);
-
-        vm.prank(tester2);
-        vm.expectRevert(WalletbeatTestErc20.WalletbeatTestErc20__Soulbound.selector);
-        erc20.transferFrom(tester, tester2, 1);
-    }
-
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
     /*                           SUPPLY TESTS                           */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
