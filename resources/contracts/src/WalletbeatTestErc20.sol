@@ -65,19 +65,4 @@ contract WalletbeatTestErc20 is ERC20 {
         uint256 userBalance = balanceOf(user);
         _burn(user, userBalance);
     }
-
-    /**
-     * @notice Enforces soulbound behavior by preventing token transfers
-     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
-     * on any other transfer attempt.
-     */
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
-        super._beforeTokenTransfer(from, to, amount);
-
-        if (from == address(0) || to == address(0)) {
-            return;
-        }
-
-        revert WalletbeatTestErc20__Soulbound();
-    }
 }
