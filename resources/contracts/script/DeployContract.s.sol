@@ -8,7 +8,6 @@ import {WalletbeatTestErc1155} from "../src/WalletbeatTestErc1155.sol";
 import {Script, console} from "../lib/forge-std/src/Script.sol";
 import {LibZip} from "solady/utils/LibZip.sol";
 
-
 contract DeployContract is Script {
     function run()
         external
