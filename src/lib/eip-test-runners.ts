@@ -325,7 +325,7 @@ export async function runStep2Connect(step: TestStep, ctx: EIPTestContext): Prom
 	}
 
 	// Give a brief moment for connect event to fire (some wallets emit asynchronously)
-	await new Promise(resolve => setTimeout(resolve, 100))
+	await new Promise(resolve => setTimeout(resolve, 500))
 
 	// Clean up listeners
 	try {
