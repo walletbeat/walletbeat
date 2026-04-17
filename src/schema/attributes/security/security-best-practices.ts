@@ -693,20 +693,20 @@ function evaluateKeysHandling(
 			return ctx.build({
 				outcome: {
 					id: 'key_off_device',
-					displayName: 'Key generated off-device',
+					displayName: 'Key material not under user control',
 					rating: Rating.FAIL,
-					shortExplanation: sentence(`
-						When generating a key with {{WALLET_NAME}}, the key is generated
-						by an external service which can use this to rug your account.
-					`),
+					shortExplanation: sentence(
+						'{{WALLET_NAME}} generates keys on external servers. The security of key material at rest cannot be independently verified.',
+					),
 				},
 				details: markdown(`
-					Key generation with {{WALLET_NAME}} occurs off-device. This means
-					your private key is not confined to your device, and the service
-					that has your private key can take over your account.
-
-					**"Not your keys, not your coins."**
+					Key material for {{WALLET_NAME}} is generated and held on external
+					servers. Users have no control over how it is stored or encrypted
+					at rest, and cannot independently verify that it is protected.
 				`),
+				howToImprove: mdParagraph(
+					"{{WALLET_NAME}} should generate and store key material on the user's device so the user controls how it is secured at rest.",
+				),
 			})
 	}
 
@@ -720,21 +720,20 @@ function evaluateKeysHandling(
 				outcome: {
 					id: 'multiparty_reconstructed_without_user_device',
 					rating: Rating.FAIL,
-					displayName: 'MPC key reconstructed without user',
-					shortExplanation: sentence(`
-						{{WALLET_NAME}} uses MPC, but the key reconstruction process can
-						occur without requiring the user's device.
-					`),
+					displayName: 'MPC key reconstruction bypasses user device',
+					shortExplanation: sentence(
+						"{{WALLET_NAME}}'s MPC keys can be reconstructed server-side, outside the user's security perimeter.",
+					),
 				},
 				details: markdown(`
-					{{WALLET_NAME}} uses multi-party computation to derive the account's
-					private key. However, this key can be reconstructed by external
-					services without your device being involved. This allows these
-					external services to conspire to reconstruct your private key, and
-					take over your account.
-
-					**"Not your keys, not your coins."**
+					{{WALLET_NAME}} uses multi-party computation, but key reconstruction
+					can occur on external servers without the user's device being
+					involved. The at-rest security of the reconstructed key material on
+					the provider's infrastructure cannot be independently verified.
 				`),
+				howToImprove: mdParagraph(
+					"{{WALLET_NAME}} should ensure that key reconstruction always requires user-device participation, so key material never exists in full outside the user's security perimeter.",
+				),
 			})
 	}
 
@@ -742,13 +741,13 @@ function evaluateKeysHandling(
 		outcome: {
 			id: 'keys_handling_pass',
 			rating: Rating.PASS,
-			displayName: 'Secure key generation and handling',
+			displayName: 'Key material remains within user security perimeter',
 			shortExplanation: sentence(
-				"{{WALLET_NAME}} generates and handles key material securely on the user's device.",
+				"{{WALLET_NAME}} generates and handles key material on the user's device, keeping it within the user's security perimeter.",
 			),
 		},
 		details: paragraph(
-			"Keys are generated on the user's device and cannot be reconstructed by external services without user involvement.",
+			"Key material is generated on the user's device and cannot be reconstructed outside it. At-rest security is governed by the local storage mechanism.",
 		),
 	})
 }
@@ -898,9 +897,9 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				),
 			),
 			exampleRating(
-				paragraph(`
-					The private key of the user's account resides on an external server.
-				`),
+				paragraph(
+					'The wallet generates keys on external servers. Users cannot verify or control how that key material is stored at rest.',
+				),
 				evaluateKeysHandling(
 					EvaluationContext.forTest(() => securityBestPractices),
 					{
@@ -910,10 +909,9 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				),
 			),
 			exampleRating(
-				paragraph(`
-					The wallet uses an MPC key which can be reconstructed by external
-					services without the user's involvement.
-				`),
+				paragraph(
+					"The wallet uses MPC but reconstructs the key on external servers, placing key material outside the user's security perimeter.",
+				),
 				evaluateKeysHandling(
 					EvaluationContext.forTest(() => securityBestPractices),
 					{
