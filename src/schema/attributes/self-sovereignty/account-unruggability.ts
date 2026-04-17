@@ -16,7 +16,12 @@ import {
 	GuardianPolicyType,
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
-import { isSupported, supported } from '@/schema/features/support'
+import {
+	KeyGenerationLocation,
+	type KeysHandlingSupport,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
@@ -118,8 +123,73 @@ function evaluateGuardianUnruggabilityPolicy(
 
 function evaluateAccountUnruggability(
 	ctx: EvaluationContext<AccountUnruggabilityMetadata>,
+	keysHandling: KeysHandlingSupport,
 	accountRecovery: AccountRecovery,
 ): Evaluation<AccountUnruggabilityMetadata> {
+	switch (keysHandling.keyGeneration) {
+		case KeyGenerationLocation.FULLY_ON_USER_DEVICE:
+			break // OK
+		case KeyGenerationLocation.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE:
+			break // OK
+		case KeyGenerationLocation.FULLY_OFF_USER_DEVICE:
+			return ctx.build({
+				outcome: {
+					id: 'key_off_device',
+					displayName: 'Key generated off-device',
+					rating: Rating.FAIL,
+					shortExplanation: sentence(`
+						When generating a key with {{WALLET_NAME}}, the key is generated
+						by an external service which can use this to rug your account.
+					`),
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
+				},
+				details: markdown(`
+					Key generation with {{WALLET_NAME}} occurs off-device. This means
+					your private key is not confined to your device, and the service
+					that has your private key can take over your account.
+
+					**"Not your keys, not your coins."**
+				`),
+			})
+	}
+
+	switch (keysHandling.multipartyKeyReconstruction) {
+		case MultiPartyKeyReconstruction.NON_MULTIPARTY:
+			break // OK
+		case MultiPartyKeyReconstruction.ON_USER_DEVICE:
+			break // OK
+		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE:
+			break // OK
+		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE:
+			return ctx.build({
+				outcome: {
+					id: 'multiparty_reconstructed_without_user_device',
+					displayName: 'MPC key reconstructed without user',
+					rating: Rating.FAIL,
+					shortExplanation: sentence(`
+						{{WALLET_NAME}} uses MPC, but the key reconstruction process can
+						occur without requiring the user's device.
+					`),
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
+				},
+				details: markdown(`
+					{{WALLET_NAME}} uses multi-party computation to derive the account's
+					private key. However, this key can be reconstructed by external
+					services without your device being involved. This allows these
+					external services to conspire to reconstruct your private key, and
+					take over your account.
+
+					**"Not your keys, not your coins."**
+				`),
+			})
+	}
+
 	if (isSupported(accountRecovery.guardianRecovery)) {
 		return evaluateGuardianUnruggabilityPolicy(
 			ctx,
@@ -186,11 +256,47 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 		fail: [
 			exampleRating(
 				paragraph(`
+					The private key of the user's account resides on an external server.
+				`),
+				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
+					{
+						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
+						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+					},
+					{
+						guardianRecovery: notSupported,
+					},
+				),
+			),
+			exampleRating(
+				paragraph(`
+					The wallet uses an MPC key which can be reconstructed by external
+					services without the user's involvement.
+				`),
+				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
+					{
+						keyGeneration: KeyGenerationLocation.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE,
+						multipartyKeyReconstruction:
+							MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE,
+					},
+					{
+						guardianRecovery: notSupported,
+					},
+				),
+			),
+			exampleRating(
+				paragraph(`
 					The wallet developer offers to back up the seed phrase onto their
 					own platform unencrypted, allowing them to take over the user's account.
 				`),
 				evaluateAccountUnruggability(
 					EvaluationContext.forTest(() => accountUnruggability),
+					{
+						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
+						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+					},
 					{
 						guardianRecovery: supported({
 							ref: refNotNecessary,
@@ -215,13 +321,17 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 			),
 			exampleRating(
 				paragraph(`
-					The wallet provider is listed as an optional guardian, and only
-					one guardian is required to initiate recovery. This lets the
-					wallet provider trigger recovery on their own and take over the
-					account.
+					The wallet splits the recovery secret into two pieces required for
+					recovery. However, the secret reconstitution process happens on
+					servers owned by the wallet provider, putting them in a position
+					to obtain a copy of the recovery secret and take over the account.
 				`),
 				evaluateAccountUnruggability(
 					EvaluationContext.forTest(() => accountUnruggability),
+					{
+						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
+						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+					},
 					{
 						guardianRecovery: supported({
 							ref: refNotNecessary,
@@ -230,16 +340,16 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 								descriptionMarkdown: '',
 								requiredGuardians: [],
 								optionalGuardians: [
-									{
-										type: GuardianType.WALLET_PROVIDER,
-										entity: exampleWalletDevelopmentCompany,
-										description: 'Wallet developer storage cloud',
-									},
 									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
+									{
+										type: GuardianType.USER_EXTERNAL_ACCOUNT,
+										entity: exampleSecurityAuditor,
+										description: '',
+									},
 								],
-								optionalGuardiansMinimumConfigurable: 1,
-								optionalGuardiansMinimumNeededForRecovery: 1,
-								secretReconstitution: 'CLIENT_SIDE',
+								optionalGuardiansMinimumConfigurable: 2,
+								optionalGuardiansMinimumNeededForRecovery: 2,
+								secretReconstitution: exampleWalletDevelopmentCompany,
 							},
 						}),
 					},
@@ -259,6 +369,10 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 				`),
 				evaluateAccountUnruggability(
 					EvaluationContext.forTest(() => accountUnruggability),
+					{
+						keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+					},
 					{
 						guardianRecovery: supported({
 							ref: refNotNecessary,
@@ -294,13 +408,23 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 	): Evaluation<AccountUnruggabilityMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
-		if (ctx.features.security.accountRecovery === null) {
+		if (
+			ctx.features.security.keysHandling === null ||
+			ctx.features.security.accountRecovery === null
+		) {
 			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
 		}
 
-		ctx.addRef(ctx.features.security.accountRecovery.guardianRecovery)
+		ctx.addRef(
+			ctx.features.security.keysHandling,
+			ctx.features.security.accountRecovery.guardianRecovery,
+		)
 
-		return evaluateAccountUnruggability(ctx, ctx.features.security.accountRecovery)
+		return evaluateAccountUnruggability(
+			ctx,
+			ctx.features.security.keysHandling,
+			ctx.features.security.accountRecovery,
+		)
 	},
 	aggregate: pickWorstRating<AccountUnruggabilityMetadata>,
 }
