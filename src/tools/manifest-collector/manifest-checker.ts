@@ -1,6 +1,8 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
+import { getErrorMessage } from '@/types/errors'
+
 import {
 	computeAndroidParsed,
 	computeBrowserExtParsed,
@@ -60,7 +62,7 @@ export async function checkParsedManifests(repoRoot: string): Promise<ManifestMi
 					walletId,
 					parsedFile,
 					parsedPath,
-					issue: `Failed to JSON-parse raw manifest: ${e instanceof Error ? e.message : String(e)}`,
+					issue: `Failed to JSON-parse raw manifest: ${getErrorMessage(e)}`,
 				})
 				continue
 			}
@@ -74,7 +76,7 @@ export async function checkParsedManifests(repoRoot: string): Promise<ManifestMi
 					walletId,
 					parsedFile,
 					parsedPath,
-					issue: `Failed to parse manifest: ${e instanceof Error ? e.message : String(e)}`,
+					issue: `Failed to parse manifest: ${getErrorMessage(e)}`,
 				})
 				continue
 			}
@@ -125,7 +127,7 @@ export async function checkParsedManifests(repoRoot: string): Promise<ManifestMi
 					walletId,
 					parsedFile,
 					parsedPath,
-					issue: `Failed to parse Android manifest: ${e instanceof Error ? e.message : String(e)}`,
+					issue: `Failed to parse Android manifest: ${getErrorMessage(e)}`,
 				})
 			}
 
@@ -173,7 +175,7 @@ export async function checkParsedManifests(repoRoot: string): Promise<ManifestMi
 					walletId,
 					parsedFile,
 					parsedPath,
-					issue: `Failed to parse iOS plist: ${e instanceof Error ? e.message : String(e)}`,
+					issue: `Failed to parse iOS plist: ${getErrorMessage(e)}`,
 				})
 			}
 

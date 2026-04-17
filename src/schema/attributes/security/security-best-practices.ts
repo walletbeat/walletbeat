@@ -32,22 +32,14 @@ import {
 	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
 import { isSupported } from '@/schema/features/support'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import { Variant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import {
-	ContentType,
-	isTypographicContent,
-	markdown,
-	mdParagraph,
-	mdSentence,
-	paragraph,
-	sentence,
-} from '@/types/content'
-import { isNonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+import { isNonEmptyArray } from '@/types/utils/non-empty'
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { aggregateVariantEvaluations, exempt, pickWorstRating, unrated } from '../common'
 
 export type SecurityBestPracticesValue = null
 
@@ -397,7 +389,7 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.WEB_AUTHENTICATION_PROXY]: Rating.FAIL,
 	// Captures the screen, a window, or a tab as a media stream.
 	[BrowserExtensionPermission.DESKTOP_CAPTURE]: Rating.FAIL,
-	// Legitimate for hardware wallet communication but opens a native OS code execution channel.
+	// Legitimate for hardware wallet communication but opens a native OS code execution channel; prefer browser-native HID, USB, or Bluetooth APIs instead.
 	[BrowserExtensionPermission.NATIVE_MESSAGING]: Rating.FAIL,
 	// Reads clipboard contents without a user gesture, exposing seed phrases or keys copied elsewhere.
 	[BrowserExtensionPermission.CLIPBOARD_READ]: Rating.FAIL,
@@ -933,50 +925,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 		],
 	},
-	aggregate: (
-		perVariant: AtLeastOneVariant<Evaluation<SecurityBestPracticesValue>>,
-	): Evaluation<SecurityBestPracticesValue> => {
-		const worst = pickWorstRating<SecurityBestPracticesValue>(perVariant)
-		const entries = nonEmptyEntries<Variant, Evaluation<SecurityBestPracticesValue>>(perVariant)
-
-		if (entries.length === 1) {
-			return worst
-		}
-
-		const variantLabel = (variant: Variant): string => {
-			switch (variant) {
-				case Variant.BROWSER:
-					return 'Browser extension'
-				case Variant.MOBILE:
-					return 'Mobile app'
-				case Variant.DESKTOP:
-					return 'Desktop app'
-				default:
-					return variant
-			}
-		}
-
-		const combinedDetails = entries
-			.map(([variant, evaluation]) => {
-				if (!isTypographicContent(evaluation.details)) {
-					return null
-				}
-
-				const text =
-					evaluation.details.contentType === ContentType.TEXT
-						? evaluation.details.text
-						: evaluation.details.markdown
-
-				return `**${variantLabel(variant as Variant)}:** ${text}`
-			})
-			.filter(line => line !== null)
-			.join('\n\n')
-
-		return {
-			...worst,
-			details: markdown(combinedDetails),
-		}
-	},
+	aggregate: aggregateVariantEvaluations<SecurityBestPracticesValue>,
 	exempted: (
 		ctx: EvaluationContext<SecurityBestPracticesValue>,
 		_metadata: WalletMetadata,
