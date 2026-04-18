@@ -1,0 +1,12 @@
+{
+	"usageDescriptions": [
+		"NSBluetoothAlwaysUsageDescription",
+		"NSBluetoothPeripheralUsageDescription",
+		"NSCameraUsageDescription",
+		"NSFaceIDUsageDescription",
+		"NSLocationWhenInUseUsageDescription",
+		"NSMicrophoneUsageDescription",
+		"NSPhotoLibraryAddUsageDescription",
+		"NSPhotoLibraryUsageDescription"
+	]
+}

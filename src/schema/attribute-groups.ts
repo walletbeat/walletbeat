@@ -66,6 +66,10 @@ import {
 } from './attributes/security/hardware-wallet-support'
 import { scamPrevention, type ScamPreventionMetadata } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsMetadata } from './attributes/security/security-audits'
+import {
+	securityBestPractices,
+	type SecurityBestPracticesValue,
+} from './attributes/security/security-best-practices'
 import { supplyChainDIY, type SupplyChainDIYMetadata } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
@@ -106,6 +110,7 @@ type SecurityValues = Dict<{
 	chainVerification: null
 	transactionLegibility: null
 	hardwareWalletSupport: HardwareWalletSupportMetadata
+	securityBestPractices: SecurityBestPracticesValue
 	bugBountyProgram: null
 	supplyChainDIY: SupplyChainDIYMetadata
 	supplyChainFactory: SupplyChainFactoryMetadata
@@ -127,6 +132,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification,
 		transactionLegibility,
 		hardwareWalletSupport,
+		securityBestPractices,
 		bugBountyProgram,
 		supplyChainDIY,
 		supplyChainFactory,
@@ -141,6 +147,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification: 1.0,
 		transactionLegibility: 1.0,
 		hardwareWalletSupport: 1.0,
+		securityBestPractices: 1.0,
 		bugBountyProgram: 1.0,
 		supplyChainDIY: 1.0,
 		supplyChainFactory: 1.0,
@@ -351,6 +358,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	userSafety: EvaluatedAttribute<UserSafetyMetadata>
 	accountRecovery: EvaluatedAttribute<AccountRecoveryMetadata>
 	duressResistance: EvaluatedAttribute
+	securityBestPractices: EvaluatedAttribute<SecurityBestPracticesValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -455,6 +463,7 @@ export function evaluateAttributes(
 			chainVerification: evalAttr(chainVerification),
 			transactionLegibility: evalAttr(transactionLegibility),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
+			securityBestPractices: evalAttr(securityBestPractices),
 			bugBountyProgram: evalAttr(bugBountyProgram),
 			supplyChainDIY: evalAttr(supplyChainDIY),
 			supplyChainFactory: evalAttr(supplyChainFactory),
@@ -530,6 +539,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			chainVerification: attr(tree => tree.security.chainVerification),
 			transactionLegibility: attr(tree => tree.security.transactionLegibility),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
+			securityBestPractices: attr(tree => tree.security.securityBestPractices),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
 			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
 			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),

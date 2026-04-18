@@ -178,6 +178,7 @@ export const keystoneWallet: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.PCI,
 			}),
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
