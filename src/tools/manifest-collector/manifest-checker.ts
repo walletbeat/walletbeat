@@ -33,7 +33,7 @@ export async function checkParsedManifests(repoRoot: string): Promise<ManifestMi
 	const manifestsRoot = path.join(repoRoot, 'data', 'software-wallets', 'manifests')
 
 	if (!fs.existsSync(manifestsRoot)) {
-		return []
+		throw new Error(`Manifests directory not found: ${manifestsRoot}`)
 	}
 
 	const mismatches: ManifestMismatch[] = []

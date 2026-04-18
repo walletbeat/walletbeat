@@ -38,6 +38,7 @@ import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
 import { aggregateVariantEvaluations, exempt, pickWorstRating, unrated } from '../common'
 
@@ -418,10 +419,10 @@ function evaluateBrowserPermissions(
 				),
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} declares the following high-risk browser permissions that are not required for wallet functionality: ${badPerms.join(', ')}.`,
+				`{{WALLET_NAME}} declares the following high-risk browser permissions that are not required for wallet functionality: ${commaListFormat(badPerms)}.`,
 			),
 			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should remove these permissions from its manifest: ${badPerms.map(p => `\`${p}\``).join(', ')}.`,
+				`{{WALLET_NAME}} should remove these permissions from its manifest: ${commaListFormat(badPerms.map(p => `\`${p}\``))}.`,
 			),
 		})
 	}
@@ -562,8 +563,8 @@ const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAI
 }
 
 function getUnnecessaryPermissionLists(manifest: MobileAppManifest): {
-	androidList: string
-	iosList: string
+	androidList: string[]
+	iosList: string[]
 } {
 	const badAndroid =
 		manifest.android === 'NOT_AN_ANDROID_APP'
@@ -575,8 +576,8 @@ function getUnnecessaryPermissionLists(manifest: MobileAppManifest): {
 			: manifest.ios.usageDescriptions.filter(p => iosPermissionRatings[p] === Rating.FAIL)
 
 	return {
-		androidList: badAndroid.map(p => `\`${p.replace('android.permission.', '')}\``).join(', '),
-		iosList: badIos.map(p => `\`${p}\``).join(', '),
+		androidList: badAndroid.map(p => `\`${p.replace('android.permission.', '')}\``),
+		iosList: badIos.map(p => `\`${p}\``),
 	}
 }
 
@@ -611,10 +612,10 @@ function evaluateMobileApp(
 			),
 		},
 		details: mdParagraph(
-			`{{WALLET_NAME}}'s mobile app declares high-risk OS permissions not required for wallet functionality, increasing the attack surface.${androidList.length > 0 ? ` Unnecessary Android permissions: ${androidList}.` : ''}${iosList.length > 0 ? ` Unnecessary iOS permissions: ${iosList}.` : ''}`,
+			`{{WALLET_NAME}}'s mobile app declares high-risk OS permissions not required for wallet functionality, increasing the attack surface.${androidList.length > 0 ? ` Unnecessary Android permissions: ${commaListFormat(androidList)}.` : ''}${iosList.length > 0 ? ` Unnecessary iOS permissions: ${commaListFormat(iosList)}.` : ''}`,
 		),
 		howToImprove: mdParagraph(
-			`{{WALLET_NAME}} should remove the unnecessary permissions from its manifests.${androidList.length > 0 ? ` Android (\`AndroidManifest.xml\`): ${androidList}.` : ''}${iosList.length > 0 ? ` iOS (\`Info.plist\`): ${iosList}.` : ''}`,
+			`{{WALLET_NAME}} should remove the unnecessary permissions from its manifests.${androidList.length > 0 ? ` Android (\`AndroidManifest.xml\`): ${commaListFormat(androidList)}.` : ''}${iosList.length > 0 ? ` iOS (\`Info.plist\`): ${commaListFormat(iosList)}.` : ''}`,
 		),
 	})
 }
@@ -953,64 +954,54 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 		const { variant } = ctx.features
 		const subEvaluations: Array<Evaluation<SecurityBestPracticesValue>> = []
 
-		if (securityBestPractices !== null) {
-			if (
-				variant === Variant.BROWSER &&
-				securityBestPractices.browser === 'NOT_A_BROWSER_EXTENSION'
-			) {
+		if (variant === Variant.BROWSER) {
+			if (securityBestPractices.browser === 'NOT_A_BROWSER_EXTENSION') {
 				return exempt(ctx, sentence('This wallet does not have a browser extension variant.'))
 			}
 
-			if (variant === Variant.MOBILE && securityBestPractices.mobile === 'NOT_A_MOBILE_APP') {
+			const browser = ctx.popRefs<BrowserSecurityBestPractices>(securityBestPractices.browser)
+
+			subEvaluations.push(
+				evaluateKeyStorage(ctx, browser.keyStorageMechanism),
+				evaluateSecureRng(ctx, browser.secureRng),
+				evaluateBrowserExtension(ctx, browser.browserExtensionHardening),
+				evaluateContentScripts(ctx, browser.browserExtensionHardening),
+				evaluateExternallyConnectable(ctx, browser.browserExtensionHardening),
+				evaluateBrowserPermissions(ctx, browser.browserExtensionHardening),
+			)
+		}
+
+		if (variant === Variant.MOBILE) {
+			if (securityBestPractices.mobile === 'NOT_A_MOBILE_APP') {
 				return exempt(ctx, sentence('This wallet does not have a mobile app variant.'))
 			}
 
-			if (variant === Variant.DESKTOP && securityBestPractices.desktop === 'NOT_A_DESKTOP_APP') {
+			const mobile = ctx.popRefs<MobileSecurityBestPractices>(securityBestPractices.mobile)
+
+			subEvaluations.push(
+				evaluateKeyStorage(ctx, mobile.keyStorageMechanism),
+				evaluateSecureRng(ctx, mobile.secureRng),
+				evaluateMobileApp(ctx, mobile.mobileAppHardening),
+			)
+		}
+
+		if (variant === Variant.DESKTOP) {
+			if (securityBestPractices.desktop === 'NOT_A_DESKTOP_APP') {
 				return exempt(ctx, sentence('This wallet does not have a desktop app variant.'))
 			}
 
-			if (
-				variant === Variant.BROWSER &&
-				securityBestPractices.browser !== 'NOT_A_BROWSER_EXTENSION'
-			) {
-				const browser = ctx.popRefs<BrowserSecurityBestPractices>(securityBestPractices.browser)
+			const desktop = ctx.popRefs<SecurityBestPracticesBase>(securityBestPractices.desktop)
 
-				subEvaluations.push(
-					evaluateKeyStorage(ctx, browser.keyStorageMechanism),
-					evaluateSecureRng(ctx, browser.secureRng),
-					evaluateBrowserExtension(ctx, browser.browserExtensionHardening),
-					evaluateContentScripts(ctx, browser.browserExtensionHardening),
-					evaluateExternallyConnectable(ctx, browser.browserExtensionHardening),
-					evaluateBrowserPermissions(ctx, browser.browserExtensionHardening),
-				)
-			}
-
-			if (variant === Variant.MOBILE && securityBestPractices.mobile !== 'NOT_A_MOBILE_APP') {
-				const mobile = ctx.popRefs<MobileSecurityBestPractices>(securityBestPractices.mobile)
-
-				subEvaluations.push(
-					evaluateKeyStorage(ctx, mobile.keyStorageMechanism),
-					evaluateSecureRng(ctx, mobile.secureRng),
-					evaluateMobileApp(ctx, mobile.mobileAppHardening),
-				)
-			}
-
-			if (variant === Variant.DESKTOP && securityBestPractices.desktop !== 'NOT_A_DESKTOP_APP') {
-				const desktop = ctx.popRefs<SecurityBestPracticesBase>(securityBestPractices.desktop)
-
-				subEvaluations.push(
-					evaluateKeyStorage(ctx, desktop.keyStorageMechanism),
-					evaluateSecureRng(ctx, desktop.secureRng),
-				)
-			}
+			subEvaluations.push(
+				evaluateKeyStorage(ctx, desktop.keyStorageMechanism),
+				evaluateSecureRng(ctx, desktop.secureRng),
+			)
 		}
 
-		if (keysHandling !== null) {
-			ctx.addRef(keysHandling)
-			subEvaluations.push(evaluateKeysHandling(ctx, keysHandling))
-		}
+		ctx.addRef(keysHandling)
+		subEvaluations.push(evaluateKeysHandling(ctx, keysHandling))
 
-		if (passkeyVerification !== null && isSupported(passkeyVerification)) {
+		if (isSupported(passkeyVerification)) {
 			const passkeySupport = ctx.popRefs<PasskeyVerificationSupport>(passkeyVerification)
 
 			subEvaluations.push(evaluatePasskeySubEval(ctx, passkeySupport))
