@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
-	import { type WalletName, allRatedWallets } from '@/data/wallets'
+	import { allRatedWalletsBySlug } from '@/data/wallets'
 	import {
 		type Attribute,
 		type AttributeGroup,
@@ -16,6 +16,17 @@
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
 	import { VariantSpecificity } from '@/schema/wallet'
 	import { ContentType, isTypographicContent } from '@/types/content'
+	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
+	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
+	import type { FundingDetailsProps } from '@/types/content/funding-details'
+	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
+	import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
+	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
+	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
+	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
+	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
+	import type { OutcomeMetadata } from '@/schema/attributes'
+	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
 
 
 	// Functions
@@ -48,7 +59,7 @@
 		showStage = true,
 		showScores = false,
 	}: {
-		walletName: WalletName,
+		walletName: string,
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
@@ -76,7 +87,7 @@
 
 	// (Derived)
 	const wallet = $derived(
-		allRatedWallets[walletName]
+		allRatedWalletsBySlug[walletName]
 	)
 
 	const walletNews = $derived(
@@ -226,7 +237,7 @@
 									attribute,
 								}))
 								.filter(({ evalAttr }) => (
-									evalAttr && evalAttr.evaluation.value.rating !== Rating.EXEMPT
+									evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT
 								))
 								.map(({ attribute }) => ({
 									'@type': 'Question',
@@ -536,7 +547,7 @@
 			attribute,
 			evalAttr: evalGroup[attrId] as EvaluatedAttribute<any> | undefined,
 		}))
-		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.value.rating !== Rating.EXEMPT)
+		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT)
 		.map(({ attribute, evalAttr }) => ({
 			attribute,
 			evalAttr: evalAttr!,
@@ -614,9 +625,9 @@
 									attributes
 										.map(({ attribute, evalAttr }) => ({
 											id: attribute.id,
-											color: ratingToColor(evalAttr.evaluation.value.rating),
+											color: ratingToColor(evalAttr.evaluation.outcome.rating),
 											weight: attrGroup.attributeWeights[attribute.id],
-											arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+											arcLabel: evalAttr.evaluation.outcome.icon ?? evalAttr.attribute.icon,
 											titleText: formatAttributeTitleText(evalAttr),
 											href: `#${slugifyCamelCase(attribute.id)}`,
 										}))
@@ -630,16 +641,11 @@
 								}}
 							>
 								{#snippet centerContentSnippet()}
-									<circle
-										r="8"
-										fill={scoreColor}
-									>
-										{#if showScores && score?.hasUnratedComponent}
-											<title>
-												*contains unrated components
-											</title>
-										{/if}
-									</circle>
+									<span
+										class="pie-center-dot pie-center-dot-large"
+										style:--pie-center-color={scoreColor}
+										title={showScores && score?.hasUnratedComponent ? '*contains unrated components' : undefined}
+									></span>
 								{/snippet}
 							</Pie>
 						</div>
@@ -658,7 +664,7 @@
 										<a
 											data-link="camouflaged"
 											href={attributeUrl}
-											style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
+											style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 											data-card="secondary padding-3"
 											data-row="gap-2"
 											data-highlighted={highlightedAttributeId === attribute.id ? '' : undefined}
@@ -672,8 +678,8 @@
 											<span data-row-item="flexible">{attribute.displayName}</span>
 											<data
 												data-badge="small"
-												value={evalAttr.evaluation.value.rating}
-											>{evalAttr.evaluation.value.rating}</data>
+												value={evalAttr.evaluation.outcome.rating}
+											>{evalAttr.evaluation.outcome.rating}</data>
 										</a>
 									</li>
 								{/each}
@@ -729,8 +735,8 @@
 		class="attribute"
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
-		style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
-		data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
+		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 		data-icon={attribute.icon}
 	>
 		<details
@@ -853,7 +859,7 @@
 					</div>
 
 					{#if true}
-						{@const verifiability = evalAttr.evaluation.value.verifiability}
+						{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 						{#if verifiability === Verifiability.UNVERIFIABLE}
 							<data
 								data-row-item="wrap-end"
@@ -873,19 +879,19 @@
 					<data
 						data-row-item="wrap-end"
 						data-badge="medium"
-						value={evalAttr.evaluation.value.rating}
-					>{evalAttr.evaluation.value.rating}</data>
+						value={evalAttr.evaluation.outcome.rating}
+					>{evalAttr.evaluation.outcome.rating}</data>
 				</header>
 			</summary>
 
 			<ul
 				class="attribute-rating-details"
-				data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
+				data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 				data-card="padding-5"
 			>
 				<li
 					data-list-item="gap-3"
-					data-list-item-marker={ratingIcons[evalAttr.evaluation.value.rating as Rating]}
+					data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
 				>
 					{#if isTypographicContent(evalAttr.evaluation.details)}
 						<Typography
@@ -896,30 +902,30 @@
 					{:else if evalAttr.evaluation.details}
 						{@const componentName = evalAttr.evaluation.details.component.component}
 						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
-						{@const value = evalAttr.evaluation.value}
+						{@const outcome = evalAttr.evaluation.outcome}
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
 							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...componentProps} {wallet} {value} />
+								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
 							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...componentProps} {wallet} {value} />
+								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
 							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...componentProps} {wallet} {value} refs={references} />
+								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...componentProps} {wallet} {value} />
-							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...componentProps} {wallet} {value} />
+								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
+							{:else if componentName === 'SecurityAuditsDetails' && outcome.metadata}
+								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata} />
 							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...componentProps} {wallet} {value} />
+								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
 							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...componentProps} {wallet} {value} />
-							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...componentProps} {wallet} {value} />
-							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...componentProps} {wallet} {value} />
+								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
+							{:else if componentName === 'AccountRecoveryDetails' && outcome.metadata}
+								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata} />
+							{:else if componentName === 'AccountUnruggabilityDetails' && outcome.metadata}
+								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata} />
 							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...componentProps} {wallet} {value} />
+								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
 							{/if}
 						</div>
 
@@ -974,8 +980,8 @@
 				/>
 			{/if}
 
-			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.value && typeof evalAttr.evaluation.value === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.value && Array.isArray(evalAttr.evaluation.value.supportedHardwareWallets) && evalAttr.evaluation.value.supportedHardwareWallets.length > 0}
-				{@const supportedBrands = evalAttr.evaluation.value.supportedHardwareWallets}
+			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
+				{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
 
 				{@const supportedModels =
 					allHardwareModels.filter(m => (
@@ -1003,7 +1009,7 @@
 				<details data-card="padding-2 secondary radius-4" data-column="gap-0">
 					<summary>
 						<h4>
-							{evalAttr.evaluation.value.rating === Rating.PASS || evalAttr.evaluation.value.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
+							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
 						</h4>
 					</summary>
 
@@ -1609,6 +1615,14 @@
 		}
 	}
 
+	.pie-center-dot {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background-color: var(--pie-center-color);
+	}
+
 	@container (min-width: 1140px) {
 		.attributes-overview-container {
 			@supports (container-type: scroll-state) {
@@ -1652,18 +1666,17 @@
 				}
 			}
 
-			> :global(*) {
-				transition-property: translate, scale, opacity;
-				transition-duration: 0.5s;
-				translate: var(--translate);
-				scale: var(--scale);
-				opacity: var(--opacity);
-			}
-
 			:global {
-				.slice {
-					transition-property: transform, opacity !important;
-					opacity: calc(1 - clamp(0, abs(var(--pie-slice-highlightIndex) - var(--i)), 1) * 0.5 * var(--isTransformed));
+				> .pie-container {
+					transition-property: translate, scale, opacity;
+					transition-duration: 0.5s;
+					translate: var(--translate);
+					scale: var(--scale);
+					opacity: var(--opacity);
+
+					.slice {
+						--slice-opacity: calc(1 - clamp(0, abs(var(--pie-slice-highlightIndex) - var(--i)), 1) * 0.5 * var(--isTransformed));
+					}
 				}
 			}
 		}

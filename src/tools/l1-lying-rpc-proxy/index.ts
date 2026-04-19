@@ -105,7 +105,8 @@ function forwardToUpstream(
 	body: Buffer,
 ): Promise<{ statusCode: number; body: Buffer }> {
 	return new Promise((resolve, reject) => {
-		const isHttps = upstreamUrl.startsWith('https:')
+		const parsed = new URL(upstreamUrl)
+		const isHttps = parsed.protocol === 'https:'
 
 		const options = {
 			method: 'POST',
@@ -129,8 +130,24 @@ function forwardToUpstream(
 		}
 
 		const req = isHttps
-			? https.request(upstreamUrl, options, callback)
-			: http.request(upstreamUrl, options, callback)
+			? https.request(
+					{
+						...options,
+						hostname: parsed.hostname,
+						port: parsed.port || 443,
+						path: parsed.pathname + parsed.search,
+					},
+					callback,
+				)
+			: http.request(
+					{
+						...options,
+						hostname: parsed.hostname,
+						port: parsed.port || 80,
+						path: parsed.pathname + parsed.search,
+					},
+					callback,
+				)
 
 		req.on('error', reject)
 		req.write(body)

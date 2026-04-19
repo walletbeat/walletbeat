@@ -200,6 +200,7 @@ export const gridplusWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: {
 				// Source: gridplus team responses fileverse document
 				type: FirmwareType.FAIL,
@@ -209,7 +210,7 @@ export const gridplusWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.FAIL,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			keysHandling: supported({
+			keysHandling: {
 				ref: [
 					{
 						explanation:
@@ -220,7 +221,7 @@ export const gridplusWallet: HardwareWallet = {
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 				// Source: gridplus team responses fileverse document
-			}),
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
@@ -235,6 +236,7 @@ export const gridplusWallet: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {

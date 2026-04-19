@@ -35,6 +35,7 @@ scrap.md
 
 # Python cache
 __pycache__
+**/__pycache__
 
 
 # Compiler files
@@ -49,3 +50,6 @@ resources/contracts/broadcast/**/dry-run/
 
 # Docs
 resources/contracts/docs/
+
+# Claude Code worktree things
+.claude/worktrees/

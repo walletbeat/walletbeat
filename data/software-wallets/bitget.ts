@@ -179,6 +179,7 @@ export const bitget: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: {
 				ref: [
@@ -202,6 +203,7 @@ export const bitget: SoftwareWallet = {
 				scamUrlWarning: notSupported,
 				sendTransactionWarning: notSupported,
 			},
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {

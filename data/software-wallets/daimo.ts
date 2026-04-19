@@ -372,6 +372,7 @@ export const daimo: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
@@ -428,6 +429,7 @@ export const daimo: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

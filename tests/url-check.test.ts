@@ -1694,6 +1694,71 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'c89f9bd364380a9ffd5ff2e7f453e0220296d1d9',
 		retrieved: '2026-03-27',
 	},
+	{
+		url: 'https://wallet.uniswap.org/',
+		urlHash: '53c26e1f58ef41abe6e2eb4eb95ddc1bbbba7629',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://docs.uniswap.org/',
+		urlHash: 'a3e405706ac38b59e5c1bb138162c977405124c4',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://github.com/Uniswap',
+		urlHash: '046a7fce9ef8ea6ac8c0d5854f920cb6639afa45',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
+		urlHash: '97d54b721f1af8144f69b9e89abfd76d8243a5a2',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://discord.com/invite/uniswap',
+		urlHash: 'f9dc5c01d6d7dd0a07ab46833c0ae1e3c1ac259a',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://farcaster.xyz/uniswap',
+		urlHash: 'c8299cb24ebec66fffacb45145fc7439e60b4f03',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://x.com/Uniswap',
+		urlHash: '236d460e150a8fff554beddcc672387e11669452',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
+		urlHash: 'f3ee58ccad5b73604401c32f5ce451e773809784',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+		urlHash: '1eb054801b62cdf521f2a266ea9336ff6072cab3',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+		urlHash: 'fef14a0fce263eab6abdcf946c39d3e496bff766',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/zerion-wallet-crypto-defi/klghhnkeealcohjjanjjdaeeggmfmlpl',
+		urlHash: 'f4db2da787034114958427804936711fd439e152',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
+		urlHash: 'da0b34b74deeac2a56309905cb86da9028010e11',
+		retrieved: '2026-03-31',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
+		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
+		retrieved: '2026-03-31',
+	},
 ]
 
 /**
@@ -1821,6 +1886,16 @@ describe('reference URLs', () => {
 			it('has valid extensions', async () => {
 				for (const extension of wallet.metadata.urls?.extensions ?? []) {
 					await checkValidUrl(extension)
+				}
+			})
+			it('has valid androidManifestXml', async () => {
+				if (wallet.metadata.urls?.androidManifestXml !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.androidManifestXml)
+				}
+			})
+			it('has valid iosInfoPlist', async () => {
+				if (wallet.metadata.urls?.iosInfoPlist !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.iosInfoPlist)
 				}
 			})
 			it('has valid socials', async () => {

@@ -1,11 +1,9 @@
 import {
 	type Attribute,
-	type Evaluation,
 	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	collectedByDefault,
@@ -25,13 +23,9 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type MultiAddressCorrelationValue = Value
-
-function uniqueDestinations(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const uniqueDestinations: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'unique_destinations',
 			rating: Rating.PASS,
 			icon: '\u{26d3}', // Broken chain
@@ -44,13 +38,10 @@ function uniqueDestinations(
 			'When configured with multiple addresses, {{WALLET_NAME}} uses unique RPC endpoints for each wallet address. Therefore, no single RPC endpoint gets to learn about more than one of your addresses.',
 		),
 	})
-}
 
-function activeAddressOnly(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const activeAddressOnly: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'active_address_only',
 			rating: Rating.PASS,
 			icon: '\u{1f4ce}', // Single paperclip
@@ -66,13 +57,10 @@ function activeAddressOnly(
 			'Multi-address privacy is generally well-preserved by {{WALLET_NAME}}. However, you should avoid quickly switching between active addresses in order to avoid making successive requests to the same RPC endpoint about different addresses.',
 		),
 	})
-}
 
-function activeAddressOnlyWithTrackingIdentifier(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'active_address_only_with_tracking_identifier',
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by a tracking cookie',
@@ -92,13 +80,10 @@ function activeAddressOnlyWithTrackingIdentifier(
 			'{{WALLET_NAME}} should strip all tracking identifiers from the RPCs it makes.',
 		),
 	})
-}
 
-function bulkRequests(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const bulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'bulkRequests',
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by an external provider',
@@ -116,13 +101,10 @@ function bulkRequests(
 			'{{WALLET_NAME}} should first ensure that it never makes requests containing multiple addresses simultaneously. Next, it should ensure that these requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 	})
-}
 
-function correlatableRequests(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const correlatableRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'correlatableRequests',
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by an external provider',
@@ -140,13 +122,10 @@ function correlatableRequests(
 			'{{WALLET_NAME}} should ensure that its requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 	})
-}
 
-function staggeredRequests(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const staggeredRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'staggered_requests',
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses are staggered across time',
@@ -169,13 +148,10 @@ function staggeredRequests(
 			'{{WALLET_NAME}} should ensure requests are proxied through distinct proxies in order to prevent the RPC endpoint from learning the correlation between addresses. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 	})
-}
 
-function separateCircuits(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const separateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'separate_circuits',
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses use separate proxies',
@@ -190,13 +166,10 @@ function separateCircuits(
 			'{{WALLET_NAME}} should add randomized delays between refreshes of separate addresses in order to reduce time-based correlatability of addresses by the RPC endpoint.',
 		),
 	})
-}
 
-function staggeredAndSeparateCircuits(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const staggeredAndSeparateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'staggered_and_separate_circuits',
 			rating: Rating.PASS,
 			icon: '\u{26d3}', // Broken chain
@@ -209,13 +182,10 @@ function staggeredAndSeparateCircuits(
 			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IP addresses from the perspective of the endpoint, and they are staggered over time. This provides a good degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. From the perspective of the endpoint, these requests come in from random IP addresses at random times, avoiding both IP-based and time-based correlation.',
 		),
 	})
-}
 
-function unsupported(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
-	return ctx.build({
-		value: {
+const unsupported: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'unsupported',
 			rating: Rating.EXEMPT,
 			icon: '\u{1f4ce}', // Single paperclip
@@ -226,7 +196,6 @@ function unsupported(
 			'You can only use one address in {{WALLET_NAME}}, so multi-address privacy is irrelevant.',
 		),
 	})
-}
 
 type QualifiedDataCollectionWithMultiAddress = QualifiedDataCollection & {
 	multiAddress: MultiAddressHandling
@@ -305,7 +274,7 @@ function rateHandling(
 	}
 }
 
-export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = {
+export const multiAddressCorrelation: Attribute = {
 	id: 'multiAddressCorrelation',
 	icon: '\u{1f587}', // Linked paperclips
 	displayName: 'Multi-address privacy',
@@ -419,14 +388,12 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<MultiAddressCorrelationValue>,
-	): Evaluation<MultiAddressCorrelationValue> => {
+	evaluate: ctx => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		if (ctx.features.multiAddress === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(ctx.features.multiAddress)) {
@@ -436,7 +403,7 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		const dataCollection = dataCollectionForAllSupportedFlows(ctx.features.privacy.dataCollection)
 
 		if (dataCollection === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		let worstHandling: DataCollectionByEntity | null = null
@@ -450,7 +417,7 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 			}
 
 			if (!isQualifiedDataCollectionWithMultiAddress(dataCollection)) {
-				return unrated(ctx, null)
+				return unrated(ctx)
 			}
 
 			ctx.addRef(collected)
@@ -463,13 +430,13 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		}
 
 		if (worstHandling === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const worstCollection = qualifiedDataCollectionWithEndpoint(worstHandling.dataCollection)
 
 		if (!isQualifiedDataCollectionWithMultiAddress(worstCollection)) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const handling = worstCollection.multiAddress
@@ -522,5 +489,5 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 				return correlatableRequests(ctx)
 		}
 	},
-	aggregate: pickWorstRating<MultiAddressCorrelationValue>,
+	aggregate: pickWorstRating,
 }

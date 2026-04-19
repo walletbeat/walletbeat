@@ -112,6 +112,7 @@ export const frame: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -139,6 +140,7 @@ export const frame: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,

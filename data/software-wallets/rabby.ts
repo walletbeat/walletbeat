@@ -424,6 +424,7 @@ export const rabby: SoftwareWallet = {
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [
@@ -668,6 +669,7 @@ export const rabby: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {

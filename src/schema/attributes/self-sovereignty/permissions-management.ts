@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -16,8 +15,6 @@ import { refTodo } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
-
-export type PermissionsManagementValue = Value
 
 function describeStandard(control: SpendingApprovalsControl): string {
 	switch (control) {
@@ -43,12 +40,12 @@ function worstControl(...controls: SpendingApprovalsControl[]): SpendingApproval
 }
 
 function evaluate(
-	ctx: EvaluationContext<PermissionsManagementValue>,
+	ctx: EvaluationContext,
 	control: Support<PermissionsManagementSupport>,
-): Evaluation<PermissionsManagementValue> {
+): Evaluation {
 	if (!isSupported(control)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'not_supported',
 				rating: Rating.FAIL,
 				displayName: 'No approval management',
@@ -80,7 +77,7 @@ function evaluate(
 
 	if (worst === SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'can_inspect_and_revoke',
 				rating: Rating.PASS,
 				displayName: 'Can inspect and revoke approvals',
@@ -96,7 +93,7 @@ function evaluate(
 
 	if (worst === SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'can_inspect_not_revoke',
 				rating: Rating.PARTIAL,
 				displayName: 'Can inspect but not revoke approvals',
@@ -116,7 +113,7 @@ function evaluate(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'cannot_inspect_or_revoke',
 			rating: Rating.FAIL,
 			displayName: 'No approval management',
@@ -138,7 +135,7 @@ function evaluate(
 	})
 }
 
-export const permissionsManagement: Attribute<PermissionsManagementValue> = {
+export const permissionsManagement: Attribute = {
 	id: 'permissionsManagement',
 	icon: '\u{1f511}', // Key
 	displayName: 'Permissions management',
@@ -201,18 +198,18 @@ export const permissionsManagement: Attribute<PermissionsManagementValue> = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext<PermissionsManagementValue>) => {
+	evaluate: (ctx: EvaluationContext) => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE)
 
 		const feature = ctx.features.selfSovereignty.permissionsManagement
 
 		if (feature === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(feature)
 
 		return evaluate(ctx, feature)
 	},
-	aggregate: pickWorstRating<PermissionsManagementValue>,
+	aggregate: pickWorstRating,
 }

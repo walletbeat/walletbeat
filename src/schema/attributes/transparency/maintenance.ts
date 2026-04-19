@@ -1,23 +1,12 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import {
-	type MaintenanceSupport,
-	MaintenanceType,
-} from '@/schema/features/transparency/maintenance'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type MaintenanceValue = Value & {
+export type MaintenanceMetadata = {
 	physicalDurability: MaintenanceType
 	mtbfDocumentation: MaintenanceType
 	repairability: MaintenanceType
@@ -25,28 +14,7 @@ export type MaintenanceValue = Value & {
 	warrantyExtensions: MaintenanceType
 }
 
-function evaluateMaintenance(features: MaintenanceSupport): Rating {
-	const ratings = [
-		features.physicalDurability,
-		features.mtbfDocumentation,
-		features.repairability,
-		features.batteryHandling,
-		features.warrantyExtensions,
-	]
-	const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
-
-	if (passCount >= 4) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 2) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-export const maintenance: Attribute<MaintenanceValue> = {
+export const maintenance: Attribute<MaintenanceMetadata> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
@@ -80,25 +48,24 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		pass: [
 			exampleRating(
 				sentence('The wallet passes most maintenance sub-criteria.'),
-				(v: MaintenanceValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet passes some maintenance sub-criteria.'),
-				(v: MaintenanceValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The wallet fails most or all maintenance sub-criteria.'),
-				(v: MaintenanceValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) =>
-		pickWorstRating<MaintenanceValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<MaintenanceValue>): Evaluation<MaintenanceValue> => {
+	aggregate: pickWorstRating,
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable unless audited, which never happens.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -123,17 +90,31 @@ export const maintenance: Attribute<MaintenanceValue> = {
 			})
 		}
 
-		const rating = evaluateMaintenance(maintenanceFeature)
+		const ratings = [
+			maintenanceFeature.physicalDurability,
+			maintenanceFeature.mtbfDocumentation,
+			maintenanceFeature.repairability,
+			maintenanceFeature.batteryHandling,
+			maintenanceFeature.warrantyExtensions,
+		]
+		const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
+		const rating = passCount >= 4 ? Rating.PASS : passCount >= 2 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'maintenance',
 				rating,
 				displayName: 'Maintenance',
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`,
 				),
-				...maintenanceFeature, // TODO: Filter fields
+				metadata: {
+					physicalDurability: maintenanceFeature.physicalDurability,
+					mtbfDocumentation: maintenanceFeature.mtbfDocumentation,
+					repairability: maintenanceFeature.repairability,
+					batteryHandling: maintenanceFeature.batteryHandling,
+					warrantyExtensions: maintenanceFeature.warrantyExtensions,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

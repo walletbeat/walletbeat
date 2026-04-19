@@ -19,6 +19,19 @@ export enum Variant {
 	HARDWARE = 'HARDWARE',
 }
 
+const variantLabels: Record<Variant, string> = {
+	[Variant.BROWSER]: 'Browser extension',
+	[Variant.MOBILE]: 'Mobile app',
+	[Variant.DESKTOP]: 'Desktop app',
+	[Variant.EMBEDDED]: 'Embedded wallet',
+	[Variant.HARDWARE]: 'Hardware wallet',
+}
+
+/** Returns a human-readable display label for a wallet variant. */
+export function variantLabel(variant: Variant): string {
+	return variantLabels[variant]
+}
+
 export const variantEnum = new Enum<Variant>({
 	[Variant.MOBILE]: true,
 	[Variant.DESKTOP]: true,

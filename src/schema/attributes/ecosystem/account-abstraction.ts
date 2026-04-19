@@ -2,11 +2,9 @@ import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import {
 	type Attribute,
-	type Evaluation,
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -23,13 +21,9 @@ import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountAbstractionValue = Value
-
-function supportsErc4337AndEip7702(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
-	return ctx.build({
-		value: {
+const supportsErc4337AndEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'erc4337_and_eip7702_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
@@ -41,13 +35,10 @@ function supportsErc4337AndEip7702(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)} and ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsErc4337(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
-	return ctx.build({
-		value: {
+const supportsErc4337: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'erc4337_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
@@ -57,13 +48,10 @@ function supportsErc4337(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)}.`,
 		),
 	})
-}
 
-function supportsEip7702(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
-	return ctx.build({
-		value: {
+const supportsEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'eip7702_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
@@ -73,13 +61,10 @@ function supportsEip7702(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsEoaAndMpc(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
-	return ctx.build({
-		value: {
+const supportsEoaAndMpc: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'eoa_and_mpc_only',
 			rating: Rating.FAIL,
 			displayName: 'EOA & MPC only',
@@ -97,13 +82,10 @@ function supportsEoaAndMpc(
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsMpcOnly(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
-	return ctx.build({
-		value: {
+const supportsMpcOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'mpc_only',
 			rating: Rating.FAIL,
 			displayName: 'MPC only',
@@ -121,13 +103,10 @@ function supportsMpcOnly(
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsRawEoaOnly(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
-	return ctx.build({
-		value: {
+const supportsRawEoaOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'eoa_only',
 			rating: Rating.FAIL,
 			displayName: 'EOA only',
@@ -143,9 +122,8 @@ function supportsRawEoaOnly(
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-export const accountAbstraction: Attribute<AccountAbstractionValue> = {
+export const accountAbstraction: Attribute = {
 	id: 'accountAbstraction',
 	icon: '\u{1f4bc}', // Briefcase
 	displayName: 'Account Abstraction',
@@ -216,13 +194,11 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<AccountAbstractionValue>,
-	): Evaluation<AccountAbstractionValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.accountSupport === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const supported: Record<AccountType, boolean> = {
@@ -268,5 +244,5 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 
 		throw new Error('Wallet supports no account type')
 	},
-	aggregate: pickWorstRating<AccountAbstractionValue>,
+	aggregate: pickWorstRating,
 }

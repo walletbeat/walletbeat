@@ -122,6 +122,7 @@ export const pillarx: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
@@ -133,6 +134,7 @@ export const pillarx: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

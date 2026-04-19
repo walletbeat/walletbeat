@@ -25,6 +25,9 @@ export const zerion: SoftwareWallet = {
 		lastUpdated: '2025-04-22',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/zerion-wallet-crypto-defi/klghhnkeealcohjjanjjdaeeggmfmlpl',
+			],
 			repositories: ['https://github.com/zeriontech/zerion-wallet-extension'],
 			socials: {
 				farcaster: 'https://farcaster.xyz/zerion.eth',
@@ -112,6 +115,7 @@ export const zerion: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: [
 					{
@@ -142,6 +146,7 @@ export const zerion: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,

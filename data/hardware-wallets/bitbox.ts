@@ -200,6 +200,7 @@ export const bitboxWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,
@@ -213,6 +214,7 @@ export const bitboxWallet: HardwareWallet = {
 			},
 			publicSecurityAudits: null,
 			secureElement: null,
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {

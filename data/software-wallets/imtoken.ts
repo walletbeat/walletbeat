@@ -267,6 +267,7 @@ export const imtoken: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: {
 				[Variant.MOBILE]: {
 					ref: [
@@ -336,6 +337,7 @@ export const imtoken: SoftwareWallet = {
 				}),
 				sendTransactionWarning: notSupported,
 			},
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

@@ -1,5 +1,5 @@
 import type { EvaluationData, WalletNameStrings } from '@/schema/attributes'
-import type { PrivateTransfersValue } from '@/schema/attributes/privacy/private-transfers'
+import type { PrivateTransfersMetadata } from '@/schema/attributes/privacy/private-transfers'
 import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 
 import {
@@ -18,7 +18,7 @@ interface PrivateTokenTransferDetails {
 	extraNotes: MarkdownParagraph<WalletNameStrings>[]
 }
 
-export interface PrivateTransfersDetailsProps extends EvaluationData<PrivateTransfersValue> {
+export interface PrivateTransfersDetailsProps extends EvaluationData<PrivateTransfersMetadata> {
 	privateTransferDetails: Map<PrivateTransferTechnology, PrivateTokenTransferDetails>
 }
 
@@ -74,7 +74,7 @@ export function mergePrivateTransferDetails(
 }
 
 export function privateTransfersDetailsContent(
-	bakedProps: Omit<PrivateTransfersDetailsProps, keyof EvaluationData<PrivateTransfersValue>>,
+	bakedProps: Omit<PrivateTransfersDetailsProps, keyof EvaluationData<PrivateTransfersMetadata>>,
 ): Content<{ WALLET_NAME: string }> {
 	return component<PrivateTransfersDetailsContent, keyof typeof bakedProps>(
 		'PrivateTransfersDetails',

@@ -29,7 +29,7 @@ import { paragraph } from '@/types/content'
 
 export const keycardShell: HardwareWallet = {
 	metadata: {
-		id: 'keycardShell',
+		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
 		blurb: paragraph(`
@@ -147,6 +147,7 @@ export const keycardShell: HardwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			// Firmware: open source MIT, reproducible builds, manual updates with hash verification
 			firmware: {
 				type: FirmwareType.PASS,
@@ -191,6 +192,7 @@ export const keycardShell: HardwareWallet = {
 				},
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			securityBestPractices: null,
 			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
 			supplyChainDIY: null,
 			supplyChainFactory: null,

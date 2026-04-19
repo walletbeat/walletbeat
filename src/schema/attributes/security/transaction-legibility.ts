@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -33,8 +32,6 @@ import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
-
-export type TransactionLegibilityValue = Value
 
 // Message signing evaluation helpers
 
@@ -355,15 +352,15 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 
 // Hardware wallet evaluation helpers
 function hardwareNoTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_no_transaction_legibility',
 			rating: Rating.FAIL,
 			displayName: 'Unclear transaction details',
@@ -381,15 +378,15 @@ function hardwareNoTransactionLegibility(
 }
 
 function hardwareBasicTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_basic_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic transaction legibility support',
@@ -407,15 +404,15 @@ function hardwareBasicTransactionLegibility(
 }
 
 function hardwarePartialTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_partial_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
@@ -433,14 +430,14 @@ function hardwarePartialTransactionLegibility(
 }
 
 function hardwareFullTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_full_transaction_legibility',
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',
@@ -870,15 +867,15 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 
 // Software wallet evaluation helpers
 function softwareNoTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: SoftwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'software_no_transaction_legibility',
 			rating: Rating.FAIL,
 			displayName: 'Unclear transaction details',
@@ -896,15 +893,15 @@ function softwareNoTransactionLegibility(
 }
 
 function softwarePartialTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: SoftwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'software_partial_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
@@ -920,14 +917,14 @@ function softwarePartialTransactionLegibility(
 }
 
 function softwareFullTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	support: SoftwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'software_full_transaction_legibility',
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',
@@ -940,9 +937,9 @@ function softwareFullTransactionLegibility(
 }
 
 function evaluateHardwareWalletTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	hardwareTransactionLegibility: HardwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	ctx.addRef(hardwareTransactionLegibility)
 
 	const { calldataDecoded, detailsDisplayed, dataExtraction, messageSigningLegibility } =
@@ -1028,7 +1025,7 @@ function evaluateHardwareWalletTransactionLegibility(
 	const overallRating = getOverallRating()
 
 	if (overallRating === Rating.UNRATED) {
-		return unrated(ctx, null)
+		return unrated(ctx)
 	}
 
 	if (overallRating === Rating.FAIL) {
@@ -1051,16 +1048,16 @@ function evaluateHardwareWalletTransactionLegibility(
 }
 
 function evaluateSoftwareWalletTransactionLegibility(
-	ctx: EvaluationContext<TransactionLegibilityValue>,
+	ctx: EvaluationContext,
 	softwareTransactionLegibility: SoftwareTransactionLegibilityImplementation,
-): Evaluation<TransactionLegibilityValue> {
+): Evaluation {
 	const transactionLegibilitySupport = ctx.popRefs(softwareTransactionLegibility)
 
 	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
 		transactionLegibilitySupport
 
 	if (calldataDisplay === null || transactionDetailsDisplay === null) {
-		return unrated(ctx, null)
+		return unrated(ctx)
 	}
 
 	const isShown = (field: DataDisplayOptions): boolean =>
@@ -1160,7 +1157,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 	return softwarePartialTransactionLegibility(ctx, softwareTransactionLegibility)
 }
 
-export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
+export const transactionLegibility: Attribute = {
 	id: 'transactionLegibility',
 	icon: '\u{1F50F}', // Lock with pen
 	displayName: 'Transaction Legibility',
@@ -1347,13 +1344,11 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<TransactionLegibilityValue>,
-	): Evaluation<TransactionLegibilityValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test.
 
 		if (ctx.features.security.transactionLegibility === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (isHardwareTransactionLegibility(ctx.features.security.transactionLegibility)) {
@@ -1368,5 +1363,5 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			ctx.features.security.transactionLegibility,
 		)
 	},
-	aggregate: pickWorstRating<TransactionLegibilityValue>,
+	aggregate: pickWorstRating,
 }

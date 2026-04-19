@@ -132,6 +132,7 @@ export const ngrave: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {
@@ -147,6 +148,7 @@ export const ngrave: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.EAL_7,
 			}),
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {

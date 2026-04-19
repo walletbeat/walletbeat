@@ -1,22 +1,13 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	type ExplicitRating,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, type ExplicitRating, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
 import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware'
-import type { AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type FirmwareValue = Value & {
+export type FirmwareMetadata = {
 	silentUpdateProtection: FirmwareType | null
 	firmwareOpenSource: FirmwareType | null
 	reproducibleBuilds: FirmwareType | null
@@ -49,7 +40,7 @@ function evaluateFirmware(features: FirmwareSupport): ExplicitRating | Rating.UN
 	return Rating.FAIL
 }
 
-export const firmware: Attribute<FirmwareValue> = {
+export const firmware: Attribute<FirmwareMetadata> = {
 	id: 'firmware',
 	icon: '💾',
 	displayName: 'Firmware',
@@ -78,25 +69,24 @@ export const firmware: Attribute<FirmwareValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes most firmware sub-criteria.'),
-				(v: FirmwareValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some firmware sub-criteria.'),
-				(v: FirmwareValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all firmware sub-criteria.'),
-				(v: FirmwareValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FirmwareValue>>) =>
-		pickWorstRating<FirmwareValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<FirmwareValue>): Evaluation<FirmwareValue> => {
+	aggregate: pickWorstRating,
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.VERIFIABLE,
@@ -135,12 +125,17 @@ export const firmware: Attribute<FirmwareValue> = {
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'firmware',
 				rating,
 				displayName: 'Firmware',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} firmware.`),
-				...firmwareFeature, // TODO: Filter fields.
+				metadata: {
+					silentUpdateProtection: firmwareFeature.silentUpdateProtection,
+					firmwareOpenSource: firmwareFeature.firmwareOpenSource,
+					reproducibleBuilds: firmwareFeature.reproducibleBuilds,
+					customFirmware: firmwareFeature.customFirmware,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

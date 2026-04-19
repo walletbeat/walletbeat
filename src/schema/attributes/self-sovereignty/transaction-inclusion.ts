@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	TransactionSubmissionL2Support,
@@ -23,12 +22,10 @@ import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type TransactionInclusionValue = Value
-
 export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE'
 
 function transactionSubmissionEvaluation(
-	ctx: EvaluationContext<TransactionInclusionValue>,
+	ctx: EvaluationContext,
 	{
 		supportsL1Broadcast,
 		supportAnyL2Transactions,
@@ -40,10 +37,10 @@ function transactionSubmissionEvaluation(
 		supportForceWithdrawal: TransactionSubmissionL2Type[]
 		unsupportedL2s: TransactionSubmissionL2Type[]
 	},
-): Evaluation<TransactionInclusionValue> {
+): Evaluation {
 	if (!isNonEmptyArray(supportAnyL2Transactions) && !isNonEmptyArray(supportForceWithdrawal)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_l2_transaction_inclusion_support',
 				rating: Rating.FAIL,
 				displayName: 'No L2 force-inclusion support',
@@ -65,7 +62,7 @@ function transactionSubmissionEvaluation(
 
 	if (supportsL1Broadcast === 'NO') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'l2_transaction_inclusion_supported_but_no_l1',
 				rating: Rating.PARTIAL,
 				displayName: 'Intermediaries required for L1 transactions',
@@ -89,7 +86,7 @@ function transactionSubmissionEvaluation(
 
 	if (unsupportedL2s.length > 0) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: valueId,
 				rating: Rating.PARTIAL,
 				displayName: 'No force-withdrawal for some L2s',
@@ -110,7 +107,7 @@ function transactionSubmissionEvaluation(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: valueId,
 			rating: Rating.PASS,
 			displayName: 'Can force-withdraw from L2s',
@@ -127,7 +124,7 @@ function transactionSubmissionEvaluation(
 	})
 }
 
-export const transactionInclusion: Attribute<TransactionInclusionValue> = {
+export const transactionInclusion: Attribute = {
 	id: 'transactionInclusion',
 	icon: '\u{1f4e1}', // Satellite antenna
 	displayName: 'Transaction inclusion',
@@ -259,18 +256,16 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<TransactionInclusionValue>,
-	): Evaluation<TransactionInclusionValue> => {
+	evaluate: ctx => {
 		if (ctx.features.selfSovereignty.transactionSubmission === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (
 			ctx.features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip === null ||
 			ctx.features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode === null
 		) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.setVerifiability(
@@ -307,7 +302,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			const support = ctx.features.selfSovereignty.transactionSubmission.l2[l2]
 
 			if (support === null) {
-				return unrated(ctx, null)
+				return unrated(ctx)
 			}
 
 			if (support === TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT) {
@@ -338,5 +333,5 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			unsupportedL2s,
 		})
 	},
-	aggregate: pickWorstRating<TransactionInclusionValue>,
+	aggregate: pickWorstRating,
 }

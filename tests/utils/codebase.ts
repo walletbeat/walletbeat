@@ -19,9 +19,17 @@ export const commonExclusions: PathPredicate[] = [
 	// Exclude entries from .gitignore.
 	await GitIgnoredFiles(),
 
-	// Exclude PNG and PDF files.
-	/\.(png|pdf)$/i,
+	// Exclude known binary files and macOS metadata files.
+	/\.(png|pdf|jpg|jpeg|gif|ico)$/i,
+
+	// Helios binary checkpoint file.
+	'deploy/helios/data/checkpoint',
 ]
+
+/** Escape special regex characters in a string. */
+function escapeRegExp(str: string): string {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 /** PathPredicate that excludes entries listed in .gitignore. */
 export async function GitIgnoredFiles(): Promise<PathPredicate> {
@@ -29,6 +37,7 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 	const gitIgnoreContents = await fs.readFile(gitIgnorePath, { encoding: 'utf-8' })
 	const specificFiles = new Set<string>()
 	const dirPrefixes: string[] = []
+	const regexExclusions: RegExp[] = []
 
 	for (let line of gitIgnoreContents.split('\n')) {
 		const hashIndex = line.indexOf('#')
@@ -56,9 +65,32 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 				line = line.substring(0, line.length - 1)
 			}
 			dirPrefixes.push(line + '/')
-		} else {
-			specificFiles.add(line)
+			continue
 		}
+
+		if (line.startsWith('**/') && !line.substring(3).includes('*')) {
+			regexExclusions.push(new RegExp(`^.*/${escapeRegExp(line.substring(3))}(?:/.*)?$`, ''))
+			continue
+		}
+
+		if (line.endsWith('*') && !line.endsWith('/*')) {
+			regexExclusions.push(
+				new RegExp(`^${escapeRegExp(line.substring(0, line.length - 1))}.*$`, ''),
+			)
+			continue
+		}
+
+		if (line.includes('*')) {
+			throw new Error(`Glob pattern not yet supported in this function: ${line}`)
+		}
+
+		// If the pattern has no slash, it matches the name anywhere in the tree (like **/<pattern>).
+		if (!line.includes('/')) {
+			regexExclusions.push(new RegExp(`(?:^|/)${escapeRegExp(line)}(?:/.*)?$`, ''))
+			continue
+		}
+
+		specificFiles.add(line)
 	}
 
 	return (path: string): boolean => {
@@ -79,11 +111,17 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 			}
 		}
 
+		for (const regexp of regexExclusions) {
+			if (regexp.exec(normalizedPath)) {
+				return true
+			}
+		}
+
 		return false
 	}
 }
 
-function normalizePath(p: string): string {
+export function normalizePath(p: string): string {
 	return path.normalize(p).replaceAll(path.sep, '/')
 }
 
@@ -118,6 +156,78 @@ export interface CodebaseIndexOptions<T extends IndexedFileData> {
 export async function getCodebaseIndex<T extends IndexedFileData>(
 	options: CodebaseIndexOptions<T>,
 ): Promise<void> {
+	const crawlOptions: CodebaseCrawOptions = {
+		root: options.root,
+		ignore: options.ignore,
+		concurrency: options.concurrency,
+		traversalFn: entry => {
+			if (entry.type === CodebaseEntryType.FILE) {
+				const fileIndex: IndexedFile<T> = {
+					filePath: entry.path,
+					...options.indexFn(entry.path, entry.contents),
+				}
+
+				options.aggregateFn(fileIndex)
+			}
+		},
+	}
+
+	await crawlCodebase(crawlOptions)
+}
+
+export enum CodebaseEntryType {
+	DIRECTORY = 'DIRECTORY',
+	FILE = 'FILE',
+	SYMLINK = 'SYMLINK',
+	OTHER = 'OTHER',
+}
+
+export type CodebaseEntry =
+	| {
+			type: CodebaseEntryType.DIRECTORY
+			path: string
+	  }
+	| {
+			type: CodebaseEntryType.FILE
+			path: string
+			raw: Buffer
+			contents: string
+	  }
+	| {
+			type: CodebaseEntryType.SYMLINK
+			path: string
+			rawTarget: string
+			selfRelativeTarget: string
+			rootRelativeTarget: string
+			absoluteTarget: string
+	  }
+	| {
+			type: CodebaseEntryType.OTHER
+			path: string
+	  }
+
+export interface CodebaseCrawOptions {
+	/** Root directory to traverse from. If undefined, use repository root. */
+	root?: string
+
+	/**
+	 * Ignore files matching any of these predicates.
+	 * Paths are relative to `root`.
+	 */
+	ignore: PathPredicate[]
+
+	/** Function to run on each entry that doesn't match any predicate in `ignore`. */
+	traversalFn: (entry: CodebaseEntry) => void
+
+	/** Max number of concurrent I/O operations. */
+	concurrency?: number
+}
+
+/**
+ * Crawl the codebase and call traversalFn for each entry.
+ * This is the core traversal logic that can be reused by different indexing operations.
+ */
+export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void> {
 	const shouldIgnore = (filePath: string): boolean =>
 		options.ignore.some(predicate => {
 			if (typeof predicate === 'function') {
@@ -135,41 +245,57 @@ export async function getCodebaseIndex<T extends IndexedFileData>(
 
 	const root = options.root ?? getRepositoryRoot()
 
-	/** Recursively walk one directory (async). */
-	const walk = async (dir: string): Promise<Promise<IndexedFile<T>>[]> => {
+	const crawl = async (dir: string): Promise<void> => {
 		const dirEntries = await concurrencyLimit(() => fs.readdir(dir, { withFileTypes: true }))
 
-		const perEntryPromises = dirEntries.map(async (entry): Promise<Promise<IndexedFile<T>>[]> => {
+		const perEntryPromises = dirEntries.map(async entry => {
 			const fullPath = path.join(dir, entry.name)
 			const rootRelativePath = path.relative(root, fullPath)
 
 			if (shouldIgnore(rootRelativePath)) {
-				return []
+				return
 			}
+
+			let entryData: CodebaseEntry
 
 			if (entry.isDirectory()) {
-				return walk(fullPath)
-			}
+				entryData = { type: CodebaseEntryType.DIRECTORY, path: rootRelativePath }
+			} else if (entry.isSymbolicLink()) {
+				try {
+					const rawTarget = await concurrencyLimit(() => fs.readlink(fullPath))
+					const selfRelativeTarget = path.join(path.dirname(rootRelativePath), rawTarget)
+					const rootRelativeTarget = path.relative(root, selfRelativeTarget)
+					const absoluteTarget = normalizePath(path.resolve(root, rootRelativeTarget))
 
-			if (entry.isFile()) {
-				const fileContents = await concurrencyLimit(() =>
-					fs.readFile(fullPath, { encoding: 'utf-8' }),
-				)
-				const fileIndex: IndexedFile<T> = {
-					filePath: rootRelativePath,
-					...options.indexFn(rootRelativePath, fileContents),
+					entryData = {
+						type: CodebaseEntryType.SYMLINK,
+						path: rootRelativePath,
+						rawTarget,
+						selfRelativeTarget,
+						rootRelativeTarget,
+						absoluteTarget,
+					}
+				} catch {
+					entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
 				}
+			} else if (entry.isFile()) {
+				const raw = await concurrencyLimit(() => fs.readFile(fullPath))
+				const contents = raw.toString('utf8')
 
-				return [Promise.resolve(fileIndex)]
+				entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
+			} else {
+				entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
 			}
 
-			return []
+			options.traversalFn(entryData)
+
+			if (entry.isDirectory()) {
+				await crawl(fullPath)
+			}
 		})
 
-		return (await Promise.all(perEntryPromises)).flat()
+		await Promise.all(perEntryPromises)
 	}
 
-	for (const fileWords of await Promise.all(await walk(root))) {
-		options.aggregateFn(fileWords)
-	}
+	await crawl(root)
 }

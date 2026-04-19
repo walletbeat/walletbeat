@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
@@ -63,13 +62,9 @@ function describeConnectionMethods(
 	return commaListFormat(methods)
 }
 
-export type AppConnectionSupportValue = Value
-
-function noAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
-): Evaluation<AppConnectionSupportValue> {
-	return ctx.build({
-		value: {
+const noAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'no_app_connection',
 			rating: Rating.FAIL,
 			displayName: 'No app connection support',
@@ -82,13 +77,10 @@ function noAppConnectionSupport(
 			'{{WALLET_NAME}} should add at least one widely adopted, standards-based app connection method and/or support connection through popular software wallets. Ideally, this support should be permissionless and rely on open standards so apps can integrate without vendor approval.',
 		),
 	})
-}
 
-function unverifiableAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
-): Evaluation<AppConnectionSupportValue> {
-	return ctx.build({
-		value: {
+const unverifiableAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'unverifiable_app_connection',
 			rating: Rating.PARTIAL,
 			displayName: 'Unverifiable app connection support',
@@ -103,14 +95,13 @@ function unverifiableAppConnectionSupport(
 			'{{WALLET_NAME}} should support open standards that enable connection via software wallets and apps. If the wallet relies on a vendor app, open-sourcing the app and connection components (or publishing verifiable builds and specs) would materially improve transparency and verifiability.',
 		),
 	})
-}
 
 function limitedVerifiableAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
+	ctx: EvaluationContext,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'limited_verifiable_app_connection',
 			rating: Rating.PARTIAL,
 			displayName: 'Limited verifiable app connection support',
@@ -128,11 +119,11 @@ function limitedVerifiableAppConnectionSupport(
 }
 
 function verifiableUniversalAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
+	ctx: EvaluationContext,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'verifiable_universal_app_connection',
 			rating: Rating.PASS,
 			displayName: 'Verifiable universal app connection support',
@@ -147,11 +138,11 @@ function verifiableUniversalAppConnectionSupport(
 }
 
 function restrictedAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
+	ctx: EvaluationContext,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'restricted_app_connection',
 			rating: Rating.PARTIAL,
 			displayName: 'Restricted app connection support',
@@ -168,7 +159,7 @@ function restrictedAppConnectionSupport(
 	})
 }
 
-export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
+export const appConnectionSupport: Attribute = {
 	id: 'appConnectionSupport',
 	icon: '\u{1F517}', // Link symbol
 	displayName: 'app Connection Support',
@@ -290,9 +281,7 @@ limiting its utility.
 			noAppConnectionSupport(EvaluationContext.forTest(() => appConnectionSupport)),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<AppConnectionSupportValue>,
-	): Evaluation<AppConnectionSupportValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		// Check for ERC-4337 smart wallet
@@ -302,7 +291,6 @@ limiting its utility.
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
-				null,
 			)
 		}
 
@@ -310,7 +298,7 @@ limiting its utility.
 		if (ctx.features.type !== WalletType.HARDWARE) {
 			// For software wallets:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'exempt_software_wallet',
 					rating: Rating.EXEMPT,
 					displayName: 'Only applicable for hardware wallets',
@@ -328,7 +316,7 @@ limiting its utility.
 		const appSupport = ctx.features.appConnectionSupport
 
 		if (appSupport === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(appSupport)
@@ -339,7 +327,7 @@ limiting its utility.
 		}
 
 		if (appSupport.requiresManufacturerConsent === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(
@@ -390,5 +378,5 @@ limiting its utility.
 		// Should not reach here if feature data is correct, but handle gracefully
 		return noAppConnectionSupport(ctx)
 	},
-	aggregate: pickWorstRating<AppConnectionSupportValue>,
+	aggregate: pickWorstRating,
 }

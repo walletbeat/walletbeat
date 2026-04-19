@@ -20,6 +20,7 @@ import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { AccountRecovery } from './features/security/account-recovery'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { DuressResistance } from './features/security/duress-resistance'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
@@ -28,6 +29,7 @@ import type { PasskeyVerificationImplementation } from './features/security/pass
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
+import type { SecurityBestPracticesData } from './features/security/security-best-practices'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type {
@@ -111,8 +113,19 @@ export interface WalletBaseFeatures {
 		/** How can users of the wallet recover their account? */
 		accountRecovery: VariantFeature<AccountRecovery>
 
+		/**
+		 * Duress resistance features, covering both basic lock-screen
+		 * protection and dedicated duress-PIN mechanisms (decoy wallet or
+		 * self-destruct-and-forward).
+		 *
+		 */
+		duressResistance: VariantFeature<DuressResistance>
+
 		/** How are secret keys handled? */
 		keysHandling: VariantFeature<WithRef<KeysHandlingSupport>>
+
+		/** Security best practices. */
+		securityBestPractices: SecurityBestPracticesData | null
 	}
 
 	/** Privacy features. */
@@ -328,10 +341,12 @@ export interface ResolvedFeatures {
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
 		keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>>
+		securityBestPractices: ResolvedFeature<SecurityBestPracticesData>
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 		userSafety: ResolvedFeature<UserSafetySupport>
 		accountRecovery: ResolvedFeature<AccountRecovery>
+		duressResistance: ResolvedFeature<DuressResistance>
 	}
 	privacy: {
 		analytics: {
@@ -474,6 +489,7 @@ export function resolveFeatures(
 				'security.supplyChainDIY',
 				features => features.security.supplyChainDIY,
 			),
+			securityBestPractices: features.security.securityBestPractices,
 			supplyChainFactory: hardwareFeat(
 				'security.supplyChainFactory',
 				features => features.security.supplyChainFactory,
@@ -482,6 +498,10 @@ export function resolveFeatures(
 			accountRecovery: baseFeat(
 				'security.accountRecovery',
 				features => features.security.accountRecovery,
+			),
+			duressResistance: baseFeat(
+				'security.duressResistance',
+				features => features.security.duressResistance,
 			),
 		},
 		privacy: {

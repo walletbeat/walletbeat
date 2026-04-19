@@ -164,6 +164,7 @@ export const ledgerWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: null,
 			keysHandling: null,
 			lightClient: {
@@ -180,6 +181,7 @@ export const ledgerWallet: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {

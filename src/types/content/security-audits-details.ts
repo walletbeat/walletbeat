@@ -1,9 +1,9 @@
-import type { EvaluationData } from '@/schema/attributes'
-import type { SecurityAuditsValue } from '@/schema/attributes/security/security-audits'
+import type { EvaluationDetailProps } from '@/schema/attributes'
+import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits'
 
 import { component, type Content } from '../content'
 
-export interface SecurityAuditsDetailsProps extends EvaluationData<SecurityAuditsValue> {
+export interface SecurityAuditsDetailsProps extends EvaluationDetailProps<SecurityAuditsMetadata> {
 	auditedInLastYear: boolean
 	hasUnaddressedFlaws: boolean
 }
@@ -14,7 +14,7 @@ export interface SecurityAuditsDetailsContent {
 }
 
 export function securityAuditsDetailsContent(
-	bakedProps: Omit<SecurityAuditsDetailsProps, keyof EvaluationData<SecurityAuditsValue>>,
+	bakedProps: Omit<SecurityAuditsDetailsProps, keyof EvaluationDetailProps<SecurityAuditsMetadata>>,
 ): Content<{ WALLET_NAME: string }> {
 	return component<SecurityAuditsDetailsContent, keyof typeof bakedProps>(
 		'SecurityAuditsDetails',

@@ -144,6 +144,7 @@ export const cypherockWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,
@@ -182,6 +183,7 @@ export const cypherockWallet: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {

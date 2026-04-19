@@ -7,7 +7,6 @@ import {
 	type EvaluationScaffold,
 	exampleRating,
 	Rating,
-	type Value,
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
@@ -51,7 +50,7 @@ import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 import { entityMarkdownLink } from '../../entity'
 import { pickWorstRating, unrated } from '../common'
 
-export type PrivateTransfersValue = Value & {
+export type PrivateTransfersMetadata = {
 	defaultFungibleTokenTransferMode: FungibleTokenTransferMode
 	perTechnology: Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>
 }
@@ -108,32 +107,32 @@ export function worstPrivateTransfersPrivacyLevel(
 }
 
 function mergeEvaluations(
-	ctx: EvaluationContext<PrivateTransfersValue>,
-	eval1: EvaluationScaffold<PrivateTransfersValue> | null,
-	eval2: EvaluationScaffold<PrivateTransfersValue>,
-): EvaluationScaffold<PrivateTransfersValue> {
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
+	eval1: EvaluationScaffold<PrivateTransfersMetadata> | null,
+	eval2: EvaluationScaffold<PrivateTransfersMetadata>,
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	if (eval1 === null) {
 		return eval2
 	}
 
-	if (eval1.value.id === eval2.value.id) {
+	if (eval1.outcome.id === eval2.outcome.id) {
 		throw new Error(
-			`Cannot disambiguate between ${JSON.stringify(eval1.value)} and ${JSON.stringify(eval2.value)} (both have the same ID)`,
+			`Cannot disambiguate between ${JSON.stringify(eval1.outcome)} and ${JSON.stringify(eval2.outcome)} (both have the same ID)`,
 		)
 	}
 
 	const worse =
-		pickWorstRating([ctx.build(eval1), ctx.build(eval2)]).value.id === eval1.value.id
+		pickWorstRating([ctx.build(eval1), ctx.build(eval2)]).outcome.id === eval1.outcome.id
 			? eval1
 			: eval2
-	const better = worse.value.id === eval1.value.id ? eval2 : eval1
+	const better = worse.outcome.id === eval1.outcome.id ? eval2 : eval1
 	const mergedMap = new Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>()
 
-	for (const [key, value] of worse.value.perTechnology) {
+	for (const [key, value] of worse.outcome.metadata.perTechnology) {
 		mergedMap.set(key, value)
 	}
 
-	for (const [key, value] of better.value.perTechnology) {
+	for (const [key, value] of better.outcome.metadata.perTechnology) {
 		if (!mergedMap.has(key)) {
 			mergedMap.set(key, value)
 		}
@@ -173,15 +172,17 @@ function mergeEvaluations(
 				: worse.details
 
 	return {
-		value: {
-			id: worse.value.id,
-			defaultFungibleTokenTransferMode: worse.value.defaultFungibleTokenTransferMode,
-			displayName: worse.value.displayName,
-			rating: worse.value.rating,
-			shortExplanation: worse.value.shortExplanation,
-			icon: worse.value.icon,
-			score: worse.value.score,
-			perTechnology: mergedMap,
+		outcome: {
+			id: worse.outcome.id,
+			displayName: worse.outcome.displayName,
+			rating: worse.outcome.rating,
+			shortExplanation: worse.outcome.shortExplanation,
+			icon: worse.outcome.icon,
+			score: worse.outcome.score,
+			metadata: {
+				defaultFungibleTokenTransferMode: worse.outcome.metadata.defaultFungibleTokenTransferMode,
+				perTechnology: mergedMap,
+			},
 		},
 		details,
 		howToImprove: worse.howToImprove,
@@ -189,17 +190,17 @@ function mergeEvaluations(
 	}
 }
 
-function noPrivateTransfers(
-	ctx: EvaluationContext<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
-	return ctx.build({
-		value: {
+const noPrivateTransfers: (typeof privateTransfers)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'no_transfer_privacy',
 			rating: Rating.FAIL,
 			displayName: 'Private token transfers are not supported',
 			shortExplanation: sentence('{{WALLET_NAME}} does not support private token transfers.'),
-			defaultFungibleTokenTransferMode: 'PUBLIC',
-			perTechnology: new Map(),
+			metadata: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				perTechnology: new Map(),
+			},
 		},
 		details: mdParagraph(
 			`
@@ -238,21 +239,20 @@ function noPrivateTransfers(
 		`,
 		),
 	})
-}
 
-function nonDefault(
-	ctx: EvaluationContext<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
-	return ctx.build({
-		value: {
+const nonDefault: (typeof privateTransfers)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'non_default_transfer_privacy',
 			rating: Rating.FAIL,
 			displayName: 'Private token transfers are not the default',
 			shortExplanation: mdSentence(
 				'Token transfers with {{WALLET_NAME}} are public by default despite it supporting private token transfers.',
 			),
-			defaultFungibleTokenTransferMode: 'PUBLIC',
-			perTechnology: new Map(),
+			metadata: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				perTechnology: new Map(),
+			},
 		},
 		details: mdParagraph(
 			`
@@ -276,12 +276,11 @@ function nonDefault(
 		`,
 		),
 	})
-}
 
 function rateStealthAddressSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	stealthAddresses: Supported<StealthAddressSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(
 		stealthAddresses,
 		stealthAddresses.recipientAddressResolution,
@@ -592,37 +591,41 @@ function rateStealthAddressSupport(
 			throw new Error('Unreachable')
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'not_private_stealth_addresses',
 					rating: Rating.FAIL,
 					displayName: 'Non-private ERC-5564 stealth address support',
 					shortExplanation: mdSentence(
 						`{{WALLET_NAME}} implements ${eipMarkdownLink(erc5564)} stealth addresses but may create unintended onchain links.`,
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_stealth_addresses',
 					rating: Rating.PARTIAL,
 					displayName: 'ERC-5564 stealth addresses reliant on trusted provider',
 					shortExplanation: mdSentence(
 						`{{WALLET_NAME}} implements ${eipMarkdownLink(erc5564)} stealth addresses but relies on a trusted external provider.`,
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'fully_private_stealth_addresses',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -630,8 +633,10 @@ function rateStealthAddressSupport(
 					shortExplanation: mdSentence(
 						`{{WALLET_NAME}} fully implements ${eipMarkdownLink(erc5564)} stealth addresses.`,
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -640,9 +645,9 @@ function rateStealthAddressSupport(
 }
 
 function rateTornadoCashNovaSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	tornadoCashNova: Supported<TornadoCashNovaSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(tornadoCashNova)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -842,30 +847,34 @@ function rateTornadoCashNovaSupport(
 			throw new Error('Unreachable')
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'non_private_tornado_cash_nova',
 					rating: Rating.FAIL,
 					displayName: 'Non-private Tornado Cash Nova integration',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Tornado Cash Nova in a non-privacy-preserving way.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_tornado_cash_nova',
 					rating: Rating.PARTIAL,
 					displayName: 'Tornado Cash Nova integration relying on external provider',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Tornado Cash Nova but relies on an external provider.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -873,15 +882,17 @@ function rateTornadoCashNovaSupport(
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
 				return {
-					value: {
+					outcome: {
 						id: 'partial_tornado_cash_nova_integration',
 						rating: Rating.PARTIAL,
 						displayName: 'Imperfect Tornado Cash Nova integration',
 						shortExplanation: mdSentence(
 							'{{WALLET_NAME}} integrates Tornado Cash Nova with some important compromises.',
 						),
-						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-						perTechnology,
+						metadata: {
+							defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+							perTechnology,
+						},
 					},
 					details,
 					howToImprove,
@@ -889,7 +900,7 @@ function rateTornadoCashNovaSupport(
 			}
 
 			return {
-				value: {
+				outcome: {
 					id: 'full_tornado_cash_nova_integration',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -897,8 +908,10 @@ function rateTornadoCashNovaSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Tornado Cash Nova for private transfers.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -907,9 +920,9 @@ function rateTornadoCashNovaSupport(
 }
 
 function ratePrivacyPoolsSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	privacyPools: Supported<PrivacyPoolsSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(privacyPools)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -1185,45 +1198,51 @@ function ratePrivacyPoolsSupport(
 	switch (worstLevel) {
 		case PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED:
 			return {
-				value: {
+				outcome: {
 					id: 'incomplete_private_privacy_pools',
 					rating: Rating.FAIL,
 					displayName: 'Incomplete Privacy Pools integration',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates some Privacy Pools features, but with severe gaps.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'non_private_privacy_pools',
 					rating: Rating.FAIL,
 					displayName: 'Non-private Privacy Pools integration',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Privacy Pools in a non-privacy-preserving way.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_privacy_pools',
 					rating: Rating.PARTIAL,
 					displayName: 'Privacy Pools integration relying on external provider',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Privacy Pools but relies on an external provider.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1231,15 +1250,17 @@ function ratePrivacyPoolsSupport(
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
 				return {
-					value: {
+					outcome: {
 						id: 'partial_privacy_pools_integration',
 						rating: Rating.PARTIAL,
 						displayName: 'Imperfect Privacy Pools integration',
 						shortExplanation: mdSentence(
 							'{{WALLET_NAME}} integrates Privacy Pools with some important compromises.',
 						),
-						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-						perTechnology,
+						metadata: {
+							defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+							perTechnology,
+						},
 					},
 					details,
 					howToImprove,
@@ -1247,7 +1268,7 @@ function ratePrivacyPoolsSupport(
 			}
 
 			return {
-				value: {
+				outcome: {
 					id: 'full_privacy_pools_integration',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -1255,8 +1276,10 @@ function ratePrivacyPoolsSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Privacy Pools for private transfers.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1265,9 +1288,9 @@ function ratePrivacyPoolsSupport(
 }
 
 function rateRailgunSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	railgun: Supported<RailgunSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(railgun)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -1589,45 +1612,51 @@ function rateRailgunSupport(
 	switch (worstLevel) {
 		case PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED:
 			return {
-				value: {
+				outcome: {
 					id: 'incomplete_railgun',
 					rating: Rating.FAIL,
 					displayName: 'Incomplete Railgun integration',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates some Railgun features, but with severe gaps.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'non_private_railgun',
 					rating: Rating.FAIL,
 					displayName: 'Non-private Railgun integration',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Railgun in a non-privacy-preserving way.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_railgun',
 					rating: Rating.PARTIAL,
 					displayName: 'Railgun integration relying on external provider',
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Railgun but relies on an external provider.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1635,15 +1664,17 @@ function rateRailgunSupport(
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
 				return {
-					value: {
+					outcome: {
 						id: 'partial_railgun_integration',
 						rating: Rating.PARTIAL,
 						displayName: 'Imperfect Railgun integration',
 						shortExplanation: mdSentence(
 							'{{WALLET_NAME}} integrates Railgun with some important compromises.',
 						),
-						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-						perTechnology,
+						metadata: {
+							defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+							perTechnology,
+						},
 					},
 					details,
 					howToImprove,
@@ -1651,14 +1682,16 @@ function rateRailgunSupport(
 			}
 
 			return {
-				value: {
+				outcome: {
 					id: 'full_railgun_integration',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
 					displayName: 'Full Railgun integration',
 					shortExplanation: mdSentence('{{WALLET_NAME}} integrates Railgun for private transfers.'),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1667,12 +1700,12 @@ function rateRailgunSupport(
 }
 
 function build(
-	scaffold: EvaluationScaffold<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
+	scaffold: EvaluationScaffold<PrivateTransfersMetadata>,
+): Evaluation<PrivateTransfersMetadata> {
 	return EvaluationContext.forTest(() => privateTransfers).build(scaffold)
 }
 
-export const privateTransfers: Attribute<PrivateTransfersValue> = {
+export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 	id: 'privateTransfers',
 	icon: '\u{1f4e8}', // Incoming envelope
 	displayName: 'Private token transfers',
@@ -1956,7 +1989,9 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<PrivateTransfersValue>): Evaluation<PrivateTransfersValue> => {
+	evaluate: (
+		ctx: EvaluationContext<PrivateTransfersMetadata>,
+	): Evaluation<PrivateTransfersMetadata> => {
 		// Verifying that private transfers are available in the UI is one thing,
 		// but verifying that the implementation is actually privacy-preserving
 		// (e.g. doesn't snitch on the user by periodically phoning home with data
@@ -1971,16 +2006,16 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			})
 		}
 
-		let evaluation: EvaluationScaffold<PrivateTransfersValue> | null = null
+		let evaluation: EvaluationScaffold<PrivateTransfersMetadata> | null = null
 		let atLeastOneTechnologySupported = false
 
 		const maybeEvaluateTechnology = <T extends object>(
 			support: Support<T>,
 			evaluate: (
-				ctx: EvaluationContext<PrivateTransfersValue>,
+				ctx: EvaluationContext<PrivateTransfersMetadata>,
 				supported: Supported<T>,
-			) => EvaluationScaffold<PrivateTransfersValue>,
-		): EvaluationScaffold<PrivateTransfersValue> | null => {
+			) => EvaluationScaffold<PrivateTransfersMetadata>,
+		): EvaluationScaffold<PrivateTransfersMetadata> | null => {
 			if (!isSupported(support)) {
 				return null
 			}
@@ -2026,7 +2061,7 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			)
 		}
 
-		if (atLeastOneTechnologySupported && evaluation.value.perTechnology.size === 0) {
+		if (atLeastOneTechnologySupported && evaluation.outcome.metadata.perTechnology.size === 0) {
 			throw new Error(
 				'Private transfer evaluation perTechnology map empty despite supporting some form of private transfer',
 			)
@@ -2036,7 +2071,7 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 
 		if (privateTransferDetails !== null) {
 			// Sanity check that the set of keys are consistent.
-			for (const [key] of evaluation.value.perTechnology) {
+			for (const [key] of evaluation.outcome.metadata.perTechnology) {
 				if (!privateTransferDetails.privateTransferDetails.has(key)) {
 					throw new Error(
 						`Private transfer evaluation details does not include expected key ${key}`,
@@ -2045,8 +2080,8 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			}
 
 			for (const [key] of privateTransferDetails.privateTransferDetails) {
-				if (!evaluation.value.perTechnology.has(key)) {
-					throw new Error(`Private transfer value does not include expected key ${key}`)
+				if (!evaluation.outcome.metadata.perTechnology.has(key)) {
+					throw new Error(`Private transfer outcome does not include expected key ${key}`)
 				}
 			}
 		} else if (atLeastOneTechnologySupported) {
@@ -2057,12 +2092,15 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 
 		return ctx.build({
 			...evaluation,
-			value: {
-				...evaluation.value,
-				defaultFungibleTokenTransferMode:
-					ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode,
+			outcome: {
+				...evaluation.outcome,
+				metadata: {
+					perTechnology: evaluation.outcome.metadata.perTechnology,
+					defaultFungibleTokenTransferMode:
+						ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode,
+				},
 			},
 		})
 	},
-	aggregate: pickWorstRating<PrivateTransfersValue>,
+	aggregate: pickWorstRating<PrivateTransfersMetadata>,
 }

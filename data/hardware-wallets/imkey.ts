@@ -122,6 +122,7 @@ export const imkeyWallet: HardwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,
@@ -136,6 +137,7 @@ export const imkeyWallet: HardwareWallet = {
 			lightClient: { ethereumL1: null },
 			publicSecurityAudits: null,
 			secureElement: null,
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: {
 				type: SupplyChainFactoryType.PASS,

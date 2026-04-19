@@ -20,7 +20,6 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		lastUpdated: '2020-01-01',
 		urls: {
 			docs: ['https://example.com/docs'],
-			extensions: ['https://example.com/extensions'],
 			repositories: ['https://example.com/repo'],
 			socials: {
 				discord: 'https://discord.com/example',
@@ -64,12 +63,14 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

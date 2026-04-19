@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -24,14 +23,9 @@ import { assertNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type OpenSourceValue = Value
-
-function open(
-	ctx: EvaluationContext<OpenSourceValue>,
-	license: FOSSLicense,
-): Evaluation<OpenSourceValue> {
+function open(ctx: EvaluationContext, license: FOSSLicense): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: license,
 			rating: Rating.PASS,
 			icon: '\u{1f496}', // Sparkling heart
@@ -48,12 +42,9 @@ function open(
 	})
 }
 
-function openInTheFuture(
-	ctx: EvaluationContext<OpenSourceValue>,
-	license: FutureFOSSLicense,
-): Evaluation<OpenSourceValue> {
+function openInTheFuture(ctx: EvaluationContext, license: FutureFOSSLicense): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: license,
 			rating: Rating.PARTIAL,
 			icon: '❤️‍🩹',
@@ -72,12 +63,9 @@ function openInTheFuture(
 	})
 }
 
-function mixedIncludingProprietary(
-	ctx: EvaluationContext<OpenSourceValue>,
-	fossLicense: FOSSLicense,
-): Evaluation<OpenSourceValue> {
+function mixedIncludingProprietary(ctx: EvaluationContext, fossLicense: FOSSLicense): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'mixed_including_proprietary',
 			rating: Rating.FAIL,
 			icon: '💔', // Broken heart
@@ -97,9 +85,9 @@ function mixedIncludingProprietary(
 	})
 }
 
-function proprietary(ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSourceValue> {
-	return ctx.build({
-		value: {
+const proprietary: (typeof openSource)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'proprietary',
 			rating: Rating.FAIL,
 			icon: '💔', // Broken heart
@@ -114,11 +102,10 @@ function proprietary(ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSo
 			'{{WALLET_NAME}} should consider re-licensing under a Free & Open Source Software license.',
 		),
 	})
-}
 
-function unlicensed(ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSourceValue> {
-	return ctx.build({
-		value: {
+const unlicensed: (typeof openSource)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'unlicensed',
 			rating: Rating.FAIL,
 			icon: '❔',
@@ -132,9 +119,8 @@ function unlicensed(ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSou
 		),
 		howToImprove: paragraph('{{WALLET_NAME}} should add a license file to its source code.'),
 	})
-}
 
-export const openSource: Attribute<OpenSourceValue> = {
+export const openSource: Attribute = {
 	id: 'openSource',
 	icon: '❤️',
 	displayName: 'Source code license',
@@ -193,11 +179,11 @@ export const openSource: Attribute<OpenSourceValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSourceValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // If open-source, inherently verifiable. If closed-source, evidently true.
 
 		if (ctx.features.licensing === null || ctx.features.licensing.walletAppLicense === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const allLicenses = new Set<License>()
@@ -210,7 +196,7 @@ export const openSource: Attribute<OpenSourceValue> = {
 				break // Nothing more to do.
 			case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
 				if (ctx.features.licensing.coreLicense === null) {
-					return unrated(ctx, null)
+					return unrated(ctx)
 				}
 
 				allLicenses.add(ctx.features.licensing.coreLicense.license)
@@ -263,5 +249,5 @@ export const openSource: Attribute<OpenSourceValue> = {
 
 		return mixedIncludingProprietary(ctx, hasFossLicense)
 	},
-	aggregate: pickWorstRating<OpenSourceValue>,
+	aggregate: pickWorstRating,
 }

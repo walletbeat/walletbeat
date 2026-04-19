@@ -48,6 +48,9 @@ export const rainbow: SoftwareWallet = {
 		lastUpdated: '2025-02-08',
 		urls: {
 			docs: ['https://rainbowkit.com/'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+			],
 			repositories: ['https://github.com/rainbow-me/rainbow'],
 			socials: {
 				farcaster: 'https://farcaster.xyz/rainbow',
@@ -147,6 +150,7 @@ export const rainbow: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -165,6 +169,7 @@ export const rainbow: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {

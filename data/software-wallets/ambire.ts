@@ -22,6 +22,7 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -37,6 +38,10 @@ import type {
 	SendTransactionWarning,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
@@ -57,6 +62,7 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
@@ -70,6 +76,7 @@ import { pimlico } from '../entities/pimlico'
 import { sentry } from '../entities/sentry'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
+import ambireRawExtManifest from './manifests/ambire/ehgjhhccekdedpbkifaojjaefeohnoea.manifest.json'
 
 const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -570,6 +577,18 @@ export const ambire: SoftwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: true,
+						[BasicUnlockMechanism.BIOMETRIC]: false,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
@@ -633,6 +652,16 @@ export const ambire: SoftwareWallet = {
 					newRecipientWarning: true,
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
+			},
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: parseBrowserExtensionManifest(ambireRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'NOT_A_MOBILE_APP',
 			},
 			transactionLegibility: {
 				ref: refTodo,

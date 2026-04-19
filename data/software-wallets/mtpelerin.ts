@@ -144,6 +144,7 @@ export const mtpelerin: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
@@ -155,6 +156,7 @@ export const mtpelerin: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

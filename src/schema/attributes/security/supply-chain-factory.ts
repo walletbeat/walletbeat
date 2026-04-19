@@ -1,12 +1,4 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	type ExemptEvaluation,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, type ExemptEvaluation, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import {
@@ -15,13 +7,12 @@ import {
 } from '@/schema/features/security/supply-chain-factory'
 import { Variant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
-import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SupplyChainFactoryValue = Value & {
+export type SupplyChainFactoryMetadata = {
 	factoryOpsecDocs: SupplyChainFactoryType
 	factoryOpsecAudit: SupplyChainFactoryType
 	tamperEvidence: SupplyChainFactoryType
@@ -52,7 +43,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 	return Rating.FAIL
 }
 
-export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
+export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 	id: 'supplyChainFactory',
 	icon: '🏭',
 	displayName: 'Supply Chain Factory',
@@ -90,27 +81,24 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes all factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: pickWorstRating<SupplyChainFactoryValue>,
-	exempted: (
-		ctx: EvaluationContext<SupplyChainFactoryValue>,
-		metadata: WalletMetadata,
-	): ExemptEvaluation<SupplyChainFactoryValue> | null => {
+	aggregate: pickWorstRating<SupplyChainFactoryMetadata>,
+	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainFactoryMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
@@ -127,9 +115,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 
 		return null
 	},
-	evaluate: (
-		ctx: EvaluationContext<SupplyChainFactoryValue>,
-	): Evaluation<SupplyChainFactoryValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.INDEPENDENTLY_AUDITED,
@@ -169,14 +155,21 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		const rating = evaluateSupplyChainFactory(factoryFeature)
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'Supply Chain Factory',
 				rating,
 				displayName: 'Supply Chain Factory',
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`,
 				),
-				...factoryFeature, // TODO: Filter fields
+				metadata: {
+					factoryOpsecDocs: factoryFeature.factoryOpsecDocs,
+					factoryOpsecAudit: factoryFeature.factoryOpsecAudit,
+					tamperEvidence: factoryFeature.tamperEvidence,
+					hardwareVerification: factoryFeature.hardwareVerification,
+					tamperResistance: factoryFeature.tamperResistance,
+					genuineCheck: factoryFeature.genuineCheck,
+				},
 			},
 			details: paragraph(
 				`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`,

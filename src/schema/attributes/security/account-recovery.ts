@@ -10,7 +10,6 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	type AccountRecovery,
@@ -40,15 +39,15 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountRecoveryValue = Value & {
+export type AccountRecoveryMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
 function evaluateGuardianRecoveryPolicy(
-	ctx: EvaluationContext<AccountRecoveryValue>,
+	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	guardianPolicy: GuardianPolicy,
-): Evaluation<AccountRecoveryValue> {
+): Evaluation<AccountRecoveryMetadata> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(outcomes)) {
@@ -65,7 +64,7 @@ function evaluateGuardianRecoveryPolicy(
 
 	if (!isNonEmptyArray(nonRecoverableOutcomes)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_recoverable',
 				rating: Rating.PASS,
 				displayName: 'Account recoverable in all likely scenarios',
@@ -73,8 +72,10 @@ function evaluateGuardianRecoveryPolicy(
 					{{WALLET_NAME}} lets the user recover their account in all
 					likely catastrophic scenarios.
 				`),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountRecoveryDetailsContent({}),
 		})
@@ -82,22 +83,24 @@ function evaluateGuardianRecoveryPolicy(
 
 	if (nonRecoverableOutcomes.length === 1) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_nonrecoverable_specific_scenario',
 				rating: Rating.FAIL,
 				displayName: 'Account may be non-recoverable',
 				shortExplanation: typographicContentWithExtraOptionalStrings(
 					nonRecoverableOutcomes[0].recovery.description,
 				),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountRecoveryDetailsContent({}),
 		})
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'guardian_policy_nonrecoverable_multiple_scenarios',
 			rating: Rating.FAIL,
 			displayName: 'Account may be non-recoverable',
@@ -105,17 +108,19 @@ function evaluateGuardianRecoveryPolicy(
 				{{WALLET_NAME}}'s account recovery feature cannot be
 				relied upon in multiple scenarios.
 			`),
-			minimumGuardianPolicy: guardianPolicy,
-			outcomes,
+			metadata: {
+				minimumGuardianPolicy: guardianPolicy,
+				outcomes,
+			},
 		},
 		details: accountRecoveryDetailsContent({}),
 	})
 }
 
 function evaluateAccountRecovery(
-	ctx: EvaluationContext<AccountRecoveryValue>,
+	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	accountRecovery: AccountRecovery,
-): Evaluation<AccountRecoveryValue> {
+): Evaluation<AccountRecoveryMetadata> {
 	if (isSupported(accountRecovery.guardianRecovery)) {
 		return evaluateGuardianRecoveryPolicy(
 			ctx,
@@ -124,7 +129,7 @@ function evaluateAccountRecovery(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_guardian_recovery',
 			displayName: 'No account recovery mechanism',
 			rating: Rating.FAIL,
@@ -132,14 +137,16 @@ function evaluateAccountRecovery(
 				{{WALLET_NAME}} does not implement guardian-based account recovery.
 				The user will lose access to their account if they lose their seed phrase.
 			`),
-			minimumGuardianPolicy: null,
-			outcomes: null,
+			metadata: {
+				minimumGuardianPolicy: null,
+				outcomes: null,
+			},
 		},
 		details: accountRecoveryDetailsContent({}),
 	})
 }
 
-export const accountRecovery: Attribute<AccountRecoveryValue> = {
+export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 	id: 'accountRecovery',
 	icon: '\u{1f6df}', // Ring Buoy
 	displayName: 'Account recovery',
@@ -320,7 +327,9 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<AccountRecoveryValue>): Evaluation<AccountRecoveryValue> => {
+	evaluate: (
+		ctx: EvaluationContext<AccountRecoveryMetadata>,
+	): Evaluation<AccountRecoveryMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
 		if (ctx.features.security.accountRecovery === null) {
@@ -334,5 +343,5 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 
 		return evaluateAccountRecovery(ctx, ctx.features.security.accountRecovery)
 	},
-	aggregate: pickWorstRating<AccountRecoveryValue>,
+	aggregate: pickWorstRating<AccountRecoveryMetadata>,
 }

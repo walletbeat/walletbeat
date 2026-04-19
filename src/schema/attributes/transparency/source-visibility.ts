@@ -1,23 +1,12 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { licenseSourceIsVisible, LicensingType } from '@/schema/features/transparency/license'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type SourceVisibilityValue = Value
-
-function sourcePublic(
-	ctx: EvaluationContext<SourceVisibilityValue>,
-): Evaluation<SourceVisibilityValue> {
-	return ctx.build({
-		value: {
+const sourcePublic: (typeof sourceVisibility)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'public',
 			rating: Rating.PASS,
 			displayName: 'Source code publicly available',
@@ -33,13 +22,10 @@ function sourcePublic(
 			for Walletbeat to review how the wallet works.
 		`),
 	})
-}
 
-function sourcePartiallyPrivate(
-	ctx: EvaluationContext<SourceVisibilityValue>,
-): Evaluation<SourceVisibilityValue> {
-	return ctx.build({
-		value: {
+const sourcePartiallyPrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'partially_private',
 			rating: Rating.FAIL,
 			displayName: 'Source code not fully available',
@@ -61,13 +47,10 @@ function sourcePartiallyPrivate(
 			viewable.
 		`),
 	})
-}
 
-function sourcePrivate(
-	ctx: EvaluationContext<SourceVisibilityValue>,
-): Evaluation<SourceVisibilityValue> {
-	return ctx.build({
-		value: {
+const sourcePrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'private',
 			rating: Rating.FAIL,
 			displayName: 'Source code not publicly available',
@@ -89,9 +72,8 @@ function sourcePrivate(
 			viewable.
 		`),
 	})
-}
 
-export const sourceVisibility: Attribute<SourceVisibilityValue> = {
+export const sourceVisibility: Attribute = {
 	id: 'sourceVisibility',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Source visibility',
@@ -121,17 +103,17 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 			be visible.
 		`),
 	},
-	evaluate: (ctx: EvaluationContext<SourceVisibilityValue>): Evaluation<SourceVisibilityValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Inherently verifiable, just look at the source.
 
 		if (ctx.features.licensing === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		switch (ctx.features.licensing.type) {
 			case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
 				if (ctx.features.licensing.walletAppLicense === null) {
-					return unrated(ctx, null)
+					return unrated(ctx)
 				}
 
 				ctx.addRef(ctx.features.licensing.walletAppLicense)
@@ -147,7 +129,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 						ctx.features.licensing.coreLicense === null ||
 						ctx.features.licensing.walletAppLicense === null
 					) {
-						return unrated(ctx, null)
+						return unrated(ctx)
 					}
 
 					ctx.addRef(ctx.features.licensing.coreLicense, ctx.features.licensing.walletAppLicense)
@@ -168,5 +150,5 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 				})()
 		}
 	},
-	aggregate: pickWorstRating<SourceVisibilityValue>,
+	aggregate: pickWorstRating,
 }

@@ -140,6 +140,7 @@ export const elytro: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
@@ -163,6 +164,7 @@ export const elytro: SoftwareWallet = {
 			}),
 			publicSecurityAudits: elytroAudits,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

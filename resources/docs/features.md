@@ -32,6 +32,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/profile.ts`](#srcschemafeaturesprofilets)
 - [`src/schema/features/security/account-recovery.ts`](#srcschemafeaturessecurityaccount-recoveryts)
 - [`src/schema/features/security/bug-bounty-program.ts`](#srcschemafeaturessecuritybug-bounty-programts)
+- [`src/schema/features/security/duress-resistance.ts`](#srcschemafeaturessecurityduress-resistancets)
 - [`src/schema/features/security/firmware.ts`](#srcschemafeaturessecurityfirmwarets)
 - [`src/schema/features/security/hardware-wallet-support.ts`](#srcschemafeaturessecurityhardware-wallet-supportts)
 - [`src/schema/features/security/keys-handling.ts`](#srcschemafeaturessecuritykeys-handlingts)
@@ -88,7 +89,9 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `lightClient` (object): Light clients.
     - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
   - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
+  - `duressResistance` (`VariantFeature<DuressResistance>`): Duress resistance features, covering both basic lock-screen protection and dedicated duress-PIN mechanisms (decoy wallet or self-destruct-and-forward).
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
+  - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
@@ -230,10 +233,12 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `bugBountyProgram` (`ResolvedFeature<Support<BugBountyProgramImplementation>>`)
   - `firmware` (`ResolvedFeature<FirmwareSupport>`)
   - `keysHandling` (`ResolvedFeature<WithRef<KeysHandlingSupport>>`)
+  - `securityBestPractices` (`ResolvedFeature<SecurityBestPracticesData>`)
   - `supplyChainDIY` (`ResolvedFeature<SupplyChainDIYSupport>`)
   - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
   - `accountRecovery` (`ResolvedFeature<AccountRecovery>`)
+  - `duressResistance` (`ResolvedFeature<DuressResistance>`)
 - `privacy` (object)
   - `analytics` (object)
     - `usage` (`ResolvedFeature<Support<WalletAnalytics>>`)
@@ -2093,6 +2098,61 @@ type BugBountyProgramImplementation = WithRef<BugBountyProgramSupport>
 
 ---
 
+## `src/schema/features/security/duress-resistance.ts`
+
+### Enum: `BasicUnlockMechanism`
+
+Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is a prerequisite for any meaningful duress resistance.
+
+- `PIN` = `'PIN'`: A numeric PIN code entered on-device or in-app.
+- `PASSWORD` = `'PASSWORD'`: An alphanumeric password or passphrase.
+- `BIOMETRIC` = `'BIOMETRIC'`: Biometric authentication (Face ID, fingerprint, etc.).
+- `PATTERN` = `'PATTERN'`: A drawn swipe pattern.
+
+---
+
+### Interface: `BasicUnlock`
+
+Information about how the wallet locks itself against unauthorized access.
+
+- `mechanisms` (`Record<BasicUnlockMechanism, boolean>`): Which unlock mechanisms the wallet supports. Set each mechanism to `true` if supported, `false` if not.
+
+---
+
+### Enum: `DuressAction`
+
+The action triggered when a duress PIN or passphrase is entered.
+
+Requires a dedicated duress credential (PIN, passphrase, etc.) that is distinct from the normal unlock credential.
+
+Note: This enum is not limited to decoy wallets. As more wallets implement different forms of duress actions, new variants should be added here.
+
+- `DECOY_WALLET` = `'DECOY_WALLET'`: Opens a decoy wallet with a separate set of accounts, hiding the real wallet.
+- `SELF_DESTRUCT` = `'SELF_DESTRUCT'`: Wipes wallet data, preventing access to funds or private keys.
+- `ONCHAIN_LOCKDOWN` = `'ONCHAIN_LOCKDOWN'`: Freezes the smart contract onchain, preventing unauthorized transfers.
+- `WIPE_AND_FORWARD` = `'WIPE_AND_FORWARD'`: Wipes wallet data and forwards all funds to a pre-configured safe address.
+
+---
+
+### Interface: `DuressMode`
+
+Information about a wallet's duress mode.
+
+- `actions` (`Record<DuressAction, boolean>`): Which actions are triggered when duress credentials are entered. Set each action to `true` if triggered, `false` if not.
+
+---
+
+### Interface: `DuressResistance`
+
+Duress resistance features of a wallet.
+
+Covers the full spectrum from basic lock-screen protection through full duress-pin-triggered decoy wallets or self-destruct mechanisms. This feature helps protect users against "wrench attacks" — physical coercion to hand over funds.
+
+- `basicUnlock` (`WithRef<BasicUnlock> | 'NO_LOCK_MECHANISM'`): The basic unlock mechanism protecting the wallet from unauthorized access. Set to 'NO_LOCK_MECHANISM' if the wallet has no lock screen at all. A non-null value is a prerequisite for any meaningful duress resistance.
+- `duressMode` (`Support<WithRef<DuressMode>>`): A dedicated duress mode triggered by a separate duress credential. Use `notSupported` when the wallet has no duress mode. Use `supported({ action: ..., ref: ... })` when a duress mode exists.
+
+---
+
 ## `src/schema/features/security/firmware.ts`
 
 ### Enum: `FirmwareType`
@@ -2527,7 +2587,7 @@ How the wallet stores the user's private key.
 - `ENCRYPTED_WITH_USER_SECRET_WEAK_KDF` = `'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF'`: The key is encrypted with a user-known secret before being stored on disk, but the key derivation is non-standard or ad-hoc.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
-- `NO_KEY_STORED` = `'NO_KEY_STORED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
+- `PASSKEY_MANAGED` = `'PASSKEY_MANAGED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
 
 ---
 
@@ -2557,10 +2617,12 @@ Scope of a Browser Extension URL match pattern grant, expressed in terms relevan
 Security-sensitive Browser Extension permission strings declared in the `permissions` manifest field. Values match the manifest string exactly.
 
 - `ACTIVE_TAB` = `'activeTab'`: Access the currently active tab's URL, title, and favicon.
+- `ALARMS` = `'alarms'`: Schedule periodic or one-time callbacks via chrome.alarms.
 - `BOOKMARKS` = `'bookmarks'`: Read and modify browser bookmarks.
 - `BROWSING_DATA` = `'browsingData'`: Delete browsing data (history, cookies, cache).
 - `CLIPBOARD_READ` = `'clipboardRead'`: Read clipboard contents without a user gesture.
 - `CLIPBOARD_WRITE` = `'clipboardWrite'`: Write to the clipboard without a user gesture.
+- `CONTEXT_MENUS` = `'contextMenus'`: Add items to the browser's right-click context menu.
 - `COOKIES` = `'cookies'`: Read and modify cookies for all accessible hosts.
 - `DEBUGGER` = `'debugger'`: Attach the browser debugger protocol to any tab.
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
@@ -2568,15 +2630,23 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
 - `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
 - `HISTORY` = `'history'`: Read the full browsing history.
+- `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
 - `IDENTITY` = `'identity'`: Access the user's Google Account identity (no email).
 - `IDENTITY_EMAIL` = `'identity.email'`: Access the user's Google Account email address.
 - `MANAGEMENT` = `'management'`: List, enable, disable, or uninstall other extensions.
 - `NATIVE_MESSAGING` = `'nativeMessaging'`: Send and receive messages from a native OS application.
+- `NOTIFICATIONS` = `'notifications'`: Show browser notifications to the user.
+- `OFFSCREEN` = `'offscreen'`: Create offscreen documents for background DOM/audio/canvas operations.
 - `PAGE_CAPTURE` = `'pageCapture'`: Save a tab's full page as MHTML.
 - `PRIVACY` = `'privacy'`: Read and modify browser privacy settings.
 - `PROXY` = `'proxy'`: Monitor and control the browser's network proxy settings.
 - `SCRIPTING` = `'scripting'`: Inject scripts and CSS into pages programmatically.
+- `SIDE_PANEL` = `'sidePanel'`: Display content in the browser's side panel.
+- `STORAGE` = `'storage'`: Persist key-value data in chrome.storage (local, sync, session).
+- `SYSTEM_CPU` = `'system.cpu'`: Query CPU processor information.
+- `SYSTEM_DISPLAY` = `'system.display'`: Read and set the system's display configuration.
 - `TABS` = `'tabs'`: Read the URLs, titles, and favicons of all open tabs.
+- `UNLIMITED_STORAGE` = `'unlimitedStorage'`: Remove the per-extension storage quota for local storage.
 - `USER_SCRIPTS` = `'userScripts'`: Register user-supplied scripts that run in web pages.
 - `WEB_AUTHENTICATION_PROXY` = `'webAuthenticationProxy'`: Intercept WebAuthn requests on behalf of the extension.
 - `WEB_NAVIGATION` = `'webNavigation'`: Observe all navigation events across tabs.
@@ -2614,7 +2684,7 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 - `hostPermissions` (`HostPermissionScope`): Scope of host permissions granted at install time, controlling which pages the background service worker may programmatically access. Maps to the `host_permissions` manifest field.
 - `contentScripts` (`HostPermissionScope`): Scope of pages the wallet's content scripts are injected into on every page load, controlling what the wallet can silently read and modify. Maps to the broadest `matches` entry across all `content_scripts`.
 - `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_EXTERNALLY_CONNECTABLE'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the manifest, meaning no external connections are permitted.
-- `permissions` (`BrowserExtensionManifest[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
+- `permissions` (`BrowserExtensionPermission[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
 - `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
 
 ---
@@ -2622,6 +2692,8 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 ### Enum: `AndroidPermission`
 
 Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enum values match the android:name attribute string exactly.
+
+All permissions seen in any wallet manifest must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
 
 - `INTERNET` = `'android.permission.INTERNET'`: Required for any network communication.
 - `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
@@ -2640,6 +2712,8 @@ Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enu
 ### Enum: `IosUsageDescription`
 
 iOS usage description keys declared in Info.plist (NS\*UsageDescription). Enum values match the plist key string exactly.
+
+All keys seen in any wallet plist must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
 
 - `BLUETOOTH_ALWAYS` = `'NSBluetoothAlwaysUsageDescription'`: Bluetooth access at all times.
 - `BLUETOOTH_PERIPHERAL` = `'NSBluetoothPeripheralUsageDescription'`: Bluetooth peripheral access (legacy, pre-iOS 13).
