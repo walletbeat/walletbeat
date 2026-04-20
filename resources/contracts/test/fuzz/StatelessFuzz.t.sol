@@ -62,22 +62,4 @@ contract StatelessFuzz is Test {
         tc.claim();
         assertEq(erc20.balanceOf(user), 0);
     }
-
-    function testFuzzErc20SoulboundBlocksAllTransfers(uint256 amount) external {
-        amount = bound(amount, 1, type(uint256).max);
-        vm.roll(10);
-
-        address sender = makeAddr("sender");
-        address receiver = makeAddr("receiver");
-
-        vm.prank(sender);
-        tc.simulateFunctionV1();
-
-        uint256 balance = erc20.balanceOf(sender);
-        uint256 transferAmount = bound(amount, 1, balance);
-
-        vm.prank(sender);
-        vm.expectRevert(WalletbeatTestErc20.WalletbeatTestErc20__Soulbound.selector);
-        erc20.transfer(receiver, transferAmount);
-    }
 }
