@@ -271,6 +271,7 @@ export const zeus: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
+			securityBestPractices: null,
 			transactionLegibility: supported({
 				ref: [
 					{

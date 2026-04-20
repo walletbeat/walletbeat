@@ -36,6 +36,26 @@ export enum PasskeyVerificationLibrary {
 }
 
 /**
+ * Human-readable name for a given passkey verification library.
+ */
+export function passkeyLibraryName(library: PasskeyVerificationLibrary): string {
+	switch (library) {
+		case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
+			return 'Smooth Crypto Lib'
+		case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
+			return 'FreshCryptoLib'
+		case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
+			return 'Daimo P256 Verifier'
+		case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
+			return 'OpenZeppelin P256 Verifier'
+		case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
+			return 'WebAuthn.sol'
+		case PasskeyVerificationLibrary.OTHER:
+			return 'an unrecognized library'
+	}
+}
+
+/**
  * Information about the passkey verification implementation.
  * To identify: look at the wallet's smart contract source code for the
  * P-256 verifier it imports or delegates to.

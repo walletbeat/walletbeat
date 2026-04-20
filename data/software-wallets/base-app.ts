@@ -182,6 +182,7 @@ export const baseApp: SoftwareWallet = {
 				scamUrlWarning: null,
 				sendTransactionWarning: notSupported,
 			},
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

@@ -1,0 +1,19 @@
+{
+	"contentScripts": "HTTP_AND_HTTPS",
+	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"hostPermissions": "HTTP_AND_HTTPS",
+	"permissions": [
+		"storage",
+		"unlimitedStorage",
+		"activeTab",
+		"notifications",
+		"scripting",
+		"contextMenus",
+		"sidePanel",
+		"system.cpu",
+		"offscreen",
+		"gcm",
+		"alarms"
+	],
+	"webAccessibleResources": "UNRESTRICTED"
+}

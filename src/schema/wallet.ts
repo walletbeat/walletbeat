@@ -27,6 +27,7 @@ import {
 	type WalletNameStrings,
 } from './attributes'
 import type { WalletDeveloper } from './entity'
+import type { ExtensionUrl } from './extension-url'
 import {
 	type ResolvedFeatures,
 	resolveFeatures,
@@ -37,6 +38,7 @@ import {
 } from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
+import type { GithubRawUrl } from './github-raw-url'
 import { ladders, type WalletLadderType } from './ladders'
 import {
 	evaluateWalletOnLadder,
@@ -153,8 +155,12 @@ export interface WalletUrls {
 	docs?: Url[]
 	/** Repository URL(s) for source code, if public. */
 	repositories?: Url[]
-	/** Extension URLs associated with the wallet, if available. */
-	extensions?: Url[]
+	/** Web Store extension URL(s) for the wallet, if available. */
+	extensions?: ExtensionUrl[]
+	/** URL to the raw AndroidManifest.xml on GitHub, if available. */
+	androidManifestXml?: GithubRawUrl
+	/** URL to the raw iOS Info.plist on GitHub, if available. */
+	iosInfoPlist?: GithubRawUrl
 	/** Web App URLs, if available. */
 	webapps?: Url[]
 	/** Play Store URL, if available. */

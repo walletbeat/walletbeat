@@ -23,6 +23,10 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
@@ -50,6 +54,8 @@ import {
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { mdParagraph, paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
@@ -60,6 +66,9 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
+import metamaskAndroidParsed from './manifests/metamask/android.parsed.json'
+import metamaskIosParsed from './manifests/metamask/ios.parsed.json'
+import metamaskRawExtManifest from './manifests/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn.manifest.json'
 
 const metamaskTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -84,10 +93,14 @@ export const metamask: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-13',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://docs.metamask.io/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
 			],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
 			repositories: ['https://github.com/MetaMask/metamask-extension'],
 			socials: {
 				farcaster: 'https://farcaster.xyz/metamask',
@@ -516,6 +529,21 @@ export const metamask: SoftwareWallet = {
 					newRecipientWarning: true,
 					userWhitelist: true,
 				}),
+			},
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: parseBrowserExtensionManifest(metamaskRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: refTodo,
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					mobileAppHardening: parseMobileManifestJson(metamaskAndroidParsed, metamaskIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
 			},
 			transactionLegibility: {
 				ref: refTodo,
