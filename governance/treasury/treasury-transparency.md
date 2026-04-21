@@ -1,6 +1,6 @@
 # Walletbeat Treasury Transparency Report
 
-_Latest operation: 2026-04-05_
+_Latest operation: 2026-04-20_
 
 This document tracks known treasury addresses and their operational history.
 
@@ -99,6 +99,7 @@ A history of transfers, grants, and treasury operations.
 | 2026-04-05 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`mattmatt_sablier`](https://eth.blockscout.com/address/0x7a86d3e6894f9c5B5f25FFBDAaE658CFc7569623)          | `7,222.37 USDC`                                        | Top-up of Sablier stream                                                                                                                                   | [`0x065d5be3...`](https://eth.blockscout.com/tx/0x065d5be3f230229562ddc4f715fa48e6ed656406651308eaa81d25d7e774ab9e) |
 | 2026-04-05 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`thegeekygrower`](https://eth.blockscout.com/address/0x66d334F1320340FC753f7B79139cc628Cb54061e)            | `500 USDC`                                             | Payment for implementation of Privacy Hygiene attribute                                                                                                    | [`0x0aaa5a53...`](https://eth.blockscout.com/tx/0x0aaa5a532c563b7bf466fa3cac05ebd6d324b5246008a138c9b7e9aeac9e4944) |
 | 2026-04-05 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`mattmatt`](https://eth.blockscout.com/address/0x943623f9bd1a83fdb8b8cc30848b09b79e95bae1)                  | `50 USDC`                                              | Reimbursement for X premium subscription for Walletbeat account                                                                                            | [`0xe75ef0ec...`](https://eth.blockscout.com/tx/0xe75ef0ecbabb33f768e9d95f5196c0cef0c7c62716ebfa42a5c2bb23b4c271fa) |
+| 2026-04-20 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`pheobeayo`](https://eth.blockscout.com/address/0x48cc0bb1814ba6bc052572a9c97dde4bc6177821)                 | `300 USDC`                                             | Payment for bounty on issue https://github.com/walletbeat/walletbeat/issues/505                                                                            | [`0xd54fe7d2...`](https://eth.blockscout.com/tx/0xd54fe7d2edb54a375637f163a00a89bcf64fae9203bd2765c44ffe763d9bc6d2) |
 
 ---
 

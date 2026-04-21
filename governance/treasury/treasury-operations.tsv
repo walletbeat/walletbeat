@@ -62,3 +62,4 @@ Date	From	To	Amount	Purpose	ID
 2026-04-05	treasury	mattmatt_sablier	7,222.37 USDC	Top-up of Sablier stream	0x065d5be3f230229562ddc4f715fa48e6ed656406651308eaa81d25d7e774ab9e
 2026-04-05	treasury	thegeekygrower	500 USDC	Payment for implementation of Privacy Hygiene attribute	0x0aaa5a532c563b7bf466fa3cac05ebd6d324b5246008a138c9b7e9aeac9e4944
 2026-04-05	treasury	mattmatt	50 USDC	Reimbursement for X premium subscription for Walletbeat account	0xe75ef0ecbabb33f768e9d95f5196c0cef0c7c62716ebfa42a5c2bb23b4c271fa
+2026-04-20	treasury	pheobeayo	300 USDC	Payment for bounty on issue https://github.com/walletbeat/walletbeat/issues/505	0xd54fe7d2edb54a375637f163a00a89bcf64fae9203bd2765c44ffe763d9bc6d2
