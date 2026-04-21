@@ -28,6 +28,7 @@ import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
 	matchers: EncodedWalletRequestMatcher[]
+	benignStrings: string[]
 }
 
 export interface EncodedWalletRequestMatcher {
@@ -180,13 +181,15 @@ export class WalletCaptureAnnotations {
 	private readonly path: string | null
 	private readonly globalPath: string | null
 	private matchers: WalletRequestMatcher[]
+	private globalBenignStrings: Set<string>
+	private benignStrings: Set<string>
 
 	public static fromFile(
 		walletId: string,
 		pathStr: string,
 		globalPath: string,
 	): WalletCaptureAnnotations {
-		let data: EncodedWalletCaptureAnnotations = { matchers: [] }
+		let data: EncodedWalletCaptureAnnotations = { matchers: [], benignStrings: [] }
 
 		if (fs.existsSync(pathStr)) {
 			const raw = fs.readFileSync(pathStr, 'utf8').trim()
@@ -246,13 +249,26 @@ export class WalletCaptureAnnotations {
 		this.matchers = global.matchers
 			.map(m => toMatcher(m, true))
 			.concat(data.matchers.map(m => toMatcher(m, false)))
+		this.globalBenignStrings = new Set()
+		this.benignStrings = new Set()
+
+		for (const benign of global.benignStrings) {
+			this.globalBenignStrings.add(benign)
+		}
+
+		for (const benign of data.benignStrings) {
+			this.benignStrings.add(benign)
+		}
 	}
 
 	private static parseEncoded(v: unknown, at: string): EncodedWalletCaptureAnnotations {
 		const root = expectRecord(v, at)
-		const arr = expectArray(root.matchers === undefined ? [] : root.matchers, `${at}.matchers`)
+		const matchersArr = expectArray(
+			root.matchers === undefined ? [] : root.matchers,
+			`${at}.matchers`,
+		)
 
-		const matchers: EncodedWalletRequestMatcher[] = arr.map((v, i) => {
+		const matchers: EncodedWalletRequestMatcher[] = matchersArr.map((v, i) => {
 			const matcherAt = `${at}.matchers[${i}]`
 			const obj = expectRecord(v, matcherAt)
 
@@ -299,13 +315,25 @@ export class WalletCaptureAnnotations {
 				policy: policyOpt === undefined ? undefined : collectionPolicyEnum.assert(policyOpt),
 			}
 		})
+		const benignStringsArr = expectArray(
+			root.benignStrings === undefined ? [] : root.benignStrings,
+			`${at}.benignStrings`,
+		)
+		const benignStrings = benignStringsArr.map(v => {
+			if (typeof v !== 'string') {
+				throw new Error(`not a string: ${String(v)}`)
+			}
 
-		return { matchers }
+			return v
+		})
+
+		return { matchers, benignStrings }
 	}
 
 	private toJSON(global: boolean): EncodedWalletCaptureAnnotations {
 		return {
 			matchers: this.matchers.filter(m => m.isGlobal === global).map(m => m.toJSON()),
+			benignStrings: Array.from(this.benignStrings),
 		}
 	}
 
@@ -321,6 +349,14 @@ export class WalletCaptureAnnotations {
 		}
 
 		this.matchers.splice(index, 1)
+	}
+
+	public addBenignString(str: string, global: boolean) {
+		;(global ? this.globalBenignStrings : this.benignStrings).add(str)
+	}
+
+	public isBenign(str: string): boolean {
+		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)
 	}
 
 	public matches(request: WalletRequest): WalletRequestMatcher | null {

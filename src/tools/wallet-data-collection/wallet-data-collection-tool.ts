@@ -30,6 +30,7 @@ import {
 	handleMarkFlowUnsupported,
 	handleMarkString,
 	handleReviewRequests,
+	handleReviewStrings,
 	markDomainOptions,
 	markFlowUnsupportedOptions,
 	markStringOptions,
@@ -180,7 +181,7 @@ cli
 		'Mark a string as conveying user data and redact it from the network capture.',
 	)
 	.usage(
-		'mark-string --string=<string> --data=<data-type> [--hint=...]' +
+		'mark-string --string=<string> --data=<data-type>|BENIGN [--hint=...]' +
 			trimWhitespacePrefix(`
 
 				Mark a string as conveying one or more pieces of user data and redact it from the network capture.
@@ -189,8 +190,12 @@ cli
 	)
 	.option('--string <string>', 'String to mark and redact.')
 	.option(
-		'--data <data-type>',
-		'User data type (comma-separated list if this matches multiples types of user data).',
+		'--data <data-type>|BENIGN',
+		'User data type (comma-separated list if this matches multiples types of user data), or BENIGN for non-user-data-carrying strings.',
+	)
+	.option(
+		'--global <true|false>',
+		'For benign strings, mark as benign globally for all captures (true), or only in this capture file (false).',
 	)
 	.option(
 		'--hint <hint>',
@@ -205,8 +210,28 @@ cli
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'",
 	)
+	.example(
+		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='BraveBrowser' --data='BENIGN' --global=true",
+	)
 	.action(async options => {
 		await handleMarkString(markStringOptions.process(options))
+	})
+
+// mark-string subcommand
+cli
+	.command('review-strings', 'Review strings from network capture.')
+	.usage(
+		'review-strings' +
+			trimWhitespacePrefix(`
+
+				Interactively review unclassified strings from network capture.
+			`),
+	)
+	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.action(async options => {
+		await handleReviewStrings(globalOptions.process(options))
 	})
 
 cli

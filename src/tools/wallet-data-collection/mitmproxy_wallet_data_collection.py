@@ -118,6 +118,7 @@ class RedactedData:
             real_str=None,
             hash_value=data["hash"],
             orig_hash=data.get("origHash"),
+            entropy=data["entropy"],
             pieces=frozenset(pieces),
             hint=data.get("hint"),
             length=data["length"],
@@ -132,6 +133,7 @@ class RedactedData:
         real_str: Optional[str],
         hash_value: str,
         orig_hash: Optional[str],
+        entropy: str,
         pieces: FrozenSet[UserInfo],
         hint: Optional[str],
         length: int,
@@ -143,6 +145,7 @@ class RedactedData:
         self.real_str = real_str
         self.hash = hash_value
         self.orig_hash = orig_hash if orig_hash is not None else self.hash
+        self.entropy = entropy
         self.pieces = pieces
         self.hint = hint
         self.length = len(real_str) if real_str is not None else length
@@ -214,6 +217,7 @@ class RedactedData:
             "labelPrefix": self.label_prefix,
             "labelIndex": self.label_index,
             "hash": self.hash,
+            "entropy": self.entropy,
             "length": self.length,
             "firstChar": self.first_char,
         }

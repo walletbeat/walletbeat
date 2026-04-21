@@ -445,14 +445,19 @@ export const markFlowUnsupportedOptions = new Options<MarkFlowUnsupportedOptions
 
 export interface MarkStringOptions extends GlobalOptions {
 	string: string
-	data: NonEmptySet<UserInfo>
+	data: NonEmptySet<UserInfo> | 'BENIGN'
+	global: boolean | null
 	hint: string | null
 }
 
 export const markStringOptions = new Options<MarkStringOptions>(
 	{
 		string: stringOption,
-		data: enumSetOption(userInfoEnums),
+		data: optionOneOf(
+			enumSetOption(userInfoEnums),
+			typedStringOption('BENIGN', (s: string): s is 'BENIGN' => s === 'BENIGN', ''),
+		),
+		global: optionalOption(booleanOption),
 		hint: optionalOption(stringOption),
 	},
 	globalOptions,
@@ -907,6 +912,19 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 	const capture = await openCaptureFile(opts)
 
+	if (opts.data === 'BENIGN') {
+		capture.addBenignString(opts.string, opts.global !== null && opts.global)
+		log(
+			`✅ Marked string "${opts.string}" as benign${opts.global !== null && opts.global ? ' globally' : ''}.`,
+		)
+
+		return
+	}
+
+	if (opts.global !== null && opts.global) {
+		throw new Error('Cannot use --global option for non-BENIGN strings')
+	}
+
 	capture.redactor.mark({
 		realStr: opts.string,
 		pieces: opts.data,
@@ -966,6 +984,208 @@ function displayRequestInfo(request: WalletRequest): void {
 
 	if (Object.keys(request.oddTrailers).length > 0) {
 		log(`   Trailers: ${formatUserDataDict(request.oddTrailers)}`)
+	}
+}
+
+export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
+	const capture = await openCaptureFile(opts)
+
+	let remainingStrings = capture.allStrings()
+	let userStopped = false
+
+	while (remainingStrings.numUnredacted() > 0 && !userStopped) {
+		// Filter to unredacted (raw string) entries
+		const unredactedStrings = remainingStrings.strings().filter(s => typeof s.str === 'string')
+
+		if (unredactedStrings.length === 0) {
+			break
+		}
+
+		// Process the highest-score string first
+		const strEntry = unredactedStrings[0]
+		const strValue = strEntry.str
+
+		if (typeof strValue !== 'string') {
+			throw new Error('Unexpectedly found non-string-typed string')
+		}
+
+		// Display the string and its occurrences
+		log('\n' + '='.repeat(80))
+		log(
+			`Unredacted string ${unredactedStrings.filter((s, i) => i <= unredactedStrings.indexOf(strEntry)).length} of ${unredactedStrings.length}`,
+		)
+		log('='.repeat(80))
+		log(`  String: ${JSON.stringify(strValue)}`)
+		log(`  Score: ${strEntry.score.toFixed(2)}`)
+		log('  Occurrences:')
+
+		for (const [key, count] of strEntry.getOccurrences().entries()) {
+			const [type, paramName] = key.split(':')
+
+			log(`    - ${type}:${paramName} (seen ${count} time${count === 1 ? '' : 's'})`)
+		}
+
+		// Build prompt choices
+		const userInfoChoices = userInfoEnums.items.map(u => ({
+			title: userInfoName(u)
+				.long.replaceAll('{{WALLET_PSEUDONYM_SINGULAR}}', 'wallet-specific pseudonym')
+				.replace(/^[a-z]/, x => x.toUpperCase()),
+			value: u,
+			description: u,
+			selected: false,
+		}))
+
+		const allChoices = [
+			{
+				title: 'Benign (no user data)',
+				value: '__BENIGN__',
+				description: 'Mark this string as benign (non-globally). All instances will be redacted.',
+				selected: false,
+			},
+			{
+				title: 'Globally benign (no user data, ignored in all captures)',
+				value: '__GLOBAL_BENIGN__',
+				description:
+					'Mark this string as globally benign. All instances across all captures will be redacted.',
+				selected: false,
+			},
+			{
+				title: '---',
+				value: '__SEPARATOR__',
+				description: '',
+				selected: false,
+				disabled: true,
+			},
+			...userInfoChoices,
+			{
+				title: '---',
+				value: '__SEPARATOR2__',
+				description: '',
+				selected: false,
+				disabled: true,
+			},
+			{
+				title: 'Stop and save',
+				value: '__STOP_AND_SAVE__',
+				description: 'Stop reviewing strings and save progress so far.',
+				selected: false,
+			},
+		]
+
+		let confirmed = false
+
+		while (!confirmed) {
+			const response = await prompts({
+				type: 'multiselect',
+				name: 'selection',
+				message: 'How would you like to classify this string?',
+				choices: allChoices,
+				hint: '- Space to select. Return to submit.',
+			})
+
+			if (response.selection === undefined) {
+				log('\nReview cancelled.')
+
+				return
+			}
+
+			if (!Array.isArray(response.selection)) {
+				throw new Error('Unexpected type for response.selection')
+			}
+
+			const selectedValues = response.selection.map((v): string => {
+				if (typeof v !== 'string') {
+					throw new Error('Unexpected value')
+				}
+
+				return v
+			})
+
+			// Check if nothing selected
+			if (selectedValues.length === 0) {
+				log('\n⚠️  Please select at least one option.')
+				continue
+			}
+
+			// Check for special options
+			const specialOptions = selectedValues.filter(v =>
+				['__BENIGN__', '__GLOBAL_BENIGN__', '__STOP_AND_SAVE__'].includes(v),
+			)
+
+			// Check for mutual exclusion of special options
+			if (specialOptions.length > 1) {
+				log('\n⚠️  Cannot select multiple special options simultaneously. Try again.')
+				continue
+			}
+
+			if (specialOptions.length === 1) {
+				const specialOption = specialOptions[0]
+
+				// Check if any UserInfo was also selected with a special option
+				const userInfoSelected = selectedValues.filter(v => userInfoEnums.is(v))
+
+				if (userInfoSelected.length > 0) {
+					log('\n⚠️  Cannot select a special option together with UserInfo options. Try again.')
+					continue
+				}
+
+				// Handle the special option
+				if (specialOption === '__STOP_AND_SAVE__') {
+					await capture.save(getSaveOptions(opts))
+					log('\n✅ Progress saved. Stopping string review.')
+					userStopped = true
+					confirmed = true
+					continue
+				}
+
+				if (specialOption === '__GLOBAL_BENIGN__') {
+					capture.addBenignString(strValue, true)
+					await capture.save(getSaveOptions(opts))
+					log(`✅ Marked string "${strValue}" as globally benign. All instances redacted.`)
+					confirmed = true
+					continue
+				}
+
+				if (specialOption === '__BENIGN__') {
+					capture.addBenignString(strValue, false)
+					await capture.save(getSaveOptions(opts))
+					log(`✅ Marked string "${strValue}" as benign. All instances redacted.`)
+					confirmed = true
+					continue
+				}
+
+				throw new Error('Logic error; unreachable')
+			}
+
+			// All selected values are UserInfo
+			const selectedUserInfoValues = selectedValues.filter(v => userInfoEnums.is(v))
+
+			if (selectedUserInfoValues.length === 0) {
+				log('\n⚠️  Please select at least one UserInfo option.')
+				continue
+			}
+
+			// Mark the string with the selected UserInfo pieces
+			capture.redactor.mark({
+				realStr: strValue,
+				pieces: nonEmptySet(selectedUserInfoValues[0], ...selectedUserInfoValues.slice(1)),
+			})
+			await capture.save(getSaveOptions(opts))
+			log(
+				`✅ Marked string "${strValue}" as ${selectedUserInfoValues.join(', ')}. All instances redacted.`,
+			)
+			confirmed = true
+		}
+
+		// Refresh strings:
+		remainingStrings = capture.allStrings()
+	}
+
+	if (!userStopped) {
+		log('\n' + '='.repeat(80))
+		log('✅ All strings have been reviewed!')
+		log(`Run \`${getCommandPrefix(opts)} check\` to verify your work.`)
+		log('='.repeat(80))
 	}
 }
 

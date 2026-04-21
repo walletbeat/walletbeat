@@ -54,6 +54,7 @@ import {
 	expectString,
 	isSameJson,
 } from './json-utils'
+import { StringEntropy } from './string-entropy'
 import type {
 	SaveOptions,
 	WalletCaptureAnnotations,
@@ -104,6 +105,7 @@ type EncodedRedactedData = {
 	labelIndex: number
 	hash: string
 	origHash?: string
+	entropy: string
 	length: number
 	firstChar: string
 	hint?: string
@@ -387,6 +389,7 @@ function parseRedactedDataJSON(v: unknown, at: string): EncodedRedactedData {
 	const hash = expectString(obj.hash, `${at}.hash`)
 	const length = expectNumber(obj.length, `${at}.length`)
 	const firstChar = expectString(obj.firstChar, `${at}.firstChar`)
+	const entropy = expectString(obj.entropy, `${at}.entropy`)
 
 	let piece: UserInfo | undefined
 
@@ -421,6 +424,7 @@ function parseRedactedDataJSON(v: unknown, at: string): EncodedRedactedData {
 		labelIndex,
 		hash,
 		...(origHash ? { origHash } : {}),
+		entropy,
 		length,
 		firstChar,
 		...(piece ? { piece } : {}),
@@ -502,6 +506,7 @@ export class RedactedData {
 
 	public readonly hash: string
 	public origHash: string
+	public entropy: StringEntropy
 	public pieces: NonEmptySet<UserInfo>
 	public hint: string | null
 	public readonly length: number
@@ -514,6 +519,7 @@ export class RedactedData {
 		realStr: string | null
 		hash: string
 		origHash: string
+		entropy: StringEntropy
 		pieces: NonEmptySet<UserInfo>
 		hint: string | null
 		length: number
@@ -528,6 +534,7 @@ export class RedactedData {
 		this.realStr = args.realStr
 		this.hash = args.hash
 		this.origHash = args.origHash
+		this.entropy = args.entropy
 		this.pieces = args.pieces
 		this.hint = args.hint
 		this.length = args.realStr != null ? args.realStr.length : args.length
@@ -557,6 +564,7 @@ export class RedactedData {
 			realStr: null,
 			hash: data.hash,
 			origHash: data.origHash ?? data.hash,
+			entropy: StringEntropy.fromEncoded(data.entropy),
 			pieces,
 			hint: data.hint ?? null,
 			length: data.length,
@@ -571,6 +579,7 @@ export class RedactedData {
 		realStr: string
 		hash: string
 		origHash: string
+		entropy: StringEntropy
 		pieces: NonEmptySet<UserInfo>
 		hint: string | null
 	}): RedactedData {
@@ -585,6 +594,7 @@ export class RedactedData {
 			realStr: args.realStr,
 			hash: args.hash,
 			origHash: args.origHash,
+			entropy: args.entropy,
 			pieces: args.pieces,
 			hint: args.hint,
 			length: args.realStr.length,
@@ -656,6 +666,7 @@ export class RedactedData {
 			labelIndex: this.labelIndex,
 			hash: this.hash,
 			...(this.origHash === this.hash ? {} : { origHash: this.origHash }),
+			entropy: this.entropy.encode(),
 			length: this.length,
 			firstChar: this.firstChar,
 			...(setItems(this.pieces).length === 1
@@ -861,6 +872,7 @@ export class RedactedStringStore {
 				realStr: str,
 				hash: h,
 				origHash,
+				entropy: StringEntropy.compute(str),
 				pieces,
 				hint: hint === undefined ? null : hint,
 			})
@@ -1033,6 +1045,141 @@ export class RedactedString {
 	 */
 	public get payload(): string {
 		return this._payload
+	}
+}
+
+enum WalletStringOccurrenceType {
+	HEADER = 'HEADER',
+	TRAILER = 'TRAILER',
+	QUERY_PARAMETER = 'QUERY_PARAMETER',
+	COOKIE = 'COOKIE',
+	WHOLE_PAYLOAD = 'WHOLE_PAYLOAD',
+	PAYLOAD_PARAMETER = 'PAYLOAD_PARAMETER',
+}
+
+type WalletStringOccurrenceKey = `${WalletStringOccurrenceType}:${string}`
+
+export class WalletDataString {
+	public static highestScoreFirst(a: WalletDataString, b: WalletDataString): number {
+		return b.score - a.score
+	}
+
+	public readonly str: string | RedactedData
+	private readonly occurrences: Map<WalletStringOccurrenceKey, number>
+	private readonly entropy: StringEntropy
+	private _score: number | null = null
+
+	/**
+	 * Returns a readonly view of the occurrences map.
+	 */
+	public getOccurrences(): ReadonlyMap<WalletStringOccurrenceKey, number> {
+		return this.occurrences
+	}
+
+	constructor(str: string | RedactedData) {
+		if (str === '') {
+			throw new Error('Cannot create a WalletDataString with the empty string')
+		}
+
+		this.str = str
+		this.occurrences = new Map()
+		this.entropy = typeof str === 'string' ? StringEntropy.compute(str) : str.entropy
+	}
+
+	public addOccurrencesFrom(other: WalletDataString) {
+		if (typeof this.str === 'string') {
+			if (typeof other.str !== 'string') {
+				throw new Error('incompatible WalletDataString types')
+			}
+
+			if (this.str !== other.str) {
+				throw new Error('mismatching WalletDataString objects')
+			}
+		} else {
+			if (typeof other.str !== 'object') {
+				throw new Error('incompatible WalletDataString types')
+			}
+
+			if (this.str.hash !== other.str.hash) {
+				throw new Error('mismatching WalletDataString objects')
+			}
+		}
+
+		for (const [key, count] of other.occurrences.entries()) {
+			const existing = this.occurrences.get(key) ?? 0
+
+			this.occurrences.set(key, existing + count)
+		}
+
+		this._score = null
+	}
+
+	public addOccurrence(occurrence: WalletStringOccurrenceType, paramName: string) {
+		const key: WalletStringOccurrenceKey = `${occurrence}:${paramName}`
+		const got = this.occurrences.get(key)
+
+		this.occurrences.set(key, got === undefined ? 1 : got + 1)
+		this._score = null
+	}
+
+	public get score(): number {
+		if (this._score === null) {
+			let appearances = 0.0
+
+			for (const [_, v] of this.occurrences.entries()) {
+				appearances += Math.pow(v, 1.25)
+			}
+			this._score = Math.pow(this.entropy.entropy, 1.5) * Math.pow(appearances, 0.5)
+		}
+
+		return this._score
+	}
+}
+
+export class WalletDataStrings {
+	private captureFile: WalletCaptureFile
+	private unredactedMap: Map<string, WalletDataString> = new Map() // Mapped by the string itself.
+	private redactedMap: Map<string, WalletDataString> = new Map() // Mapped by the redacted string's hash.
+
+	constructor(captureFile: WalletCaptureFile) {
+		this.captureFile = captureFile
+	}
+
+	public add(s: WalletDataString) {
+		if (typeof s.str === 'string') {
+			if (this.captureFile.isBenignString(s.str)) {
+				return
+			}
+
+			const existing = this.unredactedMap.get(s.str)
+
+			if (existing) {
+				existing.addOccurrencesFrom(s)
+			} else {
+				console.log(`>>> adding unredacted ${s.str}`)
+				this.unredactedMap.set(s.str, s)
+			}
+		} else {
+			const key = (s.str satisfies RedactedData).hash
+			const existing = this.redactedMap.get(key)
+
+			if (existing) {
+				existing.addOccurrencesFrom(s)
+			} else {
+				console.log(`>>> adding redacted hash ${s.str.hash}`)
+				this.redactedMap.set(key, s)
+			}
+		}
+	}
+
+	public numUnredacted(): number {
+		return this.redactedMap.size
+	}
+
+	public strings(): WalletDataString[] {
+		return Array.from(this.redactedMap.values())
+			.concat(Array.from(this.unredactedMap.values()))
+			.sort((a, b) => WalletDataString.highestScoreFirst(a, b))
 	}
 }
 
@@ -1496,6 +1643,185 @@ export class WalletRequest {
 		}
 
 		return infos
+	}
+
+	public populateStringsInto(strings: WalletDataStrings) {
+		// Process query parameters
+		this._processUserDataDict(this.query, WalletStringOccurrenceType.QUERY_PARAMETER, strings)
+
+		// Process cookies
+		this._processUserDataDict(this.cookies, WalletStringOccurrenceType.COOKIE, strings)
+
+		// Process headers
+		this._processUserDataDict(this.oddHeaders, WalletStringOccurrenceType.HEADER, strings)
+
+		// Process trailers
+		this._processUserDataDict(this.oddTrailers, WalletStringOccurrenceType.TRAILER, strings)
+
+		// Process content (payload)
+		if (this.content !== null) {
+			// FIXME: Not toString()
+			this._processPayloadString(this.content.sample.toString(), strings)
+		}
+	}
+
+	private _processUserDataDict(
+		dict: UserDataDict,
+		occurrenceType: WalletStringOccurrenceType,
+		strings: WalletDataStrings,
+	) {
+		for (const [key, piecesArray] of Object.entries(dict)) {
+			for (const pieces of piecesArray) {
+				const sample = pieces.sample.toString() // FIXME: Not toString()
+
+				if (sample === '') {
+					continue
+				}
+
+				const dataString = new WalletDataString(sample)
+
+				dataString.addOccurrence(occurrenceType, key)
+				strings.add(dataString)
+			}
+		}
+	}
+
+	private _processPayloadString(payload: string, strings: WalletDataStrings) {
+		if (payload === '') {
+			return
+		}
+
+		// Treat the payload as a whole string
+		const wholePayloadString = new WalletDataString(payload)
+
+		wholePayloadString.addOccurrence(WalletStringOccurrenceType.WHOLE_PAYLOAD, 'payload')
+		strings.add(wholePayloadString)
+
+		// Try to parse as a query string
+		this._tryParseAsQueryString(payload, strings)
+
+		// Try to parse as JSON
+		this._tryParseAsJson(payload, strings)
+
+		// Try to decode as base64
+		this._tryParseAsBase64(payload, strings)
+	}
+
+	private _tryParseAsQueryString(str: string, strings: WalletDataStrings) {
+		// Only attempt if the string contains query-like characters
+		if (!str.includes('&') && !str.includes('=')) {
+			return
+		}
+
+		try {
+			const decoded = decodeURIComponent(str)
+			const pairs = decoded.split('&')
+
+			for (const pair of pairs) {
+				if (pair === '') {
+					continue
+				}
+
+				const eqIndex = pair.indexOf('=')
+
+				if (eqIndex === -1) {
+					// Key without value
+					const keyString = new WalletDataString(pair)
+
+					keyString.addOccurrence(WalletStringOccurrenceType.PAYLOAD_PARAMETER, '_')
+					strings.add(keyString)
+				} else {
+					const key = pair.slice(0, eqIndex)
+
+					if (key === '') {
+						continue
+					}
+
+					const value = pair.slice(eqIndex + 1)
+					const keyString = new WalletDataString(key)
+
+					keyString.addOccurrence(WalletStringOccurrenceType.PAYLOAD_PARAMETER, 'key')
+					strings.add(keyString)
+
+					if (value === '') {
+						continue
+					}
+
+					const valueString = new WalletDataString(value)
+
+					valueString.addOccurrence(WalletStringOccurrenceType.PAYLOAD_PARAMETER, key)
+					strings.add(valueString)
+				}
+			}
+		} catch {
+			// Not a valid query string, silently ignore
+		}
+	}
+
+	private _tryParseAsJson(str: string, strings: WalletDataStrings) {
+		let parsed: unknown
+
+		try {
+			parsed = JSON.parse(str)
+		} catch {
+			// Not valid JSON
+			return
+		}
+
+		this._extractJsonStrings(parsed, '', strings)
+	}
+
+	private _extractJsonStrings(value: unknown, path: string, strings: WalletDataStrings) {
+		if (value === undefined || value === null) {
+			return
+		}
+
+		if (typeof value === 'string') {
+			if (value === '') {
+				return
+			}
+
+			const dataString = new WalletDataString(value)
+
+			dataString.addOccurrence(WalletStringOccurrenceType.PAYLOAD_PARAMETER, path || 'payload')
+			strings.add(dataString)
+		} else if (Array.isArray(value)) {
+			for (let i = 0; i < value.length; i++) {
+				this._extractJsonStrings(value[i], `${path}[]`, strings)
+			}
+		} else if (typeof value === 'object') {
+			for (const key of Object.keys(value).sort()) {
+				const childPath = path ? `${path}.${key}` : key
+
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know `key` is a key of `value`.
+				const obj = value as { [key]: unknown }
+
+				this._extractJsonStrings(obj[key], childPath, strings)
+			}
+		}
+		// Primitives (number, boolean, null) are ignored
+	}
+
+	private _tryParseAsBase64(str: string, strings: WalletDataStrings) {
+		// Only attempt if the string looks like base64
+		if (!/^[-_A-Za-z0-9+\s/]+=*$/.test(str.trim()) || str.length < 4) {
+			return
+		}
+
+		try {
+			const decoded = Buffer.from(str.replaceAll(/\s+/g, ''), 'base64').toString()
+
+			// Recursively process the decoded string
+			this._processPayloadString(decoded, strings)
+		} catch {
+			try {
+				const decoded = Buffer.from(str.replaceAll(/\s+/g, ''), 'base64url').toString()
+
+				this._processPayloadString(decoded, strings)
+			} catch {
+				// Not valid base64
+			}
+		}
 	}
 }
 
@@ -2284,7 +2610,34 @@ export class WalletCaptureFile {
 
 		return matched
 	}
+
 	public removeRequestMatcher(matcher: WalletRequestMatcher) {
 		this.annotations.remove(matcher)
+	}
+
+	public addBenignString(str: string, global: boolean) {
+		this.annotations.addBenignString(str, global)
+	}
+
+	public isBenignString(str: string): boolean {
+		return this.annotations.isBenign(str)
+	}
+
+	public allStrings(): WalletDataStrings {
+		const strings = new WalletDataStrings(this)
+
+		for (const f of recordedFlow.items) {
+			const flow = this.getFlow(f)
+
+			if (flow === null || flow === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const req of flow.requests) {
+				req.populateStringsInto(strings)
+			}
+		}
+
+		return strings
 	}
 }
