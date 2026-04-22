@@ -338,12 +338,14 @@ export const parseCssAttributes = (css: string): Map<string, CssAttributeEntry> 
 			}
 		}
 
-		for (const tokenMatch of blockText.matchAll(/\[(data-[a-z0-9-]+)[~]?='([^']+)'\]/g)) {
+		for (const tokenMatch of blockText.matchAll(
+			/\[(data-[a-z0-9-]+)~=(?:'([^']*)'|"([^"]*)")\]/g,
+		)) {
 			const name = tokenMatch[1]
-			const token = tokenMatch[2]
+			const token = tokenMatch[2] ?? tokenMatch[3]
 			const entry = entries.get(name)
 
-			if (entry !== undefined) {
+			if (entry !== undefined && token !== undefined && token.length > 0) {
 				entry.values.add(token)
 			}
 		}

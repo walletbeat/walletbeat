@@ -153,13 +153,7 @@
 		},
 		{
 			"name": "data-link",
-			"description": "## [data-link]\n\nShared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `data-link`). Add `data-link` on non-anchor elements when you want the same treatment; on `<a>`, use `data-link` only for non-default modes such as `camouflaged`.\n\n### Tokens\n- `camouflaged` (exact `=` selector).\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n\n### Examples\n- Default link chrome (`<a>` — no `data-link`):\n  ```html\n  <a href=\"https://example.com/article\">Read the article</a>\n  ```\n- `camouflaged` (inherits text color until hover):\n  ```html\n  <a data-link=\"camouflaged\" href=\"#footnote\">Footnote</a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`",
-			"values": [
-				{
-					"name": "camouflaged",
-					"description": "Token for `[data-link~=\"camouflaged\"]`"
-				}
-			]
+			"description": "## [data-link]\n\nShared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `data-link`). Add `data-link` on non-anchor elements when you want the same treatment; on `<a>`, use `data-link` only for non-default modes such as `camouflaged`.\n\n### Tokens\n- `camouflaged` (exact `=` selector).\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n\n### Examples\n- Default link chrome (`<a>` — no `data-link`):\n  ```html\n  <a href=\"https://example.com/article\">Read the article</a>\n  ```\n- `camouflaged` (inherits text color until hover):\n  ```html\n  <a data-link=\"camouflaged\" href=\"#footnote\">Footnote</a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`"
 		},
 		{
 			"name": "data-list",
@@ -235,13 +229,7 @@
 		},
 		{
 			"name": "data-pressable",
-			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\n\n### Tokens\n- `to-containing` (exact `=` selector).\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
-			"values": [
-				{
-					"name": "to-containing",
-					"description": "Token for `[data-pressable~=\"to-containing\"]`"
-				}
-			]
+			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\n\n### Tokens\n- `to-containing` (exact `=` selector).\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`"
 		},
 		{
 			"name": "data-row",
@@ -306,12 +294,62 @@
 				{
 					"name": "wrap",
 					"description": "Token for `[data-row~=\"wrap\"]`"
+				},
+				{
+					"name": "wrap-first-last",
+					"description": "Token for `[data-row~=\"wrap-first-last\"]`"
 				}
 			]
 		},
 		{
 			"name": "data-row-item",
-			"description": "## [data-row-item]\n\nFlex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `data-row-item` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.\n\n### Placement\n- On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `data-row-item` children).\n\n### Tokens\n- container: `start`, `center`, `end`\n- cross-axis: `align-start`, `align-center`, `align-end`\n- gap: `gap-0` … `gap-8`\n- wrap: `wrap`, `wrap-first-last`\n\n### Examples\n- Default row (`space-between`, `1em` gap):\n  ```html\n  <div data-row>\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n- Centered main axis, tighter gap, wrap:\n  ```html\n  <div data-row=\"center gap-2 wrap\">\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`\n\n---\n\nFlex row child: basis, flex growth, and wrap-axis alignment tokens read by the parent `[data-row]` / `[data-badge]` / `<summary>` flex shell.\n\n### Placement\n- Direct child of `[data-row]`, `[data-badge]`, or `<summary>` when that parent establishes the row flex container.\n\n### Tokens\n- growth: `flexible`\n- basis: `basis-1`..`basis-6`, `basis-full`\n- wrap alignment: `wrap-start`, `wrap-center`, `wrap-end`\n\n### Examples\n- `basis-3` + `flexible`:\n  ```html\n  <div data-row>\n    <span data-row-item=\"basis-3 flexible\">Sidebar</span>\n    <span>Main</span>\n  </div>\n  ```\n- `wrap-end` on a wrapped row:\n  ```html\n  <div data-row=\"wrap\">\n    <span>Title</span>\n    <span data-row-item=\"wrap-end\">Action</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row-item]`"
+			"description": "## [data-row-item]\n\nFlex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `data-row-item` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.\n\n### Placement\n- On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `data-row-item` children).\n\n### Tokens\n- container: `start`, `center`, `end`\n- cross-axis: `align-start`, `align-center`, `align-end`\n- gap: `gap-0` … `gap-8`\n- wrap: `wrap`, `wrap-first-last`\n\n### Examples\n- Default row (`space-between`, `1em` gap):\n  ```html\n  <div data-row>\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n- Centered main axis, tighter gap, wrap:\n  ```html\n  <div data-row=\"center gap-2 wrap\">\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`\n\n---\n\nFlex row child: basis, flex growth, and wrap-axis alignment tokens read by the parent `[data-row]` / `[data-badge]` / `<summary>` flex shell.\n\n### Placement\n- Direct child of `[data-row]`, `[data-badge]`, or `<summary>` when that parent establishes the row flex container.\n\n### Tokens\n- growth: `flexible`\n- basis: `basis-1`..`basis-6`, `basis-full`\n- wrap alignment: `wrap-start`, `wrap-center`, `wrap-end`\n\n### Examples\n- `basis-3` + `flexible`:\n  ```html\n  <div data-row>\n    <span data-row-item=\"basis-3 flexible\">Sidebar</span>\n    <span>Main</span>\n  </div>\n  ```\n- `wrap-end` on a wrapped row:\n  ```html\n  <div data-row=\"wrap\">\n    <span>Title</span>\n    <span data-row-item=\"wrap-end\">Action</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row-item]`",
+			"values": [
+				{
+					"name": "basis-1",
+					"description": "Token for `[data-row-item~=\"basis-1\"]`"
+				},
+				{
+					"name": "basis-2",
+					"description": "Token for `[data-row-item~=\"basis-2\"]`"
+				},
+				{
+					"name": "basis-3",
+					"description": "Token for `[data-row-item~=\"basis-3\"]`"
+				},
+				{
+					"name": "basis-4",
+					"description": "Token for `[data-row-item~=\"basis-4\"]`"
+				},
+				{
+					"name": "basis-5",
+					"description": "Token for `[data-row-item~=\"basis-5\"]`"
+				},
+				{
+					"name": "basis-6",
+					"description": "Token for `[data-row-item~=\"basis-6\"]`"
+				},
+				{
+					"name": "basis-full",
+					"description": "Token for `[data-row-item~=\"basis-full\"]`"
+				},
+				{
+					"name": "flexible",
+					"description": "Token for `[data-row-item~=\"flexible\"]`"
+				},
+				{
+					"name": "wrap-center",
+					"description": "Token for `[data-row-item~=\"wrap-center\"]`"
+				},
+				{
+					"name": "wrap-end",
+					"description": "Token for `[data-row-item~=\"wrap-end\"]`"
+				},
+				{
+					"name": "wrap-start",
+					"description": "Token for `[data-row-item~=\"wrap-start\"]`"
+				}
+			]
 		},
 		{
 			"name": "data-scroll-container",
