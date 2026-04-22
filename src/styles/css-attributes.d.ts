@@ -71,22 +71,22 @@ interface CssAttributes {
 	/**
 	 * ## [data-collapsible]
 	 *
-	 * Shared disclosure / accordion styling for native `<details>` and optional `[data-collapsible]` wrappers. Disclosure animation and summary chevron apply to `<details>`. `data-collapsible` documents the hook and can mark optional wrappers if you add them in markup.
+	 * Shared disclosure / accordion styling for native `<details>` and optional `[data-collapsible]` wrappers. Disclosure animation and summary chevron apply to `<details>`. `[data-collapsible]` documents the hook and can mark optional wrappers if you add them in markup.
 	 *
 	 * ### Applied to
 	 * - `<details>`
 	 *
 	 * ### Examples
-	 * - Native disclosure (`details` picks up animation and summary chrome — omit `data-collapsible` when you do not need the hook):
+	 * - Native disclosure (`details` picks up animation and summary chrome — omit `[data-collapsible]` when you do not need the hook):
 	 *   ```html
 	 *   <details>
 	 *     <summary>More</summary>
 	 *     <p>Hidden body.</p>
 	 *   </details>
 	 *   ```
-	 * - `data-collapsible` + `data-card` padding split between summary and body:
+	 * - `[data-collapsible]` + `[data-card]` padding split between summary and body:
 	 *   ```html
-	 *   <details data-collapsible data-card="padding-6">
+	 *   <details data-card="padding-6">
 	 *     <summary data-row="wrap wrap-first-last">Title row</summary>
 	 *     <p>Body</p>
 	 *   </details>
@@ -101,7 +101,7 @@ interface CssAttributes {
 	 * ## [data-column]
 	 *
 	 * One-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the
-	 * same column/grid defaults before card-specific rules apply below. Single-column grid with theme gap and alignment defaults. Add space-separated tokens on `data-column` for `~=` selectors.
+	 * same column/grid defaults before card-specific rules apply below. Single-column grid with theme gap and alignment defaults. Add space-separated tokens on `[data-column]`.
 	 *
 	 * ### Applied to
 	 * - `[data-card]`
@@ -134,7 +134,7 @@ interface CssAttributes {
 	/**
 	 * ## [data-input]
 	 *
-	 * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `data-input` on a wrapper or extra element when you want the same look outside those tags. No `~=` tokens yet.
+	 * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
 	 *
 	 * ### Applied to
 	 * - `<button>`
@@ -143,7 +143,7 @@ interface CssAttributes {
 	 * - `<label>` wrapping checkbox or radio inputs
 	 *
 	 * ### Examples
-	 * - Native control (no `data-input`):
+	 * - Native control (no `[data-input]`):
 	 *   ```html
 	 *   <button type="button">Save</button>
 	 *   ```
@@ -166,17 +166,17 @@ interface CssAttributes {
 	/**
 	 * ## [data-link]
 	 *
-	 * Shared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `data-link`). Add `data-link` on non-anchor elements when you want the same treatment; on `<a>`, use `data-link` only for non-default modes such as `camouflaged`.
+	 * Shared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.
 	 *
 	 * ### Tokens
-	 * - `camouflaged` (exact `=` selector).
+	 * - `camouflaged`, `contents`.
 	 *
 	 * ### CSS Variables
 	 * - `--text-primary`
 	 * - `--accent`
 	 *
 	 * ### Examples
-	 * - Default link chrome (`<a>` — no `data-link`):
+	 * - Default link (`<a>` — no `[data-link]`):
 	 *   ```html
 	 *   <a href="https://example.com/article">Read the article</a>
 	 *   ```
@@ -207,7 +207,7 @@ interface CssAttributes {
 	 * - `--list-gap`
 	 *
 	 * ### Examples
-	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `data-list` when defaults suffice):
+	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
 	 *   ```html
 	 *   <ul>
 	 *     <li>First item</li>
@@ -244,7 +244,7 @@ interface CssAttributes {
 	 * - `--list-gap`
 	 *
 	 * ### Examples
-	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `data-list` when defaults suffice):
+	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
 	 *   ```html
 	 *   <ul>
 	 *     <li>First item</li>
@@ -264,21 +264,21 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`data-list-item` gap tokens), marker column (`::before` / `data-list-item-marker`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
-	 * - `data-list-item-marker` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
 	 *
 	 * ### Tokens
-	 * - item vertical gap: `gap-0` … `gap-6` on `data-list-item`
-	 * - marker: free text via `data-list-item-marker` (attribute value, not a `~=` token list)
+	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
+	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
 	 *
 	 * ### CSS Variables
-	 * - `--listItem-gap` (per row, driven by `data-list-item`)
+	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
 	 *
 	 * ### Examples
-	 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `data-list-item` when default `gap-1` / `0.25lh` is fine):
+	 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):
 	 *   ```html
 	 *   <ul>
 	 *     <li data-list-item="gap-4">
@@ -287,10 +287,11 @@ interface CssAttributes {
 	 *     </li>
 	 *   </ul>
 	 *   ```
-	 * - Custom marker string (`data-list-item-marker`):
+	 * - Custom marker string (`[data-list-item-marker]`):
 	 *   ```html
 	 *   <ul>
-	 *     <li data-list-item-marker="‣">Step one</li>
+	 *     <li data-list-item-marker="*">First step</li>
+	 *     <li data-list-item-marker="1.">Second step</li>
 	 *   </ul>
 	 *   ```
 	 *
@@ -316,7 +317,7 @@ interface CssAttributes {
 	 * - `--list-gap`
 	 *
 	 * ### Examples
-	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `data-list` when defaults suffice):
+	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
 	 *   ```html
 	 *   <ul>
 	 *     <li>First item</li>
@@ -336,21 +337,21 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`data-list-item` gap tokens), marker column (`::before` / `data-list-item-marker`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
-	 * - `data-list-item-marker` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
 	 *
 	 * ### Tokens
-	 * - item vertical gap: `gap-0` … `gap-6` on `data-list-item`
-	 * - marker: free text via `data-list-item-marker` (attribute value, not a `~=` token list)
+	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
+	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
 	 *
 	 * ### CSS Variables
-	 * - `--listItem-gap` (per row, driven by `data-list-item`)
+	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
 	 *
 	 * ### Examples
-	 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `data-list-item` when default `gap-1` / `0.25lh` is fine):
+	 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):
 	 *   ```html
 	 *   <ul>
 	 *     <li data-list-item="gap-4">
@@ -359,10 +360,11 @@ interface CssAttributes {
 	 *     </li>
 	 *   </ul>
 	 *   ```
-	 * - Custom marker string (`data-list-item-marker`):
+	 * - Custom marker string (`[data-list-item-marker]`):
 	 *   ```html
 	 *   <ul>
-	 *     <li data-list-item-marker="‣">Step one</li>
+	 *     <li data-list-item-marker="*">First step</li>
+	 *     <li data-list-item-marker="1.">Second step</li>
 	 *   </ul>
 	 *   ```
 	 *
@@ -377,7 +379,7 @@ interface CssAttributes {
 	 * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.
 	 *
 	 * ### Tokens
-	 * - `to-containing` (exact `=` selector).
+	 * - `to-containing`
 	 *
 	 * ### CSS Variables
 	 * - `--pressable-transitionOutDuration`
@@ -401,10 +403,10 @@ interface CssAttributes {
 	/**
 	 * ## [data-row]
 	 *
-	 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `data-row-item` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
+	 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
 	 *
 	 * ### Placement
-	 * - On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `data-row-item` children).
+	 * - On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `[data-row-item]` children).
 	 *
 	 * ### Tokens
 	 * - container: `start`, `center`, `end`
@@ -436,10 +438,10 @@ interface CssAttributes {
 	/**
 	 * ## [data-row-item]
 	 *
-	 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `data-row-item` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
+	 * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
 	 *
 	 * ### Placement
-	 * - On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `data-row-item` children).
+	 * - On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `[data-row-item]` children).
 	 *
 	 * ### Tokens
 	 * - container: `start`, `center`, `end`
@@ -503,7 +505,7 @@ interface CssAttributes {
 	 * ## [data-scroll-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
-	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `data-scroll-item` on children for snap and padding tricks.
+	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.
 	 *
 	 * ### Placement
 	 * - On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).
@@ -559,7 +561,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated `~=` tokens pick block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 	 *
 	 * ### Placement
 	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -594,7 +596,7 @@ interface CssAttributes {
 	 * ## [data-scroll-item]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
-	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `data-scroll-item` on children for snap and padding tricks.
+	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.
 	 *
 	 * ### Placement
 	 * - On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).
@@ -650,7 +652,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Scroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Tokens are space-separated for `~=`; many rules read `--sticky-sizeInline` / padding variables from enclosing sticky layout.
+	 * Scroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.
 	 *
 	 * ### Placement
 	 * - On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).
@@ -684,7 +686,7 @@ interface CssAttributes {
 	/**
 	 * ## [data-stack]
 	 *
-	 * Overlay direct children in one shared grid cell (`grid-area: stack`). Presence only; no `~=` tokens.
+	 * Overlay direct children in one shared grid cell (`grid-area: stack`). Presence only (no tokens).
 	 *
 	 * ### Examples
 	 * - Badge over media:
@@ -712,7 +714,7 @@ interface CssAttributes {
 	 * ## [data-sticky]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
-	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `data-scroll-item` on children for snap and padding tricks.
+	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.
 	 *
 	 * ### Placement
 	 * - On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).
@@ -768,7 +770,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated `~=` tokens pick block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 	 *
 	 * ### Placement
 	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -803,7 +805,7 @@ interface CssAttributes {
 	 * ## [data-sticky-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
-	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `data-scroll-item` on children for snap and padding tricks.
+	 * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.
 	 *
 	 * ### Placement
 	 * - On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).
@@ -859,7 +861,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Scroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Tokens are space-separated for `~=`; many rules read `--sticky-sizeInline` / padding variables from enclosing sticky layout.
+	 * Scroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.
 	 *
 	 * ### Placement
 	 * - On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).
@@ -893,7 +895,7 @@ interface CssAttributes {
 	/**
 	 * ## [data-tag]
 	 *
-	 * Semantic tag / chip with category-based color families (`~=` tokens map to theme variables). Omit a category token for the neutral palette; add one for a themed family (`~=` in CSS).
+	 * Semantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.
 	 *
 	 * ### Tokens
 	 * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
