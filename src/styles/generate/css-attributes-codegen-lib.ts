@@ -43,7 +43,7 @@ const toCustomData = (entries: Map<string, CssAttributeEntry>): HtmlCustomData =
 							.sort((a, b) => a.localeCompare(b))
 							.map(value => ({
 								name: value,
-								description: `Token for \`[${entry.name}~="${value}"]\``,
+								description: `\`[${entry.name}~="${value}"]\``,
 							})),
 					}),
 		})),

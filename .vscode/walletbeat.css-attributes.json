@@ -7,15 +7,15 @@
 			"values": [
 				{
 					"name": "large",
-					"description": "Token for `[data-badge~=\"large\"]`"
+					"description": "`[data-badge~=\"large\"]`"
 				},
 				{
 					"name": "medium",
-					"description": "Token for `[data-badge~=\"medium\"]`"
+					"description": "`[data-badge~=\"medium\"]`"
 				},
 				{
 					"name": "small",
-					"description": "Token for `[data-badge~=\"small\"]`"
+					"description": "`[data-badge~=\"small\"]`"
 				}
 			]
 		},
@@ -25,71 +25,71 @@
 			"values": [
 				{
 					"name": "border-accent",
-					"description": "Token for `[data-card~=\"border-accent\"]`"
+					"description": "`[data-card~=\"border-accent\"]`"
 				},
 				{
 					"name": "padding-0",
-					"description": "Token for `[data-card~=\"padding-0\"]`"
+					"description": "`[data-card~=\"padding-0\"]`"
 				},
 				{
 					"name": "padding-1",
-					"description": "Token for `[data-card~=\"padding-1\"]`"
+					"description": "`[data-card~=\"padding-1\"]`"
 				},
 				{
 					"name": "padding-2",
-					"description": "Token for `[data-card~=\"padding-2\"]`"
+					"description": "`[data-card~=\"padding-2\"]`"
 				},
 				{
 					"name": "padding-3",
-					"description": "Token for `[data-card~=\"padding-3\"]`"
+					"description": "`[data-card~=\"padding-3\"]`"
 				},
 				{
 					"name": "padding-4",
-					"description": "Token for `[data-card~=\"padding-4\"]`"
+					"description": "`[data-card~=\"padding-4\"]`"
 				},
 				{
 					"name": "padding-5",
-					"description": "Token for `[data-card~=\"padding-5\"]`"
+					"description": "`[data-card~=\"padding-5\"]`"
 				},
 				{
 					"name": "padding-6",
-					"description": "Token for `[data-card~=\"padding-6\"]`"
+					"description": "`[data-card~=\"padding-6\"]`"
 				},
 				{
 					"name": "padding-7",
-					"description": "Token for `[data-card~=\"padding-7\"]`"
+					"description": "`[data-card~=\"padding-7\"]`"
 				},
 				{
 					"name": "padding-8",
-					"description": "Token for `[data-card~=\"padding-8\"]`"
+					"description": "`[data-card~=\"padding-8\"]`"
 				},
 				{
 					"name": "radius-1",
-					"description": "Token for `[data-card~=\"radius-1\"]`"
+					"description": "`[data-card~=\"radius-1\"]`"
 				},
 				{
 					"name": "radius-2",
-					"description": "Token for `[data-card~=\"radius-2\"]`"
+					"description": "`[data-card~=\"radius-2\"]`"
 				},
 				{
 					"name": "radius-3",
-					"description": "Token for `[data-card~=\"radius-3\"]`"
+					"description": "`[data-card~=\"radius-3\"]`"
 				},
 				{
 					"name": "radius-4",
-					"description": "Token for `[data-card~=\"radius-4\"]`"
+					"description": "`[data-card~=\"radius-4\"]`"
 				},
 				{
 					"name": "radius-6",
-					"description": "Token for `[data-card~=\"radius-6\"]`"
+					"description": "`[data-card~=\"radius-6\"]`"
 				},
 				{
 					"name": "radius-8",
-					"description": "Token for `[data-card~=\"radius-8\"]`"
+					"description": "`[data-card~=\"radius-8\"]`"
 				},
 				{
 					"name": "secondary",
-					"description": "Token for `[data-card~=\"secondary\"]`"
+					"description": "`[data-card~=\"secondary\"]`"
 				}
 			]
 		},
@@ -103,47 +103,47 @@
 			"values": [
 				{
 					"name": "center",
-					"description": "Token for `[data-column~=\"center\"]`"
+					"description": "`[data-column~=\"center\"]`"
 				},
 				{
 					"name": "end",
-					"description": "Token for `[data-column~=\"end\"]`"
+					"description": "`[data-column~=\"end\"]`"
 				},
 				{
 					"name": "gap-0",
-					"description": "Token for `[data-column~=\"gap-0\"]`"
+					"description": "`[data-column~=\"gap-0\"]`"
 				},
 				{
 					"name": "gap-1",
-					"description": "Token for `[data-column~=\"gap-1\"]`"
+					"description": "`[data-column~=\"gap-1\"]`"
 				},
 				{
 					"name": "gap-2",
-					"description": "Token for `[data-column~=\"gap-2\"]`"
+					"description": "`[data-column~=\"gap-2\"]`"
 				},
 				{
 					"name": "gap-3",
-					"description": "Token for `[data-column~=\"gap-3\"]`"
+					"description": "`[data-column~=\"gap-3\"]`"
 				},
 				{
 					"name": "gap-4",
-					"description": "Token for `[data-column~=\"gap-4\"]`"
+					"description": "`[data-column~=\"gap-4\"]`"
 				},
 				{
 					"name": "gap-5",
-					"description": "Token for `[data-column~=\"gap-5\"]`"
+					"description": "`[data-column~=\"gap-5\"]`"
 				},
 				{
 					"name": "gap-6",
-					"description": "Token for `[data-column~=\"gap-6\"]`"
+					"description": "`[data-column~=\"gap-6\"]`"
 				},
 				{
 					"name": "gap-8",
-					"description": "Token for `[data-column~=\"gap-8\"]`"
+					"description": "`[data-column~=\"gap-8\"]`"
 				},
 				{
 					"name": "start",
-					"description": "Token for `[data-column~=\"start\"]`"
+					"description": "`[data-column~=\"start\"]`"
 				}
 			]
 		},
@@ -161,31 +161,31 @@
 			"values": [
 				{
 					"name": "gap-0",
-					"description": "Token for `[data-list~=\"gap-0\"]`"
+					"description": "`[data-list~=\"gap-0\"]`"
 				},
 				{
 					"name": "gap-1",
-					"description": "Token for `[data-list~=\"gap-1\"]`"
+					"description": "`[data-list~=\"gap-1\"]`"
 				},
 				{
 					"name": "gap-2",
-					"description": "Token for `[data-list~=\"gap-2\"]`"
+					"description": "`[data-list~=\"gap-2\"]`"
 				},
 				{
 					"name": "gap-3",
-					"description": "Token for `[data-list~=\"gap-3\"]`"
+					"description": "`[data-list~=\"gap-3\"]`"
 				},
 				{
 					"name": "gap-4",
-					"description": "Token for `[data-list~=\"gap-4\"]`"
+					"description": "`[data-list~=\"gap-4\"]`"
 				},
 				{
 					"name": "gap-5",
-					"description": "Token for `[data-list~=\"gap-5\"]`"
+					"description": "`[data-list~=\"gap-5\"]`"
 				},
 				{
 					"name": "gap-6",
-					"description": "Token for `[data-list~=\"gap-6\"]`"
+					"description": "`[data-list~=\"gap-6\"]`"
 				}
 			]
 		},
@@ -195,31 +195,31 @@
 			"values": [
 				{
 					"name": "gap-0",
-					"description": "Token for `[data-list-item~=\"gap-0\"]`"
+					"description": "`[data-list-item~=\"gap-0\"]`"
 				},
 				{
 					"name": "gap-1",
-					"description": "Token for `[data-list-item~=\"gap-1\"]`"
+					"description": "`[data-list-item~=\"gap-1\"]`"
 				},
 				{
 					"name": "gap-2",
-					"description": "Token for `[data-list-item~=\"gap-2\"]`"
+					"description": "`[data-list-item~=\"gap-2\"]`"
 				},
 				{
 					"name": "gap-3",
-					"description": "Token for `[data-list-item~=\"gap-3\"]`"
+					"description": "`[data-list-item~=\"gap-3\"]`"
 				},
 				{
 					"name": "gap-4",
-					"description": "Token for `[data-list-item~=\"gap-4\"]`"
+					"description": "`[data-list-item~=\"gap-4\"]`"
 				},
 				{
 					"name": "gap-5",
-					"description": "Token for `[data-list-item~=\"gap-5\"]`"
+					"description": "`[data-list-item~=\"gap-5\"]`"
 				},
 				{
 					"name": "gap-6",
-					"description": "Token for `[data-list-item~=\"gap-6\"]`"
+					"description": "`[data-list-item~=\"gap-6\"]`"
 				}
 			]
 		},
@@ -237,67 +237,67 @@
 			"values": [
 				{
 					"name": "align-center",
-					"description": "Token for `[data-row~=\"align-center\"]`"
+					"description": "`[data-row~=\"align-center\"]`"
 				},
 				{
 					"name": "align-end",
-					"description": "Token for `[data-row~=\"align-end\"]`"
+					"description": "`[data-row~=\"align-end\"]`"
 				},
 				{
 					"name": "align-start",
-					"description": "Token for `[data-row~=\"align-start\"]`"
+					"description": "`[data-row~=\"align-start\"]`"
 				},
 				{
 					"name": "center",
-					"description": "Token for `[data-row~=\"center\"]`"
+					"description": "`[data-row~=\"center\"]`"
 				},
 				{
 					"name": "end",
-					"description": "Token for `[data-row~=\"end\"]`"
+					"description": "`[data-row~=\"end\"]`"
 				},
 				{
 					"name": "gap-0",
-					"description": "Token for `[data-row~=\"gap-0\"]`"
+					"description": "`[data-row~=\"gap-0\"]`"
 				},
 				{
 					"name": "gap-1",
-					"description": "Token for `[data-row~=\"gap-1\"]`"
+					"description": "`[data-row~=\"gap-1\"]`"
 				},
 				{
 					"name": "gap-2",
-					"description": "Token for `[data-row~=\"gap-2\"]`"
+					"description": "`[data-row~=\"gap-2\"]`"
 				},
 				{
 					"name": "gap-3",
-					"description": "Token for `[data-row~=\"gap-3\"]`"
+					"description": "`[data-row~=\"gap-3\"]`"
 				},
 				{
 					"name": "gap-4",
-					"description": "Token for `[data-row~=\"gap-4\"]`"
+					"description": "`[data-row~=\"gap-4\"]`"
 				},
 				{
 					"name": "gap-5",
-					"description": "Token for `[data-row~=\"gap-5\"]`"
+					"description": "`[data-row~=\"gap-5\"]`"
 				},
 				{
 					"name": "gap-6",
-					"description": "Token for `[data-row~=\"gap-6\"]`"
+					"description": "`[data-row~=\"gap-6\"]`"
 				},
 				{
 					"name": "gap-8",
-					"description": "Token for `[data-row~=\"gap-8\"]`"
+					"description": "`[data-row~=\"gap-8\"]`"
 				},
 				{
 					"name": "start",
-					"description": "Token for `[data-row~=\"start\"]`"
+					"description": "`[data-row~=\"start\"]`"
 				},
 				{
 					"name": "wrap",
-					"description": "Token for `[data-row~=\"wrap\"]`"
+					"description": "`[data-row~=\"wrap\"]`"
 				},
 				{
 					"name": "wrap-first-last",
-					"description": "Token for `[data-row~=\"wrap-first-last\"]`"
+					"description": "`[data-row~=\"wrap-first-last\"]`"
 				}
 			]
 		},
@@ -307,47 +307,47 @@
 			"values": [
 				{
 					"name": "basis-1",
-					"description": "Token for `[data-row-item~=\"basis-1\"]`"
+					"description": "`[data-row-item~=\"basis-1\"]`"
 				},
 				{
 					"name": "basis-2",
-					"description": "Token for `[data-row-item~=\"basis-2\"]`"
+					"description": "`[data-row-item~=\"basis-2\"]`"
 				},
 				{
 					"name": "basis-3",
-					"description": "Token for `[data-row-item~=\"basis-3\"]`"
+					"description": "`[data-row-item~=\"basis-3\"]`"
 				},
 				{
 					"name": "basis-4",
-					"description": "Token for `[data-row-item~=\"basis-4\"]`"
+					"description": "`[data-row-item~=\"basis-4\"]`"
 				},
 				{
 					"name": "basis-5",
-					"description": "Token for `[data-row-item~=\"basis-5\"]`"
+					"description": "`[data-row-item~=\"basis-5\"]`"
 				},
 				{
 					"name": "basis-6",
-					"description": "Token for `[data-row-item~=\"basis-6\"]`"
+					"description": "`[data-row-item~=\"basis-6\"]`"
 				},
 				{
 					"name": "basis-full",
-					"description": "Token for `[data-row-item~=\"basis-full\"]`"
+					"description": "`[data-row-item~=\"basis-full\"]`"
 				},
 				{
 					"name": "flexible",
-					"description": "Token for `[data-row-item~=\"flexible\"]`"
+					"description": "`[data-row-item~=\"flexible\"]`"
 				},
 				{
 					"name": "wrap-center",
-					"description": "Token for `[data-row-item~=\"wrap-center\"]`"
+					"description": "`[data-row-item~=\"wrap-center\"]`"
 				},
 				{
 					"name": "wrap-end",
-					"description": "Token for `[data-row-item~=\"wrap-end\"]`"
+					"description": "`[data-row-item~=\"wrap-end\"]`"
 				},
 				{
 					"name": "wrap-start",
-					"description": "Token for `[data-row-item~=\"wrap-start\"]`"
+					"description": "`[data-row-item~=\"wrap-start\"]`"
 				}
 			]
 		},
@@ -357,11 +357,11 @@
 			"values": [
 				{
 					"name": "block",
-					"description": "Token for `[data-scroll-container~=\"block\"]`"
+					"description": "`[data-scroll-container~=\"block\"]`"
 				},
 				{
 					"name": "inline",
-					"description": "Token for `[data-scroll-container~=\"inline\"]`"
+					"description": "`[data-scroll-container~=\"inline\"]`"
 				}
 			]
 		},
@@ -371,59 +371,59 @@
 			"values": [
 				{
 					"name": "block-size-max",
-					"description": "Token for `[data-scroll-item~=\"block-size-max\"]`"
+					"description": "`[data-scroll-item~=\"block-size-max\"]`"
 				},
 				{
 					"name": "inline-attached",
-					"description": "Token for `[data-scroll-item~=\"inline-attached\"]`"
+					"description": "`[data-scroll-item~=\"inline-attached\"]`"
 				},
 				{
 					"name": "inline-detached",
-					"description": "Token for `[data-scroll-item~=\"inline-detached\"]`"
+					"description": "`[data-scroll-item~=\"inline-detached\"]`"
 				},
 				{
 					"name": "inline-size-max",
-					"description": "Token for `[data-scroll-item~=\"inline-size-max\"]`"
+					"description": "`[data-scroll-item~=\"inline-size-max\"]`"
 				},
 				{
 					"name": "overflow-center",
-					"description": "Token for `[data-scroll-item~=\"overflow-center\"]`"
+					"description": "`[data-scroll-item~=\"overflow-center\"]`"
 				},
 				{
 					"name": "overflow-end",
-					"description": "Token for `[data-scroll-item~=\"overflow-end\"]`"
+					"description": "`[data-scroll-item~=\"overflow-end\"]`"
 				},
 				{
 					"name": "overflow-start",
-					"description": "Token for `[data-scroll-item~=\"overflow-start\"]`"
+					"description": "`[data-scroll-item~=\"overflow-start\"]`"
 				},
 				{
 					"name": "padding-match-end",
-					"description": "Token for `[data-scroll-item~=\"padding-match-end\"]`"
+					"description": "`[data-scroll-item~=\"padding-match-end\"]`"
 				},
 				{
 					"name": "padding-match-start",
-					"description": "Token for `[data-scroll-item~=\"padding-match-start\"]`"
+					"description": "`[data-scroll-item~=\"padding-match-start\"]`"
 				},
 				{
 					"name": "snap-block-end",
-					"description": "Token for `[data-scroll-item~=\"snap-block-end\"]`"
+					"description": "`[data-scroll-item~=\"snap-block-end\"]`"
 				},
 				{
 					"name": "snap-block-start",
-					"description": "Token for `[data-scroll-item~=\"snap-block-start\"]`"
+					"description": "`[data-scroll-item~=\"snap-block-start\"]`"
 				},
 				{
 					"name": "underflow-center",
-					"description": "Token for `[data-scroll-item~=\"underflow-center\"]`"
+					"description": "`[data-scroll-item~=\"underflow-center\"]`"
 				},
 				{
 					"name": "underflow-end",
-					"description": "Token for `[data-scroll-item~=\"underflow-end\"]`"
+					"description": "`[data-scroll-item~=\"underflow-end\"]`"
 				},
 				{
 					"name": "underflow-start",
-					"description": "Token for `[data-scroll-item~=\"underflow-start\"]`"
+					"description": "`[data-scroll-item~=\"underflow-start\"]`"
 				}
 			]
 		},
@@ -437,35 +437,35 @@
 			"values": [
 				{
 					"name": "backdrop-always",
-					"description": "Token for `[data-sticky~=\"backdrop-always\"]`"
+					"description": "`[data-sticky~=\"backdrop-always\"]`"
 				},
 				{
 					"name": "backdrop-none",
-					"description": "Token for `[data-sticky~=\"backdrop-none\"]`"
+					"description": "`[data-sticky~=\"backdrop-none\"]`"
 				},
 				{
 					"name": "block",
-					"description": "Token for `[data-sticky~=\"block\"]`"
+					"description": "`[data-sticky~=\"block\"]`"
 				},
 				{
 					"name": "block-end",
-					"description": "Token for `[data-sticky~=\"block-end\"]`"
+					"description": "`[data-sticky~=\"block-end\"]`"
 				},
 				{
 					"name": "block-start",
-					"description": "Token for `[data-sticky~=\"block-start\"]`"
+					"description": "`[data-sticky~=\"block-start\"]`"
 				},
 				{
 					"name": "inline",
-					"description": "Token for `[data-sticky~=\"inline\"]`"
+					"description": "`[data-sticky~=\"inline\"]`"
 				},
 				{
 					"name": "inline-end",
-					"description": "Token for `[data-sticky~=\"inline-end\"]`"
+					"description": "`[data-sticky~=\"inline-end\"]`"
 				},
 				{
 					"name": "inline-start",
-					"description": "Token for `[data-sticky~=\"inline-start\"]`"
+					"description": "`[data-sticky~=\"inline-start\"]`"
 				}
 			]
 		},
@@ -479,27 +479,27 @@
 			"values": [
 				{
 					"name": "account-type",
-					"description": "Token for `[data-tag~=\"account-type\"]`"
+					"description": "`[data-tag~=\"account-type\"]`"
 				},
 				{
 					"name": "eip",
-					"description": "Token for `[data-tag~=\"eip\"]`"
+					"description": "`[data-tag~=\"eip\"]`"
 				},
 				{
 					"name": "eip-status",
-					"description": "Token for `[data-tag~=\"eip-status\"]`"
+					"description": "`[data-tag~=\"eip-status\"]`"
 				},
 				{
 					"name": "eoa",
-					"description": "Token for `[data-tag~=\"eoa\"]`"
+					"description": "`[data-tag~=\"eoa\"]`"
 				},
 				{
 					"name": "manufacture-type",
-					"description": "Token for `[data-tag~=\"manufacture-type\"]`"
+					"description": "`[data-tag~=\"manufacture-type\"]`"
 				},
 				{
 					"name": "wallet-type",
-					"description": "Token for `[data-tag~=\"wallet-type\"]`"
+					"description": "`[data-tag~=\"wallet-type\"]`"
 				}
 			]
 		}
