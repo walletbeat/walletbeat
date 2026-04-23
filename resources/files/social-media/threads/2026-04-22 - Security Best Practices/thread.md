@@ -15,7 +15,7 @@ Security best practices are the fundamentals that determine whether your keys ar
 
 ---
 
-Walletbeat evaluates wallets across several areas:
+This attribute evaluates wallets across several areas:
 Key storage, secure randomness, key generation location, app permissions.
 
 ---
@@ -24,7 +24,7 @@ Key storage: are your private keys stored in a hardware security module, encrypt
 
 ---
 
-Secure randomness: does key generation use a cryptographically secure source, or a weaker library default?
+Secure randomness: does key generation use a cryptographically secure source, or a weaker source of randomness?
 
 ---
 
