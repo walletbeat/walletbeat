@@ -2,6 +2,7 @@ import * as fs from 'fs/promises'
 import * as path from 'path'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
+import { getErrorMessage } from '@/types/errors'
 
 import { type CssAttributeEntry, parseCssAttributes } from './css-attributes-generator-shared'
 
@@ -65,15 +66,27 @@ const toCustomData = (entries: Map<string, CssAttributeEntry>): HtmlCustomData =
 const main = async (): Promise<void> => {
 	const css = await fs.readFile(cssAttributesCssPath, 'utf8')
 	const data = toCustomData(parseCssAttributes(css))
+	let existingContent: string | undefined
+
+	try {
+		existingContent = await fs.readFile(outputPath, 'utf-8')
+	} catch {
+		// File doesn't exist yet, skip the comparison
+	}
+
+	if (existingContent !== undefined && JSON.stringify(data).trim() === existingContent.trim()) {
+		// Already up to date
+		return
+	}
 
 	await fs.mkdir(path.dirname(outputPath), { recursive: true })
 	await fs.writeFile(outputPath, `${JSON.stringify(data, null, '\t')}\n`, 'utf8')
-	process.stdout.write(`Generated ${path.relative(repoRoot, outputPath)}\n`)
+	process.stderr.write(`Generated ${path.relative(repoRoot, outputPath)}\n`)
 }
 
 try {
 	await main()
 } catch (error) {
-	process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`)
+	process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 	process.exit(1)
 }

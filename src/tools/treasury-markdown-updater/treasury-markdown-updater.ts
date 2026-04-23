@@ -1,6 +1,8 @@
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 
+import { getErrorMessage } from '@/types/errors'
+
 import {
 	treasuryMarkdownUpdate,
 	type TreasuryMarkdownUpdaterConfig,
@@ -26,6 +28,6 @@ const appConfig: TreasuryMarkdownUpdaterConfig = {
 try {
 	treasuryMarkdownUpdate(appConfig)
 } catch (error) {
-	process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`)
+	process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 	process.exit(1)
 }

@@ -26,7 +26,7 @@
 		"check:build:post": "tests/postbuild.sh",
 		"check:build:post:quiet": "cross-env QUIET=true pnpm run check:build:post",
 		"dev": "cross-env WALLETBEAT_DEV=true pnpm run astro dev",
-		"lint": "pnpm run check:syntax --write && pnpm run check:lint --fix && pnpm run check:spelling:reorder && pnpm run check:treasury:markdown && pnpm run wallet-data-collection lint-fix && pnpm run check:features:markdown && cspell lint .",
+		"lint": "pnpm run check:syntax --write && pnpm run check:lint --fix && pnpm run check:spelling:reorder && pnpm run check:treasury:markdown && pnpm run wallet-data-collection lint-fix && pnpm run check:features:markdown && pnpm run generate:css-attributes && cspell lint .",
 		"preview": "pnpm run astro preview",
 		"fix": "pnpm run lint",
 		"helios": "deploy/helios/helios.sh",
