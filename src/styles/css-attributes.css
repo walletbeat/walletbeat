@@ -1260,7 +1260,7 @@ ol {
 		 */
 		[data-sticky] {
 			/* Inputs */
-			--sticky-backgroundColor: light-dark(#efefefaa, #141414aa);
+			--sticky-backgroundColor: light-dark(#efefefaa, #130a2bb8);
 			--sticky-backdropFilter: blur(20px);
 			--sticky-backdropMaskImage: none;
 
