@@ -1,0 +1,116 @@
+---
+import AboutIcon from 'lucide-static/icons/building-2.svg?raw'
+import FaqIcon from 'lucide-static/icons/circle-help.svg?raw'
+import GithubIcon from 'lucide-static/icons/github.svg?raw'
+import FarcasterIcon from 'lucide-static/icons/message-circle-heart.svg?raw'
+
+const navLinks = [
+	{ href: '/about/', icon: AboutIcon, label: 'about', external: false },
+	{ href: '/faq/', icon: FaqIcon, label: 'FAQ', external: false },
+	{
+		href: 'https://github.com/walletbeat/walletbeat',
+		icon: GithubIcon,
+		label: 'code',
+		external: true,
+	},
+	{
+		href: 'https://farcaster.xyz/~/channel/walletbeat',
+		icon: FarcasterIcon,
+		label: 'Farcaster',
+		external: true,
+	},
+] as const
+---
+
+<header id='topbar'>
+	<a href='/' class='brand'>
+		<picture>
+			<source srcset='/logo-light.svg' media='(prefers-color-scheme: dark)' />
+			<img src='/logo-dark.svg' alt='Walletbeat' />
+		</picture>
+	</a>
+
+	<nav>
+		{
+			navLinks.map(({ href, icon, label, external }) => (
+				<a href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
+					<span class='icon' set:html={icon} />
+					<span class='label'>{label}</span>
+				</a>
+			))
+		}
+	</nav>
+</header>
+
+<style>
+	#topbar {
+		grid-area: Header;
+		background-color: var(--background-primary);
+		position: sticky;
+		top: 0;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem 2rem;
+		box-shadow: 0 0 0 var(--separator-width) var(--border-color);
+
+		.brand {
+			display: flex;
+			align-items: center;
+			text-decoration: none;
+
+			img {
+				display: block;
+				height: 3rem;
+			}
+		}
+
+		nav {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+
+			a {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0.375rem;
+				padding: 0.25rem 0.5rem;
+				text-decoration: none;
+				color: inherit;
+
+				.icon {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 3rem;
+					height: 3rem;
+					border-radius: 50%;
+					border: 1.5px solid currentColor;
+					color: var(--text-primary);
+
+					:global(svg) {
+						width: 1.25rem;
+						height: 1.25rem;
+					}
+				}
+
+				.label {
+					font-size: 0.75rem;
+					color: var(--text-secondary);
+				}
+
+				&:hover .icon {
+					background-color: var(--accent-backgroundColor);
+				}
+			}
+		}
+	}
+
+	@media (max-width: 1024px) {
+		#topbar {
+			display: none;
+		}
+	}
+</style>
