@@ -1759,6 +1759,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
 		retrieved: '2026-03-31',
 	},
+	{
 		url: 'https://cantina.xyz/bounties/f9df94db-c7b1-434b-bb06-d1360abdd1be',
 		urlHash: 'ad5234d3f2a749ff68602d9af4176968284636b5',
 		retrieved: '2026-04-05',
