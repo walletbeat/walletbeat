@@ -1,4 +1,5 @@
 ---
+import { topbarNavigationItems } from '@/constants/navigation'
 import AboutIcon from 'lucide-static/icons/building-2.svg?raw'
 import FaqIcon from 'lucide-static/icons/circle-help.svg?raw'
 import GithubIcon from 'lucide-static/icons/github.svg?raw'
@@ -32,12 +33,16 @@ const navLinks = [
 
 	<nav>
 		{
-			navLinks.map(({ href, icon, label, external }) => (
-				<a href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
-					<span class='icon' set:html={icon} />
-					<span class='label'>{label}</span>
-				</a>
-			))
+			topbarNavigationItems.map(({ href, icon, title }) => {
+				const external = href?.startsWith('http')
+
+				return (
+					<a href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
+						<span class='icon' set:html={icon} />
+						<span class='label'>{title}</span>
+					</a>
+				)
+			})
 		}
 	</nav>
 </header>
