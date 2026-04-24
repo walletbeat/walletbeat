@@ -12,15 +12,20 @@
 
 	--separator-width: 1px;
 
-	--background-primary: light-dark(#fff, #17191f);
-	--background-secondary: light-dark(#efefef, #141414);
-	--background-tertiary: light-dark(#eeeff4, #17191f);
+	/* Main canvas + default cards (dark: deep purple) */
+	--background-primary: light-dark(#fff, #130a2b);
+	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
+	--background-secondary: light-dark(#efefef, #1c1038);
+	--background-tertiary: light-dark(#eeeff4, #251544);
+	/* Desktop sidebar / mobile chrome strip (dark: near-black) */
+	--navigation-backgroundColor: light-dark(#efefef, #0a0a0e);
+
 	--accent: var(--accent-color);
-	--accent-color: light-dark(#e564bc, #e683c7);
-	--accent-backgroundColor: light-dark(#fbdcf2, #440530);
-	--text-primary: light-dark(#222222, #efefef);
-	--text-secondary: light-dark(#3f4046, #b1b2b9);
-	--border-color: light-dark(#cecece, #313131);
+	--accent-color: light-dark(#e564bc, #f078c8);
+	--accent-backgroundColor: light-dark(#fbdcf2, #3d0a32);
+	--text-primary: light-dark(#222222, #f4f2f8);
+	--text-secondary: light-dark(#3f4046, #b8b0d4);
+	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
 
 	--rating-pass: light-dark(oklch(0.81 0.22 152.32), oklch(0.75 0.18 152.32));
 	--rating-fail: light-dark(oklch(0.69 0.23 29.44), oklch(0.63 0.19 29.44));
@@ -113,7 +118,7 @@
 
 	color-scheme: light dark;
 	color: var(--text-primary);
-	background-color: var(--background-secondary);
+	background-color: var(--background-primary);
 	outline-color: var(--accent);
 
 	transition-property: background-color, color;
