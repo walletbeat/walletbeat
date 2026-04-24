@@ -1,26 +1,6 @@
 ---
 import { topbarNavigationItems } from '@/constants/navigation'
-import AboutIcon from 'lucide-static/icons/building-2.svg?raw'
-import FaqIcon from 'lucide-static/icons/circle-help.svg?raw'
-import GithubIcon from 'lucide-static/icons/github.svg?raw'
-import FarcasterIcon from 'lucide-static/icons/message-circle-heart.svg?raw'
 
-const navLinks = [
-	{ href: '/about/', icon: AboutIcon, label: 'about', external: false },
-	{ href: '/faq/', icon: FaqIcon, label: 'FAQ', external: false },
-	{
-		href: 'https://github.com/walletbeat/walletbeat',
-		icon: GithubIcon,
-		label: 'code',
-		external: true,
-	},
-	{
-		href: 'https://farcaster.xyz/~/channel/walletbeat',
-		icon: FarcasterIcon,
-		label: 'Farcaster',
-		external: true,
-	},
-] as const
 ---
 
 <header id='topbar'>
