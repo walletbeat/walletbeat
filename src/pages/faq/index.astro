@@ -263,15 +263,8 @@ import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import Typography from '@/components/Typography.svelte'
 
-import {
-	navigationHome,
-	navigationAbout,
-	navigationNews,
-	navigationRepository,
-	navigationFarcasterChannel,
-} from '@/constants/navigation'
+import { defaultNavigationItems } from '@/constants/navigation'
 
-import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?raw'
 ---
 
@@ -281,28 +274,7 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 		keywordsAfter: ['faq'],
 	}}
 >
-	<Navigation
-		navigationItems={[
-			navigationHome,
-			navigationAbout,
-			{
-				id: 'faq',
-				title: 'FAQ',
-				icon: HelpCircleIcon,
-				href: '/faq/#top',
-				children: [
-					...frequentlyAskedQuestions.map(faq => ({
-						id: faq.anchor,
-						title: faq.navTitle,
-						href: `#${faq.anchor}`,
-					})),
-				],
-			},
-			navigationNews,
-			navigationRepository,
-			navigationFarcasterChannel,
-		]}
-	/>
+	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container data-column='gap-8'>
 		<header id='top' data-scroll-item='inline-detached padding-match-start'>
