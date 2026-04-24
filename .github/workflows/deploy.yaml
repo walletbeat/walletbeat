@@ -54,6 +54,7 @@ jobs:
         run: ./deploy/deploy-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
+          OMNIPIN_FILECOIN_SP_ADDRESS: '0x32c90c26bCA6eD3945De9b29BA4e19D38314D618'
           OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
       - name: Check site data availability on IPFS gateways
         run: ./deploy/ping-gateways.sh
