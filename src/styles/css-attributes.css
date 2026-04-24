@@ -1039,7 +1039,7 @@ ol {
 	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
 		container-type: size;
 		container-type: scroll-state size;
-		overflow: auto auto;
+		overflow: hidden auto;
 	}
 	&[data-scroll-container~="block"] {
 		container-type: inline-size;
