@@ -127,6 +127,32 @@ export function normalizePath(p: string): string {
 }
 
 /**
+ * Returns the set of paths (relative to repo root, normalized) that git
+ * stores with CRLF line endings in its index, as reported by
+ * `git ls-files --eol`. Reading from the index bypasses autocrlf, so this
+ * is the authoritative answer for what is actually committed.
+ */
+export function getCrlfFilesFromGit(root: string): Set<string> {
+	try {
+		const output = execSync('git ls-files --eol', { cwd: root, encoding: 'utf8' })
+		const crlfFiles = new Set<string>()
+
+		for (const line of output.split('\n')) {
+			// Format: "i/<eol>  w/<eol>  attr/<attrs>\t<filepath>"
+			const match = /^i\/crlf\s.*\t(.+)$/.exec(line)
+
+			if (match) {
+				crlfFiles.add(normalizePath(match[1]))
+			}
+		}
+
+		return crlfFiles
+	} catch {
+		return new Set()
+	}
+}
+
+/**
  * On Windows, git represents symlinks as regular text files containing
  * the symlink target path (when core.symlinks=false). This function returns
  * the set of normalized paths that are stored as symlinks (mode 120000) in git,
@@ -340,8 +366,10 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 				} else {
 					const raw = await concurrencyLimit(() => fs.readFile(fullPath))
 
-					// Normalize CRLF → LF in contents so line-ending checks reflect
-					// what is stored in git, not what git's autocrlf added on checkout.
+					// Normalize CRLF → LF so that checks like trailing-newline and
+					// line-splitting work correctly on Windows (where autocrlf adds \r\n
+					// to files that are stored with \n in git). The CRLF-in-git check
+					// uses getCrlfFilesFromGit() instead, which reads the index directly.
 					const contents = raw.toString('utf8').replaceAll('\r\n', '\n')
 
 					entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }

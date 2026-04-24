@@ -8,23 +8,15 @@ import {
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
+	getCrlfFilesFromGit,
 	getRepositoryRoot,
 	normalizePath,
 	type PathPredicate,
 } from './utils/codebase'
 
 describe('codebase integrity', () => {
-	describe('all files have Unix line endings', async () => {
-		const filesWithCrlf: string[] = []
-
-		await crawlCodebase({
-			ignore: commonExclusions,
-			traversalFn: entry => {
-				if (entry.type === CodebaseEntryType.FILE && entry.contents.includes('\r\n')) {
-					filesWithCrlf.push(entry.path)
-				}
-			},
-		})
+	describe('all files have Unix line endings', () => {
+		const filesWithCrlf = [...getCrlfFilesFromGit(getRepositoryRoot())]
 
 		it('all files have Unix line endings', () => {
 			expect(filesWithCrlf, `Files with CRLF line endings: ${filesWithCrlf.join(', ')}`).toEqual([])
