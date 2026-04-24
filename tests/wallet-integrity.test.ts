@@ -5,11 +5,13 @@ import { describe, expect, it } from 'vitest'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
+import { getExtensionId } from '@/schema/extension-url'
 import type { BaseWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
 import { getErrorMessage } from '@/types/errors'
+import { toKebabCase } from '@/utils/kebab'
 
 import { getRepositoryRoot } from './utils/codebase'
 
@@ -70,8 +72,8 @@ describe('wallets', () => {
 	])) {
 		describe(walletMapName, () => {
 			for (const [walletKey, wallet] of Object.entries(walletMap)) {
-				it(`has the correct key for ${wallet.metadata.displayName}`, () => {
-					expect(walletKey).toBe(wallet.metadata.id)
+				it(`has a metadata.id that is the kebab-case of its registry key for ${wallet.metadata.displayName}`, () => {
+					expect(wallet.metadata.id).toBe(toKebabCase(walletKey))
 				})
 			}
 		})
@@ -87,6 +89,10 @@ describe('wallets', () => {
 
 	for (const wallet of Object.values(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
+			it('has a slug-style metadata.id (lowercase, hyphens only)', () => {
+				expect(wallet.metadata.id).toMatch(/^[a-z\d]+(?:-[a-z\d]+)*$/)
+			})
+
 			it('has valid icon', () => {
 				expect(
 					fs.existsSync(
@@ -99,6 +105,36 @@ describe('wallets', () => {
 			})
 
 			const dataSubdir = walletIdToDataSubdir.get(wallet.metadata.id)
+
+			if (dataSubdir !== undefined) {
+				const manifestDir = path.resolve(
+					getRepositoryRoot(),
+					'data',
+					dataSubdir,
+					'manifests',
+					wallet.metadata.id,
+				)
+
+				for (const extensionUrl of wallet.metadata.urls?.extensions ?? []) {
+					const extId = getExtensionId(extensionUrl)
+
+					it(`has checked-in raw manifest for extension ${extId}`, () => {
+						expect(fs.existsSync(path.join(manifestDir, `${extId}.manifest.json`))).toBe(true)
+					})
+				}
+
+				if (wallet.metadata.urls?.androidManifestXml !== undefined) {
+					it('has checked-in raw Android manifest', () => {
+						expect(fs.existsSync(path.join(manifestDir, 'android-manifest.xml'))).toBe(true)
+					})
+				}
+
+				if (wallet.metadata.urls?.iosInfoPlist !== undefined) {
+					it('has checked-in raw iOS plist', () => {
+						expect(fs.existsSync(path.join(manifestDir, 'ios-info.plist.xml'))).toBe(true)
+					})
+				}
+			}
 
 			if (
 				dataSubdir !== undefined &&

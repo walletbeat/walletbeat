@@ -50,3 +50,6 @@ resources/contracts/broadcast/**/dry-run/
 
 # Docs
 resources/contracts/docs/
+
+# Claude Code worktree things
+.claude/worktrees/

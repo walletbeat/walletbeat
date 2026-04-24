@@ -1,0 +1,77 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"action": {
+		"default_icon": {
+			"16": "images/icon-16.png",
+			"19": "images/icon-19.png",
+			"32": "images/icon-16@2x.png",
+			"38": "images/icon-19@2x.png",
+			"64": "images/icon-16@4x.png",
+			"128": "images/icon-16@8x.png",
+			"512": "images/icon-16@32x.png"
+		},
+		"default_popup": "popup.html"
+	},
+	"author": "https://rainbow.me",
+	"background": {
+		"service_worker": "background.js"
+	},
+	"commands": {
+		"open_rainbow": {
+			"description": "Shortcut to open Rainbow Wallet",
+			"suggested_key": {
+				"chromeos": "Alt+Shift+R",
+				"linux": "Alt+Shift+R",
+				"mac": "Alt+Shift+R",
+				"windows": "Alt+Shift+R"
+			}
+		}
+	},
+	"content_scripts": [
+		{
+			"all_frames": true,
+			"js": ["contentscript.js"],
+			"matches": ["http://*/*", "https://*/*"],
+			"run_at": "document_start"
+		},
+		{
+			"js": ["./vendor/trezor-content-script.js"],
+			"matches": ["*://connect.trezor.io/9/*"]
+		}
+	],
+	"content_security_policy": {
+		"extension_pages": "frame-ancestors 'none'; script-src 'self'; object-src 'self'; connect-src 'self' ws://localhost:9090 http://127.0.0.1:* https://*.p.rainbow.me https://*.s.rainbow.me https://aha.rainbow.me https://token-search.rainbow.me https://rpc.rainbow.me https://f2c.rainbow.me https://f2c.rainbowdotme.workers.dev https://rpc.flashbots.net https://protect.flashbots.net https://gateway.ipfs.io https://o331974.ingest.sentry.io https://*.dataplane.rudderstack.com https://*.rudderlabs.com https://rainbow.imgix.net https://firebaseinstallations.googleapis.com https://firebaseremoteconfig.googleapis.com https://rainbow-me.firebaseapp.com https://icons.duckduckgo.com https://*.live.ledger.com https://nftp.rainbow.me/ https://gateway-arbitrum.network.thegraph.com https://ccip-v2.ens.xyz;"
+	},
+	"default_locale": "en_US",
+	"description": "__MSG_appDescription__",
+	"host_permissions": ["http://*/*", "https://*/*", "wss://*/*"],
+	"icons": {
+		"16": "images/icon-16.png",
+		"19": "images/icon-19.png",
+		"32": "images/icon-16@2x.png",
+		"38": "images/icon-19@2x.png",
+		"64": "images/icon-16@4x.png",
+		"128": "images/icon-16@8x.png",
+		"512": "images/icon-16@32x.png"
+	},
+	"manifest_version": 3,
+	"minimum_chrome_version": "102",
+	"name": "__MSG_appName__",
+	"permissions": [
+		"activeTab",
+		"clipboardWrite",
+		"scripting",
+		"storage",
+		"tabs",
+		"unlimitedStorage",
+		"notifications"
+	],
+	"short_name": "__MSG_appShortName__",
+	"version": "1.6.4",
+	"web_accessible_resources": [
+		{
+			"matches": ["<all_urls>"],
+			"resources": ["inpage.js", "*.woff2", "703.css", "assets/badges/*.png"]
+		}
+	]
+}

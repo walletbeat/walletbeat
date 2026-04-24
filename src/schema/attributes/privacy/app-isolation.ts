@@ -5,7 +5,6 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -28,15 +27,13 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type AppIsolationValue = Value
-
 function rateAppIsolation(
-	ctx: EvaluationContext<AppIsolationValue>,
+	ctx: EvaluationContext,
 	appIsolation: Exclude<AppIsolation, typeof appConnectionNotSupported>,
-): Evaluation<AppIsolationValue> {
+): Evaluation {
 	if (!isSupported(appIsolation.createInAppConnectionFlow)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_account_creation_in_connection_flow',
 				displayName: 'No per-app account option',
 				rating: Rating.FAIL,
@@ -67,7 +64,7 @@ function rateAppIsolation(
 
 	if (!isSupported(appIsolation.useAppSpecificLastConnectedAddresses)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_reuse_last_connection_addresses',
 				displayName: 'No per-app account persistence',
 				rating: Rating.FAIL,
@@ -124,7 +121,7 @@ function rateAppIsolation(
 	switch (commonExposedAccountSet.defaultBehavior) {
 		case ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'active_account_only',
 					displayName: 'Encourages account reuse across apps',
 					rating: Rating.FAIL,
@@ -151,7 +148,7 @@ function rateAppIsolation(
 			})
 		case ExposedAccountsBehavior.ALL_ACCOUNTS:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'all_accounts_exposed',
 					displayName: 'All accounts exposed to all apps',
 					rating: Rating.FAIL,
@@ -178,7 +175,7 @@ function rateAppIsolation(
 			})
 		case ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'app_specific_account',
 					displayName: 'Per-app account',
 					rating: Rating.PASS,
@@ -195,7 +192,7 @@ function rateAppIsolation(
 			})
 		case ExposedAccountsBehavior.NO_DEFAULT:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'no_default_behavior',
 					displayName: 'Supports per-app accounts',
 					rating: Rating.PARTIAL,
@@ -216,7 +213,7 @@ function rateAppIsolation(
 	}
 }
 
-export const appIsolation: Attribute<AppIsolationValue> = {
+export const appIsolation: Attribute = {
 	id: 'appIsolation',
 	icon: '\u{1f3dd}', // Desert island
 	displayName: 'App isolation',
@@ -360,26 +357,25 @@ export const appIsolation: Attribute<AppIsolationValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<AppIsolationValue>): Evaluation<AppIsolationValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {
 			return exempt(
 				ctx,
 				sentence('Only software wallets are expected to deal with connecting to apps.'),
-				null,
 			)
 		}
 
 		if (ctx.features.privacy.appIsolation === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (isAppConnectionSupportedInAppIsolation(ctx.features.privacy.appIsolation)) {
-			return exempt(ctx, sentence('{{WALLET_NAME}} does not support connecting to apps.'), null)
+			return exempt(ctx, sentence('{{WALLET_NAME}} does not support connecting to apps.'))
 		}
 
 		return rateAppIsolation(ctx, ctx.features.privacy.appIsolation)
 	},
-	aggregate: pickWorstRating<AppIsolationValue>,
+	aggregate: pickWorstRating,
 }

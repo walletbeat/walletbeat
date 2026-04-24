@@ -1,0 +1,16 @@
+{
+	"contentScripts": "UNRESTRICTED",
+	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"hostPermissions": "UNRESTRICTED",
+	"permissions": [
+		"scripting",
+		"storage",
+		"unlimitedStorage",
+		"alarms",
+		"activeTab",
+		"notifications",
+		"offscreen",
+		"contextMenus"
+	],
+	"webAccessibleResources": "UNRESTRICTED"
+}

@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -25,7 +24,7 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwareWalletInteroperabilityValue = Value & {
+export type HardwareWalletInteroperabilityMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
@@ -65,18 +64,18 @@ function extraWalletsThroughWalletConnectText(
 }
 
 function singleHardwareWalletManufacturerSupport(
-	ctx: EvaluationContext<HardwareWalletInteroperabilityValue>,
+	ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletInteroperabilityValue> {
+): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'single_hardware_wallet_support',
 			rating: Rating.FAIL,
 			displayName: 'Supports only one hardware wallet manufacturer',
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} only supports hardware wallets from a single major manufacturer.
 			`),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details:
 			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
@@ -93,18 +92,18 @@ ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 }
 
 function insufficientHardwareWalletManufacturerSupport(
-	ctx: EvaluationContext<HardwareWalletInteroperabilityValue>,
+	ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletInteroperabilityValue> {
+): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'insufficient_hardware_wallet_interoperability',
 			rating: Rating.PARTIAL,
 			displayName: 'Limited hardware wallet interoperability',
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} supports a limited selection of hardware wallets.
 			`),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details:
 			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
@@ -117,16 +116,18 @@ ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 }
 
 function comprehensiveHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletInteroperabilityValue>,
+	ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletInteroperabilityValue> {
+): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'comprehensive_hardware_wallet_interoperability',
 			rating: Rating.PASS,
 			displayName: 'Interoperable hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports a wide range of hardware wallets.'),
-			hardwareWalletSupport,
+			metadata: {
+				hardwareWalletSupport,
+			},
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}`,
@@ -134,7 +135,7 @@ function comprehensiveHardwareWalletSupport(
 	})
 }
 
-export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperabilityValue> = {
+export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperabilityMetadata> = {
 	id: 'hardwareWalletInteroperability',
 	icon: '\u{1f9e9}', // Puzzle piece
 	displayName: 'Hardware wallet interoperability',
@@ -274,8 +275,8 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<HardwareWalletInteroperabilityValue>,
-	): Evaluation<HardwareWalletInteroperabilityValue> => {
+		ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
+	): Evaluation<HardwareWalletInteroperabilityMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test obvious.
 
 		if (ctx.features.type === WalletType.HARDWARE) {
@@ -332,5 +333,5 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 				return comprehensiveHardwareWalletSupport(ctx, ctx.features.security.hardwareWalletSupport)
 		}
 	},
-	aggregate: pickWorstRating<HardwareWalletInteroperabilityValue>,
+	aggregate: pickWorstRating<HardwareWalletInteroperabilityMetadata>,
 }

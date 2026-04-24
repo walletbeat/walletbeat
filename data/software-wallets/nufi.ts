@@ -31,6 +31,9 @@ export const nufi: SoftwareWallet = {
 		lastUpdated: '2025-08-11',
 		urls: {
 			docs: ['https://nufi.gitbook.io/'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
+			],
 			repositories: ['https://github.com/nufi-official/nufi'],
 			socials: {
 				discord: 'https://discord.com/invite/jSyVPAXw3w',
@@ -176,6 +179,7 @@ export const nufi: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,

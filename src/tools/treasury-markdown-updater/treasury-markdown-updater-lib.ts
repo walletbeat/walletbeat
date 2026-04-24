@@ -203,7 +203,7 @@ export function treasuryMarkdownUpdate(config: TreasuryMarkdownUpdaterConfig): v
 	const logger: Logger = {
 		info: (message: string): void => {
 			if (!config.quiet) {
-				process.stdout.write(message + '\n')
+				process.stderr.write(message + '\n')
 			}
 		},
 	}

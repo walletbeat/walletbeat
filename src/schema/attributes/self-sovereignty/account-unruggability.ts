@@ -9,7 +9,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	type AccountRecovery,
@@ -44,15 +43,15 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountUnruggabilityValue = Value & {
+export type AccountUnruggabilityMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
 function evaluateGuardianUnruggabilityPolicy(
-	ctx: EvaluationContext<AccountUnruggabilityValue>,
+	ctx: EvaluationContext<AccountUnruggabilityMetadata>,
 	guardianPolicy: GuardianPolicy,
-): Evaluation<AccountUnruggabilityValue> {
+): Evaluation<AccountUnruggabilityMetadata> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(outcomes)) {
@@ -69,7 +68,7 @@ function evaluateGuardianUnruggabilityPolicy(
 
 	if (!isNonEmptyArray(takeOverPossibleOutcomes)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_unruggable',
 				rating: Rating.PASS,
 				displayName: 'Account unruggable in all likely scenarios',
@@ -77,8 +76,10 @@ function evaluateGuardianUnruggabilityPolicy(
 					{{WALLET_NAME}} does not allow any external service to take over
 					your account.
 				`),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountUnruggabilityDetailsContent({}),
 		})
@@ -86,22 +87,24 @@ function evaluateGuardianUnruggabilityPolicy(
 
 	if (takeOverPossibleOutcomes.length === 1) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_ruggable_specific_scenario',
 				rating: Rating.FAIL,
 				displayName: 'Account may be ruggable',
 				shortExplanation: typographicContentWithExtraOptionalStrings(
 					takeOverPossibleOutcomes[0].takeover.description,
 				),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountUnruggabilityDetailsContent({}),
 		})
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'guardian_policy_ruggable_multiple_scenarios',
 			rating: Rating.FAIL,
 			displayName: 'Account may be ruggable',
@@ -109,18 +112,20 @@ function evaluateGuardianUnruggabilityPolicy(
 				{{WALLET_NAME}}'s account recovery feature leaves the account
 				vulnerable to being rugged in multiple scenarios.
 			`),
-			minimumGuardianPolicy: guardianPolicy,
-			outcomes,
+			metadata: {
+				minimumGuardianPolicy: guardianPolicy,
+				outcomes,
+			},
 		},
 		details: accountUnruggabilityDetailsContent({}),
 	})
 }
 
 function evaluateAccountUnruggability(
-	ctx: EvaluationContext<AccountUnruggabilityValue>,
+	ctx: EvaluationContext<AccountUnruggabilityMetadata>,
 	keysHandling: KeysHandlingSupport,
 	accountRecovery: AccountRecovery,
-): Evaluation<AccountUnruggabilityValue> {
+): Evaluation<AccountUnruggabilityMetadata> {
 	switch (keysHandling.keyGeneration) {
 		case KeyGenerationLocation.FULLY_ON_USER_DEVICE:
 			break // OK
@@ -128,7 +133,7 @@ function evaluateAccountUnruggability(
 			break // OK
 		case KeyGenerationLocation.FULLY_OFF_USER_DEVICE:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'key_off_device',
 					displayName: 'Key generated off-device',
 					rating: Rating.FAIL,
@@ -136,8 +141,10 @@ function evaluateAccountUnruggability(
 						When generating a key with {{WALLET_NAME}}, the key is generated
 						by an external service which can use this to rug your account.
 					`),
-					minimumGuardianPolicy: null,
-					outcomes: null,
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
 				},
 				details: markdown(`
 					Key generation with {{WALLET_NAME}} occurs off-device. This means
@@ -158,7 +165,7 @@ function evaluateAccountUnruggability(
 			break // OK
 		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'multiparty_reconstructed_without_user_device',
 					displayName: 'MPC key reconstructed without user',
 					rating: Rating.FAIL,
@@ -166,8 +173,10 @@ function evaluateAccountUnruggability(
 						{{WALLET_NAME}} uses MPC, but the key reconstruction process can
 						occur without requiring the user's device.
 					`),
-					minimumGuardianPolicy: null,
-					outcomes: null,
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
 				},
 				details: markdown(`
 					{{WALLET_NAME}} uses multi-party computation to derive the account's
@@ -189,7 +198,7 @@ function evaluateAccountUnruggability(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'pass_no_guardian_recovery',
 			displayName: 'Unruggable account',
 			rating: Rating.PASS,
@@ -197,14 +206,16 @@ function evaluateAccountUnruggability(
 				Private key material never leaves {{WALLET_NAME}}, so no external
 				entity may take over your account.
 			`),
-			minimumGuardianPolicy: null,
-			outcomes: null,
+			metadata: {
+				minimumGuardianPolicy: null,
+				outcomes: null,
+			},
 		},
 		details: accountUnruggabilityDetailsContent({}),
 	})
 }
 
-export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
+export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 	id: 'accountUnruggability',
 	icon: '\u{1fa9a}', // Carpentry Saw
 	displayName: 'Account unruggability',
@@ -393,8 +404,8 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<AccountUnruggabilityValue>,
-	): Evaluation<AccountUnruggabilityValue> => {
+		ctx: EvaluationContext<AccountUnruggabilityMetadata>,
+	): Evaluation<AccountUnruggabilityMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		if (
@@ -415,5 +426,5 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 			ctx.features.security.accountRecovery,
 		)
 	},
-	aggregate: pickWorstRating<AccountUnruggabilityValue>,
+	aggregate: pickWorstRating<AccountUnruggabilityMetadata>,
 }

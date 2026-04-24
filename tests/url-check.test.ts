@@ -1730,6 +1730,35 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-04-02',
 	},
 	{
+		url: 'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
+		urlHash: 'f3ee58ccad5b73604401c32f5ce451e773809784',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+		urlHash: '1eb054801b62cdf521f2a266ea9336ff6072cab3',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+		urlHash: 'fef14a0fce263eab6abdcf946c39d3e496bff766',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/zerion-wallet-crypto-defi/klghhnkeealcohjjanjjdaeeggmfmlpl',
+		urlHash: 'f4db2da787034114958427804936711fd439e152',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
+		urlHash: 'da0b34b74deeac2a56309905cb86da9028010e11',
+		retrieved: '2026-03-31',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
+		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
+		retrieved: '2026-03-31',
+	},
 		url: 'https://cantina.xyz/bounties/f9df94db-c7b1-434b-bb06-d1360abdd1be',
 		urlHash: 'ad5234d3f2a749ff68602d9af4176968284636b5',
 		retrieved: '2026-04-05',
@@ -1743,7 +1772,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://techcrunch.com/2022/10/13/uniswap-labs-raises-165-million-in-new-funding/',
 		urlHash: '23ae6ec55e419939adbef15cac68334d706d4e56',
 		retrieved: '2026-04-05',
-	},
+	}
 ]
 
 /**
@@ -1871,6 +1900,16 @@ describe('reference URLs', () => {
 			it('has valid extensions', async () => {
 				for (const extension of wallet.metadata.urls?.extensions ?? []) {
 					await checkValidUrl(extension)
+				}
+			})
+			it('has valid androidManifestXml', async () => {
+				if (wallet.metadata.urls?.androidManifestXml !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.androidManifestXml)
+				}
+			})
+			it('has valid iosInfoPlist', async () => {
+				if (wallet.metadata.urls?.iosInfoPlist !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.iosInfoPlist)
 				}
 			})
 			it('has valid socials', async () => {

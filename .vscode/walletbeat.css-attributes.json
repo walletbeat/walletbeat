@@ -1,0 +1,523 @@
+{
+	"version": 1.1,
+	"globalAttributes": [
+		{
+			"name": "data-badge",
+			"description": "## [data-badge]\n\nCompact badge / chip surface with size modifiers. Chip uses the medium size when the attribute is present without a token.\n\n### Tokens\n- `small`, `medium`, `large`\n\n### CSS Variables\n- `--badge-backgroundColor`\n- `--badge-borderColor`\n- `--badge-textColor`\n\n### Examples\n- Default size (medium — omit token):\n  ```html\n  <span data-badge>Status</span>\n  ```\n- `small`:\n  ```html\n  <span data-badge=\"small\">Status</span>\n  ```\n- `large`:\n  ```html\n  <span data-badge=\"large\">Status</span>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-badge]`",
+			"values": [
+				{
+					"name": "large",
+					"description": "`[data-badge~=\"large\"]`"
+				},
+				{
+					"name": "medium",
+					"description": "`[data-badge~=\"medium\"]`"
+				},
+				{
+					"name": "small",
+					"description": "`[data-badge~=\"small\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-card",
+			"description": "## [data-card]\n\nCard surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.\n\n### Tokens\n- tone: `secondary`\n- radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`\n- padding: `padding-0` … `padding-8`\n- border: `border-accent`\n\n### CSS Variables\n- `--card-backgroundColor`\n- `--card-radius`\n- `--card-padding`\n\n### Examples\n- Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):\n  ```html\n  <article data-card>\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n- Secondary tone, larger padding, accent border (omit radius when default `radius-4` / `0.5em` is fine):\n  ```html\n  <article data-card=\"secondary padding-6 border-accent\">\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`",
+			"values": [
+				{
+					"name": "border-accent",
+					"description": "`[data-card~=\"border-accent\"]`"
+				},
+				{
+					"name": "padding-0",
+					"description": "`[data-card~=\"padding-0\"]`"
+				},
+				{
+					"name": "padding-1",
+					"description": "`[data-card~=\"padding-1\"]`"
+				},
+				{
+					"name": "padding-2",
+					"description": "`[data-card~=\"padding-2\"]`"
+				},
+				{
+					"name": "padding-3",
+					"description": "`[data-card~=\"padding-3\"]`"
+				},
+				{
+					"name": "padding-4",
+					"description": "`[data-card~=\"padding-4\"]`"
+				},
+				{
+					"name": "padding-5",
+					"description": "`[data-card~=\"padding-5\"]`"
+				},
+				{
+					"name": "padding-6",
+					"description": "`[data-card~=\"padding-6\"]`"
+				},
+				{
+					"name": "padding-7",
+					"description": "`[data-card~=\"padding-7\"]`"
+				},
+				{
+					"name": "padding-8",
+					"description": "`[data-card~=\"padding-8\"]`"
+				},
+				{
+					"name": "radius-1",
+					"description": "`[data-card~=\"radius-1\"]`"
+				},
+				{
+					"name": "radius-2",
+					"description": "`[data-card~=\"radius-2\"]`"
+				},
+				{
+					"name": "radius-3",
+					"description": "`[data-card~=\"radius-3\"]`"
+				},
+				{
+					"name": "radius-4",
+					"description": "`[data-card~=\"radius-4\"]`"
+				},
+				{
+					"name": "radius-6",
+					"description": "`[data-card~=\"radius-6\"]`"
+				},
+				{
+					"name": "radius-8",
+					"description": "`[data-card~=\"radius-8\"]`"
+				},
+				{
+					"name": "secondary",
+					"description": "`[data-card~=\"secondary\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-collapsible",
+			"description": "## [data-collapsible]\n\nShared disclosure / accordion styling for native `<details>` and optional `[data-collapsible]` wrappers. Disclosure animation and summary chevron apply to `<details>`. `[data-collapsible]` documents the hook and can mark optional wrappers if you add them in markup.\n\n### Applied to\n- `<details>`\n\n### Examples\n- Native disclosure (`details` picks up animation and summary chrome — omit `[data-collapsible]` when you do not need the hook):\n  ```html\n  <details>\n    <summary>More</summary>\n    <p>Hidden body.</p>\n  </details>\n  ```\n- `[data-collapsible]` + `[data-card]` padding split between summary and body:\n  ```html\n  <details data-card=\"padding-6\">\n    <summary data-row=\"wrap wrap-first-last\">Title row</summary>\n    <p>Body</p>\n  </details>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-collapsible]`"
+		},
+		{
+			"name": "data-column",
+			"description": "## [data-column]\n\nOne-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the\nsame column/grid defaults before card-specific rules apply below. Single-column grid with theme gap and alignment defaults. Add space-separated tokens on `[data-column]`.\n\n### Applied to\n- `[data-card]`\n\n### Tokens\n- alignment: `start`, `center`, `end`\n- spacing: `gap-0`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `gap-6`, `gap-8`\n\n### Examples\n- Default column grid (`1em` gap, start-aligned content):\n  ```html\n  <section data-column>\n    <h2>Overview</h2>\n    <p>Supporting copy.</p>\n  </section>\n  ```\n- Start-aligned items, tighter gap (`gap-2`):\n  ```html\n  <section data-column=\"start gap-2\">\n    <h2>Overview</h2>\n    <p>Supporting copy.</p>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`",
+			"values": [
+				{
+					"name": "center",
+					"description": "`[data-column~=\"center\"]`"
+				},
+				{
+					"name": "end",
+					"description": "`[data-column~=\"end\"]`"
+				},
+				{
+					"name": "gap-0",
+					"description": "`[data-column~=\"gap-0\"]`"
+				},
+				{
+					"name": "gap-1",
+					"description": "`[data-column~=\"gap-1\"]`"
+				},
+				{
+					"name": "gap-2",
+					"description": "`[data-column~=\"gap-2\"]`"
+				},
+				{
+					"name": "gap-3",
+					"description": "`[data-column~=\"gap-3\"]`"
+				},
+				{
+					"name": "gap-4",
+					"description": "`[data-column~=\"gap-4\"]`"
+				},
+				{
+					"name": "gap-5",
+					"description": "`[data-column~=\"gap-5\"]`"
+				},
+				{
+					"name": "gap-6",
+					"description": "`[data-column~=\"gap-6\"]`"
+				},
+				{
+					"name": "gap-8",
+					"description": "`[data-column~=\"gap-8\"]`"
+				},
+				{
+					"name": "start",
+					"description": "`[data-column~=\"start\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-input",
+			"description": "## [data-input]\n\nShared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.\n\n### Applied to\n- `<button>`\n- `<select>`\n- `<input>`\n- `<label>` wrapping checkbox or radio inputs\n\n### Examples\n- Native control (no `[data-input]`):\n  ```html\n  <button type=\"button\">Save</button>\n  ```\n  ```html\n  <select>\n    <option>First</option>\n    <option>Second</option>\n  </select>\n  ```\n- Non-control host that should look like a control:\n  ```html\n  <span data-input role=\"button\" tabindex=\"0\">Custom</span>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-input]`"
+		},
+		{
+			"name": "data-link",
+			"description": "## [data-link]\n\nShared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.\n\n### Tokens\n- `camouflaged`, `contents`.\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n\n### Examples\n- Default link (`<a>` — no `[data-link]`):\n  ```html\n  <a href=\"https://example.com/article\">Read the article</a>\n  ```\n- `camouflaged` (inherits text color until hover):\n  ```html\n  <a data-link=\"camouflaged\" href=\"#footnote\">Footnote</a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`",
+			"values": [
+				{
+					"name": "camouflaged",
+					"description": "`[data-link~=\"camouflaged\"]`"
+				},
+				{
+					"name": "contents",
+					"description": "`[data-link~=\"contents\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-list",
+			"description": "## [data-list]\n\nList layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.\n\n### Placement\n- On the list host: `[data-list]`, `ul`, or `ol` (including inside `[data-card]`).\n\n### Tokens\n- list gap: `gap-0` … `gap-6`\n\n### CSS Variables\n- `--list-marker-inlineSize`\n- `--list-markerGap`\n- `--list-gap`\n\n### Examples\n- Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):\n  ```html\n  <ul>\n    <li>First item</li>\n    <li>Second item</li>\n  </ul>\n  ```\n- Tighter list gap (`gap-0`; default without a token is `0.5lh`):\n  ```html\n  <ul data-list=\"gap-0\">\n    <li>First</li>\n    <li>Second</li>\n  </ul>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`",
+			"values": [
+				{
+					"name": "gap-0",
+					"description": "`[data-list~=\"gap-0\"]`"
+				},
+				{
+					"name": "gap-1",
+					"description": "`[data-list~=\"gap-1\"]`"
+				},
+				{
+					"name": "gap-2",
+					"description": "`[data-list~=\"gap-2\"]`"
+				},
+				{
+					"name": "gap-3",
+					"description": "`[data-list~=\"gap-3\"]`"
+				},
+				{
+					"name": "gap-4",
+					"description": "`[data-list~=\"gap-4\"]`"
+				},
+				{
+					"name": "gap-5",
+					"description": "`[data-list~=\"gap-5\"]`"
+				},
+				{
+					"name": "gap-6",
+					"description": "`[data-list~=\"gap-6\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-list-item",
+			"description": "## [data-list-item]\n\nList layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.\n\n### Placement\n- On the list host: `[data-list]`, `ul`, or `ol` (including inside `[data-card]`).\n\n### Tokens\n- list gap: `gap-0` … `gap-6`\n\n### CSS Variables\n- `--list-marker-inlineSize`\n- `--list-markerGap`\n- `--list-gap`\n\n### Examples\n- Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):\n  ```html\n  <ul>\n    <li>First item</li>\n    <li>Second item</li>\n  </ul>\n  ```\n- Tighter list gap (`gap-0`; default without a token is `0.5lh`):\n  ```html\n  <ul data-list=\"gap-0\">\n    <li>First</li>\n    <li>Second</li>\n  </ul>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`\n\n---\n\nList row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.\n\n### Placement\n- Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.\n- `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).\n\n### Tokens\n- item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`\n- marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)\n\n### CSS Variables\n- `--listItem-gap` (per row, driven by `[data-list-item]`)\n\n### Examples\n- Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):\n  ```html\n  <ul>\n    <li data-list-item=\"gap-4\">\n      <p>Lead</p>\n      <p>Detail</p>\n    </li>\n  </ul>\n  ```\n- Custom marker string (`[data-list-item-marker]`):\n  ```html\n  <ul>\n    <li data-list-item-marker=\"*\">First step</li>\n    <li data-list-item-marker=\"1.\">Second step</li>\n  </ul>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`",
+			"values": [
+				{
+					"name": "gap-0",
+					"description": "`[data-list-item~=\"gap-0\"]`"
+				},
+				{
+					"name": "gap-1",
+					"description": "`[data-list-item~=\"gap-1\"]`"
+				},
+				{
+					"name": "gap-2",
+					"description": "`[data-list-item~=\"gap-2\"]`"
+				},
+				{
+					"name": "gap-3",
+					"description": "`[data-list-item~=\"gap-3\"]`"
+				},
+				{
+					"name": "gap-4",
+					"description": "`[data-list-item~=\"gap-4\"]`"
+				},
+				{
+					"name": "gap-5",
+					"description": "`[data-list-item~=\"gap-5\"]`"
+				},
+				{
+					"name": "gap-6",
+					"description": "`[data-list-item~=\"gap-6\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-list-item-marker",
+			"description": "## [data-list-item-marker]\n\nList layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.\n\n### Placement\n- On the list host: `[data-list]`, `ul`, or `ol` (including inside `[data-card]`).\n\n### Tokens\n- list gap: `gap-0` … `gap-6`\n\n### CSS Variables\n- `--list-marker-inlineSize`\n- `--list-markerGap`\n- `--list-gap`\n\n### Examples\n- Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):\n  ```html\n  <ul>\n    <li>First item</li>\n    <li>Second item</li>\n  </ul>\n  ```\n- Tighter list gap (`gap-0`; default without a token is `0.5lh`):\n  ```html\n  <ul data-list=\"gap-0\">\n    <li>First</li>\n    <li>Second</li>\n  </ul>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`\n\n---\n\nList row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.\n\n### Placement\n- Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.\n- `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).\n\n### Tokens\n- item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`\n- marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)\n\n### CSS Variables\n- `--listItem-gap` (per row, driven by `[data-list-item]`)\n\n### Examples\n- Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):\n  ```html\n  <ul>\n    <li data-list-item=\"gap-4\">\n      <p>Lead</p>\n      <p>Detail</p>\n    </li>\n  </ul>\n  ```\n- Custom marker string (`[data-list-item-marker]`):\n  ```html\n  <ul>\n    <li data-list-item-marker=\"*\">First step</li>\n    <li data-list-item-marker=\"1.\">Second step</li>\n  </ul>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`"
+		},
+		{
+			"name": "data-pressable",
+			"description": "## [data-pressable]\n\nConsistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.\n\n### Tokens\n- `to-containing`\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Examples\n- `to-containing` (press feedback covers the containing block — useful on block-level links):\n  ```html\n  <a data-pressable=\"to-containing\" href=\"#section\">\n    Jump to section\n  </a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
+			"values": [
+				{
+					"name": "to-containing",
+					"description": "`[data-pressable~=\"to-containing\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-row",
+			"description": "## [data-row]\n\nFlex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.\n\n### Placement\n- On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `[data-row-item]` children).\n\n### Tokens\n- container: `start`, `center`, `end`\n- cross-axis: `align-start`, `align-center`, `align-end`\n- gap: `gap-0` … `gap-8`\n- wrap: `wrap`, `wrap-first-last`\n\n### Examples\n- Default row (`space-between`, `1em` gap):\n  ```html\n  <div data-row>\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n- Centered main axis, tighter gap, wrap:\n  ```html\n  <div data-row=\"center gap-2 wrap\">\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`",
+			"values": [
+				{
+					"name": "align-center",
+					"description": "`[data-row~=\"align-center\"]`"
+				},
+				{
+					"name": "align-end",
+					"description": "`[data-row~=\"align-end\"]`"
+				},
+				{
+					"name": "align-start",
+					"description": "`[data-row~=\"align-start\"]`"
+				},
+				{
+					"name": "center",
+					"description": "`[data-row~=\"center\"]`"
+				},
+				{
+					"name": "end",
+					"description": "`[data-row~=\"end\"]`"
+				},
+				{
+					"name": "gap-0",
+					"description": "`[data-row~=\"gap-0\"]`"
+				},
+				{
+					"name": "gap-1",
+					"description": "`[data-row~=\"gap-1\"]`"
+				},
+				{
+					"name": "gap-2",
+					"description": "`[data-row~=\"gap-2\"]`"
+				},
+				{
+					"name": "gap-3",
+					"description": "`[data-row~=\"gap-3\"]`"
+				},
+				{
+					"name": "gap-4",
+					"description": "`[data-row~=\"gap-4\"]`"
+				},
+				{
+					"name": "gap-5",
+					"description": "`[data-row~=\"gap-5\"]`"
+				},
+				{
+					"name": "gap-6",
+					"description": "`[data-row~=\"gap-6\"]`"
+				},
+				{
+					"name": "gap-8",
+					"description": "`[data-row~=\"gap-8\"]`"
+				},
+				{
+					"name": "start",
+					"description": "`[data-row~=\"start\"]`"
+				},
+				{
+					"name": "wrap",
+					"description": "`[data-row~=\"wrap\"]`"
+				},
+				{
+					"name": "wrap-first-last",
+					"description": "`[data-row~=\"wrap-first-last\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-row-item",
+			"description": "## [data-row-item]\n\nFlex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.\n\n### Placement\n- On `[data-row]`, `[data-badge]`, or `<summary>` when it is the flex row container (not on `[data-row-item]` children).\n\n### Tokens\n- container: `start`, `center`, `end`\n- cross-axis: `align-start`, `align-center`, `align-end`\n- gap: `gap-0` … `gap-8`\n- wrap: `wrap`, `wrap-first-last`\n\n### Examples\n- Default row (`space-between`, `1em` gap):\n  ```html\n  <div data-row>\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n- Centered main axis, tighter gap, wrap:\n  ```html\n  <div data-row=\"center gap-2 wrap\">\n    <span>Label</span>\n    <span>Value</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`\n\n---\n\nFlex row child: basis, flex growth, and wrap-axis alignment tokens read by the parent `[data-row]` / `[data-badge]` / `<summary>` flex shell.\n\n### Placement\n- Direct child of `[data-row]`, `[data-badge]`, or `<summary>` when that parent establishes the row flex container.\n\n### Tokens\n- growth: `flexible`\n- basis: `basis-1`..`basis-6`, `basis-full`\n- wrap alignment: `wrap-start`, `wrap-center`, `wrap-end`\n\n### Examples\n- `basis-3` + `flexible`:\n  ```html\n  <div data-row>\n    <span data-row-item=\"basis-3 flexible\">Sidebar</span>\n    <span>Main</span>\n  </div>\n  ```\n- `wrap-end` on a wrapped row:\n  ```html\n  <div data-row=\"wrap\">\n    <span>Title</span>\n    <span data-row-item=\"wrap-end\">Action</span>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row-item]`",
+			"values": [
+				{
+					"name": "basis-1",
+					"description": "`[data-row-item~=\"basis-1\"]`"
+				},
+				{
+					"name": "basis-2",
+					"description": "`[data-row-item~=\"basis-2\"]`"
+				},
+				{
+					"name": "basis-3",
+					"description": "`[data-row-item~=\"basis-3\"]`"
+				},
+				{
+					"name": "basis-4",
+					"description": "`[data-row-item~=\"basis-4\"]`"
+				},
+				{
+					"name": "basis-5",
+					"description": "`[data-row-item~=\"basis-5\"]`"
+				},
+				{
+					"name": "basis-6",
+					"description": "`[data-row-item~=\"basis-6\"]`"
+				},
+				{
+					"name": "basis-full",
+					"description": "`[data-row-item~=\"basis-full\"]`"
+				},
+				{
+					"name": "flexible",
+					"description": "`[data-row-item~=\"flexible\"]`"
+				},
+				{
+					"name": "wrap-center",
+					"description": "`[data-row-item~=\"wrap-center\"]`"
+				},
+				{
+					"name": "wrap-end",
+					"description": "`[data-row-item~=\"wrap-end\"]`"
+				},
+				{
+					"name": "wrap-start",
+					"description": "`[data-row-item~=\"wrap-start\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-scroll-container",
+			"description": "## [data-scroll-container]\n\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.\n\n### Placement\n- On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Examples\n- Default (both axes scrollable; omit `block` / `inline` when this matches your layout):\n  ```html\n  <main data-scroll-container>\n    <section>\n      <p>Content</p>\n    </section>\n  </main>\n  ```\n- Vertical scroll region (`block`):\n  ```html\n  <main data-scroll-container=\"block\">\n    <section>\n      <p>Panel</p>\n    </section>\n  </main>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-container]`\n\n---\n\nSticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.\n\n### Placement\n- Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).\n\n### CSS Variables\n- `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`\n- `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`\n- `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`\n\n### Examples\n- Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):\n  ```html\n  <aside data-sticky-container>\n    <nav data-sticky=\"block-start\">Sidebar</nav>\n  </aside>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`\n\n---\n\nSticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.\n\n### Placement\n- On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).\n\n### Tokens\n- axis: `block`, `inline`\n- block edges: `block-start`, `block-end`\n- inline edges: `inline-start`, `inline-end`\n- backdrop: `backdrop-none`, `backdrop-always`\n\n### CSS Variables\n- `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`\n\n### Examples\n- Default block-axis sticky (omit edge tokens when both block edges are fine):\n  ```html\n  <header data-sticky>\n    <h1>Title</h1>\n  </header>\n  ```\n- `block-start` (narrow column sidebar):\n  ```html\n  <nav data-sticky=\"block-start\">Sections</nav>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`",
+			"values": [
+				{
+					"name": "block",
+					"description": "`[data-scroll-container~=\"block\"]`"
+				},
+				{
+					"name": "inline",
+					"description": "`[data-scroll-container~=\"inline\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-scroll-item",
+			"description": "## [data-scroll-item]\n\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.\n\n### Placement\n- On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Examples\n- Default (both axes scrollable; omit `block` / `inline` when this matches your layout):\n  ```html\n  <main data-scroll-container>\n    <section>\n      <p>Content</p>\n    </section>\n  </main>\n  ```\n- Vertical scroll region (`block`):\n  ```html\n  <main data-scroll-container=\"block\">\n    <section>\n      <p>Panel</p>\n    </section>\n  </main>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-container]`\n\n---\n\nSticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.\n\n### Placement\n- Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).\n\n### CSS Variables\n- `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`\n- `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`\n- `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`\n\n### Examples\n- Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):\n  ```html\n  <aside data-sticky-container>\n    <nav data-sticky=\"block-start\">Sidebar</nav>\n  </aside>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`\n\n---\n\nScroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.\n\n### Placement\n- On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).\n\n### Tokens\n- width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`\n- attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`\n- snap / size: `snap-block-start`, `snap-block-end`, `block-size-max`, `inline-size-max`\n\n### Examples\n- Bleed + block-end padding match (`inline-detached` + `padding-match-end`):\n  ```html\n  <section data-scroll-item=\"inline-detached padding-match-end\">\n    <figure>\n      <img src=\"figure.png\" alt=\"\" />\n    </figure>\n  </section>\n  ```\n- Scroll snap at block start:\n  ```html\n  <section data-scroll-item=\"snap-block-start\">\n    <h2>Panel</h2>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`",
+			"values": [
+				{
+					"name": "block-size-max",
+					"description": "`[data-scroll-item~=\"block-size-max\"]`"
+				},
+				{
+					"name": "inline-attached",
+					"description": "`[data-scroll-item~=\"inline-attached\"]`"
+				},
+				{
+					"name": "inline-detached",
+					"description": "`[data-scroll-item~=\"inline-detached\"]`"
+				},
+				{
+					"name": "inline-size-max",
+					"description": "`[data-scroll-item~=\"inline-size-max\"]`"
+				},
+				{
+					"name": "overflow-center",
+					"description": "`[data-scroll-item~=\"overflow-center\"]`"
+				},
+				{
+					"name": "overflow-end",
+					"description": "`[data-scroll-item~=\"overflow-end\"]`"
+				},
+				{
+					"name": "overflow-start",
+					"description": "`[data-scroll-item~=\"overflow-start\"]`"
+				},
+				{
+					"name": "padding-match-end",
+					"description": "`[data-scroll-item~=\"padding-match-end\"]`"
+				},
+				{
+					"name": "padding-match-start",
+					"description": "`[data-scroll-item~=\"padding-match-start\"]`"
+				},
+				{
+					"name": "snap-block-end",
+					"description": "`[data-scroll-item~=\"snap-block-end\"]`"
+				},
+				{
+					"name": "snap-block-start",
+					"description": "`[data-scroll-item~=\"snap-block-start\"]`"
+				},
+				{
+					"name": "underflow-center",
+					"description": "`[data-scroll-item~=\"underflow-center\"]`"
+				},
+				{
+					"name": "underflow-end",
+					"description": "`[data-scroll-item~=\"underflow-end\"]`"
+				},
+				{
+					"name": "underflow-start",
+					"description": "`[data-scroll-item~=\"underflow-start\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-stack",
+			"description": "## [data-stack]\n\nOverlay direct children in one shared grid cell (`grid-area: stack`). Presence only (no tokens).\n\n### Examples\n- Badge over media:\n  ```html\n  <div data-stack>\n    <img src=\"cover.jpg\" alt=\"\" />\n    <span>New</span>\n  </div>\n  ```\n- Image, overlay, caption in one cell:\n  ```html\n  <div data-stack>\n    <img src=\"hero.png\" alt=\"\" />\n    <div class=\"overlay\"></div>\n    <p>Caption</p>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-stack]`"
+		},
+		{
+			"name": "data-sticky",
+			"description": "## [data-sticky]\n\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.\n\n### Placement\n- On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Examples\n- Default (both axes scrollable; omit `block` / `inline` when this matches your layout):\n  ```html\n  <main data-scroll-container>\n    <section>\n      <p>Content</p>\n    </section>\n  </main>\n  ```\n- Vertical scroll region (`block`):\n  ```html\n  <main data-scroll-container=\"block\">\n    <section>\n      <p>Panel</p>\n    </section>\n  </main>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-container]`\n\n---\n\nSticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.\n\n### Placement\n- Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).\n\n### CSS Variables\n- `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`\n- `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`\n- `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`\n\n### Examples\n- Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):\n  ```html\n  <aside data-sticky-container>\n    <nav data-sticky=\"block-start\">Sidebar</nav>\n  </aside>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`\n\n---\n\nSticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.\n\n### Placement\n- On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).\n\n### Tokens\n- axis: `block`, `inline`\n- block edges: `block-start`, `block-end`\n- inline edges: `inline-start`, `inline-end`\n- backdrop: `backdrop-none`, `backdrop-always`\n\n### CSS Variables\n- `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`\n\n### Examples\n- Default block-axis sticky (omit edge tokens when both block edges are fine):\n  ```html\n  <header data-sticky>\n    <h1>Title</h1>\n  </header>\n  ```\n- `block-start` (narrow column sidebar):\n  ```html\n  <nav data-sticky=\"block-start\">Sections</nav>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`",
+			"values": [
+				{
+					"name": "backdrop-always",
+					"description": "`[data-sticky~=\"backdrop-always\"]`"
+				},
+				{
+					"name": "backdrop-none",
+					"description": "`[data-sticky~=\"backdrop-none\"]`"
+				},
+				{
+					"name": "block",
+					"description": "`[data-sticky~=\"block\"]`"
+				},
+				{
+					"name": "block-end",
+					"description": "`[data-sticky~=\"block-end\"]`"
+				},
+				{
+					"name": "block-start",
+					"description": "`[data-sticky~=\"block-start\"]`"
+				},
+				{
+					"name": "inline",
+					"description": "`[data-sticky~=\"inline\"]`"
+				},
+				{
+					"name": "inline-end",
+					"description": "`[data-sticky~=\"inline-end\"]`"
+				},
+				{
+					"name": "inline-start",
+					"description": "`[data-sticky~=\"inline-start\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-sticky-container",
+			"description": "## [data-sticky-container]\n\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.\n\n### Placement\n- On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Examples\n- Default (both axes scrollable; omit `block` / `inline` when this matches your layout):\n  ```html\n  <main data-scroll-container>\n    <section>\n      <p>Content</p>\n    </section>\n  </main>\n  ```\n- Vertical scroll region (`block`):\n  ```html\n  <main data-scroll-container=\"block\">\n    <section>\n      <p>Panel</p>\n    </section>\n  </main>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-container]`\n\n---\n\nSticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.\n\n### Placement\n- Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).\n\n### CSS Variables\n- `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`\n- `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`\n- `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`\n\n### Examples\n- Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):\n  ```html\n  <aside data-sticky-container>\n    <nav data-sticky=\"block-start\">Sidebar</nav>\n  </aside>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`\n\n---\n\nScroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.\n\n### Placement\n- On descendants inside `[data-sticky-container]` that need snap, bleed, or overflow alignment (not on the scroll root itself).\n\n### Tokens\n- width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`\n- attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`\n- snap / size: `snap-block-start`, `snap-block-end`, `block-size-max`, `inline-size-max`\n\n### Examples\n- Bleed + block-end padding match (`inline-detached` + `padding-match-end`):\n  ```html\n  <section data-scroll-item=\"inline-detached padding-match-end\">\n    <figure>\n      <img src=\"figure.png\" alt=\"\" />\n    </figure>\n  </section>\n  ```\n- Scroll snap at block start:\n  ```html\n  <section data-scroll-item=\"snap-block-start\">\n    <h2>Panel</h2>\n  </section>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`"
+		},
+		{
+			"name": "data-tag",
+			"description": "## [data-tag]\n\nSemantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.\n\n### Tokens\n- `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`\n\n### CSS Variables\n- `--tag-backgroundColor`\n- `--tag-textColor`\n- `--tag-borderColor`\n- `--tag-hover-backgroundColor`\n- `--tag-hover-textColor`\n- `--tag-hover-borderColor`\n\n### Examples\n- Neutral palette (omit category token):\n  ```html\n  <span data-tag>Label</span>\n  ```\n- `eip` family:\n  ```html\n  <button type=\"button\" data-tag=\"eip\">EIP-7702</button>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`",
+			"values": [
+				{
+					"name": "account-type",
+					"description": "`[data-tag~=\"account-type\"]`"
+				},
+				{
+					"name": "eip",
+					"description": "`[data-tag~=\"eip\"]`"
+				},
+				{
+					"name": "eip-status",
+					"description": "`[data-tag~=\"eip-status\"]`"
+				},
+				{
+					"name": "eoa",
+					"description": "`[data-tag~=\"eoa\"]`"
+				},
+				{
+					"name": "manufacture-type",
+					"description": "`[data-tag~=\"manufacture-type\"]`"
+				},
+				{
+					"name": "wallet-type",
+					"description": "`[data-tag~=\"wallet-type\"]`"
+				}
+			]
+		}
+	]
+}

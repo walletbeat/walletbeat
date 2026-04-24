@@ -1,0 +1,40 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"name": "Ambire Web3 Wallet",
+	"short_name": "Ambire",
+	"author": "https://www.ambire.com",
+	"version": "6.2.5",
+	"manifest_version": 3,
+	"permissions": [
+		"storage",
+		"tabs",
+		"unlimitedStorage",
+		"activeTab",
+		"notifications",
+		"scripting",
+		"alarms",
+		"system.display"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"icons": {
+		"16": "assets/images/xicon@16.png",
+		"48": "assets/images/xicon@48.png",
+		"96": "assets/images/xicon@96.png",
+		"128": "assets/images/xicon@128.png"
+	},
+	"action": {
+		"default_title": "Ambire",
+		"default_popup": "index.html"
+	},
+	"host_permissions": ["http://*/*", "https://*/*", "file://*/*", "wss://*/*"],
+	"externally_connectable": {
+		"ids": ["*"]
+	},
+	"description": "Fast & secure Web3 wallet to supercharge your account on Ethereum and EVM networks.",
+	"content_security_policy": {
+		"extension_pages": "frame-ancestors 'none'; script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+	},
+	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlwZ7qZgCF3auOrcgsBzkCi2Ex5yYKYTS3ruUdgXxuXKZiu9rn+KSpAqOVuT07G446AW15Gqxm39XVOmwBaN6/uZhnmekcSYzrcuSxbeFJwJ5lg28KrBx0Htx79LmsFTCPGzuuJG9SdNhL+QDlrLBxwWehKyRIgHrVQfypD1gD3URIHSgDkeF3uUdkHvDa8uM8V2Tw4K6AqqvtXh3sGIJ3LUxwxD6Ag7eULxm+c2rYY5aLp7wTP0wULQXdYipYptAQsSlVdTerLo9s+wchtC3MBG9LRgcQZqJwrxaaoJ8qkNIZ+mXnVVbJtDoJAnqfaZJniodpTImTxAYbehge6i79QIDAQAB"
+}

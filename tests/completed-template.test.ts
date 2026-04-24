@@ -17,7 +17,7 @@ describe('completed.tmpl', () => {
 			}
 
 			const { attribute, evaluation } = evalAttr
-			const { rating } = evaluation.value
+			const { rating } = evaluation.outcome
 
 			/**
 			 * Pass or exempt for attributes that are only for hardware wallets.

@@ -45,6 +45,16 @@ export const allRatedWallets = Object.fromEntries(
 	Object.entries(allWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 )
 
+/** All rated wallets keyed by their slug (metadata.id). */
+export const allRatedWalletsBySlug: Record<string, RatedWallet> = Object.fromEntries(
+	Object.entries(allWallets).map(([, wallet]) => [wallet.metadata.id, rateWallet(wallet)]),
+)
+
+/** Check if a string is a valid wallet slug (metadata.id). */
+export function isValidWalletSlug(slug: string): slug is keyof typeof allRatedWalletsBySlug {
+	return Object.prototype.hasOwnProperty.call(allRatedWalletsBySlug, slug)
+}
+
 /**
  * Map the given function to all rated wallets.
  */

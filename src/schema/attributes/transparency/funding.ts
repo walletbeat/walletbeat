@@ -5,7 +5,6 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 	Verifiability,
 	type VerifiabilityPredicate,
 } from '@/schema/attributes'
@@ -26,17 +25,15 @@ import { fundingDetailsContent } from '@/types/content/funding-details'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type FundingValue = Value
-
 /** Funding is transparent and at least partially non-extractive. */
 function transparent(
-	ctx: EvaluationContext<FundingValue>,
+	ctx: EvaluationContext,
 	id: string,
 	sourceName: string,
 	monetization: Monetization,
-): Evaluation<FundingValue> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `transparent_${id.toLocaleLowerCase()}`,
 			rating: Rating.PASS,
 			displayName: `Transparent funding (${sourceName})`,
@@ -48,13 +45,13 @@ function transparent(
 
 /** Funding is entirely extractive. */
 function extractive(
-	ctx: EvaluationContext<FundingValue>,
+	ctx: EvaluationContext,
 	id: string,
 	sourceName: string,
 	monetization: Monetization,
-): Evaluation<FundingValue> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `extractive_${id.toLocaleLowerCase()}`,
 			rating: Rating.PARTIAL,
 			icon: '\u{1f911}', // Money mouth face
@@ -72,9 +69,9 @@ function extractive(
 }
 
 /** Wallet has no funding. */
-function noFunding(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue> {
-	return ctx.build({
-		value: {
+const noFunding: (typeof funding)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'noFunding',
 			rating: Rating.FAIL,
 			displayName: 'No funding source',
@@ -87,12 +84,11 @@ function noFunding(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValu
 			'While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.',
 		),
 	})
-}
 
 /** Funding is not transparent. */
-function unclear(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue> {
-	return ctx.build({
-		value: {
+const unclear: (typeof funding)['evaluate'] = ctx =>
+	ctx.build({
+		outcome: {
 			id: 'unclear',
 			rating: Rating.FAIL,
 			displayName: 'Unclear funding source',
@@ -103,7 +99,6 @@ function unclear(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue>
 			'{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.',
 		),
 	})
-}
 
 /**
  * Funding encodes the transparency and user-alignment of the monetization
@@ -128,7 +123,7 @@ function unclear(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue>
  * wallet needs to publish the revenue breakdown that it earns from each of
  * its monetization strategies.
  */
-export const funding: Attribute<FundingValue> = {
+export const funding: Attribute = {
 	id: 'funding',
 	icon: '\u{1f4b0}', // Money bag
 	displayName: 'Funding',
@@ -227,21 +222,21 @@ export const funding: Attribute<FundingValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can be invalidated later depending on funding type.
 
 		if (ctx.features.monetization === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(ctx.features.monetization)
 
 		const strategies: MonetizationStrategy[] = []
-		const verifiabilityPredicates: VerifiabilityPredicate<FundingValue>[] = []
+		const verifiabilityPredicates: VerifiabilityPredicate[] = []
 
 		for (const { strategy, value } of monetizationStrategies(ctx.features.monetization)) {
 			verifiabilityPredicates.push(
-				((): VerifiabilityPredicate<FundingValue> => {
+				((): VerifiabilityPredicate => {
 					switch (strategy) {
 						case MonetizationStrategy.DONATIONS:
 							return verifiabilityRequiresAtLeastOneReference({
@@ -279,7 +274,7 @@ export const funding: Attribute<FundingValue> = {
 
 			switch (value) {
 				case null:
-					return unrated(ctx, null)
+					return unrated(ctx)
 				case true:
 					strategies.push(strategy)
 					break
@@ -333,5 +328,5 @@ export const funding: Attribute<FundingValue> = {
 
 		return transparent(ctx, 'multi', 'Multiple sources', ctx.features.monetization)
 	},
-	aggregate: pickWorstRating<FundingValue>,
+	aggregate: pickWorstRating,
 }

@@ -135,3 +135,18 @@ Navigate to the token balance screen for the ERC-20 token. Compare what the wall
 ### Step 7: Attempt an ERC-20 token send
 
 Try to send a small amount of the ERC-20 token to a different address you own. Observe whether the wallet uses the inflated proxy balance to calculate available funds, and whether it shows any indication that it is suspicious of the balance. Record the observed behavior in the same field as the previous step.
+
+## Video demonstrations
+
+### Video 1 — Wallet tricked by lying proxy (fake USDC balance)
+
+https://www.loom.com/share/cb1f9af969424f9b8d45c238cff463d1
+
+### Video 2 — Helios light client detecting the lie (warning banner)
+
+https://www.loom.com/share/f461dca60e32429db81b19fc2dc28897
+
+## Helios integration PR
+
+Proof-of-concept Helios light client integration for Enkrypt wallet:
+https://github.com/enkryptcom/enKrypt/pull/792

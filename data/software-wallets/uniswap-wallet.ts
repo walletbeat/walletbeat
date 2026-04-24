@@ -15,7 +15,7 @@ import type { CalendarDate } from '@/types/date'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
-		id: 'uniswapWallet',
+		id: 'uniswap-wallet',
 		displayName: 'Uniswap Wallet',
 		tableName: 'Uniswap',
 		blurb: paragraph(`
@@ -140,6 +140,7 @@ export const uniswapWallet: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

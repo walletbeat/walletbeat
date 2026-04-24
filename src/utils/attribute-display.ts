@@ -1,8 +1,10 @@
-import type { Attribute, Value } from '@/schema/attributes'
+import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
 import { renderTypographicContentToString } from '@/types/content'
 import { collapseToSingleLine } from '@/utils/markdown-utils'
 
-export function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V>): string {
+export function getHowIsEvaluatedHeading<_OutcomeMetadata extends OutcomeMetadata>(
+	attribute: Attribute<_OutcomeMetadata>,
+): string {
 	const { wording } = attribute
 
 	if (wording.midSentenceName === null) {
@@ -12,7 +14,9 @@ export function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V
 	return `How is ${wording.midSentenceName} evaluated?`
 }
 
-export function getWhyItMattersHeading<V extends Value>(attribute: Attribute<V>): string {
+export function getWhyItMattersHeading<_OutcomeMetadata extends OutcomeMetadata>(
+	attribute: Attribute<_OutcomeMetadata>,
+): string {
 	const { wording } = attribute
 
 	if (wording.midSentenceName === null) {
@@ -22,8 +26,8 @@ export function getWhyItMattersHeading<V extends Value>(attribute: Attribute<V>)
 	return `Why ${wording.midSentenceName} matters`
 }
 
-export function getHowToImproveHeading<V extends Value>(
-	attribute: Attribute<V>,
+export function getHowToImproveHeading<_OutcomeMetadata extends OutcomeMetadata>(
+	attribute: Attribute<_OutcomeMetadata>,
 	walletName: string,
 ): string {
 	const { wording } = attribute

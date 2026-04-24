@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import { Enum } from '@/utils/enum'
 
 /**
  * How the wallet stores the user's private key.
@@ -32,7 +33,7 @@ export enum KeyStorageMechanism {
 	 * No private key is stored on the device. The wallet uses passkey-managed
 	 * smart contract accounts
 	 */
-	NO_KEY_STORED = 'NO_KEY_STORED',
+	PASSKEY_MANAGED = 'PASSKEY_MANAGED',
 }
 
 /**
@@ -81,6 +82,9 @@ export enum BrowserExtensionPermission {
 	/** Access the currently active tab's URL, title, and favicon. */
 	ACTIVE_TAB = 'activeTab',
 
+	/** Schedule periodic or one-time callbacks via chrome.alarms. */
+	ALARMS = 'alarms',
+
 	/** Read and modify browser bookmarks. */
 	BOOKMARKS = 'bookmarks',
 
@@ -92,6 +96,9 @@ export enum BrowserExtensionPermission {
 
 	/** Write to the clipboard without a user gesture. */
 	CLIPBOARD_WRITE = 'clipboardWrite',
+
+	/** Add items to the browser's right-click context menu. */
+	CONTEXT_MENUS = 'contextMenus',
 
 	/** Read and modify cookies for all accessible hosts. */
 	COOKIES = 'cookies',
@@ -114,6 +121,9 @@ export enum BrowserExtensionPermission {
 	/** Read the full browsing history. */
 	HISTORY = 'history',
 
+	/** Send and receive push messages via Google Cloud Messaging (legacy). */
+	GCM = 'gcm',
+
 	/** Access the user's Google Account identity (no email). */
 	IDENTITY = 'identity',
 
@@ -125,6 +135,12 @@ export enum BrowserExtensionPermission {
 
 	/** Send and receive messages from a native OS application. */
 	NATIVE_MESSAGING = 'nativeMessaging',
+
+	/** Show browser notifications to the user. */
+	NOTIFICATIONS = 'notifications',
+
+	/** Create offscreen documents for background DOM/audio/canvas operations. */
+	OFFSCREEN = 'offscreen',
 
 	/** Save a tab's full page as MHTML. */
 	PAGE_CAPTURE = 'pageCapture',
@@ -138,8 +154,23 @@ export enum BrowserExtensionPermission {
 	/** Inject scripts and CSS into pages programmatically. */
 	SCRIPTING = 'scripting',
 
+	/** Display content in the browser's side panel. */
+	SIDE_PANEL = 'sidePanel',
+
+	/** Persist key-value data in chrome.storage (local, sync, session). */
+	STORAGE = 'storage',
+
+	/** Query CPU processor information. */
+	SYSTEM_CPU = 'system.cpu',
+
+	/** Read and set the system's display configuration. */
+	SYSTEM_DISPLAY = 'system.display',
+
 	/** Read the URLs, titles, and favicons of all open tabs. */
 	TABS = 'tabs',
+
+	/** Remove the per-extension storage quota for local storage. */
+	UNLIMITED_STORAGE = 'unlimitedStorage',
 
 	/** Register user-supplied scripts that run in web pages. */
 	USER_SCRIPTS = 'userScripts',
@@ -235,7 +266,7 @@ export interface BrowserExtensionManifest {
 	 * Security-sensitive Browser API permissions declared in the `permissions`
 	 * manifest field, granted to the extension at install time.
 	 */
-	permissions: BrowserExtensionManifest[]
+	permissions: BrowserExtensionPermission[]
 
 	/**
 	 * Broadest scope of web origins that may load resources from this
@@ -249,6 +280,9 @@ export interface BrowserExtensionManifest {
 /**
  * Android permissions declared via `<uses-permission>` in AndroidManifest.xml.
  * Enum values match the android:name attribute string exactly.
+ *
+ * All permissions seen in any wallet manifest must be listed here, including
+ * non-security-relevant ones — the manifest collector throws on unknown values.
  */
 export enum AndroidPermission {
 	/** Required for any network communication. */
@@ -285,9 +319,26 @@ export enum AndroidPermission {
 	ACCESS_FINE_LOCATION = 'android.permission.ACCESS_FINE_LOCATION',
 }
 
+export const androidPermissions = new Enum<AndroidPermission>({
+	[AndroidPermission.INTERNET]: true,
+	[AndroidPermission.ACCESS_NETWORK_STATE]: true,
+	[AndroidPermission.SYSTEM_ALERT_WINDOW]: true,
+	[AndroidPermission.CAMERA]: true,
+	[AndroidPermission.RECORD_AUDIO]: true,
+	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: true,
+	[AndroidPermission.BLUETOOTH]: true,
+	[AndroidPermission.BLUETOOTH_ADMIN]: true,
+	[AndroidPermission.BLUETOOTH_CONNECT]: true,
+	[AndroidPermission.BLUETOOTH_SCAN]: true,
+	[AndroidPermission.ACCESS_FINE_LOCATION]: true,
+})
+
 /**
  * iOS usage description keys declared in Info.plist (NS*UsageDescription).
  * Enum values match the plist key string exactly.
+ *
+ * All keys seen in any wallet plist must be listed here, including
+ * non-security-relevant ones — the manifest collector throws on unknown values.
  */
 export enum IosUsageDescription {
 	/** Bluetooth access at all times. */
@@ -314,6 +365,17 @@ export enum IosUsageDescription {
 	/** Read images from the photo library. */
 	PHOTO_LIBRARY = 'NSPhotoLibraryUsageDescription',
 }
+
+export const iosUsageDescriptions = new Enum<IosUsageDescription>({
+	[IosUsageDescription.BLUETOOTH_ALWAYS]: true,
+	[IosUsageDescription.BLUETOOTH_PERIPHERAL]: true,
+	[IosUsageDescription.CAMERA]: true,
+	[IosUsageDescription.FACE_ID]: true,
+	[IosUsageDescription.LOCATION_WHEN_IN_USE]: true,
+	[IosUsageDescription.MICROPHONE]: true,
+	[IosUsageDescription.PHOTO_LIBRARY_ADD]: true,
+	[IosUsageDescription.PHOTO_LIBRARY]: true,
+})
 
 /**
  * Security-relevant fields from a mobile app's platform manifest.

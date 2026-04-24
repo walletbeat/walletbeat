@@ -11,6 +11,7 @@
 	} from '@/schema/stages'
 	import { isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
+	import { getWalletUrl } from '@/utils/wallet-url'
 	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 
@@ -133,7 +134,7 @@
 	{:else if stage === 'QUALIFIED_FOR_NO_STAGES'}
 		<header data-column="gap-2">
 			<h3 data-row="gap-2">
-				<a data-link="camouflaged" href={`/${wallet.metadata.id}/#stages`}>
+				<a data-link="camouflaged" href={getWalletUrl(wallet, { attributeAnchor: 'stages' })}>
 					<WalletStageBadge
 						stage={stage}
 						ladderEvaluation={ladderEvaluation}
@@ -147,7 +148,7 @@
 			<h3 data-row="gap-2 start">
 				<a
 					data-link="camouflaged"
-					href={`/${wallet.metadata.id}/#${displayStage.id}`}
+					href={getWalletUrl(wallet, { attributeAnchor: displayStage.id })}
 				>
 					<WalletStageBadge
 						stage={displayStage}
@@ -175,7 +176,7 @@
 					Criteria needed to advance to
 					<a
 						data-link="camouflaged"
-						href={`/${wallet.metadata.id}/#${targetStage.id}`}
+						href={getWalletUrl(wallet, { attributeAnchor: targetStage.id })}
 					>
 						<WalletStageBadge
 							stage={targetStage}
@@ -191,7 +192,7 @@
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
-					{@const attributeLink = attributeId ? `/${wallet.metadata.id}/#${slugifyCamelCase(attributeId)}` : null}
+					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
 
 					<li
 						data-list-item-marker={attribute?.icon}
