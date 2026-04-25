@@ -35,6 +35,7 @@ To resolve this tension, this document aims to establish an upfront policy which
   - Any communication on public communications channels. Examples: GitHub issues/PRs, X tweets, Farcaster, etc.
   - Communications that are not about any of: Walletbeat, wallets, or financial compensation.
   - Conference panels and similar in-person discussions where the conversational part (i.e. not single-sided presentation) is shorter than 15 minutes.
+  - Group chats created prior to the creation of this policy (2026-03) on which the subject of Walletbeat does not come up.
 
 ## Policy
 
