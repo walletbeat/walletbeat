@@ -10,6 +10,11 @@ import {
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
+import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
@@ -18,10 +23,15 @@ import {
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -51,7 +61,10 @@ export const rainbow: SoftwareWallet = {
 			extensions: [
 				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
 			],
-			repositories: ['https://github.com/rainbow-me/rainbow'],
+						repositories: [
+					'https://github.com/rainbow-me/browser-extension',
+					'https://github.com/rainbow-me/rainbow',
+				],
 			socials: {
 				farcaster: 'https://farcaster.xyz/rainbow',
 				x: 'https://x.com/rainbowdotme',
@@ -88,7 +101,27 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+				chainConfigurability: {
+			// Source: Rainbow team responses via Walletbeat questionnaire
+			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
+				ref: refTodo,
+				customChainRpcEndpoint: featureSupported,
+				l1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+					withNoConnectivityExceptL1RPCEndpoint: {
+						accountCreation: featureSupported,
+						accountImport: featureSupported,
+						erc20BalanceLookup: featureSupported,
+						erc20TokenSend: featureSupported,
+						etherBalanceLookup: featureSupported,
+					},
+				}),
+				nonL1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				}),
+			}),
+			[Variant.MOBILE]: null,
+		},
 		ecosystem: {
 			delegation: null,
 		},
@@ -114,22 +147,34 @@ export const rainbow: SoftwareWallet = {
 				license: FOSSLicense.GPL_3_0,
 			},
 		},
-		monetization: {
-			ref: refTodo,
-			revenueBreakdownIsPublic: false,
+				monetization: {
+			// Source: Rainbow team responses via Walletbeat questionnaire
+			ref: [
+				{
+					explanation:
+						'Rainbow fee revenue data is publicly available on DeFiLlama.',
+					url: 'https://defillama.com/protocol/fees/rainbow',
+				},
+				{
+					explanation:
+						'Rainbow investor information is publicly available.',
+					url: 'https://investors.rainbow.me/',
+				},
+			],
+			revenueBreakdownIsPublic: true,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
+				governanceTokenLowFloat: true, // ~180M circulating of 1B total supply (~18% float) per CoinGecko as of 2026 04 24
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: true, // Questionnaire: fees on perpetual futures and prediction markets are not explicitly displayed
 				publicOffering: null,
 				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				transparentConvenienceFees: true, // Questionnaire: swap review sheet shows fees
+				ventureCapital: true, // $18M Series A led by Seven Seven Six, $1.5M seed including Y Combinator
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -148,7 +193,11 @@ export const rainbow: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				// Rainbow supports cloud backup (iCloud/Google Drive) but not guardian-based recovery.
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: null,
 			duressResistance: null,
 			hardwareWalletSupport: {
@@ -162,13 +211,30 @@ export const rainbow: SoftwareWallet = {
 					}),
 				},
 			},
-			keysHandling: null,
+						keysHandling: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				ref: refTodo,
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
+
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+						scamAlerts: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: refTodo,
+					leaksVisitedUrl: 'NO',
+					leaksUserAddress: false, // TODO: Follow up with Rainbow team to confirm
+					leaksIp: false, // TODO: Follow up with Rainbow team to confirm
+				}),
+				contractTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
+				sendTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
+			},
+
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
@@ -245,8 +311,19 @@ export const rainbow: SoftwareWallet = {
 				},
 			},
 		},
-		transparency: {
-			operationFees: null,
+				transparency: {
+			operationFees: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				builtInErc20Swap: supported({
+					ref: refTodo,
+					byDefault: FeeDisplayLevel.NONE,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+				}),
+				erc20L1Transfer: null,
+				ethL1Transfer: null,
+				uniswapUSDCToEtherSwap: null,
+			},
 		},
 	},
 	variants: {
