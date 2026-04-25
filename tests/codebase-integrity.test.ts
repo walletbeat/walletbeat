@@ -188,6 +188,7 @@ describe('codebase integrity', () => {
 			'℅',
 			'ᵗ',
 			'ʰ',
+			'↔',
 		])
 
 		for (const nonAscii of allowedNonAscii) {
