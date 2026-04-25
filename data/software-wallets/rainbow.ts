@@ -61,10 +61,10 @@ export const rainbow: SoftwareWallet = {
 			extensions: [
 				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
 			],
-						repositories: [
-					'https://github.com/rainbow-me/browser-extension',
-					'https://github.com/rainbow-me/rainbow',
-				],
+			repositories: [
+				'https://github.com/rainbow-me/browser-extension',
+				'https://github.com/rainbow-me/rainbow',
+			],
 			socials: {
 				farcaster: 'https://farcaster.xyz/rainbow',
 				x: 'https://x.com/rainbowdotme',
@@ -101,7 +101,7 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: null,
-				chainConfigurability: {
+		chainConfigurability: {
 			// Source: Rainbow team responses via Walletbeat questionnaire
 			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
 				ref: refTodo,
@@ -147,17 +147,15 @@ export const rainbow: SoftwareWallet = {
 				license: FOSSLicense.GPL_3_0,
 			},
 		},
-				monetization: {
+		monetization: {
 			// Source: Rainbow team responses via Walletbeat questionnaire
 			ref: [
 				{
-					explanation:
-						'Rainbow fee revenue data is publicly available on DeFiLlama.',
+					explanation: 'Rainbow fee revenue data is publicly available on DeFiLlama.',
 					url: 'https://defillama.com/protocol/fees/rainbow',
 				},
 				{
-					explanation:
-						'Rainbow investor information is publicly available.',
+					explanation: 'Rainbow investor information is publicly available.',
 					url: 'https://investors.rainbow.me/',
 				},
 			],
@@ -211,7 +209,7 @@ export const rainbow: SoftwareWallet = {
 					}),
 				},
 			},
-						keysHandling: {
+			keysHandling: {
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				ref: refTodo,
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -223,15 +221,15 @@ export const rainbow: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-						scamAlerts: {
+			scamAlerts: {
+				contractTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksVisitedUrl: 'NO',
-					leaksUserAddress: false, // TODO: Follow up with Rainbow team to confirm
 					leaksIp: false, // TODO: Follow up with Rainbow team to confirm
+					leaksUserAddress: false, // TODO: Follow up with Rainbow team to confirm
+					leaksVisitedUrl: 'NO',
 				}),
-				contractTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
 				sendTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
 			},
 
@@ -311,13 +309,13 @@ export const rainbow: SoftwareWallet = {
 				},
 			},
 		},
-				transparency: {
+		transparency: {
 			operationFees: {
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				builtInErc20Swap: supported({
 					ref: refTodo,
-					byDefault: FeeDisplayLevel.NONE,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
 				}),
 				erc20L1Transfer: null,
