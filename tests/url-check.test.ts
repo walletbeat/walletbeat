@@ -404,7 +404,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'c6157bc0c8cd5286a4684049fd6b83c0cd6fe57f',
 		retrieved: '2025-12-04',
 	},
-		{
+	{
 		url: 'https://github.com/rainbow-me/browser-extension',
 		urlHash: 'f92eadbe22abf8ad0124476f62e80a1c29637a5f',
 		retrieved: '2026-04-25',
@@ -1379,7 +1379,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '17b99560f16751649f2b5958ec1b6cceefd07c80',
 		retrieved: '2026-03-08',
 	},
-		{
+	{
 		url: 'https://investors.rainbow.me/',
 		urlHash: 'cb7977990dbe6a97892e6325c864f11b9a952fa4',
 		retrieved: '2026-04-25',
