@@ -1769,6 +1769,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
 		retrieved: '2026-03-31',
 	},
+	{
+		url: 'https://techcrunch.com/2022/02/15/web3-mobile-wallet-startup-rainbow-raises-18m-series-a-from-alexis-ohanians-fund/',
+		urlHash: '090640f8b142069bbcef4cd144b5533a862c2600',
+		retrieved: '2026-04-26',
+	},
 ]
 
 /**
@@ -1790,6 +1795,8 @@ const URLS_TO_SKIP = [
 	'coinbase.com',
 	'sec.gov',
 	'defillama.com',
+	'defillama.com',
+	'coingecko.com',
 ]
 
 const newValidUrls: string[] = []
