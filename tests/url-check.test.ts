@@ -1773,7 +1773,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://techcrunch.com/2022/10/13/uniswap-labs-raises-165-million-in-new-funding/',
 		urlHash: '23ae6ec55e419939adbef15cac68334d706d4e56',
 		retrieved: '2026-04-05',
-	}
+	},
 ]
 
 /**

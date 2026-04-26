@@ -138,11 +138,19 @@ export function getCrlfFilesFromGit(root: string): Set<string> {
 		const crlfFiles = new Set<string>()
 
 		for (const line of output.split('\n')) {
-			// Format: "i/<eol>  w/<eol>  attr/<attrs>\t<filepath>"
-			const match = /^i\/crlf\s.*\t(.+)$/.exec(line)
+			if (line === '') {
+				continue
+			}
 
-			if (match) {
-				crlfFiles.add(normalizePath(match[1]))
+			// Format: "i/<eol>  w/<eol>  attr/<attrs>\t<filepath>"
+			const match = /^i\/(crlf|lf|mixed|none)\s+w\/(crlf|lf|mixed|none)\s+attr\/\S*\t(.+)$/.exec(line)
+
+			if (match === null) {
+				throw new Error(`Unexpected git ls-files --eol output: ${line}`)
+			}
+
+			if (match[1] === 'crlf') {
+				crlfFiles.add(normalizePath(match[3]))
 			}
 		}
 
