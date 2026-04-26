@@ -13,7 +13,6 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
@@ -158,6 +157,16 @@ export const rainbow: SoftwareWallet = {
 					explanation: 'Rainbow investor information is publicly available.',
 					url: 'https://investors.rainbow.me/',
 				},
+				{
+					explanation:
+						'Rainbow raised an $18M Series A led by Seven Seven Six, following a $1.5M seed round.',
+					url: 'https://techcrunch.com/2022/02/15/web3-mobile-wallet-startup-rainbow-raises-18m-series-a-from-alexis-ohanians-fund/',
+				},
+				{
+					explanation:
+						'Rainbow token has ~180M circulating of 1B total supply (~18% float) as of April 2026.',
+					url: 'https://www.coingecko.com/en/coins/rainbow-3',
+				},
 			],
 			revenueBreakdownIsPublic: true,
 			strategies: {
@@ -221,18 +230,7 @@ export const rainbow: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: {
-				contractTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
-				// Source: Rainbow team responses via Walletbeat questionnaire
-				scamUrlWarning: supported<ScamUrlWarning>({
-					ref: refTodo,
-					leaksIp: false, // TODO: Follow up with Rainbow team to confirm
-					leaksUserAddress: false, // TODO: Follow up with Rainbow team to confirm
-					leaksVisitedUrl: 'NO',
-				}),
-				sendTransactionWarning: notSupported, // TODO: Follow up with Rainbow team
-			},
-
+			scamAlerts: null, // Rainbow uses Blockaid per questionnaire, but full details on all sub-fields pending follow-up
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
