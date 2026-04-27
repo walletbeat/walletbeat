@@ -1,9 +1,12 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
+import { alphabet } from '@/data/entities/alphabet'
+import { apple } from '@/data/entities/apple'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -203,7 +206,38 @@ export const rainbow: SoftwareWallet = {
 			accountRecovery: {
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				// Rainbow supports cloud backup (iCloud/Google Drive) but not guardian-based recovery.
-				guardianRecovery: notSupported,
+				guardianRecovery: supported({
+					ref: {
+						explanation:
+							'Rainbow encrypts the seed phrase with a user-chosen password and stores the encrypted backup in iCloud (iOS) or Google Drive (Android).',
+						url: 'https://rainbow.me/support/app/restore-from-a-backup',
+					},
+					minimumGuardianPolicy: {
+						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+						descriptionMarkdown:
+							'Rainbow encrypts the seed phrase with the user wallet password and stores it in iCloud or Google Drive. Recovery requires the backup password and access to either cloud provider.',
+						optionalGuardians: [
+							{
+								type: GuardianType.USER_EXTERNAL_ACCOUNT,
+								description: 'iCloud account',
+								entity: apple,
+							},
+							{
+								type: GuardianType.USER_EXTERNAL_ACCOUNT,
+								description: 'Google Drive account',
+								entity: alphabet,
+							},
+						],
+						optionalGuardiansMinimumConfigurable: 1,
+						optionalGuardiansMinimumNeededForRecovery: 1,
+						requiredGuardians: [
+							{
+								type: GuardianType.WALLET_PASSWORD,
+							},
+						],
+						secretReconstitution: 'CLIENT_SIDE',
+					},
+				}),
 			},
 			bugBountyProgram: null,
 			duressResistance: null,
