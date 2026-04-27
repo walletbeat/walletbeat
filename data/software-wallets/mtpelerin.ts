@@ -176,6 +176,15 @@ export const mtpelerin: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
+			},
 		},
 	},
 	variants: {
