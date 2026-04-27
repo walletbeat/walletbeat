@@ -1774,6 +1774,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '090640f8b142069bbcef4cd144b5533a862c2600',
 		retrieved: '2026-04-26',
 	},
+	{
+		url: 'https://rainbow.me/support/app/restore-from-a-backup',
+		urlHash: 'd69769c0a41f388feadaa319c9137f54e039d90a',
+		retrieved: '2026-04-27',
+	},
 ]
 
 /**
