@@ -10,10 +10,21 @@ describe('wbicons', async () => {
 		svgIconsDir: 'resources/files/wbicons',
 	})
 
-	it('wbicons font is up-to-date', () => {
+	it('is up-to-date', () => {
 		expect(
 			wbicons.isUpToDate(),
 			`wbicons font is out of date; run the following command to fix:\n\n  ${wbicons.writeCommand()}\n\n`,
 		).toBe(true)
+	})
+	it('has only monochrome files', async () => {
+		const results = await wbicons.nonMonochromeFiles()
+		const errorDetails = Object.entries(results)
+			.map(([file, errors]) => `${file}:\n  ${errors.join('\n  ')}`)
+			.join('\n\n')
+
+		expect(
+			Object.keys(results).length,
+			`Found ${Object.keys(results).length} non-monochrome file(s):\n\n${errorDetails}`,
+		).toBe(0)
 	})
 })

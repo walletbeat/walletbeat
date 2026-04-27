@@ -7,6 +7,204 @@ import svgtofont from 'svgtofont'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
+// Color attributes that can appear on SVG elements
+const SVG_COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color']
+
+// Regex to match presentation attributes like fill="..." or stroke="..."
+const PRESENTATION_ATTR_REGEX = new RegExp(
+	`(?:${SVG_COLOR_ATTRIBUTES.join('|')})\\s*=\\s*["']([^"']*)["']`,
+	'gi',
+)
+
+// Regex to match CSS-in-style declarations like fill: ...; or stroke: ...;
+const STYLE_COLOR_ATTR_REGEX = new RegExp(
+	`(?:${SVG_COLOR_ATTRIBUTES.join('|')})\\s*:\\s*([^;]+);`,
+	'gi',
+)
+
+/** Keywords that are explicitly allowed (non-color values) */
+const ALLOWED_KEYWORDS = new Set([
+	'none',
+	'inherit',
+	'currentcolor',
+	'transparent',
+	'initial',
+	'unset',
+])
+
+/**
+ * Check if a hex color represents black (R=G=B=0). Alpha channel is allowed to vary.
+ */
+function isBlackHex(hex: string): boolean {
+	const cleaned = hex.replace(/^#/, '')
+
+	// #RGB
+	if (cleaned.length === 3) {
+		return cleaned[0] === cleaned[1] && cleaned[1] === cleaned[2] && cleaned[0] === '0'
+	}
+
+	// #RGBA
+	if (cleaned.length === 4) {
+		return cleaned[0] === cleaned[1] && cleaned[1] === cleaned[2] && cleaned[0] === '0'
+	}
+
+	// #RRGGBB
+	if (cleaned.length === 6) {
+		return (
+			cleaned[0] === cleaned[1] &&
+			cleaned[1] === cleaned[2] &&
+			cleaned[2] === cleaned[3] &&
+			cleaned[3] === cleaned[4] &&
+			cleaned[4] === cleaned[5] &&
+			cleaned[0] === '0'
+		)
+	}
+
+	// #RRGGBBAA
+	if (cleaned.length === 8) {
+		return (
+			cleaned[0] === cleaned[1] &&
+			cleaned[1] === cleaned[2] &&
+			cleaned[2] === cleaned[3] &&
+			cleaned[3] === cleaned[4] &&
+			cleaned[4] === cleaned[5] &&
+			cleaned[0] === '0'
+		)
+	}
+
+	return false
+}
+
+/**
+ * Parse a numeric color component (integer 0-255 or percentage 0%-100%).
+ * Returns the value as a number 0-255, or -1 if not zero.
+ */
+function parseColorComponent(component: string): number {
+	const trimmed = component.trim()
+
+	if (trimmed.endsWith('%')) {
+		const pct = parseFloat(trimmed.slice(0, -1))
+
+		return pct === 0 ? 0 : -1
+	}
+
+	const val = parseFloat(trimmed)
+
+	return val === 0 ? 0 : -1
+}
+
+/**
+ * Check if an rgb()/rgba() color represents black (R=G=B=0). Alpha is allowed to vary.
+ */
+function isBlackRgb(color: string): boolean {
+	// Match rgb(...) or rgba(...) with either comma-separated or space-separated values
+	const match = color.match(/^(?:rgba?)\(\s*(.+?)\s*(?:\/\s*(.+?)\s*)?\)$/i)
+
+	if (!match) {
+		return false
+	}
+
+	const group1 = match[1].trim()
+	// Alpha from slash syntax is in group2
+	// If no slash, alpha might be comma-separated inside group1
+
+	let components: string[]
+
+	if (group1.includes(',')) {
+		components = group1.split(',')
+	} else {
+		// Space-separated: "0 0 0" or "0 0 0 / 0.5"
+		components = group1.split(/\s+/)
+	}
+
+	if (components.length === 4) {
+		components.pop() // Strip alpha part.
+	}
+
+	if (components.length < 3) {
+		return false
+	}
+
+	const r = parseColorComponent(components[0])
+	const g = parseColorComponent(components[1])
+	const b = parseColorComponent(components[2])
+
+	return r === 0 && g === 0 && b === 0
+}
+
+/**
+ * Validate that all colors in an SVG are black or transparent black only.
+ * Returns errors found.
+ */
+export function validateSvgIsMonochromeBlack(svgContent: string): string[] {
+	const errors: string[] = []
+
+	// Check presentation attributes
+	for (const match of svgContent.matchAll(PRESENTATION_ATTR_REGEX)) {
+		const attrName = match[0].split(/\s*=/)[0].trim()
+		const rawValue = match[1].trim()
+
+		validateSingleColor(rawValue, `${attrName}`, errors)
+	}
+
+	// Check CSS-in-style declarations
+	for (const match of svgContent.matchAll(STYLE_COLOR_ATTR_REGEX)) {
+		const fullMatch = match[0]
+		const attrName = fullMatch.split(':')[0].trim()
+		const rawValue = match[1].trim()
+
+		validateSingleColor(rawValue, `${attrName} (in style)`, errors)
+	}
+
+	return errors
+}
+
+function validateSingleColor(rawValue: string, attrLabel: string, errors: string[]): void {
+	const value = rawValue.trim().toLowerCase()
+
+	if (!value) {
+		return
+	}
+
+	// Allow special keywords
+	if (ALLOWED_KEYWORDS.has(value)) {
+		return
+	}
+
+	// Check hex colors
+	if (value.startsWith('#')) {
+		if (!isBlackHex(value)) {
+			errors.push(`${attrLabel} has non-black color: ${rawValue}`)
+		}
+
+		return
+	}
+
+	// Check rgb()/rgba()
+	if (value.startsWith('rgb(')) {
+		if (!isBlackRgb(rawValue)) {
+			errors.push(`${attrLabel} has non-black color: ${rawValue}`)
+		}
+
+		return
+	}
+
+	// Check hsl()/hsla() - these are not black (unless degenerate edge cases)
+	if (value.startsWith('hsl(')) {
+		errors.push(`${attrLabel} has non-black color (HSL): ${rawValue}`)
+
+		return
+	}
+
+	// Check named colors - if it's a single word that's not a known keyword,
+	// it might be a named color. The only allowed named color is 'black'.
+	if (!value.includes(' ') && !value.includes('(') && value !== 'black') {
+		errors.push(`${attrLabel} has non-black named color: ${rawValue}`)
+
+		return
+	}
+}
+
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
 
@@ -120,6 +318,27 @@ export class SVGFont {
 			svgoConfig,
 			currentHash,
 		)
+	}
+
+	public async nonMonochromeFiles(): Promise<Record<string, string[]>> {
+		const result: Record<string, string[]> = {}
+		const entries = await fs.promises.readdir(this.svgIconsDir)
+
+		for (const entry of entries) {
+			if (!entry.endsWith('.svg')) {
+				throw new Error(`Non-SVG file found: ${entry}`)
+			}
+
+			const fullPath = path.join(this.svgIconsDir, entry)
+			const svgContent = await fs.promises.readFile(fullPath, 'utf-8')
+			const errors = validateSvgIsMonochromeBlack(svgContent)
+
+			if (errors.length > 0) {
+				result[entry] = errors
+			}
+		}
+
+		return result
 	}
 
 	public isUpToDate(): boolean {
