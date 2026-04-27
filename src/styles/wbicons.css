@@ -1,11 +1,11 @@
 @font-face {
   font-family: "wbicons";
-  src: url('../src/styleswbicons.eot'); /* IE9*/
-  src: url('../src/styleswbicons.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
-  url('../src/styleswbicons.woff2') format('woff2'),
-  url('../src/styleswbicons.woff') format('woff'),
-  url('../src/styleswbicons.ttf') format('truetype'),
-  url('../src/styleswbicons.svg') format('svg');
+  src: url('/wbicons/wbicons.eot'); /* IE9*/
+  src: url('/wbicons/wbicons.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
+  url('/wbicons/wbicons.woff2') format('woff2'),
+  url('/wbicons/wbicons.woff') format('woff'),
+  url('/wbicons/wbicons.ttf') format('truetype'),
+  url('/wbicons/wbicons.svg') format('svg');
 }
 
 [class^="wbicons-"], [class*=" wbicons-"] {

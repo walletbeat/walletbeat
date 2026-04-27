@@ -374,7 +374,11 @@ export class SVGFont {
 		await fs.promises.mkdir(this.cssOutputDir, { recursive: true })
 
 		// Compute cssPath relative to repoRoot/public
-		const cssPath = path.relative(publicDir, this.cssOutputDir)
+		let cssPath = '/' + path.relative(publicDir, this.fontOutputDir)
+
+		if (!cssPath.endsWith('/')) {
+			cssPath += '/'
+		}
 
 		await svgtofont({
 			src: this.svgIconsDir,
@@ -384,7 +388,7 @@ export class SVGFont {
 			css: {
 				output: this.cssOutputDir,
 				hasTimestamp: false,
-				cssPath: cssPath || '.',
+				cssPath,
 				include: /\.css$/,
 			},
 			startUnicode: iconFontStartCharCode,
