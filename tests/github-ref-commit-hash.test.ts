@@ -120,4 +120,3 @@ describe('GitHub ref URLs in wallet data must use 40-char commit hashes', () => 
 		})
 	}
 })
-
