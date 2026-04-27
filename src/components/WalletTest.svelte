@@ -772,6 +772,27 @@ Issued At: ${new Date().toISOString()}`;
             onclick={() => { uiState.txSimulationSubTab = 'erc1155-mint'; }}
           />
           <WalletTesterNavigationItem
+            title="ERC-20 Transfer"
+            description="transfer() 1 token to caller address"
+            isSelected={uiState.txSimulationSubTab === 'erc20-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc20-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="ERC-721 Transfer"
+            description="safeTransferFrom() token #1 from/to caller"
+            isSelected={uiState.txSimulationSubTab === 'erc721-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc721-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="ERC-1155 Transfer"
+            description="safeTransferFrom() 1 unit of token #1 from/to caller"
+            isSelected={uiState.txSimulationSubTab === 'erc1155-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc1155-transfer'; }}
+          />
+          <WalletTesterNavigationItem
             title="All Token Transfer"
             description="Mints ERC-20, ERC-721, and ERC-1155 in one tx"
             isSelected={uiState.txSimulationSubTab === 'all-token-transfer'}
