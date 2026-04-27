@@ -25,38 +25,13 @@ interface KnownValidUrl {
  */
 const knownValidUrls: KnownValidUrl[] = [
 	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
-		urlHash: '9ee7fe5b0401855074defd33f6f000d9b44d82c9',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
-		urlHash: '22c8b0c04fd83c8b73e3385d72cfca9c341cf187',
-		retrieved: '2025-10-31',
-	},
-	{
 		url: 'https://www.ambire.com/',
 		urlHash: '9056590b5e73b6970259bcd861a1a4f25904444a',
 		retrieved: '2025-10-31',
 	},
 	{
-		url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
-		urlHash: 'e6b9b4718af4cc2d2bf7620bd222af58e0f380bd',
-		retrieved: '2025-10-31',
-	},
-	{
 		url: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
 		urlHash: 'f1819791d1bcb34e4b3bd8e7f8c84f05bbfe8362',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
-		urlHash: '018c53893a7478394c89a4c2761105aacbd2c971',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/daimo-eth/daimo/blob/master/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
-		urlHash: 'a845d17a32a9b240959429b5188ef1adf29e245c',
 		retrieved: '2025-10-31',
 	},
 	{
@@ -70,11 +45,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
-		url: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',
-		urlHash: 'f4a623a2a525b4e5e844008f9ddb76bd2e3d8d72',
-		retrieved: '2025-10-31',
-	},
-	{
 		url: 'https://elytro.com',
 		urlHash: '2e213bd9d3d9bfa33c76e72424f12fe449b7659c',
 		retrieved: '2025-10-31',
@@ -83,16 +53,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://github.com/Elytro-eth/soul-wallet-contract',
 		urlHash: 'ce277d3d0abb029b3a19965f7393d28e37ffc110',
 		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf',
-		urlHash: '92f16f81bc2d4c021645ed2374ea7e962bdf120f',
-		retrieved: '2026-01-21',
-	},
-	{
-		url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
-		urlHash: '1baad6225085b74a18803b2b810fcaa4c9834bb1',
-		retrieved: '2026-01-21',
 	},
 	{
 		url: 'https://family.co',
@@ -130,16 +90,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
-		url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
-		urlHash: '07a9ab7b43d86028875bac86fc7aca96783c0988',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
-		urlHash: '845c4b18205459fbb91be0a5cbe7ea3ab4ad371a',
-		retrieved: '2025-10-31',
-	},
-	{
 		url: 'https://assets.ctfassets.net/clixtyxoaeas/21m4LE3WLYbgWjc33aDcp2/8252073e115688b1dc1500a9c2d33fe4/metamask-delegator-framework-audit-2024-10.pdf',
 		urlHash: '13e8d550931291ff8617aefc577777e71592f627',
 		retrieved: '2025-10-31',
@@ -147,16 +97,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://assets.ctfassets.net/clixtyxoaeas/4sNMB55kkGw6BtAiIn08mm/f1f4a78d3901dd03848d070e15a1ff12/pentest-report_metamask-signing-snap.pdf',
 		urlHash: '6e3c1ded5545f10407784398daffe66a592989e2',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
-		urlHash: '5c70ba42892c9c58a0b05130acaacf22f47a690c',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
-		urlHash: '62e258694c4d2a5c08891d28fb5a498f712a6d0c',
 		retrieved: '2025-10-31',
 	},
 	{
@@ -187,11 +127,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
 		urlHash: 'ae5b23948f69b87f8ed38e206000c64e09415cc8',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
-		urlHash: '5753f96cf0bc31a9fd9d8b6f66a82423bd086222',
 		retrieved: '2025-10-31',
 	},
 	{
@@ -245,41 +180,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/contracts/AmbireAccount.sol',
-		urlHash: 'fff71c2e8756a4894ca6a677ff38e48884e6cfba',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
-		urlHash: '538f8876e903f74e2400eeac3ecceb4e8223da59',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
-		urlHash: '8f2df0e9a9dbe4ef08da29919d4a59788832f4d3',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
-		urlHash: '941e22389b148f853bcdefe3122f60b574daf9b0',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
-		urlHash: '6ccc26a8fec7f3567b523c329c35a51c5090c1fa',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
-		urlHash: 'db1d24341e14fc7f61c0d4823c856353a77d9f06',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
-		urlHash: '9d0157e2de71d84fb5d225fb69fd6b4ab86b63a3',
-		retrieved: '2025-10-31',
-	},
-	{
 		url: 'https://zerion.io',
 		urlHash: '3dbaa0aff3a17de107b4ede050772af955291068',
 		retrieved: '2025-10-31',
@@ -292,46 +192,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://www.ambire.com',
 		urlHash: '3b41a43a21f4d0d1209715d7203802b68e96a03d',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
-		urlHash: '4de756a893d258e0c399b5cf8f4c8584ca7f7df7',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
-		urlHash: '0c12cc81b82abdd74911a6f994e7efc01d510ae2',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
-		urlHash: 'e3fba673f0acb428582f8c4562d8b6e90e10b5a8',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
-		urlHash: 'df8d42a52fb0276d50fbd19ff11ded5269756ad0',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
-		urlHash: 'fa0b6a2a095e1b497de684aa96e86bf648204458',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
-		urlHash: '51a4009a53d08bc4c376ec9a7ea06d3924370e91',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
-		urlHash: '587f37c86181eaf2295b5847e9695dd8b3bd446a',
-		retrieved: '2025-10-31',
-	},
-	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
-		urlHash: '4cd45e89ca413bf099921a1aca8e6e63ef208518',
 		retrieved: '2025-10-31',
 	},
 	{
@@ -755,11 +615,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-12-23',
 	},
 	{
-		url: 'https://github.com/keycard-tech/keycard-shell/blob/master/LICENSE',
-		urlHash: 'e573bfe99ee01564179ee9ad658ee0bdef6b01ce',
-		retrieved: '2025-12-23',
-	},
-	{
 		url: 'https://github.com/keycard-tech/status-keycard',
 		urlHash: '6adbdbcc11f3049cc70df872ee50fac0b5035a07',
 		retrieved: '2025-12-23',
@@ -915,21 +770,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-02-24',
 	},
 	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/consts/networks.ts',
-		urlHash: '432952ec60b8a3d0c4c3f285ae0e248c0dad4470',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/services/ensDomains/ensDomains.ts',
-		urlHash: 'd569504fe14754c9e67e8d0590dc0c9dc6d26f5d',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/libs/portfolio/getOnchainBalances.ts',
-		urlHash: '9c1bfc857cf04c0b810b6ca297bf69e292daab31',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://x.com/ambire/status/2016861388103373134',
 		urlHash: '73cfe3038a20a4cc97667482d356dba98879ac3e',
 		retrieved: '2026-03-08',
@@ -975,11 +815,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/daimo-eth/daimo/blob/master/LICENSE',
-		urlHash: '09f707f78472bb9e8e1199831b34bc372d0b19f5',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://blog.ethereum.org/2024/02/20/esp-allocation-q423',
 		urlHash: '390f0919fb427ccb53e55992a7e5e7cd2ad7c12e',
 		retrieved: '2026-03-08',
@@ -1020,28 +855,8 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-		urlHash: '02fe5cf6c3ea473bcf83028e0553eccf2cbfc36b',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/apps/daimo-mobile/src/view/screen/send/SendTransferScreen.tsx#L234-L238',
 		urlHash: 'a310b3557d4889586133389b1f8aba8294372711',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
-		urlHash: 'cdc05573b963b71cd439521229524605647366f2',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/gemwalletcom/gem-ios/blob/main/LICENSE',
-		urlHash: '1f49d019ec5b77841e356d160d7c32b36be91583',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/consenlabs/token-core-monorepo/blob/main/LICENSE',
-		urlHash: '28111065d875e7889f96295dd1288eb06bc6f239',
 		retrieved: '2026-03-08',
 	},
 	{
@@ -1110,33 +925,13 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/pillarwallet/x/blob/main/LICENSE',
-		urlHash: '5d7e49d8b90cfcd6e84ed960668827e1a5280f8b',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://github.com/RabbyHub/Rabby/blob/5f2b84491b6af881ab4ef41f7627d5e068d10652/src/ui/views/ImportWatchAddress.tsx#L170',
 		urlHash: 'deededf1e387e65792541e7d520edb4d299d6013',
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/src/background/utils/buildinProvider.ts',
-		urlHash: '1e8a03210a5a0f5db4fe3dfbe1ece20e84696045',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
-		urlHash: '358b8dc86811d4ec16b68ef76bc554174c345d27',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://github.com/RabbyHub/rabby-mobile',
 		urlHash: '2888d02eb26291b8a642989ab448337567f8d430',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/LICENSE',
-		urlHash: '3d5664e65ef4ceb5d5761ea1e268592337a721e8',
 		retrieved: '2026-03-08',
 	},
 	{
@@ -1180,11 +975,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
-		urlHash: 'bdddc109d9c39189f7e97a089e81348e4ae6220b',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://github.com/safe-global/safe-wallet-monorepo',
 		urlHash: '0d77fb94839e0e003123241231cb81f050420446',
 		retrieved: '2026-03-08',
@@ -1210,11 +1000,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/safe-fndn/safe-modules/blob/main/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
-		urlHash: '134ef39d8a558a744a2ab007118a438673171fff',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://www.ledger.com/zerion',
 		urlHash: 'd4bd733dd72122c4130350c49d3232b185c76f0b',
 		retrieved: '2026-03-08',
@@ -1222,11 +1007,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
 		urlHash: '8e67e6ec2e1f2a8ac8f1c619f90c284ea83eb980',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/greekfetacheese/zeus/blob/master/src/gui/ui/dapps/across.rs',
-		urlHash: '2f806b799b963a8807d8ef278aa486a2a2f983cb',
 		retrieved: '2026-03-08',
 	},
 	{
@@ -1245,21 +1025,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/greekfetacheese/zeus/blob/master/src/gui/ui/tx_window.rs#L246C1-L247C1',
-		urlHash: '1a7fe2b0576c17c9d7a9ee5913a505d073c26214',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/greekfetacheese/zeus/blob/master/src/utils/tx.rs#L241C1-L242C1',
-		urlHash: 'aeadd4c58ac0197695666cfcc95ae893ce3771a9',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/greekfetacheese/zeus/blob/master/src/core/tx_analysis.rs',
-		urlHash: 'e564ba85343a9bba7eab50d39545f2097d584943',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
 		urlHash: 'f00acef6ae0c668d46df9d353411251ed520d634',
 		retrieved: '2026-03-08',
@@ -1272,11 +1037,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://bitbox.swiss/bug-bounty-program/',
 		urlHash: '2b6a6c0c3dd741590c91c424b1242a3f48ef13a6',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/LICENSE.md',
-		urlHash: 'c8b302baef5d0906000cb5f7587c3c53f6112ba5',
 		retrieved: '2026-03-08',
 	},
 	{
@@ -1307,16 +1067,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://eips.ethereum.org/EIPS/eip-4527',
 		urlHash: 'b851fade855aa347bbbc6ef1166db7a42b29d2dc',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/keylabsio/audits/blob/main/2023-11-keystone3.pdf',
-		urlHash: 'eac85a515762439897c629b22475a3a03daa3800',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
-		urlHash: '5fb7d9dc4301dd9abda8d9ea5a7d3939b036dc75',
 		retrieved: '2026-03-08',
 	},
 	{
@@ -1357,11 +1107,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://bugrap.io/bounties/OneKey',
 		urlHash: '70fc1b3a7180b7c396072d1c2eef0bd67324bc37',
-		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
-		urlHash: 'ec3f9e4c982c573a7376bb2f588558e067770221',
 		retrieved: '2026-03-08',
 	},
 	{
@@ -1625,11 +1370,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://github.com/greekfetacheese/zeus/blob/master/LICENSE-MIT',
-		urlHash: 'c621836600678482fcfe95f45775d52c6c4f37fc',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://www.businesswire.com/news/home/20210609005985/en/Ledger-completes-a-%24380-million-Series-C-fundraising-valuing-the-company-at-more-than-%241.5-billion-to-strengthen-its-position-as-the-leading-secure-gateway-to-digital-assets',
 		urlHash: '51248182cd2888bd0982b46b288742f3b649ebdd',
 		retrieved: '2026-03-08',
@@ -1638,16 +1378,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://pitchbook.com/profiles/company/184644-55',
 		urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
 		retrieved: '2026-03-14',
-	},
-	{
-		url: 'https://github.com/AmbireTech/extension/blob/main/src/common/config/analytics/CrashAnalytics.web.ts',
-		urlHash: '0e483722af77b4fdef1f013038bdee1a5c555096',
-		retrieved: '2026-03-23',
-	},
-	{
-		url: 'https://github.com/AmbireTech/extension/blob/main/src/web/modules/settings/screens/GeneralSettingsScreen/components/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
-		urlHash: '714bfb6cfe3caf2a2d5f47eba1f9d0ca4c04cf25',
-		retrieved: '2026-03-23',
 	},
 	{
 		url: 'https://docs.base.org/get-started/base',
@@ -1759,6 +1489,271 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
 		retrieved: '2026-03-31',
 	},
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/0e74e323e06e6ba30192dcaa93ffb536db9a2156/contracts/AmbireAccount7702.sol',
+                urlHash: 'ea4ded798c88fe910641f6a1c011f7df6227751d',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol',
+                urlHash: '57d336ea60f2f1505a18cda02e9a054124f4e46c',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+                urlHash: '9f2914938e1deb0427039a16d11782e8a1ff8f95',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/22678d08810b6f28fa55886c4214d3bc54260d1f/src/consts/networks.ts',
+                urlHash: '904fe3bf6ea3cdc1d0a9daf683ff82d0e98618f4',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/e3a749a1cb2e4bf098b18e547b363a1931a81d29/src/services/ensDomains/ensDomains.ts',
+                urlHash: 'a309f80f3ffb5261f36c6d67fc544bcd6ae5c4ff',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/362e2dc1e2e769d23f5de1717b66ff295c8e91bc/src/libs/portfolio/getOnchainBalances.ts',
+                urlHash: 'a5fe081d833ab1f181c03745966ecd44367a1578',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
+                urlHash: 'a52f887c478cdf142987c2d5deff5523141227ac',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/extension/blob/82c86aa342b85ece2afbe3689a5b52be9c6e1ff9/LICENSE',
+                urlHash: '85cf1937413652d10bfd2549823981e5a26f92fb',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/extension/blob/5942801f127d41d25170ef079e94aa64eb606210/src/common/config/analytics/CrashAnalytics.web.ts',
+                urlHash: '004b3bdb4fd4cd317415419485cd8574a6332f86',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/extension/blob/b4e45b584754694555d433a52e8aab8f4e0ac539/src/common/modules/settings/components/General/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+                urlHash: 'd6431e5e34c7fd41b76090cab2abcac9140b630e',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/4be3dfec816cdd11039c1d260943a1a98affdc92/audits/Pashov-Ambire-third-security-review.md',
+                urlHash: 'e1661818fa0bf5615f3ebf2ba4427c97cc6d449e',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/2bf3233cd22c28eca7f87a6ef997325936ca3214/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+                urlHash: '5a3e2f5a3ac19aa21b4c316b9c63f3b1b35607f4',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
+                urlHash: '1e839937e9e4b48890f3563bca3792895f6b2e52',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/daimo-eth/daimo/blob/01e18724ff6c1ac77727a14e64ec0f72749f54d5/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
+                urlHash: 'ef7d52ce45eb793b82d199e75a5625a249223a59',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/daimo-eth/daimo/blob/226ed1a1f5087a39ce87e6be17a66c1ce1189e9d/LICENSE',
+                urlHash: '7b2ac046dc415730ec7f82537bd0e703ee393867',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/daimo-eth/p256-verifier/blob/402e7b4ec4b91f941529f43f9270a8727f647c98/src/P256Verifier.sol',
+                urlHash: 'f8cf5e961aeb7e46fb7b6d763a525484a43e6b75',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/daimo-eth/daimo/blob/0a31a01bf47dcf339db57df4891db23ba914f1ba/audits/2023-10-veridise-daimo.pdf',
+                urlHash: '94e5185032ff214e74f3f6e5d4c2c0b2df637bf3',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/9c6d5d9a8c3aa58a92b02ddb901478cd429569c7/contracts/libraries/WebAuthn.sol',
+                urlHash: 'addfdb589abf2101d371d5774f04e4cd5f07073f',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/132867d031f25261562128e15a73da3c6bed671f/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf',
+                urlHash: 'b48796b9cba67659f375645fbea4ab197fff4b15',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/2686012c743f222b61b19b9435016117d59b7d5e/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
+                urlHash: '18a2cb678e091a7fc30e72f6e2a1361aadf18342',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/gemwalletcom/gem-ios/blob/ef264f54eacacacba837735ac6ed605c9512f84a/LICENSE',
+                urlHash: 'a416db0a12a8ec3cc152e2e58472723ce3675304',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/consenlabs/token-core-monorepo/blob/9798639887b0496b562490952d8f1585047a749e/LICENSE',
+                urlHash: '16ea36bcac493f2ede6f5959255bd0311be9d95f',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
+                urlHash: 'e07cbbfdda698b5b9e038781bb57044ecc547344',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
+                urlHash: 'c035bf95b60e66bd474014545aa237724d1e1c22',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+                urlHash: 'e9bf48d93daf8757620550840d34b3056bd83030',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+                urlHash: 'd9fe81722074beb7c8e501f77b96b1a7d662c12f',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/pillarwallet/x/blob/43b3392ad3379a04bbe64318143f1df1d5208c70/LICENSE',
+                urlHash: '2406638ff24489cc36e0563adc1886e7d88c47ae',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts',
+                urlHash: '8cb47380f27630711fc5b1a28812fb491b591ccb',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
+                urlHash: '1d4bb3cb9192c3f58f0c5c714e7fe342bbdf8198',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE',
+                urlHash: '58896ad0f1c5e6f0f54795a8f98173f7f06b2c8d',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+                urlHash: '32e445e31a760cd20de6eb2d0ae0d2aa1e7e629f',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
+                urlHash: 'bc949e9f367d60c1a04df229c9fe8b80dda1a2d1',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
+                urlHash: '673a68573d090ee125022755573f53d43662af4d',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
+                urlHash: '0a4842b0262f31c72992d02a4d56c31ff0048e08',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+                urlHash: 'f8d44f53a7cbc3064fec6106a41790b4635a1f7b',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+                urlHash: 'c13fcf04deebe90e8bfc0a9843596830fa2c3490',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+                urlHash: 'b04047d49900586ad03f8d5ca2c13277593334c4',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
+                urlHash: '726be04ed138f26adfe05a67667c9a63f7f154b7',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
+                urlHash: 'af2275135b35a93301e751ddf765c18ba42b5b12',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/rainbow-me/rainbow/blob/c26561eefb4251146db71e5b39f6f0b7233fa647/LICENSE',
+                urlHash: '1050de2bd78604d8ee344b011443c2ed922b9be2',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/safe-fndn/safe-modules/blob/1e57772571fc72471b7bc3203fde9b1799fb87d4/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
+                urlHash: 'd5012b8e4dd384ecfbfea9faebf24ea9d7b1ecb1',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+                urlHash: '47d37e8930552c9d6ef14f0a49d8bcb8f74e6d55',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+                urlHash: '6c51d921f7dea8802fbe85a353c9b324f47cc60c',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/greekfetacheese/zeus/blob/7bd2a133344bfa5b52dfe0df6e8864839cbbaee9/src/gui/ui/dapps/across.rs',
+                urlHash: '6d1c24e5c63ce3b23679a459ec7d85156cec0619',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/greekfetacheese/zeus/blob/e2f12ad22ae24845f8f9bee1f0187be0a5bd07c8/LICENSE-MIT',
+                urlHash: '00413d64bf8d180aac4ef90ada9dc07e6e9322a4',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/gui/ui/tx_window.rs#L246C1-L247C1',
+                urlHash: '920b9ff241792bdccdfade4aa1bf6a8801658a3b',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/utils/tx.rs#L241C1-L242C1',
+                urlHash: 'd2acb7759db5e6afc8be7ce8c0cd92d2a608c467',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
+                urlHash: '36edb201f899b2acf17183bcebe6ded6a56aab8f',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/3542eeae9f4455bec107fe0f02230453719706a6/LICENSE.md',
+                urlHash: '0aa691ff2788fa13980b01697e4b5ec03e83fc66',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/keycard-tech/keycard-shell/blob/48020c66841b795b4766e358f4b108a33654a347/LICENSE',
+                urlHash: 'bde3c38d51d292d599776a71224e8dda8f7b7887',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/keylabsio/audits/blob/24e10a7404106494f66c5ebcf49b8fa4eaaa2d3c/2023-11-keystone3.pdf',
+                urlHash: '7f131a77321a81ec479711b399ddd679b0f644bd',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/slowmist/Knowledge-Base/blob/bbf894fc9c42d1e9af7b2690f54fc94c7d0fc299/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
+                urlHash: '83452663211ba04cedc46593fd74711be4f6871a',
+                retrieved: '2026-04-27'
+        },
+        {
+                url: 'https://github.com/slowmist/Knowledge-Base/blob/49f4b9fce925d988b7d291bb0b97d0b6aac5f44f/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
+                urlHash: '4c113ed14d5f390d54abed081e9f468e7130c1d8',
+                retrieved: '2026-04-27'
+        },
 ]
 
 /**

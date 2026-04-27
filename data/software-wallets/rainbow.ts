@@ -108,7 +108,7 @@ export const rainbow: SoftwareWallet = {
 					{
 						explanation: 'Rainbow uses the GPL-3.0 license for its source code',
 						label: 'Rainbow License File',
-						url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
+						url: 'https://github.com/rainbow-me/rainbow/blob/c26561eefb4251146db71e5b39f6f0b7233fa647/LICENSE',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,

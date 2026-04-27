@@ -98,7 +98,7 @@ export const keycardShell: HardwareWallet = {
 			walletAppLicense: {
 				ref: {
 					explanation: 'Keycard Shell firmware and hardware designs are MIT-licensed',
-					url: 'https://github.com/keycard-tech/keycard-shell/blob/master/LICENSE',
+					url: 'https://github.com/keycard-tech/keycard-shell/blob/48020c66841b795b4766e358f4b108a33654a347/LICENSE',
 				},
 				license: FOSSLicense.MIT,
 			},
