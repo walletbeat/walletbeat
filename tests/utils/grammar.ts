@@ -46,6 +46,21 @@ function getVocabulary(): string[] {
 	return vocabulary
 }
 
+let vocabularySet: Set<string> | null = null
+
+export function isInVocabulary(word: string): boolean {
+	if (vocabularySet === null) {
+		const s = new Set<string>()
+
+		for (const word of getVocabulary()) {
+			s.add(word.toLowerCase())
+		}
+		vocabularySet = s
+	}
+
+	return vocabularySet.has(word.toLowerCase())
+}
+
 async function prepareHarperLinter(linter: harper.LocalLinter) {
 	await linter.setDialect(harper.Dialect.American)
 	await linter.setLintConfig({
@@ -325,4 +340,13 @@ export function walletContentGrammarLint(
 			}
 		})
 	})
+}
+
+/**
+ * @returns Whether the given text is likely to be english.
+ */
+export async function isLikelyEnglish(str: string): Promise<boolean> {
+	const linter = await getHarperLinter()
+
+	return await linter.isLikelyEnglish(str)
 }

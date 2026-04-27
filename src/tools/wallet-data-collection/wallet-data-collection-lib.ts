@@ -940,7 +940,9 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 function displayRequestInfo(request: WalletRequest): void {
 	function formatUserDataDict(dict: UserDataDict): string {
 		return Object.entries(dict)
-			.map(([key, values]) => `${key}=${values.map(v => v.toString()).join(', ')}`)
+			.map(
+				([key, values]) => `${key}=${values.map(v => v.toSkeletonString('[redact]')).join(', ')}`,
+			)
 			.join('; ')
 	}
 	const entity = entityForDomain(request.domain)
@@ -990,7 +992,7 @@ function displayRequestInfo(request: WalletRequest): void {
 export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 	const capture = await openCaptureFile(opts)
 
-	let remainingStrings = capture.allStrings()
+	let remainingStrings = await capture.allStrings()
 	let userStopped = false
 
 	while (remainingStrings.numUnredacted() > 0 && !userStopped) {
@@ -1015,8 +1017,8 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			`Unredacted string ${unredactedStrings.filter((s, i) => i <= unredactedStrings.indexOf(strEntry)).length} of ${unredactedStrings.length}`,
 		)
 		log('='.repeat(80))
-		log(`  String: ${JSON.stringify(strValue)}`)
-		log(`  Score: ${strEntry.score.toFixed(2)}`)
+		log(`  String:  ${JSON.stringify(strValue)}`)
+		log(`  Entropy: ${strEntry.score.toFixed(2)}`)
 		log('  Occurrences:')
 
 		for (const [key, count] of strEntry.getOccurrences().entries()) {
@@ -1024,6 +1026,9 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 			log(`    - ${type}:${paramName} (seen ${count} time${count === 1 ? '' : 's'})`)
 		}
+
+		log('  Sample Request:')
+		displayRequestInfo(strEntry.getFirstSourceRequest())
 
 		// Build prompt choices
 		const userInfoChoices = userInfoEnums.items.map(u => ({
@@ -1178,7 +1183,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 		}
 
 		// Refresh strings:
-		remainingStrings = capture.allStrings()
+		remainingStrings = await capture.allStrings()
 	}
 
 	if (!userStopped) {

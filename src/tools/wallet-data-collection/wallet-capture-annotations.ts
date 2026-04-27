@@ -176,6 +176,8 @@ export class WalletRequestMatcher {
 	}
 }
 
+export const globalBenignPlaceholder = 'WALLETBEATBENIGNPLACEHOLDER'
+
 export class WalletCaptureAnnotations {
 	private readonly walletId: string
 	private readonly path: string | null
@@ -356,7 +358,11 @@ export class WalletCaptureAnnotations {
 	}
 
 	public isBenign(str: string): boolean {
-		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)
+		return (
+			str === globalBenignPlaceholder ||
+			this.globalBenignStrings.has(str) ||
+			this.benignStrings.has(str)
+		)
 	}
 
 	public matches(request: WalletRequest): WalletRequestMatcher | null {

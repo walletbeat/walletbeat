@@ -153,5 +153,6 @@
 			"domain": "chrome.google.com",
 			"purposes": "NOT_WALLET_INITIATED"
 		}
-	]
+	],
+	"benignStrings": []
 }
