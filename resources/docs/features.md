@@ -55,6 +55,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/transparency/license.ts`](#srcschemafeaturestransparencylicensets)
 - [`src/schema/features/transparency/maintenance.ts`](#srcschemafeaturestransparencymaintenancets)
 - [`src/schema/features/transparency/monetization.ts`](#srcschemafeaturestransparencymonetizationts)
+- [`src/schema/features/transparency/release-transparency.ts`](#srcschemafeaturestransparencyrelease-transparencyts)
 - [`src/schema/features/transparency/reputation.ts`](#srcschemafeaturestransparencyreputationts)
 
 ---
@@ -102,6 +103,14 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 - `selfSovereignty` (`object`): Self-sovereignty features.
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
+  - `releaseTransparency` (object): Release transparency features.
+    - `artifactSigning` (`VariantFeature<ArtifactSigning>`)
+    - `dependencyLocking` (`VariantFeature<DependencyLocking>`)
+    - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
+    - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
+    - `hermeticBuilds` (`VariantFeature<HermeticBuilds>`)
+    - `repositoryChangeControls` (`VariantFeature<RepositoryChangeControls>`)
+    - `reproducibleBuilds` (`VariantFeature<ReproducibleBuilds>`)
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
 - `licensing` (`WalletLicensing`): License of the wallet. Variant specificity handled internally to `WalletLicense` type.
@@ -256,6 +265,14 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
+  - `releaseTransparency` (object)
+    - `artifactSigning` (`ResolvedFeature<ArtifactSigning>`)
+    - `dependencyLocking` (`ResolvedFeature<DependencyLocking>`)
+    - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
+    - `hasPublicChangelog` (`ResolvedFeature<HasPublicChangelog>`)
+    - `hermeticBuilds` (`ResolvedFeature<HermeticBuilds>`)
+    - `repositoryChangeControls` (`ResolvedFeature<RepositoryChangeControls>`)
+    - `reproducibleBuilds` (`ResolvedFeature<ReproducibleBuilds>`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
@@ -3653,6 +3670,121 @@ This enum uses camelCase-style values because it is used as object key in the wa
 type Monetization = WithRef<{
 	revenueBreakdownIsPublic: boolean
 	strategies: Record<MonetizationStrategy, boolean | null>
+}>
+```
+
+---
+
+## `src/schema/features/transparency/release-transparency.ts`
+
+### Type: `HasPublicChangelog`
+
+Whether the wallet has a publicly accessible changelog or release notes stream. The reference is required when supported, since it IS the evidence.
+
+```typescript
+type HasPublicChangelog = Support<MustRef<{}>>
+```
+
+---
+
+### Type: `ReproducibleBuilds`
+
+Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts.
+
+```typescript
+type ReproducibleBuilds = Support<WithRef<{}>>
+```
+
+---
+
+### Type: `HermeticBuilds`
+
+Whether the wallet's release builds are hermetic, i.e. the build can run fully offline from a complete, integrity-verified input set gathered in a prior dependency-fetch phase.
+
+```typescript
+type HermeticBuilds = Support<WithRef<{}>>
+```
+
+---
+
+### Type: `ArtifactSignerType`
+
+Which key or identity class signs release artifacts.
+
+```typescript
+type ArtifactSignerType = 'DEVELOPER_KEY' | 'BUILD_INFRA_IDENTITY' | 'BOTH' | 'UNKNOWN'
+```
+
+---
+
+### Type: `SignaturePublicationType`
+
+Where signatures or attestations for release artifacts are published.
+
+```typescript
+type SignaturePublicationType = 'GITHUB_RELEASE' | 'SIGSTORE_REKOR' | 'ONCHAIN' | 'OTHER_PUBLIC'
+```
+
+---
+
+### Type: `ArtifactSigning`
+
+Artifact signing information for a wallet variant.
+
+Discriminated union ensures that `artifactSigner` and `signaturePublication` are `null` when artifacts are not signed, making the invariant machine-checkable.
+
+```typescript
+type ArtifactSigning =
+	| {
+			artifactsSigned: NotSupported
+			artifactSigner: null
+			signaturePublication: null
+	  }
+	| {
+			artifactsSigned: Supported<WithRef<{}>>
+			artifactSigner: ArtifactSignerType | null
+			signaturePublication: SignaturePublicationType | null
+	  }
+```
+
+---
+
+### Type: `DependencyLocking`
+
+Whether the wallet's release builds enforce a lockfile (or equivalent) for locked dependency resolution.
+
+```typescript
+type DependencyLocking = Support<WithRef<{}>>
+```
+
+---
+
+### Type: `DependencyVulnerabilityScanning`
+
+Whether dependency vulnerability scanning is configured in CI/release workflows for the wallet.
+
+```typescript
+type DependencyVulnerabilityScanning = Support<WithRef<{}>>
+```
+
+---
+
+### Type: `RepositoryChangeControls`
+
+Observable repository-level change controls for the wallet's source repository. Each sub-field is independently researchable and may be `null` until determined.
+
+```typescript
+type RepositoryChangeControls = Nullable<{
+	/** Whether protected branch rules require an approving review before merge. */
+	requiredReview: boolean
+	/** Whether protected branch rules require status checks to pass before merge. */
+	requiredChecks: boolean
+	/** Whether force-push is blocked on protected branches. */
+	forcePushBlocked: boolean
+	/** Whether deletion is blocked on protected branches. */
+	branchDeletionBlocked: boolean
+	/** Whether release tags are protected / immutable. */
+	tagsImmutable: boolean
 }>
 ```
 

@@ -716,6 +716,25 @@ export const completedTemplate: SoftwareWallet = {
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
+			releaseTransparency: {
+				artifactSigning: {
+					artifactSigner: 'BOTH',
+					artifactsSigned: supported({ ref: refTodo }),
+					signaturePublication: 'SIGSTORE_REKOR',
+				},
+				dependencyLocking: supported({ ref: refTodo }),
+				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
+				hasPublicChangelog: supported({ ref: 'https://example.com/changelog' }),
+				hermeticBuilds: supported({ ref: refTodo }),
+				repositoryChangeControls: {
+					branchDeletionBlocked: true,
+					forcePushBlocked: true,
+					requiredChecks: true,
+					requiredReview: true,
+					tagsImmutable: true,
+				},
+				reproducibleBuilds: supported({ ref: refTodo }),
+			},
 		},
 	},
 	variants: {
