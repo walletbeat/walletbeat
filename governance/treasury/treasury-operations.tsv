@@ -65,3 +65,5 @@ Date	From	To	Amount	Purpose	ID
 2026-04-20	treasury	pheobeayo	300 USDC	Payment for bounty on issue https://github.com/walletbeat/walletbeat/issues/505	0xd54fe7d2edb54a375637f163a00a89bcf64fae9203bd2765c44ffe763d9bc6d2
 2026-04-24	treasury	treasury	0.5 ETH → 1,158.790602 USDC	Swap on Uniswap	0x19068d10487959ff67965865e8834bb5b92accb4db4ba7da6d3d5644d2a66b48
 2026-04-24	treasury	mattmatt_test1	0.2 ETH	Payment for Ethereum contract deployment on mainnet	0x250805ce918955715e1ae5b67595d12010775fdb40fbb40ed020ac2938825e5f
+2026-04-26	mattmatt_deployer	treasury	0.2 ETH	Return excess 0.2 ETH used for contract deploy	0x159d744a2b86273f1ad097904c7be533a4772a106baee2752a2016f4b2ea971b
+2026-04-26	treasury	treasury	3,000 USDC	Payment for Walletbeat social media services (April & May payment)	0xa756c0b3d95e3896f74f020a3a2746ff96bf57785ac9ff218b77623ff18a6648

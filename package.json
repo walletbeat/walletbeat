@@ -87,6 +87,7 @@
 		"remark": "^15.0.1",
 		"remark-lint-no-literal-urls": "^4.0.1",
 		"remark-preset-lint-recommended": "^7.0.1",
+		"svgo": "^4.0.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
