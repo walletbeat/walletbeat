@@ -255,6 +255,41 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
+		url: 'https://github.com/AmbireTech/extension/releases',
+		urlHash: '849318a4369731fddf595512cceb2687a1c2b87f',
+		retrieved: '2026-04-28',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/package.json',
+		urlHash: '7052ae6364ee824e5b940ad3ccb7ea7d6363fb0a',
+		retrieved: '2026-04-28',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
+		urlHash: '1a3007586a2bf38afe8e8aafe342e6d4f040a8e7',
+		retrieved: '2026-04-28',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-android.yml',
+		urlHash: '0e591e0dff82cd1567f73178af73b7a0047755bd',
+		retrieved: '2026-04-28',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-ios.yml',
+		urlHash: '0227c7416072a2a0bc3d8dab0999c74c32e9695a',
+		retrieved: '2026-04-28',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extension-gecko.yml',
+		urlHash: 'd6fe2c671308370e0774cf2c1446fb28a85484c5',
+		retrieved: '2026-04-28',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/README.MD',
+		urlHash: 'b433b9bd998668af60c5019a843d9cbd7037be9c',
+		retrieved: '2026-04-28',
+	},
+	{
 		url: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
 		urlHash: '8f2df0e9a9dbe4ef08da29919d4a59788832f4d3',
 		retrieved: '2025-10-31',

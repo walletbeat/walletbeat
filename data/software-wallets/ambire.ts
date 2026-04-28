@@ -56,7 +56,12 @@ import {
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
@@ -746,13 +751,84 @@ export const ambire: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				artifactSigning: {
+					artifactSigner: 'DEVELOPER_KEY',
+					artifactsSigned: supported({
+						ref: 'https://github.com/AmbireTech/extension/releases',
+					}),
+					signaturePublication: 'GITHUB_RELEASE',
+				},
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The `setup:ci` script enforces lockfile sync with `yarn install --frozen-lockfile`.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/package.json',
+						},
+						{
+							explanation: 'CI workflows execute `yarn setup:ci` before builds.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported({
+					ref: 'https://github.com/AmbireTech/extension/releases',
+				}),
+				hermeticBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The release build workflow updates git submodules during build execution, requiring network access rather than using a fully pre-fetched offline input set.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
+						},
+						{
+							explanation:
+								'Android build workflow runs `yarn setup:ci` during build, so JavaScript dependencies are resolved/fetched at build time.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-android.yml',
+						},
+						{
+							explanation:
+								'iOS build workflow runs `bundle exec pod install`, which performs dependency resolution/fetching during the build job.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-ios.yml',
+						},
+						{
+							explanation:
+								'Gecko ARM64 release build pulls base images and installs Alpine packages (`apk add`) at runtime, indicating non-hermetic networked build inputs.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extension-gecko.yml',
+						},
+					],
+				}),
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: supported({
+					ref: [
+						{
+							explanation:
+								'The repository README documents local installation and build commands (`yarn setup`, `yarn build:extensions`, platform build commands), indicating independent builders can perform builds themselves.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/README.MD',
+						},
+						{
+							explanation:
+								'The project defines explicit build scripts for extension, Android, and iOS targets in `package.json` (e.g. `build:extensions`, `build:android:production:apk`, `build:ios:production`).',
+							url: 'https://github.com/AmbireTech/extension/blob/main/package.json',
+						},
+						{
+							explanation:
+								'Release CI workflows call the same yarn build commands from the repo (for example, `yarn build:extensions:*`), which supports that maintainers are building from repository-defined scripts rather than opaque external tooling.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
+						},
+						{
+							explanation:
+								'Reusable Android workflow runs repository-defined build commands via yarn, showing the Android release artifacts are built from source in this repo.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-android.yml',
+						},
+						{
+							explanation:
+								'Reusable iOS workflow runs repository-defined build commands and pod install steps, showing iOS release artifacts are also built from source in this repo (with Apple toolchain/signing prerequisites).',
+							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-ios.yml',
+						},
+					],
+				}),
 			},
 		},
 	},
