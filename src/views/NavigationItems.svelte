@@ -212,7 +212,7 @@
 <style>
 	menu {
 		display: grid;
-		gap: 2px;
+		gap: 8px;
 		list-style: none;
 		font-size: 0.975em;
 
@@ -247,18 +247,23 @@
 	a {
 		> .icon {
 			display: flex;
+			align-items: center;
+			justify-content: center;
 			font-size: 1.25em;
-			width: 1em;
-			height: 1em;
+			width: 1.75em;
+			height: 1.75em;
 			line-height: 1;
+			border-radius: 50%;
+			border: 1px solid white;
+			flex-shrink: 0;
 
 			:global(
 				img,
 				svg
 			) {
-				border-radius: 0.125rem;
-				width: 100%;
-				height: 100%;
+				border-radius: 0;
+				width: 60%;
+				height: 60%;
 			}
 		}
 
