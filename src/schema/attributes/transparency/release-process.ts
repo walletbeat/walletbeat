@@ -11,28 +11,35 @@ import { isSourcePubliclyVisible } from '@/schema/features/transparency/license'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { mdParagraph, paragraph, sentence } from '@/types/content'
+import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-function pass(ctx: EvaluationContext): Evaluation {
+function describeSupportedSignals(signals: string[]): string {
+	return commaListFormat(signals)
+}
+
+function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
 	return ctx.build({
 		outcome: {
 			id: 'pass',
 			rating: Rating.PASS,
 			displayName: 'Strong release process',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} has a public changelog, reproducible or hermetic builds, artifact signing, and dependency locking.',
+				`{{WALLET_NAME}} meets all 4 release process signals: ${describeSupportedSignals(supportedSignals)}.`,
 			),
 		},
-		details: mdParagraph(`
-			**{{WALLET_NAME}}** satisfies all four release process signals:
-			a public changelog, reproducible or hermetic builds, signed release artifacts,
-			and locked dependencies.
-		`),
+		details: paragraph(
+			`{{WALLET_NAME}} satisfies all four release process signals: ${describeSupportedSignals(supportedSignals)}.`,
+		),
 	})
 }
 
-function partial(ctx: EvaluationContext, signalCount: 1 | 2 | 3): Evaluation {
+function partial(
+	ctx: EvaluationContext,
+	signalCount: 1 | 2 | 3,
+	supportedSignals: string[],
+): Evaluation {
 	const score = signalCount / 4
 
 	return ctx.build({
@@ -42,11 +49,11 @@ function partial(ctx: EvaluationContext, signalCount: 1 | 2 | 3): Evaluation {
 			score,
 			displayName: `Partial release process (${signalCount.toString()}/4 signals)`,
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals.`,
+				`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${describeSupportedSignals(supportedSignals)}.`,
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals (public changelog, reproducible or hermetic builds, artifact signing, dependency locking).`,
+			`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${describeSupportedSignals(supportedSignals)}.`,
 		),
 		howToImprove: mdParagraph(`
 			To fully pass, **{{WALLET_NAME}}** should implement all four signals:
@@ -127,7 +134,10 @@ export const releaseProcess: Attribute = {
 			paragraph(
 				'The wallet has a public changelog, reproducible or hermetic builds with public source, signed artifacts, and locked dependencies.',
 			),
-			pass(EvaluationContext.forTest(() => releaseProcess)),
+			pass(
+				EvaluationContext.forTest(() => releaseProcess),
+				['public changelog', 'reproducible builds', 'artifact signing', 'dependency locking'],
+			),
 		),
 		partial: [
 			exampleRating(
@@ -137,6 +147,7 @@ export const releaseProcess: Attribute = {
 				partial(
 					EvaluationContext.forTest(() => releaseProcess),
 					3,
+					['public changelog', 'artifact signing', 'dependency locking'],
 				),
 			),
 			exampleRating(
@@ -146,6 +157,7 @@ export const releaseProcess: Attribute = {
 				partial(
 					EvaluationContext.forTest(() => releaseProcess),
 					2,
+					['public changelog', 'artifact signing'],
 				),
 			),
 			exampleRating(
@@ -155,6 +167,7 @@ export const releaseProcess: Attribute = {
 				partial(
 					EvaluationContext.forTest(() => releaseProcess),
 					1,
+					['reproducible builds'],
 				),
 			),
 		],
@@ -191,13 +204,16 @@ export const releaseProcess: Attribute = {
 			return unrated(ctx)
 		}
 
-		const buildsSupported =
-			(rt.reproducibleBuilds !== null && isSupported(rt.reproducibleBuilds)) ||
-			(rt.hermeticBuilds !== null && isSupported(rt.hermeticBuilds))
+		const reproducibleSupported =
+			rt.reproducibleBuilds !== null && isSupported(rt.reproducibleBuilds)
+		const hermeticSupported = rt.hermeticBuilds !== null && isSupported(rt.hermeticBuilds)
 
 		// Source-visibility cap: reproducibility cannot be externally verified
 		// without public source access, so the signal does not count.
-		const builds = buildsSupported && isSourcePubliclyVisible(ctx.features.licensing)
+		const buildsVisible = isSourcePubliclyVisible(ctx.features.licensing)
+		const reproducible = reproducibleSupported && buildsVisible
+		const hermetic = hermeticSupported && buildsVisible
+		const builds = reproducible || hermetic
 
 		if (builds) {
 			ctx.addRef(rt.reproducibleBuilds, rt.hermeticBuilds)
@@ -225,10 +241,26 @@ export const releaseProcess: Attribute = {
 			ctx.addRef(rt.dependencyLocking)
 		}
 
+		const buildSignal =
+			reproducible && hermetic
+				? 'reproducible and hermetic builds'
+				: reproducible
+					? 'reproducible builds'
+					: hermetic
+						? 'hermetic builds'
+						: null
+
+		const supportedSignals = [
+			changelog ? 'public changelog' : null,
+			buildSignal,
+			signing ? 'artifact signing' : null,
+			locking ? 'dependency locking' : null,
+		].filter((signal): signal is string => signal !== null)
+
 		const signalCount = [changelog, builds, signing, locking].filter(Boolean).length
 
 		if (signalCount === 4) {
-			return pass(ctx)
+			return pass(ctx, supportedSignals)
 		}
 
 		if (signalCount === 0) {
@@ -236,7 +268,7 @@ export const releaseProcess: Attribute = {
 		}
 
 		if (signalCount === 1 || signalCount === 2 || signalCount === 3) {
-			return partial(ctx, signalCount)
+			return partial(ctx, signalCount, supportedSignals)
 		}
 
 		throw new Error('Unreachable')
