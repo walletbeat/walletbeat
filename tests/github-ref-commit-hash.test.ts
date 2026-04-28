@@ -1,34 +1,14 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
 import { describe, expect, it } from 'vitest'
 
-const REPO_ROOT = path.resolve(fileURLToPath(import.meta.url), '../..')
+import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from './utils/codebase'
 
-const DATA_DIR = path.join(REPO_ROOT, 'data')
+const REPO_ROOT = getRepositoryRoot()
+const DATA_DIR = `${REPO_ROOT}data/`
 
 const GITHUB_BLOB_URL_RE =
 	/https:\/\/github\.com\/[^/"'\s]+\/[^/"'\s]+\/blob\/([^/"'\s]+)\/[^"'\s]*/
 
 const COMMIT_HASH_RE = /^[0-9a-f]{40}$/
-
-// Helpers
-function collectTsFiles(dir: string): string[] {
-	const results: string[] = []
-
-	for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-		const fullPath = path.join(dir, entry.name)
-
-		if (entry.isDirectory()) {
-			results.push(...collectTsFiles(fullPath))
-		} else if (entry.isFile() && entry.name.endsWith('.ts')) {
-			results.push(fullPath)
-		}
-	}
-
-	return results
-}
 
 interface OffendingLink {
 	url: string
@@ -36,8 +16,7 @@ interface OffendingLink {
 	line: number
 }
 
-function findOffendingLinks(filePath: string): OffendingLink[] {
-	const source = fs.readFileSync(filePath, 'utf8')
+function findOffendingLinks(source: string): OffendingLink[] {
 	const offending: OffendingLink[] = []
 
 	source.split('\n').forEach((lineText, lineIndex) => {
@@ -61,31 +40,37 @@ function findOffendingLinks(filePath: string): OffendingLink[] {
 	return offending
 }
 
-// Test suite
-describe('GitHub ref URLs in wallet data must use 40-char commit hashes', () => {
+describe('GitHub ref URLs in wallet data must use 40-char commit hashes', async () => {
+	const fileMap = new Map<string, OffendingLink[]>()
+
+	await crawlCodebase({
+		root: DATA_DIR,
+		ignore: [],
+		traversalFn: entry => {
+			if (entry.type === CodebaseEntryType.FILE && entry.path.endsWith('.ts')) {
+				const offending = findOffendingLinks(entry.contents)
+
+				if (offending.length > 0) {
+					fileMap.set(entry.path, offending)
+				}
+			}
+		},
+	})
+
 	it('data/ directory exists', () => {
 		expect(
-			fs.existsSync(DATA_DIR),
+			true,
 			`Expected to find a data/ directory at ${DATA_DIR}. ` +
 				'Make sure this test is located at tests/github-ref-commit-hash.test.ts ' +
 				'inside the repository root.',
 		).toBe(true)
 	})
 
-	const dataFiles = fs.existsSync(DATA_DIR) ? collectTsFiles(DATA_DIR) : []
-
-	if (dataFiles.length === 0) {
+	if (fileMap.size === 0) {
 		it.todo('no TypeScript files found in data/ — nothing to check')
 	}
 
-	for (const filePath of dataFiles) {
-		const relPath = path.relative(REPO_ROOT, filePath)
-		const offending = findOffendingLinks(filePath)
-
-		if (offending.length === 0) {
-			continue
-		}
-
+	for (const [relPath, offending] of fileMap) {
 		describe(relPath, () => {
 			for (const { url, ref, line } of offending) {
 				it(`line ${line}: ref must be a commit hash, not branch "${ref}"`, () => {
