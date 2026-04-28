@@ -344,6 +344,31 @@ export function licenseSourceIsVisible(license: License): license is SourceAvail
 }
 
 /**
+ * Returns true if the wallet's source code is publicly visible,
+ * based on its resolved licensing. Useful for gating signals that
+ * require source access for external verification (e.g. reproducible builds).
+ */
+export function isSourcePubliclyVisible(licensing: ResolvedWalletLicensing): boolean {
+	if (licensing === null || licensing.walletAppLicense === null) {
+		return false
+	}
+
+	switch (licensing.type) {
+		case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
+			return licenseSourceIsVisible(licensing.walletAppLicense.license)
+		case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
+			if (licensing.coreLicense === null) {
+				return false
+			}
+
+			return (
+				licenseSourceIsVisible(licensing.coreLicense.license) &&
+				licenseSourceIsVisible(licensing.walletAppLicense.license)
+			)
+	}
+}
+
+/**
  * @param license The FOSS license to get the URL of.
  * @returns The SPDX URL of the license.
  */
