@@ -210,6 +210,10 @@
 
 
 <style>
+	input[type='search'] {
+		border-radius: 0.75rem;
+	}
+
 	menu {
 		display: grid;
 		gap: 8px;
