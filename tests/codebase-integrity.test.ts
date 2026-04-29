@@ -144,6 +144,8 @@ describe('codebase integrity', () => {
 		// Any change to the set of characters below should be examined with extreme prejudice.
 		const allowedNonAscii = new Set<string>([
 			'´',
+			'ᵗ',
+			'ˢ',
 			'°',
 			'˚',
 			'•',
