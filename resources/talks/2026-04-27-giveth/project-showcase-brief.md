@@ -18,7 +18,7 @@ Walletbeat envisions a wallet ecosystem where the Ethereum community and the Fou
 
 ## How to achieve it
 
-We achieve this by advocating for why these values matter. Setting clear examples of how these values look like in real wallets. Creatign incentives for wallets to improve.
+We achieve this by advocating for why these values matter. Setting clear examples of how these values look like in real wallets. Creating incentives for wallets to improve.
 
 ## Updates / Future Plans / Roadmap
 
