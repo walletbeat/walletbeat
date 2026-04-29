@@ -1754,6 +1754,21 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '4c113ed14d5f390d54abed081e9f468e7130c1d8',
 		retrieved: '2026-04-27',
 	},
+	{
+				url: 'https://cantina.xyz/bounties/f9df94db-c7b1-434b-bb06-d1360abdd1be',
+		urlHash: 'ad5234d3f2a749ff68602d9af4176968284636b5',
+		retrieved: '2026-04-05',
+	},
+	{
+		url: 'https://github.com/Uniswap/interface/blob/main/apps/mobile/LICENSE',
+		urlHash: '6c6686b7d4d7a4257a78a8272fa49043456a4ae8',
+		retrieved: '2026-04-05',
+	},
+	{
+		url: 'https://techcrunch.com/2022/10/13/uniswap-labs-raises-165-million-in-new-funding/',
+		urlHash: '23ae6ec55e419939adbef15cac68334d706d4e56',
+		retrieved: '2026-04-05',
+	}
 ]
 
 /**

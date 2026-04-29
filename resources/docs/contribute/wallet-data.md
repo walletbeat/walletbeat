@@ -4,7 +4,7 @@ _This guide aims to help you contribute wallet data to Walletbeat. If you'd like
 
 ## Development setup & workflow
 
-Before you can contribute wallet data to Walletbeat, you need to make a copy of the site and its data and be able to run it on your computer so you can make changes. Please read the [`/resources/docs/contribute/CONTRIBUTING.md`](/resources/docs/contribute/CONTRIBUTING.md) guide if you need help with this. The rest of this guide **assumes you have already set up a Walletbeat development environment**.
+Before you can contribute wallet data to Walletbeat, you need to make a copy of the site and its data and be able to run it on your computer so you can make changes. Please read the [`/CONTRIBUTING.md`](/CONTRIBUTING.md) guide if you need help with this. The rest of this guide **assumes you have already set up a Walletbeat development environment**.
 
 ## Wallet data changes
 
@@ -566,7 +566,7 @@ After you have populated this data, you should see attributes that rely on this 
 
 ### **Step 4**: Send a PR to Walletbeat and get it merged
 
-Once you have added or updated wallet data, it is time to send a PR (Pull Request) on GitHub with your contributions. See the corresponding section on the [`/resources/docs/contribute/CONTRIBUTING.md`](/resources/docs/contribute/CONTRIBUTING.md) guide for instructions on this.
+Once you have added or updated wallet data, it is time to send a PR (Pull Request) on GitHub with your contributions. See the corresponding section on the [`/CONTRIBUTING.md`](/CONTRIBUTING.md) guide for instructions on this.
 
 Once the PR is merged, you are done!
 

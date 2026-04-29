@@ -17,15 +17,15 @@ describe('css-attributes codegen', () => {
 	const htmlDataPath = path.join(repoRoot, '.vscode', 'walletbeat.css-attributes.json')
 
 	it('src/styles/css-attributes.d.ts matches css-attributes.css', async () => {
-		const css = await fs.readFile(cssPath, 'utf8')
-		const onDisk = await fs.readFile(dtsPath, 'utf8')
+		const css = (await fs.readFile(cssPath, 'utf8')).replaceAll('\r\n', '\n')
+		const onDisk = (await fs.readFile(dtsPath, 'utf8')).replaceAll('\r\n', '\n')
 
 		expect(generateCssAttributesDts(css)).toBe(onDisk)
 	})
 
 	it('.vscode/walletbeat.css-attributes.json matches css-attributes.css', async () => {
-		const css = await fs.readFile(cssPath, 'utf8')
-		const onDisk = await fs.readFile(htmlDataPath, 'utf8')
+		const css = (await fs.readFile(cssPath, 'utf8')).replaceAll('\r\n', '\n')
+		const onDisk = (await fs.readFile(htmlDataPath, 'utf8')).replaceAll('\r\n', '\n')
 
 		expect(generateWalletbeatHtmlDataJson(css)).toBe(onDisk)
 	})
