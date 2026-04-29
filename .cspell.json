@@ -81,6 +81,7 @@
 		"CSPRNG",
 		"ctfassets",
 		"Cure53",
+		"currentcolor",
 		"cursorignore",
 		"custodied",
 		"Cyfrin",
@@ -173,6 +174,7 @@
 		"HWW",
 		"iamkio",
 		"identicons",
+		"iefix",
 		"ilyavna",
 		"imkey",
 		"imToken",
@@ -341,6 +343,8 @@
 		"rollup",
 		"rollups",
 		"RPGF",
+		"RRGGBB",
+		"RRGGBBAA",
 		"ruggability",
 		"ruggable",
 		"Sablier",
@@ -377,6 +381,7 @@
 		"strs",
 		"subcolumns",
 		"subresource",
+		"svgtofont",
 		"takeoverable",
 		"tantodefi",
 		"Tere",
@@ -432,6 +437,7 @@
 		"WalletConnect",
 		"WalletScrutiny",
 		"Warpcast",
+		"wbicons",
 		"WBTEST",
 		"web2",
 		"web3",
@@ -475,12 +481,14 @@
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
-		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" }
+		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
+		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" }
 	],
 	"ignoreRegExpList": [
 		"Bitcoin addresses",
 		"CIDv1",
 		"Chrome extension IDs",
-		"Hexadecimal addresses"
+		"Hexadecimal addresses",
+		"svgicons2svgfont"
 	]
 }
