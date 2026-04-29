@@ -1755,7 +1755,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-04-27',
 	},
 	{
-				url: 'https://cantina.xyz/bounties/f9df94db-c7b1-434b-bb06-d1360abdd1be',
+		url: 'https://cantina.xyz/bounties/f9df94db-c7b1-434b-bb06-d1360abdd1be',
 		urlHash: 'ad5234d3f2a749ff68602d9af4176968284636b5',
 		retrieved: '2026-04-05',
 	},
@@ -1768,7 +1768,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://techcrunch.com/2022/10/13/uniswap-labs-raises-165-million-in-new-funding/',
 		urlHash: '23ae6ec55e419939adbef15cac68334d706d4e56',
 		retrieved: '2026-04-05',
-	}
+	},
 ]
 
 /**

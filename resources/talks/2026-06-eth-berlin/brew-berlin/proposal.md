@@ -1,4 +1,5 @@
 # Brew Berlin
+
 ## About
 
 BREW Privacy Matters is a one-day conference during the Berlin Blockchain Week exploring privacy in decentralized systems.
@@ -6,28 +7,31 @@ BREW Privacy Matters is a one-day conference during the Berlin Blockchain Week e
 As transparent systems become more widely adopted, privacy is becoming increasingly important.
 
 the Conference explores privacy through three lenses:
+
 - Technological foundations
 - Applications in practice
 - Real-world constraints
 
-We look at what has been built in Web3 and what near-term priorities are emerging.  
+We look at what has been built in Web3 and what near-term priorities are emerging.
 
 We bring together critical thinkers and builders who value privacy as a digital human right, while also examining how these systems can work in practice and within real constraints
 
 ## Speaker Application
+
 BREW is a one-day conference exploring privacy through systems, narratives, and adoption. It brings together the infrastructure and primitives behind zero-knowledge, MPC, FHE, and related approaches, the narratives shaping how privacy is understood and what is being built towards, and the ways these systems are taken up across regulation, institutions, and real-world use.
+
 - Proposal Title: The State of Ethereum Wallet Privacy
 - Session Type
-	- [x] Talk
-	- [ ] Panel
-	- [x] Workshop
-	- [ ] Other
+  - [x] Talk
+  - [ ] Panel
+  - [x] Workshop
+  - [ ] Other
 - Topic / Theme
-	- [ ] Cryptography and Compute
-	- [ ] Data protection & hardware security
-	- [x] Network Privacy
-	- [ ] Privacy Policy & Regulation
-	- [x] Privacy Adoption 
+  - [ ] Cryptography and Compute
+  - [ ] Data protection & hardware security
+  - [x] Network Privacy
+  - [ ] Privacy Policy & Regulation
+  - [x] Privacy Adoption
 - Short Abstract
   Wallets are the primary interface between users and Ethereum itself, yet it's not clear how much data wallets collect, share, or expose by default. This session maps the current state of wallet privacy: what the data shows, where the gaps are, and what a genuinely private wallet actually looks like in practice.
 
