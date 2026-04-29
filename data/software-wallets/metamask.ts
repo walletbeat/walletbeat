@@ -258,14 +258,14 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The MetaMask browser extension uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
 				[Variant.MOBILE]: {
 					ref: {
 						explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
@@ -462,7 +462,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
 					auditDate: '2025-03-18',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -472,7 +472,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
 					auditDate: '2025-04-01',
 					auditor: cyfrin,
 					codeSnapshot: {
