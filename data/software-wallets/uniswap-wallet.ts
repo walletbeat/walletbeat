@@ -69,7 +69,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ref: {
 					explanation:
 						'The Uniswap Wallet mobile app is explicitly licensed under GPL 3.0 or later. The browser extension directory in the same monorepo does not contain a `LICENSE` file. Development happens in a private repository and only production-ready code is published.',
-					url: 'https://github.com/Uniswap/interface/blob/main/apps/mobile/LICENSE',
+					url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE',
 				},
 				license: FOSSLicense.GPL_3_0,
 			},
