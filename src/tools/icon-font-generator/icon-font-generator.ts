@@ -12,6 +12,7 @@ try {
 		.option('--svg-icons-dir', 'Directory containing SVG icons, repo-root-relative')
 		.option('--font-output-dir', 'Directory to output font files, repo-root-relative')
 		.option('--css-output-dir', 'Directory to output CSS files, repo-root-relative')
+		.option('--force', 'Force regeneration even if up to date', { default: false })
 
 	cli.parse(process.argv)
 
@@ -20,6 +21,7 @@ try {
 		svgIconsDir?: string
 		fontOutputDir?: string
 		cssOutputDir?: string
+		force?: boolean
 	}
 
 	if (opts.fontName === undefined || opts.fontName === '') {
@@ -45,7 +47,7 @@ try {
 		cssOutputDir: opts.cssOutputDir,
 	})
 
-	if (font.isUpToDate()) {
+	if ((opts.force === undefined || !opts.force) && font.isUpToDate()) {
 		process.exit(0)
 	}
 

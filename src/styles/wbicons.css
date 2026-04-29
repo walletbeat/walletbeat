@@ -1,32 +1,68 @@
 @font-face {
-  font-family: "wbicons";
-  src: url('/wbicons/wbicons.eot'); /* IE9*/
-  src: url('/wbicons/wbicons.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
-  url('/wbicons/wbicons.woff2') format('woff2'),
-  url('/wbicons/wbicons.woff') format('woff'),
-  url('/wbicons/wbicons.ttf') format('truetype'),
-  url('/wbicons/wbicons.svg') format('svg');
+	font-family: "wbicons";
+	src: url('/wbicons/wbicons.eot'); /* IE9*/
+	src: url('/wbicons/wbicons.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
+	url('/wbicons/wbicons.woff2') format('woff2'),
+	url('/wbicons/wbicons.woff') format('woff'),
+	url('/wbicons/wbicons.ttf') format('truetype'),
+	url('/wbicons/wbicons.svg') format('svg');
 }
 
-[class^="wbicons-"], [class*=" wbicons-"] {
-  font-family: 'wbicons' !important;font-size: undefined;
-  font-style:normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+[data-wbicon] {
+	font-family: 'wbicons';
+	font-style: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	&::before {
+		content: var(--icon-content);
+	}
+
+	&[data-icon~="about"] {
+		--icon-content: "\ea01";
+	},
+
+	&[data-icon~="account_type"] {
+		--icon-content: "\ea02";
+	},
+
+	&[data-icon~="discuss"] {
+		--icon-content: "\ea03";
+	},
+
+	&[data-icon~="faq"] {
+		--icon-content: "\ea04";
+	},
+
+	&[data-icon~="newsletter"] {
+		--icon-content: "\ea05";
+	},
+
+	&[data-icon~="repository"] {
+		--icon-content: "\ea06";
+	},
+
+	&[data-icon~="wallet_browser"] {
+		--icon-content: "\ea07";
+	},
+
+	&[data-icon~="wallet_desktop"] {
+		--icon-content: "\ea08";
+	},
+
+	&[data-icon~="wallet_embedded"] {
+		--icon-content: "\ea09";
+	},
+
+	&[data-icon~="wallet_hardware"] {
+		--icon-content: "\ea0a";
+	},
+
+	&[data-icon~="wallet_mobile"] {
+		--icon-content: "\ea0b";
+	},
+
+	&[data-icon~="wallet_software"] {
+		--icon-content: "\ea0c";
+	},
 }
-
-
-.wbicons-about::before { content: "\ea01"; }
-.wbicons-account_type::before { content: "\ea02"; }
-.wbicons-discuss::before { content: "\ea03"; }
-.wbicons-faq::before { content: "\ea04"; }
-.wbicons-newsletter::before { content: "\ea05"; }
-.wbicons-repository::before { content: "\ea06"; }
-.wbicons-wallet_browser::before { content: "\ea07"; }
-.wbicons-wallet_desktop::before { content: "\ea08"; }
-.wbicons-wallet_embedded::before { content: "\ea09"; }
-.wbicons-wallet_hardware::before { content: "\ea0a"; }
-.wbicons-wallet_mobile::before { content: "\ea0b"; }
-.wbicons-wallet_software::before { content: "\ea0c"; }
-
-

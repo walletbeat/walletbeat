@@ -6,6 +6,7 @@ import { type Config, loadConfig, optimize } from 'svgo'
 import svgtofont from 'svgtofont'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
+import { trimWhitespacePrefix } from '@/types/utils/text'
 
 // Color attributes that can appear on SVG elements
 const SVG_COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color']
@@ -380,23 +381,65 @@ export class SVGFont {
 			cssPath += '/'
 		}
 
-		await svgtofont({
+		const result = await svgtofont({
 			src: this.svgIconsDir,
 			dist: this.fontOutputDir,
 			fontName: this.fontName,
 			excludeFormat: ['symbol.svg'],
-			css: {
-				output: this.cssOutputDir,
-				hasTimestamp: false,
-				cssPath,
-				include: /\.css$/,
-			},
+			css: false,
 			startUnicode: iconFontStartCharCode,
 			svgicons2svgfont: {
 				fontHeight: 1000,
 				normalize: true,
 			},
 		})
+
+		const cssRules: string[] = []
+
+		for (const [key, icon] of Object.entries(result).sort(([keyA, _valA], [keyB, _valB]) =>
+			keyA.localeCompare(keyB),
+		)) {
+			if (icon.encodedCode === undefined || typeof icon.encodedCode !== 'string') {
+				throw new Error(`Key ${key} not encoded: ${JSON.stringify(icon)}`)
+			}
+
+			cssRules.push(`
+				&[data-icon~="${key}"] {
+					--icon-content: "${icon.encodedCode}";
+				},`)
+		}
+		const singularFontName = this.fontName.endsWith('s')
+			? this.fontName.substring(0, this.fontName.length - 1)
+			: this.fontName
+		const generatedCSS =
+			trimWhitespacePrefix(`
+			@font-face {
+				font-family: "${this.fontName}";
+				src: url('${cssPath}${this.fontName}.eot'); /* IE9*/
+				src: url('${cssPath}${this.fontName}.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
+				url('${cssPath}${this.fontName}.woff2') format('woff2'),
+				url('${cssPath}${this.fontName}.woff') format('woff'),
+				url('${cssPath}${this.fontName}.ttf') format('truetype'),
+				url('${cssPath}${this.fontName}.svg') format('svg');
+			}
+
+			[data-${singularFontName}] {
+				font-family: 'wbicons';
+				font-style: normal;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+
+				&::before {
+					content: var(--icon-content);
+				}
+				${cssRules.join('\n')}
+			}
+		`)
+				.split('\n')
+				.map(line => (line.trim() === '' ? '' : line))
+				.join('\n') + '\n'
+
+		await fs.promises.writeFile(path.join(this.cssOutputDir, `${this.fontName}.css`), generatedCSS)
 
 		for (const generatedSVGPath of [path.join(this.fontOutputDir, `${this.fontName}.svg`)]) {
 			const optimizedSVG = optimize(
