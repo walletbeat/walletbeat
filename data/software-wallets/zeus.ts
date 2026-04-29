@@ -90,7 +90,7 @@ export const zeus: SoftwareWallet = {
 						{
 							explanation:
 								'Zeus has a built-in interface which uses the Across protocol to bridge ETH between chains.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/master/src/gui/ui/dapps/across.rs',
+							url: 'https://github.com/greekfetacheese/zeus/blob/7bd2a133344bfa5b52dfe0df6e8864839cbbaee9/src/gui/ui/dapps/across.rs',
 						},
 					],
 					feesLargerThan1bps: {
@@ -161,7 +161,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Zeus is licensed under the MIT license.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/master/LICENSE-MIT',
+						url: 'https://github.com/greekfetacheese/zeus/blob/e2f12ad22ae24845f8f9bee1f0187be0a5bd07c8/LICENSE-MIT',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -252,7 +252,7 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus currently does not have a scam alert mechanism, It simply shows with which contract you are interacting with. If it is a known contract a hyperlink with the contracts name is shown otherwise a truncated version of the contract address is shown (hyperlink). The user can also see all the decoded events to inspect the transaction.',
 							label: 'Contract interaction is shown in the transaction details',
-							url: 'https://github.com/greekfetacheese/zeus/blob/master/src/gui/ui/tx_window.rs#L246C1-L247C1',
+							url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/gui/ui/tx_window.rs#L246C1-L247C1',
 						},
 					],
 				}),
@@ -261,7 +261,7 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							label: 'Before every transaction the user must confirm the action.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/master/src/utils/tx.rs#L241C1-L242C1',
+							url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/utils/tx.rs#L241C1-L242C1',
 						},
 					],
 					leaksRecipient: false,
@@ -277,7 +277,7 @@ export const zeus: SoftwareWallet = {
 					{
 						explanation:
 							'Zeus performs local EVM simulations to verify and display exact transaction outcomes, including decoding of common events like erc20 transfers, swaps, approvals etc...',
-						url: 'https://github.com/greekfetacheese/zeus/blob/master/src/core/tx_analysis.rs',
+						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
 					},
 				],
 				calldataDisplay: null,

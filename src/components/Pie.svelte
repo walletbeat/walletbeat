@@ -456,7 +456,7 @@
 						var(--slice-outerR) - var(--slice-labelRadius)
 					);
 
-					--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 0.5deg);
+					--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
 					--slice-halfGap: calc(var(--slice-gap) / 2);
 					--slice-outerCornerR: max(
 						0,

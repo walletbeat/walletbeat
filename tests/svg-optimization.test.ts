@@ -129,27 +129,31 @@ const optimizedSvgHashes: Record<string, string> = {
 		'80cb26c313cc96082a0254e95110536f8326b5c7086e1eead8b6efd1884b28bf',
 	'resources/contracts/images/Walletbeat.svg':
 		'0c93bc98c4fd6e0770d5658e0860061c879457c79262ac014e49db5c6a033de6',
-	'resources/icons/about.svg': 'fc17b1d749a0607beb73edf9693139a627f09f249de091f40cd64d8a96732ee4',
-	'resources/icons/account_type.svg':
+	'resources/files/wbicons/about.svg':
+		'fc17b1d749a0607beb73edf9693139a627f09f249de091f40cd64d8a96732ee4',
+	'resources/files/wbicons/account_type.svg':
 		'db7704e2e204a93d9910fe6c5d43f487a72caaf49dcc48eeabed1536fe369114',
-	'resources/icons/discuss.svg': 'd368d2e22efa4711b35aa085075c628f021610482a86f9e3d7a86ec40ddb84f0',
-	'resources/icons/faq.svg': '4dfba1047e935c829e31a91d97f5e152cdc7805576f997f0fd1a0d4ed3cca7cb',
-	'resources/icons/newsletter.svg':
+	'resources/files/wbicons/discuss.svg':
+		'd368d2e22efa4711b35aa085075c628f021610482a86f9e3d7a86ec40ddb84f0',
+	'resources/files/wbicons/faq.svg':
+		'4dfba1047e935c829e31a91d97f5e152cdc7805576f997f0fd1a0d4ed3cca7cb',
+	'resources/files/wbicons/newsletter.svg':
 		'ba5765279f96c51580a982275e3a06f6e91fa6f18ad24caddcf8b4d200e05268',
-	'resources/icons/repository.svg':
+	'resources/files/wbicons/repository.svg':
 		'9ffcd42bb0096528573d8224b8b70466ce6581ab5a88f005904869a432548641',
-	'resources/icons/wallet_browser.svg':
+	'resources/files/wbicons/wallet_browser.svg':
 		'1d8755c1f94721cfdd3a3a7135d672f7bd8df7eb4768bc7449ef88c4494cd31a',
-	'resources/icons/wallet_desktop.svg':
+	'resources/files/wbicons/wallet_desktop.svg':
 		'39f16823ea0353c7cbacd15a05d2301b9f0a05675d6ac1fd740b6f8f042b250c',
-	'resources/icons/wallet_embedded.svg':
+	'resources/files/wbicons/wallet_embedded.svg':
 		'846126db3eecb75cf9819feec6282c72da4d8ddbf18f4242d49352ee24a6a932',
-	'resources/icons/wallet_hardware.svg':
+	'resources/files/wbicons/wallet_hardware.svg':
 		'431845d496a7423cd634df79f7e46a1fecf8328b2420dded5f097a0fae20f62f',
-	'resources/icons/wallet_mobile.svg':
+	'resources/files/wbicons/wallet_mobile.svg':
 		'dba5ad8b24a91d229e696dd8a5f6073731a52a057168c7d86b2154350a888544',
-	'resources/icons/wallet_software.svg':
+	'resources/files/wbicons/wallet_software.svg':
 		'a6bf2a2c35af75b4b4302689160de01245e5900fceef33b98d4261975fdf7dfd',
+	'public/wbicons/wbicons.svg': '3cff783f34a832710e64cecf7368cf0d4030964dad2ba2d490ab4c97bfe0d02b',
 }
 
 interface SvgResult {

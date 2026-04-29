@@ -12,7 +12,7 @@ export const ambireAccountContract: SmartWalletContract = {
 	sourceCode: {
 		ref: {
 			label: 'Ambire ERC-4337 smart contract',
-			url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
+			url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol',
 		},
 		available: true,
 	},

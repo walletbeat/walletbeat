@@ -135,7 +135,7 @@
 </search>
 
 
-{#snippet navigationItems(items: NavigationItem[])}
+{#snippet navigationItems(items: NavigationItem[], depth = 0)}
 	<menu>
 		{#each (
 			effectiveSearchValue ?
@@ -144,16 +144,16 @@
 				items
 		) as item (item.id)}
 			<li>
-				{@render navigationItem(item)}
+				{@render navigationItem(item, depth)}
 			</li>
 		{/each}
 	</menu>
 {/snippet}
 
 
-{#snippet navigationItem(item: NavigationItem)}
+{#snippet navigationItem(item: NavigationItem, depth = 0)}
 	{#if !item.children?.length}
-		{@render linkable(item)}
+		{@render linkable(item, depth)}
 	{:else}
 		<details
 			bind:open={
@@ -173,16 +173,16 @@
 				data-sticky
 				data-row="gap-2"
 			>
-				{@render linkable(item)}
+				{@render linkable(item, depth)}
 			</summary>
 
-			{@render navigationItems(item.children)}
+			{@render navigationItems(item.children, depth + 1)}
 		</details>
 	{/if}
 {/snippet}
 
 
-{#snippet linkable(item: NavigationItem)}
+{#snippet linkable(item: NavigationItem, depth = 0)}
 	{#if item.href}
 		<a
 			href={item.href}
@@ -194,14 +194,14 @@
 			data-row="start gap-2"
 		>
 			{#if item.icon}
-				<span class="icon">{@html item.icon}</span>
+				<span class="icon" class:circle={depth === 0}>{@html item.icon}</span>
 			{/if}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
 		{#if item.icon}
-			<span class="icon">{@html item.icon}</span>
+			<span class="icon" class:circle={depth === 0}>{@html item.icon}</span>
 		{/if}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
@@ -210,9 +210,13 @@
 
 
 <style>
+	input[type='search'] {
+		border-radius: 0.75rem;
+	}
+
 	menu {
 		display: grid;
-		gap: 2px;
+		gap: 8px;
 		list-style: none;
 		font-size: 0.975em;
 
@@ -247,10 +251,13 @@
 	a {
 		> .icon {
 			display: flex;
+			align-items: center;
+			justify-content: center;
 			font-size: 1.25em;
 			width: 1em;
 			height: 1em;
 			line-height: 1;
+			flex-shrink: 0;
 
 			:global(
 				img,
@@ -259,6 +266,22 @@
 				border-radius: 0.125rem;
 				width: 100%;
 				height: 100%;
+			}
+		}
+
+		> .icon.circle {
+			width: 1.75em;
+			height: 1.75em;
+			border-radius: 50%;
+			border: 1px solid white;
+
+			:global(
+				img,
+				svg
+			) {
+				border-radius: 0;
+				width: 60%;
+				height: 60%;
 			}
 		}
 

@@ -599,12 +599,12 @@
 									align: ColumnAlignment.Center,
 
 									subcolumns: attrGroupColumns,
-									isDefaultExpanded: true,
+									isDefaultExpanded: false,
 								}
 							:
 								{
 									...attrGroupColumns[0],
-									isDefaultExpanded: true,
+									isDefaultExpanded: false,
 								}
 						),
 					] as Column<RatedWallet>[]

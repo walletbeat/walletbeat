@@ -4,6 +4,11 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+	iconFontStartCharCode,
+	maxIconFontChars,
+} from '@/tools/icon-font-generator/icon-font-generator-lib'
+
+import {
 	type CodebaseEntry,
 	CodebaseEntryType,
 	commonExclusions,
@@ -182,6 +187,10 @@ describe('codebase integrity', () => {
 			'ʰ',
 			'↔',
 		])
+
+		for (let charCodeOffset = 0; charCodeOffset < maxIconFontChars; charCodeOffset++) {
+			allowedNonAscii.add(String.fromCodePoint(iconFontStartCharCode + charCodeOffset))
+		}
 
 		for (const nonAscii of allowedNonAscii) {
 			if ([...nonAscii].length !== 1) {

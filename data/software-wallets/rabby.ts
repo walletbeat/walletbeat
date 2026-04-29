@@ -199,7 +199,7 @@ export const rabby: SoftwareWallet = {
 					{
 						explanation:
 							'Rabby implements the EIP-1193 Provider interface and injects it into web pages. EIP-2700 and EIP-6963 are also supported.',
-						url: 'https://github.com/RabbyHub/Rabby/blob/develop/src/background/utils/buildinProvider.ts',
+						url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts',
 					},
 				],
 				'1193': featureSupported,
@@ -221,7 +221,7 @@ export const rabby: SoftwareWallet = {
 					{
 						explanation:
 							"Other than its rabby-api package, Rabby's core code is licensed under the MIT license.",
-						url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
+						url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
 					},
 				],
 				license: SourceAvailableNonFOSSLicense.UNLICENSED_VISIBLE,
@@ -231,7 +231,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation: "Rabby's browser extension is licensed under the MIT license.",
-							url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
+							url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
 						},
 					],
 					license: FOSSLicense.MIT,
@@ -249,7 +249,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation: "Rabby's desktop app is licensed under the MIT license.",
-							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/LICENSE',
+							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE',
 						},
 					],
 					license: FOSSLicense.MIT,
@@ -466,7 +466,7 @@ export const rabby: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
 					auditDate: '2021-06-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -476,7 +476,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
 					auditDate: '2022-03-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -488,7 +488,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
 					auditDate: '2023-07-20',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -500,7 +500,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
+					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
 					auditDate: '2023-09-26',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -512,7 +512,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: { [Variant.DESKTOP]: true },
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
 					auditDate: '2024-10-18',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -539,7 +539,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
 					auditDate: '2024-10-22',
 					auditor: cure53,
 					codeSnapshot: {
@@ -576,7 +576,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
 					auditDate: '2024-10-23',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -587,7 +587,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
 					auditDate: '2024-12-12',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -598,7 +598,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
 					auditDate: '2024-12-17',
 					auditor: slowMist,
 					codeSnapshot: {
