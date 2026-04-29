@@ -1,6 +1,7 @@
 # Intro
 
 ### Attendees:
+
 - [insert your name here]
 
 ## Project
