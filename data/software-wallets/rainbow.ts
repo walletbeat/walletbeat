@@ -1,14 +1,21 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
+import { alphabet } from '@/data/entities/alphabet'
+import { apple } from '@/data/entities/apple'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
@@ -18,10 +25,15 @@ import {
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -51,7 +63,10 @@ export const rainbow: SoftwareWallet = {
 			extensions: [
 				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
 			],
-			repositories: ['https://github.com/rainbow-me/rainbow'],
+			repositories: [
+				'https://github.com/rainbow-me/browser-extension',
+				'https://github.com/rainbow-me/rainbow',
+			],
 			socials: {
 				farcaster: 'https://farcaster.xyz/rainbow',
 				x: 'https://x.com/rainbowdotme',
@@ -88,7 +103,27 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: {
+			// Source: Rainbow team responses via Walletbeat questionnaire
+			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
+				ref: refTodo,
+				customChainRpcEndpoint: featureSupported,
+				l1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+					withNoConnectivityExceptL1RPCEndpoint: {
+						accountCreation: featureSupported,
+						accountImport: featureSupported,
+						erc20BalanceLookup: featureSupported,
+						erc20TokenSend: featureSupported,
+						etherBalanceLookup: featureSupported,
+					},
+				}),
+				nonL1: supported({
+					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				}),
+			}),
+			[Variant.MOBILE]: null,
+		},
 		ecosystem: {
 			delegation: null,
 		},
@@ -115,21 +150,41 @@ export const rainbow: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
-			revenueBreakdownIsPublic: false,
+			// Source: Rainbow team responses via Walletbeat questionnaire
+			ref: [
+				{
+					explanation: 'Rainbow fee revenue data is publicly available on DeFiLlama.',
+					url: 'https://defillama.com/protocol/fees/rainbow',
+				},
+				{
+					explanation: 'Rainbow investor information is publicly available.',
+					url: 'https://investors.rainbow.me/',
+				},
+				{
+					explanation:
+						'Rainbow raised an $18M Series A led by Seven Seven Six, following a $1.5M seed round.',
+					url: 'https://techcrunch.com/2022/02/15/web3-mobile-wallet-startup-rainbow-raises-18m-series-a-from-alexis-ohanians-fund/',
+				},
+				{
+					explanation:
+						'Rainbow token has ~180M circulating of 1B total supply (~18% float) as of April 2026.',
+					url: 'https://www.coingecko.com/en/coins/rainbow-3',
+				},
+			],
+			revenueBreakdownIsPublic: true,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
+				governanceTokenLowFloat: true, // ~180M circulating of 1B total supply (~18% float) per CoinGecko as of 2026 04 24
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: true, // Questionnaire: fees on perpetual futures and prediction markets are not explicitly displayed
 				publicOffering: null,
 				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				transparentConvenienceFees: true, // Questionnaire: swap review sheet shows fees
+				ventureCapital: true, // $18M Series A led by Seven Seven Six, $1.5M seed including Y Combinator
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
 				crashReports: null,
@@ -148,7 +203,42 @@ export const rainbow: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				// Rainbow supports cloud backup (iCloud/Google Drive) but not guardian-based recovery.
+				guardianRecovery: supported({
+					ref: {
+						explanation:
+							'Rainbow encrypts the seed phrase with a user-chosen password and stores the encrypted backup in iCloud (iOS) or Google Drive (Android).',
+						url: 'https://rainbow.me/support/app/restore-from-a-backup',
+					},
+					minimumGuardianPolicy: {
+						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+						descriptionMarkdown:
+							'Rainbow encrypts the seed phrase with the user wallet password and stores it in iCloud or Google Drive. Recovery requires the backup password and access to either cloud provider.',
+						optionalGuardians: [
+							{
+								type: GuardianType.USER_EXTERNAL_ACCOUNT,
+								description: 'iCloud account',
+								entity: apple,
+							},
+							{
+								type: GuardianType.USER_EXTERNAL_ACCOUNT,
+								description: 'Google Drive account',
+								entity: alphabet,
+							},
+						],
+						optionalGuardiansMinimumConfigurable: 1,
+						optionalGuardiansMinimumNeededForRecovery: 1,
+						requiredGuardians: [
+							{
+								type: GuardianType.WALLET_PASSWORD,
+							},
+						],
+						secretReconstitution: 'CLIENT_SIDE',
+					},
+				}),
+			},
 			bugBountyProgram: null,
 			duressResistance: null,
 			hardwareWalletSupport: {
@@ -162,13 +252,19 @@ export const rainbow: SoftwareWallet = {
 					}),
 				},
 			},
-			keysHandling: null,
+			keysHandling: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				ref: refTodo,
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
+
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: null, // Rainbow uses Blockaid per questionnaire, but full details on all sub-fields pending follow-up
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
@@ -246,7 +342,18 @@ export const rainbow: SoftwareWallet = {
 			},
 		},
 		transparency: {
-			operationFees: null,
+			operationFees: {
+				// Source: Rainbow team responses via Walletbeat questionnaire
+				builtInErc20Swap: supported({
+					ref: refTodo,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.NONE,
+					fullySponsored: false,
+				}),
+				erc20L1Transfer: null,
+				ethL1Transfer: null,
+				uniswapUSDCToEtherSwap: null,
+			},
 		},
 	},
 	variants: {
