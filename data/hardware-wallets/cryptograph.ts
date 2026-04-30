@@ -21,35 +21,35 @@ export const cryptograph: HardwareWallet = {
 		tableName: 'Cryptograph',
 		blurb: paragraph(`
 			Cryptograph is a self-custodial wallet for Apple Watch. The watch
-			generates and holds the keys; the iPhone companion app is read-only
-			and cannot sign. Recovery uses an encrypted printed QR sheet, or
-			encrypted recovery data hidden inside an ordinary JPEG photo via
-			steganography.
+			generates and holds the keys; the iPhone composes transactions
+			but holds no keys and cannot sign. Recovery uses an encrypted
+			printed QR sheet, or encrypted recovery data hidden inside an
+			ordinary JPEG photo via steganography.
 		`),
 		contributors: [perpetua],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
-				id: 'apple-watch-series-10',
-				name: 'Apple Watch Series 10',
+				id: 'apple-watch-series-11',
+				name: 'Apple Watch Series 11',
 				isFlagship: true,
 				url: 'https://www.apple.com/shop/buy-watch/apple-watch',
 			},
 			{
-				id: 'apple-watch-ultra-2',
-				name: 'Apple Watch Ultra 2',
+				id: 'apple-watch-ultra-3',
+				name: 'Apple Watch Ultra 3',
 				isFlagship: false,
-				url: 'https://www.apple.com/shop/buy-watch/apple-watch-ultra-2',
+				url: 'https://www.apple.com/shop/buy-watch/apple-watch-ultra',
 			},
 			{
-				id: 'apple-watch-se',
-				name: 'Apple Watch SE (2nd gen)',
+				id: 'apple-watch-se-3',
+				name: 'Apple Watch SE 3',
 				isFlagship: false,
 				url: 'https://www.apple.com/shop/buy-watch/apple-watch-se',
 			},
 		],
 		iconExtension: 'png',
-		lastUpdated: '2026-04-29',
+		lastUpdated: '2026-04-30',
 		urls: {
 			appstore: 'https://apps.apple.com/app/id6759300873',
 			docs: ['https://cryptograph.watch/docs', 'https://cryptograph.watch/how-it-works'],

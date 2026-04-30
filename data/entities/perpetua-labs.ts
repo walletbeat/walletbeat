@@ -17,7 +17,7 @@ export const perpetuaLabs: CorporateEntity & WalletDeveloper = {
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: 'NO_ICON',
-	jurisdiction: { type: 'UNKNOWN' },
+	jurisdiction: 'United States',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	privacyPolicy: 'https://cryptograph.watch/privacy',
 	repoUrl: 'https://github.com/perpetua-engineering',
