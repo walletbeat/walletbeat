@@ -36,6 +36,7 @@ _Keep list sorted by chronological "Established" date._
   - **Established**: 2026-04
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Telegram
+
 ## Conference panels
 
 _Keep list sorted chronologically._
