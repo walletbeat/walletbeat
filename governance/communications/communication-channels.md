@@ -30,6 +30,12 @@ _Keep list sorted by chronological "Established" date._
   - **Established**: 2026-02
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Email
+- **The Base App ↔ Walletbeat (Telegram)**:
+  - **Walletbeat contributors**: 0xMattmatt, polymutex, ren2140
+  - **Wallet development teams represented**: The Base App (Coinbase)
+  - **Established**: 2026-04
+  - **Fibonacci-approximate number of participants**: 5
+  - **Medium**: Telegram
 
 ## Conference panels
 
