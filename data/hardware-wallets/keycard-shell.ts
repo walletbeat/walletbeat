@@ -1,3 +1,4 @@
+import { mmlado } from '@/data/contributors/mmlado'
 import { phift } from '@/data/contributors/phift'
 import {
 	type AppConnectionMethodDetails,
@@ -5,12 +6,14 @@ import {
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
+import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
+import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
@@ -20,7 +23,7 @@ import {
 	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
-import { featureSupported, supported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -39,7 +42,7 @@ export const keycardShell: HardwareWallet = {
 			Keycard is a BIP-32 HD wallet running on JavaCard with EAL6+ secure element. Supports
 			BIP-39 and SLIP-39 seed phrases.
 		`),
-		contributors: [phift],
+		contributors: [phift, mmlado],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -50,7 +53,7 @@ export const keycardShell: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2025-12-23',
+		lastUpdated: '2026-05-02',
 		urls: {
 			docs: ['https://keycard.tech/en/developers/overview', 'https://keycard.tech/start/shell'],
 			repositories: [
@@ -125,8 +128,8 @@ export const keycardShell: HardwareWallet = {
 		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: notSupported,
+				usage: notSupported,
 			},
 			dataCollection: null,
 			// Privacy: No radio onboard; USB data transfer can be disabled; air-gapped via QR
@@ -147,7 +150,26 @@ export const keycardShell: HardwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: 'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8/app/keycard/keycard.c#L52',
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: true,
+						[BasicUnlockMechanism.PASSWORD]: false,
+						[BasicUnlockMechanism.BIOMETRIC]: false,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: supported({
+					ref: 'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8/app/ui/english.c#L140',
+					actions: {
+						[DuressAction.DECOY_WALLET]: true,
+						[DuressAction.SELF_DESTRUCT]: false,
+						[DuressAction.ONCHAIN_LOCKDOWN]: false,
+						[DuressAction.WIPE_AND_FORWARD]: false,
+					},
+				}),
+			},
 			// Firmware: open source MIT, reproducible builds, manual updates with hash verification
 			firmware: {
 				type: FirmwareType.PASS,
@@ -194,7 +216,14 @@ export const keycardShell: HardwareWallet = {
 			}),
 			securityBestPractices: null,
 			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
-			supplyChainDIY: null,
+			supplyChainDIY: {
+				type: SupplyChainDIYType.PASS,
+				componentSourcingComplexity: SupplyChainDIYType.PASS,
+				details:
+					'Full hardware designs, schematics, PCB files, and BOM are publicly available under MIT license. The Keycard secure element is a standard JavaCard 3.0.5 applet — any compatible card works, no NDA required. All other components are commodity parts from standard distributors.',
+				diyNoNda: SupplyChainDIYType.PASS,
+				url: 'https://github.com/keycard-tech/keycard-shell/tree/main/hardware',
+			},
 			supplyChainFactory: null,
 			// Transaction legibility: QR-based signing via ERC-4527
 			transactionLegibility: {
