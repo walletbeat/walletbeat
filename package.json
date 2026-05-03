@@ -36,15 +36,15 @@
 		"wallet-data-collection": "tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts"
 	},
 	"dependencies": {
-		"@astrojs/sitemap": "^3.7.0",
-		"@astrojs/svelte": "^7.2.5",
+		"@astrojs/sitemap": "^3.7.2",
+		"@astrojs/svelte": "^8.1.0",
 		"@eslint/js": "^9.39.3",
 		"@floating-ui/dom": "^1.7.6",
 		"@fontsource/space-grotesk": "^5.2.8",
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@wagmi/core": "^3.4.0",
-		"astro": "^5.18.0",
+		"astro": "^6.2.1",
 		"autoprefixer": "^10.4.27",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.5",
@@ -58,7 +58,7 @@
 		"wagmi": "2.16.9"
 	},
 	"devDependencies": {
-		"@astrojs/check": "^0.9.6",
+		"@astrojs/check": "^0.9.9",
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
