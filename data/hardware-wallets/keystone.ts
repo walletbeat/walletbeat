@@ -167,6 +167,7 @@ export const keystoneWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
+			scamAlerts: null,
 			secureElement: supported({
 				ref: [
 					{

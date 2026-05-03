@@ -170,6 +170,7 @@ export const ledgerWallet: HardwareWallet = {
 				ethereumL1: null,
 			},
 			publicSecurityAudits: null,
+			scamAlerts: null,
 			secureElement: supported({
 				ref: [
 					{
