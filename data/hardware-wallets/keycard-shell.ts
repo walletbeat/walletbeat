@@ -152,7 +152,10 @@ export const keycardShell: HardwareWallet = {
 			bugBountyProgram: null,
 			duressResistance: {
 				basicUnlock: {
-					ref: 'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8/app/keycard/keycard.c#L52',
+					ref: [
+						'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8149990d5bef3c86355b3e60281427c90d/app/keycard/keycard.c#L240',
+						'https://docs.keycard.tech/duress_pin',
+					],
 					mechanisms: {
 						[BasicUnlockMechanism.PIN]: true,
 						[BasicUnlockMechanism.PASSWORD]: false,
@@ -161,7 +164,10 @@ export const keycardShell: HardwareWallet = {
 					},
 				},
 				duressMode: supported({
-					ref: 'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8/app/ui/english.c#L140',
+					ref: [
+						'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8149990d5bef3c86355b3e60281427c90d/app/ui/english.c#L140',
+						'https://docs.keycard.tech/duress_pin',
+					],
 					actions: {
 						[DuressAction.DECOY_WALLET]: true,
 						[DuressAction.SELF_DESTRUCT]: false,
@@ -222,7 +228,7 @@ export const keycardShell: HardwareWallet = {
 				details:
 					'Full hardware designs, schematics, PCB files, and BOM are publicly available under MIT license. The Keycard secure element is a standard JavaCard 3.0.5 applet — any compatible card works, no NDA required. All other components are commodity parts from standard distributors.',
 				diyNoNda: SupplyChainDIYType.PASS,
-				url: 'https://github.com/keycard-tech/keycard-shell/tree/main/hardware',
+				url: 'https://github.com/keycard-tech/keycard-shell/tree/c2cf30bc46ab665a3b4a06fe0513e51ffb87d49c/hardware',
 			},
 			supplyChainFactory: null,
 			// Transaction legibility: QR-based signing via ERC-4527
