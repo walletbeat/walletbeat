@@ -1,4 +1,9 @@
 import { perpetua } from '@/data/contributors/perpetua'
+import { AccountType } from '@/schema/features/account-support'
+import {
+	AppConnectionMethod,
+	type AppConnectionMethodDetails,
+} from '@/schema/features/ecosystem/hw-app-connection-support'
 import { apple } from '@/data/entities/apple'
 import { perpetuaLabs } from '@/data/entities/perpetua-labs'
 import { reown } from '@/data/entities/reown'
@@ -25,6 +30,7 @@ import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistan
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import {
 	KeyGenerationLocation,
@@ -49,6 +55,7 @@ import {
 } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
+import type { WithRef } from '@/schema/reference'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
@@ -99,8 +106,38 @@ export const cryptograph: HardwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
-		appConnectionSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
+			eoa: supported({
+				ref: {
+					explanation:
+						'Cryptograph generates a standard BIP-39 mnemonic, derived per BIP-32 / BIP-44. Users can view their full 24-word seed phrase on the watch via Settings (the phone never sees the mnemonic). The mnemonic is portable to any BIP-39-compatible wallet.',
+					url: 'https://cryptograph.watch/how-it-works',
+				},
+				canExportPrivateKey: false,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+			ref: {
+				explanation:
+					'Cryptograph connects to dapps via WalletConnect (Reown). The iPhone companion app handles the WalletConnect session and forwards signing intents to the watch via WCSession. There is no Cryptograph-specific desktop bridge or vendor-managed connection app.',
+				url: 'https://cryptograph.watch/how-it-works',
+			},
+			requiresManufacturerConsent: null,
+			supportedConnections: {
+				[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
+			},
+		}),
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
 			coreLicense: {
@@ -138,7 +175,13 @@ export const cryptograph: HardwareWallet = {
 				ventureCapital: false,
 			},
 		},
-		multiAddress: null,
+		multiAddress: supported({
+			ref: {
+				explanation:
+					'Cryptograph supports multiple addresses across multiple chains. Each chain (Ethereum, Bitcoin, Solana, Tron, XRP, Zcash, etc.) has its own standard BIP-44 derivation path; users can derive multiple accounts per chain. Address discovery on EVM chains follows the standard BIP-44 sweep.',
+				url: 'https://cryptograph.watch/how-it-works',
+			},
+		}),
 		privacy: {
 			analytics: {
 				// Cryptograph does not integrate any third-party crash-reporting
@@ -515,7 +558,12 @@ export const cryptograph: HardwareWallet = {
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
 			lightClient: {
-				ethereumL1: null,
+				// Cryptograph trusts apiproxy and direct chain RPC endpoints for chain
+				// data; it does not run an embedded Ethereum L1 light client (Helios,
+				// Helios-Mobi, etc.). Light-client integration on watchOS is constrained
+				// by resource limits — full L1 header validation isn't realistic on
+				// the watch today.
+				ethereumL1: notSupported,
 			},
 			publicSecurityAudits: null,
 			scamAlerts: {
@@ -567,7 +615,14 @@ export const cryptograph: HardwareWallet = {
 			},
 			secureElement: null,
 			securityBestPractices: null,
-			supplyChainDIY: null,
+			supplyChainDIY: {
+				type: SupplyChainDIYType.FAIL,
+				url: 'https://www.apple.com/apple-watch/',
+				details:
+					"Cryptograph runs on Apple Watch hardware manufactured by Apple. There is no DIY-buildable variant — the device is a sealed consumer product. The schema's SupplyChainDIY attribute targets wallets like Firefly that publish open hardware schematics for self-soldering; Cryptograph does not fall in that category. FAIL on both sub-fields is the literal honest reading; the security argument that DIY supply chains are designed to defend against (factory-introduced backdoors) is addressed separately under supplyChainFactory via Apple's public hardware-supply-chain scrutiny.",
+				diyNoNda: SupplyChainDIYType.FAIL,
+				componentSourcingComplexity: SupplyChainDIYType.FAIL,
+			},
 			// Walletbeat's supplyChainFactory schema implicitly assumes the wallet
 			// vendor is also the device manufacturer (Ledger makes Ledgers, Trezor
 			// makes Trezors). Cryptograph breaks that assumption: the device the
