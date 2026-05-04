@@ -7,6 +7,8 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -123,13 +125,51 @@ export const cryptograph: HardwareWallet = {
 		multiAddress: null,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				// Cryptograph does not integrate any third-party crash-reporting
+				// SDK (Crashlytics, Sentry, Bugsnag, Datadog, etc.) and does not use
+				// Apple's MetricKit. Apple's OS-level "Share With App Developers"
+				// diagnostics setting (Settings → Privacy → Analytics & Improvements)
+				// is user-controlled and anonymized at the OS layer before reaching
+				// the developer via App Store Connect aggregate stats; that's a
+				// separate Apple data flow, not a Cryptograph-instrumented one.
+				crashReports: notSupported,
+				// No product-analytics tracking. No Mixpanel / Amplitude / Segment /
+				// Firebase Analytics. The IntegrityCheckService uses StoreKit 2
+				// AppTransaction with no identifiers and no server.
+				usage: notSupported,
 			},
+			// dataCollection requires a structured per-user-flow enumeration of every
+			// external entity contacted and what data each receives. The schema
+			// docstring points at /docs/mitmproxy-guide; doing this honestly requires
+			// a real network-introspection session. Deferred to a follow-up PR.
 			dataCollection: null,
-			hardwarePrivacy: null,
+			hardwarePrivacy: {
+				type: HardwarePrivacyType.PASS,
+				url: 'https://cryptograph.watch/security',
+				details:
+					"Cryptograph does not have a wireless protocol of its own; it uses Apple's Watch Connectivity (WCSession) framework over BLE between watch and iPhone, and standard TLS between the iPhone and external services. Each sub-field below.\n\n" +
+					"phoningHome: Cryptograph runs no product-analytics, behavioral-tracking, or telemetry pings. Network calls to Cryptograph's apiproxy backend serve specific wallet functions — relayed RPC for chains, push-notification registration for incoming-transaction alerts, contract-registry sync for the verified-contracts list and known-exploits database. All such calls are necessary for the documented wallet behavior; none are analytics or vendor-update pings. There is no third-party SDK in the app for Mixpanel, Amplitude, Segment, Sentry, Crashlytics, Datadog, Bugsnag, Firebase Analytics, or MetricKit. Apple's OS-level 'Share With App Developers' diagnostics setting is user-controlled and anonymized at the OS layer before reaching App Store Connect, separate from any Cryptograph-instrumented data flow.\n\n" +
+					"inspectableRemoteCalls: Cryptograph's external network calls all originate from the iPhone (the watch reaches services through the iPhone via WCSession; the watch itself does not make outbound network calls of its own). A technical user can install a TLS-inspecting proxy on iPhone (Settings → General → VPN & Device Management → install profile → trust → enable TLS inspection) and observe every network request the app makes — request bodies, headers, destinations. There is no proprietary or obscure transport that resists inspection.\n\n" +
+					"wirelessPrivacy: The iPhone↔watch link uses Apple's Watch Connectivity framework over BLE, with framework-level encryption and Apple's BLE MAC-address randomization (the watch's BLE MAC changes on a regular schedule, defeating long-term tracking by nearby BLE observers). External traffic from the iPhone is over standard TLS to known endpoints. There is no Cryptograph-defined wireless protocol that could leak identifiers, and the Apple-defined wireless layers below us are encrypted and address-randomized.",
+				phoningHome: HardwarePrivacyType.PASS,
+				inspectableRemoteCalls: HardwarePrivacyType.PASS,
+				wirelessPrivacy: HardwarePrivacyType.PASS,
+			},
 			privacyPolicy: 'https://cryptograph.watch/privacy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				// Cryptograph supports many chains including Zcash, which has shielded
+				// transactions natively. The Walletbeat schema's PrivateTransferTechnology
+				// enum models four EVM-side privacy techs (stealth addresses, Tornado
+				// Cash Nova, Privacy Pools, Railgun) and does not currently model
+				// chain-native shielded-transaction support. Cryptograph does not
+				// implement any of the four EVM-side techs, so all four are notSupported.
+				// Default fungible-token transfer mode for ETH/ERC-20 is PUBLIC.
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
