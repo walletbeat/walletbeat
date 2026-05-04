@@ -4,6 +4,7 @@ export type NavigationItem = {
 	title: string
 	icon?: string
 	href?: string
+	reload?: boolean
 	children?: NavigationItem[]
 }
 
@@ -125,6 +126,7 @@ export const defaultNavigationItems = [
 					title: wallet.metadata.displayName,
 					href: getWalletUrl(wallet),
 					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+					reload: true,
 				})),
 			},
 			{
@@ -166,6 +168,7 @@ export const defaultNavigationItems = [
 					title: wallet.metadata.displayName.replace(' Wallet', ''),
 					href: getWalletUrl(wallet),
 					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+					reload: true,
 				})),
 			},
 		],

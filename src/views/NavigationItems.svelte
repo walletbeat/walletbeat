@@ -191,6 +191,7 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
+			{...(item.reload && { 'data-astro-reload': '' })}
 			data-row="start gap-2"
 		>
 			{#if item.icon}
