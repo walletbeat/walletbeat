@@ -6,9 +6,9 @@ Gathering at Berlin's historic Funkhaus, the Neocypherpunk Summit brings togethe
 
 From defending resistance networks under political duress to scaling cryptography as civic infrastructure, the summit explores how open protocols and privacy tools become a resilient, shared foundation for digital autonomy, free assembly, and accountability.
 
-​Neo-Cypherpunk Summit unites movements, thinkers & activists powered by the joy of a new techno-socio-political act.
+Neo-Cypherpunk Summit unites movements, thinkers & activists powered by the joy of a new techno-socio-political act.
 
-​1 day of human rights, open-source, decentralized tech, freedom entanglements and practical activism shaping polarization, monopoly on tech, coordination, & mutual care.
+1 day of human rights, open-source, decentralized tech, freedom entanglements and practical activism shaping polarization, monopoly on tech, coordination, & mutual care.
 
 ## Speaker Application
 
