@@ -1,4 +1,19 @@
 import { perpetua } from '@/data/contributors/perpetua'
+import { apple } from '@/data/entities/apple'
+import { perpetuaLabs } from '@/data/entities/perpetua-labs'
+import { reown } from '@/data/entities/reown'
+import { solanaFoundation } from '@/data/entities/solana-foundation'
+import { tronFoundation } from '@/data/entities/tron-foundation'
+import { xrplLabs } from '@/data/entities/xrpl-labs'
+import {
+	CollectionPolicy,
+	type DataCollection,
+	DataCollectionPurpose,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	type BugBountyProgramImplementation,
@@ -138,11 +153,262 @@ export const cryptograph: HardwareWallet = {
 				// AppTransaction with no identifiers and no server.
 				usage: notSupported,
 			},
-			// dataCollection requires a structured per-user-flow enumeration of every
-			// external entity contacted and what data each receives. The schema
-			// docstring points at /docs/mitmproxy-guide; doing this honestly requires
-			// a real network-introspection session. Deferred to a follow-up PR.
-			dataCollection: null,
+			// Populated from code reading + apiproxy architecture review. Key finding:
+			// Cryptograph's apiproxy backend (a Cloudflare Worker at
+			// cryptograph-api-proxy.perpetua-cryptograph.workers.dev) abstracts every
+			// external EVM and Bitcoin call so upstream providers (Alchemy, CoinGecko,
+			// Jupiter, mempool.space, CryptoCompare) do NOT see client IPs — they see
+			// Cloudflare Worker IPs only. The apiproxy source was checked for any
+			// IP-passthrough headers (X-Forwarded-For, cf-connecting-ip, etc.) and
+			// none forward the client IP to upstream. Direct chain RPC calls
+			// (Solana, Tron, XRPL) are the exception — those endpoints DO see client
+			// IPs. CR-1239 is open in the Cryptograph repo for a mitmproxy verification
+			// session against an iOS Simulator build to ground-truth this populate; the
+			// data here will be reconciled against the capture.
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									'App Store install and (if user accepts the system push prompt) APNs push-token registration. Apple sees the device IP at install time and again on each App Store update check; the push token is a per-install identifier registered with APNs after the user accepts the system permission prompt.',
+								url: 'https://www.apple.com/legal/privacy/data/en/app-store/',
+							},
+							byEntity: apple,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+							},
+							purposes: [DataCollectionPurpose.UPDATE_CHECKING, DataCollectionPurpose.STATIC_ASSETS],
+						},
+					],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									'Continued APNs registration plus any iCloud-related state under user-controlled iOS settings. Apple does not learn wallet-specific data (mnemonic, addresses) from the wallet itself; the mnemonic is generated and stored on the watch in the watchOS Keychain and never leaves the device.',
+								url: 'https://www.apple.com/legal/privacy/data/en/',
+							},
+							byEntity: apple,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+						},
+						{
+							ref: {
+								explanation:
+									"After wallet creation, balance / asset / transaction-history lookups for the user's newly-derived addresses route through Cryptograph's apiproxy backend (a Cloudflare Worker). The apiproxy receives the user's IP, the addresses being queried, and balance/asset query payloads; it does not forward the IP to any upstream provider. Cryptograph does not assign per-user tracking identifiers; apiproxy auth is via API key bound to the install but not tied to any user identity.",
+								url: 'https://cryptograph.watch/privacy',
+							},
+							byEntity: perpetuaLabs,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									'Import from Recovery Sheet QR or Photo Backup is fully on-device. The encrypted backup is decrypted on the watch using the user-set password; no recovery data is sent to any external entity. Apple-side and apiproxy-side traffic mirrors the new-onboarding flow once the wallet is restored.',
+								url: 'https://cryptograph.watch/how-it-works',
+							},
+							byEntity: apple,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+						},
+						{
+							ref: {
+								explanation:
+									"After import, balance / asset / transaction-history lookups for the restored addresses route through apiproxy. Same data shape as new onboarding; recovery material itself never leaves the device.",
+								url: 'https://cryptograph.watch/privacy',
+							},
+							byEntity: perpetuaLabs,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.BALANCE]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ASSETS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+								DataCollectionPurpose.ASSET_METADATA,
+							],
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.SEND_ETHER]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									'EVM gas-fee fetch, transaction simulation, and broadcast all route through apiproxy. The pending transaction (sender, recipient, value, calldata) is sent to apiproxy for simulation and broadcast; apiproxy forwards to upstream Alchemy / mempool providers without including the client IP.',
+								url: 'https://cryptograph.watch/privacy',
+							},
+							byEntity: perpetuaLabs,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+							],
+						},
+					],
+				},
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									'Identical to SEND_ETHER for ERC-20 USDC: gas quote, simulation, and broadcast through apiproxy. apiproxy receives sender, recipient, token contract, amount, and calldata; upstream providers receive none of the client-side IP.',
+								url: 'https://cryptograph.watch/privacy',
+							},
+							byEntity: perpetuaLabs,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+							],
+						},
+					],
+				},
+				// Cryptograph does not have a built-in swap UI. Users sign external
+				// dapp swap intents from connected dapps via WalletConnect, which falls
+				// under MAKE_TRANSACTION + APP_CONNECTION below.
+				[UserFlow.NATIVE_SWAP]: 'FLOW_NOT_SUPPORTED',
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									'EVM and Bitcoin transaction simulation, fee quoting, and broadcast route through apiproxy. apiproxy abstracts upstream providers (Alchemy for EVM, mempool.space for Bitcoin) so upstream sees only Cloudflare Worker IPs.',
+								url: 'https://cryptograph.watch/privacy',
+							},
+							byEntity: perpetuaLabs,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TRANSACTION_SIMULATION,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+							],
+						},
+						{
+							ref: {
+								explanation:
+									"Solana transactions go directly to api.mainnet-beta.solana.com (Solana Foundation's public RPC). Solana Foundation sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.",
+								url: 'https://solana.com/privacy-policy',
+							},
+							byEntity: solanaFoundation,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+							],
+						},
+						{
+							ref: {
+								explanation:
+									"Tron transactions go directly to api.trongrid.io (TRON Foundation). TRON Foundation sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.",
+								url: 'https://tron.network/privacy',
+							},
+							byEntity: tronFoundation,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+							],
+						},
+						{
+							ref: {
+								explanation:
+									"XRP transactions go directly to xrplcluster.com (operated by XRPL Labs). XRPL Labs sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.",
+								url: 'https://xrpl-labs.com/privacy',
+							},
+							byEntity: xrplLabs,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+							],
+						},
+					],
+				},
+				[UserFlow.APP_CONNECTION]: {
+					collected: [
+						{
+							ref: {
+								explanation:
+									"WalletConnect (Reown) cloud relay handles the encrypted pairing-topic + session-relay traffic between Cryptograph and the dapp. Reown sees the client IP and the pairing topic; the dapp metadata URL is also visible in the connection request. Cryptograph runs the eth-phishing-detect bundled list locally — the dapp URL is NOT sent to any third-party for screening.",
+								url: 'https://reown.com/privacy-policy',
+							},
+							byEntity: reown,
+							dataCollection: {
+								endpoint: RegularEndpoint,
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+						},
+					],
+				},
+			} satisfies DataCollection,
 			hardwarePrivacy: {
 				type: HardwarePrivacyType.PASS,
 				url: 'https://cryptograph.watch/security',
