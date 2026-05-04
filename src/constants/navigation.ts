@@ -10,17 +10,17 @@ export type NavigationItem = {
 // Icons
 import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 import BadgeCheckIcon from 'lucide-static/icons/badge-check.svg?raw'
-import BuildingIcon from 'lucide-static/icons/building-2.svg?raw'
 import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
 import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
-import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 import CpuIcon from 'lucide-static/icons/cpu.svg?raw'
 import FlaskConical from 'lucide-static/icons/flask-conical.svg?raw'
-import GithubIcon from 'lucide-static/icons/github.svg?raw'
 import KeyIcon from 'lucide-static/icons/key.svg?raw'
-import MessageCircleIcon from 'lucide-static/icons/message-circle-heart.svg?raw'
 import NewsPaperIcon from 'lucide-static/icons/newspaper.svg?raw'
 import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
+import WbAboutIcon from '../../resources/files/wbicons/about.svg?raw'
+import WbDiscussIcon from '../../resources/files/wbicons/discuss.svg?raw'
+import WbFaqIcon from '../../resources/files/wbicons/faq.svg?raw'
+import WbRepositoryIcon from '../../resources/files/wbicons/repository.svg?raw'
 
 // Constants
 import { hardwareWallets } from '@/data/hardware-wallets'
@@ -40,14 +40,14 @@ export const navigationHome = {
 
 export const navigationFaq = {
 	id: 'faq',
-	icon: HelpCircleIcon,
+	icon: WbFaqIcon,
 	title: 'faq',
 	href: '/faq/',
 } as const satisfies NavigationItem
 
 export const navigationAbout = {
 	id: 'about',
-	icon: BuildingIcon,
+	icon: WbAboutIcon,
 	title: 'about',
 	href: '/about/',
 } as const satisfies NavigationItem
@@ -61,7 +61,7 @@ export const navigationCriteria = {
 
 export const navigationRepository = {
 	id: 'code-repository',
-	icon: GithubIcon,
+	icon: WbRepositoryIcon,
 	title: 'code',
 	href: 'https://github.com/walletbeat/walletbeat',
 } as const satisfies NavigationItem
@@ -74,7 +74,7 @@ export const navigationTesting = {
 } as const satisfies NavigationItem
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
-	icon: MessageCircleIcon,
+	icon: WbDiscussIcon,
 	title: 'farcaster',
 	href: 'https://farcaster.xyz/~/channel/walletbeat',
 } as const satisfies NavigationItem
