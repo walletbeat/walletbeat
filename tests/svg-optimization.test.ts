@@ -154,6 +154,10 @@ const optimizedSvgHashes: Record<string, string> = {
 	'resources/files/wbicons/wallet_software.svg':
 		'a6bf2a2c35af75b4b4302689160de01245e5900fceef33b98d4261975fdf7dfd',
 	'public/wbicons/wbicons.svg': '3cff783f34a832710e64cecf7368cf0d4030964dad2ba2d490ab4c97bfe0d02b',
+	'public/fonts/sp-monorium-dingbat.svg':
+		'4e075d1a474e3c9cac32668b882f38dea406bfd0f254767a4bfad9ff9fe47e3e',
+	'public/fonts/sp-monorium-regular.svg':
+		'eee6e8214eed53844156f73e7e053cce6124224642fe5366a5e9f22744d2d214',
 }
 
 interface SvgResult {

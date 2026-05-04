@@ -160,6 +160,7 @@ describe('codebase integrity', () => {
 			'▸',
 			'—',
 			'–',
+			'−',
 			'─',
 			'┌',
 			'┐',
@@ -188,15 +189,51 @@ describe('codebase integrity', () => {
 			'ᵗ',
 			'ʰ',
 			'↔',
+			'‚',
+			'„',
+			'†',
+			'‡',
+			'‹',
+			'€',
+			'™',
+			'↓',
+			'↕',
+			'↖',
+			'↘',
+			'↙',
+			'∞',
+			'≈',
+			'≠',
+			'ə',
+			'ẞ',
+			'Ỳ',
+			'ỳ',
 		])
 
+		// Characters used in font files generated from SVG.
 		for (let charCodeOffset = 0; charCodeOffset < maxIconFontChars; charCodeOffset++) {
 			allowedNonAscii.add(String.fromCodePoint(iconFontStartCharCode + charCodeOffset))
 		}
 
+		// Characters used in Monorium Dingbat.
+		for (const [charCodeMin, charCodeMax] of [
+			[160, 399],
+			[536, 567],
+			[768, 780],
+			[786, 786],
+			[806, 808],
+			[7808, 7813],
+		] as Array<[number, number]>) {
+			for (let c = charCodeMin; c <= charCodeMax; c++) {
+				allowedNonAscii.add(String.fromCodePoint(c))
+			}
+		}
+
 		for (const nonAscii of allowedNonAscii) {
 			if ([...nonAscii].length !== 1) {
-				throw new Error('invalid non-ASCII character list')
+				throw new Error(
+					`invalid non-ASCII character list: ${JSON.stringify(nonAscii)} (length: ${[...nonAscii].length})`,
+				)
 			}
 		}
 		const emojiSequence = /\p{RGI_Emoji}/gv
