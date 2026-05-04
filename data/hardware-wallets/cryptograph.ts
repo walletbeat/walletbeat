@@ -7,6 +7,7 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
@@ -184,7 +185,16 @@ export const cryptograph: HardwareWallet = {
 				},
 				duressMode: notSupported,
 			},
-			firmware: null,
+			firmware: {
+				type: FirmwareType.FAIL,
+				url: 'https://cryptograph.watch/security',
+				details:
+					"The 'firmware' concept maps poorly to App-Store-distributed iOS apps. Walletbeat's schema is built around traditional hardware wallets where the vendor controls the entire firmware image; Cryptograph is a watchOS / iOS app, so its update channel, source-distribution model, and reproducibility properties are governed by Apple's distribution chain rather than by Cryptograph directly. By the schema's literal reading, Cryptograph fails on all four sub-fields, in line with how every iOS-distributed wallet would score on this attribute. Mitigations Apple's model offers that the schema doesn't reward: every update is independently reviewed by Apple before reaching users; code-signing is enforced at every launch via FairPlay; auto-update propagates critical security patches to all users in roughly 24 hours rather than the months-long tail typical of hardware-wallet firmware updates; Apple can pull a malicious update from distribution and retroactively revoke installed copies, a kill-switch no traditional hardware wallet has. Different security philosophy (centralized trust + reviewed distribution) than the schema rewards (user freedom + transparency).",
+				silentUpdateProtection: FirmwareType.FAIL,
+				firmwareOpenSource: FirmwareType.FAIL,
+				reproducibleBuilds: FirmwareType.FAIL,
+				customFirmware: FirmwareType.FAIL,
+			},
 			keysHandling: {
 				ref: [
 					{
