@@ -158,6 +158,10 @@ const optimizedSvgHashes: Record<string, string> = {
 		'4e075d1a474e3c9cac32668b882f38dea406bfd0f254767a4bfad9ff9fe47e3e',
 	'public/fonts/sp-monorium-regular.svg':
 		'eee6e8214eed53844156f73e7e053cce6124224642fe5366a5e9f22744d2d214',
+	'resources/branding/glow-0.svg':
+		'5f40f64a49babed6573f5c16e39ec450eb83ef660efea7bcd30093fe19ac9a45',
+	'resources/branding/glow-1.svg':
+		'71e6c1520f6f9b40d189811b38f222a5381b1b01e9a281c1e55ef4941fafbed7',
 }
 
 interface SvgResult {
@@ -260,9 +264,13 @@ describe('SVG optimization', async () => {
 						)
 					})
 					.join('\n\n') +
-				'\n\n==== Single command: ====\n\n    ' +
-				needsOptimization.map(r => `npx svgo --config ${configPath} ${r.filePath}`).join(' && ') +
-				'\n\n'
+				(needsOptimization.length === 1
+					? ''
+					: '\n\n==== Single command: ====\n\n    ' +
+						needsOptimization
+							.map(r => `npx svgo --config ${configPath} ${r.filePath}`)
+							.join(' && ') +
+						'\n\n')
 
 			console.error(message)
 			expect(
