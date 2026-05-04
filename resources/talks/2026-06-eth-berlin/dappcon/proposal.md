@@ -1,0 +1,45 @@
+# Dappcon 2026
+
+## About
+
+Dappcon is all about the people building the future, and that includes you. Whether you’re a veteran researcher or a first-time builder with a fresh perspective, we want to hear your story. Join us to make ownership accessible, understandable, and immediately beneficial
+
+Dappcon 2026 will feature three key tracks:
+
+- Building the Open Infrastructure: Scalability, security, and interoperability of open-source protocols and dapps
+- Decentralized Finance for Everyone: Making DeFi accessible and useful for mainstream users
+- The Social Layer of Web3: The intersection of human connection and open-source technology
+
+## Application
+
+### Let’s start with who you are.
+
+- First Name
+- Last Name
+- Email Address
+
+### Which project are you working on?
+
+- Company
+- Position
+
+### Tell us what you’d like to bring to the Dappcon stage.
+
+- [ ] The Stage (Talk): Deep dives, case studies, or big-picture visions
+- [ ] The Workshop: Hands-on technical sessions and interactive builds.
+
+### Please provide some details about you
+
+#### Feel free to share a short biography or information about your past speaking engagements.
+
+- TBD
+
+#### Please provide your Bluesky, X or Github handle
+
+Optional: can be also submitted once you have been accepted as a speaker
+
+- TBD
+
+#### Please provide an image for the speaker website
+
+Optional: Also, if you were speaking last year and don't want to update your image, we can reuse the old one.
