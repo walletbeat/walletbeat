@@ -32,6 +32,9 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
+import { ReputationType } from '@/schema/features/transparency/reputation'
 import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
@@ -730,9 +733,70 @@ export const cryptograph: HardwareWallet = {
 			},
 		},
 		transparency: {
-			maintenance: null,
-			operationFees: null,
-			reputation: null,
+			maintenance: {
+				type: MaintenanceType.PARTIAL,
+				url: 'https://www.apple.com/shop/applecare/applewatch',
+				details:
+					"Same Apple-as-manufacturer pattern as supplyChainFactory. The device is an Apple Watch, manufactured and serviced by Apple under one of the most-documented consumer-electronics maintenance regimes in existence. Sub-field summary, framed in hardware-wallet-equivalent language:\n\n" +
+					"physicalDurability: Apple Watch Series carries IP6X dust resistance and 50m water resistance; Apple Watch Ultra adds shock resistance to MIL-STD-810H standards. Public IP / drop-test ratings exceed what any traditional hardware-wallet vendor publishes.\n\n" +
+					"mtbfDocumentation: Apple does not publish formal MTBF (mean time between failures) numbers the way enterprise hardware vendors do. This is a category-wide gap for consumer electronics; not specific to Cryptograph.\n\n" +
+					"repairability: Apple offers Self-Service Repair for the Apple Watch line (out-of-warranty parts and tools available to consumers), plus authorized service via Apple Stores and Apple Authorized Service Providers globally. Better than no DIY path, weaker than wallets like Bitbox where the user can fully open and inspect the device.\n\n" +
+					"batteryHandling: Apple offers battery service for all Apple Watch models with documented pricing and turnaround times. Battery replacement does not destroy the user's data — Apple's service flow preserves the watchOS Keychain across battery service.\n\n" +
+					"warrantyExtensions: AppleCare+ for Apple Watch extends the standard 1-year limited warranty to 2 or 3 years and adds accidental damage coverage. Available globally where Apple Watch is sold.",
+				physicalDurability: MaintenanceType.PASS,
+				mtbfDocumentation: MaintenanceType.FAIL,
+				repairability: MaintenanceType.PARTIAL,
+				batteryHandling: MaintenanceType.PASS,
+				warrantyExtensions: MaintenanceType.PASS,
+			},
+			operationFees: {
+				ethL1Transfer: supported({
+					ref: {
+						explanation:
+							"On a plain ETH transfer, the watch approval screen shows the gas fee as a single line. Cryptograph takes no wallet-side or protocol-side fee on transfers; gas is the entire fee picture, so the displayed value is comprehensive (no hidden fees being collapsed into one line).",
+						url: 'https://cryptograph.watch/how-it-works',
+					},
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+				}),
+				erc20L1Transfer: supported({
+					ref: {
+						explanation:
+							'Identical to ETH-transfer fee display: gas as a single line, no wallet-side or protocol-side fees taken on top.',
+						url: 'https://cryptograph.watch/how-it-works',
+					},
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+				}),
+				builtInErc20Swap: notSupported,
+				uniswapUSDCToEtherSwap: supported({
+					ref: {
+						explanation:
+							"For Uniswap swaps initiated from Uniswap's frontend via WalletConnect, Cryptograph's approval surface shows the decoded swap call (Uniswap V2/V3/V4 Universal Router commands are recognized by the on-watch ABI decoder), gas fee, and the simulated balance change (per-asset). The Uniswap pool fee is encoded inside the swap path and reflected in the simulated output amount rather than displayed as a separate line; that's an inherent property of Uniswap's design, not a Cryptograph-side aggregation.",
+						url: 'https://cryptograph.watch/how-it-works',
+					},
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					afterSingleAction: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+				}),
+			},
+			reputation: {
+				type: ReputationType.PARTIAL,
+				url: 'https://cryptograph.watch/',
+				details:
+					"originalProduct: Cryptograph is the first wallet to put self-custodial Ethereum signing on the Apple Watch as the trust boundary. The architecture (keys held on watch; iPhone composes but does not sign; encrypted Recovery Sheet + steganographic Photo Backup) is original to Perpetua Labs.\n\n" +
+					"availability: Currently shipping on the App Store as a paid one-time purchase.\n\n" +
+					"warrantySupportRisk: Cryptograph's recovery design is structurally robust to vendor disappearance — the BIP-39 mnemonic is viewable on-watch and portable to any compatible wallet, so users can recover their funds with or without Cryptograph the company. The Apple Watch itself is supported by Apple's globally-available service network.\n\n" +
+					"disclosureHistory: Cryptograph publishes a self-hosted bug bounty program at cryptograph.watch/bug-bounty with disclose.io-derived Safe Harbor language and a documented coordinated-disclosure timeline. No public CVEs to date — the program is recently-launched.\n\n" +
+					"bugBounty: Self-hosted, full-scope, $100–$5,000 USD bootstrap-tier rewards with a $20k annual aggregate cap, Safe Harbor adopted from disclose.io, KYC + OFAC screening on payouts, severity classified per CVSS 4.0.",
+				originalProduct: ReputationType.PASS,
+				availability: ReputationType.PASS,
+				warrantySupportRisk: ReputationType.PASS,
+				disclosureHistory: ReputationType.PARTIAL,
+				bugBounty: ReputationType.PASS,
+			},
 		},
 	},
 	variants: {
