@@ -6,7 +6,7 @@ BREW Privacy Matters is a one-day conference during the Berlin Blockchain Week e
 
 As transparent systems become more widely adopted, privacy is becoming increasingly important.
 
-the Conference explores privacy through three lenses:
+The Conference explores privacy through three lenses:
 
 - Technological foundations
 - Applications in practice
@@ -40,7 +40,12 @@ BREW is a one-day conference exploring privacy through systems, narratives, and 
 
   **What participants will learn:**
   - What the wallet privacy landscape actually looks like today: which wallets protect users and which don’t, backed by Walletbeat's data
-  - Different features of wallet privacy: data collection, private transfers, multi-address correlation, privacy hygiene (whether wallets send sensitive data like analytics or crash reports without explicit consent), and browser extension permissions (whether a wallet silently accesses every website a user visits)
+  - Different features of wallet privacy:
+    - **Wallet address privacy**: Is your wallet address linkable to other information about yourself?
+    - **Private token transfers**: Can you send and receive tokens without revealing your transaction history to others?
+    - **Multi-address privacy**: Can your multiple wallet addresses be correlated with one another?
+    - **Privacy hygiene**: Does your wallet only send sensitive data with your explicit consent?
+    - **Security best practices**: Does your browser extension wallet request dangerous permissions, or has access into every website you visit?
   - What an Ethereum wallet that passes all privacy attributes looks like
   - How to evaluate any wallet’s privacy posture using Walletbeat tooling and methodology
 
