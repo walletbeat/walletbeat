@@ -25,6 +25,7 @@ import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistan
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
@@ -663,7 +664,15 @@ export const cryptograph: HardwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			interoperability: null,
+			interoperability: {
+				type: InteroperabilityType.PASS,
+				url: 'https://cryptograph.watch/how-it-works',
+				details:
+					"Cryptograph generates and stores a standard BIP-39 mnemonic, derived per BIP-32. Users can view their full 24-word seed phrase directly on the watch via Settings (the phone never sees the mnemonic; it remains on-device). The mnemonic is fully portable — users can transcribe it manually into any BIP-39-compatible wallet (Ledger, Trezor, MetaMask, Rabby, etc.) and recover their accounts there. Recovery Sheet QR and Photo Backup are Cryptograph-specific encrypted formats, but they're convenience-on-top-of-the-mnemonic; the underlying seed is universally interchangeable.\n\n" +
+					"Cryptograph signs transactions using standard BIP-32 derivation paths and standard ECDSA / EdDSA signatures per chain. Signed transaction payloads contain no Cryptograph-specific markers, headers, or memos — they are byte-indistinguishable from transactions signed by any other BIP-39/BIP-32 wallet. External observers cannot identify a transaction as having been signed by Cryptograph.",
+				interoperability: InteroperabilityType.PASS,
+				noSupplierLinkage: InteroperabilityType.PASS,
+			},
 		},
 		transparency: {
 			maintenance: null,
