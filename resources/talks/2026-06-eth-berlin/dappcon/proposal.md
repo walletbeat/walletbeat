@@ -28,18 +28,17 @@ Dappcon 2026 will feature three key tracks:
 - [ ] The Stage (Talk): Deep dives, case studies, or big-picture visions
 - [ ] The Workshop: Hands-on technical sessions and interactive builds.
 
+- Session Title: \_\_\_\_
+- Abstract of your talk: \_\_\_\_
+
 ### Please provide some details about you
 
-#### Feel free to share a short biography or information about your past speaking engagements.
+#### Feel free to share a short biography or information about your past speaking engagements: \_\_\_\_
 
-- TBD
-
-#### Please provide your Bluesky, X or Github handle
+#### Please provide your Bluesky, X or Github handle: \_\_\_\_
 
 Optional: can be also submitted once you have been accepted as a speaker
 
-- TBD
-
-#### Please provide an image for the speaker website
+#### Please provide an image for the speaker website: \_\_\_\_
 
 Optional: Also, if you were speaking last year and don't want to update your image, we can reuse the old one.
