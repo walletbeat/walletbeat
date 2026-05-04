@@ -259,7 +259,7 @@ function getTypeParams(
 async function processFile(filePath: string, srcRoot: string): Promise<FileResult> {
 	const sourceText = fs.readFileSync(filePath, 'utf-8')
 	const sourceFile = ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true)
-	const relPath = path.relative(srcRoot, filePath)
+	const relPath = path.relative(srcRoot, filePath).replaceAll(path.sep, '/')
 	let content = ''
 
 	for (const stmt of sourceFile.statements) {

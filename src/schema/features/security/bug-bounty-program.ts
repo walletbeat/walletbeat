@@ -22,6 +22,7 @@ import type { Support } from '../support'
  */
 export enum BugBountyPlatform {
 	SELF_HOSTED = 'Self-hosted',
+	CANTINA = 'Cantina',
 	HACKER_ONE = 'Hacker One',
 	BUG_CROWD = 'Bugcrowd',
 	INTIGRITI = 'Intigriti',
