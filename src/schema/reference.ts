@@ -34,7 +34,10 @@ import {
  */
 export interface LooseReference {
 	/** The URL(s) the reference is about. */
-	url: NonEmptyArray<Url> | Url
+	url?: NonEmptyArray<Url> | Url
+
+	/** The repo-relative filename under public/ (New Field) */
+  file?: string
 
 	/** The text of the link that goes to `url`; defaults to the domain name of `url`. */
 	label?: string
@@ -48,18 +51,23 @@ export interface LooseReference {
 
 /** Type predicate for LooseReference. */
 export function isLooseReference(x: unknown): x is LooseReference {
-	return (
-		x !== undefined &&
-		x !== null &&
-		typeof x === 'object' &&
-		Object.hasOwn(x, 'url') &&
-		((url: unknown) =>
-			isUrl(url) ||
-			(Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
-			(x as unknown as { url: unknown }).url,
-		)
-	)
+  if (x === undefined || x === null || typeof x !== 'object') {
+    return false
+  }
+
+  if (Object.hasOwn(x, 'file') && typeof (x as { file: unknown }).file === 'string') {
+    return true
+  }
+
+  return (
+    Object.hasOwn(x, 'url') &&
+    ((url: unknown) =>
+      isUrl(url) ||
+      (Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      (x as unknown as { url: unknown }).url,
+    )
+  )
 }
 
 /**
@@ -138,11 +146,9 @@ export function toFullyQualified(
 
 	if (Array.isArray(reference)) {
 		const qualified: FullyQualifiedReference[] = []
-
 		for (const ref of reference) {
 			qualified.push(...toFullyQualified(ref))
 		}
-
 		return mergeRefs(...qualified)
 	}
 
@@ -158,7 +164,8 @@ export function toFullyQualified(
 
 	if (
 		Object.hasOwn(reference, 'explanation') &&
-		typeof (reference as { explanation: unknown }).explanation === 'string' // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "explanation" field exists.
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "explanation" field exists.
+		typeof (reference as { explanation: unknown }).explanation === 'string'
 	) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified the "explanation" field exists and is a string.
 		explanation = (reference as { explanation: string }).explanation
@@ -168,10 +175,44 @@ export function toFullyQualified(
 
 	if (
 		Object.hasOwn(reference, 'lastRetrieved') &&
-		typeof (reference as { lastRetrieved: unknown }).lastRetrieved === 'string' // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists.
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists.
+		typeof (reference as { lastRetrieved: unknown }).lastRetrieved === 'string'
 	) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists, and the only possible string type for it is CalendarDate.
 		lastRetrieved = (reference as { lastRetrieved: CalendarDate }).lastRetrieved
+	}
+
+	// Handle repo-file references: files committed under public/ in the walletbeat repo.
+	if (
+		Object.hasOwn(reference, 'file') &&
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "file" field exists.
+		typeof (reference as { file: unknown }).file === 'string'
+	) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified the "file" field exists and is a string.
+		const filePath = (reference as { file: string }).file
+
+		if (!filePath.startsWith('public/')) {
+			throw new Error(
+				`RepoFileReference path must be a repo-relative path under public/, got: "${filePath}"`,
+			)
+		}
+
+		const fileUrl = `/${filePath.slice('public/'.length)}`
+
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "label" field type before using it.
+		const label =
+			Object.hasOwn(reference, 'label') &&
+			typeof (reference as { label: unknown }).label === 'string'
+				? (reference as { label: string }).label
+				: filePath.split('/').pop() ?? 'Document'
+
+		return [
+			{
+				urls: [{ url: fileUrl, label }],
+				explanation,
+				lastRetrieved,
+			},
+		]
 	}
 
 	if (isLabeledUrl(reference)) {
@@ -192,6 +233,10 @@ export function toFullyQualified(
 				lastRetrieved,
 			},
 		]
+	}
+
+	if (reference.url === undefined) {
+		return []
 	}
 
 	if (reference.url.length === 1) {
