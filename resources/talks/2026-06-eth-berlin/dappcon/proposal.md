@@ -20,22 +20,22 @@ Dappcon 2026 will feature three key tracks:
 
 ### Which project are you working on?
 
-- Company
-- Position
+- Company Walletbeat
+- Position Core Contributor
 
 ### Tell us what you’d like to bring to the Dappcon stage.
 
 - [ ] The Stage (Talk): Deep dives, case studies, or big-picture visions
-- [ ] The Workshop: Hands-on technical sessions and interactive builds.
+- [x] The Workshop: Hands-on technical sessions and interactive builds.
 
-- Session Title: \_\_\_\_
-- Abstract of your talk: \_\_\_\_
+- Session Title: Testing Software Wallets & Recent EIP Proposals for Wallets
+- Abstract of your talk: A hands-on workshop exploring how to use the Walletbeat wallet testing playground, along with a deep dive into recent EIP proposals affecting wallets: EIP-7730 (structured data signing) and ERC-8213 (calldata digest).
 
 ### Please provide some details about you
 
 #### Feel free to share a short biography or information about your past speaking engagements: \_\_\_\_
 
-#### Please provide your Bluesky, X or Github handle: \_\_\_\_
+#### Please provide your Bluesky, X or Github handle: https://x.com/0xmattmatt / https://github.com/maykelxyz
 
 Optional: can be also submitted once you have been accepted as a speaker
 
