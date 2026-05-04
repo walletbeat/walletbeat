@@ -30,6 +30,11 @@ import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistan
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import {
+	IosUsageDescription,
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
@@ -617,7 +622,29 @@ export const cryptograph: HardwareWallet = {
 				}),
 			},
 			secureElement: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: {
+						explanation:
+							'Cryptograph is an iOS / watchOS app pair distributed via the App Store. The mnemonic is stored in the watchOS Keychain encrypted with ChaCha20-Poly1305 using a key derived via a Secure Enclave P-256 ECDH operation; the SE wrapping key never leaves hardware. RNG for key generation uses the Apple Secure Enclave hardware entropy source. iOS usage descriptions cover the camera (QR scanning), Face ID (biometric unlock), and location-when-in-use (a platform requirement for Bluetooth LE access on iOS, not used for geolocation tracking).',
+						url: 'https://cryptograph.watch/security',
+					},
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					secureRng: SecureRngSource.HARDWARE_ENTROPY,
+					mobileAppHardening: {
+						android: 'NOT_AN_ANDROID_APP',
+						ios: {
+							usageDescriptions: [
+								IosUsageDescription.CAMERA,
+								IosUsageDescription.FACE_ID,
+								IosUsageDescription.LOCATION_WHEN_IN_USE,
+							],
+						},
+					},
+				},
+			},
 			supplyChainDIY: {
 				type: SupplyChainDIYType.FAIL,
 				url: 'https://www.apple.com/apple-watch/',
