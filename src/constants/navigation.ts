@@ -8,19 +8,10 @@ export type NavigationItem = {
 }
 
 // Icons
-import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 import BadgeCheckIcon from 'lucide-static/icons/badge-check.svg?raw'
 import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
 import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
-import CpuIcon from 'lucide-static/icons/cpu.svg?raw'
-import FlaskConical from 'lucide-static/icons/flask-conical.svg?raw'
-import KeyIcon from 'lucide-static/icons/key.svg?raw'
-import NewsPaperIcon from 'lucide-static/icons/newspaper.svg?raw'
 import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
-import WbAboutIcon from '../../resources/files/wbicons/about.svg?raw'
-import WbDiscussIcon from '../../resources/files/wbicons/discuss.svg?raw'
-import WbFaqIcon from '../../resources/files/wbicons/faq.svg?raw'
-import WbRepositoryIcon from '../../resources/files/wbicons/repository.svg?raw'
 
 // Constants
 import { hardwareWallets } from '@/data/hardware-wallets'
@@ -29,6 +20,15 @@ import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { WalletType } from '@/schema/wallet-types'
 import { getWalletUrl } from '@/utils/wallet-url'
+
+import WbAboutIcon from '../../resources/files/wbicons/about.svg?raw'
+import WbAccountTypeIcon from '../../resources/files/wbicons/account_type.svg?raw'
+import WbDiscussIcon from '../../resources/files/wbicons/discuss.svg?raw'
+import WbFaqIcon from '../../resources/files/wbicons/faq.svg?raw'
+import WbNewsletterIcon from '../../resources/files/wbicons/newsletter.svg?raw'
+import WbRepositoryIcon from '../../resources/files/wbicons/repository.svg?raw'
+import WbWalletHardwareIcon from '../../resources/files/wbicons/wallet_hardware.svg?raw'
+import WbWalletSoftwareIcon from '../../resources/files/wbicons/wallet_software.svg?raw'
 
 // Constants
 export const navigationHome = {
@@ -68,7 +68,7 @@ export const navigationRepository = {
 
 export const navigationTesting = {
 	id: 'testing-page',
-	icon: FlaskConical,
+	icon: WbAccountTypeIcon,
 	title: 'Test your wallet',
 	href: '/test',
 } as const satisfies NavigationItem
@@ -81,7 +81,7 @@ export const navigationFarcasterChannel = {
 
 export const navigationNews = {
 	id: 'news',
-	icon: NewsPaperIcon,
+	icon: WbNewsletterIcon,
 	title: 'Wallet Security News',
 	href: '/news',
 } as const satisfies NavigationItem
@@ -100,7 +100,7 @@ export const defaultNavigationItems = [
 		id: 'software-wallets',
 		title: 'Software Wallets',
 		href: '/wallet/summary/',
-		icon: AppWindowIcon,
+		icon: WbWalletSoftwareIcon,
 		children: [
 			{
 				id: 'software-by-rating',
@@ -139,7 +139,7 @@ export const defaultNavigationItems = [
 		id: 'hardware-wallets',
 		title: 'Hardware Wallets',
 		href: '/hww/summary/',
-		icon: KeyIcon,
+		icon: WbWalletHardwareIcon,
 		children: [
 			{
 				id: 'hardware-by-rating',
@@ -170,30 +170,30 @@ export const defaultNavigationItems = [
 			},
 		],
 	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary/',
-		icon: CpuIcon,
-		children: [
-			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: ChartPieIcon,
-				children: [
-					...mapNonExemptAttributeGroupsInTree(
-						representativeWalletForType(WalletType.EMBEDDED).overall,
-						attrGroup => ({
-							id: `embedded-${attrGroup.id}`,
-							title: attrGroup.displayName,
-							icon: attrGroup.icon,
-							href: `/embedded/${attrGroup.id}/`,
-						}),
-					),
-				],
-			},
-		],
-	},
+	// {
+	// 	id: 'embedded-wallets',
+	// 	title: 'Embedded Wallets',
+	// 	href: '/embedded/summary/',
+	// 	icon: CpuIcon,
+	// 	children: [
+	// 		{
+	// 			id: 'embedded-by-rating',
+	// 			title: 'By Rating',
+	// 			icon: ChartPieIcon,
+	// 			children: [
+	// 				...mapNonExemptAttributeGroupsInTree(
+	// 					representativeWalletForType(WalletType.EMBEDDED).overall,
+	// 					attrGroup => ({
+	// 						id: `embedded-${attrGroup.id}`,
+	// 						title: attrGroup.displayName,
+	// 						icon: attrGroup.icon,
+	// 						href: `/embedded/${attrGroup.id}/`,
+	// 					}),
+	// 				),
+	// 			],
+	// 		},
+	// 	],
+	// },
 	navigationNews,
 	navigationTesting,
 ] as const satisfies NavigationItem[]
