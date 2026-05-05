@@ -14,6 +14,7 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -38,6 +39,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -87,7 +89,7 @@ export const rabby: SoftwareWallet = {
 		`),
 		contributors: [polymutex, nconsigny],
 		iconExtension: 'svg',
-		lastUpdated: '2024-12-15',
+		lastUpdated: '2026-05-06',
 		urls: {
 			docs: ['https://rabbykit.rabby.io/'],
 			extensions: [
@@ -424,7 +426,18 @@ export const rabby: SoftwareWallet = {
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: null,
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: true,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [
@@ -452,7 +465,35 @@ export const rabby: SoftwareWallet = {
 						}),
 					},
 				},
-				[Variant.BROWSER]: null,
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'Rabby Wallet Extension supports Ledger, Trezor, GridPlus, OneKey, Keystone, NGRAVE ZERO, BitBox, CoolWallet, imToken, imKey hardware wallets.',
+							url: 'https://rabby.io/download',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+						[HardwareWalletType.GRIDPLUS]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+						[HardwareWalletType.IMKEY]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+					},
+				},
 				[Variant.MOBILE]: null,
 			},
 			keysHandling: {
@@ -731,7 +772,12 @@ export const rabby: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: supported({
+				ref: refTodo,
+				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+			}),
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
