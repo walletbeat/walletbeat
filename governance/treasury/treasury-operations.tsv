@@ -67,3 +67,6 @@ Date	From	To	Amount	Purpose	ID
 2026-04-24	treasury	mattmatt_test1	0.2 ETH	Payment for Ethereum contract deployment on mainnet	0x250805ce918955715e1ae5b67595d12010775fdb40fbb40ed020ac2938825e5f
 2026-04-26	mattmatt_deployer	treasury	0.2 ETH	Return excess 0.2 ETH used for contract deploy	0x159d744a2b86273f1ad097904c7be533a4772a106baee2752a2016f4b2ea971b
 2026-04-26	treasury	treasury	3,000 USDC	Payment for Walletbeat social media services (April & May payment)	0xa756c0b3d95e3896f74f020a3a2746ff96bf57785ac9ff218b77623ff18a6648
+2026-05-04	treasury	treasury	2.789064262885852303 ETH → 6571.43 USDC	Swap On Uniswap	0xa9c89be13e9b02775a2ea800e2a72304261a6de7a2ee98f391986a1b99d7d2dc
+2026-05-04	treasury	teresa5	897.67 USDC	Payment for Walletbeat branding services	0xebb9fe2e7c30f5c8652636597a9a6a09862f65f258f6d7ce369fad967beea88e
+2026-05-04	treasury	mattmatt_sablier	5,571.43 USDC	Top-up of Sablier stream	0xdff9f6cbdaf6d138dd6092b0497e375deb7ce3b0b7f2d6b7ad0d36923cd9a427
