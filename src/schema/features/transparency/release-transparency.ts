@@ -67,15 +67,17 @@ export type DependencyVulnerabilityScanning = Support<WithRef<{}>>
  * repository. Each sub-field is independently researchable and may be `null`
  * until determined.
  */
-export type RepositoryChangeControls = Nullable<{
-	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
-	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
-	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
-	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
-	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
-}>
+export type RepositoryChangeControls = Nullable<
+	WithRef<{
+		/** Whether protected branch rules require an approving review before merge. */
+		requiredReview: boolean
+		/** Whether protected branch rules require status checks to pass before merge. */
+		requiredChecks: boolean
+		/** Whether force-push is blocked on protected branches. */
+		forcePushBlocked: boolean
+		/** Whether deletion is blocked on protected branches. */
+		branchDeletionBlocked: boolean
+		/** Whether release tags are protected / immutable. */
+		tagsImmutable: boolean
+	}>
+>

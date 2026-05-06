@@ -727,6 +727,7 @@ export const completedTemplate: SoftwareWallet = {
 				hasPublicChangelog: supported({ ref: 'https://example.com/changelog' }),
 				hermeticBuilds: supported({ ref: refTodo }),
 				repositoryChangeControls: {
+					ref: refTodo,
 					branchDeletionBlocked: true,
 					forcePushBlocked: true,
 					requiredChecks: true,

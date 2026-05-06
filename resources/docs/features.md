@@ -3774,18 +3774,20 @@ type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 Observable repository-level change controls for the wallet's source repository. Each sub-field is independently researchable and may be `null` until determined.
 
 ```typescript
-type RepositoryChangeControls = Nullable<{
-	/** Whether protected branch rules require an approving review before merge. */
-	requiredReview: boolean
-	/** Whether protected branch rules require status checks to pass before merge. */
-	requiredChecks: boolean
-	/** Whether force-push is blocked on protected branches. */
-	forcePushBlocked: boolean
-	/** Whether deletion is blocked on protected branches. */
-	branchDeletionBlocked: boolean
-	/** Whether release tags are protected / immutable. */
-	tagsImmutable: boolean
-}>
+type RepositoryChangeControls = Nullable<
+	WithRef<{
+		/** Whether protected branch rules require an approving review before merge. */
+		requiredReview: boolean
+		/** Whether protected branch rules require status checks to pass before merge. */
+		requiredChecks: boolean
+		/** Whether force-push is blocked on protected branches. */
+		forcePushBlocked: boolean
+		/** Whether deletion is blocked on protected branches. */
+		branchDeletionBlocked: boolean
+		/** Whether release tags are protected / immutable. */
+		tagsImmutable: boolean
+	}>
+>
 ```
 
 ---
