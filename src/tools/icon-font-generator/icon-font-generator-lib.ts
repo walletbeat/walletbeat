@@ -19,7 +19,7 @@ const PRESENTATION_ATTR_REGEX = new RegExp(
 
 // Regex to match CSS-in-style declarations like fill: ...; or stroke: ...;
 const STYLE_COLOR_ATTR_REGEX = new RegExp(
-	`(?:${SVG_COLOR_ATTRIBUTES.join('|')})\\s*:\\s*([^;]+);`,
+	`(?:${SVG_COLOR_ATTRIBUTES.join('|')})\\s*:\\s*([^;}"']+);?`,
 	'gi',
 )
 
