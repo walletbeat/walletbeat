@@ -40,7 +40,10 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
 	comprehensiveFeesShownByDefault,
@@ -59,6 +62,7 @@ import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manif
 import { mdParagraph, paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
+import { mattmatt } from '../contributors/0xmattmatt'
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
 import { consensys } from '../entities/consensys'
@@ -89,9 +93,9 @@ export const metamask: SoftwareWallet = {
 			been around for a long time. It is a jack-of-all-trades wallet that can
 			be extended through MetaMask Snaps.
 		`),
-		contributors: [polymutex, nconsigny],
+		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-13',
+		lastUpdated: '2026-05-06',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -602,7 +606,7 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -610,8 +614,10 @@ export const metamask: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
 				},
 			},
