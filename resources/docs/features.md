@@ -3731,20 +3731,15 @@ type SignaturePublicationType = 'GITHUB_RELEASE' | 'SIGSTORE_REKOR' | 'ONCHAIN' 
 
 Artifact signing information for a wallet variant.
 
-Discriminated union ensures that `artifactSigner` and `signaturePublication` are `null` when artifacts are not signed, making the invariant machine-checkable.
+Uses the common Support shape and carries signer/publication details when signing is supported. Metadata may still be `null` if unknown.
 
 ```typescript
-type ArtifactSigning =
-	| {
-			artifactsSigned: NotSupported
-			artifactSigner: null
-			signaturePublication: null
-	  }
-	| {
-			artifactsSigned: Supported<WithRef<{}>>
-			artifactSigner: ArtifactSignerType | null
-			signaturePublication: SignaturePublicationType | null
-	  }
+type ArtifactSigningDetails = WithRef<{
+	signer: ArtifactSignerType | null
+	publication: SignaturePublicationType | null
+}>
+
+type ArtifactSigning = Support<ArtifactSigningDetails>
 ```
 
 ---

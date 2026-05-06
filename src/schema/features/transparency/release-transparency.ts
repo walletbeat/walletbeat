@@ -1,7 +1,7 @@
 import type { Nullable } from '@/types/utils/nullable'
 
 import type { MustRef, WithRef } from '../../reference'
-import type { NotSupported, Support, Supported } from '../support'
+import type { Support } from '../support'
 
 /**
  * Whether the wallet has a publicly accessible changelog or release notes
@@ -35,20 +35,15 @@ export type SignaturePublicationType =
 /**
  * Artifact signing information for a wallet variant.
  *
- * Discriminated union ensures that `artifactSigner` and `signaturePublication`
- * are `null` when artifacts are not signed, making the invariant machine-checkable.
+ * Uses the common Support shape and carries signer/publication details
+ * when signing is supported. Metadata may still be `null` if unknown.
  */
-export type ArtifactSigning =
-	| {
-			artifactsSigned: NotSupported
-			artifactSigner: null
-			signaturePublication: null
-	  }
-	| {
-			artifactsSigned: Supported<WithRef<{}>>
-			artifactSigner: ArtifactSignerType | null
-			signaturePublication: SignaturePublicationType | null
-	  }
+export type ArtifactSigningDetails = WithRef<{
+	signer: ArtifactSignerType | null
+	publication: SignaturePublicationType | null
+}>
+
+export type ArtifactSigning = Support<ArtifactSigningDetails>
 
 /**
  * Whether the wallet's release builds enforce a lockfile (or equivalent)

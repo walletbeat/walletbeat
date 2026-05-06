@@ -86,6 +86,7 @@ import {
 	fullySponsoredFees,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -717,11 +718,11 @@ export const completedTemplate: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
 			releaseTransparency: {
-				artifactSigning: {
-					artifactSigner: 'BOTH',
-					artifactsSigned: supported({ ref: refTodo }),
-					signaturePublication: 'SIGSTORE_REKOR',
-				},
+				artifactSigning: supported<ArtifactSigningDetails>({
+					ref: refTodo,
+					publication: 'SIGSTORE_REKOR',
+					signer: 'BOTH',
+				}),
 				dependencyLocking: supported({ ref: refTodo }),
 				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
 				hasPublicChangelog: supported({ ref: 'https://example.com/changelog' }),

@@ -225,10 +225,10 @@ export const releaseProcess: Attribute = {
 			return unrated(ctx)
 		}
 
-		const signing = isSupported(rt.artifactSigning.artifactsSigned)
+		const signing = isSupported(rt.artifactSigning)
 
 		if (signing) {
-			ctx.addRef(rt.artifactSigning.artifactsSigned)
+			ctx.addRef(rt.artifactSigning)
 		}
 
 		// Signal 4: Dependency locking
