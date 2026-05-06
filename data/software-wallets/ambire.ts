@@ -800,35 +800,7 @@ export const ambire: SoftwareWallet = {
 					],
 				}),
 				repositoryChangeControls: null,
-				reproducibleBuilds: supported({
-					ref: [
-						{
-							explanation:
-								'The repository README documents local installation and build commands (`yarn setup`, `yarn build:extensions`, platform build commands), indicating independent builders can perform builds themselves.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/README.MD',
-						},
-						{
-							explanation:
-								'The project defines explicit build scripts for extension, Android, and iOS targets in `package.json` (e.g. `build:extensions`, `build:android:production:apk`, `build:ios:production`).',
-							url: 'https://github.com/AmbireTech/extension/blob/main/package.json',
-						},
-						{
-							explanation:
-								'Release CI workflows call the same yarn build commands from the repo (for example, `yarn build:extensions:*`), which supports that maintainers are building from repository-defined scripts rather than opaque external tooling.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
-						},
-						{
-							explanation:
-								'Reusable Android workflow runs repository-defined build commands via yarn, showing the Android release artifacts are built from source in this repo.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-android.yml',
-						},
-						{
-							explanation:
-								'Reusable iOS workflow runs repository-defined build commands and pod install steps, showing iOS release artifacts are also built from source in this repo (with Apple toolchain/signing prerequisites).',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-ios.yml',
-						},
-					],
-				}),
+				reproducibleBuilds: null,
 			},
 		},
 	},
