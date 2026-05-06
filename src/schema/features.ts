@@ -607,9 +607,11 @@ export function resolveFeatures(
 					'transparency.releaseTransparency.hermeticBuilds',
 					features => features.transparency.releaseTransparency.hermeticBuilds,
 				),
-				repositoryChangeControls: baseFeat(
-					'transparency.releaseTransparency.repositoryChangeControls',
-					features => features.transparency.releaseTransparency.repositoryChangeControls,
+				repositoryChangeControls: nullable(
+					baseFeat(
+						'transparency.releaseTransparency.repositoryChangeControls',
+						features => features.transparency.releaseTransparency.repositoryChangeControls,
+					),
 				),
 				reproducibleBuilds: baseFeat(
 					'transparency.releaseTransparency.reproducibleBuilds',

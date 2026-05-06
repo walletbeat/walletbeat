@@ -59,8 +59,11 @@ export type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 /**
  * Observable repository-level change controls for the wallet's source
- * repository. Each sub-field is independently researchable and may be `null`
- * until determined.
+ * repository. Sub-fields may be `null` in source data while research is in
+ * progress.
+ *
+ * During resolution, this feature is normalized all-or-nothing: if any
+ * sub-field remains unknown, the resolved value becomes `null`.
  */
 export type RepositoryChangeControls = Nullable<
 	WithRef<{

@@ -109,7 +109,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`VariantFeature<HermeticBuilds>`)
-    - `repositoryChangeControls` (`VariantFeature<RepositoryChangeControls>`)
+    - `repositoryChangeControls` (`VariantFeature<RepositoryChangeControls>`): Repository controls are normalized all-or-nothing; if any sub-field is unknown, the resolved value becomes `null`.
     - `reproducibleBuilds` (`VariantFeature<ReproducibleBuilds>`)
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
@@ -271,7 +271,7 @@ A set of features about a specific wallet variant. All features are resolved to 
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`ResolvedFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`ResolvedFeature<HermeticBuilds>`)
-    - `repositoryChangeControls` (`ResolvedFeature<RepositoryChangeControls>`)
+    - `repositoryChangeControls` (`ResolvedFeature<RepositoryChangeControls>`): Normalized all-or-nothing; partial unknowns are collapsed to `null`.
     - `reproducibleBuilds` (`ResolvedFeature<ReproducibleBuilds>`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
