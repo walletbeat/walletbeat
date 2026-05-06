@@ -344,13 +344,14 @@ export function licenseSourceIsVisible(license: License): license is SourceAvail
 }
 
 /**
- * Returns true if the wallet's source code is publicly visible,
- * based on its resolved licensing. Useful for gating signals that
- * require source access for external verification (e.g. reproducible builds).
+ * Returns source visibility based on resolved licensing.
+ * - `true`: source is publicly visible.
+ * - `false`: source is known not to be publicly visible.
+ * - `null`: licensing data is missing, so visibility cannot be determined.
  */
-export function isSourcePubliclyVisible(licensing: ResolvedWalletLicensing): boolean {
+export function isSourcePubliclyVisible(licensing: ResolvedWalletLicensing): boolean | null {
 	if (licensing === null || licensing.walletAppLicense === null) {
-		return false
+		return null
 	}
 
 	switch (licensing.type) {
@@ -358,7 +359,7 @@ export function isSourcePubliclyVisible(licensing: ResolvedWalletLicensing): boo
 			return licenseSourceIsVisible(licensing.walletAppLicense.license)
 		case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
 			if (licensing.coreLicense === null) {
-				return false
+				return null
 			}
 
 			return (

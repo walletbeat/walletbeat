@@ -211,6 +211,11 @@ export const releaseProcess: Attribute = {
 		// Source-visibility cap: reproducibility cannot be externally verified
 		// without public source access, so the signal does not count.
 		const buildsVisible = isSourcePubliclyVisible(ctx.features.licensing)
+
+		if (buildsVisible === null) {
+			return unrated(ctx)
+		}
+
 		const reproducible = reproducibleSupported && buildsVisible
 		const hermetic = hermeticSupported && buildsVisible
 		const builds = reproducible || hermetic
