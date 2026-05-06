@@ -46,7 +46,7 @@ BREW is a one-day conference exploring privacy through systems, narratives, and 
     - **Privacy hygiene**: Does your wallet only send sensitive data with your explicit consent?
     - **Security best practices**: Does your browser extension wallet request dangerous permissions, or has access into every website you visit?
   - What an Ethereum wallet that passes all privacy attributes looks like.
-  - How the current wallet landscape looks like today: how wallets fall short in practice, and how.
+  - How the current wallet landscape looks like today: where wallets fall short in practice, how they can do better, and some initiatives in flight to improve the situation.
   - How to evaluate any wallet's privacy properties using Walletbeat network capture tooling.
 
 - Additional Information / Anything else we should know? (timing preferences, AV needs, co-speakers, etc.)
