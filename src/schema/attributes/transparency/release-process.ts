@@ -15,22 +15,18 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-function describeSupportedSignals(signals: string[]): string {
-	return commaListFormat(signals)
-}
-
 function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
 	return ctx.build({
 		outcome: {
 			id: 'pass',
 			rating: Rating.PASS,
-			displayName: 'Strong release process',
+			displayName: 'Transparent release process',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} meets all 4 release process signals: ${describeSupportedSignals(supportedSignals)}.`,
+				`{{WALLET_NAME}} meets all 4 release process signals: ${commaListFormat(supportedSignals)}.`,
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} satisfies all four release process signals: ${describeSupportedSignals(supportedSignals)}.`,
+			`{{WALLET_NAME}} satisfies all four release process signals: ${commaListFormat(supportedSignals)}.`,
 		),
 	})
 }
@@ -49,11 +45,11 @@ function partial(
 			score,
 			displayName: `Partial release process (${signalCount.toString()}/4 signals)`,
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${describeSupportedSignals(supportedSignals)}.`,
+				`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${commaListFormat(supportedSignals)}.`,
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${describeSupportedSignals(supportedSignals)}.`,
+			`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${commaListFormat(supportedSignals)}.`,
 		),
 		howToImprove: mdParagraph(`
 			To fully pass, **{{WALLET_NAME}}** should implement all four signals:
@@ -119,9 +115,9 @@ export const releaseProcess: Attribute = {
 		1. **Public changelog**: the wallet publishes release notes or a changelog.
 		2. **Reproducible or hermetic builds**: independent parties can verify the build
 		   output matches the source, or the build can run fully offline.
-		   This signal only counts when the wallet's source code is publicly visible,
-		   since external verification requires source access.
-		3. **Artifact signing**: release artifacts are cryptographically signed.
+		   This requires the wallet's source code to be publicly visible, since
+		   external verification requires source access.
+		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
 		4. **Dependency locking**: a lockfile or equivalent pins all dependency versions.
 
 		All four signals present earns a **pass**. Any partial coverage earns a **partial**.
@@ -208,8 +204,8 @@ export const releaseProcess: Attribute = {
 			rt.reproducibleBuilds !== null && isSupported(rt.reproducibleBuilds)
 		const hermeticSupported = rt.hermeticBuilds !== null && isSupported(rt.hermeticBuilds)
 
-		// Source-visibility cap: reproducibility cannot be externally verified
-		// without public source access, so the signal does not count.
+		// Source-visibility requirement: reproducible or hermetic build claims
+		// only count with public source access for external verification.
 		const buildsVisible = isSourcePubliclyVisible(ctx.features.licensing)
 
 		if (buildsVisible === null) {
