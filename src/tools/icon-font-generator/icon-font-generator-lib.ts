@@ -416,7 +416,7 @@ export class SVGFont {
 			@font-face {
 				font-family: "${this.fontName}";
 				src: url('${cssPath}${this.fontName}.eot'); /* IE9*/
-				src: url('${cssPath}${this.fontName}.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
+				src: url('${cssPath}${this.fontName}.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
 				url('${cssPath}${this.fontName}.woff2') format('woff2'),
 				url('${cssPath}${this.fontName}.woff') format('woff'),
 				url('${cssPath}${this.fontName}.ttf') format('truetype'),

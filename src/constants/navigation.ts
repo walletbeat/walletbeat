@@ -21,14 +21,7 @@ import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { WalletType } from '@/schema/wallet-types'
 import { getWalletUrl } from '@/utils/wallet-url'
 
-import WbAboutIcon from '../../resources/files/wbicons/about.svg?raw'
-import WbAccountTypeIcon from '../../resources/files/wbicons/account_type.svg?raw'
-import WbDiscussIcon from '../../resources/files/wbicons/discuss.svg?raw'
-import WbFaqIcon from '../../resources/files/wbicons/faq.svg?raw'
-import WbNewsletterIcon from '../../resources/files/wbicons/newsletter.svg?raw'
-import WbRepositoryIcon from '../../resources/files/wbicons/repository.svg?raw'
-import WbWalletHardwareIcon from '../../resources/files/wbicons/wallet_hardware.svg?raw'
-import WbWalletSoftwareIcon from '../../resources/files/wbicons/wallet_software.svg?raw'
+const wbicon = (name: string) => `<span data-wbicon data-icon="${name}"></span>`
 
 // Constants
 export const navigationHome = {
@@ -40,14 +33,14 @@ export const navigationHome = {
 
 export const navigationFaq = {
 	id: 'faq',
-	icon: WbFaqIcon,
+	icon: wbicon('faq'),
 	title: 'faq',
 	href: '/faq/',
 } as const satisfies NavigationItem
 
 export const navigationAbout = {
 	id: 'about',
-	icon: WbAboutIcon,
+	icon: wbicon('about'),
 	title: 'about',
 	href: '/about/',
 } as const satisfies NavigationItem
@@ -61,27 +54,27 @@ export const navigationCriteria = {
 
 export const navigationRepository = {
 	id: 'code-repository',
-	icon: WbRepositoryIcon,
+	icon: wbicon('repository'),
 	title: 'code',
 	href: 'https://github.com/walletbeat/walletbeat',
 } as const satisfies NavigationItem
 
 export const navigationTesting = {
 	id: 'testing-page',
-	icon: WbAccountTypeIcon,
+	icon: wbicon('wallet_test'),
 	title: 'Test your wallet',
 	href: '/test',
 } as const satisfies NavigationItem
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
-	icon: WbDiscussIcon,
+	icon: wbicon('discuss'),
 	title: 'farcaster',
 	href: 'https://farcaster.xyz/~/channel/walletbeat',
 } as const satisfies NavigationItem
 
 export const navigationNews = {
 	id: 'news',
-	icon: WbNewsletterIcon,
+	icon: wbicon('newsletter'),
 	title: 'Wallet Security News',
 	href: '/news',
 } as const satisfies NavigationItem
@@ -100,7 +93,7 @@ export const defaultNavigationItems = [
 		id: 'software-wallets',
 		title: 'Software Wallets',
 		href: '/wallet/summary/',
-		icon: WbWalletSoftwareIcon,
+		icon: wbicon('wallet_software'),
 		children: [
 			{
 				id: 'software-by-rating',
@@ -139,7 +132,7 @@ export const defaultNavigationItems = [
 		id: 'hardware-wallets',
 		title: 'Hardware Wallets',
 		href: '/hww/summary/',
-		icon: WbWalletHardwareIcon,
+		icon: wbicon('wallet_hardware'),
 		children: [
 			{
 				id: 'hardware-by-rating',
