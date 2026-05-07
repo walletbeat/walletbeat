@@ -25,19 +25,24 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 	<main data-sticky-container data-column='gap-6'>
 		<header data-sticky='inline'>
-			<h1>Who watches the wallets?</h1>
+			<h1>Who watches the <br />wallets.</h1>
 
 			<p>
 				This website is still in beta. It aims to provide a comprehensive list of wallets, their
 				functionality, practices, and support for certain standards.
 			</p>
-
+			<br />
 			<p>
 				We welcome contributions via the <a
 					href='https://github.com/walletbeat/walletbeat'
 					target='_blank'
 					rel='noreferrer'>GitHub Repository</a
 				>.
+			</p>
+			<p>
+				<a>
+					Learn More.
+				</a>
 			</p>
 		</header>
 
@@ -60,15 +65,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 <style>
 	main {
 		> header {
-			&::before {
-				content: '';
-
-				background:
-					linear-gradient(to right, var(--background-primary) 33cqi, transparent 125%),
-					url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat;
-			}
-
-			padding: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 8rem)
+			padding: clamp(0.75rem, 0.04 * var(--scrollContainer-sizeInline), 4rem)
 				clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 
 			text-shadow:
@@ -77,20 +74,21 @@ import WalletTable from '@/views/WalletTable.svelte'
 				0 0 3em var(--background-primary);
 
 			h1 {
+				font-family: 'SP Monorium', monospace;
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
 				font-weight: 800;
-				color: var(--accent);
+				color: #F5F2F7;
 				margin: 0 0 1rem 0;
 				line-height: 1.1;
 			}
 
 			p {
 				font-size: smaller;
-				color: var(--text-secondary);
+				color: #F5F2F7;
 				line-height: 1.6;
 				margin: 0;
 				text-wrap: balance;
-				max-width: 72.5%;
+				max-width: 420px;
 			}
 		}
 	}

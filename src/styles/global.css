@@ -103,6 +103,16 @@
 }
 
 @font-face {
+	font-family: 'SP Monorium';
+	src:
+		url('/fonts/sp-monorium-regular.woff2') format('woff2'),
+		url('/fonts/sp-monorium-regular.woff') format('woff'),
+		url('/fonts/sp-monorium-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
 	font-family: 'Noto Color Emoji';
 	src: local('Noto Color Emoji');
 	/* The unicode range for emoji characters: */
