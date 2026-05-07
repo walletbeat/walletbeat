@@ -406,7 +406,7 @@ export class SVGFont {
 			cssRules.push(`
 				&[data-icon~="${key}"] {
 					--icon-content: "${icon.encodedCode}";
-				},`)
+				}`)
 		}
 		const singularFontName = this.fontName.endsWith('s')
 			? this.fontName.substring(0, this.fontName.length - 1)
