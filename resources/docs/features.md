@@ -109,7 +109,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`VariantFeature<HermeticBuilds>`)
-    - `repositoryChangeControls` (`VariantFeature<RepositoryChangeControls>`): Repository controls are normalized all-or-nothing; if any sub-field is unknown, the resolved value becomes `null`.
+    - `repositoryChangeControls` (`VariantFeature<RepositoryChangeControls>`)
     - `reproducibleBuilds` (`VariantFeature<ReproducibleBuilds>`)
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
@@ -271,7 +271,7 @@ A set of features about a specific wallet variant. All features are resolved to 
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`ResolvedFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`ResolvedFeature<HermeticBuilds>`)
-    - `repositoryChangeControls` (`ResolvedFeature<RepositoryChangeControls>`): Normalized all-or-nothing; partial unknowns are collapsed to `null`.
+    - `repositoryChangeControls` (`ResolvedFeature<RepositoryChangeControls>`)
     - `reproducibleBuilds` (`ResolvedFeature<ReproducibleBuilds>`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
@@ -3727,7 +3727,7 @@ type SignaturePublicationType = 'GITHUB_RELEASE' | 'SIGSTORE_REKOR' | 'ONCHAIN' 
 
 ---
 
-### Type: `ArtifactSigning`
+### Type: `ArtifactSigningDetails`
 
 Artifact signing information for a wallet variant.
 
@@ -3738,7 +3738,13 @@ type ArtifactSigningDetails = WithRef<{
 	signer: ArtifactSignerType | null
 	publication: SignaturePublicationType | null
 }>
+```
 
+---
+
+### Type: `ArtifactSigning`
+
+```typescript
 type ArtifactSigning = Support<ArtifactSigningDetails>
 ```
 
@@ -3766,7 +3772,9 @@ type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 ### Type: `RepositoryChangeControls`
 
-Observable repository-level change controls for the wallet's source repository. Each sub-field is independently researchable and may be `null` until determined.
+Observable repository-level change controls for the wallet's source repository. Sub-fields may be `null` in source data while research is in progress.
+
+During resolution, this feature is normalized all-or-nothing: if any sub-field remains unknown, the resolved value becomes `null`.
 
 ```typescript
 type RepositoryChangeControls = Nullable<

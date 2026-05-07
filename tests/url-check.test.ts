@@ -285,11 +285,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-04-28',
 	},
 	{
-		url: 'https://github.com/AmbireTech/extension/blob/main/README.MD',
-		urlHash: 'b433b9bd998668af60c5019a843d9cbd7037be9c',
-		retrieved: '2026-04-28',
-	},
-	{
 		url: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
 		urlHash: '8f2df0e9a9dbe4ef08da29919d4a59788832f4d3',
 		retrieved: '2025-10-31',
