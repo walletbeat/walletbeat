@@ -28,8 +28,14 @@ Dappcon 2026 will feature three key tracks:
 - [ ] The Stage (Talk): Deep dives, case studies, or big-picture visions
 - [x] The Workshop: Hands-on technical sessions and interactive builds.
 
-- Session Title: Testing Software Wallets & Recent EIP Proposals for Wallets
-- Abstract of your talk: A hands-on workshop exploring how to use the Walletbeat wallet testing playground, along with a deep dive into recent EIP proposals affecting wallets: EIP-7730 (structured data signing) and ERC-8213 (calldata digest).
+- Session Title: Setting the bar on Ethereum wallets
+- Abstract of your talk:
+
+A hands-on workshop that breaks down what actually makes an Ethereum wallet “good”, and how standards shape interoperability across the ecosystem.
+
+Participants will use the Walletbeat testing playground to evaluate real wallets across key categories including transaction simulations, signatures, scam alerts, and EIP support: highlighting how these features directly impact user experience.
+
+We will also do a deep dive into recent EIPs like EIP-7730 (structured data signing) and EIP-8213 (calldata digest), and how they aim to improve wallet user experience, safety, and standardization.
 
 ### Please provide some details about you
 
