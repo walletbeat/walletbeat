@@ -258,6 +258,7 @@
 			align-items: center;
 			justify-content: center;
 			font-size: 1.25em;
+			font-weight: 500;
 			width: 1em;
 			height: 1em;
 			line-height: 1;
