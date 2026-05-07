@@ -153,6 +153,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'dba5ad8b24a91d229e696dd8a5f6073731a52a057168c7d86b2154350a888544',
 	'resources/files/wbicons/wallet_software.svg':
 		'a6bf2a2c35af75b4b4302689160de01245e5900fceef33b98d4261975fdf7dfd',
+	'resources/files/wbicons/wallet_test.svg':
+		'da072830acbce4bd7b89039e3ae261f95f79e620a468eada968dcc5220c34806',
 	'public/fonts/sp-monorium-dingbat.svg':
 		'4e075d1a474e3c9cac32668b882f38dea406bfd0f254767a4bfad9ff9fe47e3e',
 	'public/fonts/sp-monorium-regular.svg':
@@ -161,7 +163,7 @@ const optimizedSvgHashes: Record<string, string> = {
 		'5f40f64a49babed6573f5c16e39ec450eb83ef660efea7bcd30093fe19ac9a45',
 	'resources/branding/glow-1.svg':
 		'71e6c1520f6f9b40d189811b38f222a5381b1b01e9a281c1e55ef4941fafbed7',
-	'public/wbicons/wbicons.svg': '45f03658c157b147a522485eaa7145bb11734f1243ebc81e48a5b90d8703f262',
+	'public/wbicons/wbicons.svg': '24d1e70fade7103f00e74ccb5df9fe8a9db459cd5802b97b687de1732eb202ac',
 	'resources/files/wbicons/account_abstraction.svg':
 		'b6dcb0b8cc200d4e283d2d13466babf09d119dc6dac9364610d3e79018080b62',
 	'resources/files/wbicons/account_portability.svg':
