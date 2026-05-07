@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
@@ -62,7 +63,6 @@ import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manif
 import { mdParagraph, paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
-import { mattmatt } from '../contributors/0xmattmatt'
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
 import { consensys } from '../entities/consensys'
