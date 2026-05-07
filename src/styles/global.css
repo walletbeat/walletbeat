@@ -13,7 +13,7 @@
 	--separator-width: 1px;
 
 	/* Main canvas + default cards (dark: deep purple) */
-	--background-primary: light-dark(#fff, #130a2b);
+	--background-primary: light-dark(#fff, #110c1f);
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
 	--background-secondary: light-dark(#efefef, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
