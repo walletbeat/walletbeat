@@ -32,22 +32,26 @@ BREW is a one-day conference exploring privacy through systems, narratives, and 
   - [x] Network Privacy
   - [ ] Privacy Policy & Regulation
   - [x] Privacy Adoption
-- Short Abstract
-  Wallets were supposed to be the new web browsers: they are the primary interface between users and Ethereum itself. You don't expect your web browser to report your browsing history to any other party. Yet today's wallets might as well. It's not clear how much data wallets collect, share, or expose by default. This session maps the current state of Ethereum wallet privacy: what the data shows, where the gaps are, and what it takes for a wallet to actually protect a user's privacy to the baseline users likely already expect.
+- Short Abstract (300 characters limit)
 
-- Detailed Description (Tell us more about: Who is the perfect participant? What will participants learn? What’s your approach?)
-  **Perfect participant:** Wallet developers, privacy researchers, app builders, and Ethereum users who value their privacy and want to understand what wallet privacy means in practice, or would like to see how their wallet measures up.
+```
+You don't expect your browser to snitch on your browsing history, yet today's wallets might as well. Let's go over the state of Ethereum wallet privacy: what the data shows, where the gaps are, and what it takes for a wallet to actually protect a user's privacy.
+```
 
-  **What participants will learn:**
-  - Different features of wallet privacy:
-    - **Wallet address privacy**: Is your wallet address linkable to other information about yourself?
-    - **Private token transfers**: Can you send and receive tokens without revealing your transaction history to others?
-    - **Multi-address privacy**: Can your multiple wallet addresses be correlated with one another?
-    - **Privacy hygiene**: Does your wallet only send sensitive data with your explicit consent?
-    - **Security best practices**: Does your browser extension wallet request dangerous permissions, or has access into every website you visit?
-  - What an Ethereum wallet that passes all privacy attributes looks like.
-  - How the current wallet landscape looks like today: where wallets fall short in practice, how they can do better, and some initiatives in flight to improve the situation.
-  - How to evaluate any wallet's privacy properties using Walletbeat network capture tooling.
+- Detailed Description (Tell us more about: Who is the perfect participant? What will participants learn? What’s your approach?) (800 characters limit)
+
+```
+Come if you are a wallet dev, privacy researcher, or if you use Ethereum and value your privacy, wanting to understand what wallet privacy means in practice, or to see how your wallet stacks up.
+
+We will learn:
+- Different facets of wallet privacy:
+  - Wallet address privacy: Is your address linkable to other info about yourself?
+  - Private token transfers: Can you send/receive tokens without revealing your transaction history to others?
+  - Multi-address privacy: Can your multiple addresses be correlated with one another?
+  - Privacy hygiene: Does your wallet only send sensitive data with your explicit consent?
+- What the current wallet landscape looks like today, and where it needs to improve.
+- How to check your wallet's privacy using Walletbeat's network capture/analysis tools.
+```
 
 - Additional Information / Anything else we should know? (timing preferences, AV needs, co-speakers, etc.)
   Can work as either a talk or a workshop.
