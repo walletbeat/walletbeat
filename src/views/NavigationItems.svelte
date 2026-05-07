@@ -243,7 +243,6 @@
 
 		&[aria-current] {
 			background-color: var(--background-primary);
-			font-weight: 700;
 		}
 	}
 
@@ -273,7 +272,7 @@
 			width: 1.75em;
 			height: 1.75em;
 			border-radius: 50%;
-			border: 1px solid white;
+			border: 1px solid #F1EEF780;
 
 			:global(
 				img,
