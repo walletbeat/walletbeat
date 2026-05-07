@@ -93,6 +93,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `duressResistance` (`VariantFeature<DuressResistance>`): Duress resistance features, covering both basic lock-screen protection and dedicated duress-PIN mechanisms (decoy wallet or self-destruct-and-forward).
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
   - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
+  - `scamAlerts` (`VariantFeature<Nullable<ScamAlerts>>`): Support for alerting the user about potential scams.
 - `privacy` (object): Privacy features.
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
@@ -127,9 +128,6 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 ```typescript
 type WalletSoftwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
-		/** Support for alerting the user about potential scams. */
-		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
-
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 

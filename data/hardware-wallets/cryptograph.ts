@@ -1,15 +1,15 @@
 import { perpetua } from '@/data/contributors/perpetua'
-import { AccountType } from '@/schema/features/account-support'
-import {
-	AppConnectionMethod,
-	type AppConnectionMethodDetails,
-} from '@/schema/features/ecosystem/hw-app-connection-support'
 import { apple } from '@/data/entities/apple'
 import { perpetuaLabs } from '@/data/entities/perpetua-labs'
 import { reown } from '@/data/entities/reown'
 import { solanaFoundation } from '@/data/entities/solana-foundation'
 import { tronFoundation } from '@/data/entities/tron-foundation'
 import { xrplLabs } from '@/data/entities/xrpl-labs'
+import { AccountType } from '@/schema/features/account-support'
+import {
+	AppConnectionMethod,
+	type AppConnectionMethodDetails,
+} from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
 	CollectionPolicy,
 	type DataCollection,
@@ -19,31 +19,29 @@ import {
 	UserFlow,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
-	type BugBountyProgramImplementation,
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
-import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
-import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
 	IosUsageDescription,
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
-import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
-import { MaintenanceType } from '@/schema/features/transparency/maintenance'
-import { ReputationType } from '@/schema/features/transparency/reputation'
-import {
-	KeyGenerationLocation,
-	MultiPartyKeyReconstruction,
-} from '@/schema/features/security/keys-handling'
+import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
@@ -52,18 +50,20 @@ import {
 	DataExtraction,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
-import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import { UserSafetyType } from '@/schema/features/security/user-safety'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { notSupported, supported } from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
+import { ReputationType } from '@/schema/features/transparency/reputation'
+import type { WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
-import type { WithRef } from '@/schema/reference'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
@@ -192,7 +192,7 @@ export const cryptograph: HardwareWallet = {
 		}),
 		privacy: {
 			analytics: {
-				// Cryptograph does not integrate any third-party crash-reporting
+				// Cryptograph does not integrate any external crash-reporting
 				// SDK (Crashlytics, Sentry, Bugsnag, Datadog, etc.) and does not use
 				// Apple's MetricKit. Apple's OS-level "Share With App Developers"
 				// diagnostics setting (Settings → Privacy → Analytics & Improvements)
@@ -232,7 +232,10 @@ export const cryptograph: HardwareWallet = {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.PROMPTED,
 							},
-							purposes: [DataCollectionPurpose.UPDATE_CHECKING, DataCollectionPurpose.STATIC_ASSETS],
+							purposes: [
+								DataCollectionPurpose.UPDATE_CHECKING,
+								DataCollectionPurpose.STATIC_ASSETS,
+							],
 						},
 					],
 				},
@@ -294,7 +297,7 @@ export const cryptograph: HardwareWallet = {
 						{
 							ref: {
 								explanation:
-									"After import, balance / asset / transaction-history lookups for the restored addresses route through apiproxy. Same data shape as new onboarding; recovery material itself never leaves the device.",
+									'After import, balance / asset / transaction-history lookups for the restored addresses route through apiproxy. Same data shape as new onboarding; recovery material itself never leaves the device.',
 								url: 'https://cryptograph.watch/privacy',
 							},
 							byEntity: perpetuaLabs,
@@ -407,7 +410,7 @@ export const cryptograph: HardwareWallet = {
 						{
 							ref: {
 								explanation:
-									"Tron transactions go directly to api.trongrid.io (TRON Foundation). TRON Foundation sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.",
+									'Tron transactions go directly to api.trongrid.io (TRON Foundation). TRON Foundation sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.',
 								url: 'https://tron.network/privacy',
 							},
 							byEntity: tronFoundation,
@@ -425,7 +428,7 @@ export const cryptograph: HardwareWallet = {
 						{
 							ref: {
 								explanation:
-									"XRP transactions go directly to xrplcluster.com (operated by XRPL Labs). XRPL Labs sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.",
+									'XRP transactions go directly to xrplcluster.com (operated by XRPL Labs). XRPL Labs sees the client IP, sender address, and the serialized transaction. This is a direct call NOT mediated by apiproxy.',
 								url: 'https://xrpl-labs.com/privacy',
 							},
 							byEntity: xrplLabs,
@@ -447,7 +450,7 @@ export const cryptograph: HardwareWallet = {
 						{
 							ref: {
 								explanation:
-									"WalletConnect (Reown) cloud relay handles the encrypted pairing-topic + session-relay traffic between Cryptograph and the dapp. Reown sees the client IP and the pairing topic; the dapp metadata URL is also visible in the connection request. Cryptograph runs the eth-phishing-detect bundled list locally — the dapp URL is NOT sent to any third-party for screening.",
+									'WalletConnect (Reown) cloud relay handles the encrypted pairing-topic + session-relay traffic between Cryptograph and the dapp. Reown sees the client IP and the pairing topic; the dapp metadata URL is also visible in the connection request. Cryptograph runs the eth-phishing-detect bundled list locally — the dapp URL is NOT sent to any external service for screening.',
 								url: 'https://reown.com/privacy-policy',
 							},
 							byEntity: reown,
@@ -463,14 +466,14 @@ export const cryptograph: HardwareWallet = {
 			} satisfies DataCollection,
 			hardwarePrivacy: {
 				type: HardwarePrivacyType.PASS,
-				url: 'https://cryptograph.watch/security',
 				details:
 					"Cryptograph does not have a wireless protocol of its own; it uses Apple's Watch Connectivity (WCSession) framework over BLE between watch and iPhone, and standard TLS between the iPhone and external services. Each sub-field below.\n\n" +
-					"phoningHome: Cryptograph runs no product-analytics, behavioral-tracking, or telemetry pings. Network calls to Cryptograph's apiproxy backend serve specific wallet functions — relayed RPC for chains, push-notification registration for incoming-transaction alerts, contract-registry sync for the verified-contracts list and known-exploits database. All such calls are necessary for the documented wallet behavior; none are analytics or vendor-update pings. There is no third-party SDK in the app for Mixpanel, Amplitude, Segment, Sentry, Crashlytics, Datadog, Bugsnag, Firebase Analytics, or MetricKit. Apple's OS-level 'Share With App Developers' diagnostics setting is user-controlled and anonymized at the OS layer before reaching App Store Connect, separate from any Cryptograph-instrumented data flow.\n\n" +
+					"phoningHome: Cryptograph runs no product-analytics, behavioral-tracking, or telemetry pings. Network calls to Cryptograph's apiproxy backend serve specific wallet functions — relayed RPC for chains, push-notification registration for incoming-transaction alerts, contract-registry sync for the verified-contracts list and known-exploits database. All such calls are necessary for the documented wallet behavior; none are analytics or vendor-update pings. There is no external SDK in the app for Mixpanel, Amplitude, Segment, Sentry, Crashlytics, Datadog, Bugsnag, Firebase Analytics, or MetricKit. Apple's OS-level 'Share With App Developers' diagnostics setting is user-controlled and anonymized at the OS layer before reaching App Store Connect, separate from any Cryptograph-instrumented data flow.\n\n" +
 					"inspectableRemoteCalls: Cryptograph's external network calls all originate from the iPhone (the watch reaches services through the iPhone via WCSession; the watch itself does not make outbound network calls of its own). A technical user can install a TLS-inspecting proxy on iPhone (Settings → General → VPN & Device Management → install profile → trust → enable TLS inspection) and observe every network request the app makes — request bodies, headers, destinations. There is no proprietary or obscure transport that resists inspection.\n\n" +
 					"wirelessPrivacy: The iPhone↔watch link uses Apple's Watch Connectivity framework over BLE, with framework-level encryption and Apple's BLE MAC-address randomization (the watch's BLE MAC changes on a regular schedule, defeating long-term tracking by nearby BLE observers). External traffic from the iPhone is over standard TLS to known endpoints. There is no Cryptograph-defined wireless protocol that could leak identifiers, and the Apple-defined wireless layers below us are encrypted and address-randomized.",
-				phoningHome: HardwarePrivacyType.PASS,
 				inspectableRemoteCalls: HardwarePrivacyType.PASS,
+				phoningHome: HardwarePrivacyType.PASS,
+				url: 'https://cryptograph.watch/security',
 				wirelessPrivacy: HardwarePrivacyType.PASS,
 			},
 			privacyPolicy: 'https://cryptograph.watch/privacy',
@@ -546,13 +549,13 @@ export const cryptograph: HardwareWallet = {
 			},
 			firmware: {
 				type: FirmwareType.FAIL,
-				url: 'https://cryptograph.watch/security',
+				customFirmware: FirmwareType.FAIL,
 				details:
 					"The 'firmware' concept maps poorly to App-Store-distributed iOS apps. Walletbeat's schema is built around traditional hardware wallets where the vendor controls the entire firmware image; Cryptograph is a watchOS / iOS app, so its update channel, source-distribution model, and reproducibility properties are governed by Apple's distribution chain rather than by Cryptograph directly. By the schema's literal reading, Cryptograph fails on all four sub-fields, in line with how every iOS-distributed wallet would score on this attribute. Mitigations Apple's model offers that the schema doesn't reward: every update is independently reviewed by Apple before reaching users; code-signing is enforced at every launch via FairPlay; auto-update propagates critical security patches to all users in roughly 24 hours rather than the months-long tail typical of hardware-wallet firmware updates; Apple can pull a malicious update from distribution and retroactively revoke installed copies, a kill-switch no traditional hardware wallet has. Different security philosophy (centralized trust + reviewed distribution) than the schema rewards (user freedom + transparency).",
-				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
-				customFirmware: FirmwareType.FAIL,
+				silentUpdateProtection: FirmwareType.FAIL,
+				url: 'https://cryptograph.watch/security',
 			},
 			keysHandling: {
 				ref: [
@@ -584,11 +587,11 @@ export const cryptograph: HardwareWallet = {
 						},
 					],
 					contractRegistry: true,
-					previousContractInteractionWarning: true,
-					recentContractWarning: false,
 					leaksContractAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
+					previousContractInteractionWarning: true,
+					recentContractWarning: false,
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: [
@@ -632,7 +635,6 @@ export const cryptograph: HardwareWallet = {
 						url: 'https://cryptograph.watch/security',
 					},
 					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
-					secureRng: SecureRngSource.HARDWARE_ENTROPY,
 					mobileAppHardening: {
 						android: 'NOT_AN_ANDROID_APP',
 						ios: {
@@ -643,15 +645,16 @@ export const cryptograph: HardwareWallet = {
 							],
 						},
 					},
+					secureRng: SecureRngSource.HARDWARE_ENTROPY,
 				},
 			},
 			supplyChainDIY: {
 				type: SupplyChainDIYType.FAIL,
-				url: 'https://www.apple.com/apple-watch/',
+				componentSourcingComplexity: SupplyChainDIYType.FAIL,
 				details:
 					"Cryptograph runs on Apple Watch hardware manufactured by Apple. There is no DIY-buildable variant — the device is a sealed consumer product. The schema's SupplyChainDIY attribute targets wallets like Firefly that publish open hardware schematics for self-soldering; Cryptograph does not fall in that category. FAIL on both sub-fields is the literal honest reading; the security argument that DIY supply chains are designed to defend against (factory-introduced backdoors) is addressed separately under supplyChainFactory via Apple's public hardware-supply-chain scrutiny.",
 				diyNoNda: SupplyChainDIYType.FAIL,
-				componentSourcingComplexity: SupplyChainDIYType.FAIL,
+				url: 'https://www.apple.com/apple-watch/',
 			},
 			// Walletbeat's supplyChainFactory schema implicitly assumes the wallet
 			// vendor is also the device manufacturer (Ledger makes Ledgers, Trezor
@@ -665,22 +668,22 @@ export const cryptograph: HardwareWallet = {
 			// pipeline, signed releases) belongs under `firmware`, not here.
 			supplyChainFactory: {
 				type: SupplyChainFactoryType.PASS,
-				url: 'https://support.apple.com/guide/security/welcome/web',
 				details:
 					"Walletbeat's supplyChainFactory schema implicitly assumes the wallet vendor is also the device manufacturer (Ledger makes Ledgers, Trezor makes Trezors). Cryptograph breaks that assumption favorably: the device the user wears is an Apple Watch, manufactured by Apple — one of the most-scrutinized consumer hardware supply chains in existence. Apple ships ~50 million Apple Watches per year, an order of magnitude beyond the entire hardware-wallet category combined; the resulting volume of independent security research, Apple Security Bounty submissions (up to $1 million per critical finding, with public Secure Enclave payouts), Pwn2Own targeting, peer-reviewed academic Secure Enclave analysis, and EU CRA vulnerability-handling oversight exceeds what any traditional hardware-wallet vendor can offer. Cryptograph inherits this hardware-supply-chain posture and contributes verification at the application and runtime-attestation layers.\n\n" +
-					"Each sub-field below is framed in hardware-wallet-equivalent language so a reader unfamiliar with watchOS internals can map the claim to something they recognize.\n\n" +
-					"factoryOpsecDocs: Apple Platform Security (https://support.apple.com/guide/security/welcome/web) is a 200+ page public document covering Secure Enclave manufacturing, secure boot chain, key provisioning sequences, and tamper-resistance properties. Functionally equivalent to a hardware-wallet vendor publishing their secure-element provisioning documentation, at greater depth.\n\n" +
-					"factoryOpsecAudit: where hardware-wallet vendors commission periodic discrete third-party audits (Trail of Bits, NCC Group, Cure53), Apple operates continuous external scrutiny through Apple Security Bounty, the Apple Security Research Device program (specially-provisioned devices issued to external researchers for SE-level investigation), ongoing Pwn2Own iOS/watchOS categories, and EU CRA enforcement. The continuous-scrutiny model exposes the SE provisioning chain to more independent eyes per year than any periodic audit produces. Separate labor/environmental supplier audits (Bureau Veritas, ELEVATE) cover non-security domains.\n\n" +
+					'Each sub-field below is framed in hardware-wallet-equivalent language so a reader unfamiliar with watchOS internals can map the claim to something they recognize.\n\n' +
+					'factoryOpsecDocs: Apple Platform Security (https://support.apple.com/guide/security/welcome/web) is a 200+ page public document covering Secure Enclave manufacturing, secure boot chain, key provisioning sequences, and tamper-resistance properties. Functionally equivalent to a hardware-wallet vendor publishing their secure-element provisioning documentation, at greater depth.\n\n' +
+					'factoryOpsecAudit: where hardware-wallet vendors commission periodic discrete independent audits (Trail of Bits, NCC Group, Cure53), Apple operates continuous external scrutiny through Apple Security Bounty, the Apple Security Research Device program (specially-provisioned devices issued to external researchers for SE-level investigation), ongoing Pwn2Own iOS/watchOS categories, and EU CRA enforcement. The continuous-scrutiny model exposes the SE provisioning chain to more independent eyes per year than any periodic audit produces. Separate labor/environmental supplier audits (Bureau Veritas, ELEVATE) cover non-security domains.\n\n' +
 					"tamperEvidence: Activation Lock cryptographically binds the device serial to the original owner's Apple ID at Apple's manufacturing servers — a device cannot be re-activated to a different Apple ID without the original owner's authentication. Combined with watchOS secure-boot signature verification, hardware substitution or firmware modification between manufacturing and the user's wrist is detectable at activation time.\n\n" +
-					"hardwareVerification: DCAppAttestService provides hardware-rooted key attestation — Cryptograph generates a key inside the Secure Enclave (analogous to a key in a Ledger's secure element), and the attestation chain rooted at Apple's CA proves to the Cryptograph apiproxy server that this is a real Apple Watch with a real Secure Enclave. Combined with StoreKit 2 AppTransaction-based checks (shipped via IntegrityCheckService), both app authenticity (\"this binary came from Apple's distribution\") and device authenticity (\"this is a real Apple device\") are cryptographically attested.\n\n" +
+					'hardwareVerification: DCAppAttestService provides hardware-rooted key attestation — Cryptograph generates a key inside the Secure Enclave (analogous to a key in a Ledger\'s secure element), and the attestation chain rooted at Apple\'s CA proves to the Cryptograph apiproxy server that this is a real Apple Watch with a real Secure Enclave. Combined with StoreKit 2 AppTransaction-based checks (shipped via IntegrityCheckService), both app authenticity ("this binary came from Apple\'s distribution") and device authenticity ("this is a real Apple device") are cryptographically attested.\n\n' +
 					"tamperResistance: the Secure Enclave provides anti-rollback monotonic counters, fault-injection countermeasures, and side-channel hardening per Apple's published specifications — the same primitives any hardware-wallet secure element claims. Additionally, watchOS protects against brute-force passcode attacks at a layer Cryptograph cannot disable, weaken, or bypass. Lockout escalates after each failed attempt (1-minute lockout after 6 attempts, then 5, 15, and 60 minutes); after 10 failed attempts the watch is permanently disabled and can only be returned to service by re-pairing through the iPhone, which itself requires a full erase. With the optional 'Erase Data' setting enabled (off by default), the watch also wipes its Keychain immediately on the 10th failed attempt rather than waiting for the re-pair flow — equivalent to Trezor's wipe-after-N-failed-PIN feature. Separately and unconditionally, removing the passcode destroys the Keychain because Cryptograph's mnemonic is stored under Apple's `WhenPasscodeSetThisDeviceOnly` protection class — the seed material is destroyed the moment the lock screen is disabled, no opt-in required. An attacker who steals an unsecured device cryptographically gets nothing.\n\n" +
 					"genuineCheck: the App Store distribution chain enforces device authenticity at every step before Cryptograph code can run. Activation Lock validates the device serial against Apple's manufacturing records; App Store install requires Apple-signed receipts bound to the device's unique identifier; every app launch verifies the code signature against device-specific FairPlay keys (Apple's DRM, which encrypts each installed app binary with device-bound keys at install time). A counterfeit Apple Watch cannot complete this chain — the very fact that Cryptograph is launching, pairing, and signing is empirical proof of a genuine Apple-manufactured device. There is no documented public case of a counterfeit Apple Watch successfully running App Store apps. The security model defeats counterfeit-device attacks structurally, before any \"scan this QR on manufacturer.com\" verification ritual is needed.",
-				factoryOpsecDocs: SupplyChainFactoryType.PASS,
 				factoryOpsecAudit: SupplyChainFactoryType.PASS,
-				tamperEvidence: SupplyChainFactoryType.PASS,
-				hardwareVerification: SupplyChainFactoryType.PASS,
-				tamperResistance: SupplyChainFactoryType.PASS,
+				factoryOpsecDocs: SupplyChainFactoryType.PASS,
 				genuineCheck: SupplyChainFactoryType.PASS,
+				hardwareVerification: SupplyChainFactoryType.PASS,
+				tamperEvidence: SupplyChainFactoryType.PASS,
+				tamperResistance: SupplyChainFactoryType.PASS,
+				url: 'https://support.apple.com/guide/security/welcome/web',
 			},
 			transactionLegibility: {
 				ref: [
@@ -702,18 +705,18 @@ export const cryptograph: HardwareWallet = {
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						DataDecoded.ON_DEVICE,
 				},
-				detailsDisplayed: {
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.NOT_IN_UI,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.QRCODE]: false,
 					[DataExtraction.HASHES]: false,
+				},
+				detailsDisplayed: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				messageSigningLegibility: {
 					decoded: DataDecoded.ON_DEVICE,
@@ -727,102 +730,102 @@ export const cryptograph: HardwareWallet = {
 			},
 			userSafety: {
 				type: UserSafetyType.PARTIAL,
-				url: 'https://cryptograph.watch/how-it-works',
+				contractLabeling: UserSafetyType.PASS,
 				details:
 					"Cryptograph's user-safety surface is built around on-device decoding plus a curated verified-contracts registry, rather than a programmable plugin system. Strengths: ENS / SNS resolution at compose time; verified-contracts registry covering thousands of named protocols (Aave, Lido, Pendle, OpenSea Seaport, Uniswap, etc.) so transactions show the protocol name on the watch; full on-device ABI decoder for ERC-20/721/1155, Uniswap V2/V3 multicall and V4 Universal Router, Permit2, ownership transfers, plus recursive Gnosis Safe `execTransaction` and `multiSend` unwrap; EIP-712 typed data parsed into a struct view with permits classified separately; on-device risk analysis (verified-contracts warning levels, known-exploit list, permit signature classifier, Solana threat detector, blocked-typed-data detector) — all bundled, all local, no per-check network call; transaction simulation surfacing per-asset balance changes on the approval screen; expert-mode Details disclosure exposing nonce, signing digest, EIP-712 domain/message/Safe hashes, and (post-CR-1237) QR export for independent verification. Honest failures: the decoder coverage is hardcoded — there is no plugin system for users to add custom decoders for either transactions or EIP-712 messages (curated, not extensible by design); transaction simulation requires an RPC node call (`eth_call`), so it is not fully local; a watch-side embedded EVM for fully-local simulation is not realistic given watchOS resource constraints.",
+				eip712CoverageExtensibility: UserSafetyType.FAIL,
+				rawEip712: UserSafetyType.PARTIAL,
+				eip712ExpertMode: UserSafetyType.PASS,
 				readableAddress: UserSafetyType.PASS,
-				contractLabeling: UserSafetyType.PASS,
+				url: 'https://cryptograph.watch/how-it-works',
+				fullyLocalRiskAnalysis: UserSafetyType.PASS,
 				rawTxReview: UserSafetyType.PARTIAL,
 				readableTx: UserSafetyType.PASS,
+				fullyLocalTxSimulation: UserSafetyType.FAIL,
 				txCoverageExtensibility: UserSafetyType.FAIL,
 				txExpertMode: UserSafetyType.PASS,
-				rawEip712: UserSafetyType.PARTIAL,
 				readableEip712: UserSafetyType.PASS,
-				eip712CoverageExtensibility: UserSafetyType.FAIL,
-				eip712ExpertMode: UserSafetyType.PASS,
 				riskAnalysis: UserSafetyType.PASS,
 				riskAnalysisLocal: UserSafetyType.PASS,
-				fullyLocalRiskAnalysis: UserSafetyType.PASS,
 				txSimulation: UserSafetyType.PASS,
 				txSimulationLocal: UserSafetyType.FAIL,
-				fullyLocalTxSimulation: UserSafetyType.FAIL,
 			},
 		},
 		selfSovereignty: {
 			interoperability: {
 				type: InteroperabilityType.PASS,
-				url: 'https://cryptograph.watch/how-it-works',
 				details:
 					"Cryptograph generates and stores a standard BIP-39 mnemonic, derived per BIP-32. Users can view their full 24-word seed phrase directly on the watch via Settings (the phone never sees the mnemonic; it remains on-device). The mnemonic is fully portable — users can transcribe it manually into any BIP-39-compatible wallet (Ledger, Trezor, MetaMask, Rabby, etc.) and recover their accounts there. Recovery Sheet QR and Photo Backup are Cryptograph-specific encrypted formats, but they're convenience-on-top-of-the-mnemonic; the underlying seed is universally interchangeable.\n\n" +
-					"Cryptograph signs transactions using standard BIP-32 derivation paths and standard ECDSA / EdDSA signatures per chain. Signed transaction payloads contain no Cryptograph-specific markers, headers, or memos — they are byte-indistinguishable from transactions signed by any other BIP-39/BIP-32 wallet. External observers cannot identify a transaction as having been signed by Cryptograph.",
+					'Cryptograph signs transactions using standard BIP-32 derivation paths and standard ECDSA / EdDSA signatures per chain. Signed transaction payloads contain no Cryptograph-specific markers, headers, or memos — they are byte-indistinguishable from transactions signed by any other BIP-39/BIP-32 wallet. External observers cannot identify a transaction as having been signed by Cryptograph.',
 				interoperability: InteroperabilityType.PASS,
 				noSupplierLinkage: InteroperabilityType.PASS,
+				url: 'https://cryptograph.watch/how-it-works',
 			},
 		},
 		transparency: {
 			maintenance: {
 				type: MaintenanceType.PARTIAL,
-				url: 'https://www.apple.com/shop/applecare/applewatch',
-				details:
-					"Same Apple-as-manufacturer pattern as supplyChainFactory. The device is an Apple Watch, manufactured and serviced by Apple under one of the most-documented consumer-electronics maintenance regimes in existence. Sub-field summary, framed in hardware-wallet-equivalent language:\n\n" +
-					"physicalDurability: Apple Watch Series carries IP6X dust resistance and 50m water resistance; Apple Watch Ultra adds shock resistance to MIL-STD-810H standards. Public IP / drop-test ratings exceed what any traditional hardware-wallet vendor publishes.\n\n" +
-					"mtbfDocumentation: Apple does not publish formal MTBF (mean time between failures) numbers the way enterprise hardware vendors do. This is a category-wide gap for consumer electronics; not specific to Cryptograph.\n\n" +
-					"repairability: Apple offers Self-Service Repair for the Apple Watch line (out-of-warranty parts and tools available to consumers), plus authorized service via Apple Stores and Apple Authorized Service Providers globally. Better than no DIY path, weaker than wallets like Bitbox where the user can fully open and inspect the device.\n\n" +
-					"batteryHandling: Apple offers battery service for all Apple Watch models with documented pricing and turnaround times. Battery replacement does not destroy the user's data — Apple's service flow preserves the watchOS Keychain across battery service.\n\n" +
-					"warrantyExtensions: AppleCare+ for Apple Watch extends the standard 1-year limited warranty to 2 or 3 years and adds accidental damage coverage. Available globally where Apple Watch is sold.",
-				physicalDurability: MaintenanceType.PASS,
-				mtbfDocumentation: MaintenanceType.FAIL,
-				repairability: MaintenanceType.PARTIAL,
 				batteryHandling: MaintenanceType.PASS,
+				details:
+					'Same Apple-as-manufacturer pattern as supplyChainFactory. The device is an Apple Watch, manufactured and serviced by Apple under one of the most-documented consumer-electronics maintenance regimes in existence. Sub-field summary, framed in hardware-wallet-equivalent language:\n\n' +
+					'physicalDurability: Apple Watch Series carries IP6X dust resistance and 50m water resistance; Apple Watch Ultra adds shock resistance to MIL-STD-810H standards. Public IP / drop-test ratings exceed what any traditional hardware-wallet vendor publishes.\n\n' +
+					'mtbfDocumentation: Apple does not publish formal MTBF (mean time between failures) numbers the way enterprise hardware vendors do. This is a category-wide gap for consumer electronics; not specific to Cryptograph.\n\n' +
+					'repairability: Apple offers Self-Service Repair for the Apple Watch line (out-of-warranty parts and tools available to consumers), plus authorized service via Apple Stores and Apple Authorized Service Providers globally. Better than no DIY path, weaker than wallets like Bitbox where the user can fully open and inspect the device.\n\n' +
+					"batteryHandling: Apple offers battery service for all Apple Watch models with documented pricing and turnaround times. Battery replacement does not destroy the user's data — Apple's service flow preserves the watchOS Keychain across battery service.\n\n" +
+					'warrantyExtensions: AppleCare+ for Apple Watch extends the standard 1-year limited warranty to 2 or 3 years and adds accidental damage coverage. Available globally where Apple Watch is sold.',
+				mtbfDocumentation: MaintenanceType.FAIL,
+				physicalDurability: MaintenanceType.PASS,
+				repairability: MaintenanceType.PARTIAL,
+				url: 'https://www.apple.com/shop/applecare/applewatch',
 				warrantyExtensions: MaintenanceType.PASS,
 			},
 			operationFees: {
-				ethL1Transfer: supported({
-					ref: {
-						explanation:
-							"On a plain ETH transfer, the watch approval screen shows the gas fee as a single line. Cryptograph takes no wallet-side or protocol-side fee on transfers; gas is the entire fee picture, so the displayed value is comprehensive (no hidden fees being collapsed into one line).",
-						url: 'https://cryptograph.watch/how-it-works',
-					},
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
-				}),
+				builtInErc20Swap: notSupported,
 				erc20L1Transfer: supported({
 					ref: {
 						explanation:
 							'Identical to ETH-transfer fee display: gas as a single line, no wallet-side or protocol-side fees taken on top.',
 						url: 'https://cryptograph.watch/how-it-works',
 					},
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
 				}),
-				builtInErc20Swap: notSupported,
+				ethL1Transfer: supported({
+					ref: {
+						explanation:
+							'On a plain ETH transfer, the watch approval screen shows the gas fee as a single line. Cryptograph takes no wallet-side or protocol-side fee on transfers; gas is the entire fee picture, so the displayed value is comprehensive (no hidden fees being collapsed into one line).',
+						url: 'https://cryptograph.watch/how-it-works',
+					},
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: {
 						explanation:
 							"For Uniswap swaps initiated from Uniswap's frontend via WalletConnect, Cryptograph's approval surface shows the decoded swap call (Uniswap V2/V3/V4 Universal Router commands are recognized by the on-watch ABI decoder), gas fee, and the simulated balance change (per-asset). The Uniswap pool fee is encoded inside the swap path and reflected in the simulated output amount rather than displayed as a separate line; that's an inherent property of Uniswap's design, not a Cryptograph-side aggregation.",
 						url: 'https://cryptograph.watch/how-it-works',
 					},
-					byDefault: FeeDisplayLevel.AGGREGATED,
 					afterSingleAction: FeeDisplayLevel.AGGREGATED,
+					byDefault: FeeDisplayLevel.AGGREGATED,
 					fullySponsored: false,
 				}),
 			},
 			reputation: {
 				type: ReputationType.PARTIAL,
-				url: 'https://cryptograph.watch/',
-				details:
-					"originalProduct: Cryptograph is the first wallet to put self-custodial Ethereum signing on the Apple Watch as the trust boundary. The architecture (keys held on watch; iPhone composes but does not sign; encrypted Recovery Sheet + steganographic Photo Backup) is original to Perpetua Labs.\n\n" +
-					"availability: Currently shipping on the App Store as a paid one-time purchase.\n\n" +
-					"warrantySupportRisk: Cryptograph's recovery design is structurally robust to vendor disappearance — the BIP-39 mnemonic is viewable on-watch and portable to any compatible wallet, so users can recover their funds with or without Cryptograph the company. The Apple Watch itself is supported by Apple's globally-available service network.\n\n" +
-					"disclosureHistory: Cryptograph publishes a self-hosted bug bounty program at cryptograph.watch/bug-bounty with disclose.io-derived Safe Harbor language and a documented coordinated-disclosure timeline. No public CVEs to date — the program is recently-launched.\n\n" +
-					"bugBounty: Self-hosted, full-scope, $100–$5,000 USD bootstrap-tier rewards with a $20k annual aggregate cap, Safe Harbor adopted from disclose.io, KYC + OFAC screening on payouts, severity classified per CVSS 4.0.",
-				originalProduct: ReputationType.PASS,
 				availability: ReputationType.PASS,
-				warrantySupportRisk: ReputationType.PASS,
-				disclosureHistory: ReputationType.PARTIAL,
 				bugBounty: ReputationType.PASS,
+				details:
+					'originalProduct: Cryptograph is the first wallet to put self-custodial Ethereum signing on the Apple Watch as the trust boundary. The architecture (keys held on watch; iPhone composes but does not sign; encrypted Recovery Sheet + steganographic Photo Backup) is original to Perpetua Labs.\n\n' +
+					'availability: Currently shipping on the App Store as a paid one-time purchase.\n\n' +
+					"warrantySupportRisk: Cryptograph's recovery design is structurally robust to vendor disappearance — the BIP-39 mnemonic is viewable on-watch and portable to any compatible wallet, so users can recover their funds with or without Cryptograph the company. The Apple Watch itself is supported by Apple's globally-available service network.\n\n" +
+					'disclosureHistory: Cryptograph publishes a self-hosted bug bounty program at cryptograph.watch/bug-bounty with disclose.io-derived Safe Harbor language and a documented coordinated-disclosure timeline. No public CVEs to date — the program is recently-launched.\n\n' +
+					'bugBounty: Self-hosted, full-scope, $100–$5,000 USD bootstrap-tier rewards with a $20k annual aggregate cap, Safe Harbor adopted from disclose.io, KYC + OFAC screening on payouts, severity classified per CVSS 4.0.',
+				disclosureHistory: ReputationType.PARTIAL,
+				originalProduct: ReputationType.PASS,
+				url: 'https://cryptograph.watch/',
+				warrantySupportRisk: ReputationType.PASS,
 			},
 		},
 	},
