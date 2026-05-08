@@ -47,7 +47,14 @@ Neo-Cypherpunk Summit unites movements, thinkers & activists powered by the joy 
 ### About yourself
 
 - Company / Organization: Walletbeat
-- Role / Title (Optional): Contributor
+- Role / Title (Optional):
+- Bio (must be at least 100 words):
+
+```
+polymutex wishes to push the Ethereum wallet ecosystem forward through Walletbeat, an L2BEAT-like wallet evaluation framework inspired by Ethereum values.:Security, privacy, self-sovereignty, transparency, and ecosystem alignment. Inspired by Vitalik's blog posts on Ethereum ecosystem alignment legibility, and "What I would like to see in a wallet", this maps well to CROPS values.
+Walletbeat is an open-source, permissively-licensed database of data about Ethereum wallet. All attributes it looks for in wallets are based on verifiable wallet behavior, from simple presence of UI features all the way down to packet-level wallet network traffic analysis to look for privacy/metadata leakage.
+```
+
 - Telegram, Signal, Whatsapp, or Matric handle (indicate which one): TG: polymutex
 - Twitter (or Bluesky) Handle(s) (Optional): polymutex
 - Is your project a sponsor of Web3Privacy Now? (Optional)
