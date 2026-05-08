@@ -643,16 +643,11 @@
 								}}
 							>
 								{#snippet centerContentSnippet()}
-									<circle
-										r="8"
-										fill={scoreColor}
-									>
-										{#if showScores && score?.hasUnratedComponent}
-											<title>
-												*contains unrated components
-											</title>
-										{/if}
-									</circle>
+									<span
+										class="pie-center-dot pie-center-dot-large"
+										style:--pie-center-color={scoreColor}
+										title={showScores && score?.hasUnratedComponent ? '*contains unrated components' : undefined}
+									></span>
 								{/snippet}
 							</Pie>
 						</div>
@@ -1623,6 +1618,14 @@
 		}
 	}
 
+	.pie-center-dot {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background-color: var(--pie-center-color);
+	}
+
 	@container (min-width: 1140px) {
 		.attributes-overview-container {
 			@supports (container-type: scroll-state) {
@@ -1666,18 +1669,17 @@
 				}
 			}
 
-			> :global(*) {
-				transition-property: translate, scale, opacity;
-				transition-duration: 0.5s;
-				translate: var(--translate);
-				scale: var(--scale);
-				opacity: var(--opacity);
-			}
-
 			:global {
-				.slice {
-					transition-property: transform, opacity !important;
-					opacity: calc(1 - clamp(0, abs(var(--pie-slice-highlightIndex) - var(--i)), 1) * 0.5 * var(--isTransformed));
+				> .pie-container {
+					transition-property: translate, scale, opacity;
+					transition-duration: 0.5s;
+					translate: var(--translate);
+					scale: var(--scale);
+					opacity: var(--opacity);
+
+					.slice {
+						--slice-opacity: calc(1 - clamp(0, abs(var(--pie-slice-highlightIndex) - var(--i)), 1) * 0.5 * var(--isTransformed));
+					}
 				}
 			}
 		}

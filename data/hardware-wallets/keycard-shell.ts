@@ -192,6 +192,7 @@ export const keycardShell: HardwareWallet = {
 				},
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			securityBestPractices: null,
 			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
 			supplyChainDIY: null,
 			supplyChainFactory: null,

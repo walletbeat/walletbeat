@@ -1,0 +1,7 @@
+{
+	"contentScripts": "HTTP_AND_HTTPS",
+	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"hostPermissions": "HTTP_AND_HTTPS",
+	"permissions": ["activeTab", "alarms", "scripting", "sidePanel", "storage", "unlimitedStorage"],
+	"webAccessibleResources": "UNRESTRICTED"
+}

@@ -1,0 +1,66 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"manifest_version": 3,
+	"name": "__MSG_appName__",
+	"short_name": "__MSG_appName__",
+	"version": "1.37.1",
+	"default_locale": "en",
+	"description": "__MSG_appDescription__",
+	"icons": {
+		"16": "logo-icon-16.f3c62d27.png",
+		"32": "logo-icon-32.4a59008d.png",
+		"48": "logo-icon-48.1d23ed75.png",
+		"128": "logo-icon-128.4a4ea3f9.png"
+	},
+	"author": "https://zerion.io/",
+	"action": {
+		"default_icon": {
+			"16": "logo-icon-16.f3c62d27.png",
+			"32": "logo-icon-32.4a59008d.png",
+			"48": "logo-icon-48.1d23ed75.png",
+			"128": "logo-icon-128.4a4ea3f9.png"
+		},
+		"default_title": "Zerion",
+		"default_popup": "popup.8e8f209b.html"
+	},
+	"side_panel": {
+		"default_path": "sidepanel.21ca0c41.html"
+	},
+	"commands": {
+		"sidepanel_open_custom": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+S"
+			},
+			"description": "Toggle Sidepanel View"
+		},
+		"_execute_action": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+E"
+			}
+		}
+	},
+	"background": {
+		"service_worker": "background.687c82fc.js"
+	},
+	"content_scripts": [
+		{
+			"all_frames": true,
+			"js": ["content-script.8a17b343.js"],
+			"matches": ["https://*/*", "http://localhost/*", "http://0.0.0.0/*"],
+			"run_at": "document_start",
+			"css": ["content-script.68dfd1e7.css"]
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": ["content-script/in-page.js"],
+			"matches": ["<all_urls>"]
+		},
+		{
+			"matches": ["https://*/*", "http://localhost/*", "http://0.0.0.0/*"],
+			"resources": ["zerion-logo.e3bf8e32.svg", "close.a6482606.svg"]
+		}
+	],
+	"permissions": ["activeTab", "alarms", "scripting", "sidePanel", "storage", "unlimitedStorage"],
+	"host_permissions": ["http://*/*", "https://*/*"]
+}

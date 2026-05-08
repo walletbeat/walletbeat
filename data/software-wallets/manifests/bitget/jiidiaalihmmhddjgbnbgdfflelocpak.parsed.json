@@ -1,0 +1,17 @@
+{
+	"contentScripts": "HTTP_AND_HTTPS",
+	"externallyConnectable": { "extensionIds": "ANY", "pageMatches": "HTTPS_ONLY" },
+	"hostPermissions": "HTTP_AND_HTTPS",
+	"permissions": [
+		"storage",
+		"activeTab",
+		"notifications",
+		"unlimitedStorage",
+		"scripting",
+		"tabs",
+		"alarms",
+		"sidePanel",
+		"contextMenus"
+	],
+	"webAccessibleResources": "NONE"
+}

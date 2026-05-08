@@ -1,0 +1,61 @@
+Category	Attribute	Groups_Count	Min_Stage	Max_Stage	Stage_Spread	Gr1_Stage	Gr2_Stage	Gr3_Stage	Gr4_Stage	Count_Stage0	Count_Stage0.5	Count_Stage1	Count_Stage2
+Standard Security Practices	If key is stored in unexportable storage (secure enclave): wallet must confirm user has made a backup first	4	0	0.5	0.5	0	0.5	0	0	3	1	0	0
+Standard Security Practices	Reuse common open-source audited cryptographic libraries (no custom/homebrew crypto)	4	0	0.5	0.5	0.5	0	0	0.5	2	2	0	0
+Standard Security Practices	Secure key material storage (e.g. OS keychain or secure enclave)	4	0	1	1	0	0	1	0.5	2	1	1	0
+Standard Security Practices	Secure RNG (secure random number generation for key derivation)	4	0	0.5	0.5	0	0	0	0.5	3	1	0	0
+Standard Security Practices	Support for keystores as a method of seed phrase export / import / encryption at rest	4	0	1	1	0	1	0.5	1	1	1	2	0
+Scam alerting	Checking dapp URLs against a database of known-bad dapp URLs	4	0.5	2	1.5	2	0.5	0.5	0.5	0	3	0	1
+Scam alerting	Checking transactions against a database of known-bad scam contracts	4	0.5	2	1.5	2	0.5	0.5	0.5	0	3	0	1
+Standard Security Practices	Hot private key material wiped from RAM as soon as possible (after backup confirmed by user)	4	0.5	2	1.5	1	0.5	2	2	0	1	1	2
+Basic Authentication	Automated inactivity lock	3	0	0.5	0.5	0.5	0		0.5	1	2	0	0
+Basic Authentication	Manual lock capability	3	0	0	0	0	0		0	3	0	0	0
+Basic Authentication	Some form of authentication and authorization (password, biometrics, etc.) at app unlock	3	0	0	0	0	0		0	3	0	0	0
+Duress resistance	Duress unlock code (unlocks a decoy wallet providing plausible deniability)	3	0	2	2	0	2		2	1	0	0	2
+Scam alerting	Address poisoning protection — detecting transactions from lookalike addresses (same prefix/suffix) with differential UI treatment (hide / red-highlight / identicon)	3	0	0.5	0.5	0	0	0.5		2	1	0	0
+Scam alerting	Address whitelisting / warnings when sending to a new address	3	0	0.5	0.5	0	0	0.5		2	1	0	0
+Scam alerting	Contract whitelisting / warnings when interacting with a new contract	3	0	0.5	0.5	0	0	0.5		2	1	0	0
+Scam alerting	Educational warnings in recovery phrase flows — both viewing (never share it) and importing (recovery phrases are never shared with external services)	3	0	0	0	0	0	0		3	0	0	0
+Scam alerting	Warning about unlimited ERC-20 approvals	3	0	0	0	0	0	0		3	0	0	0
+Scam alerting	Warnings when sending to a recently-deployed contract	3	0	1	1	0	0.5	1		1	1	1	0
+Scam alerting	Warns the user about the sensitivity of seed phrase or other private key material	3	0	0	0	0	0	0		3	0	0	0
+Scam alerting	Zero-transfer and scam token filtering or marking	3	0	1	1	0	1	0.5		1	1	1	0
+Security Audit	Undergone and published a comprehensive security audit (covering all wallet features including user safety; reflecting current key security model) — at least once	3	0	1	1	0	1		1	1	0	2	0
+Source availability	Source code is public as it pertains to key generation	3	0	1	1	1	0.5		0	1	1	1	0
+Source availability	Source code is public as it pertains to key handling	3	0	2	2	2	0.5		0	1	1	0	1
+Source availability	Source code is public as it pertains to key storage	3	0	2	2	2	0.5		0	1	1	0	1
+Duress resistance	BIP-39 passphrase (25th word) support	3	0.5	2	1.5	0.5	2		2	0	1	0	2
+Multi-Address Privacy	Multiple wallet addresses are not correlatable with one another	3	0.5	2	1.5	2	0.5		1	0	1	1	1
+Scam alerting	Prevents known-insecure forms of private key backup (e.g. block screenshots when displaying seed phrases or private keys)	3	0.5	0.5	0	0.5	0.5	0.5		0	3	0	0
+Source availability	Source code is public as it pertains to the signing security model	3	0.5	2	1.5	2	0.5		0.5	0	2	0	1
+Wallet Address Privacy	Wallet addresses are not correlatable with other user information	3	0.5	2	1.5	2	0.5		1	0	1	1	1
+Outstanding approvals management	Easy revocation of outstanding ERC-20 approvals from within the wallet	3	1	2	1	1	1		2	0	0	2	1
+Regular Security Auditing	Security audit completed within the last 12 months covering all aspects that have meaningfully changed	3	1	2	1	1	1		2	0	0	2	1
+Release Process Safety	All security-sensitive code source-available before release	3	1	1	0	1	1		1	0	0	3	0
+Release Process Safety	Builds must be signed and reproducible	3	1	1	0	1	1		1	0	0	3	0
+Standard Security Practices	Unclonable hardware root of trust (PUF or ephemeral keys)	3	1	2	1	2	1	2		0	0	1	2
+Duress resistance	Self-destruct unlock code	3	2	2	0	2	2		2	0	0	0	3
+Release Process Safety	Release mechanisms must make compromised artifacts detectable pre-release and rapidly reversible	2	0	2	2	0	2			1	0	0	1
+Source visibility	The wallet's source code is publicly available (required for Walletbeat to review the wallet)	2	0	0.5	0.5		0.5		0	1	1	0	0
+Bug Bounty Program	Must have a funded bug bounty program	2	0.5	1	0.5	0.5	1			0	1	1	0
+Hardware wallet support	Support for at least one hardware wallet (Stage 0 requirement)	2	0.5	1	0.5	0.5	1			0	1	1	0
+Release Process Safety	Security-sensitive changes going into a release must undergo two-party review	2	0.5	1	0.5	1	0.5			0	1	1	0
+Outstanding approvals management	Display current outstanding ERC-20 token approvals	2	1	1	0	1	1			0	0	2	0
+Outstanding approvals management	For smart wallets: display and manage finer-grained spend permissions (rate-limits etc.) including ERC-7702 authorizations	2	1	1	0	1	1			0	0	2	0
+Duress resistance	Plausible deniability that the wallet is even installed on the user's device (e.g. decoy home screen)	2	2	2	0	2			2	0	0	0	2
+Hardware wallet support	Support for hardware wallets from at least three manufacturers (current Walletbeat Stage 1 requirement)	2	2	2	0	2	2			0	0	0	2
+Private token transfers	Token transfers and balances are private by default	2	2	2	0		2		2	0	0	0	2
+Deployment Environment Hardening	For browser extension wallets: locked-down Chrome manifest permissions and accessible_resources	1	0	0			0			1	0	0	0
+Deployment Environment Hardening	For mobile wallets: minimal app permissions and self-imposed firewall rules	1	0	0			0			1	0	0	0
+Transaction legibility	Common transaction fields shown: gas cost, chain, nonce	1	0	0			0			1	0	0	0
+Address Resolution	Wallet can send funds to human-readable Ethereum addresses such as ENS (partial: plain ENS only)	1	0.5	0.5			0.5			0	1	0	0
+Account Recovery Drills	Periodic quiz about one or two specific words from the seed phrase	1	1	1		1				0	0	1	0
+Account Unruggability	Exit window required for any contract changes unless user explicitly approves an instant upgrade	1	1	1			1			0	0	1	0
+Transaction legibility	Asset ownership changes shown (transaction simulation results)	1	1	1			1			0	0	1	0
+Transaction legibility	High-level intent in human language (e.g. 'deposit'/'take loan' with amounts; 'Sign in request for example.com' for SIWE)	1	1	1			1			0	0	1	0
+Account Recovery	User can recover their wallet if they lose their device or seed phrase (recovery mechanism exists)	1	2	2		2				0	0	0	1
+Account Recovery Drills	Periodic checks that the user has access to guardian accounts	1	2	2		2				0	0	0	1
+Chain Verification	Light client verification of chain data (does not blindly trust RPC provider)	1	2	2			2			0	0	0	1
+Impact Mitigation	High-value spend timelocks	1	2	2			2			0	0	0	1
+Impact Mitigation	Multiparty authorization required for certain subsets of transactions	1	2	2			2			0	0	0	1
+Impact Mitigation	Rate-limits on spending (user-set self-imposed limits requiring higher auth to bypass)	1	2	2			2			0	0	0	1
+Impact Mitigation	Support Transaction Assertion setting and attaching	1	2	2			2			0	0	0	1

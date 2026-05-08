@@ -40,7 +40,12 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import {
 	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	type DisplayedBasicTransactionDetails,
@@ -53,24 +58,34 @@ import {
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
+import { citrea } from '../entities/citrea'
 import { github } from '../entities/github'
 import { hunterSecurity } from '../entities/hunter-security'
 import { lifi } from '../entities/lifi'
+import { monad } from '../entities/monad'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
 import { sentry } from '../entities/sentry'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
+import ambireRawExtManifest from './manifests/ambire/ehgjhhccekdedpbkifaojjaefeohnoea.manifest.json'
 
 const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -83,7 +98,7 @@ const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 
 const v2Audits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/4be3dfec816cdd11039c1d260943a1a98affdc92/audits/Pashov-Ambire-third-security-review.md',
 		auditDate: '2024-01-26',
 		auditor: pashov,
 		codeSnapshot: {
@@ -95,7 +110,7 @@ const v2Audits: SecurityAudit[] = [
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/2bf3233cd22c28eca7f87a6ef997325936ca3214/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
 		auditDate: '2025-02-20',
 		auditor: hunterSecurity,
 		codeSnapshot: {
@@ -180,7 +195,7 @@ const scamAlertsAndSendTxWarningRefs: WithRef<{}>['ref'] = [
 		urls: [
 			{
 				label: 'Implementation',
-				url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
+				url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
 			},
 		],
 	},
@@ -249,7 +264,7 @@ export const ambire: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation: 'Ambire supports ERC-4337 smart contract wallets',
-					url: 'https://github.com/AmbireTech/ambire-common/blob/main/contracts/AmbireAccount.sol',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol',
 				},
 				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
@@ -301,13 +316,13 @@ export const ambire: SoftwareWallet = {
 					explanation:
 						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
 					label: 'Implementation of token filtering by name',
-					url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+					url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 				},
 				ether: supported({
 					ref: {
 						explanation: 'Ambire supports filtering by token name.',
 						label: 'Implementation of token filtering by name',
-						url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+						url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 					},
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
@@ -330,9 +345,9 @@ export const ambire: SoftwareWallet = {
 					explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
 					label: 'List of RPCs Ambire uses for default chains',
 					url: [
-						'https://github.com/AmbireTech/ambire-common/blob/main/src/consts/networks.ts',
-						'https://github.com/AmbireTech/ambire-common/blob/main/src/services/ensDomains/ensDomains.ts',
-						'https://github.com/AmbireTech/ambire-common/blob/main/src/libs/portfolio/getOnchainBalances.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/22678d08810b6f28fa55886c4214d3bc54260d1f/src/consts/networks.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/e3a749a1cb2e4bf098b18e547b363a1931a81d29/src/services/ensDomains/ensDomains.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/362e2dc1e2e769d23f5de1717b66ff295c8e91bc/src/libs/portfolio/getOnchainBalances.ts',
 					],
 				},
 				{
@@ -374,7 +389,7 @@ export const ambire: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: {
-					url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
+					url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
 				},
 				'1193': featureSupported,
 				'2700': featureSupported,
@@ -388,7 +403,7 @@ export const ambire: SoftwareWallet = {
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
-				ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
+				ref: 'https://github.com/AmbireTech/extension/blob/82c86aa342b85ece2afbe3689a5b52be9c6e1ff9/LICENSE',
 				license: FOSSLicense.GPL_3_0,
 			},
 		},
@@ -415,17 +430,17 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation:
 								'Ambire integrates Sentry for anonymous crash/error reporting in the web extension context.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/src/common/config/analytics/CrashAnalytics.web.ts',
+							url: 'https://github.com/AmbireTech/extension/blob/5942801f127d41d25170ef079e94aa64eb606210/src/common/config/analytics/CrashAnalytics.web.ts',
 						},
 						{
 							explanation:
 								'Sentry is initialized in the background service worker, and events are only sent when crash analytics are enabled.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
+							url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
 						},
 						{
 							explanation:
 								'Ambire provides a user toggle for enabling/disabling crash analytics in settings.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/src/web/modules/settings/screens/GeneralSettingsScreen/components/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+							url: 'https://github.com/AmbireTech/extension/blob/b4e45b584754694555d433a52e8aab8f4e0ac539/src/common/modules/settings/components/General/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
 						},
 					],
 					entity: sentry,
@@ -448,7 +463,7 @@ export const ambire: SoftwareWallet = {
 				[Variant.DESKTOP]: null,
 			},
 			dataCollection: {
-				[UserFlow.INSTALL]: null,
+				[UserFlow.INSTALL]: { collected: [] },
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [
 						{
@@ -463,14 +478,119 @@ export const ambire: SoftwareWallet = {
 					],
 				},
 				[UserFlow.ONBOARDING_NEW]: {
-					collected: [],
+					collected: [
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: monad,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: citrea,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+					],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
-				[UserFlow.ONBOARDING_IMPORT]: null,
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: monad,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: citrea,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
 				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
-				[UserFlow.SEND_USDC]: null,
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+					],
+				},
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},
@@ -630,7 +750,7 @@ export const ambire: SoftwareWallet = {
 						urls: [
 							{
 								label: 'Implementation',
-								url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
 							},
 						],
 					},
@@ -647,19 +767,32 @@ export const ambire: SoftwareWallet = {
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
 			},
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: parseBrowserExtensionManifest(ambireRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'NOT_A_MOBILE_APP',
+			},
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: false,
-					formatted: false,
-					rawHex: true,
-				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: ambireTransactionDisplayDefault,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
@@ -728,6 +861,56 @@ export const ambire: SoftwareWallet = {
 				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+			},
+			releaseTransparency: {
+				artifactSigning: supported<ArtifactSigningDetails>({
+					ref: 'https://github.com/AmbireTech/extension/releases',
+					publication: 'GITHUB_RELEASE',
+					signer: 'DEVELOPER_KEY',
+				}),
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The `setup:ci` script enforces lockfile sync with `yarn install --frozen-lockfile`.',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/package.json',
+						},
+						{
+							explanation: 'CI workflows execute `yarn setup:ci` before builds.',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
+				hasPublicChangelog: supported({
+					ref: 'https://github.com/AmbireTech/extension/releases',
+				}),
+				hermeticBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The release build workflow updates git submodules during build execution, requiring network access rather than using a fully pre-fetched offline input set.',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
+						},
+						{
+							explanation:
+								'Android build workflow runs `yarn setup:ci` during build, so JavaScript dependencies are resolved/fetched at build time.',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-android.yml',
+						},
+						{
+							explanation:
+								'iOS build workflow runs `bundle exec pod install`, which performs dependency resolution/fetching during the build job.',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-ios.yml',
+						},
+						{
+							explanation:
+								'Gecko ARM64 release build pulls base images and installs Alpine packages (`apk add`) at runtime, indicating non-hermetic networked build inputs.',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extension-gecko.yml',
+						},
+					],
+				}),
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
 			},
 		},
 	},

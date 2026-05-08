@@ -1,3 +1,4 @@
+import type { WBIconFontID } from '@/styles/wbicons'
 import { type Sentence } from '@/types/content'
 import {
 	isNonEmptyArray,
@@ -15,14 +16,21 @@ import {
 	EvaluationContext,
 	isExempt,
 	type OutcomeMetadata,
+	type OutcomeMetadataSet,
 	Rating,
-	type ValueSet,
 	type WalletNameStrings,
 } from './attributes'
 import type { ResolvedFeatures } from './features'
 import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore } from './score'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
+
+// Attribute metadata is intentionally erased at the group/tree boundary:
+// each group contains heterogeneous attributes with distinct metadata types.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- existential attribute metadata
+type AnyAttribute = Attribute<any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- existential evaluated attribute metadata
+type AnyEvaluatedAttribute = EvaluatedAttribute<any>
 
 /**
  * An attribute group is a collection of attributes that are related to one
@@ -34,7 +42,7 @@ export interface AttributeGroup<_AttributeGroupId extends string> {
 	id: _AttributeGroupId
 
 	/** A friendly icon for the group. */
-	icon: string
+	icon: WBIconFontID
 
 	/** A human-readable name for the group. */
 	displayName: string
@@ -47,12 +55,12 @@ export interface AttributeGroup<_AttributeGroupId extends string> {
 	perWalletQuestion: Sentence<WalletNameStrings>
 
 	/** Attributes with their weights. */
-	attributes: _AttributeWithWeight<any>[]
+	attributes: _AttributeWithWeight[]
 }
 
 /** Attribute with hardcoded weight for use in attribute groups. */
-export type _AttributeWithWeight<_OutcomeMetadata extends OutcomeMetadata> = {
-	attribute: Attribute<_OutcomeMetadata>
+export type _AttributeWithWeight<_Attribute extends AnyAttribute = AnyAttribute> = {
+	attribute: _Attribute
 	weight: number
 }
 
@@ -63,7 +71,7 @@ export type AttributeTree<_AttributeGroupId extends string> = {
 /** Evaluated attributes for a single wallet. Each group has only its own attribute IDs. */
 export type EvaluationTree<_AttributeGroupId extends string> = Record<
 	_AttributeGroupId,
-	Record<string, EvaluatedAttribute<any>>
+	Record<string, AnyEvaluatedAttribute>
 >
 
 /** Rate a wallet's attributes based on its features and metadata. */
@@ -144,7 +152,7 @@ export function aggregateAttributes<_AttributeGroupId extends string>(
 			Object.fromEntries(
 				attrGroup.attributes.map(({ attribute }) => [
 					attribute.id,
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- EvaluationTree values are heterogeneous; aggregate() widens to OutcomeMetadata.
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- EvaluationTree values have erased metadata; aggregate() widens to OutcomeMetadata.
 					aggregate(tree => tree[attrGroupId][attribute.id]),
 				]),
 			),
@@ -155,7 +163,11 @@ export function aggregateAttributes<_AttributeGroupId extends string>(
 type EvaluatedGroupFromAttributeGroup<AttrGroup extends AttributeGroup<string>> =
 	AttrGroup extends AttributeGroup<infer _AttributeGroupId>
 		? {
-				[AttributeWithWeight in AttrGroup['attributes'][number] as AttributeWithWeight['attribute']['id']]: EvaluatedAttribute<any>
+				[AttributeWithWeight in AttrGroup['attributes'][number] as AttributeWithWeight['attribute']['id']]: EvaluatedAttribute<
+					AttributeWithWeight['attribute'] extends Attribute<infer _OutcomeMetadata>
+						? _OutcomeMetadata
+						: never
+				>
 			}
 		: never
 
@@ -187,8 +199,11 @@ export function mapNonExemptAttributeGroupsInTree<R, _AttributeGroupId extends s
  * Iterate over all non-exempt attributes in an evaluated attribute group,
  * calling `fn` with each attribute.
  */
-export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
-	evalGroup: EvaluatedGroup<Vs>,
+export function mapNonExemptGroupAttributes<
+	T,
+	OutcomeMetadataByAttribute extends OutcomeMetadataSet,
+>(
+	evalGroup: EvaluatedGroup<OutcomeMetadataByAttribute>,
 	fn: <_OutcomeMetadata extends OutcomeMetadata>(
 		evalAttr: EvaluatedAttribute<_OutcomeMetadata>,
 		index: number,
@@ -202,8 +217,8 @@ export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
 /**
  * Return the number of non-exempt attributes in an evaluated attribute group.
  */
-export function numNonExemptGroupAttributes<Vs extends ValueSet>(
-	evalGroup: EvaluatedGroup<Vs>,
+export function numNonExemptGroupAttributes<OutcomeMetadataByAttribute extends OutcomeMetadataSet>(
+	evalGroup: EvaluatedGroup<OutcomeMetadataByAttribute>,
 ): number {
 	return Object.values(evalGroup).filter(
 		(evalAttr): boolean => evalAttr.evaluation.outcome.rating !== Rating.EXEMPT,

@@ -26,13 +26,16 @@ import {
 	type WalletNameStrings,
 } from './attributes'
 import type { WalletDeveloper } from './entity'
+import type { ExtensionUrl } from './extension-url'
 import { type ResolvedFeatures, resolveFeatures, type WalletBaseFeatures } from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
+import type { GithubRawUrl } from './github-raw-url'
 import type { Ladders, WalletLadderType } from './ladders'
 import {
 	evaluateWalletOnLadder,
 	type StageEvaluatableWallet,
+	type WalletLadder,
 	type WalletLadderEvaluation,
 } from './stages'
 import type { DomainUrl, LabeledUrl, Url } from './url'
@@ -145,8 +148,12 @@ export interface WalletUrls {
 	docs?: Url[]
 	/** Repository URL(s) for source code, if public. */
 	repositories?: Url[]
-	/** Extension URLs associated with the wallet, if available. */
-	extensions?: Url[]
+	/** Web Store extension URL(s) for the wallet, if available. */
+	extensions?: ExtensionUrl[]
+	/** URL to the raw AndroidManifest.xml on GitHub, if available. */
+	androidManifestXml?: GithubRawUrl
+	/** URL to the raw iOS Info.plist on GitHub, if available. */
+	iosInfoPlist?: GithubRawUrl
 	/** Web App URLs, if available. */
 	webapps?: Url[]
 	/** Play Store URL, if available. */
@@ -303,7 +310,7 @@ export interface RatedWallet<_AttributeGroupId extends string> {
 	 * When displayed on the interface, it is expected that the interface code
 	 * will select the evaluation on the ladder(s) that makes sense to display.
 	 */
-	ladders: Record<WalletLadderType, WalletLadderEvaluation<_AttributeGroupId>>
+	ladders: Partial<Record<WalletLadderType, WalletLadderEvaluation<_AttributeGroupId>>>
 
 	/** Overrides for specific attributes. */
 	overrides?: WalletOverrides<_AttributeGroupId>
@@ -438,13 +445,20 @@ export function rateWallet<_AttributeGroupId extends string>(
 	return {
 		metadata: wallet.metadata,
 		...stageEvaluatable,
-		ladders: nonEmptyRemap(walletLadders, (_, ladder) => {
-			try {
-				return evaluateWalletOnLadder(stageEvaluatable, ladder)
-			} catch (e) {
-				throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`)
-			}
-		}),
+		ladders: Object.fromEntries(
+			Object.entries(walletLadders)
+				.filter(
+					(entry): entry is [WalletLadderType, WalletLadder<_AttributeGroupId>] =>
+						entry !== undefined && entry[1] !== undefined,
+				)
+				.map(([ladderType, ladder]) => {
+					try {
+						return [ladderType, evaluateWalletOnLadder(stageEvaluatable, ladder)] as const
+					} catch (e) {
+						throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`)
+					}
+				}),
+		),
 	}
 }
 

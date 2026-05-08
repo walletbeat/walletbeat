@@ -1,0 +1,16 @@
+{
+	"contentScripts": "NONE",
+	"externallyConnectable": { "extensionIds": "ANY", "pageMatches": "NONE" },
+	"hostPermissions": "UNRESTRICTED",
+	"permissions": [
+		"storage",
+		"tabs",
+		"unlimitedStorage",
+		"activeTab",
+		"notifications",
+		"scripting",
+		"alarms",
+		"system.display"
+	],
+	"webAccessibleResources": "NONE"
+}

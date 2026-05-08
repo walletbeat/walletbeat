@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import type { SoftwareWallet } from '@/data/software-wallets'
@@ -24,11 +25,15 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import {
 	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	type DisplayedBasicTransactionDetails,
-	displaysFullCallData,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -37,7 +42,10 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
 	comprehensiveFeesShownByDefault,
@@ -50,6 +58,8 @@ import {
 } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { mdParagraph, paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
@@ -60,6 +70,9 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
+import metamaskAndroidParsed from './manifests/metamask/android.parsed.json'
+import metamaskIosParsed from './manifests/metamask/ios.parsed.json'
+import metamaskRawExtManifest from './manifests/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn.manifest.json'
 
 const metamaskTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -80,14 +93,18 @@ export const metamask: SoftwareWallet = {
 			been around for a long time. It is a jack-of-all-trades wallet that can
 			be extended through MetaMask Snaps.
 		`),
-		contributors: [polymutex, nconsigny],
+		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-13',
+		lastUpdated: '2026-05-06',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://docs.metamask.io/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
 			],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
 			repositories: ['https://github.com/MetaMask/metamask-extension'],
 			socials: {
 				farcaster: 'https://farcaster.xyz/metamask',
@@ -245,14 +262,14 @@ export const metamask: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The MetaMask browser extension uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
 				[Variant.MOBILE]: {
 					ref: {
 						explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
-						url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
+						url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
 					},
 					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
@@ -449,7 +466,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
 					auditDate: '2025-03-18',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -459,7 +476,7 @@ export const metamask: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
 					auditDate: '2025-04-01',
 					auditor: cyfrin,
 					codeSnapshot: {
@@ -517,15 +534,37 @@ export const metamask: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: parseBrowserExtensionManifest(metamaskRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: refTodo,
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					mobileAppHardening: parseMobileManifestJson(metamaskAndroidParsed, metamaskIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+			},
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: displaysFullCallData,
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
 						...metamaskTransactionDisplayDefault,
@@ -574,7 +613,7 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -582,8 +621,10 @@ export const metamask: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
 				},
 			},
@@ -594,6 +635,15 @@ export const metamask: SoftwareWallet = {
 				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+			},
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
 			},
 		},
 	},

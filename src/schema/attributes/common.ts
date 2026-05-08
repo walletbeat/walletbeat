@@ -1,6 +1,17 @@
-import { type Sentence, sentence } from '@/types/content'
+import {
+	ContentType,
+	isTypographicContent,
+	markdown,
+	type Sentence,
+	sentence,
+} from '@/types/content'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty'
+import {
+	isNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyEntries,
+	nonEmptyValues,
+} from '@/types/utils/non-empty'
 
 import {
 	type Evaluation,
@@ -12,7 +23,7 @@ import {
 	Verifiability,
 	type WalletNameStrings,
 } from '../attributes'
-import type { AtLeastOneVariant, Variant } from '../variants'
+import { type AtLeastOneVariant, Variant, variantLabel } from '../variants'
 
 /**
  * Helper for constructing Evaluation with "Unrated" Outcome.
@@ -125,4 +136,44 @@ export function pickWorstRating<_OutcomeMetadata extends OutcomeMetadata>(
 	}
 
 	return worst!
+}
+
+/**
+ * Aggregation function that picks the worst rating across variants and, when
+ * there is more than one variant, merges their details into a single markdown
+ * block prefixed by variant label.
+ */
+export function aggregateVariantEvaluations<_OutcomeMetadata extends OutcomeMetadata>(
+	perVariant: AtLeastOneVariant<Evaluation<_OutcomeMetadata>>,
+): Evaluation<_OutcomeMetadata> {
+	const worst = pickWorstRating<_OutcomeMetadata>(perVariant)
+	const entries = nonEmptyEntries<Variant, Evaluation<_OutcomeMetadata>>(perVariant)
+
+	// If worst is UNRATED, pickWorstRating already short-circuited on the first
+	// UNRATED variant it encountered, so no merging is needed or possible.
+	if (entries.length === 1 || worst.outcome.rating === Rating.UNRATED) {
+		return worst
+	}
+
+	const combinedDetails = entries
+		.map(([variant, evaluation]) => {
+			if (!isTypographicContent(evaluation.details)) {
+				throw new Error(
+					`aggregateVariantEvaluations: variant ${variant} has non-typographic details and needs special handling`,
+				)
+			}
+
+			const text =
+				evaluation.details.contentType === ContentType.TEXT
+					? evaluation.details.text
+					: evaluation.details.markdown
+
+			return `**${variantLabel(variant as Variant)}:** ${text}`
+		})
+		.join('\n\n')
+
+	return {
+		...worst,
+		details: markdown(combinedDetails),
+	}
 }

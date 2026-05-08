@@ -29,6 +29,7 @@ import type { PasskeyVerificationImplementation } from './features/security/pass
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
+import type { SecurityBestPracticesData } from './features/security/security-best-practices'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type {
@@ -122,6 +123,9 @@ export interface WalletBaseFeatures {
 
 		/** How are secret keys handled? */
 		keysHandling: VariantFeature<WithRef<KeysHandlingSupport>>
+
+		/** Security best practices. */
+		securityBestPractices: SecurityBestPracticesData | null
 	}
 
 	/** Privacy features. */
@@ -337,6 +341,7 @@ export interface ResolvedFeatures {
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
 		keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>>
+		securityBestPractices: ResolvedFeature<SecurityBestPracticesData>
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 		userSafety: ResolvedFeature<UserSafetySupport>
@@ -484,6 +489,7 @@ export function resolveFeatures(
 				'security.supplyChainDIY',
 				features => features.security.supplyChainDIY,
 			),
+			securityBestPractices: features.security.securityBestPractices,
 			supplyChainFactory: hardwareFeat(
 				'security.supplyChainFactory',
 				features => features.security.supplyChainFactory,
