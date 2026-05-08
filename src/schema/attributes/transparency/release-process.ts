@@ -316,14 +316,13 @@ export const releaseProcess: Attribute = {
 
 		**Supply-chain integrity** (high-trust):
 		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
-		4. **Reproducible or hermetic builds**: independent parties can verify the build output matches
-		   the source, or the build can run fully offline. This requires the wallet's source code to be
-		   publicly visible, since external verification requires source access.
+		4. **Reproducible or hermetic builds**: independent parties can verify that build output matches
+		   source, or the build can run fully offline. This requires public source code.
 
 		A wallet **passes** when both process signals and both supply-chain signals are present.
-		Partial coverage earns a **partial** rating, scored by how much of the two groups is satisfied:
-		process signals alone score lower than supply-chain signals alone, reflecting the higher trust
-		value of supply-chain integrity. No signals at all earns a **fail**.
+		Partial coverage earns a **partial** rating, based on which groups are satisfied.
+		Process signals alone score lower than supply-chain signals alone, reflecting stronger trust from
+		supply-chain integrity evidence. No signals at all earns a **fail**.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -490,8 +489,6 @@ export const releaseProcess: Attribute = {
 					return partialProcessFailSupplyPass(ctx, supportedSignals, processSignals)
 			}
 		}
-
-		throw new Error('Unreachable')
 	},
 	aggregate: pickWorstRating,
 }

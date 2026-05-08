@@ -762,11 +762,11 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation:
 								'The `setup:ci` script enforces lockfile sync with `yarn install --frozen-lockfile`.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/package.json',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/package.json',
 						},
 						{
 							explanation: 'CI workflows execute `yarn setup:ci` before builds.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
 						},
 					],
 				}),
@@ -779,22 +779,22 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation:
 								'The release build workflow updates git submodules during build execution, requiring network access rather than using a fully pre-fetched offline input set.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extensions.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
 						},
 						{
 							explanation:
 								'Android build workflow runs `yarn setup:ci` during build, so JavaScript dependencies are resolved/fetched at build time.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-android.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-android.yml',
 						},
 						{
 							explanation:
 								'iOS build workflow runs `bundle exec pod install`, which performs dependency resolution/fetching during the build job.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/_build-ios.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-ios.yml',
 						},
 						{
 							explanation:
 								'Gecko ARM64 release build pulls base images and installs Alpine packages (`apk add`) at runtime, indicating non-hermetic networked build inputs.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/.github/workflows/build-extension-gecko.yml',
+							url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extension-gecko.yml',
 						},
 					],
 				}),
