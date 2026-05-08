@@ -86,9 +86,6 @@ export const topbarNavigationItems = [
 	navigationFarcasterChannel,
 ] as const satisfies NavigationItem[]
 export const defaultNavigationItems = [
-	// {
-	// 	...navigationHome,
-	// 	children: [
 	{
 		id: 'software-wallets',
 		title: 'Software Wallets',
@@ -163,30 +160,6 @@ export const defaultNavigationItems = [
 			},
 		],
 	},
-	// {
-	// 	id: 'embedded-wallets',
-	// 	title: 'Embedded Wallets',
-	// 	href: '/embedded/summary/',
-	// 	icon: CpuIcon,
-	// 	children: [
-	// 		{
-	// 			id: 'embedded-by-rating',
-	// 			title: 'By Rating',
-	// 			icon: ChartPieIcon,
-	// 			children: [
-	// 				...mapNonExemptAttributeGroupsInTree(
-	// 					representativeWalletForType(WalletType.EMBEDDED).overall,
-	// 					attrGroup => ({
-	// 						id: `embedded-${attrGroup.id}`,
-	// 						title: attrGroup.displayName,
-	// 						icon: attrGroup.icon,
-	// 						href: `/embedded/${attrGroup.id}/`,
-	// 					}),
-	// 				),
-	// 			],
-	// 		},
-	// 	],
-	// },
 	navigationNews,
 	navigationTesting,
 ] as const satisfies NavigationItem[]
