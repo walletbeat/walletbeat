@@ -25,13 +25,12 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 	<main data-sticky-container data-column='gap-6'>
 		<header data-sticky='inline'>
-			<h1>Who watches the <br />wallets.</h1>
+			<h1>Who watches the wallets.</h1>
 
 			<p>
 				This website is still in beta. It aims to provide a comprehensive list of wallets, their
 				functionality, practices, and support for certain standards.
 			</p>
-			<br />
 			<p>
 				We welcome contributions via the <a
 					href='https://github.com/walletbeat/walletbeat'
@@ -40,7 +39,12 @@ import WalletTable from '@/views/WalletTable.svelte'
 				>.
 			</p>
 			<p>
-				<a> Learn More. </a>
+				<a
+					href='https://github.com/walletbeat/walletbeat/blob/beta/CONTRIBUTING.md'
+					target='_blank'
+				>
+					Learn More.
+				</a>
 			</p>
 		</header>
 
@@ -87,6 +91,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 				margin: 0;
 				text-wrap: balance;
 				max-width: 420px;
+				margin-bottom: 1em;
 			}
 		}
 	}
