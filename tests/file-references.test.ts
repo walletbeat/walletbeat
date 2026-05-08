@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest'
-import { existsSync, readdirSync, readFileSync } from 'fs'
-import { resolve, dirname, join } from 'path'
+import { existsSync } from 'fs'
+import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
-import { toFullyQualified, type LooseReference } from '@/schema/reference'
+import { describe, expect, it } from 'vitest'
+
+import { allWallets } from '@/data/wallets'
+import { hasRefs, type LooseReference, toFullyQualified } from '@/schema/reference'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(currentDir, '..')
@@ -50,7 +52,7 @@ describe('RepoFileReference', () => {
 			const ref: LooseReference = { file: 'src/something.ts' }
 
 			expect(() => toFullyQualified(ref)).toThrow(
-				'RepoFileReference path must be a repo-relative path under public/',
+				'File path-based references must be a repository-relative path under public/',
 			)
 		})
 
@@ -63,49 +65,73 @@ describe('RepoFileReference', () => {
 	})
 
 	describe('file existence validation', () => {
-		it('all file references in wallet data point to files that exist', () => {
-			const dataDir = resolve(repoRoot, 'data')
-
-			if (!existsSync(dataDir)) {
-				return
+		it('all file references in wallet data point to existing files', () => {
+			type RefField = {
+				path: string[]
+				filePath: string
 			}
 
-			const fileReferences: Array<{ filePath: string; sourceFile: string }> = []
+			const fileRefs: RefField[] = []
 
-			function scanDir(dir: string): void {
-				for (const entry of readdirSync(dir, { withFileTypes: true })) {
-					const fullPath = join(dir, entry.name)
+			const findFileRefs = (path: string[], x: unknown): void => {
+				if (x === undefined || x === null) {
+					return
+				}
 
-					if (entry.isDirectory()) {
-						scanDir(fullPath)
-						continue
-					}
+				if (Array.isArray(x)) {
+					x.map((item, index) => findFileRefs(path.concat([`[${index.toString()}]`]), item))
 
-					if (!entry.name.endsWith('.ts') && !entry.name.endsWith('.tsx')) {
-						continue
-					}
+					return
+				}
 
-					const content = readFileSync(fullPath, 'utf-8')
-					const matches = content.matchAll(/file:\s*['"]([^'"]+)['"]/g)
+				if (typeof x !== 'object') {
+					return
+				}
 
-					for (const match of matches) {
-						fileReferences.push({
-							filePath: match[1],
-							sourceFile: fullPath,
-						})
+				for (const [key, val] of Object.entries(x)) {
+					findFileRefs(path.length === 0 ? [key] : path.concat([`.${key}`]), val)
+				}
+
+				if (hasRefs(x)) {
+					const qualified = toFullyQualified(x.ref)
+
+					for (const ref of qualified) {
+						for (const urlEntry of ref.urls) {
+							const url = urlEntry.url
+
+							if (url.startsWith('/') && !url.startsWith('//')) {
+								fileRefs.push({
+									path,
+									filePath: `public${url}`,
+								})
+							}
+						}
 					}
 				}
 			}
 
-			scanDir(dataDir)
+			for (const [walletName, wallet] of Object.entries(allWallets)) {
+				findFileRefs([walletName], wallet)
+			}
 
-			for (const { filePath, sourceFile } of fileReferences) {
+			for (const { path, filePath } of fileRefs) {
+				if (!filePath.startsWith('public/')) {
+					throw new Error(`${path.join('')}: file path "${filePath}" must start with public/`)
+				}
+
+				const segments = filePath.split('/')
+
+				if (segments.some(s => s === '.' || s === '..')) {
+					throw new Error(
+						`${path.join('')}: file path "${filePath}" contains path-traversal components`,
+					)
+				}
+
 				const fullPath = resolve(repoRoot, filePath)
-				const relativeSource = sourceFile.replace(repoRoot + '/', '')
 
 				expect(
 					existsSync(fullPath),
-					`${relativeSource} references "${filePath}" but this file does not exist`,
+					`${path.join('')}: references "${filePath}" but this file does not exist`,
 				).toBe(true)
 			}
 		})
