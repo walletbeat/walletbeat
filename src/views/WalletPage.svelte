@@ -621,6 +621,8 @@
 									innerRadiusFraction: 0.125,
 									gap: 8,
 									angleGap: 0,
+									outerCornerRadius: 24,
+									innerCornerRadius: 24,
 								}]}
 
 								slices={

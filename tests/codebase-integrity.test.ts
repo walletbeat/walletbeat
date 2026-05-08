@@ -4,27 +4,24 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+	iconFontStartCharCode,
+	maxIconFontChars,
+} from '@/tools/icon-font-generator/icon-font-generator-lib'
+
+import {
 	type CodebaseEntry,
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
+	getCrlfFilesFromGit,
 	getRepositoryRoot,
 	normalizePath,
 	type PathPredicate,
 } from './utils/codebase'
 
 describe('codebase integrity', () => {
-	describe('all files have Unix line endings', async () => {
-		const filesWithCrlf: string[] = []
-
-		await crawlCodebase({
-			ignore: commonExclusions,
-			traversalFn: entry => {
-				if (entry.type === CodebaseEntryType.FILE && entry.contents.includes('\r\n')) {
-					filesWithCrlf.push(entry.path)
-				}
-			},
-		})
+	describe('all files have Unix line endings', () => {
+		const filesWithCrlf = [...getCrlfFilesFromGit(getRepositoryRoot())]
 
 		it('all files have Unix line endings', () => {
 			expect(filesWithCrlf, `Files with CRLF line endings: ${filesWithCrlf.join(', ')}`).toEqual([])
@@ -139,6 +136,8 @@ describe('codebase integrity', () => {
 		// Any change to the set of characters below should be examined with extreme prejudice.
 		const allowedNonAscii = new Set<string>([
 			'´',
+			'ᵗ',
+			'ˢ',
 			'°',
 			'˚',
 			'•',
@@ -161,6 +160,7 @@ describe('codebase integrity', () => {
 			'▸',
 			'—',
 			'–',
+			'−',
 			'─',
 			'┌',
 			'┐',
@@ -188,11 +188,52 @@ describe('codebase integrity', () => {
 			'℅',
 			'ᵗ',
 			'ʰ',
+			'↔',
+			'‚',
+			'„',
+			'†',
+			'‡',
+			'‹',
+			'€',
+			'™',
+			'↓',
+			'↕',
+			'↖',
+			'↘',
+			'↙',
+			'∞',
+			'≈',
+			'≠',
+			'ə',
+			'ẞ',
+			'Ỳ',
+			'ỳ',
 		])
+
+		// Characters used in font files generated from SVG.
+		for (let charCodeOffset = 0; charCodeOffset < maxIconFontChars; charCodeOffset++) {
+			allowedNonAscii.add(String.fromCodePoint(iconFontStartCharCode + charCodeOffset))
+		}
+
+		// Characters used in Monorium Dingbat.
+		for (const [charCodeMin, charCodeMax] of [
+			[160, 399],
+			[536, 567],
+			[768, 780],
+			[786, 786],
+			[806, 808],
+			[7808, 7813],
+		] as Array<[number, number]>) {
+			for (let c = charCodeMin; c <= charCodeMax; c++) {
+				allowedNonAscii.add(String.fromCodePoint(c))
+			}
+		}
 
 		for (const nonAscii of allowedNonAscii) {
 			if ([...nonAscii].length !== 1) {
-				throw new Error('invalid non-ASCII character list')
+				throw new Error(
+					`invalid non-ASCII character list: ${JSON.stringify(nonAscii)} (length: ${[...nonAscii].length})`,
+				)
 			}
 		}
 		const emojiSequence = /\p{RGI_Emoji}/gv

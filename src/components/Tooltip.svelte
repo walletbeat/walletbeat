@@ -22,7 +22,7 @@
 
 <script lang="ts">
 	// Types/constants
-	import type { SvelteHTMLElements } from 'svelte/elements'
+	import type { HTMLAttributes } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
 
 
@@ -45,7 +45,7 @@
 		isEnabled = true,
 		children,
 		...restProps
-	}: SvelteHTMLElements['div'] & {
+	}: HTMLAttributes<HTMLDivElement> & {
 		title?: string
 		placement?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
 		buttonTriggerPlacement?: 'around' | 'behind'

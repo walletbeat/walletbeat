@@ -1,13 +1,6 @@
 ---
 // Constants
-import {
-	navigationHome,
-	navigationAbout,
-	navigationFaq,
-	navigationNews,
-	navigationRepository,
-	navigationFarcasterChannel,
-} from '@/constants/navigation'
+import { defaultNavigationItems } from '@/constants/navigation'
 
 // Layouts
 import Layout from '@/layouts/Layout.astro'
@@ -27,16 +20,7 @@ import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 		keywordsAfter: ['about'],
 	}}
 >
-	<Navigation
-		navigationItems={[
-			navigationHome,
-			navigationAbout,
-			navigationFaq,
-			navigationNews,
-			navigationRepository,
-			navigationFarcasterChannel,
-		]}
-	/>
+	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container data-column='gap-8'>
 		<header data-scroll-item='inline-detached padding-match-start'>

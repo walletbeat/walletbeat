@@ -145,7 +145,7 @@ export const keystoneWallet: HardwareWallet = {
 					ref: [
 						{
 							explanation: 'Keystone 3 Pro security audit by Keylabs',
-							url: 'https://github.com/keylabsio/audits/blob/main/2023-11-keystone3.pdf',
+							url: 'https://github.com/keylabsio/audits/blob/24e10a7404106494f66c5ebcf49b8fa4eaaa2d3c/2023-11-keystone3.pdf',
 						},
 					],
 					auditDate: '2023-11-22',
@@ -158,7 +158,7 @@ export const keystoneWallet: HardwareWallet = {
 					ref: [
 						{
 							explanation: 'Keystone 3 Pro security audit by SlowMist',
-							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/bbf894fc9c42d1e9af7b2690f54fc94c7d0fc299/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
 						},
 					],
 					auditDate: '2023-09-07',

@@ -5,7 +5,7 @@
 	"
 >
 	// Types
-	import type { SvelteHTMLElements } from 'svelte/elements'
+	import type { HTMLAttributes } from 'svelte/elements'
 	import { ContentType, type TypographicContent } from '@/types/content'
 	import type { Strings } from '@/types/utils/string-templates'
 
@@ -14,7 +14,7 @@
 	let {
 		content,
 		strings,
-	}: SvelteHTMLElements['div'] & {
+	}: HTMLAttributes<HTMLDivElement> & {
 		content: TypographicContent<_Strings>
 		strings?: _Strings extends null ? never : _Strings
 	} = $props()

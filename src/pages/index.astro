@@ -28,7 +28,6 @@ import WalletTable from '@/views/WalletTable.svelte'
 				This website is still in beta. It aims to provide a comprehensive list of wallets, their
 				functionality, practices, and support for certain standards.
 			</p>
-
 			<p>
 				We welcome contributions via the <a
 					href='https://github.com/walletbeat/walletbeat'
@@ -36,10 +35,18 @@ import WalletTable from '@/views/WalletTable.svelte'
 					rel='noreferrer'>GitHub Repository</a
 				>.
 			</p>
+			<p>
+				<a
+					href='https://github.com/walletbeat/walletbeat/blob/beta/CONTRIBUTING.md'
+					target='_blank'
+				>
+					Learn More.
+				</a>
+			</p>
 		</header>
 
 		<WalletTable
-			client:load
+			client:visible
 			title='Software Wallets'
 			ladders={softwareLadders}
 			wallets={Object.values(ratedSoftwareWallets)}
@@ -47,7 +54,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 		/>
 
 		<WalletTable
-			client:load
+			client:visible
 			title='Hardware Wallets'
 			wallets={Object.values(ratedHardwareWallets)}
 			attributeTree={hardwareWalletAttributeTree}
@@ -56,17 +63,23 @@ import WalletTable from '@/views/WalletTable.svelte'
 </Layout>
 
 <style>
+	@font-face {
+		font-family: 'SP Monorium';
+		src:
+			url('/fonts/sp-monorium-regular.woff2') format('woff2'),
+			url('/fonts/sp-monorium-regular.woff') format('woff');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+
 	main {
 		> header {
 			&::before {
 				content: '';
-
-				background:
-					linear-gradient(to right, var(--background-primary) 33cqi, transparent 125%),
-					url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat;
 			}
 
-			padding: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 8rem)
+			padding: clamp(0.75rem, 0.04 * var(--scrollContainer-sizeInline), 4rem)
 				clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 
 			text-shadow:
@@ -75,20 +88,22 @@ import WalletTable from '@/views/WalletTable.svelte'
 				0 0 3em var(--background-primary);
 
 			h1 {
+				font-family: 'SP Monorium', monospace;
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
 				font-weight: 800;
-				color: var(--accent);
 				margin: 0 0 1rem 0;
+				color: var(--text-primary);
 				line-height: 1.1;
 			}
 
 			p {
 				font-size: smaller;
-				color: var(--text-secondary);
 				line-height: 1.6;
 				margin: 0;
 				text-wrap: balance;
-				max-width: 72.5%;
+				max-width: 420px;
+				margin-bottom: 1em;
+				color: var(--text-secondary);
 			}
 		}
 	}

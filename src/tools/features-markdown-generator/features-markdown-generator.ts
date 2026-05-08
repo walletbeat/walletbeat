@@ -1,6 +1,8 @@
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 
+import { getErrorMessage } from '@/types/errors'
+
 import {
 	type FeaturesMarkdownConfig,
 	featuresMarkdownUpdate,
@@ -24,6 +26,6 @@ const config: FeaturesMarkdownConfig = {
 try {
 	await featuresMarkdownUpdate(config)
 } catch (error) {
-	process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`)
+	process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 	process.exit(1)
 }

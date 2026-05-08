@@ -1,9 +1,6 @@
 ---
 import type { NavigationItem } from '@/constants/navigation'
 import NavigationItems from './NavigationItems.svelte'
-import LuMenu from 'lucide-static/icons/menu.svg?raw'
-import LuMoon from 'lucide-static/icons/moon.svg?raw'
-import LuSun from 'lucide-static/icons/sun.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
@@ -13,14 +10,6 @@ const { navigationItems } = Astro.props
 const currentPathname = Astro.url.pathname
 ---
 
-<script>
-	document.getElementById('theme-toggle')?.addEventListener('click', () => {
-		document.documentElement.style.colorScheme =
-			document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
-		localStorage.setItem('theme', document.documentElement.style.colorScheme)
-	})
-</script>
-
 <nav
 	id='nav'
 	popover='auto'
@@ -28,30 +17,6 @@ const currentPathname = Astro.url.pathname
 	data-scroll-container
 	data-sticky-container
 >
-	<header data-sticky='block' data-row data-scroll-container>
-		<a href='/'>
-			<picture>
-				<source srcset='/logo-dark.svg' media='(prefers-color-scheme: dark)' />
-				<img src='/logo-light.svg' alt='WalletBeat Logo' />
-			</picture>
-		</a>
-
-		<menu data-row='gap-2'>
-			<li>
-				<button type='button' id='theme-toggle' data-stack>
-					<span set:html={LuSun} />
-					<span set:html={LuMoon} />
-				</button>
-			</li>
-
-			<li>
-				<button type='button' id='menu-toggle' popovertarget='nav'>
-					<span set:html={LuMenu} />
-				</button>
-			</li>
-		</menu>
-	</header>
-
 	<div id='nav-menu' data-sticky-container>
 		<NavigationItems
 			client:load
@@ -60,13 +25,6 @@ const currentPathname = Astro.url.pathname
 			currentPathname={currentPathname}
 		/>
 	</div>
-
-	<footer data-sticky>
-		<p data-card>
-			Wallets listed on Walletbeat do not represent endorsements and are for informational purposes
-			only.
-		</p>
-	</footer>
 </nav>
 
 <style>
@@ -74,55 +32,10 @@ const currentPathname = Astro.url.pathname
 		width: 100%;
 		height: 100dvh;
 		display: grid;
-		grid-template-rows: auto 1fr auto;
-
-		&[data-sticky-container] {
-			--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
-		}
-
-		> header {
-			block-size: var(--navigation-mobile-blockSize);
-			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
-
-			padding: 1rem;
-
-			a {
-				display: flex;
-				text-decoration: none;
-
-				img {
-					display: block;
-					height: 2rem;
-				}
-			}
-
-			menu {
-				li {
-					display: contents;
-				}
-
-				button {
-					svg {
-						width: 1.25em;
-						height: 1.25em;
-
-						transition-property: color;
-					}
-				}
-
-				#theme-toggle {
-					> :first-child {
-						color: light-dark(currentColor, transparent);
-					}
-					> :last-child {
-						color: light-dark(transparent, currentColor);
-					}
-				}
-			}
-		}
+		grid-template-rows: 1fr;
 
 		#nav-menu {
-			padding: 1rem 0.75rem;
+			padding: 1rem 0.75rem 1rem 1.5rem;
 
 			&[data-sticky-container] {
 				--sticky-marginBlockStart: 1rem;
@@ -130,26 +43,24 @@ const currentPathname = Astro.url.pathname
 				--sticky-marginInlineStart: 0.75rem;
 				--sticky-marginInlineEnd: 0.75rem;
 
-				--sticky-paddingBlockStart: 5rem;
-			}
-		}
-
-		footer {
-			padding: 1rem;
-
-			p {
-				&[data-card] {
-					--card-backgroundColor: var(--accent-backgroundColor);
-				}
-
-				line-height: 1.4;
-				font-size: 0.875rem;
-				color: var(--text-secondary);
+				--sticky-paddingBlockStart: 3rem;
 			}
 		}
 	}
 
 	@media not (max-width: 1024px) {
+		/* Use #nav (specificity 1-0-0) to beat the sticky system's
+		   [data-scroll-container] [data-sticky-container] [data-sticky] chain (0-3-0),
+		   which otherwise keeps position:sticky;top:0 and floats the sidebar over the topbar. */
+		#nav {
+			position: sticky;
+			z-index: auto;
+			inset: unset;
+			inset-block-start: var(--topbar-height);
+			height: calc(100dvh - var(--topbar-height));
+			align-self: start;
+		}
+
 		li:has(#menu-toggle) {
 			display: none;
 		}
@@ -166,7 +77,7 @@ const currentPathname = Astro.url.pathname
 				overflow: hidden;
 				overscroll-behavior: none;
 
-				header ~ * {
+				#nav-menu {
 					display: none;
 					interactivity: inert;
 					opacity: 0;

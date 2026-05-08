@@ -83,25 +83,6 @@ contract WalletbeatTestErc721 is ERC721 {
     }
 
     /**
-     * @notice Enforces soulbound behavior by preventing token transfers
-     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
-     * on any other transfer attempt.
-     */
-    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
-        internal
-        virtual
-        override
-    {
-        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
-
-        if (from == address(0) || to == address(0)) {
-            return;
-        }
-
-        revert WalletbeatTestErc721__Soulbound();
-    }
-
-    /**
      * @notice Returns the base data URI prefix used when constructing token metadata URIs
      * @dev Overrides the ERC721 default empty string so that `tokenURI()` produces a
      * self-contained `data:application/json;base64,` URI with no external dependencies.
