@@ -37,7 +37,7 @@ export interface LooseReference {
 	url?: NonEmptyArray<Url> | Url
 
 	/** The repo-relative filename under public/ (New Field) */
-  file?: string
+	file?: string
 
 	/** The text of the link that goes to `url`; defaults to the domain name of `url`. */
 	label?: string
@@ -51,23 +51,28 @@ export interface LooseReference {
 
 /** Type predicate for LooseReference. */
 export function isLooseReference(x: unknown): x is LooseReference {
-  if (x === undefined || x === null || typeof x !== 'object') {
-    return false
-  }
+	if (x === undefined || x === null || typeof x !== 'object') {
+		return false
+	}
 
-  if (Object.hasOwn(x, 'file') && typeof (x as { file: unknown }).file === 'string') {
-    return true
-  }
+	if (
+		Object.hasOwn(x, 'file') &&
+		typeof (x as { file: unknown }).file === 'string' &&
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified "file" is a string.
+		(x as { file: string }).file.startsWith('public/')
+	) {
+		return true
+	}
 
-  return (
-    Object.hasOwn(x, 'url') &&
-    ((url: unknown) =>
-      isUrl(url) ||
-      (Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      (x as unknown as { url: unknown }).url,
-    )
-  )
+	return (
+		Object.hasOwn(x, 'url') &&
+		((url: unknown) =>
+			isUrl(url) ||
+			(Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+			(x as unknown as { url: unknown }).url,
+		)
+	)
 }
 
 /**
@@ -146,9 +151,11 @@ export function toFullyQualified(
 
 	if (Array.isArray(reference)) {
 		const qualified: FullyQualifiedReference[] = []
+
 		for (const ref of reference) {
 			qualified.push(...toFullyQualified(ref))
 		}
+
 		return mergeRefs(...qualified)
 	}
 
@@ -193,18 +200,17 @@ export function toFullyQualified(
 
 		if (!filePath.startsWith('public/')) {
 			throw new Error(
-				`RepoFileReference path must be a repo-relative path under public/, got: "${filePath}"`,
+				`File path-based references must be a repository-relative path under public/, got: "${filePath}"`,
 			)
 		}
 
 		const fileUrl = `/${filePath.slice('public/'.length)}`
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "label" field type before using it.
 		const label =
 			Object.hasOwn(reference, 'label') &&
 			typeof (reference as { label: unknown }).label === 'string'
 				? (reference as { label: string }).label
-				: filePath.split('/').pop() ?? 'Document'
+				: (filePath.split('/').pop() ?? 'Document')
 
 		return [
 			{
