@@ -21,7 +21,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 	<main data-sticky-container>
 		<WalletTable
-			client:load
+			client:visible
 			title='Hardware Wallets'
 			wallets={Object.values(ratedHardwareWallets)}
 			{attributeGroups}

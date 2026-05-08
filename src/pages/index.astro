@@ -42,14 +42,14 @@ import WalletTable from '@/views/WalletTable.svelte'
 		</header>
 
 		<WalletTable
-			client:load
+			client:visible
 			title='Software Wallets'
 			wallets={Object.values(ratedSoftwareWallets)}
 			{attributeGroups}
 		/>
 
 		<WalletTable
-			client:load
+			client:visible
 			title='Hardware Wallets'
 			wallets={Object.values(ratedHardwareWallets)}
 			{attributeGroups}

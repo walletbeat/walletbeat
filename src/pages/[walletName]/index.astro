@@ -44,6 +44,6 @@ import WalletPage from '@/views/WalletPage.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletPage {walletName} client:load />
+		<WalletPage {walletName} client:idle />
 	</main>
 </Layout>
