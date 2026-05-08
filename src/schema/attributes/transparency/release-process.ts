@@ -15,6 +15,120 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
+type SupplyLevel = 'fail' | 'partial' | 'pass'
+
+type ProcessSignals = {
+	changelog: boolean
+	locking: boolean
+	pass: boolean
+}
+
+type SupplySignals = {
+	signing: boolean
+	builds: boolean
+	level: SupplyLevel
+}
+
+type ProcessSignalPresence = Pick<ProcessSignals, 'changelog' | 'locking'>
+type SupplySignalPresence = Pick<SupplySignals, 'signing' | 'builds'>
+
+type ReleaseTransparencyFeatures =
+	EvaluationContext['features']['transparency']['releaseTransparency']
+type HasPublicChangelog = NonNullable<ReleaseTransparencyFeatures['hasPublicChangelog']>
+type DependencyLocking = NonNullable<ReleaseTransparencyFeatures['dependencyLocking']>
+type ArtifactSigning = NonNullable<ReleaseTransparencyFeatures['artifactSigning']>
+type ReproducibleBuilds = ReleaseTransparencyFeatures['reproducibleBuilds']
+type HermeticBuilds = ReleaseTransparencyFeatures['hermeticBuilds']
+
+function computeProcessSignals(
+	hasPublicChangelog: HasPublicChangelog,
+	dependencyLocking: DependencyLocking,
+): ProcessSignals {
+	const changelog = isSupported(hasPublicChangelog)
+	const locking = isSupported(dependencyLocking)
+
+	return {
+		changelog,
+		locking,
+		pass: changelog && locking,
+	}
+}
+
+function computeSupplySignals(
+	artifactSigning: ArtifactSigning,
+	reproducibleBuilds: ReproducibleBuilds,
+	hermeticBuilds: HermeticBuilds,
+	sourceVisible: boolean,
+): SupplySignals {
+	const signing = isSupported(artifactSigning)
+	// Build-integrity claims only count when source is publicly visible,
+	// because external reproducibility checks require source access.
+	const reproducible =
+		reproducibleBuilds !== null && isSupported(reproducibleBuilds) && sourceVisible
+	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds) && sourceVisible
+	const builds = reproducible || hermetic
+
+	const level: SupplyLevel = signing && builds ? 'pass' : signing || builds ? 'partial' : 'fail'
+
+	return {
+		signing,
+		builds,
+		level,
+	}
+}
+
+function getBuildSignalLabel(
+	reproducibleBuilds: ReproducibleBuilds,
+	hermeticBuilds: HermeticBuilds,
+	buildsVisible: boolean,
+): string | null {
+	const reproducible =
+		reproducibleBuilds !== null && isSupported(reproducibleBuilds) && buildsVisible
+	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds) && buildsVisible
+
+	if (reproducible && hermetic) {
+		return 'reproducible and hermetic builds'
+	}
+
+	if (reproducible) {
+		return 'reproducible builds'
+	}
+
+	if (hermetic) {
+		return 'hermetic builds'
+	}
+
+	return null
+}
+
+function missingSupplySignal(supplySignals: SupplySignalPresence): string {
+	if (supplySignals.signing && !supplySignals.builds) {
+		return 'reproducible or hermetic builds (with publicly visible source)'
+	}
+
+	if (!supplySignals.signing && supplySignals.builds) {
+		return 'artifact signing'
+	}
+
+	return 'artifact signing and reproducible or hermetic builds (with publicly visible source)'
+}
+
+function missingProcessSignals(processSignals: ProcessSignalPresence): string {
+	if (!processSignals.changelog && !processSignals.locking) {
+		return 'public changelog and dependency locking'
+	}
+
+	if (!processSignals.changelog && processSignals.locking) {
+		return 'public changelog'
+	}
+
+	if (processSignals.changelog && !processSignals.locking) {
+		return 'dependency locking'
+	}
+
+	throw new Error('No missing process signals')
+}
+
 function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
 	return ctx.build({
 		outcome: {
@@ -22,46 +136,128 @@ function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
 			rating: Rating.PASS,
 			displayName: 'Transparent release process',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} meets all 4 release process signals: ${commaListFormat(supportedSignals)}.`,
+				'{{WALLET_NAME}} meets release process transparency requirements.',
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} satisfies all four release process signals: ${commaListFormat(supportedSignals)}.`,
+			`{{WALLET_NAME}} satisfies all release process signals across process transparency and supply-chain integrity: ${commaListFormat(supportedSignals)}.`,
 		),
 	})
 }
 
-function partial(
+function partialProcessPassSupplyFail(
 	ctx: EvaluationContext,
-	signalCount: 1 | 2 | 3,
 	supportedSignals: string[],
 ): Evaluation {
-	const score = signalCount / 4
-
 	return ctx.build({
 		outcome: {
-			id: `partial_${signalCount.toString()}`,
+			id: 'partial_process_pass_supply_fail',
 			rating: Rating.PARTIAL,
-			score,
-			displayName: `Partial release process (${signalCount.toString()}/4 signals)`,
+			score: 0.4,
+			displayName: 'Partial release process (process pass)',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${commaListFormat(supportedSignals)}.`,
+				'{{WALLET_NAME}} meets process transparency baseline signals but lacks supply-chain integrity coverage.',
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} meets ${signalCount.toString()} of 4 release process signals: ${commaListFormat(supportedSignals)}.`,
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing artifact signing and reproducible or hermetic builds (with publicly visible source).`,
 		),
 		howToImprove: mdParagraph(`
-			To fully pass, **{{WALLET_NAME}}** should implement all four signals:
+			To fully pass, **{{WALLET_NAME}}** should add both supply-chain integrity signals:
 
-			- **Public changelog**: publish release notes or a changelog for each release.
+			- **Artifact signing**: sign release artifacts so users can verify they have not
+			  been tampered with.
 			- **Reproducible or hermetic builds**: ensure independent parties can rebuild
 			  the same source to obtain a byte-for-byte identical artifact, or that the
 			  build can run fully offline from a pre-fetched, integrity-verified input set.
-			- **Artifact signing**: sign release artifacts so users can verify they have not
-			  been tampered with.
-			- **Dependency locking**: use a lockfile (or equivalent) to pin all dependencies
-			  to known versions.
+		`),
+	})
+}
+
+function partialProcessFailSupplyPartial(
+	ctx: EvaluationContext,
+	supportedSignals: string[],
+	processSignals: ProcessSignalPresence,
+	supplySignals: SupplySignalPresence,
+): Evaluation {
+	const missingSignal = missingSupplySignal(supplySignals)
+	const missingProcess = missingProcessSignals(processSignals)
+
+	return ctx.build({
+		outcome: {
+			id: 'partial_process_fail_supply_partial',
+			rating: Rating.PARTIAL,
+			score: 0.6,
+			displayName: 'Partial release process (supply partial)',
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} shows supply-chain integrity coverage but misses ${missingProcess}.`,
+			),
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingProcess} and ${missingSignal}.`,
+		),
+		howToImprove: mdParagraph(`
+			To fully pass, **{{WALLET_NAME}}** should implement the missing signals:
+
+			- **Missing supply-chain integrity signal**: ${missingSignal}.
+			- **Missing process transparency signal(s)**: ${missingProcess}.
+		`),
+	})
+}
+
+function partialProcessFailSupplyPass(
+	ctx: EvaluationContext,
+	supportedSignals: string[],
+	processSignals: ProcessSignalPresence,
+): Evaluation {
+	const missingProcess = missingProcessSignals(processSignals)
+
+	return ctx.build({
+		outcome: {
+			id: 'partial_process_fail_supply_pass',
+			rating: Rating.PARTIAL,
+			// Slightly above partial_process_fail_supply_partial because both supply signals are present.
+			score: 0.65,
+			displayName: 'Partial release process (supply pass)',
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} has strong supply-chain integrity coverage but misses ${missingProcess}.`,
+			),
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingProcess}.`,
+		),
+		howToImprove: mdParagraph(`
+			To fully pass, **{{WALLET_NAME}}** should add the process transparency baseline:
+
+			- **Missing process transparency signal(s)**: ${missingProcess}.
+		`),
+	})
+}
+
+function partialProcessPassSupplyPartial(
+	ctx: EvaluationContext,
+	supportedSignals: string[],
+	supplySignals: SupplySignalPresence,
+): Evaluation {
+	const missingSignal = missingSupplySignal(supplySignals)
+
+	return ctx.build({
+		outcome: {
+			id: 'partial_process_pass_supply_partial',
+			rating: Rating.PARTIAL,
+			score: 0.75,
+			displayName: 'Partial release process (process pass, supply partial)',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} meets process transparency baseline signals and partial supply-chain integrity coverage.',
+			),
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingSignal}.`,
+		),
+		howToImprove: mdParagraph(`
+			To fully pass, **{{WALLET_NAME}}** should add the remaining supply-chain integrity signal:
+
+			- **Missing supply-chain integrity signal**: ${missingSignal}.
 		`),
 	})
 }
@@ -71,11 +267,13 @@ function fail(ctx: EvaluationContext): Evaluation {
 		outcome: {
 			id: 'fail',
 			rating: Rating.FAIL,
-			displayName: 'No release process signals',
-			shortExplanation: sentence('{{WALLET_NAME}} has none of the four release process signals.'),
+			displayName: 'Insufficient release process coverage',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} does not meet release process transparency requirements.',
+			),
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} does not have a public changelog, reproducible or hermetic builds, artifact signing, or dependency locking.',
+			'{{WALLET_NAME}} is missing process transparency baseline signals and supply-chain integrity signals.',
 		),
 		howToImprove: mdParagraph(`
 			**{{WALLET_NAME}}** should implement the following release process signals:
@@ -110,22 +308,26 @@ export const releaseProcess: Attribute = {
 		Without these signals, a compromised or tampered release may go undetected.
 	`),
 	methodology: mdParagraph(`
-		Four independently-verifiable signals are assessed, each binary (present or absent):
+		Four binary signals are assessed, grouped into two categories:
 
+		**Process transparency** (baseline hygiene):
 		1. **Public changelog**: the wallet publishes release notes or a changelog.
-		2. **Reproducible or hermetic builds**: independent parties can verify the build
-		   output matches the source, or the build can run fully offline.
-		   This requires the wallet's source code to be publicly visible, since
-		   external verification requires source access.
-		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
-		4. **Dependency locking**: a lockfile or equivalent pins all dependency versions.
+		2. **Dependency locking**: a lockfile or equivalent pins all dependency versions.
 
-		All four signals present earns a **pass**. Any partial coverage earns a **partial**.
-		No signals earns a **fail**.
+		**Supply-chain integrity** (high-trust):
+		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
+		4. **Reproducible or hermetic builds**: independent parties can verify the build output matches
+		   the source, or the build can run fully offline. This requires the wallet's source code to be
+		   publicly visible, since external verification requires source access.
+
+		A wallet **passes** when both process signals and both supply-chain signals are present.
+		Partial coverage earns a **partial** rating, scored by how much of the two groups is satisfied:
+		process signals alone score lower than supply-chain signals alone, reflecting the higher trust
+		value of supply-chain integrity. No signals at all earns a **fail**.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
-		exhaustive: false,
+		exhaustive: true,
 		pass: exampleRating(
 			paragraph(
 				'The wallet has a public changelog, reproducible or hermetic builds with public source, signed artifacts, and locked dependencies.',
@@ -138,37 +340,49 @@ export const releaseProcess: Attribute = {
 		partial: [
 			exampleRating(
 				paragraph(
-					'The wallet has a public changelog, signed artifacts, and locked dependencies, but no reproducible or hermetic builds.',
+					'The wallet has a public changelog and dependency locking, but lacks both artifact signing and reproducible or hermetic builds.',
 				),
-				partial(
+				partialProcessPassSupplyFail(
 					EvaluationContext.forTest(() => releaseProcess),
-					3,
-					['public changelog', 'artifact signing', 'dependency locking'],
+					['public changelog', 'dependency locking'],
 				),
 			),
 			exampleRating(
 				paragraph(
-					'The wallet has a public changelog and signed artifacts, but no reproducible builds or dependency locking.',
+					'The wallet has artifact signing, but no reproducible or hermetic builds, changelog, or dependency locking.',
 				),
-				partial(
+				partialProcessFailSupplyPartial(
 					EvaluationContext.forTest(() => releaseProcess),
-					2,
-					['public changelog', 'artifact signing'],
+					['artifact signing'],
+					{ changelog: false, locking: false },
+					{ signing: true, builds: false },
 				),
 			),
 			exampleRating(
 				paragraph(
-					'The wallet has reproducible builds with public source, but lacks the other signals.',
+					'The wallet has reproducible builds and artifact signing, but lacks changelog and dependency locking.',
 				),
-				partial(
+				partialProcessFailSupplyPass(
 					EvaluationContext.forTest(() => releaseProcess),
-					1,
-					['reproducible builds'],
+					['reproducible builds', 'artifact signing'],
+					{ changelog: false, locking: false },
+				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet has a changelog, dependency locking, and artifact signing, but no reproducible or hermetic builds.',
+				),
+				partialProcessPassSupplyPartial(
+					EvaluationContext.forTest(() => releaseProcess),
+					['public changelog', 'dependency locking', 'artifact signing'],
+					{ signing: true, builds: false },
 				),
 			),
 		],
 		fail: exampleRating(
-			paragraph('The wallet has none of the four release process signals.'),
+			paragraph(
+				'The wallet lacks both process transparency baseline signals and supply-chain integrity signals.',
+			),
 			fail(EvaluationContext.forTest(() => releaseProcess)),
 		),
 	},
@@ -181,95 +395,100 @@ export const releaseProcess: Attribute = {
 	},
 	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE)
+		// Strict unknown handling for this attribute: if any required input is unknown,
+		// keep the result UNRATED rather than inferring a weaker rating.
 
 		const rt = ctx.features.transparency.releaseTransparency
 
-		// Signal 1: Public changelog
-		if (rt.hasPublicChangelog === null) {
+		const hasPublicChangelog = rt.hasPublicChangelog
+
+		if (hasPublicChangelog === null) {
 			return unrated(ctx)
 		}
 
-		const changelog = isSupported(rt.hasPublicChangelog)
-
-		if (changelog) {
-			ctx.addRef(rt.hasPublicChangelog)
-		}
-
-		// Signal 2: Reproducible or hermetic builds
 		if (rt.reproducibleBuilds === null && rt.hermeticBuilds === null) {
 			return unrated(ctx)
 		}
 
-		const reproducibleSupported =
-			rt.reproducibleBuilds !== null && isSupported(rt.reproducibleBuilds)
-		const hermeticSupported = rt.hermeticBuilds !== null && isSupported(rt.hermeticBuilds)
+		const sourceVisible = isSourcePubliclyVisible(ctx.features.licensing)
 
-		// Source-visibility requirement: reproducible or hermetic build claims
-		// only count with public source access for external verification.
-		const buildsVisible = isSourcePubliclyVisible(ctx.features.licensing)
-
-		if (buildsVisible === null) {
+		// Intentional strict policy: source visibility is required input for this attribute.
+		// We return UNRATED when unknown instead of downgrading builds to unsupported,
+		// to avoid classifying with incomplete supply-chain verifiability context.
+		if (sourceVisible === null) {
 			return unrated(ctx)
 		}
 
-		const reproducible = reproducibleSupported && buildsVisible
-		const hermetic = hermeticSupported && buildsVisible
-		const builds = reproducible || hermetic
+		const artifactSigning = rt.artifactSigning
 
-		if (builds) {
+		if (artifactSigning === null) {
+			return unrated(ctx)
+		}
+
+		const dependencyLocking = rt.dependencyLocking
+
+		if (dependencyLocking === null) {
+			return unrated(ctx)
+		}
+
+		const processSignals = computeProcessSignals(hasPublicChangelog, dependencyLocking)
+		const supplySignals = computeSupplySignals(
+			artifactSigning,
+			rt.reproducibleBuilds,
+			rt.hermeticBuilds,
+			sourceVisible,
+		)
+
+		if (processSignals.changelog) {
+			ctx.addRef(hasPublicChangelog)
+		}
+
+		if (supplySignals.builds) {
 			ctx.addRef(rt.reproducibleBuilds, rt.hermeticBuilds)
 		}
 
-		// Signal 3: Artifact signing
-		if (rt.artifactSigning === null) {
-			return unrated(ctx)
+		if (supplySignals.signing) {
+			ctx.addRef(artifactSigning)
 		}
 
-		const signing = isSupported(rt.artifactSigning)
-
-		if (signing) {
-			ctx.addRef(rt.artifactSigning)
+		if (processSignals.locking) {
+			ctx.addRef(dependencyLocking)
 		}
 
-		// Signal 4: Dependency locking
-		if (rt.dependencyLocking === null) {
-			return unrated(ctx)
-		}
-
-		const locking = isSupported(rt.dependencyLocking)
-
-		if (locking) {
-			ctx.addRef(rt.dependencyLocking)
-		}
-
-		const buildSignal =
-			reproducible && hermetic
-				? 'reproducible and hermetic builds'
-				: reproducible
-					? 'reproducible builds'
-					: hermetic
-						? 'hermetic builds'
-						: null
+		const buildSignal = getBuildSignalLabel(rt.reproducibleBuilds, rt.hermeticBuilds, sourceVisible)
 
 		const supportedSignals = [
-			changelog ? 'public changelog' : null,
+			processSignals.changelog ? 'public changelog' : null,
 			buildSignal,
-			signing ? 'artifact signing' : null,
-			locking ? 'dependency locking' : null,
+			supplySignals.signing ? 'artifact signing' : null,
+			processSignals.locking ? 'dependency locking' : null,
 		].filter((signal): signal is string => signal !== null)
 
-		const signalCount = [changelog, builds, signing, locking].filter(Boolean).length
-
-		if (signalCount === 4) {
-			return pass(ctx, supportedSignals)
-		}
-
-		if (signalCount === 0) {
-			return fail(ctx)
-		}
-
-		if (signalCount === 1 || signalCount === 2 || signalCount === 3) {
-			return partial(ctx, signalCount, supportedSignals)
+		// Classification is group-based (processPass + supplyLevel), not raw signal count.
+		// Strong supply-chain integrity without process baseline remains PARTIAL.
+		if (processSignals.pass) {
+			switch (supplySignals.level) {
+				case 'fail':
+					return partialProcessPassSupplyFail(ctx, supportedSignals)
+				case 'partial':
+					return partialProcessPassSupplyPartial(ctx, supportedSignals, supplySignals)
+				case 'pass':
+					return pass(ctx, supportedSignals)
+			}
+		} else {
+			switch (supplySignals.level) {
+				case 'fail':
+					return fail(ctx)
+				case 'partial':
+					return partialProcessFailSupplyPartial(
+						ctx,
+						supportedSignals,
+						processSignals,
+						supplySignals,
+					)
+				case 'pass':
+					return partialProcessFailSupplyPass(ctx, supportedSignals, processSignals)
+			}
 		}
 
 		throw new Error('Unreachable')
