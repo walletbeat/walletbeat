@@ -37,7 +37,16 @@ import { topbarNavigationItems } from '@/constants/navigation'
 		align-items: center;
 		justify-content: space-between;
 		padding: 1rem 2rem;
-		box-shadow: 0 0 0 var(--separator-width) var(--border-color);
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 24px;
+			right: 24px;
+			height: 1px;
+			background-color: white;
+		}
 
 		.brand {
 			display: flex;

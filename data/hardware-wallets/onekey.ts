@@ -157,7 +157,7 @@ export const onekeyWallet: HardwareWallet = {
 					ref: [
 						{
 							explanation: 'OneKey Pro security audit by SlowMist',
-							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/49f4b9fce925d988b7d291bb0b97d0b6aac5f44f/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
 						},
 					],
 					auditDate: '2024-10-21',

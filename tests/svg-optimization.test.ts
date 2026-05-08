@@ -129,27 +129,115 @@ const optimizedSvgHashes: Record<string, string> = {
 		'80cb26c313cc96082a0254e95110536f8326b5c7086e1eead8b6efd1884b28bf',
 	'resources/contracts/images/Walletbeat.svg':
 		'0c93bc98c4fd6e0770d5658e0860061c879457c79262ac014e49db5c6a033de6',
-	'resources/icons/about.svg': 'fc17b1d749a0607beb73edf9693139a627f09f249de091f40cd64d8a96732ee4',
-	'resources/icons/account_type.svg':
-		'db7704e2e204a93d9910fe6c5d43f487a72caaf49dcc48eeabed1536fe369114',
-	'resources/icons/discuss.svg': 'd368d2e22efa4711b35aa085075c628f021610482a86f9e3d7a86ec40ddb84f0',
-	'resources/icons/faq.svg': '4dfba1047e935c829e31a91d97f5e152cdc7805576f997f0fd1a0d4ed3cca7cb',
-	'resources/icons/newsletter.svg':
+	'resources/files/wbicons/about.svg':
+		'fc17b1d749a0607beb73edf9693139a627f09f249de091f40cd64d8a96732ee4',
+	'resources/files/wbicons/account_type.svg':
+		'8adcd97a6e80ce646f9fc77a619278f0be51efa19790d48d948855f6b0e552d2',
+	'resources/files/wbicons/discuss.svg':
+		'd368d2e22efa4711b35aa085075c628f021610482a86f9e3d7a86ec40ddb84f0',
+	'resources/files/wbicons/faq.svg':
+		'4dfba1047e935c829e31a91d97f5e152cdc7805576f997f0fd1a0d4ed3cca7cb',
+	'resources/files/wbicons/newsletter.svg':
 		'ba5765279f96c51580a982275e3a06f6e91fa6f18ad24caddcf8b4d200e05268',
-	'resources/icons/repository.svg':
+	'resources/files/wbicons/repository.svg':
 		'9ffcd42bb0096528573d8224b8b70466ce6581ab5a88f005904869a432548641',
-	'resources/icons/wallet_browser.svg':
+	'resources/files/wbicons/wallet_browser.svg':
 		'1d8755c1f94721cfdd3a3a7135d672f7bd8df7eb4768bc7449ef88c4494cd31a',
-	'resources/icons/wallet_desktop.svg':
+	'resources/files/wbicons/wallet_desktop.svg':
 		'39f16823ea0353c7cbacd15a05d2301b9f0a05675d6ac1fd740b6f8f042b250c',
-	'resources/icons/wallet_embedded.svg':
-		'846126db3eecb75cf9819feec6282c72da4d8ddbf18f4242d49352ee24a6a932',
-	'resources/icons/wallet_hardware.svg':
+	'resources/files/wbicons/wallet_embedded.svg':
+		'0fce01466e971a15acc17d4436c6d5c78638122df84680a362cd91657e168e36',
+	'resources/files/wbicons/wallet_hardware.svg':
 		'431845d496a7423cd634df79f7e46a1fecf8328b2420dded5f097a0fae20f62f',
-	'resources/icons/wallet_mobile.svg':
+	'resources/files/wbicons/wallet_mobile.svg':
 		'dba5ad8b24a91d229e696dd8a5f6073731a52a057168c7d86b2154350a888544',
-	'resources/icons/wallet_software.svg':
+	'resources/files/wbicons/wallet_software.svg':
 		'a6bf2a2c35af75b4b4302689160de01245e5900fceef33b98d4261975fdf7dfd',
+	'public/fonts/sp-monorium-dingbat.svg':
+		'4e075d1a474e3c9cac32668b882f38dea406bfd0f254767a4bfad9ff9fe47e3e',
+	'public/fonts/sp-monorium-regular.svg':
+		'eee6e8214eed53844156f73e7e053cce6124224642fe5366a5e9f22744d2d214',
+	'resources/branding/glow-0.svg':
+		'5f40f64a49babed6573f5c16e39ec450eb83ef660efea7bcd30093fe19ac9a45',
+	'resources/branding/glow-1.svg':
+		'71e6c1520f6f9b40d189811b38f222a5381b1b01e9a281c1e55ef4941fafbed7',
+	'public/wbicons/wbicons.svg': '45f03658c157b147a522485eaa7145bb11734f1243ebc81e48a5b90d8703f262',
+	'resources/files/wbicons/account_abstraction.svg':
+		'b6dcb0b8cc200d4e283d2d13466babf09d119dc6dac9364610d3e79018080b62',
+	'resources/files/wbicons/account_portability.svg':
+		'a03ec4f5172f68c2b9f50a83faef0ede7d6cced2e1e89e398a09debf9965667c',
+	'resources/files/wbicons/account_recovery.svg':
+		'f267b8e2944bcb4ebde7adccbc4ac575395ed4556e20f4d1d2fedc6c5ae166a0',
+	'resources/files/wbicons/account_unruggability.svg':
+		'1b5a44b7c0426562db05482af5c0e02dbd8a9e29bbfcd2eee31d02b9bbc1c801',
+	'resources/files/wbicons/address_resolution.svg':
+		'7f82eb27b6633e84e2327d38fd7d4ece1b524c37f15d373d285f40766fa45d3f',
+	'resources/files/wbicons/app_isolation.svg':
+		'b71c111821f6e5d07f14f3a0c32a4072ff4b6f4560041b60467c2a1cefc274ec',
+	'resources/files/wbicons/browser_integration.svg':
+		'06c29a2ae05e8e34cc1b32e995c465e3ede82f412660f644a64fa2d152d7affa',
+	'resources/files/wbicons/chain_abstraction.svg':
+		'7a2e5637c62e1a2c1fe81cc191a6a143735d90058016c840baac449efcbb089e',
+	'resources/files/wbicons/chain_verification.svg':
+		'bc28ceb71b51c81770ddc86264943d3fc9f4e8d6c5e69d56d3c117fa5cca2c37',
+	'resources/files/wbicons/duress_resistance.svg':
+		'714b6b7eb601a1d27b54dfeffe5a7efc82b444cfad936360cd0c2614354f6a91',
+	'resources/files/wbicons/ecosystem.svg':
+		'7580e34a8529801064757f095e24ead2be2beba9db0dc5c6699f5a7772c83284',
+	'resources/files/wbicons/fee_transparency.svg':
+		'e4aaa9aeca207194f7ba901ae714f0eea5cfcdc9add7e3443856052b6b7b6404',
+	'resources/files/wbicons/funding_transparency.svg':
+		'7e782cca7336dd1331f05d7cbdf6f960951433841516057deb7797fde29d1d19',
+	'resources/files/wbicons/hardware_wallet_interoperability.svg':
+		'd8bd85ecafae216de88358dd9e83d096152e4923e0d568d37006667f519b1329',
+	'resources/files/wbicons/hardware_wallet_support.svg':
+		'6eb3c5a03f04f3dfb7fd3c39902eafc0c1648664dc27361c40fa7a97045db5a9',
+	'resources/files/wbicons/l1_provider_independence.svg':
+		'a29e1c16e04d2c5592bb499086556447fdfc9df5398ba0467ac4e37f7c180fea',
+	'resources/files/wbicons/multi_address_privacy.svg':
+		'af3b7b87b3224b12db972c8e9d78ad667c8066fff3068c7d911e5734a99a06af',
+	'resources/files/wbicons/orderflow_transparency.svg':
+		'98ac991eb3e05cac4358d0f1eef1b58ef607af167290f228dceb728b8fbd0ca8',
+	'resources/files/wbicons/passkey_verification.svg':
+		'355d400675f850045a0a9547454c019f13568d1777b6aaf414e2096846f6ca97',
+	'resources/files/wbicons/permissions_management.svg':
+		'a071dc571cfcb6f009840ccdda67d35f09bf58be3c8dffc82ea0ce975339dff5',
+	'resources/files/wbicons/privacy_hygiene.svg':
+		'b48e2f372b01027d2b775ee4f915c2ddb8cf4403d718ab5424844a9da8781801',
+	'resources/files/wbicons/privacy.svg':
+		'fce9b9bfc99eae07e938f86998f9b211f4042625a840b6e60b1261244e860e5d',
+	'resources/files/wbicons/private_token_transfers.svg':
+		'5778e953e8e95f844ee6decad7ecd273706e67d226d9523ff43078bd2a5f1013',
+	'resources/files/wbicons/question_mark.svg':
+		'4e5813c58ea19dbb9ae2408af60381d1e01763fc22ac5be80e0e64d8201b1cd0',
+	'resources/files/wbicons/release_process_transparency.svg':
+		'dbcf7f0b7af96d7ec4c30a53e9272dc4756ea08c1ff29b363bb4d5ef6a32fe2f',
+	'resources/files/wbicons/scam_prevention.svg':
+		'4ce7403d410258225ecfda384b6d420e543be8fdb6b4831747f6635eff8ab5c6',
+	'resources/files/wbicons/security_audits.svg':
+		'c9c8321b1ad31678dace7054a74acc6b86164ef6331586e4c6eb249f1e8f58a9',
+	'resources/files/wbicons/security_best_practices.svg':
+		'3cfd3389315acc904c3b02a7a0c572d8db8f1a5a1bf89227ecdde8d02cfa9a70',
+	'resources/files/wbicons/security.svg':
+		'38bf365b832b28604f8490200e2aeafef2b23a5025e1a11014601b9f0fa14925',
+	'resources/files/wbicons/self_sovereignty.svg':
+		'67be234afaf1a92148d268fc7dde69eabcddd25be932f6fe09e162b119892ce1',
+	'resources/files/wbicons/source_code_license.svg':
+		'adf1e55fa6b50d77c72ac340d5b01f3ef5ad9aa39f9de7206eae23715a0d6427',
+	'resources/files/wbicons/source_visibility.svg':
+		'29a4ca719470edda4b0e811e5f26d122c7cc06b1c1394ddace70fbc66013a6e5',
+	'resources/files/wbicons/transaction_batching.svg':
+		'b520345224989151bd7db1fe21bf650a74499dd158c03b1d92c28f111b7f41af',
+	'resources/files/wbicons/transaction_inclusion.svg':
+		'bcbabbdb73267c6f90b1dca97a1d47f56660cca3894fc8c90d5ed00f558e35a8',
+	'resources/files/wbicons/transaction_legibility.svg':
+		'1f646f8810ff3dfc0ff2c0285593aa606e368beae692fcbe782eb28943476838',
+	'resources/files/wbicons/transparency.svg':
+		'040b8354ec132a3cea67d32ddda8dc2786ee6bee61a52ec8c1a82367ab702f00',
+	'resources/files/wbicons/user_privacy.svg':
+		'424ff4db5750bc5fe9759397e12c94d0bce96efc5741d09537d1338af939cc7b',
+	'resources/files/wbicons/wallet_address_privacy.svg':
+		'ff9e170056e31b805874caf213837de5e33e0e0f83cbdcefe9af5fabf681ae61',
 }
 
 interface SvgResult {
@@ -252,9 +340,13 @@ describe('SVG optimization', async () => {
 						)
 					})
 					.join('\n\n') +
-				'\n\n==== Single command: ====\n\n    ' +
-				needsOptimization.map(r => `npx svgo --config ${configPath} ${r.filePath}`).join(' && ') +
-				'\n\n'
+				(needsOptimization.length === 1
+					? ''
+					: '\n\n==== Single command: ====\n\n    ' +
+						needsOptimization
+							.map(r => `npx svgo --config ${configPath} ${r.filePath}`)
+							.join(' && ') +
+						'\n\n')
 
 			console.error(message)
 			expect(

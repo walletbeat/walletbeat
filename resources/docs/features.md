@@ -1951,6 +1951,7 @@ Note: account recovery features generally cannot be fully verified through hands
 Platforms that host bug bounty programs. To identify: look for a "Bug Bounty", "Security", or "Responsible Disclosure" link on the wallet's website. The platform is usually obvious from the URL Use SELF_HOSTED if the program is run directly on the wallet's own website with no external platform involved.
 
 - `SELF_HOSTED` = `'Self-hosted'`
+- `CANTINA` = `'Cantina'`
 - `HACKER_ONE` = `'Hacker One'`
 - `BUG_CROWD` = `'Bugcrowd'`
 - `INTIGRITI` = `'Intigriti'`

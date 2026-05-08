@@ -88,7 +88,7 @@ export const gemwallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Gem Wallet is licensed under the GPL-3.0 license.',
-						url: 'https://github.com/gemwalletcom/gem-ios/blob/main/LICENSE',
+						url: 'https://github.com/gemwalletcom/gem-ios/blob/ef264f54eacacacba837735ac6ed605c9512f84a/LICENSE',
 					},
 				],
 				license: FOSSLicense.GPL_3_0,

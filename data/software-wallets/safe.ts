@@ -214,7 +214,7 @@ export const safe: SoftwareWallet = {
 					},
 					{
 						explanation: 'Safe uses FCL P256 verifier for passkey verification.',
-						url: 'https://github.com/safe-fndn/safe-modules/blob/main/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
+						url: 'https://github.com/safe-fndn/safe-modules/blob/1e57772571fc72471b7bc3203fde9b1799fb87d4/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
 					},
 				],
 				details: 'Safe uses FreshCryptoLib for passkey verification in their 4337 modules.',
@@ -224,14 +224,14 @@ export const safe: SoftwareWallet = {
 			}),
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
 					auditDate: '2025-01-14',
 					auditor: certora,
 					unpatchedFlaws: 'NONE_FOUND',
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
 					auditDate: '2025-05-28',
 					auditor: ackee,
 					unpatchedFlaws: 'NONE_FOUND',

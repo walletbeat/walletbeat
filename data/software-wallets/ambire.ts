@@ -95,7 +95,7 @@ const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 
 const v2Audits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/4be3dfec816cdd11039c1d260943a1a98affdc92/audits/Pashov-Ambire-third-security-review.md',
 		auditDate: '2024-01-26',
 		auditor: pashov,
 		codeSnapshot: {
@@ -107,7 +107,7 @@ const v2Audits: SecurityAudit[] = [
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/2bf3233cd22c28eca7f87a6ef997325936ca3214/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
 		auditDate: '2025-02-20',
 		auditor: hunterSecurity,
 		codeSnapshot: {
@@ -192,7 +192,7 @@ const scamAlertsAndSendTxWarningRefs: WithRef<{}>['ref'] = [
 		urls: [
 			{
 				label: 'Implementation',
-				url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
+				url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
 			},
 		],
 	},
@@ -261,7 +261,7 @@ export const ambire: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation: 'Ambire supports ERC-4337 smart contract wallets',
-					url: 'https://github.com/AmbireTech/ambire-common/blob/main/contracts/AmbireAccount.sol',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol',
 				},
 				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
@@ -313,13 +313,13 @@ export const ambire: SoftwareWallet = {
 					explanation:
 						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
 					label: 'Implementation of token filtering by name',
-					url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+					url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 				},
 				ether: supported({
 					ref: {
 						explanation: 'Ambire supports filtering by token name.',
 						label: 'Implementation of token filtering by name',
-						url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+						url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 					},
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
@@ -342,9 +342,9 @@ export const ambire: SoftwareWallet = {
 					explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
 					label: 'List of RPCs Ambire uses for default chains',
 					url: [
-						'https://github.com/AmbireTech/ambire-common/blob/main/src/consts/networks.ts',
-						'https://github.com/AmbireTech/ambire-common/blob/main/src/services/ensDomains/ensDomains.ts',
-						'https://github.com/AmbireTech/ambire-common/blob/main/src/libs/portfolio/getOnchainBalances.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/22678d08810b6f28fa55886c4214d3bc54260d1f/src/consts/networks.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/e3a749a1cb2e4bf098b18e547b363a1931a81d29/src/services/ensDomains/ensDomains.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/362e2dc1e2e769d23f5de1717b66ff295c8e91bc/src/libs/portfolio/getOnchainBalances.ts',
 					],
 				},
 				{
@@ -386,7 +386,7 @@ export const ambire: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: {
-					url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
+					url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
 				},
 				'1193': featureSupported,
 				'2700': featureSupported,
@@ -400,7 +400,7 @@ export const ambire: SoftwareWallet = {
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
-				ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
+				ref: 'https://github.com/AmbireTech/extension/blob/82c86aa342b85ece2afbe3689a5b52be9c6e1ff9/LICENSE',
 				license: FOSSLicense.GPL_3_0,
 			},
 		},
@@ -427,17 +427,17 @@ export const ambire: SoftwareWallet = {
 						{
 							explanation:
 								'Ambire integrates Sentry for anonymous crash/error reporting in the web extension context.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/src/common/config/analytics/CrashAnalytics.web.ts',
+							url: 'https://github.com/AmbireTech/extension/blob/5942801f127d41d25170ef079e94aa64eb606210/src/common/config/analytics/CrashAnalytics.web.ts',
 						},
 						{
 							explanation:
 								'Sentry is initialized in the background service worker, and events are only sent when crash analytics are enabled.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
+							url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
 						},
 						{
 							explanation:
 								'Ambire provides a user toggle for enabling/disabling crash analytics in settings.',
-							url: 'https://github.com/AmbireTech/extension/blob/main/src/web/modules/settings/screens/GeneralSettingsScreen/components/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+							url: 'https://github.com/AmbireTech/extension/blob/b4e45b584754694555d433a52e8aab8f4e0ac539/src/common/modules/settings/components/General/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
 						},
 					],
 					entity: sentry,
@@ -642,7 +642,7 @@ export const ambire: SoftwareWallet = {
 						urls: [
 							{
 								label: 'Implementation',
-								url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
 							},
 						],
 					},
