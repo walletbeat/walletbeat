@@ -1,4 +1,4 @@
-# walletbeat 💗
+# walletbeat 🌸
 
 Walletbeat is the L2BEAT of wallets. An open repository of EVM-compatible wallets.
 
