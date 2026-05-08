@@ -212,11 +212,6 @@
 <style>
 	input[type='search'] {
 		border-radius: 0.75rem;
-		font-family: 'Space Grotesk', 'Noto Color Emoji';
-	}
-
-	summary, a, menu {
-		font-family: 'Space Grotesk', 'Noto Color Emoji';
 	}
 
 	menu {
