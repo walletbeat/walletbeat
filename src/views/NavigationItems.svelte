@@ -194,14 +194,26 @@
 			data-row="start gap-2"
 		>
 			{#if item.icon}
-				<span class="icon" class:circle={depth === 0}>{@html item.icon}</span>
+				<span class="icon" class:circle={depth === 0}>
+					{#if item.icon.startsWith('<')}
+						{@html item.icon}
+					{:else}
+						<span data-wbicon data-icon={item.icon}></span>
+					{/if}
+				</span>
 			{/if}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
 		{#if item.icon}
-			<span class="icon" class:circle={depth === 0}>{@html item.icon}</span>
+			<span class="icon" class:circle={depth === 0}>
+				{#if item.icon.startsWith('<')}
+					{@html item.icon}
+				{:else}
+					<span data-wbicon data-icon={item.icon}></span>
+				{/if}
+			</span>
 		{/if}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>

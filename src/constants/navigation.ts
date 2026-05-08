@@ -21,8 +21,6 @@ import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { WalletType } from '@/schema/wallet-types'
 import { getWalletUrl } from '@/utils/wallet-url'
 
-const wbicon = (name: string) => `<span data-wbicon data-icon="${name}"></span>`
-
 // Constants
 export const navigationHome = {
 	id: 'home',
@@ -33,14 +31,14 @@ export const navigationHome = {
 
 export const navigationFaq = {
 	id: 'faq',
-	icon: wbicon('faq'),
+	icon: 'faq',
 	title: 'faq',
 	href: '/faq/',
 } as const satisfies NavigationItem
 
 export const navigationAbout = {
 	id: 'about',
-	icon: wbicon('about'),
+	icon: 'about',
 	title: 'about',
 	href: '/about/',
 } as const satisfies NavigationItem
@@ -54,27 +52,27 @@ export const navigationCriteria = {
 
 export const navigationRepository = {
 	id: 'code-repository',
-	icon: wbicon('repository'),
+	icon: 'repository',
 	title: 'code',
 	href: 'https://github.com/walletbeat/walletbeat',
 } as const satisfies NavigationItem
 
 export const navigationTesting = {
 	id: 'testing-page',
-	icon: wbicon('wallet_test'),
+	icon: 'wallet_test',
 	title: 'Test your wallet',
 	href: '/test',
 } as const satisfies NavigationItem
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
-	icon: wbicon('discuss'),
+	icon: 'discuss',
 	title: 'farcaster',
 	href: 'https://farcaster.xyz/~/channel/walletbeat',
 } as const satisfies NavigationItem
 
 export const navigationNews = {
 	id: 'news',
-	icon: wbicon('newsletter'),
+	icon: 'newsletter',
 	title: 'Wallet Security News',
 	href: '/news',
 } as const satisfies NavigationItem
@@ -90,7 +88,7 @@ export const defaultNavigationItems = [
 		id: 'software-wallets',
 		title: 'Software Wallets',
 		href: '/wallet/summary/',
-		icon: wbicon('wallet_software'),
+		icon: 'wallet_software',
 		children: [
 			{
 				id: 'software-by-rating',
@@ -129,7 +127,7 @@ export const defaultNavigationItems = [
 		id: 'hardware-wallets',
 		title: 'Hardware Wallets',
 		href: '/hww/summary/',
-		icon: wbicon('wallet_hardware'),
+		icon: 'wallet_hardware',
 		children: [
 			{
 				id: 'hardware-by-rating',
