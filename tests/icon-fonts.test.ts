@@ -5,6 +5,7 @@ import { SVGFont } from '@/tools/icon-font-generator/icon-font-generator-lib'
 describe('wbicons', async () => {
 	const wbicons = await SVGFont.create({
 		fontName: 'wbicons',
+		fontTypeName: 'WBIcon',
 		cssOutputDir: 'src/styles',
 		fontOutputDir: 'public/wbicons',
 		svgIconsDir: 'resources/files/wbicons',
