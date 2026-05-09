@@ -6,12 +6,22 @@ type Icon = {
 	url: string
 	sizes?: string
 }
+
+type OpenGraphImage = {
+	url: string
+	width?: number
+	height?: number
+	alt?: string
+}
+
 type MetadataConfig = {
 	title: string
 	icons?: Icon[]
 	description?: string
 	keywordsBefore?: string[]
 	keywordsAfter?: string[]
+	/** Absolute or root-relative path to a 1.91:1 image used for og:image and Twitter card. */
+	image?: string
 }
 
 const siteName = 'Walletbeat'
@@ -29,6 +39,26 @@ const defaultIcons: Icon[] = [
 ]
 const locale = 'en-US'
 
+// Default OG image — falls back to /banner.png in the public folder.
+// 1920×1026 PNG; close enough to the recommended 1.91:1 ratio for FB/Slack/X
+// previews to render correctly.
+const defaultOgImage: OpenGraphImage = {
+	url: '/banner.png',
+	width: 1920,
+	height: 1026,
+	alt: 'Walletbeat — The state of the Ethereum wallet ecosystem',
+}
+
+// Resolve a possibly-relative image URL into an absolute one against the
+// configured site URL so social-card crawlers can fetch it regardless of
+// where the page is hosted.
+const toAbsolute = (url: string, site: URL | undefined): string => {
+	if (/^https?:\/\//i.test(url)) return url
+	if (!site) return url
+	const path = url.startsWith('/') ? url : `/${url}`
+	return new URL(path, site).toString()
+}
+
 // Functions
 const generateBasicMetadata = ({
 	title,
@@ -36,6 +66,7 @@ const generateBasicMetadata = ({
 	icons,
 	keywordsBefore,
 	keywordsAfter,
+	image,
 }: MetadataConfig) => ({
 	title,
 	applicationName: siteName,
@@ -49,6 +80,7 @@ const generateBasicMetadata = ({
 		description: description ?? siteDescription,
 		siteName,
 		locale,
+		image: image ? { ...defaultOgImage, url: image } : defaultOgImage,
 	},
 })
 
@@ -60,6 +92,7 @@ type Props = {
 const { metadata: rawMetadata } = Astro.props
 
 const metadata = generateBasicMetadata(rawMetadata)
+const ogImageUrl = toAbsolute(metadata.openGraph.image.url, Astro.site)
 ---
 
 <title>{metadata.title}</title>
@@ -67,9 +100,22 @@ const metadata = generateBasicMetadata(rawMetadata)
 <meta name='description' content={metadata.description} />
 <meta name='keywords' content={metadata.keywords.join(', ')} />
 {metadata.icons.map(icon => <link rel='icon' href={icon.url} sizes={icon.sizes} />)}
+
+{/* Open Graph — Facebook, LinkedIn, Slack, Discord */}
 <meta property='og:type' content={metadata.openGraph.type} />
 <meta property='og:determiner' content={metadata.openGraph.determiner} />
 <meta property='og:title' content={metadata.openGraph.title} />
 <meta property='og:description' content={metadata.openGraph.description} />
 <meta property='og:siteName' content={metadata.openGraph.siteName} />
 <meta property='og:locale' content={metadata.openGraph.locale} />
+<meta property='og:image' content={ogImageUrl} />
+<meta property='og:image:width' content={String(metadata.openGraph.image.width)} />
+<meta property='og:image:height' content={String(metadata.openGraph.image.height)} />
+<meta property='og:image:alt' content={metadata.openGraph.image.alt} />
+
+{/* Twitter / X — same image, summary_large_image renders 1.91:1 */}
+<meta name='twitter:card' content='summary_large_image' />
+<meta name='twitter:title' content={metadata.openGraph.title} />
+<meta name='twitter:description' content={metadata.openGraph.description} />
+<meta name='twitter:image' content={ogImageUrl} />
+<meta name='twitter:image:alt' content={metadata.openGraph.image.alt} />
