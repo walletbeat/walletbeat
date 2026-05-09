@@ -12,7 +12,7 @@ Walletbeat is a comprehensive rating platform for Ethereum wallets. It's built a
 # Development
 pnpm install         # Install dependencies
 pnpm dev             # Start development server (http://localhost:4321 by default)
-pnpm dev:background  # Start development server (http://localhost:4321 by default) and daemonize it; useful for keeping server running past single-turn execution.
+pnpm dev:background  # Start development server, daemonize it, and print its URL; useful for keeping server running past single-turn execution.
 
 # Quality checks (run after code changes)
 pnpm check:quick  # Fast checks (lint, syntax, spelling, misc)
