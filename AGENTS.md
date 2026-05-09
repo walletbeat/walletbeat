@@ -1,4 +1,4 @@
-# AGENTS.md
+# General Walletbeat knowledge base
 
 This file provides guidance to coding agents when working with code in this repository.
 
@@ -6,35 +6,36 @@ This file provides guidance to coding agents when working with code in this repo
 
 Walletbeat is a comprehensive rating platform for Ethereum wallets. It's built as a static site using Astro, TypeScript, and React, featuring a data-driven architecture that objectively evaluates wallet features across multiple categories (security, privacy, self-sovereignty, transparency).
 
-## Development Commands
+## Development commands
 
 ```bash
 # Development
-pnpm install          # Install dependencies
-pnpm run dev          # Start development server (http://localhost:4321)
+pnpm install         # Install dependencies
+pnpm dev             # Start development server (http://localhost:4321 by default)
+pnpm dev:background  # Start development server (http://localhost:4321 by default) and daemonize it; useful for keeping server running past single-turn execution.
 
 # Quality checks (run after code changes)
-pnpm run check:quick  # Fast checks (lint, syntax, spelling, misc)
-pnpm run check:all    # Complete checks (includes Astro check)
+pnpm check:quick  # Fast checks (lint, syntax, spelling, misc)
+pnpm check:all    # Comprehensive checks (includes Astro check)
 
 # Building
-pnpm run build        # Build for production
-pnpm run preview      # Preview production build
+pnpm build        # Build for production
+pnpm preview      # Preview production build
 
 # Fixing issues
-pnpm run lint         # Auto-fix syntax and lint issues
+pnpm lint         # Auto-fix syntax and lint issues
 ```
 
-## Core Architecture
+## Core architecture
 
-### Data Processing Pipeline
+### Data processing pipeline
 
 1. **Wallet Data** (`/data/[wallet-type]/`): Raw wallet metadata and feature data
-2. **Features** (`src/schema/features/`): Objective, factual data about wallet capabilities
+2. **Features** (`src/schema/features/`): Objective, factual data about wallet capabilities. Read `resources/docs/features.md` if you need to understand wallet feature types.
 3. **Attributes** (`src/schema/attributes/`): Evaluation logic that transforms features into ratings
 4. **Attribute Groups** (`src/schema/attribute-groups.ts`): Logical groupings of related attributes
 
-### Rating System
+### Rating system
 
 Each attribute evaluates wallet features and returns one of 5 ratings:
 
@@ -44,45 +45,47 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 - `UNRATED`: Insufficient data for evaluation
 - `EXEMPT`: Not applicable to this wallet type
 
-### Wallet Types
+### Wallet types
 
 - **Hardware wallets**: Physical devices for key storage
 - **Software wallets**: Browser extensions, mobile/desktop apps
 - **Embedded wallets**: SDKs integrated into other applications
 
-## Key Constraints
+## Key constraints
 
-### Schema Rules
+### Schema rules
 
-- No `WalletFeatures` fields should be `undefined` (use `null` for unknown data)
-- Wallet feature data must be objective and unopinionated
-- Attributes evaluate only feature data, no other inputs
+- No `WalletFeatures` fields should be `undefined` (use `null` for unknown data).
+- Wallet feature data must be objective and unopinionated.
+- Attributes evaluate only feature data, no other inputs.
+- Read `resources/docs/features.md` if you need to understand wallet feature types.
 
-### Code Quality
+### Code quality
 
-- Always run `pnpm run check:quick` after changes
-- Run `pnpm run check:all` before considering tasks complete
+- Always run `pnpm check:quick` after changes
+- Run `pnpm check:all` before considering tasks complete
 - Fix prettier issues with `pnpm lint`
 - Never use `eslint-disable` or `as any` workarounds
 - Add spelling exceptions to `.cspell.json` only for valid terms
 
-### UI Migration
+### CSS rules and system
 
-- Avoid MUI component modifications (project is migrating away from MUI)
-- Prefer Tailwind classes over MUI components
-- Use CSS variables from `global.css` for theming
+Read `src/styles/css-attributes.css` to understand how to work with the site's CSS rule system.
 
 ## Adding New Wallets
 
-1. Copy appropriate `unrated.tmpl.ts` from `data/[wallet-type]/`
-2. Rename to `[wallet-name].ts` and populate with wallet data
-3. Import in corresponding `data/[wallet-type].ts` file
-4. Submit pull request
+Load the `wallet-create` and/or `wallet-update` skills as needed.
 
-## File Structure Patterns
+## Repository layout
 
-- `/data/`: Wallet data organized by type (hardware, software, embedded)
-- `/src/schema/`: Type definitions and evaluation logic
-- `/src/components/`: React components for UI
-- `/src/pages/`: Astro pages and routing
-- `/deploy/`: Build and deployment scripts
+- `data/`: Wallet data organized by type (hardware, software, embedded).
+- `src/`: Main website and rating pipeline source code.
+- `src/schema/`: Type definitions and evaluation logic.
+- `src/components/`: React components for UI.
+- `src/pages/`: Astro pages and routing.
+- `deploy/`: Build and deployment scripts.
+- `dist/`: Build outputs as generated by `pnpm build`.
+- `public/`: Static files. `public/foo/bar.png` is served by the web server at `/foo/bar.png`.
+- `tests/`: Unit tests with Vitest. Already runs as part of `pnpm check:all`, but can be run explicitly with `pnpm check:vitest`.
+- `resources/`: Miscellaneous files.
+- `governance/`: Project governance history. You do not need to touch this directory.

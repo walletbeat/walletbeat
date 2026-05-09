@@ -7,3 +7,5 @@ You are browsing the `beta` branch of Walletbeat, available on the web at [beta.
 ## Contributing
 
 We welcome and encourage contributions. Please see our [contribution guidelines](/CONTRIBUTING.md).
+
+**Coding agents**: Please read `AGENTS.md` before making any changes.
