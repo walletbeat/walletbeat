@@ -1,14 +1,16 @@
 # Walletbeat travel policy
 
-This policy describes the policy for travel expense reimbursement for Walletbeat contributors.
+This document describes the policy for travel expense reimbursement for Walletbeat contributors.
 
 ## tl;dr / just the numbers
 
 - **Airfare**: Capped per Google Flights data
 - **Hotel**: Capped per Google Hotel Search data
-- **Stipend**: 40 USD per night stayed
-- **Swag**: 500 USD per event
-- **Total**: Max 2 trips per year per contributor, 3,500 USD cap per trip, travel expenses capped to 15% of treasury.
+- **Stipend**: 50 USD per night stayed
+- **Swag**: 400 USD per event
+- **Trips**: Max 2 trips per 360 days per contributor
+- **Total**: 4,000 USD cap per trip, excluding swag
+- **Treasury travel budget**: Max 15% over 360 days period
 
 ## Motivation
 
@@ -52,8 +54,8 @@ Walletbeat will reimburse the following expenses:
 
 - Air or rail travel expenses for a contributor to get to a conference or event, up to the 12-month average price of a roundtrip ticket per Google Flights (see below).
 - Hotel or similar lodging accommodations for a contributor to remain at the event for its duration, up to the modal per-night price reported on Google Hotel Search at least 60 days prior to the event (see below).
-- A flat stipend of 40 USD per night stayed, intended to cover food, travel between lodging and event space, and other miscellaneous expenses.
-- Cost of swag and promotional material to be distributed at the event, up to 500 USD.
+- A flat stipend of 50 USD per night stayed, intended to cover food, travel between lodging and event space, and other miscellaneous expenses.
+- Cost of swag and promotional material to be distributed at the event, up to 400 USD.
 
 Walletbeat will **not** reimburse anything not listed in the earlier list. Notably, this means the following expenses are **not** covered:
 
@@ -115,8 +117,8 @@ NOTE: Google Hotel Search also has a "What you'll pay" section; however, this se
 
 The total reimbursement amount:
 
-- Must not exceed 3,500 USD per trip.
-- Must not exceed 15% of the total treasury funds in total across all travel expenses in the last 360 days.
+- Must not exceed 4,000 USD per trip. Swag costs are excluded from this cap.
+- Total travel expenses across all contributors and all trips over the last 360 days period must not exceed 15% of the total treasury funds; otherwise, the reimbursement amount is capped accordingly.
 
 ### Putting it all together
 
@@ -124,8 +126,8 @@ As a math formula, the final reimbursement amount can be computed by the followi
 
 ```
 // Populate the following numbers:
-num_days_of_event = ...
-middle_roundtrip_airfare_per_google_flights_usd = ...
+num_days_of_event = ... // Number of days the event spans, not the amount of nights you are staying.
+average_roundtrip_airfare_per_google_flights_usd = ...
 modal_hotel_cost_per_night_per_google_hotel_search_usd = ...
 swag_cost_usd = ...
 treasury_current_value_usd = ...
@@ -133,18 +135,21 @@ treasury_total_travel_expenses_in_last_360_days_usd = ...
 
 // Computation:
 num_stayed_days = num_days_of_event + 1  // One night per event day + night preceding event
-reimbursed_airfare = middle_roundtrip_airfare_per_google_flights_usd
+reimbursed_airfare = average_roundtrip_airfare_per_google_flights_usd
 reimbursed_hotel = modal_hotel_cost_per_night_per_google_hotel_search_usd * num_stayed_days
-reimbursed_stipend = 40 * num_stayed_days
-reimbursed_swag = min(500, swag_cost_usd)
+reimbursed_stipend = 50 * num_stayed_days
 treasury_travel_budget_remaining_usd = max(
 	0,
 	treasury_current_value_usd * 0.15 - treasury_total_travel_expenses_in_last_360_days_usd,
 )
+reimbursed_non_swag = min(
+	4000,
+	reimbursed_airfare + reimbursed_hotel + reimbursed_stipend,
+)
+reimbursed_swag = min(400, swag_cost_usd)
 reimbursed_total_amount_usd = min(
-	3500,
+	reimbursed_non_swag + reimbursed_swag,
 	treasury_travel_budget_remaining_usd,
-	reimbursed_airfare + reimbursed_hotel + reimbursed_swag + reimbursed_stipend,
 )
 ```
 
