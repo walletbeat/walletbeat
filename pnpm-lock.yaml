@@ -127,8 +127,8 @@ importers:
         specifier: ^0.61.0
         version: 0.61.0
       omnipin:
-        specifier: ^2.2.4
-        version: 2.2.4
+        specifier: ^2.2.6
+        version: 2.2.6
       orbiter-cli:
         specifier: ^0.9.11
         version: 0.9.11(@types/node@25.3.3)(bufferutil@4.1.0)(esbuild@0.21.5)(utf-8-validate@5.0.10)
@@ -5201,8 +5201,8 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  omnipin@2.2.4:
-    resolution: {integrity: sha512-Yrlgx3xuyxb2vTA4UqvZmz8Arzwv04Fb3s+x2Ucke0FHGELEjkPvY+w3xyYTKguoyw2Dk4sozkDLXx4fnetUaA==}
+  omnipin@2.2.6:
+    resolution: {integrity: sha512-RmWkOjjG/iXZWYVcrZ6JPVBwul0W1hil1GSTMaVHpXVgl9h09SN4841S2hve6j1uKM0F94j0zuj5xDGUesLzug==}
     engines: {node: ^20.10.0 || >=21.1.0}
     hasBin: true
 
@@ -5991,6 +5991,11 @@ packages:
 
   semver@7.7.4:
     resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.8.0:
+    resolution: {integrity: sha512-AcM7dV/5ul4EekoQ29Agm5vri8JNqRyj39o0qpX6vDF2GZrtutZl5RwgD1XnZjiTAfncsJhMI48QQH3sN87YNA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -8957,7 +8962,7 @@ snapshots:
       debug: 4.4.3
       lodash: 4.17.23
       pony-cause: 2.1.11
-      semver: 7.7.4
+      semver: 7.8.0
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -8967,7 +8972,7 @@ snapshots:
       '@ethereumjs/tx': 4.2.0
       '@types/debug': 4.1.13
       debug: 4.4.3
-      semver: 7.7.4
+      semver: 7.8.0
       superstruct: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -8981,7 +8986,7 @@ snapshots:
       '@types/debug': 4.1.13
       debug: 4.4.3
       pony-cause: 2.1.11
-      semver: 7.7.4
+      semver: 7.8.0
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -8995,7 +9000,7 @@ snapshots:
       '@types/debug': 4.1.13
       debug: 4.4.3
       pony-cause: 2.1.11
-      semver: 7.7.4
+      semver: 7.8.0
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -13987,7 +13992,7 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  omnipin@2.2.4: {}
+  omnipin@2.2.6: {}
 
   on-exit-leak-free@0.2.0: {}
 
@@ -14969,6 +14974,8 @@ snapshots:
   semver@6.3.1: {}
 
   semver@7.7.4: {}
+
+  semver@7.8.0: {}
 
   send@0.19.2:
     dependencies:
