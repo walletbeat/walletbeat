@@ -10,13 +10,14 @@ import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
 import { refNotNecessary, type WithRef } from '../../reference'
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
 	feature: string
@@ -583,6 +584,10 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 				coreOnlyIsSufficient: true,
 			}),
 		)
+
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
+		}
 
 		if (ctx.features.security.scamAlerts === null) {
 			return unrated(ctx, { scamAlerts: null })
