@@ -43,9 +43,17 @@ jobs:
             command: pnpm run check:build:post:quiet
           - name: Commit signature
             command: pnpm run check:signed-commit
+          - name: Wallet metadata freshness
+            command: pnpm run check:wallet-metadata-update
+            # Diffs against the PR base ref, so it needs full history and only
+            # makes sense on pull_request events.
+            fetchDepth: 0
+            pullRequestOnly: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
+        with:
+          fetch-depth: ${{ matrix.fetchDepth || 1 }}
       - name: Install packages
         run: |
           sudo apt-get update
@@ -62,6 +70,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: ${{ matrix.name }}
+        if: matrix.pullRequestOnly != true || github.event_name == 'pull_request'
         run: ${{ matrix.command }}
         env:
           WALLETBEAT_ENV: CI
