@@ -7,6 +7,7 @@
 	--transition-easeInExpo: cubic-bezier(0.7, 0, 0.84, 0);
 	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
 	--transition-easeInOutExpo: cubic-bezier(0.87, 0, 0.13, 1);
+	--transition-blob: var(--transition-easeInOutExpo);
 
 	--pressable-transitionInDuration: 0.125s;
 	--pressable-transitionOutDuration: 0.2s;
@@ -20,8 +21,8 @@
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
 	--background-secondary: light-dark(#efefef, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
-	/* Sidebar uses the same background as the main canvas */
-	--navigation-backgroundColor: var(--background-primary);
+	/* Sidebar uses the same background as the sticky elements */
+	--navigation-backgroundColor: var(--sticky-backgroundColor);
 
 	--accent: var(--accent-color);
 	--accent-color: light-dark(#e564bc, #f078c8);
