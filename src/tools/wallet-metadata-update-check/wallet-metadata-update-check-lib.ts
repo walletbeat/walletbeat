@@ -56,19 +56,24 @@ const IGNORED_LINE_PATTERNS: RegExp[] = [
 
 const BLOCK_COMMENT_RE = /\/\*[\s\S]*?\*\//g
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000
+
 /** Run a git command (args passed without shell) and return stdout. */
 function git(args: string[], cwd: string): string {
 	const r = spawnSync('git', args, { cwd, encoding: 'utf8' })
+
 	if (r.status !== 0) {
 		throw new Error(
 			`git ${args.join(' ')} failed: ${r.stderr?.trim() || r.error?.message || `exit ${r.status}`}`,
 		)
 	}
+
 	return (r.stdout ?? '').trimEnd()
 }
 
 function gitOk(args: string[], cwd: string): boolean {
 	const r = spawnSync('git', args, { cwd, stdio: 'ignore' })
+
 	return r.status === 0
 }
 
@@ -77,17 +82,21 @@ function gitOk(args: string[], cwd: string): boolean {
 function resolveBaseRef(cwd: string, baseRef?: string): string {
 	const candidates = [
 		baseRef,
-		process.env.GITHUB_BASE_REF ? `origin/${process.env.GITHUB_BASE_REF}` : undefined,
+		process.env.GITHUB_BASE_REF !== undefined && process.env.GITHUB_BASE_REF !== ''
+			? `origin/${process.env.GITHUB_BASE_REF}`
+			: undefined,
 		'origin/beta',
 		'beta',
 		'origin/main',
 		'main',
 	].filter((r): r is string => Boolean(r))
+
 	for (const ref of candidates) {
 		if (gitOk(['rev-parse', '--verify', `${ref}^{commit}`], cwd)) {
 			return ref
 		}
 	}
+
 	throw new Error(
 		`Could not resolve a base ref to diff against. Tried: ${candidates.join(', ')}.`,
 	)
@@ -95,13 +104,19 @@ function resolveBaseRef(cwd: string, baseRef?: string): string {
 
 /** List wallet files modified between baseRef and HEAD. */
 function listChangedWalletFiles(cwd: string, baseRef: string, dirs: string[]): string[] {
-	const out = git(['diff', '--name-only', '--diff-filter=ACMRT', `${baseRef}...HEAD`, '--'].concat(dirs), cwd)
-	if (!out) return []
+	const out = git(
+		['diff', '--name-only', '--diff-filter=ACMRT', `${baseRef}...HEAD`, '--'].concat(dirs),
+		cwd,
+	)
+
+	if (out === '') {
+		return []
+	}
+
 	return out
 		.split('\n')
 		.map(l => l.trim())
 		.filter(l => l.length > 0 && (l.endsWith('.ts') || l.endsWith('.tsx')))
-		// Skip the templates that intentionally have no real lastUpdated.
 		.filter(l => !path.basename(l).endsWith('.tmpl.ts'))
 }
 
@@ -114,8 +129,8 @@ function fileDiffLines(
 	const raw = git(['diff', '--unified=0', `${baseRef}...HEAD`, '--', file], cwd)
 	const added: string[] = []
 	const removed: string[] = []
+
 	for (const line of raw.split('\n')) {
-		// Skip diff headers.
 		if (
 			line.startsWith('diff ') ||
 			line.startsWith('index ') ||
@@ -125,19 +140,31 @@ function fileDiffLines(
 		) {
 			continue
 		}
-		if (line.startsWith('+')) added.push(line.slice(1))
-		else if (line.startsWith('-')) removed.push(line.slice(1))
+
+		if (line.startsWith('+')) {
+			added.push(line.slice(1))
+		} else if (line.startsWith('-')) {
+			removed.push(line.slice(1))
+		}
 	}
+
 	return { added, removed }
 }
 
 /** Decide whether a diff line counts as a "feature data change" worth gating on. */
 function isFeatureChange(line: string): boolean {
 	const stripped = line.replace(BLOCK_COMMENT_RE, '').trim()
-	if (stripped === '') return false
-	for (const pattern of IGNORED_LINE_PATTERNS) {
-		if (pattern.test(line)) return false
+
+	if (stripped === '') {
+		return false
 	}
+
+	for (const pattern of IGNORED_LINE_PATTERNS) {
+		if (pattern.test(line)) {
+			return false
+		}
+	}
+
 	return true
 }
 
@@ -145,7 +172,8 @@ function isFeatureChange(line: string): boolean {
 function readLastUpdated(absPath: string): string | undefined {
 	const text = fs.readFileSync(absPath, 'utf8')
 	const m = LAST_UPDATED_RE.exec(text)
-	return m ? m[1] : undefined
+
+	return m !== null ? m[1] : undefined
 }
 
 /** Read the lastUpdated value from a file at baseRef. */
@@ -153,16 +181,20 @@ function readLastUpdatedAtBase(cwd: string, baseRef: string, file: string): stri
 	try {
 		const text = git(['show', `${baseRef}:${file}`], cwd)
 		const m = LAST_UPDATED_RE.exec(text)
-		return m ? m[1] : undefined
+
+		return m !== null ? m[1] : undefined
 	} catch {
-		return undefined // file did not exist at base — counts as "added new"
+		// File did not exist at base — counts as "added new", which the caller
+		// treats the same way as a missing-but-different `lastUpdated` value.
+		return undefined
 	}
 }
 
 /** ISO date (YYYY-MM-DD) of the HEAD commit, in UTC. */
 function headCommitDateIso(cwd: string): string {
-	const ts = git(['log', '-1', '--format=%cI', 'HEAD'], cwd) // 2026-05-09T19:42:00+02:00
+	const ts = git(['log', '-1', '--format=%cI', 'HEAD'], cwd)
 	const d = new Date(ts)
+
 	return d.toISOString().slice(0, 10)
 }
 
@@ -181,7 +213,8 @@ function diffDays(aIso: string, bIso: string): number {
 		Number(bIso.slice(5, 7)) - 1,
 		Number(bIso.slice(8, 10)),
 	)
-	return Math.round((a - b) / (24 * 60 * 60 * 1000))
+
+	return Math.round((a - b) / MS_PER_DAY)
 }
 
 export function runCheck(opts: CheckOptions = {}): CheckResult {
@@ -191,6 +224,7 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
 	const baseRef = resolveBaseRef(cwd, opts.baseRef)
 	const commitMsg = headCommitMessage(cwd)
 	const bypassed = commitMsg.includes(merged.bypassToken)
+
 	if (bypassed) {
 		return { ok: true, problems: [], inspected: [], ignored: [], bypassed: true }
 	}
@@ -204,34 +238,40 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
 	for (const file of changed) {
 		const { added, removed } = fileDiffLines(cwd, baseRef, file)
 		const featureChanges = [...added, ...removed].filter(isFeatureChange)
+
 		if (featureChanges.length === 0) {
 			ignored.push(file)
 			continue
 		}
+
 		inspected.push(file)
 
 		const absPath = path.join(cwd, file)
 		const headValue = readLastUpdated(absPath)
-		if (!headValue) {
+
+		if (headValue === undefined) {
 			problems.push(
 				`${file}: feature data changed but no \`lastUpdated\` field found in the file.`,
 			)
 			continue
 		}
+
 		if (!ISO_DATE_RE.test(headValue)) {
-			problems.push(
-				`${file}: \`lastUpdated\` is "${headValue}" — must be YYYY-MM-DD.`,
-			)
+			problems.push(`${file}: \`lastUpdated\` is "${headValue}" — must be YYYY-MM-DD.`)
 			continue
 		}
+
 		const baseValue = readLastUpdatedAtBase(cwd, baseRef, file)
+
 		if (baseValue !== undefined && baseValue === headValue) {
 			problems.push(
 				`${file}: feature data changed but \`lastUpdated\` (${headValue}) was not bumped vs. ${baseRef}.`,
 			)
 			continue
 		}
+
 		const drift = Math.abs(diffDays(headValue, headDateIso))
+
 		if (drift > merged.commitDateToleranceDays) {
 			problems.push(
 				`${file}: \`lastUpdated\` is ${headValue} but the head commit is dated ${headDateIso} (drift ${drift} days, max ${merged.commitDateToleranceDays}).`,
@@ -253,29 +293,40 @@ export function formatResult(
 ): string {
 	const bypass = opts.bypassToken ?? DEFAULT_OPTIONS.bypassToken
 	const lines: string[] = []
+
 	if (result.bypassed) {
 		lines.push(
 			`Bypassed via "${bypass}" in the commit message. No metadata-update checks were run.`,
 		)
 		return lines.join('\n')
 	}
+
 	lines.push(
 		`Inspected ${result.inspected.length} wallet file(s); ignored ${result.ignored.length} as feature-irrelevant.`,
 	)
+
 	if (result.ok) {
 		lines.push('All inspected wallets have a fresh `lastUpdated`. ✓')
 		return lines.join('\n')
 	}
+
 	lines.push('')
 	lines.push(`Found ${result.problems.length} problem(s):`)
-	for (const p of result.problems) lines.push(`  - ${p}`)
+
+	for (const p of result.problems) {
+		lines.push(`  - ${p}`)
+	}
+
 	lines.push('')
-	lines.push('Each modified wallet must bump `metadata.lastUpdated` to today\'s date (YYYY-MM-DD).')
 	lines.push(
-		`If the change is genuinely feature-irrelevant (e.g. comment-only) and the heuristic is wrong,`,
+		"Each modified wallet must bump `metadata.lastUpdated` to today's date (YYYY-MM-DD).",
+	)
+	lines.push(
+		'If the change is genuinely feature-irrelevant (e.g. comment-only) and the heuristic is wrong,',
 	)
 	lines.push(
 		`include the literal string "${bypass}" anywhere in the head commit message to skip this check.`,
 	)
+
 	return lines.join('\n')
 }
