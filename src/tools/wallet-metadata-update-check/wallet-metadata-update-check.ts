@@ -15,8 +15,14 @@
 import { formatResult, runCheck } from './wallet-metadata-update-check-lib'
 
 function getErrorMessage(err: unknown): string {
-	if (err instanceof Error) return err.message
-	if (typeof err === 'string') return err
+	if (err instanceof Error) {
+		return err.message
+	}
+
+	if (typeof err === 'string') {
+		return err
+	}
+
 	try {
 		return JSON.stringify(err)
 	} catch {
@@ -29,7 +35,11 @@ const args = process.argv.slice(2)
 function readArg(name: string): string | undefined {
 	const flag = `--${name}`
 	const idx = args.indexOf(flag)
-	if (idx === -1) return undefined
+
+	if (idx === -1) {
+		return undefined
+	}
+
 	return args[idx + 1]
 }
 
@@ -40,8 +50,11 @@ try {
 		baseRef: readArg('base'),
 	})
 	const output = formatResult(result)
+
 	if (result.ok) {
-		if (!quiet) process.stdout.write(`${output}\n`)
+		if (!quiet) {
+			process.stdout.write(`${output}\n`)
+		}
 		process.exit(0)
 	} else {
 		process.stderr.write(`${output}\n`)
