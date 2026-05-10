@@ -5,9 +5,10 @@ import {
 } from '@/schema/features/security/passkey-verification'
 import { isSupported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 export type PasskeyImplementationMetadata = {
 	library: PasskeyVerificationLibrary | null
@@ -325,6 +326,11 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
+
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
+		}
+
 		const passkeyVerification = ctx.features.security.passkeyVerification
 
 		if (passkeyVerification === null) {
