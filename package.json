@@ -28,6 +28,7 @@
 		"check:signed-commit": "bash tests/signed-commit.test.sh",
 		"check:signed-commit:quiet": "bash tests/signed-commit.test.sh --quiet",
 		"check:vitest": "vitest --typecheck --cache --run",
+		"check:wallet-metadata-update": "tsx src/tools/wallet-metadata-update-check/wallet-metadata-update-check.ts --quiet",
 		"generate:css-attributes": "pnpm run \"/^generate:css-attributes:.+/\"",
 		"generate:css-attributes:typescript": "tsx src/styles/generate/css-attributes-typescript.ts",
 		"generate:css-attributes:vscode": "tsx src/styles/generate/css-attributes-vscode.ts",
