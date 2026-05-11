@@ -285,7 +285,7 @@
 			width: 1.75em;
 			height: 1.75em;
 			border-radius: 50%;
-			border: 1px solid #F1EEF780;
+			border: 1px solid var(--navigation-borderColor);
 
 			:global(
 				img,

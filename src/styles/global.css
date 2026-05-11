@@ -22,11 +22,12 @@
 	--background-tertiary: light-dark(#eeeff4, #251544);
 	/* Sidebar uses the same background as the main canvas */
 	--navigation-backgroundColor: var(--background-primary);
+	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
 	--accent-color: light-dark(#e564bc, #f078c8);
 	--accent-backgroundColor: light-dark(#fbdcf2, #3d0a32);
-	--text-primary: light-dark(#222222, #f4f2f8);
+	--text-primary: light-dark(#222222, #f5f2f7);
 	--text-secondary: light-dark(#3f4046, #b8b0d4);
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
 
