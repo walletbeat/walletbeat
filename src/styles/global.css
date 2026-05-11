@@ -30,7 +30,6 @@
 	--text-primary: light-dark(#3D2B6E, #F5F2F7);
 	--text-secondary: light-dark(#130A2B, #B6AEC1);
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
-	--icon-navigation-color: light-dark(#3D2B6E, #B6AEC1);
 	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
 
 	--rating-pass: light-dark(oklch(0.81 0.22 152.32), oklch(0.75 0.18 152.32));
