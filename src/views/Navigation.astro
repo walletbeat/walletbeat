@@ -19,7 +19,7 @@ const currentPathname = Astro.url.pathname
 >
 	<div id='nav-menu' data-sticky-container>
 		<NavigationItems
-			client:load
+			client:idle
 			transition:persist
 			items={navigationItems}
 			currentPathname={currentPathname}

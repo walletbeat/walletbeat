@@ -9,6 +9,7 @@ try {
 
 	cli
 		.option('--font-name', 'Name of the font to generate')
+		.option('--font-type-name', 'Name of the icon TypeScript type to generate')
 		.option('--svg-icons-dir', 'Directory containing SVG icons, repo-root-relative')
 		.option('--font-output-dir', 'Directory to output font files, repo-root-relative')
 		.option('--css-output-dir', 'Directory to output CSS files, repo-root-relative')
@@ -18,6 +19,7 @@ try {
 
 	const opts = cli.options as {
 		fontName?: string
+		fontTypeName?: string
 		svgIconsDir?: string
 		fontOutputDir?: string
 		cssOutputDir?: string
@@ -26,6 +28,10 @@ try {
 
 	if (opts.fontName === undefined || opts.fontName === '') {
 		throw new Error('Error: --font-name is required\n')
+	}
+
+	if (opts.fontTypeName === undefined || opts.fontTypeName === '') {
+		throw new Error('Error: --font-type-name is required\n')
 	}
 
 	if (opts.svgIconsDir === undefined || opts.svgIconsDir === '') {
@@ -42,6 +48,7 @@ try {
 
 	const font = await SVGFont.create({
 		fontName: opts.fontName,
+		fontTypeName: opts.fontTypeName,
 		svgIconsDir: opts.svgIconsDir,
 		fontOutputDir: opts.fontOutputDir,
 		cssOutputDir: opts.cssOutputDir,
