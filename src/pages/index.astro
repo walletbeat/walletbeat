@@ -25,7 +25,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 	<main data-sticky-container data-column='gap-6'>
 		<header data-sticky='inline'>
-			<h1>Who watches the wallets.</h1>
+			<h1>Who watches the wallets?</h1>
 
 			<p>
 				This website is still in beta. It aims to provide a comprehensive list of wallets, their
@@ -80,6 +80,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
 				font-weight: 800;
 				margin: 0 0 1rem 0;
+				color: var(--text-primary);
 				line-height: 1.1;
 			}
 
@@ -90,6 +91,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 				text-wrap: balance;
 				max-width: 420px;
 				margin-bottom: 1em;
+				color: var(--text-secondary);
 			}
 		}
 	}

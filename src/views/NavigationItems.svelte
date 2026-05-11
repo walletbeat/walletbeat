@@ -224,6 +224,7 @@
 <style>
 	input[type='search'] {
 		border-radius: 0.75rem;
+		border-color: var(--icon-navigation-borderColor);
 	}
 
 	menu {
@@ -245,7 +246,7 @@
 	}
 
 	a {
-		color: inherit;
+		color: var(--text-primary);
 		font-weight: inherit;
 
 		&:hover {
@@ -285,7 +286,7 @@
 			width: 1.75em;
 			height: 1.75em;
 			border-radius: 50%;
-			border: 1px solid var(--navigation-borderColor);
+			border: 1px solid var(--icon-navigation-borderColor);
 
 			:global(
 				img,
