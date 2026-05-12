@@ -203,7 +203,7 @@ export const onekeyWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_IN_UI,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
-				messageSigningLegibility: null,
+				erc8213: null,
 			},
 			userSafety: null,
 		},
