@@ -1,5 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
+
 import type { Support } from '../support'
 
 /**
@@ -483,7 +484,7 @@ export enum MessageSigningDetails {
 
 	/**
 	 * The wallet shows the EIP-712 digest: the final hash that gets signed:
-	 * `"\x19\x01" ‖ domainSeparator ‖ hashStruct(message)`.
+	 * `"\x19\x01" || domainSeparator || hashStruct(message)`.
 	 */
 	EIP712_DIGEST = 'EIP712_DIGEST',
 }
@@ -496,15 +497,6 @@ export type SoftwareMessageSigningLegibility = Record<
 	DataDisplayOptions
 > | null
 
-/**
- * For hardware wallets: track which message signing data types are available and where they are displayed
- */
-export interface HardwareMessageSigningLegibility {
-	/** Which message signing data types does the wallet provide? */
-	messageSigningDetails: Record<MessageSigningDetails, DataDisplayOptions>
-	/** Where does the message signing data display happen? */
-	decoded: DataLocation
-}
 /**
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
@@ -591,15 +583,9 @@ export function isSupportedOnDevice(
 }
 
 export interface HardwareWalletErc8213 {
-	calldataDisplay: Record<
-		CallDataDisplay,
-		DisplayCapability
-	> | null
+	calldataDisplay: Record<CallDataDisplay, DisplayCapability> | null
 
-	messageSigningLegibility: Record<
-		MessageSigningDetails,
-		DisplayCapability
-	> | null
+	messageSigningLegibility: Record<MessageSigningDetails, DisplayCapability> | null
 }
 
 type DisplayCapability = {
@@ -611,7 +597,7 @@ type DisplayCapability = {
  * A record of transaction legibility support (both message and transaction)
  */
 export interface HardwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
-	erc8213: Support<HardwareWalletErc8213> | null,
+	erc8213: Support<HardwareWalletErc8213> | null
 
 	/**
 	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
@@ -626,18 +612,6 @@ export interface HardwareTransactionLegibilitySupport extends BaseTransactionLeg
 	 * Does a wallet allow for data extraction?
 	 */
 	dataExtraction: DataExtractionMethods | null
-
-	/**
-	 * What message signing data does the hardware wallet provide and where is it displayed?
-	 */
-	messageSigningLegibility: HardwareMessageSigningLegibility | null
-
-	/**
-	 * Does the hardware wallet display the calldata digest (`keccak256(len(calldata) ‖ calldata)`)
-	 * as defined by ERC-8213, and if so, where?
-	 * Must be ON_DEVICE for a passing rating.
-	 */
-	calldataDigest: DataLocation | null
 }
 
 /**
@@ -649,17 +623,38 @@ export interface HardwareTransactionLegibilitySupport extends BaseTransactionLeg
  * test a USDC approval transaction under `Transactions` tab.
  */
 export enum CallDataDisplay {
-	RAW_HEX= 'RAW_HEX',
+	/**
+	 * The raw `0x...` hex calldata is visible somewhere on the approval screen.
+	 * To test: look for a hex string starting with `0x` on the approval screen
+	 * or in an expandable section.
+	 */
+	RAW_HEX = 'RAW_HEX',
+	/**
+	 * A dedicated button copies the raw hex calldata to the clipboard.
+	 * For batched transactions, the full hex including the multicall wrapper is expected.
+	 * To test: look for a copy icon or "Copy" button next to the calldata.
+	 */
 	COPY_HEX_TO_CLIPBOARD = 'COPY_HEX_TO_CLIPBOARD',
+	/**
+	 * The calldata is decoded into a human-readable function name and arguments
+	 * (e.g. JSON or structured text), not just raw hex.
+	 * For batched transactions, each inner call should be decoded individually.
+	 * To test: check if the wallet shows the function name (e.g. `approve`) and
+	 * parameters (e.g. spender address, amount) in a readable format.
+	 */
 	FORMATTED = 'FORMATTED',
-	CALLDATA_DIGEST = 'CALLDATA_DIGEST'
+	/**
+	 * The wallet shows the calldata digest:
+	 * keccak256(uint256(len) || calldata)
+	 */
+	CALLDATA_DIGEST = 'CALLDATA_DIGEST',
 }
 
-export const displaysFullCallData: CallDataDisplay = {
-	rawHex: true,
-	copyHexToClipboard: true,
-	formatted: true,
-	calldataDigest: true,
+export const displaysFullCallData: Record<CallDataDisplay, DataDisplayOptions> = {
+	[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
 
 export interface SoftwareWalletErc8213 {
@@ -671,22 +666,13 @@ export interface SoftwareWalletErc8213 {
  * A record of transaction legibility support (both message and transaction)
  */
 export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
-	erc8213: Support<SoftwareWalletErc8213> | null,
+	erc8213: Support<SoftwareWalletErc8213> | null
 
-	/**
-	 * Does the software wallet support displaying the calldata in different formats?
-	 */
-	calldataDisplay: CallDataDisplay | null
 	/**
 	 * Does the software wallet support displaying the transaction details?
 	 * Evaluated per benchmark transaction type.
 	 */
 	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay | null
-
-	/**
-	 * What message signing data does the software wallet provide?
-	 */
-	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 }
 
 export const isFullBasicTransactionDetails = (
