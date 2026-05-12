@@ -52,6 +52,8 @@ import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
 import type {
 	ArtifactSigning,
+	ArtifactSigningDetails,
+	ArtifactSigningPayload,
 	DependencyLocking,
 	DependencyVulnerabilityScanning,
 	HasPublicChangelog,
@@ -174,7 +176,7 @@ export interface WalletBaseFeatures {
 
 		/** Release transparency features. */
 		releaseTransparency: {
-			artifactSigning: VariantFeature<ArtifactSigning>
+			artifactSigning: VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>
 			dependencyLocking: VariantFeature<DependencyLocking>
 			dependencyVulnerabilityScanning: VariantFeature<DependencyVulnerabilityScanning>
 			hasPublicChangelog: VariantFeature<HasPublicChangelog>
@@ -587,9 +589,11 @@ export function resolveFeatures(
 				features => features.transparency.maintenance,
 			),
 			releaseTransparency: {
-				artifactSigning: baseFeat(
-					'transparency.releaseTransparency.artifactSigning',
-					features => features.transparency.releaseTransparency.artifactSigning,
+				artifactSigning: nullable<Support<ArtifactSigningDetails>>(
+					baseFeat(
+						'transparency.releaseTransparency.artifactSigning',
+						features => features.transparency.releaseTransparency.artifactSigning,
+					),
 				),
 				dependencyLocking: baseFeat(
 					'transparency.releaseTransparency.dependencyLocking',

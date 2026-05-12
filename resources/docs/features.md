@@ -104,7 +104,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
   - `releaseTransparency` (object): Release transparency features.
-    - `artifactSigning` (`VariantFeature<ArtifactSigning>`)
+    - `artifactSigning` (`VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>`)
     - `dependencyLocking` (`VariantFeature<DependencyLocking>`)
     - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
@@ -3728,17 +3728,29 @@ type SignaturePublicationType = 'GITHUB_RELEASE' | 'SIGSTORE_REKOR' | 'ONCHAIN' 
 
 ---
 
-### Type: `ArtifactSigningDetails`
+### Type: `ArtifactSigningPayload`
 
-Artifact signing information for a wallet variant.
-
-Uses the common Support shape and carries signer/publication details when signing is supported. Metadata may still be `null` if unknown.
+Signer and publication metadata for artifact signing (no reference).
 
 ```typescript
-type ArtifactSigningDetails = WithRef<{
-	signer: ArtifactSignerType | null
-	publication: SignaturePublicationType | null
-}>
+type ArtifactSigningPayload = {
+	signer: ArtifactSignerType
+	publication: SignaturePublicationType
+}
+```
+
+---
+
+### Type: `ArtifactSigningDetails`
+
+Artifact signing information for a wallet variant when signing is supported.
+
+In `WalletBaseFeatures`, this appears under `Support<WithRef<Nullable<ArtifactSigningPayload>>>`, so `ref`, `signer`, or `publication` may be `null` in source data while research is in progress.
+
+During resolution, this feature is normalized all-or-nothing: if any field remains unknown on a supported payload, the resolved value becomes `null`.
+
+```typescript
+type ArtifactSigningDetails = WithRef<ArtifactSigningPayload>
 ```
 
 ---

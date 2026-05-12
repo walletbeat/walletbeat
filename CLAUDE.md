@@ -63,7 +63,7 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 - Some `WalletBaseFeatures` fields use `VariantFeature<Nullable<F>>` so `/data` may leave the whole blob or **any** property `null` until research is complete (`src/types/utils/nullable.ts`).
 - Export the complete shape as plain `F` from the feature module (e.g. `BasicOperationFees`, `RepositoryChangeControls`); put `Nullable<…>` on the **`WalletBaseFeatures` field**, not on the exported type alias.
 - `ResolvedFeatures` uses `ResolvedFeature<F>`: attribute code assumes **full `F` or absent**, not field-by-field nulls.
-- `resolveFeatures` (`src/schema/features.ts`) wraps those with `nullable()`, which uses `isNonNull`: **any property still `null` after resolution → whole resolved feature is `null`** (all-or-nothing). Examples: `transparency.operationFees`, `transparency.releaseTransparency.repositoryChangeControls`.
+- `resolveFeatures` (`src/schema/features.ts`) wraps those with `nullable()`, which uses `isNonNull`: **any property still `null` after resolution → whole resolved feature is `null`** (all-or-nothing). Examples: `transparency.operationFees`, `transparency.releaseTransparency.repositoryChangeControls`. For `Support`-wrapped blobs use `Support<WithRef<Nullable<InnerPayload>>>` in `WalletBaseFeatures` (not `Support<Nullable<WithRef<…>>>`) and `nullable<Support<ResolvedShape>>(…)` when resolving (e.g. `artifactSigning`, `chainConfigurability`).
 
 ### Code Quality
 

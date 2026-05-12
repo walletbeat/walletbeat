@@ -30,16 +30,23 @@ export type SignaturePublicationType =
 	| 'ONCHAIN'
 	| 'OTHER_PUBLIC'
 
+/** Signer and publication metadata for artifact signing (without reference). */
+export type ArtifactSigningPayload = {
+	signer: ArtifactSignerType
+	publication: SignaturePublicationType
+}
+
 /**
- * Artifact signing information for a wallet variant.
+ * Artifact signing information for a wallet variant when signing is supported.
  *
- * Uses the common Support shape and carries signer/publication details
- * when signing is supported. Metadata may still be `null` if unknown.
+ * In wallet feature data, use `Support<WithRef<Nullable<ArtifactSigningPayload>>>`
+ * (see `WalletBaseFeatures`) so `ref`, `signer`, or `publication` may be `null`
+ * while research is in progress — matching `chainConfigurability`.
+ *
+ * During resolution, this feature is normalized all-or-nothing: if any field
+ * remains unknown on a supported payload, the resolved value becomes `null`.
  */
-export type ArtifactSigningDetails = WithRef<{
-	signer: ArtifactSignerType | null
-	publication: SignaturePublicationType | null
-}>
+export type ArtifactSigningDetails = WithRef<ArtifactSigningPayload>
 
 export type ArtifactSigning = Support<ArtifactSigningDetails>
 
