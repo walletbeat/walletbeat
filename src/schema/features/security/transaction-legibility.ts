@@ -1,5 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
+import type { Support } from '../support'
 
 /**
  * To test: initiate the relevant transaction type and observe the approval
@@ -432,7 +433,7 @@ export type SoftwareTransactionDetailsDisplay =
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that don't have enough data
+export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataLocation | null> // Allow null for existing wallets that don't have enough data
 
 /**
  * Where does the calldata decoding actually happen?
@@ -440,7 +441,7 @@ export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDe
  * decoded output appears on the hardware wallet's own screen, or only in
  * the companion app / browser extension on the computer.
  */
-export enum DataDecoded {
+export enum DataLocation {
 	/**
 	 * Decoding happens on the hardware wallet device itself.
 	 * The decoded function name and parameters are shown on the device screen,
@@ -455,7 +456,7 @@ export enum DataDecoded {
 	OFF_DEVICE = 'OFF_DEVICE',
 
 	/** No decoding occurs; raw hex calldata is shown (or nothing at all). */
-	NOT_DECODED = 'NOT_DECODED',
+	NOT_PROVIDED = 'NOT_PROVIDED',
 }
 
 /**
@@ -480,8 +481,11 @@ export enum MessageSigningDetails {
 	/** The wallet shows the EIP-712 message hash. */
 	MESSAGE_HASH = 'MESSAGE_HASH',
 
-	/** The wallet shows the Safe-specific transaction hash (used in Safe signing flows). */
-	SAFE_HASH = 'SAFE_HASH',
+	/**
+	 * The wallet shows the EIP-712 digest: the final hash that gets signed:
+	 * `"\x19\x01" ‖ domainSeparator ‖ hashStruct(message)`.
+	 */
+	EIP712_DIGEST = 'EIP712_DIGEST',
 }
 
 /**
@@ -499,29 +503,29 @@ export interface HardwareMessageSigningLegibility {
 	/** Which message signing data types does the wallet provide? */
 	messageSigningDetails: Record<MessageSigningDetails, DataDisplayOptions>
 	/** Where does the message signing data display happen? */
-	decoded: DataDecoded
+	decoded: DataLocation
 }
 /**
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
-	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
+	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataLocation.NOT_PROVIDED,
+	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.NOT_PROVIDED,
+	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataLocation.NOT_PROVIDED,
+	[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DataLocation.NOT_PROVIDED,
+	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataLocation.NOT_PROVIDED,
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-		DataDecoded.NOT_DECODED,
+		DataLocation.NOT_PROVIDED,
 }
 
 /**
  * Returns whether the given calldata decoding types support any decoding at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some(v => v !== DataDecoded.NOT_DECODED)
+	return Object.values(calldataDecodingTypes).some(v => v !== DataLocation.NOT_PROVIDED)
 }
 
 /**
@@ -583,13 +587,32 @@ export function isSupportedOnDevice(
 	legibility: CalldataDecodingTypes,
 	decoding: HardwareBenchmarkTransactions,
 ): boolean {
-	return legibility[decoding] === DataDecoded.ON_DEVICE
+	return legibility[decoding] === DataLocation.ON_DEVICE
+}
+
+export interface HardwareWalletErc8213 {
+	calldataDisplay: Record<
+		CallDataDisplay,
+		DisplayCapability
+	> | null
+
+	messageSigningLegibility: Record<
+		MessageSigningDetails,
+		DisplayCapability
+	> | null
+}
+
+type DisplayCapability = {
+	display: DataDisplayOptions
+	location: DataLocation
 }
 
 /**
  * A record of transaction legibility support (both message and transaction)
  */
-export interface HardwareTransactionLegibilitySupport {
+export interface HardwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
+	erc8213: Support<HardwareWalletErc8213> | null,
+
 	/**
 	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
 	 */
@@ -608,6 +631,13 @@ export interface HardwareTransactionLegibilitySupport {
 	 * What message signing data does the hardware wallet provide and where is it displayed?
 	 */
 	messageSigningLegibility: HardwareMessageSigningLegibility | null
+
+	/**
+	 * Does the hardware wallet display the calldata digest (`keccak256(len(calldata) ‖ calldata)`)
+	 * as defined by ERC-8213, and if so, where?
+	 * Must be ON_DEVICE for a passing rating.
+	 */
+	calldataDigest: DataLocation | null
 }
 
 /**
@@ -618,41 +648,31 @@ export interface HardwareTransactionLegibilitySupport {
  * Users can test on https://beta.walletbeat.eth.limo/test and
  * test a USDC approval transaction under `Transactions` tab.
  */
-export interface CallDataDisplay {
-	/**
-	 * The raw `0x...` hex calldata is visible somewhere on the approval screen.
-	 * To test: look for a hex string starting with `0x` on the approval screen
-	 * or in an expandable section.
-	 */
-	rawHex: boolean
-
-	/**
-	 * A dedicated button copies the raw hex calldata to the clipboard.
-	 * For batched transactions, the full hex including the multicall wrapper is expected.
-	 * To test: look for a copy icon or "Copy" button next to the calldata.
-	 */
-	copyHexToClipboard: boolean
-
-	/**
-	 * The calldata is decoded into a human-readable function name and arguments
-	 * (e.g. JSON or structured text), not just raw hex.
-	 * For batched transactions, each inner call should be decoded individually.
-	 * To test: check if the wallet shows the function name (e.g. `approve`) and
-	 * parameters (e.g. spender address, amount) in a readable format.
-	 */
-	formatted: boolean
+export enum CallDataDisplay {
+	RAW_HEX= 'RAW_HEX',
+	COPY_HEX_TO_CLIPBOARD = 'COPY_HEX_TO_CLIPBOARD',
+	FORMATTED = 'FORMATTED',
+	CALLDATA_DIGEST = 'CALLDATA_DIGEST'
 }
 
 export const displaysFullCallData: CallDataDisplay = {
 	rawHex: true,
 	copyHexToClipboard: true,
 	formatted: true,
+	calldataDigest: true,
+}
+
+export interface SoftwareWalletErc8213 {
+	calldataDisplay: Record<CallDataDisplay, DataDisplayOptions> | null
+	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 }
 
 /**
  * A record of transaction legibility support (both message and transaction)
  */
-export interface SoftwareTransactionLegibilitySupport {
+export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
+	erc8213: Support<SoftwareWalletErc8213> | null,
+
 	/**
 	 * Does the software wallet support displaying the calldata in different formats?
 	 */
@@ -694,6 +714,10 @@ export function isHardwareTransactionLegibility(
 	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
 	// between the two types:
 	return Object.hasOwn(transactionLegibility, 'dataExtraction')
+}
+
+export interface BaseTransactionLegibilitySupport {
+	erc8213: Support | null
 }
 
 export type HardwareTransactionLegibilityImplementation =
