@@ -15,22 +15,22 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-type SupplyLevel = 'fail' | 'partial' | 'pass'
+type AdvancedGroupLevel = 'fail' | 'partial' | 'pass'
 
-type ProcessSignals = {
+type BasicSignals = {
 	changelog: boolean
 	locking: boolean
 	pass: boolean
 }
 
-type SupplySignals = {
+type AdvancedSignals = {
 	signing: boolean
 	builds: boolean
-	level: SupplyLevel
+	level: AdvancedGroupLevel
 }
 
-type ProcessSignalPresence = Pick<ProcessSignals, 'changelog' | 'locking'>
-type SupplySignalPresence = Pick<SupplySignals, 'signing' | 'builds'>
+type BasicSignalPresence = Pick<BasicSignals, 'changelog' | 'locking'>
+type AdvancedSignalPresence = Pick<AdvancedSignals, 'signing' | 'builds'>
 
 type ReleaseTransparencyFeatures =
 	EvaluationContext['features']['transparency']['releaseTransparency']
@@ -40,10 +40,10 @@ type ArtifactSigning = NonNullable<ReleaseTransparencyFeatures['artifactSigning'
 type ReproducibleBuilds = ReleaseTransparencyFeatures['reproducibleBuilds']
 type HermeticBuilds = ReleaseTransparencyFeatures['hermeticBuilds']
 
-function computeProcessSignals(
+function computeBasicSignals(
 	hasPublicChangelog: HasPublicChangelog,
 	dependencyLocking: DependencyLocking,
-): ProcessSignals {
+): BasicSignals {
 	const changelog = isSupported(hasPublicChangelog)
 	const locking = isSupported(dependencyLocking)
 
@@ -54,12 +54,12 @@ function computeProcessSignals(
 	}
 }
 
-function computeSupplySignals(
+function computeAdvancedSignals(
 	artifactSigning: ArtifactSigning,
 	reproducibleBuilds: ReproducibleBuilds,
 	hermeticBuilds: HermeticBuilds,
 	sourceVisible: boolean,
-): SupplySignals {
+): AdvancedSignals {
 	const signing = isSupported(artifactSigning)
 	// Build-integrity claims only count when source is publicly visible,
 	// because external reproducibility checks require source access.
@@ -68,7 +68,8 @@ function computeSupplySignals(
 	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds) && sourceVisible
 	const builds = reproducible || hermetic
 
-	const level: SupplyLevel = signing && builds ? 'pass' : signing || builds ? 'partial' : 'fail'
+	const level: AdvancedGroupLevel =
+		signing && builds ? 'pass' : signing || builds ? 'partial' : 'fail'
 
 	return {
 		signing,
@@ -101,32 +102,32 @@ function getBuildSignalLabel(
 	return null
 }
 
-function missingSupplySignal(supplySignals: SupplySignalPresence): string {
-	if (supplySignals.signing && !supplySignals.builds) {
+function missingAdvancedSignal(advancedSignals: AdvancedSignalPresence): string {
+	if (advancedSignals.signing && !advancedSignals.builds) {
 		return 'reproducible or hermetic builds (with publicly visible source)'
 	}
 
-	if (!supplySignals.signing && supplySignals.builds) {
+	if (!advancedSignals.signing && advancedSignals.builds) {
 		return 'artifact signing'
 	}
 
 	return 'artifact signing and reproducible or hermetic builds (with publicly visible source)'
 }
 
-function missingProcessSignals(processSignals: ProcessSignalPresence): string {
-	if (!processSignals.changelog && !processSignals.locking) {
+function missingBasicSignals(basicSignals: BasicSignalPresence): string {
+	if (!basicSignals.changelog && !basicSignals.locking) {
 		return 'public changelog and dependency locking'
 	}
 
-	if (!processSignals.changelog && processSignals.locking) {
+	if (!basicSignals.changelog && basicSignals.locking) {
 		return 'public changelog'
 	}
 
-	if (processSignals.changelog && !processSignals.locking) {
+	if (basicSignals.changelog && !basicSignals.locking) {
 		return 'dependency locking'
 	}
 
-	throw new Error('No missing process signals')
+	throw new Error('No missing basic signals')
 }
 
 function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
@@ -140,30 +141,30 @@ function pass(ctx: EvaluationContext, supportedSignals: string[]): Evaluation {
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} satisfies all release process signals across process transparency and supply-chain integrity: ${commaListFormat(supportedSignals)}.`,
+			`{{WALLET_NAME}} satisfies all release process signals across the basic and advanced groups: ${commaListFormat(supportedSignals)}.`,
 		),
 	})
 }
 
-function partialProcessPassSupplyFail(
+function partialBasicPassAdvancedFail(
 	ctx: EvaluationContext,
 	supportedSignals: string[],
 ): Evaluation {
 	return ctx.build({
 		outcome: {
-			id: 'partial_process_pass_supply_fail',
+			id: 'partial_basic_pass_advanced_fail',
 			rating: Rating.PARTIAL,
 			score: 0.4,
-			displayName: 'Partial release process (process pass)',
+			displayName: 'Partial release process (basic pass)',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} meets process transparency baseline signals but lacks supply-chain integrity coverage.',
+				'{{WALLET_NAME}} meets basic release-process signals but lacks advanced-group coverage.',
 			),
 		},
 		details: paragraph(
 			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing artifact signing and reproducible or hermetic builds (with publicly visible source).`,
 		),
 		howToImprove: mdParagraph(`
-			To fully pass, **{{WALLET_NAME}}** should add both supply-chain integrity signals:
+			To fully pass, **{{WALLET_NAME}}** should add both advanced signals:
 
 			- **Artifact signing**: sign release artifacts so users can verify they have not
 			  been tampered with.
@@ -174,90 +175,90 @@ function partialProcessPassSupplyFail(
 	})
 }
 
-function partialProcessFailSupplyPartial(
+function partialBasicFailAdvancedPartial(
 	ctx: EvaluationContext,
 	supportedSignals: string[],
-	processSignals: ProcessSignalPresence,
-	supplySignals: SupplySignalPresence,
+	basicSignals: BasicSignalPresence,
+	advancedSignals: AdvancedSignalPresence,
 ): Evaluation {
-	const missingSignal = missingSupplySignal(supplySignals)
-	const missingProcess = missingProcessSignals(processSignals)
+	const missingSignal = missingAdvancedSignal(advancedSignals)
+	const missingBasic = missingBasicSignals(basicSignals)
 
 	return ctx.build({
 		outcome: {
-			id: 'partial_process_fail_supply_partial',
+			id: 'partial_basic_fail_advanced_partial',
 			rating: Rating.PARTIAL,
 			score: 0.6,
-			displayName: 'Partial release process (supply partial)',
+			displayName: 'Partial release process (advanced partial)',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} shows supply-chain integrity coverage but misses ${missingProcess}.`,
+				`{{WALLET_NAME}} shows advanced-group coverage but misses ${missingBasic}.`,
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingProcess} and ${missingSignal}.`,
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingBasic} and ${missingSignal}.`,
 		),
 		howToImprove: mdParagraph(`
 			To fully pass, **{{WALLET_NAME}}** should implement the missing signals:
 
-			- **Missing supply-chain integrity signal**: ${missingSignal}.
-			- **Missing process transparency signal(s)**: ${missingProcess}.
+			- **Missing advanced signal**: ${missingSignal}.
+			- **Missing basic signal(s)**: ${missingBasic}.
 		`),
 	})
 }
 
-function partialProcessFailSupplyPass(
+function partialBasicFailAdvancedPass(
 	ctx: EvaluationContext,
 	supportedSignals: string[],
-	processSignals: ProcessSignalPresence,
+	basicSignals: BasicSignalPresence,
 ): Evaluation {
-	const missingProcess = missingProcessSignals(processSignals)
+	const missingBasic = missingBasicSignals(basicSignals)
 
 	return ctx.build({
 		outcome: {
-			id: 'partial_process_fail_supply_pass',
+			id: 'partial_basic_fail_advanced_pass',
 			rating: Rating.PARTIAL,
-			// Slightly above partial_process_fail_supply_partial because both supply signals are present.
+			// Slightly above partial_basic_fail_advanced_partial because both advanced signals are present.
 			score: 0.65,
-			displayName: 'Partial release process (supply pass)',
+			displayName: 'Partial release process (advanced pass)',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} has strong supply-chain integrity coverage but misses ${missingProcess}.`,
+				`{{WALLET_NAME}} has strong advanced-group coverage but misses ${missingBasic}.`,
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingProcess}.`,
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingBasic}.`,
 		),
 		howToImprove: mdParagraph(`
-			To fully pass, **{{WALLET_NAME}}** should add the process transparency baseline:
+			To fully pass, **{{WALLET_NAME}}** should add the basic signals:
 
-			- **Missing process transparency signal(s)**: ${missingProcess}.
+			- **Missing basic signal(s)**: ${missingBasic}.
 		`),
 	})
 }
 
-function partialProcessPassSupplyPartial(
+function partialBasicPassAdvancedPartial(
 	ctx: EvaluationContext,
 	supportedSignals: string[],
-	supplySignals: SupplySignalPresence,
+	advancedSignals: AdvancedSignalPresence,
 ): Evaluation {
-	const missingSignal = missingSupplySignal(supplySignals)
+	const missingSignal = missingAdvancedSignal(advancedSignals)
 
 	return ctx.build({
 		outcome: {
-			id: 'partial_process_pass_supply_partial',
+			id: 'partial_basic_pass_advanced_partial',
 			rating: Rating.PARTIAL,
 			score: 0.75,
-			displayName: 'Partial release process (process pass, supply partial)',
+			displayName: 'Partial release process (basic pass, advanced partial)',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} meets process transparency baseline signals and partial supply-chain integrity coverage.',
+				'{{WALLET_NAME}} meets basic signals and partial advanced-group coverage.',
 			),
 		},
 		details: paragraph(
 			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing ${missingSignal}.`,
 		),
 		howToImprove: mdParagraph(`
-			To fully pass, **{{WALLET_NAME}}** should add the remaining supply-chain integrity signal:
+			To fully pass, **{{WALLET_NAME}}** should add the remaining advanced signal:
 
-			- **Missing supply-chain integrity signal**: ${missingSignal}.
+			- **Missing advanced signal**: ${missingSignal}.
 		`),
 	})
 }
@@ -272,9 +273,7 @@ function fail(ctx: EvaluationContext): Evaluation {
 				'{{WALLET_NAME}} does not meet release process transparency requirements.',
 			),
 		},
-		details: paragraph(
-			'{{WALLET_NAME}} is missing process transparency baseline signals and supply-chain integrity signals.',
-		),
+		details: paragraph('{{WALLET_NAME}} is missing basic signals and advanced signals.'),
 		howToImprove: mdParagraph(`
 			**{{WALLET_NAME}}** should implement the following release process signals:
 
@@ -310,19 +309,19 @@ export const releaseProcess: Attribute = {
 	methodology: mdParagraph(`
 		Four binary signals are assessed, grouped into two categories:
 
-		**Process transparency** (baseline hygiene):
+		**Basic**:
 		1. **Public changelog**: the wallet publishes release notes or a changelog.
 		2. **Dependency locking**: a lockfile or equivalent pins all dependency versions.
 
-		**Supply-chain integrity** (high-trust):
+		**Advanced**:
 		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
 		4. **Reproducible or hermetic builds**: independent parties can verify that build output matches
 		   source, or the build can run fully offline. This requires public source code.
 
-		A wallet **passes** when both process signals and both supply-chain signals are present.
+		A wallet **passes** when both basic signals and both advanced signals are present.
 		Partial coverage earns a **partial** rating, based on which groups are satisfied.
-		Process signals alone score lower than supply-chain signals alone, reflecting stronger trust from
-		supply-chain integrity evidence. No signals at all earns a **fail**.
+		Basic signals alone score lower than advanced signals alone, reflecting stronger trust from
+		advanced-group evidence. No signals at all earns a **fail**.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -341,7 +340,7 @@ export const releaseProcess: Attribute = {
 				paragraph(
 					'The wallet has a public changelog and dependency locking, but lacks both artifact signing and reproducible or hermetic builds.',
 				),
-				partialProcessPassSupplyFail(
+				partialBasicPassAdvancedFail(
 					EvaluationContext.forTest(() => releaseProcess),
 					['public changelog', 'dependency locking'],
 				),
@@ -350,7 +349,7 @@ export const releaseProcess: Attribute = {
 				paragraph(
 					'The wallet has artifact signing, but no reproducible or hermetic builds, changelog, or dependency locking.',
 				),
-				partialProcessFailSupplyPartial(
+				partialBasicFailAdvancedPartial(
 					EvaluationContext.forTest(() => releaseProcess),
 					['artifact signing'],
 					{ changelog: false, locking: false },
@@ -361,7 +360,7 @@ export const releaseProcess: Attribute = {
 				paragraph(
 					'The wallet has reproducible builds and artifact signing, but lacks changelog and dependency locking.',
 				),
-				partialProcessFailSupplyPass(
+				partialBasicFailAdvancedPass(
 					EvaluationContext.forTest(() => releaseProcess),
 					['reproducible builds', 'artifact signing'],
 					{ changelog: false, locking: false },
@@ -371,7 +370,7 @@ export const releaseProcess: Attribute = {
 				paragraph(
 					'The wallet has a changelog, dependency locking, and artifact signing, but no reproducible or hermetic builds.',
 				),
-				partialProcessPassSupplyPartial(
+				partialBasicPassAdvancedPartial(
 					EvaluationContext.forTest(() => releaseProcess),
 					['public changelog', 'dependency locking', 'artifact signing'],
 					{ signing: true, builds: false },
@@ -379,9 +378,7 @@ export const releaseProcess: Attribute = {
 			),
 		],
 		fail: exampleRating(
-			paragraph(
-				'The wallet lacks both process transparency baseline signals and supply-chain integrity signals.',
-			),
+			paragraph('The wallet lacks both basic signals and advanced signals.'),
 			fail(EvaluationContext.forTest(() => releaseProcess)),
 		),
 	},
@@ -413,7 +410,7 @@ export const releaseProcess: Attribute = {
 
 		// Intentional strict policy: source visibility is required input for this attribute.
 		// We return UNRATED when unknown instead of downgrading builds to unsupported,
-		// to avoid classifying with incomplete supply-chain verifiability context.
+		// to avoid classifying with incomplete advanced-group verifiability context.
 		if (sourceVisible === null) {
 			return unrated(ctx)
 		}
@@ -430,63 +427,63 @@ export const releaseProcess: Attribute = {
 			return unrated(ctx)
 		}
 
-		const processSignals = computeProcessSignals(hasPublicChangelog, dependencyLocking)
-		const supplySignals = computeSupplySignals(
+		const basicSignals = computeBasicSignals(hasPublicChangelog, dependencyLocking)
+		const advancedSignals = computeAdvancedSignals(
 			artifactSigning,
 			rt.reproducibleBuilds,
 			rt.hermeticBuilds,
 			sourceVisible,
 		)
 
-		if (processSignals.changelog) {
+		if (basicSignals.changelog) {
 			ctx.addRef(hasPublicChangelog)
 		}
 
-		if (supplySignals.builds) {
+		if (advancedSignals.builds) {
 			ctx.addRef(rt.reproducibleBuilds, rt.hermeticBuilds)
 		}
 
-		if (supplySignals.signing) {
+		if (advancedSignals.signing) {
 			ctx.addRef(artifactSigning)
 		}
 
-		if (processSignals.locking) {
+		if (basicSignals.locking) {
 			ctx.addRef(dependencyLocking)
 		}
 
 		const buildSignal = getBuildSignalLabel(rt.reproducibleBuilds, rt.hermeticBuilds, sourceVisible)
 
 		const supportedSignals = [
-			processSignals.changelog ? 'public changelog' : null,
+			basicSignals.changelog ? 'public changelog' : null,
 			buildSignal,
-			supplySignals.signing ? 'artifact signing' : null,
-			processSignals.locking ? 'dependency locking' : null,
+			advancedSignals.signing ? 'artifact signing' : null,
+			basicSignals.locking ? 'dependency locking' : null,
 		].filter((signal): signal is string => signal !== null)
 
-		// Classification is group-based (processPass + supplyLevel), not raw signal count.
-		// Strong supply-chain integrity without process baseline remains PARTIAL.
-		if (processSignals.pass) {
-			switch (supplySignals.level) {
+		// Classification is group-based (basic pass + advanced level), not raw signal count.
+		// Strong advanced-group coverage without basic signals remains PARTIAL.
+		if (basicSignals.pass) {
+			switch (advancedSignals.level) {
 				case 'fail':
-					return partialProcessPassSupplyFail(ctx, supportedSignals)
+					return partialBasicPassAdvancedFail(ctx, supportedSignals)
 				case 'partial':
-					return partialProcessPassSupplyPartial(ctx, supportedSignals, supplySignals)
+					return partialBasicPassAdvancedPartial(ctx, supportedSignals, advancedSignals)
 				case 'pass':
 					return pass(ctx, supportedSignals)
 			}
 		} else {
-			switch (supplySignals.level) {
+			switch (advancedSignals.level) {
 				case 'fail':
 					return fail(ctx)
 				case 'partial':
-					return partialProcessFailSupplyPartial(
+					return partialBasicFailAdvancedPartial(
 						ctx,
 						supportedSignals,
-						processSignals,
-						supplySignals,
+						basicSignals,
+						advancedSignals,
 					)
 				case 'pass':
-					return partialProcessFailSupplyPass(ctx, supportedSignals, processSignals)
+					return partialBasicFailAdvancedPass(ctx, supportedSignals, basicSignals)
 			}
 		}
 	},
