@@ -350,15 +350,19 @@ export function licenseSourceIsVisible(license: License): license is SourceAvail
  * - `null`: licensing data is missing, so visibility cannot be determined.
  */
 export function isSourcePubliclyVisible(licensing: ResolvedWalletLicensing): boolean | null {
-	if (licensing === null || licensing.walletAppLicense === null) {
+	if (licensing === null) {
 		return null
 	}
 
 	switch (licensing.type) {
 		case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
+			if (licensing.walletAppLicense === null) {
+				return null
+			}
+
 			return licenseSourceIsVisible(licensing.walletAppLicense.license)
 		case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
-			if (licensing.coreLicense === null) {
+			if (licensing.coreLicense === null || licensing.walletAppLicense === null) {
 				return null
 			}
 
