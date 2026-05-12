@@ -10,23 +10,25 @@ import {
 	BasicBenchmarkTransactions,
 	benchmarkTransactionLabel,
 	benchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
-	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
-	type HardwareMessageSigningLegibility,
+	DataLocation,
 	type HardwareTransactionLegibilityImplementation,
+	type HardwareWalletErc8213,
 	isFullBasicTransactionDetails,
 	isHardwareTransactionLegibility,
 	isSupportedOnDevice,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
-	type SoftwareMessageSigningLegibility,
 	type SoftwareTransactionLegibilityImplementation,
+	type SoftwareWalletErc8213,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
+import { isSupported, type Support } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
