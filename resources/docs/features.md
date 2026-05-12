@@ -3730,14 +3730,10 @@ type SignaturePublicationType = 'GITHUB_RELEASE' | 'SIGSTORE_REKOR' | 'ONCHAIN' 
 
 ### Type: `ArtifactSigningPayload`
 
-Signer and publication metadata for artifact signing (no reference).
+Signer and publication metadata for artifact signing (without reference).
 
-```typescript
-type ArtifactSigningPayload = {
-	signer: ArtifactSignerType
-	publication: SignaturePublicationType
-}
-```
+- `signer` (`ArtifactSignerType`)
+- `publication` (`SignaturePublicationType`)
 
 ---
 
@@ -3745,7 +3741,7 @@ type ArtifactSigningPayload = {
 
 Artifact signing information for a wallet variant when signing is supported.
 
-In `WalletBaseFeatures`, this appears under `Support<WithRef<Nullable<ArtifactSigningPayload>>>`, so `ref`, `signer`, or `publication` may be `null` in source data while research is in progress.
+In wallet feature data, use `Support<WithRef<Nullable<ArtifactSigningPayload>>>` (see `WalletBaseFeatures`) so `ref`, `signer`, or `publication` may be `null` while research is in progress — matching `chainConfigurability`.
 
 During resolution, this feature is normalized all-or-nothing: if any field remains unknown on a supported payload, the resolved value becomes `null`.
 
@@ -3787,7 +3783,7 @@ type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 Observable repository-level change controls for the wallet's source repository.
 
-In `WalletBaseFeatures`, this appears as `VariantFeature<Nullable<RepositoryChangeControls>>`, so sub-fields may be `null` in source data while research is in progress.
+In wallet feature data, use `Nullable<RepositoryChangeControls>` (see `WalletBaseFeatures`) so sub-fields may be `null` while research is in progress.
 
 During resolution, this feature is normalized all-or-nothing: if any sub-field remains unknown, the resolved value becomes `null`.
 

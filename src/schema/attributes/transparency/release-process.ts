@@ -263,7 +263,40 @@ function partialBasicPassAdvancedPartial(
 	})
 }
 
-function fail(ctx: EvaluationContext): Evaluation {
+function fail(ctx: EvaluationContext, basicSignals: BasicSignalPresence): Evaluation {
+	// When advancedSignals.level is 'fail', only basic signals can appear in the
+	// "supported" list; advanced slots are always empty at the evaluate() call site.
+	const supportedBasicSignals = [
+		basicSignals.changelog ? 'public changelog' : null,
+		basicSignals.locking ? 'dependency locking' : null,
+	].filter((signal): signal is string => signal !== null)
+
+	const detailsText =
+		supportedBasicSignals.length === 0
+			? '{{WALLET_NAME}} is missing basic signals and advanced signals.'
+			: `{{WALLET_NAME}} supports ${commaListFormat(supportedBasicSignals)}, but is missing ${missingBasicSignals(basicSignals)} and advanced signals.`
+
+	const bullets: string[] = []
+
+	if (!basicSignals.changelog) {
+		bullets.push('- **Public changelog**: publish release notes or a changelog for each release.')
+	}
+
+	if (!basicSignals.locking) {
+		bullets.push(
+			'- **Dependency locking**: use a lockfile (or equivalent) to pin all dependencies to known versions.',
+		)
+	}
+
+	bullets.push(
+		'- **Reproducible or hermetic builds**: ensure independent parties can rebuild the same source to obtain a byte-for-byte identical artifact, or that the build can run fully offline from a pre-fetched, integrity-verified input set.',
+		'- **Artifact signing**: sign release artifacts so users can verify they have not been tampered with.',
+	)
+
+	// Subsequent bullets are prefixed with the same leading tabs as the template
+	// literal's content so trimWhitespacePrefix can strip them uniformly.
+	const bulletsBlock = bullets.join('\n\t\t\t')
+
 	return ctx.build({
 		outcome: {
 			id: 'fail',
@@ -273,18 +306,11 @@ function fail(ctx: EvaluationContext): Evaluation {
 				'{{WALLET_NAME}} does not meet release process transparency requirements.',
 			),
 		},
-		details: paragraph('{{WALLET_NAME}} is missing basic signals and advanced signals.'),
+		details: paragraph(detailsText),
 		howToImprove: mdParagraph(`
-			**{{WALLET_NAME}}** should implement the following release process signals:
+			**{{WALLET_NAME}}** should implement the missing release process signals:
 
-			- **Public changelog**: publish release notes or a changelog for each release.
-			- **Reproducible or hermetic builds**: ensure independent parties can rebuild
-			  the same source to obtain a byte-for-byte identical artifact, or that the
-			  build can run fully offline from a pre-fetched, integrity-verified input set.
-			- **Artifact signing**: sign release artifacts so users can verify they have not
-			  been tampered with.
-			- **Dependency locking**: use a lockfile (or equivalent) to pin all dependencies
-			  to known versions.
+			${bulletsBlock}
 		`),
 	})
 }
@@ -377,10 +403,24 @@ export const releaseProcess: Attribute = {
 				),
 			),
 		],
-		fail: exampleRating(
-			paragraph('The wallet lacks both basic signals and advanced signals.'),
-			fail(EvaluationContext.forTest(() => releaseProcess)),
-		),
+		fail: [
+			exampleRating(
+				paragraph(
+					'The wallet has a public changelog, but lacks dependency locking, artifact signing, and reproducible or hermetic builds.',
+				),
+				fail(
+					EvaluationContext.forTest(() => releaseProcess),
+					{ changelog: true, locking: false },
+				),
+			),
+			exampleRating(
+				paragraph('The wallet lacks both basic signals and advanced signals.'),
+				fail(
+					EvaluationContext.forTest(() => releaseProcess),
+					{ changelog: false, locking: false },
+				),
+			),
+		],
 	},
 	exempted: (ctx: EvaluationContext, _metadata: WalletMetadata) => {
 		if (ctx.features.type === WalletType.HARDWARE) {
@@ -474,7 +514,7 @@ export const releaseProcess: Attribute = {
 		} else {
 			switch (advancedSignals.level) {
 				case 'fail':
-					return fail(ctx)
+					return fail(ctx, basicSignals)
 				case 'partial':
 					return partialBasicFailAdvancedPartial(
 						ctx,
