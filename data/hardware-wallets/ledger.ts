@@ -199,7 +199,7 @@ export const ledgerWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
-				messageSigningLegibility: null,
+				erc8213: null,
 			},
 			userSafety: null,
 		},

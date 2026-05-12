@@ -238,7 +238,7 @@ export const bitboxWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				messageSigningLegibility: null,
+				erc8213: null,
 			},
 			userSafety: null,
 		},
