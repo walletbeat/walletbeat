@@ -328,7 +328,13 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
 		if (ctx.features.type === WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
+			return exempt(
+				ctx,
+				sentence(
+					'This attribute is not applicable to hardware wallets because hardware wallets rely on dedicated secure hardware.',
+				),
+				{ library: null },
+			)
 		}
 
 		const passkeyVerification = ctx.features.security.passkeyVerification
