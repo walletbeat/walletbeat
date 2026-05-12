@@ -1,5 +1,3 @@
-import type { Nullable } from '@/types/utils/nullable'
-
 import type { MustRef, WithRef } from '../../reference'
 import type { Support } from '../support'
 
@@ -59,23 +57,24 @@ export type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 /**
  * Observable repository-level change controls for the wallet's source
- * repository. Sub-fields may be `null` in source data while research is in
+ * repository.
+ *
+ * In wallet feature data, use `Nullable<RepositoryChangeControls>` (see
+ * `WalletBaseFeatures`) so sub-fields may be `null` while research is in
  * progress.
  *
  * During resolution, this feature is normalized all-or-nothing: if any
  * sub-field remains unknown, the resolved value becomes `null`.
  */
-export type RepositoryChangeControls = Nullable<
-	WithRef<{
-		/** Whether protected branch rules require an approving review before merge. */
-		requiredReview: boolean
-		/** Whether protected branch rules require status checks to pass before merge. */
-		requiredChecks: boolean
-		/** Whether force-push is blocked on protected branches. */
-		forcePushBlocked: boolean
-		/** Whether deletion is blocked on protected branches. */
-		branchDeletionBlocked: boolean
-		/** Whether release tags are protected / immutable. */
-		tagsImmutable: boolean
-	}>
->
+export type RepositoryChangeControls = WithRef<{
+	/** Whether protected branch rules require an approving review before merge. */
+	requiredReview: boolean
+	/** Whether protected branch rules require status checks to pass before merge. */
+	requiredChecks: boolean
+	/** Whether force-push is blocked on protected branches. */
+	forcePushBlocked: boolean
+	/** Whether deletion is blocked on protected branches. */
+	branchDeletionBlocked: boolean
+	/** Whether release tags are protected / immutable. */
+	tagsImmutable: boolean
+}>

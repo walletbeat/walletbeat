@@ -179,7 +179,7 @@ export interface WalletBaseFeatures {
 			dependencyVulnerabilityScanning: VariantFeature<DependencyVulnerabilityScanning>
 			hasPublicChangelog: VariantFeature<HasPublicChangelog>
 			hermeticBuilds: VariantFeature<HermeticBuilds>
-			repositoryChangeControls: VariantFeature<RepositoryChangeControls>
+			repositoryChangeControls: VariantFeature<Nullable<RepositoryChangeControls>>
 			reproducibleBuilds: VariantFeature<ReproducibleBuilds>
 		}
 	}

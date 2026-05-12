@@ -112,3 +112,13 @@ Unlike `Variant` and `WalletType`, a single wallet (regardless of how many `Vari
 
   `VariantFeature<T>` data is later resolved to `ResolvedFeature<T>` as part of the wallet evaluation processing pipeline.
   This pass normalizes `VariantFeature` data so that all of them are either `null`, or maps from `Variant` to feature data.
+
+### Nullable feature blobs (partial research)
+
+Some features allow **per-field unknowns** while `/data` is still being filled in. For those, `WalletBaseFeatures` uses `VariantFeature<Nullable<F>>` (see `Nullable<F>` in `src/types/utils/nullable.ts`): the whole blob may be `null`, or **any** property of `F` may be `null` until research is complete.
+
+Export the **complete** shape as plain `F` from the feature module (e.g. `BasicOperationFees`, `RepositoryChangeControls`). Put `Nullable<…>` on the **`WalletBaseFeatures` field**, not on the exported type alias, so attribute code has one obvious “full object” type.
+
+`ResolvedFeatures` lists `ResolvedFeature<F>` for those fields: attributes treat the value as **either** a full `F` **or** absent (`null`), not a partially filled object.
+
+In `resolveFeatures` (`src/schema/features.ts`), those entries are wrapped with `nullable()`, which uses `isNonNull` (`src/types/utils/nullable.ts`): **if any property is still `null` after resolution, the entire resolved feature becomes `null`** (all-or-nothing). Examples: `transparency.operationFees`, `transparency.releaseTransparency.repositoryChangeControls`.

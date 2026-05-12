@@ -109,7 +109,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`VariantFeature<HermeticBuilds>`)
-    - `repositoryChangeControls` (`VariantFeature<RepositoryChangeControls>`)
+    - `repositoryChangeControls` (`VariantFeature<Nullable<RepositoryChangeControls>>`)
     - `reproducibleBuilds` (`VariantFeature<ReproducibleBuilds>`)
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
@@ -3773,25 +3773,25 @@ type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 ### Type: `RepositoryChangeControls`
 
-Observable repository-level change controls for the wallet's source repository. Sub-fields may be `null` in source data while research is in progress.
+Observable repository-level change controls for the wallet's source repository.
+
+In `WalletBaseFeatures`, this appears as `VariantFeature<Nullable<RepositoryChangeControls>>`, so sub-fields may be `null` in source data while research is in progress.
 
 During resolution, this feature is normalized all-or-nothing: if any sub-field remains unknown, the resolved value becomes `null`.
 
 ```typescript
-type RepositoryChangeControls = Nullable<
-	WithRef<{
-		/** Whether protected branch rules require an approving review before merge. */
-		requiredReview: boolean
-		/** Whether protected branch rules require status checks to pass before merge. */
-		requiredChecks: boolean
-		/** Whether force-push is blocked on protected branches. */
-		forcePushBlocked: boolean
-		/** Whether deletion is blocked on protected branches. */
-		branchDeletionBlocked: boolean
-		/** Whether release tags are protected / immutable. */
-		tagsImmutable: boolean
-	}>
->
+type RepositoryChangeControls = WithRef<{
+	/** Whether protected branch rules require an approving review before merge. */
+	requiredReview: boolean
+	/** Whether protected branch rules require status checks to pass before merge. */
+	requiredChecks: boolean
+	/** Whether force-push is blocked on protected branches. */
+	forcePushBlocked: boolean
+	/** Whether deletion is blocked on protected branches. */
+	branchDeletionBlocked: boolean
+	/** Whether release tags are protected / immutable. */
+	tagsImmutable: boolean
+}>
 ```
 
 ---
