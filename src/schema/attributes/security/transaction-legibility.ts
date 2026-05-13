@@ -39,71 +39,32 @@ import { pickWorstRating, unrated } from '../common'
 
 /**
  * Evaluates if software wallet message signing meets PASS criteria.
- * PASS if showing: EIP-712 struct OR (domainHash & messageHash) OR safeHash
+ * PASS requires: EIP-712 digest shown (per ERC-8213).
  */
 function evaluateSoftwareMessageSigning(
-	messageSigningLegibility: SoftwareMessageSigningLegibility,
+	msgSigning: NonNullable<SoftwareWalletErc8213['messageSigningLegibility']>,
 ): boolean {
-	if (messageSigningLegibility === null) {
-		return false
-	}
-
-	const hasEip712Struct =
-		messageSigningLegibility[MessageSigningDetails.EIP712_STRUCT] ===
-			DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		messageSigningLegibility[MessageSigningDetails.EIP712_STRUCT] ===
-			DataDisplayOptions.SHOWN_OPTIONALLY
-	const hasDomainHash =
-		messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH] ===
-			DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH] ===
-			DataDisplayOptions.SHOWN_OPTIONALLY
-	const hasMessageHash =
-		messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH] ===
-			DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH] ===
-			DataDisplayOptions.SHOWN_OPTIONALLY
-	const hasSafeHash =
-		messageSigningLegibility[MessageSigningDetails.SAFE_HASH] ===
-			DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		messageSigningLegibility[MessageSigningDetails.SAFE_HASH] ===
-			DataDisplayOptions.SHOWN_OPTIONALLY
-
-	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
-	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
+	return (
+		msgSigning[MessageSigningDetails.EIP712_DIGEST] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		msgSigning[MessageSigningDetails.EIP712_DIGEST] === DataDisplayOptions.SHOWN_OPTIONALLY
+	)
 }
 
 /**
  * Evaluates if hardware wallet message signing meets PASS criteria.
- * PASS if showing: (EIP-712 struct OR (domainHash & messageHash) OR safeHash) AND on-device
+ * PASS requires: EIP-712 digest shown ON_DEVICE (per ERC-8213).
  */
 function evaluateHardwareMessageSigning(
-	messageSigningLegibility: HardwareMessageSigningLegibility,
+	msgSigning: NonNullable<HardwareWalletErc8213['messageSigningLegibility']>,
 ): boolean {
-	if (messageSigningLegibility === null) {
-		return false
-	}
+	const digestCapability = msgSigning[MessageSigningDetails.EIP712_DIGEST]
 
-	if (messageSigningLegibility.decoded !== DataDecoded.ON_DEVICE) {
-		return false
-	}
-
-	const provides = messageSigningLegibility.messageSigningDetails
-	const hasEip712Struct =
-		provides[MessageSigningDetails.EIP712_STRUCT] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		provides[MessageSigningDetails.EIP712_STRUCT] === DataDisplayOptions.SHOWN_OPTIONALLY
-	const hasDomainHash =
-		provides[MessageSigningDetails.DOMAIN_HASH] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		provides[MessageSigningDetails.DOMAIN_HASH] === DataDisplayOptions.SHOWN_OPTIONALLY
-	const hasMessageHash =
-		provides[MessageSigningDetails.MESSAGE_HASH] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		provides[MessageSigningDetails.MESSAGE_HASH] === DataDisplayOptions.SHOWN_OPTIONALLY
-	const hasSafeHash =
-		provides[MessageSigningDetails.SAFE_HASH] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-		provides[MessageSigningDetails.SAFE_HASH] === DataDisplayOptions.SHOWN_OPTIONALLY
-
-	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
-	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
+	return (
+		digestCapability !== undefined &&
+		digestCapability.location === DataLocation.ON_DEVICE &&
+		(digestCapability.display === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			digestCapability.display === DataDisplayOptions.SHOWN_OPTIONALLY)
+	)
 }
 
 // Hardware wallet detail generation helpers
@@ -111,7 +72,7 @@ interface HardwareFeatureDetails {
 	calldataDecoding: {
 		supported: string[]
 		missing: string[]
-		decodedLocation: DataDecoded | null
+		decodedLocation: DataLocation | null
 	}
 	transactionDetails: {
 		supported: string[]
@@ -124,21 +85,22 @@ interface HardwareFeatureDetails {
 	messageSigning: {
 		supported: string[]
 		missing: string[]
-		decodedLocation: DataDecoded | null
+		decodedLocation: DataLocation | null
 	}
+	calldataDigest: DataLocation | null
 }
 
-function analyzeHardwareFeatures({
-	calldataDecoded,
-	detailsDisplayed,
-	dataExtraction,
-	messageSigningLegibility,
-}: HardwareTransactionLegibilityImplementation): HardwareFeatureDetails {
+function analyzeHardwareFeatures(
+	{ calldataDecoded, detailsDisplayed, dataExtraction }: HardwareTransactionLegibilityImplementation,
+	calldataDigestLocation: DataLocation | null,
+	messageSigningLegibility: HardwareWalletErc8213['messageSigningLegibility'] | null,
+): HardwareFeatureDetails {
 	const details: HardwareFeatureDetails = {
 		calldataDecoding: { supported: [], missing: [], decodedLocation: null },
 		transactionDetails: { supported: [], missing: [] },
 		dataExtraction: { supported: [], missing: [] },
 		messageSigning: { supported: [], missing: [], decodedLocation: null },
+		calldataDigest: calldataDigestLocation,
 	}
 
 	// Analyze calldata decoding
@@ -147,7 +109,7 @@ function analyzeHardwareFeatures({
 
 		// Track decoded location for calldata decoding
 		// If any supported decoding is ON_DEVICE, show ON_DEVICE; otherwise show OFF_DEVICE if any are supported
-		let calldataDecodedLocation: DataDecoded | null = null
+		let calldataDecodedLocation: DataLocation | null = null
 		let hasOnDeviceDecoding = false
 		let hasOffDeviceDecoding = false
 
@@ -155,8 +117,8 @@ function analyzeHardwareFeatures({
 			const label = benchmarkTransactionLabel(key)
 			const decodedLocation = calldataDecoded[key]
 
-			if (decodedLocation !== DataDecoded.NOT_DECODED) {
-				if (decodedLocation === DataDecoded.ON_DEVICE) {
+			if (decodedLocation !== DataLocation.NOT_PROVIDED) {
+				if (decodedLocation === DataLocation.ON_DEVICE) {
 					hasOnDeviceDecoding = true
 				} else {
 					hasOffDeviceDecoding = true
@@ -174,9 +136,9 @@ function analyzeHardwareFeatures({
 
 		// Prefer ON_DEVICE if any decoding is ON_DEVICE, otherwise use OFF_DEVICE if any are supported
 		if (hasOnDeviceDecoding) {
-			calldataDecodedLocation = DataDecoded.ON_DEVICE
+			calldataDecodedLocation = DataLocation.ON_DEVICE
 		} else if (hasOffDeviceDecoding) {
-			calldataDecodedLocation = DataDecoded.OFF_DEVICE
+			calldataDecodedLocation = DataLocation.OFF_DEVICE
 		}
 
 		details.calldataDecoding.decodedLocation = calldataDecodedLocation
@@ -221,33 +183,35 @@ function analyzeHardwareFeatures({
 
 	// Analyze message signing
 	if (messageSigningLegibility !== null) {
-		const provides = messageSigningLegibility.messageSigningDetails
-		const decodedLocation = messageSigningLegibility.decoded
-		const onDevice = decodedLocation === DataDecoded.ON_DEVICE
-
-		details.messageSigning.decodedLocation = decodedLocation
+		const provides = messageSigningLegibility
 
 		const signingChecks = [
 			{ key: MessageSigningDetails.EIP712_STRUCT, label: 'EIP-712 structured data' },
 			{ key: MessageSigningDetails.DOMAIN_HASH, label: 'Domain hash' },
 			{ key: MessageSigningDetails.MESSAGE_HASH, label: 'Message hash' },
-			{ key: MessageSigningDetails.SAFE_HASH, label: 'Safe hash' },
+			{ key: MessageSigningDetails.EIP712_DIGEST, label: 'EIP-712 digest' },
 		]
 
-		if (onDevice) {
-			signingChecks.forEach(({ key, label }) => {
-				if (
-					provides[key] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-					provides[key] === DataDisplayOptions.SHOWN_OPTIONALLY
-				) {
-					details.messageSigning.supported.push(label)
-				} else {
-					details.messageSigning.missing.push(label)
-				}
-			})
-		} else {
-			details.messageSigning.missing.push('On-device message signing display')
-		}
+		// Determine if any are on-device
+		const anyOnDevice = Object.values(provides).some(cap => cap.location === DataLocation.ON_DEVICE)
+
+		details.messageSigning.decodedLocation = anyOnDevice
+			? DataLocation.ON_DEVICE
+			: DataLocation.OFF_DEVICE
+
+		signingChecks.forEach(({ key, label }) => {
+			const cap = provides[key]
+
+			if (
+				cap.location === DataLocation.ON_DEVICE &&
+				(cap.display === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+					cap.display === DataDisplayOptions.SHOWN_OPTIONALLY)
+			) {
+				details.messageSigning.supported.push(label)
+			} else {
+				details.messageSigning.missing.push(label)
+			}
+		})
 	}
 
 	return details
@@ -263,9 +227,9 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 	) {
 		sections.push('**Calldata Decoding**\n')
 
-		if (features.calldataDecoding.decodedLocation === DataDecoded.ON_DEVICE) {
+		if (features.calldataDecoding.decodedLocation === DataLocation.ON_DEVICE) {
 			sections.push('Decoded on-device.\n')
-		} else if (features.calldataDecoding.decodedLocation === DataDecoded.OFF_DEVICE) {
+		} else if (features.calldataDecoding.decodedLocation === DataLocation.OFF_DEVICE) {
 			sections.push('Decoded off-device.\n')
 		}
 
@@ -278,13 +242,26 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 		}
 	}
 
+	// Calldata digest section (ERC-8213)
+	if (features.calldataDigest !== null) {
+		sections.push('\n**Calldata digest (ERC-8213)**\n')
+
+		if (features.calldataDigest === DataLocation.ON_DEVICE) {
+			sections.push('✓ Calldata digest displayed on-device.\n')
+		} else if (features.calldataDigest === DataLocation.OFF_DEVICE) {
+			sections.push('⚠ Calldata digest displayed off-device only.\n')
+		} else {
+			sections.push('✗ Calldata digest not shown.\n')
+		}
+	}
+
 	// Message Signing section
 	if (features.messageSigning.supported.length > 0 || features.messageSigning.missing.length > 0) {
 		sections.push('\n**Message Signing**\n')
 
-		if (features.messageSigning.decodedLocation === DataDecoded.ON_DEVICE) {
+		if (features.messageSigning.decodedLocation === DataLocation.ON_DEVICE) {
 			sections.push('Displayed on-device.\n')
-		} else if (features.messageSigning.decodedLocation === DataDecoded.OFF_DEVICE) {
+		} else if (features.messageSigning.decodedLocation === DataLocation.OFF_DEVICE) {
 			sections.push('Displayed off-device.\n')
 		}
 
@@ -295,6 +272,28 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 		if (features.messageSigning.missing.length > 0) {
 			sections.push(`✗ Missing: ${commaListFormat(features.messageSigning.missing)}\n`)
 		}
+	}
+
+	// ERC-8213 compliance summary
+	const calldataDigestOnDevice = features.calldataDigest === DataLocation.ON_DEVICE
+	const eip712DigestOnDevice = features.messageSigning.supported.includes('EIP-712 digest')
+	const erc8213Full = calldataDigestOnDevice && eip712DigestOnDevice
+	const erc8213Partial = calldataDigestOnDevice || eip712DigestOnDevice
+
+	sections.push('\n**ERC-8213 Compliance**\n')
+
+	if (erc8213Full) {
+		sections.push(
+			'✓ Fully implemented on-device: Calldata digest and EIP-712 digest are both shown.\n',
+		)
+	} else if (erc8213Partial) {
+		sections.push(
+			`⚠ Partial: ${calldataDigestOnDevice ? '✓ Calldata digest (on-device)' : '✗ Calldata digest'}, ${eip712DigestOnDevice ? '✓ EIP-712 digest (on-device)' : '✗ EIP-712 digest'}.\n`,
+		)
+	} else {
+		sections.push(
+			'✗ Not implemented: Neither Calldata digest nor EIP-712 digest is shown on-device.\n',
+		)
 	}
 
 	return sections.join('\n')
@@ -315,7 +314,7 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 		}
 	}
 
-	if (features.calldataDecoding.decodedLocation === DataDecoded.OFF_DEVICE) {
+	if (features.calldataDecoding.decodedLocation === DataLocation.OFF_DEVICE) {
 		improvements.push(
 			"**Calldata Decoding:** Move decoding on-device so users don't have to trust a potentially compromised companion app.",
 		)
@@ -327,7 +326,7 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 		)
 	}
 
-	if (features.messageSigning.decodedLocation === DataDecoded.OFF_DEVICE) {
+	if (features.messageSigning.decodedLocation === DataLocation.OFF_DEVICE) {
 		improvements.push(
 			'**Message Signing:** Display message signing details on-device to prevent host software from altering what the user thinks they are approving.',
 		)
@@ -345,19 +344,58 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 		)
 	}
 
+	const erc8213Missing: string[] = []
+
+	if (features.calldataDigest !== DataLocation.ON_DEVICE) {
+		erc8213Missing.push(
+			features.calldataDigest === DataLocation.OFF_DEVICE
+				? '**Calldata digest:** Move on-device, the digest must appear on the hardware screen, not only in companion software.'
+				: '**Calldata digest:** Show `keccak256(len(calldata) || calldata)` on the device screen so users can independently verify the calldata.',
+		)
+	}
+
+	if (!features.messageSigning.supported.includes('EIP-712 digest')) {
+		erc8213Missing.push(
+			'**EIP-712 digest:** Show the final `"\\x19\\x01" || domainSeparator || hashStruct(message)` hash on the device screen during typed message signing.',
+		)
+	}
+
+	if (erc8213Missing.length > 0) {
+		improvements.push(
+			`**ERC-8213 Implementation:** Implement the following on-device to fully comply with ERC-8213:\n${erc8213Missing.map(m => `- ${m}`).join('\n')}`,
+		)
+	}
+
 	if (improvements.length === 0) {
-		return 'No improvements needed - the wallet implements full transaction legibility.'
+		return 'No improvements needed: The wallet implements full transaction legibility including ERC-8213.'
 	}
 
 	return improvements.join('\n\n')
 }
 
 // Hardware wallet evaluation helpers
+function unwrapHardwareErc8213(support: HardwareTransactionLegibilityImplementation): {
+	calldataDigestLocation: DataLocation | null
+	messageSigningLegibility: HardwareWalletErc8213['messageSigningLegibility'] | null
+} {
+	const erc8213Data =
+		support.erc8213 !== null && isSupported(support.erc8213) ? support.erc8213 : null
+	let calldataDigestLocation: DataLocation | null = null
+	if (erc8213Data !== null && erc8213Data.calldataDisplay !== null) {
+		calldataDigestLocation =
+			erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
+	}
+	const messageSigningLegibility =
+		erc8213Data !== null ? erc8213Data.messageSigningLegibility : null
+	return { calldataDigestLocation, messageSigningLegibility }
+}
+
 function hardwareNoTransactionLegibility(
 	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
-	const features = analyzeHardwareFeatures(support)
+	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
+	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -383,7 +421,8 @@ function hardwareBasicTransactionLegibility(
 	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
-	const features = analyzeHardwareFeatures(support)
+	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
+	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -409,7 +448,8 @@ function hardwarePartialTransactionLegibility(
 	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
-	const features = analyzeHardwareFeatures(support)
+	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
+	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -435,7 +475,8 @@ function hardwareFullTransactionLegibility(
 	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
-	const features = analyzeHardwareFeatures(support)
+	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
+	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 
 	return ctx.build({
@@ -468,34 +509,55 @@ interface SoftwareFeatureDetails {
 		supported: string[]
 		missing: string[]
 	}
+	erc8213: {
+		calldataDigest: boolean
+		eip712Digest: boolean
+	}
 }
 
 function analyzeSoftwareFeatures({
-	calldataDisplay,
+	erc8213,
 	transactionDetailsDisplay,
-	messageSigningLegibility,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
+	const erc8213Data = erc8213 !== null && isSupported(erc8213) ? erc8213 : null
+	const calldataDisplay = erc8213Data !== null ? erc8213Data.calldataDisplay : null
+	const messageSigningLegibility = erc8213Data !== null ? erc8213Data.messageSigningLegibility : null
+
+	const isDisplayed = (opt: DataDisplayOptions): boolean =>
+		opt === DataDisplayOptions.SHOWN_BY_DEFAULT || opt === DataDisplayOptions.SHOWN_OPTIONALLY
+
+	const erc8213CalldataDigest =
+		calldataDisplay !== null && isDisplayed(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])
+
+	const erc8213Eip712Digest =
+		messageSigningLegibility !== null &&
+		isDisplayed(messageSigningLegibility[MessageSigningDetails.EIP712_DIGEST])
+
 	const details: SoftwareFeatureDetails = {
 		calldataDisplay: { supported: [], missing: [] },
 		transactions: { passing: [], partial: [], failing: [] },
 		messageSigning: { supported: [], missing: [] },
+		erc8213: {
+			calldataDigest: erc8213CalldataDigest,
+			eip712Digest: erc8213Eip712Digest,
+		},
 	}
 
 	// Analyze calldata display
 	if (calldataDisplay !== null) {
-		if (calldataDisplay.rawHex) {
+		if (isDisplayed(calldataDisplay[CallDataDisplay.RAW_HEX])) {
 			details.calldataDisplay.supported.push('Raw hex display')
 		} else {
 			details.calldataDisplay.missing.push('Raw hex display')
 		}
 
-		if (calldataDisplay.formatted) {
+		if (isDisplayed(calldataDisplay[CallDataDisplay.FORMATTED])) {
 			details.calldataDisplay.supported.push('Formatted output')
 		} else {
 			details.calldataDisplay.missing.push('Formatted output')
 		}
 
-		if (calldataDisplay.copyHexToClipboard) {
+		if (isDisplayed(calldataDisplay[CallDataDisplay.COPY_HEX_TO_CLIPBOARD])) {
 			details.calldataDisplay.supported.push('Copy to clipboard')
 		} else {
 			details.calldataDisplay.missing.push('Copy to clipboard')
@@ -671,7 +733,7 @@ function analyzeSoftwareFeatures({
 			}
 		}
 
-		// Safe nested multisend (hardest benchmark — requires calldataDecoded and explained outcome to PASS)
+		// Safe nested multisend (hardest benchmark: requires calldataDecoded and explained outcome to PASS)
 		{
 			const tx =
 				transactionDetailsDisplay[
@@ -742,7 +804,7 @@ function analyzeSoftwareFeatures({
 			{ key: MessageSigningDetails.EIP712_STRUCT, label: 'EIP-712 structured data' },
 			{ key: MessageSigningDetails.DOMAIN_HASH, label: 'Domain hash' },
 			{ key: MessageSigningDetails.MESSAGE_HASH, label: 'Message hash' },
-			{ key: MessageSigningDetails.SAFE_HASH, label: 'Safe hash' },
+			{ key: MessageSigningDetails.EIP712_DIGEST, label: 'EIP-712 digest' },
 		]
 
 		signingChecks.forEach(({ key, label }) => {
@@ -826,6 +888,22 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 		}
 	}
 
+	// ERC-8213 compliance section
+	const erc8213Full = features.erc8213.calldataDigest && features.erc8213.eip712Digest
+	const erc8213Partial = features.erc8213.calldataDigest || features.erc8213.eip712Digest
+
+	sections.push('\n**ERC-8213 Compliance**\n')
+
+	if (erc8213Full) {
+		sections.push('✓ Fully implemented: Calldata digest and EIP-712 digest are both shown.\n')
+	} else if (erc8213Partial) {
+		sections.push(
+			`⚠ Partial: ${features.erc8213.calldataDigest ? '✓ Calldata digest' : '✗ Calldata digest'}, ${features.erc8213.eip712Digest ? '✓ EIP-712 digest' : '✗ EIP-712 digest'}.\n`,
+		)
+	} else {
+		sections.push('✗ Not implemented: Neither Calldata digest nor EIP-712 digest is shown.\n')
+	}
+
 	return sections.join('\n')
 }
 
@@ -860,8 +938,28 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 		)
 	}
 
+	const erc8213Missing: string[] = []
+
+	if (!features.erc8213.calldataDigest) {
+		erc8213Missing.push(
+			'**Calldata digest:** Show `keccak256(len(calldata) || calldata)` on the signing screen so users can independently verify the calldata.',
+		)
+	}
+
+	if (!features.erc8213.eip712Digest) {
+		erc8213Missing.push(
+			'**EIP-712 digest:** Show the final `"\\x19\\x01" || domainSeparator || hashStruct(message)` hash during typed message signing.',
+		)
+	}
+
+	if (erc8213Missing.length > 0) {
+		improvements.push(
+			`**ERC-8213 Implementation:** Implement the following to fully comply with ERC-8213:\n${erc8213Missing.map(m => `- ${m}`).join('\n')}`,
+		)
+	}
+
 	if (improvements.length === 0) {
-		return 'No improvements needed - the wallet implements full transaction legibility.'
+		return 'No improvements needed: The wallet implements full transaction legibility including ERC-8213.'
 	}
 
 	return improvements.join('\n\n')
@@ -944,17 +1042,32 @@ function evaluateHardwareWalletTransactionLegibility(
 ): Evaluation {
 	ctx.addRef(hardwareTransactionLegibility)
 
-	const { calldataDecoded, detailsDisplayed, dataExtraction, messageSigningLegibility } =
+	const { calldataDecoded, detailsDisplayed, dataExtraction, erc8213 } =
 		hardwareTransactionLegibility
 
 	const getOverallRating = (): Rating => {
-		if (calldataDecoded === null || detailsDisplayed === null || dataExtraction === null) {
+		if (calldataDecoded === null || detailsDisplayed === null || dataExtraction === null || erc8213 === null) {
 			return Rating.UNRATED
 		}
 
+		const erc8213Data = isSupported(erc8213) ? erc8213 : null
+
+		if (erc8213Data === null) {
+			return Rating.UNRATED
+		}
+
+		let calldataDigestLocation: DataLocation | null = null
+
+		if (erc8213Data.calldataDisplay !== null) {
+			calldataDigestLocation =
+				erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
+		}
+
+		const messageSigningLegibility = erc8213Data.messageSigningLegibility
+
 		// Evaluate message signing (PASS/FAIL only)
 		const messageSigningPasses =
-			messageSigningLegibility && evaluateHardwareMessageSigning(messageSigningLegibility)
+			messageSigningLegibility !== null && evaluateHardwareMessageSigning(messageSigningLegibility)
 
 		// Check if wallet supports calldata decoding for complex transactions (ON_DEVICE)
 		const supportsComplexDecoding: boolean =
@@ -988,12 +1101,16 @@ function evaluateHardwareWalletTransactionLegibility(
 			dataExtraction[DataExtraction.QRCODE] === true &&
 			dataExtraction[DataExtraction.HASHES] === true
 
-		// PASS: Full support - complex decoding AND all details displayed AND advanced data extraction AND message signing passes
+		// Check if Calldata digest is displayed on-device (ERC-8213)
+		const hasCalldataDigestOnDevice = calldataDigestLocation === DataLocation.ON_DEVICE
+
+		// PASS: Full support - complex decoding AND all details displayed AND advanced data extraction AND message signing passes AND Calldata digest on-device
 		if (
 			supportsComplexDecoding &&
 			displaysAllDetails &&
 			hasAdvancedDataExtraction &&
-			messageSigningPasses
+			messageSigningPasses &&
+			hasCalldataDigestOnDevice
 		) {
 			return Rating.PASS
 		}
@@ -1003,7 +1120,7 @@ function evaluateHardwareWalletTransactionLegibility(
 			(!supportsAnyCalldataDecoding(calldataDecoded) &&
 				!displaysAllDetails &&
 				!hasDataExtraction) ||
-			(messageSigningLegibility !== null && !messageSigningPasses)
+			!messageSigningPasses
 		) {
 			return Rating.FAIL
 		}
@@ -1055,12 +1172,20 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation {
 	const transactionLegibilitySupport = ctx.popRefs(softwareTransactionLegibility)
 
-	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
-		transactionLegibilitySupport
+	const { erc8213, transactionDetailsDisplay } = transactionLegibilitySupport
 
-	if (calldataDisplay === null || transactionDetailsDisplay === null) {
+	if (transactionDetailsDisplay === null || erc8213 === null) {
 		return unrated(ctx)
 	}
+
+	const erc8213Data = isSupported(erc8213) ? erc8213 : null
+
+	if (erc8213Data === null || erc8213Data.calldataDisplay === null || erc8213Data.messageSigningLegibility === null) {
+		return unrated(ctx)
+	}
+
+	const calldataDisplay = erc8213Data.calldataDisplay
+	const messageSigningLegibility = erc8213Data.messageSigningLegibility
 
 	const isShown = (field: DataDisplayOptions): boolean =>
 		field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
@@ -1115,20 +1240,20 @@ function evaluateSoftwareWalletTransactionLegibility(
 	let rating: Rating
 
 	if (
-		!calldataDisplay.rawHex ||
-		(messageSigningLegibility !== null &&
-			!evaluateSoftwareMessageSigning(messageSigningLegibility)) ||
+		calldataDisplay[CallDataDisplay.RAW_HEX] === DataDisplayOptions.NOT_IN_UI ||
+		!evaluateSoftwareMessageSigning(messageSigningLegibility) ||
 		allTransactions.some(tx => !allBasicFieldsShown(tx)) ||
 		!isShown(usdcApproval.calldataDecoded) ||
 		!isShown(aaveSupply.calldataDecoded)
 	) {
 		rating = Rating.FAIL
 	} else {
-		// PASS requires: formatted + copyable calldata display, all transaction outcomes explained,
-		// complex nested transactions fully decoded, and simulation benchmarks detected.
+		// PASS requires: formatted + copyable + digest calldata display, all transaction outcomes explained,
+		// complex nested transactions fully decoded, simulation benchmarks detected, and ERC-8213 Calldata digest.
 		const isPartial =
-			!calldataDisplay.formatted ||
-			!calldataDisplay.copyHexToClipboard ||
+			calldataDisplay[CallDataDisplay.FORMATTED] === DataDisplayOptions.NOT_IN_UI ||
+			calldataDisplay[CallDataDisplay.COPY_HEX_TO_CLIPBOARD] === DataDisplayOptions.NOT_IN_UI ||
+			calldataDisplay[CallDataDisplay.CALLDATA_DIGEST] === DataDisplayOptions.NOT_IN_UI ||
 			erc20.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			erc721.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			erc1155.transactionOutcome !== TransactionOutcome.EXPLAINED ||
@@ -1140,7 +1265,6 @@ function evaluateSoftwareWalletTransactionLegibility(
 			safeMultisend.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			failedTx.failure !== 'DETECTED' ||
 			nondeterminismTx.nondeterminism !== 'RESIMULATES_WITH_WARNING' ||
-			messageSigningLegibility === null ||
 			!evaluateSoftwareMessageSigning(messageSigningLegibility)
 
 		rating = isPartial ? Rating.PARTIAL : Rating.PASS
@@ -1179,11 +1303,20 @@ export const transactionLegibility: Attribute = {
 		step is crucial for preventing attacks where malicious software might attempt to trick users
 		into signing transactions with different parameters than what they intended.
 
-		Without this, users are at the mercy of the app they are interacting with sending them a bad transactions, either because they have a bug, were hacked, or are malicious. Without a signer being able to verify if their transaction is correct, user should not send such a transaction.
+		Without this, users are at the mercy of the app they are interacting with sending them bad transactions, whether due to a bug, a hack, or malicious intent. Without being able to verify what they are signing, users should not send such transactions.
 
 		Full transaction legibility implementations ensure that all relevant transaction details (recipient
-		address, amount, fees, etc.) are clearly displayed on the wallet screen, EIP-712 message hashes,
-		and decoded calldata, allowing users to make informed decisions before authorizing transactions.
+		address, amount, fees, etc.) are clearly displayed on the wallet screen alongside decoded calldata,
+		allowing users to make informed decisions before authorizing transactions.
+
+		**ERC-8213: Standardizing What Users Sign**
+		[ERC-8213](https://erc8213.eth.limo) introduces two cryptographic digests that give users a
+		machine-verifiable way to confirm exactly what they are approving:
+
+		- **Calldata digest**, \`keccak256(len(calldata) || calldata)\`: a hash of the raw transaction calldata. Users can compute this independently to verify the calldata hasn't been tampered with.
+		- **EIP-712 digest**, \`"\\x19\\x01" || domainSeparator || hashStruct(message)\`: the final hash that gets signed for typed structured data.
+
+		A full ERC-8213 implementation means the wallet shows both digests, enabling users to independently verify every transaction and signature: not just trust what the UI displays.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on key aspects of transaction legibility, with different criteria for software and hardware wallets:
@@ -1206,27 +1339,37 @@ export const transactionLegibility: Attribute = {
 		- Raw hex format: Users can view the raw hexadecimal calldata
 		- Formatted output: Users can view decoded, human-readable calldata
 		- Copy to clipboard: Users can copy the calldata directly for verification
+		- Calldata digest (ERC-8213): Users can verify the calldata hash independently
 
-		Software wallets must also support calldata decoding for various transaction types, from basic token transfers to complex nested transactions.
+		Software wallets must also support calldata decoding for various transaction types, from basic token transfers to complex nested transactions, and must display the EIP-712 digest for typed message signing (ERC-8213).
 
 		**Hardware Wallet Specific Requirements:**
-		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet device itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
+		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet device itself. Any data shown only in a companion app or browser extension is ignored for hardware wallet ratings.
 
 		Hardware wallets must also provide data extraction methods to allow users to independently verify transaction data:
 		- Visual display: Users can view the data on the hardware wallet screen
 		- QR code: Users can scan a QR code displayed on the device to extract data
 		- Hashes: Users can compare hashes displayed on the device to verify data
 
+		The Calldata digest and EIP-712 digest (ERC-8213) must be shown on the device itself.
+
+		**ERC-8213 Compliance:**
+		A wallet fully implements ERC-8213 when it displays both:
+		- The **Calldata digest** for transactions with calldata
+		- The **EIP-712 digest** for typed structured data signatures
+
+		For hardware wallets, both must be shown on the device screen (not just in companion software).
+
 		**Rating Criteria:**
 
 		For software wallets:
-		- A wallet receives a passing rating if it displays calldata in all three formats (raw hex, formatted, copyable), displays all essential transaction details, and supports complex calldata decoding (including nested transactions).
-		- A wallet receives a partial rating if it has some combination of these features but not all, or if calldata decoding data has not been provided.
+		- A wallet receives a passing rating if it displays calldata in all formats (raw hex, formatted, copyable, digest), displays all essential transaction details, supports complex calldata decoding, and shows the EIP-712 digest for message signing (full ERC-8213 compliance).
+		- A wallet receives a partial rating if it has some combination of these features but not all.
 		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
 
 		For hardware wallets:
-		- A wallet receives a passing rating if it supports decoding of complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes, in addition to visual display).
-		- A wallet receives a partial rating if it has some combination of these features (decoding support, transaction details display, or data extraction methods), but not all at the full level.
+		- A wallet receives a passing rating if it supports decoding of complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes). It must also implement ERC-8213 (Calldata digest and EIP-712 digest on-device).
+		- A wallet receives a partial rating if it has some combination of these features but not all at the full level.
 		- A wallet receives a failing rating if it lacks calldata decoding support, does not display essential transaction details on the device, and provides no effective data extraction methods.
 	`),
 	ratingScale: {
@@ -1241,10 +1384,10 @@ export const transactionLegibility: Attribute = {
 				hardwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc8213: null,
 						calldataDecoded: null,
 						detailsDisplayed: null,
 						dataExtraction: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
@@ -1257,9 +1400,8 @@ export const transactionLegibility: Attribute = {
 				softwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						calldataDisplay: null,
+						erc8213: null,
 						transactionDetailsDisplay: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
@@ -1274,10 +1416,10 @@ export const transactionLegibility: Attribute = {
 				hardwarePartialTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc8213: null,
 						calldataDecoded: null,
 						detailsDisplayed: null,
 						dataExtraction: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
@@ -1290,10 +1432,10 @@ export const transactionLegibility: Attribute = {
 				hardwareBasicTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc8213: null,
 						calldataDecoded: null,
 						detailsDisplayed: null,
 						dataExtraction: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
@@ -1306,9 +1448,8 @@ export const transactionLegibility: Attribute = {
 				softwarePartialTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						calldataDisplay: null,
+						erc8213: null,
 						transactionDetailsDisplay: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
@@ -1322,10 +1463,10 @@ export const transactionLegibility: Attribute = {
 				hardwareNoTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc8213: null,
 						calldataDecoded: null,
 						detailsDisplayed: null,
 						dataExtraction: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
@@ -1337,9 +1478,8 @@ export const transactionLegibility: Attribute = {
 				softwareNoTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						calldataDisplay: null,
+						erc8213: null,
 						transactionDetailsDisplay: null,
-						messageSigningLegibility: null,
 						ref: refNotNecessary,
 					},
 				),
