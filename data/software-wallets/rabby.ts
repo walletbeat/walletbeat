@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import type { WalletAnalytics } from '@/schema/features'
@@ -87,7 +88,7 @@ export const rabby: SoftwareWallet = {
 			Rabby is a user-friendly Ethereum wallet focusing on smooth UX and security.
 			It features an intuitive transaction preview feature and works on many chains.
 		`),
-		contributors: [polymutex, nconsigny],
+		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-05-06',
 		urls: {
