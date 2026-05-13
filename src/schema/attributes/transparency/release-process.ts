@@ -8,6 +8,7 @@ import {
 } from '@/schema/attributes'
 import { isSupported } from '@/schema/features/support'
 import { isSourcePubliclyVisible } from '@/schema/features/transparency/license'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { mdParagraph, paragraph, sentence } from '@/types/content'
@@ -58,14 +59,10 @@ function computeAdvancedSignals(
 	artifactSigning: ArtifactSigning,
 	reproducibleBuilds: ReproducibleBuilds,
 	hermeticBuilds: HermeticBuilds,
-	sourceVisible: boolean,
 ): AdvancedSignals {
 	const signing = isSupported(artifactSigning)
-	// Build-integrity claims only count when source is publicly visible,
-	// because external reproducibility checks require source access.
-	const reproducible =
-		reproducibleBuilds !== null && isSupported(reproducibleBuilds) && sourceVisible
-	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds) && sourceVisible
+	const reproducible = reproducibleBuilds !== null && isSupported(reproducibleBuilds)
+	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds)
 	const builds = reproducible || hermetic
 
 	const level: AdvancedGroupLevel =
@@ -81,11 +78,9 @@ function computeAdvancedSignals(
 function getBuildSignalLabel(
 	reproducibleBuilds: ReproducibleBuilds,
 	hermeticBuilds: HermeticBuilds,
-	buildsVisible: boolean,
 ): string | null {
-	const reproducible =
-		reproducibleBuilds !== null && isSupported(reproducibleBuilds) && buildsVisible
-	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds) && buildsVisible
+	const reproducible = reproducibleBuilds !== null && isSupported(reproducibleBuilds)
+	const hermetic = hermeticBuilds !== null && isSupported(hermeticBuilds)
 
 	if (reproducible && hermetic) {
 		return 'reproducible and hermetic builds'
@@ -104,14 +99,14 @@ function getBuildSignalLabel(
 
 function missingAdvancedSignal(advancedSignals: AdvancedSignalPresence): string {
 	if (advancedSignals.signing && !advancedSignals.builds) {
-		return 'reproducible or hermetic builds (with publicly visible source)'
+		return 'reproducible or hermetic builds'
 	}
 
 	if (!advancedSignals.signing && advancedSignals.builds) {
 		return 'artifact signing'
 	}
 
-	return 'artifact signing and reproducible or hermetic builds (with publicly visible source)'
+	return 'artifact signing and reproducible or hermetic builds'
 }
 
 function missingBasicSignals(basicSignals: BasicSignalPresence): string {
@@ -161,7 +156,7 @@ function partialBasicPassAdvancedFail(
 			),
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing artifact signing and reproducible or hermetic builds (with publicly visible source).`,
+			`{{WALLET_NAME}} supports ${commaListFormat(supportedSignals)}, but is missing artifact signing and reproducible or hermetic builds.`,
 		),
 		howToImprove: mdParagraph(`
 			To fully pass, **{{WALLET_NAME}}** should add both advanced signals:
@@ -342,7 +337,8 @@ export const releaseProcess: Attribute = {
 		**Advanced**:
 		3. **Artifact signing**: release artifacts are cryptographically signed and these signatures are published.
 		4. **Reproducible or hermetic builds**: independent parties can verify that build output matches
-		   source, or the build can run fully offline. This requires public source code.
+		   source, or the build can run fully offline. Verifying this independently requires access to
+		   public source code.
 
 		A wallet **passes** when both basic signals and both advanced signals are present.
 		Partial coverage earns a **partial** rating, based on which groups are satisfied.
@@ -354,7 +350,7 @@ export const releaseProcess: Attribute = {
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph(
-				'The wallet has a public changelog, reproducible or hermetic builds with public source, signed artifacts, and locked dependencies.',
+				'The wallet has a public changelog, reproducible or hermetic builds, signed artifacts, and locked dependencies.',
 			),
 			pass(
 				EvaluationContext.forTest(() => releaseProcess),
@@ -430,7 +426,6 @@ export const releaseProcess: Attribute = {
 		return null
 	},
 	evaluate: (ctx: EvaluationContext): Evaluation => {
-		ctx.setVerifiability(Verifiability.VERIFIABLE)
 		// Strict unknown handling for this attribute: if any required input is unknown,
 		// keep the result UNRATED rather than inferring a weaker rating.
 
@@ -443,15 +438,6 @@ export const releaseProcess: Attribute = {
 		}
 
 		if (rt.reproducibleBuilds === null && rt.hermeticBuilds === null) {
-			return unrated(ctx)
-		}
-
-		const sourceVisible = isSourcePubliclyVisible(ctx.features.licensing)
-
-		// Intentional strict policy: source visibility is required input for this attribute.
-		// We return UNRATED when unknown instead of downgrading builds to unsupported,
-		// to avoid classifying with incomplete advanced-group verifiability context.
-		if (sourceVisible === null) {
 			return unrated(ctx)
 		}
 
@@ -472,14 +458,17 @@ export const releaseProcess: Attribute = {
 			artifactSigning,
 			rt.reproducibleBuilds,
 			rt.hermeticBuilds,
-			sourceVisible,
 		)
+
+		let verifiabilityNeedsSourceCodeVisibility = false
 
 		if (basicSignals.changelog) {
 			ctx.addRef(hasPublicChangelog)
 		}
 
 		if (advancedSignals.builds) {
+			// Build-integrity claims require public source code to verify independently.
+			verifiabilityNeedsSourceCodeVisibility = true
 			ctx.addRef(rt.reproducibleBuilds, rt.hermeticBuilds)
 		}
 
@@ -488,10 +477,12 @@ export const releaseProcess: Attribute = {
 		}
 
 		if (basicSignals.locking) {
+			// Dependency locking can only be checked against the wallet's source tree.
+			verifiabilityNeedsSourceCodeVisibility = true
 			ctx.addRef(dependencyLocking)
 		}
 
-		const buildSignal = getBuildSignalLabel(rt.reproducibleBuilds, rt.hermeticBuilds, sourceVisible)
+		const buildSignal = getBuildSignalLabel(rt.reproducibleBuilds, rt.hermeticBuilds)
 
 		const supportedSignals = [
 			basicSignals.changelog ? 'public changelog' : null,
@@ -499,6 +490,18 @@ export const releaseProcess: Attribute = {
 			advancedSignals.signing ? 'artifact signing' : null,
 			basicSignals.locking ? 'dependency locking' : null,
 		].filter((signal): signal is string => signal !== null)
+
+		ctx.setVerifiability(
+			verifiabilityNeedsSourceCodeVisibility
+				? verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false })
+				: Verifiability.VERIFIABLE,
+		)
+
+		const sourceVisible = isSourcePubliclyVisible(ctx.features.licensing)
+
+		if (verifiabilityNeedsSourceCodeVisibility && sourceVisible === null) {
+			return unrated(ctx)
+		}
 
 		// Classification is group-based (basic pass + advanced level), not raw signal count.
 		// Strong advanced-group coverage without basic signals remains PARTIAL.
