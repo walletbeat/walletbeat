@@ -28,7 +28,7 @@ import {
 	supportsAnyDataExtraction,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
-import { isSupported, type Support } from '@/schema/features/support'
+import { isSupported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
@@ -91,7 +91,11 @@ interface HardwareFeatureDetails {
 }
 
 function analyzeHardwareFeatures(
-	{ calldataDecoded, detailsDisplayed, dataExtraction }: HardwareTransactionLegibilityImplementation,
+	{
+		calldataDecoded,
+		detailsDisplayed,
+		dataExtraction,
+	}: HardwareTransactionLegibilityImplementation,
 	calldataDigestLocation: DataLocation | null,
 	messageSigningLegibility: HardwareWalletErc8213['messageSigningLegibility'] | null,
 ): HardwareFeatureDetails {
@@ -381,12 +385,14 @@ function unwrapHardwareErc8213(support: HardwareTransactionLegibilityImplementat
 	const erc8213Data =
 		support.erc8213 !== null && isSupported(support.erc8213) ? support.erc8213 : null
 	let calldataDigestLocation: DataLocation | null = null
+
 	if (erc8213Data !== null && erc8213Data.calldataDisplay !== null) {
-		calldataDigestLocation =
-			erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
+		calldataDigestLocation = erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
 	}
+
 	const messageSigningLegibility =
 		erc8213Data !== null ? erc8213Data.messageSigningLegibility : null
+
 	return { calldataDigestLocation, messageSigningLegibility }
 }
 
@@ -395,7 +401,11 @@ function hardwareNoTransactionLegibility(
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
 	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
-	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
+	const features = analyzeHardwareFeatures(
+		support,
+		calldataDigestLocation,
+		messageSigningLegibility,
+	)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -422,7 +432,11 @@ function hardwareBasicTransactionLegibility(
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
 	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
-	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
+	const features = analyzeHardwareFeatures(
+		support,
+		calldataDigestLocation,
+		messageSigningLegibility,
+	)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -449,7 +463,11 @@ function hardwarePartialTransactionLegibility(
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
 	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
-	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
+	const features = analyzeHardwareFeatures(
+		support,
+		calldataDigestLocation,
+		messageSigningLegibility,
+	)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -476,7 +494,11 @@ function hardwareFullTransactionLegibility(
 	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
 	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
-	const features = analyzeHardwareFeatures(support, calldataDigestLocation, messageSigningLegibility)
+	const features = analyzeHardwareFeatures(
+		support,
+		calldataDigestLocation,
+		messageSigningLegibility,
+	)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 
 	return ctx.build({
@@ -521,7 +543,8 @@ function analyzeSoftwareFeatures({
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
 	const erc8213Data = erc8213 !== null && isSupported(erc8213) ? erc8213 : null
 	const calldataDisplay = erc8213Data !== null ? erc8213Data.calldataDisplay : null
-	const messageSigningLegibility = erc8213Data !== null ? erc8213Data.messageSigningLegibility : null
+	const messageSigningLegibility =
+		erc8213Data !== null ? erc8213Data.messageSigningLegibility : null
 
 	const isDisplayed = (opt: DataDisplayOptions): boolean =>
 		opt === DataDisplayOptions.SHOWN_BY_DEFAULT || opt === DataDisplayOptions.SHOWN_OPTIONALLY
@@ -1046,7 +1069,12 @@ function evaluateHardwareWalletTransactionLegibility(
 		hardwareTransactionLegibility
 
 	const getOverallRating = (): Rating => {
-		if (calldataDecoded === null || detailsDisplayed === null || dataExtraction === null || erc8213 === null) {
+		if (
+			calldataDecoded === null ||
+			detailsDisplayed === null ||
+			dataExtraction === null ||
+			erc8213 === null
+		) {
 			return Rating.UNRATED
 		}
 
@@ -1059,8 +1087,7 @@ function evaluateHardwareWalletTransactionLegibility(
 		let calldataDigestLocation: DataLocation | null = null
 
 		if (erc8213Data.calldataDisplay !== null) {
-			calldataDigestLocation =
-				erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
+			calldataDigestLocation = erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
 		}
 
 		const messageSigningLegibility = erc8213Data.messageSigningLegibility
@@ -1180,7 +1207,11 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	const erc8213Data = isSupported(erc8213) ? erc8213 : null
 
-	if (erc8213Data === null || erc8213Data.calldataDisplay === null || erc8213Data.messageSigningLegibility === null) {
+	if (
+		erc8213Data === null ||
+		erc8213Data.calldataDisplay === null ||
+		erc8213Data.messageSigningLegibility === null
+	) {
 		return unrated(ctx)
 	}
 

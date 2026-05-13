@@ -644,7 +644,7 @@ export enum CallDataDisplay {
 	 */
 	FORMATTED = 'FORMATTED',
 	/**
-	 * The wallet shows the calldata digest:
+	 * The wallet shows the Calldata digest:
 	 * keccak256(uint256(len) || calldata)
 	 */
 	CALLDATA_DIGEST = 'CALLDATA_DIGEST',

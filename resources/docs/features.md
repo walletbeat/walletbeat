@@ -3170,7 +3170,7 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval
 - `RAW_HEX` = `'RAW_HEX'`: The raw `0x...` hex calldata is visible somewhere on the approval screen. To test: look for a hex string starting with `0x` on the approval screen or in an expandable section.
 - `COPY_HEX_TO_CLIPBOARD` = `'COPY_HEX_TO_CLIPBOARD'`: A dedicated button copies the raw hex calldata to the clipboard. For batched transactions, the full hex including the multicall wrapper is expected. To test: look for a copy icon or "Copy" button next to the calldata.
 - `FORMATTED` = `'FORMATTED'`: The calldata is decoded into a human-readable function name and arguments (e.g. JSON or structured text), not just raw hex. For batched transactions, each inner call should be decoded individually. To test: check if the wallet shows the function name (e.g. `approve`) and parameters (e.g. spender address, amount) in a readable format.
-- `CALLDATA_DIGEST` = `'CALLDATA_DIGEST'`: The wallet shows the calldata digest: keccak256(uint256(len) || calldata)
+- `CALLDATA_DIGEST` = `'CALLDATA_DIGEST'`: The wallet shows the Calldata digest: keccak256(uint256(len) || calldata)
 
 ---
 
