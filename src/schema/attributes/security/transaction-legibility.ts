@@ -197,9 +197,11 @@ function analyzeHardwareFeatures(
 		]
 
 		// Determine if any are on-device
-		const anyOnDevice = Object.values(provides).some(cap => cap.location === DataLocation.ON_DEVICE)
+		const allOnDevice = Object.values(provides).every(
+			cap => cap.location === DataLocation.ON_DEVICE,
+		)
 
-		details.messageSigning.decodedLocation = anyOnDevice
+		details.messageSigning.decodedLocation = allOnDevice
 			? DataLocation.ON_DEVICE
 			: DataLocation.OFF_DEVICE
 
@@ -303,7 +305,7 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 	return sections.join('\n')
 }
 
-function generateHardwareHowToImprove(features: HardwareFeatureDetails): string {
+function generateHardwareHowToImprove(features: HardwareFeatureDetails): string | undefined {
 	const improvements: string[] = []
 
 	if (features.calldataDecoding.missing.length > 0) {
@@ -371,7 +373,7 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 	}
 
 	if (improvements.length === 0) {
-		return 'No improvements needed: The wallet implements full transaction legibility including ERC-8213.'
+		return undefined
 	}
 
 	return improvements.join('\n\n')
@@ -421,9 +423,12 @@ function hardwareNoTransactionLegibility(
 		details: markdown(
 			`{{WALLET_NAME}} implements either zero or very little transaction legibility on the hardware device itself. Transaction legibility is important for security as it allows users to verify transaction details directly on their hardware wallet screen before signing, without relying on potentially compromised software.\n\n${featureDetailsMarkdown}`,
 		),
-		howToImprove: markdown(
-			`{{WALLET_NAME}} should implement the following improvements to provide comprehensive transaction legibility on the hardware device:\n\n${improvementsMarkdown}`,
-		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements to provide comprehensive transaction legibility on the hardware device:\n\n${improvementsMarkdown}`,
+					),
 	})
 }
 
@@ -452,9 +457,12 @@ function hardwareBasicTransactionLegibility(
 		details: markdown(
 			`{{WALLET_NAME}} supports basic transaction legibility on the hardware device, but the implementation does not provide full transparency. The device may display some transaction details or support basic calldata decoding, but lacks comprehensive support for complex transactions, all essential details, or advanced data extraction methods.\n\n${featureDetailsMarkdown}`,
 		),
-		howToImprove: markdown(
-			`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
-		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
+					),
 	})
 }
 
@@ -483,9 +491,12 @@ function hardwarePartialTransactionLegibility(
 		details: markdown(
 			`{{WALLET_NAME}} supports partial transaction legibility on the hardware device. The device displays most transaction details and may support calldata decoding for some transaction types, but may not fully decode complex nested transactions or provide all data extraction methods. Showing transaction details directly on the hardware device is crucial for security as it allows users to verify transaction details independently of potentially compromised software.\n\n${featureDetailsMarkdown}`,
 		),
-		howToImprove: markdown(
-			`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
-		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
+					),
 	})
 }
 
@@ -930,7 +941,7 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 	return sections.join('\n')
 }
 
-function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string {
+function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string | undefined {
 	const improvements: string[] = []
 
 	if (features.calldataDisplay.missing.length > 0) {
@@ -982,7 +993,7 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 	}
 
 	if (improvements.length === 0) {
-		return 'No improvements needed: The wallet implements full transaction legibility including ERC-8213.'
+		return undefined
 	}
 
 	return improvements.join('\n\n')
@@ -1009,9 +1020,12 @@ function softwareNoTransactionLegibility(
 		details: markdown(
 			`{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata (raw hex, formatted, copyable) or essential transaction details for all benchmark transaction types. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.\n\n${featureDetailsMarkdown}`,
 		),
-		howToImprove: markdown(
-			`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
-		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
+					),
 	})
 }
 
@@ -1033,9 +1047,12 @@ function softwarePartialTransactionLegibility(
 		details: markdown(
 			`{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet displays basic transaction details but may be missing calldata display formats, clear transaction outcome explanations for complex interactions, or simulation capabilities. Showing full transaction details is crucial for security.\n\n${featureDetailsMarkdown}`,
 		),
-		howToImprove: markdown(
-			`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
-		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
+					),
 	})
 }
 
