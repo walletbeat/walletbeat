@@ -955,10 +955,11 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 	}
 
 	if (features.transactions.failing.length > 0) {
-		          improvements.push(                                                                                                                              
-           `**Transaction Information:** Add the required fields or calldata decoding for:\n${features.transactions.failing.map(t => `- ${t}`).join('\n')
-          }`,                                                                                                                                                 
-          )  
+		improvements.push(
+			`**Transaction Information:** Add the required fields or calldata decoding for:\n${features.transactions.failing
+				.map(t => `- ${t}`)
+				.join('\n')}`,
+		)
 	}
 
 	if (features.transactions.partial.length > 0) {
