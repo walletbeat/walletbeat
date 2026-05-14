@@ -44,8 +44,8 @@ export function slugifyCamelCase(camelCaseString: string): string {
 }
 
 /**
- * Return the prefix to use before a list item in a comma-separated list.
- * For example, ["a", "b", "c", "d"] would be written as "a, b, c and d".
+ * Return the prefix to use before a list item in a Oxford comma-separated list.
+ * For example, ["a", "b", "c", "d"] would be written as "a, b, c, and d".
  * @param index The index of the element being rendered.
  * @param listSize The total size of the list.
  * @returns The prefix to use before the element.
@@ -55,7 +55,7 @@ export function commaListPrefix(index: number, listSize: number, and?: string): 
 		return ''
 	}
 
-	return index < listSize - 1 ? ', ' : ` ${and ?? 'and'} `
+	return index < listSize - 1 ? ', ' : `${listSize > 2 ? ',' : ''} ${and ?? 'and'} `
 }
 
 /**
