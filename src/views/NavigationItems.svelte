@@ -197,8 +197,10 @@
 				<span class="icon" class:circle={depth === 0}>
 					{#if item.icon.startsWith('<')}
 						{@html item.icon}
-					{:else}
+					{:else if /^[a-z0-9_]+$/i.test(item.icon)}
 						<span data-wbicon data-icon={item.icon}></span>
+					{:else}
+						{item.icon}
 					{/if}
 				</span>
 			{/if}
@@ -210,8 +212,10 @@
 			<span class="icon" class:circle={depth === 0}>
 				{#if item.icon.startsWith('<')}
 					{@html item.icon}
-				{:else}
+				{:else if /^[a-z0-9_]+$/i.test(item.icon)} 
 					<span data-wbicon data-icon={item.icon}></span>
+				{:else}
+					{item.icon}
 				{/if}
 			</span>
 		{/if}
@@ -271,6 +275,7 @@
 			height: 1em;
 			line-height: 1;
 			flex-shrink: 0;
+			color: var(--icon-navigation-color);
 
 			:global(
 				img,

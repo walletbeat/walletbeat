@@ -1,8 +1,10 @@
 // Types
+import type { WBIconFontID } from '@/styles/wbicons'
+
 export type NavigationItem = {
 	id: string
 	title: string
-	icon?: string
+	icon?: WBIconFontID | string
 	href?: string
 	children?: NavigationItem[]
 }
