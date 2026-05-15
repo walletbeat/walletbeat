@@ -32,13 +32,16 @@ import {
 /**
  * A loose reference which can be converted to a FullyQualifiedReference.
  */
-export interface LooseReference {
-	/** The URL(s) the reference is about. */
-	url?: NonEmptyArray<Url> | Url
-
-	/** The repo-relative filename under public/ (New Field) */
-	file?: string
-
+export type LooseReference = (
+	| {
+			/** The URL(s) the reference is about. */
+			url: NonEmptyArray<Url> | Url
+	  }
+	| {
+			/** The repo-relative filename under public/ (New Field) */
+			file: string
+	  }
+) & {
 	/** The text of the link that goes to `url`; defaults to the domain name of `url`. */
 	label?: string
 
@@ -69,7 +72,7 @@ export function isLooseReference(x: unknown): x is LooseReference {
 		((url: unknown) =>
 			isUrl(url) ||
 			(Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
 			(x as unknown as { url: unknown }).url,
 		)
 	)
@@ -221,36 +224,40 @@ export function toFullyQualified(
 		]
 	}
 
-	if (isLabeledUrl(reference)) {
+	// At this point, the 'file' variant has been handled and returned above.
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we've already handled the 'file' variant above.
+	const urlRef = reference as { url: NonEmptyArray<Url> | Url } & {
+		label?: string
+		explanation?: string
+		lastRetrieved?: CalendarDate
+	}
+
+	if (isLabeledUrl(urlRef)) {
 		return [
 			{
-				urls: [reference],
+				urls: [urlRef],
 				explanation,
 				lastRetrieved,
 			},
 		]
 	}
 
-	if (isUrl(reference.url)) {
+	if (isUrl(urlRef.url)) {
 		return [
 			{
-				urls: [labeledUrl(reference.url, reference.label)],
+				urls: [labeledUrl(urlRef.url, urlRef.label)],
 				explanation,
 				lastRetrieved,
 			},
 		]
 	}
 
-	if (reference.url === undefined) {
-		return []
-	}
-
-	if (reference.url.length === 1) {
-		const url = nonEmptyGet(reference.url)
+	if (urlRef.url.length === 1) {
+		const url = nonEmptyGet(urlRef.url)
 
 		return [
 			{
-				urls: [labeledUrl(url, reference.label)],
+				urls: [labeledUrl(url, urlRef.label)],
 				explanation,
 				lastRetrieved,
 			},
@@ -259,7 +266,7 @@ export function toFullyQualified(
 
 	const labelCounter = new Map<string, number>()
 
-	return reference.url.map(url => {
+	return urlRef.url.map(url => {
 		if (isLabeledUrl(url)) {
 			return {
 				urls: [url],
