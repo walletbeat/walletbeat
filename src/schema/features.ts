@@ -50,6 +50,17 @@ import {
 } from './features/transparency/license'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
+import type {
+	ArtifactSigning,
+	ArtifactSigningDetails,
+	ArtifactSigningPayload,
+	DependencyLocking,
+	DependencyVulnerabilityScanning,
+	HasPublicChangelog,
+	HermeticBuilds,
+	RepositoryChangeControls,
+	ReproducibleBuilds,
+} from './features/transparency/release-transparency'
 import type { ReputationSupport } from './features/transparency/reputation'
 import type { WithRef } from './reference'
 import {
@@ -162,6 +173,17 @@ export interface WalletBaseFeatures {
 	transparency: {
 		/** Information on how fees are displayed for basic operations. */
 		operationFees: VariantFeature<Nullable<BasicOperationFees>>
+
+		/** Release transparency features. */
+		releaseTransparency: {
+			artifactSigning: VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>
+			dependencyLocking: VariantFeature<DependencyLocking>
+			dependencyVulnerabilityScanning: VariantFeature<DependencyVulnerabilityScanning>
+			hasPublicChangelog: VariantFeature<HasPublicChangelog>
+			hermeticBuilds: VariantFeature<HermeticBuilds>
+			repositoryChangeControls: VariantFeature<Nullable<RepositoryChangeControls>>
+			reproducibleBuilds: VariantFeature<ReproducibleBuilds>
+		}
 	}
 
 	/** Which types of accounts the wallet supports. */
@@ -368,6 +390,15 @@ export interface ResolvedFeatures {
 		operationFees: ResolvedFeature<BasicOperationFees>
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
+		releaseTransparency: {
+			artifactSigning: ResolvedFeature<ArtifactSigning>
+			dependencyLocking: ResolvedFeature<DependencyLocking>
+			dependencyVulnerabilityScanning: ResolvedFeature<DependencyVulnerabilityScanning>
+			hasPublicChangelog: ResolvedFeature<HasPublicChangelog>
+			hermeticBuilds: ResolvedFeature<HermeticBuilds>
+			repositoryChangeControls: ResolvedFeature<RepositoryChangeControls>
+			reproducibleBuilds: ResolvedFeature<ReproducibleBuilds>
+		}
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<Support<WithRef<ChainConfigurability>>>
@@ -557,6 +588,40 @@ export function resolveFeatures(
 				'transparency.maintenance',
 				features => features.transparency.maintenance,
 			),
+			releaseTransparency: {
+				artifactSigning: nullable<Support<ArtifactSigningDetails>>(
+					baseFeat(
+						'transparency.releaseTransparency.artifactSigning',
+						features => features.transparency.releaseTransparency.artifactSigning,
+					),
+				),
+				dependencyLocking: baseFeat(
+					'transparency.releaseTransparency.dependencyLocking',
+					features => features.transparency.releaseTransparency.dependencyLocking,
+				),
+				dependencyVulnerabilityScanning: baseFeat(
+					'transparency.releaseTransparency.dependencyVulnerabilityScanning',
+					features => features.transparency.releaseTransparency.dependencyVulnerabilityScanning,
+				),
+				hasPublicChangelog: baseFeat(
+					'transparency.releaseTransparency.hasPublicChangelog',
+					features => features.transparency.releaseTransparency.hasPublicChangelog,
+				),
+				hermeticBuilds: baseFeat(
+					'transparency.releaseTransparency.hermeticBuilds',
+					features => features.transparency.releaseTransparency.hermeticBuilds,
+				),
+				repositoryChangeControls: nullable(
+					baseFeat(
+						'transparency.releaseTransparency.repositoryChangeControls',
+						features => features.transparency.releaseTransparency.repositoryChangeControls,
+					),
+				),
+				reproducibleBuilds: baseFeat(
+					'transparency.releaseTransparency.reproducibleBuilds',
+					features => features.transparency.releaseTransparency.reproducibleBuilds,
+				),
+			},
 		},
 		chainAbstraction: nullable(
 			softwareFeat('chainAbstraction', features => features.chainAbstraction),
