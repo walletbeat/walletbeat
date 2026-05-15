@@ -3783,10 +3783,6 @@ type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 Observable repository-level change controls for the wallet's source repository.
 
-In wallet feature data, use `Nullable<RepositoryChangeControls>` (see `WalletBaseFeatures`) so sub-fields may be `null` while research is in progress.
-
-During resolution, this feature is normalized all-or-nothing: if any sub-field remains unknown, the resolved value becomes `null`.
-
 ```typescript
 type RepositoryChangeControls = WithRef<{
 	/** Whether protected branch rules require an approving review before merge. */
