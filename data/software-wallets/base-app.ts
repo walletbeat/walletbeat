@@ -1,11 +1,13 @@
 import { ren2140 } from '@/data/contributors/ren2140'
-import { AccountType } from '@/schema/features/account-support'
+import { coinbaseSmartWalletContract } from '@/data/wallet-contracts/coinbase-smart-wallet'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -46,7 +48,9 @@ export const baseApp: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.eoa,
+			// New signups create passkey-based ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
+			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
+			defaultAccountType: AccountType.rawErc4337,
 			eip7702: notSupported,
 			eoa: supported({
 				ref: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
@@ -59,7 +63,18 @@ export const baseApp: SoftwareWallet = {
 				},
 			}),
 			mpc: notSupported,
-			rawErc4337: notSupported,
+			rawErc4337: supported({
+				ref: {
+					explanation:
+						'Base Accounts are ERC-4337 Smart Wallets created via passkey signup. The user is sole owner by default (passkey held in device secure enclave); Coinbase does not hold a co-owner key per https://wallet.coinbase.com/terms-of-service. The underlying contract supports multi-owner via addOwner/removeOwnerAtIndex, but as of Base App v29.94.123 the mobile app does not expose any passkey or owner management UI (Account Management shows only Sign out). Optional recovery-key signup likely lives in keys.coinbase.com rather than the mobile app.',
+					url: 'https://docs.base.org/base-account/overview/what-is-base-account',
+				},
+				contract: coinbaseSmartWalletContract,
+				controllingSharesInSelfCustodyByDefault: 'YES',
+				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+				tokenTransferTransactionGeneration:
+					TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
+			}),
 			safe: notSupported,
 		},
 		addressResolution: {
@@ -167,7 +182,17 @@ export const baseApp: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: null,
+			passkeyVerification: supported({
+				ref: {
+					explanation:
+						'Coinbase Smart Wallet verifies passkey signatures on-chain via webauthn-sol, which uses the RIP-7212 precompile when available and falls back to FreshCryptoLib.',
+					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
+				},
+				details:
+					'Uses base-org/webauthn-sol (built on Daimo WebAuthn.sol). Tries RIP-7212 P-256 precompile first, falls back to FreshCryptoLib.',
+				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
+				libraryUrl: 'https://github.com/base-org/webauthn-sol',
+			}),
 			publicSecurityAudits: null,
 			scamAlerts: {
 				contractTransactionWarning: supported<ContractTransactionWarning>({
