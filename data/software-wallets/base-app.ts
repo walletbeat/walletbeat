@@ -2,6 +2,7 @@ import { ren2140 } from '@/data/contributors/ren2140'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { WalletProfile } from '@/schema/features/profile'
+import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
@@ -145,7 +146,36 @@ export const baseApp: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			// Coinbase Smart Wallet supports a "recovery key" feature where the user
+			// generates a standalone Ethereum private key that is registered on-chain
+			// as an additional owner. There is no encryption layer. The recovery key
+			// itself is the secret and a holder of it has full unilateral wallet
+			// control (can drain, can evict the original passkey). No timelock, no
+			// notification. Per Base team questionnaire (Q15) and
+			// https://help.coinbase.com/en/wallet/getting-started/smart-wallet-recovery.
+			accountRecovery: {
+				guardianRecovery: supported({
+					ref: {
+						explanation:
+							'Coinbase Smart Wallet supports an optional "recovery key" — a standalone Ethereum private key that the user generates and stores, registered on-chain as an additional owner. The key holder can re-establish wallet access by adding a new passkey owner.',
+						url: 'https://help.coinbase.com/en/wallet/getting-started/smart-wallet-recovery',
+					},
+					minimumGuardianPolicy: {
+						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+						descriptionMarkdown:
+							'The user generates a single recovery key (a standard Ethereum private key) which is registered on-chain as an additional owner of the Smart Wallet. The user is solely responsible for storing the recovery key — it is not encrypted, not split into shares, and not held by Coinbase. A holder of the recovery key has full owner powers (can add new passkey owners, but also can drain the wallet or evict the original passkey). There is no timelock or notification during recovery.',
+						optionalGuardians: [
+							{
+								type: GuardianType.SELF_CUSTODY,
+							},
+						],
+						optionalGuardiansMinimumConfigurable: 1,
+						optionalGuardiansMinimumNeededForRecovery: 1,
+						requiredGuardians: [],
+						secretReconstitution: 'CLIENT_SIDE',
+					},
+				}),
+			},
 			bugBountyProgram: supported({
 				ref: 'https://hackerone.com/coinbase?type=team',
 				availability: BugBountyProgramAvailability.ACTIVE,
