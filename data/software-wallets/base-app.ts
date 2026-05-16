@@ -175,7 +175,7 @@ export const baseApp: SoftwareWallet = {
 			// Legacy 12-word-recovery-phrase accounts are EOAs and out of scope for these audits.
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Cantina-December-2023.pdf',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-December-2023.pdf',
 					auditor: cantina,
 					auditDate: '2024-01-07',
 					codeSnapshot: {
@@ -186,7 +186,7 @@ export const baseApp: SoftwareWallet = {
 					variantsScope: { [Variant.MOBILE]: true },
 				},
 				{
-					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Certora-February-2024.pdf',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Certora-February-2024.pdf',
 					auditor: certora,
 					auditDate: '2024-02-29',
 					codeSnapshot: {
@@ -207,7 +207,7 @@ export const baseApp: SoftwareWallet = {
 					variantsScope: { [Variant.MOBILE]: true },
 				},
 				{
-					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Cantina-April-2024.pdf',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-April-2024.pdf',
 					auditor: cantina,
 					auditDate: '2024-04-23',
 					codeSnapshot: {
