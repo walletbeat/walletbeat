@@ -1,4 +1,5 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import { coinbaseEip7702ProxyContract } from '@/data/wallet-contracts/coinbase-eip7702-proxy'
 import { coinbaseSmartWalletContract } from '@/data/wallet-contracts/coinbase-smart-wallet'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -51,7 +52,14 @@ export const baseApp: SoftwareWallet = {
 			// New signups create passkey-based ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
 			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
 			defaultAccountType: AccountType.rawErc4337,
-			eip7702: notSupported,
+			eip7702: supported({
+				ref: {
+					explanation:
+						'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of dApp interactions; there is no user-facing "upgrade my account" UI in the Base App. Per the Base team questionnaire response (2026-03-13), accounts are "EOA + 7702 delegation / 4337".',
+					url: 'https://blog.base.dev/securing-eip-7702-upgrades',
+				},
+				contract: coinbaseEip7702ProxyContract,
+			}),
 			eoa: supported({
 				ref: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 				canExportPrivateKey: true,
