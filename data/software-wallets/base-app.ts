@@ -182,6 +182,13 @@ export const baseApp: SoftwareWallet = {
 				scamUrlWarning: null,
 				sendTransactionWarning: notSupported,
 			},
+			// Base App is closed-source; no public URL hosts the AndroidManifest.xml
+			// or Info.plist, so the `pnpm collect:manifests` tool cannot fetch them.
+			// Filling this out requires manually extracting the manifests from the
+			// published APK/IPA. What we know without extraction: for new passkey
+			// accounts (the smart-wallet path), keyStorageMechanism would be
+			// PASSKEY_MANAGED — the WebAuthn passkey lives in the iOS Secure
+			// Enclave or Android Keystore and no private key is stored by the app.
 			securityBestPractices: null,
 			transactionLegibility: null,
 		},
