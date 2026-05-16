@@ -1,6 +1,7 @@
 import { ren2140 } from '@/data/contributors/ren2140'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -141,7 +142,18 @@ export const baseApp: SoftwareWallet = {
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://wallet.coinbase.com/dapp-privacy-policy',
-			transactionPrivacy: null,
+			// Base App ships no built-in privacy features as of v29.94.123. Default
+			// transfers are public ERC-20 / ETH sends on Base. Coinbase has signaled
+			// future work on private transactions (Iron Fish acquisition, March 2025),
+			// but no stealth address, Railgun, Privacy Pools, or Tornado Cash Nova
+			// integration is in the app today. Confirmed by direct app testing.
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
