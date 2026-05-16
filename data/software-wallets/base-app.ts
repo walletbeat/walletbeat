@@ -162,7 +162,14 @@ export const baseApp: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			hardwareWalletSupport: null,
+			// Base App exposes no UI for adding, pairing, or managing hardware wallet keys
+			// and there are no settings for Ledger, Trezor, or other hardware devices.
+			// There is also nothing in the Base App documentation that indicates support
+			// for hardware wallets.
+			hardwareWalletSupport: {
+				ref: refTodo,
+				wallets: {},
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: notSupported,
