@@ -64,9 +64,13 @@ export const baseApp: SoftwareWallet = {
 		},
 		addressResolution: {
 			ref: refTodo,
+			// Confirmed in-app (Base App v29.94.123): neither ERC-7828
+			// (donations.walletbeat.eth@optimism.eth) nor ERC-7831
+			// (donations.walletbeat.eth:optimism:1) resolves in the Send recipient
+			// field. No public documentation indicates support for either standard.
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
