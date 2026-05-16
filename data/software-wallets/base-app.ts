@@ -1,4 +1,7 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import { cantina } from '@/data/entities/cantina'
+import { certora } from '@/data/entities/certora'
+import { code4rena } from '@/data/entities/code4rena'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { WalletProfile } from '@/schema/features/profile'
@@ -168,7 +171,53 @@ export const baseApp: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
+			// Audits cover the Coinbase Smart Wallet contracts that power Base App passkey-created accounts.
+			// Legacy 12-word-recovery-phrase accounts are EOAs and out of scope for these audits.
+			publicSecurityAudits: [
+				{
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Cantina-December-2023.pdf',
+					auditor: cantina,
+					auditDate: '2024-01-07',
+					codeSnapshot: {
+						commit: '2779bed4',
+						date: '2023-12-11',
+					},
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Certora-February-2024.pdf',
+					auditor: certora,
+					auditDate: '2024-02-29',
+					codeSnapshot: {
+						commit: '7aa092a',
+						date: '2024-02-08',
+					},
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: 'https://code4rena.com/reports/2024-03-coinbase',
+					auditor: code4rena,
+					auditDate: '2024-05-01',
+					codeSnapshot: {
+						date: '2024-03-14',
+					},
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Cantina-April-2024.pdf',
+					auditor: cantina,
+					auditDate: '2024-04-23',
+					codeSnapshot: {
+						commit: '9edcf7f1',
+						date: '2024-04-15',
+					},
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+			],
 			scamAlerts: {
 				contractTransactionWarning: supported<ContractTransactionWarning>({
 					ref: refTodo,
