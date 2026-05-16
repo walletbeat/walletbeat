@@ -176,8 +176,8 @@ export const baseApp: SoftwareWallet = {
 			publicSecurityAudits: [
 				{
 					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-December-2023.pdf',
-					auditor: cantina,
 					auditDate: '2024-01-07',
+					auditor: cantina,
 					codeSnapshot: {
 						commit: '2779bed4',
 						date: '2023-12-11',
@@ -187,8 +187,8 @@ export const baseApp: SoftwareWallet = {
 				},
 				{
 					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Certora-February-2024.pdf',
-					auditor: certora,
 					auditDate: '2024-02-29',
+					auditor: certora,
 					codeSnapshot: {
 						commit: '7aa092a',
 						date: '2024-02-08',
@@ -198,8 +198,8 @@ export const baseApp: SoftwareWallet = {
 				},
 				{
 					ref: 'https://code4rena.com/reports/2024-03-coinbase',
-					auditor: code4rena,
 					auditDate: '2024-05-01',
+					auditor: code4rena,
 					codeSnapshot: {
 						date: '2024-03-14',
 					},
@@ -208,8 +208,8 @@ export const baseApp: SoftwareWallet = {
 				},
 				{
 					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-April-2024.pdf',
-					auditor: cantina,
 					auditDate: '2024-04-23',
+					auditor: cantina,
 					codeSnapshot: {
 						commit: '9edcf7f1',
 						date: '2024-04-15',
