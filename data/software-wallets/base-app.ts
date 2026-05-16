@@ -49,7 +49,7 @@ export const baseApp: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			// New signups create passkey-based ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
+			// New accounts created via passkey onboarding are ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
 			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
 			defaultAccountType: AccountType.rawErc4337,
 			eip7702: supported({
@@ -74,7 +74,7 @@ export const baseApp: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation:
-						'Base Accounts are ERC-4337 Smart Wallets created via passkey signup. The user is sole owner by default (passkey held in device secure enclave); Coinbase does not hold a co-owner key per https://wallet.coinbase.com/terms-of-service. The underlying contract supports multi-owner via addOwner/removeOwnerAtIndex, but as of Base App v29.94.123 the mobile app does not expose any passkey or owner management UI (Account Management shows only Sign out). Optional recovery-key signup likely lives in keys.coinbase.com rather than the mobile app.',
+						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave); Coinbase does not hold a co-owner key per https://wallet.coinbase.com/terms-of-service. The underlying contract supports multi-owner via addOwner/removeOwnerAtIndex, but as of Base App v29.94.123 the mobile app does not expose any passkey or owner management UI (Account Management shows only Sign out). Optional recovery-key setup likely lives in keys.coinbase.com rather than the mobile app.',
 					url: 'https://docs.base.org/base-account/overview/what-is-base-account',
 				},
 				contract: coinbaseSmartWalletContract,
