@@ -168,7 +168,7 @@ export const baseApp: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Coinbase privacy policy: "In the past 12 months, Coinbase has disclosed identifiers with third party analytics providers and advertising partners."',
+								'Coinbase privacy policy: in the past 12 months, Coinbase has disclosed identifiers with third-party analytics providers and advertising partners.',
 							url: 'https://wallet.coinbase.com/privacy-policy',
 						},
 					],
