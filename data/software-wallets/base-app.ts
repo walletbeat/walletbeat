@@ -163,12 +163,12 @@ export const baseApp: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity, used for third-party advertising, developer advertising/marketing, AND analytics. The in-app "Personalized Advertising" toggle (defaulted ON) reduces advertising-related sharing but does not stop the underlying usage analytics collection.',
+								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity, used for external advertising, developer advertising/marketing, AND analytics. The in-app "Personalized Advertising" toggle (defaulted ON) reduces advertising-related sharing but does not stop the underlying usage analytics collection.',
 							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
 						},
 						{
 							explanation:
-								'Coinbase privacy policy: in the past 12 months, Coinbase has disclosed identifiers with third-party analytics providers and advertising partners.',
+								'Coinbase privacy policy: in the past 12 months, Coinbase has disclosed identifiers with external analytics providers and advertising partners.',
 							url: 'https://wallet.coinbase.com/privacy-policy',
 						},
 					],
