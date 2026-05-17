@@ -7,6 +7,7 @@ import {
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
 import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
+import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
@@ -186,7 +187,27 @@ export const baseApp: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			// Coinbase Smart Wallet supports "Spend Permissions" — a Coinbase-specific
+			// mechanism (the SpendPermissionManager contract added as a wallet owner)
+			// where dApps request recurring spending authority on the user's native ETH
+			// or ERC-20 tokens with amount + frequency + duration semantics. NFT
+			// (ERC-721 / ERC-1155) approvals are architecturally excluded from this
+			// design for security reasons. Inspection and revocation of Spend
+			// Permissions is possible via the Base Account web dashboard at
+			// keys.coinbase.com (Settings > Settings for your Base Account > Manage
+			// permissions), NOT in the Base mobile app itself. Traditional ERC-20
+			// approve() allowances granted via legacy paths are not shown in the
+			// dashboard and must be revoked using external tools (e.g. revoke.cash).
+			permissionsManagement: supported({
+				ref: {
+					explanation:
+						'Coinbase Smart Wallet exposes inspection and revocation for "Spend Permissions" (a Coinbase-specific recurring-allowance mechanism for native ETH and ERC-20 tokens) via the Base Account web dashboard. Traditional ERC-20 approve() allowances and NFT approvals are not covered. The Base mobile app does not surface this UI directly; users are linked out to the web flow.',
+					url: 'https://help.coinbase.com/en/wallet/getting-started/smart-wallet-permissions',
+				},
+				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+			}),
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
