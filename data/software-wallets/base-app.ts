@@ -167,7 +167,7 @@ export const baseApp: SoftwareWallet = {
 			// There is also nothing in the Base App documentation that indicates support
 			// for hardware wallets.
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: refNotNecessary,
 				wallets: {},
 			},
 			keysHandling: null,
