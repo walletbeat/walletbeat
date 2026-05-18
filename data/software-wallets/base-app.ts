@@ -161,7 +161,19 @@ export const baseApp: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			// Verified in-app (Base App v29.94.123):
+			// - No app-level PIN, password, biometric toggle, or pattern lock.
+			//   Opening the app does not require any authentication.
+			// - Face ID / biometric IS required before signing transactions (this is
+			//   the passkey unlock, not an app-level lock — gated per-action rather
+			//   than at app launch).
+			// - No duress credential, decoy mode, or emergency wipe feature.
+			// Per the schema: "Set to 'NO_LOCK_MECHANISM' if the wallet has no lock
+			// screen at all."
+			duressResistance: {
+				basicUnlock: 'NO_LOCK_MECHANISM',
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
