@@ -593,6 +593,10 @@ type DisplayCapability = {
 	location: DataLocation
 }
 
+export interface BaseTransactionLegibilitySupport {
+	erc8213: Support | null
+}
+
 /**
  * A record of transaction legibility support (both message and transaction)
  */
@@ -657,8 +661,15 @@ export const displaysFullCallData: Record<CallDataDisplay, DataDisplayOptions> =
 	[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
 
+/**
+ * ERC-8213 (Transaction Legibility) support for software wallets.
+ * Tracks which calldata display formats and message signing data types
+ * the wallet exposes to the user.
+ */
 export interface SoftwareWalletErc8213 {
+	/** Which calldata display formats are available and how they are shown. */
 	calldataDisplay: Record<CallDataDisplay, DataDisplayOptions> | null
+	/** Which message signing data types are available and how they are shown. */
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 }
 
@@ -700,10 +711,6 @@ export function isHardwareTransactionLegibility(
 	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
 	// between the two types:
 	return Object.hasOwn(transactionLegibility, 'dataExtraction')
-}
-
-export interface BaseTransactionLegibilitySupport {
-	erc8213: Support | null
 }
 
 export type HardwareTransactionLegibilityImplementation =
