@@ -6,6 +6,10 @@ import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
 import {
 	TransactionSubmissionL2Support,
@@ -181,7 +185,27 @@ export const baseApp: SoftwareWallet = {
 				duressMode: notSupported,
 			},
 			hardwareWalletSupport: null,
-			keysHandling: null,
+			// New passkey accounts (rawErc4337 default): WebAuthn passkey generated in
+			// the device secure enclave (iOS) / Android Keystore. Legacy 12-word-phrase
+			// accounts: BIP39 seed phrase generated locally. Both paths fall under
+			// FULLY_ON_USER_DEVICE / NON_MULTIPARTY — keys never leave the device
+			// during generation, and there is no key-splitting or threshold scheme.
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							'Per Coinbase Help, Smart Wallet passkeys are stored on the device (in the platform passkey store backed by iOS Secure Enclave or Android Keystore). The user retains control of the device-bound credential.',
+						url: 'https://help.coinbase.com/en/wallet/getting-started/smart-wallet-passkeys',
+					},
+					{
+						explanation:
+							'Per Coinbase Help, legacy 12-word recovery phrase accounts are generated on-device using BIP39; the seed phrase is shown only to the user and stored locally.',
+						url: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: notSupported,
 			},
