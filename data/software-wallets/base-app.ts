@@ -7,7 +7,10 @@ import {
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
 import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -187,16 +190,33 @@ export const baseApp: SoftwareWallet = {
 		},
 		selfSovereignty: {
 			permissionsManagement: null,
+			// Base App is mobile-only and closed-source. It does not ship its own
+			// Ethereum P2P (devp2p) stack, transactions
+			// are broadcast via Coinbase's RPC infrastructure. Users cannot configure
+			// a custom RPC endpoint (chainConfigurability: notSupported above), so
+			// there is no path to self-broadcast via a self-hosted node either.
+			// For L2s: Base + Optimism (OP Stack) and Arbitrum are supported. No in-app force-inclusion UI for any L2, users
+			// would need to interact with L1 bridge contracts directly.
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					ref: {
+						explanation:
+							"Base App and base/account-sdk are both built by Coinbase. The SDK (open-source) handles dApp-initiated transactions for Base accounts and uses viem's HTTP RPC transport — it does not implement Ethereum's devp2p protocol. It is reasonable to infer the closed-source Base App mobile binary uses the same approach for its native send/swap features: mobile platform constraints make running a devp2p node impractical, and Coinbase has never advertised doing so. URL pinned to the SDK's HTTP RPC fallback logic.",
+						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+					},
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-					ref: refTodo,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					ref: {
+						explanation:
+							'Per the open-source base/account-sdk that backs Base App account flows, SUPPORTED_MAINNET_CHAINS includes Base, Optimism (both OP Stack), Arbitrum, Ethereum mainnet, Polygon, Avalanche, BSC, and Zora. The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
+						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+					},
 				},
 			},
 		},
