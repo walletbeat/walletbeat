@@ -3150,6 +3150,12 @@ type DataExtractionMethods = Record<DataExtraction, boolean | null>
 
 ---
 
+### Interface: `BaseTransactionLegibilitySupport`
+
+- `erc8213` (`Support | null`)
+
+---
+
 ### Interface: `HardwareTransactionLegibilitySupport`
 
 A record of transaction legibility support (both message and transaction)
@@ -3176,8 +3182,10 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval
 
 ### Interface: `SoftwareWalletErc8213`
 
-- `calldataDisplay` (`Record<CallDataDisplay, DataDisplayOptions> | null`)
-- `messageSigningLegibility` (`SoftwareMessageSigningLegibility | null`)
+ERC-8213 (Transaction Legibility) support for software wallets. Tracks which calldata display formats and message signing data types the wallet exposes to the user.
+
+- `calldataDisplay` (`Record<CallDataDisplay, DataDisplayOptions> | null`): Which calldata display formats are available and how they are shown.
+- `messageSigningLegibility` (`SoftwareMessageSigningLegibility | null`): Which message signing data types are available and how they are shown.
 
 ---
 
@@ -3187,12 +3195,6 @@ A record of transaction legibility support (both message and transaction)
 
 - `erc8213` (`Support<SoftwareWalletErc8213> | null`)
 - `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Does the software wallet support displaying the transaction details? Evaluated per benchmark transaction type.
-
----
-
-### Interface: `BaseTransactionLegibilitySupport`
-
-- `erc8213` (`Support | null`)
 
 ---
 
