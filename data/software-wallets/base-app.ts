@@ -135,7 +135,10 @@ export const baseApp: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		// Base App has no UI for adding additional Ethereum addresses to a single
+		// install — verified in-app (Base App v29.94.123). The wallet manages a
+		// single account/address per install.
+		multiAddress: notSupported,
 		privacy: {
 			analytics: {
 				crashReports: null,
