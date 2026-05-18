@@ -47,6 +47,12 @@ Over the last 12 months, we massively expanded the set of wallets we cover, we w
 
 You can look over the past monthly update threads for detailed information:
 
+https://x.com/walletbeat/status/2019829961662820840
+
+https://x.com/walletbeat/status/2033995844744032348
+
+https://farcaster.xyz/walletbeat/0x730d98dd
+
 
 ### What milestones are you currently working towards? *
 We are working towards:
