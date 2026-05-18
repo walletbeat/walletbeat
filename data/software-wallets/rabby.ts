@@ -773,12 +773,22 @@ export const rabby: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: supported({
-				ref: refTodo,
-				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-			}),
+			// Rabby's browser extension exposes inspection and revocation for
+			// ERC-20, ERC-721, and ERC-1155 token approvals directly in the popup
+			// UI (a recent integration; previously this opened a separate tab to a
+			// Rabby-owned revoke site, which would not have qualified under the
+			// in-wallet-UI standard). Verified in-app. Mobile and desktop variants
+			// not independently verified, so left as null.
+			permissionsManagement: {
+				[Variant.BROWSER]: supported({
+					ref: refTodo,
+					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				}),
+				[Variant.DESKTOP]: null,
+				[Variant.MOBILE]: null,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
