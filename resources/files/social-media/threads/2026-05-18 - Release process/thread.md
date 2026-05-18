@@ -29,7 +29,7 @@ You should know what changed between versions — not only after something break
 
 Dependency locking: does the build pin dependencies to known versions with a lockfile or equivalent?
 
-Unpinned dependencies make it harder to reproduce builds, easier to ship unexpected changes between releases, and leave you unsure which third-party code actually went into a given release.
+Unpinned dependencies make it harder to reproduce builds, easier to ship unexpected changes between releases, and leave you unsure which external dependencies actually went into a given release.
 
 ---
 
