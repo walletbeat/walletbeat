@@ -1,3 +1,5 @@
+import { eip712 } from '@/data/eips/eip-712'
+import { erc8213 } from '@/data/eips/erc-8213'
 import {
 	type Attribute,
 	type Evaluation,
@@ -6,6 +8,7 @@ import {
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
+import { eipMarkdownLink, eipMarkdownShortLink } from '@/schema/eips'
 import {
 	BasicBenchmarkTransactions,
 	benchmarkTransactionLabel,
@@ -1389,7 +1392,7 @@ export const transactionLegibility: Attribute = {
 		- Copy to clipboard: Users can copy the calldata directly for verification
 		- Calldata digest (ERC-8213): Users can verify the calldata hash independently
 
-		Software wallets must also support calldata decoding for various transaction types, from basic token transfers to complex nested transactions, and must display the EIP-712 digest for typed message signing (ERC-8213).
+		Software wallets must also support calldata decoding for various transaction types, from basic token transfers to complex nested transactions, and must display the ${eipMarkdownShortLink(eip712)} digest for typed message signing (${eipMarkdownLink(erc8213)}).
 
 		**Hardware Wallet Specific Requirements:**
 		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet device itself. Any data shown only in a companion app or browser extension is ignored for hardware wallet ratings.
@@ -1399,24 +1402,24 @@ export const transactionLegibility: Attribute = {
 		- QR code: Users can scan a QR code displayed on the device to extract data
 		- Hashes: Users can compare hashes displayed on the device to verify data
 
-		The Calldata digest and EIP-712 digest (ERC-8213) must be shown on the device itself.
+		The Calldata digest and ${eipMarkdownShortLink(eip712)} digest (${eipMarkdownLink(erc8213)}) must be shown on the device itself.
 
-		**ERC-8213 Compliance:**
-		A wallet fully implements ERC-8213 when it displays both:
+		**${eipMarkdownLink(erc8213)} Compliance:**
+		A wallet fully implements ${eipMarkdownShortLink(erc8213)} when it displays both:
 		- The **Calldata digest** for transactions with calldata
-		- The **EIP-712 digest** for typed structured data signatures
+		- The **${eipMarkdownShortLink(eip712)} digest** for typed structured data signatures
 
 		For hardware wallets, both must be shown on the device screen (not just in companion software).
 
 		**Rating Criteria:**
 
 		For software wallets:
-		- A wallet receives a passing rating if it displays calldata in all formats (raw hex, formatted, copyable, digest), displays all essential transaction details, supports complex calldata decoding, and shows the EIP-712 digest for message signing (full ERC-8213 compliance).
+		- A wallet receives a passing rating if it displays calldata in all formats (raw hex, formatted, copyable, digest), displays all essential transaction details, supports complex calldata decoding, and shows the ${eipMarkdownShortLink(eip712)} digest for message signing (full ${eipMarkdownShortLink(erc8213)} compliance).
 		- A wallet receives a partial rating if it has some combination of these features but not all.
 		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
 
 		For hardware wallets:
-		- A wallet receives a passing rating if it supports decoding of complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes). It must also implement ERC-8213 (Calldata digest and EIP-712 digest on-device).
+		- A wallet receives a passing rating if it supports decoding of complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes). It must also implement ${eipMarkdownLink(erc8213)} (Calldata digest and ${eipMarkdownShortLink(eip712)} digest on-device).
 		- A wallet receives a partial rating if it has some combination of these features but not all at the full level.
 		- A wallet receives a failing rating if it lacks calldata decoding support, does not display essential transaction details on the device, and provides no effective data extraction methods.
 	`),
