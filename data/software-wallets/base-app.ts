@@ -21,6 +21,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
+import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -378,15 +379,21 @@ export const baseApp: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			// Coinbase Smart Wallet has a "Spend Permissions" mechanism for inspecting
-			// and revoking dApp spending authority over the user's native ETH and ERC-20
-			// tokens, but that UI lives only in the Base Account web dashboard at
-			// keys.coinbase.com — NOT in the Base mobile app itself. Per the walletbeat
-			// "in-wallet UI only" standard (PR #745 discussion), a feature that requires
-			// the user to leave the wallet app does not count as integrated, regardless
-			// of whether the external destination is operated by the same entity.
-			// Leaving this null until/unless Coinbase ships in-app permission management.
-			permissionsManagement: null,
+			// Base App exposes in-app ERC-20 token approval management via a "Token
+			// Approvals" screen (verified in-app, Base App v29.94.123). Users can
+			// inspect and revoke individual approvals directly in the wallet UI,
+			// across multiple chains (Ethereum, Base, Optimism observed). The screen
+			// covers traditional ERC-20 token.approve() allowances and Permit2-style
+			// allowances. NFT (ERC-721 / ERC-1155) approvals are NOT surfaced in this
+			// view — only fungibles. This satisfies the in-wallet-UI standard
+			// established in the prior #745 review (which was reverted under the
+			// assumption that revocation lived only at keys.coinbase.com).
+			permissionsManagement: supported({
+				ref: refTodo,
+				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+			}),
 			// Base App is mobile-only and closed-source. It does not ship its own
 			// Ethereum P2P (devp2p) stack, transactions
 			// are broadcast via Coinbase's RPC infrastructure. Users cannot configure
