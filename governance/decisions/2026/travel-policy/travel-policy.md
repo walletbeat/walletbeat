@@ -45,8 +45,33 @@ Contributors that apply for reimbursement must meet all of the following criteri
 - For any given event, if there are more than two contributors planning to attend, only the expenses of the two lowest-cost contributors may be reimbursed.
   - Rationale: This favors local contributors over far-away ones, in order to minimize total expenses, and encourages spreading event attendance over multiple events rather than concentrating attendance into any one single event.
 - The contributor must not belong to any organization that sponsors the event, unless Walletbeat itself is sponsoring the event.
+- The contributor must have a plan for how they will be furthering Walletbeat's mission at the event. See below for examples of what this entails.
+  - Rationale: As reimbursement funds come from the project treasury, they should only be spent on expenses that further the project's mission.
 
 NOTE: Walletbeat contributors can still go to events even if they do not qualify for reimbursement; they simply will not be reimbursed.
+
+## Qualifying impact plans
+
+Contributors that apply for reimbursement must prepare a plan for how they will further Walletbeat's mission by attending the event. For example:
+
+- Propose a talk or a workshop related to Walletbeat.
+  - Talks and workshops can be either directly about Walletbeat, either around Walletbeat's mission. For example, a talk around Ethereum values qualifies as well.
+  - Reimbursement is contingent on acceptance by the event organizers.
+- Run a Walletbeat booth or demo station at the event.
+  - Reimbursement is contingent on the booth being accepted.
+- Participate in a panel related to wallets or Walletbeat.
+  - Reimbursement is contingent on acceptance by the event organizers.
+- Run a Walletbeat class or curriculum session at an educational event.
+  - Reimbursement is contingent on acceptance by the event organizers.
+- Appear on a podcast (recorded at the event) related to Walletbeat.
+  - Podcast must be reputable (more than 10,000 subscribers).
+  - Reimbursement is contingent on acceptance by the podcast organizers.
+- Participate in wallet-related event or workshop where Walletbeat's attendance is valuable.
+  - Examples: Wallet industry groups for establishing EIP/ERC standards that impact wallets.
+  - Three or more distinct wallet teams must attend. Events with fewer than this number do not qualify.
+  - Reimbursement is contingent on being accepted into the event.
+
+Contributors must also show the impact _after_ the event in order to obtain reimbursement. See "After the event" section below.
 
 ## Expenses covered
 
