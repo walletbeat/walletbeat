@@ -378,6 +378,14 @@ export const baseApp: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			// Coinbase Smart Wallet has a "Spend Permissions" mechanism for inspecting
+			// and revoking dApp spending authority over the user's native ETH and ERC-20
+			// tokens, but that UI lives only in the Base Account web dashboard at
+			// keys.coinbase.com — NOT in the Base mobile app itself. Per the walletbeat
+			// "in-wallet UI only" standard (PR #745 discussion), a feature that requires
+			// the user to leave the wallet app does not count as integrated, regardless
+			// of whether the external destination is operated by the same entity.
+			// Leaving this null until/unless Coinbase ships in-app permission management.
 			permissionsManagement: null,
 			// Base App is mobile-only and closed-source. It does not ship its own
 			// Ethereum P2P (devp2p) stack, transactions
