@@ -385,9 +385,7 @@ export const baseApp: SoftwareWallet = {
 			// across multiple chains (Ethereum, Base, Optimism observed). The screen
 			// covers traditional ERC-20 token.approve() allowances and Permit2-style
 			// allowances. NFT (ERC-721 / ERC-1155) approvals are NOT surfaced in this
-			// view — only fungibles. This satisfies the in-wallet-UI standard
-			// established in the prior #745 review (which was reverted under the
-			// assumption that revocation lived only at keys.coinbase.com).
+			// view.
 			permissionsManagement: supported({
 				ref: refTodo,
 				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
