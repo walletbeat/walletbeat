@@ -3,7 +3,7 @@
 export type NavigationItem = {
 	id: string
 	title: string
-	icon?:  string
+	icon?: string
 	href?: string
 	children?: NavigationItem[]
 }
