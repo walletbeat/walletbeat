@@ -7,7 +7,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'what-is-walletbeat',
 		question: 'What is Walletbeat?',
-		navTitle: 'What is Walletbeat?',
 		answer: markdown(`
 			**Walletbeat is an Ethereum wallet rating site.**
 
@@ -18,7 +17,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'why-does-walletbeat-exist',
 		question: 'Why does Walletbeat exist?',
-		navTitle: 'What is Walletbeat for?',
 		answer: markdown(`
 			The Ethereum wallet ecosystem today is fragmented and it is difficult
 			for users to find a wallet that meets all of their requirements.
@@ -48,7 +46,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'why-should-i-care',
 		question: 'Why should I care?',
-		navTitle: 'Why should I care?',
 		answer: markdown(`
 			**As an Ethereum user**, Walletbeat helps you make an informed decision
 			about which wallet to use, and which wallet you may want to fund.
@@ -61,7 +58,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'how-are-wallets-evaluated',
 		question: 'How are wallets evaluated?',
-		navTitle: 'Wallet evaluation',
 		answer: markdown(`
 			Wallets are evaluated on a set of pass-fail rules that evaluate
 			specific **attributes**.
@@ -145,7 +141,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'rating-categories',
 		question: 'What do the rating categories mean?',
-		navTitle: 'Rating categories',
 		answer: markdown(`
 			Wallets are rated based on various attributes which are grouped under
 			five high-level buckets:
@@ -154,7 +149,7 @@ const frequentlyAskedQuestions = [
 				This includes security features such as hardware wallet support,
 				chain verification, resilience against software supply chain attacks
 				on the wallet's development process, scam warning features, etc.
-			* \u1f575 **Privacy** attributes look at how well a wallet protects
+			* ὗ5 **Privacy** attributes look at how well a wallet protects
 				your privacy. This includes features to interact with the Ethereum
 				ecosystem privately such as private transfers, but also how much data
 				the wallet collects about you.
@@ -191,7 +186,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'score-computation',
 		question: "How are wallets' score computed?",
-		navTitle: 'How is the score computed?',
 		answer: markdown(`
 			Scores are computed as a weighted average of all the criteria that go
 			into assessing wallets.
@@ -215,7 +209,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'who-is-behind-walletbeat',
 		question: 'Who is behind Walletbeat?',
-		navTitle: 'Who runs Walletbeat?',
 		answer: markdown(`
 			Walletbeat was originally created by
 			[moritz](https://warpcast.com/moritz/) as an open-source effort to
@@ -239,7 +232,6 @@ const frequentlyAskedQuestions = [
 	{
 		anchor: 'how-can-i-help',
 		question: 'How can I help?',
-		navTitle: 'How can I help?',
 		answer: markdown(`
 			Walletbeat is a work in progress and we would love your help!
 
@@ -264,8 +256,6 @@ import Navigation from '@/views/Navigation.astro'
 import Typography from '@/components/Typography.svelte'
 
 import { defaultNavigationItems } from '@/constants/navigation'
-
-import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?raw'
 ---
 
 <Layout
@@ -278,65 +268,101 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 
 	<main data-sticky-container data-column='gap-8'>
 		<header id='top' data-scroll-item='inline-detached padding-match-start'>
-			<h1>Walletbeat FAQ</h1>
+			<hgroup data-column='gap-2'>
+				<h1>Walletbeat FAQ</h1>
+				<p>Everything you need to know about Walletbeat and how we evaluate wallets.</p>
+			</hgroup>
 		</header>
 
-		{
-			frequentlyAskedQuestions.map(entry => (
-				<>
-					<hr />
+		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
+			{
+				frequentlyAskedQuestions.map(entry => (
+					<details id={entry.anchor}>
+						<summary>
+							<h4>{entry.question}</h4>
+						</summary>
 
-					<section id={entry.anchor} data-column='gap-3'>
-						<header data-sticky='block' data-scroll-item='inline-detached'>
-							<h2>
-								<span set:html={HelpOutlineIcon} />
-								{entry.question}
-							</h2>
-						</header>
-
-						<div data-column='gap-5' data-scroll-item='inline-detached'>
+						<div data-column='gap-5'>
 							<Typography client:visible content={entry.answer} />
 						</div>
-					</section>
-				</>
-			))
-		}
+					</details>
+				))
+			}
+		</div>
 	</main>
 </Layout>
 
 <style>
 	main {
 		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 42rem;
+			--scrollItem-inlineDetached-maxSize: 58rem;
 			--scrollItem-inlineDetached-paddingStart: 4.5rem;
 			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
 			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
 		}
 
 		line-height: 1.4;
+	}
 
-		section {
+	h1 {
+		font-family: 'SP Monorium', monospace;
+	}
+
+	hgroup p {
+		color: var(--text-secondary);
+		font-size: 1rem;
+	}
+
+	details {
+		border: var(--separator-width) solid var(--border-color);
+		border-radius: 0.5rem;
+		padding: 1.25rem 1.5rem;
+
+		summary {
+			cursor: pointer;
+			list-style: none;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+
+			&::-webkit-details-marker {
+				display: none;
+			}
+
+			&::after {
+				content: '';
+				width: 0.45em;
+				height: 0.45em;
+				border-right: 2px solid var(--text-secondary);
+				border-bottom: 2px solid var(--text-secondary);
+				transform: rotate(45deg);
+				flex-shrink: 0;
+				transition-property: transform;
+				transition-duration: 0.2s;
+				margin-block-end: 0.15em;
+			}
+
+			h4 {
+				font-size: 1.2rem;
+				font-weight: 600;
+				line-height: 1.4;
+			}
+		}
+
+		&[open] > summary::after {
+			transform: rotate(-135deg);
+			margin-block-end: -0.15em;
+		}
+
+		> div {
+			margin-block-start: 1rem;
 			line-height: 1.8;
-			/* padding-inline-start: clamp(0, (var(--scrollItem-inlineDetached-maxSize) - var(--sticky-sizeInline)) / 2, 5rem); */
-			/* padding-inline-start: 2.5rem; */
+			font-family: 'Avenir LT Std';
+		}
 
-			> header {
-				margin-block-start: -1rem;
-				padding-block: 1.5rem;
-			}
-
-			h2 {
-				position: relative;
-
-				span {
-					position: absolute;
-					right: 100%;
-					top: 0;
-					transform: translateX(-0.5em);
-					color: var(--text-secondary);
-					line-height: 1.3;
-				}
-			}
+		div :global(ul) {
+			padding-inline-start: 1.5em;
 		}
 	}
 </style>
