@@ -382,7 +382,7 @@ export const baseApp: SoftwareWallet = {
 			// Base App exposes in-app ERC-20 token approval management via a "Token
 			// Approvals" screen (verified in-app, Base App v29.94.123). Users can
 			// inspect and revoke individual approvals directly in the wallet UI,
-			// across multiple chains (Ethereum, Base, Optimism observed). The screen
+			// across multiple chains. The screen
 			// covers traditional ERC-20 token.approve() allowances and Permit2-style
 			// allowances. NFT (ERC-721 / ERC-1155) approvals are NOT surfaced in this
 			// view.
