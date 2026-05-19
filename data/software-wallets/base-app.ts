@@ -1,4 +1,7 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import { cantina } from '@/data/entities/cantina'
+import { certora } from '@/data/entities/certora'
+import { code4rena } from '@/data/entities/code4rena'
 import { coinbase } from '@/data/entities/coinbase'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
@@ -270,7 +273,53 @@ export const baseApp: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
+			// Audits cover the Coinbase Smart Wallet contracts that power Base App passkey-created accounts.
+			// Legacy 12-word-recovery-phrase accounts are EOAs and out of scope for these audits.
+			publicSecurityAudits: [
+				{
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-December-2023.pdf',
+					auditDate: '2024-01-07',
+					auditor: cantina,
+					codeSnapshot: {
+						commit: '2779bed4',
+						date: '2023-12-11',
+					},
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Certora-February-2024.pdf',
+					auditDate: '2024-02-29',
+					auditor: certora,
+					codeSnapshot: {
+						commit: '7aa092a',
+						date: '2024-02-08',
+					},
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: 'https://code4rena.com/reports/2024-03-coinbase',
+					auditDate: '2024-05-01',
+					auditor: code4rena,
+					codeSnapshot: {
+						date: '2024-03-14',
+					},
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+				{
+					ref: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-April-2024.pdf',
+					auditDate: '2024-04-23',
+					auditor: cantina,
+					codeSnapshot: {
+						commit: '9edcf7f1',
+						date: '2024-04-15',
+					},
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+			],
 			scamAlerts: {
 				contractTransactionWarning: supported<ContractTransactionWarning>({
 					ref: refTodo,
