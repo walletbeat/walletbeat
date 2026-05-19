@@ -2,7 +2,6 @@ import {
 	type Attribute,
 	type Evaluation,
 	EvaluationContext,
-	type EvaluationScaffold,
 	exampleRating,
 	Rating,
 } from '@/schema/attributes'
@@ -10,13 +9,14 @@ import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
 import { refNotNecessary, type WithRef } from '../../reference'
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
 	feature: string
@@ -191,11 +191,6 @@ function evaluateScamAlerts(
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
-	type NonNullScamPreventionMetadataScaffold = Exclude<
-		EvaluationScaffold<ScamPreventionMetadata>['outcome'],
-		{ metadata: { scamAlerts: null } }
-	>
-
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
 		return ctx.build({
@@ -212,7 +207,7 @@ function evaluateScamAlerts(
 					contractTransactionWarning,
 					scamUrlWarning,
 				},
-			} as NonNullScamPreventionMetadataScaffold,
+			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
 		})
@@ -241,7 +236,7 @@ function evaluateScamAlerts(
 						contractTransactionWarning,
 						scamUrlWarning,
 					},
-				} as NonNullScamPreventionMetadataScaffold,
+				},
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
@@ -269,7 +264,7 @@ function evaluateScamAlerts(
 						contractTransactionWarning,
 						scamUrlWarning,
 					},
-				} as NonNullScamPreventionMetadataScaffold,
+				},
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
@@ -296,7 +291,7 @@ function evaluateScamAlerts(
 					contractTransactionWarning,
 					scamUrlWarning,
 				},
-			} as NonNullScamPreventionMetadataScaffold,
+			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should implement the following features:
@@ -331,7 +326,7 @@ function evaluateScamAlerts(
 					contractTransactionWarning,
 					scamUrlWarning,
 				},
-			} as NonNullScamPreventionMetadataScaffold,
+			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should ensure all scam alerting features are implemented in a privacy-preserving manner.
@@ -371,7 +366,7 @@ function evaluateScamAlerts(
 				contractTransactionWarning,
 				scamUrlWarning,
 			},
-		} as NonNullScamPreventionMetadataScaffold,
+		},
 		details: scamAlertsDetailsContent({}),
 	})
 }
@@ -583,6 +578,16 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 				coreOnlyIsSufficient: true,
 			}),
 		)
+
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(
+				ctx,
+				sentence(
+					'This attribute is not applicable to hardware wallets because hardware wallets rely on dedicated secure hardware.',
+				),
+				{ scamAlerts: null },
+			)
+		}
 
 		if (ctx.features.security.scamAlerts === null) {
 			return unrated(ctx, { scamAlerts: null })

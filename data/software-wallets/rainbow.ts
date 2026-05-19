@@ -7,6 +7,7 @@ import type { AddressResolutionData } from '@/schema/features/privacy/address-re
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -29,7 +30,10 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -57,7 +61,7 @@ export const rainbow: SoftwareWallet = {
 		`),
 		contributors: [polymutex, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2025-02-08',
+		lastUpdated: '2026-05-11',
 		urls: {
 			docs: ['https://rainbowkit.com/'],
 			extensions: [
@@ -239,8 +243,19 @@ export const rainbow: SoftwareWallet = {
 					},
 				}),
 			},
-			bugBountyProgram: null,
-			duressResistance: null,
+			bugBountyProgram: notSupported,
+			duressResistance: supported({
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: true,
+						[BasicUnlockMechanism.BIOMETRIC]: false,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: notSupported,
+			}),
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -260,10 +275,10 @@ export const rainbow: SoftwareWallet = {
 			},
 
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [],
 			scamAlerts: null, // Rainbow uses Blockaid per questionnaire, but full details on all sub-fields pending follow-up
 			securityBestPractices: null,
 			transactionLegibility: {
@@ -327,16 +342,18 @@ export const rainbow: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
 				},
 			},
@@ -353,6 +370,15 @@ export const rainbow: SoftwareWallet = {
 				erc20L1Transfer: null,
 				ethL1Transfer: null,
 				uniswapUSDCToEtherSwap: null,
+			},
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
 			},
 		},
 	},

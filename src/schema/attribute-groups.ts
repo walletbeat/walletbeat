@@ -96,6 +96,7 @@ import {
 import { funding } from './attributes/transparency/funding'
 import { maintenance, type MaintenanceMetadata } from './attributes/transparency/maintenance'
 import { openSource } from './attributes/transparency/open-source'
+import { releaseProcess } from './attributes/transparency/release-process'
 import { reputation, type ReputationMetadata } from './attributes/transparency/reputation'
 import { sourceVisibility } from './attributes/transparency/source-visibility'
 import type { ResolvedFeatures } from './features'
@@ -231,6 +232,7 @@ type TransparencyValues = Dict<{
 	sourceVisibility: null
 	funding: null
 	feeTransparency: FeeTransparencyMetadata
+	releaseProcess: null
 	reputation: ReputationMetadata
 }>
 
@@ -247,6 +249,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		sourceVisibility,
 		funding,
 		feeTransparency,
+		releaseProcess,
 		reputation,
 	},
 	attributeWeights: {
@@ -254,6 +257,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		sourceVisibility: 1.0,
 		funding: 1.0,
 		feeTransparency: 1.0,
+		releaseProcess: 1.0,
 		reputation: 1.0,
 	},
 }
@@ -384,6 +388,7 @@ export interface TransparencyEvaluations extends EvaluatedGroup<TransparencyValu
 	sourceVisibility: EvaluatedAttribute
 	funding: EvaluatedAttribute
 	feeTransparency: EvaluatedAttribute<FeeTransparencyMetadata>
+	releaseProcess: EvaluatedAttribute
 }
 
 /** Evaluated ecosystem attributes for a single wallet. */
@@ -492,6 +497,7 @@ export function evaluateAttributes(
 			sourceVisibility: evalAttr(sourceVisibility),
 			funding: evalAttr(funding),
 			feeTransparency: evalAttr(feeTransparency),
+			releaseProcess: evalAttr(releaseProcess),
 			reputation: evalAttr(reputation),
 		},
 		ecosystem: {
@@ -568,6 +574,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			sourceVisibility: attr(tree => tree.transparency.sourceVisibility),
 			funding: attr(tree => tree.transparency.funding),
 			feeTransparency: attr(tree => tree.transparency.feeTransparency),
+			releaseProcess: attr(tree => tree.transparency.releaseProcess),
 			reputation: attr(tree => tree.transparency.reputation),
 		},
 		ecosystem: {

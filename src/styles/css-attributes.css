@@ -1260,7 +1260,7 @@ ol {
 		 */
 		[data-sticky] {
 			/* Inputs */
-			--sticky-backgroundColor: light-dark(#efefefaa, #130a2bb8);
+			--sticky-backgroundColor: light-dark(#efefef44, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
 			--sticky-backdropMaskImage: none;
 
@@ -1304,7 +1304,6 @@ ol {
 			&:not([data-sticky~="backdrop-none"]) {
 				&[data-scroll-container],
 				&:not([data-scroll-container])::before {
-					background-color: var(--sticky-backgroundColor);
 					backdrop-filter: var(--sticky-backdropFilter);
 					border-radius: inherit;
 

@@ -119,6 +119,15 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		transparency: {
 			maintenance: null,
 			operationFees: null,
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
+			},
 			reputation: null,
 		},
 	},
