@@ -1,6 +1,9 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import { coinbase } from '@/data/entities/coinbase'
+import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -148,9 +151,44 @@ export const baseApp: SoftwareWallet = {
 		// single account/address per install.
 		multiAddress: notSupported,
 		privacy: {
+			// Per direct in-app check (Settings > Privacy & Security, Base App v29.94.123):
+			// there is NO toggle to disable crash reporting, diagnostics, or usage
+			// analytics. The only data-collection toggle is "Personalized Advertising"
+			// (defaulted ON), which reduces ad-related data sharing but does not stop
+			// the underlying analytics collection.
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'Apple App Store privacy label declares "Diagnostics: Crash Data" and performance metrics are collected.',
+							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
+						},
+						{
+							explanation:
+								'No opt-out exists in the Base App Privacy & Security settings as of v29.94.123.',
+							url: 'https://wallet.coinbase.com/privacy-policy',
+						},
+					],
+					entity: coinbase,
+					policy: CollectionPolicy.ALWAYS,
+				}),
+				usage: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity, used for external advertising, developer advertising/marketing, AND analytics. The in-app "Personalized Advertising" toggle (defaulted ON) reduces advertising-related sharing but does not stop the underlying usage analytics collection.',
+							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
+						},
+						{
+							explanation:
+								'Coinbase privacy policy: in the past 12 months, Coinbase has disclosed identifiers with external analytics providers and advertising partners.',
+							url: 'https://wallet.coinbase.com/privacy-policy',
+						},
+					],
+					entity: coinbase,
+					policy: CollectionPolicy.ALWAYS,
+				}),
 			},
 			appIsolation: null,
 			dataCollection: null,
