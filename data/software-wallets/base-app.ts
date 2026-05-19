@@ -3,10 +3,13 @@ import { cantina } from '@/data/entities/cantina'
 import { certora } from '@/data/entities/certora'
 import { code4rena } from '@/data/entities/code4rena'
 import { coinbase } from '@/data/entities/coinbase'
+import { coinbaseEip7702ProxyContract } from '@/data/wallet-contracts/coinbase-eip7702-proxy'
+import { coinbaseSmartWalletContract } from '@/data/wallet-contracts/coinbase-smart-wallet'
 import type { WalletAnalytics } from '@/schema/features'
-import { AccountType } from '@/schema/features/account-support'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -16,6 +19,7 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
 import {
 	TransactionSubmissionL2Support,
@@ -59,8 +63,17 @@ export const baseApp: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			// New accounts created via passkey onboarding are ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
+			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
+			defaultAccountType: AccountType.rawErc4337,
+			eip7702: supported({
+				ref: {
+					explanation:
+						'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of dApp interactions; there is no user-facing "upgrade my account" UI in the Base App. Per the Base team questionnaire response (2026-03-13), accounts are "EOA + 7702 delegation / 4337".',
+					url: 'https://blog.base.dev/securing-eip-7702-upgrades',
+				},
+				contract: coinbaseEip7702ProxyContract,
+			}),
 			eoa: supported({
 				ref: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 				canExportPrivateKey: true,
@@ -72,7 +85,18 @@ export const baseApp: SoftwareWallet = {
 				},
 			}),
 			mpc: notSupported,
-			rawErc4337: notSupported,
+			rawErc4337: supported({
+				ref: {
+					explanation:
+						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave); Coinbase does not hold a co-owner key per https://wallet.coinbase.com/terms-of-service. The underlying contract supports multi-owner via addOwner/removeOwnerAtIndex, but as of Base App v29.94.123 the mobile app does not expose any passkey or owner management UI (Account Management shows only Sign out). Optional recovery-key setup likely lives in keys.coinbase.com rather than the mobile app.',
+					url: 'https://docs.base.org/base-account/overview/what-is-base-account',
+				},
+				contract: coinbaseSmartWalletContract,
+				controllingSharesInSelfCustodyByDefault: 'YES',
+				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+				tokenTransferTransactionGeneration:
+					TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
+			}),
 			safe: notSupported,
 		},
 		addressResolution: {
@@ -272,7 +296,17 @@ export const baseApp: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: null,
+			passkeyVerification: supported({
+				ref: {
+					explanation:
+						'Coinbase Smart Wallet verifies passkey signatures on-chain via webauthn-sol, which uses the RIP-7212 precompile when available and falls back to FreshCryptoLib.',
+					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
+				},
+				details:
+					'Uses base-org/webauthn-sol (built on Daimo WebAuthn.sol). Tries RIP-7212 P-256 precompile first, falls back to FreshCryptoLib.',
+				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
+				libraryUrl: 'https://github.com/base-org/webauthn-sol',
+			}),
 			// Audits cover the Coinbase Smart Wallet contracts that power Base App passkey-created accounts.
 			// Legacy 12-word-recovery-phrase accounts are EOAs and out of scope for these audits.
 			publicSecurityAudits: [
