@@ -10,7 +10,7 @@ Can users trust how this wallet's releases are built and distributed?
 Most users focus on what a wallet can do.
 Few ask how it's built and shipped.
 
-Release process is about the pipeline behind every update — not just the features in the release notes.
+Release process is about the pipeline behind every update, not just the features in the release notes.
 
 ---
 
@@ -23,7 +23,7 @@ Advanced: artifact signing, reproducible or hermetic builds
 
 Public changelog: does the wallet publish release notes or a changelog you can read before trusting an update?
 
-You should know what changed between versions — not only after something breaks.
+You should know what changed between versions, not only after something breaks.
 
 ---
 
@@ -35,26 +35,26 @@ Unpinned dependencies make it harder to reproduce builds, easier to ship unexpec
 
 Artifact signing: are release artifacts cryptographically signed, with signatures published where users or tooling can verify them?
 
-Signing helps detect tampering — the file you downloaded is the one the project attested to.
+Signing helps detect tampering. The file you downloaded should match what the project published.
 
 ---
 
 Reproducible or hermetic builds: can independent parties verify that build output matches the published source?
 
-• Reproducible: same source revision produces a bit-for-bit identical artifact
-• Hermetic: the build runs offline from a pre-fetched, integrity-verified input set
+• With reproducible builds, the same source revision yields a bit-for-bit identical artifact
+• With hermetic builds, the build runs offline using a pre-fetched, integrity-verified input set
 
 ---
 
 Rating scale:
 
-❌ Fail — missing both basic and advanced tiers
+❌ Fail: missing both basic and advanced tiers
 
-⚠️ Partial — one or both tiers incomplete, e.g.:
+⚠️ Partial: one or both tiers incomplete, e.g.:
 • Basic tier only: changelog + lockfile, no signing or reproducible/hermetic builds
 • Advanced without basic: signing + reproducible builds, but no changelog or lockfile
 
-✅ Pass — both tiers complete (all four signals)
+✅ Pass: both tiers complete (all four signals)
 
 ---
 
@@ -66,7 +66,4 @@ These aren't advanced features. They're how you know what you're installing is w
 
 ---
 
-Hardware wallets are exempt from this attribute — release process for hardware is tracked separately.
-
-Check Release process ratings on Walletbeat:
-https://beta.walletbeat.eth.limo/software-wallets
+Hardware wallets are exempt from this attribute, as release process for hardware is tracked separately.
