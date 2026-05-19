@@ -127,6 +127,13 @@
 }
 
 @font-face {
+	font-family: 'Avenir LT Std';
+	src: url('/fonts/avenir-lt-std-heavy.otf') format('opentype');
+	font-weight: 700;
+	font-style: normal;
+}
+
+@font-face {
 	font-family: 'Noto Color Emoji';
 	src: local('Noto Color Emoji');
 	/* The unicode range for emoji characters: */
