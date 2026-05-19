@@ -237,7 +237,14 @@ export const baseApp: SoftwareWallet = {
 				basicUnlock: 'NO_LOCK_MECHANISM',
 				duressMode: notSupported,
 			},
-			hardwareWalletSupport: null,
+			// Base App exposes no UI for adding, pairing, or managing hardware wallet keys
+			// and there are no settings for Ledger, Trezor, or other hardware devices.
+			// There is also nothing in the Base App documentation that indicates support
+			// for hardware wallets.
+			hardwareWalletSupport: {
+				ref: refNotNecessary,
+				wallets: {},
+			},
 			// New passkey accounts (rawErc4337 default): WebAuthn passkey generated in
 			// the device secure enclave (iOS) / Android Keystore. Legacy 12-word-phrase
 			// accounts: BIP39 seed phrase generated locally. Both paths fall under
