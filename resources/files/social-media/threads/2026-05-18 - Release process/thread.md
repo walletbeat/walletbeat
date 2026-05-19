@@ -67,3 +67,6 @@ These aren't advanced features. They're how you know what you're installing is w
 ---
 
 Hardware wallets are exempt from this attribute, as release process for hardware is tracked separately.
+
+Check Release process ratings on Walletbeat:
+https://beta.walletbeat.eth.limo
