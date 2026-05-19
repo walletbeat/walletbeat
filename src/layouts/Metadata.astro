@@ -53,8 +53,12 @@ const defaultOgImage: OpenGraphImage = {
 // configured site URL so social-card crawlers can fetch it regardless of
 // where the page is hosted.
 const toAbsolute = (url: string, site: URL | undefined): string => {
-	if (/^https?:\/\//i.test(url)) return url
-	if (!site) return url
+	if (/^https?:\/\//i.test(url)) {
+		return url
+	}
+	if (!site) {
+		return url
+	}
 	const path = url.startsWith('/') ? url : `/${url}`
 	return new URL(path, site).toString()
 }
