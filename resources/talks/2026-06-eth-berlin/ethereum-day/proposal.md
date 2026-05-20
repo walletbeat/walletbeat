@@ -26,6 +26,7 @@ Follow the Berlin Ethereum Meetup account to learn more and stay up to date!
 - [ ] Lightning talk (8 mins)
 - [ ] Talk (20 mins)
 - [ ] Panel Discussion (40 mins)
+
 9. What topic is your talk mostly related to? (maximum 2 answers)
 
 - [ ] Censorship Resistance & Digital Freedom
@@ -43,6 +44,7 @@ Follow the Berlin Ethereum Meetup account to learn more and stay up to date!
 - [ ] Art, NFTs, Gaming & Digital Culture
 - [ ] Regenerative Finance (ReFi) & Impact
 - [ ] Other
+
 10. Title of the Talk
 11. Abstract of the Talk
 12. Please briefly describe why you think this topic is relevant and would add value to this event.
