@@ -44,6 +44,27 @@ import { aggregateVariantEvaluations, exempt, pickWorstRating, unrated } from '.
 
 export type SecurityBestPracticesValue = null
 
+function sourceNotAvailable(
+	ctx: EvaluationContext<SecurityBestPracticesValue>,
+): Evaluation<SecurityBestPracticesValue> {
+	return ctx.build({
+		outcome: {
+			id: 'source_not_available',
+			rating: Rating.FAIL,
+			displayName: 'Source code not available',
+			shortExplanation: mdSentence(
+				"{{WALLET_NAME}}'s source code is not publicly available, so security best practices cannot be independently verified.",
+			),
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} does not make its source code publicly available. As a result, it is not possible to independently verify how it handles key storage, random number generation, or deployment hardening.',
+		),
+		howToImprove: mdParagraph(
+			'{{WALLET_NAME}} should open-source its code so that key storage, random number generation, and deployment hardening can be independently verified.',
+		),
+	})
+}
+
 function keyStoragePass(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	mechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE | KeyStorageMechanism.PASSKEY_MANAGED,
@@ -922,6 +943,12 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 					},
 				),
 			),
+			exampleRating(
+				mdParagraph(
+					"The wallet's source code is not publicly available, so key storage, RNG, and deployment hardening cannot be independently verified.",
+				),
+				sourceNotAvailable(EvaluationContext.forTest(() => securityBestPractices)),
+			),
 		],
 	},
 	aggregate: aggregateVariantEvaluations<SecurityBestPracticesValue>,
@@ -959,6 +986,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				return exempt(ctx, sentence('This wallet does not have a browser extension variant.'))
 			}
 
+			if (securityBestPractices.browser === 'SOURCE_NOT_AVAILABLE') {
+				return sourceNotAvailable(ctx)
+			}
+
 			const browser = ctx.popRefs<BrowserSecurityBestPractices>(securityBestPractices.browser)
 
 			subEvaluations.push(
@@ -976,6 +1007,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				return exempt(ctx, sentence('This wallet does not have a mobile app variant.'))
 			}
 
+			if (securityBestPractices.mobile === 'SOURCE_NOT_AVAILABLE') {
+				return sourceNotAvailable(ctx)
+			}
+
 			const mobile = ctx.popRefs<MobileSecurityBestPractices>(securityBestPractices.mobile)
 
 			subEvaluations.push(
@@ -988,6 +1023,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 		if (variant === Variant.DESKTOP) {
 			if (securityBestPractices.desktop === 'NOT_A_DESKTOP_APP') {
 				return exempt(ctx, sentence('This wallet does not have a desktop app variant.'))
+			}
+
+			if (securityBestPractices.desktop === 'SOURCE_NOT_AVAILABLE') {
+				return sourceNotAvailable(ctx)
 			}
 
 			const desktop = ctx.popRefs<SecurityBestPracticesBase>(securityBestPractices.desktop)
