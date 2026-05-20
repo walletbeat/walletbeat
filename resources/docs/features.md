@@ -2606,6 +2606,7 @@ How the wallet stores the user's private key.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
 - `PASSKEY_MANAGED` = `'PASSKEY_MANAGED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
+- `NOT_VERIFIABLE` = `'NOT_VERIFIABLE'`: The key storage mechanism cannot be determined because the wallet's source code is not publicly available.
 
 ---
 
@@ -2616,6 +2617,7 @@ The entropy source used when generating the wallet's private key.
 - `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided Cryptographically Secure Pseudorandom RNG.
 - `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source.
 - `LIBRARY_RNG` = `'LIBRARY_RNG'`: A library-provided RNG whose quality is not independently verified.
+- `NOT_VERIFIABLE` = `'NOT_VERIFIABLE'`: The RNG source cannot be determined because the wallet's source code is not publicly available.
 
 ---
 
@@ -2782,7 +2784,10 @@ Security best-practices for the mobile app variant.
 
 Security best-practices data for a wallet, broken down by variant.
 
-- `browser` (`| WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
+- `browser` (`| WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and no data can be obtained at all.
+
+  For closed-source wallets whose browser extension manifest is publicly available (e.g. via the Chrome Web Store), fill in actual manifest data and setting keyStorageMechanism / secureRng to KeyStorageMechanism.NOT_VERIFIABLE / SecureRngSource.NOT_VERIFIABLE
+
 - `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP' | 'SOURCE_NOT_AVAILABLE'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
 - `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP' | 'SOURCE_NOT_AVAILABLE'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
 

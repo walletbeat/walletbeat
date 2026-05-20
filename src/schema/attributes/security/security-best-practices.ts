@@ -131,6 +131,27 @@ function keyStorageFail(
 	})
 }
 
+function keyStorageUnverifiable(
+	ctx: EvaluationContext<SecurityBestPracticesValue>,
+): Evaluation<SecurityBestPracticesValue> {
+	return ctx.build({
+		outcome: {
+			id: 'key_storage_not_verifiable',
+			rating: Rating.FAIL,
+			displayName: 'Key storage cannot be verified',
+			shortExplanation: mdSentence(
+				"{{WALLET_NAME}}'s source code is not publicly available, so the key storage mechanism cannot be independently verified.",
+			),
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} does not make its source code publicly available. As a result, it is not possible to independently verify how it stores private keys.',
+		),
+		howToImprove: mdParagraph(
+			'{{WALLET_NAME}} should open-source its code so that its key storage mechanism can be independently verified.',
+		),
+	})
+}
+
 function evaluateKeyStorage(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	mechanism: KeyStorageMechanism,
@@ -144,6 +165,8 @@ function evaluateKeyStorage(
 			return keyStoragePartial(ctx, mechanism)
 		case KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_WEAK_KDF:
 			return keyStorageFail(ctx)
+		case KeyStorageMechanism.NOT_VERIFIABLE:
+			return keyStorageUnverifiable(ctx)
 		default:
 			return keyStorageFail(ctx)
 	}
@@ -184,6 +207,23 @@ function evaluateSecureRng(
 				),
 				howToImprove: mdParagraph(
 					"{{WALLET_NAME}} should use the operating system's CSPRNG for key generation.",
+				),
+			})
+		case SecureRngSource.NOT_VERIFIABLE:
+			return ctx.build({
+				outcome: {
+					id: 'rng_not_verifiable',
+					rating: Rating.FAIL,
+					displayName: 'RNG source cannot be verified',
+					shortExplanation: mdSentence(
+						"{{WALLET_NAME}}'s source code is not publicly available, so the entropy source used for key generation cannot be independently verified.",
+					),
+				},
+				details: paragraph(
+					'{{WALLET_NAME}} does not make its source code publicly available. As a result, it is not possible to independently verify what entropy source it uses for key generation.',
+				),
+				howToImprove: mdParagraph(
+					'{{WALLET_NAME}} should open-source its code so that the entropy source used for key generation can be independently verified.',
 				),
 			})
 		default:
@@ -945,7 +985,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 			exampleRating(
 				mdParagraph(
-					"The wallet's source code is not publicly available, so key storage, RNG, and deployment hardening cannot be independently verified.",
+					"The wallet is closed-source. For browser wallets with a public extension manifest, set `keyStorageMechanism` and `secureRng` to `NOT_VERIFIABLE` while filling in actual manifest data. For mobile/desktop or when no data is obtainable at all, set the variant to `'SOURCE_NOT_AVAILABLE'`.",
 				),
 				sourceNotAvailable(EvaluationContext.forTest(() => securityBestPractices)),
 			),
