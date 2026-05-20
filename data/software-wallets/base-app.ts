@@ -159,19 +159,25 @@ export const baseApp: SoftwareWallet = {
 				license: SourceNotAvailableLicense.PROPRIETARY,
 			},
 		},
+		// Coinbase is the parent company funding Base App development. Public via
+		// direct listing on Nasdaq (COIN, April 2021), so publicOffering captures
+		// the public-equity-funded nature. Base App's in-app swap UI displays a
+		// separate Coinbase-attributed fee, so transparentConvenienceFees applies.
+		// No governance token tied to Base App or Coinbase. SEC filings provide
+		// public revenue breakdown.
 		monetization: {
 			ref: 'https://www.sec.gov/edgar/browse/?CIK=0001679788',
 			revenueBreakdownIsPublic: true,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				donations: false,
+				ecosystemGrants: false,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
+				publicOffering: true,
+				selfFunded: false,
+				transparentConvenienceFees: true,
+				ventureCapital: false,
 			},
 		},
 		// Base App has no UI for adding additional Ethereum addresses to a single
