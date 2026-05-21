@@ -985,7 +985,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 			exampleRating(
 				mdParagraph(
-					"The wallet is closed-source. For browser wallets with a public extension manifest, set `keyStorageMechanism` and `secureRng` to `NOT_VERIFIABLE` while filling in actual manifest data. For mobile/desktop or when no data is obtainable at all, set the variant to `'SOURCE_NOT_AVAILABLE'`.",
+					'The wallet is closed-source. Security properties such as key storage, random number generation, and manifests cannot be independently verified.',
 				),
 				sourceNotAvailable(EvaluationContext.forTest(() => securityBestPractices)),
 			),
