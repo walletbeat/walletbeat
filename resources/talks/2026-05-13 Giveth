@@ -1,0 +1,13 @@
+The simplest way to to think about Walletbeat is that we're similar to L2beat but instead of covering L2s we cover wallets and our goal is to bring as much transparency to the wallet ecosystem within Ethereum as possible
+We rank wallets based off of 5 core attributes: privacy, self-sovereignty, transparency, ecosystem alignment, and security
+Security is extremely important but its still hard for an average user to understand what security features their wallets have and how those compare to other wallets. How Walletbeat evaluate security? Some of the questions we ask are:
+Has the wallet been audited, by whom? are the audits easily accessible? When was the date of the last audit?
+Does the wallet provide scam prevention warnings? 
+Does the wallet support hardware wallet pass through? 
+Does the wallet have light client support?  
+Does the wallet show transaction call data in a human readable way?
+etc.
+These are some of the criteria we cover within security. 
+We take this data along with data from the other categories and compute a stage ranking for wallets similar to L2beat
+All of this data is publicly available, auditable, free and open source at walletbeat.eth.limo or on our github
+We'll be using these funds to continue researching wallets, adding new wallets and trying to make the wallet space in Ethereum more secure for everyone
