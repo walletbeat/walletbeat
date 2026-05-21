@@ -1098,19 +1098,17 @@ function evaluateHardwareWalletTransactionLegibility(
 			return Rating.UNRATED
 		}
 
-		const erc8213Data = isSupported(erc8213) ? erc8213 : null
-
-		if (erc8213Data === null) {
-			return Rating.UNRATED
+		if (!isSupported(erc8213)) {
+			return Rating.FAIL
 		}
 
 		let calldataDigestLocation: DataLocation | null = null
 
-		if (erc8213Data.calldataDisplay !== null) {
-			calldataDigestLocation = erc8213Data.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
+		if (erc8213.calldataDisplay !== null) {
+			calldataDigestLocation = erc8213.calldataDisplay[CallDataDisplay.CALLDATA_DIGEST].location
 		}
 
-		const messageSigningLegibility = erc8213Data.messageSigningLegibility
+		const messageSigningLegibility = erc8213.messageSigningLegibility
 
 		// Evaluate message signing (PASS/FAIL only)
 		const messageSigningPasses =
@@ -1225,18 +1223,16 @@ function evaluateSoftwareWalletTransactionLegibility(
 		return unrated(ctx)
 	}
 
-	const erc8213Data = isSupported(erc8213) ? erc8213 : null
+	if (!isSupported(erc8213)) {
+		return softwareNoTransactionLegibility(ctx, softwareTransactionLegibility)
+	}
 
-	if (
-		erc8213Data === null ||
-		erc8213Data.calldataDisplay === null ||
-		erc8213Data.messageSigningLegibility === null
-	) {
+	if (erc8213.calldataDisplay === null || erc8213.messageSigningLegibility === null) {
 		return unrated(ctx)
 	}
 
-	const calldataDisplay = erc8213Data.calldataDisplay
-	const messageSigningLegibility = erc8213Data.messageSigningLegibility
+	const calldataDisplay = erc8213.calldataDisplay
+	const messageSigningLegibility = erc8213.messageSigningLegibility
 
 	const isShown = (field: DataDisplayOptions): boolean =>
 		field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
