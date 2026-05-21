@@ -60,6 +60,7 @@ export function isLooseReference(x: unknown): x is LooseReference {
 
 	if (
 		Object.hasOwn(x, 'file') &&
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "file" field exists.
 		typeof (x as { file: unknown }).file === 'string' &&
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified "file" is a string.
 		(x as { file: string }).file.startsWith('public/')
@@ -211,8 +212,10 @@ export function toFullyQualified(
 
 		const label =
 			Object.hasOwn(reference, 'label') &&
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "label" field exists.
 			typeof (reference as { label: unknown }).label === 'string'
-				? (reference as { label: string }).label
+				? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified "label" is a string.
+					(reference as { label: string }).label
 				: (filePath.split('/').pop() ?? 'Document')
 
 		return [
