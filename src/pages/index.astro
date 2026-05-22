@@ -58,6 +58,16 @@ import WalletTable from '@/views/WalletTable.svelte'
 </Layout>
 
 <style>
+	@font-face {
+		font-family: 'SP Monorium';
+		src:
+			url('/fonts/sp-monorium-regular.woff2') format('woff2'),
+			url('/fonts/sp-monorium-regular.woff') format('woff');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+
 	main {
 		> header {
 			&::before {
@@ -75,8 +85,9 @@ import WalletTable from '@/views/WalletTable.svelte'
 				0 0 3em var(--background-primary);
 
 			h1 {
-				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
-				font-weight: 800;
+				font-family: 'SP Monorium', 'Space Grotesk', sans-serif;
+				font-size: clamp(2rem, 5vw, 60px);
+				font-weight: 400;
 				color: var(--accent);
 				margin: 0 0 1rem 0;
 				line-height: 1.1;
