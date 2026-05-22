@@ -559,10 +559,10 @@ function analyzeSoftwareFeatures({
 	erc8213,
 	transactionDetailsDisplay,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
-	const erc8213Data = erc8213 !== null && isSupported(erc8213) ? erc8213 : null
-	const calldataDisplay = erc8213Data !== null ? erc8213Data.calldataDisplay : null
-	const messageSigningLegibility =
-		erc8213Data !== null ? erc8213Data.messageSigningLegibility : null
+	const { calldataDisplay, messageSigningLegibility } =
+		erc8213 !== null && isSupported(erc8213)
+			? erc8213
+			: { calldataDisplay: null, messageSigningLegibility: null }
 
 	const isDisplayed = (opt: DataDisplayOptions): boolean =>
 		opt === DataDisplayOptions.SHOWN_BY_DEFAULT || opt === DataDisplayOptions.SHOWN_OPTIONALLY
