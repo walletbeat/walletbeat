@@ -96,9 +96,15 @@ describe('codebase integrity', () => {
 				// Husky-generated shims under `.husky/_/` are local-only (not tracked) and often have no trailing newline.
 				(path: string): boolean => normalizePath(path).startsWith('.husky/_/'),
 			].concat(commonExclusions),
-			traversalFn: entry => {
-				if (entry.type !== CodebaseEntryType.FILE) {
+			complexTraversalFn: async (entryBase, getFullEntry) => {
+				if (entryBase.type !== CodebaseEntryType.FILE) {
 					return
+				}
+
+				const entry = await getFullEntry()
+
+				if (entry.type !== CodebaseEntryType.FILE) {
+					throw new Error('inconsistent type')
 				}
 
 				if (entry.path.endsWith('.svg')) {
@@ -135,7 +141,7 @@ describe('codebase integrity', () => {
 
 		await crawlCodebase({
 			ignore: ['.git', await GitIgnoredFiles()],
-			traversalFn: entry => {
+			baseTraversalFn: entry => {
 				if (entry.type !== CodebaseEntryType.FILE) {
 					return
 				}
@@ -175,8 +181,14 @@ describe('codebase integrity', () => {
 
 		await crawlCodebase({
 			ignore: ['.git', 'node_modules'],
-			traversalFn: entry => {
-				if (entry.type === CodebaseEntryType.SYMLINK) {
+			complexTraversalFn: async (entryBase, getFullEntry) => {
+				if (entryBase.type === CodebaseEntryType.SYMLINK) {
+					const entry = await getFullEntry()
+
+					if (entry.type !== CodebaseEntryType.SYMLINK) {
+						throw new Error('inconsistent type')
+					}
+
 					symlinks.push(entry)
 				}
 			},
@@ -337,7 +349,7 @@ describe('codebase integrity', () => {
 
 		await crawlCodebase({
 			ignore: commonExclusions,
-			traversalFn: entry => {
+			fullTraversalFn: entry => {
 				if (entry.type !== CodebaseEntryType.FILE) {
 					return
 				}
@@ -471,7 +483,7 @@ describe('codebase integrity', () => {
 
 		await crawlCodebase({
 			ignore: commonExclusions,
-			traversalFn: entry => {
+			baseTraversalFn: entry => {
 				// Skip the root path itself
 				if (entry.path === '.' || entry.path === '') {
 					return
