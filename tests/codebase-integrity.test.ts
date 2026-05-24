@@ -445,4 +445,58 @@ describe('codebase integrity', () => {
 			).toEqual([])
 		})
 	})
+
+	describe('all filenames use consistent naming', async () => {
+		/**
+		 * Regexes applied to each path component (segment between slashes).
+		 * Paths must match at least one.
+		 */
+		const PATH_COMPONENT_REGEXES = [
+			/^\.[a-z0-9]+(\.[a-z0-9]+)*$/, // .dotfiles
+			/^[a-z0-9]+([-.][a-z0-9]+)*(\.[a-z0-9]+)*$/, // snake-case
+			/^[a-z0-9]+([_.][a-z0-9]+)*(\.[a-z0-9]+)*$/, // snake_case
+			/^[a-z0-9]+([A-Z][a-z0-9]*)*(\.[a-z0-9]+)*$/, // camelCase
+			/^([A-Z0-9][a-z0-9]*)+(\.[a-z0-9]+)*$/, // PascalCase
+			/^\d{4}-\d{2}-\d{2} - [-\w ]+(\.[a-z0-9]+)*$/, // 'YYYY-MM-DD - Something'
+		]
+
+		/** Path components that are exempt from the check. */
+		const PATH_COMPONENT_WHITELIST = new Set<string>([
+			'eternalsafe.Containerfile',
+			'[attrGroupId].astro',
+			'[walletName]',
+		])
+
+		const componentsFailed: string[] = []
+
+		await crawlCodebase({
+			ignore: commonExclusions,
+			traversalFn: entry => {
+				// Skip the root path itself
+				if (entry.path === '.' || entry.path === '') {
+					return
+				}
+
+				const components = entry.path.split('/')
+
+				for (const component of components) {
+					if (PATH_COMPONENT_WHITELIST.has(component)) {
+						continue
+					}
+
+					if (PATH_COMPONENT_REGEXES.every(regex => !regex.test(component))) {
+						componentsFailed.push(`${entry.path} (component: ${component})`)
+						break
+					}
+				}
+			},
+		})
+
+		it('all file paths use consistent naming', () => {
+			expect(
+				componentsFailed,
+				`Paths failing naming consistency check:\n\n${componentsFailed.join('\n')}\n\nPlease rename to snake-case or CamelCase or add to whitelist.`,
+			).toEqual([])
+		})
+	})
 })
