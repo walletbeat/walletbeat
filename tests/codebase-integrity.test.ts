@@ -15,9 +15,66 @@ import {
 	crawlCodebase,
 	getCrlfFilesFromGit,
 	getRepositoryRoot,
+	GitIgnoredFiles,
 	normalizePath,
 	type PathPredicate,
 } from './utils/codebase'
+
+/** File extensions that are allowed in the repository. */
+const ALLOWED_EXTENSIONS = new Set([
+	'.ts',
+	'.astro',
+	'.svelte',
+	'.css',
+	'.txt',
+	'.md',
+	'.mdc',
+	'.eot',
+	'.ttf',
+	'.woff',
+	'.woff2',
+	'.png',
+	'.jpg',
+	'.jpeg',
+	'.gif',
+	'.ico',
+	'.svg',
+	'.pdf',
+	'.sh',
+	'.py',
+	'.sty',
+	'.sha256',
+	'.sha512sums',
+	'.version',
+	'.lock',
+	'.Containerfile',
+	'.sol',
+	'.json',
+	'.jsonc',
+	'.js',
+	'.mjs',
+	'.html',
+	'.xml',
+	'.tsv',
+	'.yaml',
+	'.toml',
+])
+
+/** Filenames that are allowed without a recognized extension. */
+const ALLOWED_BARE_FILENAMES = new Set([
+	'README',
+	'LICENSE',
+	'CONTRIBUTING',
+	'Makefile',
+	'agentsignore',
+	'checkpoint',
+	'torrc',
+	'.editorconfig',
+	'.gitattributes',
+	'.gitignore',
+	'.gitmodules',
+	'.prettierignore',
+])
 
 describe('codebase integrity', () => {
 	describe('all files have Unix line endings', () => {
@@ -69,6 +126,46 @@ describe('codebase integrity', () => {
 			expect(
 				svgFilesWithNewline,
 				`SVG files with trailing newline:\n\n${svgFilesWithNewline.join('\n')}\n\nPlease strip the newline.`,
+			).toEqual([])
+		})
+	})
+
+	describe('all files have valid extensions', async () => {
+		const filesWithInvalidExtensions: string[] = []
+
+		await crawlCodebase({
+			ignore: ['.git', await GitIgnoredFiles()],
+			traversalFn: entry => {
+				if (entry.type !== CodebaseEntryType.FILE) {
+					return
+				}
+
+				// Get the basename and extension from the path
+				const basename = entry.path.split('/').pop() ?? entry.path
+				const dotIndex = basename.lastIndexOf('.')
+
+				// Files with no extension: check against allowed bare filenames
+				if (dotIndex === -1 || dotIndex === 0) {
+					if (!ALLOWED_BARE_FILENAMES.has(basename)) {
+						filesWithInvalidExtensions.push(entry.path)
+					}
+
+					return
+				}
+
+				// Files with an extension: check against allowed extensions
+				const extension = basename.slice(dotIndex)
+
+				if (!ALLOWED_EXTENSIONS.has(extension)) {
+					filesWithInvalidExtensions.push(entry.path)
+				}
+			},
+		})
+
+		it('all files have valid extensions', () => {
+			expect(
+				filesWithInvalidExtensions,
+				`Files with invalid extensions:\n\n${filesWithInvalidExtensions.join('\n')}\n\nPlease rename the file, add the extension to the whitelist, or remove the file.`,
 			).toEqual([])
 		})
 	})
