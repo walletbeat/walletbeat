@@ -16,7 +16,6 @@ import {
 	DataDisplayOptions,
 	DataExtraction,
 	displaysFullTransactionDetails,
-	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -192,7 +191,7 @@ export const onekeyWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/J_XG7cNOVhM',
 					},
 				],
-				calldataDecoded: noCalldataDecoding,
+				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,

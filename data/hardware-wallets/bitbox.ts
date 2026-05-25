@@ -25,7 +25,6 @@ import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	DataDisplayOptions,
 	DataExtraction,
-	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -224,7 +223,7 @@ export const bitboxWallet: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
 					},
 				],
-				calldataDecoded: noCalldataDecoding,
+				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,

@@ -15,7 +15,6 @@ import {
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	DataExtraction,
@@ -194,18 +193,15 @@ export const keystoneWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/Ly9lo4g5NpA',
 					},
 				],
-				calldataDecoded: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.ON_DEVICE,
-					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataLocation.ON_DEVICE,
+				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						DataLocation.NOT_PROVIDED,
-				},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.NOT_PROVIDED,
+				}),
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,

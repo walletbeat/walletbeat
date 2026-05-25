@@ -15,12 +15,10 @@ import {
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import {
-	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	DataExtraction,
 	DataLocation,
-	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -258,11 +256,15 @@ export const keycardShell: HardwareWallet = {
 						url: 'https://github.com/keycard-tech/eth-abi-repo',
 					},
 				],
-				calldataDecoded: {
-					...noCalldataDecoding,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.ON_DEVICE,
+				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
-				},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.NOT_PROVIDED,
+				}),
 				// Data extraction: QR codes used for transaction data (ERC-4527); display visible to eyes
 				dataExtraction: {
 					[DataExtraction.EYES]: true,

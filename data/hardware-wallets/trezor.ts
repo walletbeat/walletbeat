@@ -18,7 +18,6 @@ import {
 	DataDisplayOptions,
 	DataExtraction,
 	displaysFullTransactionDetails,
-	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -179,7 +178,7 @@ export const trezorWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/4LayLrSuHNg',
 					},
 				],
-				calldataDecoded: noCalldataDecoding,
+				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
