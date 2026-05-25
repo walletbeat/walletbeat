@@ -269,6 +269,8 @@ export const safe: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				// transactionDetailsDisplay: displaysFullTransactionDetails,
+				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -278,8 +280,8 @@ export const safe: SoftwareWallet = {
 					},
 					messageSigningLegibility: null,
 				}),
-				// transactionDetailsDisplay: displaysFullTransactionDetails,
 				transactionDetailsDisplay: null,
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

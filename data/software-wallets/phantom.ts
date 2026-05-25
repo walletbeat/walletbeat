@@ -145,7 +145,6 @@ export const phantom: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				erc8213: null,
 				// transactionDetailsDisplay: {
 				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// 	from: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -154,7 +153,10 @@ export const phantom: SoftwareWallet = {
 				// 	to: DataDisplayOptions.SHOWN_OPTIONALLY,
 				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// },
+				erc7730: null,
+				erc8213: null,
 				transactionDetailsDisplay: null,
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

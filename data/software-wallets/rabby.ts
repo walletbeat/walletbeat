@@ -32,7 +32,6 @@ import {
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -70,15 +69,6 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
-
-const rabbyTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_OPTIONALLY,
-	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -715,6 +705,21 @@ export const rabby: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+				}),
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -730,50 +735,43 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: rabbyTransactionDisplayDefault,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_OPTIONALLY,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...rabbyTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...rabbyTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...rabbyTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: rabbyTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...rabbyTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...rabbyTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...rabbyTransactionDisplayDefault,
-						failure: 'DETECTED',
-					},
-					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...rabbyTransactionDisplayDefault,
-						nondeterminism: 'STATIC_SINGLE_OUTCOME',
-					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...rabbyTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...rabbyTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
-				},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {

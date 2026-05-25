@@ -32,7 +32,6 @@ import {
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -73,15 +72,6 @@ import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702
 import metamaskAndroidParsed from './manifests/metamask/android.parsed.json'
 import metamaskIosParsed from './manifests/metamask/ios.parsed.json'
 import metamaskRawExtManifest from './manifests/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn.manifest.json'
-
-const metamaskTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -551,6 +541,21 @@ export const metamask: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+				}),
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -566,50 +571,43 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...metamaskTransactionDisplayDefault,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...metamaskTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: metamaskTransactionDisplayDefault,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...metamaskTransactionDisplayDefault,
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: metamaskTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...metamaskTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...metamaskTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...metamaskTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...metamaskTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
-					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...metamaskTransactionDisplayDefault,
-						nondeterminism: 'RESIMULATES_NO_WARNING',
-					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...metamaskTransactionDisplayDefault,
-						failure: 'DETECTED',
+						failure: 'DETECTED' as const,
 					},
-				},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'RESIMULATES_NO_WARNING' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {

@@ -143,8 +143,10 @@ export const frame: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: null,
 				erc8213: null,
 				transactionDetailsDisplay: null,
+				transactionSimulations: null,
 				// transactionDetailsDisplay: {
 				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
