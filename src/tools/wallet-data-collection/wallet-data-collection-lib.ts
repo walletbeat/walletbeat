@@ -745,7 +745,7 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 
 export async function handleCheck(opts: GlobalOptions): Promise<number> {
 	const capture = await openCaptureFile(opts)
-	const issues = capture.check()
+	const issues = await capture.check()
 
 	if (issues.length == 0) {
 		log('✅ No issues found! Wallet capture process complete. Well done.')
@@ -940,9 +940,7 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 function displayRequestInfo(request: WalletRequest): void {
 	function formatUserDataDict(dict: UserDataDict): string {
 		return Object.entries(dict)
-			.map(
-				([key, values]) => `${key}=${values.map(v => v.toSkeletonString('[redact]')).join(', ')}`,
-			)
+			.map(([key, values]) => `${key}=${values.map(v => v.toSkeletonString(null)).join(', ')}`)
 			.join('; ')
 	}
 	const entity = entityForDomain(request.domain)
@@ -963,7 +961,11 @@ function displayRequestInfo(request: WalletRequest): void {
 	}
 
 	if (request.content !== null) {
-		log(`    Content: ${request.content.toString()}`)
+		const contentStr = request.content.toSkeletonString(null)
+
+		if (contentStr.trim() !== '') {
+			log(`    Content: ${request.content.toString()}`)
+		}
 	}
 
 	if (Object.keys(request.cookies).length > 0) {
@@ -990,10 +992,12 @@ function displayRequestInfo(request: WalletRequest): void {
 }
 
 export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
-	const capture = await openCaptureFile(opts)
+	let capture = await openCaptureFile(opts)
 
 	let remainingStrings = await capture.allStrings()
 	let userStopped = false
+	let numIterations = 1
+	const initialNumUnredacted = remainingStrings.numUnredacted()
 
 	while (remainingStrings.numUnredacted() > 0 && !userStopped) {
 		// Filter to unredacted (raw string) entries
@@ -1013,9 +1017,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 		// Display the string and its occurrences
 		log('\n' + '='.repeat(80))
-		log(
-			`Unredacted string ${unredactedStrings.filter((s, i) => i <= unredactedStrings.indexOf(strEntry)).length} of ${unredactedStrings.length}`,
-		)
+		log(`Unredacted string ${numIterations} of ${initialNumUnredacted}`)
 		log('='.repeat(80))
 		log(`  String:  ${JSON.stringify(strValue)}`)
 		log(`  Entropy: ${strEntry.score.toFixed(2)}`)
@@ -1183,7 +1185,9 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 		}
 
 		// Refresh strings:
+		capture = await openCaptureFile(opts)
 		remainingStrings = await capture.allStrings()
+		numIterations++
 	}
 
 	if (!userStopped) {
@@ -1395,7 +1399,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 			// Collect detected user info from request. CollectionPolicy is irrelevant here since we
 			// only look at the keys (`UserInfo`s).
-			const detectedUserInfo = new Set(request.userInfo(null, false).keys())
+			const detectedUserInfo = new Set((await request.userInfo(null, false)).keys())
 
 			if (detectedUserInfo.size > 0) {
 				log(`\n  Auto-detected user data: ${Array.from(detectedUserInfo).join(', ')}`)

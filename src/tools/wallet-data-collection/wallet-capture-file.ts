@@ -1044,11 +1044,18 @@ export class RedactedString {
 	/**
 	 * @returns A string with `placeholder` everywhere a redacted substring exists.
 	 */
-	public toSkeletonString(placeholder: string): string {
-		return this._payload
-			.split(this.escapeChar)
-			.map((v, i) => {
-				return i % 2 === 0 ? v : placeholder
+	public toSkeletonString(placeholder: string | null): string {
+		return this._parts(this._payload)
+			.map(data => {
+				if (typeof data === 'string') {
+					return data
+				}
+
+				if (placeholder !== null) {
+					return placeholder
+				}
+
+				return '█'.repeat(data.length)
 			})
 			.join('')
 	}
@@ -1611,11 +1618,11 @@ export class UserDataPieces {
 		return { sample: this.sample.encode(), pieces }
 	}
 
-	public toSkeletonString(placeholder: string): string {
+	public toSkeletonString(placeholder: string | null): string {
 		const sampleRepr = this.sample.toSkeletonString(placeholder)
 
 		if (this.pieces.size === 0) {
-			return `${sampleRepr} [no user data]`
+			return sampleRepr
 		}
 
 		const pieces = [...this.pieces].sort().join(' ')
@@ -1627,7 +1634,7 @@ export class UserDataPieces {
 		const sampleRepr = JSON.stringify(this.sample.encode())
 
 		if (this.pieces.size === 0) {
-			return `${sampleRepr} [no user data]`
+			return sampleRepr
 		}
 
 		const pieces = [...this.pieces].sort().join(' ')
@@ -1840,6 +1847,7 @@ export class WalletRequest {
 	 * Equivalent to Python `WalletRequest.decode(...)` (for requests already stored in JSON).
 	 */
 	public static fromEncoded(
+		captureFile: WalletCaptureFile,
 		req: EncodedWalletDataRequest,
 		redactor: RedactedStringStore,
 		at = '$',
@@ -1852,6 +1860,7 @@ export class WalletRequest {
 					: [...req.jsonRpcMethod]
 
 		return new WalletRequest({
+			captureFile,
 			domain: req.domain,
 			path: req.path,
 			sessionTime: new WalletCaptureSessionTime(req.sessionTime),
@@ -1963,10 +1972,10 @@ export class WalletRequest {
 		return [this.domain]
 	}
 
-	public userInfo(
+	public async userInfo(
 		matcherCollectionPolicy: CollectionPolicy | null,
 		includeManualReview: boolean,
-	): Map<UserInfo, CollectionPolicy | null> {
+	): Promise<Map<UserInfo, CollectionPolicy | null>> {
 		const infos = new Map<UserInfo, CollectionPolicy | null>()
 
 		const setInfo = (info: UserInfo, collectionPolicy: CollectionPolicy | null) => {
@@ -1999,7 +2008,7 @@ export class WalletRequest {
 
 		setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
 
-		const processUserDataPieces = (piece: UserDataPieces) => {
+		const processUserDataPieces = async (piece: UserDataPieces) => {
 			for (const userInfo of piece.pieces) {
 				setInfo(userInfo, matcherCollectionPolicy)
 			}
@@ -2024,21 +2033,21 @@ export class WalletRequest {
 			}
 		}
 
-		const processDict = (dict: UserDataDict) => {
+		const processDict = async (dict: UserDataDict) => {
 			for (const values of Object.values(dict)) {
 				for (const piece of values) {
-					processUserDataPieces(piece)
+					await processUserDataPieces(piece)
 				}
 			}
 		}
 
-		processDict(this.query)
-		processDict(this.cookies)
-		processDict(this.oddHeaders)
-		processDict(this.oddTrailers)
+		await processDict(this.query)
+		await processDict(this.cookies)
+		await processDict(this.oddHeaders)
+		await processDict(this.oddTrailers)
 
 		if (this.content !== null) {
-			processUserDataPieces(this.content)
+			await processUserDataPieces(this.content)
 		}
 
 		if (includeManualReview) {
@@ -2116,6 +2125,7 @@ export class WalletCaptureFlow {
 
 		this._requests = data.requests.map((r, i) =>
 			WalletRequest.fromEncoded(
+				file,
 				r,
 				this.file.redactor,
 				`$.flows[${JSON.stringify(flow)}].requests[${i}]`,
@@ -2404,7 +2414,7 @@ export class WalletCaptureFile {
 	 * partial data into wallet feature data without breakage. Unit tests
 	 * should check in strict mode.
 	 */
-	public toDataCollection(options: AutoGenerationOptions): DataCollection {
+	public async toDataCollection(options: AutoGenerationOptions): Promise<DataCollection> {
 		const dataCollection: DataCollection = {
 			[UserFlow.INSTALL]: null,
 			[UserFlow.ONBOARDING_NEW]: null,
@@ -2436,7 +2446,7 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			const collected = this.processFlowRequests(flow, options.strict ?? false)
+			const collected = await this.processFlowRequests(flow, options.strict ?? false)
 			const flowData: DataCollectionForFlow = {
 				collected,
 			}
@@ -2460,10 +2470,10 @@ export class WalletCaptureFile {
 	/**
 	 * Process flow requests to build DataCollectionByEntity array.
 	 */
-	private processFlowRequests(
+	private async processFlowRequests(
 		flow: WalletCaptureFlow,
 		strict: boolean,
-	): WithRef<DataCollectionByEntity>[] {
+	): Promise<WithRef<DataCollectionByEntity>[]> {
 		const maybeThrow = (error: string) => {
 			if (strict) {
 				throw new Error(error)
@@ -2487,7 +2497,7 @@ export class WalletCaptureFile {
 			}
 
 			const matcher = this.findMatcherForReq(request)
-			const userInfos = request.userInfo(matcher === null ? null : matcher.policy, true)
+			const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
 			const purposes = new Set<DataCollectionPurpose>()
 
 			if (matcher !== null) {
@@ -2669,7 +2679,7 @@ export class WalletCaptureFile {
 		}
 	}
 
-	public check(): WalletCaptureIssue[] {
+	public async check(): Promise<WalletCaptureIssue[]> {
 		if (recordedFlow.items.map(this.getFlow.bind(this)).every(v => v === null)) {
 			return [
 				new WalletCaptureIssue({
@@ -2784,7 +2794,7 @@ export class WalletCaptureFile {
 		if (issues.length === 0) {
 			// Double-check that this is the case by trying to convert in strict mode:
 			try {
-				this.toDataCollection({
+				await this.toDataCollection({
 					strict: true,
 				})
 			} catch (e) {

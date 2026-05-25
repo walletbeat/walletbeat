@@ -335,7 +335,7 @@ export class WalletCaptureAnnotations {
 	private toJSON(global: boolean): EncodedWalletCaptureAnnotations {
 		return {
 			matchers: this.matchers.filter(m => m.isGlobal === global).map(m => m.toJSON()),
-			benignStrings: Array.from(this.benignStrings),
+			benignStrings: Array.from(global ? this.benignStrings : this.globalBenignStrings).toSorted(),
 		}
 	}
 
@@ -405,14 +405,9 @@ export class WalletCaptureAnnotations {
 			}
 		}
 
-		let globalNeedsWrite = false
 		const globalContent = JSON.stringify(this.toJSON(true), null, '\t') + '\n'
 		const existingGlobalContent = fs.readFileSync(this.globalPath, 'utf8')
-
-		if (!isSameJson(existingGlobalContent, globalContent)) {
-			globalNeedsWrite = true
-		}
-
+		const globalNeedsWrite = !isSameJson(existingGlobalContent, globalContent)
 		const changed: string[] = []
 
 		if (opts.verifyExisting) {
