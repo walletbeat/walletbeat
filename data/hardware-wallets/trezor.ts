@@ -178,7 +178,6 @@ export const trezorWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/4LayLrSuHNg',
 					},
 				],
-				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -189,6 +188,7 @@ export const trezorWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_IN_UI,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

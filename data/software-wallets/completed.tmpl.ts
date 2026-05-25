@@ -629,6 +629,9 @@ export const completedTemplate: SoftwareWallet = {
 						{
 							decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
 				}),
 				erc8213: supported({
 					calldataDisplay: displaysFullCallData,
@@ -670,6 +673,15 @@ export const completedTemplate: SoftwareWallet = {
 						{
 							transactionOutcome: TransactionOutcome.EXPLAINED,
 						},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
 						failure: 'DETECTED' as const,
 					},

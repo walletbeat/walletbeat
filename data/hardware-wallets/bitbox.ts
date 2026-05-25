@@ -223,7 +223,6 @@ export const bitboxWallet: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
 					},
 				],
-				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -237,6 +236,7 @@ export const bitboxWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

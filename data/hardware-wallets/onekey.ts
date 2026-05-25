@@ -191,7 +191,6 @@ export const onekeyWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/J_XG7cNOVhM',
 					},
 				],
-				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -202,6 +201,7 @@ export const onekeyWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_IN_UI,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

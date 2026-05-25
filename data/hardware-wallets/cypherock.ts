@@ -197,7 +197,6 @@ export const cypherockWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/YG6lzwTUojE',
 					},
 				],
-				erc7730: notSupported,
 
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -212,6 +211,7 @@ export const cypherockWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT, // contract address
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

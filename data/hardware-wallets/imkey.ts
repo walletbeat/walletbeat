@@ -160,7 +160,6 @@ export const imkeyWallet: HardwareWallet = {
 						],
 					},
 				],
-				erc7730: notSupported,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -170,6 +169,7 @@ export const imkeyWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

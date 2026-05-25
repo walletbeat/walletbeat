@@ -288,6 +288,7 @@ export const rainbow: SoftwareWallet = {
 						{
 							decoded: DataDisplayOptions.NOT_IN_UI,
 						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
 				}),
 				erc8213: supported({
 					calldataDisplay: {
@@ -334,6 +335,9 @@ export const rainbow: SoftwareWallet = {
 						{
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
 						failure: 'DETECTED' as const,
 					},

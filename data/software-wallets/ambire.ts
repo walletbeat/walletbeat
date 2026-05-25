@@ -676,6 +676,9 @@ export const ambire: SoftwareWallet = {
 						{
 							decoded: DataDisplayOptions.NOT_IN_UI,
 						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
 				}),
 				erc8213: supported({
 					calldataDisplay: {
@@ -700,6 +703,12 @@ export const ambire: SoftwareWallet = {
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
@@ -722,6 +731,9 @@ export const ambire: SoftwareWallet = {
 						{
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
 						failure: 'DETECTED' as const,
 					},
