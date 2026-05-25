@@ -707,6 +707,9 @@ export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLeg
 	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay | null
 }
 
+export const isShown = (field: DataDisplayOptions): boolean =>
+	field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
+
 export const isFullBasicTransactionDetails = (
 	details: DisplayedBasicTransactionDetails,
 ): boolean => {
