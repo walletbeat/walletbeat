@@ -371,33 +371,43 @@ export enum SimulationBenchmarkTransactions {
 }
 
 /**
- * Details for a failed simulation benchmark transaction.
+ * ERC-7730 transaction decoding details for a single complex benchmark transaction.
+ * ERC-7730 defines a standard for structured calldata descriptors that wallets use
+ * to display human-readable descriptions of smart contract calls.
  */
-export interface DisplayedFailedTransactionDetails extends Omit<
-	DisplayedComplexTransactionDetails,
-	'transactionOutcome' | 'calldataDecoded'
-> {
+export interface Erc7730TransactionDetails {
 	/**
-	 * If the wallet detects that a transaction will fail and shows this to the user,
-	 * it's 'DETECTED'; otherwise, 'NOT_DETECTED'.
+	 * Whether the calldata is decoded into a human-readable description
+	 * using ERC-7730 structured calldata descriptors.
 	 */
+	decoded: DataDisplayOptions
+}
+
+/**
+ * ERC-7730 support for software wallets.
+ * Tracks whether the wallet can show human-readable descriptions for
+ * each complex benchmark transaction.
+ */
+export type SoftwareErc7730Support = Record<ComplexBenchmarkTransactions, Erc7730TransactionDetails>
+
+/**
+ * Simulation entry for a transaction that tracks the outcome explanation.
+ */
+export interface TransactionOutcomeEntry {
+	transactionOutcome: TransactionOutcome
+}
+
+/**
+ * Simulation entry for a transaction that may fail.
+ */
+export interface SimulatedFailedTransaction {
 	failure: 'DETECTED' | 'NOT_DETECTED'
 }
 
 /**
- * Details for a nondeterministic simulation benchmark transaction.
+ * Simulation entry for a transaction with nondeterministic outcome.
  */
-export interface DisplayedNondeterministicTransactionDetails extends Omit<
-	DisplayedComplexTransactionDetails,
-	'transactionOutcome' | 'calldataDecoded'
-> {
-	/**
-	 * How the wallet handles state-dependent (non-deterministic) transactions.
-	 *
-	 * - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
-	 * - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
-	 * - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
-	 */
+export interface SimulatedNondeterministicTransaction {
 	nondeterminism:
 		| 'NO_OUTCOME_SHOWN'
 		| 'STATIC_SINGLE_OUTCOME'
@@ -406,30 +416,35 @@ export interface DisplayedNondeterministicTransactionDetails extends Omit<
 }
 
 /**
- * Display details for token transfer transactions (ERC-20, ERC-721).
- * These include a transaction outcome since the transfer involves contract interaction.
+ * Per-benchmark-transaction simulation data for software wallets.
+ * - Token transfer types (ERC-20/721/1155) and complex transactions track transactionOutcome.
+ * - FAILED_TRANSACTION tracks failure detection.
+ * - NONDETERMINISTIC_TRANSACTION tracks nondeterminism handling.
  */
-export interface DisplayedTokenTransferDetails extends DisplayedBasicTransactionDetails {
-	transactionOutcome: TransactionOutcome
+export type SoftwareTransactionSimulations = {
+	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: TransactionOutcomeEntry
+	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: TransactionOutcomeEntry
+	[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: TransactionOutcomeEntry
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: TransactionOutcomeEntry
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: TransactionOutcomeEntry
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: TransactionOutcomeEntry
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: TransactionOutcomeEntry
+	[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: SimulatedFailedTransaction
+	[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: SimulatedNondeterministicTransaction
 }
 
 /**
- * Per-benchmark-transaction display details for software wallets.
- * Each benchmark transaction records what the wallet shows when that transaction is being signed.
+ * Global transaction details display for software wallets.
+ * These basic fields are expected to be shown across all transaction types.
  */
-export type SoftwareTransactionDetailsDisplay =
-	| ({
-			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
-			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
-	  } & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
-				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
-			} & {
-				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
-			})
-	| null
+export interface SoftwareTransactionDetailsDisplay {
+	gas: DataDisplayOptions
+	nonce: DataDisplayOptions
+	from: DataDisplayOptions
+	to: DataDisplayOptions
+	chain: DataDisplayOptions
+	value: DataDisplayOptions
+}
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
@@ -680,8 +695,19 @@ export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLeg
 	erc8213: Support<SoftwareWalletErc8213> | null
 
 	/**
-	 * Does the software wallet support displaying the transaction details?
-	 * Evaluated per benchmark transaction type.
+	 * ERC-7730 calldata decoding support per complex benchmark transaction.
+	 */
+	erc7730: Support<SoftwareErc7730Support> | null
+
+	/**
+	 * Per-benchmark simulation data: transaction outcomes for token and complex transactions,
+	 * plus failure/nondeterminism detection for simulation-specific benchmarks.
+	 */
+	transactionSimulations: Support<SoftwareTransactionSimulations> | null
+
+	/**
+	 * Global basic transaction details display (gas, nonce, from, to, chain, value).
+	 * Applied across all transaction types.
 	 */
 	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay | null
 }
