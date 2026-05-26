@@ -29,6 +29,7 @@ export interface ConcreteWalletEvalStrings {
 	WALLET_PSEUDONYM_PLURAL: string
 }
 
+import type { WBIconFontID } from '@/styles/wbicons'
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
@@ -48,7 +49,6 @@ import {
 import type { Score } from './score'
 import type { AtLeastOneVariant } from './variants'
 import type { RatedWallet, WalletMetadata } from './wallet'
-import type { WBIconFontID } from '@/styles/wbicons'
 
 /**
  * Rating is an enum that should be visually meaningful.
