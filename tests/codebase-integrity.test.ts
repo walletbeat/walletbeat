@@ -30,6 +30,7 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.md',
 	'.mdc',
 	'.eot',
+	'.otf',
 	'.ttf',
 	'.woff',
 	'.woff2',
