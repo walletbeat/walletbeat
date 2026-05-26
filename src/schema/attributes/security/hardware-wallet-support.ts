@@ -104,7 +104,7 @@ function directHardwareWalletSupport(
 
 export const hardwareWalletSupport: Attribute<HardwareWalletSupportMetadata> = {
 	id: 'hardwareWalletSupport',
-	icon: '\u{1F5DD}', // Key emoji
+	icon: 'hardware_wallet_support',
 	displayName: 'Hardware wallet support',
 	wording: {
 		midSentenceName: null,

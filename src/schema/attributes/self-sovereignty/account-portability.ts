@@ -428,7 +428,7 @@ function evaluateEip7702(ctx: EvaluationContext, accountSupport: AccountSupport)
 
 export const accountPortability: Attribute = {
 	id: 'accountPortability',
-	icon: '\u{1f9f3}', // Luggage
+	icon: 'account_portability',
 	displayName: 'Account portability',
 	wording: {
 		midSentenceName: 'account portability',

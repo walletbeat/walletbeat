@@ -215,7 +215,7 @@ function rateAppIsolation(
 
 export const appIsolation: Attribute = {
 	id: 'appIsolation',
-	icon: '\u{1f3dd}', // Desert island
+	icon: 'app_isolation',
 	displayName: 'App isolation',
 	wording: {
 		midSentenceName: 'app isolation',

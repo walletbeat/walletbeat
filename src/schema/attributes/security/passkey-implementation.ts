@@ -198,7 +198,7 @@ function webAuthnSolImplementation(
 
 export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 	id: 'passkeyImplementation',
-	icon: '\u{1fac6}', // Fingerprint
+	icon: 'passkey_verification',
 	displayName: 'Passkey implementation',
 	wording: {
 		midSentenceName: null,

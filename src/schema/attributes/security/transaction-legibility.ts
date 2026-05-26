@@ -1159,7 +1159,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 export const transactionLegibility: Attribute = {
 	id: 'transactionLegibility',
-	icon: '\u{1F50F}', // Lock with pen
+	icon: 'transaction_legibility',
 	displayName: 'Transaction Legibility',
 	wording: {
 		midSentenceName: null,

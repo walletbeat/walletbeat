@@ -83,7 +83,7 @@ function noChainVerification(
 
 export const chainVerification: Attribute = {
 	id: 'chainVerification',
-	icon: '\u{2693}', // Anchor
+	icon: 'chain_verification',
 	displayName: 'Chain verification',
 	wording: {
 		midSentenceName: 'chain verification',

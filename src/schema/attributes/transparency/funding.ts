@@ -125,7 +125,7 @@ const unclear: (typeof funding)['evaluate'] = ctx =>
  */
 export const funding: Attribute = {
 	id: 'funding',
-	icon: '\u{1f4b0}', // Money bag
+	icon: 'funding_transparency',
 	displayName: 'Funding',
 	wording: {
 		midSentenceName: 'funding',

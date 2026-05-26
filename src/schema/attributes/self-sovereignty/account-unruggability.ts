@@ -217,7 +217,7 @@ function evaluateAccountUnruggability(
 
 export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 	id: 'accountUnruggability',
-	icon: '\u{1fa9a}', // Carpentry Saw
+	icon: 'account_unruggability',
 	displayName: 'Account unruggability',
 	wording: {
 		midSentenceName: 'account unruggability',

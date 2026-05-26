@@ -755,7 +755,7 @@ function evaluateKeysHandling(
 
 export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	id: 'securityBestPractices',
-	icon: '\u{1f510}', // Locked with key
+	icon: 'security_best_practices',
 	displayName: 'Security best practices',
 	wording: {
 		midSentenceName: null,

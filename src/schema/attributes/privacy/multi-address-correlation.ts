@@ -276,7 +276,7 @@ function rateHandling(
 
 export const multiAddressCorrelation: Attribute = {
 	id: 'multiAddressCorrelation',
-	icon: '\u{1f587}', // Linked paperclips
+	icon: 'multi_address_privacy',
 	displayName: 'Multi-address privacy',
 	wording: {
 		midSentenceName: 'multi-address privacy',

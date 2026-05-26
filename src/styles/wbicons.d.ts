@@ -37,7 +37,7 @@ export type WBIconFontID =
 	| 'security_best_practices'
 	| 'self_sovereignty'
 	| 'source_code_license'
-	| 'source_visibility'
+	| 'open_source'
 	| 'transaction_batching'
 	| 'transaction_inclusion'
 	| 'transaction_legibility'

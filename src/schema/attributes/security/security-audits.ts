@@ -125,7 +125,7 @@ const sampleSecurityAudit: SecurityAudit = {
 
 export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 	id: 'securityAudits',
-	icon: '\u{1f50f}', // Locked with Pen
+	icon: 'security_audits',
 	displayName: 'Security audits',
 	wording: {
 		midSentenceName: null,

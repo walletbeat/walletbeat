@@ -16,7 +16,7 @@ export type ReputationMetadata = {
 
 export const reputation: Attribute<ReputationMetadata> = {
 	id: 'reputation',
-	icon: '🌟',
+	icon: 'transparency',
 	displayName: 'Reputation',
 	wording: {
 		midSentenceName: null,

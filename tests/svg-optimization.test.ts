@@ -226,7 +226,7 @@ const optimizedSvgHashes: Record<string, string> = {
 		'67be234afaf1a92148d268fc7dde69eabcddd25be932f6fe09e162b119892ce1',
 	'resources/files/wbicons/source_code_license.svg':
 		'adf1e55fa6b50d77c72ac340d5b01f3ef5ad9aa39f9de7206eae23715a0d6427',
-	'resources/files/wbicons/source_visibility.svg':
+	'resources/files/wbicons/open_source.svg':
 		'29a4ca719470edda4b0e811e5f26d122c7cc06b1c1394ddace70fbc66013a6e5',
 	'resources/files/wbicons/transaction_batching.svg':
 		'b520345224989151bd7db1fe21bf650a74499dd158c03b1d92c28f111b7f41af',

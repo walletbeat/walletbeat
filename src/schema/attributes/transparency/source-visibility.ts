@@ -75,7 +75,7 @@ const sourcePrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
 
 export const sourceVisibility: Attribute = {
 	id: 'sourceVisibility',
-	icon: '\u{1f50d}', // Looking glass
+	icon: 'source_visibility',
 	displayName: 'Source visibility',
 	wording: {
 		midSentenceName: 'source visibility',
