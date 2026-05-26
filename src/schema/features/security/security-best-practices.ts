@@ -34,6 +34,12 @@ export enum KeyStorageMechanism {
 	 * smart contract accounts
 	 */
 	PASSKEY_MANAGED = 'PASSKEY_MANAGED',
+
+	/**
+	 * The key storage mechanism cannot be determined because the wallet's
+	 * source code is not publicly available.
+	 */
+	NOT_VERIFIABLE = 'NOT_VERIFIABLE',
 }
 
 /**
@@ -48,6 +54,12 @@ export enum SecureRngSource {
 
 	/** A library-provided RNG whose quality is not independently verified. */
 	LIBRARY_RNG = 'LIBRARY_RNG',
+
+	/**
+	 * The RNG source cannot be determined because the wallet's source code
+	 * is not publicly available.
+	 */
+	NOT_VERIFIABLE = 'NOT_VERIFIABLE',
 }
 
 /**
@@ -433,12 +445,32 @@ export interface MobileSecurityBestPractices extends SecurityBestPracticesBase {
  * Security best-practices data for a wallet, broken down by variant.
  */
 export interface SecurityBestPracticesData {
-	/** Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. */
-	browser: WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION'
+	/**
+	 * Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent.
+	 * Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and no data
+	 * can be obtained at all.
+	 *
+	 * For closed-source wallets whose browser extension manifest is publicly
+	 * available (e.g. via the Chrome Web Store), fill in actual
+	 * manifest data and setting keyStorageMechanism / secureRng to
+	 * KeyStorageMechanism.NOT_VERIFIABLE / SecureRngSource.NOT_VERIFIABLE
+	 */
+	browser:
+		| WithRef<BrowserSecurityBestPractices>
+		| 'NOT_A_BROWSER_EXTENSION'
+		| 'SOURCE_NOT_AVAILABLE'
 
-	/** Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent. */
-	mobile: WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP'
+	/**
+	 * Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent.
+	 * Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security
+	 * properties cannot be independently verified.
+	 */
+	mobile: WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP' | 'SOURCE_NOT_AVAILABLE'
 
-	/** Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent. */
-	desktop: WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP'
+	/**
+	 * Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent.
+	 * Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security
+	 * properties cannot be independently verified.
+	 */
+	desktop: WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP' | 'SOURCE_NOT_AVAILABLE'
 }

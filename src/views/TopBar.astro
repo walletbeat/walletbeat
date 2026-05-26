@@ -36,7 +36,9 @@ import { topbarNavigationItems } from '@/constants/navigation'
 <style>
 	#topbar {
 		grid-area: Header;
-		background-color: var(--sticky-backgroundColor);
+		background-color: var(--background-primary);
+		/* Blurs the background gradient behind the bar */
+		backdrop-filter: blur(20px);
 		position: sticky;
 		top: 0;
 		z-index: 2;

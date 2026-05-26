@@ -15,9 +15,66 @@ import {
 	crawlCodebase,
 	getCrlfFilesFromGit,
 	getRepositoryRoot,
+	GitIgnoredFiles,
 	normalizePath,
 	type PathPredicate,
 } from './utils/codebase'
+
+/** File extensions that are allowed in the repository. */
+const ALLOWED_EXTENSIONS = new Set([
+	'.ts',
+	'.astro',
+	'.svelte',
+	'.css',
+	'.txt',
+	'.md',
+	'.mdc',
+	'.eot',
+	'.ttf',
+	'.woff',
+	'.woff2',
+	'.png',
+	'.jpg',
+	'.jpeg',
+	'.gif',
+	'.ico',
+	'.svg',
+	'.pdf',
+	'.sh',
+	'.py',
+	'.sty',
+	'.sha256',
+	'.sha512sums',
+	'.version',
+	'.lock',
+	'.Containerfile',
+	'.sol',
+	'.json',
+	'.jsonc',
+	'.js',
+	'.mjs',
+	'.html',
+	'.xml',
+	'.tsv',
+	'.yaml',
+	'.toml',
+])
+
+/** Filenames that are allowed without a recognized extension. */
+const ALLOWED_BARE_FILENAMES = new Set([
+	'README',
+	'LICENSE',
+	'CONTRIBUTING',
+	'Makefile',
+	'agentsignore',
+	'checkpoint',
+	'torrc',
+	'.editorconfig',
+	'.gitattributes',
+	'.gitignore',
+	'.gitmodules',
+	'.prettierignore',
+])
 
 describe('codebase integrity', () => {
 	describe('all files have Unix line endings', () => {
@@ -39,9 +96,15 @@ describe('codebase integrity', () => {
 				// Husky-generated shims under `.husky/_/` are local-only (not tracked) and often have no trailing newline.
 				(path: string): boolean => normalizePath(path).startsWith('.husky/_/'),
 			].concat(commonExclusions),
-			traversalFn: entry => {
-				if (entry.type !== CodebaseEntryType.FILE) {
+			complexTraversalFn: async (entryBase, getFullEntry) => {
+				if (entryBase.type !== CodebaseEntryType.FILE) {
 					return
+				}
+
+				const entry = await getFullEntry()
+
+				if (entry.type !== CodebaseEntryType.FILE) {
+					throw new Error('inconsistent type')
 				}
 
 				if (entry.path.endsWith('.svg')) {
@@ -73,13 +136,59 @@ describe('codebase integrity', () => {
 		})
 	})
 
+	describe('all files have valid extensions', async () => {
+		const filesWithInvalidExtensions: string[] = []
+
+		await crawlCodebase({
+			ignore: ['.git', await GitIgnoredFiles()],
+			baseTraversalFn: entry => {
+				if (entry.type !== CodebaseEntryType.FILE) {
+					return
+				}
+
+				// Get the basename and extension from the path
+				const basename = entry.path.split('/').pop() ?? entry.path
+				const dotIndex = basename.lastIndexOf('.')
+
+				// Files with no extension: check against allowed bare filenames
+				if (dotIndex === -1 || dotIndex === 0) {
+					if (!ALLOWED_BARE_FILENAMES.has(basename)) {
+						filesWithInvalidExtensions.push(entry.path)
+					}
+
+					return
+				}
+
+				// Files with an extension: check against allowed extensions
+				const extension = basename.slice(dotIndex)
+
+				if (!ALLOWED_EXTENSIONS.has(extension)) {
+					filesWithInvalidExtensions.push(entry.path)
+				}
+			},
+		})
+
+		it('all files have valid extensions', () => {
+			expect(
+				filesWithInvalidExtensions,
+				`Files with invalid extensions:\n\n${filesWithInvalidExtensions.join('\n')}\n\nPlease rename the file, add the extension to the whitelist, or remove the file.`,
+			).toEqual([])
+		})
+	})
+
 	describe('all symlinks are valid', async () => {
 		const symlinks: (CodebaseEntry & { type: CodebaseEntryType.SYMLINK })[] = []
 
 		await crawlCodebase({
 			ignore: ['.git', 'node_modules'],
-			traversalFn: entry => {
-				if (entry.type === CodebaseEntryType.SYMLINK) {
+			complexTraversalFn: async (entryBase, getFullEntry) => {
+				if (entryBase.type === CodebaseEntryType.SYMLINK) {
+					const entry = await getFullEntry()
+
+					if (entry.type !== CodebaseEntryType.SYMLINK) {
+						throw new Error('inconsistent type')
+					}
+
 					symlinks.push(entry)
 				}
 			},
@@ -240,7 +349,7 @@ describe('codebase integrity', () => {
 
 		await crawlCodebase({
 			ignore: commonExclusions,
-			traversalFn: entry => {
+			fullTraversalFn: entry => {
 				if (entry.type !== CodebaseEntryType.FILE) {
 					return
 				}
@@ -345,6 +454,60 @@ describe('codebase integrity', () => {
 			expect(
 				filesWithBom,
 				`Files with BOM (Byte Order Mark):\n\n${filesWithBom.join('\n')}\n\nPlease remove the BOM.`,
+			).toEqual([])
+		})
+	})
+
+	describe('all filenames use consistent naming', async () => {
+		/**
+		 * Regexes applied to each path component (segment between slashes).
+		 * Paths must match at least one.
+		 */
+		const PATH_COMPONENT_REGEXES = [
+			/^\.[a-z0-9]+(\.[a-z0-9]+)*$/, // .dotfiles
+			/^[a-z0-9]+([-.][a-z0-9]+)*(\.[a-z0-9]+)*$/, // snake-case
+			/^[a-z0-9]+([_.][a-z0-9]+)*(\.[a-z0-9]+)*$/, // snake_case
+			/^[a-z0-9]+([A-Z][a-z0-9]*)*(\.[a-z0-9]+)*$/, // camelCase
+			/^([A-Z0-9][a-z0-9]*)+(\.[a-z0-9]+)*$/, // PascalCase
+			/^\d{4}-\d{2}-\d{2} - [-\w ]+(\.[a-z0-9]+)*$/, // 'YYYY-MM-DD - Something'
+		]
+
+		/** Path components that are exempt from the check. */
+		const PATH_COMPONENT_WHITELIST = new Set<string>([
+			'eternalsafe.Containerfile',
+			'[attrGroupId].astro',
+			'[walletName]',
+		])
+
+		const componentsFailed: string[] = []
+
+		await crawlCodebase({
+			ignore: commonExclusions,
+			baseTraversalFn: entry => {
+				// Skip the root path itself
+				if (entry.path === '.' || entry.path === '') {
+					return
+				}
+
+				const components = entry.path.split('/')
+
+				for (const component of components) {
+					if (PATH_COMPONENT_WHITELIST.has(component)) {
+						continue
+					}
+
+					if (PATH_COMPONENT_REGEXES.every(regex => !regex.test(component))) {
+						componentsFailed.push(`${entry.path} (component: ${component})`)
+						break
+					}
+				}
+			},
+		})
+
+		it('all file paths use consistent naming', () => {
+			expect(
+				componentsFailed,
+				`Paths failing naming consistency check:\n\n${componentsFailed.join('\n')}\n\nPlease rename to snake-case or CamelCase or add to whitelist.`,
 			).toEqual([])
 		})
 	})

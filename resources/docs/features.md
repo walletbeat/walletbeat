@@ -2606,6 +2606,7 @@ How the wallet stores the user's private key.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
 - `PASSKEY_MANAGED` = `'PASSKEY_MANAGED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
+- `NOT_VERIFIABLE` = `'NOT_VERIFIABLE'`: The key storage mechanism cannot be determined because the wallet's source code is not publicly available.
 
 ---
 
@@ -2616,6 +2617,7 @@ The entropy source used when generating the wallet's private key.
 - `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided Cryptographically Secure Pseudorandom RNG.
 - `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source.
 - `LIBRARY_RNG` = `'LIBRARY_RNG'`: A library-provided RNG whose quality is not independently verified.
+- `NOT_VERIFIABLE` = `'NOT_VERIFIABLE'`: The RNG source cannot be determined because the wallet's source code is not publicly available.
 
 ---
 
@@ -2782,9 +2784,12 @@ Security best-practices for the mobile app variant.
 
 Security best-practices data for a wallet, broken down by variant.
 
-- `browser` (`WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent.
-- `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent.
-- `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent.
+- `browser` (`| WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and no data can be obtained at all.
+
+  For closed-source wallets whose browser extension manifest is publicly available (e.g. via the Chrome Web Store), fill in actual manifest data and setting keyStorageMechanism / secureRng to KeyStorageMechanism.NOT_VERIFIABLE / SecureRngSource.NOT_VERIFIABLE
+
+- `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP' | 'SOURCE_NOT_AVAILABLE'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
+- `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP' | 'SOURCE_NOT_AVAILABLE'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
 
 ---
 
@@ -3098,18 +3103,18 @@ type SoftwareTransactionDetailsDisplay =
 Types of transactions that a wallet can decode the calldata of.
 
 ```typescript
-type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDecoded | null>
+type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataLocation | null>
 ```
 
 ---
 
-### Enum: `DataDecoded`
+### Enum: `DataLocation`
 
 Where does the calldata decoding actually happen? To identify: initiate a contract transaction and observe whether the decoded output appears on the hardware wallet's own screen, or only in the companion app / browser extension on the computer.
 
 - `ON_DEVICE` = `'ON_DEVICE'`: Decoding happens on the hardware wallet device itself. The decoded function name and parameters are shown on the device screen, independently of any software running on the connected computer.
 - `OFF_DEVICE` = `'OFF_DEVICE'`: Decoding happens off-device — in a companion app, browser extension, or desktop software. The hardware wallet's own screen does not show decoded data.
-- `NOT_DECODED` = `'NOT_DECODED'`: No decoding occurs; raw hex calldata is shown (or nothing at all).
+- `NOT_PROVIDED` = `'NOT_PROVIDED'`: No decoding occurs; raw hex calldata is shown (or nothing at all).
 
 ---
 
@@ -3122,7 +3127,7 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a EIP-712 messa
 - `EIP712_STRUCT` = `'EIP712_STRUCT'`: The wallet shows the full decoded EIP-712 struct — domain fields and message fields rendered as human-readable key-value pairs.
 - `DOMAIN_HASH` = `'DOMAIN_HASH'`: The wallet shows the EIP-712 domain separator hash.
 - `MESSAGE_HASH` = `'MESSAGE_HASH'`: The wallet shows the EIP-712 message hash.
-- `SAFE_HASH` = `'SAFE_HASH'`: The wallet shows the Safe-specific transaction hash (used in Safe signing flows).
+- `EIP712_DIGEST` = `'EIP712_DIGEST'`: The wallet shows the EIP-712 digest: the final hash that gets signed: `"\x19\x01" || domainSeparator || hashStruct(message)`.
 
 ---
 
@@ -3133,15 +3138,6 @@ For software wallets: track which message signing data types are available
 ```typescript
 type SoftwareMessageSigningLegibility = Record<MessageSigningDetails, DataDisplayOptions> | null
 ```
-
----
-
-### Interface: `HardwareMessageSigningLegibility`
-
-For hardware wallets: track which message signing data types are available and where they are displayed
-
-- `messageSigningDetails` (`Record<MessageSigningDetails, DataDisplayOptions>`): Which message signing data types does the wallet provide?
-- `decoded` (`DataDecoded`): Where does the message signing data display happen?
 
 ---
 
@@ -3169,26 +3165,49 @@ type DataExtractionMethods = Record<DataExtraction, boolean | null>
 
 ---
 
+### Interface: `HardwareWalletErc8213`
+
+- `calldataDisplay` (`Record<CallDataDisplay, DisplayCapability> | null`)
+- `messageSigningLegibility` (`Record<MessageSigningDetails, DisplayCapability> | null`)
+
+---
+
+### Interface: `BaseTransactionLegibilitySupport`
+
+- `erc8213` (`Support | null`)
+
+---
+
 ### Interface: `HardwareTransactionLegibilitySupport`
 
 A record of transaction legibility support (both message and transaction)
 
+- `erc8213` (`Support<HardwareWalletErc8213> | null`)
 - `calldataDecoded` (`CalldataDecodingTypes | null`): Does the wallet decode basic and complex transaction calldata to show function names and parameters?
 - `detailsDisplayed` (`DisplayedBasicTransactionDetails | null`): Does a wallet display transaction details clearly?
 - `dataExtraction` (`DataExtractionMethods | null`): Does a wallet allow for data extraction?
-- `messageSigningLegibility` (`HardwareMessageSigningLegibility | null`): What message signing data does the hardware wallet provide and where is it displayed?
 
 ---
 
-### Interface: `CallDataDisplay`
+### Enum: `CallDataDisplay`
 
 What can the user do with the calldata on the approval screen? To test: initiate a contract transaction (e.g. USDC_APPROVAL) and check what calldata options the wallet provides.
 
 Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval transaction under `Transactions` tab.
 
-- `rawHex` (`boolean`): The raw `0x...` hex calldata is visible somewhere on the approval screen. To test: look for a hex string starting with `0x` on the approval screen or in an expandable section.
-- `copyHexToClipboard` (`boolean`): A dedicated button copies the raw hex calldata to the clipboard. For batched transactions, the full hex including the multicall wrapper is expected. To test: look for a copy icon or "Copy" button next to the calldata.
-- `formatted` (`boolean`): The calldata is decoded into a human-readable function name and arguments (e.g. JSON or structured text), not just raw hex. For batched transactions, each inner call should be decoded individually. To test: check if the wallet shows the function name (e.g. `approve`) and parameters (e.g. spender address, amount) in a readable format.
+- `RAW_HEX` = `'RAW_HEX'`: The raw `0x...` hex calldata is visible somewhere on the approval screen. To test: look for a hex string starting with `0x` on the approval screen or in an expandable section.
+- `COPY_HEX_TO_CLIPBOARD` = `'COPY_HEX_TO_CLIPBOARD'`: A dedicated button copies the raw hex calldata to the clipboard. For batched transactions, the full hex including the multicall wrapper is expected. To test: look for a copy icon or "Copy" button next to the calldata.
+- `FORMATTED` = `'FORMATTED'`: The calldata is decoded into a human-readable function name and arguments (e.g. JSON or structured text), not just raw hex. For batched transactions, each inner call should be decoded individually. To test: check if the wallet shows the function name (e.g. `approve`) and parameters (e.g. spender address, amount) in a readable format.
+- `CALLDATA_DIGEST` = `'CALLDATA_DIGEST'`: The wallet shows the Calldata digest: keccak256(uint256(len) || calldata)
+
+---
+
+### Interface: `SoftwareWalletErc8213`
+
+ERC-8213 (Transaction Legibility) support for software wallets. Tracks which calldata display formats and message signing data types the wallet exposes to the user.
+
+- `calldataDisplay` (`Record<CallDataDisplay, DataDisplayOptions> | null`): Which calldata display formats are available and how they are shown.
+- `messageSigningLegibility` (`SoftwareMessageSigningLegibility | null`): Which message signing data types are available and how they are shown.
 
 ---
 
@@ -3196,9 +3215,8 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval
 
 A record of transaction legibility support (both message and transaction)
 
-- `calldataDisplay` (`CallDataDisplay | null`): Does the software wallet support displaying the calldata in different formats?
+- `erc8213` (`Support<SoftwareWalletErc8213> | null`)
 - `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Does the software wallet support displaying the transaction details? Evaluated per benchmark transaction type.
-- `messageSigningLegibility` (`SoftwareMessageSigningLegibility | null`): What message signing data does the software wallet provide?
 
 ---
 

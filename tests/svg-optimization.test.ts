@@ -5,7 +5,6 @@ import { loadConfig, optimize } from 'svgo'
 import { describe, expect, it } from 'vitest'
 
 import {
-	type CodebaseEntry,
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
@@ -258,13 +257,19 @@ describe('SVG optimization', async () => {
 
 	await crawlCodebase({
 		ignore: commonExclusions,
-		traversalFn: (entry: CodebaseEntry) => {
-			if (entry.type !== CodebaseEntryType.FILE) {
+		complexTraversalFn: async (entryBase, getFullEntry) => {
+			if (entryBase.type !== CodebaseEntryType.FILE) {
 				return
 			}
 
-			if (!entry.path.endsWith('.svg')) {
+			if (!entryBase.path.endsWith('.svg')) {
 				return
+			}
+
+			const entry = await getFullEntry()
+
+			if (entry.type !== CodebaseEntryType.FILE) {
+				throw new Error('inconsistent type')
 			}
 
 			const filePath = entry.path
