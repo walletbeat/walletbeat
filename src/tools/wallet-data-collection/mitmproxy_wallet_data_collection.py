@@ -2,11 +2,8 @@ from __future__ import annotations
 
 import enum
 import json
-import hashlib
 import logging
 import os
-import random
-import string
 import time
 import threading
 import urllib.parse
@@ -101,336 +98,85 @@ class UserInfo(enum.StrEnum):
         return self.value.replace("_", "")
 
 
-class RedactedData:
+class UserDataString:
+    """A raw string paired with classified UserInfo pieces. Stored with deduplication."""
+
+    def __init__(self, str: str, pieces: FrozenSet[UserInfo]):
+        self.str = str
+        self.pieces = pieces
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, UserDataString):
+            return False
+        return self.str == other.str and self.pieces == other.pieces
+
+    def __hash__(self) -> int:
+        return hash((self.str, self.pieces))
+
+    def __repr__(self) -> str:
+        if len(self.pieces) == 0:
+            return f"{repr(self.str)} [no user data]"
+        pieces_str = " ".join(sorted(str(p) for p in self.pieces))
+        return f"{repr(self.str)} [{pieces_str}]"
+
+    def encode(self) -> dict:
+        data: dict = {"str": self.str}
+        sorted_pieces = list(sorted(str(p) for p in self.pieces))
+        if len(sorted_pieces) == 1:
+            data["piece"] = sorted_pieces[0]
+        elif len(sorted_pieces) > 1:
+            data["pieces"] = sorted_pieces
+        return data
+
     @classmethod
-    def decode(cls, redactor: RedactedStringStore, data: dict):
+    def decode(cls, data: dict) -> UserDataString:
         pieces: Set[UserInfo] = set()
         if "piece" in data:
             pieces.add(UserInfo[data["piece"]])
         if "pieces" in data:
             for p in data["pieces"]:
                 pieces.add(UserInfo[p])
-
-        return cls(
-            redactor=redactor,
-            label_prefix=data["labelPrefix"],
-            label_index=data["labelIndex"],
-            real_str=None,
-            hash_value=data["hash"],
-            orig_hash=data.get("origHash"),
-            entropy=data["entropy"],
-            pieces=frozenset(pieces),
-            hint=data.get("hint"),
-            length=data["length"],
-            first_char=data["firstChar"],
-        )
-
-    def __init__(
-        self,
-        redactor: RedactedStringStore,
-        label_prefix: str,
-        label_index: int,
-        real_str: Optional[str],
-        hash_value: str,
-        orig_hash: Optional[str],
-        entropy: str,
-        pieces: FrozenSet[UserInfo],
-        hint: Optional[str],
-        length: int,
-        first_char: Optional[str] = None,
-    ):
-        self._redactor = redactor
-        self.label_prefix = label_prefix
-        self.label_index = label_index
-        self.real_str = real_str
-        self.hash = hash_value
-        self.orig_hash = orig_hash if orig_hash is not None else self.hash
-        self.entropy = entropy
-        self.pieces = pieces
-        self.hint = hint
-        self.length = len(real_str) if real_str is not None else length
-
-        if first_char is not None:
-            self.first_char = first_char.lower()
-        elif real_str is not None and len(real_str) > 0:
-            self.first_char = real_str[0].lower()
-        else:
-            raise ValueError("Must provide either real_str or first_char")
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        return (
-            self.label_prefix == other.label_prefix
-            and self.label_index == other.label_index
-        )
-
-    def __hash__(self):
-        return hash((self.label_prefix, self.label_index))
-
-    @property
-    def label(self) -> str:
-        return f"{self.label_prefix}_{self.label_index}"
-
-    def augment(
-        self,
-        real_str: Optional[str] = None,
-        orig_hash: Optional[str] = None,
-        pieces: Optional[FrozenSet[UserInfo]] = None,
-        hint: Optional[str] = None,
-    ) -> bool:
-        changed = False
-
-        if real_str is not None:
-            assert self.real_str is None or self.real_str == real_str, "Hash collision"
-            assert len(real_str) == self.length, "Length mismatch"
-            assert real_str[0].lower() == self.first_char, "First character mismatch"
-            changed = changed or self.real_str != real_str
-            self.real_str = real_str
-
-        if orig_hash is not None:
-            assert self.orig_hash == self.hash or self.orig_hash == orig_hash, (
-                "Mismatching orig_hash"
-            )
-            changed = changed or self.orig_hash != orig_hash
-            self.orig_hash = orig_hash
-
-        if pieces is not None:
-            new_pieces = set(self.pieces)
-            for p in pieces:
-                if p not in new_pieces:
-                    new_pieces.add(p)
-                    changed = True
-            if changed:
-                self.pieces = frozenset(new_pieces)
-
-        if hint is not None:
-            assert self.hint is None or self.hint == hint, "Conflicting hint"
-            if self.hint != hint:
-                changed = True
-                self.hint = hint
-
-        return changed
-
-    def encode(self) -> dict:
-        data = {
-            "labelPrefix": self.label_prefix,
-            "labelIndex": self.label_index,
-            "hash": self.hash,
-            "entropy": self.entropy,
-            "length": self.length,
-            "firstChar": self.first_char,
-        }
-
-        sorted_pieces = list(sorted(str(p) for p in self.pieces))
-        if len(sorted_pieces) == 1:
-            data["piece"] = sorted_pieces[0]
-        elif len(sorted_pieces) > 1:
-            data["pieces"] = sorted_pieces
-        if self.orig_hash != self.hash:
-            data["origHash"] = self.orig_hash
-        if self.hint is not None:
-            data["hint"] = self.hint
-
-        return data
+        return cls(str=data["str"], pieces=frozenset(pieces))
 
 
-class RedactedStringStore:
-    @classmethod
-    def decode(cls, data: dict) -> RedactedStringStore:
-        redactor = cls(salt=data["salt"])
-
-        for redaction_data in data.get("redactions", []):
-            redaction = RedactedData.decode(redactor=redactor, data=redaction_data)
-            key = (redaction.label_prefix, redaction.label_index)
-
-            redactor._redactions[key] = redaction
-            redactor._hash_to_label[redaction.hash] = key
-
-            # Update label_next_index
-            current_next = redactor._label_next_index.get(redaction.label_prefix, 1)
-            if redaction.label_index >= current_next:
-                redactor._label_next_index[redaction.label_prefix] = (
-                    redaction.label_index + 1
-                )
-
-            # Track length and first_char for efficient scanning
-            redactor._register_length_and_first_char(
-                redaction.length, redaction.first_char
-            )
-
-        return redactor
+class UserDataStringStore:
+    """A deduplicated set of UserDataString objects."""
 
     @classmethod
-    def new(cls) -> RedactedStringStore:
-        return cls(
-            salt="".join(random.choice(string.ascii_lowercase) for _ in range(32))
-        )
+    def decode(cls, data: dict) -> UserDataStringStore:
+        store = cls()
+        for item_data in data.get("userData", []):
+            store.add(UserDataString.decode(item_data))
+        return store
 
-    def __init__(self, salt: str):
+    @classmethod
+    def new(cls) -> UserDataStringStore:
+        return cls()
+
+    def __init__(self):
         self._lock = threading.Lock()
-        self._salt = salt
-        self._label_next_index: Dict[str, int] = {}
-        self._hash_to_label: Dict[str, Tuple[str, int]] = {}
-        self._redactions: Dict[Tuple[str, int], RedactedData] = {}
-        self._lengths: Tuple[int, ...] = ()
-        self._length_to_first_chars: Dict[int, Set[str]] = {}
+        self._strings: Set[UserDataString] = set()
         self._needs_flushing = 0
 
-    def _register_length_and_first_char(self, length: int, first_char: str):
-        """Register a length and first character for efficient scanning."""
-        first_char = first_char.lower()
-        if length not in self._length_to_first_chars:
-            self._length_to_first_chars[length] = set()
-            self._lengths = tuple(
-                sorted(self._length_to_first_chars.keys(), reverse=True)
-            )
-        self._length_to_first_chars[length].add(first_char)
+    def add(self, item: UserDataString) -> None:
+        with self._lock:
+            if item not in self._strings:
+                self._strings.add(item)
+                self._needs_flushing += 1
 
     def needs_flushing(self) -> int:
         with self._lock:
             return self._needs_flushing
 
-    def mark_flushed(self, amount: int):
+    def mark_flushed(self, amount: int) -> None:
         with self._lock:
             self._needs_flushing -= amount
 
     def encode(self) -> dict:
         with self._lock:
             return {
-                "salt": self._salt,
-                "redactions": [
-                    self._redactions[k].encode()
-                    for k in sorted(self._redactions.keys())
-                ],
+                "userData": [item.encode() for item in sorted(self._strings, key=lambda x: x.str)],
             }
-
-    def _hash(self, s: str) -> str:
-        h = hashlib.sha256()
-        h.update(self._salt.encode("utf-8"))
-        h.update(s.encode("utf-8"))
-        return h.hexdigest()
-
-    def redact(
-        self, string: str, escape_char: Optional[str] = None
-    ) -> Tuple[str, FrozenSet[RedactedData]]:
-        assert not string.startswith("~R:"), (
-            "String was already redacted, cannot redact twice."
-        )
-
-        if escape_char is None:
-            escape_char = RedactedString.pick_escape_char(string)
-
-        with self._lock:
-            lengths = tuple(self._lengths)
-            length_to_first_chars = {
-                k: set(v) for k, v in self._length_to_first_chars.items()
-            }
-
-        redactions: Set[RedactedData] = set()
-
-        def _round(s: str) -> str:
-            is_redaction = False
-            offset_from_start = 0
-
-            for component in s.split(escape_char):
-                if not is_redaction:
-                    for relevant_len in lengths:
-                        if len(component) < relevant_len:
-                            continue
-                        relevant_first_chars = length_to_first_chars.get(
-                            relevant_len, set()
-                        )
-                        for offset in range(0, len(component) - relevant_len + 1):
-                            first_char = component[offset].lower()
-                            if first_char not in relevant_first_chars:
-                                continue
-                            substr = component[offset : offset + relevant_len]
-                            for variant in (substr, substr.lower()):
-                                h = self._hash(variant)
-                                relevant_label = self._hash_to_label.get(h)
-                                if relevant_label is None:
-                                    continue
-                                with self._lock:
-                                    redaction = self._redactions[relevant_label]
-                                    if redaction.augment(real_str=variant):
-                                        self._needs_flushing += 1
-                                redactions.add(redaction)
-                                label_str = f"{relevant_label[0]}_{relevant_label[1]}"
-                                return (
-                                    s[: offset_from_start + offset]
-                                    + f"{escape_char}{label_str}{escape_char}"
-                                    + s[offset_from_start + offset + relevant_len :]
-                                )
-                else:
-                    parts = component.split("_", 1)
-                    if len(parts) == 2:
-                        label_prefix = parts[0]
-                        try:
-                            label_index = int(parts[1])
-                            with self._lock:
-                                if (label_prefix, label_index) in self._redactions:
-                                    redaction = self._redactions[
-                                        (label_prefix, label_index)
-                                    ]
-                                    redactions.add(redaction)
-                        except ValueError:
-                            raise ValueError(f"Invalid label: {component}")
-
-                is_redaction = not is_redaction
-                offset_from_start += len(component) + len(escape_char)
-
-            return s
-
-        new_string = _round(string)
-        while new_string != string:
-            string = new_string
-            new_string = _round(string)
-
-        return string, frozenset(redactions)
-
-
-class RedactedString:
-    _POSSIBLE_ESCAPE_CHARS = "~+!@#$%^&*:;?.,`|-/"
-
-    @classmethod
-    def pick_escape_char(cls, real_str: str) -> str:
-        for c in cls._POSSIBLE_ESCAPE_CHARS:
-            if c not in real_str:
-                return c
-        raise ValueError("Cannot find an escape character in string: %r" % (real_str,))
-
-    @classmethod
-    def from_real(cls, real_str: str, redactor: RedactedStringStore) -> RedactedString:
-        escape_char = cls.pick_escape_char(real_str)
-        return cls(
-            redactor=redactor,
-            redacted_str=f"~R:{escape_char}{real_str}",
-        )
-
-    @classmethod
-    def decode(
-        cls, encoded_redacted_str: str, redactor: RedactedStringStore
-    ) -> RedactedString:
-        return cls(redactor=redactor, redacted_str=encoded_redacted_str)
-
-    def __init__(self, redactor: RedactedStringStore, redacted_str: str):
-        assert redacted_str.startswith("~R:") and len(redacted_str) >= 4
-        self._redactor = redactor
-        self._escape_character = redacted_str[3]
-        self._payload = redacted_str[4:]
-
-    def __str__(self):
-        return self.encode()
-
-    def __repr__(self):
-        return repr(str(self))
-
-    def encode(self) -> str:
-        redacted, _ = self._redactor.redact(
-            string=self._payload, escape_char=self._escape_character
-        )
-        return f"~R:{self._escape_character}{redacted}"
 
 
 class WalletCaptureContext(enum.StrEnum):
@@ -442,12 +188,13 @@ class WalletCaptureContext(enum.StrEnum):
 
 class UserDataPieces:
     @classmethod
-    def decode(
-        cls, redactor: RedactedStringStore, data: Union[dict, str]
-    ) -> UserDataPieces:
+    def decode(cls, data: Union[dict, str]) -> UserDataPieces:
         if isinstance(data, str):
-            pieces: Set[UserInfo] = set()
-            encoded_redacted_str = data
+            # Legacy format: just a string sample with no pieces
+            return cls(
+                pieces=frozenset(),
+                sample=UserDataString(str=data, pieces=frozenset()),
+            )
         else:
             pieces_list = []
             if "pieces" in data:
@@ -456,70 +203,68 @@ class UserDataPieces:
                 pieces_list = [data["piece"]]
 
             pieces = set(UserInfo[p] for p in pieces_list)
-            encoded_redacted_str = data["sample"]
+            sample_str = data["sample"]
+            # Sample can be a plain string or a dict with "str" field
+            if isinstance(sample_str, dict):
+                sample = UserDataString.decode(sample_str)
+                # Merge pieces from sample with pieces from outer dict
+                all_pieces = set(pieces)
+                for p in sample.pieces:
+                    all_pieces.add(p)
+                pieces = all_pieces
+            else:
+                sample = UserDataString(str=sample_str, pieces=frozenset())
 
-        return cls(
-            pieces=frozenset(pieces),
-            sample=RedactedString.decode(
-                encoded_redacted_str=encoded_redacted_str, redactor=redactor
-            ),
-        )
+        return cls(pieces=frozenset(pieces), sample=sample)
 
     @classmethod
-    def classify_str(
-        cls, data: str, redactor: RedactedStringStore, context: WalletCaptureContext
-    ) -> UserDataPieces:
+    def classify_str(cls, data: str, context: WalletCaptureContext) -> UserDataPieces:
         return cls(
             pieces=frozenset(),
-            sample=RedactedString.from_real(real_str=data, redactor=redactor),
+            sample=UserDataString(str=data, pieces=frozenset()),
         )
 
     @classmethod
     def classify_multidict(
         cls,
         data: Dict[str, Union[str, List[str]]],
-        redactor: RedactedStringStore,
         context: WalletCaptureContext,
     ) -> Dict[str, Tuple[UserDataPieces, ...]]:
         classified = {}
         for k, v in data.items():
             if isinstance(v, list):
                 classified[k] = tuple(
-                    cls.classify_str(data=s, redactor=redactor, context=context)
+                    cls.classify_str(data=s, context=context)
                     for s in v
                 )
             else:
                 classified[k] = (
-                    cls.classify_str(data=v, redactor=redactor, context=context),
+                    cls.classify_str(data=v, context=context),
                 )
         return classified
 
-    def __init__(self, pieces: FrozenSet[UserInfo], sample: RedactedString):
+    def __init__(self, pieces: FrozenSet[UserInfo], sample: UserDataString):
         self._pieces = pieces
         self._sample = sample
 
     def __str__(self):
-        if len(self._pieces) == 0:
-            return f"{repr(self._sample)} [no user data]"
-        return (
-            f"{repr(self._sample)} [{' '.join(sorted(str(p) for p in self._pieces))}]"
-        )
+        return repr(self._sample)
 
     def __repr__(self):
         return str(self)
 
     def encode(self):
         if len(self._pieces) == 0:
-            return self._sample.encode()
+            return self._sample.str
 
         data = {
-            "sample": self._sample.encode(),
+            "sample": self._sample.str,
         }
 
         sorted_pieces = list(sorted(str(p) for p in self._pieces))
         if len(sorted_pieces) == 1:
             data["piece"] = sorted_pieces[0]
-        else:
+        elif len(sorted_pieces) > 1:
             data["pieces"] = sorted_pieces
 
         return data
@@ -540,21 +285,21 @@ def _multidict_to_dict_of_lists(multidict, filter_fn=None) -> Dict[str, List[str
 
 class WalletRequest:
     @classmethod
-    def decode(cls, data: dict, redactor: RedactedStringStore):
+    def decode(cls, data: dict):
         def _decode_if_set(k):
             if k not in data:
                 return None
-            return UserDataPieces.decode(redactor=redactor, data=data[k])
+            return UserDataPieces.decode(data=data[k])
 
         def _decode_str_multidict(k):
             decoded = {}
             for key, v in data.get(k, {}).items():
                 if isinstance(v, list):
                     decoded[key] = tuple(
-                        UserDataPieces.decode(redactor=redactor, data=x) for x in v
+                        UserDataPieces.decode(data=x) for x in v
                     )
                 else:
-                    decoded[key] = (UserDataPieces.decode(redactor=redactor, data=v),)
+                    decoded[key] = (UserDataPieces.decode(data=v),)
             return decoded
 
         json_rpc_method: Tuple[str, ...] = ()
@@ -565,7 +310,6 @@ class WalletRequest:
                 json_rpc_method = (data["jsonRpcMethod"],)
 
         return cls(
-            redactor=redactor,
             domain=data["domain"],
             path=data["path"],
             query=_decode_str_multidict("query"),
@@ -580,9 +324,7 @@ class WalletRequest:
         )
 
     @classmethod
-    def from_request(
-        cls, redactor: RedactedStringStore, req: http.Request, session_time: int
-    ):
+    def from_request(cls, req: http.Request, session_time: int):
         url = urllib.parse.urlparse(req.url)
         json_rpc_method: Tuple[str, ...] = ()
         text = req.get_text()
@@ -607,25 +349,22 @@ class WalletRequest:
             referer_domain = urllib.parse.urlparse(req.headers["Referer"]).hostname
 
         return cls(
-            redactor=redactor,
             domain=url.hostname,
             path=url.path,
             query=UserDataPieces.classify_multidict(
                 _multidict_to_dict_of_lists(req.query),
-                redactor=redactor,
                 context=WalletCaptureContext.QUERY,
             ),
             json_rpc_method=json_rpc_method,
             content=(
                 UserDataPieces.classify_str(
-                    text, redactor=redactor, context=WalletCaptureContext.POST_BODY
+                    text, context=WalletCaptureContext.POST_BODY
                 )
                 if text is not None
                 else None
             ),
             cookies=UserDataPieces.classify_multidict(
                 _multidict_to_dict_of_lists(req.cookies),
-                redactor=redactor,
                 context=WalletCaptureContext.COOKIE,
             ),
             referer_domain=referer_domain,
@@ -633,7 +372,6 @@ class WalletRequest:
                 _multidict_to_dict_of_lists(
                     req.headers, filter_fn=lambda k: not is_benign_header(k)
                 ),
-                redactor=redactor,
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
             odd_trailers=UserDataPieces.classify_multidict(
@@ -642,7 +380,6 @@ class WalletRequest:
                 )
                 if req.trailers
                 else {},
-                redactor=redactor,
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
             session_time=session_time,
@@ -651,7 +388,6 @@ class WalletRequest:
 
     def __init__(
         self,
-        redactor: RedactedStringStore,
         domain: str,
         path: str,
         query: Dict[str, Tuple[UserDataPieces, ...]],
@@ -664,7 +400,6 @@ class WalletRequest:
         session_time: int,
         review: Optional[object],
     ):
-        self._redactor = redactor
         self._domain = domain
         self._path = path
         self._query = query
@@ -753,22 +488,17 @@ class WalletRequest:
 
 class WalletCaptureFlow:
     @classmethod
-    def decode(cls, redactor: RedactedStringStore, flow: str, data: dict):
-        flow_obj = cls(flow=flow, redactor=redactor)
+    def decode(cls, flow: str, data: dict):
+        flow_obj = cls(flow=flow)
         for r in data.get("requests", []):
-            flow_obj._add_decoded(WalletRequest.decode(data=r, redactor=redactor))
+            flow_obj._add_decoded(WalletRequest.decode(data=r))
         return flow_obj
 
-    def __init__(self, flow: Union[UxFlow, str], redactor: RedactedStringStore):
+    def __init__(self, flow: Union[UxFlow, str]):
         self._flow = flow
-        self._redactor = redactor
         self._requests: List[WalletRequest] = []
         self._needs_flushing = 0
         self._lock = threading.Lock()
-
-    @property
-    def redactor(self) -> RedactedStringStore:
-        return self._redactor
 
     def _add_decoded(self, wallet_request: WalletRequest):
         """Add a request that was decoded from file (doesn't increment flush counter)."""
@@ -811,11 +541,11 @@ class WalletCaptureFile:
                 if os.path.getsize(self.path) > 2:
                     raise e
                 data = {}  # Empty file, reset data.
-        self._identity = data["identity"]
-        if "redactions" in data:
-            self._redactor = RedactedStringStore.decode(data["redactions"])
+        self._identity = data.get("identity", "")
+        if "userData" in data:
+            self._user_data_store = UserDataStringStore.decode(data)
         else:
-            self._redactor = RedactedStringStore.new()
+            self._user_data_store = UserDataStringStore.new()
 
         self._flows: Dict[str, Union[WalletCaptureFlow, str]] = {}
         for flow_name, flow_data in data.get("flows", {}).items():
@@ -823,7 +553,7 @@ class WalletCaptureFile:
                 self._flows[flow_name] = "NOT_SUPPORTED"
             else:
                 self._flows[flow_name] = WalletCaptureFlow.decode(
-                    redactor=self._redactor, flow=flow_name, data=flow_data
+                    flow=flow_name, data=flow_data
                 )
 
         self._session_number: int = data.get("sessions", 0) + 1
@@ -831,8 +561,8 @@ class WalletCaptureFile:
         self._lock = threading.Lock()
 
     @property
-    def redactor(self) -> RedactedStringStore:
-        return self._redactor
+    def user_data_store(self) -> UserDataStringStore:
+        return self._user_data_store
 
     def session_time(self) -> int:
         """Session time as a session-start-relative timestamp."""
@@ -844,18 +574,14 @@ class WalletCaptureFile:
         with self._lock:
             flow_key = str(flow)
             if flow_key not in self._flows:
-                self._flows[flow_key] = WalletCaptureFlow(
-                    flow=flow, redactor=self._redactor
-                )
+                self._flows[flow_key] = WalletCaptureFlow(flow=flow)
                 self._needs_flushing += 1
             elif (
                 isinstance(self._flows[flow_key], str)
                 and self._flows[flow_key] == "NOT_SUPPORTED"
             ):
                 # Override NOT_SUPPORTED with a new flow
-                self._flows[flow_key] = WalletCaptureFlow(
-                    flow=flow, redactor=self._redactor
-                )
+                self._flows[flow_key] = WalletCaptureFlow(flow=flow)
                 self._needs_flushing += 1
 
             result = self._flows[flow_key]
@@ -866,7 +592,7 @@ class WalletCaptureFile:
         with self._lock:
             # Calculate total pending changes
             total_needs_flushing = (
-                self._needs_flushing + self._redactor.needs_flushing()
+                self._needs_flushing + self._user_data_store.needs_flushing()
             )
             for f in self._flows.values():
                 if isinstance(f, WalletCaptureFlow):
@@ -879,7 +605,7 @@ class WalletCaptureFile:
 
             # Capture current flush amounts
             file_flush_amount = self._needs_flushing
-            redactor_flush_amount = self._redactor.needs_flushing()
+            user_data_flush_amount = self._user_data_store.needs_flushing()
             per_flow_amounts = [
                 (f, f.needs_flushing())
                 for f in self._flows.values()
@@ -899,7 +625,7 @@ class WalletCaptureFile:
                             )
                             for flow_name, flow in self._flows.items()
                         },
-                        "redactions": self._redactor.encode(),
+                        "userData": self._user_data_store.encode(),
                         "sessions": self._session_number,
                     },
                     f,
@@ -911,7 +637,7 @@ class WalletCaptureFile:
 
             # Mark as flushed
             self._needs_flushing -= file_flush_amount
-            self._redactor.mark_flushed(redactor_flush_amount)
+            self._user_data_store.mark_flushed(user_data_flush_amount)
             for f, amount in per_flow_amounts:
                 f.mark_flushed(amount)
 
@@ -1034,7 +760,6 @@ class WalletDataCollectionAddon:
         req.anticache()
         req.constrain_encoding()
         wallet_data_req = WalletRequest.from_request(
-            redactor=self._wallet_data.redactor,
             req=req,
             session_time=self._wallet_data.session_time(),
         )

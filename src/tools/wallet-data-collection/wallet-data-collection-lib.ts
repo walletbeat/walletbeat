@@ -18,7 +18,6 @@ import {
 	DataCollectionPurpose,
 	dataCollectionPurpose,
 	dataCollectionPurposeToText,
-	hintForUserInfo,
 	UserFlow,
 	type UserInfo,
 	userInfoEnums,
@@ -34,7 +33,6 @@ import {
 	type NonEmptyArray,
 	nonEmptyMap,
 	type NonEmptySet,
-	nonEmptySet,
 	nonEmptySetFromArray,
 	setContains,
 	setItems,
@@ -52,6 +50,7 @@ import {
 	recordedFlow,
 	RecordedOnlyFlow,
 	type UserDataDict,
+	UserDataString,
 	WalletCaptureFile,
 	WalletCaptureIssue,
 	WalletRequest,
@@ -447,7 +446,6 @@ export interface MarkStringOptions extends GlobalOptions {
 	string: string
 	data: NonEmptySet<UserInfo> | 'BENIGN'
 	global: boolean | null
-	hint: string | null
 }
 
 export const markStringOptions = new Options<MarkStringOptions>(
@@ -458,7 +456,6 @@ export const markStringOptions = new Options<MarkStringOptions>(
 			typedStringOption('BENIGN', (s: string): s is 'BENIGN' => s === 'BENIGN', ''),
 		),
 		global: optionalOption(booleanOption),
-		hint: optionalOption(stringOption),
 	},
 	globalOptions,
 )
@@ -638,16 +635,12 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 			throw new Error(`Must specify --wallet-addresses for flow ${opts.flow}.`)
 		}
 	} else {
-		const walletRedactionFile = await openCaptureFile(opts)
+		const captureFile = await openCaptureFile(opts)
 
 		for (const walletAddr of setItems(opts.walletAddresses)) {
-			walletRedactionFile.redactor.mark({
-				realStr: walletAddr,
-				pieces: nonEmptySet(WalletInfo.ACCOUNT_ADDRESS),
-				hint: hintForUserInfo(walletAddr, WalletInfo.ACCOUNT_ADDRESS),
-			})
+			captureFile.userData.add(new UserDataString(walletAddr, [WalletInfo.ACCOUNT_ADDRESS]))
 		}
-		await walletRedactionFile.save(getSaveOptions(opts))
+		await captureFile.save(getSaveOptions(opts))
 	}
 
 	argv.push('-s', path.join(scriptDir(), 'mitmproxy_wallet_data_collection.py'))
@@ -925,16 +918,10 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 		throw new Error('Cannot use --global option for non-BENIGN strings')
 	}
 
-	capture.redactor.mark({
-		realStr: opts.string,
-		pieces: opts.data,
-		hint: opts.hint === null ? undefined : opts.hint,
-	})
+	capture.userData.add(new UserDataString(opts.string, setItems(opts.data)))
 
 	await capture.save(getSaveOptions(opts))
-	log(
-		`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}. All instances redacted.`,
-	)
+	log(`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}.`)
 }
 
 function displayRequestInfo(request: WalletRequest): void {
@@ -997,18 +984,11 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 	let remainingStrings = await capture.allStrings()
 	let userStopped = false
 	let numIterations = 1
-	const initialNumUnredacted = remainingStrings.numUnredacted()
+	const initialNumStrings = remainingStrings.size()
 
-	while (remainingStrings.numUnredacted() > 0 && !userStopped) {
-		// Filter to unredacted (raw string) entries
-		const unredactedStrings = remainingStrings.strings().filter(s => typeof s.str === 'string')
-
-		if (unredactedStrings.length === 0) {
-			break
-		}
-
+	while (remainingStrings.size() > 0 && !userStopped) {
 		// Process the highest-score string first
-		const strEntry = unredactedStrings[0]
+		const strEntry = remainingStrings.strings()[0]
 		const strValue = strEntry.str
 
 		if (typeof strValue !== 'string') {
@@ -1017,7 +997,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 		// Display the string and its occurrences
 		log('\n' + '='.repeat(80))
-		log(`Unredacted string ${numIterations} of ${initialNumUnredacted}`)
+		log(`String ${numIterations} of ${initialNumStrings}`)
 		log('='.repeat(80))
 		log(`  String:  ${JSON.stringify(strValue)}`)
 		log(`  Entropy: ${strEntry.score.toFixed(2)}`)
@@ -1046,14 +1026,14 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			{
 				title: 'Benign (no user data)',
 				value: '__BENIGN__',
-				description: 'Mark this string as benign (non-globally). All instances will be redacted.',
+				description: 'Mark this string as benign (non-globally).',
 				selected: false,
 			},
 			{
 				title: 'Globally benign (no user data, ignored in all captures)',
 				value: '__GLOBAL_BENIGN__',
 				description:
-					'Mark this string as globally benign. All instances across all captures will be redacted.',
+					'Mark this string as globally benign. All instances across all captures will be ignored.',
 				selected: false,
 			},
 			{
@@ -1148,7 +1128,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 				if (specialOption === '__GLOBAL_BENIGN__') {
 					capture.addBenignString(strValue, true)
 					await capture.save(getSaveOptions(opts))
-					log(`✅ Marked string "${strValue}" as globally benign. All instances redacted.`)
+					log(`✅ Marked string "${strValue}" as globally benign.`)
 					confirmed = true
 					continue
 				}
@@ -1156,7 +1136,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 				if (specialOption === '__BENIGN__') {
 					capture.addBenignString(strValue, false)
 					await capture.save(getSaveOptions(opts))
-					log(`✅ Marked string "${strValue}" as benign. All instances redacted.`)
+					log(`✅ Marked string "${strValue}" as benign.`)
 					confirmed = true
 					continue
 				}
@@ -1173,14 +1153,9 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			}
 
 			// Mark the string with the selected UserInfo pieces
-			capture.redactor.mark({
-				realStr: strValue,
-				pieces: nonEmptySet(selectedUserInfoValues[0], ...selectedUserInfoValues.slice(1)),
-			})
+			capture.userData.add(new UserDataString(strValue, selectedUserInfoValues))
 			await capture.save(getSaveOptions(opts))
-			log(
-				`✅ Marked string "${strValue}" as ${selectedUserInfoValues.join(', ')}. All instances redacted.`,
-			)
+			log(`✅ Marked string "${strValue}" as ${selectedUserInfoValues.join(', ')}.`)
 			confirmed = true
 		}
 

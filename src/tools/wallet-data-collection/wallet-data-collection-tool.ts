@@ -176,19 +176,16 @@ cli
 
 // mark-string subcommand
 cli
-	.command(
-		'mark-string',
-		'Mark a string as conveying user data and redact it from the network capture.',
-	)
+	.command('mark-string', 'Mark a string as conveying user data.')
 	.usage(
-		'mark-string --string=<string> --data=<data-type>|BENIGN [--hint=...]' +
+		'mark-string --string=<string> --data=<data-type>|BENIGN' +
 			trimWhitespacePrefix(`
 
-				Mark a string as conveying one or more pieces of user data and redact it from the network capture.
+				Mark a string as conveying one or more pieces of user data.
 				Valid user data types: ${userInfoEnums.items.join(', ')}
 			`),
 	)
-	.option('--string <string>', 'String to mark and redact.')
+	.option('--string <string>', 'String to mark.')
 	.option(
 		'--data <data-type>|BENIGN',
 		'User data type (comma-separated list if this matches multiples types of user data), or BENIGN for non-user-data-carrying strings.',
@@ -196,10 +193,6 @@ cli
 	.option(
 		'--global <true|false>',
 		'For benign strings, mark as benign globally for all captures (true), or only in this capture file (false).',
-	)
-	.option(
-		'--hint <hint>',
-		'Hint/explanation as to what the string is; helps understand redacted data.',
 	)
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='GA1.1.1294582759' --data='TRACKING_IDENTIFIER'",
