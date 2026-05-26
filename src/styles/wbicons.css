@@ -106,67 +106,67 @@
 		--icon-content: "\ea16";
 	}
 
-	&[data-icon~="orderflow_transparency"] {
+	&[data-icon~="open_source"] {
 		--icon-content: "\ea17";
 	}
 
-	&[data-icon~="passkey_verification"] {
+	&[data-icon~="orderflow_transparency"] {
 		--icon-content: "\ea18";
 	}
 
-	&[data-icon~="permissions_management"] {
+	&[data-icon~="passkey_verification"] {
 		--icon-content: "\ea19";
 	}
 
-	&[data-icon~="privacy"] {
+	&[data-icon~="permissions_management"] {
 		--icon-content: "\ea1a";
 	}
 
-	&[data-icon~="privacy_hygiene"] {
+	&[data-icon~="privacy"] {
 		--icon-content: "\ea1b";
 	}
 
-	&[data-icon~="private_token_transfers"] {
+	&[data-icon~="privacy_hygiene"] {
 		--icon-content: "\ea1c";
 	}
 
-	&[data-icon~="question_mark"] {
+	&[data-icon~="private_token_transfers"] {
 		--icon-content: "\ea1d";
 	}
 
-	&[data-icon~="release_process_transparency"] {
+	&[data-icon~="question_mark"] {
 		--icon-content: "\ea1e";
 	}
 
-	&[data-icon~="repository"] {
+	&[data-icon~="release_process_transparency"] {
 		--icon-content: "\ea1f";
 	}
 
-	&[data-icon~="scam_prevention"] {
+	&[data-icon~="repository"] {
 		--icon-content: "\ea20";
 	}
 
-	&[data-icon~="security"] {
+	&[data-icon~="scam_prevention"] {
 		--icon-content: "\ea21";
 	}
 
-	&[data-icon~="security_audits"] {
+	&[data-icon~="security"] {
 		--icon-content: "\ea22";
 	}
 
-	&[data-icon~="security_best_practices"] {
+	&[data-icon~="security_audits"] {
 		--icon-content: "\ea23";
 	}
 
-	&[data-icon~="self_sovereignty"] {
+	&[data-icon~="security_best_practices"] {
 		--icon-content: "\ea24";
 	}
 
-	&[data-icon~="source_code_license"] {
+	&[data-icon~="self_sovereignty"] {
 		--icon-content: "\ea25";
 	}
 
-	&[data-icon~="source_visibility"] {
+	&[data-icon~="source_code_license"] {
 		--icon-content: "\ea26";
 	}
 
