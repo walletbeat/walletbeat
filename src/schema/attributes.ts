@@ -48,6 +48,7 @@ import {
 import type { Score } from './score'
 import type { AtLeastOneVariant } from './variants'
 import type { RatedWallet, WalletMetadata } from './wallet'
+import type { WBIconFontID } from '@/styles/wbicons'
 
 /**
  * Rating is an enum that should be visually meaningful.
@@ -180,15 +181,15 @@ export function ratingToColor(rating: Rating): string {
 export function borderRatingToColor(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
-			return '#e74c3c' // Red
+			return '#FB6682' // Red
 		case Rating.PARTIAL:
-			return '#f1c40f' // Yellow
+			return '#FFCC73' // Yellow
 		case Rating.PASS:
-			return '#2ecc71' // Green
+			return '#B5ED9D' // Green
 		case Rating.UNRATED:
-			return '#bdc3c7' // Gray
+			return '#F8ECEC' // Gray
 		case Rating.EXEMPT:
-			return '#bdc3c7' // Gray
+			return '#D5D4FB' // Gray
 	}
 }
 
@@ -518,7 +519,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	id: string
 
 	/** An icon representing the attribute. Shown on rating charts. */
-	icon: string
+	icon: WBIconFontID
 
 	/**
 	 * A very short, human-readable title for the attribute.
@@ -881,7 +882,7 @@ export interface AttributeGroup<Vs extends ValueSet> {
 	id: string
 
 	/** A friendly icon for the group. */
-	icon: string
+	icon: WBIconFontID
 
 	/** A human-readable name for the group. */
 	displayName: string
