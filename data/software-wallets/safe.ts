@@ -14,6 +14,7 @@ import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
 	CallDataDisplay,
 	DataDisplayOptions,
+	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
@@ -269,7 +270,6 @@ export const safe: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				// transactionDetailsDisplay: displaysFullTransactionDetails,
 				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {
@@ -280,7 +280,7 @@ export const safe: SoftwareWallet = {
 					},
 					messageSigningLegibility: null,
 				}),
-				transactionDetailsDisplay: null,
+				transactionDetailsDisplay: displaysFullTransactionDetails,
 				transactionSimulations: null,
 			},
 		},
