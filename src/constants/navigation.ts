@@ -1,18 +1,23 @@
 // Types
+import type { WBIconFontID } from '@/styles/wbicons'
+
+export type LucideNavigationIcon = 'ICON_CHART_BAR' | 'ICON_CHART_PIE' | 'ICON_WALLET'
+
+export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
+
+export type NavigationIconID = WBIconFontID | LucideNavigationIcon | WalletImageNavigationIcon
 
 export type NavigationItem = {
 	id: string
 	title: string
-	icon?: string
+	icon?: NavigationIconID
 	href?: string
 	children?: NavigationItem[]
 }
 
-// Icons
-import BadgeCheckIcon from 'lucide-static/icons/badge-check.svg?raw'
-import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
-import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
-import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
+function walletImageIcon(id: string, ext: string): WalletImageNavigationIcon {
+	return `ICON_WALLET_IMG:/images/wallets/${id}.${ext}`
+}
 
 // Constants
 import { hardwareWallets } from '@/data/hardware-wallets'
@@ -21,14 +26,6 @@ import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { WalletType } from '@/schema/wallet-types'
 import { getWalletUrl } from '@/utils/wallet-url'
-
-// Constants
-export const navigationHome = {
-	id: 'home',
-	title: 'Wallets',
-	href: '/',
-	icon: WalletIcon,
-} as const satisfies NavigationItem
 
 export const navigationFaq = {
 	id: 'faq',
@@ -44,13 +41,6 @@ export const navigationAbout = {
 	href: '/about/',
 } as const satisfies NavigationItem
 
-export const navigationCriteria = {
-	id: 'criteria',
-	icon: BadgeCheckIcon,
-	title: 'Evaluation Criteria',
-	href: '/#criteria',
-} as const satisfies NavigationItem
-
 export const navigationRepository = {
 	id: 'code-repository',
 	icon: 'repository',
@@ -64,6 +54,7 @@ export const navigationTesting = {
 	title: 'Test your wallet',
 	href: '/test',
 } as const satisfies NavigationItem
+
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
 	icon: 'discuss',
@@ -84,6 +75,7 @@ export const topbarNavigationItems = [
 	navigationRepository,
 	navigationFarcasterChannel,
 ] as const satisfies NavigationItem[]
+
 export const defaultNavigationItems = [
 	{
 		id: 'software-wallets',
@@ -94,7 +86,7 @@ export const defaultNavigationItems = [
 			{
 				id: 'software-by-rating',
 				title: 'By Rating',
-				icon: ChartPieIcon,
+				icon: 'ICON_CHART_PIE',
 				children: mapNonExemptAttributeGroupsInTree(
 					representativeWalletForType(WalletType.SOFTWARE).overall,
 					attrGroup => ({
@@ -108,19 +100,19 @@ export const defaultNavigationItems = [
 			{
 				id: 'software-by-wallet',
 				title: 'By Wallet',
-				icon: WalletIcon,
+				icon: 'ICON_WALLET',
 				children: Object.entries(softwareWallets).map(([key, wallet]) => ({
 					id: key,
 					title: wallet.metadata.displayName,
 					href: getWalletUrl(wallet),
-					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+					icon: walletImageIcon(wallet.metadata.id, wallet.metadata.iconExtension),
 				})),
 			},
 			{
 				id: 'eip-7702-tracker',
 				title: 'EIP-7702 Tracker',
 				href: '/wallet/7702/',
-				icon: ChartBarIcon,
+				icon: 'ICON_CHART_BAR',
 			},
 		],
 	},
@@ -133,7 +125,7 @@ export const defaultNavigationItems = [
 			{
 				id: 'hardware-by-rating',
 				title: 'By Rating',
-				icon: ChartPieIcon,
+				icon: 'ICON_CHART_PIE',
 				children: [
 					...mapNonExemptAttributeGroupsInTree(
 						representativeWalletForType(WalletType.HARDWARE).overall,
@@ -149,12 +141,12 @@ export const defaultNavigationItems = [
 			{
 				id: 'hardware-by-wallet',
 				title: 'By Wallet',
-				icon: WalletIcon,
+				icon: 'ICON_WALLET',
 				children: Object.entries(hardwareWallets).map(([key, wallet]) => ({
 					id: key,
 					title: wallet.metadata.displayName.replace(' Wallet', ''),
 					href: getWalletUrl(wallet),
-					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+					icon: walletImageIcon(wallet.metadata.id, wallet.metadata.iconExtension),
 				})),
 			},
 		],

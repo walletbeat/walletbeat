@@ -17,14 +17,7 @@ import { topbarNavigationItems } from '@/constants/navigation'
 
 				return (
 					<a href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
-						<span class='icon'>
-							{icon &&
-								(icon.startsWith('<') ? (
-									<span set:html={icon} />
-								) : (
-									<span data-wbicon data-icon={icon} />
-								))}
-						</span>
+						<span class='icon'>{icon && <span data-wbicon data-icon={icon} />}</span>
 						<span class='label'>{title}</span>
 					</a>
 				)

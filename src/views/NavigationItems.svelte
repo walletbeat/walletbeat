@@ -1,6 +1,17 @@
 <script lang="ts">
 	// Types
-	import type { NavigationItem } from '@/constants/navigation'
+	import type { LucideNavigationIcon, NavigationItem } from '@/constants/navigation'
+
+	// Icons
+	import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
+	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
+
+	const LUCIDE_ICONS: Record<LucideNavigationIcon, string> = {
+		ICON_CHART_BAR: ChartBarIcon,
+		ICON_CHART_PIE: ChartPieIcon,
+		ICON_WALLET: WalletIcon,
+	}
 
 
 	// Props
@@ -195,12 +206,12 @@
 		>
 			{#if item.icon}
 				<span class="icon" class:circle={depth === 0}>
-					{#if item.icon.startsWith('<')}
-						{@html item.icon}
-					{:else if /^[a-z0-9_]+$/i.test(item.icon)}
-						<span data-wbicon data-icon={item.icon}></span>
+					{#if item.icon.startsWith('ICON_WALLET_IMG:')}
+						<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+					{:else if item.icon in LUCIDE_ICONS}
+						{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
 					{:else}
-						{item.icon}
+						<span data-wbicon data-icon={item.icon}></span>
 					{/if}
 				</span>
 			{/if}
@@ -210,12 +221,12 @@
 	{:else}
 		{#if item.icon}
 			<span class="icon" class:circle={depth === 0}>
-				{#if item.icon.startsWith('<')}
-					{@html item.icon}
-				{:else if /^[a-z0-9_]+$/i.test(item.icon)} 
-					<span data-wbicon data-icon={item.icon}></span>
+				{#if item.icon.startsWith('ICON_WALLET_IMG:')}
+					<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+				{:else if item.icon in LUCIDE_ICONS}
+					{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
 				{:else}
-					{item.icon}
+					<span data-wbicon data-icon={item.icon}></span>
 				{/if}
 			</span>
 		{/if}
