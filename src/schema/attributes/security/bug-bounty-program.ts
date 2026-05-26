@@ -211,7 +211,7 @@ function getLegalProtectionDescription(legalProtection: LegalProtection): string
 
 export const bugBountyProgram: Attribute = {
 	id: 'bugBountyProgram',
-	icon: '\u{1F41B}', // Bug emoji
+	icon: 'security',
 	displayName: 'Bug Bounty Program',
 	wording: {
 		midSentenceName: null,

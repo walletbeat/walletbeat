@@ -15,7 +15,7 @@ export type SupplyChainDIYMetadata = {
 
 export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	id: 'supplyChainDIY',
-	icon: '🛠️',
+	icon: 'security_best_practices',
 	displayName: 'Supply Chain DIY',
 	wording: {
 		midSentenceName: null,

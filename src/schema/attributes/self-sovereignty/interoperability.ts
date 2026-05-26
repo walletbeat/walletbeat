@@ -13,7 +13,7 @@ export type InteroperabilityMetadata = {
 
 export const interoperability: Attribute<InteroperabilityMetadata> = {
 	id: 'interoperability',
-	icon: '🔗',
+	icon: 'self_sovereignty',
 	displayName: 'Interoperability',
 	wording: {
 		midSentenceName: null,

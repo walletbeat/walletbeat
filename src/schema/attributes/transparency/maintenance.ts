@@ -16,7 +16,7 @@ export type MaintenanceMetadata = {
 
 export const maintenance: Attribute<MaintenanceMetadata> = {
 	id: 'maintenance',
-	icon: '🛠️',
+	icon: 'transparency',
 	displayName: 'Maintenance',
 	wording: {
 		midSentenceName: null,
