@@ -716,7 +716,7 @@ function analyzeSoftwareFeatures({
 
 		// EOA nested multisend (AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
 		{
-			const batchApproveSupplyentry =
+			const batchApproveSupplyEntry =
 				erc7730Data !== null
 					? erc7730Data[
 							ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
@@ -725,7 +725,7 @@ function analyzeSoftwareFeatures({
 			const batchApproveSupplySimEntry =
 				simData[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]
 
-			if (!isTransactionDecoded(batchApproveSupplyentry)) {
+			if (!isTransactionDecoded(batchApproveSupplyEntry)) {
 				details.transactions.partial.push('EOA nested multisend (calldata not decoded)')
 			} else if (!isTransactionOutcomeExplained(batchApproveSupplySimEntry)) {
 				details.transactions.partial.push('EOA nested multisend (outcome not explained)')
