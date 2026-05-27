@@ -468,6 +468,25 @@ export type SoftwareTransactionSimulations = Record<
 	[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: SimulatedNondeterministicTransaction | null
 }
 
+/** Returns true if the entry exists and its outcome is fully explained. */
+export function isTransactionOutcomeExplained(entry: TransactionOutcomeEntry | null): boolean {
+	return (
+		entry !== null &&
+		entry !== undefined &&
+		entry.transactionOutcome === TransactionOutcome.EXPLAINED
+	)
+}
+
+/** Returns true if the entry exists and its calldata was decoded and shown. */
+export function isTransactionDecoded(entry: { decoded: DataDisplayOptions } | null): boolean {
+	return (
+		entry !== null &&
+		entry !== undefined &&
+		(entry.decoded === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			entry.decoded === DataDisplayOptions.SHOWN_OPTIONALLY)
+	)
+}
+
 /**
  * Global transaction details display for software wallets.
  * These basic fields are expected to be shown across all transaction types.
