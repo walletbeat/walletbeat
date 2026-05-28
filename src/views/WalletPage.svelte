@@ -1308,6 +1308,7 @@
 				border-radius: 50%;
 				flex-shrink: 0;
 				color: black;
+				font-weight: normal;
 			}
 		}
 

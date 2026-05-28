@@ -258,7 +258,7 @@
 		this={slice.href ? 'a' : 'div'}
 		href={slice.href}
 
-		class="slice"
+		class={`slice ${slice.children !== undefined && slice.children.length > 0 ? 'slice-outer' : 'slice-inner'}`}
 		title={slice.titleText}
 
 		role="button"
@@ -646,8 +646,8 @@
 
 				&:not(:hover, :focus-within) > .slice-shape > .label[data-wbicon] {
 					filter: none;
-					color: white;
-					opacity: 0.7;
+					color: contrast-color(--slice-fill);
+					opacity: 1;
 				}
 
 				&:hover > .slice-shape > .label[data-wbicon],
@@ -655,6 +655,12 @@
 					filter: none;
 					color: black;
 					opacity: 1;
+				}
+			}
+
+			.slice-outer {
+				.slice-shape > .label[data-wbicon] {
+					font-size: calc(var(--slice-labelSize) * 2px);
 				}
 			}
 
