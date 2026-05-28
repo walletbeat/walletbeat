@@ -622,6 +622,10 @@ function analyzeSoftwareFeatures({
 			? transactionSimulations
 			: null
 
+	/**
+	 * No null checks per individual simulation data.
+	 * Already guarded in `evaluateSoftwareWalletTransactionLegibility` function.
+	 */
 	if (simData !== null) {
 		// ERC-20 token transfer outcome
 		if (!isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_20_TRANSFER])) {
@@ -1084,10 +1088,33 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation {
 	const transactionLegibilitySupport = ctx.popRefs(softwareTransactionLegibility)
 
-	const { erc8213, erc7730, transactionDetailsDisplay } = transactionLegibilitySupport
+	const { erc8213, erc7730, transactionDetailsDisplay, transactionSimulations } =
+		transactionLegibilitySupport
 
-	if (transactionDetailsDisplay === null || erc8213 === null || erc7730 === null) {
+	if (
+		transactionDetailsDisplay === null ||
+		erc8213 === null ||
+		erc7730 === null ||
+		transactionSimulations === null
+	) {
 		return unrated(ctx)
+	}
+
+	// If simulation data is provided, all required benchmark entries must be populated.
+	if (isSupported(transactionSimulations)) {
+		if (
+			transactionSimulations[BasicBenchmarkTransactions.ERC_20_TRANSFER] === null ||
+			transactionSimulations[BasicBenchmarkTransactions.ERC_721_TRANSFER] === null ||
+			transactionSimulations[BasicBenchmarkTransactions.ERC_1155_TRANSFER] === null ||
+			transactionSimulations[ComplexBenchmarkTransactions.USDC_APPROVAL] === null ||
+			transactionSimulations[ComplexBenchmarkTransactions.AAVE_SUPPLY] === null ||
+			transactionSimulations[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED] === null ||
+			transactionSimulations[
+				ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
+			] === null
+		) {
+			return unrated(ctx)
+		}
 	}
 
 	// ERC-8213 support level
@@ -1095,19 +1122,15 @@ function evaluateSoftwareWalletTransactionLegibility(
 		return softwareNoTransactionLegibility(ctx, softwareTransactionLegibility)
 	}
 
-	if (erc8213.calldataDisplay === null || erc8213.messageSigningLegibility === null) {
+	const { calldataDisplay, messageSigningLegibility } = erc8213
+
+	if (calldataDisplay === null || messageSigningLegibility === null) {
 		return unrated(ctx)
 	}
 
-	const calldataDisplay = erc8213 !== null ? erc8213.calldataDisplay : null
-	const messageSigningLegibility = erc8213 !== null ? erc8213.messageSigningLegibility : null
-
-	const eip712DigestShown =
-		messageSigningLegibility !== null && evaluateSoftwareMessageSigning(messageSigningLegibility)
-	const calldataHexShown =
-		calldataDisplay !== null && isShown(calldataDisplay[CallDataDisplay.RAW_HEX])
-	const calldataDigestShown =
-		calldataDisplay !== null && isShown(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])
+	const eip712DigestShown = evaluateSoftwareMessageSigning(messageSigningLegibility)
+	const calldataHexShown = isShown(calldataDisplay[CallDataDisplay.RAW_HEX])
+	const calldataDigestShown = isShown(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])
 
 	// Full ERC-8213: calldata hex + calldata digest + EIP-712 digest
 	const erc8213Full = calldataHexShown && calldataDigestShown && eip712DigestShown
@@ -1116,30 +1139,36 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	// ERC-7730 support level
 
-	const usdcEntry = erc7730[ComplexBenchmarkTransactions.USDC_APPROVAL] ?? null
-	const aaveEntry = erc7730[ComplexBenchmarkTransactions.AAVE_SUPPLY] ?? null
-	const safeNestedEntry =
-		erc7730[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED] ?? null
+	const usdcEntry = erc7730[ComplexBenchmarkTransactions.USDC_APPROVAL]
+	const aaveEntry = erc7730[ComplexBenchmarkTransactions.AAVE_SUPPLY]
+	const safeNestedEntry = erc7730[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]
 	const safeMultisendEntry =
-		erc7730[
-			ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
-		] ?? null
-	const eoaBatchEntry =
-		erc7730[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND] ?? null
+		erc7730[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]
+	const usdcApproveAaveSupplyBatch =
+		erc7730[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]
 
-	const usdcDecoded = usdcEntry !== null ? usdcEntry.decoded : DataDisplayOptions.NOT_IN_UI
-	const aaveDecoded = aaveEntry !== null ? aaveEntry.decoded : DataDisplayOptions.NOT_IN_UI
-	const safeNestedDecoded =
-		safeNestedEntry !== null ? safeNestedEntry.decoded : DataDisplayOptions.NOT_IN_UI
-	const safeMultisendDecoded =
-		safeMultisendEntry !== null ? safeMultisendEntry.decoded : DataDisplayOptions.NOT_IN_UI
-	const eoaBatchDecoded = eoaBatchEntry !== null ? eoaBatchEntry.decoded : null
+	// Required entries must be populated; eoaBatch is optional (treated as passing if absent).
+	if (
+		usdcEntry === null ||
+		aaveEntry === null ||
+		safeNestedEntry === null ||
+		safeMultisendEntry === null ||
+		usdcApproveAaveSupplyBatch === null
+	) {
+		return unrated(ctx)
+	}
+
+	const usdcDecoded = usdcEntry.decoded
+	const aaveDecoded = aaveEntry.decoded
+	const safeNestedDecoded = safeNestedEntry.decoded
+	const safeMultisendDecoded = safeMultisendEntry.decoded
+	const usdcApproveAaveSupplyBatchDecoded = usdcApproveAaveSupplyBatch.decoded
 
 	// Full ERC-7730: decodes inner calldata of batched AND safe transactions
 	const erc7730Full =
 		isShown(safeNestedDecoded) &&
 		isShown(safeMultisendDecoded) &&
-		(eoaBatchDecoded === null || isShown(eoaBatchDecoded))
+		isShown(usdcApproveAaveSupplyBatchDecoded)
 
 	// Any ERC-7730 support: at least basic human-readable calldata decoded
 	const erc7730HasSupport = erc7730Full || isShown(usdcDecoded) || isShown(aaveDecoded)
@@ -1190,13 +1219,13 @@ export const transactionLegibility: Attribute = {
 		${eipMarkdownShortLink(erc7730)} defines a standard JSON descriptor format for structured calldata,
 		enabling wallets to display human-readable descriptions of smart contract calls.
 		Instead of showing raw hex calldata, wallets that implement ${eipMarkdownShortLink(erc7730)} can show
-		the function name and decoded parameters in plain language — for example,
+		the function name and decoded parameters in plain language. For example:
 		"Approve 100 USDC for Aave" instead of the raw \`0x095ea7b3...\` bytes.
 
 		For hardware wallets, on-device ${eipMarkdownShortLink(erc7730)} decoding is especially valuable:
 		even if the companion software is compromised, the device itself can still display the correct
 		decoded description of the transaction being signed. Wallets are evaluated against a set of
-		benchmark transactions — from simple token approvals to complex Safe nested multisend batches — to
+		benchmark transactions, from simple token approvals to complex Safe nested multisend batches to
 		measure how broad their ${eipMarkdownShortLink(erc7730)} coverage is.
 
 		**${eipMarkdownLink(erc8213)}: Standardizing What Users Sign**

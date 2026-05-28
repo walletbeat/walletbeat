@@ -470,18 +470,13 @@ export type SoftwareTransactionSimulations = Record<
 
 /** Returns true if the entry exists and its outcome is fully explained. */
 export function isTransactionOutcomeExplained(entry: TransactionOutcomeEntry | null): boolean {
-	return (
-		entry !== null &&
-		entry !== undefined &&
-		entry.transactionOutcome === TransactionOutcome.EXPLAINED
-	)
+	return entry !== null && entry.transactionOutcome === TransactionOutcome.EXPLAINED
 }
 
 /** Returns true if the entry exists and its calldata was decoded and shown. */
 export function isTransactionDecoded(entry: { decoded: DataDisplayOptions } | null): boolean {
 	return (
 		entry !== null &&
-		entry !== undefined &&
 		(entry.decoded === DataDisplayOptions.SHOWN_BY_DEFAULT ||
 			entry.decoded === DataDisplayOptions.SHOWN_OPTIONALLY)
 	)
