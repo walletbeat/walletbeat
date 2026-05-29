@@ -1068,4 +1068,66 @@ Issued At: ${new Date().toISOString()}`;
       cursor: not-allowed;
     }
   }
+
+  @media (max-width: 864px) {
+    .tab-selector {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .tab-button {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .content-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .sidebar {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .main-content {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .sidebar-content {
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      gap: 0.375rem;
+      padding-bottom: 0.25rem;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .sidebar-content :global(.sidebar-item) {
+      width: auto;
+      flex-shrink: 0;
+      padding: 0.5rem 0.875rem;
+      white-space: nowrap;
+    }
+
+    .sidebar-content :global(.sidebar-item-desc) {
+      display: none;
+    }
+  }
 </style>
