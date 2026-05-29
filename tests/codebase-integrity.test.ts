@@ -318,6 +318,7 @@ describe('codebase integrity', () => {
 			'ẞ',
 			'Ỳ',
 			'ỳ',
+			'‖',
 		])
 
 		// Characters used in font files generated from SVG.
