@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { concat, hashTypedData, keccak256, numberToHex, toBytes } from 'viem'
+  import { hashTypedData } from 'viem'
   import { hashStruct } from 'viem/utils'
+  import { bytesToHex, hexToBytes, keccak256, numberTo32Bytes } from '../../types/utils/ethereum-address'
 
   export type ERC8213SubTab = 'calldata' | 'eip712'
 
@@ -28,24 +29,27 @@
     if (!hex.startsWith('0x')) { hex = '0x' + hex; }
 
     if (!/^0x[0-9a-fA-F]*$/.test(hex)) {
-      calldataState.error = 'Invalid hex input — must be a 0x-prefixed hex string.'
+      calldataState.error = 'Invalid hex input, must be a 0x-prefixed hex string.'
 
       return
     }
 
     try {
-      const calldataBytes = toBytes(hex)
+      const calldataBytes = hexToBytes(hex)
       // ERC-8213: keccak256(len(calldata) ‖ calldata), length as 32-byte big-endian
-      const lenWord = toBytes(numberToHex(calldataBytes.length, { size: 32 }))
+      const lenWord = numberTo32Bytes(calldataBytes.length)
+      const encoded = new Uint8Array(32 + calldataBytes.length)
 
-      calldataState.digest = keccak256(concat([lenWord, calldataBytes]))
+      encoded.set(lenWord)
+      encoded.set(calldataBytes, 32)
+      calldataState.digest = '0x' + bytesToHex(keccak256(encoded))
     } catch (e) {
       calldataState.error = e instanceof Error ? e.message : 'Failed to compute digest.'
     }
   }
 
   // -------------------------------------------------------------------
-  // EIP-712 state — single JSON input (eth_signTypedData_v4 format)
+  // EIP-712 state: single JSON input (eth_signTypedData_v4 format)
   // -------------------------------------------------------------------
 
   const eip712State = $state({
@@ -134,8 +138,8 @@
     <div data-column="gap-2">
       <h3 class="section-title">Calldata digest</h3>
       <p class="section-desc">
-        ERC-8213 specifies <code>keccak256(len(calldata) ‖ calldata)</code> — the 32-byte
-        big-endian length word prepended before the raw calldata — so users can verify the
+        ERC-8213 specifies <code>keccak256(len(calldata) ‖ calldata)</code>, the 32-byte
+        big-endian length word prepended before the raw calldata, so users can verify the
         transaction data is unmodified. Paste any calldata hex below.
       </p>
     </div>
@@ -161,7 +165,7 @@
     {#if calldataState.digest}
       <div class="result-card" data-column="gap-3">
         <div data-column="gap-1">
-          <span class="result-label">Calldata digest — <code>keccak256(len ‖ calldata)</code></span>
+          <span class="result-label">Calldata digest: <code>keccak256(len ‖ calldata)</code></span>
           <code class="hash-value">{calldataState.digest}</code>
         </div>
         <p class="result-note">
@@ -178,7 +182,7 @@
       <p class="section-desc">
         ERC-8213 requires wallets to show the final
         <code>keccak256("\x19\x01" ‖ domainSeparator ‖ hashStruct(message))</code>
-        so users can verify typed-data signatures without trusting the dApp.
+        so users can verify typed-data signatures without trusting the app.
       </p>
     </div>
 
@@ -208,22 +212,22 @@
     {#if eip712State.fullDigest}
       <div class="result-card" data-column="gap-4">
         <div data-column="gap-1">
-          <span class="result-label">Domain separator — <code>hashStruct(EIP712Domain)</code></span>
+          <span class="result-label">Domain separator: <code>hashStruct(EIP712Domain)</code></span>
           <code class="hash-value">{eip712State.domainSeparator}</code>
         </div>
         <div data-column="gap-1">
-          <span class="result-label">Message hash — <code>hashStruct({eip712State.primaryType})</code></span>
+          <span class="result-label">Message hash: <code>hashStruct({eip712State.primaryType})</code></span>
           <code class="hash-value">{eip712State.messageHash}</code>
         </div>
         <div data-column="gap-1">
           <span class="result-label">
-            Full EIP-712 digest — <code>keccak256("\x19\x01" ‖ domainSep ‖ msgHash)</code>
+            Full EIP-712 digest: <code>keccak256("\x19\x01" ‖ domainSep ‖ msgHash)</code>
           </span>
           <code class="hash-value highlight">{eip712State.fullDigest}</code>
         </div>
         <p class="result-note">
           A wallet with ERC-8213 support should display the full digest when asking the user to
-          approve a typed-data signature, so it can be verified independently of the dApp.
+          approve a typed-data signature, so it can be verified independently of the app.
         </p>
       </div>
     {/if}

@@ -116,7 +116,7 @@ export function keccak256(data: Uint8Array): Uint8Array {
 	return hash
 }
 
-function bytesToHex(bytes: Uint8Array): string {
+export function bytesToHex(bytes: Uint8Array): string {
 	let hex = ''
 
 	for (let i = 0; i < bytes.length; i++) {
@@ -124,6 +124,28 @@ function bytesToHex(bytes: Uint8Array): string {
 	}
 
 	return hex
+}
+
+export function hexToBytes(hex: string): Uint8Array {
+	const bare = hex.startsWith('0x') ? hex.slice(2) : hex
+	const out = new Uint8Array(bare.length / 2)
+
+	for (let i = 0; i < out.length; i++) {
+		out[i] = parseInt(bare.slice(i * 2, i * 2 + 2), 16)
+	}
+
+	return out
+}
+
+export function numberTo32Bytes(n: number): Uint8Array {
+	const out = new Uint8Array(32)
+
+	for (let i = 31; i >= 0 && n > 0; i--) {
+		out[i] = n & 0xff
+		n = Math.floor(n / 256)
+	}
+
+	return out
 }
 
 export type Erc55Address = `0x${string}`
