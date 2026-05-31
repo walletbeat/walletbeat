@@ -58,3 +58,6 @@ resources/contracts/docs/
 deploy/dev/dev-server.log
 deploy/dev/dev-server.pid
 deploy/dev/dev-server.url
+
+# Ruff cache
+.ruff_cache
