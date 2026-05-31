@@ -32,6 +32,8 @@ import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
 	type NonEmptyArray,
+	nonEmptyConcat,
+	nonEmptyGet,
 	nonEmptyMapToRecord,
 	nonEmptySet,
 	setItems,
@@ -48,7 +50,6 @@ import {
 } from './json-utils'
 import { StringEntropy } from './string-entropy'
 import {
-	globalBenignPlaceholder,
 	type SaveOptions,
 	type WalletCaptureAnnotations,
 	type WalletRequestMatcher,
@@ -94,9 +95,7 @@ interface EncodedUserDataString {
 /**
  * Encoded representation of a deduplicated set of UserDataString objects.
  */
-interface EncodedUserDataStringStore {
-	userData: EncodedUserDataString[]
-}
+type EncodedUserDataStringStore = EncodedUserDataString[]
 
 interface EncodedWalletDataRequest {
 	domain: string
@@ -121,7 +120,7 @@ interface EncodedWalletDataRequest {
 	/**
 	 * Encoded as omitted if absent, otherwise EncodedUserDataPieces.
 	 */
-	content?: EncodedUserDataPieces
+	content?: string
 
 	cookies?: EncodedMultiDict
 	refererDomain?: string
@@ -134,20 +133,10 @@ interface EncodedWalletDataRequest {
 /**
  * How query params / cookies / headers are encoded.
  * Each key maps to either:
- * - a single EncodedUserDataPieces (if only one value)
- * - or an array of EncodedUserDataPieces (if multiple values)
+ * - a single string (if only one value)
+ * - or an array of strings (if multiple values)
  */
-type EncodedMultiDict = Record<string, EncodedUserDataPieces | EncodedUserDataPieces[]>
-
-/**
- * EncodedUserDataPieces encoding:
- * - If no pieces were detected: encoded directly as a raw string.
- * - If pieces were detected: encoded as an object with `sample` plus `piece` or `pieces`.
- */
-type EncodedUserDataPieces =
-	| string
-	| { sample: string; piece: UserInfo }
-	| { sample: string; pieces: UserInfo[] }
+type EncodedMultiDict = Record<string, string | NonEmptyArray<string>>
 
 interface EncodedWalletRequestReview {
 	manuallyReviewed: boolean
@@ -165,38 +154,6 @@ interface EncodedWalletCaptureFile {
 	flows: Record<string, EncodedWalletCaptureFlow | 'NOT_SUPPORTED'>
 	userData: EncodedUserDataStringStore
 	sessions: number
-}
-
-function parseEncodedUserDataPieces(v: unknown, at: string): EncodedUserDataPieces {
-	if (typeof v === 'string') {
-		return expectString(v, at)
-	}
-
-	const obj = expectRecord(v, at)
-
-	// sample is required in object form
-	const sample = expectString(obj.sample, `${at}.sample`)
-
-	const hasPiece = Object.prototype.hasOwnProperty.call(obj, 'piece')
-	const hasPieces = Object.prototype.hasOwnProperty.call(obj, 'pieces')
-
-	if (hasPiece === hasPieces) {
-		// either both present or neither present
-		throw new Error(`Expected exactly one of "piece" or "pieces" at ${at}`)
-	}
-
-	if (hasPiece) {
-		const piece = userInfoEnums.assert(expectString(obj.piece, `${at}.piece`))
-
-		return { sample, piece }
-	}
-
-	const piecesRaw = expectArray(obj.pieces, `${at}.pieces`)
-	const pieces = piecesRaw.map((x, i) =>
-		userInfoEnums.assert(expectString(x, `${at}.pieces[${i}]`)),
-	)
-
-	return { sample, pieces }
 }
 
 function parseEncodedWalletRequestReview(v: unknown, at: string): EncodedWalletRequestReview {
@@ -258,9 +215,9 @@ function parseEncodedMultiDict(v: unknown, at: string): EncodedMultiDict {
 		const keyAt = `${at}[${JSON.stringify(k)}]`
 
 		if (Array.isArray(rawVal)) {
-			out[k] = rawVal.map((x, i) => parseEncodedUserDataPieces(x, `${keyAt}[${i}]`))
-		} else {
-			out[k] = parseEncodedUserDataPieces(rawVal, keyAt)
+			out[k] = assertNonEmptyArray(rawVal.map((x, i) => expectString(x, `${keyAt}[${i}]`)))
+		} else if (typeof rawVal === 'string') {
+			out[k] = expectString(rawVal, keyAt)
 		}
 	}
 
@@ -304,10 +261,10 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		oddTrailers = parseEncodedMultiDict(obj.oddTrailers, `${at}.oddTrailers`)
 	}
 
-	let content: EncodedUserDataPieces | undefined
+	let content: string | undefined
 
 	if (obj.content !== undefined) {
-		content = parseEncodedUserDataPieces(obj.content, `${at}.content`)
+		content = expectString(obj.content, `${at}.content`)
 	}
 
 	let jsonRpcMethod: string | string[] | undefined
@@ -386,10 +343,6 @@ export class UserDataString {
 	}
 
 	public static decode(data: unknown, at: string): UserDataString {
-		if (typeof data === 'string') {
-			return new UserDataString(data, [])
-		}
-
 		const record = expectRecord(data, at)
 		const pieces: UserInfo[] = []
 
@@ -430,13 +383,26 @@ export class UserDataString {
 
 		return true
 	}
+
+	public withMerged(...userInfo: UserInfo[]): UserDataString {
+		const newSet: Set<UserInfo> = new Set()
+
+		for (const info of this.pieces) {
+			newSet.add(info)
+		}
+
+		for (const info of userInfo) {
+			newSet.add(info)
+		}
+
+		return new UserDataString(this.str, newSet)
+	}
 }
 
 /**
  * A deduplicated set of UserDataString objects.
  */
 export class UserDataStringStore {
-	private readonly _strings: Set<UserDataString> = new Set()
 	private readonly _index: Map<string, UserDataString> = new Map()
 
 	public static newStore(): UserDataStringStore {
@@ -444,10 +410,9 @@ export class UserDataStringStore {
 	}
 
 	public static fromJSON(data: unknown, at: string): UserDataStringStore {
-		const record = expectRecord(data, at)
 		const store = new UserDataStringStore()
 
-		for (const itemData of expectArray(record.userData, `${at}.userData`)) {
+		for (const itemData of expectArray(data, `${at}.userData`)) {
 			const item = UserDataString.decode(itemData, `${at}.userData[]`)
 
 			store.add(item)
@@ -457,30 +422,23 @@ export class UserDataStringStore {
 	}
 
 	public add(item: UserDataString): void {
-		const key = this._makeKey(item)
+		const existing = this._index.get(item.str)
 
-		if (!this._index.has(key)) {
-			this._strings.add(item)
-			this._index.set(key, item)
+		if (existing === undefined) {
+			this._index.set(item.str, item)
+		} else {
+			this._index.set(item.str, existing.withMerged(...item.pieces))
 		}
 	}
 
-	private _makeKey(item: UserDataString): string {
-		return item.str + '|' + [...item.pieces].sort(compareUserInfo).join(',')
+	public get(str: string): UserDataString | undefined {
+		return this._index.get(str)
 	}
 
 	public toJSON(): EncodedUserDataStringStore {
-		const sorted = [...this._strings].sort((a, b) => a.str.localeCompare(b.str))
-
-		return { userData: sorted.map(item => item.encode()) }
-	}
-
-	public *iter(): Iterable<UserDataString> {
-		yield* this._strings
-	}
-
-	public get size(): number {
-		return this._strings.size
+		return Array.from(this._index.values())
+			.sort((a, b) => a.str.localeCompare(b.str))
+			.map(item => item.encode())
 	}
 }
 
@@ -489,97 +447,213 @@ export class UserDataStringStore {
 enum WalletStringOccurrenceType {
 	HEADER = 'HEADER',
 	TRAILER = 'TRAILER',
-	QUERY_PARAMETER = 'QUERY_PARAMETER',
+	QUERY = 'QUERY',
 	COOKIE = 'COOKIE',
-	WHOLE_PAYLOAD = 'WHOLE_PAYLOAD',
-	PAYLOAD_PARAMETER = 'PAYLOAD_PARAMETER',
+	PAYLOAD = 'PAYLOAD',
 }
 
-type WalletStringOccurrenceKey = `${WalletStringOccurrenceType}:${string}`
+const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
+	[WalletStringOccurrenceType.HEADER]: true,
+	[WalletStringOccurrenceType.TRAILER]: true,
+	[WalletStringOccurrenceType.QUERY]: true,
+	[WalletStringOccurrenceType.COOKIE]: true,
+	[WalletStringOccurrenceType.PAYLOAD]: true,
+})
+
+export type WalletDataStringBreadcrumb =
+	| {
+			type: WalletStringOccurrenceType.HEADER
+	  }
+	| {
+			type: WalletStringOccurrenceType.TRAILER
+	  }
+	| {
+			type: WalletStringOccurrenceType.QUERY
+	  }
+	| {
+			type: WalletStringOccurrenceType.COOKIE
+	  }
+	| {
+			type: WalletStringOccurrenceType.PAYLOAD
+	  }
+	| {
+			type: 'INDEX'
+			index: number
+	  }
+	| { type: 'KEY'; key: string; branch: 'KEY' | 'VALUE' }
+	| ({ type: 'MULTI_KEY'; key: string } & (
+			| {
+					branch: 'KEY'
+			  }
+			| {
+					branch: 'VALUE'
+					index: number
+			  }
+	  ))
+	| {
+			type: 'BASE64_DECODE'
+	  }
+	| { type: 'JSON_DECODE' }
+	| { type: 'NDJSON_DECODE' }
+	| { type: 'QUERY_STRING_DECODE' }
+	| { type: 'SUBSTRING'; from: number; to: number }
+
+function breadcrumbToString(breadcrumb: WalletDataStringBreadcrumb): string {
+	if (walletStringOccurrenceType.is(breadcrumb.type)) {
+		return breadcrumb.type.toString()
+	}
+
+	switch (breadcrumb.type) {
+		case 'BASE64_DECODE':
+			return 'BASE64_DECODE'
+		case 'INDEX':
+			return `INDEX:${breadcrumb.index}`
+		case 'JSON_DECODE':
+			return 'JSON_DECODE'
+		case 'NDJSON_DECODE':
+			return 'NDJSON_DECODE'
+		case 'QUERY_STRING_DECODE':
+			return 'QUERY_STRING_DECODE'
+		case 'KEY':
+			return `KEY:${breadcrumb.key}:${breadcrumb.branch}`
+		case 'MULTI_KEY':
+			return `MULTI_KEY:${breadcrumb.key}:${breadcrumb.branch}:${breadcrumb.branch === 'KEY' ? '' : ':' + breadcrumb.index.toString()}`
+		case 'SUBSTRING':
+			return `SUBSTRING:${breadcrumb.from}:${breadcrumb.to}`
+		default:
+			throw new Error('unimplemented breadcrumb type')
+	}
+}
+
+export class WalletDataStringBreadcrumbs {
+	private readonly breadcrumbs: NonEmptyArray<WalletDataStringBreadcrumb>
+	constructor(breadcrumbs: NonEmptyArray<WalletDataStringBreadcrumb>) {
+		this.breadcrumbs = breadcrumbs
+	}
+	public get key(): string {
+		return this.breadcrumbs.map(breadcrumbToString).join(',')
+	}
+	public toString(): string {
+		return this.breadcrumbs.map(breadcrumbToString).join(' → ')
+	}
+	public add(breadcrumb: WalletDataStringBreadcrumb): WalletDataStringBreadcrumbs {
+		return new WalletDataStringBreadcrumbs(nonEmptyConcat([this.breadcrumbs, [breadcrumb]]))
+	}
+
+	/**
+	 * @returns A map key that can be used to roughly verify whether this WalletDataStringBreadcrumbs came from a similar-ish source as another, if the keys match.
+	 */
+	public roughKey(): string {
+		const second = <T extends WalletDataStringBreadcrumb['type']>(
+			assertType: T,
+		): WalletDataStringBreadcrumb & { type: T } => {
+			if (this.breadcrumbs.length < 2) {
+				throw new Error('unexpected breadcrumb sequence')
+			}
+
+			const second = this.breadcrumbs[1]
+
+			if (second.type !== assertType) {
+				throw new Error(
+					`second breadcrumb after ${this.breadcrumbs[0].type} was of unexpected type ${second.type} (want: ${assertType})`,
+				)
+			}
+
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked.
+			return second as WalletDataStringBreadcrumb & { type: T }
+		}
+
+		switch (this.breadcrumbs[0].type) {
+			case WalletStringOccurrenceType.COOKIE:
+				return `Cookie: ${second('MULTI_KEY').key}`
+			case WalletStringOccurrenceType.HEADER:
+				return `Header: ${second('MULTI_KEY').key}`
+			case WalletStringOccurrenceType.TRAILER:
+				return `Trailer: ${second('MULTI_KEY').key}`
+			case WalletStringOccurrenceType.QUERY:
+				return `Query: ${second('MULTI_KEY').key}`
+			case WalletStringOccurrenceType.PAYLOAD:
+				return 'payload'
+			case 'BASE64_DECODE':
+				return ''
+			case 'INDEX':
+				return ''
+			case 'JSON_DECODE':
+				return ''
+			case 'KEY':
+				return ''
+			case 'MULTI_KEY':
+				return ''
+			case 'NDJSON_DECODE':
+				return ''
+			case 'QUERY_STRING_DECODE':
+				return ''
+			case 'SUBSTRING':
+				return ''
+			default:
+				throw new Error('unimplemented breadcrumb type')
+		}
+	}
+}
+
+export class WalletDataStringOrigin {
+	public readonly request: WalletRequest
+	public readonly breadcrumbs: WalletDataStringBreadcrumbs
+	constructor(request: WalletRequest, breadcrumbs: WalletDataStringBreadcrumbs) {
+		this.request = request
+		this.breadcrumbs = breadcrumbs
+	}
+	public get key(): string {
+		return `${this.request.key}:${this.breadcrumbs.key}`
+	}
+	public add(breadcrumb: WalletDataStringBreadcrumb): WalletDataStringOrigin {
+		return new WalletDataStringOrigin(this.request, this.breadcrumbs.add(breadcrumb))
+	}
+	public keyByDomainAndRoughBreadcrumbs(): string {
+		return `${this.request.domain}: ${this.breadcrumbs.roughKey()}`
+	}
+}
 
 export class WalletDataString {
 	public static highestScoreFirst(a: WalletDataString, b: WalletDataString): number {
 		return b.score - a.score
 	}
 
-	/**
-	 * Construct WalletDataString instances from a UserDataPieces sample.
-	 */
-	public static async fromUserDataPieces(
-		pieces: UserDataPieces,
-		occurrence: WalletStringOccurrenceType,
-		paramName: string,
-		sourceRequest: WalletRequest,
-	): Promise<WalletDataString[]> {
-		// Reconstruct string: replace user-data parts with placeholder
-		const sampleStr = pieces.sample.str
-
-		// If the sample has pieces marked, replace the whole thing with a placeholder
-		const reconstitutedStr = sampleStr
-
-		return await WalletDataString.createMany(reconstitutedStr, occurrence, paramName, sourceRequest)
-	}
-
-	/**
-	 * Break down a payload string by attempting to parse it as a query string, or JSON.
-	 * Recursively processes decoded values. Falls back to a single WalletDataString if no
-	 * parsing strategy succeeds.
-	 *
-	 * @param str The payload string to parse.
-	 * @param occurrence The occurrence type for tracking.
-	 * @param paramName The parameter name for tracking.
-	 * @param sourceRequest Wallet request that sourced this string.
-	 * @returns An array of WalletDataString instances representing the decomposed payload.
-	 */
-	private static async createMany(
+	public static async createMany(
+		strings: WalletDataStrings,
 		str: string,
-		occurrence: WalletStringOccurrenceType,
-		paramName: string,
-		sourceRequest: WalletRequest,
+		origin: WalletDataStringOrigin,
 	): Promise<WalletDataString[]> {
 		if (str === '') {
 			return []
 		}
 
-		if (str === globalBenignPlaceholder) {
-			return []
-		}
-
-		// Try query string parsing first
-		const queryResult = await WalletDataString._tryParseAsQueryString(
-			str,
-			occurrence,
-			paramName,
-			sourceRequest,
-		)
-
-		if (queryResult !== null) {
-			return queryResult
-		}
-
 		// Try JSON parsing
-		const jsonResult = await WalletDataString._tryParseAsJson(
-			str,
-			occurrence,
-			paramName,
-			sourceRequest,
-		)
+		const jsonResult = await WalletDataString._tryParseAsJson(strings, str, origin)
 
 		if (jsonResult !== null) {
 			return jsonResult
 		}
 
 		if (str.includes('\n')) {
-			const ndjsonResult = await WalletDataString._tryParseAsJsonLines(
-				str,
-				occurrence,
-				paramName,
-				sourceRequest,
-			)
+			const ndjsonResult = await WalletDataString._tryParseAsJsonLines(strings, str, origin)
 
 			if (ndjsonResult !== null) {
 				return ndjsonResult
 			}
+		}
+
+		// Try query string parsing
+		const queryResult = await WalletDataString._tryParseAsQueryString(strings, str, origin)
+
+		if (queryResult !== null) {
+			return queryResult
+		}
+
+		const substrResult = await WalletDataString._tryFindSubstrings(strings, str, origin)
+
+		if (substrResult !== null) {
+			return substrResult
 		}
 
 		// Check if we are dealing with english text.
@@ -601,38 +675,14 @@ export class WalletDataString {
 			return []
 		}
 
-		if (str.includes(globalBenignPlaceholder)) {
-			const parts = str.split(globalBenignPlaceholder)
-			const partWise: WalletDataString[] = []
-
-			for (const part of parts) {
-				if (part.trim() === '') {
-					continue
-				}
-
-				partWise.push(
-					...(await WalletDataString.createMany(part, occurrence, paramName, sourceRequest)),
-				)
-			}
-
-			if (partWise.length > 0) {
-				return partWise
-			}
-		}
-
 		// Fallback: treat the entire string as a single WalletDataString
-		const instance = new WalletDataString(str, sourceRequest)
-
-		instance.addOccurrence(occurrence, paramName)
-
-		return [instance]
+		return [new WalletDataString(new UserDataString(str, new Set()), origin)]
 	}
 
 	private static async _tryParseAsQueryString(
+		strings: WalletDataStrings,
 		str: string,
-		occurrence: WalletStringOccurrenceType,
-		paramName: string,
-		sourceRequest: WalletRequest,
+		origin: WalletDataStringOrigin,
 	): Promise<WalletDataString[] | null> {
 		// Only attempt if the string contains query-like characters
 		if (!str.includes('&') && !str.includes('=')) {
@@ -649,8 +699,12 @@ export class WalletDataString {
 
 		const results: WalletDataString[] = []
 		const pairs = decoded.split('&')
+		const originWithQuery = origin.add({ type: 'QUERY_STRING_DECODE' })
+		const numOccurrences: Map<string, number> = new Map()
 
-		for (const pair of pairs) {
+		for (let i = 0; i < pairs.length; i++) {
+			const pair = pairs[i]
+
 			if (pair === '') {
 				continue
 			}
@@ -659,19 +713,53 @@ export class WalletDataString {
 
 			if (eqIndex === -1) {
 				// Key without value
-				results.push(
-					...(await WalletDataString.createMany(pair, occurrence, paramName, sourceRequest)),
-				)
+				if (!numOccurrences.has(pair)) {
+					results.push(
+						...(await WalletDataString.createMany(
+							strings,
+							pair,
+							originWithQuery.add({
+								type: 'MULTI_KEY',
+								key: pair,
+								branch: 'KEY',
+							}),
+						)),
+					)
+					numOccurrences.set(pair, 0)
+				}
 			} else {
 				const key = pair.slice(0, eqIndex)
+
+				if (!numOccurrences.has(key)) {
+					results.push(
+						...(await WalletDataString.createMany(
+							strings,
+							key,
+							originWithQuery.add({
+								type: 'MULTI_KEY',
+								key: key,
+								branch: 'KEY',
+							}),
+						)),
+					)
+				}
+
+				const numOccurrence = numOccurrences.get(key) ?? 0
 				const value = pair.slice(eqIndex + 1)
 
 				results.push(
-					...(await WalletDataString.createMany(key, occurrence, paramName, sourceRequest)),
+					...(await WalletDataString.createMany(
+						strings,
+						value,
+						originWithQuery.add({
+							type: 'MULTI_KEY',
+							key: key,
+							branch: 'VALUE',
+							index: numOccurrence,
+						}),
+					)),
 				)
-				results.push(
-					...(await WalletDataString.createMany(value, occurrence, paramName, sourceRequest)),
-				)
+				numOccurrences.set(pair, numOccurrence + 1)
 			}
 		}
 
@@ -683,10 +771,9 @@ export class WalletDataString {
 	}
 
 	private static async _tryParseAsJson(
+		strings: WalletDataStrings,
 		str: string,
-		occurrence: WalletStringOccurrenceType,
-		paramName: string,
-		sourceRequest: WalletRequest,
+		origin: WalletDataStringOrigin,
 	): Promise<WalletDataString[] | null> {
 		let parsed: unknown
 
@@ -697,19 +784,16 @@ export class WalletDataString {
 		}
 
 		return await WalletDataString._extractJsonStrings(
+			strings,
 			parsed,
-			'',
-			occurrence,
-			paramName,
-			sourceRequest,
+			origin.add({ type: 'JSON_DECODE' }),
 		)
 	}
 
 	private static async _tryParseAsJsonLines(
+		strings: WalletDataStrings,
 		str: string,
-		occurrence: WalletStringOccurrenceType,
-		paramName: string,
-		sourceRequest: WalletRequest,
+		origin: WalletDataStringOrigin,
 	): Promise<WalletDataString[] | null> {
 		const lines = str.split('\n').filter(line => line.trim() !== '')
 
@@ -718,6 +802,7 @@ export class WalletDataString {
 		}
 
 		const results: WalletDataString[] = []
+		const originWithNDJSON = origin.add({ type: 'NDJSON_DECODE' })
 
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i].trim()
@@ -729,27 +814,22 @@ export class WalletDataString {
 				return null
 			}
 
-			const linePath = lines.length > 1 ? `[${i}]` : ''
-			const extracted = await WalletDataString._extractJsonStrings(
-				parsed,
-				linePath,
-				occurrence,
-				paramName,
-				sourceRequest,
+			results.push(
+				...(await WalletDataString._extractJsonStrings(
+					strings,
+					parsed,
+					originWithNDJSON.add({ type: 'INDEX', index: i }),
+				)),
 			)
-
-			results.push(...extracted)
 		}
 
 		return results
 	}
 
 	private static async _extractJsonStrings(
+		strings: WalletDataStrings,
 		value: unknown,
-		path: string,
-		occurrence: WalletStringOccurrenceType,
-		paramName: string,
-		sourceRequest: WalletRequest,
+		origin: WalletDataStringOrigin,
 	): Promise<WalletDataString[]> {
 		const results: WalletDataString[] = []
 
@@ -758,120 +838,181 @@ export class WalletDataString {
 		}
 
 		if (typeof value === 'string') {
-			results.push(
-				...(await WalletDataString.createMany(value, occurrence, path || paramName, sourceRequest)),
-			)
+			results.push(...(await WalletDataString.createMany(strings, value, origin)))
 		} else if (Array.isArray(value)) {
-			for (const val of value) {
-				results.push(
-					...(await WalletDataString._extractJsonStrings(
-						val,
-						`${path}[]`,
-						occurrence,
-						paramName,
-						sourceRequest,
-					)),
-				)
-			}
+			await Promise.all(
+				value.map(async (val, i) => {
+					results.push(
+						...(await WalletDataString._extractJsonStrings(
+							strings,
+							val,
+							origin.add({ type: 'INDEX', index: i }),
+						)),
+					)
+				}),
+			)
 		} else if (typeof value === 'object') {
 			for (const key of Object.keys(value).sort()) {
 				results.push(
-					...(await WalletDataString.createMany(key, occurrence, path || paramName, sourceRequest)),
+					...(await WalletDataString.createMany(
+						strings,
+						key,
+						origin.add({ type: 'KEY', key, branch: 'KEY' }),
+					)),
 				)
-				const childPath = path ? `${path}.${key}` : key
 
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know `key` is a key of `value`.
 				const obj = value as { [key]: unknown }
 
 				results.push(
 					...(await WalletDataString._extractJsonStrings(
+						strings,
 						obj[key],
-						childPath,
-						occurrence,
-						paramName,
-						sourceRequest,
+						origin.add({ type: 'KEY', key, branch: 'VALUE' }),
 					)),
 				)
 			}
 		}
-		// Primitives (number, boolean, null) are ignored
+		// Primitives (number, boolean, null, etc) are ignored
 
 		return results
 	}
 
-	public readonly str: string | UserDataString
-	private readonly firstSourceRequest: WalletRequest
-	private readonly occurrences: Map<WalletStringOccurrenceKey, number>
+	private static async _tryFindSubstrings(
+		strings: WalletDataStrings,
+		str: string,
+		origin: WalletDataStringOrigin,
+	): Promise<WalletDataString[] | null> {
+		const strLength = str.length
+		const substrings: (WalletDataStringBreadcrumb & { type: 'SUBSTRING' })[] = []
+
+		for (const existing of strings.longestFirstUserInfoOnlyStrings()) {
+			const existingStr = existing.str.str
+
+			if (existingStr.length >= strLength) {
+				continue
+			}
+
+			const bits = str.split(existingStr)
+
+			if (bits.length <= 1) {
+				continue
+			}
+
+			let strIndex = 0
+
+			for (let i = 0; i < bits.length - 1; i++) {
+				const fromIndex = strIndex + bits[i].length
+
+				if (bits[i].length > 0) {
+					substrings.push({ type: 'SUBSTRING', from: strIndex, to: fromIndex })
+				}
+
+				strIndex = fromIndex + existingStr.length
+				substrings.push({ type: 'SUBSTRING', from: fromIndex, to: strIndex })
+			}
+
+			if (strIndex < strLength) {
+				substrings.push({ type: 'SUBSTRING', from: strIndex, to: strLength })
+			}
+		}
+
+		if (substrings.length === 0) {
+			return null
+		}
+
+		return (
+			await Promise.all(
+				substrings.map(breadcrumb =>
+					WalletDataString.createMany(
+						strings,
+						str.substring(breadcrumb.from, breadcrumb.to),
+						origin.add(breadcrumb),
+					),
+				),
+			)
+		).flat()
+	}
+
+	public str: UserDataString
+	private readonly _firstOrigin: WalletDataStringOrigin
+	private readonly origins: Map<string, WalletDataStringOrigin>
+	private readonly occurrencesByRoughKey: Map<string, number>
 	private readonly entropy: StringEntropy
 	private _score: number | null = null
 
-	private constructor(str: string | UserDataString, firstSourceRequest: WalletRequest) {
-		if (typeof str === 'string' && str === '') {
-			throw new Error('Cannot create a WalletDataString with the empty string')
-		}
-
+	private constructor(str: UserDataString, firstOrigin: WalletDataStringOrigin) {
 		this.str = str
-		this.firstSourceRequest = firstSourceRequest
-		this.occurrences = new Map()
-		this.entropy =
-			typeof str === 'string' ? StringEntropy.compute(str) : StringEntropy.compute(str.str)
+		this.origins = new Map()
+		this.occurrencesByRoughKey = new Map()
+		this._firstOrigin = firstOrigin
+		this.addOccurrence(firstOrigin)
+		this.entropy = StringEntropy.compute(str.str)
 	}
 
 	/**
 	 * Returns the first request that sourced this data string.
 	 */
-	public getFirstSourceRequest(): WalletRequest {
-		return this.firstSourceRequest
+	public get firstOrigin(): WalletDataStringOrigin {
+		return this._firstOrigin
 	}
 
 	/**
 	 * Returns a readonly view of the occurrences map.
 	 */
-	public getOccurrences(): ReadonlyMap<WalletStringOccurrenceKey, number> {
-		return this.occurrences
+	public getOrigins(): ReadonlyMap<string, WalletDataStringOrigin> {
+		return this.origins
+	}
+
+	/**
+	 * @returns A readonly view of the number of occurrences of this string, keyed by rough key (domain and basic breadcrumbs)
+	 */
+	public getRoughOccurrences(): ReadonlyMap<string, number> {
+		return this.occurrencesByRoughKey
 	}
 
 	public addOccurrencesFrom(other: WalletDataString) {
-		if (typeof this.str === 'string') {
-			if (typeof other.str !== 'string') {
-				throw new Error('incompatible WalletDataString types')
-			}
-
-			if (this.str !== other.str) {
-				throw new Error('mismatching WalletDataString objects')
-			}
-		} else {
-			if (typeof other.str !== 'object') {
-				throw new Error('incompatible WalletDataString types')
-			}
-
-			if (this.str.str !== other.str.str) {
-				throw new Error('mismatching WalletDataString objects')
-			}
+		if (this.str.str !== other.str.str) {
+			throw new Error(`mismatching WalletDataString objects: ${this.str.str} vs ${other.str.str}`)
 		}
 
-		for (const [key, count] of other.occurrences.entries()) {
-			const existing = this.occurrences.get(key) ?? 0
-
-			this.occurrences.set(key, existing + count)
+		for (const [_, origin] of other.origins.entries()) {
+			if (this.addOccurrence(origin)) {
+				this._score = null
+			}
 		}
-
-		this._score = null
 	}
 
-	public addOccurrence(occurrence: WalletStringOccurrenceType, paramName: string) {
-		const key: WalletStringOccurrenceKey = `${occurrence}:${paramName}`
-		const got = this.occurrences.get(key)
+	public addOccurrence(origin: WalletDataStringOrigin): boolean {
+		const key = origin.key
 
-		this.occurrences.set(key, got === undefined ? 1 : got + 1)
+		if (this.origins.has(key)) {
+			return false
+		}
+
+		this.origins.set(key, origin)
+		const roughKey = origin.keyByDomainAndRoughBreadcrumbs()
+		const numOccurrences = this.occurrencesByRoughKey.get(roughKey)
+
+		this.occurrencesByRoughKey.set(roughKey, numOccurrences === undefined ? 1 : numOccurrences + 1)
 		this._score = null
+
+		return true
+	}
+
+	public addUserInfoFrom(userDataString: UserDataString) {
+		if (userDataString.str !== this.str.str) {
+			throw new Error(`mismatching strings: ${userDataString.str} vs ${this.str.str}`)
+		}
+
+		this.str = this.str.withMerged(...userDataString.pieces)
 	}
 
 	public get score(): number {
 		if (this._score === null) {
 			let appearances = 0.0
 
-			for (const [_, v] of this.occurrences.entries()) {
+			for (const [_, v] of this.occurrencesByRoughKey.entries()) {
 				appearances += Math.pow(v, 1.25)
 			}
 			this._score = Math.pow(this.entropy.entropy, 1.5) * Math.pow(appearances, 0.5)
@@ -884,13 +1025,15 @@ export class WalletDataString {
 export class WalletDataStrings {
 	private captureFile: WalletCaptureFile
 	private _strings: Map<string, WalletDataString> = new Map()
+	private _highestScoreFirstStrings: WalletDataString[] | null = null
+	private _longestFirstStrings: WalletDataString[] | null = null
 
 	constructor(captureFile: WalletCaptureFile) {
 		this.captureFile = captureFile
 	}
 
 	public add(s: WalletDataString) {
-		const key = typeof s.str === 'string' ? s.str : s.str.str
+		const key = s.str.str
 
 		if (this.captureFile.isBenignString(key)) {
 			return
@@ -901,127 +1044,66 @@ export class WalletDataStrings {
 		if (existing) {
 			existing.addOccurrencesFrom(s)
 		} else {
+			const ud = this.captureFile.userData.get(s.str.str)
+
+			if (ud !== undefined) {
+				s.addUserInfoFrom(ud)
+			}
+
 			this._strings.set(key, s)
 		}
+
+		this._highestScoreFirstStrings = null
+		this._longestFirstStrings = null
 	}
 
-	public size(): number {
+	public get size(): number {
 		return this._strings.size
 	}
 
-	public strings(): WalletDataString[] {
-		return Array.from(this._strings.values()).sort((a, b) =>
-			WalletDataString.highestScoreFirst(a, b),
-		)
+	public strings(): ReadonlyArray<WalletDataString> {
+		if (this._highestScoreFirstStrings === null) {
+			this._highestScoreFirstStrings = Array.from(this._strings.values()).sort((a, b) =>
+				WalletDataString.highestScoreFirst(a, b),
+			)
+		}
+
+		return this._highestScoreFirstStrings
+	}
+
+	public get(str: string): WalletDataString | undefined {
+		return this._strings.get(str)
+	}
+
+	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
+		if (this._longestFirstStrings === null) {
+			this._longestFirstStrings = Array.from(this._strings.values())
+				.filter(s => s.str.pieces.size > 0)
+				.sort((a, b) => b.str.str.length - a.str.str.length)
+		}
+
+		return this._longestFirstStrings
 	}
 }
 
-export type UserDataDict = Record<string, NonEmptyArray<UserDataPieces>>
+export type UserDataDict = Record<string, NonEmptyArray<string>>
 
-function decodeUserDataDict(encoded: EncodedMultiDict | undefined, at: string): UserDataDict {
-	if (!encoded) {
+function decodeUserDataDict(encoded: EncodedMultiDict | undefined, _at: string): UserDataDict {
+	if (encoded === undefined) {
 		return {}
 	}
 
 	const out: UserDataDict = {}
 
-	for (const [k, raw] of Object.entries(encoded)) {
-		const keyAt = `${at}[${JSON.stringify(k)}]`
-
-		if (Array.isArray(raw)) {
-			try {
-				out[k] = assertNonEmptyArray(raw.map((x, i) => UserDataPieces.decode(x, `${keyAt}[${i}]`)))
-			} catch (e) {
-				throw new Error(`${getErrorMessage(e)} at ${keyAt}`)
-			}
+	for (const [k, v] of Object.entries(encoded)) {
+		if (typeof v === 'string') {
+			out[k] = [v]
 		} else {
-			out[k] = [UserDataPieces.decode(raw, keyAt)]
+			out[k] = v
 		}
 	}
 
 	return out
-}
-
-export class UserDataPieces {
-	public readonly sample: UserDataString
-	public readonly pieces: ReadonlySet<UserInfo>
-
-	private constructor(args: { sample: UserDataString; pieces: Iterable<UserInfo> }) {
-		this.sample = args.sample
-		this.pieces = new Set(args.pieces)
-	}
-
-	public static decode(data: EncodedUserDataPieces, at = '$'): UserDataPieces {
-		try {
-			let sample: UserDataString
-
-			if (typeof data === 'string') {
-				sample = new UserDataString(data, [])
-			} else {
-				sample = new UserDataString(data.sample, [])
-			}
-
-			if (typeof data === 'string') {
-				return new UserDataPieces({ sample, pieces: [] })
-			}
-
-			if ('piece' in data) {
-				return new UserDataPieces({ sample, pieces: [data.piece] })
-			}
-
-			if ('pieces' in data) {
-				return new UserDataPieces({ sample, pieces: data.pieces })
-			}
-
-			return new UserDataPieces({ sample, pieces: [] })
-		} catch (e) {
-			throw new Error(`${getErrorMessage(e)} at ${at}`)
-		}
-	}
-
-	public encode(): EncodedUserDataPieces {
-		const sampleStr = this.sample.str
-		const samplePieces = this.sample.pieces
-
-		// Merge sample pieces with our own pieces
-		const allPieces = new Set<UserInfo>([...this.pieces, ...samplePieces])
-
-		if (allPieces.size === 0) {
-			return sampleStr
-		}
-
-		const sortedPieces = [...allPieces].sort(compareUserInfo)
-
-		if (sortedPieces.length === 1) {
-			return { sample: sampleStr, piece: sortedPieces[0] }
-		}
-
-		return { sample: sampleStr, pieces: sortedPieces }
-	}
-
-	public toSkeletonString(placeholder: string | null): string {
-		const sampleRepr = placeholder !== null ? placeholder : this.sample.str
-
-		if (this.pieces.size === 0) {
-			return sampleRepr
-		}
-
-		const pieces = [...this.pieces].sort().join(' ')
-
-		return `${sampleRepr} [${pieces}]`
-	}
-
-	public toString(): string {
-		const sampleRepr = JSON.stringify(this.sample.encode())
-
-		if (this.pieces.size === 0) {
-			return sampleRepr
-		}
-
-		const pieces = [...this.pieces].sort().join(' ')
-
-		return `${sampleRepr} [${pieces}]`
-	}
 }
 
 export class WalletCaptureSessionTime {
@@ -1048,10 +1130,6 @@ export class WalletCaptureSessionTime {
 	public toString(): string {
 		return `${this.session}@${this.milliseconds}ms`
 	}
-}
-
-export type UserDataPiecesWithDomain = UserDataPieces & {
-	domain: string
 }
 
 export class WalletRequestReview {
@@ -1186,12 +1264,13 @@ export class WalletRequest {
 	public readonly sessionTime: WalletCaptureSessionTime
 	public readonly query: UserDataDict
 	public readonly jsonRpcMethods: string[]
-	public readonly content: UserDataPieces | null
+	public readonly content: string | null
 	public readonly cookies: UserDataDict
 	public readonly refererDomain: string | null
 	public readonly oddHeaders: UserDataDict
 	public readonly oddTrailers: UserDataDict
 	public readonly review: WalletRequestReview
+	private readonly _key: string
 
 	private constructor(args: {
 		captureFile: WalletCaptureFile
@@ -1200,7 +1279,7 @@ export class WalletRequest {
 		sessionTime: WalletCaptureSessionTime
 		query: UserDataDict
 		jsonRpcMethods: string[]
-		content: UserDataPieces | null
+		content: string | null
 		cookies: UserDataDict
 		refererDomain: string | null
 		oddHeaders: UserDataDict
@@ -1218,6 +1297,7 @@ export class WalletRequest {
 		this.refererDomain = args.refererDomain
 		this.oddHeaders = args.oddHeaders
 		this.oddTrailers = args.oddTrailers
+		this._key = `${this.sessionTime.toString()}:${this.domain}:${this.path}`
 		this.review =
 			args.review === null
 				? WalletRequestReview.unspecified(this)
@@ -1246,8 +1326,7 @@ export class WalletRequest {
 			sessionTime: new WalletCaptureSessionTime(req.sessionTime),
 			query: decodeUserDataDict(req.query, `${at}.query`),
 			jsonRpcMethods,
-			content:
-				req.content === undefined ? null : UserDataPieces.decode(req.content, `${at}.content`),
+			content: req.content ?? null,
 			cookies: decodeUserDataDict(req.cookies, `${at}.cookies`),
 			refererDomain: req.refererDomain ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, `${at}.oddHeaders`),
@@ -1269,7 +1348,7 @@ export class WalletRequest {
 			for (const k of keys) {
 				const vals = d[k]
 
-				out[k] = vals.length === 1 ? vals[0].encode() : vals.map(v => v.encode())
+				out[k] = vals.length === 1 ? nonEmptyGet(vals) : vals
 			}
 
 			return out
@@ -1293,7 +1372,7 @@ export class WalletRequest {
 			sessionTime: this.sessionTime.toNumber(),
 			...(query ? { query } : {}),
 			...(jsonRpcMethod ? { jsonRpcMethod } : {}),
-			...(this.content ? { content: this.content.encode() } : {}),
+			...(this.content ? { content: this.content } : {}),
 			...(cookies ? { cookies } : {}),
 			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
@@ -1337,6 +1416,10 @@ export class WalletRequest {
 			fmtMultiDict('headers', this.oddHeaders) +
 			fmtMultiDict('trailers', this.oddTrailers)
 		)
+	}
+
+	public get key(): string {
+		return this._key
 	}
 
 	public domains(): NonEmptyArray<string> {
@@ -1385,39 +1468,14 @@ export class WalletRequest {
 		}
 
 		setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
+		const reqStrings = new WalletDataStrings(this._captureFile)
 
-		const processUserDataPieces = async (piece: UserDataPieces) => {
-			for (const userInfo of piece.pieces) {
+		await this.populateStringsInto(reqStrings)
+
+		for (const dataString of reqStrings.strings()) {
+			for (const userInfo of dataString.str.pieces) {
 				setInfo(userInfo, matcherCollectionPolicy)
 			}
-			const dataStrings = new WalletDataStrings(this._captureFile)
-
-			await this.populateStringsInto(dataStrings)
-
-			for (const dataString of dataStrings.strings()) {
-				if (typeof dataString.str === 'object') {
-					for (const userInfo of dataString.str.pieces) {
-						setInfo(userInfo, matcherCollectionPolicy)
-					}
-				}
-			}
-		}
-
-		const processDict = async (dict: UserDataDict) => {
-			for (const values of Object.values(dict)) {
-				for (const piece of values) {
-					await processUserDataPieces(piece)
-				}
-			}
-		}
-
-		await processDict(this.query)
-		await processDict(this.cookies)
-		await processDict(this.oddHeaders)
-		await processDict(this.oddTrailers)
-
-		if (this.content !== null) {
-			await processUserDataPieces(this.content)
 		}
 
 		if (includeManualReview) {
@@ -1438,17 +1496,19 @@ export class WalletRequest {
 	}
 
 	public async populateStringsInto(strings: WalletDataStrings) {
-		await this._processUserDataDict(this.query, WalletStringOccurrenceType.QUERY_PARAMETER, strings)
-		await this._processUserDataDict(this.cookies, WalletStringOccurrenceType.COOKIE, strings)
-		await this._processUserDataDict(this.oddHeaders, WalletStringOccurrenceType.HEADER, strings)
-		await this._processUserDataDict(this.oddTrailers, WalletStringOccurrenceType.TRAILER, strings)
+		await this._processUserDataDict(strings, this.query, WalletStringOccurrenceType.QUERY)
+		await this._processUserDataDict(strings, this.cookies, WalletStringOccurrenceType.COOKIE)
+		await this._processUserDataDict(strings, this.oddHeaders, WalletStringOccurrenceType.HEADER)
+		await this._processUserDataDict(strings, this.oddTrailers, WalletStringOccurrenceType.TRAILER)
 
 		if (this.content !== null) {
-			const dataStrings = await WalletDataString.fromUserDataPieces(
+			const dataStrings = await WalletDataString.createMany(
+				strings,
 				this.content,
-				WalletStringOccurrenceType.WHOLE_PAYLOAD,
-				'payload',
-				this,
+				new WalletDataStringOrigin(
+					this,
+					new WalletDataStringBreadcrumbs([{ type: WalletStringOccurrenceType.PAYLOAD }]),
+				),
 			)
 
 			for (const ds of dataStrings) {
@@ -1458,17 +1518,47 @@ export class WalletRequest {
 	}
 
 	private async _processUserDataDict(
+		strings: WalletDataStrings,
 		dict: UserDataDict,
 		occurrenceType: WalletStringOccurrenceType,
-		strings: WalletDataStrings,
 	) {
 		for (const [key, piecesArray] of Object.entries(dict)) {
-			for (const pieces of piecesArray) {
-				const dataStrings = await WalletDataString.fromUserDataPieces(
-					pieces,
-					occurrenceType,
-					key,
+			const keyStrings = await WalletDataString.createMany(
+				strings,
+				key,
+				new WalletDataStringOrigin(
 					this,
+					new WalletDataStringBreadcrumbs([
+						{ type: occurrenceType },
+						{
+							type: 'MULTI_KEY',
+							key,
+							branch: 'KEY',
+						},
+					]),
+				),
+			)
+
+			for (const ds of keyStrings) {
+				strings.add(ds)
+			}
+
+			for (let i = 0; i < piecesArray.length; i++) {
+				const dataStrings = await WalletDataString.createMany(
+					strings,
+					piecesArray[i],
+					new WalletDataStringOrigin(
+						this,
+						new WalletDataStringBreadcrumbs([
+							{ type: occurrenceType },
+							{
+								type: 'MULTI_KEY',
+								key,
+								branch: 'VALUE',
+								index: i,
+							},
+						]),
+					),
 				)
 
 				for (const ds of dataStrings) {
@@ -1614,6 +1704,7 @@ export class WalletCaptureFile {
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
+
 	public static async fromFile(
 		identity: WalletCaptureFileIdentity | null,
 		path: string,
@@ -1661,6 +1752,7 @@ export class WalletCaptureFile {
 
 		return captureFile
 	}
+
 	public static fromData(
 		identity: WalletCaptureFileIdentity | null,
 		data: unknown,
@@ -1668,6 +1760,7 @@ export class WalletCaptureFile {
 	): WalletCaptureFile {
 		return new WalletCaptureFile(identity, null, data, annotations)
 	}
+
 	private constructor(
 		identity: WalletCaptureFileIdentity | null,
 		path: string | null,
@@ -2273,7 +2366,7 @@ export class WalletCaptureFile {
 		return this.annotations.isBenign(str)
 	}
 
-	public async allStrings(): Promise<WalletDataStrings> {
+	public async gatherStrings(): Promise<WalletDataStrings> {
 		const strings = new WalletDataStrings(this)
 
 		for (const f of recordedFlow.items) {
@@ -2284,7 +2377,11 @@ export class WalletCaptureFile {
 			}
 
 			for (const req of flow.requests) {
-				await req.populateStringsInto(strings)
+				const matcher = this.findMatcherForReq(req)
+
+				if (matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED') {
+					await req.populateStringsInto(strings)
+				}
 			}
 		}
 

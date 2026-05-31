@@ -101,7 +101,7 @@ class UserInfo(enum.StrEnum):
 class UserDataString:
     """A raw string paired with classified UserInfo pieces. Stored with deduplication."""
 
-    def __init__(self, str: str, pieces: FrozenSet[UserInfo]):
+    def __init__(self, str: str, pieces: Set[UserInfo]):
         self.str = str
         self.pieces = pieces
 
@@ -136,16 +136,18 @@ class UserDataString:
         if "pieces" in data:
             for p in data["pieces"]:
                 pieces.add(UserInfo[p])
-        return cls(str=data["str"], pieces=frozenset(pieces))
+        if len(pieces) == 0:
+            raise ValueError(f"Invalid UserDataString: {repr(data)}")
+        return cls(str=data["str"], pieces=pieces)
 
 
 class UserDataStringStore:
     """A deduplicated set of UserDataString objects."""
 
     @classmethod
-    def decode(cls, data: dict) -> UserDataStringStore:
+    def decode(cls, data: list[dict]) -> UserDataStringStore:
         store = cls()
-        for item_data in data.get("userData", []):
+        for item_data in data:
             store.add(UserDataString.decode(item_data))
         return store
 
@@ -155,13 +157,20 @@ class UserDataStringStore:
 
     def __init__(self):
         self._lock = threading.Lock()
-        self._strings: Set[UserDataString] = set()
+        self._strings: dict[str, UserDataString] = {}
         self._needs_flushing = 0
 
     def add(self, item: UserDataString) -> None:
         with self._lock:
-            if item not in self._strings:
-                self._strings.add(item)
+            existing =  self._strings.get(item.str, None)
+            if existing is None:
+                self._strings[item.str] = item
+                self._needs_flushing += 1
+                return
+            before_merge = len(existing.pieces)
+            for piece in item.pieces:
+                existing.pieces.add(piece)
+            if before_merge != len(existing.pieces):
                 self._needs_flushing += 1
 
     def needs_flushing(self) -> int:
@@ -172,11 +181,9 @@ class UserDataStringStore:
         with self._lock:
             self._needs_flushing -= amount
 
-    def encode(self) -> dict:
+    def encode(self) -> list[dict]:
         with self._lock:
-            return {
-                "userData": [item.encode() for item in sorted(self._strings, key=lambda x: x.str)],
-            }
+            return [item.encode() for item in sorted(self._strings.values(), key=lambda x: x.str)]
 
 
 class WalletCaptureContext(enum.StrEnum):
@@ -193,7 +200,7 @@ class UserDataPieces:
             # Legacy format: just a string sample with no pieces
             return cls(
                 pieces=frozenset(),
-                sample=UserDataString(str=data, pieces=frozenset()),
+                sample=UserDataString(str=data, pieces=set()),
             )
         else:
             pieces_list = []
@@ -213,7 +220,7 @@ class UserDataPieces:
                     all_pieces.add(p)
                 pieces = all_pieces
             else:
-                sample = UserDataString(str=sample_str, pieces=frozenset())
+                sample = UserDataString(str=sample_str, pieces=set())
 
         return cls(pieces=frozenset(pieces), sample=sample)
 
@@ -221,7 +228,7 @@ class UserDataPieces:
     def classify_str(cls, data: str, context: WalletCaptureContext) -> UserDataPieces:
         return cls(
             pieces=frozenset(),
-            sample=UserDataString(str=data, pieces=frozenset()),
+            sample=UserDataString(str=data, pieces=set()),
         )
 
     @classmethod
@@ -543,7 +550,7 @@ class WalletCaptureFile:
                 data = {}  # Empty file, reset data.
         self._identity = data.get("identity", "")
         if "userData" in data:
-            self._user_data_store = UserDataStringStore.decode(data)
+            self._user_data_store = UserDataStringStore.decode(data["userData"])
         else:
             self._user_data_store = UserDataStringStore.new()
 
@@ -630,6 +637,7 @@ class WalletCaptureFile:
                     },
                     f,
                     indent="\t",
+                    ensure_ascii=False,
                 )
                 f.write("\n")
 
@@ -669,8 +677,8 @@ class WalletDataCollectionAddon:
             f"{self._wallet_id.lower()}.{self._wallet_variant.lower()}.capture.json",
         )
 
-    def configure(self, updated):
-        logging.info(f"Processing configuration data: {dict(updated)}")
+    def configure(self, updated: set[str]):
+        logging.info(f"Processing configuration data: {', '.join(sorted(updated))}")
         if "wallet_type" in updated or ctx.options.wallet_type:
             self._wallet_type = ctx.options.wallet_type
         if "wallet_variant" in updated or ctx.options.wallet_variant:

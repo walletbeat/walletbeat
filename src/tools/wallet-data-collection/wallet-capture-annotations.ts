@@ -72,6 +72,8 @@ function optionalGlobMatches(pattern: string | null, value: string): boolean {
 	return globToRegExp(pattern).test(value)
 }
 
+const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [/^chrome-extension:\/\/\w+$/]
+
 export interface SaveOptions {
 	/** Verify existing file contents instead of saving. */
 	verifyExisting: boolean
@@ -176,8 +178,6 @@ export class WalletRequestMatcher {
 	}
 }
 
-export const globalBenignPlaceholder = 'WALLETBEATBENIGNPLACEHOLDER'
-
 export class WalletCaptureAnnotations {
 	private readonly walletId: string
 	private readonly path: string | null
@@ -191,7 +191,10 @@ export class WalletCaptureAnnotations {
 		pathStr: string,
 		globalPath: string,
 	): WalletCaptureAnnotations {
-		let data: EncodedWalletCaptureAnnotations = { matchers: [], benignStrings: [] }
+		let data: EncodedWalletCaptureAnnotations = {
+			matchers: [],
+			benignStrings: [],
+		}
 
 		if (fs.existsSync(pathStr)) {
 			const raw = fs.readFileSync(pathStr, 'utf8').trim()
@@ -218,49 +221,6 @@ export class WalletCaptureAnnotations {
 		const global = WalletCaptureAnnotations.parseEncoded(globalData, '$')
 
 		return new WalletCaptureAnnotations(walletId, null, null, parsed, global)
-	}
-
-	private constructor(
-		walletId: string,
-		pathStr: string | null,
-		globalPath: string | null,
-		data: EncodedWalletCaptureAnnotations,
-		global: EncodedWalletCaptureAnnotations,
-	) {
-		const toMatcher = (m: EncodedWalletRequestMatcher, isGlobal: boolean): WalletRequestMatcher => {
-			return new WalletRequestMatcher(
-				{
-					domain: m.domain,
-					path: m.path ?? null,
-					method: m.method ?? null,
-					purposes:
-						m.purposes === undefined
-							? null
-							: m.purposes === 'NOT_WALLET_INITIATED'
-								? 'NOT_WALLET_INITIATED'
-								: nonEmptySetFromArray(m.purposes),
-					policy: m.policy ?? null,
-				},
-				isGlobal,
-			)
-		}
-
-		this.walletId = walletId
-		this.globalPath = globalPath
-		this.path = pathStr
-		this.matchers = global.matchers
-			.map(m => toMatcher(m, true))
-			.concat(data.matchers.map(m => toMatcher(m, false)))
-		this.globalBenignStrings = new Set()
-		this.benignStrings = new Set()
-
-		for (const benign of global.benignStrings) {
-			this.globalBenignStrings.add(benign)
-		}
-
-		for (const benign of data.benignStrings) {
-			this.benignStrings.add(benign)
-		}
 	}
 
 	private static parseEncoded(v: unknown, at: string): EncodedWalletCaptureAnnotations {
@@ -329,7 +289,53 @@ export class WalletCaptureAnnotations {
 			return v
 		})
 
-		return { matchers, benignStrings }
+		return {
+			matchers,
+			benignStrings,
+		}
+	}
+
+	private constructor(
+		walletId: string,
+		pathStr: string | null,
+		globalPath: string | null,
+		data: EncodedWalletCaptureAnnotations,
+		global: EncodedWalletCaptureAnnotations,
+	) {
+		const toMatcher = (m: EncodedWalletRequestMatcher, isGlobal: boolean): WalletRequestMatcher => {
+			return new WalletRequestMatcher(
+				{
+					domain: m.domain,
+					path: m.path ?? null,
+					method: m.method ?? null,
+					purposes:
+						m.purposes === undefined
+							? null
+							: m.purposes === 'NOT_WALLET_INITIATED'
+								? 'NOT_WALLET_INITIATED'
+								: nonEmptySetFromArray(m.purposes),
+					policy: m.policy ?? null,
+				},
+				isGlobal,
+			)
+		}
+
+		this.walletId = walletId
+		this.globalPath = globalPath
+		this.path = pathStr
+		this.matchers = global.matchers
+			.map(m => toMatcher(m, true))
+			.concat(data.matchers.map(m => toMatcher(m, false)))
+		this.globalBenignStrings = new Set()
+		this.benignStrings = new Set()
+
+		for (const benign of global.benignStrings) {
+			this.globalBenignStrings.add(benign)
+		}
+
+		for (const benign of data.benignStrings) {
+			this.benignStrings.add(benign)
+		}
 	}
 
 	private toJSON(global: boolean): EncodedWalletCaptureAnnotations {
@@ -358,11 +364,13 @@ export class WalletCaptureAnnotations {
 	}
 
 	public isBenign(str: string): boolean {
-		return (
-			str === globalBenignPlaceholder ||
-			this.globalBenignStrings.has(str) ||
-			this.benignStrings.has(str)
-		)
+		for (const benignRegexp of GLOBAL_BENIGN_REGULAR_EXPRESSIONS) {
+			if (benignRegexp.test(str)) {
+				return true
+			}
+		}
+
+		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)
 	}
 
 	public matches(request: WalletRequest): WalletRequestMatcher | null {

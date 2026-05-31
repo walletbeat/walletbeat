@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import { spawn } from 'child_process'
 import fs from 'fs'
 import path from 'path'
@@ -53,6 +54,8 @@ import {
 	UserDataString,
 	WalletCaptureFile,
 	WalletCaptureIssue,
+	WalletDataString,
+	WalletDataStrings,
 	WalletRequest,
 	WalletRequestReview,
 } from './wallet-capture-file'
@@ -924,11 +927,47 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 	log(`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}.`)
 }
 
-function displayRequestInfo(request: WalletRequest): void {
+function displayRequestInfo(
+	request: WalletRequest,
+	options: {
+		captureStrings: WalletDataStrings | null
+		isBenignString: ((str: string) => boolean) | null
+		highlight: ((s: string) => string) | null
+		headerPrefix: string | null
+	},
+): void {
+	function formatStr(str: string): string {
+		if (options.highlight !== null) {
+			const highlighted = options.highlight(str)
+
+			if (highlighted !== str) {
+				return highlighted
+			}
+		}
+
+		if (options.isBenignString !== null && options.isBenignString(str)) {
+			return chalk.green(str)
+		}
+
+		if (options.captureStrings !== null) {
+			const s = options.captureStrings.get(str)
+
+			if (s !== undefined) {
+				return chalk.yellow(str)
+			}
+		}
+
+		return str
+	}
+	function fadedOut(str: string): string {
+		return chalk.gray(str)
+	}
 	function formatUserDataDict(dict: UserDataDict): string {
 		return Object.entries(dict)
-			.map(([key, values]) => `${key}=${values.map(v => v.toSkeletonString(null)).join(', ')}`)
-			.join('; ')
+			.map(
+				([key, values]) => `${formatStr(key)}${fadedOut('=')}${values.map(formatStr).join(', ')}`,
+			)
+			.join(`${fadedOut(';')} `)
 	}
 	const entity = entityForDomain(request.domain)
 
@@ -936,27 +975,35 @@ function displayRequestInfo(request: WalletRequest): void {
 		throw new Error(`no entity associated with ${request.domain}`)
 	}
 
-	log(`        URL: https://${request.domain}${request.path}`)
-	log(`     Domain: ${request.domain} (${entity.name})`)
+	function header(header: string): string {
+		return (
+			(options.headerPrefix === null ? '' : options.headerPrefix) +
+			' '.repeat(12 - header.length) +
+			chalk.bold(header) +
+			fadedOut(':') +
+			' '
+		)
+	}
+
+	log(`${header('URL')}${fadedOut('https://')}${chalk.blue(request.domain)}${request.path}`)
+	log(
+		`${header('Domain')}${chalk.blue(request.domain)} ${fadedOut('(')}${chalk.cyan(entity.name)}${fadedOut(')')}`,
+	)
 
 	if (Object.keys(request.query).length > 0) {
-		log(`      Query: ${formatUserDataDict(request.query)}`)
+		log(`${header('Query')}${formatUserDataDict(request.query)}`)
 	}
 
 	if (request.jsonRpcMethods.length > 0) {
-		log(`   JSON-RPC: ${request.jsonRpcMethods.join(', ')}`)
+		log(`${header('JSON-RPC')}${request.jsonRpcMethods.map(formatStr).join(`${fadedOut(',')} `)}`)
 	}
 
-	if (request.content !== null) {
-		const contentStr = request.content.toSkeletonString(null)
-
-		if (contentStr.trim() !== '') {
-			log(`    Content: ${request.content.toString()}`)
-		}
+	if (request.content !== null && request.content.trim() !== '') {
+		log(`${header('Content')}${formatStr(request.content.toString())}`)
 	}
 
 	if (Object.keys(request.cookies).length > 0) {
-		log(`    Cookies: ${formatUserDataDict(request.cookies)}`)
+		log(`${header('Cookies')}${formatUserDataDict(request.cookies)}`)
 	}
 
 	if (request.refererDomain !== null) {
@@ -966,63 +1013,105 @@ function displayRequestInfo(request: WalletRequest): void {
 			throw new Error(`no entity associated with referer domain ${request.refererDomain}`)
 		}
 
-		log(`    Referer: ${request.refererDomain} (${refEntity.name})`)
+		log(
+			`${header('Referer')}${chalk.blue(request.refererDomain)} ${fadedOut('(')}${chalk.cyan(refEntity.name)}${fadedOut(')')}`,
+		)
 	}
 
 	if (Object.keys(request.oddHeaders).length > 0) {
-		log(`    Headers: ${formatUserDataDict(request.oddHeaders)}`)
+		log(`${header('Headers')}${formatUserDataDict(request.oddHeaders)}`)
 	}
 
 	if (Object.keys(request.oddTrailers).length > 0) {
-		log(`   Trailers: ${formatUserDataDict(request.oddTrailers)}`)
+		log(`${header('Trailers')}${formatUserDataDict(request.oddTrailers)}`)
 	}
 }
 
 export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 	let capture = await openCaptureFile(opts)
 
-	let remainingStrings = await capture.allStrings()
-	let userStopped = false
-	let numIterations = 1
-	const initialNumStrings = remainingStrings.size()
+	let walletDataStrings = await capture.gatherStrings()
+	let allStrings = walletDataStrings.strings()
+	const isWorthReviewing = (str: WalletDataString): boolean => {
+		if (capture.isBenignString(str.str.str)) {
+			return false
+		}
 
-	while (remainingStrings.size() > 0 && !userStopped) {
+		return str.str.pieces.size === 0
+	}
+	let firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
+	let userStopped = false
+	const highlightStr = chalk.bgRed.whiteBright.bold
+
+	while (firstUnreviewedStringIndex !== -1 && !userStopped) {
 		// Process the highest-score string first
-		const strEntry = remainingStrings.strings()[0]
+		const strEntry = allStrings[firstUnreviewedStringIndex]
 		const strValue = strEntry.str
 
-		if (typeof strValue !== 'string') {
-			throw new Error('Unexpectedly found non-string-typed string')
-		}
-
 		// Display the string and its occurrences
-		log('\n' + '='.repeat(80))
-		log(`String ${numIterations} of ${initialNumStrings}`)
-		log('='.repeat(80))
-		log(`  String:  ${JSON.stringify(strValue)}`)
-		log(`  Entropy: ${strEntry.score.toFixed(2)}`)
-		log('  Occurrences:')
+		log('\n' + chalk.bgBlue.gray('='.repeat(80)))
+		const headerLineLen = `String ${firstUnreviewedStringIndex + 1} of ${allStrings.length}`.length
 
-		for (const [key, count] of strEntry.getOccurrences().entries()) {
-			const [type, paramName] = key.split(':')
+		log(
+			chalk.bgBlue(
+				`${chalk.whiteBright('String ')}${chalk.yellowBright((firstUnreviewedStringIndex + 1).toString())}${chalk.whiteBright(' of ')}${chalk.yellowBright(allStrings.length.toString())}${chalk.whiteBright(' '.repeat(80 - headerLineLen))}`,
+			),
+		)
+		log(chalk.bgBlue.gray('='.repeat(80)))
+		function header(header: string): string {
+			return ' '.repeat(16 - header.length) + chalk.bold(header) + chalk.gray(':') + ' '
+		}
+		log(`${header('String')}${highlightStr(strValue.str)}`)
 
-			log(`    - ${type}:${paramName} (seen ${count} time${count === 1 ? '' : 's'})`)
+		if (strValue.pieces.size > 0) {
+			log(`${header('Info')}${Array.from(strValue.pieces).toSorted().join(', ')}`)
 		}
 
-		log('  Sample Request:')
-		displayRequestInfo(strEntry.getFirstSourceRequest())
+		log(`${header('Entropy')}${strEntry.score.toFixed(2)}`)
+		log(header('Occurrences'))
+
+		for (const [roughKey, count] of Array.from(strEntry.getRoughOccurrences()).toSorted(
+			(a, b) => b[1] - a[1],
+		)) {
+			const highlightedKey = roughKey.split(strValue.str).join(highlightStr(strValue.str))
+
+			log(
+				`       ${chalk.gray('-')} ${highlightedKey}${count === 1 ? '' : ` ${chalk.gray('(')}seen ${chalk.bold(count.toString())} times${chalk.gray(')')}`}`,
+			)
+		}
+
+		log(header('Sample Request'))
+		displayRequestInfo(strEntry.firstOrigin.request, {
+			captureStrings: walletDataStrings,
+			highlight: (s: string): string => {
+				if (!s.includes(strValue.str)) {
+					return s
+				}
+
+				return s.split(strValue.str).join(highlightStr(strValue.str))
+			},
+			isBenignString: (s: string) => capture.isBenignString(s),
+			headerPrefix: ' '.repeat(4),
+		})
 
 		// Build prompt choices
-		const userInfoChoices = userInfoEnums.items.map(u => ({
-			title: userInfoName(u)
-				.long.replaceAll('{{WALLET_PSEUDONYM_SINGULAR}}', 'wallet-specific pseudonym')
-				.replace(/^[a-z]/, x => x.toUpperCase()),
-			value: u,
-			description: u,
-			selected: false,
-		}))
+		const userInfoChoices: prompts.PromptObject<'selected'>['choices'] = userInfoEnums.items.map(
+			u => {
+				const hasInfo = strEntry.str.pieces.has(u)
 
-		const allChoices = [
+				return {
+					title: userInfoName(u)
+						.long.replaceAll('{{WALLET_PSEUDONYM_SINGULAR}}', 'wallet-specific pseudonym')
+						.replace(/^[a-z]/, x => x.toUpperCase()),
+					value: u,
+					description: `${u}${hasInfo ? ' (already tagged as such)' : ''}`,
+					selected: hasInfo,
+					disabled: hasInfo,
+				}
+			},
+		)
+
+		const allChoices: prompts.PromptObject<'selected'>['choices'] = [
 			{
 				title: 'Benign (no user data)',
 				value: '__BENIGN__',
@@ -1034,6 +1123,13 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 				value: '__GLOBAL_BENIGN__',
 				description:
 					'Mark this string as globally benign. All instances across all captures will be ignored.',
+				selected: false,
+			},
+			{
+				title: 'Not wallet-related (all requests that sent it were not initiated by the wallet)',
+				value: '__NOT_WALLET_RELATED__',
+				description:
+					'Select this if the string only belongs to requests that were not wallet-initiated (included in the capture by accident).',
 				selected: false,
 			},
 			{
@@ -1096,7 +1192,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 			// Check for special options
 			const specialOptions = selectedValues.filter(v =>
-				['__BENIGN__', '__GLOBAL_BENIGN__', '__STOP_AND_SAVE__'].includes(v),
+				['__BENIGN__', '__GLOBAL_BENIGN__', '__NOT_WALLET_RELATED__', '__STOP_AND_SAVE__'].includes(v),
 			)
 
 			// Check for mutual exclusion of special options
@@ -1116,7 +1212,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 					continue
 				}
 
-				// Handle the special option
+				// Handle the special options
 				if (specialOption === '__STOP_AND_SAVE__') {
 					await capture.save(getSaveOptions(opts))
 					log('\n✅ Progress saved. Stopping string review.')
@@ -1126,17 +1222,28 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 				}
 
 				if (specialOption === '__GLOBAL_BENIGN__') {
-					capture.addBenignString(strValue, true)
+					capture.addBenignString(strValue.str, true)
 					await capture.save(getSaveOptions(opts))
-					log(`✅ Marked string "${strValue}" as globally benign.`)
+					log(`✅ Marked string "${strValue.str}" as globally benign.`)
 					confirmed = true
 					continue
 				}
 
 				if (specialOption === '__BENIGN__') {
-					capture.addBenignString(strValue, false)
+					capture.addBenignString(strValue.str, false)
 					await capture.save(getSaveOptions(opts))
-					log(`✅ Marked string "${strValue}" as benign.`)
+					log(`✅ Marked string "${strValue.str}" as benign.`)
+					confirmed = true
+					continue
+				}
+
+				if (specialOption === '__NOT_WALLET_RELATED__') {
+					await capture.save(getSaveOptions(opts))
+					log('\n💾 Progress saved. Stopping string review.')
+					log('If you are seeing non-wallet-initiated requests, you should either:')
+					log('  - Create matchers for these requests using the `explain-request` subcommand.')
+					log('  - Manually review requests using the `review-requests` subcommand.')
+					userStopped = true
 					confirmed = true
 					continue
 				}
@@ -1153,16 +1260,21 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			}
 
 			// Mark the string with the selected UserInfo pieces
-			capture.userData.add(new UserDataString(strValue, selectedUserInfoValues))
+			const merged = strValue.withMerged(...selectedUserInfoValues)
+
+			capture.userData.add(merged)
 			await capture.save(getSaveOptions(opts))
-			log(`✅ Marked string "${strValue}" as ${selectedUserInfoValues.join(', ')}.`)
+			log(
+				`✅ Marked string "${strValue.str}" as ${Array.from(merged.pieces).toSorted().join(', ')}.`,
+			)
 			confirmed = true
 		}
 
 		// Refresh strings:
 		capture = await openCaptureFile(opts)
-		remainingStrings = await capture.allStrings()
-		numIterations++
+		walletDataStrings = await capture.gatherStrings()
+		allStrings = walletDataStrings.strings()
+		firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
 	}
 
 	if (!userStopped) {
@@ -1175,6 +1287,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 	const capture = await openCaptureFile(opts)
+	const allStrings = await capture.gatherStrings()
 
 	// Collect all unreviewed requests across all flows
 	const unreviewedRequests: Array<{ flow: RecordedFlow; review: WalletRequestReview }> = []
@@ -1222,7 +1335,13 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 			log('='.repeat(80))
 
 			// Display request information
-			displayRequestInfo(request)
+			displayRequestInfo(request, {
+				captureStrings: allStrings,
+
+				isBenignString: (s: string) => capture.isBenignString(s),
+				highlight: null,
+				headerPrefix: null,
+			})
 
 			// Get matcher if any
 			const matcher = capture.findMatcherForReq(request)
@@ -1492,7 +1611,12 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 			log('\n' + '-'.repeat(40))
 			log('Review Summary:')
 			log('-'.repeat(40))
-			displayRequestInfo(request)
+			displayRequestInfo(request, {
+				captureStrings: allStrings,
+				isBenignString: (s: string) => capture.isBenignString(s),
+				highlight: null,
+				headerPrefix: null,
+			})
 
 			log('\n   Purposes:')
 

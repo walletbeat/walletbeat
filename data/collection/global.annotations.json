@@ -154,5 +154,9 @@
 			"purposes": "NOT_WALLET_INITIATED"
 		}
 	],
-	"benignStrings": []
+	"benignStrings": [
+		"AWSALB",
+		"engagement_time_msec",
+		"x-api-ver"
+	]
 }
