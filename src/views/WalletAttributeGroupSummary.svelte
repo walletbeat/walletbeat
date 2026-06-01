@@ -6,7 +6,9 @@
 </script>
 
 
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends AttributeGroupId
+">
 	// Types/constants
 	import { AttributeGroupId } from '@/schema/attribute-tree'
 	import { calculateAttributeGroupScore, type AttributeGroup } from '@/schema/attribute-groups'
@@ -21,8 +23,8 @@
 		summaryType = WalletAttributeGroupSummaryType.None,
 		isInTooltip = false,
 	}: {
-		wallet: RatedWallet
-		attributeGroup: AttributeGroup<AttributeGroupId>,
+		wallet: RatedWallet<_AttributeGroupId>,
+		attributeGroup: AttributeGroup<_AttributeGroupId>,
 		summaryType?: WalletAttributeGroupSummaryType
 		isInTooltip?: boolean
 	} = $props()
