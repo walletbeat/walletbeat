@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { hashTypedData } from 'viem'
-  import { hashStruct } from 'viem/utils'
-  import { bytesToHex, hexToBytes, keccak256, numberTo32Bytes } from '../../types/utils/ethereum-address'
+  import { bytesToHex, hexToBytes, keccak256, numberTo32Bytes } from '../../types/utils/bytes'
+  import { hashStruct, hashTypedData } from '../../types/utils/eip712'
+  import type { Eip712TypeMap } from '../../types/utils/eip712'
 
   export type ERC8213SubTab = 'calldata' | 'eip712'
 
@@ -93,8 +93,12 @@
     eip712State.primaryType = ''
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- user-supplied JSON
-      const parsed = JSON.parse(eip712State.json) as Parameters<typeof hashTypedData>[0]
+      const parsed: {
+        types: Eip712TypeMap
+        domain: Record<string, unknown>
+        primaryType: string
+        message: Record<string, unknown>
+      } = JSON.parse(eip712State.json)
       const { types, domain, primaryType, message } = parsed
 
       if (!primaryType) { throw new Error('Missing "primaryType" in JSON.'); }
@@ -121,7 +125,7 @@
       eip712State.primaryType = primaryType
       eip712State.domainSeparator = hashStruct({
          
-        data: domain as Record<string, unknown>,
+        data: domain,
         types: { EIP712Domain: domainFields },
         primaryType: 'EIP712Domain',
       })
