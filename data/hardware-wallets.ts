@@ -1,10 +1,10 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
+import { AttributeGroupId, attributeTreeForIds } from '@/schema/attribute-tree'
 import type { WalletHardwareFeatures } from '@/schema/features'
-import { softwareLadders } from '@/schema/ladders'
+import { hardwareLadders } from '@/schema/ladders'
 import type { Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
-import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
 import { bitboxWallet } from './hardware-wallets/bitbox'
 import { cypherockWallet } from './hardware-wallets/cypherock'
 import { fireflyWallet } from './hardware-wallets/firefly'
@@ -73,7 +73,7 @@ export function isValidHardwareWalletName(name: string): name is HardwareWalletN
 export const ratedHardwareWallets = Object.fromEntries(
 	Object.entries(hardwareWallets).map(([name, wallet]) => [
 		name,
-		rateWallet<HardwareAttributeGroupId>(hardwareWalletAttributeTree, softwareLadders, wallet),
+		rateWallet<HardwareAttributeGroupId>(hardwareWalletAttributeTree, hardwareLadders, wallet),
 	]),
 ) satisfies Record<string, RatedWallet<HardwareAttributeGroupId>>
 
@@ -89,7 +89,7 @@ export function mapHardwareWallets<T>(
 /** The unrated hardware wallet as a rated wallet. */
 export const unratedHardwareWallet = rateWallet<HardwareAttributeGroupId>(
 	hardwareWalletAttributeTree,
-	softwareLadders,
+	hardwareLadders,
 	unratedHardwareTemplate,
 )
 

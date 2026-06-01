@@ -42,7 +42,7 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 
 	// Otherwise, return the first applicable ladder evaluation
 	const applicableLadder = Object.values(wallet.ladders).find(
-		ladderEvaluation => ladderEvaluation.stage !== 'NOT_APPLICABLE',
+		ladderEvaluation => ladderEvaluation !== undefined && ladderEvaluation.stage !== 'NOT_APPLICABLE',
 	)
 
 	return applicableLadder

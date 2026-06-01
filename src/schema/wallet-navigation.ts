@@ -1,6 +1,6 @@
-import { attributeTree } from '@/data/attribute-groups'
 import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
+import { attributeTree } from '@/schema/attribute-tree'
 import type { WalletType } from '@/schema/wallet-types'
 
 /**

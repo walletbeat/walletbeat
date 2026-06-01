@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { describe, expect, it } from 'vitest'
 
-import { AttributeGroupId } from '@/data/attribute-groups'
+import { AttributeGroupId } from '@/schema/attribute-tree'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'

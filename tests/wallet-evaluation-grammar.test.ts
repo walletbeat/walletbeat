@@ -1,7 +1,7 @@
 import { describe } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
-import { AttributeGroupId } from '@/data/attribute-groups'
+import { AttributeGroupId } from '@/schema/attribute-tree'
 import { allRatedWallets, walletAttributeTree } from '@/data/wallets'
 import {
 	type AttributeGroup,

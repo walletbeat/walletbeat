@@ -1,8 +1,8 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
+import { type AttributeGroupId } from '@/schema/attribute-tree'
 import { type BaseWallet, type RatedWallet, type WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 
-import { type AttributeGroupId } from './attribute-groups'
 import {
 	type EmbeddedAttributeGroupId,
 	embeddedWalletAttributeTree,

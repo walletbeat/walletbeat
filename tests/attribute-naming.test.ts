@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeTree } from '@/data/attribute-groups'
+import { attributeTree } from '@/schema/attribute-tree'
 
 describe('attribute', () => {
 	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {

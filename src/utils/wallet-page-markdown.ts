@@ -194,7 +194,6 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 		attributeTree,
 		wallet.overall,
 		(attrGroup, evalGroup): string[] => {
-			// TODO: https://github.com/walletbeat/walletbeat/issues/547
 			const attrLines: string[][] = mapNonExemptGroupAttributes(evalGroup, (evalAttr): string[] => {
 				const { attribute, evaluation } = evalAttr
 				const rating = ratingToText(evaluation.outcome.rating)

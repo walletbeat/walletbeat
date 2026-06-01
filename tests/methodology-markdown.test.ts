@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeTree } from '@/data/attribute-groups'
+import { attributeTree } from '@/schema/attribute-tree'
 import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
 
 import { assertValidMarkdown } from './utils/assert-valid-markdown'

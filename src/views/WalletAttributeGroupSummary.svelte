@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	// Types/constants
-	import { AttributeGroupId } from '@/data/attribute-groups'
+	import { AttributeGroupId } from '@/schema/attribute-tree'
 	import { calculateAttributeGroupScore, type AttributeGroup } from '@/schema/attribute-groups'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { scoreToColor } from '@/utils/colors'

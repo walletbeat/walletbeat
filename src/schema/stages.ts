@@ -1,4 +1,4 @@
-import { attributeTree } from '@/data/attribute-groups'
+import { attributeTree } from '@/schema/attribute-tree'
 import { type Content, type Paragraph, type Sentence, sentence } from '@/types/content'
 import { getErrorMessage } from '@/types/errors'
 import {

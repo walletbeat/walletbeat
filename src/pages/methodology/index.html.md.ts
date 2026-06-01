@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { getBaseUrl } from '@/base-url'
-import { attributeTree } from '@/data/attribute-groups'
+import { attributeTree } from '@/schema/attribute-tree'
 import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
 
 export const prerender = true

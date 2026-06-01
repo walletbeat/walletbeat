@@ -1,4 +1,4 @@
-import { attributeTree } from '@/data/attribute-groups'
+import { attributeTree } from '@/schema/attribute-tree'
 import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
 import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
 import {

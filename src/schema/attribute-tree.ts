@@ -72,7 +72,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 		],
-		icon: '\u{1f512}',
+		icon: 'security',
 		perWalletQuestion: sentence('How secure is {{WALLET_NAME}}?'),
 	},
 
@@ -109,7 +109,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 		],
-		icon: '\u{1f60e}',
+		icon: 'privacy',
 		perWalletQuestion: sentence('How well does {{WALLET_NAME}} protect your privacy?'),
 	},
 
@@ -144,7 +144,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 		],
-		icon: '\u{1f3f0}',
+		icon: 'self_sovereignty',
 		perWalletQuestion: sentence(
 			'How much control and ownership over your account does {{WALLET_NAME}} give you?',
 		),
@@ -177,7 +177,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 		],
-		icon: '\u{1f575}',
+		icon: 'transparency',
 		perWalletQuestion: sentence(
 			"How transparent and sustainable is {{WALLET_NAME}}'s development model?",
 		),
@@ -229,7 +229,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 		],
-		icon: '🌳',
+		icon: 'ecosystem',
 		perWalletQuestion: sentence('How well does {{WALLET_NAME}} align with the ecosystem?'),
 	},
 
@@ -242,7 +242,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 		],
-		icon: '🛠️',
+		icon: 'transparency',
 		perWalletQuestion: sentence('How well-maintained is {{WALLET_NAME}}?'),
 	},
 ] as const satisfies readonly AttributeGroup<AttributeGroupId>[]

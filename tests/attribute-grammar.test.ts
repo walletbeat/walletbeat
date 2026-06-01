@@ -1,7 +1,12 @@
 import { describe, it } from 'vitest'
 
-import { attributeTree } from '@/data/attribute-groups'
-import type { TypographicContent } from '@/types/content'
+import { attributeTree } from '@/schema/attribute-tree'
+import {
+	type Content,
+	ContentType,
+	isTypographicContent,
+	type TypographicContent,
+} from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { contentGrammarLint, walletContentGrammarLint, warmupHarperLinter } from './utils/grammar'
@@ -9,7 +14,19 @@ import { contentGrammarLint, walletContentGrammarLint, warmupHarperLinter } from
 await warmupHarperLinter()
 
 const hasDescription = (rating: unknown): rating is { description: TypographicContent } =>
-	typeof rating === 'object' && rating !== null && 'description' in rating
+	typeof rating === 'object' &&
+	rating !== null &&
+	'description' in rating &&
+	isContent(rating.description) &&
+	isTypographicContent(rating.description)
+
+const isContent = (content: unknown): content is Content =>
+	typeof content === 'object' &&
+	content !== null &&
+	'contentType' in content &&
+	(content.contentType === ContentType.TEXT ||
+		content.contentType === ContentType.MARKDOWN ||
+		content.contentType === ContentType.COMPONENT)
 
 const normalizeRatings = (ratings: unknown): { description: TypographicContent }[] =>
 	(Array.isArray(ratings) ? ratings : [ratings]).filter(hasDescription)

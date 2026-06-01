@@ -1,10 +1,10 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
+import { AttributeGroupId, attributeTreeForIds } from '@/schema/attribute-tree'
 import type { WalletSoftwareFeatures } from '@/schema/features'
 import { softwareLadders } from '@/schema/ladders'
 import type { Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
-import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
 import { ambire } from './software-wallets/ambire'
 import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
