@@ -461,7 +461,7 @@ function evaluateWorstFeeDisplay(
 
 export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 	id: 'feeTransparency',
-	icon: '\u{1F4B8}', // Money with wings
+	icon: 'fee_transparency',
 	displayName: 'Fee transparency',
 	wording: {
 		midSentenceName: null,

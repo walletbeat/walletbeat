@@ -532,6 +532,37 @@
 			</div>
 		{/if}
 	</article>
+
+	<nav class="toc" aria-label="Table of contents">
+		{#each evalTree ? Object.entries(attributeTree) : [] as [attrGroupId, attrGroup]}
+			{@const evalGroup = evalTree?.[attrGroupId]}
+			{#if evalGroup}
+				{@const score = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
+				{@const scoreColor = scoreToColor(score === null ? null : score.score)}
+				<a
+					class="toc-group"
+					href="#{slugifyCamelCase(attrGroup.id)}"
+					style:--accent={scoreColor}
+				>
+					<span class="toc-icon" data-wbicon data-icon={attrGroup.icon}></span>
+					<span class="toc-label">{attrGroup.displayName}</span>
+				</a>
+				{#each Object.entries(attrGroup.attributes) as [, attribute]}
+					{@const evalAttr = evalGroup[attribute.id] as EvaluatedAttribute<any> | undefined}
+					{#if evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT}
+						<a
+							class="toc-attr"
+							href="#{slugifyCamelCase(attribute.id)}"
+							style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+						>
+							<span class="toc-icon" data-wbicon data-icon={attribute.icon}></span>
+							<span class="toc-label">{attribute.displayName}</span>
+						</a>
+					{/if}
+				{/each}
+			{/if}
+		{/each}
+	</nav>
 </div>
 
 
@@ -566,7 +597,6 @@
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
 			data-icon={attrGroup.icon}
-			style:--attributeGroup-icon={`'${attrGroup.icon}'`}
 			style:--accent={scoreColor}
 		>
 			<header
@@ -608,6 +638,7 @@
 							class="attributes-pie"
 							data-row-item="wrap-center"
 						>
+							<span class="attributes-pie-icon" data-wbicon data-icon={attrGroup.icon}></span>
 							<Pie
 								title={formatAttributeGroupTitleText(attrGroup, score, showScores)}
 
@@ -629,7 +660,8 @@
 											id: attribute.id,
 											color: ratingToColor(evalAttr.evaluation.outcome.rating),
 											weight: attrGroup.attributeWeights[attribute.id],
-											arcLabel: evalAttr.evaluation.outcome.icon ?? evalAttr.attribute.icon,
+											arcLabel: '',
+											arcIconId: evalAttr.attribute.icon,
 											titleText: formatAttributeTitleText(evalAttr),
 											href: `#${slugifyCamelCase(attribute.id)}`,
 										}))
@@ -744,12 +776,14 @@
 		<details
 			data-card="radius-8 padding-0 border-accent"
 			data-column="gap-0"
-			open
 		>
 			<summary data-row>
 				<header data-row="wrap">
 					<div data-row-item="flexible basis-2">
 						<div data-row="start gap-2 wrap">
+							{#if attribute.icon}
+								<span class="attribute-icon" data-wbicon data-icon={attribute.icon}></span>
+							{/if}
 							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
 								<h3
 									data-icon={attribute.icon}
@@ -850,14 +884,6 @@
 							{/if}
 						</div>
 
-						{#if attribute.question}
-							<div class="subsection-caption">
-								<Typography
-									content={attribute.question}
-									strings={{ WALLET_NAME: wallet.metadata.displayName }}
-								/>
-							</div>
-						{/if}
 					</div>
 
 					{#if true}
@@ -885,6 +911,15 @@
 					>{evalAttr.evaluation.outcome.rating}</data>
 				</header>
 			</summary>
+
+			{#if attribute.question}
+				<div class="subsection-caption">
+					<Typography
+						content={attribute.question}
+						strings={{ WALLET_NAME: wallet.metadata.displayName }}
+					/>
+				</div>
+			{/if}
 
 			<ul
 				class="attribute-rating-details"
@@ -1189,17 +1224,8 @@
 
 		position: relative;
 
-		@supports (scroll-marker-group: before) {
-			&[data-sticky-container] {
-				--sticky-paddingInlineEnd: var(--nav-width);
-			}
-		}
-
-		@supports not (scroll-marker-group: before) {
-			&::before {
-				content: '';
-				grid-area: Nav;
-			}
+		&[data-sticky-container] {
+			--sticky-paddingInlineEnd: var(--nav-width);
 		}
 
 		article {
@@ -1211,56 +1237,100 @@
 			scroll-padding-block-start: 5rem;
 			scroll-padding-block-end: 1rem;
 
-			scroll-marker-group: before;
-
 			display: grid;
+		}
 
-			&::scroll-marker-group {
-				z-index: 2;
-				grid-area: Nav;
+		.toc {
+			grid-area: Nav;
+			z-index: 2;
 
-				scroll-padding-block: 0.5rem;
-				box-sizing: border-box;
-				position: sticky;
-				top: 0;
-				width: var(--nav-width);
-				max-height: 100dvh;
+			box-sizing: border-box;
+			position: sticky;
+			top: 0;
+			align-self: start;
+			width: var(--nav-width);
+			max-height: 100dvh;
 
-				overflow-y: auto;
-				scroll-behavior: smooth;
+			overflow-y: auto;
+			scroll-behavior: smooth;
 
-				display: grid;
-				align-content: start;
-				padding: calc(2.5rem + 1rem) 0.75rem 1rem;
-				gap: 2px;
+			display: flex;
+			flex-direction: column;
+			padding: calc(2.5rem + 1rem) 0.75rem 1rem;
+			gap: 2px;
 
-				background:
-					linear-gradient(
-						to right,
-						transparent 1.66rem,
-						var(--border-color) 1.66rem,
-						var(--border-color) calc(1.66rem + 1px),
-						transparent calc(1.66rem + 1px)
-					)
-					0 calc(2.5rem + 1rem) / 100% calc(100% - calc(2.5rem + 1rem) - 1rem) no-repeat,
-					var(--background-secondary)
-				;
-				border-inline: 1px solid var(--border-color);
-			}
+			background:
+				linear-gradient(
+					to right,
+					transparent 2.75rem,
+					var(--border-color) 2.75rem,
+					var(--border-color) calc(2.75rem + 1px),
+					transparent calc(2.75rem + 1px)
+				)
+				0 calc(2.5rem + 1rem) / 100% calc(100% - calc(2.5rem + 1rem) - 1rem) no-repeat,
+				var(--background-secondary)
+			;
+			border-inline: 1px solid var(--border-color);
 
 			@media (max-width: 864px) {
-				&::scroll-marker-group {
-					top: calc(var(--navigation-mobile-blockSize) + 4rem);
-					max-height: calc(100dvh - var(--navigation-mobile-blockSize) - 4rem);
+				top: calc(var(--navigation-mobile-blockSize) + 4rem);
+				max-height: calc(100dvh - var(--navigation-mobile-blockSize) - 4rem);
+				transition: translate 0.3s var(--ease-out-expo);
+				translate: -100% 0;
 
-					transition-property: translate;
-					transition-timing-function: var(--ease-out-expo);
-					transition-duration: 0.3s;
+				&:focus-within {
+					translate: 0 0;
 				}
+			}
+		}
 
-				&::scroll-marker-group:not(:focus-within) {
-					translate: -100% 0;
-				}
+		.toc-group,
+		.toc-attr {
+			display: flex;
+			align-items: center;
+			gap: 0.75em;
+			padding: 0.45rem 0.75rem;
+			border-radius: 0.375rem;
+			text-decoration: none;
+			color: inherit;
+			transition: background-color 0.15s, color 0.15s;
+
+			&:hover {
+				background-color: var(--background-primary);
+				color: var(--accent);
+			}
+
+			.toc-icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				background: var(--accent);
+				border-radius: 50%;
+				flex-shrink: 0;
+				color: black;
+				font-weight: normal;
+			}
+		}
+
+		.toc-group {
+			font-weight: 600;
+			font-size: 1.05em;
+
+			.toc-icon {
+				width: 2.5rem;
+				height: 2.5rem;
+				font-size: 1.2rem;
+			}
+		}
+
+		.toc-attr {
+			margin-left: 2rem;
+			font-size: 0.95em;
+
+			.toc-icon {
+				width: 2rem;
+				height: 2rem;
+				font-size: 1rem;
 			}
 		}
 	}
@@ -1268,24 +1338,6 @@
 	a:has(> :is(h1, h2, h3)) {
 		display: flex;
 		align-items: center;
-
-		&::before {
-			content: '# ';
-			display: inline-flex;
-			justify-content: end;
-			text-align: end;
-			width: 0;
-			padding-inline-end: 0.66rem;
-			margin-inline-start: -0.66rem;
-			font-size: 1.25rem;
-			line-height: calc(1 / 0.7);
-
-			transition-property: opacity;
-		}
-
-		&:not(:hover)::before {
-			opacity: 0;
-		}
 	}
 
 	@property --wallet-icon-size {
@@ -1459,51 +1511,6 @@
 
 		scroll-margin-top: 3.5rem;
 
-		&::scroll-marker {
-			content: attr(data-icon) '\00a0\00a0' attr(aria-label);
-
-			padding: 0.45rem 2rem 0.45rem 0.45rem;
-
-			font-size: 0.975em;
-
-			color: inherit;
-			font-weight: 500;
-			text-decoration: none;
-
-			border-radius: 0.375rem;
-			background:
-				radial-gradient(
-					circle closest-side,
-					var(--accent, var(--text-secondary)) calc(100% - 0.5px),
-					transparent 100%
-				)
-				no-repeat right calc(1.15rem - 0.25em) center / 0.5em 0.5em
-				var(--background-secondary)
-			;
-
-			transition-property: opacity, scale, background-color, color, outline;
-		}
-
-		&::scroll-marker:hover:not(:target-current) {
-			background-color: var(--background-primary);
-			color: var(--accent);
-		}
-
-		&::scroll-marker:target-current {
-			background-color: var(--background-primary);
-			color: var(--accent);
-			font-weight: 500;
-		}
-
-		&::scroll-marker:focus {
-			outline: 2px solid var(--accent);
-			outline-offset: -1px;
-		}
-
-		&::scroll-marker:active {
-			background-color: var(--background-primary);
-		}
-
 		> header {
 			padding-block: 1rem;
 
@@ -1648,8 +1655,7 @@
 			;
 			animation-timeline: --AttributesViewTimeline;
 
-			&::before {
-				content: var(--attributeGroup-icon);
+			.attributes-pie-icon {
 				position: absolute;
 				inset: 0;
 				display: grid;
@@ -1743,53 +1749,19 @@
 	.attribute {
 		position: relative;
 
-		&::scroll-marker {
-			content: attr(data-icon) '\00a0\00a0' attr(aria-label);
-
-			margin-left: 1.5rem;
-			padding: 0.45rem 0.75rem;
-
-			position: relative;
-
-			font-size: 0.9em;
-
-			border-radius: 0.375rem;
-			background:
-				radial-gradient(
-					circle closest-side,
-					var(--accent, var(--text-secondary)) calc(100% - 0.5px),
-					transparent 100%
-				)
-				no-repeat right calc(1.15rem - 0.25em) center / 0.5em 0.5em
-				var(--background-secondary)
-			;
-
-
-			color: inherit;
-			font-weight: 500;
-			text-decoration: none;
-
-			transition-property: opacity, scale, background-color, color, outline;
-		}
-
-		&::scroll-marker:hover:not(:target-current) {
-			background-color: var(--background-primary);
-			color: var(--accent);
-		}
-
-		&::scroll-marker:target-current {
-			background-color: var(--background-primary);
-			color: var(--accent);
-			font-weight: 500;
-		}
-
-		&::scroll-marker:focus {
-			outline: 2px solid var(--accent);
-			outline-offset: -1px;
-		}
-
-		&::scroll-marker:active {
-			background-color: var(--background-primary);
+		.attribute-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--accent);
+			border: 1px solid white;
+			border-radius: 50%;
+			width: 2.2em;
+			height: 2.2em;
+			font-size: 1.2em;
+			line-height: 1;
+			flex-shrink: 0;
+			color: black;
 		}
 
 		> details {

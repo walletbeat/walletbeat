@@ -17,7 +17,7 @@ import { topbarNavigationItems } from '@/constants/navigation'
 
 				return (
 					<a href={href} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
-						<span class='icon' set:html={icon} />
+						<span class='icon'>{icon && <span data-wbicon data-icon={icon} />}</span>
 						<span class='label'>{title}</span>
 					</a>
 				)
@@ -44,10 +44,10 @@ import { topbarNavigationItems } from '@/constants/navigation'
 			content: '';
 			position: absolute;
 			bottom: 0;
-			left: 24px;
-			right: 24px;
+			left: 0;
+			right: 0;
 			height: 1px;
-			background-color: white;
+			background-color: var(--navigation-borderColor);
 		}
 
 		.brand {
@@ -59,6 +59,10 @@ import { topbarNavigationItems } from '@/constants/navigation'
 				display: block;
 				height: 3rem;
 			}
+		}
+		span svg {
+			width: 1.5em;
+			height: 1.5em;
 		}
 
 		nav {
@@ -79,11 +83,12 @@ import { topbarNavigationItems } from '@/constants/navigation'
 					display: flex;
 					align-items: center;
 					justify-content: center;
+					font-size: 1.75rem;
+					font-weight: 500;
 					width: 3rem;
 					height: 3rem;
 					border-radius: 50%;
-					border: 1.5px solid currentColor;
-					color: var(--text-primary);
+					border: 1px solid var(--icon-navigation-borderColor);
 
 					:global(svg) {
 						width: 1.25rem;

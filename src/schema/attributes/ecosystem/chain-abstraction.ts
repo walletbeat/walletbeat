@@ -327,7 +327,7 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 
 export const chainAbstraction: Attribute = {
 	id: 'chainAbstraction',
-	icon: '\u{1f309}', // Bridge
+	icon: 'chain_abstraction',
 	displayName: 'Chain abstraction',
 	wording: {
 		midSentenceName: 'chain abstraction',

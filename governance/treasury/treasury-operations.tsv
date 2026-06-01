@@ -73,3 +73,5 @@ Date	From	To	Amount	Purpose	ID
 2026-05-18	treasury	lucilajuliana.shefi.eth	3100 USDC	Upfront payment for Berlin Blockchain Week attendance	0xf46e19e71aa9d0431d69866eb39c016ed8134481dc9016327496ed5ba6d8a329
 2026-05-18	treasury	thegeekygrower	500 USDC	Payment for implementation of Release Process attribute	0xdf2950ce6ccbd389b2757fb6f457d28ae8a138d6ee70c5f5a57832b6a57b364c
 2026-05-20	treasury	walletbeat_social	0.01 ETH	Seed wallet with enough Ether for gas fees	0x28bcb85666f5d456686b7b00c2dc37f12e808f1839563fb68e54da8f37e0c2f5
+2026-05-31	treasury	treasury	1 ETH → 1,997.500184 USDC	Swap On Uniswap	0xad1f00725960ce70ac37059381559d8b17018290e60a651311a92f1cd8a2be48
+2026-05-31	treasury	ren2140	3500 USDC	Payment for Base App review and upcoming Walletbeat work	0x4788e3b66b47b478109f626d0412a2f560b2211f97612313073128e7a26daa8c

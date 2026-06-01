@@ -53,10 +53,12 @@
     isEip6963AnnounceProviderEvent,
   } from '@/types/utils/ethereum-types'
   import type { TransactionSimulationSubTab } from './Tabs/TransactionSimulationsTab.svelte';
+  import ERC8213Tab from './Tabs/ERC8213Tab.svelte';
+  import type { ERC8213SubTab } from './Tabs/ERC8213Tab.svelte';
 
   type Account = ReturnType<typeof getAccount>;
 
-  type ActiveTab = 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations';
+  type ActiveTab = 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations' | 'erc-8213';
   type AppIsolationSubTab = 'eth-accounts' | 'wallet-connect';
 
   // Consolidated state objects
@@ -133,6 +135,7 @@
     selectedScamAlertId: string | null;
     appIsolationSubTab: AppIsolationSubTab;
     txSimulationSubTab: TransactionSimulationSubTab;
+    erc8213SubTab: ERC8213SubTab;
   }>({
     activeTab: 'transactions',
     selectedTxId: null,
@@ -140,6 +143,7 @@
     selectedScamAlertId: null,
     appIsolationSubTab: 'eth-accounts',
     txSimulationSubTab: 'erc20-mint',
+    erc8213SubTab: 'calldata',
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -670,7 +674,7 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'tx-simulations', 'scam-alerts'] as tab (tab)}
+    {#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'tx-simulations', 'scam-alerts', 'erc-8213'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
@@ -701,10 +705,12 @@ Issued At: ${new Date().toISOString()}`;
             if (!uiState.selectedScamAlertId && scamAlertTests.length) {
               uiState.selectedScamAlertId = scamAlertTests[0].id;
             }
+          } else if (tab === 'erc-8213') {
+            uiState.activeTab = 'erc-8213';
           }
         }}
       >
-        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab === 'tx-simulations' ? 'Tx Simulations' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab === 'tx-simulations' ? 'Tx Simulations' : tab === 'erc-8213' ? 'ERC-8213' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
@@ -857,6 +863,21 @@ Issued At: ${new Date().toISOString()}`;
               onclick={() => (uiState.selectedScamAlertId = test.id)}
             />
           {/each}
+        {:else if uiState.activeTab === 'erc-8213'}
+          <WalletTesterNavigationItem
+            title="Calldata digest"
+            description="keccak256 of raw transaction calldata"
+            isSelected={uiState.erc8213SubTab === 'calldata'}
+            isCompleted={false}
+            onclick={() => { uiState.erc8213SubTab = 'calldata'; }}
+          />
+          <WalletTesterNavigationItem
+            title="EIP-712 digest"
+            description="Full typed-data hash with domain + message"
+            isSelected={uiState.erc8213SubTab === 'eip712'}
+            isCompleted={false}
+            onclick={() => { uiState.erc8213SubTab = 'eip712'; }}
+          />
         {/if}
       </div>
     </div>
@@ -916,6 +937,8 @@ Issued At: ${new Date().toISOString()}`;
           {account}
           onSendTransaction={handleSendTransaction}
         />
+      {:else if uiState.activeTab === 'erc-8213'}
+        <ERC8213Tab activeSubTab={uiState.erc8213SubTab} />
       {/if}
     </div>
   </div>
@@ -1066,6 +1089,68 @@ Issued At: ${new Date().toISOString()}`;
       background-color: var(--border-color);
       color: var(--text-secondary);
       cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 864px) {
+    .tab-selector {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .tab-button {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .content-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .sidebar {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .main-content {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .sidebar-content {
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      gap: 0.375rem;
+      padding-bottom: 0.25rem;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .sidebar-content :global(.sidebar-item) {
+      width: auto;
+      flex-shrink: 0;
+      padding: 0.5rem 0.875rem;
+      white-space: nowrap;
+    }
+
+    .sidebar-content :global(.sidebar-item-desc) {
+      display: none;
     }
   }
 </style>

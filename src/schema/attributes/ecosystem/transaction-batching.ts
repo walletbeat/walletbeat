@@ -147,7 +147,7 @@ function evaluateTransactionBatching(
 
 export const transactionBatching: Attribute = {
 	id: 'transactionBatching',
-	icon: '\u{1f9fa}', // Basket
+	icon: 'transaction_batching',
 	displayName: 'Transaction batching',
 	wording: {
 		midSentenceName: 'transaction batching',

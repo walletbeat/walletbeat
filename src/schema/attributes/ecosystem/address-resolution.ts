@@ -212,7 +212,7 @@ function evaluateAddressResolution(
 
 export const addressResolution: Attribute<AddressResolutionMetadata> = {
 	id: 'addressResolution',
-	icon: '\u{1f4c7}', // Card index
+	icon: 'address_resolution',
 	displayName: 'Address resolution',
 	wording: {
 		midSentenceName: 'address resolution',

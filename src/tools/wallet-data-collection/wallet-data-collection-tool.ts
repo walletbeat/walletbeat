@@ -30,6 +30,7 @@ import {
 	handleMarkFlowUnsupported,
 	handleMarkString,
 	handleReviewRequests,
+	handleReviewStrings,
 	markDomainOptions,
 	markFlowUnsupportedOptions,
 	markStringOptions,
@@ -175,26 +176,23 @@ cli
 
 // mark-string subcommand
 cli
-	.command(
-		'mark-string',
-		'Mark a string as conveying user data and redact it from the network capture.',
-	)
+	.command('mark-string', 'Mark a string as conveying user data.')
 	.usage(
-		'mark-string --string=<string> --data=<data-type> [--hint=...]' +
+		'mark-string --string=<string> --data=<data-type>|BENIGN' +
 			trimWhitespacePrefix(`
 
-				Mark a string as conveying one or more pieces of user data and redact it from the network capture.
+				Mark a string as conveying one or more pieces of user data.
 				Valid user data types: ${userInfoEnums.items.join(', ')}
 			`),
 	)
-	.option('--string <string>', 'String to mark and redact.')
+	.option('--string <string>', 'String to mark.')
 	.option(
-		'--data <data-type>',
-		'User data type (comma-separated list if this matches multiples types of user data).',
+		'--data <data-type>|BENIGN',
+		'User data type (comma-separated list if this matches multiples types of user data), or BENIGN for non-user-data-carrying strings.',
 	)
 	.option(
-		'--hint <hint>',
-		'Hint/explanation as to what the string is; helps understand redacted data.',
+		'--global <true|false>',
+		'For benign strings, mark as benign globally for all captures (true), or only in this capture file (false).',
 	)
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='GA1.1.1294582759' --data='TRACKING_IDENTIFIER'",
@@ -205,8 +203,28 @@ cli
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'",
 	)
+	.example(
+		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='BraveBrowser' --data='BENIGN' --global=true",
+	)
 	.action(async options => {
 		await handleMarkString(markStringOptions.process(options))
+	})
+
+// mark-string subcommand
+cli
+	.command('review-strings', 'Review strings from network capture.')
+	.usage(
+		'review-strings' +
+			trimWhitespacePrefix(`
+
+				Interactively review unclassified strings from network capture.
+			`),
+	)
+	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.action(async options => {
+		await handleReviewStrings(globalOptions.process(options))
 	})
 
 cli

@@ -137,7 +137,7 @@ function evaluate(
 
 export const permissionsManagement: Attribute = {
 	id: 'permissionsManagement',
-	icon: '\u{1f511}', // Key
+	icon: 'permissions_management',
 	displayName: 'Permissions management',
 	wording: {
 		midSentenceName: 'permissions management',

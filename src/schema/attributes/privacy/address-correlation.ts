@@ -208,7 +208,7 @@ export function linkableToWalletAddress<T extends UserInfo>(
 
 export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 	id: 'addressCorrelation',
-	icon: '\u{1f517}', // Link
+	icon: 'wallet_address_privacy',
 	displayName: 'Wallet address privacy',
 	wording: {
 		midSentenceName: 'wallet address privacy',

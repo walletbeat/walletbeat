@@ -31,13 +31,20 @@ import WalletTable from '@/views/WalletTable.svelte'
 				This website is still in beta. It aims to provide a comprehensive list of wallets, their
 				functionality, practices, and support for certain standards.
 			</p>
-
 			<p>
 				We welcome contributions via the <a
 					href='https://github.com/walletbeat/walletbeat'
 					target='_blank'
 					rel='noreferrer'>GitHub Repository</a
 				>.
+			</p>
+			<p>
+				<a
+					href='https://github.com/walletbeat/walletbeat/blob/beta/CONTRIBUTING.md'
+					target='_blank'
+				>
+					Learn More.
+				</a>
 			</p>
 		</header>
 
@@ -72,11 +79,9 @@ import WalletTable from '@/views/WalletTable.svelte'
 		> header {
 			&::before {
 				content: '';
-
-				background: url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat;
 			}
 
-			padding: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 8rem)
+			padding: clamp(0.75rem, 0.04 * var(--scrollContainer-sizeInline), 4rem)
 				clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 
 			text-shadow:
@@ -85,21 +90,22 @@ import WalletTable from '@/views/WalletTable.svelte'
 				0 0 3em var(--background-primary);
 
 			h1 {
-				font-family: 'SP Monorium', 'Space Grotesk', sans-serif;
-				font-size: clamp(2rem, 5vw, 60px);
-				font-weight: 400;
-				color: var(--accent);
+				font-family: 'SP Monorium', monospace;
+				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
+				font-weight: 800;
 				margin: 0 0 1rem 0;
+				color: var(--text-primary);
 				line-height: 1.1;
 			}
 
 			p {
 				font-size: smaller;
-				color: var(--text-secondary);
 				line-height: 1.6;
 				margin: 0;
 				text-wrap: balance;
-				max-width: 72.5%;
+				max-width: 420px;
+				margin-bottom: 1em;
+				color: var(--text-secondary);
 			}
 		}
 	}

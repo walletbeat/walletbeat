@@ -30,6 +30,7 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.md',
 	'.mdc',
 	'.eot',
+	'.otf',
 	'.ttf',
 	'.woff',
 	'.woff2',
@@ -317,6 +318,7 @@ describe('codebase integrity', () => {
 			'ẞ',
 			'Ỳ',
 			'ỳ',
+			'‖',
 		])
 
 		// Characters used in font files generated from SVG.

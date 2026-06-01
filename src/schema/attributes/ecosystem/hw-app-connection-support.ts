@@ -161,7 +161,7 @@ function restrictedAppConnectionSupport(
 
 export const appConnectionSupport: Attribute = {
 	id: 'appConnectionSupport',
-	icon: '\u{1F517}', // Link symbol
+	icon: 'hardware_wallet_support',
 	displayName: 'app Connection Support',
 	wording: {
 		midSentenceName: null,

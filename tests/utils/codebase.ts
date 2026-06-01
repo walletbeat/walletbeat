@@ -21,7 +21,7 @@ export const commonExclusions: PathPredicate[] = [
 	await GitIgnoredFiles(),
 
 	// Exclude known binary files and macOS metadata files.
-	/\.(png|pdf|jpg|jpeg|gif|ico|eot|ttf|woff|woff2)$/i,
+	/\.(png|pdf|jpg|jpeg|gif|ico|eot|otf|ttf|woff|woff2)$/i,
 
 	// Helios binary checkpoint file.
 	'deploy/helios/data/checkpoint',

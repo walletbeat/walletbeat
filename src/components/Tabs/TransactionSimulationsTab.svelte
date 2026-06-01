@@ -310,6 +310,8 @@
 <style>
   .tx-simulations-tab {
     width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .detail-card h3 {
@@ -344,7 +346,10 @@
     padding: 0.75rem;
     border-radius: 0.5rem;
     word-break: break-all;
+    overflow-wrap: break-word;
     color: var(--text-primary);
+    display: block;
+    min-width: 0;
   }
 
   .detail-code.calldata {

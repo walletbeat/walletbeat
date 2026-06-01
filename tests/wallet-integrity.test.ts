@@ -171,7 +171,7 @@ describe('wallets', () => {
 						const captureFileObj = await WalletCaptureFile.fromFile(null, capturePath, annotations)
 
 						// TODO until data collection CLI is more complete.
-						/* const issues = */ captureFileObj.check()
+						/* const issues = */ await captureFileObj.check()
 
 						/*
 						TODO until data collection CLI is more complete:

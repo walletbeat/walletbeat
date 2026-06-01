@@ -103,7 +103,7 @@ const noSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
 
 export const l1ProviderIndependence: Attribute = {
 	id: 'l1ProviderIndependence',
-	icon: '\u{1f3e0}', // House
+	icon: 'l1_provider_independence',
 	displayName: 'L1 provider independence',
 	wording: {
 		midSentenceName: 'L1 provider independence',

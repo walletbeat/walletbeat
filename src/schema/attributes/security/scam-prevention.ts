@@ -373,7 +373,7 @@ function evaluateScamAlerts(
 
 export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	id: 'scamPrevention',
-	icon: '\u{1f6a8}', // Police Cars Revolving Light
+	icon: 'scam_prevention',
 	displayName: 'Scam prevention',
 	wording: {
 		midSentenceName: 'scam prevention',

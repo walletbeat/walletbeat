@@ -39,5 +39,7 @@
 		"head *": "allow",
 		"tail *": "allow",
 		"sort": "allow",
+		"xxd": "allow",
+		"sed": "ask",
 	},
 }

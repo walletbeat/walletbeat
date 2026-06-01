@@ -88,7 +88,7 @@
 >
 	<header data-row="center gap-3 wrap">
 		<h4 data-row="gap-2">
-			<span>{attribute.evaluation.outcome.icon ?? attribute.attribute.icon}</span>
+			<span data-wbicon data-icon={attribute.attribute.icon}></span>
 			{attribute.attribute.displayName}
 		</h4>
 

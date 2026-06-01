@@ -60,6 +60,18 @@ export type MarkdownContent<_Strings extends Strings = null> = {
 	strings?: _Strings
 }
 
+export type Frontmatter = Record<string, string>
+
+/**
+ * Markdown-based content with specific Frontmatter.
+ */
+export type MarkdownContentWithFrontmatter<
+	_Strings extends Strings = null,
+	_Frontmatter extends Frontmatter = {},
+> = MarkdownContent<_Strings> & {
+	frontmatter: _Frontmatter
+}
+
 /**
  * Custom-component-based content that may be displayed on the UI.
  */
