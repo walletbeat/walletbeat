@@ -1,6 +1,7 @@
 ---
 // Types/constants
 import { betaImagesRoot } from '@/constants'
+import { getBaseUrl } from '@/base-url'
 
 type Icon = {
 	url: string
@@ -40,27 +41,22 @@ const defaultIcons: Icon[] = [
 const locale = 'en-US'
 
 // Default OG image — falls back to /banner.png in the public folder.
-// 1920×1026 PNG; close enough to the recommended 1.91:1 ratio for FB/Slack/X
-// previews to render correctly.
 const defaultOgImage: OpenGraphImage = {
 	url: '/banner.png',
-	width: 1920,
-	height: 1026,
-	alt: 'Walletbeat — The state of the Ethereum wallet ecosystem',
+	width: 955,
+	height: 500,
+	alt: 'Walletbeat - Who watches the wallets?',
 }
 
-// Resolve a possibly-relative image URL into an absolute one against the
-// configured site URL so social-card crawlers can fetch it regardless of
+// Resolve a possibly-relative image URL into an absolute one using the
+// site's base URL so social-card crawlers can fetch it regardless of
 // where the page is hosted.
-const toAbsolute = (url: string, site: URL | undefined): string => {
+const toAbsolute = (url: string): string => {
 	if (/^https?:\/\//i.test(url)) {
 		return url
 	}
-	if (!site) {
-		return url
-	}
 	const path = url.startsWith('/') ? url : `/${url}`
-	return new URL(path, site).toString()
+	return `${getBaseUrl()}${path}`
 }
 
 // Functions
@@ -96,7 +92,7 @@ type Props = {
 const { metadata: rawMetadata } = Astro.props
 
 const metadata = generateBasicMetadata(rawMetadata)
-const ogImageUrl = toAbsolute(metadata.openGraph.image.url, Astro.site)
+const ogImageUrl = toAbsolute(metadata.openGraph.image.url)
 ---
 
 <title>{metadata.title}</title>
