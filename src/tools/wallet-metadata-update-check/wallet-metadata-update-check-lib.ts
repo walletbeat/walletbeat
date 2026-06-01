@@ -2,6 +2,10 @@ import { spawnSync } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { type CalendarDate, daysBetween } from '@/types/date'
+
+import { getRepositoryRoot } from '@/tests/utils/codebase'
+
 /**
  * Result of running the metadata-update check.
  */
@@ -18,8 +22,6 @@ export interface CheckResult {
 }
 
 export interface CheckOptions {
-	/** Repo root. Defaults to cwd. */
-	cwd?: string
 	/** Base ref to diff against. Defaults to origin/beta, then beta, then main. */
 	baseRef?: string
 	/** Glob-like prefixes within the repo that contain wallet entries. */
@@ -30,15 +32,17 @@ export interface CheckOptions {
 	bypassToken?: string
 }
 
-const DEFAULT_OPTIONS: Required<Omit<CheckOptions, 'cwd' | 'baseRef'>> = {
+const DEFAULT_OPTIONS: Required<Omit<CheckOptions, 'baseRef'>> = {
 	walletDirs: ['data/software-wallets/', 'data/hardware-wallets/'],
 	commitDateToleranceDays: 3,
 	bypassToken: 'WALLET_FEATURE_DATA_NOT_UPDATED',
 }
 
-const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
-
-/** YYYY-MM-DD string extracted from a wallet file's `lastUpdated` field. */
+/**
+ * Match a YYYY-MM-DD literal. The captured group is asserted to be a
+ * `CalendarDate` (see `@/types/date`) after a successful match — the regex
+ * shape is a strict subset of the `CalendarDate` template-literal type.
+ */
 const LAST_UPDATED_RE = /lastUpdated\s*:\s*['"](\d{4}-\d{2}-\d{2})['"]/
 
 /** Diff hunk lines that should NEVER count as "feature data changed". */
@@ -56,7 +60,10 @@ const IGNORED_LINE_PATTERNS: RegExp[] = [
 
 const BLOCK_COMMENT_RE = /\/\*[\s\S]*?\*\//g
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000
+/** Strict CalendarDate guard (YYYY-MM-DD with valid calendar ranges). */
+function isCalendarDate(s: string): s is CalendarDate {
+	return /^(20|21)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(s)
+}
 
 /** Run a git command (args passed without shell) and return stdout. */
 function git(args: string[], cwd: string): string {
@@ -190,35 +197,24 @@ function readLastUpdatedAtBase(cwd: string, baseRef: string, file: string): stri
 	}
 }
 
-/** ISO date (YYYY-MM-DD) of the HEAD commit, in UTC. */
-function headCommitDateIso(cwd: string): string {
+/** CalendarDate of the HEAD commit, in UTC. */
+function headCommitDate(cwd: string): CalendarDate {
 	const ts = git(['log', '-1', '--format=%cI', 'HEAD'], cwd)
-	const d = new Date(ts)
+	const iso = new Date(ts).toISOString().slice(0, 10)
 
-	return d.toISOString().slice(0, 10)
+	if (!isCalendarDate(iso)) {
+		throw new Error(`HEAD commit date "${iso}" is not a valid YYYY-MM-DD.`)
+	}
+
+	return iso
 }
 
 function headCommitMessage(cwd: string): string {
 	return git(['log', '-1', '--format=%B', 'HEAD'], cwd)
 }
 
-function diffDays(aIso: string, bIso: string): number {
-	const a = Date.UTC(
-		Number(aIso.slice(0, 4)),
-		Number(aIso.slice(5, 7)) - 1,
-		Number(aIso.slice(8, 10)),
-	)
-	const b = Date.UTC(
-		Number(bIso.slice(0, 4)),
-		Number(bIso.slice(5, 7)) - 1,
-		Number(bIso.slice(8, 10)),
-	)
-
-	return Math.round((a - b) / MS_PER_DAY)
-}
-
 export function runCheck(opts: CheckOptions = {}): CheckResult {
-	const cwd = opts.cwd ?? process.cwd()
+	const cwd = getRepositoryRoot()
 	const merged = { ...DEFAULT_OPTIONS, ...opts }
 
 	const baseRef = resolveBaseRef(cwd, opts.baseRef)
@@ -233,7 +229,7 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
 	const inspected: string[] = []
 	const ignored: string[] = []
 	const problems: string[] = []
-	const headDateIso = headCommitDateIso(cwd)
+	const headDate = headCommitDate(cwd)
 
 	for (const file of changed) {
 		const { added, removed } = fileDiffLines(cwd, baseRef, file)
@@ -256,7 +252,7 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
 			continue
 		}
 
-		if (!ISO_DATE_RE.test(headValue)) {
+		if (!isCalendarDate(headValue)) {
 			problems.push(`${file}: \`lastUpdated\` is "${headValue}" — must be YYYY-MM-DD.`)
 			continue
 		}
@@ -265,16 +261,16 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
 
 		if (baseValue !== undefined && baseValue === headValue) {
 			problems.push(
-				`${file}: feature data changed but \`lastUpdated\` (${headValue}) was not bumped vs. ${baseRef}.`,
+				`${file}: feature data changed but \`lastUpdated\` (${headValue}) was not bumped vs. ${baseRef}. Please bump \`lastUpdated\` to the commit date (${headDate}).`,
 			)
 			continue
 		}
 
-		const drift = Math.abs(diffDays(headValue, headDateIso))
+		const drift = Math.abs(daysBetween(headValue, headDate))
 
 		if (drift > merged.commitDateToleranceDays) {
 			problems.push(
-				`${file}: \`lastUpdated\` is ${headValue} but the head commit is dated ${headDateIso} (drift ${drift} days, max ${merged.commitDateToleranceDays}).`,
+				`${file}: \`lastUpdated\` is ${headValue} but the head commit is dated ${headDate} (drift ${drift} days, max ${merged.commitDateToleranceDays}). Please bump \`lastUpdated\` to the commit date (${headDate}).`,
 			)
 		}
 	}
