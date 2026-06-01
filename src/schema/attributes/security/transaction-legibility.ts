@@ -628,21 +628,27 @@ function analyzeSoftwareFeatures({
 	 */
 	if (simData !== null) {
 		// ERC-20 token transfer outcome
-		if (!isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_20_TRANSFER])) {
+		if (
+			isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_20_TRANSFER]) !== true
+		) {
 			details.transactions.partial.push('ERC-20 token transfer (outcome not explained)')
 		} else {
 			details.transactions.passing.push('ERC-20 token transfer')
 		}
 
 		// ERC-721 NFT transfer outcome
-		if (!isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_721_TRANSFER])) {
+		if (
+			isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_721_TRANSFER]) !== true
+		) {
 			details.transactions.partial.push('ERC-721 NFT transfer (outcome not explained)')
 		} else {
 			details.transactions.passing.push('ERC-721 NFT transfer')
 		}
 
 		// ERC-1155 token transfer outcome
-		if (!isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_1155_TRANSFER])) {
+		if (
+			isTransactionOutcomeExplained(simData[BasicBenchmarkTransactions.ERC_1155_TRANSFER]) !== true
+		) {
 			details.transactions.partial.push('ERC-1155 token transfer (outcome not explained)')
 		} else {
 			details.transactions.passing.push('ERC-1155 token transfer')
@@ -654,9 +660,9 @@ function analyzeSoftwareFeatures({
 				erc7730Data !== null ? erc7730Data[ComplexBenchmarkTransactions.USDC_APPROVAL] : null
 			const usdcSimEntry = simData[ComplexBenchmarkTransactions.USDC_APPROVAL]
 
-			if (!isTransactionDecoded(usdcErc7730Entry)) {
+			if (isTransactionDecoded(usdcErc7730Entry) !== true) {
 				details.transactions.failing.push('USDC approval (calldata not decoded)')
-			} else if (!isTransactionOutcomeExplained(usdcSimEntry)) {
+			} else if (isTransactionOutcomeExplained(usdcSimEntry) !== true) {
 				details.transactions.partial.push('USDC approval (outcome not explained)')
 			} else {
 				details.transactions.passing.push('USDC approval')
@@ -669,9 +675,9 @@ function analyzeSoftwareFeatures({
 				erc7730Data !== null ? erc7730Data[ComplexBenchmarkTransactions.AAVE_SUPPLY] : null
 			const aaveSimEntry = simData[ComplexBenchmarkTransactions.AAVE_SUPPLY]
 
-			if (!isTransactionDecoded(aaveErc7730Entry)) {
+			if (isTransactionDecoded(aaveErc7730Entry) !== true) {
 				details.transactions.failing.push('Aave supply (calldata not decoded)')
-			} else if (!isTransactionOutcomeExplained(aaveSimEntry)) {
+			} else if (isTransactionOutcomeExplained(aaveSimEntry) !== true) {
 				details.transactions.partial.push('Aave supply (outcome not explained)')
 			} else {
 				details.transactions.passing.push('Aave supply')
@@ -686,9 +692,9 @@ function analyzeSoftwareFeatures({
 					: null
 			const safeNestedSimEntry = simData[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]
 
-			if (!isTransactionDecoded(safeNestedErc7730Entry)) {
+			if (isTransactionDecoded(safeNestedErc7730Entry) !== true) {
 				details.transactions.partial.push('Safe nested Aave supply (calldata not decoded)')
-			} else if (!isTransactionOutcomeExplained(safeNestedSimEntry)) {
+			} else if (isTransactionOutcomeExplained(safeNestedSimEntry) !== true) {
 				details.transactions.partial.push('Safe nested Aave supply (outcome not explained)')
 			} else {
 				details.transactions.passing.push('Safe nested Aave supply')
@@ -709,9 +715,9 @@ function analyzeSoftwareFeatures({
 					ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
 				]
 
-			if (!isTransactionDecoded(safeMultisendErc7730Entry)) {
+			if (isTransactionDecoded(safeMultisendErc7730Entry) !== true) {
 				details.transactions.partial.push('Safe nested multisend (calldata not decoded)')
-			} else if (!isTransactionOutcomeExplained(safeMultisendSimEntry)) {
+			} else if (isTransactionOutcomeExplained(safeMultisendSimEntry) !== true) {
 				details.transactions.partial.push('Safe nested multisend (outcome not explained)')
 			} else {
 				details.transactions.passing.push('Safe nested multisend')
@@ -729,9 +735,9 @@ function analyzeSoftwareFeatures({
 			const batchApproveSupplySimEntry =
 				simData[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]
 
-			if (!isTransactionDecoded(batchApproveSupplyEntry)) {
+			if (isTransactionDecoded(batchApproveSupplyEntry) !== true) {
 				details.transactions.partial.push('EOA nested multisend (calldata not decoded)')
-			} else if (!isTransactionOutcomeExplained(batchApproveSupplySimEntry)) {
+			} else if (isTransactionOutcomeExplained(batchApproveSupplySimEntry) !== true) {
 				details.transactions.partial.push('EOA nested multisend (outcome not explained)')
 			} else {
 				details.transactions.passing.push('EOA nested multisend')

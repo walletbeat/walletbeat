@@ -468,17 +468,28 @@ export type SoftwareTransactionSimulations = Record<
 	[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: SimulatedNondeterministicTransaction | null
 }
 
-/** Returns true if the entry exists and its outcome is fully explained. */
-export function isTransactionOutcomeExplained(entry: TransactionOutcomeEntry | null): boolean {
-	return entry !== null && entry.transactionOutcome === TransactionOutcome.EXPLAINED
+/** Returns true if the entry's outcome is fully explained, null if entry is null. */
+export function isTransactionOutcomeExplained(
+	entry: TransactionOutcomeEntry | null,
+): boolean | null {
+	if (entry === null) {
+		return null
+	}
+
+	return entry.transactionOutcome === TransactionOutcome.EXPLAINED
 }
 
-/** Returns true if the entry exists and its calldata was decoded and shown. */
-export function isTransactionDecoded(entry: { decoded: DataDisplayOptions } | null): boolean {
+/** Returns true if the entry's calldata was decoded and shown, null if entry is null. */
+export function isTransactionDecoded(
+	entry: { decoded: DataDisplayOptions } | null,
+): boolean | null {
+	if (entry === null) {
+		return null
+	}
+
 	return (
-		entry !== null &&
-		(entry.decoded === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			entry.decoded === DataDisplayOptions.SHOWN_OPTIONALLY)
+		entry.decoded === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		entry.decoded === DataDisplayOptions.SHOWN_OPTIONALLY
 	)
 }
 
