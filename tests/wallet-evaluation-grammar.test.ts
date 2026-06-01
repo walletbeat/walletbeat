@@ -1,13 +1,13 @@
 import { describe } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
-import { AttributeGroupId } from '@/schema/attribute-tree'
 import { allRatedWallets, walletAttributeTree } from '@/data/wallets'
 import {
 	type AttributeGroup,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
+import { AttributeGroupId } from '@/schema/attribute-tree'
 import {
 	type Attribute,
 	type EvaluatedAttribute,

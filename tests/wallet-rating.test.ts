@@ -13,7 +13,7 @@ type WalletMapTestCase = {
 	walletMap: Record<string, BaseWallet<string>>
 }
 
-const walletMaps = [
+const walletMaps: WalletMapTestCase[] = [
 	{
 		attributeTree: softwareWalletAttributeTree,
 		ladders: softwareLadders,
@@ -26,13 +26,15 @@ const walletMaps = [
 		title: 'hardware wallets',
 		walletMap: hardwareWallets,
 	},
-] satisfies WalletMapTestCase[]
+]
 
 describe('wallets', () => {
 	for (const { attributeTree, ladders, title, walletMap } of walletMaps) {
 		describe(title, () => {
-			for (const [walletName, wallet] of Object.entries(walletMap)) {
-				it(`can rate ${String(walletName)}`, () => {
+			for (const walletName in walletMap) {
+				const wallet = walletMap[walletName]
+
+				it(`can rate ${walletName}`, () => {
 					rateWallet(attributeTree, ladders, wallet)
 				})
 			}

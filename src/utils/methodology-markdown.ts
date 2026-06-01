@@ -1,5 +1,5 @@
-import { AttributeGroupId } from '@/schema/attribute-tree'
 import type { AttributeTree } from '@/schema/attribute-groups'
+import { AttributeGroupId } from '@/schema/attribute-tree'
 import type { Attribute, ExampleRating, OutcomeMetadata } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
 import { renderTypographicContentToString, type TypographicContent } from '@/types/content'

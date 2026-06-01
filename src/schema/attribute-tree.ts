@@ -39,6 +39,11 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 			{
+				attribute: (await import('@/schema/attributes/security/security-best-practices.ts'))
+					.securityBestPractices,
+				weight: 1.0,
+			},
+			{
 				attribute: (await import('@/schema/attributes/security/bug-bounty-program.ts'))
 					.bugBountyProgram,
 				weight: 1.0,
@@ -170,6 +175,11 @@ const attributeGroupDefinitions = [
 			{
 				attribute: (await import('@/schema/attributes/transparency/fee-transparency.ts'))
 					.feeTransparency,
+				weight: 1.0,
+			},
+			{
+				attribute: (await import('@/schema/attributes/transparency/release-process.ts'))
+					.releaseProcess,
 				weight: 1.0,
 			},
 			{
