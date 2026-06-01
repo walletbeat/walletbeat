@@ -11,16 +11,21 @@
 
 ### Introduction
 
-- Quick introduction to Walletbeat
 - Introduction to Ethereum wallets
   - Audience engagement:
-    - “Who here has never used an Ethereum wallet before?”
-- Brief introduction to Walletbeat’s evaluation attributes:
-  - Security
-  - Privacy
-  - Transparency
-  - Self-sovereignty
-  - Ecosystem alignment
+    - "Who here has never used an Ethereum wallet before?"
+    - "Who here has signed a transaction without fully understanding what it does?"
+
+---
+
+### Why Wallets Matter
+
+#### The Bybit Hack
+
+- February 2025: $1.5 billion stolen from Bybit
+- Not a protocol exploit: attackers compromised the signing interface
+- Bybit's signers approved a transaction they thought was routine; it wasn't
+- The wallet showed them something different from what they actually signed
 
 ---
 
@@ -38,7 +43,6 @@ Examples:
 
 #### Real-World Context
 
-- The Bybit $1.5B hack
 - Social engineering and signing-based attacks
 - Everyday users signing transactions they cannot interpret
 
@@ -69,6 +73,19 @@ Better standards improve:
 - transaction clarity
 - user trust
 - wallet safety
+- open competition
+
+---
+
+### Introducing Walletbeat
+
+- A rating system for Ethereum wallets
+- Evaluates wallets across five dimensions:
+  - Security
+  - Privacy
+  - Transparency
+  - Self-sovereignty
+  - Ecosystem alignment
 
 ---
 
@@ -98,4 +115,4 @@ Demonstrate:
 
 ### Closing Message
 
-It’s time to push wallets toward better standards, better interoperability, and safer user experiences.
+It's time to push wallets toward better standards, better interoperability, and safer user experiences.
