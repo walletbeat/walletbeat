@@ -73,7 +73,7 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('contains the Walletbeat page URL', () => {
-				expect(md).toContain(`${SITE_URL}/${wallet.metadata.id}`)
+				expect(md).toContain(`${SITE_URL}${getWalletUrl(wallet)}`)
 			})
 
 			it('contains each non-exempt attribute group heading', () => {
