@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 22
       - name: Install packageManager
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - name: Install dependencies
         run: pnpm install
       - name: Run checks

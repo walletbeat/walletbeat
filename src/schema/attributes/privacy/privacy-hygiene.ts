@@ -364,7 +364,7 @@ function scanFlowsForForbiddenDataViolations(
 
 export const privacyHygiene: Attribute = {
 	id: 'privacyHygiene',
-	icon: '\u{1f9fc}', // Soap
+	icon: 'privacy_hygiene',
 	displayName: 'Privacy hygiene',
 	wording: {
 		midSentenceName: 'privacy hygiene',

@@ -1,0 +1,16 @@
+minimumReleaseAge: 20160
+minimumReleaseAgeIgnoreMissingTime: false
+minimumReleaseAgeStrict: true
+trustPolicy: no-downgrade
+allowBuilds:
+  bufferutil: false
+  esbuild: false
+  keccak: false
+  sharp: false
+  ttf2woff2: false
+  utf-8-validate: false
+trustPolicyExclude:
+  - 'chokidar@4.0.3'
+  - 'semver@6.3.1'
+  - '@noble/curves@1.8.0'
+  - '@noble/hashes@1.7.0'

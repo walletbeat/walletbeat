@@ -2,8 +2,10 @@ import { ackee } from '@/data/entities/ackee'
 import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
+import { citrea } from '@/data/entities/citrea'
 import { deBank } from '@/data/entities/debank'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
+import { monad } from '@/data/entities/monad'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
@@ -18,8 +20,10 @@ export const allEntities = {
 	alphabet,
 	ambire: ambireEntity,
 	apple,
+	citrea,
 	debank: deBank,
 	hyperFoundation,
+	monad,
 	sentry,
 	sonicLabs,
 	walletbeat,

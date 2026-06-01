@@ -1707,7 +1707,7 @@ function build(
 
 export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 	id: 'privateTransfers',
-	icon: '\u{1f4e8}', // Incoming envelope
+	icon: 'private_token_transfers',
 	displayName: 'Private token transfers',
 	wording: {
 		midSentenceName: 'token transfer privacy',

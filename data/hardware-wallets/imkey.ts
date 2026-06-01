@@ -7,9 +7,9 @@ import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
-	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
+	DataLocation,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
@@ -165,15 +165,15 @@ export const imkeyWallet: HardwareWallet = {
 				],
 				calldataDecoded: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.ON_DEVICE,
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
-					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						DataDecoded.NOT_DECODED,
+						DataLocation.NOT_PROVIDED,
 				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -184,7 +184,7 @@ export const imkeyWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
-				messageSigningLegibility: null,
+				erc8213: null,
 			},
 			userSafety: null,
 		},
@@ -205,6 +205,15 @@ export const imkeyWallet: HardwareWallet = {
 				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: notSupported,
+			},
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
 			},
 			reputation: null,
 		},

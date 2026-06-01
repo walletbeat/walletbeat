@@ -148,7 +148,7 @@ function evaluateAccountRecovery(
 
 export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 	id: 'accountRecovery',
-	icon: '\u{1f6df}', // Ring Buoy
+	icon: 'account_recovery',
 	displayName: 'Account recovery',
 	wording: {
 		midSentenceName: 'account recovery',

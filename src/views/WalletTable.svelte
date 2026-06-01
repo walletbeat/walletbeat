@@ -234,6 +234,7 @@
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
+	import { getWalletUrl } from '@/utils/wallet-url'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
@@ -684,7 +685,7 @@
 							.filter(variant => variant in wallet.variants)
 					)}
 
-					{@const walletUrl = `/${wallet.metadata.id}/${selectedVariant ? `?variant=${selectedVariant}` : ''}`}
+					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
 
 					<TooltipOrAccordion
 						class="wallet-info-details"
@@ -1009,7 +1010,8 @@
 
 										return {
 											id: `attrGroup_${attrGroup.id}`,
-											arcLabel: `${attrGroup.icon}${(groupScore !== null && groupScore.hasUnratedComponent) ? '*' : ''}`,
+											arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
+										arcIconId: attrGroup.icon,
 											color: (
 												groupScore !== null ?
 													scoreToColor(groupScore.score)
@@ -1043,7 +1045,8 @@
 																	?.weight
 																?? 1
 															),
-															arcLabel: attribute.evaluation.outcome.icon ?? attribute.attribute.icon,
+															arcLabel: '',
+															arcIconId: attribute.attribute.icon,
 															titleText: formatAttributeTitleText(attribute),
 															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 																opacity: 0.33,
@@ -1259,8 +1262,6 @@
 									: nonEmptyMap(
 										evalEntries,
 										([attributeId, attribute]) => {
-											const icon = attribute.evaluation.outcome.icon ?? attribute.attribute.icon
-
 											const tooltipSuffix = (() => {
 												const variant = selectedVariant
 
@@ -1287,7 +1288,8 @@
 														?.weight
 													?? 1
 												),
-												arcLabel: icon,
+												arcLabel: '',
+												arcIconId: attribute.attribute.icon,
 												titleText: formatAttributeTitleText(attribute, tooltipSuffix),
 												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 													opacity: 0.33,
@@ -1343,9 +1345,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon">
-											{attrGroup.icon}
-										</span>
+										<span class="pie-center-icon" data-wbicon data-icon={attrGroup.icon}></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}
@@ -1451,7 +1451,8 @@
 												id: `attrGroup_${attributeGroupId}__attr_${attributeId}`,
 												color: ratingToColor(attribute.evaluation.outcome.rating),
 												weight: 1,
-												arcLabel: attribute.icon,
+												arcLabel: '',
+												arcIconId: attribute.icon,
 												titleText: formatAttributeTitleText(attribute),
 											}
 										]

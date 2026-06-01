@@ -39,7 +39,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 <Layout
 	metadata={{
-		title: `${attrGroup.displayName} - Walletbeat`,
+		title: `Ethereum Wallets ${attrGroup.displayName} - Walletbeat`,
 		description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
 		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
 	}}
@@ -48,7 +48,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 	<main data-sticky-container>
 		<WalletTable
-			client:load
+			client:visible
 			title='Software Wallets'
 			ladders={softwareLadders}
 			wallets={Object.values(ratedSoftwareWallets)}

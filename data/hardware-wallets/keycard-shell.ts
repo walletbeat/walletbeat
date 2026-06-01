@@ -18,9 +18,9 @@ import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
-	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
+	DataLocation,
 	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
@@ -260,8 +260,8 @@ export const keycardShell: HardwareWallet = {
 				],
 				calldataDecoded: {
 					...noCalldataDecoding,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
 				},
 				// Data extraction: QR codes used for transaction data (ERC-4527); display visible to eyes
 				dataExtraction: {
@@ -277,7 +277,7 @@ export const keycardShell: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				messageSigningLegibility: null,
+				erc8213: null,
 			},
 			userSafety: null,
 		},
@@ -297,6 +297,15 @@ export const keycardShell: HardwareWallet = {
 		transparency: {
 			maintenance: null,
 			operationFees: null,
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
+			},
 			reputation: null,
 		},
 	},

@@ -42,7 +42,7 @@ function evaluateFirmware(features: FirmwareSupport): ExplicitRating | Rating.UN
 
 export const firmware: Attribute<FirmwareMetadata> = {
 	id: 'firmware',
-	icon: '💾',
+	icon: 'security_best_practices',
 	displayName: 'Firmware',
 	wording: {
 		midSentenceName: null,

@@ -143,8 +143,7 @@ export const frame: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: null,
-				messageSigningLegibility: null,
+				erc8213: null,
 				transactionDetailsDisplay: null,
 				// transactionDetailsDisplay: {
 				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -173,6 +172,15 @@ export const frame: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
+			},
 		},
 	},
 	variants: {

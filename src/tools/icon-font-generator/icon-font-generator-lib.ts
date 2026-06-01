@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import * as fs from 'node:fs'
 import path from 'node:path'
 
+import * as prettier from 'prettier'
 import { type Config, loadConfig, optimize } from 'svgo'
 import svgtofont from 'svgtofont'
 
@@ -211,6 +212,7 @@ export const maxIconFontChars = 255
 
 export class SVGFont {
 	public readonly fontName: string
+	public readonly fontTypeName: string
 	public readonly svgIconsDir: string
 	public readonly fontOutputDir: string
 	public readonly cssOutputDir: string
@@ -219,6 +221,7 @@ export class SVGFont {
 
 	private constructor(
 		fontName: string,
+		fontTypeName: string,
 		svgIconsDir: string,
 		fontOutputDir: string,
 		cssOutputDir: string,
@@ -226,6 +229,7 @@ export class SVGFont {
 		currentHash: string,
 	) {
 		this.fontName = fontName
+		this.fontTypeName = fontTypeName
 		this.svgIconsDir = svgIconsDir
 		this.fontOutputDir = fontOutputDir
 		this.cssOutputDir = cssOutputDir
@@ -286,11 +290,13 @@ export class SVGFont {
 
 	public static async create({
 		fontName,
+		fontTypeName,
 		svgIconsDir,
 		fontOutputDir,
 		cssOutputDir,
 	}: {
 		fontName: string
+		fontTypeName: string
 		svgIconsDir: string
 		fontOutputDir: string
 		cssOutputDir: string
@@ -313,6 +319,7 @@ export class SVGFont {
 
 		return new SVGFont(
 			fontName,
+			fontTypeName,
 			svgIconsDirAbs,
 			fontOutputDirAbs,
 			cssOutputDirAbs,
@@ -364,7 +371,7 @@ export class SVGFont {
 		const relFontOutputDir = path.relative(repoRoot, this.fontOutputDir)
 		const relCssOutputDir = path.relative(repoRoot, this.cssOutputDir)
 
-		return `pnpm tsx src/tools/icon-font-generator/icon-font-generator.ts --font-name "${this.fontName}" --svg-icons-dir "${relSvgIconsDir}" --font-output-dir "${relFontOutputDir}" --css-output-dir "${relCssOutputDir}"`
+		return `pnpm tsx src/tools/icon-font-generator/icon-font-generator.ts --font-name "${this.fontName}" --font-type-name "${this.fontTypeName}" --svg-icons-dir "${relSvgIconsDir}" --font-output-dir "${relFontOutputDir}" --css-output-dir "${relCssOutputDir}"`
 	}
 
 	public async write() {
@@ -395,6 +402,7 @@ export class SVGFont {
 		})
 
 		const cssRules: string[] = []
+		const typeValues: string[] = []
 
 		for (const [key, icon] of Object.entries(result).sort(([keyA, _valA], [keyB, _valB]) =>
 			keyA.localeCompare(keyB),
@@ -407,6 +415,7 @@ export class SVGFont {
 				&[data-icon~="${key}"] {
 					--icon-content: "${icon.encodedCode}";
 				},`)
+			typeValues.push(`\t| ${JSON.stringify(key)}`)
 		}
 		const singularFontName = this.fontName.endsWith('s')
 			? this.fontName.substring(0, this.fontName.length - 1)
@@ -416,7 +425,7 @@ export class SVGFont {
 			@font-face {
 				font-family: "${this.fontName}";
 				src: url('${cssPath}${this.fontName}.eot'); /* IE9*/
-				src: url('${cssPath}${this.fontName}.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
+				src: url('${cssPath}${this.fontName}.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
 				url('${cssPath}${this.fontName}.woff2') format('woff2'),
 				url('${cssPath}${this.fontName}.woff') format('woff'),
 				url('${cssPath}${this.fontName}.ttf') format('truetype'),
@@ -452,6 +461,16 @@ export class SVGFont {
 
 			await fs.promises.writeFile(generatedSVGPath, optimizedSVG)
 		}
+		let dtsContent = [
+			`/** Icon ID for the ${this.fontName} font. */`,
+			`export type ${this.fontTypeName}FontID =`,
+			...typeValues,
+		].join('\n')
+		const dtsPath = path.join(this.cssOutputDir, `${this.fontName}.d.ts`)
+		const prettierConfig = await prettier.resolveConfig(dtsPath)
+
+		dtsContent = await prettier.format(dtsContent, { ...prettierConfig, parser: 'typescript' })
+		await fs.promises.writeFile(dtsPath, dtsContent)
 		await fs.promises.writeFile(
 			path.join(this.fontOutputDir, 'font_hash.sha256'),
 			this.currentHash + '\n',

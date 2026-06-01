@@ -68,6 +68,7 @@ import {
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	type DisplayedBasicTransactionDetails,
+	displaysFullCallData,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -87,6 +88,7 @@ import {
 	fullySponsoredFees,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
@@ -629,17 +631,15 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: true,
-					formatted: true,
-					rawHex: true,
-				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc8213: supported({
+					calldataDisplay: displaysFullCallData,
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+				}),
 				transactionDetailsDisplay: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: passTransactionDisplay,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
@@ -715,6 +715,26 @@ export const completedTemplate: SoftwareWallet = {
 				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+			},
+			releaseTransparency: {
+				artifactSigning: supported<ArtifactSigningDetails>({
+					ref: refTodo,
+					publication: 'SIGSTORE_REKOR',
+					signer: 'BOTH',
+				}),
+				dependencyLocking: supported({ ref: refTodo }),
+				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
+				hasPublicChangelog: supported({ ref: 'https://example.com/changelog' }),
+				hermeticBuilds: supported({ ref: refTodo }),
+				repositoryChangeControls: {
+					ref: refTodo,
+					branchDeletionBlocked: true,
+					forcePushBlocked: true,
+					requiredChecks: true,
+					requiredReview: true,
+					tagsImmutable: true,
+				},
+				reproducibleBuilds: supported({ ref: refTodo }),
 			},
 		},
 	},

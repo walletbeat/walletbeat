@@ -56,7 +56,7 @@
 >
 	<header data-row="center gap-3 wrap">
 		<h3 data-row="gap-2">
-			<span>{attributeGroup.icon}</span> {attributeGroup.displayName}
+			<span data-wbicon data-icon={attributeGroup.icon}></span> {attributeGroup.displayName}
 		</h3>
 
 		{#if summaryType === WalletAttributeGroupSummaryType.Score}

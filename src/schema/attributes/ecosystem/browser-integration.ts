@@ -99,7 +99,7 @@ function browserIntegrationSupport(
 
 export const browserIntegration: Attribute<BrowserIntegrationMetadata> = {
 	id: 'browserIntegration',
-	icon: '\u{1f310}', // Globe with Meridians
+	icon: 'browser_integration',
 	displayName: 'Browser integration',
 	wording: {
 		midSentenceName: 'browser integration',

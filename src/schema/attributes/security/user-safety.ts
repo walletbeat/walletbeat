@@ -26,7 +26,7 @@ export type UserSafetyMetadata = {
 
 export const userSafety: Attribute<UserSafetyMetadata> = {
 	id: 'userSafety',
-	icon: '🛡️',
+	icon: 'scam_prevention',
 	displayName: 'User Safety',
 	wording: {
 		midSentenceName: null,

@@ -20,3 +20,4 @@ eth:0x48cc0bb1814ba6bc052572a9c97dde4bc6177821	pheobeayo	pheobeayo	EOA owned by 
 eth:0x218357FCA1f62b434495516dd6F98CC27Ec71dBd	ren2140	ren2140	Deposit address owned by ren2140, USDC on mainnet only.
 eth:0x0c6C7D131b2Ae973bb3eA40902Bd20A82d04B436	mattmatt_deployer	0xMattmatt	Contract deployer address owned by Mattmatt
 eth:0x96373d84487E69aA10EF3e8d2ecE28Ca27b50ADD	lucilajuliana.shefi.eth	lucila	EOA owned by lucila
+eth:0xb766E918c601c119bFB8760d40C318FA7E843F48	walletbeat_social	Any contributor as needed	Walletbeat social wallet using shared seed phrase, used to log into apps that only support EOAs

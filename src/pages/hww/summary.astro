@@ -12,14 +12,14 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 <Layout
 	metadata={{
-		title: 'Walletbeat',
+		title: 'Ethereum Hardware Wallets - Walletbeat',
 	}}
 >
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
 		<WalletTable
-			client:load
+			client:visible
 			title='Hardware Wallets'
 			ladders={softwareLadders}
 			wallets={Object.values(ratedHardwareWallets)}

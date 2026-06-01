@@ -30,6 +30,7 @@ import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import {
 	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	type DisplayedBasicTransactionDetails,
@@ -714,17 +715,20 @@ export const rabby: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: false,
-					formatted: true,
-					rawHex: true,
-				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: rabbyTransactionDisplayDefault,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
@@ -773,12 +777,22 @@ export const rabby: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: supported({
-				ref: refTodo,
-				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-			}),
+			// Rabby's browser extension exposes inspection and revocation for
+			// ERC-20, ERC-721, and ERC-1155 token approvals directly in the popup
+			// UI (a recent integration; previously this opened a separate tab to a
+			// Rabby-owned revoke site, which would not have qualified under the
+			// in-wallet-UI standard). Verified in-app. Mobile and desktop variants
+			// not independently verified, so left as null.
+			permissionsManagement: {
+				[Variant.BROWSER]: supported({
+					ref: refTodo,
+					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				}),
+				[Variant.DESKTOP]: null,
+				[Variant.MOBILE]: null,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -815,6 +829,15 @@ export const rabby: SoftwareWallet = {
 					fullySponsored: false,
 				}),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+			},
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
 			},
 		},
 	},

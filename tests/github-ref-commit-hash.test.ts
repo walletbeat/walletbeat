@@ -46,7 +46,7 @@ describe('GitHub ref URLs in wallet data must use 40-char commit hashes', async 
 	await crawlCodebase({
 		root: DATA_DIR,
 		ignore: [],
-		traversalFn: entry => {
+		fullTraversalFn: entry => {
 			if (entry.type === CodebaseEntryType.FILE && entry.path.endsWith('.ts')) {
 				const offending = findOffendingLinks(entry.contents)
 

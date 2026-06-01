@@ -122,7 +122,7 @@ const unlicensed: (typeof openSource)['evaluate'] = ctx =>
 
 export const openSource: Attribute = {
 	id: 'openSource',
-	icon: '❤️',
+	icon: 'open_source',
 	displayName: 'Source code license',
 	wording: {
 		midSentenceName: 'source code license',

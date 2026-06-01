@@ -258,6 +258,8 @@
 <style>
   .step-test-container {
     width: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .progress-header {
@@ -469,6 +471,9 @@
     font-size: 0.7rem;
     color: var(--accent);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 
   .critical-badge {

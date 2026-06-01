@@ -18,9 +18,9 @@ import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
-	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
+	DataLocation,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
@@ -196,15 +196,15 @@ export const keystoneWallet: HardwareWallet = {
 				],
 				calldataDecoded: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.ON_DEVICE,
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
-					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						DataDecoded.NOT_DECODED,
+						DataLocation.NOT_PROVIDED,
 				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -215,7 +215,7 @@ export const keystoneWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
-				messageSigningLegibility: null,
+				erc8213: null,
 			},
 			userSafety: null,
 		},
@@ -225,6 +225,15 @@ export const keystoneWallet: HardwareWallet = {
 		transparency: {
 			maintenance: null,
 			operationFees: null,
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
+			},
 			reputation: null,
 		},
 	},

@@ -137,7 +137,7 @@ function comprehensiveHardwareWalletSupport(
 
 export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperabilityMetadata> = {
 	id: 'hardwareWalletInteroperability',
-	icon: '\u{1f9e9}', // Puzzle piece
+	icon: 'hardware_wallet_interoperability',
 	displayName: 'Hardware wallet interoperability',
 	wording: {
 		midSentenceName: null,

@@ -5,7 +5,6 @@ import { loadConfig, optimize } from 'svgo'
 import { describe, expect, it } from 'vitest'
 
 import {
-	type CodebaseEntry,
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
@@ -153,6 +152,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'dba5ad8b24a91d229e696dd8a5f6073731a52a057168c7d86b2154350a888544',
 	'resources/files/wbicons/wallet_software.svg':
 		'a6bf2a2c35af75b4b4302689160de01245e5900fceef33b98d4261975fdf7dfd',
+	'resources/files/wbicons/wallet_test.svg':
+		'da072830acbce4bd7b89039e3ae261f95f79e620a468eada968dcc5220c34806',
 	'public/fonts/sp-monorium-dingbat.svg':
 		'4e075d1a474e3c9cac32668b882f38dea406bfd0f254767a4bfad9ff9fe47e3e',
 	'public/fonts/sp-monorium-regular.svg':
@@ -161,7 +162,7 @@ const optimizedSvgHashes: Record<string, string> = {
 		'5f40f64a49babed6573f5c16e39ec450eb83ef660efea7bcd30093fe19ac9a45',
 	'resources/branding/glow-1.svg':
 		'71e6c1520f6f9b40d189811b38f222a5381b1b01e9a281c1e55ef4941fafbed7',
-	'public/wbicons/wbicons.svg': '45f03658c157b147a522485eaa7145bb11734f1243ebc81e48a5b90d8703f262',
+	'public/wbicons/wbicons.svg': '3face06111626daa5f9c29609a4812fb900b6ace49ff52b2fb861f045f6d5623',
 	'resources/files/wbicons/account_abstraction.svg':
 		'b6dcb0b8cc200d4e283d2d13466babf09d119dc6dac9364610d3e79018080b62',
 	'resources/files/wbicons/account_portability.svg':
@@ -224,7 +225,7 @@ const optimizedSvgHashes: Record<string, string> = {
 		'67be234afaf1a92148d268fc7dde69eabcddd25be932f6fe09e162b119892ce1',
 	'resources/files/wbicons/source_code_license.svg':
 		'adf1e55fa6b50d77c72ac340d5b01f3ef5ad9aa39f9de7206eae23715a0d6427',
-	'resources/files/wbicons/source_visibility.svg':
+	'resources/files/wbicons/open_source.svg':
 		'29a4ca719470edda4b0e811e5f26d122c7cc06b1c1394ddace70fbc66013a6e5',
 	'resources/files/wbicons/transaction_batching.svg':
 		'b520345224989151bd7db1fe21bf650a74499dd158c03b1d92c28f111b7f41af',
@@ -256,13 +257,19 @@ describe('SVG optimization', async () => {
 
 	await crawlCodebase({
 		ignore: commonExclusions,
-		traversalFn: (entry: CodebaseEntry) => {
-			if (entry.type !== CodebaseEntryType.FILE) {
+		complexTraversalFn: async (entryBase, getFullEntry) => {
+			if (entryBase.type !== CodebaseEntryType.FILE) {
 				return
 			}
 
-			if (!entry.path.endsWith('.svg')) {
+			if (!entryBase.path.endsWith('.svg')) {
 				return
+			}
+
+			const entry = await getFullEntry()
+
+			if (entry.type !== CodebaseEntryType.FILE) {
+				throw new Error('inconsistent type')
 			}
 
 			const filePath = entry.path
