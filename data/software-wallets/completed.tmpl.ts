@@ -7,15 +7,17 @@
  * Use this as a reference when filling in real wallet data to understand what
  * "best-in-class" looks like for each field.
  *
- * NOTE: All `ref` fields use `refTodo` as a placeholder. Real wallet submissions
- * must replace each `refTodo` with a URL or reference pointing to the source
- * of the claim (source code, documentation, or audit report).
+ * NOTE: Most `ref` fields use `refTodo` as a placeholder. `MustRef` fields (e.g.
+ * enclave audit refs, orderflow practices page) use example URLs instead. Real
+ * wallet submissions must replace placeholders with URLs pointing to the source
+ * of each claim (source code, documentation, or audit report).
  */
 
 import { exampleContributor } from '@/data/contributors/example'
 import {
 	exampleCex,
 	exampleNodeCompany,
+	exampleOrderflowAuctioneer,
 	exampleSecurityAuditor,
 	exampleWalletDevelopmentCompany,
 } from '@/data/entities/example'
@@ -86,6 +88,10 @@ import {
 	fullySponsoredFees,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import {
+	OnchainVerificationDocumentation,
+	OrderflowDisclosureLevel,
+} from '@/schema/features/transparency/orderflow'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -116,6 +122,12 @@ const dataLeakReferences: Record<string, References> = {
 		{
 			explanation: 'Used as a bundler for ERC-4337 user operations.',
 			url: 'https://example.com/bundler',
+		},
+	],
+	orderflowAuctioneer: [
+		{
+			explanation: 'Receives mempool transactions for orderflow auctioning by default.',
+			url: 'https://example.com/orderflow-auctioneer',
 		},
 	],
 	staticContent: [
@@ -161,7 +173,9 @@ const sealedEnclaveEndpoint: Endpoint = {
 		clientVerification: {
 			type: 'VERIFIED',
 			ref: 'https://example.com',
+			verificationCodeAudit: { ref: 'https://example.com' },
 		},
+		independentCodeAudit: { ref: 'https://example.com' },
 		reproducibleBuilds: true,
 		sourceAvailable: true,
 	},
@@ -395,6 +409,17 @@ export const completedTemplate: SoftwareWallet = {
 				},
 				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
+						{
+							ref: dataLeakReferences.orderflowAuctioneer,
+							byEntity: exampleOrderflowAuctioneer,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.NEVER,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.NEVER,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+							},
+							purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
+						},
 						{
 							ref: dataLeakReferences.walletBackend,
 							byEntity: exampleWalletDevelopmentCompany,
@@ -716,6 +741,27 @@ export const completedTemplate: SoftwareWallet = {
 				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+			},
+			orderflowPractices: {
+				ref: refTodo,
+				disclosure: {
+					ref: refTodo,
+					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+					byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
+				},
+				practicesPage: supported({
+					ref: 'https://example.com/orderflow-practices',
+					contents: {
+						ref: refTodo,
+						documentsHowToChangeDefaults: true,
+						explainsDefaultOrderflowAuctioning: true,
+						listsEntitiesAndWhatTheyDo: true,
+						onchainVerification: OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE,
+						pageLastUpdated: '2026-02-27',
+					},
+					url: 'https://example.com/orderflow-practices',
+				}),
+				userCanRemoveAuctioning: supported({ ref: refTodo }),
 			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({

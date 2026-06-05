@@ -50,6 +50,7 @@ import {
 } from './features/transparency/license'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
+import type { OrderflowPractices } from './features/transparency/orderflow'
 import type {
 	ArtifactSigning,
 	ArtifactSigningDetails,
@@ -173,6 +174,9 @@ export interface WalletBaseFeatures {
 	transparency: {
 		/** Information on how fees are displayed for basic operations. */
 		operationFees: VariantFeature<Nullable<BasicOperationFees>>
+
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 
 		/** Release transparency features. */
 		releaseTransparency: {
@@ -388,6 +392,7 @@ export interface ResolvedFeatures {
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
+		orderflowPractices: ResolvedFeature<OrderflowPractices>
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
 		releaseTransparency: {
@@ -579,6 +584,12 @@ export function resolveFeatures(
 		transparency: {
 			operationFees: nullable(
 				baseFeat('transparency.operationFees', features => features.transparency.operationFees),
+			),
+			orderflowPractices: nullable(
+				baseFeat(
+					'transparency.orderflowPractices',
+					features => features.transparency.orderflowPractices,
+				),
 			),
 			reputation: hardwareFeat(
 				'transparency.reputation',

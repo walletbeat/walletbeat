@@ -110,3 +110,14 @@ export const someWallet: SoftwareWallet = {
 ```
 
 Once this is done, run the unit tests (`pnpm vitest`) to verify the integrity of the data. If everything passes, you are done! 🫡
+
+## Orderflow auctioning (`ORDERFLOW_AUCTION`)
+
+Use the `ORDERFLOW_AUCTION` data-collection purpose when an entity receives **pre-inclusion** transaction data (`MEMPOOL_TRANSACTIONS` with `BY_DEFAULT` or `ALWAYS`) **to auction orderflow** (MEV), as distinct from:
+
+- `TRANSACTION_BROADCAST` — plain broadcast or private-mempool routing without auctioning
+- `TRANSACTION_SIMULATION` — simulation / preview only
+
+**Validation:** A row must not list `ORDERFLOW_AUCTION` unless qualified `MEMPOOL_TRANSACTIONS` on that same row is `BY_DEFAULT` or `ALWAYS`. `OPT_IN` / `PROMPTED` mempool collection may coexist with `ORDERFLOW_AUCTION` on the row (optional auctioning).
+
+**Endpoint:** When documenting default or always mempool collection, record an `endpoint` on the row (`RegularEndpoint` at minimum if only the host is known; complete `SECURE_ENCLAVE` details when researched). Rows with default/always mempool collection but no `endpoint` leave orderflow ratings **UNRATED** until finished.

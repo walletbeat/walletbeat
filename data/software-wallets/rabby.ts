@@ -816,6 +816,7 @@ export const rabby: SoftwareWallet = {
 				}),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

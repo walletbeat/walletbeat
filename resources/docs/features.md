@@ -55,6 +55,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/transparency/license.ts`](#srcschemafeaturestransparencylicensets)
 - [`src/schema/features/transparency/maintenance.ts`](#srcschemafeaturestransparencymaintenancets)
 - [`src/schema/features/transparency/monetization.ts`](#srcschemafeaturestransparencymonetizationts)
+- [`src/schema/features/transparency/orderflow.ts`](#srcschemafeaturestransparencyorderflowts)
 - [`src/schema/features/transparency/release-transparency.ts`](#srcschemafeaturestransparencyrelease-transparencyts)
 - [`src/schema/features/transparency/reputation.ts`](#srcschemafeaturestransparencyreputationts)
 
@@ -103,6 +104,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 - `selfSovereignty` (`object`): Self-sovereignty features.
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
+  - `orderflowPractices` (`VariantFeature<Nullable<OrderflowPractices>>`): Orderflow auctioning disclosure and practices page.
   - `releaseTransparency` (object): Release transparency features.
     - `artifactSigning` (`VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>`)
     - `dependencyLocking` (`VariantFeature<DependencyLocking>`)
@@ -263,6 +265,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
+  - `orderflowPractices` (`ResolvedFeature<OrderflowPractices>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
   - `releaseTransparency` (object)
@@ -979,6 +982,12 @@ type Endpoint =
 				reproducibleBuilds: boolean
 
 				/**
+				 * Reference to an independent audit of the server software running in the
+				 * enclave (independent of client verification code).
+				 */
+				independentCodeAudit: MustRef<{}>
+
+				/**
 				 * How the client verifies that the endpoint is running in a secure enclave.
 				 */
 				clientVerification:
@@ -998,6 +1007,12 @@ type Endpoint =
 							 * The client verifies this. Must also come with a code reference.
 							 */
 							type: 'VERIFIED'
+
+							/**
+							 * Reference to an independent audit of the wallet's attestation
+							 * verification code.
+							 */
+							verificationCodeAudit: MustRef<{}>
 					  }>
 			}>
 
@@ -1131,6 +1146,7 @@ Why is data being collected?
 - `UPDATE_CHECKING` = `'UPDATE_CHECKING'`: Checking for updates to the wallet.
 - `CHAIN_DATA_LOOKUP` = `'CHAIN_DATA_LOOKUP'`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST` = `'TRANSACTION_BROADCAST'`: Broadcasting transactions for inclusion.
+- `ORDERFLOW_AUCTION` = `'ORDERFLOW_AUCTION'`: Auctioning orderflow (MEV) from pre-inclusion transaction data.
 - `TRANSACTION_SIMULATION` = `'TRANSACTION_SIMULATION'`: Simulating transaction outcome.
 - `GAS_QUOTE` = `'GAS_QUOTE'`: Getting the present price of gas on the chain.
 - `SWAP_QUOTE` = `'SWAP_QUOTE'`: Getting a quote for a swap or bridge operation.
@@ -1229,6 +1245,20 @@ type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
 
 ---
 
+### Type: `DataCollectionForUserFlowOrUnsupported`
+
+A {@link DataCollection} user-flow field when the wallet may not offer that flow.
+
+- `null` — not researched
+- `'FLOW_NOT_SUPPORTED'` — wallet does not offer this flow (not unknown)
+- {@link DataCollectionForFlow} — researched
+
+```typescript
+type DataCollectionForUserFlowOrUnsupported = DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+```
+
+---
+
 ### Interface: `DataCollection`
 
 A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
@@ -1236,11 +1266,11 @@ A collection of data that a wallet collects. See /docs/mitmproxy-guide for how t
 - `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
 - `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
 - `[UserFlow.ONBOARDING_IMPORT]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during account import?
-- `[UserFlow.SEND_ETHER]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending Ether?
-- `[UserFlow.SEND_USDC]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending USDC?
-- `[UserFlow.NATIVE_SWAP]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when swapping tokens using the wallet's native swap feature?
-- `[UserFlow.MAKE_TRANSACTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected during the transaction review/signing flow?
-- `[UserFlow.APP_CONNECTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when connecting to an app?
+- `[UserFlow.SEND_ETHER]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when sending Ether?
+- `[UserFlow.SEND_USDC]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when sending USDC?
+- `[UserFlow.NATIVE_SWAP]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when swapping tokens using the wallet's native swap feature?
+- `[UserFlow.MAKE_TRANSACTION]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected during the transaction review/signing flow?
+- `[UserFlow.APP_CONNECTION]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when connecting to an app?
 - `[UserFlow.UNCLASSIFIED]` (`DataCollectionForFlow`, optional): What other data is collected but not covered in the other flows, if any?
 
 ---
@@ -3671,6 +3701,79 @@ This enum uses camelCase-style values because it is used as object key in the wa
 type Monetization = WithRef<{
 	revenueBreakdownIsPublic: boolean
 	strategies: Record<MonetizationStrategy, boolean | null>
+}>
+```
+
+---
+
+## `src/schema/features/transparency/orderflow.ts`
+
+### Enum: `OrderflowDisclosureLevel`
+
+What level of orderflow / MEV auctioning information is shown by default and after a user action during transaction confirmation.
+
+- `NONE` = `'NONE'`: No mention of auction / orderflow / MEV.
+- `AGGREGATED` = `'AGGREGATED'`: Single line or toggle (e.g. "MEV protection", "Private tx") without full breakdown.
+- `COMPREHENSIVE` = `'COMPREHENSIVE'`: Clear block: auctioning disclosed, stats or kickback called out, Learn more to practices page.
+
+---
+
+### Interface: `OrderflowDisclosure`
+
+How much orderflow / MEV information is displayed by default and after a user action.
+
+`byDefault` and `afterSingleAction` must tell a consistent story: one user action may reveal the same or more detail, but never less. Enforced by `validateOrderflowDisclosure`.
+
+Valid pairs include `(NONE, NONE)`, `(NONE, AGGREGATED)`, `(AGGREGATED, AGGREGATED)`, `(AGGREGATED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
+
+Invalid examples:
+
+- `(AGGREGATED, NONE)` — e.g. "MEV protection: on" is visible by default, but nothing
+  orderflow-related appears after the user taps it.
+- `(COMPREHENSIVE, AGGREGATED)` — a full orderflow block is shown by default, but one
+  action collapses it to a single line.
+
+- `byDefault` (`OrderflowDisclosureLevel`): Level shown with default settings and no orderflow-related user action.
+- `afterSingleAction` (`OrderflowDisclosureLevel`): Level shown after at most one orderflow-related user action (e.g. tapping a row, toggle, or "Learn more"), with no settings changed.
+
+---
+
+### Enum: `OnchainVerificationDocumentation`
+
+Whether the wallet documents how users can verify onchain outcomes.
+
+- `NO_METHOD_DOCUMENTED` = `'NO_METHOD_DOCUMENTED'`
+- `METHOD_DOCUMENTED` = `'METHOD_DOCUMENTED'`
+- `METHOD_DOCUMENTED_AND_EFFECTIVE` = `'METHOD_DOCUMENTED_AND_EFFECTIVE'`
+
+---
+
+### Interface: `OrderflowPracticesPageContents`
+
+Contents researchers evaluate on the wallet's orderflow practices page.
+
+- `listsEntitiesAndWhatTheyDo` (`boolean`)
+- `explainsDefaultOrderflowAuctioning` (`boolean`)
+- `documentsHowToChangeDefaults` (`boolean`)
+- `onchainVerification` (`OnchainVerificationDocumentation`)
+- `pageLastUpdated` (`string`): Calendar date shown on the wallet's practices page (YYYY-MM-DD).
+
+---
+
+### Type: `OrderflowPractices`
+
+Orderflow transparency practices beyond data-collection entity rows.
+
+```typescript
+type OrderflowPractices = WithRef<{
+	disclosure: WithRef<OrderflowDisclosure>
+	userCanRemoveAuctioning: Support
+	practicesPage: Support<
+		MustRef<{
+			url: string
+			contents: WithRef<OrderflowPracticesPageContents>
+		}>
+	>
 }>
 ```
 

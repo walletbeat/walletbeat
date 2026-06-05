@@ -751,6 +751,7 @@ export const ambire: SoftwareWallet = {
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({
 					ref: 'https://github.com/AmbireTech/extension/releases',

@@ -316,6 +316,7 @@ export const safe: SoftwareWallet = {
 					fullySponsored: false,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

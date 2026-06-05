@@ -178,6 +178,7 @@ export const ngrave: HardwareWallet = {
 		transparency: {
 			maintenance: null,
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

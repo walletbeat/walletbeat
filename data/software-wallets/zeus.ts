@@ -383,6 +383,7 @@ export const zeus: SoftwareWallet = {
 					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
