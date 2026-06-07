@@ -389,6 +389,10 @@ export class SVGFont {
 				fontHeight: 1000,
 				normalize: true,
 			},
+			// Fixed timestamp to ensure deterministic output
+			svg2ttf: {
+				ts: 0,
+			},
 		})
 
 		const cssRules: string[] = []
