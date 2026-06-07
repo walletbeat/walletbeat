@@ -16,7 +16,7 @@
 		tooltipHoverTriggerPlacement = 'around',
 
 		children,
-		ExpandedContent: ExpandedContent,
+		ExpandedContent,
 
 		...restProps
 	}: HTMLAttributes<HTMLDetailsElement> & {
