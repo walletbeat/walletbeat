@@ -72,7 +72,7 @@
 	const matchesSearch = (item: NavigationItem, query: string): boolean => (
 		!query
 		|| !!fuzzyMatch(item.title, query)
-		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
+		|| (item.children?.some(child => matchesSearch(child, query)) ?? false)
 	)
 
 	const highlightText = (text: string, query: string) => {

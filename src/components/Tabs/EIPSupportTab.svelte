@@ -35,7 +35,7 @@
 	const isRunning = $derived(currentStepResult?.status === 'running')
 	const stepStatus = $derived<StepStatus>(currentStepResult?.status ?? 'pending')
 	const completedSteps = $derived(
-		Object.values(stepTestState.stepResults).filter((result) => result.status === 'passed').length
+		Object.values(stepTestState.stepResults).filter(result => result.status === 'passed').length
 	)
 	const totalSteps = testSteps.length
 
@@ -127,7 +127,7 @@
 		<div class="checks-section" data-column="gap-2">
 			<span class="section-label">Checks:</span>
 			{#each currentStep.eips as eip (eip.eipNumber)}
-				{@const eipResult = currentStepResult?.eipResults.find((result) => result.eipNumber === eip.eipNumber)}
+				{@const eipResult = currentStepResult?.eipResults.find(result => result.eipNumber === eip.eipNumber)}
 				<div class="eip-checks-group" data-column="gap-2">
 					<span class="eip-group-label">{eip.eipNumber}</span>
 					{#each eip.checks as check (check.id)}

@@ -722,7 +722,7 @@
 												<Select
 													bind:value={
 														() => selectedModels.get(wallet.metadata.id),
-														(value) => {
+														value => {
 															if (value)
 																selectedModels.set(wallet.metadata.id, value)
 															else
