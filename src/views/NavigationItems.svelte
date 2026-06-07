@@ -35,7 +35,7 @@
 		''
 	)
 
-	let effectiveSearchValue = $derived(
+	const effectiveSearchValue = $derived(
 		searchValue.trim().toLowerCase()
 	)
 

@@ -64,18 +64,18 @@
 
 
 	// Derived
-	let ladderDefinition = $derived(
+	const ladderDefinition = $derived(
 		ladderEvaluation?.ladder ?? null
 	)
 
-	let currentStageIndex = $derived(
+	const currentStageIndex = $derived(
 		(!stage || typeof stage === 'string' || !ladderDefinition) ?
 			null
 		:
 			ladderDefinition.stages.findIndex(s => s.id === stage.id)
 	)
 
-	let defaultOpenStageIndex = $derived(
+	const defaultOpenStageIndex = $derived(
 		!ladderDefinition ?
 			null
 		: currentStageIndex === null ?
@@ -84,12 +84,11 @@
 			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
 	)
 
-	let stageEvaluatableWallet = $derived(
-		(() => {
-			const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
-			return rest
-		})(),
-	)
+	const stageEvaluatableWallet = $derived.by(() => {
+		const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
+
+		return rest
+	})
 
 
 	// Functions
