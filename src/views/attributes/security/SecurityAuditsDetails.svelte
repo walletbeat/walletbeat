@@ -125,12 +125,12 @@
 			>
 				<summary>
 					<header data-row="wrap wrap-first-last">
-						<div 
+						<div
 							data-row-item="flexible basis-1"
 							data-row="start wrap gap-2"
 						>
 							<h4>
-								Audit by 
+								Audit by
 								<cite>
 									{#if isUrl(audit.auditor.url)}
 										<a
@@ -156,7 +156,7 @@
 											{@const unfixedCount = flaws.filter((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED').length}
 											{@const allFixed = unfixedCount === 0}
 
-											<data	
+											<data
 												data-badge="small"
 												data-row="gap-1"
 												value={severity}
