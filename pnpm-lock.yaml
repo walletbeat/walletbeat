@@ -139,8 +139,8 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0
       pnpm:
-        specifier: 10.28.0
-        version: 10.28.0
+        specifier: 11.3.0
+        version: 11.3.0
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
@@ -5410,9 +5410,9 @@ packages:
     resolution: {integrity: sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==}
     engines: {node: '>=10.13.0'}
 
-  pnpm@10.28.0:
-    resolution: {integrity: sha512-Bd9x0UIfITmeBT/eVnzqNNRG+gLHZXFEG/wceVbpjjYwiJgtlARl/TRIDU2QoGaLwSNi+KqIAApk6D0LDke+SA==}
-    engines: {node: '>=18.12'}
+  pnpm@11.3.0:
+    resolution: {integrity: sha512-LEA9ZZRScodnKx9wVjQ6H3w2NANqZ/+r/MKz11ldhDdo+HhxSNG1fPeVbJBga70ZKFfDY68Z6W0tDsnsV0HSFQ==}
+    engines: {node: '>=22.13'}
     hasBin: true
 
   pony-cause@2.1.11:
@@ -14036,7 +14036,7 @@ snapshots:
 
   pngjs@5.0.0: {}
 
-  pnpm@10.28.0: {}
+  pnpm@11.3.0: {}
 
   pony-cause@2.1.11: {}
 
