@@ -12,12 +12,12 @@
 		class="modal-backdrop"
 		role="button"
 		tabindex="0"
-		onclick={(event) => {
+		onclick={event => {
 			if (event.target === event.currentTarget) {
 				onClose();
 			}
 		}}
-		onkeydown={(event) => {
+		onkeydown={event => {
 			if (event.key === 'Enter' || event.key === ' ') {
 				event.preventDefault();
 				onClose();

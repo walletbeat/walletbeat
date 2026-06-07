@@ -15,8 +15,16 @@
 		class="modal-backdrop"
 		role="button"
 		tabindex="0"
-    onclick={(e) => e.target === e.currentTarget && onClose()}
-    onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onClose())}
+		onclick={event => {
+			if (event.target === event.currentTarget)
+				onClose()
+		}}
+		onkeydown={event => {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault()
+				onClose()
+			}
+		}}
 	>
 		<div class="modal" data-card="radius-8 padding-5">
 			<h3>{title}</h3>
