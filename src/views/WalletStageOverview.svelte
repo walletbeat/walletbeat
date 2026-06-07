@@ -113,7 +113,7 @@
 		}
 	>
 		<div data-column="gap-4">
-			{#each ladderDefinition.stages as s, index}
+			{#each ladderDefinition.stages as s, index (s.id)}
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
 				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
@@ -170,7 +170,7 @@
 					>
 						{#if s.criteriaGroups}
 							<div data-column>
-								{#each s.criteriaGroups as criteriaGroup}
+								{#each s.criteriaGroups as criteriaGroup (criteriaGroup.id)}
 									{@const {
 										passedCount: groupPassedCount,
 										totalCount: groupTotalCount,
@@ -214,7 +214,7 @@
 													data-card="padding-4"
 													data-list="gap-3"
 												>
-													{#each criteriaGroup.criteria as criterion}
+													{#each criteriaGroup.criteria as criterion (criterion.id)}
 														{@const criterionEvaluation = ladderDefinition ? criterion.evaluate(wallet) : null}
 														{@const criterionRating = criterionEvaluation?.rating}
 														{@const attributeId = getCriterionAttributeId(criterion)}
