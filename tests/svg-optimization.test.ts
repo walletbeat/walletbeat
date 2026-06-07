@@ -162,7 +162,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'5f40f64a49babed6573f5c16e39ec450eb83ef660efea7bcd30093fe19ac9a45',
 	'resources/branding/glow-1.svg':
 		'71e6c1520f6f9b40d189811b38f222a5381b1b01e9a281c1e55ef4941fafbed7',
-	'public/wbicons/wbicons.svg': '3face06111626daa5f9c29609a4812fb900b6ace49ff52b2fb861f045f6d5623',
+	'src/assets/fonts/wbicons/wbicons.svg':
+		'3face06111626daa5f9c29609a4812fb900b6ace49ff52b2fb861f045f6d5623',
 	'resources/files/wbicons/account_abstraction.svg':
 		'b6dcb0b8cc200d4e283d2d13466babf09d119dc6dac9364610d3e79018080b62',
 	'resources/files/wbicons/account_portability.svg':

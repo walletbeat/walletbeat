@@ -20,7 +20,7 @@
 		"generate:css-attributes": "pnpm run generate:css-attributes:vscode && pnpm run generate:css-attributes:typescript",
 		"generate:css-attributes:typescript": "tsx src/styles/generate/css-attributes-typescript.ts",
 		"generate:css-attributes:vscode": "tsx src/styles/generate/css-attributes-vscode.ts",
-		"generate:wbicons": "tsx src/tools/icon-font-generator/icon-font-generator.ts --font-name wbicons --font-type-name WBIcon --svg-icons-dir resources/files/wbicons --font-output-dir public/wbicons --css-output-dir src/styles",
+		"generate:wbicons": "tsx src/tools/icon-font-generator/icon-font-generator.ts --font-name wbicons --font-type-name WBIcon --svg-icons-dir resources/files/wbicons --font-output-dir src/assets/fonts/wbicons --css-output-dir src/styles",
 		"l1-lying-rpc-proxy": "tsx src/tools/l1-lying-rpc-proxy/index.ts",
 		"check:misc": "for script in deploy/misc-tests/*.sh; do echo \"> Running check: $(basename \"${script}\" | cut -d. -f1)...\" >&2; bash \"$script\" || exit \"$?\"; done; echo \"> All checks passed!\" >&2",
 		"check:vitest": "vitest --typecheck --cache",

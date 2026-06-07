@@ -1,8 +1,3 @@
-@import '@fontsource/space-grotesk/latin-400.css';
-@import '@fontsource/space-grotesk/latin-500.css';
-@import '@fontsource/space-grotesk/latin-600.css';
-@import '@fontsource/space-grotesk/latin-700.css';
-
 :root {
 	--transition-easeInExpo: cubic-bezier(0.7, 0, 0.84, 0);
 	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -111,30 +106,6 @@
 }
 
 @font-face {
-	font-family: 'SP Monorium';
-	src:
-		url('/fonts/sp-monorium-regular.woff2') format('woff2'),
-		url('/fonts/sp-monorium-regular.woff') format('woff'),
-		url('/fonts/sp-monorium-regular.ttf') format('truetype');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Avenir LT Std';
-	src: url('/fonts/avenir-lt-std-roman.otf') format('opentype');
-	font-weight: 400;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'Avenir LT Std';
-	src: url('/fonts/avenir-lt-std-heavy.otf') format('opentype');
-	font-weight: 700;
-	font-style: normal;
-}
-
-@font-face {
 	font-family: 'Noto Color Emoji';
 	src: local('Noto Color Emoji');
 	/* The unicode range for emoji characters: */
@@ -145,7 +116,7 @@
 	scroll-behavior: smooth;
 	overflow: hidden;
 
-	font-family: 'Space Grotesk', 'Noto Color Emoji';
+	font-family: var(--fontFamily-spaceGrotesk), 'Noto Color Emoji';
 	font-size: min(3.2vw, 16px);
 
 	color-scheme: light dark;

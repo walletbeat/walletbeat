@@ -198,7 +198,6 @@
 		"HWW",
 		"iamkio",
 		"identicons",
-		"iefix",
 		"ilyavna",
 		"imkey",
 		"imToken",
@@ -500,6 +499,7 @@
 	"flagWords": [],
 	"ignorePaths": [
 		"**/*.css",
+		"**/fonts/**/*.svg",
 		"data/software-wallets/manifests/**",
 		"data/collection/global.annotations.json",
 		"data/entities/domains/entity-domains.json",
