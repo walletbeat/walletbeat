@@ -9,6 +9,7 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
@@ -149,16 +150,17 @@ export const zerion: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: null,
 				erc8213: null,
-				transactionDetailsDisplay: null,
-				// transactionDetailsDisplay: {
-				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// },
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

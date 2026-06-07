@@ -18,7 +18,6 @@ import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
-	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -193,13 +192,13 @@ export const ledgerWallet: HardwareWallet = {
 						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
 					},
 				],
-				calldataDecoded: noCalldataDecoding,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

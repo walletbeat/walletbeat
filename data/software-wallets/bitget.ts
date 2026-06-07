@@ -207,6 +207,7 @@ export const bitget: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -222,6 +223,7 @@ export const bitget: SoftwareWallet = {
 					},
 				}),
 				transactionDetailsDisplay: null,
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

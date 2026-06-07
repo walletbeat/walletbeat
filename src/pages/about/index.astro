@@ -1,129 +1,21 @@
 ---
 // Types
-import { markdown } from '@/types/content'
-// Constants
-import { defaultNavigationItems } from '@/constants/navigation'
+import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
 
 // Layouts
-import Layout from '@/layouts/Layout.astro'
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
 
-// Components
-import Navigation from '@/views/Navigation.astro'
-import Typography from '@/components/Typography.svelte'
+// Data
+import about from './about.md?raw'
 
-const aboutContent = markdown(`
-	Walletbeat is a public good project that brings transparency to the Ethereum wallet ecosystem.
-
-	**As [L2Beat](https://l2beat.com) has done for Ethereum Layer 2s, Walletbeat aims to do the same for Ethereum wallets.**
-
-	---
-
-	Walletbeat aims to be fair, objective and impartial in its assessment methodology of Ethereum wallets.
-
-	Where there is inherent subjectivity, such as in the decision of *which* criteria are used to rate
-	and categorize wallets, Walletbeat aims to follow Ethereum's ethos and cypherpunk values as a
-	guiding principle. See [Vitalik's blog post on wallets](https://vitalik.eth.limo/general/2024/12/03/wallets.html)
-	and the [Walletbeat FAQ page](/faq/) for more details.
-
-	---
-
-	Walletbeat is committed to transparency. Contributors reveal their affiliation and / or shares in
-	wallet companies. It is an [open-source project](https://github.com/walletbeat/walletbeat) licensed
-	under the Free and Open-Source MIT license.
-
-	Discussions are held on the [Walletbeat Farcaster channel](https://warpcast.com/~/channel/walletbeat).
-
-	---
-
-	Walletbeat has received the following funding:
-
-	- **2025-03**: Received **577.02 USD** from **Ethereum Foundation** as part of
-	  [Pectra Proactive Grant Round](https://esp.ethereum.foundation/pectra-pgr):
-	  [Grant Proposal](https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round)
-	- **2025-07**: Received **106,100 USD** from **Ethereum Foundation** as part of
-	  [Ethereum Foundation Trillion Dollar Security project](https://blog.ethereum.org/2025/08/20/trillion-dollar-sec-2):
-	  [Grant Proposal](https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-07-ethereum-foundation-esp-grant-proposal)
-
-	If further funding becomes a necessity in the future, Walletbeat aims to raise funds through
-	retroactive funding, ecosystem grants, and individual donations. Walletbeat will then update
-	the above list to document the date, source, and amount of such funding.
-
-	---
-
-	Walletbeat refuses and will continue to refuse funding from wallet-related entities.
-
-	Walletbeat however was originally created and is currently hosted by [Fluidkey](https://fluidkey.com/),
-	an incorporated company in Switzerland with a wallet offering. In order to maximize credible
-	neutrality, Walletbeat's long-term ownership goal is to become an independent DAO or foundation
-	(similar to L2Beat) once Walletbeat reaches a higher level of maturity and a broader set of regular
-	contributors. Until this is achieved, Walletbeat will not list nor rate wallet software from Fluidkey.
-
-	---
-
-	Wallets listed on Walletbeat do not represent endorsements and are for informational purposes only.
-
-	If you find that something is wrong, please help Walletbeat by
-	[contributing](https://github.com/walletbeat/walletbeat)!
-`)
+const aboutContent = parseMarkdownWithFrontmatter<{ title: string; description: string }>(about, {
+	title: true,
+	description: true,
+} as const)
 ---
 
-<Layout
-	metadata={{
-		title: 'About Walletbeat',
-		keywordsAfter: ['about'],
-	}}
->
-	<Navigation navigationItems={defaultNavigationItems} />
-
-	<main data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
-			<hgroup data-column='gap-4'>
-				<h1>About Walletbeat</h1>
-			</hgroup>
-		</header>
-
-		<div data-scroll-item='inline-detached padding-match-end'>
-			<Typography client:visible content={aboutContent} />
-		</div>
-	</main>
-</Layout>
-
-<style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup p {
-			font-size: 1.25rem;
-			font-style: italic;
-			color: var(--text-secondary);
-			opacity: 0.75;
-		}
-
-		p {
-			font-family: 'Avenir LT Std';
-		}
-
-		div {
-			line-height: 1.8;
-		}
-
-		div :global(ul) {
-			padding-inline-start: 1.5em;
-		}
-
-		div :global(hr) {
-			border: none;
-			border-top: 1px solid var(--border);
-			margin-block: 1rem;
-		}
-		h1 {
-			font-family: 'SP Monorium', monospace;
-		}
-	}
-</style>
+<MarkdownPage
+	metadata={{}}
+	repoRootRelativePath='/src/pages/about/about.md'
+	markdown={aboutContent}
+/>

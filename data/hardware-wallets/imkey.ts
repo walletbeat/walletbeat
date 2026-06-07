@@ -5,11 +5,8 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
-	BasicBenchmarkTransactions,
-	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	DataExtraction,
-	DataLocation,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
@@ -163,18 +160,6 @@ export const imkeyWallet: HardwareWallet = {
 						],
 					},
 				],
-				calldataDecoded: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataLocation.ON_DEVICE,
-					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataLocation.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
-					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						DataLocation.NOT_PROVIDED,
-				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -184,6 +169,7 @@ export const imkeyWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

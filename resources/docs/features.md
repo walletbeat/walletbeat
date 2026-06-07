@@ -3028,15 +3028,38 @@ These transactions interact with smart contracts in non-trivial ways, so there i
     param9: 0x000000000000000000000000f8cade19b26a2b970f2def5ea9eccf1bda3d1186000000000000000000000000000000000000000000000000000000000000000001
   ```
 
----
+- `AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND` = `'AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND'`: https://tools.cyfrin.io/abi-encoding?data=0x8d80ff0a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000017200a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f42400087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000f42400000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
-### Type: `HardwareBenchmarkTransactions`
-
-HardwareBenchmarkTransactions is the union of basic and complex benchmark transactions. Used for hardware wallet calldata decoding evaluation.
-
-```typescript
-type HardwareBenchmarkTransactions = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
-```
+  ```
+  			Function: multiSend(bytes)
+  		Parameters:
+  			param0:
+  				Multi-Send (2 transactions):
+  					[0] Transaction:
+  						Operation: 0 (Call)
+  						To: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+  						Value: 0
+  						Data Length: 68
+  						Decoded Call:
+  							Function: approve(address,uint256)
+  							Selector: 0x095ea7b3
+  							Parameters:
+  								param0: 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2
+  								param1: 1000000
+  					[1] Transaction:
+  						Operation: 0 (Call)
+  						To: 0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2
+  						Value: 0
+  						Data Length: 132
+  						Decoded Call:
+  							Function: supply(address,uint256,address,uint16)
+  							Selector: 0x617ba037
+  							Parameters:
+  								param0: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+  								param1: 1000000
+  								param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
+  								param3: 0
+  ```
 
 ---
 
@@ -3049,62 +3072,84 @@ Benchmark transactions for simulation-specific scenarios. These test the wallet'
 
 ---
 
-### Interface: `DisplayedFailedTransactionDetails`
+### Interface: `Erc7730TransactionDetails`
 
-Details for a failed simulation benchmark transaction.
+ERC-7730 transaction decoding details for a single complex benchmark transaction. ERC-7730 defines a standard for structured calldata descriptors that wallets use to display human-readable descriptions of smart contract calls.
 
-- `failure` (`'DETECTED' | 'NOT_DETECTED'`): If the wallet detects that a transaction will fail and shows this to the user, it's 'DETECTED'; otherwise, 'NOT_DETECTED'.
-
----
-
-### Interface: `DisplayedNondeterministicTransactionDetails`
-
-Details for a nondeterministic simulation benchmark transaction.
-
-- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | 'RESIMULATES_WITH_WARNING'`): How the wallet handles state-dependent (non-deterministic) transactions.
-  - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
-  - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
-  - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
+- `decoded` (`DataDisplayOptions`): Whether the calldata is decoded into a human-readable description using ERC-7730 structured calldata descriptors.
 
 ---
 
-### Interface: `DisplayedTokenTransferDetails`
+### Type: `SoftwareWalletErc7730`
 
-Display details for token transfer transactions (ERC-20, ERC-721). These include a transaction outcome since the transfer involves contract interaction.
+ERC-7730 support for software wallets. Tracks whether the wallet can show human-readable descriptions for each complex benchmark transaction.
+
+```typescript
+type SoftwareWalletErc7730 = Record<ComplexBenchmarkTransactions, Erc7730TransactionDetails | null>
+```
+
+---
+
+### Interface: `TransactionOutcomeEntry`
+
+Simulation entry for a transaction that tracks the outcome explanation.
 
 - `transactionOutcome` (`TransactionOutcome`)
 
 ---
 
-### Type: `SoftwareTransactionDetailsDisplay`
+### Interface: `SimulatedFailedTransaction`
 
-Per-benchmark-transaction display details for software wallets. Each benchmark transaction records what the wallet shows when that transaction is being signed.
+Simulation entry for a transaction that may fail.
+
+- `failure` (`'DETECTED' | 'NOT_DETECTED'`)
+
+---
+
+### Interface: `SimulatedNondeterministicTransaction`
+
+Simulation entry for a transaction with nondeterministic outcome.
+
+- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | 'RESIMULATES_WITH_WARNING'`)
+
+---
+
+### Type: `TransactionSimulationsBenchmark`
+
+All benchmark transactions for which simulation can track a transaction outcome.
 
 ```typescript
-type SoftwareTransactionDetailsDisplay =
-	| ({
-			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
-			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
-	  } & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
-				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
-			} & {
-				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
-			})
-	| null
+type TransactionSimulationsBenchmark = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 ```
 
 ---
 
-### Type: `CalldataDecodingTypes`
+### Type: `SoftwareTransactionSimulations`
 
-Types of transactions that a wallet can decode the calldata of.
+Per-benchmark-transaction simulation data for software wallets. All basic and complex benchmark transactions track transactionOutcome; simulation-specific benchmarks track failure detection and nondeterminism handling.
 
 ```typescript
-type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataLocation | null>
+type SoftwareTransactionSimulations = Record<
+	TransactionSimulationsBenchmark,
+	TransactionOutcomeEntry | null
+> & {
+	[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: SimulatedFailedTransaction | null
+	[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: SimulatedNondeterministicTransaction | null
+}
 ```
+
+---
+
+### Interface: `SoftwareTransactionDetailsDisplay`
+
+Global transaction details display for software wallets. These basic fields are expected to be shown across all transaction types.
+
+- `gas` (`DataDisplayOptions`)
+- `nonce` (`DataDisplayOptions`)
+- `from` (`DataDisplayOptions`)
+- `to` (`DataDisplayOptions`)
+- `chain` (`DataDisplayOptions`)
+- `value` (`DataDisplayOptions`)
 
 ---
 
@@ -3165,6 +3210,14 @@ type DataExtractionMethods = Record<DataExtraction, boolean | null>
 
 ---
 
+### Type: `HardwareWalletErc7730`
+
+```typescript
+type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation | null>
+```
+
+---
+
 ### Interface: `HardwareWalletErc8213`
 
 - `calldataDisplay` (`Record<CallDataDisplay, DisplayCapability> | null`)
@@ -3183,7 +3236,7 @@ type DataExtractionMethods = Record<DataExtraction, boolean | null>
 A record of transaction legibility support (both message and transaction)
 
 - `erc8213` (`Support<HardwareWalletErc8213> | null`)
-- `calldataDecoded` (`CalldataDecodingTypes | null`): Does the wallet decode basic and complex transaction calldata to show function names and parameters?
+- `erc7730` (`Support<HardwareWalletErc7730> | null`)
 - `detailsDisplayed` (`DisplayedBasicTransactionDetails | null`): Does a wallet display transaction details clearly?
 - `dataExtraction` (`DataExtractionMethods | null`): Does a wallet allow for data extraction?
 
@@ -3216,7 +3269,9 @@ ERC-8213 (Transaction Legibility) support for software wallets. Tracks which cal
 A record of transaction legibility support (both message and transaction)
 
 - `erc8213` (`Support<SoftwareWalletErc8213> | null`)
-- `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Does the software wallet support displaying the transaction details? Evaluated per benchmark transaction type.
+- `erc7730` (`Support<SoftwareWalletErc7730> | null`): ERC-7730 calldata decoding support per complex benchmark transaction.
+- `transactionSimulations` (`Support<SoftwareTransactionSimulations> | null`): Per-benchmark simulation data: transaction outcomes for token and complex transactions, plus failure/nondeterminism detection for simulation-specific benchmarks.
+- `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Global basic transaction details display (gas, nonce, from, to, chain, value). Applied across all transaction types.
 
 ---
 

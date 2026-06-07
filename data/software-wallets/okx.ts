@@ -197,6 +197,7 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -211,15 +212,15 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 				}),
-				// transactionDetailsDisplay: {
-				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	nonce: DataDisplayOptions.NOT_DECODED,
-				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// },
-				transactionDetailsDisplay: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

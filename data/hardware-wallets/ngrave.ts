@@ -15,7 +15,6 @@ import {
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataDisplayOptions,
-	noCalldataDecoding,
 	noDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
@@ -158,7 +157,6 @@ export const ngrave: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
 					},
 				],
-				calldataDecoded: noCalldataDecoding,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: {
 					chain: DataDisplayOptions.NOT_IN_UI,
@@ -168,6 +166,7 @@ export const ngrave: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				erc7730: notSupported,
 				erc8213: null,
 			},
 			userSafety: null,

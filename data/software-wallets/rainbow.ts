@@ -23,7 +23,6 @@ import {
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -42,15 +41,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-
-const rainbowTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: DataDisplayOptions.NOT_IN_UI,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 export const rainbow: SoftwareWallet = {
 	metadata: {
@@ -284,6 +274,22 @@ export const rainbow: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+				}),
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -299,50 +305,46 @@ export const rainbow: SoftwareWallet = {
 					},
 				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: rainbowTransactionDisplayDefault,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: rainbowTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...rainbowTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...rainbowTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...rainbowTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...rainbowTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...rainbowTransactionDisplayDefault,
-						failure: 'DETECTED',
+						failure: 'DETECTED' as const,
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...rainbowTransactionDisplayDefault,
-						nondeterminism: 'STATIC_SINGLE_OUTCOME',
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
 					},
-				},
+				}),
 			},
 		},
 		selfSovereignty: {

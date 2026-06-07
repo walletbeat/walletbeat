@@ -67,7 +67,6 @@ import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	displaysFullCallData,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
@@ -92,21 +91,6 @@ import type { ArtifactSigningDetails } from '@/schema/features/transparency/rele
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-
-/**
- * Default transaction display showing all 6 basic fields.
- *
- * PASS for transaction-legibility requires ALL 6 fields shown (including nonce).
- * Setting nonce to NOT_IN_UI causes a FAIL.
- */
-const passTransactionDisplay: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 /**
  * Fictitious data leak references for the completed template.
@@ -631,6 +615,24 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+				}),
 				erc8213: supported({
 					calldataDisplay: displaysFullCallData,
 					messageSigningLegibility: {
@@ -641,50 +643,52 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: passTransactionDisplay,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...passTransactionDisplay,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...passTransactionDisplay,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...passTransactionDisplay,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: passTransactionDisplay,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...passTransactionDisplay,
-						calldataDecoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...passTransactionDisplay,
-						calldataDecoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...passTransactionDisplay,
-						calldataDecoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...passTransactionDisplay,
-							calldataDecoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							transactionOutcome: TransactionOutcome.EXPLAINED,
 						},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...passTransactionDisplay,
-						failure: 'DETECTED',
+						failure: 'DETECTED' as const,
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...passTransactionDisplay,
-						nondeterminism: 'RESIMULATES_WITH_WARNING',
+						nondeterminism: 'RESIMULATES_WITH_WARNING' as const,
 					},
-				},
+				}),
 			},
 		},
 		selfSovereignty: {

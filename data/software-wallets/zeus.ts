@@ -278,6 +278,7 @@ export const zeus: SoftwareWallet = {
 						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
 					},
 				],
+				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: null,
 					messageSigningLegibility: {
@@ -287,15 +288,15 @@ export const zeus: SoftwareWallet = {
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 				}),
-				// transactionDetailsDisplay: {
-				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	gas: DataDisplayOptions.NOT_DECODED,
-				// 	nonce: DataDisplayOptions.NOT_DECODED,
-				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// },
-				transactionDetailsDisplay: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: null,
 			}),
 		},
 		selfSovereignty: {
