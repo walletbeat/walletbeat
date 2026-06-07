@@ -39,11 +39,11 @@
 	}
 
 	function getStepName(stepId: string): string {
-		return testSteps.find((s) => s.id === stepId)?.name ?? stepId
+		return testSteps.find((step) => step.id === stepId)?.name ?? stepId
 	}
 
 	function getStepNumber(stepId: string): number {
-		return testSteps.find((s) => s.id === stepId)?.stepNumber ?? 0
+		return testSteps.find((step) => step.id === stepId)?.stepNumber ?? 0
 	}
 </script>
 

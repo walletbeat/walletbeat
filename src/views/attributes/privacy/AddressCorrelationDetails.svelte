@@ -101,8 +101,8 @@
 					key: linkable.info,
 					value: userInfoName(linkable.info).long
 				}))
-				.filter((info, index, arr) =>
-					arr.slice(index + 1).every(otherInfo => otherInfo.key !== info.key)
+				.filter((info, index, allInfo) =>
+					allInfo.slice(index + 1).every(otherInfo => otherInfo.key !== info.key)
 				),
 			refs: mergeRefs(...linkables.flatMap(linkable => linkable.refs)),
 			entity: nonEmptyGet(linkables).by

@@ -51,7 +51,7 @@
 		(!stage || typeof stage === 'string' || !ladderDefinition) ?
 			null
 		:
-			ladderDefinition.stages.findIndex(s => s.id === stage.id)
+			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 	)
 
 	const currentStage = $derived(

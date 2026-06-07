@@ -34,17 +34,17 @@
 
 	const addr = $derived(assertTransactionId(account?.address ?? ZERO_ADDRESS))
 
-	function padAddr(a: string): string {
-		return a.toLowerCase().replace('0x', '').padStart(64, '0')
+	function padAddr(address: string): string {
+		return address.toLowerCase().replace('0x', '').padStart(64, '0')
 	}
-	function padUint(v: bigint): string {
-		return v.toString(16).padStart(64, '0')
+	function padUint(value: bigint): string {
+		return value.toString(16).padStart(64, '0')
 	}
-	function safeUint(s: string, fallback = 0n): bigint {
-		try { return BigInt(s) } catch { return fallback }
+	function safeUint(stringValue: string, fallback = 0n): bigint {
+		try { return BigInt(stringValue) } catch { return fallback }
 	}
-	function isValidAddress(a: string): a is `0x${string}` {
-		return /^0x[0-9a-fA-F]{40}$/.test(a)
+	function isValidAddress(address: string): address is `0x${string}` {
+		return /^0x[0-9a-fA-F]{40}$/.test(address)
 	}
 
 	// Editable params for transfer

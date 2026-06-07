@@ -81,8 +81,8 @@
 		return (
 			ranges ?
 				[
-					...ranges.flatMap(([start, end], i, arr) => [
-						text.slice(arr[i - 1]?.[1] ?? 0, start),
+					...ranges.flatMap(([start, end], i, allRanges) => [
+						text.slice(allRanges[i - 1]?.[1] ?? 0, start),
 						`<mark>${text.slice(start, end)}</mark>`,
 					]),
 					text.slice(ranges.at(-1)?.[1] ?? 0),

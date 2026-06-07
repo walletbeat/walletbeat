@@ -87,10 +87,10 @@
 				<div class="detail-section">
 					<span class="detail-label">🔗 Calls ({selectedTx.calls.length}):</span>
 					<div class="parameters-list" data-column="gap-3">
-						{#each selectedTx.calls as call, idx (idx)}
+						{#each selectedTx.calls as call, i (i)}
 							<div class="parameter-item">
 								<div class="parameter-header">
-									<span class="parameter-name">Call {idx + 1}</span>
+									<span class="parameter-name">Call {i + 1}</span>
 								</div>
 								<div data-column="gap-2">
 									<div>
