@@ -222,8 +222,9 @@
 
 
 <svelte:head>
-	{@html `<script type="application/ld+json">${
-		JSON.stringify({
+	{@html (
+		'<script type="application/ld+json">'
+		+ JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'FAQPage',
 			mainEntity: (
@@ -304,7 +305,8 @@
 				),
 			},
 		})
-	}</script>`}
+		+ '<\/script>'
+	)}
 </svelte:head>
 
 
