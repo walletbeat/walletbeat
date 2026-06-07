@@ -1,15 +1,4 @@
 <script lang="ts">
-	interface WalletTesterNavigationItemProps {
-		title: string;
-		description?: string;
-		isSelected: boolean;
-		isCompleted: boolean;
-		isPartial?: boolean;
-		isFailed?: boolean;
-		isDisabled?: boolean;
-		onclick: () => void;
-	}
-
 	let {
 		title,
 		description,
@@ -19,8 +8,18 @@
 		isFailed = false,
 		isDisabled = false,
 		onclick,
-	}: WalletTesterNavigationItemProps = $props();
+	}: {
+		title: string
+		description?: string
+		isSelected: boolean
+		isCompleted: boolean
+		isPartial?: boolean
+		isFailed?: boolean
+		isDisabled?: boolean
+		onclick: () => void
+	} = $props()
 </script>
+
 
 <button
 	type="button"
@@ -47,6 +46,7 @@
 		<p class="sidebar-item-desc">{description}</p>
 	{/if}
 </button>
+
 
 <style>
 	.sidebar-item {

@@ -1,45 +1,49 @@
 <script lang="ts">
-	import Modal from '../Modal.svelte';
-	import type { StepResult } from '../../constants/test-eip-support';
-	import { testSteps } from '../../constants/test-eip-support';
+	import Modal from '../Modal.svelte'
+	import type { StepResult } from '../../constants/test-eip-support'
+	import { testSteps } from '../../constants/test-eip-support'
 	import { SvelteSet } from 'svelte/reactivity'
 
-	interface Props {
-		isOpen: boolean;
-		overallPassed: boolean;
-		hasPartialResults: boolean;
-		stepResults: StepResult[];
-		onClose: () => void;
-	}
-
-	let { isOpen, overallPassed, hasPartialResults, stepResults, onClose }: Props = $props();
+	let {
+		isOpen,
+		overallPassed,
+		hasPartialResults,
+		stepResults,
+		onClose,
+	}: {
+		isOpen: boolean
+		overallPassed: boolean
+		hasPartialResults: boolean
+		stepResults: StepResult[]
+		onClose: () => void
+	} = $props()
 
 	// Determine the overall result type for display
 	const overallResult = $derived(
 		overallPassed && !hasPartialResults ? 'passed' :
 		overallPassed && hasPartialResults ? 'partial' :
 		'failed'
-	);
+	)
 
 	// Track which steps are expanded
-	let expandedSteps = $state<Set<string>>(new Set());
+	let expandedSteps = $state<Set<string>>(new Set())
 
 	function toggleStep(stepId: string) {
 		if (expandedSteps.has(stepId)) {
-			expandedSteps.delete(stepId);
+			expandedSteps.delete(stepId)
 		} else {
-			expandedSteps.add(stepId);
+			expandedSteps.add(stepId)
 		}
 
-		expandedSteps = new SvelteSet(expandedSteps);
+		expandedSteps = new SvelteSet(expandedSteps)
 	}
 
 	function getStepName(stepId: string): string {
-		return testSteps.find((s) => s.id === stepId)?.name ?? stepId;
+		return testSteps.find((s) => s.id === stepId)?.name ?? stepId
 	}
 
 	function getStepNumber(stepId: string): number {
-		return testSteps.find((s) => s.id === stepId)?.stepNumber ?? 0;
+		return testSteps.find((s) => s.id === stepId)?.stepNumber ?? 0
 	}
 </script>
 

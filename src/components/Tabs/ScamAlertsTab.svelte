@@ -1,21 +1,5 @@
 <script lang="ts">
-	import type { ScamAlertTest } from '../../constants/test-scam-alerts';
-
-	interface Props {
-		selectedTest: ScamAlertTest | undefined;
-		scamAlertState: {
-			activeId: string | null;
-			isPending: boolean;
-			hashes: Record<string, `0x${string}`>;
-			signatures: Record<string, string>;
-		};
-		disclaimerAccepted: boolean;
-		account: { address?: string } | null;
-		onAcceptDisclaimer: () => void;
-		onSendScamAlert: (test: ScamAlertTest) => void;
-		onSignScamAlert: (test: ScamAlertTest) => void;
-		onOpenInExplorer: (txHash: string) => void;
-	}
+	import type { ScamAlertTest } from '../../constants/test-scam-alerts'
 
 	let {
 		selectedTest,
@@ -26,43 +10,57 @@
 		onSendScamAlert,
 		onSignScamAlert,
 		onOpenInExplorer,
-	}: Props = $props();
+	}: {
+		selectedTest: ScamAlertTest | undefined
+		scamAlertState: {
+			activeId: string | null
+			isPending: boolean
+			hashes: Record<string, `0x${string}`>
+			signatures: Record<string, string>
+		}
+		disclaimerAccepted: boolean
+		account: { address?: string } | null
+		onAcceptDisclaimer: () => void
+		onSendScamAlert: (test: ScamAlertTest) => void
+		onSignScamAlert: (test: ScamAlertTest) => void
+		onOpenInExplorer: (txHash: string) => void
+	} = $props()
 
-	let checkboxChecked = $state(false);
-	let customAddress = $state('');
-	let customAddressError = $state('');
+	let checkboxChecked = $state(false)
+	let customAddress = $state('')
+	let customAddressError = $state('')
 
 	const isActive = $derived(
 		selectedTest && scamAlertState.activeId === selectedTest.id
-	);
-	const isPending = $derived(scamAlertState.isPending && isActive);
-	const txHash = $derived(selectedTest ? scamAlertState.hashes[selectedTest.id] : undefined);
-	const sigResult = $derived(selectedTest ? scamAlertState.signatures[selectedTest.id] : undefined);
+	)
+	const isPending = $derived(scamAlertState.isPending && isActive)
+	const txHash = $derived(selectedTest ? scamAlertState.hashes[selectedTest.id] : undefined)
+	const sigResult = $derived(selectedTest ? scamAlertState.signatures[selectedTest.id] : undefined)
 
-	const isWalletOwn = $derived(selectedTest?.customAddress === true);
-	const isSignature = $derived(selectedTest?.testType === 'signature');
+	const isWalletOwn = $derived(selectedTest?.customAddress === true)
+	const isSignature = $derived(selectedTest?.testType === 'signature')
 
 	function isValidAddress(addr: string): addr is `0x${string}` {
-		return /^0x[0-9a-fA-F]{40}$/.test(addr);
+		return /^0x[0-9a-fA-F]{40}$/.test(addr)
 	}
 
 	function handleAction() {
-		if (!selectedTest || !account?.address) return;
+		if (!selectedTest || !account?.address) return
 
-		customAddressError = '';
+		customAddressError = ''
 
 		if (isSignature) {
-			onSignScamAlert(selectedTest);
+			onSignScamAlert(selectedTest)
 		} else if (isWalletOwn) {
 			if (!isValidAddress(customAddress)) {
-				customAddressError = 'Enter a valid Ethereum address (0x…)';
+				customAddressError = 'Enter a valid Ethereum address (0x…)'
 
-				return;
+				return
 			}
 
-			onSendScamAlert({ ...selectedTest, contractAddress: customAddress });
+			onSendScamAlert({ ...selectedTest, contractAddress: customAddress })
 		} else {
-			onSendScamAlert(selectedTest);
+			onSendScamAlert(selectedTest)
 		}
 	}
 
@@ -70,17 +68,17 @@
 	// transform: perspective() on [data-scroll-item], which otherwise traps
 	// position: fixed children within the section instead of the viewport.
 	function portal(node: HTMLElement) {
-		document.body.appendChild(node);
+		document.body.appendChild(node)
 
-		return { destroy() { node.remove(); } };
+		return { destroy() { node.remove() } }
 	}
 
 	function getRiskLabel(riskType: ScamAlertTest['riskType']): string {
 		switch (riskType) {
-			case 'recent-deploy': return 'Recently Deployed';
-			case 'previous-interaction': return 'Previous Interaction';
-			case 'known-scam': return 'Known Scam';
-			case 'allow-infinite': return 'Infinite Approval';
+			case 'recent-deploy': return 'Recently Deployed'
+			case 'previous-interaction': return 'Previous Interaction'
+			case 'known-scam': return 'Known Scam'
+			case 'allow-infinite': return 'Infinite Approval'
 		}
 	}
 </script>

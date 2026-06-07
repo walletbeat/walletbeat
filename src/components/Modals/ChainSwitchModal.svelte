@@ -1,16 +1,21 @@
 <script lang="ts">
-	import Modal from '../Modal.svelte';
+	import Modal from '../Modal.svelte'
 
-	interface Props {
-		isOpen: boolean;
-		isSwitching: boolean;
-		currentChainId: number | undefined;
-		onClose: () => void;
-		onSwitch: () => void;
-	}
-
-	let { isOpen, isSwitching, currentChainId, onClose, onSwitch }: Props = $props();
+	let {
+		isOpen,
+		isSwitching,
+		currentChainId,
+		onClose,
+		onSwitch,
+	}: {
+		isOpen: boolean
+		isSwitching: boolean
+		currentChainId: number | undefined
+		onClose: () => void
+		onSwitch: () => void
+	} = $props()
 </script>
+
 
 <Modal {isOpen} title="Switch to Ethereum Mainnet" {onClose}>
 	<div class="body-text" data-column="gap-2">
@@ -29,6 +34,7 @@
 		</button>
 	{/snippet}
 </Modal>
+
 
 <style>
 	.body-text {

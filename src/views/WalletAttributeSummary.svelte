@@ -5,6 +5,7 @@
 	}
 </script>
 
+
 <script lang="ts" generics="
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata

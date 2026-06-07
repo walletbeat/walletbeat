@@ -1,17 +1,22 @@
 <script lang="ts">
-	import type { Connector } from '@wagmi/core';
-	import Modal from '../Modal.svelte';
+	import type { Connector } from '@wagmi/core'
+	import Modal from '../Modal.svelte'
 
-	interface Props {
-		isOpen: boolean;
-		connectors: readonly Connector[];
-		isConnecting: boolean;
-		onClose: () => void;
-		onConnect: (connector: Connector) => void;
-	}
-
-	let { isOpen, connectors, isConnecting, onClose, onConnect }: Props = $props();
+	let {
+		isOpen,
+		connectors,
+		isConnecting,
+		onClose,
+		onConnect,
+	}: {
+		isOpen: boolean
+		connectors: readonly Connector[]
+		isConnecting: boolean
+		onClose: () => void
+		onConnect: (connector: Connector) => void
+	} = $props()
 </script>
+
 
 <Modal {isOpen} title="Select a wallet" {onClose}>
 	{#if connectors.length}
@@ -37,6 +42,7 @@
 		</button>
 	{/snippet}
 </Modal>
+
 
 <style>
 	.connector-list {

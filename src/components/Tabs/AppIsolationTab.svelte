@@ -1,75 +1,77 @@
 <script lang="ts">
-	import type { Eip1193Provider } from '../../types/eip';
+	import type { Eip1193Provider } from '../../types/eip'
 
-	export type AppIsolationSubTab = 'eth-accounts' | 'wallet-connect';
+	export type AppIsolationSubTab = 'eth-accounts' | 'wallet-connect'
 
-	interface Props {
-		activeSubTab: AppIsolationSubTab;
-		provider: Eip1193Provider | null;
-	}
-
-	let { activeSubTab, provider }: Props = $props();
+	let {
+		activeSubTab,
+		provider,
+	}: {
+		activeSubTab: AppIsolationSubTab
+		provider: Eip1193Provider | null
+	} = $props()
 
 	const ethAccountsState = $state({
 		isPending: false,
 		result: null as string[] | null,
 		error: '',
-	});
+	})
 
 	const walletConnectState = $state({
 		isPending: false,
-		result: null as unknown,
+		result: null,
 		error: '',
-	});
+	})
 
 	async function callEthAccounts() {
 		if (!provider) {
-			ethAccountsState.error = 'No provider available. Connect a wallet first.';
+			ethAccountsState.error = 'No provider available. Connect a wallet first.'
 
-			return;
+			return
 		}
 
-		ethAccountsState.isPending = true;
-		ethAccountsState.error = '';
-		ethAccountsState.result = null;
+		ethAccountsState.isPending = true
+		ethAccountsState.error = ''
+		ethAccountsState.result = null
 
 		try {
-			const accounts = await provider.request({ method: 'eth_accounts' });
+			const accounts = await provider.request({ method: 'eth_accounts' })
 
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eth_accounts returns string[]
-			ethAccountsState.result = accounts as string[];
+			ethAccountsState.result = accounts as string[]
 		} catch (err) {
-			ethAccountsState.error = err instanceof Error ? err.message : 'Request failed';
+			ethAccountsState.error = err instanceof Error ? err.message : 'Request failed'
 		} finally {
-			ethAccountsState.isPending = false;
+			ethAccountsState.isPending = false
 		}
 	}
 
 	async function callWalletConnect() {
 		if (!provider) {
-			walletConnectState.error = 'No provider available. Connect a wallet first.';
+			walletConnectState.error = 'No provider available. Connect a wallet first.'
 
-			return;
+			return
 		}
 
-		walletConnectState.isPending = true;
-		walletConnectState.error = '';
-		walletConnectState.result = null;
+		walletConnectState.isPending = true
+		walletConnectState.error = ''
+		walletConnectState.result = null
 
 		try {
 			const result = await provider.request({
 				method: 'wallet_connect',
 				params: [{ version: '1' }],
-			});
+			})
 
-			walletConnectState.result = result;
+			walletConnectState.result = result
 		} catch (err) {
-			walletConnectState.error = err instanceof Error ? err.message : 'Request failed';
+			walletConnectState.error = err instanceof Error ? err.message : 'Request failed'
 		} finally {
-			walletConnectState.isPending = false;
+			walletConnectState.isPending = false
 		}
 	}
 </script>
+
 
 <div class="app-isolation-tab" data-column="gap-4">
 	{#if activeSubTab === 'eth-accounts'}
@@ -171,6 +173,7 @@
 		</div>
 	{/if}
 </div>
+
 
 <style>
 	.app-isolation-tab {

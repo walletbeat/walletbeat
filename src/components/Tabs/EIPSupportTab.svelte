@@ -4,61 +4,66 @@
 		StepResult,
 		StepStatus,
 		DiscoveredProvider,
-	} from '../../constants/test-eip-support';
-	import { testSteps } from '../../constants/test-eip-support';
+	} from '../../constants/test-eip-support'
+	import { testSteps } from '../../constants/test-eip-support'
 
-	interface Props {
-		currentStep: TestStep;
-		currentStepResult: StepResult | undefined;
+	let {
+		currentStep,
+		currentStepResult,
+		stepTestState,
+		onRunStep,
+		onReset,
+		onSelectProvider,
+	}: {
+		currentStep: TestStep
+		currentStepResult: StepResult | undefined
 		stepTestState: {
-			currentStepIndex: number;
-			overallStatus: 'idle' | 'in_progress' | 'completed' | 'failed';
-			stepResults: Record<string, StepResult>;
-			discoveredProviders: Array<DiscoveredProvider & { provider: unknown }>;
-			selectedProviderId: string | null;
-			connectedAddress: string | null;
-			chainId: number | null;
-			batchId: string | null;
-		};
-		onRunStep: () => void;
-		onReset: () => void;
-		onSelectProvider: (providerId: string) => void;
-	}
+			currentStepIndex: number
+			overallStatus: 'idle' | 'in_progress' | 'completed' | 'failed'
+			stepResults: Record<string, StepResult>
+			discoveredProviders: Array<DiscoveredProvider & { provider: unknown }>
+			selectedProviderId: string | null
+			connectedAddress: string | null
+			chainId: number | null
+			batchId: string | null
+		}
+		onRunStep: () => void
+		onReset: () => void
+		onSelectProvider: (providerId: string) => void
+	} = $props()
 
-	let { currentStep, currentStepResult, stepTestState, onRunStep, onReset, onSelectProvider }: Props =
-		$props();
-
-	const isRunning = $derived(currentStepResult?.status === 'running');
-	const stepStatus = $derived<StepStatus>(currentStepResult?.status ?? 'pending');
+	const isRunning = $derived(currentStepResult?.status === 'running')
+	const stepStatus = $derived<StepStatus>(currentStepResult?.status ?? 'pending')
 	const completedSteps = $derived(
 		Object.values(stepTestState.stepResults).filter((r) => r.status === 'passed').length
-	);
-	const totalSteps = testSteps.length;
+	)
+	const totalSteps = testSteps.length
 
 	function getStepButtonText(): string {
-		if (isRunning) return 'Running...';
+		if (isRunning) return 'Running...'
 
-		if (stepStatus === 'passed') return 'Step Passed ✅';
+		if (stepStatus === 'passed') return 'Step Passed ✅'
 
-		if (stepStatus === 'partial') return 'Step Partial ⚠️';
+		if (stepStatus === 'partial') return 'Step Partial ⚠️'
 
-		if (stepStatus === 'failed') return 'Retry Step 🔄';
+		if (stepStatus === 'failed') return 'Retry Step 🔄'
 
-		return 'Run Step';
+		return 'Run Step'
 	}
 
 	function canRunCurrentStep(): boolean {
-		if (isRunning) return false;
+		if (isRunning) return false
 
-		if (stepTestState.currentStepIndex === 0) return true;
+		if (stepTestState.currentStepIndex === 0) return true
 
-		const prevStep = testSteps[stepTestState.currentStepIndex - 1];
-		const prevStatus = stepTestState.stepResults[prevStep.id]?.status;
+		const prevStep = testSteps[stepTestState.currentStepIndex - 1]
+		const prevStatus = stepTestState.stepResults[prevStep.id]?.status
 
 		// Allow running if previous step completed (passed, partial, or failed)
-		return prevStatus === 'passed' || prevStatus === 'partial' || prevStatus === 'failed';
+		return prevStatus === 'passed' || prevStatus === 'partial' || prevStatus === 'failed'
 	}
 </script>
+
 
 <div class="step-test-container" data-column="gap-4">
 	<!-- Progress Header -->
@@ -254,6 +259,7 @@
 		</div>
 	{/if}
 </div>
+
 
 <style>
 	.step-test-container {

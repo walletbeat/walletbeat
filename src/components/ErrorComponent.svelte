@@ -1,10 +1,11 @@
 <script lang="ts">
-	interface ErrorComponentProps {
-		error: string | null;
-		onClose: () => void;
-	}
-
-	let { error, onClose }: ErrorComponentProps = $props();
+	let {
+		error,
+		onClose,
+	}: {
+		error: string | null
+		onClose: () => void
+	} = $props()
 </script>
 
 {#if error}
@@ -14,13 +15,13 @@
 		tabindex="0"
 		onclick={event => {
 			if (event.target === event.currentTarget) {
-				onClose();
+				onClose()
 			}
 		}}
 		onkeydown={event => {
 			if (event.key === 'Enter' || event.key === ' ') {
-				event.preventDefault();
-				onClose();
+				event.preventDefault()
+				onClose()
 			}
 		}}
 	>
@@ -75,4 +76,3 @@
 		margin-top: 0.5rem;
 	}
 </style>
-

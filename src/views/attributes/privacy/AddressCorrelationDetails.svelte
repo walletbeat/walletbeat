@@ -11,15 +11,6 @@
 		value: string
 	}
 
-	type LeaksListItem = {
-		sourceName: string
-		linkables: NonEmptyArray<WalletAddressLinkableBy>
-		linkableInfos: LeakInfo[]
-		refs: FullyQualifiedReference[]
-		entity: WalletAddressLinkableBy['by']
-	}
-
-
 	// Props
 	const {
 		wallet,
@@ -100,30 +91,23 @@
 		return map
 	})()}
 
-	{@const leaksList = (() => {
-		const list: LeaksListItem[] = []
-
-		bySource.forEach((linkables, sourceName) => {
-			let linkableInfos: LeakInfo[] = linkables.map(linkable => ({
-				key: linkable.info,
-				value: userInfoName(linkable.info).long
-			}))
-
-			linkableInfos = linkableInfos.filter((info, index) => linkableInfos.slice(index+1).every(otherInfo => otherInfo.key != info.key))
-			const refs = mergeRefs(...linkables.flatMap(linkable => linkable.refs))
-			const entity = nonEmptyGet(linkables).by
-
-			list.push({
-				sourceName,
-				linkables,
-				linkableInfos,
-				refs,
-				entity
-			})
+	{@const leaksList = Array.from(
+		bySource,
+		([sourceName, linkables]) => ({
+			sourceName,
+			linkables,
+			linkableInfos: linkables
+				.map(linkable => ({
+					key: linkable.info,
+					value: userInfoName(linkable.info).long
+				}))
+				.filter((info, index, arr) =>
+					arr.slice(index + 1).every(otherInfo => otherInfo.key !== info.key)
+				),
+			refs: mergeRefs(...linkables.flatMap(linkable => linkable.refs)),
+			entity: nonEmptyGet(linkables).by
 		})
-
-		return list
-	})()}
+	)}
 
 	{@const leaksText = leaksList.map(leak => (
 		leak.entity === 'onchain' ?

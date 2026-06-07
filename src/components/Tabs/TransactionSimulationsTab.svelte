@@ -10,86 +10,94 @@
 		| 'misleading-selector'
 		| 'fake-airdrop'
 		| 'volatile-outcome'
-		| 'failing-transaction';
+		| 'failing-transaction'
 
-	import type { TestTransaction } from '../../constants/test-transactions-signatures';
+	import type { TestTransaction } from '../../constants/test-transactions-signatures'
 	import {
 		WALLETBEAT_TEST_CONTRACT,
 		WALLETBEAT_TEST_ERC721,
 		WALLETBEAT_TEST_ERC1155,
 		WALLETBEAT_TEST_ERC20,
 		ZERO_ADDRESS,
-	} from '../../constants/test-contracts';
-	import { assertTransactionId } from '@/types/utils/ethereum-types';
+	} from '../../constants/test-contracts'
+	import { assertTransactionId } from '@/types/utils/ethereum-types'
 
-	interface Props {
-		activeSubTab: TransactionSimulationSubTab;
-		account: { address?: string } | null;
-		onSendTransaction: (tx: TestTransaction) => void;
-	}
+	let {
+		activeSubTab,
+		account,
+		onSendTransaction,
+	}: {
+		activeSubTab: TransactionSimulationSubTab
+		account: { address?: string } | null
+		onSendTransaction: (tx: TestTransaction) => void
+	} = $props()
 
-	let { activeSubTab, account, onSendTransaction }: Props = $props();
-
-	const addr = $derived(assertTransactionId(account?.address ?? ZERO_ADDRESS));
+	const addr = $derived(assertTransactionId(account?.address ?? ZERO_ADDRESS))
 
 	function padAddr(a: string): string {
-		return a.toLowerCase().replace('0x', '').padStart(64, '0');
+		return a.toLowerCase().replace('0x', '').padStart(64, '0')
 	}
 	function padUint(v: bigint): string {
-		return v.toString(16).padStart(64, '0');
+		return v.toString(16).padStart(64, '0')
 	}
 	function safeUint(s: string, fallback = 0n): bigint {
-		try { return BigInt(s); } catch { return fallback; }
+		try { return BigInt(s) } catch { return fallback }
 	}
 	function isValidAddress(a: string): a is `0x${string}` {
-		return /^0x[0-9a-fA-F]{40}$/.test(a);
+		return /^0x[0-9a-fA-F]{40}$/.test(a)
 	}
 
 	// Editable params for transfer
-	let erc20To = $state('');
-	let erc20ToError = $state('');
+	let erc20To = $state('')
+	let erc20ToError = $state('')
 
-	let erc721From = $state('');
-	let erc721To = $state('');
-	let erc721TokenId = $state('1');
-	let erc721ToError = $state('');
+	let erc721From = $state('')
+	let erc721To = $state('')
+	let erc721TokenId = $state('1')
+	let erc721ToError = $state('')
 
-	let erc1155From = $state('');
-	let erc1155To = $state('');
-	let erc1155TokenId = $state('1');
-	let erc1155ToError = $state('');
+	let erc1155From = $state('')
+	let erc1155To = $state('')
+	let erc1155TokenId = $state('1')
+	let erc1155ToError = $state('')
 
 	// Pre-fill 'from' fields when wallet connects
 	$effect(() => {
 		if (addr !== ZERO_ADDRESS) {
-			if (!erc721From) erc721From = addr;
+			if (!erc721From) erc721From = addr
 
-			if (!erc1155From) erc1155From = addr;
+			if (!erc1155From) erc1155From = addr
 		}
-	});
+	})
 
 	function handleSend() {
 		if (activeSubTab === 'erc20-transfer') {
-			erc20ToError = '';
+			erc20ToError = ''
 
-			if (!isValidAddress(erc20To)) { erc20ToError = 'Enter a valid Ethereum address (0x…)';
+			if (!isValidAddress(erc20To)) {
+				erc20ToError = 'Enter a valid Ethereum address (0x…)'
 
- return; }
+				return
+			}
 		} else if (activeSubTab === 'erc721-transfer') {
-			erc721ToError = '';
+			erc721ToError = ''
 
-			if (!isValidAddress(erc721To)) { erc721ToError = 'Enter a valid Ethereum address (0x…)';
+			if (!isValidAddress(erc721To)) {
+				erc721ToError = 'Enter a valid Ethereum address (0x…)'
 
- return; }
+				return
+			}
 		} else if (activeSubTab === 'erc1155-transfer') {
-			erc1155ToError = '';
+			erc1155ToError = ''
 
-			if (!isValidAddress(erc1155To)) { erc1155ToError = 'Enter a valid Ethereum address (0x…)';
+			if (!isValidAddress(erc1155To)) {
+				erc1155ToError = 'Enter a valid Ethereum address (0x…)'
 
- return; }
+				return
+			}
 		}
 
-		onSendTransaction(simulations[activeSubTab]);
+		onSendTransaction(simulations[activeSubTab])
 	}
 
 	const simulations = $derived<Record<TransactionSimulationSubTab, TestTransaction>>({
@@ -208,11 +216,12 @@
 			contractAddress: WALLETBEAT_TEST_CONTRACT,
 			calldata: '0x128e6c37',
 		},
-	});
+	})
 
-	const current = $derived(simulations[activeSubTab]);
+	const current = $derived(simulations[activeSubTab])
 
 </script>
+
 
 <div class="tx-simulations-tab" data-column="gap-4">
 	<div class="detail-card" data-card="radius-8 padding-5">
@@ -306,6 +315,7 @@
 		</div>
 	</div>
 </div>
+
 
 <style>
 	.tx-simulations-tab {

@@ -1,23 +1,27 @@
 <script lang="ts">
-	import type { TestSignature } from '../../constants/test-transactions-signatures';
+	import type { TestSignature } from '../../constants/test-transactions-signatures'
 
-	interface Props {
-		selectedSig: TestSignature | undefined;
+	let {
+		selectedSig,
+		signatureState,
+		account,
+		onSignMessage,
+		onSignTypedData,
+	}: {
+		selectedSig: TestSignature | undefined
 		signatureState: {
-			activeId: string | null;
-			isPending: boolean;
-			results: Record<string, string>;
-		};
-		account: { address?: string } | null;
-		onSignMessage: (sig: TestSignature) => void;
-		onSignTypedData: (sig: TestSignature) => void;
-	}
+			activeId: string | null
+			isPending: boolean
+			results: Record<string, string>
+		}
+		account: { address?: string } | null
+		onSignMessage: (sig: TestSignature) => void
+		onSignTypedData: (sig: TestSignature) => void
+	} = $props()
 
-	let { selectedSig, signatureState, account, onSignMessage, onSignTypedData }: Props = $props();
-
-	const isActive = $derived(selectedSig && signatureState.activeId === selectedSig.id);
-	const isPending = $derived(signatureState.isPending && isActive);
-	const sigResult = $derived(selectedSig ? signatureState.results[selectedSig.id] : undefined);
+	const isActive = $derived(selectedSig && signatureState.activeId === selectedSig.id)
+	const isPending = $derived(signatureState.isPending && isActive)
+	const sigResult = $derived(selectedSig ? signatureState.results[selectedSig.id] : undefined)
 </script>
 
 {#if selectedSig}

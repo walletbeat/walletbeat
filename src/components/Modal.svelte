@@ -1,14 +1,19 @@
 <script lang="ts">
-	interface ModalProps {
-		isOpen: boolean;
-		title: string;
-		onClose: () => void;
-		children: import('svelte').Snippet;
-		footer?: import('svelte').Snippet;
-	}
-
-	let { isOpen, title, onClose, children, footer }: ModalProps = $props();
+	let {
+		isOpen,
+		title,
+		onClose,
+		children,
+		footer,
+	}: {
+		isOpen: boolean
+		title: string
+		onClose: () => void
+		children: import('svelte').Snippet
+		footer?: import('svelte').Snippet
+	} = $props()
 </script>
+
 
 {#if isOpen}
 	<div
@@ -39,6 +44,7 @@
 		</div>
 	</div>
 {/if}
+
 
 <style>
 	.modal-backdrop {

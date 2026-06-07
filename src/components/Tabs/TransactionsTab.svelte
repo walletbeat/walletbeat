@@ -1,18 +1,5 @@
 <script lang="ts">
-	import type { TestTransaction } from '../../constants/test-transactions-signatures';
-
-	interface Props {
-		selectedTx: TestTransaction | undefined;
-		transactionState: {
-			activeId: string | null;
-			isPending: boolean;
-			hashes: Record<string, `0x${string}`>;
-		};
-		account: { address?: string } | null;
-		onSendTransaction: (tx: TestTransaction) => void;
-		onOpenInExplorer: (txHash: string) => void;
-		formatValue: (value: string, type: string) => string;
-	}
+	import type { TestTransaction } from '../../constants/test-transactions-signatures'
 
 	let {
 		selectedTx,
@@ -21,13 +8,24 @@
 		onSendTransaction,
 		onOpenInExplorer,
 		formatValue,
-	}: Props = $props();
+	}: {
+		selectedTx: TestTransaction | undefined
+		transactionState: {
+			activeId: string | null
+			isPending: boolean
+			hashes: Record<string, `0x${string}`>
+		}
+		account: { address?: string } | null
+		onSendTransaction: (tx: TestTransaction) => void
+		onOpenInExplorer: (txHash: string) => void
+		formatValue: (value: string, type: string) => string
+	} = $props()
 
 	const isActive = $derived(
 		selectedTx && transactionState.activeId === selectedTx.id
-	);
-	const isPending = $derived(transactionState.isPending && isActive);
-	const txHash = $derived(selectedTx ? transactionState.hashes[selectedTx.id] : undefined);
+	)
+	const isPending = $derived(transactionState.isPending && isActive)
+	const txHash = $derived(selectedTx ? transactionState.hashes[selectedTx.id] : undefined)
 </script>
 
 {#if selectedTx}

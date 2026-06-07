@@ -25,6 +25,7 @@
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
+
 <Typography
 	content={outcome.shortExplanation}
 	strings={getWalletEvalStrings(wallet)}
