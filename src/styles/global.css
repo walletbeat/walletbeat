@@ -26,7 +26,7 @@
 	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
-	--accent-color: light-dark(#e564bc, #f078c8);
+	--accent-color: light-dark(#3D2B6E, #f078c8);
 	--accent-backgroundColor: light-dark(#fbdcf2, #3d0a32);
 	--text-primary: light-dark(#130A2B, #F5F2F7);
 	--text-secondary: light-dark(#130A2B, #B6AEC1);
