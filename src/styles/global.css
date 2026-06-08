@@ -19,7 +19,7 @@
 	/* Main canvas + default cards (dark: deep purple) */
 	--background-primary: light-dark(#F8EDFF, #110c1f);
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
-	--background-secondary: light-dark(#efefef, #1c1038);
+	--background-secondary: light-dark(#FFFFFF80, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
 	/* Sidebar uses the same background as the sticky elements */
 	--navigation-backgroundColor: var(--sticky-backgroundColor);

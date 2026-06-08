@@ -1259,17 +1259,7 @@
 			padding: calc(2.5rem + 1rem) 0.75rem 1rem;
 			gap: 2px;
 
-			background:
-				linear-gradient(
-					to right,
-					transparent 2.75rem,
-					var(--border-color) 2.75rem,
-					var(--border-color) calc(2.75rem + 1px),
-					transparent calc(2.75rem + 1px)
-				)
-				0 calc(2.5rem + 1rem) / 100% calc(100% - calc(2.5rem + 1rem) - 1rem) no-repeat,
-				var(--background-secondary)
-			;
+			background: var(--background-secondary);
 			border-inline: 1px solid var(--border-color);
 
 			@media (max-width: 864px) {
