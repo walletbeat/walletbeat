@@ -891,7 +891,7 @@
 			counter-reset: TableRowCount;
 
 			:where(tr) {
-				--table-row-backgroundColor: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.03));
+				--table-row-backgroundColor: light-dark(rgba(133, 0, 126, 0.05), rgba(255, 255, 255, 0.03));
 
 				&:not([data-disabled]) {
 					counter-increment: TableRowCount;
@@ -916,7 +916,7 @@
 					}
 
 					&:hover {
-						--table-row-backgroundColor: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.05));
+						--table-row-backgroundColor: light-dark(rgba(255, 0, 208, 0.1), rgba(255, 255, 255, 0.05));
 					}
 
 					&:active:not(:has([tabindex='0']:active)) {
