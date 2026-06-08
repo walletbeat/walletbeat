@@ -4,10 +4,8 @@ import { topbarNavigationItems } from '@/constants/navigation'
 
 <header id='topbar'>
 	<a href='/' class='brand'>
-		<picture>
-			<source srcset='/logo-light.svg' media='(prefers-color-scheme: dark)' />
-			<img src='/logo-dark.svg' alt='Walletbeat' />
-		</picture>
+		<img class='logo-for-light' src='/logo-dark.svg' alt='Walletbeat' />
+		<img class='logo-for-dark' src='/logo-light.svg' alt='Walletbeat' />
 	</a>
 
 	<nav>
@@ -58,6 +56,29 @@ import { topbarNavigationItems } from '@/constants/navigation'
 			img {
 				display: block;
 				height: 3rem;
+			}
+
+			/* Light mode: show dark logo */
+			.logo-for-dark {
+				display: none;
+			}
+
+			/* Dark mode via system preference */
+			@media (prefers-color-scheme: dark) {
+				:global(html:not([style*='color-scheme: light'])) & .logo-for-dark {
+					display: block;
+				}
+				:global(html:not([style*='color-scheme: light'])) & .logo-for-light {
+					display: none;
+				}
+			}
+
+			/* Dark mode via manual JS toggle */
+			:global(html[style*='color-scheme: dark']) & .logo-for-dark {
+				display: block;
+			}
+			:global(html[style*='color-scheme: dark']) & .logo-for-light {
+				display: none;
 			}
 		}
 		span svg {

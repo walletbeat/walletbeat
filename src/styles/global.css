@@ -12,7 +12,7 @@
 	--separator-width: 1px;
 
 	/* Main canvas + default cards (dark: deep purple) */
-	--background-primary: light-dark(#fff, #110c1f);
+	--background-primary: light-dark(#F8EDFF, #110c1f);
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
 	--background-secondary: light-dark(#efefef, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
@@ -23,7 +23,7 @@
 	--accent: var(--accent-color);
 	--accent-color: light-dark(#e564bc, #f078c8);
 	--accent-backgroundColor: light-dark(#fbdcf2, #3d0a32);
-	--text-primary: light-dark(#3D2B6E, #F5F2F7);
+	--text-primary: light-dark(#130A2B, #F5F2F7);
 	--text-secondary: light-dark(#130A2B, #B6AEC1);
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
 	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
