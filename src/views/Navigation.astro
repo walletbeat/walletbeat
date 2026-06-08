@@ -4,6 +4,7 @@ import { topbarNavigationItems } from '@/constants/navigation'
 import NavigationItems from './NavigationItems.svelte'
 import MenuIcon from 'lucide-static/icons/menu.svg?raw'
 import XIcon from 'lucide-static/icons/x.svg?raw'
+import SunMoonIcon from 'lucide-static/icons/sun-moon.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
@@ -20,13 +21,11 @@ const currentPathname = Astro.url.pathname
 	data-scroll-container
 	data-sticky-container
 >
-	<!-- Mobile-only: collapsed top bar (logo centered + hamburger on right) -->
+	<!-- Mobile-only: collapsed top bar (logo center, hamburger right) -->
 	<div id='nav-collapsed-bar'>
 		<a href='/' class='nav-collapsed-logo' aria-label='Walletbeat'>
-			<picture>
-				<source srcset='/logo-light.svg' media='(prefers-color-scheme: dark)' />
-				<img src='/logo-dark.svg' alt='Walletbeat' />
-			</picture>
+			<img class='logo-for-light' src='/logo-dark.svg' alt='Walletbeat' />
+			<img class='logo-for-dark' src='/logo-light.svg' alt='Walletbeat' />
 		</a>
 		<button id='nav-hamburger' aria-label='Open navigation'>
 			<Fragment set:html={MenuIcon} />
@@ -34,17 +33,17 @@ const currentPathname = Astro.url.pathname
 	</div>
 
 	<div id='nav-menu' data-sticky-container>
-		<!-- Mobile-only: sidebar header with logo + close button -->
+		<!-- Mobile-only: sidebar header with logo, theme toggle, close button -->
 		<div class='nav-sidebar-header'>
 			<a href='/' class='nav-sidebar-logo' aria-label='Walletbeat'>
-				<picture>
-					<source srcset='/logo-light.svg' media='(prefers-color-scheme: dark)' />
-					<img src='/logo-dark.svg' alt='Walletbeat' />
-				</picture>
+				<img class='logo-for-light' src='/logo-dark.svg' alt='Walletbeat' />
+				<img class='logo-for-dark' src='/logo-light.svg' alt='Walletbeat' />
 			</a>
-			<button id='nav-close-btn' aria-label='Close navigation'>
-				<Fragment set:html={XIcon} />
-			</button>
+			<div class='nav-sidebar-actions'>
+				<button id='nav-close-btn' aria-label='Close navigation'>
+					<Fragment set:html={XIcon} />
+				</button>
+			</div>
 		</div>
 
 		<NavigationItems
@@ -64,10 +63,27 @@ const currentPathname = Astro.url.pathname
 				showSearch={false}
 			/>
 		</div>
+
+		<!-- Theme toggle — shown in sidebar on both mobile and desktop -->
+		<div class='nav-theme-footer'>
+			<button class='nav-theme-btn' id='nav-theme-btn-sidebar' aria-label='Toggle theme'>
+				<Fragment set:html={SunMoonIcon} />
+				<span>Toggle theme</span>
+			</button>
+		</div>
 	</div>
 </nav>
 
 <script>
+	function toggleTheme() {
+		const current = document.documentElement.style.colorScheme
+		const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+		const resolved = current || system
+		const next = resolved === 'dark' ? 'light' : 'dark'
+		document.documentElement.style.colorScheme = next
+		localStorage.setItem('theme', next)
+	}
+
 	function setupMobileNav() {
 		const nav = document.getElementById('nav') as
 			| (HTMLElement & {
@@ -80,6 +96,10 @@ const currentPathname = Astro.url.pathname
 
 		hamburger?.addEventListener('click', () => nav?.showPopover?.())
 		closeBtn?.addEventListener('click', () => nav?.hidePopover?.())
+
+		document
+			.querySelectorAll<HTMLButtonElement>('.nav-theme-btn')
+			.forEach(btn => btn.addEventListener('click', toggleTheme))
 	}
 
 	setupMobileNav()
@@ -108,6 +128,32 @@ const currentPathname = Astro.url.pathname
 		}
 	}
 
+	/* Logo switching for both collapsed bar and sidebar */
+	.nav-collapsed-logo .logo-for-dark,
+	.nav-sidebar-logo .logo-for-dark {
+		display: none;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(html:not([style*='color-scheme: light'])) .nav-collapsed-logo .logo-for-dark,
+		:global(html:not([style*='color-scheme: light'])) .nav-sidebar-logo .logo-for-dark {
+			display: block;
+		}
+		:global(html:not([style*='color-scheme: light'])) .nav-collapsed-logo .logo-for-light,
+		:global(html:not([style*='color-scheme: light'])) .nav-sidebar-logo .logo-for-light {
+			display: none;
+		}
+	}
+
+	:global(html[style*='color-scheme: dark']) .nav-collapsed-logo .logo-for-dark,
+	:global(html[style*='color-scheme: dark']) .nav-sidebar-logo .logo-for-dark {
+		display: block;
+	}
+	:global(html[style*='color-scheme: dark']) .nav-collapsed-logo .logo-for-light,
+	:global(html[style*='color-scheme: dark']) .nav-sidebar-logo .logo-for-light {
+		display: none;
+	}
+
 	/* Mobile collapsed bar — hidden on desktop */
 	#nav-collapsed-bar {
 		display: none;
@@ -125,6 +171,41 @@ const currentPathname = Astro.url.pathname
 
 	.nav-section-divider {
 		display: none;
+	}
+
+	/* Theme footer — shown on desktop sidebar too */
+	.nav-theme-footer {
+		margin-block-start: auto;
+		padding-block-start: 1rem;
+		border-block-start: 1px solid var(--navigation-borderColor);
+		padding: 0.75rem 0.75rem 0 0.75rem;
+	}
+
+	.nav-theme-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		width: 100%;
+		padding: 0.45rem 0.45rem;
+		border: none;
+		border-radius: 0.375rem;
+		background: transparent;
+		cursor: pointer;
+		color: var(--text-primary);
+		font-size: 0.975em;
+		font-weight: 500;
+
+		:global(svg) {
+			width: 1.25em;
+			height: 1.25em;
+			stroke: currentColor;
+			flex-shrink: 0;
+		}
+
+		&:hover {
+			background-color: var(--background-primary);
+			color: var(--accent);
+		}
 	}
 
 	@media not (max-width: 1024px) {
@@ -189,7 +270,6 @@ const currentPathname = Astro.url.pathname
 
 				img {
 					height: 2rem;
-					display: block;
 				}
 			}
 
@@ -233,8 +313,13 @@ const currentPathname = Astro.url.pathname
 
 				img {
 					height: 2rem;
-					display: block;
 				}
+			}
+
+			.nav-sidebar-actions {
+				display: flex;
+				align-items: center;
+				gap: 0.25rem;
 			}
 		}
 
