@@ -258,8 +258,8 @@ export default [
 			'@typescript-eslint/no-unsafe-return': 'warn',
 
 			// svelte-eslint-parser incorrectly types extracted template handlers as `(event) => …` with an implicit-any `event`.
-			'@typescript-eslint/no-unsafe-call': 'off',
-			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unsafe-call': 'warn',
+			'@typescript-eslint/no-unsafe-member-access': 'warn',
 		},
 	},
 ]
