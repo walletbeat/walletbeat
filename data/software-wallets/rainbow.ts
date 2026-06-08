@@ -381,7 +381,20 @@ export const rainbow: SoftwareWallet = {
 				artifactSigning: null,
 				dependencyLocking: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				hasPublicChangelog: {
+					[Variant.BROWSER]: supported({
+						ref: {
+							explanation: 'Rainbow publishes browser extension release notes via GitHub Releases.',
+							url: 'https://github.com/rainbow-me/browser-extension/releases',
+						},
+					}),
+					[Variant.MOBILE]: supported({
+						ref: {
+							explanation: 'Rainbow publishes mobile wallet release notes via GitHub Releases.',
+							url: 'https://github.com/rainbow-me/rainbow/releases',
+						},
+					}),
+				},
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
