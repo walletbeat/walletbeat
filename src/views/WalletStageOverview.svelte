@@ -225,7 +225,7 @@
 
 														<li
 															data-list-item-marker={attribute?.icon}
-															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].color}
+															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].color}
 															data-stage-criterion-rating={criterionRating}
 														>
 															<span data-row>
@@ -257,9 +257,9 @@
 
 																<data
 																	value={criterionRating}
-																	title={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].label}
+																	title={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].label}
 																>
-																	{stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].icon}
+																	{stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].icon}
 																</data>
 															</span>
 														</li>

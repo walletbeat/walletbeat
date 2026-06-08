@@ -55,8 +55,7 @@ export class Enum<E extends string> {
 			throw new Error(`Attempted to typecast object of type ${typeof obj} to enum`)
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just checked.
-		return obj as unknown as E[]
+		return obj.map(x => this.assert(x))
 	}
 
 	/** Reorder an array of enums using the canonical enum order. */
