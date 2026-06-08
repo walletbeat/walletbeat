@@ -18,9 +18,11 @@
 	let {
 		items,
 		currentPathname,
+		showSearch = true,
 	}: {
 		items: NavigationItem[]
 		currentPathname: string
+		showSearch?: boolean
 	} = $props()
 
 
@@ -95,6 +97,7 @@
 </script>
 
 
+{#if showSearch}
 <search data-column="gap-3">
 	<input
 		type="search"
@@ -144,6 +147,11 @@
 
 	{@render navigationItems(items)}
 </search>
+{:else}
+<div data-column="gap-3">
+	{@render navigationItems(items)}
+</div>
+{/if}
 
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}

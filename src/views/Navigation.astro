@@ -1,6 +1,9 @@
 ---
 import type { NavigationItem } from '@/constants/navigation'
+import { topbarNavigationItems } from '@/constants/navigation'
 import NavigationItems from './NavigationItems.svelte'
+import MenuIcon from 'lucide-static/icons/menu.svg?raw'
+import XIcon from 'lucide-static/icons/x.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
@@ -17,22 +20,78 @@ const currentPathname = Astro.url.pathname
 	data-scroll-container
 	data-sticky-container
 >
+	<!-- Mobile-only: collapsed top bar (logo centered + hamburger on right) -->
+	<div id='nav-collapsed-bar'>
+		<a href='/' class='nav-collapsed-logo' aria-label='Walletbeat'>
+			<picture>
+				<source srcset='/logo-light.svg' media='(prefers-color-scheme: dark)' />
+				<img src='/logo-dark.svg' alt='Walletbeat' />
+			</picture>
+		</a>
+		<button id='nav-hamburger' aria-label='Open navigation'>
+			<Fragment set:html={MenuIcon} />
+		</button>
+	</div>
+
 	<div id='nav-menu' data-sticky-container>
+		<!-- Mobile-only: sidebar header with logo + close button -->
+		<div class='nav-sidebar-header'>
+			<a href='/' class='nav-sidebar-logo' aria-label='Walletbeat'>
+				<picture>
+					<source srcset='/logo-light.svg' media='(prefers-color-scheme: dark)' />
+					<img src='/logo-dark.svg' alt='Walletbeat' />
+				</picture>
+			</a>
+			<button id='nav-close-btn' aria-label='Close navigation'>
+				<Fragment set:html={XIcon} />
+			</button>
+		</div>
+
 		<NavigationItems
 			client:idle
 			transition:persist
 			items={navigationItems}
 			currentPathname={currentPathname}
 		/>
+
+		<!-- Mobile-only: topbar links (about, faq, code, farcaster) -->
+		<div class='nav-topbar-section'>
+			<hr class='nav-section-divider' />
+			<NavigationItems
+				client:idle
+				items={topbarNavigationItems}
+				currentPathname={currentPathname}
+				showSearch={false}
+			/>
+		</div>
 	</div>
 </nav>
+
+<script>
+	function setupMobileNav() {
+		const nav = document.getElementById('nav') as
+			| (HTMLElement & {
+					showPopover?: () => void
+					hidePopover?: () => void
+			  })
+			| null
+		const hamburger = document.getElementById('nav-hamburger')
+		const closeBtn = document.getElementById('nav-close-btn')
+
+		hamburger?.addEventListener('click', () => nav?.showPopover?.())
+		closeBtn?.addEventListener('click', () => nav?.hidePopover?.())
+	}
+
+	setupMobileNav()
+	document.addEventListener('astro:after-swap', setupMobileNav)
+</script>
 
 <style>
 	nav {
 		width: 100%;
 		height: 100dvh;
 		display: grid;
-		grid-template-rows: 1fr;
+		grid-template-rows: auto 1fr;
 		border-right: 1px solid var(--navigation-borderColor);
 
 		#nav-menu {
@@ -47,6 +106,25 @@ const currentPathname = Astro.url.pathname
 				--sticky-paddingBlockStart: 3rem;
 			}
 		}
+	}
+
+	/* Mobile collapsed bar — hidden on desktop */
+	#nav-collapsed-bar {
+		display: none;
+	}
+
+	/* Mobile sidebar header — hidden on desktop */
+	.nav-sidebar-header {
+		display: none;
+	}
+
+	/* Mobile topbar section — hidden on desktop */
+	.nav-topbar-section {
+		display: none;
+	}
+
+	.nav-section-divider {
+		display: none;
 	}
 
 	@media not (max-width: 1024px) {
@@ -85,6 +163,110 @@ const currentPathname = Astro.url.pathname
 					pointer-events: none;
 				}
 			}
+
+			/* Show collapsed bar only when nav is NOT open */
+			&[popover]:not(:popover-open) #nav-collapsed-bar {
+				display: flex;
+			}
+
+			/* Hide collapsed bar when nav IS open (full sidebar visible) */
+			&[popover]:popover-open #nav-collapsed-bar {
+				display: none;
+			}
+		}
+
+		#nav-collapsed-bar {
+			position: relative;
+			align-items: center;
+			justify-content: center;
+			height: var(--navigation-mobile-blockSize);
+			padding-inline: 1rem;
+
+			.nav-collapsed-logo {
+				display: flex;
+				align-items: center;
+				text-decoration: none;
+
+				img {
+					height: 2rem;
+					display: block;
+				}
+			}
+
+			#nav-hamburger {
+				position: absolute;
+				right: 1rem;
+			}
+		}
+
+		#nav-hamburger {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.5rem;
+			height: 2.5rem;
+			border: none;
+			background: transparent;
+			cursor: pointer;
+			padding: 0;
+			color: var(--text-primary);
+
+			:global(svg) {
+				width: 1.5rem;
+				height: 1.5rem;
+				stroke: currentColor;
+			}
+		}
+
+		.nav-sidebar-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+			border-block-end: 1px solid var(--navigation-borderColor);
+			margin-block-end: 0.75rem;
+
+			.nav-sidebar-logo {
+				display: flex;
+				align-items: center;
+				text-decoration: none;
+
+				img {
+					height: 2rem;
+					display: block;
+				}
+			}
+		}
+
+		#nav-close-btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.5rem;
+			height: 2.5rem;
+			border: none;
+			background: transparent;
+			cursor: pointer;
+			padding: 0;
+			color: var(--text-primary);
+			flex-shrink: 0;
+
+			:global(svg) {
+				width: 1.5rem;
+				height: 1.5rem;
+				stroke: currentColor;
+			}
+		}
+
+		.nav-topbar-section {
+			display: block;
+		}
+
+		.nav-section-divider {
+			display: block;
+			border: none;
+			border-block-start: 1px solid var(--navigation-borderColor);
+			margin: 0.75rem 0.75rem;
 		}
 	}
 </style>
