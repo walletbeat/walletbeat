@@ -10,42 +10,42 @@ Thanks for taking the time to answer the following questions. For each response 
 ## General
 
 1. **What type of accounts (e.g. EOA, 7702, 4337, Safe wallet) do you support?**
-    1. **If EOA, how are accounts derived? Do you support BIP32, BIP44, and/or BIP39 for key derivation?**
-        - EOA + 7702 delegation / 4337, implementation [https://github.com/coinbase/smart-wallet](https://github.com/coinbase/smart-wallet)
-    2. **Do you allow private key export, and/or seed phrase export?**
-        - Yes, we offer a recovery key feature which allow users to retain full access of their account in the event they lose access to clients / their account's other keys.
+   1. **If EOA, how are accounts derived? Do you support BIP32, BIP44, and/or BIP39 for key derivation?**
+      - EOA + 7702 delegation / 4337, implementation [https://github.com/coinbase/smart-wallet](https://github.com/coinbase/smart-wallet)
+   2. **Do you allow private key export, and/or seed phrase export?**
+      - Yes, we offer a recovery key feature which allow users to retain full access of their account in the event they lose access to clients / their account's other keys.
 
 2. **Is it possible to configure the L1 and L2 RPC endpoints?**
-    - No.
-    1. **Can users configure their own chains with custom endpoints?**
-        - No.
+   - No.
+   1. **Can users configure their own chains with custom endpoints?**
+      - No.
 
 3. **Do you warn the user about potentially malicious contracts? Does this check rely on an external service about the contract being checked? If so, which one?**
-    - Yes. We are partnered with Blockaid.
+   - Yes. We are partnered with Blockaid.
 
 4. **Do you warn the user about potentially malicious URLs? Does this check rely on an external service about the contract being checked? If so, which one?**
-    - Yes.
+   - Yes.
 
 5. **Do you warn users when sending tokens to addresses they have not sent tokens to before?**
-    - No.
+   - No.
 
 6. **Do you support cross-chain bridging?**
-    - Yes.
+   - Yes.
 
-7. **Do you support displaying cross-chain *separate* token balances? (i.e. "what is my USDC balance on Ethereum and what is my USDC balance on Base)?**
-    - Yes.
+7. **Do you support displaying cross-chain _separate_ token balances? (i.e. "what is my USDC balance on Ethereum and what is my USDC balance on Base)?**
+   - Yes.
 
-8. **Do you support displaying cross-chain, *same-token balances* (i.e. "what is my USDC balance across all chains")?**
-    - Yes.
+8. **Do you support displaying cross-chain, _same-token balances_ (i.e. "what is my USDC balance across all chains")?**
+   - Yes.
 
 9. **Do you support displaying single-chain balances (i.e. "what token balances do I have on OP Mainnet")?**
-    - Yes.
+   - Yes.
 
 10. **Do you support resolving ENS addresses when sending tokens?**
     - Yes.
 
 11. **What are your revenue streams and are they publicly disclosed somewhere?**
-    - *(no response)*
+    - _(no response)_
 
 12. **Do you have a document explaining the type of data you collect from users, if any? (e.g. privacy policy URL)**
     - [https://wallet.coinbase.com/dapp-privacy-policy](https://wallet.coinbase.com/dapp-privacy-policy)
@@ -65,24 +65,24 @@ Thanks for taking the time to answer the following questions. For each response 
 ## Software Wallet Only
 
 1. **Do you support light clients?**
-    - No
+   - No
 
 2. **Do you support any interoperability protocols (e.g. RIP 7755, ERC 7683, etc.)?**
-    - No
+   - No
 
 3. **Do you support EIP-1193, EIP-2700, and/or EIP-6963?**
-    - Yes.
+   - Yes.
 
 4. **Where is the wallet's source code and what license is this under?**
-    - Implementation, SDK. Both MIT. Rest is closed-source.
-    1. **Is the wallet's code split across multiple repositories (e.g. core vs UI), and are all components source-available?**
-        - Yes. Smart contracts and SDK (EIP-1193 provider) are open-source. Rest is closed-source.
-    2. **Is it possible to build the wallet from source completely locally?**
-        - Yes
+   - Implementation, SDK. Both MIT. Rest is closed-source.
+   1. **Is the wallet's code split across multiple repositories (e.g. core vs UI), and are all components source-available?**
+      - Yes. Smart contracts and SDK (EIP-1193 provider) are open-source. Rest is closed-source.
+   2. **Is it possible to build the wallet from source completely locally?**
+      - Yes
 
 ## Hardware Wallet Only
 
-*(Not applicable -- Base App is a software wallet)*
+_(Not applicable -- Base App is a software wallet)_
 
 1. **Under what license is the hardware wallet firmware code?**
 2. **What secure element does the wallet use, if any?**
