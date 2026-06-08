@@ -34,10 +34,10 @@
 	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
 	--icon-navigation-color: light-dark(#000000, #FFFFFF);
 
-	--rating-pass: #B5ED9D;
-	--rating-fail: #FB6682;
-	--rating-partial: #FFCC73;
-	--rating-neutral: #D5D4FB;
+	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
+	--rating-fail: light-dark(#FF969699,#FB6682);
+	--rating-partial: light-dark(#FFCC7399,#FFCC73);
+	--rating-neutral: light-dark(#D5D4FB99,#D5D4FB);
 	--rating-unrated: #F8ECEC;
 	--rating-icon-color: #000000;
 
