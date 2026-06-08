@@ -2023,9 +2023,6 @@
 	.mobile-card-logo-wrap {
 		width: 2.75rem;
 		height: 2.75rem;
-		border-radius: 50%;
-		overflow: hidden;
-		border: 2px solid rgba(255, 255, 255, 0.15);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -2069,34 +2066,42 @@
 	.mobile-variant-btn {
 		width: 2rem;
 		height: 2rem;
-		border-radius: 50%;
-		border: 1px solid var(--icon-navigation-borderColor);
+		border: none;
 		background: none;
-		color: inherit;
+		color: var(--text-secondary);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
 		padding: 0;
-		transition-property: background-color, border-color, color;
+		transition-property: color;
 
 		[data-wbicon] {
-			font-size: 1rem;
+			font-size: 1.25rem;
 			line-height: 1;
 		}
 
 		&.active {
-			background-color: var(--accent-backgroundColor);
-			border-color: var(--accent);
 			color: var(--accent);
 		}
 	}
 
 	.mobile-attr-grid {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 1.25rem 3rem;
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 1.25rem 0.5rem;
+
+		/* First two items sit in row 1, centered across 6 columns */
+		.mobile-attr-item:nth-child(1) {
+			grid-column: 2 / span 2;
+		}
+		.mobile-attr-item:nth-child(2) {
+			grid-column: 4 / span 2;
+		}
+		/* Items 3-5 auto-fill row 2 spanning 2 columns each */
+		.mobile-attr-item:nth-child(n + 3) {
+			grid-column: span 2;
+		}
 	}
 
 	.mobile-attr-item {
@@ -2104,7 +2109,6 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 0.4rem;
-		width: 6rem;
 		text-decoration: none;
 	}
 
@@ -2112,7 +2116,6 @@
 		width: 3.5rem;
 		height: 3.5rem;
 		border-radius: 50%;
-		border: 1.5px solid var(--attr-color);
 		background: color-mix(in srgb, var(--attr-color) 20%, transparent);
 		color: var(--attr-color);
 		display: flex;
