@@ -82,7 +82,7 @@ Thanks for taking the time to answer the following questions. For each response 
 
 ## Hardware Wallet Only
 
-*(Not applicable — Base App is a software wallet)*
+*(Not applicable -- Base App is a software wallet)*
 
 1. **Under what license is the hardware wallet firmware code?**
 2. **What secure element does the wallet use, if any?**

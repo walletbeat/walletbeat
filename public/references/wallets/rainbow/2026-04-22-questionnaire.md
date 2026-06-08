@@ -15,13 +15,13 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 * **Website:** [https://rainbow.me/](https://rainbow.me/)
 * **Supported platforms:** (check all that apply)
     
-    * ☐ Browser Extension
+    * [ ] Browser Extension
         
         * Yes
-    * ☐ Mobile
+    * [ ] Mobile
         
         * Yes
-    * ☐ Desktop
+    * [ ] Desktop
         
         * No
 * **Is your wallet designed for general use, or peer-to-peer payments, or some other specific use-case?**
@@ -29,16 +29,16 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
     * General use
 * **Which account types does your wallet support?** (check all that apply)
     
-    * ☐ EOA (externally owned account — standard seed phrase wallet)
+    * [ ] EOA (externally owned account -- standard seed phrase wallet)
         
         * Yes
-    * ☐ MPC (multi-party computation — key is split across multiple parties)
-    * ☐ EIP-7702 (delegating an EOA to act as a smart contract)
+    * [ ] MPC (multi-party computation -- key is split across multiple parties)
+    * [ ] EIP-7702 (delegating an EOA to act as a smart contract)
         
         * Yes
-    * ☐ ERC-4337 smart account
-    * ☐ Safe multisig
-    * ☐ Other (please describe):
+    * [ ] ERC-4337 smart account
+    * [ ] Safe multisig
+    * [ ] Other (please describe):
 * **What is the default account type when a new user creates a wallet?**
 
 * * *
@@ -52,19 +52,19 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
     * Yes
 * **What recovery method(s) do you support?**
     
-    * ☐ Guardian-based / social recovery
-    * ☐ Cloud backup (iCloud, Google Drive, etc.)
+    * [ ] Guardian-based / social recovery
+    * [ ] Cloud backup (iCloud, Google Drive, etc.)
         
         * Yes
-    * ☐ Multi-factor / passkey backup
-    * ☐ Not supported
-    * ☐ Other:
+    * [ ] Multi-factor / passkey backup
+    * [ ] Not supported
+    * [ ] Other:
 * **[If guardian-based] Please describe your guardian scheme and link to its documentation.**
 
 ### Chain Verification
 
 * **Do you use a light client to independently verify Ethereum L1 state (without trusting a centralized RPC)?** (yes / no)
-* **If yes, which implementation?** (e.g. Helios)
+* **If yes, which implementation?** (e.g. Helios)
 
 ### Passkeys
 
@@ -73,11 +73,11 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
     * Currently, no. Our engineering team is currently working to add passkey support.
 * **If yes, which library do you use for on-chain P-256 verification? N/A**
     
-    * ☐ Smooth Crypto Lib
-    * ☐ Daimo P256 Verifier
-    * ☐ OpenZeppelin P256 Verifier
-    * ☐ WebAuthn.sol
-    * ☐ Other:
+    * [ ] Smooth Crypto Lib
+    * [ ] Daimo P256 Verifier
+    * [ ] OpenZeppelin P256 Verifier
+    * [ ] WebAuthn.sol
+    * [ ] Other:
 
 ### Security Audits
 
@@ -105,20 +105,20 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
         * Does this check send the visited URL to an external service? (yes / no)
             
             * No
-        * Does it send the user’s wallet address to an external service? (yes / no)
-        * Can the external service learn the user’s IP address? (yes / no)
+        * Does it send the user's wallet address to an external service? (yes / no)
+        * Can the external service learn the user's IP address? (yes / no)
 
 **First-time contract warnings:**
 
-* Do you warn users before interacting with a contract they haven’t used before? (yes / no)
+* Do you warn users before interacting with a contract they haven't used before? (yes / no)
     
     * Is a database of known-bad contracts or external service involved? If so, which one?
     * Does this check send the contract address to an external service? (yes / no)
-    * Can the external service learn the user’s wallet address or IP address? (yes / no)
+    * Can the external service learn the user's wallet address or IP address? (yes / no)
 
 **First-time recipient warnings:**
 
-* Do you warn users when sending funds to an address they’ve never sent to before? (yes / no)
+* Do you warn users when sending funds to an address they've never sent to before? (yes / no)
     
     * Does this check send the recipient address to an external service? (yes / no)
 
@@ -148,11 +148,11 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
     * No
 * **Which privacy technology?** (check all that apply)
     
-    * ☐ Stealth addresses (ERC-5564)
-    * ☐ Privacy Pools
-    * ☐ Railgun
-    * ☐ Tornado Cash Nova
-    * ☐ Other:
+    * [ ] Stealth addresses (ERC-5564)
+    * [ ] Privacy Pools
+    * [ ] Railgun
+    * [ ] Tornado Cash Nova
+    * [ ] Other:
 
 ## Self-Sovereignty
 
@@ -168,7 +168,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
     
     * Can users export their seed phrase? (yes / no)
     * Can users export individual private keys? (yes / no)
-* **[If MPC or ERC-4337] Can users generate and broadcast transactions using open-source tools, without relying on your wallet application?** (yes / no — if yes, please describe)
+* **[If MPC or ERC-4337] Can users generate and broadcast transactions using open-source tools, without relying on your wallet application?** (yes / no -- if yes, please describe)
 * **[If ERC-4337] Smart account implementation:**
     
     * Which smart contract or implementation do you use?
@@ -178,20 +178,20 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 
 * **Where are private keys (or key shares) generated and stored?**
     
-    * ☐ Generated and stored on the user’s device only
-    * ☐ Generated on your servers
-    * ☐ Generated jointly (MPC/threshold) between user device and your servers
-    * ☐ Other:
-* **Can your servers reconstruct or access the user’s private key at any point?** (yes / no / only with user consent — please explain)
+    * [ ] Generated and stored on the user's device only
+    * [ ] Generated on your servers
+    * [ ] Generated jointly (MPC/threshold) between user device and your servers
+    * [ ] Other:
+* **Can your servers reconstruct or access the user's private key at any point?** (yes / no / only with user consent -- please explain)
 * **\[If MPC\] Can users sign transactions without your servers being available?** (yes / no)
 
 ### Transaction Submission
 
 * **Can users broadcast Ethereum L1 transactions without routing through your infrastructure?**
     
-    * ☐ Yes, via direct P2P gossip (acting as a node on the network)
-    * ☐ Yes, via a user-configured self-hosted RPC node (connecting to a node and relaying the transaction)
-    * ☐ No, all transactions go through your servers
+    * [ ] Yes, via direct P2P gossip (acting as a node on the network)
+    * [ ] Yes, via a user-configured self-hosted RPC node (connecting to a node and relaying the transaction)
+    * [ ] No, all transactions go through your servers
 * **For Arbitrum: do you support force-inclusion (bypassing the Arbitrum sequencer to submit via L1)?** (yes / no / not supported)
 * **For OP Stack chains (Optimism, Base, etc.): do you support force-inclusion?** (yes / no / not supported)
 
@@ -228,16 +228,16 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 
 ### Fee Display
 
-* **Before a user confirms a transaction, do you show the complete fee breakdown — including any convenience fees or routing markups charged by your wallet?** (yes / no)
+* **Before a user confirms a transaction, do you show the complete fee breakdown -- including any convenience fees or routing markups charged by your wallet?** (yes / no)
     
     * Yes. There is a review sheet for swaps that shows fees. This is optional with most users in defaulting to turning this off.
-* **Are there any fees your wallet takes that are not explicitly displayed to the user before they confirm?** (yes / no — if yes, please describe)
+* **Are there any fees your wallet takes that are not explicitly displayed to the user before they confirm?** (yes / no -- if yes, please describe)
     
     * Yes. Perps and prediction markets.
 
 ### Open Source
 
-* **Is the wallet’s source code publicly available?** (yes / no)
+* **Is the wallet's source code publicly available?** (yes / no)
     
     * Yes
 * **If yes, under what license?**
@@ -260,4 +260,4 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 
 ## Anything Else you want to specifically mention?
 
-Is there anything about your wallet’s security, privacy, or self-sovereignty features that you’d like us to know, or that the questions above didn’t cover?
+Is there anything about your wallet's security, privacy, or self-sovereignty features that you'd like us to know, or that the questions above didn't cover?
