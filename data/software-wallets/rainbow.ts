@@ -34,7 +34,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -382,7 +387,25 @@ export const rainbow: SoftwareWallet = {
 				dependencyLocking: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hermeticBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The browser extension build job checks out an external repository (rainbow-me/browser-extension-env) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build, so build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet Android release build runs `yarn install --immutable && yarn setup` and resolves Gradle dependencies while assembling the release, fetching build inputs from the network.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet iOS build runs `yarn install --immutable && yarn setup` and `fastlane match`, which fetches signing certificates from a remote git repository during the build, fetching build inputs from the network.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
+						},
+					],
+				}),
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
