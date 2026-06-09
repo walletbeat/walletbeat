@@ -380,7 +380,20 @@ export const rainbow: SoftwareWallet = {
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
+				dependencyVulnerabilityScanning: supported({
+					ref: [
+						{
+							explanation:
+								'The browser extension runs `yarn audit:ci` (audit-ci) as a CI step, failing the build on vulnerable dependencies.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet runs `yarn audit-ci` as a CI step, failing the build on vulnerable dependencies.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/c203ae4e9cb48627310f37ebbab05dbb43211286/.github/workflows/unit-test.yml',
+						},
+					],
+				}),
 				hasPublicChangelog: null,
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
