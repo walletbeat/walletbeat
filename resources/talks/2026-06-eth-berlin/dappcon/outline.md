@@ -1,4 +1,3 @@
-
 # Dappcon Walletbeat workshop: Setting the Bar on Ethereum Wallets
 
 - Date: June 17th, 2026
@@ -104,10 +103,8 @@ Demonstrate:
 - Signing a transaction using a wallet supporting ERC-8213 and ERC-7730
 - Comparing readable vs unreadable signing experiences
 - A real transaction flow using:
-
   - Uniswap
   - CoW Swap
-
 
 ### Final Takeaway
 
