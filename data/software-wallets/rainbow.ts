@@ -2,8 +2,11 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
 import { alphabet } from '@/data/entities/alphabet'
 import { apple } from '@/data/entities/apple'
+import { sentry } from '@/data/entities/sentry'
+import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
@@ -182,7 +185,34 @@ export const rainbow: SoftwareWallet = {
 		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
-				crashReports: null,
+				crashReports: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'Both Rainbow clients integrate Sentry for crash and error reporting. In the mobile app, `initSentry` runs in all production builds (disabled only for dev/test sessions).',
+							url: 'https://github.com/rainbow-me/rainbow/blob/903d96e1075054ede51a721f5430b09c530fedf9/src/logger/sentry.ts',
+						},
+						{
+							explanation:
+								'The in-app Analytics toggle (Settings > Privacy) only disables usage analytics via `analytics.disable()`; it does not stop Sentry crash reporting.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+						},
+						{
+							explanation:
+								'In the browser extension, `initializeSentry` runs in all non-dev builds and is not gated by the analytics opt-out, so the user cannot disable crash reporting.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/566dbc30d057e007a6f05ca2694cc600683e4ae8/src/core/sentry/index.ts',
+						},
+						{
+							explanation:
+								'The in-app Privacy settings state that when the Analytics toggle is disabled, "only essential crash diagnostics are collected", confirming crash reporting cannot be turned off by the user.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png',
+						},
+					],
+					entity: sentry,
+					// Sentry crash reporting runs in all production builds of both clients and is
+					// not gated by the in-app analytics opt-out, so users cannot disable it.
+					policy: CollectionPolicy.ALWAYS,
+				}),
 				usage: null,
 			},
 			appIsolation: null,
