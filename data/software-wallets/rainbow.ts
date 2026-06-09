@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
 import { alphabet } from '@/data/entities/alphabet'
 import { apple } from '@/data/entities/apple'
+import { rainbow as rainbowEntity } from '@/data/entities/rainbow'
 import { sentry } from '@/data/entities/sentry'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
@@ -218,7 +219,37 @@ export const rainbow: SoftwareWallet = {
 					// not gated by the in-app analytics opt-out, so users cannot disable it.
 					policy: CollectionPolicy.ALWAYS,
 				}),
-				usage: null,
+				usage: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'The mobile app collects product usage analytics via RudderStack; analytics default to enabled and are disabled only when the `doNotTrack` device flag is set.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
+						},
+						{
+							explanation:
+								'The browser extension also collects usage analytics via RudderStack, enabled by default (gated by the `analyticsDisabled` setting).',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/b5da91cd683f1b9cdd2eb4a43b3b8314986cf1af/src/analytics/index.ts',
+						},
+						{
+							explanation:
+								'Usage analytics can be disabled by the user via the in-app Analytics toggle (Settings > Privacy), which calls `analytics.disable()` and sets `doNotTrack`.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+						},
+						{
+							explanation:
+								'The in-app Privacy settings describe the Analytics toggle as "allowing analytics of usage data", confirming it governs usage analytics collection.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png',
+						},
+					],
+					// Usage analytics is collected by Rainbow, implemented via the RudderStack
+					// SDK. The data plane host is configured through a build-time environment
+					// variable, so whether events also reach RudderStack as an external recipient
+					// cannot be verified from the public source; collection is attributed to
+					// Rainbow, the recipient we can confirm.
+					entity: rainbowEntity,
+					policy: CollectionPolicy.BY_DEFAULT,
+				}),
 			},
 			appIsolation: null,
 			dataCollection: null,
