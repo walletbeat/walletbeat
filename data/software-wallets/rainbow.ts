@@ -384,7 +384,11 @@ export const rainbow: SoftwareWallet = {
 				hasPublicChangelog: null,
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Rainbow publishes no reproducible-build tooling, documentation, or
+				// verification process, and its release builds are not hermetic (they fetch
+				// inputs from the network during the build), so an independent party cannot
+				// rebuild the released artifacts and confirm a bit-for-bit match.
+				reproducibleBuilds: notSupported,
 			},
 		},
 	},
