@@ -255,7 +255,7 @@
 	}
 
 	li[data-wbicon]::before {
-		font-family: 'wbicons';
+		font-family: var(--fontFamily-wbicons);
 		content: var(--icon-content);
 	}
 
