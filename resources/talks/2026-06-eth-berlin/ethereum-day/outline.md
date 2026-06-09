@@ -10,7 +10,7 @@ This talk walks through how CROPS values map to wallets, what the current wallet
 
 ## Outline
 
-### Users interact with wallets, not directy to Ethereum.
+### Users interact with wallets, not directly to Ethereum.
 
 - Ethereum's values are only substantial if users experience them.
 - A wallet becomes the user's relationship with Ethereum.
@@ -50,7 +50,7 @@ This talk walks through how CROPS values map to wallets, what the current wallet
 
 ### Current wallet landscape backed by Walletbeat's data (?)
 
-- Pick two or three attributes to show wallets wekanesses & strengths common ground
+- Pick two or three attributes to show wallets weaknesses & strengths common ground
   - Source code availability
   - L1 provider independence
   - Private transfers
