@@ -6,6 +6,7 @@ import '@/styles/wbicons.css'
 
 // Props
 import type { ComponentProps } from 'astro/types'
+import { Font } from 'astro:assets'
 import { ClientRouter } from 'astro:transitions'
 
 type Props = {
@@ -34,6 +35,12 @@ import Background from '@/components/Background.svelte'
 			content='width=device-width, viewport-fit=cover, maximum-scale=1.0, user-scalable=no'
 		/>
 		<Metadata {metadata} />
+
+		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
+		<Font cssVariable='--fontFamily-spMonorium' preload />
+		<Font cssVariable='--fontFamily-wbicons' preload />
+		<Font cssVariable='--fontFamily-avenir' />
+
 		<ClientRouter />
 		<script is:inline>
 			// `color-scheme` override
