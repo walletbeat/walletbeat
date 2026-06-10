@@ -547,7 +547,7 @@ function evaluateAuctioningOrderflow(
 
 export const orderflowTransparency: Attribute = {
 	id: 'orderflowTransparency',
-	icon: '\u{1f500}', // Twisted rightwards arrows (🔀)
+	icon: 'orderflow_transparency',
 	displayName: 'Orderflow transparency',
 	wording: {
 		midSentenceName: null,
