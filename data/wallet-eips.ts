@@ -178,7 +178,7 @@ export const walletEips: WalletEip[] = [
 			'A human-readable address format that includes a chain shortName prefix (e.g. `eth:0x…`, `oeth:0x…`).',
 		title: 'Chain-specific Addresses (ERC-3770)',
 		walletRelevance:
-			'Prevents cross-chain send errors by encoding the intended chain directly in the address string; wallets should display and validate this format.',
+			'Prevents cross-chain send errors by encoding the intended chain directly in the address string (e.g. `eth:0x…`); wallets should display and validate this format.',
 	},
 ]
 
