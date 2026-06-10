@@ -378,7 +378,12 @@ export const rainbow: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: null,
 			},
 			releaseTransparency: {
-				artifactSigning: null,
+				// Rainbow signs release artifacts only with the mandatory platform/store keys
+				// (Apple certificates via fastlane match; the Android upload keystore). No
+				// independent signatures or attestations are published to a verifiable channel:
+				// GitHub releases carry no assets, and the CI/publish workflows use no sigstore,
+				// cosign, GitHub build attestation, or GPG signing.
+				artifactSigning: notSupported,
 				dependencyLocking: supported({
 					ref: [
 						{
