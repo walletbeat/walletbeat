@@ -34,7 +34,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -378,60 +383,29 @@ export const rainbow: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: null,
 			},
 			releaseTransparency: {
-				// Rainbow signs release artifacts only with the mandatory platform/store keys
-				// (Apple certificates via fastlane match; the Android upload keystore). No
-				// independent signatures or attestations are published to a verifiable channel:
-				// GitHub releases carry no assets, and the CI/publish workflows use no sigstore,
-				// cosign, GitHub build attestation, or GPG signing.
-				artifactSigning: notSupported,
-				dependencyLocking: supported({
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: notSupportedWithRef({
 					ref: [
 						{
 							explanation:
-								'The browser extension CI runs `yarn install --immutable` and a dedicated `yarn check-lockfile` step, failing the build if yarn.lock is out of sync.',
+								'The browser extension build job checks out an external repository (rainbow-me/browser-extension-env) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build, so build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
 						},
 						{
 							explanation:
-								'The mobile wallet Android release build installs dependencies with `yarn install --immutable`, which fails if yarn.lock would change.',
+								'The mobile wallet Android release build runs `yarn install --immutable && yarn setup` and resolves Gradle dependencies while assembling the release, fetching build inputs from the network.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
 						},
 						{
 							explanation:
-								'The mobile wallet iOS release build installs dependencies with `yarn install --immutable`, which fails if yarn.lock would change.',
+								'The mobile wallet iOS build runs `yarn install --immutable && yarn setup` and `fastlane match`, which fetches signing certificates from a remote git repository during the build, fetching build inputs from the network.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
 						},
 					],
 				}),
-				dependencyVulnerabilityScanning: supported({
-					ref: [
-						{
-							explanation:
-								'The browser extension runs `yarn audit:ci` (audit-ci) as a CI step, failing the build on vulnerable dependencies.',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
-						},
-						{
-							explanation:
-								'The mobile wallet runs `yarn audit-ci` as a CI step, failing the build on vulnerable dependencies.',
-							url: 'https://github.com/rainbow-me/rainbow/blob/c203ae4e9cb48627310f37ebbab05dbb43211286/.github/workflows/unit-test.yml',
-						},
-					],
-				}),
-				hasPublicChangelog: {
-					[Variant.BROWSER]: supported({
-						ref: {
-							explanation: 'Rainbow publishes browser extension release notes via GitHub Releases.',
-							url: 'https://github.com/rainbow-me/browser-extension/releases',
-						},
-					}),
-					[Variant.MOBILE]: supported({
-						ref: {
-							explanation: 'Rainbow publishes mobile wallet release notes via GitHub Releases.',
-							url: 'https://github.com/rainbow-me/rainbow/releases',
-						},
-					}),
-				},
-				hermeticBuilds: null,
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
