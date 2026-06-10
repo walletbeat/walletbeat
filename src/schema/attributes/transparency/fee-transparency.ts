@@ -9,7 +9,12 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
-import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	type BasicOperationFees,
+	compareFeeDisplay,
+	type FeeDisplay,
+	FeeDisplayLevel,
+} from '@/schema/features/transparency/fee-display'
 import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
@@ -152,87 +157,10 @@ function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
 	)
 }
 
-function validateFeeDisplay(feeDisplay: FeeDisplay) {
-	if (
-		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
-			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
-		feeDisplay.afterSingleAction === FeeDisplayLevel.NONE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
-		)
-	}
-
-	if (
-		feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE &&
-		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
-		)
-	}
-}
-
-/**
- * Returns;
- *   * 1 if feeDisplay1 is better
- *   * 0 if feeDisplay1 and feeDisplay2 are completely equal
- *   * -1 if feeDisplay2 is better
- */
-function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDisplay): -1 | 0 | 1 {
-	validateFeeDisplay(feeDisplay1)
-	validateFeeDisplay(feeDisplay2)
-
-	if (
-		feeDisplay1.byDefault === feeDisplay2.byDefault &&
-		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
-		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
-	) {
-		return 0
-	}
-
-	if (feeDisplay1.fullySponsored !== feeDisplay2.fullySponsored) {
-		return feeDisplay1.fullySponsored ? 1 : -1
-	}
-
-	const compareFeeDisplayLevel = (
-		displayLevel1: FeeDisplayLevel,
-		displayLevel2: FeeDisplayLevel,
-	): -1 | 0 | 1 => {
-		if (displayLevel1 === FeeDisplayLevel.COMPREHENSIVE) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.COMPREHENSIVE) {
-			return -1
-		}
-
-		if (displayLevel1 === FeeDisplayLevel.AGGREGATED) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.AGGREGATED) {
-			return -1
-		}
-
-		throw new Error('Unreachable')
-	}
-
-	if (feeDisplay1.byDefault !== feeDisplay2.byDefault) {
-		return compareFeeDisplayLevel(feeDisplay1.byDefault, feeDisplay2.byDefault)
-	}
-
-	if (feeDisplay1.afterSingleAction !== feeDisplay2.afterSingleAction) {
-		return compareFeeDisplayLevel(feeDisplay1.afterSingleAction, feeDisplay2.afterSingleAction)
-	}
-
-	throw new Error('Unreachable')
-}
-
 /**
  * How a wallet handles the worst type of fees it does handle.
  */
-type WorstFeeDisplay = {
+export type WorstFeeDisplay = {
 	/** The way the wallet displays fees. */
 	feeDisplay: FeeDisplay
 
@@ -291,6 +219,21 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	}
 
 	return worstFeeTypes
+}
+
+/** Worst-case fee display among basic operation fees only. */
+export function worstOperationFeeDisplay(operationFees: BasicOperationFees): FeeDisplay | null {
+	return (
+		computeWorstFees({
+			[FeeType.ETH_L1_TRANSFER]: operationFees.ethL1Transfer,
+			[FeeType.ERC20_L1_TRANSFER]: operationFees.erc20L1Transfer,
+			[FeeType.BUILT_IN_ERC20_SWAP]: operationFees.builtInErc20Swap,
+			[FeeType.UNISWAP_USDC_TO_ETHER_SWAP]: operationFees.uniswapUSDCToEtherSwap,
+			[FeeType.CROSS_CHAIN_BRIDGING]: null,
+			[FeeType.TORNADO_CASH_NOVA_RELAYER]: null,
+			[FeeType.STEALTH_ADDRESS_SENDING]: null,
+		})?.feeDisplay ?? null
+	)
 }
 
 export type FeeTransparencyMetadata = {

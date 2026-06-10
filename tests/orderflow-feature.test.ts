@@ -17,15 +17,16 @@ import {
 	validateDataCollectionByEntityRow,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
+import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
+	compareOrderflowDisclosureToFeeDisplay,
 	OrderflowDisclosureLevel,
 	validateOrderflowDisclosure,
 } from '@/schema/features/transparency/orderflow'
 import {
-	auctionsOrderflowByDefault,
-	hasMempoolCollectionWithoutEndpoint,
+	deriveOrderflowFacts,
 	orderflowTransactionFlows,
-	preInclusionRecipientsByDefault,
+	partitionPreInclusionRecipientsByExtractiveness,
 } from '@/schema/features/transparency/orderflow-derived'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 
@@ -131,10 +132,10 @@ describe('orderflow-derived helpers', () => {
 		])
 	})
 
-	it('returns null when any orderflow flow is not researched', () => {
-		expect(
-			preInclusionRecipientsByDefault(researchedDataCollection({ [UserFlow.SEND_ETHER]: null })),
-		).toBeNull()
+	it('returns incomplete when any orderflow flow is not researched', () => {
+		expect(deriveOrderflowFacts(researchedDataCollection({ [UserFlow.SEND_ETHER]: null }))).toEqual(
+			{ status: 'incomplete' },
+		)
 	})
 
 	it('detects mempool collection without endpoint', () => {
@@ -157,7 +158,9 @@ describe('orderflow-derived helpers', () => {
 			},
 		})
 
-		expect(hasMempoolCollectionWithoutEndpoint(dataCollection)).toBe(true)
+		const facts = deriveOrderflowFacts(dataCollection)
+
+		expect(facts).toMatchObject({ status: 'complete', hasMempoolWithoutEndpoint: true })
 	})
 
 	it('concatenates pre-inclusion rows and filters auctioneers', () => {
@@ -188,8 +191,165 @@ describe('orderflow-derived helpers', () => {
 			},
 		})
 
-		expect(preInclusionRecipientsByDefault(dataCollection)).toHaveLength(2)
-		expect(auctionsOrderflowByDefault(dataCollection)).toEqual([auctionRow])
+		const facts = deriveOrderflowFacts(dataCollection)
+
+		expect(facts).toMatchObject({ status: 'complete', hasMempoolWithoutEndpoint: false })
+
+		if (facts.status !== 'complete') {
+			return
+		}
+
+		expect(facts.preInclusionRecipients).toHaveLength(2)
+		expect(facts.auctioneers).toEqual([auctionRow])
+	})
+
+	it('partitions pre-inclusion recipients by endpoint extractiveness', () => {
+		const enclaveRow: WithRef<DataCollectionByEntity> = {
+			ref: refNotNecessary,
+			byEntity: exampleWalletDevelopmentCompany,
+			dataCollection: {
+				[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+				endpoint: fullEnclaveEndpoint,
+			},
+			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+		}
+
+		const regularRow: WithRef<DataCollectionByEntity> = {
+			ref: refNotNecessary,
+			byEntity: exampleOrderflowAuctioneer,
+			dataCollection: {
+				[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+				endpoint: RegularEndpoint,
+			},
+			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+		}
+
+		expect(partitionPreInclusionRecipientsByExtractiveness([])).toEqual({
+			nonExtractive: [],
+			extractive: [],
+		})
+
+		expect(partitionPreInclusionRecipientsByExtractiveness([enclaveRow])).toEqual({
+			nonExtractive: [enclaveRow],
+			extractive: [],
+		})
+
+		expect(partitionPreInclusionRecipientsByExtractiveness([enclaveRow, regularRow])).toEqual({
+			nonExtractive: [enclaveRow],
+			extractive: [regularRow],
+		})
+	})
+})
+
+const comprehensiveFeeDisplay: FeeDisplay = {
+	byDefault: FeeDisplayLevel.COMPREHENSIVE,
+	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+	fullySponsored: false,
+}
+
+const aggregatedFeeDisplay: FeeDisplay = {
+	byDefault: FeeDisplayLevel.AGGREGATED,
+	afterSingleAction: FeeDisplayLevel.AGGREGATED,
+	fullySponsored: false,
+}
+
+const fullySponsoredFeeDisplay: FeeDisplay = {
+	byDefault: FeeDisplayLevel.NONE,
+	afterSingleAction: FeeDisplayLevel.NONE,
+	fullySponsored: true,
+}
+
+describe('compareOrderflowDisclosureToFeeDisplay', () => {
+	it('returns 0 when prominence levels match', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
+					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+				},
+				comprehensiveFeeDisplay,
+			),
+		).toBe(0)
+	})
+
+	it('returns 1 when orderflow disclosure is more prominent', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
+					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+				},
+				aggregatedFeeDisplay,
+			),
+		).toBe(1)
+	})
+
+	it('returns -1 when orderflow disclosure is less prominent', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.AGGREGATED,
+					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+				},
+				comprehensiveFeeDisplay,
+			),
+		).toBe(-1)
+	})
+
+	it('ranks sponsored fees with no fee UI as NONE when orderflow is visible', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.AGGREGATED,
+					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+				},
+				fullySponsoredFeeDisplay,
+			),
+		).toBe(1)
+	})
+
+	it('returns -1 when fees are fully sponsored but fee UI is still shown', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.AGGREGATED,
+					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+				},
+				{
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: true,
+				},
+			),
+		).toBe(-1)
+	})
+
+	it('returns 0 when fully sponsored fees match orderflow prominence levels', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.AGGREGATED,
+					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+				},
+				{
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					afterSingleAction: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: true,
+				},
+			),
+		).toBe(0)
+	})
+
+	it('returns -1 when comprehensive fees exceed aggregated orderflow disclosure', () => {
+		expect(
+			compareOrderflowDisclosureToFeeDisplay(
+				{
+					byDefault: OrderflowDisclosureLevel.AGGREGATED,
+					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+				},
+				comprehensiveFeeDisplay,
+			),
+		).toBe(-1)
 	})
 })
 

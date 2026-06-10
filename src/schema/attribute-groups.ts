@@ -96,6 +96,7 @@ import {
 import { funding } from './attributes/transparency/funding'
 import { maintenance, type MaintenanceMetadata } from './attributes/transparency/maintenance'
 import { openSource } from './attributes/transparency/open-source'
+import { orderflowTransparency } from './attributes/transparency/orderflow-transparency'
 import { releaseProcess } from './attributes/transparency/release-process'
 import { reputation, type ReputationMetadata } from './attributes/transparency/reputation'
 import { sourceVisibility } from './attributes/transparency/source-visibility'
@@ -232,6 +233,7 @@ type TransparencyValues = Dict<{
 	sourceVisibility: null
 	funding: null
 	feeTransparency: FeeTransparencyMetadata
+	orderflowTransparency: null
 	releaseProcess: null
 	reputation: ReputationMetadata
 }>
@@ -249,6 +251,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		sourceVisibility,
 		funding,
 		feeTransparency,
+		orderflowTransparency,
 		releaseProcess,
 		reputation,
 	},
@@ -257,6 +260,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		sourceVisibility: 1.0,
 		funding: 1.0,
 		feeTransparency: 1.0,
+		orderflowTransparency: 1.0,
 		releaseProcess: 1.0,
 		reputation: 1.0,
 	},
@@ -388,6 +392,7 @@ export interface TransparencyEvaluations extends EvaluatedGroup<TransparencyValu
 	sourceVisibility: EvaluatedAttribute
 	funding: EvaluatedAttribute
 	feeTransparency: EvaluatedAttribute<FeeTransparencyMetadata>
+	orderflowTransparency: EvaluatedAttribute
 	releaseProcess: EvaluatedAttribute
 }
 
@@ -497,6 +502,7 @@ export function evaluateAttributes(
 			sourceVisibility: evalAttr(sourceVisibility),
 			funding: evalAttr(funding),
 			feeTransparency: evalAttr(feeTransparency),
+			orderflowTransparency: evalAttr(orderflowTransparency),
 			releaseProcess: evalAttr(releaseProcess),
 			reputation: evalAttr(reputation),
 		},
@@ -574,6 +580,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			sourceVisibility: attr(tree => tree.transparency.sourceVisibility),
 			funding: attr(tree => tree.transparency.funding),
 			feeTransparency: attr(tree => tree.transparency.feeTransparency),
+			orderflowTransparency: attr(tree => tree.transparency.orderflowTransparency),
 			releaseProcess: attr(tree => tree.transparency.releaseProcess),
 			reputation: attr(tree => tree.transparency.reputation),
 		},

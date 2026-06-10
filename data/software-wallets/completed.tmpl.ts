@@ -97,6 +97,7 @@ import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 /**
  * Default transaction display showing all 6 basic fields.
@@ -757,7 +758,7 @@ export const completedTemplate: SoftwareWallet = {
 						explainsDefaultOrderflowAuctioning: true,
 						listsEntitiesAndWhatTheyDo: true,
 						onchainVerification: OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE,
-						pageLastUpdated: '2026-02-27',
+						pageLastUpdated: '2026-02-27' as CalendarDate,
 					},
 					url: 'https://example.com/orderflow-practices',
 				}),

@@ -1,6 +1,8 @@
 import type { MustRef, WithRef } from '@/schema/reference'
+import type { CalendarDate } from '@/types/date'
 
 import { type Support } from '../support'
+import { type FeeDisplay, FeeDisplayLevel, validateFeeDisplay } from './fee-display'
 
 /**
  * What level of orderflow / MEV auctioning information is shown by default and
@@ -64,7 +66,7 @@ export interface OrderflowPracticesPageContents {
 	documentsHowToChangeDefaults: boolean
 	onchainVerification: OnchainVerificationDocumentation
 	/** Calendar date shown on the wallet's practices page (YYYY-MM-DD). */
-	pageLastUpdated: string
+	pageLastUpdated: CalendarDate
 }
 
 /** Orderflow transparency practices beyond data-collection entity rows. */
@@ -108,4 +110,63 @@ export function validateOrderflowDisclosure(orderflow: OrderflowDisclosure): voi
 			'Invalid orderflow disclosure: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
 		)
 	}
+}
+
+function compareProminenceLevels(
+	orderflowLevel: OrderflowDisclosureLevel,
+	feeLevel: FeeDisplayLevel,
+): -1 | 0 | 1 {
+	const rank = (level: OrderflowDisclosureLevel | FeeDisplayLevel): number => {
+		switch (level) {
+			case OrderflowDisclosureLevel.COMPREHENSIVE:
+			case FeeDisplayLevel.COMPREHENSIVE:
+				return 2
+			case OrderflowDisclosureLevel.AGGREGATED:
+			case FeeDisplayLevel.AGGREGATED:
+				return 1
+			case OrderflowDisclosureLevel.NONE:
+			case FeeDisplayLevel.NONE:
+				return 0
+		}
+	}
+
+	const orderflowRank = rank(orderflowLevel)
+	const feeRank = rank(feeLevel)
+
+	if (orderflowRank > feeRank) {
+		return 1
+	}
+
+	if (orderflowRank < feeRank) {
+		return -1
+	}
+
+	return 0
+}
+
+/**
+ * Compares orderflow UI disclosure prominence to fee display.
+ *
+ * Returns:
+ *   * `1` if orderflow disclosure is more prominent than fees
+ *   * `0` if prominence is equal at both by-default and after-single-action levels
+ *   * `-1` if orderflow disclosure is less prominent than fees
+ *
+ * Compares `feeDisplay.byDefault` and `feeDisplay.afterSingleAction` to the
+ * corresponding orderflow disclosure levels using the same prominence ordering.
+ */
+export function compareOrderflowDisclosureToFeeDisplay(
+	disclosure: OrderflowDisclosure,
+	feeDisplay: FeeDisplay,
+): -1 | 0 | 1 {
+	validateOrderflowDisclosure(disclosure)
+	validateFeeDisplay(feeDisplay)
+
+	const byDefaultCompare = compareProminenceLevels(disclosure.byDefault, feeDisplay.byDefault)
+
+	if (byDefaultCompare !== 0) {
+		return byDefaultCompare
+	}
+
+	return compareProminenceLevels(disclosure.afterSingleAction, feeDisplay.afterSingleAction)
 }

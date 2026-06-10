@@ -55,6 +55,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/transparency/license.ts`](#srcschemafeaturestransparencylicensets)
 - [`src/schema/features/transparency/maintenance.ts`](#srcschemafeaturestransparencymaintenancets)
 - [`src/schema/features/transparency/monetization.ts`](#srcschemafeaturestransparencymonetizationts)
+- [`src/schema/features/transparency/orderflow-derived.ts`](#srcschemafeaturestransparencyorderflow-derivedts)
 - [`src/schema/features/transparency/orderflow.ts`](#srcschemafeaturestransparencyorderflowts)
 - [`src/schema/features/transparency/release-transparency.ts`](#srcschemafeaturestransparencyrelease-transparencyts)
 - [`src/schema/features/transparency/reputation.ts`](#srcschemafeaturestransparencyreputationts)
@@ -3498,6 +3499,8 @@ How much fee information is displayed by default and after an action.
 - `afterSingleAction` (`FeeDisplayLevel`): Level of fee information shown after at most one additional click/tap on the transaction approval screen (e.g. tapping a fee row, an info icon, or a "show details" chevron), with no settings changed. To test: from the same default approval screen, make exactly one fee-related interaction and record the highest level of detail then shown. If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
 - `fullySponsored` (`boolean`): Whether the wallet fully sponsors these fees on behalf of the user, so the user pays nothing. To test: complete the transaction and verify that no gas or protocol fee is deducted from the user's balance. Check the wallet's documentation or source code to confirm sponsorship is intentional and not a test-net artifact.
 
+  This field describes payment (whether the user pays nothing), while `byDefault` and `afterSingleAction` describe UI visibility. Orderflow prominence comparison uses the recorded display levels as-is; if no fee-related copy appears on the approval screen, set both levels to `NONE` even when the wallet fully sponsors fees.
+
 ---
 
 ### Interface: `BasicOperationFees`
@@ -3508,6 +3511,15 @@ Details about how the wallet displays fees for basic operations.
 - `erc20L1Transfer` (`Support<WithRef<FeeDisplay>>`): How does the wallet display fees for a simple ERC-20 transfer on L1? To test: initiate a send of any ERC-20 token (e.g. USDC) to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
 - `builtInErc20Swap` (`Support<WithRef<FeeDisplay>>`): If the wallet has a built-in ERC-20 swap feature, how are fees displayed? To test: use the wallet's own swap UI (not an external app) to swap one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee display on the approval screen. Set to not supported if the wallet has no built-in swap feature.
 - `uniswapUSDCToEtherSwap` (`Support<WithRef<FeeDisplay>>`): For a Uniswap transaction exchanging USDC for Ether, initiated through the Uniswap frontend (not the wallet's built-in swap feature, if any), how are fees displayed in the wallet's transaction approval dialog? To test: go to app.uniswap.org, connect the wallet, set up a USDC→ETH swap, and evaluate the fee display shown in the wallet's approval popup — not the Uniswap UI itself.
+
+---
+
+### Type: `WorstOperationFees`
+
+Worst basic-operation fee display with contributing research refs.
+
+- `feeDisplay` (`FeeDisplay`)
+- `references` (`FullyQualifiedReference[]`)
 
 ---
 
@@ -3706,6 +3718,23 @@ type Monetization = WithRef<{
 
 ---
 
+## `src/schema/features/transparency/orderflow-derived.ts`
+
+### Type: `OrderflowFacts`
+
+```typescript
+type OrderflowFacts =
+	| { status: 'incomplete' }
+	| {
+			status: 'complete'
+			hasMempoolWithoutEndpoint: boolean
+			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
+			auctioneers: WithRef<DataCollectionByEntity>[]
+	  }
+```
+
+---
+
 ## `src/schema/features/transparency/orderflow.ts`
 
 ### Enum: `OrderflowDisclosureLevel`
@@ -3756,7 +3785,7 @@ Contents researchers evaluate on the wallet's orderflow practices page.
 - `explainsDefaultOrderflowAuctioning` (`boolean`)
 - `documentsHowToChangeDefaults` (`boolean`)
 - `onchainVerification` (`OnchainVerificationDocumentation`)
-- `pageLastUpdated` (`string`): Calendar date shown on the wallet's practices page (YYYY-MM-DD).
+- `pageLastUpdated` (`CalendarDate`): Calendar date shown on the wallet's practices page (YYYY-MM-DD).
 
 ---
 

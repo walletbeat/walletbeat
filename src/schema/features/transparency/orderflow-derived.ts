@@ -6,6 +6,7 @@ import {
 	type DataCollectionByEntity,
 	type DataCollectionForUserFlowOrUnsupported,
 	DataCollectionPurpose,
+	endpointIsVerifiablyNonExtractive,
 	isWithEndpoint,
 	qualifiedDataCollection,
 	UserFlow,
@@ -40,16 +41,6 @@ function flowDataCollection(
 	}
 }
 
-function allOrderFlowsResearched(dataCollection: DataCollection): boolean {
-	for (const flow of orderflowTransactionFlows) {
-		if (flowDataCollection(dataCollection, flow) === null) {
-			return false
-		}
-	}
-
-	return true
-}
-
 function mempoolCollectedByDefaultOrAlways(
 	collectionByEntity: WithRef<DataCollectionByEntity>,
 ): boolean {
@@ -60,89 +51,78 @@ function mempoolCollectedByDefaultOrAlways(
 	return policy === CollectionPolicy.BY_DEFAULT || policy === CollectionPolicy.ALWAYS
 }
 
-function rowsMatchingMempoolPreInclusionWithEndpoint(
-	flow: DataCollectionForUserFlowOrUnsupported,
-): WithRef<DataCollectionByEntity>[] {
-	if (flow === null || flow === 'FLOW_NOT_SUPPORTED') {
-		return []
+export type OrderflowFacts =
+	| { status: 'incomplete' }
+	| {
+			status: 'complete'
+			hasMempoolWithoutEndpoint: boolean
+			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
+			auctioneers: WithRef<DataCollectionByEntity>[]
+	  }
+
+/** Derived orderflow-related facts from privacy data collection in a single pass. */
+export function deriveOrderflowFacts(dataCollection: DataCollection | null): OrderflowFacts {
+	if (dataCollection === null) {
+		return { status: 'incomplete' }
 	}
 
-	const matching: WithRef<DataCollectionByEntity>[] = []
-
-	for (const collectionByEntity of flow.collected) {
-		if (!isWithEndpoint(collectionByEntity.dataCollection)) {
-			continue
-		}
-
-		if (mempoolCollectedByDefaultOrAlways(collectionByEntity)) {
-			matching.push(collectionByEntity)
-		}
-	}
-
-	return matching
-}
-
-/**
- * Whether any pre-inclusion mempool collection row in the orderflow transaction
- * flows lacks endpoint information (attribute UNRATED when true).
- */
-export function hasMempoolCollectionWithoutEndpoint(
-	dataCollection: DataCollection | null,
-): boolean {
-	if (dataCollection === null || !allOrderFlowsResearched(dataCollection)) {
-		return false
-	}
+	const preInclusionRecipients: WithRef<DataCollectionByEntity>[] = []
+	let hasMempoolWithoutEndpoint = false
 
 	for (const flow of orderflowTransactionFlows) {
 		const flowData = flowDataCollection(dataCollection, flow)
 
-		if (flowData === null || flowData === 'FLOW_NOT_SUPPORTED') {
+		if (flowData === null) {
+			return { status: 'incomplete' }
+		}
+
+		if (flowData === 'FLOW_NOT_SUPPORTED') {
 			continue
 		}
 
 		for (const collectionByEntity of flowData.collected) {
-			if (
-				!isWithEndpoint(collectionByEntity.dataCollection) &&
-				mempoolCollectedByDefaultOrAlways(collectionByEntity)
-			) {
-				return true
+			if (!mempoolCollectedByDefaultOrAlways(collectionByEntity)) {
+				continue
 			}
+
+			if (!isWithEndpoint(collectionByEntity.dataCollection)) {
+				hasMempoolWithoutEndpoint = true
+				continue
+			}
+
+			preInclusionRecipients.push(collectionByEntity)
 		}
 	}
 
-	return false
-}
-
-/** Pre-inclusion recipients (with endpoint) reached by default across orderflow flows. */
-export function preInclusionRecipientsByDefault(
-	dataCollection: DataCollection | null,
-): WithRef<DataCollectionByEntity>[] | null {
-	if (dataCollection === null || !allOrderFlowsResearched(dataCollection)) {
-		return null
-	}
-
-	const collectionsByEntity: WithRef<DataCollectionByEntity>[] = []
-
-	for (const flow of orderflowTransactionFlows) {
-		collectionsByEntity.push(
-			...rowsMatchingMempoolPreInclusionWithEndpoint(flowDataCollection(dataCollection, flow)),
-		)
-	}
-
-	return collectionsByEntity
-}
-
-/** Pre-inclusion recipients that auction orderflow by default. */
-export function auctionsOrderflowByDefault(
-	dataCollection: DataCollection | null,
-): WithRef<DataCollectionByEntity>[] | null {
-	const preInclusion = preInclusionRecipientsByDefault(dataCollection)
-
-	if (preInclusion === null) {
-		return null
-	}
-
-	return preInclusion.filter(collectionByEntity =>
+	const auctioneers = preInclusionRecipients.filter(collectionByEntity =>
 		collectionByEntity.purposes.includes(DataCollectionPurpose.ORDERFLOW_AUCTION),
 	)
+
+	return {
+		status: 'complete',
+		hasMempoolWithoutEndpoint,
+		preInclusionRecipients,
+		auctioneers,
+	}
+}
+
+/** Partition default pre-inclusion recipients by whether their endpoint is verifiably non-extractive. */
+export function partitionPreInclusionRecipientsByExtractiveness(
+	recipients: WithRef<DataCollectionByEntity>[],
+): {
+	nonExtractive: WithRef<DataCollectionByEntity>[]
+	extractive: WithRef<DataCollectionByEntity>[]
+} {
+	const nonExtractive: WithRef<DataCollectionByEntity>[] = []
+	const extractive: WithRef<DataCollectionByEntity>[] = []
+
+	for (const row of recipients) {
+		if (endpointIsVerifiablyNonExtractive(row.dataCollection.endpoint)) {
+			nonExtractive.push(row)
+		} else {
+			extractive.push(row)
+		}
+	}
+
+	return { nonExtractive, extractive }
 }
