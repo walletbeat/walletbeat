@@ -1,0 +1,190 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+import WalletEipCard from '@/components/WalletEipCard.svelte'
+import { walletEips, eipCategories, type EipCategory } from '@/data/wallet-eips'
+
+const grouped = (Object.keys(eipCategories) as EipCategory[]).map(cat => ({
+	category: cat,
+	meta: eipCategories[cat],
+	eips: walletEips.filter(e => e.category === cat),
+}))
+
+const totalCount = walletEips.length
+---
+
+<Layout
+	metadata={{
+		title: 'Wallet EIPs',
+		description:
+			'A reference of Ethereum Improvement Proposals (EIPs and ERCs) that wallet developers and users should know — grouped by theme, with plain-English explanations of why each one matters.',
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>Wallet EIPs</h1>
+				<p>
+					Key Ethereum standards wallet developers implement — and users benefit from. Grouped by
+					theme and explained in plain English.
+				</p>
+			</hgroup>
+			<p class='hero__meta'>
+				{totalCount} standards &nbsp;·&nbsp; sourced from
+				<a href='https://eips.ethereum.org' target='_blank' rel='noopener noreferrer'>
+					eips.ethereum.org
+				</a>
+			</p>
+		</header>
+
+		<div data-scroll-item='inline-detached padding-match-end' class='eip-content'>
+			<nav class='cat-nav' aria-label='Jump to category'>
+				{
+					grouped.map(({ category, meta }) => (
+						<a class='cat-nav__link' href={`#${category}`}>
+							{meta.label}
+						</a>
+					))
+				}
+			</nav>
+
+			<div class='eip-sections'>
+				{
+					grouped.map(({ category, meta, eips }) => (
+						<section id={category} class='eip-section'>
+							<div class='eip-section__header'>
+								<h2>{meta.label}</h2>
+								<p>{meta.description}</p>
+							</div>
+							<div class='eip-grid'>
+								{eips.map(eip => (
+									<WalletEipCard {eip} client:visible />
+								))}
+							</div>
+						</section>
+					))
+				}
+			</div>
+
+			<footer class='contribute'>
+				<p>
+					Missing an EIP? Open an issue or PR on the{' '}
+					<a
+						href='https://github.com/walletbeat/walletbeat'
+						target='_blank'
+						rel='noopener noreferrer'
+					>
+						walletbeat repository
+					</a>.
+				</p>
+			</footer>
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 58rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+
+		hgroup p {
+			font-size: 1.1rem;
+			color: var(--text-secondary);
+			opacity: 0.75;
+		}
+	}
+
+	.hero__meta {
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		opacity: 0.6;
+		margin-top: 1rem;
+	}
+
+	.hero__meta a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
+	.cat-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 3.5rem;
+	}
+
+	.cat-nav__link {
+		font-size: 0.82rem;
+		font-weight: 500;
+		padding: 0.35em 0.9em;
+		border: 1px solid var(--border);
+		border-radius: 99px;
+		color: var(--text-secondary);
+		text-decoration: none;
+		transition:
+			border-color 0.15s ease,
+			color 0.15s ease;
+	}
+
+	.cat-nav__link:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+
+	.eip-sections {
+		display: flex;
+		flex-direction: column;
+		gap: 4rem;
+	}
+
+	.eip-section__header {
+		margin-bottom: 1.5rem;
+	}
+
+	.eip-section__header h2 {
+		margin: 0 0 0.5rem;
+		scroll-margin-top: 5rem;
+	}
+
+	.eip-section__header p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		max-width: 42rem;
+		line-height: 1.65;
+		opacity: 0.8;
+	}
+
+	.eip-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+		gap: 1rem;
+	}
+
+	.contribute {
+		margin-top: 2rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--border);
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		opacity: 0.8;
+	}
+
+	.contribute a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	.contribute a:hover {
+		text-decoration: underline;
+	}
+</style>
