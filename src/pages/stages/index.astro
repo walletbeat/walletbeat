@@ -1,0 +1,21 @@
+---
+import { defaultNavigationItems } from '@/constants/navigation'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import StagesPage from '@/views/StagesPage.svelte'
+---
+
+<Layout
+	metadata={{
+		title: 'Wallet Stages — Walletbeat',
+		description:
+			'The stage system Walletbeat uses to evaluate Ethereum wallets: from Verifiable to Foundational to Ethereum Standard to Trust-minimized.',
+		keywordsAfter: ['stages', 'criteria', 'roadmap', 'evaluation'],
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container>
+		<StagesPage client:load />
+	</main>
+</Layout>
