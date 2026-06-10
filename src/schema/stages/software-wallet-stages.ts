@@ -9,8 +9,12 @@ import { addressCorrelation } from '../attributes/privacy/address-correlation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { chainVerification } from '../attributes/security/chain-verification'
+import { scamPrevention } from '../attributes/security/scam-prevention'
 import { securityAudits } from '../attributes/security/security-audits'
+import { securityBestPractices } from '../attributes/security/security-best-practices'
+import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
+import { permissionsManagement } from '../attributes/self-sovereignty/permissions-management'
 import { transactionInclusion } from '../attributes/self-sovereignty/transaction-inclusion'
 import { feeTransparency } from '../attributes/transparency/fee-transparency'
 import { funding } from '../attributes/transparency/funding'
@@ -18,6 +22,7 @@ import { openSource } from '../attributes/transparency/open-source'
 import { sourceVisibility } from '../attributes/transparency/source-visibility'
 import { hardwareWalletType } from '../features/security/hardware-wallet-support'
 import { RpcEndpointConfiguration } from '../features/self-sovereignty/chain-configurability'
+import { SpendingApprovalsControl } from '../features/self-sovereignty/permissions-management'
 import { isSupported, notSupported } from '../features/support'
 import {
 	type StageCriterionEvaluation,
@@ -47,7 +52,7 @@ export const softwareWalletStageZero: WalletStage = {
 					id: 'source_available',
 					description: sentence("The wallet's source code is publicly available."),
 					rationale: sentence(
-						'The source code must be publicly available so that it can be reviewed by Walletbeat.',
+						'The source code must be publicly available so that it can be reviewed by the public.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
 					displayName: 'Source Availability',
@@ -61,26 +66,100 @@ export const softwareWalletStageZeroFive: WalletStage = {
 	id: 'stage:software-0-5',
 	label: 'Stage 0.5',
 	name: 'Foundational Wallet',
-	description: sentence('The wallet meets the minimum criteria for evaluation.'),
+	description: sentence(
+		'The wallet meets the basic requirements to be considered a usable Ethereum wallet.',
+	),
 	criteriaGroups: [
 		{
-			id: 'reviewability',
-			description: sentence("The wallet's source code can be reviewed by the public."),
+			id: 'security',
+			description: sentence('The wallet provides basic security protections for its users.'),
 			criteria: [
 				{
-					id: 'source_available',
-					description: sentence("The wallet's source code is publicly available."),
+					id: 'hardware_wallet_any',
+					description: sentence('The wallet supports at least one hardware wallet manufacturer.'),
 					rationale: sentence(
-						'The source code must be publicly available so that it can be reviewed by Walletbeat.',
+						'Supporting hardware wallets lets users keep their private keys offline, adding a critical layer of security.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
-					displayName: 'Source Availability',
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (variantWallet.features.security.hardwareWalletSupport === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							const numSupportedWallets = Object.values(
+								hardwareWalletType.fullRecord(
+									variantWallet.features.security.hardwareWalletSupport.wallets,
+									notSupported,
+								),
+							).filter(isSupported).length
+
+							if (numSupportedWallets < 1) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence('{{WALLET_NAME}} does not support any hardware wallets.'),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} supports at least one hardware wallet manufacturer.',
+								),
+							}
+						},
+					),
+					displayName: 'Hardware Wallet Support',
+				},
+				{
+					id: 'transaction_legibility_basic',
+					description: sentence(
+						'The wallet displays basic transaction details before the user signs.',
+					),
+					rationale: sentence(
+						'Users must be able to see key transaction details (amount, recipient, chain, fees) before signing to avoid being deceived.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionLegibility, {
+						allowPartial: true,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Transaction Legibility',
+				},
+				{
+					id: 'basic_authentication',
+					description: sentence('The wallet requires a PIN, password, or biometric to unlock.'),
+					rationale: sentence(
+						'Without a lock screen, anyone who picks up a device can immediately access and transfer funds. Basic authentication is the minimum bar for protecting users against physical theft or unauthorized access.',
+					),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (variantWallet.features.security.duressResistance === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (
+								variantWallet.features.security.duressResistance.basicUnlock === 'NO_LOCK_MECHANISM'
+							) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence('{{WALLET_NAME}} has no PIN, password, or biometric lock.'),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence('{{WALLET_NAME}} requires authentication to unlock.'),
+							}
+						},
+					),
+					displayName: 'Basic Authentication',
 				},
 			],
 		},
 	],
 }
-
 
 export const softwareWalletStageOne: WalletStage = {
 	id: 'stage:software-1',
@@ -103,7 +182,7 @@ export const softwareWalletStageOne: WalletStage = {
 						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
 					}),
-					displayName: 'Security Audit 1Y',
+					displayName: 'Security Audits',
 				},
 				{
 					id: 'hardware_wallet_subset',
@@ -149,14 +228,34 @@ export const softwareWalletStageOne: WalletStage = {
 					displayName: 'Hardware Wallet Support',
 				},
 				{
-					id: 'chain_verification',
-					description: sentence('The wallet verifies the integrity of the L1 chain.'),
-					rationale: sentence(`
-            Much like browsers use HTTPS to provide integrity when doing online purchases,
-            wallets should verify the integrity of the L1 chain when performing transactions.
-          `),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainVerification),
-					displayName: 'Chain Verification',
+					id: 'scam_alerting',
+					description: sentence('The wallet warns users about potential scams.'),
+					rationale: sentence(
+						'Wallets should alert users about known scams before transactions are made, helping prevent irreversible losses. Transaction legibility (Stage 0.5) is a prerequisite for meaningful scam alerting.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, scamPrevention, {
+						allowPartial: true,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s scam prevention cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Scam Alerting',
+				},
+				{
+					id: 'security_best_practices',
+					description: sentence(
+						'The wallet follows standard security practices for key storage and platform hardening.',
+					),
+					rationale: sentence(
+						'Standard security practices, such as storing keys in a secure enclave and requesting minimal permissions, protect users from key extraction attacks and malicious apps. These are baseline implementation requirements for a wallet that takes security seriously.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityBestPractices, {
+						allowPartial: true,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Standard Security Practices',
 				},
 				// TODO: Add "Private key access security" to this list.
 				// See https://github.com/walletbeat/walletbeat/issues/218
@@ -176,6 +275,32 @@ export const softwareWalletStageOne: WalletStage = {
           `),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, privateTransfers),
 					displayName: 'Private Transfers',
+				},
+				{
+					id: 'address_privacy',
+					description: sentence(
+						'Wallet addresses are not correlatable with other user information.',
+					),
+					rationale: sentence(`
+						Your wallet address is unique and permanent, which makes it easy to track your activity.
+						In web-privacy terms, it is worse than cookies: wallet addresses are permanent,
+						publicly visible, and can even be tracked across multiple devices and websites.
+						Keeping it private is paramount for user privacy at least on par with web2.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation),
+					displayName: 'Wallet Address Privacy',
+				},
+				{
+					id: 'multi_address_correlation',
+					description: sentence('Multiple wallet addresses are not correlatable with one another.'),
+					rationale: sentence(`
+						You probably have more than one wallet address configured in your wallet,
+						which you use for different purposes and perhaps as different identities.
+						These wallet addresses all belong to you, but you would rather keep that
+						fact private. It is therefore important to use a wallet that does not reveal that fact.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, multiAddressCorrelation),
+					displayName: 'Multi-Address Privacy',
 				},
 			],
 		},
@@ -253,6 +378,51 @@ export const softwareWalletStageOne: WalletStage = {
 					),
 					displayName: 'Support Own Node',
 				},
+				{
+					id: 'outstanding_approvals_erc20',
+					description: sentence(
+						'The wallet lets users inspect their outstanding ERC-20 token approvals.',
+					),
+					rationale: sentence(
+						'Outstanding token approvals are a major risk vector, they allow contracts to drain user funds even long after initial interaction. Being able to inspect (and ideally revoke) ERC-20 approvals is the baseline for protecting users from this risk.',
+					),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							const feature = variantWallet.features.selfSovereignty.permissionsManagement
+
+							if (feature === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!isSupported(feature)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not support token approval management.',
+									),
+								}
+							}
+
+							if (feature.erc20Approvals === SpendingApprovalsControl.CANNOT_INSPECT) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not let users inspect their ERC-20 approvals.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} lets users inspect their ERC-20 token approvals.',
+								),
+							}
+						},
+					),
+					displayName: 'Outstanding Approvals (ERC-20)',
+				},
 			],
 		},
 		{
@@ -329,6 +499,17 @@ const softwareWalletStageTwo: WalletStage = {
 			description: sentence('The wallet provides a strong level of security.'),
 			criteria: [
 				{
+					id: 'chain_verification',
+					description: sentence('The wallet verifies the integrity of the Ethereum chain.'),
+					rationale: sentence(`
+            Much like browsers use HTTPS to provide integrity when doing online purchases,
+            wallets should verify the integrity of the chain when performing transactions.
+            This requires a light client and is a high bar, appropriate for Stage 2.
+          `),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainVerification),
+					displayName: 'Chain Verification',
+				},
+				{
 					id: 'bug_bounty_program',
 					description: sentence('The wallet is part of a funded Bug Bounty program.'),
 					rationale: sentence(
@@ -355,30 +536,21 @@ const softwareWalletStageTwo: WalletStage = {
 			),
 			criteria: [
 				{
-					id: 'address_privacy',
+					id: 'data_collection',
 					description: sentence(
-						'Wallet addresses are not correlatable with other user information.',
+						'The wallet collects no more user data than a web browser does by default.',
 					),
-					rationale: sentence(`
-						Your wallet address is unique and permanent, which makes it easy to track your activity.
-						In web-privacy terms, it is worse than cookies: wallet addresses are permanent,
-						publicly visible, and can even be tracked across multiple devices and websites.
-						Keeping it private is paramount for user privacy at least on par with web2.
-					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation),
-					displayName: 'Address Privacy',
-				},
-				{
-					id: 'multi_address_correlation',
-					description: sentence('Multiple wallet addresses are not correlatable with one another.'),
-					rationale: sentence(`
-						You probably have more than one wallet address configured in your wallet,
-						which you use for different purposes and perhaps as different identities.
-						These wallet addresses all belong to you, but you would rather keep that
-						fact private. It is therefore important to use a wallet that does not reveal that fact.
-					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, multiAddressCorrelation),
-					displayName: 'Multi-Address Correlation',
+					rationale: sentence(
+						'Wallets handle sensitive financial data. Collecting excessive user data creates unnecessary privacy risks and undermines user trust.',
+					),
+					// TODO: Replace with a proper data_collection attribute evaluation.
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(_): StageCriterionEvaluation => ({
+							rating: StageCriterionRating.UNRATED,
+						}),
+					),
+					displayName: 'Minimal Data Collection',
 				},
 			],
 		},
@@ -458,6 +630,17 @@ const softwareWalletStageTwo: WalletStage = {
 						},
 					),
 					displayName: 'Chain Configurability',
+				},
+				{
+					id: 'outstanding_approvals_full',
+					description: sentence(
+						'The wallet lets users inspect and revoke ERC-20, ERC-721, and ERC-1155 token approvals.',
+					),
+					rationale: sentence(
+						'Full approval management across all token standards, ERC-20, ERC-721, and ERC-1155, is required at Stage 2. Being able to revoke approvals (not just inspect them) is critical for recovering from compromised contracts.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, permissionsManagement),
+					displayName: 'Outstanding Approvals (Full)',
 				},
 			],
 		},
@@ -555,7 +738,12 @@ const softwareWalletStageTwo: WalletStage = {
  * Ladder for software wallets.
  */
 export const softwareWalletLadder: WalletLadder = {
-	stages: [softwareWalletStageZero, softwareWalletStageOne, softwareWalletStageTwo],
+	stages: [
+		softwareWalletStageZero,
+		softwareWalletStageZeroFive,
+		softwareWalletStageOne,
+		softwareWalletStageTwo,
+	],
 	applicableTo: (wallet: StageEvaluatableWallet): boolean => {
 		return setContains<WalletType>(wallet.types, WalletType.SOFTWARE)
 	},
