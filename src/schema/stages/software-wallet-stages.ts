@@ -36,6 +36,7 @@ export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 export const softwareWalletStageZero: WalletStage = {
 	id: 'stage:software-0',
 	label: 'Stage 0',
+	name: 'Verifiable',
 	description: sentence('The wallet meets the minimum criteria for evaluation.'),
 	criteriaGroups: [
 		{
@@ -56,8 +57,34 @@ export const softwareWalletStageZero: WalletStage = {
 	],
 }
 
+export const softwareWalletStageZeroFive: WalletStage = {
+	id: 'stage:software-0-5',
+	label: 'Stage 0.5',
+	name: 'Foundational Wallet',
+	description: sentence('The wallet meets the minimum criteria for evaluation.'),
+	criteriaGroups: [
+		{
+			id: 'reviewability',
+			description: sentence("The wallet's source code can be reviewed by the public."),
+			criteria: [
+				{
+					id: 'source_available',
+					description: sentence("The wallet's source code is publicly available."),
+					rationale: sentence(
+						'The source code must be publicly available so that it can be reviewed by Walletbeat.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
+					displayName: 'Source Availability',
+				},
+			],
+		},
+	],
+}
+
+
 export const softwareWalletStageOne: WalletStage = {
 	id: 'stage:software-1',
+	name: 'Ethereum Standard wallet',
 	label: 'Stage 1',
 	description: sentence('The wallet has made a minimal commitment to Ethereum values.'),
 	criteriaGroups: [
@@ -293,6 +320,7 @@ export const softwareWalletStageOne: WalletStage = {
 
 const softwareWalletStageTwo: WalletStage = {
 	id: 'stage:software-2',
+	name: 'Trust-minimized wallet',
 	label: 'Stage 2',
 	description: sentence('The wallet has made a significant commitment to Ethereum values.'),
 	criteriaGroups: [
