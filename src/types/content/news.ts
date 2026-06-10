@@ -135,6 +135,8 @@ export enum ImpactCategory {
 	PRIVACY_LEAK = 'PRIVACY_LEAK',
 	/** Related to phishing attacks or social engineering */
 	PHISHING_RELATED = 'PHISHING_RELATED',
+	/** Related to attacks and vulnerabilities on hardware (e.g. secure elements). */
+	HARDWARE_VULNERABILITY = 'HARDWARE_VULNERABILITY',
 	/** Impact category not covered by other types */
 	OTHER = 'OTHER',
 }
@@ -157,6 +159,9 @@ export const impactCategories = {
 	},
 	[ImpactCategory.PHISHING_RELATED]: {
 		label: 'Phishing Related',
+	},
+	[ImpactCategory.HARDWARE_VULNERABILITY]: {
+		label: 'Hardware Vulnerability',
 	},
 	[ImpactCategory.OTHER]: {
 		label: 'Other',
