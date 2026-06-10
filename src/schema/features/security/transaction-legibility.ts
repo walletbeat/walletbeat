@@ -1,6 +1,8 @@
 import type { WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
+import type { Support } from '../support'
+
 /**
  * To test: initiate the relevant transaction type and observe the approval
  * screen without clicking anything fee-related or expanding any sections.
@@ -304,6 +306,41 @@ export enum ComplexBenchmarkTransactions {
 	 */
 	SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND = 'SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND',
 
+	/**
+	 * https://tools.cyfrin.io/abi-encoding?data=0x8d80ff0a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000017200a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f42400087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000f42400000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+	 ```
+			Function: multiSend(bytes)
+		Parameters:
+			param0:
+				Multi-Send (2 transactions):
+					[0] Transaction:
+						Operation: 0 (Call)
+						To: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+						Value: 0
+						Data Length: 68
+						Decoded Call:
+							Function: approve(address,uint256)
+							Selector: 0x095ea7b3
+							Parameters:
+								param0: 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2
+								param1: 1000000
+					[1] Transaction:
+						Operation: 0 (Call)
+						To: 0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2
+						Value: 0
+						Data Length: 132
+						Decoded Call:
+							Function: supply(address,uint256,address,uint16)
+							Selector: 0x617ba037
+							Parameters:
+								param0: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+								param1: 1000000
+								param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
+								param3: 0
+	```
+	*/
+	AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND = 'AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND',
+
 	// In the future, add decoding of L1 -> L2 messages like `sendToL1`
 }
 
@@ -312,6 +349,7 @@ export const complexBenchmarkTransactions = new Enum<ComplexBenchmarkTransaction
 	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: true,
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
+	[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
 })
 
 export const benchmarkTransactions = mergeEnums(
@@ -344,17 +382,11 @@ export function benchmarkTransactionLabel(
 		case ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED:
 			return 'nested Safe transactions'
 		case ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND:
+			return 'complex Safe nested multisend transactions'
+		case ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND:
 			return 'complex nested multisend transactions'
 	}
 }
-
-/**
- * HardwareBenchmarkTransactions is the union of basic and complex benchmark transactions.
- * Used for hardware wallet calldata decoding evaluation.
- */
-export type HardwareBenchmarkTransactions =
-	| BasicBenchmarkTransactions
-	| ComplexBenchmarkTransactions
 
 /**
  * Benchmark transactions for simulation-specific scenarios.
@@ -369,33 +401,46 @@ export enum SimulationBenchmarkTransactions {
 }
 
 /**
- * Details for a failed simulation benchmark transaction.
+ * ERC-7730 transaction decoding details for a single complex benchmark transaction.
+ * ERC-7730 defines a standard for structured calldata descriptors that wallets use
+ * to display human-readable descriptions of smart contract calls.
  */
-export interface DisplayedFailedTransactionDetails extends Omit<
-	DisplayedComplexTransactionDetails,
-	'transactionOutcome' | 'calldataDecoded'
-> {
+export interface Erc7730TransactionDetails {
 	/**
-	 * If the wallet detects that a transaction will fail and shows this to the user,
-	 * it's 'DETECTED'; otherwise, 'NOT_DETECTED'.
+	 * Whether the calldata is decoded into a human-readable description
+	 * using ERC-7730 structured calldata descriptors.
 	 */
+	decoded: DataDisplayOptions
+}
+
+/**
+ * ERC-7730 support for software wallets.
+ * Tracks whether the wallet can show human-readable descriptions for
+ * each complex benchmark transaction.
+ */
+export type SoftwareWalletErc7730 = Record<
+	ComplexBenchmarkTransactions,
+	Erc7730TransactionDetails | null
+>
+
+/**
+ * Simulation entry for a transaction that tracks the outcome explanation.
+ */
+export interface TransactionOutcomeEntry {
+	transactionOutcome: TransactionOutcome
+}
+
+/**
+ * Simulation entry for a transaction that may fail.
+ */
+export interface SimulatedFailedTransaction {
 	failure: 'DETECTED' | 'NOT_DETECTED'
 }
 
 /**
- * Details for a nondeterministic simulation benchmark transaction.
+ * Simulation entry for a transaction with nondeterministic outcome.
  */
-export interface DisplayedNondeterministicTransactionDetails extends Omit<
-	DisplayedComplexTransactionDetails,
-	'transactionOutcome' | 'calldataDecoded'
-> {
-	/**
-	 * How the wallet handles state-dependent (non-deterministic) transactions.
-	 *
-	 * - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
-	 * - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
-	 * - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
-	 */
+export interface SimulatedNondeterministicTransaction {
 	nondeterminism:
 		| 'NO_OUTCOME_SHOWN'
 		| 'STATIC_SINGLE_OUTCOME'
@@ -404,35 +449,62 @@ export interface DisplayedNondeterministicTransactionDetails extends Omit<
 }
 
 /**
- * Display details for token transfer transactions (ERC-20, ERC-721).
- * These include a transaction outcome since the transfer involves contract interaction.
+ * All benchmark transactions for which simulation can track a transaction outcome.
  */
-export interface DisplayedTokenTransferDetails extends DisplayedBasicTransactionDetails {
-	transactionOutcome: TransactionOutcome
+export type TransactionSimulationsBenchmark =
+	| BasicBenchmarkTransactions
+	| ComplexBenchmarkTransactions
+
+/**
+ * Per-benchmark-transaction simulation data for software wallets.
+ * All basic and complex benchmark transactions track transactionOutcome;
+ * simulation-specific benchmarks track failure detection and nondeterminism handling.
+ */
+export type SoftwareTransactionSimulations = Record<
+	TransactionSimulationsBenchmark,
+	TransactionOutcomeEntry | null
+> & {
+	[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: SimulatedFailedTransaction | null
+	[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: SimulatedNondeterministicTransaction | null
+}
+
+/** Returns true if the entry's outcome is fully explained, null if entry is null. */
+export function isTransactionOutcomeExplained(
+	entry: TransactionOutcomeEntry | null,
+): boolean | null {
+	if (entry === null) {
+		return null
+	}
+
+	return entry.transactionOutcome === TransactionOutcome.EXPLAINED
+}
+
+/** Returns true if the entry's calldata was decoded and shown, null if entry is null. */
+export function isTransactionDecoded(
+	entry: { decoded: DataDisplayOptions } | null,
+): boolean | null {
+	if (entry === null) {
+		return null
+	}
+
+	return (
+		entry.decoded === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		entry.decoded === DataDisplayOptions.SHOWN_OPTIONALLY
+	)
 }
 
 /**
- * Per-benchmark-transaction display details for software wallets.
- * Each benchmark transaction records what the wallet shows when that transaction is being signed.
+ * Global transaction details display for software wallets.
+ * These basic fields are expected to be shown across all transaction types.
  */
-export type SoftwareTransactionDetailsDisplay =
-	| ({
-			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
-			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
-	  } & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
-				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
-			} & {
-				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
-			})
-	| null
-
-/**
- * Types of transactions that a wallet can decode the calldata of.
- */
-export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that don't have enough data
+export interface SoftwareTransactionDetailsDisplay {
+	gas: DataDisplayOptions
+	nonce: DataDisplayOptions
+	from: DataDisplayOptions
+	to: DataDisplayOptions
+	chain: DataDisplayOptions
+	value: DataDisplayOptions
+}
 
 /**
  * Where does the calldata decoding actually happen?
@@ -440,7 +512,7 @@ export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDe
  * decoded output appears on the hardware wallet's own screen, or only in
  * the companion app / browser extension on the computer.
  */
-export enum DataDecoded {
+export enum DataLocation {
 	/**
 	 * Decoding happens on the hardware wallet device itself.
 	 * The decoded function name and parameters are shown on the device screen,
@@ -455,7 +527,7 @@ export enum DataDecoded {
 	OFF_DEVICE = 'OFF_DEVICE',
 
 	/** No decoding occurs; raw hex calldata is shown (or nothing at all). */
-	NOT_DECODED = 'NOT_DECODED',
+	NOT_PROVIDED = 'NOT_PROVIDED',
 }
 
 /**
@@ -480,8 +552,11 @@ export enum MessageSigningDetails {
 	/** The wallet shows the EIP-712 message hash. */
 	MESSAGE_HASH = 'MESSAGE_HASH',
 
-	/** The wallet shows the Safe-specific transaction hash (used in Safe signing flows). */
-	SAFE_HASH = 'SAFE_HASH',
+	/**
+	 * The wallet shows the EIP-712 digest: the final hash that gets signed:
+	 * `"\x19\x01" || domainSeparator || hashStruct(message)`.
+	 */
+	EIP712_DIGEST = 'EIP712_DIGEST',
 }
 
 /**
@@ -491,38 +566,6 @@ export type SoftwareMessageSigningLegibility = Record<
 	MessageSigningDetails,
 	DataDisplayOptions
 > | null
-
-/**
- * For hardware wallets: track which message signing data types are available and where they are displayed
- */
-export interface HardwareMessageSigningLegibility {
-	/** Which message signing data types does the wallet provide? */
-	messageSigningDetails: Record<MessageSigningDetails, DataDisplayOptions>
-	/** Where does the message signing data display happen? */
-	decoded: DataDecoded
-}
-/**
- * Shorthand for a wallet that cannot do any calldata decoding.
- */
-export const noCalldataDecoding: CalldataDecodingTypes = {
-	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DataDecoded.NOT_DECODED,
-	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-		DataDecoded.NOT_DECODED,
-}
-
-/**
- * Returns whether the given calldata decoding types support any decoding at all.
- */
-export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some(v => v !== DataDecoded.NOT_DECODED)
-}
 
 /**
  * Data Extraction: how can a user independently verify the data shown on
@@ -576,24 +619,29 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
 	return Object.values(dataExtractionMethods).includes(true)
 }
 
-/**
- * Helper function to check if a calldata decoding is supported and ON_DEVICE
- */
-export function isSupportedOnDevice(
-	legibility: CalldataDecodingTypes,
-	decoding: HardwareBenchmarkTransactions,
-): boolean {
-	return legibility[decoding] === DataDecoded.ON_DEVICE
+export type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation | null>
+
+export interface HardwareWalletErc8213 {
+	calldataDisplay: Record<CallDataDisplay, DisplayCapability> | null
+
+	messageSigningLegibility: Record<MessageSigningDetails, DisplayCapability> | null
+}
+
+type DisplayCapability = {
+	display: DataDisplayOptions
+	location: DataLocation
+}
+
+export interface BaseTransactionLegibilitySupport {
+	erc8213: Support | null
 }
 
 /**
  * A record of transaction legibility support (both message and transaction)
  */
-export interface HardwareTransactionLegibilitySupport {
-	/**
-	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
-	 */
-	calldataDecoded: CalldataDecodingTypes | null
+export interface HardwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
+	erc8213: Support<HardwareWalletErc8213> | null
+	erc7730: Support<HardwareWalletErc7730> | null
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
@@ -603,11 +651,6 @@ export interface HardwareTransactionLegibilitySupport {
 	 * Does a wallet allow for data extraction?
 	 */
 	dataExtraction: DataExtractionMethods | null
-
-	/**
-	 * What message signing data does the hardware wallet provide and where is it displayed?
-	 */
-	messageSigningLegibility: HardwareMessageSigningLegibility | null
 }
 
 /**
@@ -618,21 +661,19 @@ export interface HardwareTransactionLegibilitySupport {
  * Users can test on https://beta.walletbeat.eth.limo/test and
  * test a USDC approval transaction under `Transactions` tab.
  */
-export interface CallDataDisplay {
+export enum CallDataDisplay {
 	/**
 	 * The raw `0x...` hex calldata is visible somewhere on the approval screen.
 	 * To test: look for a hex string starting with `0x` on the approval screen
 	 * or in an expandable section.
 	 */
-	rawHex: boolean
-
+	RAW_HEX = 'RAW_HEX',
 	/**
 	 * A dedicated button copies the raw hex calldata to the clipboard.
 	 * For batched transactions, the full hex including the multicall wrapper is expected.
 	 * To test: look for a copy icon or "Copy" button next to the calldata.
 	 */
-	copyHexToClipboard: boolean
-
+	COPY_HEX_TO_CLIPBOARD = 'COPY_HEX_TO_CLIPBOARD',
 	/**
 	 * The calldata is decoded into a human-readable function name and arguments
 	 * (e.g. JSON or structured text), not just raw hex.
@@ -640,34 +681,59 @@ export interface CallDataDisplay {
 	 * To test: check if the wallet shows the function name (e.g. `approve`) and
 	 * parameters (e.g. spender address, amount) in a readable format.
 	 */
-	formatted: boolean
+	FORMATTED = 'FORMATTED',
+	/**
+	 * The wallet shows the Calldata digest:
+	 * keccak256(uint256(len) || calldata)
+	 */
+	CALLDATA_DIGEST = 'CALLDATA_DIGEST',
 }
 
-export const displaysFullCallData: CallDataDisplay = {
-	rawHex: true,
-	copyHexToClipboard: true,
-	formatted: true,
+export const displaysFullCallData: Record<CallDataDisplay, DataDisplayOptions> = {
+	[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+}
+
+/**
+ * ERC-8213 (Transaction Legibility) support for software wallets.
+ * Tracks which calldata display formats and message signing data types
+ * the wallet exposes to the user.
+ */
+export interface SoftwareWalletErc8213 {
+	/** Which calldata display formats are available and how they are shown. */
+	calldataDisplay: Record<CallDataDisplay, DataDisplayOptions> | null
+	/** Which message signing data types are available and how they are shown. */
+	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 }
 
 /**
  * A record of transaction legibility support (both message and transaction)
  */
-export interface SoftwareTransactionLegibilitySupport {
-	/**
-	 * Does the software wallet support displaying the calldata in different formats?
-	 */
-	calldataDisplay: CallDataDisplay | null
-	/**
-	 * Does the software wallet support displaying the transaction details?
-	 * Evaluated per benchmark transaction type.
-	 */
-	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay | null
+export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
+	erc8213: Support<SoftwareWalletErc8213> | null
 
 	/**
-	 * What message signing data does the software wallet provide?
+	 * ERC-7730 calldata decoding support per complex benchmark transaction.
 	 */
-	messageSigningLegibility: SoftwareMessageSigningLegibility | null
+	erc7730: Support<SoftwareWalletErc7730> | null
+
+	/**
+	 * Per-benchmark simulation data: transaction outcomes for token and complex transactions,
+	 * plus failure/nondeterminism detection for simulation-specific benchmarks.
+	 */
+	transactionSimulations: Support<SoftwareTransactionSimulations> | null
+
+	/**
+	 * Global basic transaction details display (gas, nonce, from, to, chain, value).
+	 * Applied across all transaction types.
+	 */
+	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay | null
 }
+
+export const isShown = (field: DataDisplayOptions): boolean =>
+	field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
 
 export const isFullBasicTransactionDetails = (
 	details: DisplayedBasicTransactionDetails,

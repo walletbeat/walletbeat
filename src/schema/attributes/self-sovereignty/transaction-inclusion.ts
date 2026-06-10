@@ -126,7 +126,7 @@ function transactionSubmissionEvaluation(
 
 export const transactionInclusion: Attribute = {
 	id: 'transactionInclusion',
-	icon: '\u{1f4e1}', // Satellite antenna
+	icon: 'transaction_inclusion',
 	displayName: 'Transaction inclusion',
 	wording: {
 		midSentenceName: 'transaction inclusion',

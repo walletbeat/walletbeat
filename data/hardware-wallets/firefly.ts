@@ -1,10 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import {
-	noCalldataDecoding,
-	noDataExtraction,
-} from '@/schema/features/security/transaction-legibility'
+import { noDataExtraction } from '@/schema/features/security/transaction-legibility'
 import { notSupported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -83,10 +80,10 @@ export const fireflyWallet: HardwareWallet = {
 			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDecoded: noCalldataDecoding,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: null,
-				messageSigningLegibility: null,
+				erc7730: notSupported,
+				erc8213: null,
 			},
 			userSafety: null,
 		},

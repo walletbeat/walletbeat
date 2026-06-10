@@ -2,287 +2,409 @@
 	"matchers": [
 		{
 			"domain": "festats.debank.com",
-			"purposes": ["ANALYTICS"]
+			"purposes": [
+				"ANALYTICS"
+			]
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP", "TRANSACTION_BROADCAST"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP",
+				"TRANSACTION_BROADCAST"
+			],
 			"path": "/v1/wallet/eth_rpc"
 		},
 		{
 			"domain": "matomo.debank.com",
-			"purposes": ["ANALYTICS"]
+			"purposes": [
+				"ANALYTICS"
+			]
 		},
 		{
 			"domain": "sentry.io",
-			"purposes": ["ANALYTICS"]
+			"purposes": [
+				"ANALYTICS"
+			]
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TRANSACTION_BROADCAST"],
+			"purposes": [
+				"TRANSACTION_BROADCAST"
+			],
 			"path": "/v2/wallet/submit_tx"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["ANALYTICS"],
+			"purposes": [
+				"ANALYTICS"
+			],
 			"path": "/v1/engine/action/log"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/contract/has_interaction"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/gas_account/check_txs"
 		},
 		{
 			"domain": "static.debank.com",
-			"purposes": ["STATIC_ASSETS"]
+			"purposes": [
+				"STATIC_ASSETS"
+			]
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/chainrpc"
 		},
 		{
 			"domain": "www.google-analytics.com",
-			"purposes": ["ANALYTICS"],
+			"purposes": [
+				"ANALYTICS"
+			],
 			"path": "/mp/collect"
 		},
 		{
 			"domain": "static-assets.debank.com",
-			"purposes": ["STATIC_ASSETS"]
+			"purposes": [
+				"STATIC_ASSETS"
+			]
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TRANSACTION_SIMULATION"],
+			"purposes": [
+				"TRANSACTION_SIMULATION"
+			],
 			"path": "/v1/wallet/tx_is_gasless"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["ASSET_METADATA"],
+			"purposes": [
+				"ASSET_METADATA"
+			],
 			"path": "/v1/user/token"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/contract"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TRANSACTION_SIMULATION"],
+			"purposes": [
+				"TRANSACTION_SIMULATION"
+			],
 			"path": "/v1/wallet/pre_exec_tx"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TRANSACTION_SIMULATION"],
+			"purposes": [
+				"TRANSACTION_SIMULATION"
+			],
 			"path": "/v1/engine/action/parse_tx"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["GAS_QUOTE"],
+			"purposes": [
+				"GAS_QUOTE"
+			],
 			"path": "/v2/wallet/gas_market"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["GAS_QUOTE"],
+			"purposes": [
+				"GAS_QUOTE"
+			],
 			"path": "/v1/wallet/gas_price_stats"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/total_balance"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/addr/is_blocked"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/token_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/wallet/get_tx_requests"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE"],
+			"purposes": [
+				"SWAP_QUOTE"
+			],
 			"path": "/v2/bridge/supported_chains"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["UPDATE_CHECKING"],
+			"purposes": [
+				"UPDATE_CHECKING"
+			],
 			"path": "/v1/bridge/list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE"],
+			"purposes": [
+				"SWAP_QUOTE"
+			],
 			"path": "/v1/cex/supported_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE"],
+			"purposes": [
+				"SWAP_QUOTE"
+			],
 			"path": "/v1/wallet/supported_dex_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE"],
+			"purposes": [
+				"SWAP_QUOTE"
+			],
 			"path": "/v1/wallet/swap_quote"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE", "TRANSACTION_BROADCAST"],
+			"purposes": [
+				"SWAP_QUOTE",
+				"TRANSACTION_BROADCAST"
+			],
 			"path": "/v1/wallet/swap_trade"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["STATIC_ASSETS"],
+			"purposes": [
+				"STATIC_ASSETS"
+			],
 			"path": "/v1/chain/offline_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/cache_token_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TOKEN_PRICE_LOOKUP"],
+			"purposes": [
+				"TOKEN_PRICE_LOOKUP"
+			],
 			"path": "/v1/token/price_change"
 		},
 		{
 			"domain": "api.hyperliquid.xyz",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/info"
 		},
 		{
 			"domain": "api.hyperliquid.xyz",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/ws"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/approval_status"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TOKEN_PRICE_LOOKUP"],
+			"purposes": [
+				"TOKEN_PRICE_LOOKUP"
+			],
 			"path": "/v1/user/total_net_curve"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE"],
+			"purposes": [
+				"SWAP_QUOTE"
+			],
 			"path": "/v1/wallet/check_slippage"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["UPDATE_CHECKING"],
+			"purposes": [
+				"UPDATE_CHECKING"
+			],
 			"path": "/v1/user/complex_app_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["GAS_QUOTE", "CHAIN_DATA_LOOKUP", "TRANSACTION_BROADCAST"],
+			"purposes": [
+				"GAS_QUOTE",
+				"CHAIN_DATA_LOOKUP",
+				"TRANSACTION_BROADCAST"
+			],
 			"path": "/v1/wallet/txs_is_gasless"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["GAS_QUOTE", "CHAIN_DATA_LOOKUP", "TRANSACTION_BROADCAST"],
+			"purposes": [
+				"GAS_QUOTE",
+				"CHAIN_DATA_LOOKUP",
+				"TRANSACTION_BROADCAST"
+			],
 			"path": "/v1/wallet/history_tx_used_gas"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SWAP_QUOTE"],
+			"purposes": [
+				"SWAP_QUOTE"
+			],
 			"path": "/v1/wallet/suggest_slippage"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/wallet/swap_token_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/history_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["ASSET_METADATA"],
+			"purposes": [
+				"ASSET_METADATA"
+			],
 			"path": "/v1/token/identity"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TOKEN_PRICE_LOOKUP"],
+			"purposes": [
+				"TOKEN_PRICE_LOOKUP"
+			],
 			"path": "/v1/token/price_curve"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["TRANSACTION_SIMULATION"],
+			"purposes": [
+				"TRANSACTION_SIMULATION"
+			],
 			"path": "/v1/gas_account/check_eligibility"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/used_chain_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/engine/addr/used_chain_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/engine/addr/has_transfer"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/token/deposit_forbidden"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/addr/is_spoofing"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/engine/addr/desc"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v2/engine/addr/has_transfer"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/origin/is_verified"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/origin/is_scam"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/origin/third_party_collect_list"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["SCAM_DETECTION"],
+			"purposes": [
+				"SCAM_DETECTION"
+			],
 			"path": "/v1/engine/origin/popularity_level"
 		},
 		{
 			"domain": "api.rabby.io",
-			"purposes": ["CHAIN_DATA_LOOKUP"],
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
 			"path": "/v1/user/complex_protocol_list"
 		},
 		{
@@ -292,7 +414,12 @@
 		},
 		{
 			"domain": "static-assets.rabby.io",
-			"purposes": ["STATIC_ASSETS"]
+			"purposes": [
+				"STATIC_ASSETS"
+			]
 		}
+	],
+	"benignStrings": [
+		"https://acmacodkjbdgmoleebolmdjonilkdbch.com/send-token?type"
 	]
 }

@@ -5,9 +5,10 @@ import {
 } from '@/schema/features/security/passkey-verification'
 import { isSupported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 export type PasskeyImplementationMetadata = {
 	library: PasskeyVerificationLibrary | null
@@ -197,7 +198,7 @@ function webAuthnSolImplementation(
 
 export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 	id: 'passkeyImplementation',
-	icon: '\u{1fac6}', // Fingerprint
+	icon: 'passkey_verification',
 	displayName: 'Passkey implementation',
 	wording: {
 		midSentenceName: null,
@@ -325,6 +326,17 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
+
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(
+				ctx,
+				sentence(
+					'This attribute is not applicable to hardware wallets because hardware wallets rely on dedicated secure hardware.',
+				),
+				{ library: null },
+			)
+		}
+
 		const passkeyVerification = ctx.features.security.passkeyVerification
 
 		if (passkeyVerification === null) {

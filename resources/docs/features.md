@@ -2637,6 +2637,7 @@ How the wallet stores the user's private key.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
 - `PASSKEY_MANAGED` = `'PASSKEY_MANAGED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
+- `NOT_VERIFIABLE` = `'NOT_VERIFIABLE'`: The key storage mechanism cannot be determined because the wallet's source code is not publicly available.
 
 ---
 
@@ -2647,6 +2648,7 @@ The entropy source used when generating the wallet's private key.
 - `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided Cryptographically Secure Pseudorandom RNG.
 - `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source.
 - `LIBRARY_RNG` = `'LIBRARY_RNG'`: A library-provided RNG whose quality is not independently verified.
+- `NOT_VERIFIABLE` = `'NOT_VERIFIABLE'`: The RNG source cannot be determined because the wallet's source code is not publicly available.
 
 ---
 
@@ -2813,9 +2815,12 @@ Security best-practices for the mobile app variant.
 
 Security best-practices data for a wallet, broken down by variant.
 
-- `browser` (`WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent.
-- `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent.
-- `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent.
+- `browser` (`| WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and no data can be obtained at all.
+
+  For closed-source wallets whose browser extension manifest is publicly available (e.g. via the Chrome Web Store), fill in actual manifest data and setting keyStorageMechanism / secureRng to KeyStorageMechanism.NOT_VERIFIABLE / SecureRngSource.NOT_VERIFIABLE
+
+- `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP' | 'SOURCE_NOT_AVAILABLE'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
+- `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP' | 'SOURCE_NOT_AVAILABLE'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and security properties cannot be independently verified.
 
 ---
 
@@ -3054,15 +3059,38 @@ These transactions interact with smart contracts in non-trivial ways, so there i
     param9: 0x000000000000000000000000f8cade19b26a2b970f2def5ea9eccf1bda3d1186000000000000000000000000000000000000000000000000000000000000000001
   ```
 
----
+- `AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND` = `'AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND'`: https://tools.cyfrin.io/abi-encoding?data=0x8d80ff0a0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000017200a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f42400087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000f42400000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
-### Type: `HardwareBenchmarkTransactions`
-
-HardwareBenchmarkTransactions is the union of basic and complex benchmark transactions. Used for hardware wallet calldata decoding evaluation.
-
-```typescript
-type HardwareBenchmarkTransactions = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
-```
+  ```
+  			Function: multiSend(bytes)
+  		Parameters:
+  			param0:
+  				Multi-Send (2 transactions):
+  					[0] Transaction:
+  						Operation: 0 (Call)
+  						To: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+  						Value: 0
+  						Data Length: 68
+  						Decoded Call:
+  							Function: approve(address,uint256)
+  							Selector: 0x095ea7b3
+  							Parameters:
+  								param0: 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2
+  								param1: 1000000
+  					[1] Transaction:
+  						Operation: 0 (Call)
+  						To: 0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2
+  						Value: 0
+  						Data Length: 132
+  						Decoded Call:
+  							Function: supply(address,uint256,address,uint16)
+  							Selector: 0x617ba037
+  							Parameters:
+  								param0: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+  								param1: 1000000
+  								param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
+  								param3: 0
+  ```
 
 ---
 
@@ -3075,72 +3103,94 @@ Benchmark transactions for simulation-specific scenarios. These test the wallet'
 
 ---
 
-### Interface: `DisplayedFailedTransactionDetails`
+### Interface: `Erc7730TransactionDetails`
 
-Details for a failed simulation benchmark transaction.
+ERC-7730 transaction decoding details for a single complex benchmark transaction. ERC-7730 defines a standard for structured calldata descriptors that wallets use to display human-readable descriptions of smart contract calls.
 
-- `failure` (`'DETECTED' | 'NOT_DETECTED'`): If the wallet detects that a transaction will fail and shows this to the user, it's 'DETECTED'; otherwise, 'NOT_DETECTED'.
-
----
-
-### Interface: `DisplayedNondeterministicTransactionDetails`
-
-Details for a nondeterministic simulation benchmark transaction.
-
-- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | 'RESIMULATES_WITH_WARNING'`): How the wallet handles state-dependent (non-deterministic) transactions.
-  - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
-  - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
-  - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
+- `decoded` (`DataDisplayOptions`): Whether the calldata is decoded into a human-readable description using ERC-7730 structured calldata descriptors.
 
 ---
 
-### Interface: `DisplayedTokenTransferDetails`
+### Type: `SoftwareWalletErc7730`
 
-Display details for token transfer transactions (ERC-20, ERC-721). These include a transaction outcome since the transfer involves contract interaction.
+ERC-7730 support for software wallets. Tracks whether the wallet can show human-readable descriptions for each complex benchmark transaction.
+
+```typescript
+type SoftwareWalletErc7730 = Record<ComplexBenchmarkTransactions, Erc7730TransactionDetails | null>
+```
+
+---
+
+### Interface: `TransactionOutcomeEntry`
+
+Simulation entry for a transaction that tracks the outcome explanation.
 
 - `transactionOutcome` (`TransactionOutcome`)
 
 ---
 
-### Type: `SoftwareTransactionDetailsDisplay`
+### Interface: `SimulatedFailedTransaction`
 
-Per-benchmark-transaction display details for software wallets. Each benchmark transaction records what the wallet shows when that transaction is being signed.
+Simulation entry for a transaction that may fail.
+
+- `failure` (`'DETECTED' | 'NOT_DETECTED'`)
+
+---
+
+### Interface: `SimulatedNondeterministicTransaction`
+
+Simulation entry for a transaction with nondeterministic outcome.
+
+- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | 'RESIMULATES_WITH_WARNING'`)
+
+---
+
+### Type: `TransactionSimulationsBenchmark`
+
+All benchmark transactions for which simulation can track a transaction outcome.
 
 ```typescript
-type SoftwareTransactionDetailsDisplay =
-	| ({
-			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
-			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DisplayedTokenTransferDetails
-			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
-	  } & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
-				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
-			} & {
-				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
-			})
-	| null
+type TransactionSimulationsBenchmark = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 ```
 
 ---
 
-### Type: `CalldataDecodingTypes`
+### Type: `SoftwareTransactionSimulations`
 
-Types of transactions that a wallet can decode the calldata of.
+Per-benchmark-transaction simulation data for software wallets. All basic and complex benchmark transactions track transactionOutcome; simulation-specific benchmarks track failure detection and nondeterminism handling.
 
 ```typescript
-type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDecoded | null>
+type SoftwareTransactionSimulations = Record<
+	TransactionSimulationsBenchmark,
+	TransactionOutcomeEntry | null
+> & {
+	[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: SimulatedFailedTransaction | null
+	[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: SimulatedNondeterministicTransaction | null
+}
 ```
 
 ---
 
-### Enum: `DataDecoded`
+### Interface: `SoftwareTransactionDetailsDisplay`
+
+Global transaction details display for software wallets. These basic fields are expected to be shown across all transaction types.
+
+- `gas` (`DataDisplayOptions`)
+- `nonce` (`DataDisplayOptions`)
+- `from` (`DataDisplayOptions`)
+- `to` (`DataDisplayOptions`)
+- `chain` (`DataDisplayOptions`)
+- `value` (`DataDisplayOptions`)
+
+---
+
+### Enum: `DataLocation`
 
 Where does the calldata decoding actually happen? To identify: initiate a contract transaction and observe whether the decoded output appears on the hardware wallet's own screen, or only in the companion app / browser extension on the computer.
 
 - `ON_DEVICE` = `'ON_DEVICE'`: Decoding happens on the hardware wallet device itself. The decoded function name and parameters are shown on the device screen, independently of any software running on the connected computer.
 - `OFF_DEVICE` = `'OFF_DEVICE'`: Decoding happens off-device — in a companion app, browser extension, or desktop software. The hardware wallet's own screen does not show decoded data.
-- `NOT_DECODED` = `'NOT_DECODED'`: No decoding occurs; raw hex calldata is shown (or nothing at all).
+- `NOT_PROVIDED` = `'NOT_PROVIDED'`: No decoding occurs; raw hex calldata is shown (or nothing at all).
 
 ---
 
@@ -3153,7 +3203,7 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a EIP-712 messa
 - `EIP712_STRUCT` = `'EIP712_STRUCT'`: The wallet shows the full decoded EIP-712 struct — domain fields and message fields rendered as human-readable key-value pairs.
 - `DOMAIN_HASH` = `'DOMAIN_HASH'`: The wallet shows the EIP-712 domain separator hash.
 - `MESSAGE_HASH` = `'MESSAGE_HASH'`: The wallet shows the EIP-712 message hash.
-- `SAFE_HASH` = `'SAFE_HASH'`: The wallet shows the Safe-specific transaction hash (used in Safe signing flows).
+- `EIP712_DIGEST` = `'EIP712_DIGEST'`: The wallet shows the EIP-712 digest: the final hash that gets signed: `"\x19\x01" || domainSeparator || hashStruct(message)`.
 
 ---
 
@@ -3164,15 +3214,6 @@ For software wallets: track which message signing data types are available
 ```typescript
 type SoftwareMessageSigningLegibility = Record<MessageSigningDetails, DataDisplayOptions> | null
 ```
-
----
-
-### Interface: `HardwareMessageSigningLegibility`
-
-For hardware wallets: track which message signing data types are available and where they are displayed
-
-- `messageSigningDetails` (`Record<MessageSigningDetails, DataDisplayOptions>`): Which message signing data types does the wallet provide?
-- `decoded` (`DataDecoded`): Where does the message signing data display happen?
 
 ---
 
@@ -3200,26 +3241,57 @@ type DataExtractionMethods = Record<DataExtraction, boolean | null>
 
 ---
 
+### Type: `HardwareWalletErc7730`
+
+```typescript
+type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation | null>
+```
+
+---
+
+### Interface: `HardwareWalletErc8213`
+
+- `calldataDisplay` (`Record<CallDataDisplay, DisplayCapability> | null`)
+- `messageSigningLegibility` (`Record<MessageSigningDetails, DisplayCapability> | null`)
+
+---
+
+### Interface: `BaseTransactionLegibilitySupport`
+
+- `erc8213` (`Support | null`)
+
+---
+
 ### Interface: `HardwareTransactionLegibilitySupport`
 
 A record of transaction legibility support (both message and transaction)
 
-- `calldataDecoded` (`CalldataDecodingTypes | null`): Does the wallet decode basic and complex transaction calldata to show function names and parameters?
+- `erc8213` (`Support<HardwareWalletErc8213> | null`)
+- `erc7730` (`Support<HardwareWalletErc7730> | null`)
 - `detailsDisplayed` (`DisplayedBasicTransactionDetails | null`): Does a wallet display transaction details clearly?
 - `dataExtraction` (`DataExtractionMethods | null`): Does a wallet allow for data extraction?
-- `messageSigningLegibility` (`HardwareMessageSigningLegibility | null`): What message signing data does the hardware wallet provide and where is it displayed?
 
 ---
 
-### Interface: `CallDataDisplay`
+### Enum: `CallDataDisplay`
 
 What can the user do with the calldata on the approval screen? To test: initiate a contract transaction (e.g. USDC_APPROVAL) and check what calldata options the wallet provides.
 
 Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval transaction under `Transactions` tab.
 
-- `rawHex` (`boolean`): The raw `0x...` hex calldata is visible somewhere on the approval screen. To test: look for a hex string starting with `0x` on the approval screen or in an expandable section.
-- `copyHexToClipboard` (`boolean`): A dedicated button copies the raw hex calldata to the clipboard. For batched transactions, the full hex including the multicall wrapper is expected. To test: look for a copy icon or "Copy" button next to the calldata.
-- `formatted` (`boolean`): The calldata is decoded into a human-readable function name and arguments (e.g. JSON or structured text), not just raw hex. For batched transactions, each inner call should be decoded individually. To test: check if the wallet shows the function name (e.g. `approve`) and parameters (e.g. spender address, amount) in a readable format.
+- `RAW_HEX` = `'RAW_HEX'`: The raw `0x...` hex calldata is visible somewhere on the approval screen. To test: look for a hex string starting with `0x` on the approval screen or in an expandable section.
+- `COPY_HEX_TO_CLIPBOARD` = `'COPY_HEX_TO_CLIPBOARD'`: A dedicated button copies the raw hex calldata to the clipboard. For batched transactions, the full hex including the multicall wrapper is expected. To test: look for a copy icon or "Copy" button next to the calldata.
+- `FORMATTED` = `'FORMATTED'`: The calldata is decoded into a human-readable function name and arguments (e.g. JSON or structured text), not just raw hex. For batched transactions, each inner call should be decoded individually. To test: check if the wallet shows the function name (e.g. `approve`) and parameters (e.g. spender address, amount) in a readable format.
+- `CALLDATA_DIGEST` = `'CALLDATA_DIGEST'`: The wallet shows the Calldata digest: keccak256(uint256(len) || calldata)
+
+---
+
+### Interface: `SoftwareWalletErc8213`
+
+ERC-8213 (Transaction Legibility) support for software wallets. Tracks which calldata display formats and message signing data types the wallet exposes to the user.
+
+- `calldataDisplay` (`Record<CallDataDisplay, DataDisplayOptions> | null`): Which calldata display formats are available and how they are shown.
+- `messageSigningLegibility` (`SoftwareMessageSigningLegibility | null`): Which message signing data types are available and how they are shown.
 
 ---
 
@@ -3227,9 +3299,10 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a USDC approval
 
 A record of transaction legibility support (both message and transaction)
 
-- `calldataDisplay` (`CallDataDisplay | null`): Does the software wallet support displaying the calldata in different formats?
-- `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Does the software wallet support displaying the transaction details? Evaluated per benchmark transaction type.
-- `messageSigningLegibility` (`SoftwareMessageSigningLegibility | null`): What message signing data does the software wallet provide?
+- `erc8213` (`Support<SoftwareWalletErc8213> | null`)
+- `erc7730` (`Support<SoftwareWalletErc7730> | null`): ERC-7730 calldata decoding support per complex benchmark transaction.
+- `transactionSimulations` (`Support<SoftwareTransactionSimulations> | null`): Per-benchmark simulation data: transaction outcomes for token and complex transactions, plus failure/nondeterminism detection for simulation-specific benchmarks.
+- `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Global basic transaction details display (gas, nonce, from, to, chain, value). Applied across all transaction types.
 
 ---
 

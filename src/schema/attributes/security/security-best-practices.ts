@@ -44,6 +44,27 @@ import { aggregateVariantEvaluations, exempt, pickWorstRating, unrated } from '.
 
 export type SecurityBestPracticesValue = null
 
+function sourceNotAvailable(
+	ctx: EvaluationContext<SecurityBestPracticesValue>,
+): Evaluation<SecurityBestPracticesValue> {
+	return ctx.build({
+		outcome: {
+			id: 'source_not_available',
+			rating: Rating.FAIL,
+			displayName: 'Source code not available',
+			shortExplanation: mdSentence(
+				"{{WALLET_NAME}}'s source code is not publicly available, so security best practices cannot be independently verified.",
+			),
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} does not make its source code publicly available. As a result, it is not possible to independently verify how it handles key storage, random number generation, or deployment hardening.',
+		),
+		howToImprove: mdParagraph(
+			'{{WALLET_NAME}} should open-source its code so that key storage, random number generation, and deployment hardening can be independently verified.',
+		),
+	})
+}
+
 function keyStoragePass(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	mechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE | KeyStorageMechanism.PASSKEY_MANAGED,
@@ -110,6 +131,27 @@ function keyStorageFail(
 	})
 }
 
+function keyStorageUnverifiable(
+	ctx: EvaluationContext<SecurityBestPracticesValue>,
+): Evaluation<SecurityBestPracticesValue> {
+	return ctx.build({
+		outcome: {
+			id: 'key_storage_not_verifiable',
+			rating: Rating.FAIL,
+			displayName: 'Key storage cannot be verified',
+			shortExplanation: mdSentence(
+				"{{WALLET_NAME}}'s source code is not publicly available, so the key storage mechanism cannot be independently verified.",
+			),
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} does not make its source code publicly available. As a result, it is not possible to independently verify how it stores private keys.',
+		),
+		howToImprove: mdParagraph(
+			'{{WALLET_NAME}} should open-source its code so that its key storage mechanism can be independently verified.',
+		),
+	})
+}
+
 function evaluateKeyStorage(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	mechanism: KeyStorageMechanism,
@@ -123,6 +165,8 @@ function evaluateKeyStorage(
 			return keyStoragePartial(ctx, mechanism)
 		case KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_WEAK_KDF:
 			return keyStorageFail(ctx)
+		case KeyStorageMechanism.NOT_VERIFIABLE:
+			return keyStorageUnverifiable(ctx)
 		default:
 			return keyStorageFail(ctx)
 	}
@@ -163,6 +207,23 @@ function evaluateSecureRng(
 				),
 				howToImprove: mdParagraph(
 					"{{WALLET_NAME}} should use the operating system's CSPRNG for key generation.",
+				),
+			})
+		case SecureRngSource.NOT_VERIFIABLE:
+			return ctx.build({
+				outcome: {
+					id: 'rng_not_verifiable',
+					rating: Rating.FAIL,
+					displayName: 'RNG source cannot be verified',
+					shortExplanation: mdSentence(
+						"{{WALLET_NAME}}'s source code is not publicly available, so the entropy source used for key generation cannot be independently verified.",
+					),
+				},
+				details: paragraph(
+					'{{WALLET_NAME}} does not make its source code publicly available. As a result, it is not possible to independently verify what entropy source it uses for key generation.',
+				),
+				howToImprove: mdParagraph(
+					'{{WALLET_NAME}} should open-source its code so that the entropy source used for key generation can be independently verified.',
 				),
 			})
 		default:
@@ -755,7 +816,7 @@ function evaluateKeysHandling(
 
 export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	id: 'securityBestPractices',
-	icon: '\u{1f510}', // Locked with key
+	icon: 'security_best_practices',
 	displayName: 'Security best practices',
 	wording: {
 		midSentenceName: null,
@@ -922,6 +983,12 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 					},
 				),
 			),
+			exampleRating(
+				mdParagraph(
+					'The wallet is closed-source. Security properties such as key storage, random number generation, and manifests cannot be independently verified.',
+				),
+				sourceNotAvailable(EvaluationContext.forTest(() => securityBestPractices)),
+			),
 		],
 	},
 	aggregate: aggregateVariantEvaluations<SecurityBestPracticesValue>,
@@ -959,6 +1026,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				return exempt(ctx, sentence('This wallet does not have a browser extension variant.'))
 			}
 
+			if (securityBestPractices.browser === 'SOURCE_NOT_AVAILABLE') {
+				return sourceNotAvailable(ctx)
+			}
+
 			const browser = ctx.popRefs<BrowserSecurityBestPractices>(securityBestPractices.browser)
 
 			subEvaluations.push(
@@ -976,6 +1047,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				return exempt(ctx, sentence('This wallet does not have a mobile app variant.'))
 			}
 
+			if (securityBestPractices.mobile === 'SOURCE_NOT_AVAILABLE') {
+				return sourceNotAvailable(ctx)
+			}
+
 			const mobile = ctx.popRefs<MobileSecurityBestPractices>(securityBestPractices.mobile)
 
 			subEvaluations.push(
@@ -988,6 +1063,10 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 		if (variant === Variant.DESKTOP) {
 			if (securityBestPractices.desktop === 'NOT_A_DESKTOP_APP') {
 				return exempt(ctx, sentence('This wallet does not have a desktop app variant.'))
+			}
+
+			if (securityBestPractices.desktop === 'SOURCE_NOT_AVAILABLE') {
+				return sourceNotAvailable(ctx)
 			}
 
 			const desktop = ctx.popRefs<SecurityBestPracticesBase>(securityBestPractices.desktop)

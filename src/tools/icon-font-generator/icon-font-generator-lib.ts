@@ -306,11 +306,11 @@ export class SVGFont {
 		const svgIconsDirAbs = path.join(repoRoot, svgIconsDir)
 		const fontOutputDirAbs = path.join(repoRoot, fontOutputDir)
 		const cssOutputDirAbs = path.join(repoRoot, cssOutputDir)
-		const publicDir = path.resolve(repoRoot, 'public')
+		const fontsDir = path.resolve(repoRoot, 'src', 'assets', 'fonts')
 
-		if (!path.resolve(fontOutputDirAbs).startsWith(publicDir)) {
+		if (!path.resolve(fontOutputDirAbs).startsWith(fontsDir)) {
 			throw new Error(
-				`fontOutputDir must be a subdirectory of 'public/' but got: ${fontOutputDirAbs}`,
+				`fontOutputDir must be a subdirectory of 'src/assets/fonts/' but got: ${fontOutputDirAbs}`,
 			)
 		}
 
@@ -375,18 +375,8 @@ export class SVGFont {
 	}
 
 	public async write() {
-		const repoRoot = getRepositoryRoot()
-		const publicDir = path.resolve(repoRoot, 'public')
-
 		await fs.promises.mkdir(this.fontOutputDir, { recursive: true })
 		await fs.promises.mkdir(this.cssOutputDir, { recursive: true })
-
-		// Compute cssPath relative to repoRoot/public
-		let cssPath = '/' + path.relative(publicDir, this.fontOutputDir)
-
-		if (!cssPath.endsWith('/')) {
-			cssPath += '/'
-		}
 
 		const result = await svgtofont({
 			src: this.svgIconsDir,
@@ -398,6 +388,10 @@ export class SVGFont {
 			svgicons2svgfont: {
 				fontHeight: 1000,
 				normalize: true,
+			},
+			// Fixed timestamp to ensure deterministic output
+			svg2ttf: {
+				ts: 0,
 			},
 		})
 
@@ -414,7 +408,7 @@ export class SVGFont {
 			cssRules.push(`
 				&[data-icon~="${key}"] {
 					--icon-content: "${icon.encodedCode}";
-				},`)
+				}`)
 			typeValues.push(`\t| ${JSON.stringify(key)}`)
 		}
 		const singularFontName = this.fontName.endsWith('s')
@@ -422,18 +416,8 @@ export class SVGFont {
 			: this.fontName
 		const generatedCSS =
 			trimWhitespacePrefix(`
-			@font-face {
-				font-family: "${this.fontName}";
-				src: url('${cssPath}${this.fontName}.eot'); /* IE9*/
-				src: url('${cssPath}${this.fontName}.eot?#iefix') format('embedded-opentype') /* IE6-IE8 */,
-				url('${cssPath}${this.fontName}.woff2') format('woff2'),
-				url('${cssPath}${this.fontName}.woff') format('woff'),
-				url('${cssPath}${this.fontName}.ttf') format('truetype'),
-				url('${cssPath}${this.fontName}.svg') format('svg');
-			}
-
 			[data-${singularFontName}] {
-				font-family: 'wbicons';
+				font-family: var(--fontFamily-${this.fontName});
 				font-style: normal;
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;

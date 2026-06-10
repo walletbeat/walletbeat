@@ -28,6 +28,7 @@ import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
 	matchers: EncodedWalletRequestMatcher[]
+	benignStrings: string[]
 }
 
 export interface EncodedWalletRequestMatcher {
@@ -70,6 +71,8 @@ function optionalGlobMatches(pattern: string | null, value: string): boolean {
 
 	return globToRegExp(pattern).test(value)
 }
+
+const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [/^chrome-extension:\/\/\w+$/]
 
 export interface SaveOptions {
 	/** Verify existing file contents instead of saving. */
@@ -180,13 +183,18 @@ export class WalletCaptureAnnotations {
 	private readonly path: string | null
 	private readonly globalPath: string | null
 	private matchers: WalletRequestMatcher[]
+	private globalBenignStrings: Set<string>
+	private benignStrings: Set<string>
 
 	public static fromFile(
 		walletId: string,
 		pathStr: string,
 		globalPath: string,
 	): WalletCaptureAnnotations {
-		let data: EncodedWalletCaptureAnnotations = { matchers: [] }
+		let data: EncodedWalletCaptureAnnotations = {
+			matchers: [],
+			benignStrings: [],
+		}
 
 		if (fs.existsSync(pathStr)) {
 			const raw = fs.readFileSync(pathStr, 'utf8').trim()
@@ -215,44 +223,14 @@ export class WalletCaptureAnnotations {
 		return new WalletCaptureAnnotations(walletId, null, null, parsed, global)
 	}
 
-	private constructor(
-		walletId: string,
-		pathStr: string | null,
-		globalPath: string | null,
-		data: EncodedWalletCaptureAnnotations,
-		global: EncodedWalletCaptureAnnotations,
-	) {
-		const toMatcher = (m: EncodedWalletRequestMatcher, isGlobal: boolean): WalletRequestMatcher => {
-			return new WalletRequestMatcher(
-				{
-					domain: m.domain,
-					path: m.path ?? null,
-					method: m.method ?? null,
-					purposes:
-						m.purposes === undefined
-							? null
-							: m.purposes === 'NOT_WALLET_INITIATED'
-								? 'NOT_WALLET_INITIATED'
-								: nonEmptySetFromArray(m.purposes),
-					policy: m.policy ?? null,
-				},
-				isGlobal,
-			)
-		}
-
-		this.walletId = walletId
-		this.globalPath = globalPath
-		this.path = pathStr
-		this.matchers = global.matchers
-			.map(m => toMatcher(m, true))
-			.concat(data.matchers.map(m => toMatcher(m, false)))
-	}
-
 	private static parseEncoded(v: unknown, at: string): EncodedWalletCaptureAnnotations {
 		const root = expectRecord(v, at)
-		const arr = expectArray(root.matchers === undefined ? [] : root.matchers, `${at}.matchers`)
+		const matchersArr = expectArray(
+			root.matchers === undefined ? [] : root.matchers,
+			`${at}.matchers`,
+		)
 
-		const matchers: EncodedWalletRequestMatcher[] = arr.map((v, i) => {
+		const matchers: EncodedWalletRequestMatcher[] = matchersArr.map((v, i) => {
 			const matcherAt = `${at}.matchers[${i}]`
 			const obj = expectRecord(v, matcherAt)
 
@@ -299,13 +277,71 @@ export class WalletCaptureAnnotations {
 				policy: policyOpt === undefined ? undefined : collectionPolicyEnum.assert(policyOpt),
 			}
 		})
+		const benignStringsArr = expectArray(
+			root.benignStrings === undefined ? [] : root.benignStrings,
+			`${at}.benignStrings`,
+		)
+		const benignStrings = benignStringsArr.map(v => {
+			if (typeof v !== 'string') {
+				throw new Error(`not a string: ${String(v)}`)
+			}
 
-		return { matchers }
+			return v
+		})
+
+		return {
+			matchers,
+			benignStrings,
+		}
+	}
+
+	private constructor(
+		walletId: string,
+		pathStr: string | null,
+		globalPath: string | null,
+		data: EncodedWalletCaptureAnnotations,
+		global: EncodedWalletCaptureAnnotations,
+	) {
+		const toMatcher = (m: EncodedWalletRequestMatcher, isGlobal: boolean): WalletRequestMatcher => {
+			return new WalletRequestMatcher(
+				{
+					domain: m.domain,
+					path: m.path ?? null,
+					method: m.method ?? null,
+					purposes:
+						m.purposes === undefined
+							? null
+							: m.purposes === 'NOT_WALLET_INITIATED'
+								? 'NOT_WALLET_INITIATED'
+								: nonEmptySetFromArray(m.purposes),
+					policy: m.policy ?? null,
+				},
+				isGlobal,
+			)
+		}
+
+		this.walletId = walletId
+		this.globalPath = globalPath
+		this.path = pathStr
+		this.matchers = global.matchers
+			.map(m => toMatcher(m, true))
+			.concat(data.matchers.map(m => toMatcher(m, false)))
+		this.globalBenignStrings = new Set()
+		this.benignStrings = new Set()
+
+		for (const benign of global.benignStrings) {
+			this.globalBenignStrings.add(benign)
+		}
+
+		for (const benign of data.benignStrings) {
+			this.benignStrings.add(benign)
+		}
 	}
 
 	private toJSON(global: boolean): EncodedWalletCaptureAnnotations {
 		return {
 			matchers: this.matchers.filter(m => m.isGlobal === global).map(m => m.toJSON()),
+			benignStrings: Array.from(global ? this.globalBenignStrings : this.benignStrings).toSorted(),
 		}
 	}
 
@@ -321,6 +357,20 @@ export class WalletCaptureAnnotations {
 		}
 
 		this.matchers.splice(index, 1)
+	}
+
+	public addBenignString(str: string, global: boolean) {
+		;(global ? this.globalBenignStrings : this.benignStrings).add(str)
+	}
+
+	public isBenign(str: string): boolean {
+		for (const benignRegexp of GLOBAL_BENIGN_REGULAR_EXPRESSIONS) {
+			if (benignRegexp.test(str)) {
+				return true
+			}
+		}
+
+		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)
 	}
 
 	public matches(request: WalletRequest): WalletRequestMatcher | null {
@@ -363,14 +413,9 @@ export class WalletCaptureAnnotations {
 			}
 		}
 
-		let globalNeedsWrite = false
 		const globalContent = JSON.stringify(this.toJSON(true), null, '\t') + '\n'
 		const existingGlobalContent = fs.readFileSync(this.globalPath, 'utf8')
-
-		if (!isSameJson(existingGlobalContent, globalContent)) {
-			globalNeedsWrite = true
-		}
-
+		const globalNeedsWrite = !isSameJson(existingGlobalContent, globalContent)
 		const changed: string[] = []
 
 		if (opts.verifyExisting) {

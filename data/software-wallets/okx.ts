@@ -8,6 +8,7 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import {
+	CallDataDisplay,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -196,26 +197,30 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: true,
-					formatted: false,
-					rawHex: true,
+				erc7730: null,
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
-				// transactionDetailsDisplay: {
-				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	nonce: DataDisplayOptions.NOT_DECODED,
-				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// },
-				transactionDetailsDisplay: null,
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

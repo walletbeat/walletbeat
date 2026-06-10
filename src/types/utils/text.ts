@@ -44,8 +44,8 @@ export function slugifyCamelCase(camelCaseString: string): string {
 }
 
 /**
- * Return the prefix to use before a list item in a comma-separated list.
- * For example, ["a", "b", "c", "d"] would be written as "a, b, c and d".
+ * Return the prefix to use before a list item in a Oxford comma-separated list.
+ * For example, ["a", "b", "c", "d"] would be written as "a, b, c, and d".
  * @param index The index of the element being rendered.
  * @param listSize The total size of the list.
  * @returns The prefix to use before the element.
@@ -55,7 +55,7 @@ export function commaListPrefix(index: number, listSize: number, and?: string): 
 		return ''
 	}
 
-	return index < listSize - 1 ? ', ' : ` ${and ?? 'and'} `
+	return index < listSize - 1 ? ', ' : `${listSize > 2 ? ',' : ''} ${and ?? 'and'} `
 }
 
 /**
@@ -200,4 +200,78 @@ export function trimWhitespacePrefix(str: string): string {
 					: line,
 		)
 		.join('\n')
+}
+
+/**
+ * Verifies that `str` starts with `prefix` at a typesystem-aware level.
+ */
+export function stringHasPrefix<_P extends string>(
+	str: string,
+	prefix: _P,
+): str is `${_P}${string}` {
+	return str.startsWith(prefix)
+}
+
+/**
+ * Verifies that `str` ends with `suffix` at a typesystem-aware level.
+ */
+export function stringHasSuffix<_S extends string>(
+	str: string,
+	suffix: _S,
+): str is `${string}${_S}` {
+	return str.endsWith(suffix)
+}
+
+/**
+ * Verifies that `str` ends with `suffix` at a typesystem-aware level.
+ */
+export function stringHasPrefixAndSuffix<_P extends string, _S extends string>(
+	str: string,
+	{ prefix, suffix }: { prefix: _P; suffix: _S },
+): str is `${_P}${string}${_S}` {
+	return stringHasPrefix(str, prefix) && stringHasSuffix(str, suffix)
+}
+
+/**
+ * Asserts that `str` starts with `prefix` at a typesystem-aware level.
+ */
+export function assertStringHasPrefix<_P extends string>(
+	str: string,
+	prefix: _P,
+): `${_P}${string}` {
+	if (!stringHasPrefix(str, prefix)) {
+		throw new Error(`Expected string to start with "${prefix}", got "${str}"`)
+	}
+
+	return str
+}
+
+/**
+ * Asserts that `str` ends with `suffix` at a typesystem-aware level.
+ */
+export function assertStringHasSuffix<_S extends string>(
+	str: string,
+	suffix: _S,
+): `${string}${_S}` {
+	if (!stringHasSuffix(str, suffix)) {
+		throw new Error(`Expected string to end with "${suffix}", got "${str}"`)
+	}
+
+	return str
+}
+
+/**
+ * Asserts that `str` starts with `prefix` and ends with `suffix` at a typesystem-aware level.
+ */
+export function assertStringHasPrefixAndSuffix<_P extends string, _S extends string>(
+	str: string,
+	{ prefix, suffix, errorMessage }: { prefix: _P; suffix: _S; errorMessage?: string },
+): `${_P}${string}${_S}` {
+	if (!stringHasPrefixAndSuffix(str, { prefix, suffix })) {
+		throw new Error(
+			`${errorMessage === undefined ? '' : `${errorMessage}: `}Expected string to start with "${prefix}" and end with "${suffix}", got "${str}"`,
+		)
+	}
+
+	return str
 }

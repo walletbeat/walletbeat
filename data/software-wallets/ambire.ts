@@ -44,9 +44,9 @@ import {
 } from '@/schema/features/security/security-best-practices'
 import {
 	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -74,24 +74,17 @@ import type { CalendarDate } from '@/types/date'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
+import { citrea } from '../entities/citrea'
 import { github } from '../entities/github'
 import { hunterSecurity } from '../entities/hunter-security'
 import { lifi } from '../entities/lifi'
+import { monad } from '../entities/monad'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
 import { sentry } from '../entities/sentry'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
 import ambireRawExtManifest from './manifests/ambire/ehgjhhccekdedpbkifaojjaefeohnoea.manifest.json'
-
-const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: DataDisplayOptions.NOT_IN_UI,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 const v2Audits: SecurityAudit[] = [
 	{
@@ -460,7 +453,7 @@ export const ambire: SoftwareWallet = {
 				[Variant.DESKTOP]: null,
 			},
 			dataCollection: {
-				[UserFlow.INSTALL]: null,
+				[UserFlow.INSTALL]: { collected: [] },
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [
 						{
@@ -475,14 +468,119 @@ export const ambire: SoftwareWallet = {
 					],
 				},
 				[UserFlow.ONBOARDING_NEW]: {
-					collected: [],
+					collected: [
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: monad,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: citrea,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+					],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
-				[UserFlow.ONBOARDING_IMPORT]: null,
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: monad,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+						{
+							ref: refTodo,
+							byEntity: citrea,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+					],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
 				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
-				[UserFlow.SEND_USDC]: null,
+				[UserFlow.SEND_USDC]: {
+					collected: [
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
+					],
+				},
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},
@@ -671,62 +769,85 @@ export const ambire: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: false,
-					formatted: false,
-					rawHex: true,
-				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: ambireTransactionDisplayDefault,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...ambireTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...ambireTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...ambireTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: ambireTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...ambireTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...ambireTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...ambireTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...ambireTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...ambireTransactionDisplayDefault,
-						failure: 'DETECTED',
+						failure: 'DETECTED' as const,
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...ambireTransactionDisplayDefault,
-						nondeterminism: 'STATIC_SINGLE_OUTCOME',
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
 					},
-				},
+				}),
 			},
 		},
 		selfSovereignty: {
@@ -771,7 +892,7 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				dependencyVulnerabilityScanning: notSupported,
+				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/AmbireTech/extension/releases',
 				}),

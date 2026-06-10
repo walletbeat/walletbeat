@@ -1,8 +1,3 @@
-@import '@fontsource/space-grotesk/latin-400.css';
-@import '@fontsource/space-grotesk/latin-500.css';
-@import '@fontsource/space-grotesk/latin-600.css';
-@import '@fontsource/space-grotesk/latin-700.css';
-
 :root {
 	--transition-easeInExpo: cubic-bezier(0.7, 0, 0.84, 0);
 	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -17,25 +12,29 @@
 	--separator-width: 1px;
 
 	/* Main canvas + default cards (dark: deep purple) */
-	--background-primary: light-dark(#fff, #130a2b);
+	--background-primary: light-dark(#F8EDFF, #110c1f);
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
-	--background-secondary: light-dark(#efefef, #1c1038);
+	--background-secondary: light-dark(#FFFFFF80, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
 	/* Sidebar uses the same background as the sticky elements */
 	--navigation-backgroundColor: var(--sticky-backgroundColor);
+	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
-	--accent-color: light-dark(#e564bc, #f078c8);
+	--accent-color: light-dark(#3D2B6E, #f078c8);
 	--accent-backgroundColor: light-dark(#fbdcf2, #3d0a32);
-	--text-primary: light-dark(#222222, #f4f2f8);
-	--text-secondary: light-dark(#3f4046, #b8b0d4);
+	--text-primary: light-dark(#130A2B, #F5F2F7);
+	--text-secondary: light-dark(#130A2B, #B6AEC1);
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
+	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
+	--icon-navigation-color: light-dark(#000000, #FFFFFF);
 
-	--rating-pass: light-dark(oklch(0.81 0.22 152.32), oklch(0.75 0.18 152.32));
-	--rating-fail: light-dark(oklch(0.69 0.23 29.44), oklch(0.63 0.19 29.44));
-	--rating-partial: light-dark(oklch(0.9 0.21 91.75), oklch(0.84 0.17 91.75));
-	--rating-neutral: #bdc3c7;
-	--rating-unrated: light-dark(oklch(0.75 0.02 244.87), oklch(0.67 0.01 264.61));
+	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
+	--rating-fail: light-dark(#FF969699,#FB6682);
+	--rating-partial: light-dark(#FFCC7399,#FFCC73);
+	--rating-neutral: light-dark(#D5D4FB99,#D5D4FB);
+	--rating-unrated: #F8ECEC;
+	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
 
@@ -117,7 +116,7 @@
 	scroll-behavior: smooth;
 	overflow: hidden;
 
-	font-family: 'Space Grotesk', 'Noto Color Emoji';
+	font-family: var(--fontFamily-spaceGrotesk), 'Noto Color Emoji';
 	font-size: min(3.2vw, 16px);
 
 	color-scheme: light dark;
@@ -196,3 +195,10 @@ h6 {
 	text-wrap: balance;
 }
 
+h3,
+h4,
+h5,
+h6, 
+p {
+	font-family: var(--fontFamily-avenir);
+}

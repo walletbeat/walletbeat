@@ -21,7 +21,7 @@ export const commonExclusions: PathPredicate[] = [
 	await GitIgnoredFiles(),
 
 	// Exclude known binary files and macOS metadata files.
-	/\.(png|pdf|jpg|jpeg|gif|ico|eot|ttf|woff|woff2)$/i,
+	/\.(png|pdf|jpg|jpeg|gif|ico|eot|otf|ttf|woff|woff2)$/i,
 
 	// Helios binary checkpoint file.
 	'deploy/helios/data/checkpoint',
@@ -222,7 +222,7 @@ export async function getCodebaseIndex<T extends IndexedFileData>(
 		root: options.root,
 		ignore: options.ignore,
 		concurrency: options.concurrency,
-		traversalFn: entry => {
+		fullTraversalFn: entry => {
 			if (entry.type === CodebaseEntryType.FILE) {
 				const fileIndex: IndexedFile<T> = {
 					filePath: entry.path,
@@ -244,31 +244,34 @@ export enum CodebaseEntryType {
 	OTHER = 'OTHER',
 }
 
-export type CodebaseEntry =
-	| {
-			type: CodebaseEntryType.DIRECTORY
-			path: string
-	  }
-	| {
-			type: CodebaseEntryType.FILE
-			path: string
-			raw: Buffer
-			contents: string
-	  }
-	| {
-			type: CodebaseEntryType.SYMLINK
-			path: string
-			rawTarget: string
-			selfRelativeTarget: string
-			rootRelativeTarget: string
-			absoluteTarget: string
-	  }
-	| {
-			type: CodebaseEntryType.OTHER
-			path: string
-	  }
+export interface CodebaseEntryBase {
+	type: CodebaseEntryType
+	path: string
+}
 
-export interface CodebaseCrawOptions {
+export type CodebaseEntry = CodebaseEntryBase &
+	(
+		| {
+				type: CodebaseEntryType.DIRECTORY
+		  }
+		| {
+				type: CodebaseEntryType.FILE
+				raw: Buffer
+				contents: string
+		  }
+		| {
+				type: CodebaseEntryType.SYMLINK
+				rawTarget: string
+				selfRelativeTarget: string
+				rootRelativeTarget: string
+				absoluteTarget: string
+		  }
+		| {
+				type: CodebaseEntryType.OTHER
+		  }
+	)
+
+export type CodebaseCrawOptions = {
 	/** Root directory to traverse from. If undefined, use repository root. */
 	root?: string
 
@@ -278,12 +281,35 @@ export interface CodebaseCrawOptions {
 	 */
 	ignore: PathPredicate[]
 
-	/** Function to run on each entry that doesn't match any predicate in `ignore`. */
-	traversalFn: (entry: CodebaseEntry) => void
-
 	/** Max number of concurrent I/O operations. */
 	concurrency?: number
-}
+} & (
+	| {
+			/**
+			 * Function to run on each entry that doesn't match any predicate in `ignore`.
+			 * Only base entry contents are fetched.
+			 * This saves down on I/O for tests that don't need file contents.
+			 */
+			baseTraversalFn: (entryBase: CodebaseEntryBase) => void
+	  }
+	| {
+			/**
+			 * Function to run on each entry that doesn't match any predicate in `ignore`.
+			 * Full entry contents are fetched.
+			 */
+			fullTraversalFn: (entry: CodebaseEntry) => void
+	  }
+	| {
+			/**
+			 * Function to run on each entry that doesn't match any predicate in `ignore`.
+			 * Full entry contents are fetched by calling the provided callback.
+			 */
+			complexTraversalFn: (
+				baseEntry: CodebaseEntryBase,
+				entryFn: () => Promise<CodebaseEntry>,
+			) => Promise<void>
+	  }
+)
 
 /**
  * Crawl the codebase and call traversalFn for each entry.
@@ -311,6 +337,35 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 	// Pre-load the set of git symlinks so we can reclassify them correctly.
 	const gitSymlinks = process.platform === 'win32' ? getGitSymlinkPaths(root) : new Set<string>()
 
+	const processEntry = async (
+		baseEntry: CodebaseEntryBase,
+		getFullEntry: () => Promise<CodebaseEntry>,
+	) => {
+		if (Object.hasOwn(options, 'baseTraversalFn')) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just checked
+			const optionsWithFn = options as { baseTraversalFn: (entryBase: CodebaseEntryBase) => void }
+
+			optionsWithFn.baseTraversalFn(baseEntry)
+		} else if (Object.hasOwn(options, 'fullTraversalFn')) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just checked
+			const optionsWithFn = options as { fullTraversalFn: (entryBase: CodebaseEntry) => void }
+
+			optionsWithFn.fullTraversalFn(await getFullEntry())
+		} else if (Object.hasOwn(options, 'complexTraversalFn')) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just checked
+			const optionsWithFn = options as {
+				complexTraversalFn: (
+					baseEntry: CodebaseEntryBase,
+					entryFn: () => Promise<CodebaseEntry>,
+				) => Promise<void>
+			}
+
+			await optionsWithFn.complexTraversalFn(baseEntry, getFullEntry)
+		} else {
+			throw new Error('Invalid options')
+		}
+	}
+
 	const crawl = async (dir: string): Promise<void> => {
 		const dirEntries = await concurrencyLimit(() => fs.readdir(dir, { withFileTypes: true }))
 
@@ -322,44 +377,28 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 				return
 			}
 
-			let entryData: CodebaseEntry
+			let entryBaseData: CodebaseEntryBase
+			let entryDataFn: () => Promise<CodebaseEntry>
 
 			if (entry.isDirectory()) {
-				entryData = { type: CodebaseEntryType.DIRECTORY, path: rootRelativePath }
+				const dirBaseEntry = { type: CodebaseEntryType.DIRECTORY, path: rootRelativePath } as const
+
+				entryBaseData = dirBaseEntry
+				entryDataFn = () => Promise.resolve(dirBaseEntry)
 			} else if (entry.isSymbolicLink()) {
-				try {
-					const rawTarget = await concurrencyLimit(() => fs.readlink(fullPath))
-					const selfRelativeTarget = path.join(path.dirname(rootRelativePath), rawTarget)
-					const rootRelativeTarget = path.relative(root, selfRelativeTarget)
-					const absoluteTarget = normalizePath(path.resolve(root, rootRelativeTarget))
-
-					entryData = {
-						type: CodebaseEntryType.SYMLINK,
-						path: rootRelativePath,
-						rawTarget,
-						selfRelativeTarget,
-						rootRelativeTarget,
-						absoluteTarget,
-					}
-				} catch {
-					entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
+				entryBaseData = {
+					type: CodebaseEntryType.SYMLINK,
+					path: rootRelativePath,
 				}
-			} else if (entry.isFile()) {
-				// On Windows, git symlinks are stored as stub text files containing
-				// the target path. Reclassify them as SYMLINK entries so they are
-				// treated consistently with real symlinks on Unix.
-				if (gitSymlinks.has(rootRelativePath)) {
-					const stubContent = (await concurrencyLimit(() => fs.readFile(fullPath, 'utf8'))).trim()
 
-					// A valid symlink stub is a single-line relative path.
-					// If the content has newlines, the stub was replaced with real file content.
-					if (!stubContent.includes('\n')) {
-						const rawTarget = stubContent
+				entryDataFn = async () => {
+					try {
+						const rawTarget = await concurrencyLimit(() => fs.readlink(fullPath))
 						const selfRelativeTarget = path.join(path.dirname(rootRelativePath), rawTarget)
 						const rootRelativeTarget = path.relative(root, selfRelativeTarget)
 						const absoluteTarget = normalizePath(path.resolve(root, rootRelativeTarget))
 
-						entryData = {
+						return {
 							type: CodebaseEntryType.SYMLINK,
 							path: rootRelativePath,
 							rawTarget,
@@ -367,13 +406,46 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 							rootRelativeTarget,
 							absoluteTarget,
 						}
-					} else {
+					} catch {
+						return { type: CodebaseEntryType.OTHER, path: rootRelativePath }
+					}
+				}
+			} else if (entry.isFile()) {
+				entryBaseData = {
+					type: CodebaseEntryType.FILE,
+					path: rootRelativePath,
+				}
+				entryDataFn = async () => {
+					// On Windows, git symlinks are stored as stub text files containing
+					// the target path. Reclassify them as SYMLINK entries so they are
+					// treated consistently with real symlinks on Unix.
+					if (gitSymlinks.has(rootRelativePath)) {
+						const stubContent = (await concurrencyLimit(() => fs.readFile(fullPath, 'utf8'))).trim()
+
+						// A valid symlink stub is a single-line relative path.
+						// If the content has newlines, the stub was replaced with real file content.
+						if (!stubContent.includes('\n')) {
+							const rawTarget = stubContent
+							const selfRelativeTarget = path.join(path.dirname(rootRelativePath), rawTarget)
+							const rootRelativeTarget = path.relative(root, selfRelativeTarget)
+							const absoluteTarget = normalizePath(path.resolve(root, rootRelativeTarget))
+
+							return {
+								type: CodebaseEntryType.SYMLINK,
+								path: rootRelativePath,
+								rawTarget,
+								selfRelativeTarget,
+								rootRelativeTarget,
+								absoluteTarget,
+							}
+						}
+
 						const raw = await concurrencyLimit(() => fs.readFile(fullPath))
 						const contents = raw.toString('utf8').replaceAll('\r\n', '\n')
 
-						entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
+						return { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
 					}
-				} else {
+
 					const raw = await concurrencyLimit(() => fs.readFile(fullPath))
 
 					// Normalize CRLF → LF so that checks like trailing-newline and
@@ -382,13 +454,16 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 					// uses getCrlfFilesFromGit() instead, which reads the index directly.
 					const contents = raw.toString('utf8').replaceAll('\r\n', '\n')
 
-					entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
+					return { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
 				}
 			} else {
-				entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
+				const otherEntryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath } as const
+
+				entryBaseData = otherEntryData
+				entryDataFn = () => Promise.resolve(otherEntryData)
 			}
 
-			options.traversalFn(entryData)
+			await processEntry(entryBaseData, entryDataFn)
 
 			if (entry.isDirectory()) {
 				await crawl(fullPath)

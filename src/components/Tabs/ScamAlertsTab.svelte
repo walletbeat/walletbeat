@@ -522,7 +522,10 @@
     padding: 0.75rem;
     border-radius: 0.5rem;
     word-break: break-all;
+    overflow-wrap: break-word;
     color: var(--text-primary);
+    display: block;
+    min-width: 0;
   }
 
   .address-input {
@@ -566,6 +569,7 @@
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
+    min-width: 0;
   }
 
   .permit-key {
@@ -581,6 +585,8 @@
     font-size: 0.8rem;
     color: var(--text-primary);
     word-break: break-all;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 
   .value-badge {
@@ -679,6 +685,9 @@
     text-align: left;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
       monospace;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 
   .result-link:hover {
@@ -691,5 +700,7 @@
     font-size: 0.8rem;
     color: var(--text-primary);
     word-break: break-all;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 </style>

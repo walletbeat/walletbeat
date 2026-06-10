@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { ethereumErc55Address, isErc55Address, keccak256 } from '@/types/utils/ethereum-address'
+import { keccak256 } from '@/types/utils/bytes'
+import { ethereumErc55Address, isErc55Address } from '@/types/utils/ethereum-address'
 
 function toHex(bytes: Uint8Array): string {
 	return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')

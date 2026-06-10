@@ -29,9 +29,9 @@ import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import {
 	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -69,15 +69,6 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
-
-const rabbyTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_OPTIONALLY,
-	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -714,71 +705,96 @@ export const rabby: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: false,
-					formatted: true,
-					rawHex: true,
-				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+				}),
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: rabbyTransactionDisplayDefault,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_OPTIONALLY,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...rabbyTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...rabbyTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...rabbyTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: rabbyTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...rabbyTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...rabbyTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...rabbyTransactionDisplayDefault,
-						failure: 'DETECTED',
-					},
-					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...rabbyTransactionDisplayDefault,
-						nondeterminism: 'STATIC_SINGLE_OUTCOME',
-					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...rabbyTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...rabbyTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
-				},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: supported({
-				ref: refTodo,
-				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-			}),
+			// Rabby's browser extension exposes inspection and revocation for
+			// ERC-20, ERC-721, and ERC-1155 token approvals directly in the popup
+			// UI (a recent integration; previously this opened a separate tab to a
+			// Rabby-owned revoke site, which would not have qualified under the
+			// in-wallet-UI standard). Verified in-app. Mobile and desktop variants
+			// not independently verified, so left as null.
+			permissionsManagement: {
+				[Variant.BROWSER]: supported({
+					ref: refTodo,
+					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				}),
+				[Variant.DESKTOP]: null,
+				[Variant.MOBILE]: null,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

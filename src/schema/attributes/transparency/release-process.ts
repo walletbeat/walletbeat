@@ -312,7 +312,7 @@ function fail(ctx: EvaluationContext, basicSignals: BasicSignalPresence): Evalua
 
 export const releaseProcess: Attribute = {
 	id: 'releaseProcess',
-	icon: '\u{1f4e6}', // Package box
+	icon: 'release_process_transparency',
 	displayName: 'Release process',
 	wording: {
 		midSentenceName: 'release process',

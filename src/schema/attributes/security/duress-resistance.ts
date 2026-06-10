@@ -115,7 +115,7 @@ function hasDuressMode(
 
 export const duressResistance: Attribute = {
 	id: 'duressResistance',
-	icon: '\u{1F527}', // Wrench (references the "wrench attack" threat model)
+	icon: 'duress_resistance',
 	displayName: 'Duress Resistance',
 	wording: {
 		midSentenceName: 'duress resistance',

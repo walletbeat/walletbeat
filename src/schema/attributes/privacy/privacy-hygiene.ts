@@ -364,27 +364,42 @@ function scanFlowsForForbiddenDataViolations(
 
 export const privacyHygiene: Attribute = {
 	id: 'privacyHygiene',
-	icon: '\u{1f9fc}', // Soap
+	icon: 'privacy_hygiene',
 	displayName: 'Privacy hygiene',
 	wording: {
 		midSentenceName: 'privacy hygiene',
 	},
 	question: sentence('Does {{WALLET_NAME}} only send sensitive data with your explicit consent?'),
 	why: markdown(
-		[
-			'Users expect that data like browsing history is never sent without consent.',
-			'Much like users would not expect a web browser to leak browsing history for analytics, they should not expect wallets to track every site interaction by default.',
-			'Product analytics and crash/error reporting telemetry should only be used after the user has agreed.',
-			'This attribute encodes that baseline.',
-		].join(' '),
+		`
+			Users expect that data like browsing history is never sent without consent.
+			Much like users would not expect a web browser to leak browsing history for
+			analytics, they should not expect wallets to track every site interaction by
+			default.
+
+			Such tracking may be industry-standard in web2, but is very easy to get wrong
+			in wallets, as they deal with sensitive public and private information that
+			can easily end up in analytics or crash logs.
+
+			For example, the multi-million
+			[Solana Slope wallet](https://decrypt.co/106680/solana-hack-blamed-slope-mobile-wallet-exploit)
+			hack was caused by the wallet inadvertently leaking users' seed phrases to
+			the Sentry crash reporting platform.
+			Even if a wallet doesn't leak the seed phrase, it is easy to accidentally
+			leak other information that uniquely identifies users: account addresses,
+			token balances, lists of wallet assets, transaction intents, etc.
+
+			As such, product analytics and crash/error reporting telemetry should
+			only be enabled if the user has agreed to such tracking.
+		`,
 	),
 	methodology: markdown(
-		[
-			'We evaluate default behavior using network requests and published data-collection policies.',
-			'The wallet fails if it sends browsing history by default.',
-			'The wallet also fails if it uses product analytics without prior consent.',
-			'It gets a partial rating when crash/error reporting runs without prior consent.',
-		].join(' '),
+		`
+			We evaluate default behavior using network requests and published data collection policies.
+			The wallet fails if it sends browsing history by default.
+			The wallet also fails if it uses product analytics without prior consent.
+			It gets a partial rating when crash/error reporting runs without prior consent.
+		`,
 	),
 	ratingScale: {
 		display: 'fail-pass',

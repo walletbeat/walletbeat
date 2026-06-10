@@ -125,7 +125,7 @@ type SecurityValues = Dict<{
 /** Security attributes. */
 export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
-	icon: '\u{1f512}', // Lock
+	icon: 'security',
 	displayName: 'Security',
 	perWalletQuestion: sentence('How secure is {{WALLET_NAME}}?'),
 	attributes: {
@@ -173,7 +173,7 @@ type PrivacyValues = Dict<{
 /** Privacy attributes. */
 export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	id: 'privacy',
-	icon: '\u{1f60e}', // Face with sunglasses
+	icon: 'privacy',
 	displayName: 'Privacy',
 	perWalletQuestion: sentence('How well does {{WALLET_NAME}} protect your privacy?'),
 	attributes: {
@@ -206,7 +206,7 @@ type SelfSovereigntyValues = Dict<{
 /** Self-sovereignty attributes. */
 export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues> = {
 	id: 'selfSovereignty',
-	icon: '\u{1f3f0}', // Castle
+	icon: 'self_sovereignty',
 	displayName: 'Self-sovereignty',
 	perWalletQuestion: sentence(
 		'How much control and ownership over your account does {{WALLET_NAME}} give you?',
@@ -241,7 +241,7 @@ type TransparencyValues = Dict<{
 /** Transparency attributes. */
 export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
-	icon: '\u{1f575}', // Detective
+	icon: 'transparency',
 	displayName: 'Transparency',
 	perWalletQuestion: sentence(
 		"How transparent and sustainable is {{WALLET_NAME}}'s development model?",
@@ -281,7 +281,7 @@ type EcosystemValues = Dict<{
 /** Ecosystem attributes. */
 export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
-	icon: '🌳',
+	icon: 'ecosystem',
 	displayName: 'Ecosystem',
 	perWalletQuestion: sentence('How well does {{WALLET_NAME}} align with the ecosystem?'),
 	attributes: {
@@ -314,7 +314,7 @@ type MaintenanceValues = Dict<{
 /** Maintenance attributes. */
 export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
-	icon: '🛠️',
+	icon: 'transparency',
 	displayName: 'Maintenance',
 	perWalletQuestion: sentence('How well-maintained is {{WALLET_NAME}}?'),
 	attributes: {

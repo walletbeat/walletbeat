@@ -182,8 +182,6 @@ export const nufi: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: null,
-				messageSigningLegibility: null,
 				// transactionDetailsDisplay: {
 				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -192,7 +190,10 @@ export const nufi: SoftwareWallet = {
 				// 	to: DataDisplayOptions.SHOWN_OPTIONALLY,
 				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// },
+				erc7730: null,
+				erc8213: null,
 				transactionDetailsDisplay: null,
+				transactionSimulations: null,
 			},
 		},
 		selfSovereignty: {

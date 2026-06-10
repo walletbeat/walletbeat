@@ -5,6 +5,7 @@
 		color: string
 		weight: number
 		arcLabel: string
+		arcIconId?: string
 		titleText: string
 		href?: string
 		children?: Slice[]
@@ -257,7 +258,7 @@
 		this={slice.href ? 'a' : 'div'}
 		href={slice.href}
 
-		class="slice"
+		class={`slice ${slice.children !== undefined && slice.children.length > 0 ? 'slice-outer' : 'slice-inner'}`}
 		title={slice.titleText}
 
 		role="button"
@@ -296,7 +297,11 @@
 		<div
 			class="slice-shape"
 		>
-			<span class="label" aria-hidden="true">{slice.arcLabel}</span>
+			{#if slice.arcIconId}
+				<span class="label" aria-hidden="true" data-wbicon data-icon={slice.arcIconId}></span>
+			{:else}
+				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
+			{/if}
 		</div>
 	</svelte:element>
 
@@ -637,6 +642,25 @@
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
 					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
+				}
+
+				&:not(:hover, :focus-within) > .slice-shape > .label[data-wbicon] {
+					filter: none;
+					color: contrast-color(--slice-fill);
+					opacity: 1;
+				}
+
+				&:hover > .slice-shape > .label[data-wbicon],
+				&:focus-within > .slice-shape > .label[data-wbicon] {
+					filter: none;
+					color: black;
+					opacity: 1;
+				}
+			}
+
+			.slice-outer {
+				.slice-shape > .label[data-wbicon] {
+					font-size: calc(var(--slice-labelSize) * 2px);
 				}
 			}
 

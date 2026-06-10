@@ -1,15 +1,28 @@
 <script lang="ts">
 	// Types
-	import type { NavigationItem } from '@/constants/navigation'
+	import type { LucideNavigationIcon, NavigationItem } from '@/constants/navigation'
+
+	// Icons
+	import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
+	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
+
+	const LUCIDE_ICONS: Record<LucideNavigationIcon, string> = {
+		ICON_CHART_BAR: ChartBarIcon,
+		ICON_CHART_PIE: ChartPieIcon,
+		ICON_WALLET: WalletIcon,
+	}
 
 
 	// Props
 	let {
 		items,
 		currentPathname,
+		showSearch = true,
 	}: {
 		items: NavigationItem[]
 		currentPathname: string
+		showSearch?: boolean
 	} = $props()
 
 
@@ -84,6 +97,7 @@
 </script>
 
 
+{#if showSearch}
 <search data-column="gap-3">
 	<input
 		type="search"
@@ -133,6 +147,11 @@
 
 	{@render navigationItems(items)}
 </search>
+{:else}
+<div data-column="gap-3">
+	{@render navigationItems(items)}
+</div>
+{/if}
 
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
@@ -194,14 +213,30 @@
 			data-row="start gap-2"
 		>
 			{#if item.icon}
-				<span class="icon" class:circle={depth === 0}>{@html item.icon}</span>
+				<span class="icon" class:circle={depth === 0}>
+					{#if item.icon.startsWith('ICON_WALLET_IMG:')}
+						<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+					{:else if item.icon in LUCIDE_ICONS}
+						{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
+					{:else}
+						<span data-wbicon data-icon={item.icon}></span>
+					{/if}
+				</span>
 			{/if}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
 		{#if item.icon}
-			<span class="icon" class:circle={depth === 0}>{@html item.icon}</span>
+			<span class="icon" class:circle={depth === 0}>
+				{#if item.icon.startsWith('ICON_WALLET_IMG:')}
+					<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+				{:else if item.icon in LUCIDE_ICONS}
+					{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
+				{:else}
+					<span data-wbicon data-icon={item.icon}></span>
+				{/if}
+			</span>
 		{/if}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
@@ -212,6 +247,7 @@
 <style>
 	input[type='search'] {
 		border-radius: 0.75rem;
+		border-color: var(--icon-navigation-borderColor);
 	}
 
 	menu {
@@ -233,7 +269,7 @@
 	}
 
 	a {
-		color: inherit;
+		color: var(--text-primary);
 		font-weight: inherit;
 
 		&:hover {
@@ -243,7 +279,6 @@
 
 		&[aria-current] {
 			background-color: var(--background-primary);
-			font-weight: 700;
 		}
 	}
 
@@ -254,10 +289,12 @@
 			align-items: center;
 			justify-content: center;
 			font-size: 1.25em;
+			font-weight: 500;
 			width: 1em;
 			height: 1em;
 			line-height: 1;
 			flex-shrink: 0;
+			color: var(--icon-navigation-color);
 
 			:global(
 				img,
@@ -273,7 +310,7 @@
 			width: 1.75em;
 			height: 1.75em;
 			border-radius: 50%;
-			border: 1px solid white;
+			border: 1px solid var(--icon-navigation-borderColor);
 
 			:global(
 				img,

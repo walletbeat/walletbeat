@@ -15,12 +15,10 @@ import {
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import {
-	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
-	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
-	noCalldataDecoding,
+	DataLocation,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -258,11 +256,6 @@ export const keycardShell: HardwareWallet = {
 						url: 'https://github.com/keycard-tech/eth-abi-repo',
 					},
 				],
-				calldataDecoded: {
-					...noCalldataDecoding,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
-				},
 				// Data extraction: QR codes used for transaction data (ERC-4527); display visible to eyes
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -277,7 +270,16 @@ export const keycardShell: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				messageSigningLegibility: null,
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.NOT_PROVIDED,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.NOT_PROVIDED,
+				}),
+				erc8213: null,
 			},
 			userSafety: null,
 		},

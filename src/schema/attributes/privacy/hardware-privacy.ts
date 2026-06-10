@@ -15,7 +15,7 @@ export type HardwarePrivacyMetadata = {
 
 export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 	id: 'hardwarePrivacy',
-	icon: '🔒',
+	icon: 'user_privacy',
 	displayName: 'Hardware Privacy',
 	wording: {
 		midSentenceName: null,

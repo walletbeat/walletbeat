@@ -134,29 +134,26 @@ Purposes are case-insensitive on the command line.
 #### `mark-string` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>' [--hint=...]
+$ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
-Mark a string as conveying the given data type. All instances of the string will be redacted from the capture file.
-A hint should be optionally provided to explain what this string contains. The hint is stored in the capture file and helps understand redacted data.
+Mark a string as conveying the given data type. The string will be classified and stored in the capture file's user data store.
 
-Marking a string as carrying user data has two effects:
+Marking a string as carrying user data has the following effect:
 
 - All requests carrying this string will automatically be considered as having sent this user data.
-- The string will be redacted out of all network capture files for your own privacy.
-  - Future network captures containing the same string will still be correctly identified as such, by matching on the hash of the redacted string.
 
 ##### Examples
 
 ```
 # Mark a cookie as a tracking identifier:
-$ pnpm wallet-data-collection <global flags> mark-string --string='GA1.1.1294582759.1067224611' --data='TRACKING_IDENTIFIER' --hint='Google Analytics cookie'
+$ pnpm wallet-data-collection <global flags> mark-string --string='GA1.1.1294582759.1067224611' --data='TRACKING_IDENTIFIER'
 
 # Mark a wallet address as such:
-$ pnpm wallet-data-collection <global flags> mark-string --string='0x1234678...' --data='ACCOUNT_ADDRESS' --hint='Imported address 1'
+$ pnpm wallet-data-collection <global flags> mark-string --string='0x1234678...' --data='ACCOUNT_ADDRESS'
 
 # Mark your X.com and Farcaster account name as such:
-$ pnpm wallet-data-collection <global flags> mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT' --hint='Social media account'
+$ pnpm wallet-data-collection <global flags> mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'
 ```
 
 #### `review-requests` subcommand
@@ -199,7 +196,7 @@ After a request is manually reviewed, it will never be prompted for in future ex
 - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
   - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
   - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
-  - Run the `mark-string` subcommand to redact any personal data and automatically associate requests to the data they send.
+  - Run the `mark-string` subcommand to classify personal data strings and automatically associate requests to the data they send.
   - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
   - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
 - Once the `check` subcommand is successful, you are done!

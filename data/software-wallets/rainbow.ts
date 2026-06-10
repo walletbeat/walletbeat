@@ -2,8 +2,12 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
 import { alphabet } from '@/data/entities/alphabet'
 import { apple } from '@/data/entities/apple'
+import { rainbow as rainbowEntity } from '@/data/entities/rainbow'
+import { sentry } from '@/data/entities/sentry'
+import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
@@ -19,9 +23,9 @@ import {
 } from '@/schema/features/security/keys-handling'
 import {
 	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
-	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
@@ -34,22 +38,18 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-const rainbowTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
-	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: DataDisplayOptions.NOT_IN_UI,
-	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-}
 
 export const rainbow: SoftwareWallet = {
 	metadata: {
@@ -191,8 +191,65 @@ export const rainbow: SoftwareWallet = {
 		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'Both Rainbow clients integrate Sentry for crash and error reporting. In the mobile app, `initSentry` runs in all production builds (disabled only for dev/test sessions).',
+							url: 'https://github.com/rainbow-me/rainbow/blob/903d96e1075054ede51a721f5430b09c530fedf9/src/logger/sentry.ts',
+						},
+						{
+							explanation:
+								'The in-app Analytics toggle (Settings > Privacy) only disables usage analytics via `analytics.disable()`; it does not stop Sentry crash reporting.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+						},
+						{
+							explanation:
+								'In the browser extension, `initializeSentry` runs in all non-dev builds and is not gated by the analytics opt-out, so the user cannot disable crash reporting.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/566dbc30d057e007a6f05ca2694cc600683e4ae8/src/core/sentry/index.ts',
+						},
+						{
+							explanation:
+								'The in-app Privacy settings state that when the Analytics toggle is disabled, "only essential crash diagnostics are collected", confirming crash reporting cannot be turned off by the user.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png',
+						},
+					],
+					entity: sentry,
+					// Sentry crash reporting runs in all production builds of both clients and is
+					// not gated by the in-app analytics opt-out, so users cannot disable it.
+					policy: CollectionPolicy.ALWAYS,
+				}),
+				usage: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'The mobile app collects product usage analytics via RudderStack; analytics default to enabled and are disabled only when the `doNotTrack` device flag is set.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
+						},
+						{
+							explanation:
+								'The browser extension also collects usage analytics via RudderStack, enabled by default (gated by the `analyticsDisabled` setting).',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/b5da91cd683f1b9cdd2eb4a43b3b8314986cf1af/src/analytics/index.ts',
+						},
+						{
+							explanation:
+								'Usage analytics can be disabled by the user via the in-app Analytics toggle (Settings > Privacy), which calls `analytics.disable()` and sets `doNotTrack`.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+						},
+						{
+							explanation:
+								'The in-app Privacy settings describe the Analytics toggle as "allowing analytics of usage data", confirming it governs usage analytics collection.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png',
+						},
+					],
+					// Usage analytics is collected by Rainbow, implemented via the RudderStack
+					// SDK. The data plane host is configured through a build-time environment
+					// variable, so whether events also reach RudderStack as an external recipient
+					// cannot be verified from the public source; collection is attributed to
+					// Rainbow, the recipient we can confirm.
+					entity: rainbowEntity,
+					policy: CollectionPolicy.BY_DEFAULT,
+				}),
 			},
 			appIsolation: null,
 			dataCollection: null,
@@ -283,62 +340,77 @@ export const rainbow: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: {
-					copyHexToClipboard: true,
-					formatted: false,
-					rawHex: true,
-				},
-				messageSigningLegibility: {
-					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
-				},
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+				}),
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: rainbowTransactionDisplayDefault,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+				transactionSimulations: supported({
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
-						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
-						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
-						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: rainbowTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						...rainbowTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						...rainbowTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						...rainbowTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							...rainbowTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
-						...rainbowTransactionDisplayDefault,
-						failure: 'DETECTED',
+						failure: 'DETECTED' as const,
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
-						...rainbowTransactionDisplayDefault,
-						nondeterminism: 'STATIC_SINGLE_OUTCOME',
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
 					},
-				},
+				}),
 			},
 		},
 		selfSovereignty: {
@@ -377,9 +449,31 @@ export const rainbow: SoftwareWallet = {
 				dependencyLocking: null,
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				hermeticBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'The browser extension build job checks out an external repository (rainbow-me/browser-extension-env) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build, so build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet Android release build runs `yarn install --immutable && yarn setup` and resolves Gradle dependencies while assembling the release, fetching build inputs from the network.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet iOS build runs `yarn install --immutable && yarn setup` and `fastlane match`, which fetches signing certificates from a remote git repository during the build, fetching build inputs from the network.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
+						},
+					],
+				}),
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Rainbow publishes no reproducible-build tooling, documentation, or
+				// verification process, and its release builds are not hermetic (they fetch
+				// inputs from the network during the build), so an independent party cannot
+				// rebuild the released artifacts and confirm a bit-for-bit match.
+				reproducibleBuilds: notSupported,
 			},
 		},
 	},

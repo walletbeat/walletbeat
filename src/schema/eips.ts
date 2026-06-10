@@ -2,6 +2,7 @@
  * The set of all EIP numbers tracked by Walletbeat.
  */
 export type EipNumber =
+	| '712'
 	| '1193'
 	| '2700'
 	| '4337'
@@ -9,8 +10,10 @@ export type EipNumber =
 	| '5792'
 	| '6963'
 	| '7702'
+	| '7730'
 	| '7828'
 	| '7831'
+	| '8213'
 
 /**
  * The status of an Ethereum Improvement Proposal (EIP).
@@ -77,6 +80,11 @@ export function eipEthereumDotOrgUrl(eip: EipNumber | Eip): string {
 /** Return a magic URL which the Markdown parser can turn into an EIP link. */
 function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): string {
 	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`
+}
+
+/** Return a markdown link for an EIP using only its short label (e.g. "EIP-712"). */
+export function eipMarkdownShortLink(eip: Eip): string {
+	return `[${eipShortLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
 }
 
 /** Return a markdown link for an EIP. */

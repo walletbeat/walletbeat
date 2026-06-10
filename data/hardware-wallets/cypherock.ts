@@ -16,7 +16,6 @@ import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataDisplayOptions,
 	DataExtraction,
-	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -198,7 +197,6 @@ export const cypherockWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/YG6lzwTUojE',
 					},
 				],
-				calldataDecoded: noCalldataDecoding,
 
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -213,7 +211,8 @@ export const cypherockWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT, // contract address
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				messageSigningLegibility: null,
+				erc7730: notSupported,
+				erc8213: null,
 			},
 			userSafety: null,
 		},

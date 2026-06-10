@@ -7,7 +7,7 @@ describe('wbicons', async () => {
 		fontName: 'wbicons',
 		fontTypeName: 'WBIcon',
 		cssOutputDir: 'src/styles',
-		fontOutputDir: 'public/wbicons',
+		fontOutputDir: 'src/assets/fonts/wbicons',
 		svgIconsDir: 'resources/files/wbicons',
 	})
 
