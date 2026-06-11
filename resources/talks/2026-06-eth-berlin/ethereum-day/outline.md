@@ -22,6 +22,7 @@ This talk walks through how CROPS values map to wallets, what the current wallet
   - Rely on the wallet RPC provider.
   - collect unnecessary user data.
   - not account portable.
+	- not be transparent in its fee-taking, user-data-sharing, or implementation practices.
 - Ethereum wallets != Ethereum aligned.
 
 #### CROPS - Translating values into wallet properties
@@ -29,15 +30,18 @@ This talk walks through how CROPS values map to wallets, what the current wallet
 ##### Censorship resistance
 
 - RPC independence
+- Force-inclusion transactions for L2s
+- Self-sovereign account recovery or portability process
 
 ##### Open source
 
-- Source code availability
+- Free and open source software.
 
 ##### Privacy
 
 - Private transfers
 - Minimal data collection
+- Anti correlation of addresses
 
 ##### Self sovereignty
 
