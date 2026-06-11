@@ -43,11 +43,11 @@ import {
 import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
-	BasicBenchmarkTransactions,
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
-	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
+	DataLocation,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { UserSafetyType } from '@/schema/features/security/user-safety'
@@ -689,44 +689,85 @@ export const cryptograph: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Transaction details are parsed and rendered on the watch itself. Cryptograph maintains a hardcoded ABI decoder covering ERC-20 / ERC-721 / ERC-1155 transfers and approvals, Uniswap V2 / V3 multicall and Uniswap V4 Universal Router commands, Permit2, ownership transfers, and named-selector lookups for many other functions; transactions to a maintained list of verified contracts (Aave, Lido, Pendle, OpenSea Seaport, etc.) are labeled with the protocol and product name on the watch. Gnosis Safe `execTransaction` and `multiSend` wrappers are recursively unwrapped on the watch (capped at 3 levels deep), so the inner call is shown alongside the Safe label. EIP-712 typed data is parsed on the watch into a struct view; permit-style signatures are classified separately and shown with a dedicated security warning. The Details disclosure on the EIP-712 approval surface exposes the EIP-712 domain hash, message hash, and Safe transaction hash for power-user verification.',
+							'Transaction details are parsed and rendered on the watch itself. Cryptograph maintains a hardcoded ABI decoder covering ERC-20 / ERC-721 / ERC-1155 transfers and approvals, Uniswap V2 / V3 multicall and Uniswap V4 Universal Router commands, Permit2, ownership transfers, and named-selector lookups for many other functions; transactions to a maintained list of verified contracts (Aave, Lido, Pendle, OpenSea Seaport, etc.) are labeled with the protocol and product name on the watch. Gnosis Safe `execTransaction` and `multiSend` wrappers are recursively unwrapped on the watch (capped at 3 levels deep), so the inner call is shown alongside the Safe label. EIP-712 typed data is parsed on the watch into a struct view; permit-style signatures are classified separately and shown with a dedicated security warning. The Details disclosure exposes the EIP-712 domain hash, message hash, and Safe transaction hash, plus the transaction nonce and signing digest, for power-user verification; the pending transaction payload can also be exported as a QR code for independent verification on a separate device.',
 						url: 'https://cryptograph.watch/how-it-works',
 					},
 				],
-				calldataDecoded: {
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.ON_DEVICE,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
-					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.ON_DEVICE,
-					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DataDecoded.ON_DEVICE,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						DataDecoded.ON_DEVICE,
-				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
-					[DataExtraction.QRCODE]: false,
-					[DataExtraction.HASHES]: false,
+					[DataExtraction.HASHES]: true,
+					[DataExtraction.QRCODE]: true,
 				},
 				detailsDisplayed: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				messageSigningLegibility: {
-					decoded: DataDecoded.ON_DEVICE,
-					messageSigningDetails: {
-						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_OPTIONALLY,
-						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_OPTIONALLY,
-						[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.SHOWN_OPTIONALLY,
+				// Decoded display per complex benchmark happens on the watch via
+				// Cryptograph's curated on-device ABI decoder, not via ERC-7730
+				// registry metadata consumption. The values below describe where the
+				// decoded display happens, which is what the evaluator measures; if
+				// this field is intended to be strictly about ERC-7730 registry
+				// support, flag in review and we will adjust.
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.ON_DEVICE,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataLocation.ON_DEVICE,
+				}),
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: {
+							display: DataDisplayOptions.NOT_IN_UI,
+							location: DataLocation.NOT_PROVIDED,
+						},
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
+							display: DataDisplayOptions.NOT_IN_UI,
+							location: DataLocation.NOT_PROVIDED,
+						},
+						[CallDataDisplay.FORMATTED]: {
+							display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							location: DataLocation.ON_DEVICE,
+						},
+						// The Details disclosure shows the transaction signing digest
+						// (keccak256 of the RLP-encoded unsigned transaction), which is
+						// not the same construction as the ERC-8213 calldata digest
+						// (keccak256 of length-prefixed calldata), so this is honestly
+						// NOT_IN_UI until the ERC-8213 construction ships.
+						[CallDataDisplay.CALLDATA_DIGEST]: {
+							display: DataDisplayOptions.NOT_IN_UI,
+							location: DataLocation.NOT_PROVIDED,
+						},
 					},
-				},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: {
+							display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							location: DataLocation.ON_DEVICE,
+						},
+						[MessageSigningDetails.DOMAIN_HASH]: {
+							display: DataDisplayOptions.SHOWN_OPTIONALLY,
+							location: DataLocation.ON_DEVICE,
+						},
+						[MessageSigningDetails.MESSAGE_HASH]: {
+							display: DataDisplayOptions.SHOWN_OPTIONALLY,
+							location: DataLocation.ON_DEVICE,
+						},
+						// The Details disclosure shows domain hash, message hash, and
+						// Safe transaction hash. The final EIP-712 digest
+						// ("\x19\x01" || domainSeparator || hashStruct(message)) is not
+						// currently displayed as its own row.
+						[MessageSigningDetails.EIP712_DIGEST]: {
+							display: DataDisplayOptions.NOT_IN_UI,
+							location: DataLocation.NOT_PROVIDED,
+						},
+					},
+				}),
 			},
 			userSafety: {
 				type: UserSafetyType.PARTIAL,
@@ -811,6 +852,18 @@ export const cryptograph: HardwareWallet = {
 					byDefault: FeeDisplayLevel.AGGREGATED,
 					fullySponsored: false,
 				}),
+			},
+			// Release-transparency data (artifact signing, reproducible builds,
+			// dependency locking, etc.) is being assembled as part of the
+			// build-transparency work tracked internally; null = unrated for now.
+			releaseTransparency: {
+				artifactSigning: null,
+				dependencyLocking: null,
+				dependencyVulnerabilityScanning: null,
+				hasPublicChangelog: null,
+				hermeticBuilds: null,
+				repositoryChangeControls: null,
+				reproducibleBuilds: null,
 			},
 			reputation: {
 				type: ReputationType.PARTIAL,
