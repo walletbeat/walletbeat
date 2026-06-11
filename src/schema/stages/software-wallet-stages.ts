@@ -720,9 +720,7 @@ const softwareWalletStageTwo: WalletStage = {
 				},
 				{
 					id: 'release_process_safety',
-					description: sentence(
-						'The wallet release process follows safety best practices.',
-					),
+					description: sentence('The wallet release process follows safety best practices.'),
 					rationale: sentence(
 						'A well-defined release process with artifact signing, reproducible builds, and dependency locking reduces supply chain attack risk.',
 					),
