@@ -116,7 +116,7 @@ function hasDuressMode(
 export const duressResistance: Attribute = {
 	id: 'duressResistance',
 	icon: 'duress_resistance',
-	displayName: 'Duress Resistance',
+	displayName: 'Duress resistance',
 	wording: {
 		midSentenceName: 'duress resistance',
 	},

@@ -1198,7 +1198,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 export const transactionLegibility: Attribute = {
 	id: 'transactionLegibility',
 	icon: 'transaction_legibility',
-	displayName: 'Transaction Legibility',
+	displayName: 'Transaction legibility',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: 'How is a wallet evaluated for clearly showing what users are signing?',
