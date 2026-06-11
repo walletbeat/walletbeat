@@ -234,6 +234,32 @@
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
 
+	// Score helpers
+	const getWalletScore = (wallet: RatedWallet): number | null => {
+		const overallScore = calculateOverallScore(
+			wallet.overall,
+			ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
+		)
+		return overallScore === null ? null : overallScore.score
+	}
+	const walletStageThenScoreCompare = (walletA: RatedWallet, walletB: RatedWallet): number => {
+		// Returns -1 for wallets that cleared no stage (or N/A);
+		// 0, 1, 2... for wallets that cleared stage 0, 1, 2...
+		const stageIndex = (wallet: RatedWallet): number => {
+			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+			if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return -1
+			if (typeof stage === 'string') return -1 // QUALIFIED_FOR_NO_STAGES
+			const idx = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
+			return idx >= 0 ? idx : -1
+		}
+		const stageDiff = stageIndex(walletA) - stageIndex(walletB)
+		if (stageDiff !== 0) return stageDiff
+		const scoreA = getWalletScore(walletA)
+		const scoreB = getWalletScore(walletB)
+		return ((scoreA as number | null) ?? 0) - ((scoreB as number | null) ?? 0)
+	}
+
+
 	// Mobile filter helpers
 	const variantWbIconIds: Record<Variant, WBIconFontID> = {
 		[Variant.BROWSER]: 'wallet_browser',
@@ -677,13 +703,7 @@
 								{
 									id: 'overall',
 									name: 'Rating',
-									value: wallet => {
-										const overallScore = calculateOverallScore(
-											wallet.overall,
-											ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
-										)
-										return overallScore === null ? null : overallScore.score
-									},
+									value: wallet => getWalletScore(wallet),
 
 									sort: {
 										isDefault: true,
@@ -692,20 +712,7 @@
 										// a stage 1 wallet should never appear below a stage 0 wallet
 										// regardless of how good its attribute scores are. Within the
 										// same stage, fall back to the attribute score as a tiebreaker.
-										compare: (scoreA, scoreB, walletA, walletB) => {
-											// Returns -1 for wallets that cleared no stage (or N/A);
-											// 0, 1, 2... for wallets that cleared stage 0, 1, 2...
-											const stageIndex = (wallet: RatedWallet): number => {
-												const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
-												if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return -1
-												if (typeof stage === 'string') return -1 // QUALIFIED_FOR_NO_STAGES
-												const idx = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
-												return idx >= 0 ? idx : -1
-											}
-											const stageDiff = stageIndex(walletA) - stageIndex(walletB)
-											if (stageDiff !== 0) return stageDiff
-											return ((scoreA as number | null) ?? 0) - ((scoreB as number | null) ?? 0)
-										},
+										compare: (_scoreA, _scoreB, walletA, walletB) => walletStageThenScoreCompare(walletA, walletB),
 									},
 
 									align: ColumnAlignment.Center,
@@ -1539,7 +1546,7 @@
 
 	<!-- Mobile wallet cards (shown only on mobile, replaces table) -->
 	<div class="mobile-wallet-list">
-		{#each filteredWallets as wallet, i}
+		{#each filteredWallets.toSorted((walletA, walletB) => -walletStageThenScoreCompare(walletA, walletB)) as wallet, i}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 			{@const score = calculateOverallScore(wallet.overall, ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id))}
 			{@const overallFilteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)) : null}
