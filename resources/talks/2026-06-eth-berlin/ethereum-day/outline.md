@@ -43,9 +43,11 @@ This talk walks through how CROPS values map to wallets, what the current wallet
 - Minimal data collection
 - Anti correlation of addresses
 
-##### Self sovereignty
+##### Security
 
-- Transaction inclusion
+- Transaction legibility
+- Security best practices
+- Security audits
 
 ### Introduce Walletbeat
 
