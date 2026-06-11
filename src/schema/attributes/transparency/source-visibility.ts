@@ -75,7 +75,7 @@ const sourcePrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
 
 export const sourceVisibility: Attribute = {
 	id: 'sourceVisibility',
-	icon: 'open_source',
+	icon: 'source_visibility',
 	displayName: 'Source visibility',
 	wording: {
 		midSentenceName: 'source visibility',

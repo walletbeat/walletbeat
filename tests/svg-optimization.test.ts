@@ -162,8 +162,6 @@ const optimizedSvgHashes: Record<string, string> = {
 		'5f40f64a49babed6573f5c16e39ec450eb83ef660efea7bcd30093fe19ac9a45',
 	'resources/branding/glow-1.svg':
 		'71e6c1520f6f9b40d189811b38f222a5381b1b01e9a281c1e55ef4941fafbed7',
-	'src/assets/fonts/wbicons/wbicons.svg':
-		'3face06111626daa5f9c29609a4812fb900b6ace49ff52b2fb861f045f6d5623',
 	'resources/files/wbicons/account_abstraction.svg':
 		'b6dcb0b8cc200d4e283d2d13466babf09d119dc6dac9364610d3e79018080b62',
 	'resources/files/wbicons/account_portability.svg':
@@ -224,10 +222,6 @@ const optimizedSvgHashes: Record<string, string> = {
 		'38bf365b832b28604f8490200e2aeafef2b23a5025e1a11014601b9f0fa14925',
 	'resources/files/wbicons/self_sovereignty.svg':
 		'67be234afaf1a92148d268fc7dde69eabcddd25be932f6fe09e162b119892ce1',
-	'resources/files/wbicons/source_code_license.svg':
-		'adf1e55fa6b50d77c72ac340d5b01f3ef5ad9aa39f9de7206eae23715a0d6427',
-	'resources/files/wbicons/open_source.svg':
-		'29a4ca719470edda4b0e811e5f26d122c7cc06b1c1394ddace70fbc66013a6e5',
 	'resources/files/wbicons/transaction_batching.svg':
 		'b520345224989151bd7db1fe21bf650a74499dd158c03b1d92c28f111b7f41af',
 	'resources/files/wbicons/transaction_inclusion.svg':
@@ -240,6 +234,12 @@ const optimizedSvgHashes: Record<string, string> = {
 		'424ff4db5750bc5fe9759397e12c94d0bce96efc5741d09537d1338af939cc7b',
 	'resources/files/wbicons/wallet_address_privacy.svg':
 		'ff9e170056e31b805874caf213837de5e33e0e0f83cbdcefe9af5fabf681ae61',
+	'resources/files/wbicons/free_and_open_source_license.svg':
+		'adf1e55fa6b50d77c72ac340d5b01f3ef5ad9aa39f9de7206eae23715a0d6427',
+	'resources/files/wbicons/source_visibility.svg':
+		'29a4ca719470edda4b0e811e5f26d122c7cc06b1c1394ddace70fbc66013a6e5',
+	'src/assets/fonts/wbicons/wbicons.svg':
+		'9223fb69d0e988d5783b3b125d5b97ec078c6e146dc9e83ef3c0bccb00c7c965',
 }
 
 interface SvgResult {
