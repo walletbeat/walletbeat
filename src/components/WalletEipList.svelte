@@ -61,15 +61,13 @@
 				bind:isExpanded={openStates[eip.number]}
 				showAccordionMarker
 			>
-				{#snippet children()}
-					<div class="eip-row">
-						<span class="eip-label">{eipShortLabel(eip)}</span>
-						<span class="eip-name">{eip.friendlyName}</span>
-						<span class="eip-status" data-status={eip.status}>
-							{statusLabel[eip.status]}
-						</span>
-					</div>
-				{/snippet}
+				<div class="eip-row">
+					<span class="eip-label">{eipShortLabel(eip)}</span>
+					<span class="eip-name">{eip.friendlyName}</span>
+					<span class="eip-status" data-status={eip.status}>
+						{statusLabel[eip.status]}
+					</span>
+				</div>
 
 				{#snippet ExpandedContent()}
 					<div class="eip-detail">
@@ -110,7 +108,6 @@
 {/if}
 
 <style>
-	
 	.filter-nav {
 		display: flex;
 		align-items: center;
@@ -168,7 +165,6 @@
 			border-top: 1px solid var(--border);
 		}
 
-		/* TooltipOrAccordion renders a <details> — style it */
 		:global(details) {
 			padding: 0.875rem 0.25rem;
 		}
@@ -178,7 +174,6 @@
 			list-style: none;
 		}
 	}
-
 
 	.eip-row {
 		display: flex;
@@ -232,13 +227,12 @@
 		}
 	}
 
-	
 	.eip-detail {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		padding: 0.5rem 0.25rem 0.75rem;
-		font-size: 1rem; /* reset the 0.66em from TooltipOrAccordion */
+		font-size: 1rem;
 		text-align: left;
 	}
 
@@ -272,7 +266,6 @@
 		}
 	}
 
-	
 	.empty {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
