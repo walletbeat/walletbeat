@@ -1238,6 +1238,7 @@
 			scroll-padding-block-end: 1rem;
 
 			display: grid;
+			padding-block-end: calc(var(--topbar-height, 6.8rem) + 2rem);
 		}
 
 		.toc {
@@ -1256,7 +1257,7 @@
 
 			display: flex;
 			flex-direction: column;
-			padding: calc(2.5rem + 1rem) 0.75rem 1rem;
+			padding: calc(2.5rem + 1rem) 0.75rem calc(var(--topbar-height, 6.8rem) + 1rem);
 			gap: 2px;
 
 			background: var(--background-secondary);
@@ -1581,6 +1582,9 @@
 
 				li {
 					display: contents;
+					&::before {
+						content: none;
+					}
 				}
 
 				a {
