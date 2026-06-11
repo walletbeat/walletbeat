@@ -9,16 +9,19 @@ import { addressCorrelation } from '../attributes/privacy/address-correlation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { chainVerification } from '../attributes/security/chain-verification'
+import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import { securityAudits } from '../attributes/security/security-audits'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
+import { accountUnruggability } from '../attributes/self-sovereignty/account-unruggability'
 import { permissionsManagement } from '../attributes/self-sovereignty/permissions-management'
 import { transactionInclusion } from '../attributes/self-sovereignty/transaction-inclusion'
 import { feeTransparency } from '../attributes/transparency/fee-transparency'
 import { funding } from '../attributes/transparency/funding'
 import { openSource } from '../attributes/transparency/open-source'
+import { releaseProcess } from '../attributes/transparency/release-process'
 import { sourceVisibility } from '../attributes/transparency/source-visibility'
 import { hardwareWalletType } from '../features/security/hardware-wallet-support'
 import { RpcEndpointConfiguration } from '../features/self-sovereignty/chain-configurability'
@@ -525,6 +528,40 @@ const softwareWalletStageTwo: WalletStage = {
 					),
 					displayName: 'Bug Bounty Program',
 				},
+				{
+					id: 'duress_resistance',
+					description: sentence(
+						'The wallet protects users against physical coercion and unauthorized access.',
+					),
+					rationale: sentence(
+						'A wallet should provide mechanisms such as a duress PIN or decoy wallet to protect users under coercion, limiting the effectiveness of physical theft or forced access.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, duressResistance, {
+						allowPartial: true,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s duress resistance cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Duress Resistance',
+				},
+				{
+					id: 'impact_mitigation',
+					description: sentence(
+						'The wallet lets users set self-imposed limits to mitigate damage from unauthorized access.',
+					),
+					rationale: sentence(
+						'Spending rate-limits, high-value spend timelocks, or multiparty authorization for large transactions limit the blast radius of a compromised wallet.',
+					),
+					// TODO: Replace with a proper impact_mitigation attribute evaluation once the attribute exists.
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(_): StageCriterionEvaluation => ({
+							rating: StageCriterionRating.UNRATED,
+						}),
+					),
+					displayName: 'Impact Mitigation',
+				},
 				// TODO: Add "key is stored in encrypted form"
 				// TODO: Add calldata interpretation
 			],
@@ -632,6 +669,23 @@ const softwareWalletStageTwo: WalletStage = {
 					displayName: 'Chain Configurability',
 				},
 				{
+					id: 'account_unruggability',
+					description: sentence(
+						"No external party can take over the account without the user's consent.",
+					),
+					rationale: sentence(
+						"True self-sovereignty requires that neither the wallet developer nor any external service can unilaterally take over the user's account.",
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountUnruggability, {
+						allowPartial: false,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s account unruggability cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Account Unruggability',
+				},
+				{
 					id: 'outstanding_approvals_full',
 					description: sentence(
 						'The wallet lets users inspect and revoke ERC-20, ERC-721, and ERC-1155 token approvals.',
@@ -663,6 +717,23 @@ const softwareWalletStageTwo: WalletStage = {
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, funding),
 					displayName: 'Funding Transparency',
+				},
+				{
+					id: 'release_process_safety',
+					description: sentence(
+						'The wallet release process follows safety best practices.',
+					),
+					rationale: sentence(
+						'A well-defined release process with artifact signing, reproducible builds, and dependency locking reduces supply chain attack risk.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, releaseProcess, {
+						allowPartial: true,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s release process safety cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Release Process Safety',
 				},
 				{
 					id: 'fee_transparency',
