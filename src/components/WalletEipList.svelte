@@ -41,7 +41,7 @@
 
 <!-- Filter pills -->
 <nav class="filter-nav" aria-label="Filter EIPs">
-	{#each filters as f}
+	{#each filters as f (f.value)}
 		<button
 			class="filter-pill"
 			class:active={activeFilter === f.value}
