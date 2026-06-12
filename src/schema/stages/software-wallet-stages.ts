@@ -290,7 +290,13 @@ export const softwareWalletStageOne: WalletStage = {
 						publicly visible, and can even be tracked across multiple devices and websites.
 						Keeping it private is paramount for user privacy at least on par with web2.
 					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation,
+						{
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}
+					),
 					displayName: 'Wallet Address Privacy',
 				},
 				{
