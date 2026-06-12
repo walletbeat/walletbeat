@@ -38,6 +38,7 @@ import {
 } from '../stages'
 import { Variant } from '../variants'
 import { WalletType, walletTypeToVariants } from '../wallet-types'
+import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 
 export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
@@ -260,8 +261,6 @@ export const softwareWalletStageOne: WalletStage = {
 					}),
 					displayName: 'Standard Security Practices',
 				},
-				// TODO: Add "Private key access security" to this list.
-				// See https://github.com/walletbeat/walletbeat/issues/218
 			],
 		},
 		{
@@ -313,6 +312,23 @@ export const softwareWalletStageOne: WalletStage = {
 				'The wallet does not lock the user in and lets the user remain in full control of their account.',
 			),
 			criteria: [
+				{
+					id: 'account_unruggability',
+					description: sentence(
+						"No external party can take over the account without the user's consent.",
+					),
+					rationale: sentence(
+						"True self-sovereignty requires that neither the wallet developer nor any external service can unilaterally take over the user's account.",
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountUnruggability, {
+						allowPartial: false,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s account unruggability cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Account Unruggability',
+				},
 				{
 					id: 'account_portability',
 					description: sentence('The user can freely export their account to another wallet.'),
@@ -562,8 +578,6 @@ const softwareWalletStageTwo: WalletStage = {
 					),
 					displayName: 'Impact Mitigation',
 				},
-				// TODO: Add "key is stored in encrypted form"
-				// TODO: Add calldata interpretation
 			],
 		},
 		{
@@ -580,12 +594,9 @@ const softwareWalletStageTwo: WalletStage = {
 					rationale: sentence(
 						'Wallets handle sensitive financial data. Collecting excessive user data creates unnecessary privacy risks and undermines user trust.',
 					),
-					// TODO: Replace with a proper data_collection attribute evaluation.
-					evaluate: stageCriterionEvaluationPerVariant(
+					evaluate: variantsMustPassAttribute(
 						softwareWalletVariants,
-						(_): StageCriterionEvaluation => ({
-							rating: StageCriterionRating.UNRATED,
-						}),
+						privacyHygiene
 					),
 					displayName: 'Minimal Data Collection',
 				},
@@ -667,23 +678,6 @@ const softwareWalletStageTwo: WalletStage = {
 						},
 					),
 					displayName: 'Chain Configurability',
-				},
-				{
-					id: 'account_unruggability',
-					description: sentence(
-						"No external party can take over the account without the user's consent.",
-					),
-					rationale: sentence(
-						"True self-sovereignty requires that neither the wallet developer nor any external service can unilaterally take over the user's account.",
-					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountUnruggability, {
-						allowPartial: false,
-						ifUnverifiable: sentence(
-							"{{WALLET_NAME}}'s account unruggability cannot be publicly verified.",
-						),
-						ifNoVariantInScope: null,
-					}),
-					displayName: 'Account Unruggability',
 				},
 				{
 					id: 'outstanding_approvals_full',
