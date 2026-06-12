@@ -214,11 +214,7 @@ export const bugBountyProgram: Attribute = {
 	icon: 'security',
 	displayName: 'Bug Bounty Program',
 	wording: {
-		midSentenceName: null,
-		howIsEvaluated: "How is a hardware wallet's bug bounty program evaluated?",
-		whatCanWalletDoAboutIts: sentence(
-			'What can {{WALLET_NAME}} do to improve its bug bounty program?',
-		),
+		midSentenceName: "bug bounty program",
 	},
 	question: sentence(
 		'Does {{WALLET_NAME}} maintain an active bug bounty program with a clear disclosure and upgrade process for security issues?',
