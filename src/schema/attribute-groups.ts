@@ -57,7 +57,6 @@ import {
 	type AccountRecoveryMetadata,
 } from './attributes/security/account-recovery'
 import { bugBountyProgram } from './attributes/security/bug-bounty-program'
-import { chainVerification } from './attributes/security/chain-verification'
 import { duressResistance } from './attributes/security/duress-resistance'
 import { firmware, type FirmwareMetadata } from './attributes/security/firmware'
 import {
@@ -82,6 +81,7 @@ import {
 	accountUnruggability,
 	type AccountUnruggabilityMetadata,
 } from './attributes/self-sovereignty/account-unruggability'
+import { chainVerification } from './attributes/self-sovereignty/chain-verification'
 import {
 	interoperability,
 	type InteroperabilityMetadata,
@@ -108,7 +108,6 @@ import type { WalletMetadata } from './wallet'
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsMetadata
 	scamPrevention: ScamPreventionMetadata
-	chainVerification: null
 	transactionLegibility: null
 	hardwareWalletSupport: HardwareWalletSupportMetadata
 	securityBestPractices: SecurityBestPracticesValue
@@ -130,7 +129,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	attributes: {
 		securityAudits,
 		scamPrevention,
-		chainVerification,
 		transactionLegibility,
 		hardwareWalletSupport,
 		securityBestPractices,
@@ -145,7 +143,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	attributeWeights: {
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
-		chainVerification: 1.0,
 		transactionLegibility: 1.0,
 		hardwareWalletSupport: 1.0,
 		securityBestPractices: 1.0,
@@ -198,6 +195,7 @@ type SelfSovereigntyValues = Dict<{
 	l1ProviderIndependence: null
 	accountPortability: null
 	permissionsManagement: null
+	chainVerification: null
 	transactionInclusion: null
 	accountUnruggability: AccountUnruggabilityMetadata
 }>
@@ -214,6 +212,7 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		l1ProviderIndependence,
 		accountPortability,
 		transactionInclusion,
+		chainVerification,
 		accountUnruggability,
 		permissionsManagement,
 	},
@@ -221,6 +220,7 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		l1ProviderIndependence: 1.0,
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
+		chainVerification: 1.0,
 		accountUnruggability: 1.0,
 		permissionsManagement: 1.0,
 	},
@@ -353,7 +353,6 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	transactionLegibility: EvaluatedAttribute
 	securityAudits: EvaluatedAttribute<SecurityAuditsMetadata>
 	scamPrevention: EvaluatedAttribute<ScamPreventionMetadata>
-	chainVerification: EvaluatedAttribute
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportMetadata>
 	bugBountyProgram: EvaluatedAttribute
 	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYMetadata>
@@ -379,7 +378,10 @@ export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
 export interface SelfSovereigntyEvaluations extends EvaluatedGroup<SelfSovereigntyValues> {
 	l1ProviderIndependence: EvaluatedAttribute
 	accountPortability: EvaluatedAttribute
+	permissionsManagement: EvaluatedAttribute
 	transactionInclusion: EvaluatedAttribute
+	chainVerification: EvaluatedAttribute
+	accountUnruggability: EvaluatedAttribute<AccountUnruggabilityMetadata>
 }
 
 /** Evaluated transparency attributes for a single wallet. */
@@ -465,7 +467,6 @@ export function evaluateAttributes(
 		security: {
 			securityAudits: evalAttr(securityAudits),
 			scamPrevention: evalAttr(scamPrevention),
-			chainVerification: evalAttr(chainVerification),
 			transactionLegibility: evalAttr(transactionLegibility),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			securityBestPractices: evalAttr(securityBestPractices),
@@ -489,6 +490,7 @@ export function evaluateAttributes(
 			l1ProviderIndependence: evalAttr(l1ProviderIndependence),
 			accountPortability: evalAttr(accountPortability),
 			transactionInclusion: evalAttr(transactionInclusion),
+			chainVerification: evalAttr(chainVerification),
 			accountUnruggability: evalAttr(accountUnruggability),
 			permissionsManagement: evalAttr(permissionsManagement),
 		},
@@ -542,7 +544,6 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
 			scamPrevention: attr(tree => tree.security.scamPrevention),
-			chainVerification: attr(tree => tree.security.chainVerification),
 			transactionLegibility: attr(tree => tree.security.transactionLegibility),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			securityBestPractices: attr(tree => tree.security.securityBestPractices),
@@ -566,6 +567,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			l1ProviderIndependence: attr(tree => tree.selfSovereignty.l1ProviderIndependence),
 			accountPortability: attr(tree => tree.selfSovereignty.accountPortability),
 			transactionInclusion: attr(tree => tree.selfSovereignty.transactionInclusion),
+			chainVerification: attr(tree => tree.selfSovereignty.chainVerification),
 			accountUnruggability: attr(tree => tree.selfSovereignty.accountUnruggability),
 			permissionsManagement: attr(tree => tree.selfSovereignty.permissionsManagement),
 		},
