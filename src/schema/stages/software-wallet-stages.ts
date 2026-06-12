@@ -39,6 +39,7 @@ import {
 import { Variant } from '../variants'
 import { WalletType, walletTypeToVariants } from '../wallet-types'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
+import { bugBountyProgram } from '../attributes/security/bug-bounty-program'
 
 export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
@@ -124,7 +125,7 @@ export const softwareWalletStageZeroFive: WalletStage = {
 						'Users must be able to see key transaction details (amount, recipient, chain, fees) before signing to avoid being deceived.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionLegibility, {
-						allowPartial: true,
+						allowPartial: false,
 						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
 					}),
@@ -534,13 +535,9 @@ const softwareWalletStageTwo: WalletStage = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					// TODO: Replace with this once bug bounty program attribute applies to software wallets (#230):
-					// evaluate: variantsMustPassAttribute(softwareWalletVariants, bugBountyProgram),
-					evaluate: stageCriterionEvaluationPerVariant(
+					evaluate: variantsMustPassAttribute(
 						softwareWalletVariants,
-						(_): StageCriterionEvaluation => ({
-							rating: StageCriterionRating.UNRATED,
-						}),
+						bugBountyProgram,
 					),
 					displayName: 'Bug Bounty Program',
 				},
