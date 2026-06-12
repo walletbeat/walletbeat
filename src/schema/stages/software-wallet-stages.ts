@@ -7,7 +7,9 @@ import { browserIntegration } from '../attributes/ecosystem/browser-integration'
 import { transactionBatching } from '../attributes/ecosystem/transaction-batching'
 import { addressCorrelation } from '../attributes/privacy/address-correlation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
+import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
+import { bugBountyProgram } from '../attributes/security/bug-bounty-program'
 import { chainVerification } from '../attributes/security/chain-verification'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
@@ -38,8 +40,6 @@ import {
 } from '../stages'
 import { Variant } from '../variants'
 import { WalletType, walletTypeToVariants } from '../wallet-types'
-import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
-import { bugBountyProgram } from '../attributes/security/bug-bounty-program'
 
 export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
@@ -282,21 +282,19 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'address_privacy',
 					description: sentence(
-						'Wallet addresses are not correlatable with other user information.',
+						'Wallet addresses are not linkable to sensitive personal information.',
 					),
 					rationale: sentence(`
 						Your wallet address is unique and permanent, which makes it easy to track your activity.
-						In web-privacy terms, it is worse than cookies: wallet addresses are permanent,
-						publicly visible, and can even be tracked across multiple devices and websites.
-						Keeping it private is paramount for user privacy at least on par with web2.
+						At minimum, wallets must not link your wallet address to personally identifying data
+						such as your name, email, phone number, or account credentials.
+						Linkage to IP address or pseudonyms is tolerated at this stage.
 					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation,
-						{
-						allowPartial: false,
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation, {
+						allowPartial: true,
 						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
-					}
-					),
+					}),
 					displayName: 'Wallet Address Privacy',
 				},
 				{
@@ -527,11 +525,9 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'chain_verification',
 					description: sentence('The wallet verifies the integrity of the Ethereum chain.'),
-					rationale: sentence(`
-            Much like browsers use HTTPS to provide integrity when doing online purchases,
-            wallets should verify the integrity of the chain when performing transactions.
-            This requires a light client and is a high bar, appropriate for Stage 2.
-          `),
+					rationale: sentence(
+						'Much like browsers use HTTPS to provide integrity when doing online purchases, wallets should verify the integrity of the chain when performing transactions.',
+					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainVerification),
 					displayName: 'Chain Verification',
 				},
@@ -541,10 +537,7 @@ const softwareWalletStageTwo: WalletStage = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(
-						softwareWalletVariants,
-						bugBountyProgram,
-					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, bugBountyProgram),
 					displayName: 'Bug Bounty Program',
 				},
 				{
@@ -597,11 +590,26 @@ const softwareWalletStageTwo: WalletStage = {
 					rationale: sentence(
 						'Wallets handle sensitive financial data. Collecting excessive user data creates unnecessary privacy risks and undermines user trust.',
 					),
-					evaluate: variantsMustPassAttribute(
-						softwareWalletVariants,
-						privacyHygiene
-					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, privacyHygiene),
 					displayName: 'Minimal Data Collection',
+				},
+				{
+					id: 'address_privacy_full',
+					description: sentence(
+						'Wallet addresses are not correlatable with any user information, including IP address.',
+					),
+					rationale: sentence(`
+						At Stage 2, wallets must go beyond avoiding sensitive personal data linkage.
+						Even an IP address is enough to de-anonymize a user across sessions and devices.
+						All network requests carrying the wallet address must be proxied or otherwise
+						decoupled from the user's network identity.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Full Wallet Address Privacy',
 				},
 			],
 		},
