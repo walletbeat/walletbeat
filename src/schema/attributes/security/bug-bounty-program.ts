@@ -212,7 +212,7 @@ function getLegalProtectionDescription(legalProtection: LegalProtection): string
 export const bugBountyProgram: Attribute = {
 	id: 'bugBountyProgram',
 	icon: 'security',
-	displayName: 'Bug Bounty Program',
+	displayName: 'Bug bounty program',
 	wording: {
 		midSentenceName: 'bug bounty program',
 	},
