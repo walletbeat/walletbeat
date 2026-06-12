@@ -22,7 +22,7 @@ This talk walks through how CROPS values map to wallets, what the current wallet
   - Rely on the wallet RPC provider.
   - collect unnecessary user data.
   - not account portable.
-	- not be transparent in its fee-taking, user-data-sharing, or implementation practices.
+  - not be transparent in its fee-taking, user-data-sharing, or implementation practices.
 - Ethereum wallets != Ethereum aligned.
 
 #### CROPS - Translating values into wallet properties
@@ -54,7 +54,7 @@ This talk walks through how CROPS values map to wallets, what the current wallet
 - How Walletbeat's attributes measure a wallet's CROPS values.
   - Framework that measures how wallets align with Ethereum values.
 
-### Current wallet landscape backed by Walletbeat's data (?)
+### Current wallet landscape backed by Walletbeat's data
 
 - Pick two or three attributes to show wallets weaknesses & strengths common ground
   - Source code availability
@@ -81,6 +81,6 @@ This talk walks through how CROPS values map to wallets, what the current wallet
 
 #### For the ecosystem
 
-- Feedback loop between EF & community
+- As a pillar of the Ethereum ecosystem
 
 Key role: Pushing the wallet ecosystem towards Ethereum values.
