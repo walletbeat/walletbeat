@@ -51,7 +51,7 @@
 		(!stage || typeof stage === 'string' || !ladderDefinition) ?
 			null
 		:
-			ladderDefinition.stages.findIndex(s => s.id === stage.id)
+			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 	)
 
 	const currentStage = $derived(
@@ -188,7 +188,7 @@
 					<li
 						data-list-item-marker={attribute?.icon}
 						data-stage-criterion-rating={evaluation.rating}
-						style:--accent={stageCriterionRatings[evaluation.rating as StageCriterionRating].color}
+						style:--accent={stageCriterionRatings[evaluation.rating].color}
 					>
 						<span data-row="start gap-2">
 							<span data-row-item="flexible">
@@ -218,9 +218,9 @@
 
 							<data
 								value={evaluation.rating}
-								title={stageCriterionRatings[evaluation.rating as StageCriterionRating].label}
+								title={stageCriterionRatings[evaluation.rating].label}
 							>
-								{stageCriterionRatings[evaluation.rating as StageCriterionRating].icon}
+								{stageCriterionRatings[evaluation.rating].icon}
 							</data>
 						</span>
 					</li>

@@ -647,16 +647,16 @@
 								role="button"
 								tabindex="0"
 								aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-								onclick={(e) => {
-									e.preventDefault()
-									e.stopPropagation()
+								onclick={event => {
+									event.preventDefault()
+									event.stopPropagation()
 									toggleAttributeFilterById?.(stageFilterId)
 								}}
-								onkeydown={(e) => {
-									if (e.key !== 'Enter' && e.key !== ' ') return
+								onkeydown={event => {
+									if (event.key !== 'Enter' && event.key !== ' ') return
 
-									e.preventDefault()
-									e.stopPropagation()
+									event.preventDefault()
+									event.stopPropagation()
 									toggleAttributeFilterById?.(stageFilterId)
 								}}
 							>
@@ -722,7 +722,7 @@
 												<Select
 													bind:value={
 														() => selectedModels.get(wallet.metadata.id),
-														(value) => {
+														value => {
 															if (value)
 																selectedModels.set(wallet.metadata.id, value)
 															else
@@ -812,14 +812,14 @@
 													role="button"
 													tabindex="0"
 													aria-label="Filter by {tag.label}"
-													onclick={e => {
-														e.stopPropagation()
+													onclick={event => {
+														event.stopPropagation()
 														toggleFilterById!(tag.filterId)
 													}}
-													onkeydown={e => {
-														if (e.key !== 'Enter' && e.key !== ' ') return
+													onkeydown={event => {
+														if (event.key !== 'Enter' && event.key !== ' ') return
 
-														e.stopPropagation()
+														event.stopPropagation()
 														toggleFilterById!(tag.filterId)
 													}}
 												>
@@ -838,8 +838,8 @@
 											<button
 												data-tag={tag.type}
 												aria-label="Filter by {tag.label}"
-												onclick={(e) => {
-													e.stopPropagation()
+												onclick={event => {
+													event.stopPropagation()
 													toggleFilterById!(tag.filterId)
 												}}
 											>
@@ -857,8 +857,8 @@
 											data-selected={variant === selectedVariant ? '' : undefined}
 											aria-label={`Select ${variants[variant].label} variant`}
 											aria-pressed={variant === selectedVariant}
-											onclick={e => {
-												e.stopPropagation()
+											onclick={event => {
+												event.stopPropagation()
 												toggleFilterById!(`variant-${variant}`, true)
 											}}
 										>
@@ -875,7 +875,7 @@
 							{/if}
 						</div>
 
-						{#snippet ExpandedContent({ isInTooltip }: { isInTooltip?: boolean })}
+						{#snippet ExpandedContent({ isInTooltip })}
 							<div class="wallet-summary" data-card={isInTooltip ? 'radius p-sm' : undefined} data-column="gap-4">
 								{#if selectedVariant && !wallet.variants[selectedVariant]}
 									<p>

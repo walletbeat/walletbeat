@@ -30,10 +30,10 @@
 
 		return stage.id
 	})
-	
+
 	const stageIndex = $derived(
 		stage && typeof stage === 'object' && ladderEvaluation ?
-			ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
+			ladderEvaluation.ladder.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 		:
 			null
 	)

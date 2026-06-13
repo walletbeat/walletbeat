@@ -10,7 +10,7 @@ function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
 		return false
 	}
 
-	const outcome = (e as { outcome: unknown }).outcome
+	const outcome = e.outcome
 
 	return (
 		typeof outcome === 'object' &&
