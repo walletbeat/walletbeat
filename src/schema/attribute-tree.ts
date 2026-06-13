@@ -24,7 +24,7 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/security/chain-verification.ts'))
+				attribute: (await import('@/schema/attributes/self-sovereignty/chain-verification.ts'))
 					.chainVerification,
 				weight: 1.0,
 			},

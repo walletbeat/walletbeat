@@ -1,11 +1,9 @@
 ---
 // Types/constants
-import { allRatedWallets, assertValidWalletName, walletAttributeTree } from '@/data/wallets'
+import { allRatedWallets, assertValidWalletName, attributeTreeForWallet } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { softwareLadders } from '@/schema/ladders'
-import type { AttributeTree } from '@/schema/attribute-groups'
 import type { Ladders } from '@/schema/ladders'
-import type { RatedWallet } from '@/schema/wallet'
 
 // Functions
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
@@ -24,9 +22,8 @@ const { walletName } = Astro.params
 assertValidWalletName(walletName)
 
 // Data
-const wallet: RatedWallet<string> = allRatedWallets[walletName]
-
-const attributeTree: AttributeTree<string> = walletAttributeTree(wallet)
+const wallet = allRatedWallets[walletName]
+const attributeTree = attributeTreeForWallet(wallet)
 const ladders: Ladders<string> = softwareLadders
 
 // Components

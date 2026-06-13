@@ -5,6 +5,7 @@ import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 import { softwareWalletAttributeTree } from '@/data/software-wallets'
 import {
 	allRatedWallets,
+	attributeTreeForWallet,
 	isEmbeddedRatedWallet,
 	isHardwareRatedWallet,
 	isSoftwareRatedWallet,
@@ -32,17 +33,6 @@ const markdownForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRate
 			? walletPageMarkdown(hardwareWalletAttributeTree, wallet, SITE_URL)
 			: isEmbeddedRatedWallet(wallet)
 				? walletPageMarkdown(embeddedWalletAttributeTree, wallet, SITE_URL)
-				: (() => {
-						throw new Error('Wallet has no recognized type')
-					})()
-
-const attributeTreeForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRatedWallets]) =>
-	isSoftwareRatedWallet(wallet)
-		? softwareWalletAttributeTree
-		: isHardwareRatedWallet(wallet)
-			? hardwareWalletAttributeTree
-			: isEmbeddedRatedWallet(wallet)
-				? embeddedWalletAttributeTree
 				: (() => {
 						throw new Error('Wallet has no recognized type')
 					})()

@@ -1,4 +1,3 @@
-import type { AttributeTree } from '@/schema/attribute-groups'
 import { type AttributeGroupId } from '@/schema/attribute-tree'
 import { type BaseWallet, type RatedWallet, type WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
@@ -58,7 +57,7 @@ export const allRatedWallets = {
 	...ratedSoftwareWallets,
 	...ratedHardwareWallets,
 	...ratedEmbeddedWallets,
-} as const satisfies Record<WalletName, RatedWallet<string>>
+} as const satisfies Record<WalletName, RatedWallet<any>>
 
 /** All rated wallets keyed by their slug (metadata.id). */
 export const allRatedWalletsBySlug: Record<string, RatedWallet<string>> = Object.fromEntries(
@@ -109,28 +108,20 @@ export function isEmbeddedRatedWallet(
 	return wallet.types[WalletType.EMBEDDED] === true
 }
 
-export function walletAttributeTree(
-	wallet: Pick<RatedWallet<SoftwareAttributeGroupId>, 'types'>,
-): typeof softwareWalletAttributeTree
-export function walletAttributeTree(
-	wallet: Pick<RatedWallet<HardwareAttributeGroupId>, 'types'>,
-): typeof hardwareWalletAttributeTree
-export function walletAttributeTree(
-	wallet: Pick<RatedWallet<EmbeddedAttributeGroupId>, 'types'>,
-): typeof embeddedWalletAttributeTree
-export function walletAttributeTree(
-	wallet: Pick<RatedWallet<string>, 'types'>,
-): AttributeTree<string> {
-	switch (true) {
-		case wallet.types[WalletType.SOFTWARE] === true:
-			return softwareWalletAttributeTree
-		case wallet.types[WalletType.HARDWARE] === true:
-			return hardwareWalletAttributeTree
-		case wallet.types[WalletType.EMBEDDED] === true:
-			return embeddedWalletAttributeTree
-		default:
-			throw new Error('Invalid wallet type')
+export function attributeTreeForWallet(wallet: typeof allRatedWallets[keyof typeof allRatedWallets]) {
+	if (isSoftwareRatedWallet(wallet)) {
+		return softwareWalletAttributeTree
 	}
+
+	if (isHardwareRatedWallet(wallet)) {
+		return hardwareWalletAttributeTree
+	}
+
+	if (isEmbeddedRatedWallet(wallet)) {
+		return embeddedWalletAttributeTree
+	}
+
+	throw new Error('Wallet has no valid type')
 }
 
 /**

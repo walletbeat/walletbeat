@@ -1,7 +1,7 @@
 import { describe } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
-import { allRatedWallets, walletAttributeTree } from '@/data/wallets'
+import { allRatedWallets, attributeTreeForWallet } from '@/data/wallets'
 import {
 	type AttributeGroup,
 	mapNonExemptAttributeGroupsInTree,
@@ -88,7 +88,7 @@ describe('evaluations', () => {
 				})),
 		]) {
 			mapNonExemptAttributeGroupsInTree(
-				walletAttributeTree(ratedWallet),
+				attributeTreeForWallet(ratedWallet),
 				evalTree,
 				(attrGroup, evalGroup) => {
 					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
