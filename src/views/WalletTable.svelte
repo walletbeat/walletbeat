@@ -649,7 +649,8 @@
 								id: attrGroup.id,
 								name: attrGroup.displayName,
 								value: wallet => {
-									const attrGroupScore = calculateAttributeGroupScore(attrGroup, wallet.overall[attrGroup.id])
+									const evalGroup = wallet.overall[attrGroup.id]
+									const attrGroupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
 									return attrGroupScore === null ? null : attrGroupScore.score
 								},
 
@@ -1128,8 +1129,8 @@
 
 								slices={
 									displayedAttributeGroups.map(attrGroup => {
-										const groupScore = calculateAttributeGroupScore(attrGroup, wallet.overall[attrGroup.id])
 										const evalGroup = wallet.overall[attrGroup.id]
+										const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
 
 										return {
 											id: `attrGroup_${attrGroup.id}`,
@@ -1310,7 +1311,7 @@
 					<!-- Attribute group rating -->
 					{:else if typeof column.id === 'string' && !column.id.includes('.')}
 						{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === column.id)}
-						{#if attrGroup}
+						{#if attrGroup && wallet.overall[attrGroup.id]}
 							{@const evalGroup = wallet.overall[attrGroup.id]}
 						{@const groupScore = calculateAttributeGroupScore(attrGroup, evalGroup)}
 
@@ -1650,7 +1651,8 @@
 				<!-- Attribute group circles -->
 				<div class="mobile-attr-grid">
 					{#each displayedAttributeGroups as attrGroup}
-						{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])}
+						{@const evalGroup = wallet.overall[attrGroup.id]}
+						{@const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
 						<a
 							class="mobile-attr-item"
 							href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: attrGroup.id })}
@@ -1696,8 +1698,8 @@
 						]}
 						slices={
 							displayedAttributeGroups.map(attrGroup => {
-								const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
 								const evalGroup = wallet.overall[attrGroup.id]
+								const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null
 								return {
 									id: `m_${wallet.metadata.id}_ag_${attrGroup.id}`,
 									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
@@ -1715,7 +1717,11 @@
 												.map(([attributeId, attribute]) => ({
 													id: `m_${wallet.metadata.id}_ag_${attrGroup.id}_a_${attributeId}`,
 													color: ratingToColor(attribute.evaluation.outcome.rating),
-													weight: attrGroup.attributeWeights[attributeId],
+													weight: (
+														attrGroup.attributes.find(w => w.attribute.id === attributeId)
+															?.weight
+														?? 1
+													),
 													arcLabel: '',
 													arcIconId: attribute.attribute.icon,
 													titleText: formatAttributeTitleText(attribute),

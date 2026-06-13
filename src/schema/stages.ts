@@ -164,6 +164,8 @@ export interface WalletStage<_AttributeGroupId extends string> {
 	/** A human-readable label for this stage (e.g., "Stage 0", "Stage 1"). */
 	label: string
 
+	name: string
+
 	/** A description of what this stage represents. */
 	description: Content
 
