@@ -81,7 +81,9 @@ export const softwareWalletStageZeroFive: WalletStage = {
 			criteria: [
 				{
 					id: 'hardware_wallet_any',
-					description: sentence('The wallet supports at least one hardware wallet manufacturer.'),
+					description: sentence(
+						'The wallet must support at least one hardware wallet manufacturer.',
+					),
 					rationale: sentence(
 						'Supporting hardware wallets lets users keep their private keys offline, adding a critical layer of security.',
 					),
@@ -119,10 +121,10 @@ export const softwareWalletStageZeroFive: WalletStage = {
 				{
 					id: 'transaction_legibility_basic',
 					description: sentence(
-						'The wallet displays basic transaction details before the user signs.',
+						'The wallet must display basic transaction details before the user signs.',
 					),
 					rationale: sentence(
-						'Users must be able to see key transaction details (amount, recipient, chain, fees) before signing to avoid being deceived.',
+						'Users must be able to see key transaction details (amount, recipient, chain, fees) before signing to understand the transaction they are about to do.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionLegibility, {
 						allowPartial: false,
@@ -133,7 +135,7 @@ export const softwareWalletStageZeroFive: WalletStage = {
 				},
 				{
 					id: 'basic_authentication',
-					description: sentence('The wallet requires a PIN, password, or biometric to unlock.'),
+					description: sentence('The wallet must require a PIN, password, or biometric to unlock.'),
 					rationale: sentence(
 						'Without a lock screen, anyone who picks up a device can immediately access and transfer funds. Basic authentication is the minimum bar for protecting users against physical theft or unauthorized access.',
 					),
@@ -178,7 +180,7 @@ export const softwareWalletStageOne: WalletStage = {
 			criteria: [
 				{
 					id: 'security_audit_1y',
-					description: sentence('The wallet has passed a security audit within the last year.'),
+					description: sentence('The wallet must pass a security audit within the last year.'),
 					rationale: sentence(
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
@@ -192,7 +194,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'hardware_wallet_subset',
 					description: sentence(
-						'The wallet supports hardware wallets from at least three manufacturers.',
+						'The wallet must support hardware wallets from at least three manufacturers.',
 					),
 					rationale: sentence(`
             By letting you offload your private key to a separate hardware
@@ -234,7 +236,7 @@ export const softwareWalletStageOne: WalletStage = {
 				},
 				{
 					id: 'scam_alerting',
-					description: sentence('The wallet warns users about potential scams.'),
+					description: sentence('The wallet must warn users about potential scams.'),
 					rationale: sentence(
 						'Wallets should alert users about known scams before transactions are made, helping prevent irreversible losses. Transaction legibility (Stage 0.5) is a prerequisite for meaningful scam alerting.',
 					),
@@ -250,7 +252,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'security_best_practices',
 					description: sentence(
-						'The wallet follows standard security practices for key storage and platform hardening.',
+						'The wallet must follow standard security practices for key storage and platform hardening.',
 					),
 					rationale: sentence(
 						'Standard security practices, such as storing keys in a secure enclave and requesting minimal permissions, protect users from key extraction attacks and malicious apps. These are baseline implementation requirements for a wallet that takes security seriously.',
@@ -270,7 +272,7 @@ export const softwareWalletStageOne: WalletStage = {
 			criteria: [
 				{
 					id: 'private_transfers',
-					description: sentence('Token transfers and balances are private by default.'),
+					description: sentence('Token transfers and balances must be private by default.'),
 					rationale: sentence(`
             Without private token transfers, the user's Ethereum activity will be
             publicly and forever stored for the world to see.
@@ -282,7 +284,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'address_privacy',
 					description: sentence(
-						'Wallet addresses are not linkable to sensitive personal information.',
+						'Wallet addresses must not be linkable to sensitive personal information.',
 					),
 					rationale: sentence(`
 						Your wallet address is unique and permanent, which makes it easy to track your activity.
@@ -299,7 +301,9 @@ export const softwareWalletStageOne: WalletStage = {
 				},
 				{
 					id: 'multi_address_correlation',
-					description: sentence('Multiple wallet addresses are not correlatable with one another.'),
+					description: sentence(
+						'Multiple wallet addresses must not be correlatable with one another.',
+					),
 					rationale: sentence(`
 						You probably have more than one wallet address configured in your wallet,
 						which you use for different purposes and perhaps as different identities.
@@ -320,7 +324,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'account_unruggability',
 					description: sentence(
-						"No external party can take over the account without the user's consent.",
+						"No external party must be able to take over the account without the user's consent.",
 					),
 					rationale: sentence(
 						"True self-sovereignty requires that neither the wallet developer nor any external service can unilaterally take over the user's account.",
@@ -336,7 +340,9 @@ export const softwareWalletStageOne: WalletStage = {
 				},
 				{
 					id: 'account_portability',
-					description: sentence('The user can freely export their account to another wallet.'),
+					description: sentence(
+						'The wallet must allow users to freely export their account to another wallet.',
+					),
 					rationale: sentence(`
             To avoid wallet lock-in, users must be able to export their
             account information and import it in another wallet.
@@ -347,7 +353,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'support_own_node',
 					description: sentence(
-						'The wallet allows the user to use their own node when interacting with the L1 chain.',
+						'The wallet must allow the user to use their own node when interacting with the L1 chain.',
 					),
 					rationale: sentence(`
             Blockchains' censorship resistance properties relies on
@@ -405,7 +411,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'outstanding_approvals_erc20',
 					description: sentence(
-						'The wallet lets users inspect their outstanding ERC-20 token approvals.',
+						'The wallet must let users inspect their outstanding ERC-20 token approvals.',
 					),
 					rationale: sentence(
 						'Outstanding token approvals are a major risk vector, they allow contracts to drain user funds even long after initial interaction. Being able to inspect (and ideally revoke) ERC-20 approvals is the baseline for protecting users from this risk.',
@@ -458,7 +464,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'foss',
 					description: sentence(
-						'The wallet is licensed under a Free and Open Source Software (FOSS) license.',
+						'The wallet must be licensed under a Free and Open Source Software (FOSS) license.',
 					),
 					rationale: sentence(
 						'Free and Open Source Software (FOSS) licensing allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities.',
@@ -477,7 +483,7 @@ export const softwareWalletStageOne: WalletStage = {
 				{
 					id: 'address_resolution',
 					description: sentence(
-						'The wallet can send funds to human-readable Ethereum addresses (e.g. ENS).',
+						'The wallet must allow users to send funds to human-readable Ethereum addresses (e.g. ENS).',
 					),
 					rationale: sentence(`
 						This improves the user experience of Ethereum and its layer 2 ecosystem
@@ -492,7 +498,7 @@ export const softwareWalletStageOne: WalletStage = {
 				},
 				{
 					id: 'browser_integration',
-					description: sentence('The wallet complies with web browser integration standards.'),
+					description: sentence('The wallet must comply with web browser integration standards.'),
 					rationale: sentence(`
 						This ensures compatibility across wallets, and ensures that the
 						Ethereum wallet ecosystem remains competitive thanks to interoperability.
@@ -524,7 +530,7 @@ const softwareWalletStageTwo: WalletStage = {
 			criteria: [
 				{
 					id: 'chain_verification',
-					description: sentence('The wallet verifies the integrity of the Ethereum chain.'),
+					description: sentence('The wallet must verify the integrity of the Ethereum chain.'),
 					rationale: sentence(
 						'Much like browsers use HTTPS to provide integrity when doing online purchases, wallets should verify the integrity of the chain when performing transactions.',
 					),
@@ -533,7 +539,7 @@ const softwareWalletStageTwo: WalletStage = {
 				},
 				{
 					id: 'bug_bounty_program',
-					description: sentence('The wallet is part of a funded Bug Bounty program.'),
+					description: sentence('The wallet must be part of a funded Bug Bounty program.'),
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
@@ -543,7 +549,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'duress_resistance',
 					description: sentence(
-						'The wallet protects users against physical coercion and unauthorized access.',
+						'The wallet must protect users against physical coercion and unauthorized access.',
 					),
 					rationale: sentence(
 						'A wallet should provide mechanisms such as a duress PIN or decoy wallet to protect users under coercion, limiting the effectiveness of physical theft or forced access.',
@@ -560,7 +566,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'impact_mitigation',
 					description: sentence(
-						'The wallet lets users set self-imposed limits to mitigate damage from unauthorized access.',
+						'The wallet must let users set self-imposed limits to mitigate damage from unauthorized access.',
 					),
 					rationale: sentence(
 						'Spending rate-limits, high-value spend timelocks, or multiparty authorization for large transactions limit the blast radius of a compromised wallet.',
@@ -585,7 +591,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'data_collection',
 					description: sentence(
-						'The wallet collects no more user data than a web browser does by default.',
+						'The wallet must collect no more user data than a web browser does by default.',
 					),
 					rationale: sentence(
 						'Wallets handle sensitive financial data. Collecting excessive user data creates unnecessary privacy risks and undermines user trust.',
@@ -596,7 +602,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'address_privacy_full',
 					description: sentence(
-						'Wallet addresses are not correlatable with any user information, including IP address.',
+						'Wallet addresses must not be correlatable with any user information, including IP address.',
 					),
 					rationale: sentence(`
 						At Stage 2, wallets must go beyond avoiding sensitive personal data linkage.
@@ -616,13 +622,13 @@ const softwareWalletStageTwo: WalletStage = {
 		{
 			id: 'self_sovereignty',
 			description: sentence(
-				'The wallet does not lock the user in and lets the user remain in full control of their account.',
+				'The wallet must not lock the user in and lets the user remain in full control of their account.',
 			),
 			criteria: [
 				{
 					id: 'transaction_inclusion',
 					description: sentence(
-						'The wallet can withdraw L2 funds to Ethereum L1 without relying on intermediaries.',
+						'The wallet must allow users to withdraw L2 funds to Ethereum L1 without relying on intermediaries.',
 					),
 					rationale: sentence(`
 						Wallets must be able to submit permissionlessly submit transactions on L2s and L1
@@ -635,7 +641,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'support_own_chains',
 					description: sentence(
-						'The wallet allows the user to use their own node when interacting with any chain.',
+						'The wallet must allow the user to use their own node when interacting with any chain.',
 					),
 					rationale: sentence(`
             Blockchains' censorship resistance properties relies on
@@ -693,7 +699,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'outstanding_approvals_full',
 					description: sentence(
-						'The wallet lets users inspect and revoke ERC-20, ERC-721, and ERC-1155 token approvals.',
+						'The wallet must let users inspect and revoke ERC-20, ERC-721, and ERC-1155 token approvals.',
 					),
 					rationale: sentence(
 						'Full approval management across all token standards, ERC-20, ERC-721, and ERC-1155, is required at Stage 2. Being able to revoke approvals (not just inspect them) is critical for recovering from compromised contracts.',
@@ -712,7 +718,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'funding',
 					description: sentence(
-						"The wallet's funding sources and revenue model are public and transparent.",
+						"The wallet's funding sources and revenue model must be public and transparent.",
 					),
 					rationale: sentence(`
 						Wallets are complex, high-stakes pieces of software.
@@ -725,7 +731,7 @@ const softwareWalletStageTwo: WalletStage = {
 				},
 				{
 					id: 'release_process_safety',
-					description: sentence('The wallet release process follows safety best practices.'),
+					description: sentence('The wallet release process must follow safety best practices.'),
 					rationale: sentence(
 						'A well-defined release process with artifact signing, reproducible builds, and dependency locking reduces supply chain attack risk.',
 					),
@@ -741,7 +747,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'fee_transparency',
 					description: sentence(
-						'The fees charged by the wallet are made transparent to the user at all times.',
+						'The fees charged by the wallet must be made transparent to the user at all times.',
 					),
 					rationale: sentence(`
 						Wallets may charge fees to the user for convenience services,
@@ -766,7 +772,7 @@ const softwareWalletStageTwo: WalletStage = {
 				{
 					id: 'chain_specific_address_resolution',
 					description: sentence(
-						'The wallet supports chain-specific human-readable addresses (e.g. ERC-7828, ERC-7831).',
+						'The wallet must support chain-specific human-readable addresses (e.g. ERC-7828, ERC-7831).',
 					),
 					rationale: sentence(`
 						Including the destination chain in the address reduces wrong-chain sends
@@ -781,7 +787,7 @@ const softwareWalletStageTwo: WalletStage = {
 				},
 				{
 					id: 'account_abstraction',
-					description: sentence('The wallet is Account Abstraction ready.'),
+					description: sentence('The wallet must be Account Abstraction ready.'),
 					rationale: sentence(`
 						Account Abstraction is a massive UX upgrade and security for
 						Ethereum users. Wallets must support it through open standards
@@ -792,7 +798,7 @@ const softwareWalletStageTwo: WalletStage = {
 				},
 				{
 					id: 'transaction_batching',
-					description: sentence('The wallet supports atomic batched transactions.'),
+					description: sentence('The wallet must support atomic batched transactions.'),
 					rationale: sentence(`
 						Batched transactions through the WalletCall API enables better UX
 						for common DeFi workflows, such as token approvals followed by a
