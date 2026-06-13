@@ -25,13 +25,6 @@ import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore }
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
 
-// Attribute metadata is intentionally erased at the group/tree boundary:
-// each group contains heterogeneous attributes with distinct metadata types.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- existential attribute metadata
-type AnyAttribute = Attribute<any>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- existential evaluated attribute metadata
-type AnyEvaluatedAttribute = EvaluatedAttribute<any>
-
 /**
  * An attribute group is a collection of attributes that are related to one
  * another. For example, all attributes about privacy would be in the same
@@ -59,7 +52,9 @@ export interface AttributeGroup<_AttributeGroupId extends string> {
 }
 
 /** Attribute with hardcoded weight for use in attribute groups. */
-export type _AttributeWithWeight<_Attribute extends AnyAttribute = AnyAttribute> = {
+export type _AttributeWithWeight<
+	_Attribute extends Attribute<OutcomeMetadata> = Attribute<OutcomeMetadata>,
+> = {
 	attribute: _Attribute
 	weight: number
 }
@@ -71,7 +66,7 @@ export type AttributeTree<_AttributeGroupId extends string> = {
 /** Evaluated attributes for a single wallet. Each group has only its own attribute IDs. */
 export type EvaluationTree<_AttributeGroupId extends string> = Record<
 	_AttributeGroupId,
-	Record<string, AnyEvaluatedAttribute>
+	Record<string, EvaluatedAttribute<OutcomeMetadata>>
 >
 
 /** Rate a wallet's attributes based on its features and metadata. */
@@ -152,7 +147,6 @@ export function aggregateAttributes<_AttributeGroupId extends string>(
 			Object.fromEntries(
 				attrGroup.attributes.map(({ attribute }) => [
 					attribute.id,
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- EvaluationTree values have erased metadata; aggregate() widens to OutcomeMetadata.
 					aggregate(tree => tree[attrGroupId][attribute.id]),
 				]),
 			),
@@ -231,15 +225,12 @@ export function numNonExemptGroupAttributes<OutcomeMetadataByAttribute extends O
  * Useful to compare multiple trees of attributes, by calling `getter` on
  * various trees.
  */
-export function mapAttributesGetter<
-	_AttributeGroupId extends string,
-	_OutcomeMetadata extends OutcomeMetadata,
->(
+export function mapAttributesGetter<_AttributeGroupId extends string>(
 	templateTree: EvaluationTree<_AttributeGroupId>,
 	fn: (
 		getter: (
 			evalTree: EvaluationTree<_AttributeGroupId>,
-		) => EvaluatedAttribute<_OutcomeMetadata> | undefined,
+		) => EvaluatedAttribute<OutcomeMetadata> | undefined,
 	) => void,
 ): void {
 	for (const groupName of Object.keys(templateTree)) {
