@@ -484,12 +484,12 @@ export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata> {
 	 * Match function that determines whether the given outcome matches this
 	 * example.
 	 */
-	matchesValue: (outcome: Outcome<_OutcomeMetadata>) => boolean
+	matchesValue(outcome: Outcome<_OutcomeMetadata>): boolean
 
 	/**
 	 * Sample evaluations for this rating. Optional, may be empty.
 	 */
-	sampleEvaluations: Evaluation<_OutcomeMetadata>[]
+	sampleEvaluations: readonly Evaluation<_OutcomeMetadata>[]
 }
 
 /**
@@ -619,7 +619,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	 * by preventing their evaluation code from taking any metadata into
 	 * account.
 	 */
-	evaluate: (ctx: EvaluationContext<_OutcomeMetadata>) => Evaluation<_OutcomeMetadata>
+	evaluate(ctx: EvaluationContext<_OutcomeMetadata>): Evaluation<_OutcomeMetadata>
 
 	/**
 	 * Check whether the attribute applies to a wallet, according to its
@@ -632,19 +632,19 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	 *
 	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
 	 */
-	exempted?: (
+	exempted?(
 		ctx: EvaluationContext<_OutcomeMetadata>,
 		metadata: WalletMetadata,
-	) => null | ExemptEvaluation<_OutcomeMetadata>
+	): null | ExemptEvaluation<_OutcomeMetadata>
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.
 	 * @param perVariant One or more per-variant evaluations.
 	 * @returns The aggregated evaluation for these per-variant evaluations.
 	 */
-	aggregate: (
+	aggregate(
 		perVariant: AtLeastOneVariant<Evaluation<_OutcomeMetadata>>,
-	) => Evaluation<_OutcomeMetadata>
+	): Evaluation<_OutcomeMetadata>
 }
 
 export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = null> {
@@ -664,9 +664,9 @@ export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata> = Omit<
 }
 
 /** A function that takes a wallet's evaluation context and returns a `Verifiability`. */
-export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = null> = (
-	ctx: EvaluationContext<_OutcomeMetadata>,
-) => Verifiability
+export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = null> = {
+	predicate(ctx: EvaluationContext<_OutcomeMetadata>): Verifiability
+}['predicate']
 
 /**
  * EvaluationContext is a helper class to build `Evaluation<_OutcomeMetadata>` objects,
