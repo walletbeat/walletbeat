@@ -1,15 +1,5 @@
-@font-face {
-	font-family: "wbicons";
-	src: url('/wbicons/wbicons.eot'); /* IE9*/
-	src: url('/wbicons/wbicons.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-	url('/wbicons/wbicons.woff2') format('woff2'),
-	url('/wbicons/wbicons.woff') format('woff'),
-	url('/wbicons/wbicons.ttf') format('truetype'),
-	url('/wbicons/wbicons.svg') format('svg');
-}
-
 [data-wbicon] {
-	font-family: 'wbicons';
+	font-family: var(--fontFamily-wbicons);
 	font-style: normal;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -82,31 +72,31 @@
 		--icon-content: "\ea10";
 	}
 
-	&[data-icon~="funding_transparency"] {
+	&[data-icon~="free_and_open_source_license"] {
 		--icon-content: "\ea11";
 	}
 
-	&[data-icon~="hardware_wallet_interoperability"] {
+	&[data-icon~="funding_transparency"] {
 		--icon-content: "\ea12";
 	}
 
-	&[data-icon~="hardware_wallet_support"] {
+	&[data-icon~="hardware_wallet_interoperability"] {
 		--icon-content: "\ea13";
 	}
 
-	&[data-icon~="l1_provider_independence"] {
+	&[data-icon~="hardware_wallet_support"] {
 		--icon-content: "\ea14";
 	}
 
-	&[data-icon~="multi_address_privacy"] {
+	&[data-icon~="l1_provider_independence"] {
 		--icon-content: "\ea15";
 	}
 
-	&[data-icon~="newsletter"] {
+	&[data-icon~="multi_address_privacy"] {
 		--icon-content: "\ea16";
 	}
 
-	&[data-icon~="open_source"] {
+	&[data-icon~="newsletter"] {
 		--icon-content: "\ea17";
 	}
 
@@ -166,7 +156,7 @@
 		--icon-content: "\ea25";
 	}
 
-	&[data-icon~="source_code_license"] {
+	&[data-icon~="source_visibility"] {
 		--icon-content: "\ea26";
 	}
 

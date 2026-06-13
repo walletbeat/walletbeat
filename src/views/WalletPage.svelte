@@ -1241,6 +1241,7 @@
 			scroll-padding-block-end: 1rem;
 
 			display: grid;
+			padding-block-end: calc(var(--topbar-height, 6.8rem) + 2rem);
 		}
 
 		.toc {
@@ -1259,20 +1260,10 @@
 
 			display: flex;
 			flex-direction: column;
-			padding: calc(2.5rem + 1rem) 0.75rem 1rem;
+			padding: calc(2.5rem + 1rem) 0.75rem calc(var(--topbar-height, 6.8rem) + 1rem);
 			gap: 2px;
 
-			background:
-				linear-gradient(
-					to right,
-					transparent 2.75rem,
-					var(--border-color) 2.75rem,
-					var(--border-color) calc(2.75rem + 1px),
-					transparent calc(2.75rem + 1px)
-				)
-				0 calc(2.5rem + 1rem) / 100% calc(100% - calc(2.5rem + 1rem) - 1rem) no-repeat,
-				var(--background-secondary)
-			;
+			background: var(--background-secondary);
 			border-inline: 1px solid var(--border-color);
 
 			@media (max-width: 864px) {
@@ -1594,6 +1585,9 @@
 
 				li {
 					display: contents;
+					&::before {
+						content: none;
+					}
 				}
 
 				a {

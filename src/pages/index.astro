@@ -15,7 +15,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 
 <Layout
 	metadata={{
-		title: 'Walletbeat',
+		title: 'Walletbeat - Who watches the wallets?',
 	}}
 >
 	<Navigation navigationItems={defaultNavigationItems} />
@@ -63,16 +63,6 @@ import WalletTable from '@/views/WalletTable.svelte'
 </Layout>
 
 <style>
-	@font-face {
-		font-family: 'SP Monorium';
-		src:
-			url('/fonts/sp-monorium-regular.woff2') format('woff2'),
-			url('/fonts/sp-monorium-regular.woff') format('woff');
-		font-weight: 400;
-		font-style: normal;
-		font-display: swap;
-	}
-
 	main {
 		> header {
 			&::before {
@@ -88,7 +78,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 				0 0 3em var(--background-primary);
 
 			h1 {
-				font-family: 'SP Monorium', monospace;
+				font-family: var(--fontFamily-spMonorium);
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
 				font-weight: 800;
 				margin: 0 0 1rem 0;

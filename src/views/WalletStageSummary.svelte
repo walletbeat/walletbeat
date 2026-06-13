@@ -186,7 +186,8 @@
 					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
 
 					<li
-						data-list-item-marker={attribute?.icon}
+						data-wbicon={attribute?.icon ? '' : undefined}
+									data-icon={attribute?.icon}
 						data-stage-criterion-rating={evaluation.rating}
 						style:--accent={stageCriterionRatings[evaluation.rating as StageCriterionRating].color}
 					>
@@ -242,6 +243,11 @@
 
 	li > span > span:last-child {
 		color: var(--text-secondary);
+	}
+
+	li[data-wbicon]::before {
+		font-family: var(--fontFamily-wbicons);
+		content: var(--icon-content);
 	}
 
 	[data-stage-criterion-rating] {

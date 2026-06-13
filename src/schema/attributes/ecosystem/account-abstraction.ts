@@ -126,7 +126,7 @@ const supportsRawEoaOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
 export const accountAbstraction: Attribute = {
 	id: 'accountAbstraction',
 	icon: 'account_abstraction',
-	displayName: 'Account Abstraction',
+	displayName: 'Account abstraction',
 	wording: {
 		midSentenceName: 'account abstraction support',
 	},

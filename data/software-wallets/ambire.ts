@@ -768,23 +768,32 @@ export const ambire: SoftwareWallet = {
 				mobile: 'NOT_A_MOBILE_APP',
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						file: 'public/images/references/ambire/transaction_legibility_1.png',
+						label: 'Transaction legibility screenshot 1',
+					},
+					{
+						file: 'public/images/references/ambire/transaction_legibility_2.png',
+						label: 'Transaction legibility screenshot 2',
+					},
+				],
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							decoded: DataDisplayOptions.NOT_IN_UI,
+							decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						},
 					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 				}),
 				erc8213: supported({

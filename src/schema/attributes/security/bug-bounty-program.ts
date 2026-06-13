@@ -212,7 +212,7 @@ function getLegalProtectionDescription(legalProtection: LegalProtection): string
 export const bugBountyProgram: Attribute = {
 	id: 'bugBountyProgram',
 	icon: 'security',
-	displayName: 'Bug Bounty Program',
+	displayName: 'Bug bounty program',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a hardware wallet's bug bounty program evaluated?",
