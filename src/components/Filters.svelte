@@ -321,7 +321,7 @@
 										() => (
 											activeFilters.has(filter)
 										),
-										(checked) => {
+										checked => {
 											if (checked)
 												activeFilters.add(filter)
 											else

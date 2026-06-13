@@ -5,6 +5,7 @@
 	}
 </script>
 
+
 <script lang="ts" generics="
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata
@@ -19,7 +20,7 @@
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 
-// Props
+	// Props
 	let {
 		ladders,
 		wallet,
@@ -115,10 +116,10 @@
 					</a>
 
 					{#snippet TooltipContent()}
-						<WalletStageSummary 
-							{wallet} 
+						<WalletStageSummary
+							{wallet}
 							{ladders}
-							stage={firstStage} 
+							stage={firstStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}
 						/>

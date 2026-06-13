@@ -6,6 +6,7 @@
 	}
 </script>
 
+
 <script lang="ts">
 	// Types/constants
 	import type { MaybeUnratedScore } from '@/schema/score'

@@ -575,24 +575,24 @@
 					onclick={() => {
 						onRowClick?.(row, rowId)
 					}}
-					onkeypress={e => {
-						if(e.code === 'Enter' || e.code === 'Space'){
+					onkeypress={event => {
+						if(event.code === 'Enter' || event.code === 'Space'){
 							onRowClick?.(row, rowId)
 						}
 					}}
-					onkeyup={e => {
-						if(e.code === 'ArrowUp'){
-							e.preventDefault()
+					onkeyup={event => {
+						if(event.code === 'ArrowUp'){
+							event.preventDefault()
 
-							const row = e.currentTarget.previousElementSibling ?? e.currentTarget.parentElement?.lastElementChild
+							const row = event.currentTarget.previousElementSibling ?? event.currentTarget.parentElement?.lastElementChild
 
 							if(row instanceof HTMLElement)
 								row.focus()
 						}
-						else if(e.code === 'ArrowDown'){
-							e.preventDefault()
+						else if(event.code === 'ArrowDown'){
+							event.preventDefault()
 
-							const row = e.currentTarget.nextElementSibling ?? e.currentTarget.parentElement?.firstElementChild
+							const row = event.currentTarget.nextElementSibling ?? event.currentTarget.parentElement?.firstElementChild
 
 							if(row instanceof HTMLElement)
 								row.focus()

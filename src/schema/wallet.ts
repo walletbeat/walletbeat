@@ -455,7 +455,7 @@ export function rateWallet<_AttributeGroupId extends string>(
 					try {
 						return [ladderType, evaluateWalletOnLadder(stageEvaluatable, ladder)] as const
 					} catch (e) {
-						throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`)
+						throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`, { cause: e })
 					}
 				}),
 		),

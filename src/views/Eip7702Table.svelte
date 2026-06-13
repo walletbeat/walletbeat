@@ -206,9 +206,9 @@
 							src={`/images/wallets/${wallet.metadata.id}.svg`}
 							alt={wallet.metadata.displayName}
 							class="wallet-icon"
-							onerror={e => {
-								if (e.currentTarget)
-									e.currentTarget.src = '/images/wallets/default.svg'
+							onerror={event => {
+								if (event.currentTarget instanceof HTMLImageElement)
+									event.currentTarget.src = '/images/wallets/default.svg'
 							}}
 						/>
 
@@ -233,8 +233,8 @@
 							<button
 								data-tag="eip"
 								aria-label="Filter by EIP-7702"
-								onclick={e => {
-									e.stopPropagation()
+								onclick={event => {
+									event.stopPropagation()
 									toggleFilterById!('accountType-eip7702')
 								}}
 							>
@@ -253,8 +253,8 @@
 								<button
 									data-tag="eip"
 									aria-label="Filter by ERC-4337"
-									onclick={e => {
-										e.stopPropagation()
+									onclick={event => {
+										event.stopPropagation()
 										toggleFilterById!('accountType-erc4337')
 									}}
 								>
@@ -270,8 +270,8 @@
 								<button
 									data-tag="eoa"
 									aria-label="Filter by EOA"
-									onclick={e => {
-										e.stopPropagation()
+									onclick={event => {
+										event.stopPropagation()
 										toggleFilterById!('accountType-eoa')
 									}}
 								>

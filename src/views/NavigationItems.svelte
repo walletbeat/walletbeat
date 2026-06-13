@@ -37,7 +37,7 @@
 		''
 	)
 
-	let effectiveSearchValue = $derived(
+	const effectiveSearchValue = $derived(
 		searchValue.trim().toLowerCase()
 	)
 
@@ -74,7 +74,7 @@
 	const matchesSearch = (item: NavigationItem, query: string): boolean => (
 		!query
 		|| !!fuzzyMatch(item.title, query)
-		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
+		|| (item.children?.some(child => matchesSearch(child, query)) ?? false)
 	)
 
 	const highlightText = (text: string, query: string) => {
@@ -83,8 +83,8 @@
 		return (
 			ranges ?
 				[
-					...ranges.flatMap(([start, end], i, arr) => [
-						text.slice(arr[i - 1]?.[1] ?? 0, start),
+					...ranges.flatMap(([start, end], i, allRanges) => [
+						text.slice(allRanges[i - 1]?.[1] ?? 0, start),
 						`<mark>${text.slice(start, end)}</mark>`,
 					]),
 					text.slice(ranges.at(-1)?.[1] ?? 0),

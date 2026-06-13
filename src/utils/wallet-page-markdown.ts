@@ -164,8 +164,6 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 							descText !== '' && /^[a-z]/.test(descText)
 								? descText.charAt(0).toUpperCase() + descText.slice(1)
 								: descText
-						const rating = evaluation.rating as StageCriterionRating
-						const ratingInfo = stageCriterionRatings[rating]
 						const displayName = criterion.displayName
 						const attrLink =
 							attributeId !== null
@@ -173,6 +171,8 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 										attributeAnchor: slugifyCamelCase(attributeId),
 									})})`
 								: displayName
+						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- StageCriterionEvaluation.rating is a discriminated union; tsc requires narrowing to index stageCriterionRatings.
+						const ratingInfo = stageCriterionRatings[evaluation.rating as StageCriterionRating]
 						const bullet =
 							descForBullet !== ''
 								? `- ${attrLink} — ${descForBullet}: ${ratingInfo.icon}`

@@ -433,16 +433,18 @@ export function evaluateWalletOnLadder<_AttributeGroupId extends string>(
 								try {
 									return criterion.evaluate(wallet)
 								} catch (e) {
-									throw new Error(`Criterion ${criterion.id}: ${getErrorMessage(e)}`)
+									throw new Error(`Criterion ${criterion.id}: ${getErrorMessage(e)}`, { cause: e })
 								}
 							})
 						} catch (e) {
-							throw new Error(`Criteria group ${criteriaGroup.id}: ${getErrorMessage(e)}`)
+							throw new Error(`Criteria group ${criteriaGroup.id}: ${getErrorMessage(e)}`, {
+								cause: e,
+							})
 						}
 					}),
 				)
 			} catch (e) {
-				throw new Error(`Stage ${stage.id}: ${getErrorMessage(e)}`)
+				throw new Error(`Stage ${stage.id}: ${getErrorMessage(e)}`, { cause: e })
 			}
 		})()
 

@@ -193,7 +193,12 @@ describe('wallets', () => {
 								walletVariants: wallet.variants,
 							})
 						} catch (e) {
-							throw new Error(`${getErrorMessage(e)} (run \`pnpm fix\` to fix this automatically)`)
+							throw new Error(
+								`${getErrorMessage(e)} (run \`pnpm fix\` to fix this automatically)`,
+								{
+									cause: e,
+								},
+							)
 						}
 					}
 				})
