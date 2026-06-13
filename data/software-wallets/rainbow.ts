@@ -107,27 +107,23 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: null,
-		chainConfigurability: {
-			// Source: Rainbow team responses via Walletbeat questionnaire
-			[Variant.BROWSER]: supported<WithRef<ChainConfigurability>>({
-				ref: refTodo,
-				customChainRpcEndpoint: featureSupported,
-				l1: supported({
-					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
-					withNoConnectivityExceptL1RPCEndpoint: {
-						accountCreation: featureSupported,
-						accountImport: featureSupported,
-						erc20BalanceLookup: featureSupported,
-						erc20TokenSend: featureSupported,
-						etherBalanceLookup: featureSupported,
-					},
-				}),
-				nonL1: supported({
-					rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
-				}),
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: refTodo,
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
 			}),
-			[Variant.MOBILE]: null,
-		},
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
 		ecosystem: {
 			delegation: null,
 		},
