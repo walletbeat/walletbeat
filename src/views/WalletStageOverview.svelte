@@ -143,13 +143,12 @@
 									value={`STAGE_${stageIndex}`}
 									style:--accent={stageToColor(stageIndex, ladderDefinition?.stages.length ?? 3)}
 								>
-									<strong>
-										Stage {stageIndex}
-									</strong>
+									<strong>{s.label}</strong>
 								</data>
 							</a>
 
 							<h3 data-row-item="flexible basis-3">
+								<strong>{s.name}</strong>:
 								{#if isTypographicContent(s.description)}
 									<Typography content={s.description} />
 								{:else}

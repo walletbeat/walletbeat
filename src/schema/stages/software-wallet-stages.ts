@@ -47,7 +47,7 @@ export const softwareWalletStageZero: WalletStage = {
 	id: 'stage:software-0',
 	label: 'Stage 0',
 	name: 'Verifiable',
-	description: sentence('The wallet meets the minimum criteria for evaluation.'),
+	description: sentence('The wallet meets the minimum criteria for being verifiably evaluated.'),
 	criteriaGroups: [
 		{
 			id: 'reviewability',
@@ -70,9 +70,9 @@ export const softwareWalletStageZero: WalletStage = {
 export const softwareWalletStageZeroFive: WalletStage = {
 	id: 'stage:software-0-5',
 	label: 'Stage 0.5',
-	name: 'Foundational Wallet',
+	name: 'Foundational',
 	description: sentence(
-		'The wallet meets the basic requirements to be considered a usable Ethereum wallet.',
+		'The wallet meets the basic requirements to be considered a secure Ethereum wallet.',
 	),
 	criteriaGroups: [
 		{
@@ -170,9 +170,11 @@ export const softwareWalletStageZeroFive: WalletStage = {
 
 export const softwareWalletStageOne: WalletStage = {
 	id: 'stage:software-1',
-	name: 'Ethereum Standard wallet',
+	name: 'Ethereum standard',
 	label: 'Stage 1',
-	description: sentence('The wallet has made a minimal commitment to Ethereum values.'),
+	description: sentence(`
+		The wallet has reached a level of maturity representative of Ethereum values.
+	`),
 	criteriaGroups: [
 		{
 			id: 'security',
@@ -520,9 +522,11 @@ export const softwareWalletStageOne: WalletStage = {
 
 const softwareWalletStageTwo: WalletStage = {
 	id: 'stage:software-2',
-	name: 'Trust-minimized wallet',
+	name: 'Trust-minimized',
 	label: 'Stage 2',
-	description: sentence('The wallet has made a significant commitment to Ethereum values.'),
+	description: sentence(`
+		The wallet has minimized trust assumptions on its own infrastructure while maximizing user privacy and sovereignty.
+	`),
 	criteriaGroups: [
 		{
 			id: 'security',
