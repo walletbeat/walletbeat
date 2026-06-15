@@ -158,6 +158,7 @@ export interface WalletStage {
 	/** A human-readable label for this stage (e.g., "Stage 0", "Stage 1"). */
 	label: string
 
+	/** The name of the stage. Short adjective or noun that describes the general principle of the stage. */
 	name: string
 
 	/** A description of what this stage represents. */
