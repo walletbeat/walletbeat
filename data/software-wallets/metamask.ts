@@ -196,8 +196,8 @@ export const metamask: SoftwareWallet = {
 				withNoConnectivityExceptL1RPCEndpoint: {
 					accountCreation: featureSupported,
 					accountImport: featureSupported,
-					erc20BalanceLookup: notSupported, // Token import dialog is broken in this case
-					erc20TokenSend: notSupported, // Can't add token.
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
 					etherBalanceLookup: featureSupported,
 				},
 			}),
