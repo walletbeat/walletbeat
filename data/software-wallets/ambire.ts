@@ -647,6 +647,20 @@ export const ambire: SoftwareWallet = {
 								DataCollectionPurpose.STATIC_ASSETS,
 							],
 						},
+						// ENS resolution when the user opens the wallet
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
 					],
 				},
 			},
