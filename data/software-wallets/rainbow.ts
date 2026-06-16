@@ -4,6 +4,7 @@ import { alphabet } from '@/data/entities/alphabet'
 import { apple } from '@/data/entities/apple'
 import { rainbow as rainbowEntity } from '@/data/entities/rainbow'
 import { sentry } from '@/data/entities/sentry'
+import { rainbowCaliburContract } from '@/data/wallet-contracts/rainbow-calibur'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -81,7 +82,25 @@ export const rainbow: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			// Rainbow ships EIP-7702 "smart wallets": EOAs are delegated to Rainbow's
+			// deployment of the Calibur delegate contract to batch approvals and actions
+			// into a single transaction. Delegation is gated behind a feature flag /
+			// remote config and applied lazily at the first operation that needs it.
+			eip7702: supported({
+				ref: [
+					{
+						explanation:
+							'Rainbow announced EIP-7702 smart wallets that delegate EOAs to bundle approvals and actions into a single transaction.',
+						url: 'https://x.com/rainbowdotme/status/2026753700216127820',
+					},
+					{
+						explanation:
+							'Both clients execute EIP-7702 (type-4) delegation as part of swap/send-calls flows via the @rainbow-me/delegation SDK; `willExecuteDelegation` decides per (address, chainId) whether the next operation delegates.',
+						url: 'https://github.com/rainbow-me/rainbow/blob/a6caacc07ddad0d40554d647dc4414945c9ebb81/src/features/delegation/willDelegate.ts',
+					},
+				],
+				contract: rainbowCaliburContract,
+			}),
 			eoa: supported({
 				ref: refTodo,
 				canExportPrivateKey: true,
@@ -125,7 +144,29 @@ export const rainbow: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
-			delegation: null,
+			// Delegation is never offered at EOA creation or import; it is applied lazily,
+			// bundled into the first operation (e.g. a swap) that benefits from it.
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					// The bundled swap/send is shown with its normal transaction details; the
+					// delegation is carried alongside rather than replacing the operation UI.
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: true,
+				}),
+				fee: {
+					// No evidence Rainbow lets the user pay the delegation gas with a token on
+					// another chain.
+					crossChainGas: notSupported,
+					// Sponsored: prepared managed calls set `fees.payer: 'sponsor'`
+					// (src/features/delegation/calls.ts) and are submitted via Rainbow's own relay
+					// (relayService.ts, RAINBOW_RELAY_*). Sponsorship is gated on delegation —
+					// `predictSponsoredCallsExecution` requires `canUseDelegatedExecution` — and
+					// limited to sponsorship-eligible chains and the sponsor wallet's balance.
+					walletSponsored: featureSupported,
+				},
+			},
 		},
 		integration: {
 			browser: {
