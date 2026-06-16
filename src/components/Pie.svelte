@@ -8,6 +8,11 @@
 		arcIconId?: string
 		titleText: string
 		href?: string
+		gradient?: {
+			areaRadiusStops?: number[]
+			colors: string[]
+			transparentStopColor?: string
+		}
 		children?: Slice[]
 	}
 
@@ -129,7 +134,66 @@
 
 
 	// Functions
-	const getLevelConfig = (level: number): LevelConfig => levels[Math.min(level, levels.length - 1)]
+	const getLevelConfig = (level: number) => levels[Math.min(level, levels.length - 1)]
+
+	const sliceFill = (slice: ComputedSlice) => {
+		if (!slice.children?.length || !slice.gradient) return slice.color
+
+		const colorWeights = slice.gradient.colors
+			.map(color => ({
+				color,
+				weight: slice.children
+					.filter(child => child.color === color)
+					.reduce((sum, child) => sum + child.weight, 0),
+			}))
+			.filter(({ weight }) => weight > 0)
+
+		if (colorWeights.length <= 1) return colorWeights[0]?.color ?? slice.color
+
+		const areaRadiusStops = slice.gradient.areaRadiusStops
+		const totalWeight = colorWeights.reduce((sum, entry) => sum + entry.weight, 0)
+		const minimumStopGap = Math.min(8, (slice.computed.outerR - slice.computed.innerR) / Math.max(colorWeights.length - 1, 1))
+		const stopPositions = colorWeights
+			.map(({ weight }, index, weights) => {
+				const areaFraction = (weights.slice(0, index).reduce((sum, entry) => sum + entry.weight, 0) + weight / 2) / totalWeight
+				const scaledStopIndex = areaRadiusStops ? areaFraction * (areaRadiusStops.length - 1) : 0
+				const stopIndex = Math.floor(scaledStopIndex)
+				const normalizedRadius = (
+					areaRadiusStops ?
+						areaRadiusStops[stopIndex] + (
+							areaRadiusStops[Math.min(stopIndex + 1, areaRadiusStops.length - 1)] - areaRadiusStops[stopIndex]
+						) * (scaledStopIndex - stopIndex)
+					:
+						Math.sqrt(
+							(
+								slice.computed.innerR ** 2
+								+ (slice.computed.outerR ** 2 - slice.computed.innerR ** 2) * areaFraction
+							),
+					)
+				)
+
+				return areaRadiusStops ? slice.computed.innerR + (slice.computed.outerR - slice.computed.innerR) * normalizedRadius : normalizedRadius
+			})
+			.reduce<number[]>(
+				(stops, stop, index) => [
+					...stops,
+					Math.max(stop, index === 0 ? slice.computed.innerR : stops[index - 1] + minimumStopGap),
+				],
+				[],
+			)
+			.reduceRight<number[]>(
+				(stops, stop, index) => [
+					Math.min(
+						stop,
+						index === colorWeights.length - 1 ? slice.computed.outerR : stops[0] - minimumStopGap,
+					),
+					...stops,
+				],
+				[],
+			)
+
+		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), ${slice.color}`
+	}
 
 	const computeSlices = (
 		{
@@ -288,7 +352,8 @@
 		style:--slice-arcSize={Math.abs(slice.computed.totalAngle) > 180 ? 'large' : 'small'}
 		class:full-ring={Math.abs(slice.computed.totalAngle) >= 359.99}
 
-		style:--slice-fill={slice.color}
+		style:--slice-color={slice.color}
+		style:--slice-fill={sliceFill(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
 
 		data-slice-id={slice.id}
@@ -512,7 +577,7 @@
 					--slice-outerStartX: calc(var(--pie-originX) + sin(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
 					--slice-outerStartY: calc(var(--pie-originY) - cos(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
 
-					background-color: var(--slice-fill);
+					background: var(--slice-fill);
 
 					clip-path: shape(
 						from
@@ -646,7 +711,7 @@
 
 				&:not(:hover, :focus-within) > .slice-shape > .label[data-wbicon] {
 					filter: none;
-					color: contrast-color(--slice-fill);
+					color: contrast-color(--slice-color);
 					opacity: 1;
 				}
 

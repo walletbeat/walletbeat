@@ -233,8 +233,6 @@
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
-
-	// Score helpers
 	const getWalletScore = (wallet: RatedWallet): number | null => {
 		const overallScore = calculateOverallScore(
 			wallet.overall,
@@ -335,7 +333,7 @@
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
-	import Pie, { PieLayout } from '@/components/Pie.svelte'
+	import Pie, { PieLayout, type Slice } from '@/components/Pie.svelte'
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
@@ -353,6 +351,24 @@
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
 	import type { WBIconFontID } from '@/styles/wbicons'
+
+
+	// Flower visualization helpers
+	const attributeGroupFlowerGradient: NonNullable<Slice['gradient']> = {
+		areaRadiusStops: [
+			0.000000, 0.038097, 0.075252, 0.111402, 0.146585, 0.180353, 0.213312, 0.245668, 0.277513,
+			0.308937, 0.339923, 0.370813, 0.401695, 0.432635, 0.463538, 0.494531, 0.525379, 0.555836,
+			0.586127, 0.616255, 0.646222, 0.676031, 0.705683, 0.735183, 0.764631, 0.793975, 0.823297,
+			0.852492, 0.881757, 0.911014, 0.940339, 0.969777, 1.000000,
+		],
+		colors: [
+			ratingToColor(Rating.UNRATED),
+			ratingToColor(Rating.FAIL),
+			ratingToColor(Rating.PARTIAL),
+			ratingToColor(Rating.PASS),
+		],
+		transparentStopColor: ratingToColor(Rating.UNRATED),
+	}
 </script>
 
 
@@ -1132,6 +1148,7 @@
 												groupScore,
 												summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
 											),
+											gradient: attributeGroupFlowerGradient,
 											weight: 1,
 											...evalGroup && {
 												children: (
@@ -1644,6 +1661,7 @@
 									arcIconId: attrGroup.icon,
 									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
 									titleText: formatAttributeGroupTitleText(attrGroup, groupScore, false),
+									gradient: attributeGroupFlowerGradient,
 									weight: 1,
 									...evalGroup && {
 										children: (
