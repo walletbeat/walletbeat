@@ -66,15 +66,6 @@
     }
   }
 
-  // Teleports the element to document.body so it escapes the ancestor
-  // transform: perspective() on [data-scroll-item], which otherwise traps
-  // position: fixed children within the section instead of the viewport.
-  function portal(node: HTMLElement) {
-    document.body.appendChild(node);
-
-    return { destroy() { node.remove(); } };
-  }
-
   function getRiskLabel(riskType: ScamAlertTest['riskType']): string {
     switch (riskType) {
       case 'recent-deploy': return 'Recently Deployed';
@@ -86,7 +77,7 @@
 </script>
 
 {#if !disclaimerAccepted}
-  <div class="disclaimer-fullscreen" use:portal>
+  <div class="disclaimer-fullscreen">
     <div class="disclaimer-overlay" data-card="radius-8 padding-5">
       <div class="disclaimer-content" data-column="gap-4">
         <div class="disclaimer-icon">&#9888;</div>
