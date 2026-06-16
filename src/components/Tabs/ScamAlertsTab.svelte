@@ -271,7 +271,7 @@
 {/if}
 
 <style>
-  .disclaimer-fullscreen {
+  :global(.disclaimer-fullscreen) {
     position: fixed;
     inset: 0;
     z-index: 9999;
@@ -282,7 +282,7 @@
     backdrop-filter: blur(4px);
   }
 
-  .disclaimer-overlay {
+  :global(.disclaimer-overlay) {
     border: 2px solid var(--rating-fail);
     background: var(--background-primary);
     max-width: 36rem;
@@ -291,7 +291,7 @@
     overflow-y: auto;
   }
 
-  .disclaimer-content {
+  :global(.disclaimer-content) {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -300,23 +300,23 @@
     margin: 0 auto;
   }
 
-  .disclaimer-icon {
+  :global(.disclaimer-icon) {
     font-size: 3rem;
     color: var(--rating-fail);
   }
 
-  .disclaimer-title {
+  :global(.disclaimer-title) {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--rating-fail);
     margin: 0;
   }
 
-  .disclaimer-warnings {
+  :global(.disclaimer-warnings) {
     width: 100%;
   }
 
-  .disclaimer-rule {
+  :global(.disclaimer-rule) {
     font-size: 0.95rem;
     color: var(--text-primary);
     margin: 0;
@@ -326,7 +326,7 @@
     border-radius: 0.5rem;
   }
 
-  .disclaimer-checkbox {
+  :global(.disclaimer-checkbox) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -335,7 +335,7 @@
     cursor: pointer;
   }
 
-  .disclaimer-checkbox input {
+  :global(.disclaimer-checkbox input) {
     width: 1.1rem;
     height: 1.1rem;
     cursor: pointer;
@@ -343,7 +343,7 @@
     accent-color: var(--rating-fail);
   }
 
-  .disclaimer-button {
+  :global(.disclaimer-button) {
     background-color: var(--rating-fail);
     color: white;
     font-weight: 600;
@@ -354,11 +354,11 @@
     transition: opacity 0.15s;
   }
 
-  .disclaimer-button:hover:not(:disabled) {
+  :global(.disclaimer-button:hover:not(:disabled)) {
     opacity: 0.9;
   }
 
-  .disclaimer-button:disabled {
+  :global(.disclaimer-button:disabled) {
     opacity: 0.4;
     cursor: not-allowed;
   }
