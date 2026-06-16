@@ -440,10 +440,54 @@ export const rainbow: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: null,
 			},
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				artifactSigning: notSupported,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The browser extension CI runs `yarn install --immutable` and a dedicated `yarn check-lockfile` step, failing the build if yarn.lock is out of sync.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet Android release build installs dependencies with `yarn install --immutable`, which fails if yarn.lock would change.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet iOS release build installs dependencies with `yarn install --immutable`, which fails if yarn.lock would change.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: supported({
+					ref: [
+						{
+							explanation:
+								'The browser extension runs `yarn audit:ci` (audit-ci) as a CI step, failing the build on vulnerable dependencies.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+						},
+						{
+							explanation:
+								'The mobile wallet runs `yarn audit-ci` as a CI step, failing the build on vulnerable dependencies.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/c203ae4e9cb48627310f37ebbab05dbb43211286/.github/workflows/unit-test.yml',
+						},
+					],
+				}),
+				hasPublicChangelog: {
+					[Variant.BROWSER]: supported({
+						ref: {
+							explanation: 'Rainbow publishes browser extension release notes via GitHub Releases.',
+							url: 'https://github.com/rainbow-me/browser-extension/releases',
+						},
+					}),
+					[Variant.MOBILE]: supported({
+						ref: {
+							explanation: 'Rainbow publishes mobile wallet release notes via GitHub Releases.',
+							url: 'https://github.com/rainbow-me/rainbow/releases',
+						},
+					}),
+				},
 				hermeticBuilds: notSupportedWithRef({
 					ref: [
 						{
