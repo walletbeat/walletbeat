@@ -32,8 +32,8 @@
 	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
 	--rating-fail: light-dark(#FF969699,#FB6682);
 	--rating-partial: light-dark(#FFCC7399,#FFCC73);
-	--rating-neutral: light-dark(#D5D4FB99,#D5D4FB);
-	--rating-unrated: #F8ECEC;
+	--rating-neutral: #bdc3c7;
+	--rating-unrated: light-dark(oklch(0.75 0.02 244.87), oklch(0.67 0.01 264.61));
 	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
