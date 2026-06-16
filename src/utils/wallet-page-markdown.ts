@@ -1,25 +1,20 @@
 import { variantToName } from '@/constants/variants'
 import {
+	type AttributeTree,
 	getAttributeFromTree,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
-import {
-	type AttributeGroup,
-	type EvaluatedGroup,
-	Rating,
-	ratingToText,
-	type ValueSet,
-} from '@/schema/attributes'
+import { Rating, ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
-import {
-	StageCriterionRating,
-	stageCriterionRatings,
-	type WalletStage,
-	type WalletStageCriterion,
-} from '@/schema/stages'
+import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
-import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
+import {
+	type RatedWallet,
+	type ResolvedWallet,
+	VariantSpecificity,
+	type WalletMetadata,
+} from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
@@ -42,7 +37,7 @@ import { getWalletUrl } from '@/utils/wallet-url'
  * Return the wallet blurb as a single collapsed line, suitable for use
  * as a short description in the /llms.txt index.
  */
-export function walletBlurbText(wallet: RatedWallet): string {
+export function walletBlurbText(wallet: { metadata: WalletMetadata }): string {
 	return collapseToSingleLine(
 		renderTypographicContentToString(wallet.metadata.blurb, {
 			WALLET_NAME: wallet.metadata.displayName,
@@ -54,10 +49,15 @@ export function walletBlurbText(wallet: RatedWallet): string {
  * Generate a clean markdown page for a wallet, following the llms.txt convention
  * of providing LLM-friendly content at `{walletUrl}/index.html.md`.
  *
+ * @param attributeTree Attribute tree for this wallet class; must match the shape of `wallet.overall`.
  * @param wallet The fully-rated wallet to render.
  * @param siteUrl The site root URL without trailing slash (e.g. "https://wallet.page").
  */
-export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string {
+export function walletPageMarkdown<_AttributeGroupId extends string>(
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	wallet: RatedWallet<_AttributeGroupId>,
+	siteUrl: string,
+): string {
 	const { metadata } = wallet
 	const walletName = metadata.displayName
 
@@ -119,7 +119,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 			const { metadata: _metadata, ladders: _ladders, ...stageEvaluatableWallet } = wallet
 
 			for (let stageIndex = 0; stageIndex < ladderEvaluation.ladder.stages.length; stageIndex++) {
-				const s: WalletStage = ladderEvaluation.ladder.stages[stageIndex]
+				const s = ladderEvaluation.ladder.stages[stageIndex]
 
 				stageSection.push(`### Stage ${stageIndex}: ${s.label}`, '')
 
@@ -152,7 +152,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						}
 					}
 
-					const groupCriteria: readonly WalletStageCriterion[] = criteriaGroup.criteria
+					const groupCriteria = criteriaGroup.criteria
 
 					for (const criterion of groupCriteria) {
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
@@ -164,13 +164,15 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 							descText !== '' && /^[a-z]/.test(descText)
 								? descText.charAt(0).toUpperCase() + descText.slice(1)
 								: descText
-						const rating = evaluation.rating as StageCriterionRating
-						const ratingInfo = stageCriterionRatings[rating]
 						const displayName = criterion.displayName
 						const attrLink =
 							attributeId !== null
-								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) })})`
+								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, {
+										attributeAnchor: slugifyCamelCase(attributeId),
+									})})`
 								: displayName
+						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- StageCriterionEvaluation.rating is a discriminated union; tsc requires narrowing to index stageCriterionRatings.
+						const ratingInfo = stageCriterionRatings[evaluation.rating as StageCriterionRating]
 						const bullet =
 							descForBullet !== ''
 								? `- ${attrLink} — ${descForBullet}: ${ratingInfo.icon}`
@@ -189,128 +191,127 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const isMultiVariant = !hasSingleVariant(wallet.variants)
 
 	const groupLines = mapNonExemptAttributeGroupsInTree(
+		attributeTree,
 		wallet.overall,
-		<Vs extends ValueSet>(
-			attrGroup: AttributeGroup<Vs>,
-			evalGroup: EvaluatedGroup<Vs>,
-		): string[] => {
-			// TODO: https://github.com/walletbeat/walletbeat/issues/547
-			const attrLines: string[][] = mapNonExemptGroupAttributes<string[], Vs>(
-				evalGroup,
-				(evalAttr): string[] => {
-					const { attribute, evaluation } = evalAttr
-					const rating = ratingToText(evaluation.outcome.rating)
-					const walletAttrUrl = `${siteUrl}${getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attribute.id) })}`
-					const parts: string[] = [`### ${attribute.displayName}: ${rating}`, '']
+		(attrGroup, evalGroup): string[] => {
+			const attrLines: string[][] = mapNonExemptGroupAttributes(evalGroup, (evalAttr): string[] => {
+				const { attribute, evaluation } = evalAttr
+				const rating = ratingToText(evaluation.outcome.rating)
+				const walletAttrUrl = `${siteUrl}${getWalletUrl(wallet, {
+					attributeAnchor: slugifyCamelCase(attribute.id),
+				})}`
+				const parts: string[] = [`### ${attribute.displayName}: ${rating}`, '']
 
-					if (isMultiVariant) {
-						const isVariantSpecific = nonEmptyValues<Variant, Map<string, VariantSpecificity>>(
-							wallet.variantSpecificity,
-						).some(specMap => {
-							const spec = specMap.get(attribute.id)
+				if (isMultiVariant) {
+					const isVariantSpecific = nonEmptyValues<Variant, Map<string, VariantSpecificity>>(
+						wallet.variantSpecificity,
+					).some(specMap => {
+						const spec = specMap.get(attribute.id)
 
-							return (
-								spec === VariantSpecificity.UNIQUE_TO_VARIANT ||
-								spec === VariantSpecificity.NOT_UNIVERSAL
+						return (
+							spec === VariantSpecificity.UNIQUE_TO_VARIANT ||
+							spec === VariantSpecificity.NOT_UNIVERSAL
+						)
+					})
+
+					if (isVariantSpecific) {
+						const perVariantParts: string[] = []
+
+						for (const [variant, resolved] of nonEmptyEntries<
+							Variant,
+							ResolvedWallet<_AttributeGroupId>
+						>(wallet.variants)) {
+							const variantEvalAttr = getAttributeFromTree(
+								attributeTree,
+								resolved.attributes,
+								attribute,
 							)
-						})
 
-						if (isVariantSpecific) {
-							const perVariantParts: string[] = []
-
-							for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet>(
-								wallet.variants,
-							)) {
-								const variantEvalAttr = getAttributeFromTree(resolved.attributes, attribute)
-
-								if (
-									variantEvalAttr === null ||
-									variantEvalAttr.evaluation.outcome.rating === Rating.EXEMPT
-								) {
-									continue
-								}
-
-								perVariantParts.push(
-									`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.outcome.rating)}`,
-								)
+							if (
+								variantEvalAttr === null ||
+								variantEvalAttr.evaluation.outcome.rating === Rating.EXEMPT
+							) {
+								continue
 							}
 
-							if (perVariantParts.length > 0) {
-								parts.push(
-									`**Per-variant ratings:** ${perVariantParts.join(', ')}. [See full details](${walletAttrUrl}).`,
-									'',
-								)
-							}
+							perVariantParts.push(
+								`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.outcome.rating)}`,
+							)
+						}
+
+						if (perVariantParts.length > 0) {
+							parts.push(
+								`**Per-variant ratings:** ${perVariantParts.join(', ')}. [See full details](${walletAttrUrl}).`,
+								'',
+							)
 						}
 					}
+				}
 
-					const shortExpl = normalizeMarkdownBlankLines(
+				const shortExpl = normalizeMarkdownBlankLines(
+					trimWhitespacePrefix(
+						renderTypographicContentToString(evaluation.outcome.shortExplanation, evalStrings),
+					),
+				)
+
+				parts.push(shortExpl, '')
+
+				const details = normalizeMarkdownBlankLines(
+					renderContentToText(evaluation.details, evalStrings, {
+						fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
+						trim: true,
+					}),
+				)
+
+				if (details.trim() !== '') {
+					parts.push(details, '')
+				}
+
+				if (evaluation.impact !== undefined) {
+					const impact = normalizeMarkdownBlankLines(
+						trimWhitespacePrefix(renderTypographicContentToString(evaluation.impact, evalStrings)),
+					)
+
+					if (impact.trim() !== '') {
+						parts.push('#### Impact', '', impact, '')
+					}
+				}
+
+				if (evaluation.howToImprove !== undefined) {
+					const howTo = normalizeMarkdownBlankLines(
 						trimWhitespacePrefix(
-							renderTypographicContentToString(evaluation.outcome.shortExplanation, evalStrings),
+							renderTypographicContentToString(evaluation.howToImprove, evalStrings),
 						),
 					)
 
-					parts.push(shortExpl, '')
-
-					const details = normalizeMarkdownBlankLines(
-						renderContentToText(evaluation.details, evalStrings, {
-							fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
-							trim: true,
-						}),
-					)
-
-					if (details.trim() !== '') {
-						parts.push(details, '')
+					if (howTo.trim() !== '') {
+						parts.push(`#### ${getHowToImproveHeading(attribute, walletName)}`, '', howTo, '')
 					}
+				}
 
-					if (evaluation.impact !== undefined) {
-						const impact = normalizeMarkdownBlankLines(
-							trimWhitespacePrefix(
-								renderTypographicContentToString(evaluation.impact, evalStrings),
-							),
-						)
+				if (evaluation.references !== undefined && evaluation.references.length > 0) {
+					const qualifiedRefs = toFullyQualified(evaluation.references)
 
-						if (impact.trim() !== '') {
-							parts.push('#### Impact', '', impact, '')
-						}
-					}
+					if (qualifiedRefs.length > 0) {
+						parts.push('#### References', '')
 
-					if (evaluation.howToImprove !== undefined) {
-						const howTo = normalizeMarkdownBlankLines(
-							trimWhitespacePrefix(
-								renderTypographicContentToString(evaluation.howToImprove, evalStrings),
-							),
-						)
+						for (const ref of qualifiedRefs) {
+							for (const labeledUrl of ref.urls) {
+								const prefix =
+									ref.explanation === undefined
+										? ''
+										: `${collapseToSingleLine(ref.explanation)} Source: `
 
-						if (howTo.trim() !== '') {
-							parts.push(`#### ${getHowToImproveHeading(attribute, walletName)}`, '', howTo, '')
-						}
-					}
-
-					if (evaluation.references !== undefined && evaluation.references.length > 0) {
-						const qualifiedRefs = toFullyQualified(evaluation.references)
-
-						if (qualifiedRefs.length > 0) {
-							parts.push('#### References', '')
-
-							for (const ref of qualifiedRefs) {
-								for (const labeledUrl of ref.urls) {
-									const prefix =
-										ref.explanation === undefined
-											? ''
-											: `${collapseToSingleLine(ref.explanation)} Source: `
-
-									parts.push(`- ${prefix}[${labeledUrl.label}](${labeledUrl.url})`)
-								}
+								parts.push(`- ${prefix}[${labeledUrl.label}](${labeledUrl.url})`)
 							}
-
-							parts.push('')
 						}
-					}
 
-					return parts
-				},
-			)
+						parts.push('')
+					}
+				}
+
+				return parts
+			})
 
 			return [`## ${attrGroup.displayName}`, '', ...attrLines.flat()]
 		},

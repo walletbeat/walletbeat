@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
@@ -20,7 +21,6 @@ import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 

@@ -1,9 +1,9 @@
 ---
 // Types/constants
-import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { ratedHardwareWallets, hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 import { representativeWalletForType } from '@/data/wallets'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
+import { WalletType } from '@/schema/wallet-types'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
@@ -22,6 +22,7 @@ const { attrGroupId } = Astro.params
 // Data
 const attrGroup = getAttributeGroupById(
 	attrGroupId,
+	hardwareWalletAttributeTree,
 	representativeWalletForType(WalletType.HARDWARE).overall,
 )
 
@@ -49,7 +50,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 			client:visible
 			title='Hardware Wallets'
 			wallets={Object.values(ratedHardwareWallets)}
-			attributeGroups={[attrGroup]}
+			attributeTree={hardwareWalletAttributeTree}
 		/>
 	</main>
 </Layout>
