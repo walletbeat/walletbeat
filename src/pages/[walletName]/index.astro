@@ -2,8 +2,6 @@
 // Types/constants
 import { allRatedWallets, assertValidWalletName, attributeTreeForWallet } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { softwareLadders } from '@/schema/ladders'
-import type { Ladders } from '@/schema/ladders'
 
 // Functions
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
@@ -24,7 +22,7 @@ assertValidWalletName(walletName)
 // Data
 const wallet = allRatedWallets[walletName]
 const attributeTree = attributeTreeForWallet(wallet)
-const ladders: Ladders<string> = softwareLadders
+const { ladders: _ladders, ...walletPageWallet } = wallet
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -54,6 +52,6 @@ import WalletPage from '@/views/WalletPage.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletPage {wallet} {ladders} {attributeTree} client:idle />
+		<WalletPage wallet={walletPageWallet} {attributeTree} client:idle />
 	</main>
 </Layout>

@@ -52,17 +52,16 @@
 
 
 	// Derived
-	const ladderEvaluation = $derived(
+	const walletStageAndLadder = $derived(
 		getWalletStageAndLadder(wallet)
-			.ladderEvaluation
-		?? undefined
+	)
+
+	const ladderEvaluation = $derived(
+		walletStageAndLadder.ladderEvaluation ?? undefined
 	)
 
 	const ladderType = $derived(
-		(ladders && ladderEvaluation) &&
-			Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
-		||
-			undefined
+		walletStageAndLadder.ladderType ?? undefined
 	)
 
 	const attributeStages = $derived(
