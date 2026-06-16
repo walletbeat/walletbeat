@@ -8,6 +8,7 @@ import { softwareLadders } from '@/schema/ladders'
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import WalletTable from '@/views/WalletTable.svelte'
+import WalletTableData from '@/views/WalletTableData.svelte'
 ---
 
 <Layout
@@ -18,12 +19,13 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Software Wallets'
-			ladders={softwareLadders}
-			wallets={Object.values(ratedSoftwareWallets)}
-			attributeTree={softwareWalletAttributeTree}
-		/>
+		<WalletTableData client:idle title='Software Wallets' tableDataId='wallet-summary'>
+			<WalletTable
+				title='Software Wallets'
+				ladders={softwareLadders}
+				wallets={Object.values(ratedSoftwareWallets)}
+				attributeTree={softwareWalletAttributeTree}
+			/>
+		</WalletTableData>
 	</main>
 </Layout>

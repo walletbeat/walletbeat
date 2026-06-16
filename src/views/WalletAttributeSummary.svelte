@@ -69,13 +69,30 @@
 		ladders && getAttributeStagesForWallet(ladders, attribute.attribute, wallet)
 	)
 
+	const compactRelevantStages = $derived(
+		ladderEvaluation?.ladder.stages
+			.map((stage, stageNumber) => (
+				stage.criteriaGroups.some(criteriaGroup =>
+					criteriaGroup.criteria.some(criterion =>
+						'attributeId' in criterion && criterion.attributeId === attribute.attribute.id
+					)
+				) ?
+					stageNumber
+				:
+					null
+			))
+			.filter((stageNumber): stageNumber is number => stageNumber !== null)
+		??
+			[]
+	)
+
 	const relevantStages = $derived(
 		ladderType && ladderEvaluation &&
 			attributeStages
 				?.find(stage => stage.ladderType === ladderType)
 				?.stageNumbers
 		||
-			[]
+			compactRelevantStages
 	)
 
 	const firstStage = $derived(

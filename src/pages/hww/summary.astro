@@ -7,6 +7,7 @@ import { hardwareWalletAttributeTree, ratedHardwareWallets } from '@/data/hardwa
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import WalletTable from '@/views/WalletTable.svelte'
+import WalletTableData from '@/views/WalletTableData.svelte'
 ---
 
 <Layout
@@ -17,11 +18,12 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Hardware Wallets'
-			wallets={Object.values(ratedHardwareWallets)}
-			attributeTree={hardwareWalletAttributeTree}
-		/>
+		<WalletTableData client:idle title='Hardware Wallets' tableDataId='hww-summary'>
+			<WalletTable
+				title='Hardware Wallets'
+				wallets={Object.values(ratedHardwareWallets)}
+				attributeTree={hardwareWalletAttributeTree}
+			/>
+		</WalletTableData>
 	</main>
 </Layout>
