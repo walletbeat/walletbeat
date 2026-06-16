@@ -107,6 +107,9 @@
 		node.popoverTargetElement.style.setProperty('position-anchor', anchorName)
 
 		const updatePosition = () => {
+			if (!node.isConnected || !node.popoverTargetElement?.isConnected)
+				return
+
 			void computePosition(
 				node,
 				node.popoverTargetElement,
