@@ -34,6 +34,7 @@ if (!attrGroup) {
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import WalletTable from '@/views/WalletTable.svelte'
+import WalletTableData from '@/views/WalletTableData.svelte'
 ---
 
 <Layout
@@ -46,11 +47,12 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Embedded Wallets'
-			wallets={Object.values(ratedEmbeddedWallets)}
-			attributeTree={embeddedWalletAttributeTree}
-		/>
+		<WalletTableData client:idle title='Embedded Wallets' tableDataId='embedded-summary'>
+			<WalletTable
+				title='Embedded Wallets'
+				wallets={Object.values(ratedEmbeddedWallets)}
+				attributeTree={embeddedWalletAttributeTree}
+			/>
+		</WalletTableData>
 	</main>
 </Layout>

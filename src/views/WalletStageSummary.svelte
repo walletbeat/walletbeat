@@ -15,6 +15,8 @@
 	import { getWalletUrl } from '@/utils/wallet-url'
 	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
 
+	type WalletTableStageEvaluations = Record<string, Record<string, Record<string, StageCriterionRating>>>
+
 
 	// Props
 	const {
@@ -23,7 +25,7 @@
 		ladderEvaluation,
 		showNextStageCriteria = true,
 	}: {
-		wallet: RatedWallet<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId> & { stageEvaluations?: WalletTableStageEvaluations }
 		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 		showNextStageCriteria?: boolean
@@ -41,6 +43,10 @@
 
 	const ladderDefinition = $derived(
 		ladderEvaluation?.ladder ?? null
+	)
+
+	const ladderType = $derived(
+		Object.entries(wallet.ladders).find(([, evaluation]) => evaluation === ladderEvaluation)?.[0]
 	)
 
 	const stage0 = $derived(
@@ -97,7 +103,15 @@
 					.map(criterion => ({
 						criteriaGroup,
 						criterion,
-						evaluation: criterion.evaluate(stageEvaluatableWallet),
+						evaluation:
+							'evaluate' in criterion && typeof criterion.evaluate === 'function' ?
+								criterion.evaluate(stageEvaluatableWallet)
+							: ladderType && wallet.stageEvaluations?.[ladderType]?.[targetStage.id]?.[criterion.id] ?
+								{
+									rating: wallet.stageEvaluations[ladderType][targetStage.id][criterion.id],
+								}
+							:
+								{ rating: StageCriterionRating.FAIL },
 					}))
 					.filter(({ evaluation }) =>
 						!showNextStageCriteria || evaluation.rating !== StageCriterionRating.PASS
@@ -180,7 +194,7 @@
 
 			<ul>
 				{#each criteria as { criterion, evaluation } (criterion.id)}
-					{@const attributeId = getCriterionAttributeId(criterion)}
+					{@const attributeId = 'attributeId' in criterion && typeof criterion.attributeId === 'string' ? criterion.attributeId : getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
 					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}

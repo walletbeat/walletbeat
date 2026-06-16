@@ -11,6 +11,7 @@ import Layout from '../layouts/Layout.astro'
 // Components
 import Navigation from '@/views/Navigation.astro'
 import WalletTable from '@/views/WalletTable.svelte'
+import WalletTableData from '@/views/WalletTableData.svelte'
 ---
 
 <Layout
@@ -45,20 +46,22 @@ import WalletTable from '@/views/WalletTable.svelte'
 			</p>
 		</header>
 
-		<WalletTable
-			client:visible
-			title='Software Wallets'
-			ladders={softwareLadders}
-			wallets={Object.values(ratedSoftwareWallets)}
-			attributeTree={softwareWalletAttributeTree}
-		/>
+		<WalletTableData client:idle title='Software Wallets' tableDataId='home-software'>
+			<WalletTable
+				title='Software Wallets'
+				ladders={softwareLadders}
+				wallets={Object.values(ratedSoftwareWallets)}
+				attributeTree={softwareWalletAttributeTree}
+			/>
+		</WalletTableData>
 
-		<WalletTable
-			client:visible
-			title='Hardware Wallets'
-			wallets={Object.values(ratedHardwareWallets)}
-			attributeTree={hardwareWalletAttributeTree}
-		/>
+		<WalletTableData client:idle title='Hardware Wallets' tableDataId='home-hardware'>
+			<WalletTable
+				title='Hardware Wallets'
+				wallets={Object.values(ratedHardwareWallets)}
+				attributeTree={hardwareWalletAttributeTree}
+			/>
+		</WalletTableData>
 	</main>
 </Layout>
 
