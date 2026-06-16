@@ -583,9 +583,10 @@
 			evalAttr: evalGroup[attribute.id],
 		}))
 		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT)
-		.map(({ attribute, evalAttr }) => ({
+		.map(({ attribute, evalAttr, weight }) => ({
 			attribute,
 			evalAttr: evalAttr!,
+			weight,
 		}))}
 
 	{#if attributes.length > 0}
