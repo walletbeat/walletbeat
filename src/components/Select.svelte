@@ -54,8 +54,8 @@
 	{#snippet selectedContent()}
 		<button
 			type="button"
-			onclick={event => {
-				event.stopPropagation()
+			onclick={e => {
+				e.stopPropagation()
 			}}
 		>
 			<selectedcontent></selectedcontent>
@@ -66,8 +66,8 @@
 		<option
 			value={option.value}
 			selected={option.value === defaultValue}
-			onclick={event => {
-				event.preventDefault()
+			onclick={e => {
+				e.preventDefault()
 			}}
 		>
 			{#if optionContent}

@@ -1,8 +1,8 @@
 import { exampleContributor } from '@/data/contributors/example'
-import type { EmbeddedWallet } from '@/data/embedded-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { EmbeddedWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const unratedEmbeddedTemplate: EmbeddedWallet = {

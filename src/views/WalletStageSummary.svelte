@@ -1,8 +1,7 @@
-<script lang="ts" generics="
-	_AttributeGroupId extends string
-">
+<script lang="ts">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
+	import { ladders } from '@/schema/ladders'
 	import {
 		StageCriterionRating,
 		stageCriterionRatings,
@@ -23,15 +22,15 @@
 		ladderEvaluation,
 		showNextStageCriteria = true,
 	}: {
-		wallet: RatedWallet<_AttributeGroupId>
-		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
-		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
+		wallet: RatedWallet
+		stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		ladderEvaluation: WalletLadderEvaluation | null
 		showNextStageCriteria?: boolean
 	} = $props()
 
 
 	// (Derived)
-	const stageEvaluatableWallet: StageEvaluatableWallet<_AttributeGroupId> = $derived({
+	const stageEvaluatableWallet: StageEvaluatableWallet = $derived({
 		types: wallet.types,
 		variants: wallet.variants,
 		variantSpecificity: wallet.variantSpecificity,
@@ -39,8 +38,18 @@
 		overrides: wallet.overrides,
 	})
 
+	const ladderType = $derived(
+		ladderEvaluation ?
+			Object.entries(wallet.ladders)
+				.find(([, evaluation]) => evaluation === ladderEvaluation)
+				?.[0]
+			?? null
+		:
+			null
+	)
+
 	const ladderDefinition = $derived(
-		ladderEvaluation?.ladder ?? null
+		ladderType ? ladders[ladderType] : null
 	)
 
 	const stage0 = $derived(
@@ -51,7 +60,7 @@
 		(!stage || typeof stage === 'string' || !ladderDefinition) ?
 			null
 		:
-			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
+			ladderDefinition.stages.findIndex(s => s.id === stage.id)
 	)
 
 	const currentStage = $derived(
@@ -189,7 +198,7 @@
 						data-wbicon={attribute?.icon ? '' : undefined}
 									data-icon={attribute?.icon}
 						data-stage-criterion-rating={evaluation.rating}
-						style:--accent={stageCriterionRatings[evaluation.rating].color}
+						style:--accent={stageCriterionRatings[evaluation.rating as StageCriterionRating].color}
 					>
 						<span data-row="start gap-2">
 							<span data-row-item="flexible">
@@ -219,9 +228,9 @@
 
 							<data
 								value={evaluation.rating}
-								title={stageCriterionRatings[evaluation.rating].label}
+								title={stageCriterionRatings[evaluation.rating as StageCriterionRating].label}
 							>
-								{stageCriterionRatings[evaluation.rating].icon}
+								{stageCriterionRatings[evaluation.rating as StageCriterionRating].icon}
 							</data>
 						</span>
 					</li>

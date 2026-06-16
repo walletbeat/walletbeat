@@ -1,7 +1,10 @@
 ---
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
-import { hardwareWalletAttributeTree, ratedHardwareWallets } from '@/data/hardware-wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -21,7 +24,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 			client:visible
 			title='Hardware Wallets'
 			wallets={Object.values(ratedHardwareWallets)}
-			attributeTree={hardwareWalletAttributeTree}
+			{attributeGroups}
 		/>
 	</main>
 </Layout>

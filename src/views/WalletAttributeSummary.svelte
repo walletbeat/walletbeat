@@ -5,14 +5,9 @@
 	}
 </script>
 
-
-<script lang="ts" generics="
-	_AttributeGroupId extends string,
-	_OutcomeMetadata extends OutcomeMetadata
-">
+<script lang="ts">
 	// Types/constants
-	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor } from '@/schema/attributes'
-	import { type Ladders } from '@/schema/ladders'
+	import { type EvaluatedAttribute, ratingIcons, ratingToColor } from '@/schema/attributes'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
@@ -20,18 +15,16 @@
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 
-	// Props
+// Props
 	let {
-		ladders,
 		wallet,
 		attribute,
 		variant,
 		summaryType = WalletAttributeSummaryType.None,
 		isInTooltip = false,
 	}: {
-		ladders?: Ladders<_AttributeGroupId>
-		wallet: RatedWallet<_AttributeGroupId>
-		attribute: EvaluatedAttribute<_OutcomeMetadata>
+		wallet: RatedWallet
+		attribute: EvaluatedAttribute
 		variant?: Variant
 		summaryType?: WalletAttributeSummaryType
 		isInTooltip?: boolean
@@ -59,20 +52,20 @@
 	)
 
 	const ladderType = $derived(
-		(ladders && ladderEvaluation) &&
+		ladderEvaluation &&
 			Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
 		||
 			undefined
 	)
 
 	const attributeStages = $derived(
-		ladders && getAttributeStagesForWallet(ladders, attribute.attribute, wallet)
+		getAttributeStagesForWallet(attribute.attribute, wallet)
 	)
 
 	const relevantStages = $derived(
 		ladderType && ladderEvaluation &&
 			attributeStages
-				?.find(stage => stage.ladderType === ladderType)
+				.find(stage => stage.ladderType === ladderType)
 				?.stageNumbers
 		||
 			[]
@@ -118,7 +111,6 @@
 					{#snippet TooltipContent()}
 						<WalletStageSummary
 							{wallet}
-							{ladders}
 							stage={firstStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}

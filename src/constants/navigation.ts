@@ -24,7 +24,6 @@ import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
-import { attributeTree } from '@/schema/attribute-tree'
 import { WalletType } from '@/schema/wallet-types'
 import { getWalletUrl } from '@/utils/wallet-url'
 
@@ -53,7 +52,7 @@ export const navigationTesting = {
 	id: 'testing-page',
 	icon: 'wallet_test',
 	title: 'Test your wallet',
-	href: '/test/',
+	href: '/test',
 } as const satisfies NavigationItem
 
 export const navigationFarcasterChannel = {
@@ -67,7 +66,7 @@ export const navigationNews = {
 	id: 'news',
 	icon: 'newsletter',
 	title: 'Wallet Security News',
-	href: '/news/',
+	href: '/news',
 } as const satisfies NavigationItem
 
 export const topbarNavigationItems = [
@@ -89,9 +88,8 @@ export const defaultNavigationItems = [
 				title: 'By Rating',
 				icon: 'ICON_CHART_PIE',
 				children: mapNonExemptAttributeGroupsInTree(
-					attributeTree,
 					representativeWalletForType(WalletType.SOFTWARE).overall,
-					(attrGroup, _evalGroup) => ({
+					attrGroup => ({
 						id: `software-${attrGroup.id}`,
 						title: attrGroup.displayName,
 						icon: attrGroup.icon,
@@ -130,9 +128,8 @@ export const defaultNavigationItems = [
 				icon: 'ICON_CHART_PIE',
 				children: [
 					...mapNonExemptAttributeGroupsInTree(
-						attributeTree,
 						representativeWalletForType(WalletType.HARDWARE).overall,
-						(attrGroup, _evalGroup) => ({
+						attrGroup => ({
 							id: `hardware-${attrGroup.id}`,
 							title: attrGroup.displayName,
 							icon: attrGroup.icon,
@@ -151,29 +148,6 @@ export const defaultNavigationItems = [
 					href: getWalletUrl(wallet),
 					icon: walletImageIcon(wallet.metadata.id, wallet.metadata.iconExtension),
 				})),
-			},
-		],
-	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary/',
-		icon: 'wallet_embedded',
-		children: [
-			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: 'ICON_CHART_PIE',
-				children: mapNonExemptAttributeGroupsInTree(
-					attributeTree,
-					representativeWalletForType(WalletType.EMBEDDED).overall,
-					(attrGroup, _evalGroup) => ({
-						id: `embedded-${attrGroup.id}`,
-						title: attrGroup.displayName,
-						icon: attrGroup.icon,
-						href: `/embedded/${attrGroup.id}/`,
-					}),
-				),
 			},
 		],
 	},

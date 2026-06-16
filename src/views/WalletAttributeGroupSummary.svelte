@@ -6,12 +6,10 @@
 </script>
 
 
-<script lang="ts" generics="
-	_AttributeGroupId extends AttributeGroupId
-">
+<script lang="ts">
 	// Types/constants
-	import { AttributeGroupId } from '@/schema/attribute-tree'
-	import { calculateAttributeGroupScore, type AttributeGroup } from '@/schema/attribute-groups'
+	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
+	import type { AttributeGroup, ValueSet } from '@/schema/attributes'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { scoreToColor } from '@/utils/colors'
 
@@ -23,8 +21,8 @@
 		summaryType = WalletAttributeGroupSummaryType.None,
 		isInTooltip = false,
 	}: {
-		wallet: RatedWallet<_AttributeGroupId>,
-		attributeGroup: AttributeGroup<_AttributeGroupId>,
+		wallet: RatedWallet
+		attributeGroup: AttributeGroup<ValueSet>,
 		summaryType?: WalletAttributeGroupSummaryType
 		isInTooltip?: boolean
 	} = $props()
@@ -32,7 +30,7 @@
 
 	// Derived
 	const groupScore = $derived(
-		calculateAttributeGroupScore(attributeGroup, wallet.overall[attributeGroup.id])
+		calculateAttributeGroupScore(attributeGroup.attributeWeights, wallet.overall[attributeGroup.id])
 	)
 
 

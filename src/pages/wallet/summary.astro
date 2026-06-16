@@ -1,8 +1,11 @@
 ---
 // Types/constants
+import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { ratedSoftwareWallets, softwareWalletAttributeTree } from '@/data/software-wallets'
-import { softwareLadders } from '@/schema/ladders'
+import { allRatedWallets } from '@/data/wallets'
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -21,9 +24,8 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:visible
 			title='Software Wallets'
-			ladders={softwareLadders}
-			wallets={Object.values(ratedSoftwareWallets)}
-			attributeTree={softwareWalletAttributeTree}
+			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.SOFTWARE])}
+			{attributeGroups}
 		/>
 	</main>
 </Layout>

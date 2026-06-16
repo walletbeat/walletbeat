@@ -497,12 +497,11 @@
 		seconds: 0,
 	})
 
-	let {
-		blobs,
-	}: {
+	interface BackgroundProps {
 		blobs: Record<string, PartialBackgroundBlob>
-	} = $props()
+	}
 
+	let { blobs }: BackgroundProps = $props()
 	const completeBlob = (partialBlob: PartialBackgroundBlob): BackgroundBlob => ({
 		scaleX: partialBlob.scaleX ?? staticValue('100%'),
 		translationX: partialBlob.translationX ?? staticValue('50%'),
@@ -515,7 +514,6 @@
 		darkThemeColor: partialBlob.darkThemeColor,
 	})
 </script>
-
 
 <div class="background-blobs">
 	{#each Object.entries(blobs).map( ([blobName, blob], index): BackgroundBlob & { id: string; index: number } => ({ id: blobName, index, ...completeBlob(blob) }), ) as blob (blob.id)}
@@ -578,7 +576,6 @@
 	{/each}
 	<div class="background-dither"></div>
 </div>
-
 
 <style>
 	.background-blobs {

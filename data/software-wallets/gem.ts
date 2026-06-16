@@ -1,5 +1,4 @@
 import { h3rman } from '@/data/contributors/0xh3rman'
-import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -10,6 +9,7 @@ import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const gemwallet: SoftwareWallet = {

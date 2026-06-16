@@ -118,9 +118,7 @@ export function variantToWalletType(variant: Variant): WalletType {
 /**
  * Returns the types of a given wallet.
  */
-export function walletTypesOf<_AttributeGroupId extends string>(
-	wallet: BaseWallet<_AttributeGroupId> | RatedWallet<_AttributeGroupId>,
-): NonEmptySet<WalletType> {
+export function walletTypesOf(wallet: BaseWallet | RatedWallet): NonEmptySet<WalletType> {
 	return nonEmptySetFromArray(
 		nonEmptyMap(nonEmptyKeys(getVariants(wallet.variants)), variantToWalletType),
 	)

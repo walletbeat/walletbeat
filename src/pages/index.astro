@@ -1,9 +1,12 @@
 ---
 // Constants
 import { defaultNavigationItems } from '@/constants/navigation'
-import { softwareLadders } from '@/schema/ladders'
-import { ratedSoftwareWallets, softwareWalletAttributeTree } from '@/data/software-wallets'
-import { ratedHardwareWallets, hardwareWalletAttributeTree } from '@/data/hardware-wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
+
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
@@ -48,16 +51,15 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:visible
 			title='Software Wallets'
-			ladders={softwareLadders}
 			wallets={Object.values(ratedSoftwareWallets)}
-			attributeTree={softwareWalletAttributeTree}
+			{attributeGroups}
 		/>
 
 		<WalletTable
 			client:visible
 			title='Hardware Wallets'
 			wallets={Object.values(ratedHardwareWallets)}
-			attributeTree={hardwareWalletAttributeTree}
+			{attributeGroups}
 		/>
 	</main>
 </Layout>

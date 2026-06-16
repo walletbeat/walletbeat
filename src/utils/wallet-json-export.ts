@@ -1,13 +1,16 @@
 import { getBaseUrl } from '@/base-url'
 import { ratedWalletExportSchemaPath } from '@/constants'
-import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 import {
+	type EvaluationTree,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import type {
+	AttributeGroup,
 	EvaluatedAttribute,
+	EvaluatedGroup,
 	OutcomeMetadata,
+	ValueSet,
 	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
 import { type ResolvedFeatures } from '@/schema/features'
@@ -20,6 +23,7 @@ import {
 import {
 	type WalletLadderEvaluation,
 	type WalletStage,
+	type WalletStageCriterion,
 	type WalletStageGroup,
 } from '@/schema/stages'
 import { getUrl } from '@/schema/url'
@@ -41,7 +45,7 @@ import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
 
-type StageExportInput = WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+type StageExportInput = WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 
 /**
  * Maps the wallet stage (from getWalletStageAndLadder) to the string used in JSON export.
@@ -265,22 +269,23 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	}
 }
 
-function serializeEvaluationTree<_AttributeGroupId extends string>(
-	attributeTree: AttributeTree<_AttributeGroupId>,
-	evalTree: EvaluationTree<_AttributeGroupId>,
+function serializeEvaluationTree(
+	tree: EvaluationTree,
 	evalStrings: WalletNameAndPseudonymStrings,
 ): AttributeGroupsExport {
 	const result: AttributeGroupsExport = {}
 
-	const pairs: [_AttributeGroupId, Record<string, AttributeExportBlock>][] =
-		mapNonExemptAttributeGroupsInTree(attributeTree, evalTree, (attrGroup, evalGroup) => {
+	const pairs = mapNonExemptAttributeGroupsInTree(
+		tree,
+		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
 			const entries = mapNonExemptGroupAttributes(
 				evalGroup,
 				evalAttr => [evalAttr.attribute.id, serializeAttribute(evalAttr, evalStrings)] as const,
 			)
 
-			return [attrGroup.id, Object.fromEntries(entries)]
-		})
+			return [attrGroup.id, Object.fromEntries(entries)] as const
+		},
+	)
 
 	for (const [groupId, groupExport] of pairs) {
 		result[groupId] = groupExport
@@ -289,16 +294,16 @@ function serializeEvaluationTree<_AttributeGroupId extends string>(
 	return result
 }
 
-function serializeStageCriteriaGroup<_AttributeGroupId extends string>(
-	group: WalletStageGroup<_AttributeGroupId>,
-	stageEvaluatableWallet: Omit<RatedWallet<_AttributeGroupId>, 'metadata' | 'ladders'>,
+function serializeStageCriteriaGroup(
+	group: WalletStageGroup,
+	stageEvaluatableWallet: Omit<RatedWallet, 'metadata' | 'ladders'>,
 	evalStrings: WalletNameAndPseudonymStrings,
 ): StageCriteriaGroupBreakdownItemJsonExport {
 	const description = renderContentToText(group.description, evalStrings, { trim: true })
 
 	const criteria: StageCriterionBreakdownItemJsonExport[] = []
 
-	const groupCriteria = group.criteria
+	const groupCriteria: readonly WalletStageCriterion[] = group.criteria
 
 	for (const criterion of groupCriteria) {
 		const evaluation = criterion.evaluate(stageEvaluatableWallet)
@@ -317,9 +322,9 @@ function serializeStageCriteriaGroup<_AttributeGroupId extends string>(
 	return { description, criteria }
 }
 
-function computeStageBreakdown<_AttributeGroupId extends string>(
-	wallet: RatedWallet<_AttributeGroupId>,
-	ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null,
+function computeStageBreakdown(
+	wallet: RatedWallet,
+	ladderEvaluation: WalletLadderEvaluation | null,
 ): StageBreakdownItemJsonExport[] | null {
 	if (ladderEvaluation === null || ladderEvaluation.stage === 'NOT_APPLICABLE') {
 		return null
@@ -335,7 +340,7 @@ function computeStageBreakdown<_AttributeGroupId extends string>(
 			stageEvaluatableWallet,
 		)
 
-		const criteriaGroups = s.criteriaGroups.map((group: WalletStageGroup<_AttributeGroupId>) =>
+		const criteriaGroups = s.criteriaGroups.map(group =>
 			serializeStageCriteriaGroup(group, stageEvaluatableWallet, evalStrings),
 		)
 
@@ -352,10 +357,7 @@ function computeStageBreakdown<_AttributeGroupId extends string>(
 	return result
 }
 
-export function ratedWalletJsonExport<_AttributeGroupId extends string>(
-	attributeTree: AttributeTree<_AttributeGroupId>,
-	wallet: RatedWallet<_AttributeGroupId>,
-): RatedWalletJsonExport {
+export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExport {
 	const { metadata } = wallet
 	const evalStrings = getWalletEvalStrings(wallet)
 
@@ -382,7 +384,7 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 		stageBreakdown,
 		...(website !== undefined && { website }),
 		...(repository !== undefined && { repository }),
-		overall: serializeEvaluationTree(attributeTree, wallet.overall, evalStrings),
+		overall: serializeEvaluationTree(wallet.overall, evalStrings),
 		perVariant: {},
 	}
 
@@ -391,7 +393,7 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 
 		if (resolved !== undefined) {
 			payload.perVariant[variant] = {
-				attributes: serializeEvaluationTree(attributeTree, resolved.attributes, evalStrings),
+				attributes: serializeEvaluationTree(resolved.attributes, evalStrings),
 				features: serializeResolvedFeatures(resolved.features),
 			}
 		}

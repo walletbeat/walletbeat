@@ -136,7 +136,7 @@
 
 
 {#snippet filterItemContent(
-	filter: Filter<typeof items[number]>,
+	filter: Filter<any>,
 	count: number
 )}
 	<span class="icon" aria-hidden="true">{@html filter.icon}</span>
@@ -321,7 +321,7 @@
 										() => (
 											activeFilters.has(filter)
 										),
-										checked => {
+										(checked) => {
 											if (checked)
 												activeFilters.add(filter)
 											else

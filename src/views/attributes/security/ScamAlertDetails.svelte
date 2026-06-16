@@ -25,7 +25,6 @@
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
-
 <Typography
 	content={outcome.shortExplanation}
 	strings={getWalletEvalStrings(wallet)}
@@ -42,7 +41,7 @@
 						'the full URL of the app',
 					outcome.metadata.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
 						'the domain name of the app',
-				].filter(segment => segment !== ''))}
+				].filter(s => s !== ''))}
 
 	<ul data-list="gap-4">
 		{#if outcome.metadata.sendTransactionWarning?.required}
@@ -69,7 +68,7 @@
 														'your Ethereum address',
 													outcome.metadata.scamAlerts.sendTransactionWarning.leaksRecipient &&
 														"the recipient's Ethereum address",
-												].filter(segment => segment !== ''),
+												].filter(s => s !== ''),
 											)} to an external provider which can correlate them.`
 										: ''
 								}`
@@ -111,7 +110,7 @@
 												outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning &&
 													'Warning you when interacting with a contract that has only recently been created onchain',
 											]
-												.filter(segment => segment)
+												.filter(s => s)
 												.map(listItem => `\n* ${listItem}`)
 												.join('')}`
 										: outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry
@@ -131,7 +130,7 @@
 														'your Ethereum address',
 													outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress &&
 														'the contract address',
-												].filter(segment => segment),
+												].filter(s => s),
 											)} to an external provider which can correlate them ahead of the transaction being submitted.`
 										: ''
 								}`

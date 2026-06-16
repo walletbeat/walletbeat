@@ -55,7 +55,8 @@ export class Enum<E extends string> {
 			throw new Error(`Attempted to typecast object of type ${typeof obj} to enum`)
 		}
 
-		return obj.map(x => this.assert(x))
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just checked.
+		return obj as unknown as E[]
 	}
 
 	/** Reorder an array of enums using the canonical enum order. */
@@ -84,7 +85,6 @@ export class Enum<E extends string> {
 		predicate: (e: E, t: T) => boolean,
 	): Partial<Record<E, T>> {
 		return this.reorderPartialRecord(
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` loses `Partial<Record<E, T>>` keys.
 			Object.fromEntries(
 				Object.entries(rec).filter((entry): entry is [E, T] =>
 					entry?.[1] === undefined ? false : predicate(this.assert(entry[0]), entry[1]),
@@ -97,30 +97,22 @@ export class Enum<E extends string> {
 	 * @returns A non-Partial Record<E, T> containing the non-undefined entries of `rec`, and `defaultValue` for all other keys.
 	 */
 	public fullRecord<T>(rec: Partial<Record<E, T>>, defaultValue: T): Record<E, T> {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` loses `Record` key typing.
-		return Object.fromEntries(this.items.map(e => [e, rec[e] ?? defaultValue])) as Record<E, T>
+		return Object.fromEntries(this.items.map(e => [e, rec[e] ?? defaultValue]))
 	}
 
 	/** Reorder a non-empty array of enums using the canonical enum order. */
 	public reorderRecord<T>(rec: Record<E, T>): Record<E, T> {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` loses `Record` key typing.
-		return Object.fromEntries(this.items.map(e => [e, rec[e]])) as Record<E, T>
+		return Object.fromEntries(this.items.map(e => [e, rec[e]]))
 	}
 
 	/** Reorder a non-empty array of enums using the canonical enum order. */
 	public reorderNonEmptyRecord<T>(rec: NonEmptyRecord<E, T>): NonEmptyRecord<E, T> {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` loses `NonEmptyRecord`.
-		return Object.fromEntries(
-			this.items.filter(e => Object.hasOwn(rec, e)).map(e => [e, rec[e]]),
-		) as NonEmptyRecord<E, T>
+		return Object.fromEntries(this.items.filter(e => Object.hasOwn(rec, e)).map(e => [e, rec[e]]))
 	}
 
 	/** Reorder a non-empty array of enums using the canonical enum order. */
 	public reorderPartialRecord<T>(rec: Partial<Record<E, T>>): Partial<Record<E, T>> {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` loses partial `Record` typing.
-		return Object.fromEntries(
-			this.items.filter(e => Object.hasOwn(rec, e)).map(e => [e, rec[e]]),
-		) as Partial<Record<E, T>>
+		return Object.fromEntries(this.items.filter(e => Object.hasOwn(rec, e)).map(e => [e, rec[e]]))
 	}
 }
 
@@ -137,10 +129,7 @@ export function mergeEnums<E1 extends string, E2 extends string>(
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because E1|E2 is a superset of E2.
 		e2.set as NonEmptySet<E1 | E2>,
 	])
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` loses enum key union.
-	const mergedRecord = Object.fromEntries(
-		setItems(mergedSet).map(e => [e, true as const]),
-	) as Record<E1 | E2, true>
+	const mergedRecord = Object.fromEntries(setItems(mergedSet).map(e => [e, true as const]))
 
 	return new Enum<E1 | E2>(mergedRecord)
 }

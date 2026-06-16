@@ -1,7 +1,11 @@
 ---
 // Types/constants
+import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { embeddedWalletAttributeTree, ratedEmbeddedWallets } from '@/data/embedded-wallets'
+import { allRatedWallets } from '@/data/wallets'
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -20,8 +24,8 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:visible
 			title='Embedded Wallets'
-			wallets={Object.values(ratedEmbeddedWallets)}
-			attributeTree={embeddedWalletAttributeTree}
+			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.EMBEDDED])}
+			{attributeGroups}
 		/>
 	</main>
 </Layout>

@@ -346,7 +346,7 @@ export async function runStep2Connect(step: TestStep, ctx: EIPTestContext): Prom
 	})
 
 	// Check if connect event actually fired (EIP-1193 MUST emit when connected)
-	let connectEventDetail: string
+	let connectEventDetail = ''
 
 	if (connectEventFired) {
 		// Validate connect event data has chainId per EIP-1193
@@ -408,7 +408,7 @@ export async function runStep3Account(step: TestStep, ctx: EIPTestContext): Prom
 
 	// Call eth_accounts
 	let accountsPassed = false
-	let accountsDetail: string
+	let accountsDetail = ''
 	let returnedAddress = ''
 
 	try {
@@ -887,7 +887,7 @@ export async function runStep6BatchStatus(
 
 	// Check wallet_getCallsStatus
 	let statusPassed = false
-	let statusDetail: string
+	let statusDetail = ''
 	let validResponse = false
 	let hasAtomicField = false
 	let hasValidReceipts = false
@@ -987,7 +987,7 @@ export async function runStep6BatchStatus(
 	})
 
 	// Test wallet_showCallsStatus (optional)
-	let showStatusPassed: boolean
+	let showStatusPassed = false
 
 	try {
 		await provider.request({

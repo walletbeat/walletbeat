@@ -10,24 +10,10 @@ import { setContains } from '@/types/utils/non-empty'
  * For software wallets, returns the SOFTWARE ladder stage.
  * For other wallet types, returns the first applicable ladder stage.
  */
-/**
- * Staging ladder display only depends on these rated-wallet fields.
- * Parameter uses `string` attribute-group IDs so site wallets rated on a subset
- * of groups (software / hardware / embedded trees) are accepted.
- */
-export type RatedWalletStageSlice = Pick<RatedWallet<string>, 'types' | 'ladders' | 'variants'>
-
-export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
-	stage: WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
-	ladderEvaluation: WalletLadderEvaluation<string> | null
+export function getWalletStageAndLadder(wallet: RatedWallet): {
+	stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+	ladderEvaluation: WalletLadderEvaluation | null
 } {
-	if (wallet.types === undefined || wallet.ladders === undefined) {
-		return {
-			stage: null,
-			ladderEvaluation: null,
-		}
-	}
-
 	// Prioritize SOFTWARE ladder if the wallet is a software wallet
 	if (setContains<WalletType>(wallet.types, WalletType.SOFTWARE)) {
 		const softwareLadder = wallet.ladders[WalletLadderType.SOFTWARE]
@@ -42,8 +28,7 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 
 	// Otherwise, return the first applicable ladder evaluation
 	const applicableLadder = Object.values(wallet.ladders).find(
-		ladderEvaluation =>
-			ladderEvaluation !== undefined && ladderEvaluation.stage !== 'NOT_APPLICABLE',
+		ladderEvaluation => ladderEvaluation.stage !== 'NOT_APPLICABLE',
 	)
 
 	return applicableLadder

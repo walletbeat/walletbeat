@@ -1,14 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
-import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
-import { softwareWalletAttributeTree } from '@/data/software-wallets'
-import {
-	allRatedWallets,
-	isEmbeddedRatedWallet,
-	isHardwareRatedWallet,
-	isSoftwareRatedWallet,
-} from '@/data/wallets'
+import { allRatedWallets } from '@/data/wallets'
 import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
@@ -18,21 +10,10 @@ import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 import { RatedWalletExportValidator } from './utils/assert-valid-json'
 
-const payloadForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRatedWallets]) =>
-	isSoftwareRatedWallet(wallet)
-		? ratedWalletJsonExport(softwareWalletAttributeTree, wallet)
-		: isHardwareRatedWallet(wallet)
-			? ratedWalletJsonExport(hardwareWalletAttributeTree, wallet)
-			: isEmbeddedRatedWallet(wallet)
-				? ratedWalletJsonExport(embeddedWalletAttributeTree, wallet)
-				: (() => {
-						throw new Error('Wallet has no recognized type')
-					})()
-
 describe('ratedWalletJsonExport', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
-			const payload = payloadForWallet(wallet)
+			const payload = ratedWalletJsonExport(wallet)
 
 			it('produces schema-valid JSON', () => {
 				const validator = new RatedWalletExportValidator()
@@ -96,7 +77,7 @@ describe('ratedWalletJsonExport', () => {
 
 	it('includes website and repository in export when present in wallet metadata', () => {
 		for (const wallet of Object.values(allRatedWallets)) {
-			const payload = payloadForWallet(wallet)
+			const payload = ratedWalletJsonExport(wallet)
 			const websites = wallet.metadata.urls?.websites
 			const repositories = wallet.metadata.urls?.repositories
 

@@ -1,15 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
-import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
-import { softwareWalletAttributeTree } from '@/data/software-wallets'
-import {
-	allRatedWallets,
-	attributeTreeForWallet,
-	isEmbeddedRatedWallet,
-	isHardwareRatedWallet,
-	isSoftwareRatedWallet,
-} from '@/data/wallets'
+import { allRatedWallets } from '@/data/wallets'
 import {
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
@@ -26,21 +17,11 @@ import { grammarLint, warmupHarperLinter } from './utils/grammar'
 await warmupHarperLinter()
 
 const SITE_URL = 'http://localhost:4321'
-const markdownForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRatedWallets]) =>
-	isSoftwareRatedWallet(wallet)
-		? walletPageMarkdown(softwareWalletAttributeTree, wallet, SITE_URL)
-		: isHardwareRatedWallet(wallet)
-			? walletPageMarkdown(hardwareWalletAttributeTree, wallet, SITE_URL)
-			: isEmbeddedRatedWallet(wallet)
-				? walletPageMarkdown(embeddedWalletAttributeTree, wallet, SITE_URL)
-				: (() => {
-						throw new Error('Wallet has no recognized type')
-					})()
 
 describe('walletPageMarkdown', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
-			const md = markdownForWallet(wallet)
+			const md = walletPageMarkdown(wallet, SITE_URL)
 
 			it('produces non-empty output', () => {
 				expect(md.length).toBeGreaterThan(100)
@@ -67,10 +48,9 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('contains each non-exempt attribute group heading', () => {
-				const groupNames: string[] = mapNonExemptAttributeGroupsInTree(
-					attributeTreeForWallet(wallet),
+				const groupNames = mapNonExemptAttributeGroupsInTree(
 					wallet.overall,
-					(attrGroup, _evalGroup): string => attrGroup.displayName,
+					attrGroup => attrGroup.displayName,
 				)
 
 				for (const name of groupNames) {
@@ -79,15 +59,12 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('contains a correct heading for every non-exempt attribute', () => {
-				const headings = mapNonExemptAttributeGroupsInTree(
-					attributeTreeForWallet(wallet),
-					wallet.overall,
-					(_attrGroup, evalGroup) =>
-						mapNonExemptGroupAttributes(
-							evalGroup,
-							evalAttr =>
-								`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`,
-						),
+				const headings = mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) =>
+					mapNonExemptGroupAttributes(
+						evalGroup,
+						evalAttr =>
+							`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`,
+					),
 				).flat()
 
 				for (const heading of headings) {
@@ -96,29 +73,26 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('includes at least one URL for every attribute that has references', () => {
-				const urlSetsToCheck: string[][] = mapNonExemptAttributeGroupsInTree(
-					attributeTreeForWallet(wallet),
-					wallet.overall,
-					(_attrGroup, evalGroup) =>
-						mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-							const { references } = evalAttr.evaluation
+				const urlSetsToCheck = mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) =>
+					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
+						const { references } = evalAttr.evaluation
 
-							if (references === undefined || references.length === 0) {
-								return null
-							}
+						if (references === undefined || references.length === 0) {
+							return null
+						}
 
-							const qualifiedRefs = toFullyQualified(references)
+						const qualifiedRefs = toFullyQualified(references)
 
-							if (qualifiedRefs.length === 0) {
-								return null
-							}
+						if (qualifiedRefs.length === 0) {
+							return null
+						}
 
-							return qualifiedRefs.flatMap(ref => ref.urls.map(u => u.url))
-						}).filter((urls): urls is string[] => urls !== null),
+						return qualifiedRefs.flatMap(ref => ref.urls.map(u => u.url))
+					}).filter((urls): urls is string[] => urls !== null),
 				).flat()
 
 				for (const allUrls of urlSetsToCheck) {
-					expect(allUrls.some((url: string) => md.includes(url))).toBe(true)
+					expect(allUrls.some(url => md.includes(url))).toBe(true)
 				}
 			})
 

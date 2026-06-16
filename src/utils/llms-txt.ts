@@ -5,7 +5,7 @@ import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
-function walletEntry(wallet: RatedWallet<string>, siteUrl: string): string {
+function walletEntry(wallet: RatedWallet, siteUrl: string): string {
 	const blurb = walletBlurbText(wallet)
 	const url = `${siteUrl}/${wallet.metadata.id}/index.html.md`
 

@@ -1,5 +1,5 @@
 import type { ConcreteWalletEvalStrings, WalletNameAndPseudonymStrings } from '@/schema/attributes'
-import type { WalletMetadata } from '@/schema/wallet'
+import type { RatedWallet } from '@/schema/wallet'
 import {
 	type Content,
 	isTypographicContent,
@@ -11,9 +11,7 @@ import { trimWhitespacePrefix } from '@/types/utils/text'
  * Build the wallet name and pseudonym strings used when rendering evaluation content.
  * Single place to avoid drift when adding more placeholder keys.
  */
-export function getWalletEvalStrings(wallet: {
-	metadata: WalletMetadata
-}): ConcreteWalletEvalStrings {
+export function getWalletEvalStrings(wallet: RatedWallet): ConcreteWalletEvalStrings {
 	const { metadata } = wallet
 
 	return {

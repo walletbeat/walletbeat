@@ -268,12 +268,12 @@
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
 		onblur={() => { onSliceBlur?.(slice.id) }}
-		onclick={(event: MouseEvent) => {
-			event.stopPropagation()
+		onclick={e => {
+			e.stopPropagation()
 			onSliceClick?.(slice.id)
 		}}
-		onkeydown={(event: KeyboardEvent) => {
-			if (event.code === 'Enter' || event.code === 'Space')
+		onkeydown={e => {
+			if (e.code === 'Enter' || e.code === 'Space')
 				onSliceClick?.(slice.id)
 		}}
 

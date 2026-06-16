@@ -17,7 +17,7 @@
 
   const calldataState = $state({
     input: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240',
-    digest: '',
+    digest: '' as string,
     error: '',
   })
 
@@ -78,10 +78,10 @@
     "contents": "Hello, Bob!"
   }
 }`,
-    primaryType: '',
-    domainSeparator: '',
-    messageHash: '',
-    fullDigest: '',
+    primaryType: '' as string,
+    domainSeparator: '' as string,
+    messageHash: '' as string,
+    fullDigest: '' as string,
     error: '',
   })
 

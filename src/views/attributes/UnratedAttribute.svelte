@@ -8,18 +8,20 @@
 	const {
 		wallet,
 	}: {
-		wallet: RatedWallet<string>
+		wallet: RatedWallet
 	} = $props()
 
 	const githubUrl = $derived(
-		wallet.types.SOFTWARE ?
-			`https://github.com/walletbeat/walletbeat/tree/beta/data/software-wallets/${wallet.metadata.id}.ts`
-		: wallet.types.HARDWARE ?
-			`https://github.com/walletbeat/walletbeat/tree/beta/data/hardware-wallets/${wallet.metadata.id}.ts`
-		: wallet.types.EMBEDDED ?
-			`https://github.com/walletbeat/walletbeat/tree/beta/data/embedded-wallets/${wallet.metadata.id}.ts`
-		:
-			''
+		`https://github.com/walletbeat/walletbeat/tree/beta/data/${
+			wallet.types.SOFTWARE ?
+				'software-wallets'
+			: wallet.types.HARDWARE ?
+				'hardware-wallets'
+			: wallet.types.EMBEDDED ?
+				'embedded-wallets'
+			:
+				''
+		}/${wallet.metadata.id}.ts`
 	)
 
 

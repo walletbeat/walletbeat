@@ -45,7 +45,7 @@
 	let borderBoxSize: ResizeObserverSize[] | undefined = $state()
 
 	// (Computed)
-	const alignBlock = $derived(
+	let alignBlock = $derived(
 		({ 'top': 'start', 'center': 'center', 'bottom': 'end' } as const)[align]
 	)
 

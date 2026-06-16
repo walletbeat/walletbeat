@@ -2,8 +2,7 @@
 // Types/constants
 import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { representativeWalletForType } from '@/data/wallets'
-import { ratedEmbeddedWallets, embeddedWalletAttributeTree } from '@/data/embedded-wallets'
+import { representativeWalletForType, allRatedWallets } from '@/data/wallets'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
@@ -22,7 +21,6 @@ const { attrGroupId } = Astro.params
 // Data
 const attrGroup = getAttributeGroupById(
 	attrGroupId,
-	embeddedWalletAttributeTree,
 	representativeWalletForType(WalletType.EMBEDDED).overall,
 )
 
@@ -49,8 +47,8 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:visible
 			title='Embedded Wallets'
-			wallets={Object.values(ratedEmbeddedWallets)}
-			attributeTree={embeddedWalletAttributeTree}
+			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.EMBEDDED])}
+			attributeGroups={[attrGroup]}
 		/>
 	</main>
 </Layout>
