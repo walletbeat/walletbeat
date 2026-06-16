@@ -238,8 +238,6 @@ const optimizedSvgHashes: Record<string, string> = {
 		'adf1e55fa6b50d77c72ac340d5b01f3ef5ad9aa39f9de7206eae23715a0d6427',
 	'resources/files/wbicons/source_visibility.svg':
 		'29a4ca719470edda4b0e811e5f26d122c7cc06b1c1394ddace70fbc66013a6e5',
-	'src/assets/fonts/wbicons/wbicons.svg':
-		'9223fb69d0e988d5783b3b125d5b97ec078c6e146dc9e83ef3c0bccb00c7c965',
 }
 
 interface SvgResult {
@@ -257,7 +255,10 @@ describe('SVG optimization', async () => {
 	const results: SvgResult[] = []
 
 	await crawlCodebase({
-		ignore: commonExclusions,
+		ignore: commonExclusions.concat([
+			// Generated font output is covered by the icon font generator hash.
+			filePath => filePath.startsWith('src/assets/fonts/'),
+		]),
 		complexTraversalFn: async (entryBase, getFullEntry) => {
 			if (entryBase.type !== CodebaseEntryType.FILE) {
 				return
