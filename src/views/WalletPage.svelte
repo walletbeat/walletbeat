@@ -87,13 +87,41 @@
 	)
 
 	$effect(() => {
-		if(queryParams && queryParams.toString() !== globalThis.location.search)
-			globalThis.history.replaceState(null, '', `${globalThis.location.pathname}?${queryParams.toString()}`)
+		const queryString = queryParams?.toString()
+
+		if(queryString !== undefined && queryString !== globalThis.location.search.slice(1))
+			globalThis.history.replaceState(
+				null,
+				'',
+				`${globalThis.location.pathname}${queryString ? `?${queryString}` : ''}${globalThis.location.hash}`,
+			)
 	})
 
 	let highlightedAttributeId = $state<string | null>(
 		null
 	)
+
+	function openHashDetails() {
+		const id = decodeURIComponent(globalThis.location.hash.slice(1))
+		const target = id ? globalThis.document.getElementById(id) : null
+
+		if(target instanceof HTMLDetailsElement)
+			target.open = true
+
+		const containingDetails = target?.closest('details')
+
+		if(containingDetails)
+			containingDetails.open = true
+	}
+
+	$effect(() => {
+		openHashDetails()
+		globalThis.addEventListener('hashchange', openHashDetails)
+
+		return () => {
+			globalThis.removeEventListener('hashchange', openHashDetails)
+		}
+	})
 
 	// (Derived)
 	const walletNews = $derived(
@@ -134,7 +162,7 @@
 		!newsIsStale
 	)
 
-	let selectedVariant = $derived<Variant | undefined>(
+	let selectedVariant = $state<Variant | undefined>(
 		hasSingleVariant(wallet.variants) ?
 			undefined
 		:
@@ -148,7 +176,7 @@
 			queryParams?.delete('variant')
 	})
 
-	let selectedModel = $derived(
+	let selectedModel = $state(
 		queryParams?.get('model') ?? undefined
 	)
 
