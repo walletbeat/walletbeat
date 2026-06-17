@@ -591,9 +591,7 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
 	// Posts notifications such as transaction confirmations and price alerts (Android 13+).
 	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
-	// Writes to shared storage, e.g. to export transaction receipts or QR codes. The implicit
-	// read access this used to grant disappeared after Android 4.4 (API 19, 2013), which is far
-	// older than any version in practical use, so writing is a benign, wallet-typical operation.
+	// Writes to shared storage, e.g. to export transaction receipts or QR codes.
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
