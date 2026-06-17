@@ -593,10 +593,10 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
-	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); a
-	// wallet never needs this and it is a phishing vector (e.g. a fake seed-phrase prompt). On
-	// Android < 14 it is auto-granted at install, and the manifest gives no guarantee of the
-	// user's OS version, so we take the pessimistic view.
+	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
+	// is a phishing vector (e.g. a fake seed-phrase prompt). On Android < 14 it is auto-granted
+	// at install, and the manifest gives no guarantee of the user's OS version, so we take the
+	// pessimistic view.
 	[AndroidPermission.USE_FULL_SCREEN_INTENT]: Rating.FAIL,
 	// Allows drawing overlays over other apps, can be used to phish seed phrases or intercept transaction confirmations.
 	[AndroidPermission.SYSTEM_ALERT_WINDOW]: Rating.FAIL,
@@ -606,7 +606,7 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.ACCESS_FINE_LOCATION]: Rating.FAIL,
 	// Modifying global audio settings can suppress security alerts or notifications from other apps.
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
-	// Broad read of shared storage exposes private files; a wallet only ever needs to write, not read.
+	// Broad read of shared storage exposes private files.
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: Rating.FAIL,
 	// Writes to shared storage. On Android <= 18 (API) this permission group also granted
 	// implicit read access, and the declared manifest gives no guarantee of the user's OS
