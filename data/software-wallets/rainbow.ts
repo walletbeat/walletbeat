@@ -23,6 +23,10 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import {
 	BasicBenchmarkTransactions,
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
@@ -50,7 +54,13 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { paragraph } from '@/types/content'
+
+import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
+import rainbowIosParsed from './manifests/rainbow/ios.parsed.json'
+import rainbowRawExtManifest from './manifests/rainbow/opfgelmcmbiajamepnmloijbpoleiama.manifest.json'
 
 export const rainbow: SoftwareWallet = {
 	metadata: {
@@ -64,10 +74,14 @@ export const rainbow: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2026-05-11',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://rainbowkit.com/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
 			],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/ios/Rainbow/Info.plist',
 			repositories: [
 				'https://github.com/rainbow-me/browser-extension',
 				'https://github.com/rainbow-me/rainbow',
@@ -374,7 +388,33 @@ export const rainbow: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
 			scamAlerts: null, // Rainbow uses Blockaid per questionnaire, but full details on all sub-fields pending follow-up
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: [
+						{
+							explanation:
+								'The browser extension encrypts its keychain "vault" with a user-chosen password using @metamask/browser-passworder (PBKDF2, 600k iterations) before persisting it; the decrypted keychains live in memory only while unlocked.',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/132521f80261f1c4473c33965ee27976d8506630/src/core/keychain/KeychainManager.ts',
+						},
+					],
+					browserExtensionHardening: parseBrowserExtensionManifest(rainbowRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								'The mobile app stores the seed phrase / private key in react-native-keychain, gated by biometrics or device passcode (iOS USER_PRESENCE, Android BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE) and wrapped by an RSA key held in the OS keystore / Secure Enclave, so the secret cannot be extracted by other software.',
+							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/features/local-auth/keychain.ts',
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					mobileAppHardening: parseMobileManifestJson(rainbowAndroidParsed, rainbowIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				erc7730: supported({
