@@ -9,6 +9,7 @@ import {
 } from '@/schema/features/security/security-best-practices'
 
 const ANDROID_NS = 'http://schemas.android.com/apk/res/android'
+const TOOLS_NS = 'http://schemas.android.com/tools'
 
 /**
  * Parses an AndroidManifest.xml string and returns the declared permissions.
@@ -17,6 +18,11 @@ const ANDROID_NS = 'http://schemas.android.com/apk/res/android'
  * to `AndroidPermission` enum values. Throws if an unrecognized permission is
  * encountered — add it to the `AndroidPermission` enum if it is security-relevant,
  * or explicitly ignore it there if not.
+ *
+ * Entries carrying the `tools:node="remove"` manifest-merger directive are
+ * skipped: that directive strips the permission from the final merged manifest,
+ * so it is not present in the shipped app (a permission a wallet actually grants
+ * is declared without the directive, and is still captured).
  */
 export function parseAndroidManifest(xmlText: string): Set<AndroidPermission> {
 	const permissions = new Set<AndroidPermission>()
@@ -31,6 +37,10 @@ export function parseAndroidManifest(xmlText: string): Set<AndroidPermission> {
 			throw new Error(
 				`<uses-permission> element at index ${i} is missing the android:name attribute`,
 			)
+		}
+
+		if (elements[i].getAttributeNS(TOOLS_NS, 'node') === 'remove') {
+			continue
 		}
 
 		if (!androidPermissions.is(name)) {

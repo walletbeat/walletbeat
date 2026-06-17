@@ -1,0 +1,15 @@
+{
+	"usesPermissions": [
+		"android.permission.INTERNET",
+		"android.permission.CAMERA",
+		"android.permission.SYSTEM_ALERT_WINDOW",
+		"android.permission.WRITE_EXTERNAL_STORAGE",
+		"android.permission.READ_EXTERNAL_STORAGE",
+		"android.permission.ACCESS_NETWORK_STATE",
+		"android.permission.POST_NOTIFICATIONS",
+		"android.permission.BLUETOOTH",
+		"android.permission.BLUETOOTH_ADMIN",
+		"android.permission.BLUETOOTH_SCAN",
+		"android.permission.BLUETOOTH_CONNECT"
+	]
+}
