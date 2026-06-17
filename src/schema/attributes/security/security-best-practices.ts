@@ -591,6 +591,10 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
 	// Posts notifications such as transaction confirmations and price alerts (Android 13+).
 	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
+	// Writes to shared storage, e.g. to export transaction receipts or QR codes. The implicit
+	// read access this used to grant disappeared after Android 4.4 (API 19, 2013), which is far
+	// older than any version in practical use, so writing is a benign, wallet-typical operation.
+	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
@@ -608,10 +612,6 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
 	// Broad read of shared storage exposes private files.
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: Rating.FAIL,
-	// Writes to shared storage. On Android <= 18 (API) this permission group also granted
-	// implicit read access, and the declared manifest gives no guarantee of the user's OS
-	// version, so we take the pessimistic view and treat it as read-capable / privacy-risky.
-	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.FAIL,
 }
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
