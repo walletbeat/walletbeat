@@ -9,10 +9,11 @@
  * ```
  * {some: "object", ref: "https://example.com"}
  * {some: "object", ref: {url: "https://example.com"}}
- * {some: "object", ref: {url: "https://example.com", label: "Source code"}}
+ * {some: "object", ref: {url: "https://example.com", label: "Source code", explanation: "Wallet X uses library Y for key derivation"}}
  * {some: "object", ref: ["https://example.com", "https://example2.com"]}
  * {some: "object", ref: [{url: "https://example.com"}, {url: "https://example2.com"}]}
  * {some: "object", ref: [{url: "https://example.com"}, "https://example2.com"]}
+ * {some: "object", ref: {file: "public/references/.../path/to/something.png", label: "Screenshot of wallet swap UI", explanation: "Wallet X shows fees when swapping"}}
  * ```
  */
 
@@ -36,16 +37,36 @@ export type LooseReference = (
 	| {
 			/** The URL(s) the reference is about. */
 			url: NonEmptyArray<Url> | Url
+
+			/**
+			 * The text of the link that goes to `url`; defaults to the domain name of `url`.
+			 * This is used as the text of the link itself, so it should not be a long explanation.
+			 * The domain name of the URL or the name of the site is generally sufficient.
+			 */
+			label?: string
 	  }
 	| {
 			/** The repo-relative filename under public/ (New Field) */
 			file: string
+
+			/**
+			 * The description of the file; e.g. for screenshots, this would be alt text.
+			 * This is more of a literal description of the reference, not an explanation
+			 * of why the reference is relevant.
+			 * For example, for a screenshot showing a wallet's swap interface and its fees,
+			 * the `label` could be "Wallet X swapping UI" while the `explanation` could be
+			 * "Wallet X does not comprehensively break down fees in its swapping UI".
+			 *
+			 * Unlike URL-based references, this field is not optional for file-based references.
+			 */
+			label: string
 	  }
 ) & {
-	/** The text of the link that goes to `url`; defaults to the domain name of `url`. */
-	label?: string
-
-	/** A human-readable string that explains what the reference is about. */
+	/**
+	 * A human-readable string that explains what the reference is about.
+	 * Will be displayed as Markdown. Should generally not be longer than a paragraph,
+	 * and should not contain links.
+	 */
 	explanation?: string
 
 	/** The date the reference was last retrieved. */
@@ -63,7 +84,10 @@ export function isLooseReference(x: unknown): x is LooseReference {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "file" field exists.
 		typeof (x as { file: unknown }).file === 'string' &&
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified "file" is a string.
-		(x as { file: string }).file.startsWith('public/')
+		(x as { file: string }).file.startsWith('public/') &&
+		Object.hasOwn(x, 'label') &&
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "label" field exists.
+		typeof (x as { label: unknown }).label === 'string'
 	) {
 		return true
 	}

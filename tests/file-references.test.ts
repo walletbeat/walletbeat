@@ -12,18 +12,14 @@ const repoRoot = resolve(currentDir, '..')
 describe('RepoFileReference', () => {
 	describe('toFullyQualified with file references', () => {
 		it('converts a file reference under public/ to a root-relative URL', () => {
-			const ref: LooseReference = { file: 'public/questionnaires/example.pdf' }
+			const ref: LooseReference = {
+				file: 'public/questionnaires/example.pdf',
+				label: 'Example document',
+			}
 			const result = toFullyQualified(ref)
 
 			expect(result).toHaveLength(1)
 			expect(result[0].urls[0].url).toBe('/questionnaires/example.pdf')
-		})
-
-		it('uses the filename as the default label', () => {
-			const ref: LooseReference = { file: 'public/questionnaires/example.pdf' }
-			const result = toFullyQualified(ref)
-
-			expect(result[0].urls[0].label).toBe('example.pdf')
 		})
 
 		it('uses a custom label when provided', () => {
@@ -39,6 +35,7 @@ describe('RepoFileReference', () => {
 		it('preserves explanation and lastRetrieved', () => {
 			const ref: LooseReference = {
 				file: 'public/questionnaires/example.pdf',
+				label: 'Example document',
 				explanation: 'Submitted by wallet team',
 				lastRetrieved: '2025-01-15',
 			}
@@ -49,7 +46,7 @@ describe('RepoFileReference', () => {
 		})
 
 		it('throws if the file path is not under public/', () => {
-			const ref: LooseReference = { file: 'src/something.ts' }
+			const ref: LooseReference = { file: 'src/something.ts', label: 'Example document' }
 
 			expect(() => toFullyQualified(ref)).toThrow(
 				'File path-based references must be a repository-relative path under public/',
@@ -57,7 +54,10 @@ describe('RepoFileReference', () => {
 		})
 
 		it('strips nested public/ subdirectories correctly', () => {
-			const ref: LooseReference = { file: 'public/docs/wallets/metamask/answers.pdf' }
+			const ref: LooseReference = {
+				file: 'public/docs/wallets/metamask/answers.pdf',
+				label: 'Example document',
+			}
 			const result = toFullyQualified(ref)
 
 			expect(result[0].urls[0].url).toBe('/docs/wallets/metamask/answers.pdf')
