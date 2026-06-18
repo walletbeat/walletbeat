@@ -139,7 +139,76 @@ export const rainbow: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: [
+						{
+							explanation:
+								'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default (and "Hold to Bridge" is available there), so the fee shown by default is aggregated. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these. Verified in the Rainbow mobile app.',
+							lastRetrieved: '2026-06-17',
+							url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
+						},
+						{
+							explanation:
+								'Rainbow mobile app bridge amount-entry screen: by default only a gas estimate is shown (labelled "Free", roughly 0.0001 ETH), with the "Included Rainbow Fee" and slippage not visible. "Hold to Bridge" is available here, so a user can confirm without ever seeing the itemized fee.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-input-gas-only.jpg',
+							lastRetrieved: '2026-06-17',
+						},
+						{
+							explanation:
+								'Rainbow mobile app bridge "Review" screen (reached by tapping "Review", one action): fees are itemized as the destination network, minimum received, "Included Rainbow Fee", and max slippage, with no warning explaining bridge trust assumptions or cross-chain risk.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-review-fees.jpg',
+							lastRetrieved: '2026-06-17',
+						},
+					],
+					feesLargerThan1bps: {
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				// Sending more of a token on one chain than is held there, while
+				// holding enough of it on another chain, just yields an "Insufficient
+				// Funds" block rather than a prompt to bridge the shortfall. Verified
+				// in the Rainbow mobile app (USDC send on Polygon).
+				suggestedBridging: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Rainbow mobile app Send screen: attempting to send 1 USDC on Polygon (0.50 USDC held there, but more held on another chain) shows an "Insufficient Funds" block, with no prompt to bridge the shortfall from the other chain.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-send-insufficient-funds.jpg',
+						lastRetrieved: '2026-06-17',
+					},
+				}),
+			},
+			crossChainBalances: {
+				ref: [
+					{
+						explanation:
+							'Rainbow displays a single portfolio total summing the account value across all supported chains, and lists per-chain token balances as separate line items (e.g. ETH held on mainnet and on an L2 each appear as their own row with a chain badge). It does not, however, sum a single token across chains into one combined balance: the same asset on multiple chains is shown as multiple rows rather than a single total. Verified in the Rainbow mobile app.',
+						lastRetrieved: '2026-06-17',
+						url: 'https://rainbow.me/support/app/supported-networks',
+					},
+					{
+						explanation:
+							'Rainbow mobile app home screen: a single account-value total at the top, with ETH and WETH each appearing as separate per-chain rows (mainnet and an L2, distinguished by chain badges) rather than a single summed-per-token balance.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-portfolio-per-chain-balances.jpg',
+						lastRetrieved: '2026-06-17',
+					},
+				],
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
+		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
 			ref: refTodo,
 			customChainRpcEndpoint: featureSupported,
