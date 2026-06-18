@@ -261,8 +261,9 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'The in-app Privacy settings state that when the Analytics toggle is disabled, "only essential crash diagnostics are collected", confirming crash reporting cannot be turned off by the user.',
+								'The in-app Privacy settings state that when the Analytics toggle is disabled, "only essential crash diagnostics are collected". Hence, crash reporting **cannot** be turned off by the user.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png',
+							label: 'Rainbow mobile app privacy settings',
 						},
 					],
 					entity: sentry,
@@ -291,6 +292,7 @@ export const rainbow: SoftwareWallet = {
 							explanation:
 								'The in-app Privacy settings describe the Analytics toggle as "allowing analytics of usage data", confirming it governs usage analytics collection.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png',
+							label: 'Rainbow mobile app privacy settings',
 						},
 					],
 					// Usage analytics is collected by Rainbow, implemented via the RudderStack
@@ -393,7 +395,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension encrypts its keychain "vault" with a user-chosen password using @metamask/browser-passworder (PBKDF2, 600k iterations) before persisting it; the decrypted keychains live in memory only while unlocked.',
+								'The browser extension encrypts its keychain "vault" with a user-chosen password using `@metamask/browser-passworder` (PBKDF2, 600k iterations) before persisting it. The decrypted keychains live in memory only while unlocked.',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/132521f80261f1c4473c33965ee27976d8506630/src/core/keychain/KeychainManager.ts',
 						},
 					],
@@ -406,7 +408,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The mobile app stores the seed phrase / private key in react-native-keychain, gated by biometrics or device passcode (iOS USER_PRESENCE, Android BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE) and wrapped by an RSA key held in the OS keystore / Secure Enclave, so the secret cannot be extracted by other software.',
+								'The mobile app stores the seed phrase in `react-native-keychain`, gated by biometrics or device passcode (iOS `USER_PRESENCE`, Android `BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE`) wrapped by an RSA key held in OS keystore. The secret cannot be extracted by other software.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/features/local-auth/keychain.ts',
 						},
 					],
@@ -573,7 +575,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension build job checks out an external repository (rainbow-me/browser-extension-env) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build, so build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
+								'The browser extension build job checks out an external repository (`rainbow-me/browser-extension-env`) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build. This means build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
 						},
 						{

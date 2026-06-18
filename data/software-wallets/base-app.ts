@@ -68,11 +68,19 @@ export const baseApp: SoftwareWallet = {
 			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
 			defaultAccountType: AccountType.rawErc4337,
 			eip7702: supported({
-				ref: {
-					explanation:
-						'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of dApp interactions; there is no user-facing "upgrade my account" UI in the Base App. Per the Base team questionnaire response (2026-03-13), accounts are "EOA + 7702 delegation / 4337".',
-					url: 'https://blog.base.dev/securing-eip-7702-upgrades',
-				},
+				ref: [
+					{
+						explanation:
+							'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of app interactions. There is no user-facing "upgrade my account" UI in the Base App.',
+						url: 'https://blog.base.dev/securing-eip-7702-upgrades',
+					},
+					{
+						explanation:
+							'Per Base App team statement, supported account types are "EOA + 7702 delegation / 4337".',
+						file: 'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+						label: 'Base App team statement (2026-02-23)',
+					},
+				],
 				contract: coinbaseEip7702ProxyContract,
 			}),
 			eoa: supported({
@@ -89,7 +97,7 @@ export const baseApp: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation:
-						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave); Coinbase does not hold a co-owner key per https://wallet.coinbase.com/terms-of-service. The underlying contract supports multi-owner via addOwner/removeOwnerAtIndex, but as of Base App v29.94.123 the mobile app does not expose any passkey or owner management UI (Account Management shows only Sign out). Optional recovery-key setup likely lives in keys.coinbase.com rather than the mobile app.',
+						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave). Coinbase does not hold a co-owner key per Terms of Service. The underlying contract supports multi-owner via `addOwner`/`removeOwnerAtIndex`, but the mobile app does not expose passkey or owner management UI. Account Management shows only "Sign out". Optional recovery-key setup lives in `keys.coinbase.com` rather than the mobile app.',
 					url: 'https://docs.base.org/base-account/overview/what-is-base-account',
 				},
 				contract: coinbaseSmartWalletContract,
@@ -211,7 +219,7 @@ export const baseApp: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity, used for external advertising, developer advertising/marketing, AND analytics. The in-app "Personalized Advertising" toggle (defaulted ON) reduces advertising-related sharing but does not stop the underlying usage analytics collection.',
+								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity. It states that it is used for external advertising, developer advertising/marketing, and analytics. The in-app "Personalized Advertising" toggle (defaulted on) reduces sharing, but does not stop the underlying analytics collection.',
 							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
 						},
 						{
@@ -306,7 +314,7 @@ export const baseApp: SoftwareWallet = {
 			passkeyVerification: supported({
 				ref: {
 					explanation:
-						'Coinbase Smart Wallet verifies passkey signatures on-chain via webauthn-sol, which uses the RIP-7212 precompile when available and falls back to FreshCryptoLib.',
+						'Coinbase Smart Wallet verifies passkey signatures on-chain via `webauthn-sol`, which uses the RIP-7212 precompile when available and falls back to `FreshCryptoLib`.',
 					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
 				},
 				details:
@@ -409,7 +417,7 @@ export const baseApp: SoftwareWallet = {
 				l1: {
 					ref: {
 						explanation:
-							"Base App and base/account-sdk are both built by Coinbase. The SDK (open-source) handles dApp-initiated transactions for Base accounts and uses viem's HTTP RPC transport — it does not implement Ethereum's devp2p protocol. It is reasonable to infer the closed-source Base App mobile binary uses the same approach for its native send/swap features: mobile platform constraints make running a devp2p node impractical, and Coinbase has never advertised doing so. URL pinned to the SDK's HTTP RPC fallback logic.",
+							"Base App and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
 						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
 					},
 					selfBroadcastViaDirectGossip: notSupported,
@@ -422,7 +430,7 @@ export const baseApp: SoftwareWallet = {
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: {
 						explanation:
-							'Per the open-source base/account-sdk that backs Base App account flows, SUPPORTED_MAINNET_CHAINS includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
+							'Per the open-source `base/account-sdk` that backs Base App account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
 						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
 					},
 				},
