@@ -8,6 +8,10 @@ import { rainbowCaliburContract } from '@/data/wallet-contracts/rainbow-calibur'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import {
+	ExposedAccountsBehavior,
+	type ExposedAccountSet,
+} from '@/schema/features/privacy/app-isolation'
 import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -383,7 +387,77 @@ export const rainbow: SoftwareWallet = {
 					policy: CollectionPolicy.BY_DEFAULT,
 				}),
 			},
-			appIsolation: null,
+			appIsolation: {
+				[Variant.BROWSER]: {
+					// The connection flow only lets the user pick from existing
+					// accounts; there is no option to create a fresh address for the app
+					// being connected.
+					createInAppConnectionFlow: notSupportedWithRef({
+						ref: {
+							explanation:
+								'The Rainbow browser extension connection dialog only offers a "Switch Wallets" picker over existing accounts; it provides no option to create a new address as part of connecting to an app.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-wallet-picker.png',
+							label:
+								'Rainbow browser extension connect dialog showing only an existing-wallet picker, no create option',
+							lastRetrieved: '2026-06-18',
+						},
+					}),
+					// The Walletbeat test page wallet_connect call returns an error
+					// ("wallet may not support ERC-7846"), so Rainbow does not implement
+					// the ERC-7846 privacy-preserving connection RPC.
+					erc7846WalletConnect: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Calling wallet_connect (ERC-7846) from the Walletbeat test page against the Rainbow browser extension returns an error ("wallet may not support ERC-7846 / Request failed"), so Rainbow does not support the ERC-7846 privacy-preserving connection RPC.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-wallet-connect-unsupported.png',
+							label:
+								'Walletbeat test page showing Rainbow wallet_connect (ERC-7846) returning an error',
+							lastRetrieved: '2026-06-18',
+						},
+					}),
+					// On connect, Rainbow shows a single-account picker ("Switch
+					// Wallets") that defaults to the currently active account, and
+					// `eth_accounts` then returns only that one account. Switching the
+					// active account in the wallet and reconnecting defaults the picker
+					// to the new active account, confirming ACTIVE_ACCOUNT_ONLY.
+					ethAccounts: supported<WithRef<ExposedAccountSet>>({
+						ref: [
+							{
+								explanation:
+									'Rainbow browser extension connection dialog: the "Wallet" field is a single-select "Switch Wallets" picker that defaults to the currently active account. Connecting exposes only that one account; tested against the Walletbeat test page, eth_accounts returned exactly the single selected account.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-eth-accounts-single.png',
+								label:
+									'Walletbeat test page showing Rainbow eth_accounts returning a single account',
+								lastRetrieved: '2026-06-18',
+							},
+							{
+								explanation:
+									'Rainbow browser extension connection dialog with the wallet picker expanded: it is a single-select list of existing accounts ("Switch Wallets"), pre-highlighting the currently active account, with no option to expose more than one account.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-wallet-picker.png',
+								label:
+									'Rainbow browser extension connect dialog with the single-select wallet picker expanded',
+								lastRetrieved: '2026-06-18',
+							},
+						],
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					// Reconnecting to a previously-connected app does not restore the
+					// address used before: with a different account set active, the
+					// connect dialog defaults to the active account, not the one the app
+					// was last connected with.
+					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+						ref: {
+							explanation:
+								'After connecting the Rainbow browser extension to an app with one account, disconnecting, switching the active account in the wallet, and reconnecting to the same app, the connection dialog defaults to the now-active account rather than the previously-connected one. Rainbow does not remember the per-app last-connected address.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-defaults-to-active-account.png',
+							label:
+								'Rainbow browser extension reconnect dialog defaulting to the active account, not the previously-connected one',
+							lastRetrieved: '2026-06-18',
+						},
+					}),
+				},
+				[Variant.MOBILE]: null,
+			},
 			dataCollection: null,
 			privacyPolicy: 'https://rainbow.me/privacy',
 			transactionPrivacy: {
