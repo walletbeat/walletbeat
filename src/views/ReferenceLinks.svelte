@@ -14,7 +14,9 @@
 
 
 	// Components
+	import Typography from '@/components/Typography.svelte'
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
+	import { markdown } from '@/types/content'
 </script>
 
 
@@ -53,7 +55,7 @@
 								{@render Url(ref.urls[0])}
 								<br>
 							{/if}
-							{ref.explanation}
+							<Typography content={markdown(ref.explanation)} />
 						</p>
 					{/if}
 

@@ -998,17 +998,19 @@
 			{/if}
 
 			{#if (
-				!isTypographicContent(evalAttr.evaluation.details)
-				&& evalAttr.evaluation.references?.length
-				&& !(
-					// Custom components that render their own reference links
-					[
-						'ChainVerificationDetails',
-						'FundingDetails',
-						'ScamAlertDetails',
-						'SecurityAuditsDetails',
-					]
-						.includes(evalAttr.evaluation.details.component.component)
+				evalAttr.evaluation.references?.length &&
+				(
+					isTypographicContent(evalAttr.evaluation.details) ||
+					!(
+						// Custom components that render their own reference links
+						[
+							'ChainVerificationDetails',
+							'FundingDetails',
+							'ScamAlertDetails',
+							'SecurityAuditsDetails',
+						]
+							.includes(evalAttr.evaluation.details.component.component)
+					)
 				)
 			)}
 				<ReferenceLinks

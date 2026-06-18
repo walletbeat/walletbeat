@@ -862,7 +862,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 				}
 			})() as unknown as Outcome<_OutcomeMetadata, Rating>,
 
-			...(finalRefs.length === 0 && { references: finalRefs }),
+			...(finalRefs.length > 0 && { references: finalRefs }),
 		}
 	}
 }
