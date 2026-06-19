@@ -456,7 +456,96 @@ export const rainbow: SoftwareWallet = {
 						},
 					}),
 				},
-				[Variant.MOBILE]: null,
+				[Variant.MOBILE]: {
+					// The mobile connection sheet's account picker does surface an
+					// "+ Add" button that can create a new wallet, but creating one exits
+					// the connection flow back to the home screen instead of connecting
+					// the app to the newly-created account. So a fresh address cannot be
+					// created as part of the connection flow itself; the connection can
+					// only be completed by selecting an existing account.
+					createInAppConnectionFlow: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The Rainbow mobile connection sheet exposes a single "Wallet" picker (alongside a network picker) with Cancel/Connect actions. Expanding the picker reveals the account list with an "+ Add" button.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet.png',
+								label:
+									'Rainbow mobile app connection sheet with the wallet picker and Connect action',
+								lastRetrieved: '2026-06-19',
+							},
+							{
+								explanation:
+									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen rather than connecting the app with the new account, so a fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet-add-account.jpg',
+								label:
+									'Rainbow mobile connection sheet account picker expanded, showing the "+ Add" option among existing accounts',
+								lastRetrieved: '2026-06-19',
+							},
+						],
+					}),
+					// The Walletbeat test page wallet_connect call (run in Rainbow's
+					// in-app browser) returns an error, so mobile does not implement the
+					// ERC-7846 privacy-preserving connection RPC either.
+					erc7846WalletConnect: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Calling wallet_connect (ERC-7846) from the Walletbeat test page inside the Rainbow mobile app in-app browser returns an error ("wallet may not support ERC-7846 / Request failed"), so Rainbow mobile does not support the ERC-7846 privacy-preserving connection RPC.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-wallet-connect-unsupported.png',
+							label:
+								'Walletbeat test page in the Rainbow mobile in-app browser showing wallet_connect (ERC-7846) returning an error',
+							lastRetrieved: '2026-06-19',
+						},
+					}),
+					// Mobile exposes only a single account and live-tracks the active
+					// account: the connection sheet defaults to the currently active
+					// wallet, eth_accounts returns just that one account, and switching
+					// the active account in-wallet pushes the new account to the
+					// already-connected site without reconnecting. (This differs from the
+					// browser extension, which stays pinned to the originally-connected
+					// account until the user disconnects.)
+					ethAccounts: supported<WithRef<ExposedAccountSet>>({
+						ref: [
+							{
+								explanation:
+									'Rainbow mobile in-app browser on the Walletbeat test page: with one account active, eth_accounts returns exactly that single account, never the full account list.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-single.png',
+								label:
+									'Walletbeat test page in the Rainbow mobile in-app browser showing eth_accounts returning a single account',
+								lastRetrieved: '2026-06-19',
+							},
+							{
+								explanation:
+									'Rainbow mobile connection sheet: a single "Wallet" picker that defaults to the currently active account ("Test"), so the account exposed to the app is whichever account is active in the wallet.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet.png',
+								label:
+									'Rainbow mobile connection sheet with the wallet picker defaulting to the active account',
+								lastRetrieved: '2026-06-19',
+							},
+							{
+								explanation:
+									'Rainbow mobile after switching the active account in-wallet (from "Test" to "Test 2"): the already-connected test page\'s "Connected as" indicator updates on its own to the newly-active account, without reconnecting. The eth_accounts result line shown is the un-refreshed prior call, so it still displays the previous account.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-after-account-switch.png',
+								label:
+									'Walletbeat test page in the Rainbow mobile in-app browser, connected account following an in-wallet active-account switch',
+								lastRetrieved: '2026-06-19',
+							},
+						],
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					// Reconnecting to a previously-connected app does not restore the
+					// address used before: the connection sheet defaults to the currently
+					// active account, not the one the app was last connected with.
+					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+						ref: {
+							explanation:
+								'After connecting the Rainbow mobile app to an app with one account, disconnecting, switching the active account in the wallet, and reconnecting to the same app, the connection sheet defaults to the now-active account rather than the previously-connected one. Rainbow mobile does not remember the per-app last-connected address.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet.png',
+							label:
+								'Rainbow mobile connection sheet defaulting to the active account rather than a remembered per-app address',
+							lastRetrieved: '2026-06-19',
+						},
+					}),
+				},
 			},
 			dataCollection: null,
 			privacyPolicy: 'https://rainbow.me/privacy',
