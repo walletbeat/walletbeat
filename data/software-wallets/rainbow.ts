@@ -144,6 +144,9 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: {
+			// Chain abstraction was evaluated on the mobile app only; the browser
+			// extension has not been tested for it yet.
+			[Variant.BROWSER]: null,
 			[Variant.MOBILE]: {
 				bridging: {
 					builtInBridging: supported({
