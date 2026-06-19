@@ -188,10 +188,28 @@ export const baseApp: SoftwareWallet = {
 				ventureCapital: false,
 			},
 		},
-		// Base App has no UI for adding additional Ethereum addresses to a single
-		// install — verified in-app (Base App v29.94.123). The wallet manages a
-		// single account/address per install.
-		multiAddress: notSupported,
+		// A recent Base App update added multi-wallet support: the wallet picker
+		// lists multiple coexisting wallets (e.g. "Wallet 5", "Wallet 6") and an
+		// "Add Wallet" sheet offers both "Create Wallet" (a new multi-chain wallet)
+		// and "Import Wallet" (sign into an existing passkey). Verified first-hand
+		// in-app (Base App v29.99.7, 2026-06-19); supersedes the earlier
+		// single-account-per-install finding from v29.94.123.
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'The Base App wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
+					file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
+					label: 'Base App "Add Wallet" sheet: Create Wallet / Import Wallet options',
+				},
+				{
+					explanation:
+						'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
+					file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg',
+					label: 'Base App wallet picker showing multiple coexisting wallets',
+				},
+			],
+		}),
 		privacy: {
 			// Per direct in-app check (Settings > Privacy & Security, Base App v29.94.123):
 			// there is NO toggle to disable crash reporting, diagnostics, or usage
