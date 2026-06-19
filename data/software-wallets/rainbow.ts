@@ -526,7 +526,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Rainbow mobile after switching the active account in-wallet (from "Test" to "Test 2"): the already-connected test page\'s "Connected as" indicator updates on its own to the newly-active account, without reconnecting. The eth_accounts result line shown is the un-refreshed prior call, so it still displays the previous account.',
+									'Rainbow mobile after switching the active account in-wallet (from "Test" to "Test 2"): the already-connected test page\'s "Connected as" indicator updates on its own to the newly-active account, without reconnecting.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-after-account-switch.png',
 								label:
 									'Walletbeat test page in the Rainbow mobile in-app browser, connected account following an in-wallet active-account switch',
