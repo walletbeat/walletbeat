@@ -120,7 +120,7 @@ export const baseApp: SoftwareWallet = {
 					},
 				],
 				contract: coinbaseSmartWalletContract,
-				// NO: the default email-onboarded account's signing key is operated
+				// The default email-onboarded account's signing key is operated
 				// by Coinbase server-side and is reachable with email auth alone
 				// (proven by signing from a passkey-less browser). Passkey-import
 				// accounts remain self-custody, but that is not the create default.
@@ -318,10 +318,7 @@ export const baseApp: SoftwareWallet = {
 			// FULLY_OFF_USER_DEVICE criteria ("requires login before any key material
 			// is available"). Legacy/import paths still generate on-device (BIP39
 			// seed shown locally; imported passkeys live in the device secure
-			// enclave). multipartyKeyReconstruction is left NON_MULTIPARTY because we
-			// have NOT confirmed whether the email signer is a single Coinbase-held
-			// key vs. server-side MPC (MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE) — open
-			// item for poly to confirm/replicate.
+			// enclave).
 			keysHandling: {
 				ref: [
 					{
