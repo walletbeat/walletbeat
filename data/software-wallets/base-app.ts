@@ -191,9 +191,8 @@ export const baseApp: SoftwareWallet = {
 		// A recent Base App update added multi-wallet support: the wallet picker
 		// lists multiple coexisting wallets (e.g. "Wallet 5", "Wallet 6") and an
 		// "Add Wallet" sheet offers both "Create Wallet" (a new multi-chain wallet)
-		// and "Import Wallet" (sign into an existing passkey). Verified first-hand
-		// in-app (Base App v29.99.7, 2026-06-19); supersedes the earlier
-		// single-account-per-install finding from v29.94.123.
+		// and "Import Wallet" (sign into an existing passkey). Verified in-app
+		// (Base App v29.99.7, 2026-06-19).
 		multiAddress: supported({
 			ref: [
 				{
