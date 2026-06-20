@@ -209,12 +209,12 @@ export const rabby: SoftwareWallet = {
 			coreLicense: {
 				ref: [
 					{
-						explanation: "Rabby's rabby-api package is unlicensed.",
+						explanation: "Rabby's `rabby-api` package is unlicensed.",
 						url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 					},
 					{
 						explanation:
-							"Other than its rabby-api package, Rabby's core code is licensed under the MIT license.",
+							"Other than its `rabby-api` package, Rabby's core code is licensed under the MIT license.",
 						url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
 					},
 				],

@@ -2312,7 +2312,7 @@ export class WalletCaptureFile {
 			}
 		}
 
-		return issues
+		return await Promise.resolve(issues)
 	}
 
 	public markFlowUnsupported(f: RecordedFlow) {

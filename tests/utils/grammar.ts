@@ -1,7 +1,6 @@
 import * as harper from 'harper.js'
 import { describe, expect, it } from 'vitest'
 
-import { allWallets } from '@/data/wallets'
 import { getCSpellWords } from '@/tests/utils/cspell'
 import {
 	ContentType,
@@ -22,16 +21,8 @@ let vocabulary: string[] | null = null
 function getVocabulary(): string[] {
 	if (vocabulary === null) {
 		const cSpellWords = getCSpellWords()
-		const walletNames: string[] = Object.values(allWallets).map(
-			wallet => wallet.metadata.displayName,
-		)
-		// TODO: https://github.com/walletbeat/walletbeat/issues/547
-		// Wallet IDs (URL slugs) are not fully in cspell; add them so Harper accepts them in generated markdown URLs (e.g. .../trezor#maintenance).
-		const walletIds: string[] = Object.values(allWallets).map(wallet => wallet.metadata.id)
 
 		vocabulary = cSpellWords
-			.concat(walletNames)
-			.concat(walletIds)
 			.reduce<string[]>((prev, cur) => {
 				if (cur.toLowerCase() === cur) {
 					return prev.concat([cur])
@@ -127,6 +118,22 @@ interface AbstractLinter {
 
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
 
+function isInsideUrl(text: string, start: number, end: number): boolean {
+	// Match URLs starting with common schemes (http://, https://, ftp://, etc.)
+	// The regex matches the scheme followed by any non-whitespace characters.
+	for (const match of text.matchAll(/\b[a-z][-a-z0-9+.]*:\/\/[^\s,$}>\])"]*/gi)) {
+		const urlStart = match.index ?? 0
+		const urlEnd = urlStart + match[0].length
+
+		// Check if the given [start, end] span overlaps with this URL
+		if (start >= urlStart && end <= urlEnd) {
+			return true
+		}
+	}
+
+	return false
+}
+
 function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
 	const before = text.substring(0, start)
 	const lastLinkStart = before.lastIndexOf('](')
@@ -170,6 +177,10 @@ function getRegexpLinter({
 						const start = match.index ?? 0
 
 						if (isInsideMarkdownLinkUrl(text, start)) {
+							continue
+						}
+
+						if (isInsideUrl(text, start, start + matchedText.length)) {
 							continue
 						}
 
@@ -236,6 +247,7 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 
 	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
 	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
+	lints = lints.filter(lint => !isInsideUrl(trimmedText, lint.span().start, lint.span().end))
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(
@@ -257,8 +269,18 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 	const message: string[] = []
 
 	for (const lint of lints) {
+		const fewCharsBefore = trimmedText.substring(
+			Math.max(0, lint.span().start - 8),
+			lint.span().start,
+		)
+		const fewCharsAfter = trimmedText.substring(
+			lint.span().end,
+			Math.min(trimmedText.length, lint.span().end + 8),
+		)
+		const badText = trimmedText.substring(lint.span().start, lint.span().end)
+
 		message.push(
-			`- ${lint.span().start}:${lint.span().end}: ${lint.lint_kind_pretty()}: ${lint.message()}`,
+			`- ${lint.span().start}:${lint.span().end} ("${fewCharsBefore}>>${badText}<<${fewCharsAfter}"): ${lint.lint_kind_pretty()}: ${lint.message()}`,
 		)
 
 		if (lint.suggestions().length !== 0) {
@@ -340,13 +362,4 @@ export function walletContentGrammarLint(
 			}
 		})
 	})
-}
-
-/**
- * @returns Whether the given text is likely to be english.
- */
-export async function isLikelyEnglish(str: string): Promise<boolean> {
-	const linter = await getHarperLinter()
-
-	return await linter.isLikelyEnglish(str)
 }
