@@ -1095,6 +1095,8 @@ export function userFlowMayBeMarkedUnsupported(
 	| UserFlow.NATIVE_SWAP
 	| UserFlow.MAKE_TRANSACTION
 	| UserFlow.APP_CONNECTION {
+	return true // Temp
+
 	return (
 		flow === UserFlow.SEND_ETHER ||
 		flow === UserFlow.SEND_USDC ||

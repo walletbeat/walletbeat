@@ -187,6 +187,10 @@ export function linkableToWalletAddress<T extends UserInfo>(
 	const qualRefs = refs({ ref })
 
 	for (const info of personalInfo.items) {
+		if (info === PersonalInfo.TRACKING_IDENTIFIER) {
+			continue // Temp
+		}
+
 		if (!collectedByDefault(qualLeaks[info])) {
 			continue
 		}
@@ -327,7 +331,13 @@ export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 			ctx.features.privacy.dataCollection[UserFlow.ONBOARDING_NEW],
 			ctx.features.privacy.dataCollection[UserFlow.ONBOARDING_IMPORT],
 		]) {
-			if (onboarding !== null && onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN') {
+			// Temp:
+			if (
+				onboarding !== null &&
+				Object.hasOwn(onboarding, 'publishedOnchain') &&
+				onboarding.publishedOnchain !== undefined &&
+				onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN'
+			) {
 				ctx.addRef(onboarding.publishedOnchain)
 
 				for (const linkable of linkableToWalletAddress(

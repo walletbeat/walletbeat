@@ -7,8 +7,6 @@ const walletDataCollection = autoGenerateWalletDataCollection({
 	annotations,
 	data: {
 		BROWSER: browserData,
-		DESKTOP: null,
-		MOBILE: null,
 	},
 	walletId: 'rabby',
 })

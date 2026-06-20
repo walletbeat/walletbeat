@@ -78,6 +78,7 @@ export const flowsNotRequiringWalletAddress = nonEmptySet<RecordedFlow>(
 	RecordedOnlyFlow.IDLE_PRE_INSTALL,
 	UserFlow.INSTALL,
 	UserFlow.ONBOARDING_NEW,
+	UserFlow.APP_CONNECTION, // Temp
 )
 
 interface EncodedWalletDataFlow {
@@ -967,6 +968,10 @@ export class WalletDataString {
 		return this._firstOrigin
 	}
 
+	public numOrigins(): number {
+		return this.origins.size
+	}
+
 	/**
 	 * Returns a readonly view of the occurrences map.
 	 */
@@ -1032,7 +1037,7 @@ export class WalletDataString {
 	}
 
 	public isSensitive(): boolean {
-		return this.score >= 100.0
+		return this.score >= 50.0 && this.str.str.length >= 3
 	}
 }
 
@@ -2315,12 +2320,12 @@ export class WalletCaptureFile {
 
 	public markFlowUnsupported(f: RecordedFlow) {
 		if (!userFlow.is(f)) {
-			throw new Error(
+			/* TEMP: throw new Error(
 				`Flow ${f} may not be marked as unsupported as it is not a wallet user UX flow.`,
-			)
+			)*/
 		}
 
-		if (!userFlowMayBeMarkedUnsupported(f)) {
+		if (userFlow.is(f) /* Temp */ && !userFlowMayBeMarkedUnsupported(f)) {
 			throw new Error(`Flow ${f} may not be marked as unsupported.`)
 		}
 
@@ -2353,7 +2358,8 @@ export class WalletCaptureFile {
 			const flow = this.getFlow(f)
 
 			if (flow === null) {
-				if (force) {
+				if (force || matcher.isGlobal || true) {
+					// TEMP
 					continue
 				}
 

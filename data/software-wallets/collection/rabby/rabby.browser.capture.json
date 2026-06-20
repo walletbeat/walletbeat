@@ -1,0 +1,19 @@
+{
+	"identity": {
+		"walletId": "rabby",
+		"walletType": "SOFTWARE",
+		"walletVariant": "BROWSER"
+	},
+	"flows": {
+		"INSTALL": "NOT_SUPPORTED",
+		"ONBOARDING_NEW": "NOT_SUPPORTED",
+		"ONBOARDING_IMPORT": "NOT_SUPPORTED",
+		"SEND_ETHER": "NOT_SUPPORTED",
+		"SEND_USDC": "NOT_SUPPORTED",
+		"NATIVE_SWAP": "NOT_SUPPORTED",
+		"MAKE_TRANSACTION": "NOT_SUPPORTED",
+		"IDLE_PRE_INSTALL": "NOT_SUPPORTED"
+	},
+	"userData": [],
+	"sessions": 0
+}
