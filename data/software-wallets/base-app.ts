@@ -158,7 +158,32 @@ export const baseApp: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: null,
+			// Base App default accounts are Coinbase Smart Wallet contracts, which
+			// expose EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
+			// contract-level property (executeBatch) that holds on every chain the
+			// wallet is deployed to, including Ethereum L1 — verified first-hand:
+			// eth_getCode for the implementation (0x00000110dcdedc9581cb5ecb8467282f2926534d)
+			// returns bytecode on mainnet, and executeBatch is in the audited source.
+			walletCall: supported({
+				ref: [
+					{
+						explanation:
+							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
+						url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
+					},
+					{
+						explanation:
+							'The open-source `base/account-sdk` that backs Base App account flows implements `wallet_sendCalls` with an `atomicRequired` parameter; the SDK is chain-agnostic and the atomic capability is reported by the account, not restricted to L2.',
+						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
+					},
+					{
+						explanation:
+							'Atomic batching is a property of the Coinbase Smart Wallet contract (`executeBatch`), which is deployed at the same address on Ethereum mainnet. First-hand (2026-06-20): `eth_getCode` for `0x00000110dcdedc9581cb5ecb8467282f2926534d` on Ethereum L1 returns contract bytecode, so atomic multi-transaction batching is available on L1, which is the scope this attribute measures.',
+						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+					},
+				],
+				atomicMultiTransactions: featureSupported,
+			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
