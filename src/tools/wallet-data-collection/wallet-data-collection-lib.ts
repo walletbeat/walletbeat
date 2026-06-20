@@ -398,6 +398,10 @@ class Options<T extends object> {
 			const value = input[fieldName]
 
 			if (typeof value === 'number') {
+				if (fieldName === 'port') {
+					continue // Port number; skip.
+				}
+
 				const rawValue = recoverRawArgValue(fieldName)
 
 				if (rawValue === null) {
@@ -1134,7 +1138,11 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			return false
 		}
 
-		return str.str.pieces.size === 0
+		if (str.str.pieces.size > 0) {
+			return true
+		}
+
+		return str.isSensitive()
 	}
 	let firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
 	let userStopped = false

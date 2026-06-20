@@ -198,10 +198,6 @@ export class StringEntropy {
 		this.entropy = entropy
 	}
 
-	public sensitive(): boolean {
-		return this.entropy > 100.0
-	}
-
 	public encode(): `v1:${StringEntropyCharset}:${string}` {
 		return `v1:${this.charset}:${this.entropy.toFixed(20)}`
 	}

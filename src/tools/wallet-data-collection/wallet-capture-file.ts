@@ -690,13 +690,7 @@ export class WalletDataString {
 		}
 
 		// Fallback: treat the entire string as a single WalletDataString
-		const dataStr = new WalletDataString(new UserDataString(str, new Set()), origin)
-
-		if (!isKnown && !dataStr.entropy.sensitive()) {
-			return []
-		}
-
-		return [dataStr]
+		return [new WalletDataString(new UserDataString(str, new Set()), origin)]
 	}
 
 	private static _tryParseAsQueryString(
@@ -1035,6 +1029,10 @@ export class WalletDataString {
 		}
 
 		return this._score
+	}
+
+	public isSensitive(): boolean {
+		return this.score >= 100.0
 	}
 }
 
