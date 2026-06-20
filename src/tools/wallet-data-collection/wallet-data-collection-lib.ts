@@ -113,15 +113,15 @@ export function getNextFlow(flow: RecordedFlow): RecordedFlow | 'DONE' {
 // Option Interfaces
 // ============================================================================
 
-type Option<O> = (x: unknown) => O
+type Option<O> = (x: unknown) => Promise<O>
 
 function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2> {
-	return (x: unknown): O1 | O2 => {
+	return async (x: unknown): Promise<O1 | O2> => {
 		try {
-			return opt1(x)
+			return await opt1(x)
 		} catch (e1) {
 			try {
-				return opt2(x)
+				return await opt2(x)
 			} catch (e2) {
 				throw new Error(`${getErrorMessage(e1)} & ${getErrorMessage(e2)}`)
 			}
@@ -129,16 +129,16 @@ function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2
 	}
 }
 
-function stringOption(x: unknown): string {
+async function stringOption(x: unknown): Promise<string> {
 	if (x === undefined) {
 		throw new Error('flag not specified')
 	}
 
 	if (typeof x !== 'string') {
-		throw new Error(`not a string (got ${typeof x})`)
+		throw new Error(`not a string (got ${typeof x}: ${JSON.stringify(x)})`)
 	}
 
-	return x
+	return await Promise.resolve(x)
 }
 
 function typedStringOption<T extends string>(
@@ -146,8 +146,8 @@ function typedStringOption<T extends string>(
 	predicate: (s: string) => s is T,
 	helpText: string,
 ): Option<T> {
-	return (x: unknown): T => {
-		const s = stringOption(x)
+	return async (x: unknown): Promise<T> => {
+		const s = await stringOption(x)
 
 		if (!predicate(s)) {
 			throw new Error(
@@ -159,7 +159,7 @@ function typedStringOption<T extends string>(
 	}
 }
 
-function stringListOption(x: unknown): NonEmptyArray<string> {
+async function stringListOption(x: unknown): Promise<NonEmptyArray<string>> {
 	if (x === undefined) {
 		throw new Error('flag not specified')
 	}
@@ -177,11 +177,11 @@ function stringListOption(x: unknown): NonEmptyArray<string> {
 		throw new Error('nothing specified')
 	}
 
-	return split
+	return await Promise.resolve(split)
 }
 
-function walletAddressesSet(x: unknown): NonEmptySet<Erc55Address> {
-	const set = nonEmptySetFromArray(nonEmptyMap(stringListOption(x), ethereumErc55Address))
+async function walletAddressesSet(x: unknown): Promise<NonEmptySet<Erc55Address>> {
+	const set = nonEmptySetFromArray(nonEmptyMap(await stringListOption(x), ethereumErc55Address))
 
 	if (setItems(set).length < 4) {
 		throw new Error(
@@ -192,7 +192,7 @@ function walletAddressesSet(x: unknown): NonEmptySet<Erc55Address> {
 	return set
 }
 
-function booleanOption(x: unknown): boolean {
+async function booleanOption(x: unknown): Promise<boolean> {
 	if (x === undefined) {
 		throw new Error('flag not specified')
 	}
@@ -207,10 +207,10 @@ function booleanOption(x: unknown): boolean {
 		throw new Error(`"${x}": not a valid boolean (want either "true" or "false")`)
 	}
 
-	return lower == 'true' || lower === 'yes'
+	return await Promise.resolve(lower == 'true' || lower === 'yes')
 }
 
-function numberOption(x: unknown): number {
+async function numberOption(x: unknown): Promise<number> {
 	if (x === undefined) {
 		throw new Error('flag not specified')
 	}
@@ -223,7 +223,7 @@ function numberOption(x: unknown): number {
 		const n = Number(x)
 
 		if (Number.isFinite(n)) {
-			return n
+			return await Promise.resolve(n)
 		}
 	}
 
@@ -231,7 +231,7 @@ function numberOption(x: unknown): number {
 }
 
 function enumOption<E extends string>(e: Enum<E>): Option<E> {
-	return (x: unknown): E => {
+	return async (x: unknown): Promise<E> => {
 		if (x === undefined) {
 			throw new Error('flag not specified')
 		}
@@ -250,12 +250,12 @@ function enumOption<E extends string>(e: Enum<E>): Option<E> {
 			throw new Error(`invalid: "${x}" (must be one of: ${e.items.join(', ')})`)
 		}
 
-		return x
+		return await Promise.resolve(x)
 	}
 }
 
 function enumSetOption<E extends string>(e: Enum<E>): Option<NonEmptySet<E>> {
-	return (x: unknown): NonEmptySet<E> => {
+	return async (x: unknown): Promise<NonEmptySet<E>> => {
 		if (x === undefined) {
 			throw new Error('flag not specified')
 		}
@@ -291,17 +291,81 @@ function enumSetOption<E extends string>(e: Enum<E>): Option<NonEmptySet<E>> {
 			throw new Error('need at least one item')
 		}
 
-		return nonEmptySetFromArray(items)
+		return await Promise.resolve(nonEmptySetFromArray(items))
 	}
 }
 
+/**
+ * Checks if a string value is one that `cac` would coerce to a JavaScript number.
+ * `cac` uses JavaScript's `Number()` internally, which accepts:
+ * - Plain integers and decimals (123, -45.6)
+ * - Hex literals (0xabcd, 0XABCDEF)
+ * - Scientific notation (1e10, 1.5e-3)
+ * - Special values (Infinity, -Infinity, NaN)
+ */
+function looksLikeCoercibleNumber(s: string): boolean {
+	const trimmed = s.trim()
+
+	if (trimmed === '') {
+		return false
+	}
+
+	// Check special values first
+	if (trimmed === 'Infinity' || trimmed === '-Infinity' || trimmed === 'NaN') {
+		return true
+	}
+
+	// Check hex literals (0x or 0X prefix followed by hex digits)
+	if (/^0[xX][0-9a-fA-F]+$/.test(trimmed)) {
+		return true
+	}
+
+	// Check if Number() parses it as a finite number or NaN
+	const n = Number(trimmed)
+
+	return !Number.isNaN(n)
+}
+
+/**
+ * Recovers the raw string value for a CLI flag from `process.argv`.
+ * Supports both `--fieldName=value` and `--fieldName value` formats.
+ * Returns `null` if the flag is not found in `process.argv`.
+ */
+function recoverRawArgValue(fieldName: string): string | null {
+	const flagEquals = `--${fieldName}=`
+	const flagSpace = `--${fieldName}`
+
+	for (let i = 0; i < process.argv.length; i++) {
+		const arg = process.argv[i]
+
+		// Check --fieldName=value format
+		if (arg.startsWith(flagEquals) && arg.length > flagEquals.length) {
+			return arg.slice(flagEquals.length)
+		}
+
+		// Check --fieldName value format
+		if (arg === flagSpace && i + 1 < process.argv.length) {
+			const next = process.argv[i + 1]
+
+			// If the next arg looks like another flag, the value was not provided
+			if (next.startsWith('-')) {
+				return null
+			}
+
+			return next
+		}
+	}
+
+	return null
+}
+
 function optionalOption<O>(nonOptional: Option<O>): Option<O | null> {
-	return (x: unknown): O | null => {
+	return async (x: unknown): Promise<O | null> => {
 		if (x === undefined || x === null) {
 			return null
 		}
 
-		return nonOptional(x)
+		return await nonOptional(x)
 	}
 }
 
@@ -312,13 +376,46 @@ class Options<T extends object> {
 		this.fields = fields
 		this.chained = chained === undefined ? null : chained
 	}
-	public process(x: unknown): T {
+	public async process(x: unknown): Promise<T> {
 		if (x === null || x === undefined) {
 			throw new Error('provided null options')
 		}
 
 		if (typeof x !== 'object') {
 			throw new Error('provided non-object')
+		}
+
+		// Pre-process: recover raw string values from process.argv for fields
+		// that `cac` incorrectly coerced to numbers (e.g., hex strings like 0x...).
+		const input = x as Partial<Record<keyof T, unknown>>
+		const fieldNames = Object.keys(this.fields)
+
+		for (const fieldName of fieldNames) {
+			if (!Object.hasOwn(this.fields, fieldName) || typeof fieldName !== 'string') {
+				throw new Error(`unexpected non-string argument name: ${String(fieldName)}`)
+			}
+
+			const value = input[fieldName]
+
+			if (typeof value === 'number') {
+				const rawValue = recoverRawArgValue(fieldName)
+
+				if (rawValue === null) {
+					throw new Error(
+						`Flag --${fieldName.toString()}: cac coerced this value to a number, ` +
+							'but the original flag could not be found in process.argv',
+					)
+				}
+
+				if (!looksLikeCoercibleNumber(rawValue)) {
+					throw new Error(
+						`Flag --${fieldName.toString()}: cac coerced this value to a number, ` +
+							`but the original value '${rawValue}' does not look like a number-like string`,
+					)
+				}
+
+				input[fieldName] = rawValue
+			}
 		}
 
 		let result: Partial<T> = {}
@@ -332,7 +429,7 @@ class Options<T extends object> {
 					culled[fieldName as keyof T] = (x as Partial<T>)[fieldName as keyof T]
 				}
 			}
-			result = { ...result, ...this.chained.process(culled) }
+			result = { ...result, ...(await this.chained.process(culled)) }
 		}
 
 		for (const fieldName of Object.keys(x)) {
@@ -345,7 +442,7 @@ class Options<T extends object> {
 			}
 		}
 
-		for (const fieldName of Object.keys(this.fields)) {
+		for (const fieldName of fieldNames) {
 			const option = this.fields[fieldName]
 
 			if (option === undefined) {
@@ -353,7 +450,7 @@ class Options<T extends object> {
 			}
 
 			try {
-				const processed = option((x as Partial<T>)[fieldName])
+				const processed = await option(input[fieldName])
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
@@ -373,7 +470,7 @@ export interface GlobalOptions {
 }
 
 export const globalOptions = new Options<GlobalOptions>({
-	id: (x: unknown): WalletName => {
+	id: async (x: unknown): Promise<WalletName> => {
 		if (x === undefined) {
 			throw new Error('must specify wallet ID')
 		}
@@ -390,18 +487,18 @@ export const globalOptions = new Options<GlobalOptions>({
 			throw new Error(`not a valid wallet ID: ${x}`)
 		}
 
-		return x
+		return await Promise.resolve(x)
 	},
 	variant: enumOption(variantEnum),
 	type: enumOption(walletTypes),
 })
 
-export function getSaveOptions(opts: GlobalOptions): SaveOptions {
-	return {
+export async function getSaveOptions(opts: GlobalOptions): Promise<SaveOptions> {
+	return await Promise.resolve({
 		verifyExisting: false,
 		walletId: opts.id,
 		walletVariants: allWallets[opts.id].variants,
-	}
+	})
 }
 
 export function getCommandPrefix(opts: GlobalOptions): string {
@@ -643,7 +740,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 		for (const walletAddr of setItems(opts.walletAddresses)) {
 			captureFile.userData.add(new UserDataString(walletAddr, [WalletInfo.ACCOUNT_ADDRESS]))
 		}
-		await captureFile.save(getSaveOptions(opts))
+		await captureFile.save(await getSaveOptions(opts))
 	}
 
 	argv.push('-s', path.join(scriptDir(), 'mitmproxy_wallet_data_collection.py'))
@@ -735,7 +832,7 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 	const capture = await openCaptureFile(opts)
 
 	capture.deleteSession(opts.session)
-	await capture.save(getSaveOptions(opts))
+	await capture.save(await getSaveOptions(opts))
 	log(`✅ Successfully deleted all data for session ${opts.session}.`)
 }
 
@@ -803,7 +900,7 @@ export async function handleMarkFlowUnsupported(opts: MarkFlowUnsupportedOptions
 	const capture = await openCaptureFile(opts)
 
 	capture.markFlowUnsupported(opts.flow)
-	await capture.save(getSaveOptions(opts))
+	await capture.save(await getSaveOptions(opts))
 	log(`Flow ${opts.flow} marked as unsupported.`)
 	log(`Run \`${getCommandPrefix(opts)} check\` to see if there are any more issues to address.`)
 }
@@ -897,7 +994,7 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 		opts.force ?? false,
 	)
 
-	await capture.save(getSaveOptions(opts))
+	await capture.save(await getSaveOptions(opts))
 	log(`✅ Matched ${matched.length} request${matched.length === 1 ? '' : 's'}`)
 
 	for (const req of matched) {
@@ -923,7 +1020,7 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 
 	capture.userData.add(new UserDataString(opts.string, setItems(opts.data)))
 
-	await capture.save(getSaveOptions(opts))
+	await capture.save(await getSaveOptions(opts))
 	log(`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}.`)
 }
 
@@ -1030,7 +1127,7 @@ function displayRequestInfo(
 export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 	let capture = await openCaptureFile(opts)
 
-	let walletDataStrings = await capture.gatherStrings()
+	let walletDataStrings = capture.gatherStrings()
 	let allStrings = walletDataStrings.strings()
 	const isWorthReviewing = (str: WalletDataString): boolean => {
 		if (capture.isBenignString(str.str.str)) {
@@ -1216,7 +1313,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 				// Handle the special options
 				if (specialOption === '__STOP_AND_SAVE__') {
-					await capture.save(getSaveOptions(opts))
+					await capture.save(await getSaveOptions(opts))
 					log('\n✅ Progress saved. Stopping string review.')
 					userStopped = true
 					confirmed = true
@@ -1225,7 +1322,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 				if (specialOption === '__GLOBAL_BENIGN__') {
 					capture.addBenignString(strValue.str, true)
-					await capture.save(getSaveOptions(opts))
+					await capture.save(await getSaveOptions(opts))
 					log(`✅ Marked string "${strValue.str}" as globally benign.`)
 					confirmed = true
 					continue
@@ -1233,14 +1330,14 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 				if (specialOption === '__BENIGN__') {
 					capture.addBenignString(strValue.str, false)
-					await capture.save(getSaveOptions(opts))
+					await capture.save(await getSaveOptions(opts))
 					log(`✅ Marked string "${strValue.str}" as benign.`)
 					confirmed = true
 					continue
 				}
 
 				if (specialOption === '__NOT_WALLET_RELATED__') {
-					await capture.save(getSaveOptions(opts))
+					await capture.save(await getSaveOptions(opts))
 					log('\n💾 Progress saved. Stopping string review.')
 					log('If you are seeing non-wallet-initiated requests, you should either:')
 					log('  - Create matchers for these requests using the `explain-request` subcommand.')
@@ -1265,7 +1362,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			const merged = strValue.withMerged(...selectedUserInfoValues)
 
 			capture.userData.add(merged)
-			await capture.save(getSaveOptions(opts))
+			await capture.save(await getSaveOptions(opts))
 			log(
 				`✅ Marked string "${strValue.str}" as ${Array.from(merged.pieces).toSorted().join(', ')}.`,
 			)
@@ -1274,7 +1371,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 		// Refresh strings:
 		capture = await openCaptureFile(opts)
-		walletDataStrings = await capture.gatherStrings()
+		walletDataStrings = capture.gatherStrings()
 		allStrings = walletDataStrings.strings()
 		firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
 	}
@@ -1289,7 +1386,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 	const capture = await openCaptureFile(opts)
-	const allStrings = await capture.gatherStrings()
+	const allStrings = capture.gatherStrings()
 
 	// Collect all unreviewed requests across all flows
 	const unreviewedRequests: Array<{ flow: RecordedFlow; review: WalletRequestReview }> = []
@@ -1391,7 +1488,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 				if (confirmResponse.value) {
 					review.markAsReviewed()
-					await capture.save(getSaveOptions(opts))
+					await capture.save(await getSaveOptions(opts))
 					log('✅ Review saved.')
 					confirmed = true
 				}
@@ -1482,7 +1579,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 						if (removeMatcherResponse.value) {
 							capture.removeRequestMatcher(matcher)
-							await capture.save(getSaveOptions(opts))
+							await capture.save(await getSaveOptions(opts))
 							log('✅ Matcher deleted. Restarting this request review...')
 						}
 
@@ -1495,7 +1592,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 			// Collect detected user info from request. CollectionPolicy is irrelevant here since we
 			// only look at the keys (`UserInfo`s).
-			const detectedUserInfo = new Set((await request.userInfo(null, false)).keys())
+			const detectedUserInfo = new Set(request.userInfo(null, false).keys())
 
 			if (detectedUserInfo.size > 0) {
 				log(`\n  Auto-detected user data: ${Array.from(detectedUserInfo).join(', ')}`)
@@ -1707,7 +1804,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				}
 
 				review.markAsReviewed()
-				await capture.save(getSaveOptions(opts))
+				await capture.save(await getSaveOptions(opts))
 				log('✅ Review saved.')
 				confirmed = true
 			} else {

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 import json
+import hashlib
 import logging
 import os
 import time
@@ -183,7 +184,7 @@ class UserDataStringStore:
 
     def encode(self) -> list[dict]:
         with self._lock:
-            return [item.encode() for item in sorted(self._strings.values(), key=lambda x: x.str)]
+            return [item.encode() for item in sorted(self._strings.values(), key=lambda x: hashlib.sha256(x.str.encode('utf-8')).hexdigest())]
 
 
 class WalletCaptureContext(enum.StrEnum):

@@ -63,7 +63,7 @@ cli
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' capture --flow='SEND_ETHER' --wallet-addresses='0x123...,0x456...'",
 	)
 	.action(async options => {
-		await handleCapture(captureOptions.process(options))
+		await handleCapture(await captureOptions.process(options))
 	})
 
 // delete-capture subcommand
@@ -74,7 +74,7 @@ cli
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' delete-capture --session=42",
 	)
 	.action(async options => {
-		await handleDeleteCapture(deleteCaptureOptions.process(options))
+		await handleDeleteCapture(await deleteCaptureOptions.process(options))
 	})
 
 // check subcommand
@@ -82,7 +82,7 @@ cli
 	.command('check', 'Examine capture file and flag missing information needing triage')
 	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' check")
 	.action(async options => {
-		await handleCheck(globalOptions.process(options))
+		await handleCheck(await globalOptions.process(options))
 	})
 
 // mark-flow-unsupported subcommand
@@ -93,7 +93,7 @@ cli
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-flow-unsupported --flow='NATIVE_SWAP'",
 	)
 	.action(async options => {
-		await handleMarkFlowUnsupported(markFlowUnsupportedOptions.process(options))
+		await handleMarkFlowUnsupported(await markFlowUnsupportedOptions.process(options))
 	})
 
 // mark-domain subcommand
@@ -108,18 +108,17 @@ cli
 		'Entity to assign the domain to. Entities must exist in the codebase first.',
 	)
 	.usage(
-		'mark-domain --domain=<domain-pattern> --entity=<entity-id>' +
+		'mark-domain --domain=<domain-pattern> --entity=<entity-id>\n' +
 			trimWhitespacePrefix(`
-
 				Entities must be defined in the codebase first.
 				Known entity IDs: ${Object.keys(allEntities).toSorted().join(', ')}
-	`),
+			`),
 	)
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain --domain='infura.io' --entity='consensys'",
 	)
 	.action(async options => {
-		await handleMarkDomain(markDomainOptions.process(options))
+		await handleMarkDomain(await markDomainOptions.process(options))
 	})
 
 // explain-request subcommand
@@ -129,7 +128,7 @@ cli
 		'Mark requests matching selectors as being done for specific purposes',
 	)
 	.usage(
-		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--policy=<collection_policy>] [--force=true]" +
+		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--policy=<collection_policy>] [--force=true]\n" +
 			trimWhitespacePrefix(`
 				Mark requests matching selectors as being done for specific purposes.
 				Use \`--purposes=NOT_WALLET_INITIATED\` if these requests were not initiated by the wallet,
@@ -171,16 +170,15 @@ cli
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='builtin-spyware-reporting.chrome.google.com' --purposes='NOT_WALLET_INITIATED'",
 	)
 	.action(async options => {
-		await handleExplainRequest(explainRequestOptions.process(options))
+		await handleExplainRequest(await explainRequestOptions.process(options))
 	})
 
 // mark-string subcommand
 cli
 	.command('mark-string', 'Mark a string as conveying user data.')
 	.usage(
-		'mark-string --string=<string> --data=<data-type>|BENIGN' +
+		'mark-string --string=<string> --data=<data-type>|BENIGN\n' +
 			trimWhitespacePrefix(`
-
 				Mark a string as conveying one or more pieces of user data.
 				Valid user data types: ${userInfoEnums.items.join(', ')}
 			`),
@@ -207,16 +205,15 @@ cli
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='BraveBrowser' --data='BENIGN' --global=true",
 	)
 	.action(async options => {
-		await handleMarkString(markStringOptions.process(options))
+		await handleMarkString(await markStringOptions.process(options))
 	})
 
 // mark-string subcommand
 cli
 	.command('review-strings', 'Review strings from network capture.')
 	.usage(
-		'review-strings' +
+		'review-strings\n' +
 			trimWhitespacePrefix(`
-
 				Interactively review unclassified strings from network capture.
 			`),
 	)
@@ -224,14 +221,14 @@ cli
 	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
 	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
 	.action(async options => {
-		await handleReviewStrings(globalOptions.process(options))
+		await handleReviewStrings(await globalOptions.process(options))
 	})
 
 cli
 	.command('review-requests', 'Interactively review requests')
 	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-requests")
 	.action(async options => {
-		await handleReviewRequests(globalOptions.process(options))
+		await handleReviewRequests(await globalOptions.process(options))
 	})
 
 cli

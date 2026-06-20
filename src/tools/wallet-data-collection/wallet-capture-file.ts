@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 
@@ -26,7 +27,7 @@ import {
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type Variant, variantEnum } from '@/schema/variants'
 import { type WalletType, walletTypes } from '@/schema/wallet-types'
-import { isInVocabulary, isLikelyEnglish } from '@/tests/utils/grammar'
+import { isInVocabulary } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
 import {
 	assertNonEmptyArray,
@@ -435,9 +436,18 @@ export class UserDataStringStore {
 		return this._index.get(str)
 	}
 
+	public all(): Set<string> {
+		return new Set(this._index.keys())
+	}
+
 	public toJSON(): EncodedUserDataStringStore {
 		return Array.from(this._index.values())
-			.sort((a, b) => a.str.localeCompare(b.str))
+			.sort((a, b) => {
+				const hashA = crypto.createHash('sha256').update(a.str, 'utf8').digest('hex')
+				const hashB = crypto.createHash('sha256').update(b.str, 'utf8').digest('hex')
+
+				return hashA.localeCompare(hashB)
+			})
 			.map(item => item.encode())
 	}
 }
@@ -619,24 +629,24 @@ export class WalletDataString {
 		return b.score - a.score
 	}
 
-	public static async createMany(
+	public static createMany(
 		strings: WalletDataStrings,
 		str: string,
 		origin: WalletDataStringOrigin,
-	): Promise<WalletDataString[]> {
+	): WalletDataString[] {
 		if (str === '') {
 			return []
 		}
 
 		// Try JSON parsing
-		const jsonResult = await WalletDataString._tryParseAsJson(strings, str, origin)
+		const jsonResult = WalletDataString._tryParseAsJson(strings, str, origin)
 
 		if (jsonResult !== null) {
 			return jsonResult
 		}
 
 		if (str.includes('\n')) {
-			const ndjsonResult = await WalletDataString._tryParseAsJsonLines(strings, str, origin)
+			const ndjsonResult = WalletDataString._tryParseAsJsonLines(strings, str, origin)
 
 			if (ndjsonResult !== null) {
 				return ndjsonResult
@@ -644,46 +654,56 @@ export class WalletDataString {
 		}
 
 		// Try query string parsing
-		const queryResult = await WalletDataString._tryParseAsQueryString(strings, str, origin)
+		const queryResult = WalletDataString._tryParseAsQueryString(strings, str, origin)
 
 		if (queryResult !== null) {
 			return queryResult
 		}
 
-		const substrResult = await WalletDataString._tryFindSubstrings(strings, str, origin)
+		const substrResult = WalletDataString._tryFindSubstrings(strings, str, origin)
 
 		if (substrResult !== null) {
 			return substrResult
 		}
 
-		// Check if we are dealing with english text.
-		// Normalize slugs and CamelCase as we go.
-		const normalizedText = str.replaceAll(/([a-z])([A-Z])/g, '$1 $2').replaceAll(/[-_.,/\s]+/g, ' ')
+		const isKnown = strings.isKnown(str)
 
-		if (isInVocabulary(normalizedText)) {
-			return []
-		}
+		if (!isKnown) {
+			// Check if we are dealing with english text.
+			// Normalize slugs and CamelCase as we go.
+			const normalizedText = str
+				.replaceAll(/([a-z])([A-Z])/g, '$1 $2')
+				.replaceAll(/[-_.,/\s]+/g, ' ')
 
-		if (
-			normalizedText.includes(' ') &&
-			normalizedText.split(' ').every(v => v.trim() === '' || isInVocabulary(v.trim()))
-		) {
-			return []
-		}
+			if (isInVocabulary(normalizedText)) {
+				return []
+			}
 
-		if (await isLikelyEnglish(normalizedText)) {
-			return []
+			if (
+				normalizedText.includes(' ') &&
+				normalizedText
+					.split(' ')
+					.every((v: string): boolean => v.trim() === '' || isInVocabulary(v.trim()))
+			) {
+				return []
+			}
 		}
 
 		// Fallback: treat the entire string as a single WalletDataString
-		return [new WalletDataString(new UserDataString(str, new Set()), origin)]
+		const dataStr = new WalletDataString(new UserDataString(str, new Set()), origin)
+
+		if (!isKnown && !dataStr.entropy.sensitive()) {
+			return []
+		}
+
+		return [dataStr]
 	}
 
-	private static async _tryParseAsQueryString(
+	private static _tryParseAsQueryString(
 		strings: WalletDataStrings,
 		str: string,
 		origin: WalletDataStringOrigin,
-	): Promise<WalletDataString[] | null> {
+	): WalletDataString[] | null {
 		// Only attempt if the string contains query-like characters
 		if (!str.includes('&') && !str.includes('=')) {
 			return null
@@ -715,7 +735,7 @@ export class WalletDataString {
 				// Key without value
 				if (!numOccurrences.has(pair)) {
 					results.push(
-						...(await WalletDataString.createMany(
+						...WalletDataString.createMany(
 							strings,
 							pair,
 							originWithQuery.add({
@@ -723,7 +743,7 @@ export class WalletDataString {
 								key: pair,
 								branch: 'KEY',
 							}),
-						)),
+						),
 					)
 					numOccurrences.set(pair, 0)
 				}
@@ -732,7 +752,7 @@ export class WalletDataString {
 
 				if (!numOccurrences.has(key)) {
 					results.push(
-						...(await WalletDataString.createMany(
+						...WalletDataString.createMany(
 							strings,
 							key,
 							originWithQuery.add({
@@ -740,7 +760,7 @@ export class WalletDataString {
 								key: key,
 								branch: 'KEY',
 							}),
-						)),
+						),
 					)
 				}
 
@@ -748,7 +768,7 @@ export class WalletDataString {
 				const value = pair.slice(eqIndex + 1)
 
 				results.push(
-					...(await WalletDataString.createMany(
+					...WalletDataString.createMany(
 						strings,
 						value,
 						originWithQuery.add({
@@ -757,7 +777,7 @@ export class WalletDataString {
 							branch: 'VALUE',
 							index: numOccurrence,
 						}),
-					)),
+					),
 				)
 				numOccurrences.set(pair, numOccurrence + 1)
 			}
@@ -770,11 +790,11 @@ export class WalletDataString {
 		return results
 	}
 
-	private static async _tryParseAsJson(
+	private static _tryParseAsJson(
 		strings: WalletDataStrings,
 		str: string,
 		origin: WalletDataStringOrigin,
-	): Promise<WalletDataString[] | null> {
+	): WalletDataString[] | null {
 		let parsed: unknown
 
 		try {
@@ -783,18 +803,18 @@ export class WalletDataString {
 			return null
 		}
 
-		return await WalletDataString._extractJsonStrings(
+		return WalletDataString._extractJsonStrings(
 			strings,
 			parsed,
 			origin.add({ type: 'JSON_DECODE' }),
 		)
 	}
 
-	private static async _tryParseAsJsonLines(
+	private static _tryParseAsJsonLines(
 		strings: WalletDataStrings,
 		str: string,
 		origin: WalletDataStringOrigin,
-	): Promise<WalletDataString[] | null> {
+	): WalletDataString[] | null {
 		const lines = str.split('\n').filter(line => line.trim() !== '')
 
 		if (lines.length === 0) {
@@ -815,22 +835,22 @@ export class WalletDataString {
 			}
 
 			results.push(
-				...(await WalletDataString._extractJsonStrings(
+				...WalletDataString._extractJsonStrings(
 					strings,
 					parsed,
 					originWithNDJSON.add({ type: 'INDEX', index: i }),
-				)),
+				),
 			)
 		}
 
 		return results
 	}
 
-	private static async _extractJsonStrings(
+	private static _extractJsonStrings(
 		strings: WalletDataStrings,
 		value: unknown,
 		origin: WalletDataStringOrigin,
-	): Promise<WalletDataString[]> {
+	): WalletDataString[] {
 		const results: WalletDataString[] = []
 
 		if (value === undefined || value === null) {
@@ -838,38 +858,36 @@ export class WalletDataString {
 		}
 
 		if (typeof value === 'string') {
-			results.push(...(await WalletDataString.createMany(strings, value, origin)))
+			results.push(...WalletDataString.createMany(strings, value, origin))
 		} else if (Array.isArray(value)) {
-			await Promise.all(
-				value.map(async (val, i) => {
-					results.push(
-						...(await WalletDataString._extractJsonStrings(
-							strings,
-							val,
-							origin.add({ type: 'INDEX', index: i }),
-						)),
-					)
-				}),
-			)
+			value.map((val, i) => {
+				results.push(
+					...WalletDataString._extractJsonStrings(
+						strings,
+						val,
+						origin.add({ type: 'INDEX', index: i }),
+					),
+				)
+			})
 		} else if (typeof value === 'object') {
 			for (const key of Object.keys(value).sort()) {
 				results.push(
-					...(await WalletDataString.createMany(
+					...WalletDataString.createMany(
 						strings,
 						key,
 						origin.add({ type: 'KEY', key, branch: 'KEY' }),
-					)),
+					),
 				)
 
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know `key` is a key of `value`.
 				const obj = value as { [key]: unknown }
 
 				results.push(
-					...(await WalletDataString._extractJsonStrings(
+					...WalletDataString._extractJsonStrings(
 						strings,
 						obj[key],
 						origin.add({ type: 'KEY', key, branch: 'VALUE' }),
-					)),
+					),
 				)
 			}
 		}
@@ -878,17 +896,15 @@ export class WalletDataString {
 		return results
 	}
 
-	private static async _tryFindSubstrings(
+	private static _tryFindSubstrings(
 		strings: WalletDataStrings,
 		str: string,
 		origin: WalletDataStringOrigin,
-	): Promise<WalletDataString[] | null> {
+	): WalletDataString[] | null {
 		const strLength = str.length
 		const substrings: (WalletDataStringBreadcrumb & { type: 'SUBSTRING' })[] = []
 
-		for (const existing of strings.longestFirstUserInfoOnlyStrings()) {
-			const existingStr = existing.str.str
-
+		for (const existingStr of strings.longestFirstStrings()) {
 			if (existingStr.length >= strLength) {
 				continue
 			}
@@ -921,17 +937,17 @@ export class WalletDataString {
 			return null
 		}
 
-		return (
-			await Promise.all(
-				substrings.map(breadcrumb =>
-					WalletDataString.createMany(
-						strings,
-						str.substring(breadcrumb.from, breadcrumb.to),
-						origin.add(breadcrumb),
-					),
-				),
-			)
-		).flat()
+		return substrings
+			.map(breadcrumb => {
+				const sub = WalletDataString.createMany(
+					strings,
+					str.substring(breadcrumb.from, breadcrumb.to),
+					origin.add(breadcrumb),
+				)
+
+				return sub
+			})
+			.flat()
 	}
 
 	public str: UserDataString
@@ -1026,10 +1042,15 @@ export class WalletDataStrings {
 	private captureFile: WalletCaptureFile
 	private _strings: Map<string, WalletDataString> = new Map()
 	private _highestScoreFirstStrings: WalletDataString[] | null = null
-	private _longestFirstStrings: WalletDataString[] | null = null
+	private _longestFirstWalletDataStrings: WalletDataString[] | null = null
+	private _longestFirstPremarkedStrings: string[]
+	private _longestFirstStrings: string[] | null = null
 
 	constructor(captureFile: WalletCaptureFile) {
 		this.captureFile = captureFile
+		this._longestFirstPremarkedStrings = Array.from(this.captureFile.userData.all()).sort(
+			(a, b) => b.length - a.length,
+		)
 	}
 
 	public add(s: WalletDataString) {
@@ -1054,6 +1075,7 @@ export class WalletDataStrings {
 		}
 
 		this._highestScoreFirstStrings = null
+		this._longestFirstWalletDataStrings = null
 		this._longestFirstStrings = null
 	}
 
@@ -1071,15 +1093,34 @@ export class WalletDataStrings {
 		return this._highestScoreFirstStrings
 	}
 
+	public isKnown(str: string): boolean {
+		return this._strings.has(str) || this.captureFile.userData.get(str) !== undefined
+	}
+
 	public get(str: string): WalletDataString | undefined {
 		return this._strings.get(str)
 	}
 
-	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
-		if (this._longestFirstStrings === null) {
-			this._longestFirstStrings = Array.from(this._strings.values())
+	longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
+		if (this._longestFirstWalletDataStrings === null) {
+			this._longestFirstWalletDataStrings = Array.from(this._strings.values())
 				.filter(s => s.str.pieces.size > 0)
 				.sort((a, b) => b.str.str.length - a.str.str.length)
+		}
+
+		return this._longestFirstWalletDataStrings
+	}
+
+	premarkedLongestFirstUserDataStrings(): ReadonlyArray<string> {
+		return this._longestFirstPremarkedStrings
+	}
+
+	public longestFirstStrings(): ReadonlyArray<string> {
+		if (this._longestFirstStrings === null) {
+			this._longestFirstStrings = this.longestFirstUserInfoOnlyStrings()
+				.map(s => s.str.str)
+				.concat(this.premarkedLongestFirstUserDataStrings())
+				.sort((a, b) => b.length - a.length)
 		}
 
 		return this._longestFirstStrings
@@ -1433,10 +1474,10 @@ export class WalletRequest {
 		return [this.domain]
 	}
 
-	public async userInfo(
+	public userInfo(
 		matcherCollectionPolicy: CollectionPolicy | null,
 		includeManualReview: boolean,
-	): Promise<Map<UserInfo, CollectionPolicy | null>> {
+	): Map<UserInfo, CollectionPolicy | null> {
 		const infos = new Map<UserInfo, CollectionPolicy | null>()
 
 		const setInfo = (info: UserInfo, collectionPolicy: CollectionPolicy | null) => {
@@ -1470,7 +1511,7 @@ export class WalletRequest {
 		setInfo(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
 		const reqStrings = new WalletDataStrings(this._captureFile)
 
-		await this.populateStringsInto(reqStrings)
+		this.populateStringsInto(reqStrings)
 
 		for (const dataString of reqStrings.strings()) {
 			for (const userInfo of dataString.str.pieces) {
@@ -1495,14 +1536,14 @@ export class WalletRequest {
 		return infos
 	}
 
-	public async populateStringsInto(strings: WalletDataStrings) {
-		await this._processUserDataDict(strings, this.query, WalletStringOccurrenceType.QUERY)
-		await this._processUserDataDict(strings, this.cookies, WalletStringOccurrenceType.COOKIE)
-		await this._processUserDataDict(strings, this.oddHeaders, WalletStringOccurrenceType.HEADER)
-		await this._processUserDataDict(strings, this.oddTrailers, WalletStringOccurrenceType.TRAILER)
+	public populateStringsInto(strings: WalletDataStrings) {
+		this._processUserDataDict(strings, this.query, WalletStringOccurrenceType.QUERY)
+		this._processUserDataDict(strings, this.cookies, WalletStringOccurrenceType.COOKIE)
+		this._processUserDataDict(strings, this.oddHeaders, WalletStringOccurrenceType.HEADER)
+		this._processUserDataDict(strings, this.oddTrailers, WalletStringOccurrenceType.TRAILER)
 
 		if (this.content !== null) {
-			const dataStrings = await WalletDataString.createMany(
+			const dataStrings = WalletDataString.createMany(
 				strings,
 				this.content,
 				new WalletDataStringOrigin(
@@ -1517,13 +1558,13 @@ export class WalletRequest {
 		}
 	}
 
-	private async _processUserDataDict(
+	private _processUserDataDict(
 		strings: WalletDataStrings,
 		dict: UserDataDict,
 		occurrenceType: WalletStringOccurrenceType,
 	) {
 		for (const [key, piecesArray] of Object.entries(dict)) {
-			const keyStrings = await WalletDataString.createMany(
+			const keyStrings = WalletDataString.createMany(
 				strings,
 				key,
 				new WalletDataStringOrigin(
@@ -1544,7 +1585,7 @@ export class WalletRequest {
 			}
 
 			for (let i = 0; i < piecesArray.length; i++) {
-				const dataStrings = await WalletDataString.createMany(
+				const dataStrings = WalletDataString.createMany(
 					strings,
 					piecesArray[i],
 					new WalletDataStringOrigin(
@@ -1872,7 +1913,7 @@ export class WalletCaptureFile {
 	 * partial data into wallet feature data without breakage. Unit tests
 	 * should check in strict mode.
 	 */
-	public async toDataCollection(options: AutoGenerationOptions): Promise<DataCollection> {
+	public toDataCollection(options: AutoGenerationOptions): DataCollection {
 		const dataCollection: DataCollection = {
 			[UserFlow.INSTALL]: null,
 			[UserFlow.ONBOARDING_NEW]: null,
@@ -1904,7 +1945,7 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			const collected = await this.processFlowRequests(flow, options.strict ?? false)
+			const collected = this.processFlowRequests(flow, options.strict ?? false)
 			const flowData: DataCollectionForFlow = {
 				collected,
 			}
@@ -1928,10 +1969,10 @@ export class WalletCaptureFile {
 	/**
 	 * Process flow requests to build DataCollectionByEntity array.
 	 */
-	private async processFlowRequests(
+	private processFlowRequests(
 		flow: WalletCaptureFlow,
 		strict: boolean,
-	): Promise<WithRef<DataCollectionByEntity>[]> {
+	): WithRef<DataCollectionByEntity>[] {
 		const maybeThrow = (error: string) => {
 			if (strict) {
 				throw new Error(error)
@@ -1955,7 +1996,7 @@ export class WalletCaptureFile {
 			}
 
 			const matcher = this.findMatcherForReq(request)
-			const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
+			const userInfos = request.userInfo(matcher === null ? null : matcher.policy, true)
 			const purposes = new Set<DataCollectionPurpose>()
 
 			if (matcher !== null) {
@@ -2252,7 +2293,7 @@ export class WalletCaptureFile {
 		if (issues.length === 0) {
 			// Double-check that this is the case by trying to convert in strict mode:
 			try {
-				await this.toDataCollection({
+				this.toDataCollection({
 					strict: true,
 				})
 			} catch (e) {
@@ -2366,7 +2407,7 @@ export class WalletCaptureFile {
 		return this.annotations.isBenign(str)
 	}
 
-	public async gatherStrings(): Promise<WalletDataStrings> {
+	public gatherStrings(): WalletDataStrings {
 		const strings = new WalletDataStrings(this)
 
 		for (const f of recordedFlow.items) {
@@ -2380,7 +2421,7 @@ export class WalletCaptureFile {
 				const matcher = this.findMatcherForReq(req)
 
 				if (matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED') {
-					await req.populateStringsInto(strings)
+					req.populateStringsInto(strings)
 				}
 			}
 		}

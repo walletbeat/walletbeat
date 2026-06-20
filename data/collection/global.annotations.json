@@ -152,6 +152,10 @@
 		{
 			"domain": "chrome.google.com",
 			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "mitm.it",
+			"purposes": "NOT_WALLET_INITIATED"
 		}
 	],
 	"benignStrings": ["AWSALB", "engagement_time_msec", "x-api-ver"]
