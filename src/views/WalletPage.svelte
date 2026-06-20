@@ -827,13 +827,13 @@
 											<a
 												href={`#${stage.id}`}
 												data-link="camouflaged"
-												title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+												title={`This attribute is required for ${stage.label}`}
 											>
 												<div
 													data-badge="small"
 													style:--accent="var(--accent-color)"
 												>
-													<small>Stage {stageNumbers.join(', ')}</small>
+													<small>{stage.label}</small>
 												</div>
 											</a>
 
