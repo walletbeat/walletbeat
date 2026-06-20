@@ -102,19 +102,19 @@ export const baseApp: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Base Accounts are ERC-4337 smart wallets. The default in-app "Create Wallet" flow (v29.99.7) provisions an account whose sole signer is a Coinbase-operated "email signer": no passkey and no seed phrase are generated, and keys.coinbase.com Settings lists the only sign-in method as "Email signer — Only one email permitted per account". The underlying contract supports multi-owner via `addOwner`/`removeOwnerAtIndex`, but the app exposes no owner-management UI.',
+							'Base Accounts are ERC-4337 smart wallets. The default in-app "Create Wallet" flow (v29.99.7) provisions an account whose sole signer is a Coinbase-operated "email signer". No passkey and no seed phrase are generated. On keys.coinbase.com, Settings lists the only sign-in method as "Email signer — Only one email permitted per account". The underlying contract supports multi-owner via `addOwner`/`removeOwnerAtIndex`, but the app exposes no owner-management UI.',
 						url: 'https://docs.base.org/base-account/overview/what-is-base-account',
 					},
 					{
 						explanation:
-							"First-hand verification (2026-06-19, Base App v29.99.7): signing in to keys.coinbase.com from a desktop browser with no synced passkey, using only an emailed one-time code, granted full wallet control and let us sign and broadcast a real send. Because a passkey-less device could authorize a signature with email auth alone, the signing key is held server-side by Coinbase and reachable via email — it is NOT in the user's sole self-custody by default. Hence controllingSharesInSelfCustodyByDefault is NO (a key/share is stored solely on the provider's servers).",
+							"First-hand verification (2026-06-19, Base App v29.99.7): we signed into keys.coinbase.com from a desktop browser with no synced passkey, using only an emailed one-time code. That granted full wallet control and let us sign and broadcast a real send. Because a passkey-less device could authorize a signature with email auth alone, the signing key is held server-side by Coinbase and is reachable via email. It is therefore not in the user's sole self-custody by default: a key share is stored solely on the provider's servers.",
 						file: 'public/references/wallets/base-app/screenshots/2026-06-19-email-signer.png',
 						label:
 							'keys.coinbase.com Sign-in Methods showing "Email signer" as the only signer (no passkey)',
 					},
 					{
 						explanation:
-							'The send review screen ("Request from Base Account", Ethereum, ~$0.10) signed and broadcast on email-only auth, with "Signing with 0xFF7E…d323" — the Coinbase-operated signer.',
+							'The send review screen ("Request from Base Account", Ethereum, ~$0.10) signed and broadcast on email-only auth, with "Signing with `0xFF7E…d323`" — the Coinbase-operated signer.',
 						file: 'public/references/wallets/base-app/screenshots/2026-06-19-email-account-send-review.png',
 						label: 'Email-only send review on keys.coinbase.com, signing with the email signer',
 					},
