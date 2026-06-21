@@ -173,12 +173,12 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'The open-source `base/account-sdk` that backs Base App account flows implements `wallet_sendCalls` with an `atomicRequired` parameter; the SDK is chain-agnostic and the atomic capability is reported by the account, not restricted to L2.',
+							'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
 						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
 					},
 					{
 						explanation:
-							'Atomic batching is a property of the Coinbase Smart Wallet contract (`executeBatch`), which is deployed at the same address on Ethereum mainnet. First-hand (2026-06-20): `eth_getCode` for `0x00000110dcdedc9581cb5ecb8467282f2926534d` on Ethereum L1 returns contract bytecode, so atomic multi-transaction batching is available on L1, which is the scope this attribute measures.',
+							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). `0x00000110dcdedc9581cb5ecb8467282f2926534d` is a recognized Coinbase Smart Wallet implementation, deployed at the same address across chains (including Ethereum L1) via the Safe Singleton Factory. First-hand (2026-06-20): `eth_getCode` for that implementation on Ethereum L1 returns contract bytecode, so atomic multi-transaction batching is available on L1, which is the scope this attribute measures.',
 						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
 					},
 				],
