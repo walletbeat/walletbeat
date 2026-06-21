@@ -183,7 +183,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet (chain id 1) as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded. This is a direct, on-chain demonstration of EIP-5792 atomic batching on L1, which is the scope this attribute measures.",
+							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
 						url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
 					},
 				],
