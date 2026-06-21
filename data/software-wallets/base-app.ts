@@ -158,13 +158,12 @@ export const baseApp: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			// Base App default accounts are Coinbase Smart Wallet contracts, which
-			// expose EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
+			// Base App accounts run Coinbase Smart Wallet logic, which exposes
+			// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
 			// contract-level property (executeBatch) that holds on every chain the
-			// wallet is deployed to, including Ethereum L1. The implementation
-			// (0x00000110dcdedc9581cb5ecb8467282f2926534d) is a deployed contract on
-			// mainnet (publicly verifiable on any block explorer), and executeBatch
-			// is in the audited source.
+			// wallet is deployed to, including Ethereum L1. Confirmed live on
+			// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
+			// UserOperation routed through the account's executeBatch (see refs).
 			walletCall: supported({
 				ref: [
 					{
@@ -184,8 +183,8 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'The implementation `0x00000110dcdedc9581cb5ecb8467282f2926534d` is a recognized Coinbase Smart Wallet implementation, deployed at the same address across chains (including Ethereum L1) via the Safe Singleton Factory. It is a deployed contract on Ethereum mainnet — publicly verifiable: the address holds contract bytecode (`eth_getCode` returns non-empty), so atomic multi-transaction batching is available on L1, which is the scope this attribute measures.',
-						url: 'https://etherscan.io/address/0x00000110dcdedc9581cb5ecb8467282f2926534d',
+							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet (chain id 1) as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded. This is a direct, on-chain demonstration of EIP-5792 atomic batching on L1, which is the scope this attribute measures.",
+						url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
 					},
 				],
 				atomicMultiTransactions: featureSupported,
