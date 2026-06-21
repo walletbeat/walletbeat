@@ -210,6 +210,62 @@ function validateSingleColor(rawValue: string, attrLabel: string, errors: string
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
 
+const iconFontCodepoints: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+	wbicons: {
+		about: 'ℹ️',
+		account_abstraction: '💼',
+		account_portability: '🧳',
+		account_recovery: '🛟',
+		account_type: '🪪',
+		account_unruggability: '🪚',
+		address_resolution: '📇',
+		app_isolation: '🏝️',
+		browser_integration: '🌐',
+		chain_abstraction: '🌉',
+		chain_verification: '⚓',
+		discuss: '💬',
+		duress_resistance: '🔧',
+		ecosystem: '🌳',
+		faq: '❓',
+		fee_transparency: '💸',
+		free_and_open_source_license: '❤️',
+		funding_transparency: '💰',
+		hardware_wallet_interoperability: '🧩',
+		hardware_wallet_support: '🗝️',
+		l1_provider_independence: '🏠',
+		multi_address_privacy: '🖇️',
+		newsletter: '📰',
+		orderflow_transparency: '💸',
+		passkey_verification: '🫆',
+		permissions_management: '🔑',
+		privacy: '😎',
+		privacy_hygiene: '🧼',
+		private_token_transfers: '📨',
+		question_mark: '❔',
+		release_process_transparency: '🚢',
+		repository: '💻',
+		scam_prevention: '🚨',
+		security: '🔒',
+		security_audits: '🔏',
+		security_best_practices: '🔐',
+		self_sovereignty: '🏰',
+		source_visibility: '🔍',
+		transaction_batching: '🧺',
+		transaction_inclusion: '📡',
+		transaction_legibility: '🔏',
+		transparency: '🕵️',
+		user_privacy: '🔒',
+		wallet_address_privacy: '🔗',
+		wallet_browser: '🌐',
+		wallet_desktop: '🖥️',
+		wallet_embedded: '🧩',
+		wallet_hardware: '🔐',
+		wallet_mobile: '📱',
+		wallet_software: '💻',
+		wallet_test: '🧪',
+	},
+}
+
 export class SVGFont {
 	public readonly fontName: string
 	public readonly fontTypeName: string
@@ -275,7 +331,12 @@ export class SVGFont {
 
 		svgFiles.sort()
 
-		const hashParts = [fontName, JSON.stringify(svgoConfig), String(svgFiles.length)]
+		const hashParts = [
+			fontName,
+			JSON.stringify(svgoConfig),
+			JSON.stringify(iconFontCodepoints[fontName] ?? null),
+			String(svgFiles.length),
+		]
 
 		for (const file of svgFiles) {
 			const contents = await fs.promises.readFile(path.join(svgIconsDir, file), 'utf-8')
@@ -378,6 +439,8 @@ export class SVGFont {
 		await fs.promises.mkdir(this.fontOutputDir, { recursive: true })
 		await fs.promises.mkdir(this.cssOutputDir, { recursive: true })
 
+		const iconCodepoints = iconFontCodepoints[this.fontName] ?? null
+
 		const result = await svgtofont({
 			src: this.svgIconsDir,
 			dist: this.fontOutputDir,
@@ -385,6 +448,9 @@ export class SVGFont {
 			excludeFormat: ['symbol.svg'],
 			css: false,
 			startUnicode: iconFontStartCharCode,
+			getIconUnicode: (name, unicode, startUnicode) => {
+				return [iconCodepoints?.[name] ?? unicode, startUnicode]
+			},
 			svgicons2svgfont: {
 				fontHeight: 1000,
 				normalize: true,
@@ -405,9 +471,15 @@ export class SVGFont {
 				throw new Error(`Key ${key} not encoded: ${JSON.stringify(icon)}`)
 			}
 
+			const iconCodepoint = iconCodepoints?.[key]
+
+			if (iconCodepoints !== null && iconCodepoint === undefined) {
+				throw new Error(`Missing emoji unicode mapping for ${this.fontName} icon: ${key}`)
+			}
+
 			cssRules.push(`
 				&[data-icon~="${key}"] {
-					--icon-content: "${icon.encodedCode}";
+					--icon-content: "${iconCodepoint ?? icon.encodedCode}";
 				}`)
 			typeValues.push(`\t| ${JSON.stringify(key)}`)
 		}

@@ -79,19 +79,19 @@ export default defineConfig({
 				],
 			},
 		},
-		{
-			name: 'wbicons',
-			cssVariable: '--fontFamily-wbicons',
-			provider: fontProviders.local(),
-			options: {
-				variants: [
-					{
-						src: ['./src/assets/fonts/wbicons/wbicons.woff2'],
-						weight: '400',
-						style: 'normal',
-					},
-				],
-			},
-		},
+		// {
+		// 	name: 'wbicons',
+		// 	cssVariable: '--fontFamily-wbicons',
+		// 	provider: fontProviders.local(),
+		// 	options: {
+		// 		variants: [
+		// 			{
+		// 				src: ['./src/assets/fonts/wbicons/wbicons.woff2'],
+		// 				weight: '400',
+		// 				style: 'normal',
+		// 			},
+		// 		],
+		// 	},
+		// },
 	],
 })

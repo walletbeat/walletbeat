@@ -1108,7 +1108,7 @@
 										offset: 80,
 										outerCornerRadius: 8,
 										innerCornerRadius: 8,
-										labelSize: 11,
+										labelSize: 9,
 									}
 								]}
 
@@ -1631,7 +1631,7 @@
 								offset: 100,
 								outerCornerRadius: 10,
 								innerCornerRadius: 10,
-								labelSize: 11,
+								labelSize: 9,
 							}
 						]}
 						slices={
