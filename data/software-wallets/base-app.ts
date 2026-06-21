@@ -161,7 +161,7 @@ export const baseApp: SoftwareWallet = {
 			// Base App default accounts are Coinbase Smart Wallet contracts, which
 			// expose EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
 			// contract-level property (executeBatch) that holds on every chain the
-			// wallet is deployed to, Ethereum L1 among them. The implementation
+			// wallet is deployed to, including Ethereum L1. The implementation
 			// (0x00000110dcdedc9581cb5ecb8467282f2926534d) is a deployed contract on
 			// mainnet (publicly verifiable on any block explorer), and executeBatch
 			// is in the audited source.
