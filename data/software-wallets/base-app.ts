@@ -161,9 +161,10 @@ export const baseApp: SoftwareWallet = {
 			// Base App default accounts are Coinbase Smart Wallet contracts, which
 			// expose EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
 			// contract-level property (executeBatch) that holds on every chain the
-			// wallet is deployed to, including Ethereum L1 — verified first-hand:
-			// eth_getCode for the implementation (0x00000110dcdedc9581cb5ecb8467282f2926534d)
-			// returns bytecode on mainnet, and executeBatch is in the audited source.
+			// wallet is deployed to, including Ethereum L1. The implementation
+			// (0x00000110dcdedc9581cb5ecb8467282f2926534d) is a deployed contract on
+			// mainnet (publicly verifiable on any block explorer), and executeBatch
+			// is in the audited source.
 			walletCall: supported({
 				ref: [
 					{
@@ -178,8 +179,13 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). `0x00000110dcdedc9581cb5ecb8467282f2926534d` is a recognized Coinbase Smart Wallet implementation, deployed at the same address across chains (including Ethereum L1) via the Safe Singleton Factory. First-hand (2026-06-20): `eth_getCode` for that implementation on Ethereum L1 returns contract bytecode, so atomic multi-transaction batching is available on L1, which is the scope this attribute measures.',
+							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
 						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+					},
+					{
+						explanation:
+							'The implementation `0x00000110dcdedc9581cb5ecb8467282f2926534d` is a recognized Coinbase Smart Wallet implementation, deployed at the same address across chains (including Ethereum L1) via the Safe Singleton Factory. It is a deployed contract on Ethereum mainnet — publicly verifiable: the address holds contract bytecode (`eth_getCode` returns non-empty), so atomic multi-transaction batching is available on L1, which is the scope this attribute measures.',
+						url: 'https://etherscan.io/address/0x00000110dcdedc9581cb5ecb8467282f2926534d',
 					},
 				],
 				atomicMultiTransactions: featureSupported,
