@@ -1138,11 +1138,19 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			return false
 		}
 
+		if (capture.userData.get(str.str.str)) {
+			return false // Already known
+		}
+
 		if (str.str.pieces.size > 0) {
 			return true
 		}
 
-		return str.isSensitive()
+		if (!str.isSensitive()) {
+			return false
+		}
+
+		return true
 	}
 	let firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
 	let userStopped = false

@@ -967,6 +967,10 @@ export class WalletDataString {
 		return this._firstOrigin
 	}
 
+	public numOrigins(): number {
+		return this.origins.size
+	}
+
 	/**
 	 * Returns a readonly view of the occurrences map.
 	 */
@@ -1032,7 +1036,7 @@ export class WalletDataString {
 	}
 
 	public isSensitive(): boolean {
-		return this.score >= 100.0
+		return this.score >= 50.0 && this.str.str.length >= 3
 	}
 }
 
