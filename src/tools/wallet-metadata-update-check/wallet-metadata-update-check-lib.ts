@@ -2,9 +2,8 @@ import { spawnSync } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { type CalendarDate, daysBetween } from '@/types/date'
-
 import { getRepositoryRoot } from '@/tests/utils/codebase'
+import { type CalendarDate, daysBetween } from '@/types/date'
 
 /**
  * Result of running the metadata-update check.
@@ -104,9 +103,7 @@ function resolveBaseRef(cwd: string, baseRef?: string): string {
 		}
 	}
 
-	throw new Error(
-		`Could not resolve a base ref to diff against. Tried: ${candidates.join(', ')}.`,
-	)
+	throw new Error(`Could not resolve a base ref to diff against. Tried: ${candidates.join(', ')}.`)
 }
 
 /** List wallet files modified between baseRef and HEAD. */
@@ -246,9 +243,7 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
 		const headValue = readLastUpdated(absPath)
 
 		if (headValue === undefined) {
-			problems.push(
-				`${file}: feature data changed but no \`lastUpdated\` field found in the file.`,
-			)
+			problems.push(`${file}: feature data changed but no \`lastUpdated\` field found in the file.`)
 			continue
 		}
 
@@ -283,10 +278,7 @@ export function runCheck(opts: CheckOptions = {}): CheckResult {
  * the failure message so contributors know how to skip the check when their
  * change really is feature-irrelevant.
  */
-export function formatResult(
-	result: CheckResult,
-	opts: { bypassToken?: string } = {},
-): string {
+export function formatResult(result: CheckResult, opts: { bypassToken?: string } = {}): string {
 	const bypass = opts.bypassToken ?? DEFAULT_OPTIONS.bypassToken
 	const lines: string[] = []
 
@@ -294,6 +286,7 @@ export function formatResult(
 		lines.push(
 			`Bypassed via "${bypass}" in the commit message. No metadata-update checks were run.`,
 		)
+
 		return lines.join('\n')
 	}
 
@@ -303,6 +296,7 @@ export function formatResult(
 
 	if (result.ok) {
 		lines.push('All inspected wallets have a fresh `lastUpdated`. ✓')
+
 		return lines.join('\n')
 	}
 
@@ -314,9 +308,7 @@ export function formatResult(
 	}
 
 	lines.push('')
-	lines.push(
-		"Each modified wallet must bump `metadata.lastUpdated` to today's date (YYYY-MM-DD).",
-	)
+	lines.push("Each modified wallet must bump `metadata.lastUpdated` to today's date (YYYY-MM-DD).")
 	lines.push(
 		'If the change is genuinely feature-irrelevant (e.g. comment-only) and the heuristic is wrong,',
 	)
