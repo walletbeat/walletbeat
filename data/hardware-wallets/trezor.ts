@@ -153,6 +153,7 @@ export const trezorWallet: HardwareWallet = {
 				ethereumL1: null,
 			},
 			publicSecurityAudits: null,
+			scamAlerts: null,
 			secureElement: supported({
 				ref: [
 					{

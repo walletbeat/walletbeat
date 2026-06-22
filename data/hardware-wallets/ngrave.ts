@@ -138,6 +138,7 @@ export const ngrave: HardwareWallet = {
 				ethereumL1: null,
 			},
 			publicSecurityAudits: null,
+			scamAlerts: null,
 			secureElement: supported({
 				ref: [
 					{

@@ -137,6 +137,9 @@ export interface WalletBaseFeatures {
 
 		/** Security best practices. */
 		securityBestPractices: SecurityBestPracticesData | null
+
+		/** Support for alerting the user about potential scams. */
+		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
 	}
 
 	/** Privacy features. */
@@ -211,9 +214,6 @@ export interface WalletBaseFeatures {
  */
 export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
-		/** Support for alerting the user about potential scams. */
-		scamAlerts: VariantFeature<Nullable<ScamAlerts>>
-
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 
@@ -478,7 +478,7 @@ export function resolveFeatures(
 		profile: features.profile,
 		security: {
 			scamAlerts: nullable(
-				softwareFeat('security.scamAlerts', features => features.security.scamAlerts),
+				baseFeat('security.scamAlerts', features => features.security.scamAlerts),
 			),
 			publicSecurityAudits:
 				features.security.publicSecurityAudits === null

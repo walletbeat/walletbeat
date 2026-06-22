@@ -106,6 +106,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 				ethereumL1: null,
 			},
 			publicSecurityAudits: null,
+			scamAlerts: null,
 			secureElement: null,
 			securityBestPractices: null,
 			supplyChainDIY: null,

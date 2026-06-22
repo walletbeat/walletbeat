@@ -210,6 +210,7 @@ export const keycardShell: HardwareWallet = {
 				ethereumL1: null,
 			},
 			publicSecurityAudits: null, // Security: EAL6+ certified JavaCard secure element (on the Keycard smartcard)
+			scamAlerts: null,
 			secureElement: supported({
 				ref: {
 					explanation:

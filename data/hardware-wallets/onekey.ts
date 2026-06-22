@@ -166,6 +166,7 @@ export const onekeyWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
+			scamAlerts: null,
 			secureElement: supported({
 				ref: [
 					{
