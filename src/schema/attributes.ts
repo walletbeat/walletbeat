@@ -187,9 +187,9 @@ export function borderRatingToColor(rating: Rating): string {
 		case Rating.PASS:
 			return '#B5ED9D' // Green
 		case Rating.UNRATED:
-			return '#F8ECEC' // Gray
+			return '#bdc3c7' // Gray
 		case Rating.EXEMPT:
-			return '#D5D4FB' // Gray
+			return '#bdc3c7' // Gray
 	}
 }
 
