@@ -55,6 +55,7 @@ try {
 		if (!quiet) {
 			process.stdout.write(`${output}\n`)
 		}
+
 		process.exit(0)
 	} else {
 		process.stderr.write(`${output}\n`)
