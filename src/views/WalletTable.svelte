@@ -1989,7 +1989,7 @@
 		cursor: pointer;
 		transition-property: background-color, border-color, color;
 
-		[data-icon~="wbicons"] {
+		> span {
 			font-size: 1.5rem;
 			line-height: 1;
 		}
@@ -2103,7 +2103,7 @@
 		padding: 0;
 		transition-property: color;
 
-		[data-icon~="wbicons"] {
+		> span {
 			font-size: 1.25rem;
 			line-height: 1;
 		}
@@ -2150,7 +2150,7 @@
 		justify-content: center;
 		flex-shrink: 0;
 
-		[data-icon~="wbicons"] {
+		> span {
 			font-size: 1.4rem;
 			line-height: 1;
 		}
