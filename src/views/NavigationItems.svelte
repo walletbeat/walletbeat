@@ -219,7 +219,7 @@
 					{:else if item.icon in LUCIDE_ICONS}
 						{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
 					{:else}
-						<span data-wbicon data-icon={item.icon}></span>
+						<span data-icon="wbicons {item.icon}"></span>
 					{/if}
 				</span>
 			{/if}
@@ -234,7 +234,7 @@
 				{:else if item.icon in LUCIDE_ICONS}
 					{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
 				{:else}
-					<span data-wbicon data-icon={item.icon}></span>
+					<span data-icon="wbicons {item.icon}"></span>
 				{/if}
 			</span>
 		{/if}

@@ -422,7 +422,7 @@
 									aria-label={variantToName(variant, true)}
 									onclick={() => toggleFilterById?.(filterId)}
 								>
-									<span data-wbicon data-icon={variantWbIconIds[variant]}></span>
+									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
 								<span class="filter-circle-label">{variantToName(variant, false)}</span>
 							</div>
@@ -444,7 +444,7 @@
 								aria-label={label}
 								onclick={() => toggleFilterById?.(id)}
 							>
-								<span data-wbicon data-icon="account_type"></span>
+								<span data-icon="wbicons account_type"></span>
 							</button>
 							<span class="filter-circle-label">{label}</span>
 						</div>
@@ -1438,7 +1438,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon" data-wbicon="emoji" data-icon={attrGroup.icon}></span>
+										<span class="pie-center-icon" data-icon="wbicons emoji {attrGroup.icon}"></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}
@@ -1598,7 +1598,7 @@
 									aria-pressed={variant === selectedVariant}
 									onclick={() => toggleFilterById?.(`variant-${variant}`, true)}
 								>
-									<span data-wbicon data-icon={variantWbIconIds[variant]}></span>
+									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
 							{/each}
 						</div>
@@ -1617,7 +1617,7 @@
 								class="mobile-attr-circle"
 								style:--attr-color={groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)'}
 							>
-								<span data-wbicon data-icon={attrGroup.icon}></span>
+								<span data-icon="wbicons {attrGroup.icon}"></span>
 							</div>
 							<span class="mobile-attr-label">{attrGroup.displayName}</span>
 						</a>
@@ -1989,7 +1989,7 @@
 		cursor: pointer;
 		transition-property: background-color, border-color, color;
 
-		[data-wbicon] {
+		[data-icon~="wbicons"] {
 			font-size: 1.5rem;
 			line-height: 1;
 		}
@@ -2103,7 +2103,7 @@
 		padding: 0;
 		transition-property: color;
 
-		[data-wbicon] {
+		[data-icon~="wbicons"] {
 			font-size: 1.25rem;
 			line-height: 1;
 		}
@@ -2150,7 +2150,7 @@
 		justify-content: center;
 		flex-shrink: 0;
 
-		[data-wbicon] {
+		[data-icon~="wbicons"] {
 			font-size: 1.4rem;
 			line-height: 1;
 		}

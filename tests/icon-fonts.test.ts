@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+	generatedIconFontCSS,
 	iconFontCodepoints,
 	repeatedIconFontCodepoints,
 	SVGFont,
@@ -28,6 +29,19 @@ describe('wbicons', async () => {
 			repeatedCodepoints,
 			`Every wbicon needs a unique unicode sequence so the font can map it back to its SVG glyph: ${JSON.stringify(repeatedCodepoints)}`,
 		).toEqual({})
+	})
+	it('only renders data-icon values with the wbicons token', () => {
+		const css = generatedIconFontCSS('wbicons', [
+			'&[data-icon~="security"] {\n\t--icon-content: "🔒";\n}',
+		])
+
+		expect(css).toContain('[data-icon~="wbicons"] {')
+		expect(css).toContain(
+			'&::before {\n\t\tcontent: var(--icon-content);\n\t\tfont-family: var(--fontFamily-wbicons);',
+		)
+		expect(css).toContain('&[data-icon~="security"]')
+		expect(css).not.toContain(':where(')
+		expect(css).toContain('&[data-icon~="emoji"]::before')
 	})
 	it('has only monochrome files', async () => {
 		const results = await wbicons.nonMonochromeFiles()

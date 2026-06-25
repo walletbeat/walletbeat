@@ -1,15 +1,14 @@
-[data-wbicon] {
-	font-family: var(--fontFamily-wbicons);
-	font-style: normal;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-
-	&[data-wbicon~="emoji"] {
-		font-family: var(--fontFamily-emoji);
-	}
-
+[data-icon~="wbicons"] {
 	&::before {
 		content: var(--icon-content);
+		font-family: var(--fontFamily-wbicons);
+		font-style: normal;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	&[data-icon~="emoji"]::before {
+		font-family: var(--fontFamily-emoji);
 	}
 
 	&[data-icon~="about"] {
@@ -173,7 +172,7 @@
 	}
 
 	&[data-icon~="transaction_legibility"] {
-		--icon-content: "🔏‍";
+		--icon-content: "🧾";
 	}
 
 	&[data-icon~="transparency"] {
@@ -181,7 +180,7 @@
 	}
 
 	&[data-icon~="user_privacy"] {
-		--icon-content: "🔒‍";
+		--icon-content: "🕶️";
 	}
 
 	&[data-icon~="wallet_address_privacy"] {

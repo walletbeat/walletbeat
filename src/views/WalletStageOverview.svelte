@@ -221,8 +221,7 @@
 														{@const attributeTitle = attribute?.displayName ?? attributeId}
 
 														<li
-															data-wbicon={attribute?.icon ? '' : undefined}
-																	data-icon={attribute?.icon}
+															data-icon={attribute?.icon ? `wbicons ${attribute.icon}` : undefined}
 															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].color}
 															data-stage-criterion-rating={criterionRating}
 														>
@@ -290,11 +289,6 @@
 
 	h4 {
 		font-weight: normal;
-	}
-
-	li[data-wbicon]::before {
-		font-family: var(--fontFamily-wbicons);
-		content: var(--icon-content);
 	}
 
 	[data-stage-criterion-rating] {

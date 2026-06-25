@@ -363,7 +363,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-wbicon="emoji" data-icon={slice.arcIconId}></span>
+				<span class="label" aria-hidden="true" data-icon="wbicons emoji {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}

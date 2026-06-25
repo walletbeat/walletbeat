@@ -12,17 +12,19 @@ import { getRepositoryRoot } from '@/tests/utils/codebase'
 const require = createRequire(import.meta.url)
 const requireFromSvgToFont = createRequire(require.resolve('svgtofont'))
 
-const requireFontConverter = (packageName: string): ((buffer: Buffer) => Uint8Array) => {
+type FontConverter = (buffer: Buffer) => Uint8Array
+const isFontConverter = (value: unknown): value is FontConverter => typeof value === 'function'
+
+const requireFontConverter = (packageName: string): FontConverter => {
 	const module = requireFromSvgToFont(packageName) as unknown
-	const converter =
-		typeof module === 'function'
-			? module
-			: typeof module === 'object' &&
-				  module !== null &&
-				  'default' in module &&
-				  typeof module.default === 'function'
-				? module.default
-				: null
+	const converter = isFontConverter(module)
+		? module
+		: typeof module === 'object' &&
+			  module !== null &&
+			  'default' in module &&
+			  isFontConverter(module.default)
+			? module.default
+			: null
 
 	if (converter === null) {
 		throw new Error(`Cannot load ${packageName} from svgtofont dependencies.`)
@@ -291,9 +293,9 @@ export const iconFontCodepoints: Readonly<Record<string, Readonly<Record<string,
 		source_visibility: '🔍',
 		transaction_batching: '🧺',
 		transaction_inclusion: '📡',
-		transaction_legibility: '🔏‍',
+		transaction_legibility: '🧾',
 		transparency: '🕵️',
-		user_privacy: '🔒‍',
+		user_privacy: '🕶️',
 		wallet_address_privacy: '🔗',
 		wallet_browser: '🧩',
 		wallet_desktop: '🖥️',
@@ -683,23 +685,18 @@ const fontWithEmojiVariationSequences = (
 }
 
 export const generatedIconFontCSS = (fontName: string, cssRules: readonly string[]): string => {
-	const singularFontName = fontName.endsWith('s')
-		? fontName.substring(0, fontName.length - 1)
-		: fontName
-
 	return [
-		`[data-${singularFontName}] {`,
-		`\tfont-family: var(--fontFamily-${fontName});`,
-		'\tfont-style: normal;',
-		'\t-webkit-font-smoothing: antialiased;',
-		'\t-moz-osx-font-smoothing: grayscale;',
-		'',
-		'\t&[data-wbicon~="emoji"] {',
-		'\t\tfont-family: var(--fontFamily-emoji);',
-		'\t}',
-		'',
+		'[data-icon~="wbicons"] {',
 		'\t&::before {',
 		'\t\tcontent: var(--icon-content);',
+		`\t\tfont-family: var(--fontFamily-${fontName});`,
+		'\t\tfont-style: normal;',
+		'\t\t-webkit-font-smoothing: antialiased;',
+		'\t\t-moz-osx-font-smoothing: grayscale;',
+		'\t}',
+		'',
+		'\t&[data-icon~="emoji"]::before {',
+		'\t\tfont-family: var(--fontFamily-emoji);',
 		'\t}',
 		'',
 		cssRules
