@@ -544,7 +544,7 @@
 					href="#{slugifyCamelCase(attrGroup.id)}"
 					style:--accent={scoreColor}
 				>
-					<span class="toc-icon" data-wbicon data-icon={attrGroup.icon}></span>
+					<span class="toc-icon" data-icon="wbicons emoji {attrGroup.icon}"></span>
 					<span class="toc-label">{attrGroup.displayName}</span>
 				</a>
 				{#each Object.entries(attrGroup.attributes) as [, attribute]}
@@ -555,7 +555,7 @@
 							href="#{slugifyCamelCase(attribute.id)}"
 							style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 						>
-							<span class="toc-icon" data-wbicon data-icon={attribute.icon}></span>
+							<span class="toc-icon" data-icon="wbicons emoji {attribute.icon}"></span>
 							<span class="toc-label">{attribute.displayName}</span>
 						</a>
 					{/if}
@@ -636,9 +636,9 @@
 					>
 						<div
 							class="attributes-pie"
+							data-icon="wbicons emoji {attrGroup.icon}"
 							data-row-item="wrap-center"
 						>
-							<span class="attributes-pie-icon" data-wbicon data-icon={attrGroup.icon}></span>
 							<Pie
 								title={formatAttributeGroupTitleText(attrGroup, score, showScores)}
 
@@ -781,14 +781,11 @@
 				<header data-row="wrap">
 					<div data-row-item="flexible basis-2">
 						<div data-row="start gap-2 wrap">
-							{#if attribute.icon}
-								<span class="attribute-icon" data-wbicon data-icon={attribute.icon}></span>
-							{/if}
 							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
 								<h3
-									data-icon={attribute.icon}
 									title={formatAttributeTitleText(evalAttr)}
 								>
+									<span class="attribute-icon" data-icon="wbicons emoji {attribute.icon}"></span>
 									{attribute.displayName}
 								</h3>
 							</a>
@@ -1279,6 +1276,8 @@
 
 		.toc-group,
 		.toc-attr {
+			--icon-filter: brightness(0) opacity(0.35);
+
 			display: flex;
 			align-items: center;
 			gap: 0.75em;
@@ -1289,42 +1288,38 @@
 			transition: background-color 0.15s, color 0.15s;
 
 			&:hover {
+				--icon-filter: none;
+
 				background-color: var(--background-primary);
 				color: var(--accent);
 			}
 
 			.toc-icon {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				background: var(--accent);
+				display: grid;
+				place-items: center;
+				width: 1em;
+				aspect-ratio: 1;
 				border-radius: 50%;
-				flex-shrink: 0;
-				color: black;
-				font-weight: normal;
+				background-color: var(--accent);
+				font-size: 2.1em;
+			}
+
+			.toc-icon::before {
+				font-size: 0.5em;
+				line-height: 1;
+				filter: var(--icon-filter);
+				transition-property: filter;
 			}
 		}
 
 		.toc-group {
 			font-weight: 600;
 			font-size: 1.05em;
-
-			.toc-icon {
-				width: 2.5rem;
-				height: 2.5rem;
-				font-size: 1.2rem;
-			}
 		}
 
 		.toc-attr {
 			margin-left: 2rem;
 			font-size: 0.95em;
-
-			.toc-icon {
-				width: 2rem;
-				height: 2rem;
-				font-size: 1rem;
-			}
 		}
 	}
 
@@ -1561,6 +1556,10 @@
 			font-size: 2.5em;
 		}
 
+		> .attributes-pie::before {
+			display: none;
+		}
+
 		> .attributes-list {
 			transition-property: translate, scale, opacity;
 
@@ -1651,7 +1650,7 @@
 			;
 			animation-timeline: --AttributesViewTimeline;
 
-			.attributes-pie-icon {
+			&::before {
 				position: absolute;
 				inset: 0;
 				display: grid;
@@ -1745,19 +1744,33 @@
 	.attribute {
 		position: relative;
 
-		.attribute-icon {
+		h3:has(.attribute-icon) {
+			--icon-filter: brightness(0) opacity(0.35);
+
 			display: inline-flex;
 			align-items: center;
-			justify-content: center;
-			background: var(--accent);
-			border: 1px solid white;
+			gap: 0.5rem;
+
+			&:hover {
+				--icon-filter: none;
+			}
+		}
+
+		.attribute-icon {
+			display: grid;
+			place-items: center;
+			width: 1em;
+			aspect-ratio: 1;
 			border-radius: 50%;
-			width: 2.2em;
-			height: 2.2em;
-			font-size: 1.2em;
+			background-color: var(--accent);
+			font-size: 2.2em;
+		}
+
+		.attribute-icon::before {
+			font-size: 0.5em;
 			line-height: 1;
-			flex-shrink: 0;
-			color: black;
+			filter: var(--icon-filter);
+			transition-property: filter;
 		}
 
 		> details {
