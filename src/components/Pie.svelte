@@ -703,6 +703,10 @@
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
 						transition-property: translate, rotate, filter;
 					}
+
+					> .label[data-wbicon] {
+						font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+					}
 				}
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
@@ -712,7 +716,7 @@
 
 			.slice-outer {
 				.slice-shape > .label[data-wbicon] {
-					font-size: calc(var(--slice-labelSize) * 2px);
+					font-size: calc(var(--slice-labelSize) * 1.6px);
 				}
 			}
 
@@ -730,6 +734,10 @@
 						font-size: 0.8em;
 						color: currentColor;
 						translate: 0 calc((var(--center-align-offset, 0)) * 1px);
+					}
+
+					> [data-wbicon] {
+						font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 					}
 				}
 			}
