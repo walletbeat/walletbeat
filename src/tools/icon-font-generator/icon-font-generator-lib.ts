@@ -331,6 +331,20 @@ export const repeatedIconFontCodepoints = (
 const iconFontCSSRuleForIcon = (key: string, iconContent: string): string =>
 	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
 
+export const generatedIconFontTypescript = (
+	fontTypeName: string,
+	typeValues: readonly string[],
+	iconEmoji: Readonly<Record<string, string>>,
+): string =>
+	[
+		`/** Icon ID for the ${fontTypeName} font. */`,
+		`export type ${fontTypeName}FontID =`,
+		...typeValues,
+		'',
+		`export const iconFontEmoji: Readonly<Record<${fontTypeName}FontID, string>> = ${JSON.stringify(iconEmoji)}`,
+		'',
+	].join('\n')
+
 const sfntChecksumAdjustment = 0xb1b0afba
 const postCustomGlyphNameStart = 258
 
@@ -729,6 +743,7 @@ export class SVGFont {
 	static async computeHash(
 		svgIconsDir: string,
 		fontName: string,
+		fontTypeName: string,
 		svgoConfig: Config,
 	): Promise<string> {
 		const entries = await fs.promises.readdir(svgIconsDir)
@@ -772,6 +787,9 @@ export class SVGFont {
 			iconFontGeneratorVersion,
 			JSON.stringify(iconFontCodepoints[fontName] ?? null),
 			generatedIconFontCSS(fontName, [iconFontCSSRuleForIcon('__icon_name__', '__icon_content__')]),
+			generatedIconFontTypescript(fontTypeName, ['\t| "__icon_name__"'], {
+				__icon_name__: '__icon_content__',
+			}),
 			String(svgFiles.length),
 		]
 
@@ -813,7 +831,12 @@ export class SVGFont {
 		}
 
 		const svgoConfig = await loadConfig(path.join(repoRoot, 'tests/utils/svgo.config.mjs'))
-		const currentHash = await SVGFont.computeHash(svgIconsDirAbs, fontName, svgoConfig)
+		const currentHash = await SVGFont.computeHash(
+			svgIconsDirAbs,
+			fontName,
+			fontTypeName,
+			svgoConfig,
+		)
 
 		return new SVGFont(
 			fontName,
@@ -924,6 +947,7 @@ export class SVGFont {
 
 		const cssRules: string[] = []
 		const typeValues: string[] = []
+		const iconEmoji: Record<string, string> = {}
 
 		for (const [key, icon] of Object.entries(result).sort(([keyA, _valA], [keyB, _valB]) =>
 			keyA.localeCompare(keyB),
@@ -940,6 +964,7 @@ export class SVGFont {
 
 			cssRules.push(iconFontCSSRuleForIcon(key, iconCodepoint ?? icon.encodedCode))
 			typeValues.push(`\t| ${JSON.stringify(key)}`)
+			iconEmoji[key] = iconCodepoint ?? icon.encodedCode
 		}
 		const generatedCSS = generatedIconFontCSS(this.fontName, cssRules)
 
@@ -956,16 +981,15 @@ export class SVGFont {
 
 			await fs.promises.writeFile(generatedSVGPath, optimizedSVG)
 		}
-		let dtsContent = [
-			`/** Icon ID for the ${this.fontName} font. */`,
-			`export type ${this.fontTypeName}FontID =`,
-			...typeValues,
-		].join('\n')
-		const dtsPath = path.join(this.cssOutputDir, `${this.fontName}.d.ts`)
-		const prettierConfig = await prettier.resolveConfig(dtsPath)
+		let typescriptContent = generatedIconFontTypescript(this.fontTypeName, typeValues, iconEmoji)
+		const typescriptPath = path.join(this.cssOutputDir, `${this.fontName}.ts`)
+		const prettierConfig = await prettier.resolveConfig(typescriptPath)
 
-		dtsContent = await prettier.format(dtsContent, { ...prettierConfig, parser: 'typescript' })
-		await fs.promises.writeFile(dtsPath, dtsContent)
+		typescriptContent = await prettier.format(typescriptContent, {
+			...prettierConfig,
+			parser: 'typescript',
+		})
+		await fs.promises.writeFile(typescriptPath, typescriptContent)
 		await fs.promises.writeFile(
 			path.join(this.fontOutputDir, 'font_hash.sha256'),
 			this.currentHash + '\n',
