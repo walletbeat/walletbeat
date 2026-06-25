@@ -1438,7 +1438,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon" data-wbicon data-icon={attrGroup.icon}></span>
+										<span class="pie-center-icon" data-wbicon="emoji" data-icon={attrGroup.icon}></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}

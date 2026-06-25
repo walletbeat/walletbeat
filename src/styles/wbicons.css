@@ -1,9 +1,12 @@
 [data-wbicon] {
-	font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+	font-family: var(--fontFamily-wbicons);
 	font-style: normal;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	font-family: var(--fontFamily-wbicons);
+
+	&[data-wbicon~="emoji"] {
+		font-family: var(--fontFamily-emoji);
+	}
 
 	&::before {
 		content: var(--icon-content);

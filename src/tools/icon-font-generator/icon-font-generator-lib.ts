@@ -236,7 +236,6 @@ function validateSingleColor(rawValue: string, attrLabel: string, errors: string
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
 const iconFontGeneratorVersion = 'emoji-codepoint-cmap14-v1'
-const iconFontEmojiFallback = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"'
 const svgToFontOptions = {
 	startUnicode: iconFontStartCharCode,
 	svgicons2svgfont: {
@@ -690,11 +689,14 @@ export const generatedIconFontCSS = (fontName: string, cssRules: readonly string
 
 	return [
 		`[data-${singularFontName}] {`,
-		`\tfont-family: ${iconFontEmojiFallback};`,
+		`\tfont-family: var(--fontFamily-${fontName});`,
 		'\tfont-style: normal;',
 		'\t-webkit-font-smoothing: antialiased;',
 		'\t-moz-osx-font-smoothing: grayscale;',
-		`\tfont-family: var(--fontFamily-${fontName});`,
+		'',
+		'\t&[data-wbicon~="emoji"] {',
+		'\t\tfont-family: var(--fontFamily-emoji);',
+		'\t}',
 		'',
 		'\t&::before {',
 		'\t\tcontent: var(--icon-content);',

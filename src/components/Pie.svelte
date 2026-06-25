@@ -363,7 +363,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-wbicon data-icon={slice.arcIconId}></span>
+				<span class="label" aria-hidden="true" data-wbicon="emoji" data-icon={slice.arcIconId}></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
@@ -703,10 +703,6 @@
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
 						transition-property: translate, rotate, filter;
 					}
-
-					> .label[data-wbicon] {
-						font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
-					}
 				}
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
@@ -728,10 +724,6 @@
 						font-size: 0.8em;
 						color: currentColor;
 						translate: 0 calc((var(--center-align-offset, 0)) * 1px);
-					}
-
-					> [data-wbicon] {
-						font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 					}
 				}
 			}
