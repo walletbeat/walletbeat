@@ -322,7 +322,7 @@
 		this={slice.href ? 'a' : 'div'}
 		href={slice.href}
 
-		class={`slice ${slice.children !== undefined && slice.children.length > 0 ? 'slice-outer' : 'slice-inner'}`}
+		class="slice"
 		title={slice.titleText}
 
 		role="button"
@@ -711,12 +711,6 @@
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
 					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
-				}
-			}
-
-			.slice-outer {
-				.slice-shape > .label[data-wbicon] {
-					font-size: calc(var(--slice-labelSize) * 1.6px);
 				}
 			}
 

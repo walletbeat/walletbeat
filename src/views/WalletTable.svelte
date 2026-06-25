@@ -1114,6 +1114,7 @@
 										offset: 3,
 										outerCornerRadius: 28,
 										innerCornerRadius: 16,
+										labelSize: 32,
 									},
 									{
 										outerRadiusFraction: 0.45,
@@ -1638,6 +1639,7 @@
 								offset: 4,
 								outerCornerRadius: 35,
 								innerCornerRadius: 20,
+								labelSize: 40,
 							},
 							{
 								outerRadiusFraction: 0.45,
