@@ -596,7 +596,6 @@
 			id={slugifyCamelCase(attrGroup.id)}
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
-			data-icon={attrGroup.icon}
 			style:--accent={scoreColor}
 		>
 			<header
@@ -771,7 +770,6 @@
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
-		data-icon={attribute.icon}
 	>
 		<details
 			data-card="radius-8 padding-0 border-accent"
