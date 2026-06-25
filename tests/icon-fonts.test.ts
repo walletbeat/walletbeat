@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { wbIconEmojiSequences } from '@/styles/wbicons'
 import {
 	generatedIconFontCSS,
-	iconFontCodepoints,
-	repeatedIconFontCodepoints,
+	repeatedIconFontUnicodeSequences,
 	SVGFont,
 } from '@/tools/icon-font-generator/icon-font-generator-lib'
 
@@ -14,6 +14,7 @@ describe('wbicons', async () => {
 		cssOutputDir: 'src/styles',
 		fontOutputDir: 'src/assets/fonts/wbicons',
 		svgIconsDir: 'resources/files/wbicons',
+		iconUnicodeSequences: wbIconEmojiSequences,
 	})
 
 	it('is up-to-date', () => {
@@ -23,11 +24,11 @@ describe('wbicons', async () => {
 		).toBe(true)
 	})
 	it('maps every icon to a unique emoji sequence', () => {
-		const repeatedCodepoints = repeatedIconFontCodepoints(iconFontCodepoints.wbicons)
+		const repeatedUnicodeSequences = repeatedIconFontUnicodeSequences(wbIconEmojiSequences)
 
 		expect(
-			repeatedCodepoints,
-			`Every wbicon needs a unique unicode sequence so the font can map it back to its SVG glyph: ${JSON.stringify(repeatedCodepoints)}`,
+			repeatedUnicodeSequences,
+			`Every wbicon needs a unique unicode sequence so the font can map it back to its SVG glyph: ${JSON.stringify(repeatedUnicodeSequences)}`,
 		).toEqual({})
 	})
 	it('only renders data-icon values with the wbicons token', () => {

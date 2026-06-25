@@ -235,9 +235,12 @@ function validateSingleColor(rawValue: string, attrLabel: string, errors: string
 	}
 }
 
+export type IconUnicodeSequences = Readonly<Record<string, string>>
+
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
-const iconFontGeneratorVersion = 'emoji-codepoint-cmap14-v1'
+const iconFontGeneratorVersion = 'emoji-unicode-sequence-cmap14-v1'
+
 const svgToFontOptions = {
 	startUnicode: iconFontStartCharCode,
 	svgicons2svgfont: {
@@ -251,81 +254,25 @@ const svgToFontOptions = {
 
 const generatedFontFormats = ['ttf', 'eot', 'woff', 'woff2', 'svg'] as const
 
-export const iconFontCodepoints: Readonly<Record<string, Readonly<Record<string, string>>>> = {
-	wbicons: {
-		about: 'ℹ️',
-		account_abstraction: '👤',
-		account_portability: '🧳',
-		account_recovery: '🛟',
-		account_type: '🪪',
-		account_unruggability: '🪚',
-		address_resolution: '📇',
-		app_isolation: '🏝️',
-		browser_integration: '🌐',
-		chain_abstraction: '🌉',
-		chain_verification: '⚓',
-		discuss: '💬',
-		duress_resistance: '🔧',
-		ecosystem: '🌳',
-		faq: '❓',
-		fee_transparency: '💸',
-		free_and_open_source_license: '❤️',
-		funding_transparency: '💰',
-		hardware_wallet_interoperability: '🧱',
-		hardware_wallet_support: '🗝️',
-		l1_provider_independence: '🏠',
-		multi_address_privacy: '🖇️',
-		newsletter: '📰',
-		orderflow_transparency: '🔀',
-		passkey_verification: '🫆',
-		permissions_management: '🔑',
-		privacy: '😎',
-		privacy_hygiene: '🧼',
-		private_token_transfers: '📨',
-		question_mark: '❔',
-		release_process_transparency: '📦',
-		repository: '🐱',
-		scam_prevention: '🚨',
-		security: '🔒',
-		security_audits: '📜',
-		security_best_practices: '📋',
-		self_sovereignty: '🏰',
-		source_visibility: '🔍',
-		transaction_batching: '🧺',
-		transaction_inclusion: '📡',
-		transaction_legibility: '🧾',
-		transparency: '🕵️',
-		user_privacy: '🕶️',
-		wallet_address_privacy: '🔗',
-		wallet_browser: '🧩',
-		wallet_desktop: '🖥️',
-		wallet_embedded: '🧬',
-		wallet_hardware: '📟',
-		wallet_mobile: '📱',
-		wallet_software: '💻',
-		wallet_test: '🧪',
-	},
-}
-
-export const duplicateIconFontCodepoints = (
-	iconCodepoints: Readonly<Record<string, string>>,
+export const duplicateIconFontUnicodeSequences = (
+	iconUnicodeSequences: IconUnicodeSequences,
 ): Record<string, string[]> =>
-	Object.entries(iconCodepoints).reduce<Record<string, string[]>>(
-		(duplicates, [iconName, codepoint]) => {
-			duplicates[codepoint] ??= []
-			duplicates[codepoint].push(iconName)
+	Object.entries(iconUnicodeSequences).reduce<Record<string, string[]>>(
+		(duplicates, [iconName, unicodeSequence]) => {
+			duplicates[unicodeSequence] ??= []
+			duplicates[unicodeSequence].push(iconName)
 
 			return duplicates
 		},
 		{},
 	)
 
-export const repeatedIconFontCodepoints = (
-	iconCodepoints: Readonly<Record<string, string>>,
+export const repeatedIconFontUnicodeSequences = (
+	iconUnicodeSequences: IconUnicodeSequences,
 ): Record<string, string[]> =>
 	Object.fromEntries(
-		Object.entries(duplicateIconFontCodepoints(iconCodepoints)).filter(
-			([_codepoint, iconNames]) => iconNames.length > 1,
+		Object.entries(duplicateIconFontUnicodeSequences(iconUnicodeSequences)).filter(
+			([_unicodeSequence, iconNames]) => iconNames.length > 1,
 		),
 	)
 
@@ -339,12 +286,12 @@ const generatedIconFontEmojiSequencesName = (fontTypeName: string): string =>
 
 export const generatedIconFontTypescript = (
 	fontTypeName: string,
-	iconEmoji: Readonly<Record<string, string>>,
+	iconUnicodeSequences: IconUnicodeSequences,
 ): string => {
 	const emojiSequencesName = generatedIconFontEmojiSequencesName(fontTypeName)
 
 	return [
-		`export const ${emojiSequencesName} = ${JSON.stringify(iconEmoji)} as const`,
+		`export const ${emojiSequencesName} = ${JSON.stringify(iconUnicodeSequences)} as const`,
 		'',
 		`/** Icon ID for ${fontTypeName}. */`,
 		`export type ${fontTypeName}ID = keyof typeof ${emojiSequencesName}`,
@@ -466,11 +413,11 @@ const glyphIdByName = (fontBuffer: Buffer): Map<string, number> => {
 
 const emojiVariationMappings = (
 	fontBuffer: Buffer,
-	iconCodepoints: Readonly<Record<string, string>>,
+	iconUnicodeSequences: IconUnicodeSequences,
 ): VariationSequenceMapping[] => {
 	const glyphIds = glyphIdByName(fontBuffer)
 
-	return Object.entries(iconCodepoints)
+	return Object.entries(iconUnicodeSequences)
 		.map(([iconName, iconSequence]): VariationSequenceMapping | null => {
 			const codepoints = [...iconSequence].map(codepoint => codepoint.codePointAt(0))
 
@@ -673,9 +620,9 @@ const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer): Buff
 
 const fontWithEmojiVariationSequences = (
 	fontBuffer: Buffer,
-	iconCodepoints: Readonly<Record<string, string>>,
+	iconUnicodeSequences: IconUnicodeSequences,
 ): Buffer => {
-	const mappings = emojiVariationMappings(fontBuffer, iconCodepoints)
+	const mappings = emojiVariationMappings(fontBuffer, iconUnicodeSequences)
 
 	if (mappings.length === 0) {
 		return fontBuffer
@@ -726,6 +673,7 @@ export class SVGFont {
 	public readonly cssOutputDir: string
 	private readonly currentHash: string
 	private readonly svgoConfig: Config
+	private readonly iconUnicodeSequences: IconUnicodeSequences | null
 
 	private constructor(
 		fontName: string,
@@ -735,6 +683,7 @@ export class SVGFont {
 		cssOutputDir: string,
 		svgoConfig: Config,
 		currentHash: string,
+		iconUnicodeSequences: IconUnicodeSequences | null,
 	) {
 		this.fontName = fontName
 		this.fontTypeName = fontTypeName
@@ -743,6 +692,7 @@ export class SVGFont {
 		this.cssOutputDir = cssOutputDir
 		this.svgoConfig = svgoConfig
 		this.currentHash = currentHash
+		this.iconUnicodeSequences = iconUnicodeSequences
 	}
 
 	static async computeHash(
@@ -750,6 +700,7 @@ export class SVGFont {
 		fontName: string,
 		fontTypeName: string,
 		svgoConfig: Config,
+		iconUnicodeSequences: IconUnicodeSequences | null,
 	): Promise<string> {
 		const entries = await fs.promises.readdir(svgIconsDir)
 
@@ -790,7 +741,7 @@ export class SVGFont {
 			JSON.stringify(svgToFontOptions),
 			JSON.stringify(generatedFontFormats),
 			iconFontGeneratorVersion,
-			JSON.stringify(iconFontCodepoints[fontName] ?? null),
+			JSON.stringify(iconUnicodeSequences),
 			generatedIconFontCSS(fontName, [iconFontCSSRuleForIcon('__icon_name__', '__icon_content__')]),
 			generatedIconFontTypescript(fontTypeName, {
 				__icon_name__: '__icon_content__',
@@ -815,12 +766,14 @@ export class SVGFont {
 		svgIconsDir,
 		fontOutputDir,
 		cssOutputDir,
+		iconUnicodeSequences = null,
 	}: {
 		fontName: string
 		fontTypeName: string
 		svgIconsDir: string
 		fontOutputDir: string
 		cssOutputDir: string
+		iconUnicodeSequences?: IconUnicodeSequences | null
 	}) {
 		const repoRoot = getRepositoryRoot()
 
@@ -841,6 +794,7 @@ export class SVGFont {
 			fontName,
 			fontTypeName,
 			svgoConfig,
+			iconUnicodeSequences,
 		)
 
 		return new SVGFont(
@@ -851,6 +805,7 @@ export class SVGFont {
 			cssOutputDirAbs,
 			svgoConfig,
 			currentHash,
+			iconUnicodeSequences,
 		)
 	}
 
@@ -904,14 +859,14 @@ export class SVGFont {
 		await fs.promises.mkdir(this.fontOutputDir, { recursive: true })
 		await fs.promises.mkdir(this.cssOutputDir, { recursive: true })
 
-		const iconCodepoints = iconFontCodepoints[this.fontName] ?? null
+		const { iconUnicodeSequences } = this
 
-		if (iconCodepoints !== null) {
-			const repeatedCodepoints = repeatedIconFontCodepoints(iconCodepoints)
+		if (iconUnicodeSequences !== null) {
+			const repeatedUnicodeSequences = repeatedIconFontUnicodeSequences(iconUnicodeSequences)
 
-			if (Object.keys(repeatedCodepoints).length > 0) {
+			if (Object.keys(repeatedUnicodeSequences).length > 0) {
 				throw new Error(
-					`Duplicate unicode mappings for ${this.fontName}: ${JSON.stringify(repeatedCodepoints)}`,
+					`Duplicate unicode mappings for ${this.fontName}: ${JSON.stringify(repeatedUnicodeSequences)}`,
 				)
 			}
 		}
@@ -924,15 +879,15 @@ export class SVGFont {
 			css: false,
 			...svgToFontOptions,
 			getIconUnicode: (name, unicode, startUnicode) => {
-				return [iconCodepoints?.[name] ?? unicode, startUnicode]
+				return [iconUnicodeSequences?.[name] ?? unicode, startUnicode]
 			},
 		})
 
-		if (iconCodepoints !== null) {
+		if (iconUnicodeSequences !== null) {
 			const ttfPath = path.join(this.fontOutputDir, `${this.fontName}.ttf`)
 			const patchedTtf = fontWithEmojiVariationSequences(
 				await fs.promises.readFile(ttfPath),
-				iconCodepoints,
+				iconUnicodeSequences,
 			)
 
 			await fs.promises.writeFile(ttfPath, patchedTtf)
@@ -951,7 +906,7 @@ export class SVGFont {
 		}
 
 		const cssRules: string[] = []
-		const iconEmoji: Record<string, string> = {}
+		const generatedIconUnicodeSequences: Record<string, string> = {}
 
 		for (const [key, icon] of Object.entries(result).sort(([keyA, _valA], [keyB, _valB]) =>
 			keyA.localeCompare(keyB),
@@ -960,14 +915,14 @@ export class SVGFont {
 				throw new Error(`Key ${key} not encoded: ${JSON.stringify(icon)}`)
 			}
 
-			const iconCodepoint = iconCodepoints?.[key]
+			const iconUnicodeSequence = iconUnicodeSequences?.[key]
 
-			if (iconCodepoints !== null && iconCodepoint === undefined) {
+			if (iconUnicodeSequences !== null && iconUnicodeSequence === undefined) {
 				throw new Error(`Missing emoji unicode mapping for ${this.fontName} icon: ${key}`)
 			}
 
-			cssRules.push(iconFontCSSRuleForIcon(key, iconCodepoint ?? icon.encodedCode))
-			iconEmoji[key] = iconCodepoint ?? icon.encodedCode
+			cssRules.push(iconFontCSSRuleForIcon(key, iconUnicodeSequence ?? icon.encodedCode))
+			generatedIconUnicodeSequences[key] = iconUnicodeSequence ?? icon.encodedCode
 		}
 		const generatedCSS = generatedIconFontCSS(this.fontName, cssRules)
 
@@ -984,7 +939,10 @@ export class SVGFont {
 
 			await fs.promises.writeFile(generatedSVGPath, optimizedSVG)
 		}
-		let typescriptContent = generatedIconFontTypescript(this.fontTypeName, iconEmoji)
+		let typescriptContent = generatedIconFontTypescript(
+			this.fontTypeName,
+			generatedIconUnicodeSequences,
+		)
 		const typescriptPath = path.join(this.cssOutputDir, `${this.fontName}.ts`)
 		const prettierConfig = await prettier.resolveConfig(typescriptPath)
 

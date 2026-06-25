@@ -1,8 +1,13 @@
 import { cac } from 'cac'
 
+import { wbIconEmojiSequences } from '@/styles/wbicons'
 import { getErrorMessage } from '@/types/errors'
 
-import { SVGFont } from './icon-font-generator-lib'
+import { type IconUnicodeSequences, SVGFont } from './icon-font-generator-lib'
+
+const emojiSequencesByFontName: Readonly<Record<string, IconUnicodeSequences>> = {
+	wbicons: wbIconEmojiSequences,
+}
 
 try {
 	const cli = cac('icon-font-generator')
@@ -52,6 +57,7 @@ try {
 		svgIconsDir: opts.svgIconsDir,
 		fontOutputDir: opts.fontOutputDir,
 		cssOutputDir: opts.cssOutputDir,
+		iconUnicodeSequences: emojiSequencesByFontName[opts.fontName] ?? null,
 	})
 
 	if ((opts.force === undefined || !opts.force) && font.isUpToDate()) {
