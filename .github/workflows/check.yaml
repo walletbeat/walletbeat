@@ -29,7 +29,7 @@ jobs:
             command: pnpm run check:syntax
           - name: Spell check – CSpell
             command: pnpm run check:spelling:quiet
-          - name: Validate
+          - name: Other checks
             command: pnpm run check:misc
           - name: Build – Astro
             command: pnpm run check:build:post:quiet
