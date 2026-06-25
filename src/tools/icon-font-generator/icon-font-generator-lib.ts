@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import * as fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import * as prettier from 'prettier'
@@ -7,7 +8,32 @@ import { type Config, loadConfig, optimize } from 'svgo'
 import svgtofont from 'svgtofont'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
-import { trimWhitespacePrefix } from '@/types/utils/text'
+
+const require = createRequire(import.meta.url)
+const requireFromSvgToFont = createRequire(require.resolve('svgtofont'))
+
+const requireFontConverter = (packageName: string): ((buffer: Buffer) => Uint8Array) => {
+	const module = requireFromSvgToFont(packageName) as unknown
+	const converter =
+		typeof module === 'function'
+			? module
+			: typeof module === 'object' &&
+				  module !== null &&
+				  'default' in module &&
+				  typeof module.default === 'function'
+				? module.default
+				: null
+
+	if (converter === null) {
+		throw new Error(`Cannot load ${packageName} from svgtofont dependencies.`)
+	}
+
+	return converter
+}
+
+const ttf2eot = requireFontConverter('ttf2eot')
+const ttf2woff = requireFontConverter('ttf2woff')
+const ttf2woff2 = requireFontConverter('ttf2woff2')
 
 // Color attributes that can appear on SVG elements
 const SVG_COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color']
@@ -209,11 +235,25 @@ function validateSingleColor(rawValue: string, attrLabel: string, errors: string
 
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
+const iconFontGeneratorVersion = 'emoji-codepoint-cmap14-v1'
+const iconFontEmojiFallback = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"'
+const svgToFontOptions = {
+	startUnicode: iconFontStartCharCode,
+	svgicons2svgfont: {
+		fontHeight: 1000,
+		normalize: true,
+	},
+	svg2ttf: {
+		ts: 0,
+	},
+} as const
 
-const iconFontCodepoints: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+const generatedFontFormats = ['ttf', 'eot', 'woff', 'woff2', 'svg'] as const
+
+export const iconFontCodepoints: Readonly<Record<string, Readonly<Record<string, string>>>> = {
 	wbicons: {
 		about: 'ℹ️',
-		account_abstraction: '💼',
+		account_abstraction: '👤',
 		account_portability: '🧳',
 		account_recovery: '🛟',
 		account_type: '🪪',
@@ -230,40 +270,433 @@ const iconFontCodepoints: Readonly<Record<string, Readonly<Record<string, string
 		fee_transparency: '💸',
 		free_and_open_source_license: '❤️',
 		funding_transparency: '💰',
-		hardware_wallet_interoperability: '🧩',
+		hardware_wallet_interoperability: '🧱',
 		hardware_wallet_support: '🗝️',
 		l1_provider_independence: '🏠',
 		multi_address_privacy: '🖇️',
 		newsletter: '📰',
-		orderflow_transparency: '💸',
+		orderflow_transparency: '🔀',
 		passkey_verification: '🫆',
 		permissions_management: '🔑',
 		privacy: '😎',
 		privacy_hygiene: '🧼',
 		private_token_transfers: '📨',
 		question_mark: '❔',
-		release_process_transparency: '🚢',
-		repository: '💻',
+		release_process_transparency: '📦',
+		repository: '🐱',
 		scam_prevention: '🚨',
 		security: '🔒',
-		security_audits: '🔏',
-		security_best_practices: '🔐',
+		security_audits: '📜',
+		security_best_practices: '📋',
 		self_sovereignty: '🏰',
 		source_visibility: '🔍',
 		transaction_batching: '🧺',
 		transaction_inclusion: '📡',
-		transaction_legibility: '🔏',
+		transaction_legibility: '🔏‍',
 		transparency: '🕵️',
-		user_privacy: '🔒',
+		user_privacy: '🔒‍',
 		wallet_address_privacy: '🔗',
-		wallet_browser: '🌐',
+		wallet_browser: '🧩',
 		wallet_desktop: '🖥️',
-		wallet_embedded: '🧩',
-		wallet_hardware: '🔐',
+		wallet_embedded: '🧬',
+		wallet_hardware: '📟',
 		wallet_mobile: '📱',
 		wallet_software: '💻',
 		wallet_test: '🧪',
 	},
+}
+
+export const duplicateIconFontCodepoints = (
+	iconCodepoints: Readonly<Record<string, string>>,
+): Record<string, string[]> =>
+	Object.entries(iconCodepoints).reduce<Record<string, string[]>>(
+		(duplicates, [iconName, codepoint]) => {
+			duplicates[codepoint] ??= []
+			duplicates[codepoint].push(iconName)
+
+			return duplicates
+		},
+		{},
+	)
+
+export const repeatedIconFontCodepoints = (
+	iconCodepoints: Readonly<Record<string, string>>,
+): Record<string, string[]> =>
+	Object.fromEntries(
+		Object.entries(duplicateIconFontCodepoints(iconCodepoints)).filter(
+			([_codepoint, iconNames]) => iconNames.length > 1,
+		),
+	)
+
+const iconFontCSSRuleForIcon = (key: string, iconContent: string): string =>
+	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
+
+const sfntChecksumAdjustment = 0xb1b0afba
+const postCustomGlyphNameStart = 258
+
+type SfntTable = {
+	tag: string
+	checksum: number
+	offset: number
+	length: number
+	data: Buffer
+}
+
+type VariationSequenceMapping = {
+	baseCodepoint: number
+	glyphId: number
+	variationSelector: number
+}
+
+const align4 = (value: number): number => (value + 3) & ~3
+
+const checksumForTable = (table: Buffer): number => {
+	let checksum = 0
+	const paddedTable = Buffer.alloc(align4(table.length))
+
+	table.copy(paddedTable)
+
+	for (let offset = 0; offset < paddedTable.length; offset += 4) {
+		checksum = (checksum + paddedTable.readUInt32BE(offset)) >>> 0
+	}
+
+	return checksum
+}
+
+const parseSfntTables = (fontBuffer: Buffer): SfntTable[] => {
+	const tableCount = fontBuffer.readUInt16BE(4)
+	const tables: SfntTable[] = []
+
+	for (let index = 0; index < tableCount; index++) {
+		const recordOffset = 12 + index * 16
+		const tag = fontBuffer.toString('ascii', recordOffset, recordOffset + 4)
+		const offset = fontBuffer.readUInt32BE(recordOffset + 8)
+		const length = fontBuffer.readUInt32BE(recordOffset + 12)
+
+		tables.push({
+			tag,
+			checksum: fontBuffer.readUInt32BE(recordOffset + 4),
+			offset,
+			length,
+			data: fontBuffer.subarray(offset, offset + length),
+		})
+	}
+
+	return tables
+}
+
+const pascalStrings = (buffer: Buffer, offset: number, count: number): string[] => {
+	const strings: string[] = []
+	let stringOffset = offset
+
+	while (stringOffset < buffer.length && strings.length < count) {
+		const length = buffer.readUInt8(stringOffset)
+		const start = stringOffset + 1
+		const end = start + length
+
+		if (end > buffer.length) {
+			break
+		}
+
+		strings.push(buffer.toString('ascii', start, end))
+		stringOffset = end
+	}
+
+	return strings
+}
+
+const glyphIdByName = (fontBuffer: Buffer): Map<string, number> => {
+	const tables = parseSfntTables(fontBuffer)
+	const post = tables.find(table => table.tag === 'post')
+	const maxp = tables.find(table => table.tag === 'maxp')
+
+	if (post === undefined || maxp === undefined) {
+		throw new Error('Cannot map glyph names without post and maxp tables.')
+	}
+
+	if (post.data.readUInt32BE(0) !== 0x00020000) {
+		throw new Error('Cannot map glyph names unless the post table uses format 2.')
+	}
+
+	const glyphCount = maxp.data.readUInt16BE(4)
+	const nameIndexes = Array.from({ length: glyphCount }, (_value, glyphId) =>
+		post.data.readUInt16BE(34 + glyphId * 2),
+	)
+	const customNameCount = Math.max(
+		0,
+		...nameIndexes.map(nameIndex => nameIndex - postCustomGlyphNameStart + 1),
+	)
+	const customNames = pascalStrings(post.data, 34 + glyphCount * 2, customNameCount)
+	const result = new Map<string, number>()
+
+	for (const [glyphId, nameIndex] of nameIndexes.entries()) {
+		const glyphName =
+			nameIndex < postCustomGlyphNameStart
+				? undefined
+				: customNames[nameIndex - postCustomGlyphNameStart]
+
+		if (glyphName !== undefined && glyphName !== '') {
+			result.set(glyphName, glyphId)
+		}
+	}
+
+	return result
+}
+
+const emojiVariationMappings = (
+	fontBuffer: Buffer,
+	iconCodepoints: Readonly<Record<string, string>>,
+): VariationSequenceMapping[] => {
+	const glyphIds = glyphIdByName(fontBuffer)
+
+	return Object.entries(iconCodepoints)
+		.map(([iconName, iconSequence]): VariationSequenceMapping | null => {
+			const codepoints = [...iconSequence].map(codepoint => codepoint.codePointAt(0))
+
+			if (codepoints.length !== 2 || codepoints[0] === undefined || codepoints[1] !== 0xfe0f) {
+				return null
+			}
+
+			const glyphId = glyphIds.get(iconName)
+
+			if (glyphId === undefined) {
+				throw new Error(`Cannot find glyph named ${iconName} for emoji variation mapping.`)
+			}
+
+			return {
+				baseCodepoint: codepoints[0],
+				glyphId,
+				variationSelector: codepoints[1],
+			}
+		})
+		.filter((mapping): mapping is VariationSequenceMapping => mapping !== null)
+}
+
+const writeUInt24BE = (buffer: Buffer, value: number, offset: number): void => {
+	buffer.writeUInt8((value >> 16) & 0xff, offset)
+	buffer.writeUInt8((value >> 8) & 0xff, offset + 1)
+	buffer.writeUInt8(value & 0xff, offset + 2)
+}
+
+const cmapFormat14Table = (mappings: readonly VariationSequenceMapping[]): Buffer => {
+	const mappingsBySelector = new Map<number, VariationSequenceMapping[]>()
+
+	for (const mapping of mappings) {
+		const selectorMappings = mappingsBySelector.get(mapping.variationSelector) ?? []
+
+		selectorMappings.push(mapping)
+		mappingsBySelector.set(mapping.variationSelector, selectorMappings)
+	}
+
+	const selectorEntries = [...mappingsBySelector.entries()].sort(
+		([selectorA], [selectorB]) => selectorA - selectorB,
+	)
+	const headerLength = 10 + selectorEntries.length * 11
+	const mappingTables = selectorEntries.map(([variationSelector, selectorMappings]) => ({
+		variationSelector,
+		mappings: selectorMappings
+			.slice()
+			.sort(
+				(mappingA, mappingB) =>
+					mappingA.baseCodepoint - mappingB.baseCodepoint || mappingA.glyphId - mappingB.glyphId,
+			)
+			.map(mapping => ({
+				baseCodepoint: mapping.baseCodepoint,
+				glyphId: mapping.glyphId,
+			})),
+	}))
+	const length =
+		headerLength + mappingTables.reduce((size, table) => size + 4 + table.mappings.length * 5, 0)
+	const buffer = Buffer.alloc(length)
+
+	buffer.writeUInt16BE(14, 0)
+	buffer.writeUInt32BE(length, 2)
+	buffer.writeUInt32BE(mappingTables.length, 6)
+
+	let recordOffset = 10
+	let mappingTableOffset = headerLength
+
+	for (const table of mappingTables) {
+		writeUInt24BE(buffer, table.variationSelector, recordOffset)
+		buffer.writeUInt32BE(0, recordOffset + 3)
+		buffer.writeUInt32BE(mappingTableOffset, recordOffset + 7)
+		buffer.writeUInt32BE(table.mappings.length, mappingTableOffset)
+
+		let mappingOffset = mappingTableOffset + 4
+
+		for (const mapping of table.mappings) {
+			writeUInt24BE(buffer, mapping.baseCodepoint, mappingOffset)
+			buffer.writeUInt16BE(mapping.glyphId, mappingOffset + 3)
+			mappingOffset += 5
+		}
+
+		recordOffset += 11
+		mappingTableOffset = mappingOffset
+	}
+
+	return buffer
+}
+
+const cmapWithVariationSequences = (
+	cmap: Buffer,
+	mappings: readonly VariationSequenceMapping[],
+): Buffer => {
+	const subtableCount = cmap.readUInt16BE(2)
+	const retainedRecords: { platformId: number; encodingId: number; table: Buffer }[] = []
+	const seenOffsets = new Set<number>()
+
+	for (let index = 0; index < subtableCount; index++) {
+		const recordOffset = 4 + index * 8
+		const platformId = cmap.readUInt16BE(recordOffset)
+		const encodingId = cmap.readUInt16BE(recordOffset + 2)
+		const subtableOffset = cmap.readUInt32BE(recordOffset + 4)
+		const format = cmap.readUInt16BE(subtableOffset)
+
+		if (format === 14) {
+			continue
+		}
+
+		if (seenOffsets.has(subtableOffset)) {
+			continue
+		}
+
+		seenOffsets.add(subtableOffset)
+
+		const length =
+			format === 12 ? cmap.readUInt32BE(subtableOffset + 4) : cmap.readUInt16BE(subtableOffset + 2)
+
+		retainedRecords.push({
+			platformId,
+			encodingId,
+			table: cmap.subarray(subtableOffset, subtableOffset + length),
+		})
+	}
+
+	retainedRecords.push({
+		platformId: 0,
+		encodingId: 5,
+		table: cmapFormat14Table(mappings),
+	})
+
+	const headerLength = 4 + retainedRecords.length * 8
+	const length =
+		headerLength + retainedRecords.reduce((size, record) => size + record.table.length, 0)
+	const buffer = Buffer.alloc(length)
+
+	buffer.writeUInt16BE(0, 0)
+	buffer.writeUInt16BE(retainedRecords.length, 2)
+
+	let subtableOffset = headerLength
+
+	for (const [index, record] of retainedRecords.entries()) {
+		const recordOffset = 4 + index * 8
+
+		buffer.writeUInt16BE(record.platformId, recordOffset)
+		buffer.writeUInt16BE(record.encodingId, recordOffset + 2)
+		buffer.writeUInt32BE(subtableOffset, recordOffset + 4)
+		record.table.copy(buffer, subtableOffset)
+		subtableOffset += record.table.length
+	}
+
+	return buffer
+}
+
+const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer): Buffer => {
+	const tables = parseSfntTables(fontBuffer)
+	const table = tables.find(entry => entry.tag === tag)
+
+	if (table === undefined) {
+		throw new Error(`Cannot replace missing ${tag} table.`)
+	}
+
+	table.data = tableData
+	table.length = tableData.length
+	tables.sort((tableA, tableB) => tableA.tag.localeCompare(tableB.tag))
+
+	const tableCount = tables.length
+	const headerLength = 12 + tableCount * 16
+	let nextOffset = headerLength
+
+	for (const entry of tables) {
+		entry.offset = nextOffset
+		entry.length = entry.data.length
+		entry.checksum = checksumForTable(entry.data)
+		nextOffset += align4(entry.length)
+	}
+
+	const output = Buffer.alloc(nextOffset)
+
+	fontBuffer.copy(output, 0, 0, 12)
+
+	for (const [index, entry] of tables.entries()) {
+		const recordOffset = 12 + index * 16
+
+		output.write(entry.tag, recordOffset, 4, 'ascii')
+		output.writeUInt32BE(entry.checksum, recordOffset + 4)
+		output.writeUInt32BE(entry.offset, recordOffset + 8)
+		output.writeUInt32BE(entry.length, recordOffset + 12)
+		entry.data.copy(output, entry.offset)
+	}
+
+	const head = tables.find(entry => entry.tag === 'head')
+
+	if (head === undefined) {
+		throw new Error('Cannot set font checksum without a head table.')
+	}
+
+	output.writeUInt32BE(0, head.offset + 8)
+	output.writeUInt32BE((sfntChecksumAdjustment - checksumForTable(output)) >>> 0, head.offset + 8)
+
+	return output
+}
+
+const fontWithEmojiVariationSequences = (
+	fontBuffer: Buffer,
+	iconCodepoints: Readonly<Record<string, string>>,
+): Buffer => {
+	const mappings = emojiVariationMappings(fontBuffer, iconCodepoints)
+
+	if (mappings.length === 0) {
+		return fontBuffer
+	}
+
+	const cmap = parseSfntTables(fontBuffer).find(table => table.tag === 'cmap')
+
+	if (cmap === undefined) {
+		throw new Error('Cannot add emoji variation sequences without a cmap table.')
+	}
+
+	return fontWithTable(fontBuffer, 'cmap', cmapWithVariationSequences(cmap.data, mappings))
+}
+
+export const generatedIconFontCSS = (fontName: string, cssRules: readonly string[]): string => {
+	const singularFontName = fontName.endsWith('s')
+		? fontName.substring(0, fontName.length - 1)
+		: fontName
+
+	return [
+		`[data-${singularFontName}] {`,
+		`\tfont-family: ${iconFontEmojiFallback};`,
+		'\tfont-style: normal;',
+		'\t-webkit-font-smoothing: antialiased;',
+		'\t-moz-osx-font-smoothing: grayscale;',
+		`\tfont-family: var(--fontFamily-${fontName});`,
+		'',
+		'\t&::before {',
+		'\t\tcontent: var(--icon-content);',
+		'\t}',
+		'',
+		cssRules
+			.map(cssRule =>
+				cssRule
+					.split('\n')
+					.map(line => `\t${line}`)
+					.join('\n'),
+			)
+			.join('\n\n'),
+		'}',
+		'',
+	].join('\n')
 }
 
 export class SVGFont {
@@ -334,7 +767,11 @@ export class SVGFont {
 		const hashParts = [
 			fontName,
 			JSON.stringify(svgoConfig),
+			JSON.stringify(svgToFontOptions),
+			JSON.stringify(generatedFontFormats),
+			iconFontGeneratorVersion,
 			JSON.stringify(iconFontCodepoints[fontName] ?? null),
+			generatedIconFontCSS(fontName, [iconFontCSSRuleForIcon('__icon_name__', '__icon_content__')]),
 			String(svgFiles.length),
 		]
 
@@ -441,25 +878,49 @@ export class SVGFont {
 
 		const iconCodepoints = iconFontCodepoints[this.fontName] ?? null
 
+		if (iconCodepoints !== null) {
+			const repeatedCodepoints = repeatedIconFontCodepoints(iconCodepoints)
+
+			if (Object.keys(repeatedCodepoints).length > 0) {
+				throw new Error(
+					`Duplicate unicode mappings for ${this.fontName}: ${JSON.stringify(repeatedCodepoints)}`,
+				)
+			}
+		}
+
 		const result = await svgtofont({
 			src: this.svgIconsDir,
 			dist: this.fontOutputDir,
 			fontName: this.fontName,
 			excludeFormat: ['symbol.svg'],
 			css: false,
-			startUnicode: iconFontStartCharCode,
+			...svgToFontOptions,
 			getIconUnicode: (name, unicode, startUnicode) => {
 				return [iconCodepoints?.[name] ?? unicode, startUnicode]
 			},
-			svgicons2svgfont: {
-				fontHeight: 1000,
-				normalize: true,
-			},
-			// Fixed timestamp to ensure deterministic output
-			svg2ttf: {
-				ts: 0,
-			},
 		})
+
+		if (iconCodepoints !== null) {
+			const ttfPath = path.join(this.fontOutputDir, `${this.fontName}.ttf`)
+			const patchedTtf = fontWithEmojiVariationSequences(
+				await fs.promises.readFile(ttfPath),
+				iconCodepoints,
+			)
+
+			await fs.promises.writeFile(ttfPath, patchedTtf)
+			await fs.promises.writeFile(
+				path.join(this.fontOutputDir, `${this.fontName}.eot`),
+				Buffer.from(ttf2eot(patchedTtf)),
+			)
+			await fs.promises.writeFile(
+				path.join(this.fontOutputDir, `${this.fontName}.woff`),
+				Buffer.from(ttf2woff(patchedTtf)),
+			)
+			await fs.promises.writeFile(
+				path.join(this.fontOutputDir, `${this.fontName}.woff2`),
+				Buffer.from(ttf2woff2(patchedTtf)),
+			)
+		}
 
 		const cssRules: string[] = []
 		const typeValues: string[] = []
@@ -477,32 +938,10 @@ export class SVGFont {
 				throw new Error(`Missing emoji unicode mapping for ${this.fontName} icon: ${key}`)
 			}
 
-			cssRules.push(`
-				&[data-icon~="${key}"] {
-					--icon-content: "${iconCodepoint ?? icon.encodedCode}";
-				}`)
+			cssRules.push(iconFontCSSRuleForIcon(key, iconCodepoint ?? icon.encodedCode))
 			typeValues.push(`\t| ${JSON.stringify(key)}`)
 		}
-		const singularFontName = this.fontName.endsWith('s')
-			? this.fontName.substring(0, this.fontName.length - 1)
-			: this.fontName
-		const generatedCSS =
-			trimWhitespacePrefix(`
-			[data-${singularFontName}] {
-				font-family: var(--fontFamily-${this.fontName});
-				font-style: normal;
-				-webkit-font-smoothing: antialiased;
-				-moz-osx-font-smoothing: grayscale;
-
-				&::before {
-					content: var(--icon-content);
-				}
-				${cssRules.join('\n')}
-			}
-		`)
-				.split('\n')
-				.map(line => (line.trim() === '' ? '' : line))
-				.join('\n') + '\n'
+		const generatedCSS = generatedIconFontCSS(this.fontName, cssRules)
 
 		await fs.promises.writeFile(path.join(this.cssOutputDir, `${this.fontName}.css`), generatedCSS)
 
