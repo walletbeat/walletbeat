@@ -1,11 +1,11 @@
 // Types
-import type { WBIconFontID } from '@/styles/wbicons'
+import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon = 'ICON_CHART_BAR' | 'ICON_CHART_PIE' | 'ICON_WALLET'
 
 export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
 
-export type NavigationIconID = WBIconFontID | LucideNavigationIcon | WalletImageNavigationIcon
+export type NavigationIconID = WBIconID | LucideNavigationIcon | WalletImageNavigationIcon
 
 export type NavigationItem = {
 	id: string

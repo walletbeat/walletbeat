@@ -259,7 +259,7 @@
 
 
 	// Mobile filter helpers
-	const variantWbIconIds: Record<Variant, WBIconFontID> = {
+	const variantWbIconIds: Record<Variant, WBIconID> = {
 		[Variant.BROWSER]: 'wallet_browser',
 		[Variant.DESKTOP]: 'wallet_desktop',
 		[Variant.MOBILE]: 'wallet_mobile',
@@ -350,7 +350,7 @@
 
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
-	import type { WBIconFontID } from '@/styles/wbicons'
+	import type { WBIconID } from '@/styles/wbicons'
 
 
 	// Flower visualization helpers

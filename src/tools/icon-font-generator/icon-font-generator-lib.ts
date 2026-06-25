@@ -346,8 +346,8 @@ export const generatedIconFontTypescript = (
 	return [
 		`export const ${emojiSequencesName} = ${JSON.stringify(iconEmoji)} as const`,
 		'',
-		`/** Icon ID for the ${fontTypeName} font. */`,
-		`export type ${fontTypeName}FontID = keyof typeof ${emojiSequencesName}`,
+		`/** Icon ID for ${fontTypeName}. */`,
+		`export type ${fontTypeName}ID = keyof typeof ${emojiSequencesName}`,
 		'',
 	].join('\n')
 }

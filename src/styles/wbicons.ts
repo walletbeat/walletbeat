@@ -52,5 +52,5 @@ export const wbIconEmojiSequences = {
 	wallet_test: '🧪',
 } as const
 
-/** Icon ID for the WBIcon font. */
-export type WBIconFontID = keyof typeof wbIconEmojiSequences
+/** Icon ID for WBIcon. */
+export type WBIconID = keyof typeof wbIconEmojiSequences

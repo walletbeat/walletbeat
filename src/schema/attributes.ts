@@ -29,7 +29,7 @@ export interface ConcreteWalletEvalStrings {
 	WALLET_PSEUDONYM_PLURAL: string
 }
 
-import { wbIconEmojiSequences, type WBIconFontID } from '@/styles/wbicons'
+import { wbIconEmojiSequences, type WBIconID } from '@/styles/wbicons'
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
@@ -519,7 +519,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	id: string
 
 	/** An icon representing the attribute. Shown on rating charts. */
-	icon: WBIconFontID
+	icon: WBIconID
 
 	/**
 	 * A very short, human-readable title for the attribute.
@@ -882,7 +882,7 @@ export interface AttributeGroup<Vs extends ValueSet> {
 	id: string
 
 	/** A friendly icon for the group. */
-	icon: WBIconFontID
+	icon: WBIconID
 
 	/** A human-readable name for the group. */
 	displayName: string
