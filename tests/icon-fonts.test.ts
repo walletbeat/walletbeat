@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { SVGFont } from '@/tools/icon-font-generator/icon-font-generator-lib'
+import {
+	iconFontCodepoints,
+	repeatedIconFontCodepoints,
+	SVGFont,
+} from '@/tools/icon-font-generator/icon-font-generator-lib'
 
 describe('wbicons', async () => {
 	const wbicons = await SVGFont.create({
@@ -16,6 +20,14 @@ describe('wbicons', async () => {
 			wbicons.isUpToDate(),
 			`wbicons font is out of date; run the following command to fix:\n\n  ${wbicons.writeCommand()}\n\n`,
 		).toBe(true)
+	})
+	it('maps every icon to a unique emoji sequence', () => {
+		const repeatedCodepoints = repeatedIconFontCodepoints(iconFontCodepoints.wbicons)
+
+		expect(
+			repeatedCodepoints,
+			`Every wbicon needs a unique unicode sequence so the font can map it back to its SVG glyph: ${JSON.stringify(repeatedCodepoints)}`,
+		).toEqual({})
 	})
 	it('has only monochrome files', async () => {
 		const results = await wbicons.nonMonochromeFiles()
