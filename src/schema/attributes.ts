@@ -29,7 +29,7 @@ export interface ConcreteWalletEvalStrings {
 	WALLET_PSEUDONYM_PLURAL: string
 }
 
-import { iconFontEmoji, type WBIconFontID } from '@/styles/wbicons'
+import { wbIconEmojiSequences, type WBIconFontID } from '@/styles/wbicons'
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
@@ -1013,7 +1013,7 @@ export const formatAttributeTitleText = (
 	attribute: EvaluatedAttribute<OutcomeMetadata>,
 	suffix?: string,
 ) =>
-	`${attribute.evaluation.outcome.icon ?? iconFontEmoji[attribute.attribute.icon]} ${
+	`${attribute.evaluation.outcome.icon ?? wbIconEmojiSequences[attribute.attribute.icon]} ${
 		attribute.attribute.displayName
 	}${suffix ?? ''} [${ratingIcons[attribute.evaluation.outcome.rating]} ${
 		attribute.evaluation.outcome.rating

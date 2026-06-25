@@ -332,19 +332,25 @@ export const repeatedIconFontCodepoints = (
 const iconFontCSSRuleForIcon = (key: string, iconContent: string): string =>
 	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
 
+const generatedIconFontEmojiSequencesName = (fontTypeName: string): string =>
+	`${fontTypeName
+		.replace(/^[A-Z]+(?=[A-Z][a-z])/, prefix => prefix.toLowerCase())
+		.replace(/^./, firstChar => firstChar.toLowerCase())}EmojiSequences`
+
 export const generatedIconFontTypescript = (
 	fontTypeName: string,
-	typeValues: readonly string[],
 	iconEmoji: Readonly<Record<string, string>>,
-): string =>
-	[
-		`/** Icon ID for the ${fontTypeName} font. */`,
-		`export type ${fontTypeName}FontID =`,
-		...typeValues,
+): string => {
+	const emojiSequencesName = generatedIconFontEmojiSequencesName(fontTypeName)
+
+	return [
+		`export const ${emojiSequencesName} = ${JSON.stringify(iconEmoji)} as const`,
 		'',
-		`export const iconFontEmoji: Readonly<Record<${fontTypeName}FontID, string>> = ${JSON.stringify(iconEmoji)}`,
+		`/** Icon ID for the ${fontTypeName} font. */`,
+		`export type ${fontTypeName}FontID = keyof typeof ${emojiSequencesName}`,
 		'',
 	].join('\n')
+}
 
 const sfntChecksumAdjustment = 0xb1b0afba
 const postCustomGlyphNameStart = 258
@@ -786,7 +792,7 @@ export class SVGFont {
 			iconFontGeneratorVersion,
 			JSON.stringify(iconFontCodepoints[fontName] ?? null),
 			generatedIconFontCSS(fontName, [iconFontCSSRuleForIcon('__icon_name__', '__icon_content__')]),
-			generatedIconFontTypescript(fontTypeName, ['\t| "__icon_name__"'], {
+			generatedIconFontTypescript(fontTypeName, {
 				__icon_name__: '__icon_content__',
 			}),
 			String(svgFiles.length),
@@ -945,7 +951,6 @@ export class SVGFont {
 		}
 
 		const cssRules: string[] = []
-		const typeValues: string[] = []
 		const iconEmoji: Record<string, string> = {}
 
 		for (const [key, icon] of Object.entries(result).sort(([keyA, _valA], [keyB, _valB]) =>
@@ -962,7 +967,6 @@ export class SVGFont {
 			}
 
 			cssRules.push(iconFontCSSRuleForIcon(key, iconCodepoint ?? icon.encodedCode))
-			typeValues.push(`\t| ${JSON.stringify(key)}`)
 			iconEmoji[key] = iconCodepoint ?? icon.encodedCode
 		}
 		const generatedCSS = generatedIconFontCSS(this.fontName, cssRules)
@@ -980,7 +984,7 @@ export class SVGFont {
 
 			await fs.promises.writeFile(generatedSVGPath, optimizedSVG)
 		}
-		let typescriptContent = generatedIconFontTypescript(this.fontTypeName, typeValues, iconEmoji)
+		let typescriptContent = generatedIconFontTypescript(this.fontTypeName, iconEmoji)
 		const typescriptPath = path.join(this.cssOutputDir, `${this.fontName}.ts`)
 		const prettierConfig = await prettier.resolveConfig(typescriptPath)
 
