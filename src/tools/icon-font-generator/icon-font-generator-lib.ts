@@ -753,25 +753,32 @@ export class SVGFont {
 		)
 	}
 
-	public async nonMonochromeFiles() {
+	public async nonMonochromeFiles(): Promise<Record<string, string[]>> {
 		const entries = await fs.readdir(this.svgIconsDir)
+		const entriesWithErrors = await Promise.all(
+			entries.map(async entry => {
+				if (!entry.endsWith('.svg')) {
+					throw new Error(`Non-SVG file found: ${entry}`)
+				}
 
-		return Object.fromEntries(
-			(
-				await Promise.all(
-					entries.map(async entry => {
-						if (!entry.endsWith('.svg')) {
-							throw new Error(`Non-SVG file found: ${entry}`)
-						}
-
-						const svgContent = await fs.readFile(path.join(this.svgIconsDir, entry), 'utf-8')
-						const errors = validateSvgIsMonochromeBlack(svgContent)
-
-						return errors.length > 0 ? [entry, errors] : null
-					}),
-				)
-			).filter(entry => entry !== null),
+				return {
+					entry,
+					errors: validateSvgIsMonochromeBlack(
+						await fs.readFile(path.join(this.svgIconsDir, entry), 'utf-8'),
+					),
+				}
+			}),
 		)
+
+		const result: Record<string, string[]> = {}
+
+		for (const { entry, errors } of entriesWithErrors) {
+			if (errors.length > 0) {
+				result[entry] = errors
+			}
+		}
+
+		return result
 	}
 
 	public isUpToDate() {

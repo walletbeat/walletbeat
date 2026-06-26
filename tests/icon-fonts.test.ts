@@ -45,7 +45,7 @@ describe('wbicons', async () => {
 		expect(css).toContain('&[data-icon~="emoji"]::before')
 	})
 	it('has only monochrome files', async () => {
-		const results = await wbicons.nonMonochromeFiles()
+		const results: Record<string, string[]> = await wbicons.nonMonochromeFiles()
 		const errorDetails = Object.entries(results)
 			.map(([file, errors]) => `${file}:\n  ${errors.join('\n  ')}`)
 			.join('\n\n')
