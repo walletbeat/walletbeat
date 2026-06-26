@@ -12,6 +12,8 @@
 		displayType?: 'select' | 'group'
 		filters: Filter<Item, FilterId>[]
 		operation?: 'union' | 'intersection'
+		/** When true, all filters in the group are shown even if their count is 0. */
+		alwaysShowFilters?: boolean
 	} & (
 		| {
 			exclusive: true
@@ -157,8 +159,11 @@
 			.map(group => ({
 				group,
 				visibleFilters: (
-					group.filters
-						.filter(filter => filterItems(new Set([filter])).length > 0)
+					group.alwaysShowFilters ?
+						group.filters
+					:
+						group.filters
+							.filter(filter => filterItems(new Set([filter])).length > 0)
 				)
 			}))
 			.filter(({ visibleFilters }) => (
