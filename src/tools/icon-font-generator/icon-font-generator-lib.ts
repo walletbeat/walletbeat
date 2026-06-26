@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto'
-import * as fs from 'node:fs'
+import { existsSync, promises as fs, readFileSync } from 'node:fs'
 import path from 'node:path'
 
-import * as prettier from 'prettier'
+import { format, resolveConfig } from 'prettier'
 import { type Config, loadConfig, optimize } from 'svgo'
 import svgtofont from 'svgtofont'
 import ttf2eot from 'ttf2eot'
@@ -646,7 +646,7 @@ export class SVGFont {
 		svgoConfig: Config,
 		iconUnicodeSequences: IconUnicodeSequences | null,
 	) {
-		const entries = await fs.promises.readdir(svgIconsDir)
+		const entries = await fs.readdir(svgIconsDir)
 
 		if (entries.length === 0) {
 			throw new Error(`SVG icons directory is empty: ${svgIconsDir}`)
@@ -661,7 +661,7 @@ export class SVGFont {
 		const svgFiles = await Promise.all(
 			entries.map(async entry => {
 				const fullPath = path.join(svgIconsDir, entry)
-				const stat = await fs.promises.stat(fullPath)
+				const stat = await fs.stat(fullPath)
 
 				if (!stat.isFile()) {
 					throw new Error(
@@ -694,10 +694,7 @@ export class SVGFont {
 		]
 
 		const svgFileHashParts = await Promise.all(
-			svgFiles.map(async file => [
-				file,
-				await fs.promises.readFile(path.join(svgIconsDir, file), 'utf-8'),
-			]),
+			svgFiles.map(async file => [file, await fs.readFile(path.join(svgIconsDir, file), 'utf-8')]),
 		)
 
 		hashParts.push(...svgFileHashParts.flat())
@@ -757,7 +754,7 @@ export class SVGFont {
 	}
 
 	public async nonMonochromeFiles() {
-		const entries = await fs.promises.readdir(this.svgIconsDir)
+		const entries = await fs.readdir(this.svgIconsDir)
 
 		return Object.fromEntries(
 			(
@@ -767,10 +764,7 @@ export class SVGFont {
 							throw new Error(`Non-SVG file found: ${entry}`)
 						}
 
-						const svgContent = await fs.promises.readFile(
-							path.join(this.svgIconsDir, entry),
-							'utf-8',
-						)
+						const svgContent = await fs.readFile(path.join(this.svgIconsDir, entry), 'utf-8')
 						const errors = validateSvgIsMonochromeBlack(svgContent)
 
 						return errors.length > 0 ? [entry, errors] : null
@@ -784,11 +778,11 @@ export class SVGFont {
 		const hashFilePath = path.join(this.fontOutputDir, 'font_hash.sha256')
 
 		try {
-			if (!fs.existsSync(this.fontOutputDir)) {
+			if (!existsSync(this.fontOutputDir)) {
 				return false
 			}
 
-			const storedHash = fs.readFileSync(hashFilePath, 'utf-8').trim()
+			const storedHash = readFileSync(hashFilePath, 'utf-8').trim()
 
 			return storedHash === this.currentHash
 		} catch {
@@ -806,8 +800,8 @@ export class SVGFont {
 	}
 
 	public async write() {
-		await fs.promises.mkdir(this.fontOutputDir, { recursive: true })
-		await fs.promises.mkdir(this.cssOutputDir, { recursive: true })
+		await fs.mkdir(this.fontOutputDir, { recursive: true })
+		await fs.mkdir(this.cssOutputDir, { recursive: true })
 
 		const { iconUnicodeSequences } = this
 
@@ -836,21 +830,21 @@ export class SVGFont {
 		if (iconUnicodeSequences !== null) {
 			const ttfPath = path.join(this.fontOutputDir, `${this.fontName}.ttf`)
 			const patchedTtf = fontWithEmojiVariationSequences(
-				await fs.promises.readFile(ttfPath),
+				await fs.readFile(ttfPath),
 				iconUnicodeSequences,
 			)
 
 			await Promise.all([
-				fs.promises.writeFile(ttfPath, patchedTtf),
-				fs.promises.writeFile(
+				fs.writeFile(ttfPath, patchedTtf),
+				fs.writeFile(
 					path.join(this.fontOutputDir, `${this.fontName}.eot`),
 					Buffer.from(ttf2eot(patchedTtf)),
 				),
-				fs.promises.writeFile(
+				fs.writeFile(
 					path.join(this.fontOutputDir, `${this.fontName}.woff`),
 					Buffer.from(ttf2woff(patchedTtf)),
 				),
-				fs.promises.writeFile(
+				fs.writeFile(
 					path.join(this.fontOutputDir, `${this.fontName}.woff2`),
 					Buffer.from(ttf2woff2(patchedTtf)),
 				),
@@ -881,32 +875,26 @@ export class SVGFont {
 		const generatedCSS = generatedIconFontCSS(this.fontName, cssRules)
 
 		const generatedSVGPath = path.join(this.fontOutputDir, `${this.fontName}.svg`)
-		const optimizedSVG = optimize(
-			(await fs.promises.readFile(generatedSVGPath)).toString('utf-8'),
-			{
-				path: generatedSVGPath,
-				...this.svgoConfig,
-			},
-		).data
+		const optimizedSVG = optimize((await fs.readFile(generatedSVGPath)).toString('utf-8'), {
+			path: generatedSVGPath,
+			...this.svgoConfig,
+		}).data
 		let typescriptContent = generatedIconFontTypescript(
 			this.fontTypeName,
 			generatedIconUnicodeSequences,
 		)
 		const typescriptPath = path.join(this.cssOutputDir, `${this.fontName}.ts`)
-		const prettierConfig = await prettier.resolveConfig(typescriptPath)
+		const prettierConfig = await resolveConfig(typescriptPath)
 
-		typescriptContent = await prettier.format(typescriptContent, {
+		typescriptContent = await format(typescriptContent, {
 			...prettierConfig,
 			parser: 'typescript',
 		})
 		await Promise.all([
-			fs.promises.writeFile(path.join(this.cssOutputDir, `${this.fontName}.css`), generatedCSS),
-			fs.promises.writeFile(generatedSVGPath, optimizedSVG),
-			fs.promises.writeFile(typescriptPath, typescriptContent),
-			fs.promises.writeFile(
-				path.join(this.fontOutputDir, 'font_hash.sha256'),
-				this.currentHash + '\n',
-			),
+			fs.writeFile(path.join(this.cssOutputDir, `${this.fontName}.css`), generatedCSS),
+			fs.writeFile(generatedSVGPath, optimizedSVG),
+			fs.writeFile(typescriptPath, typescriptContent),
+			fs.writeFile(path.join(this.fontOutputDir, 'font_hash.sha256'), this.currentHash + '\n'),
 		])
 	}
 }
