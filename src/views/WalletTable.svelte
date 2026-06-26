@@ -44,8 +44,15 @@
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
 
 	// (Derived)
-	const stageFilterDefinitions = $derived(
-		Array.from(
+	const stageFilterDefinitions = $derived([
+		{
+			id: 'stage-unrated',
+			label: 'Unrated',
+			filterFunction: (wallet: RatedWallet) => (
+				!walletHasAchievedStage(wallet, stagesById.keys().next().value!)
+			),
+		},
+		...Array.from(
 			stagesById.entries(),
 			([stageId, stage]) => ({
 				id: `stage-${stageId}`,
@@ -54,8 +61,8 @@
 					walletHasAchievedStage(wallet, stageId)
 				),
 			})
-		)
-	)
+		),
+	])
 
 	const displayedAttributeGroups = $derived.by(() => {
 		let filtered = (
@@ -563,6 +570,7 @@
 								displayType: 'group',
 								exclusive: false,
 								operation: 'union',
+								alwaysShowFilters: !hasNonApplicableStages,
 								filters: stageFilterDefinitions,
 							},
 						]
