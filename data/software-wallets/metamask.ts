@@ -555,9 +555,9 @@ export const metamask: SoftwareWallet = {
 						{
 							decoded: DataDisplayOptions.NOT_IN_UI,
 						},
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: 						{
-							decoded: DataDisplayOptions.NOT_IN_UI,
-						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
 				}),
 				erc8213: supported({
 					calldataDisplay: {
@@ -610,7 +610,7 @@ export const metamask: SoftwareWallet = {
 					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:  {
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
