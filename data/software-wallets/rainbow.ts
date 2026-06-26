@@ -179,7 +179,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Rainbow displays a single portfolio total summing the account value across all supported chains, and lists per-chain token balances as separate line items (e.g. ETH held on mainnet and on an L2 each appear as their own row with a chain badge). It does not, however, sum a single token across chains into one combined balance: the same asset on multiple chains is shown as multiple rows rather than a single total.',
+								'Rainbow displays a single portfolio total summing the account value across all supported chains. It lists per-chain token balances as separate line items (e.g. ETH held on mainnet and on an L2 each appear as their own row with a chain badge). It does not, however, sum a single token across chains into one combined balance: the same asset on multiple chains is shown as multiple rows rather than a single total.',
 							lastRetrieved: '2026-06-26',
 							url: 'https://rainbow.me/support/app/supported-networks',
 						},
@@ -257,7 +257,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Rainbow displays a single portfolio total summing the account value across all supported chains, and lists per-chain token balances as separate line items (e.g. ETH held on mainnet and on an L2 each appear as their own row with a chain badge). It does not, however, sum a single token across chains into one combined balance: the same asset on multiple chains is shown as multiple rows rather than a single total.',
+								'Rainbow displays a single portfolio total summing the account value across all supported chains. It lists per-chain token balances as separate line items (e.g. ETH held on mainnet and on an L2 each appear as their own row with a chain badge). It does not, however, sum a single token across chains into one combined balance: the same asset on multiple chains is shown as multiple rows rather than a single total.',
 							lastRetrieved: '2026-06-17',
 							url: 'https://rainbow.me/support/app/supported-networks',
 						},
