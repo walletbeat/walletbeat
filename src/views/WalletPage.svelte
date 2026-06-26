@@ -1742,33 +1742,35 @@
 	.attribute {
 		position: relative;
 
-		h3:has(.attribute-icon) {
+		a:has(.attribute-icon) {
 			--icon-filter: brightness(0) opacity(0.35);
-
-			display: inline-flex;
-			align-items: center;
-			gap: 0.5rem;
 
 			&:hover {
 				--icon-filter: none;
 			}
-		}
 
-		.attribute-icon {
-			display: grid;
-			place-items: center;
-			width: 1em;
-			aspect-ratio: 1;
-			border-radius: 50%;
-			background-color: var(--accent);
-			font-size: 2.2em;
-		}
+			h3 {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
 
-		.attribute-icon::before {
-			font-size: 0.5em;
-			line-height: 1;
-			filter: var(--icon-filter);
-			transition-property: filter;
+			.attribute-icon {
+				display: grid;
+				place-items: center;
+				width: 1em;
+				aspect-ratio: 1;
+				border-radius: 50%;
+				background-color: var(--accent);
+				font-size: 2.2em;
+
+				&::before {
+					font-size: 0.5em;
+					line-height: 1;
+					filter: var(--icon-filter);
+					transition-property: filter;
+				}
+			}
 		}
 
 		> details {
