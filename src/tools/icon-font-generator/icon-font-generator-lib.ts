@@ -1,40 +1,15 @@
 import { createHash } from 'node:crypto'
 import * as fs from 'node:fs'
-import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import * as prettier from 'prettier'
 import { type Config, loadConfig, optimize } from 'svgo'
 import svgtofont from 'svgtofont'
+import ttf2eot from 'ttf2eot'
+import ttf2woff from 'ttf2woff'
+import ttf2woff2 from 'ttf2woff2'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
-
-const require = createRequire(import.meta.url)
-const requireFromSvgToFont = createRequire(require.resolve('svgtofont'))
-
-type FontConverter = (buffer: Buffer) => Uint8Array
-
-const isFontConverter = (converter: unknown): converter is FontConverter =>
-	typeof converter === 'function'
-
-const loadFontConverter = (packageName: string) => {
-	const module: unknown = requireFromSvgToFont(packageName)
-	const converter = isFontConverter(module)
-		? module
-		: module !== null && typeof module === 'object' && 'default' in module
-			? module.default
-			: null
-
-	if (!isFontConverter(converter)) {
-		throw new Error(`Cannot load ${packageName} from svgtofont dependencies.`)
-	}
-
-	return converter
-}
-
-const ttf2eot = loadFontConverter('ttf2eot')
-const ttf2woff = loadFontConverter('ttf2woff')
-const ttf2woff2 = loadFontConverter('ttf2woff2')
 
 // Color attributes that can appear on SVG elements
 const SVG_COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color']
