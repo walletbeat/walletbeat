@@ -13,29 +13,28 @@ const require = createRequire(import.meta.url)
 const requireFromSvgToFont = createRequire(require.resolve('svgtofont'))
 
 type FontConverter = (buffer: Buffer) => Uint8Array
-const isFontConverter = (value: unknown): value is FontConverter => typeof value === 'function'
 
-const requireFontConverter = (packageName: string): FontConverter => {
-	const module = requireFromSvgToFont(packageName) as unknown
+const isFontConverter = (converter: unknown): converter is FontConverter =>
+	typeof converter === 'function'
+
+const loadFontConverter = (packageName: string) => {
+	const module: unknown = requireFromSvgToFont(packageName)
 	const converter = isFontConverter(module)
 		? module
-		: typeof module === 'object' &&
-			  module !== null &&
-			  'default' in module &&
-			  isFontConverter(module.default)
+		: module !== null && typeof module === 'object' && 'default' in module
 			? module.default
 			: null
 
-	if (converter === null) {
+	if (!isFontConverter(converter)) {
 		throw new Error(`Cannot load ${packageName} from svgtofont dependencies.`)
 	}
 
 	return converter
 }
 
-const ttf2eot = requireFontConverter('ttf2eot')
-const ttf2woff = requireFontConverter('ttf2woff')
-const ttf2woff2 = requireFontConverter('ttf2woff2')
+const ttf2eot = loadFontConverter('ttf2eot')
+const ttf2woff = loadFontConverter('ttf2woff')
+const ttf2woff2 = loadFontConverter('ttf2woff2')
 
 // Color attributes that can appear on SVG elements
 const SVG_COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color']
@@ -65,7 +64,7 @@ const ALLOWED_KEYWORDS = new Set([
 /**
  * Check if a hex color represents black (R=G=B=0). Alpha channel is allowed to vary.
  */
-function isBlackHex(hex: string): boolean {
+function isBlackHex(hex: string) {
 	const cleaned = hex.replace(/^#/, '')
 
 	// #RGB
@@ -109,7 +108,7 @@ function isBlackHex(hex: string): boolean {
  * Parse a numeric color component (integer 0-255 or percentage 0%-100%).
  * Returns the value as a number 0-255, or -1 if not zero.
  */
-function parseColorComponent(component: string): number {
+function parseColorComponent(component: string) {
 	const trimmed = component.trim()
 
 	if (trimmed.endsWith('%')) {
@@ -126,7 +125,7 @@ function parseColorComponent(component: string): number {
 /**
  * Check if an rgb()/rgba() color represents black (R=G=B=0). Alpha is allowed to vary.
  */
-function isBlackRgb(color: string): boolean {
+function isBlackRgb(color: string) {
 	// Match rgb(...) or rgba(...) with either comma-separated or space-separated values
 	const match = color.match(/^(?:rgba?)\(\s*(.+?)\s*(?:\/\s*(.+?)\s*)?\)$/i)
 
@@ -166,7 +165,7 @@ function isBlackRgb(color: string): boolean {
  * Validate that all colors in an SVG are black or transparent black only.
  * Returns errors found.
  */
-export function validateSvgIsMonochromeBlack(svgContent: string): string[] {
+export function validateSvgIsMonochromeBlack(svgContent: string) {
 	const errors: string[] = []
 
 	// Check presentation attributes
@@ -189,7 +188,7 @@ export function validateSvgIsMonochromeBlack(svgContent: string): string[] {
 	return errors
 }
 
-function validateSingleColor(rawValue: string, attrLabel: string, errors: string[]): void {
+function validateSingleColor(rawValue: string, attrLabel: string, errors: string[]) {
 	const value = rawValue.trim().toLowerCase()
 
 	if (!value) {
@@ -254,41 +253,31 @@ const svgToFontOptions = {
 
 const generatedFontFormats = ['ttf', 'eot', 'woff', 'woff2', 'svg'] as const
 
-export const duplicateIconFontUnicodeSequences = (
-	iconUnicodeSequences: IconUnicodeSequences,
-): Record<string, string[]> =>
-	Object.entries(iconUnicodeSequences).reduce<Record<string, string[]>>(
-		(duplicates, [iconName, unicodeSequence]) => {
-			duplicates[unicodeSequence] ??= []
-			duplicates[unicodeSequence].push(iconName)
-
-			return duplicates
-		},
-		{},
-	)
-
-export const repeatedIconFontUnicodeSequences = (
-	iconUnicodeSequences: IconUnicodeSequences,
-): Record<string, string[]> =>
+export const repeatedIconFontUnicodeSequences = (iconUnicodeSequences: IconUnicodeSequences) =>
 	Object.fromEntries(
-		Object.entries(duplicateIconFontUnicodeSequences(iconUnicodeSequences)).filter(
-			([_unicodeSequence, iconNames]) => iconNames.length > 1,
-		),
+		Object.entries(
+			Object.entries(iconUnicodeSequences).reduce<Record<string, string[]>>(
+				(duplicates, [iconName, unicodeSequence]) => {
+					duplicates[unicodeSequence] ??= []
+					duplicates[unicodeSequence].push(iconName)
+
+					return duplicates
+				},
+				{},
+			),
+		).filter(([_unicodeSequence, iconNames]) => iconNames.length > 1),
 	)
 
-const iconFontCSSRuleForIcon = (key: string, iconContent: string): string =>
+const iconFontCSSRuleForIcon = (key: string, iconContent: string) =>
 	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
-
-const generatedIconFontEmojiSequencesName = (fontTypeName: string): string =>
-	`${fontTypeName
-		.replace(/^[A-Z]+(?=[A-Z][a-z])/, prefix => prefix.toLowerCase())
-		.replace(/^./, firstChar => firstChar.toLowerCase())}EmojiSequences`
 
 export const generatedIconFontTypescript = (
 	fontTypeName: string,
 	iconUnicodeSequences: IconUnicodeSequences,
-): string => {
-	const emojiSequencesName = generatedIconFontEmojiSequencesName(fontTypeName)
+) => {
+	const emojiSequencesName = `${fontTypeName
+		.replace(/^[A-Z]+(?=[A-Z][a-z])/, prefix => prefix.toLowerCase())
+		.replace(/^./, firstChar => firstChar.toLowerCase())}EmojiSequences`
 
 	return [
 		`export const ${emojiSequencesName} = ${JSON.stringify(iconUnicodeSequences)} as const`,
@@ -302,23 +291,9 @@ export const generatedIconFontTypescript = (
 const sfntChecksumAdjustment = 0xb1b0afba
 const postCustomGlyphNameStart = 258
 
-type SfntTable = {
-	tag: string
-	checksum: number
-	offset: number
-	length: number
-	data: Buffer
-}
+const align4 = (value: number) => (value + 3) & ~3
 
-type VariationSequenceMapping = {
-	baseCodepoint: number
-	glyphId: number
-	variationSelector: number
-}
-
-const align4 = (value: number): number => (value + 3) & ~3
-
-const checksumForTable = (table: Buffer): number => {
+const checksumForTable = (table: Buffer) => {
 	let checksum = 0
 	const paddedTable = Buffer.alloc(align4(table.length))
 
@@ -331,9 +306,15 @@ const checksumForTable = (table: Buffer): number => {
 	return checksum
 }
 
-const parseSfntTables = (fontBuffer: Buffer): SfntTable[] => {
+const parseSfntTables = (fontBuffer: Buffer) => {
 	const tableCount = fontBuffer.readUInt16BE(4)
-	const tables: SfntTable[] = []
+	const tables: Array<{
+		tag: string
+		checksum: number
+		offset: number
+		length: number
+		data: Buffer
+	}> = []
 
 	for (let index = 0; index < tableCount; index++) {
 		const recordOffset = 12 + index * 16
@@ -353,38 +334,10 @@ const parseSfntTables = (fontBuffer: Buffer): SfntTable[] => {
 	return tables
 }
 
-const pascalStrings = (buffer: Buffer, offset: number, count: number): string[] => {
-	const strings: string[] = []
-	let stringOffset = offset
-
-	while (stringOffset < buffer.length && strings.length < count) {
-		const length = buffer.readUInt8(stringOffset)
-		const start = stringOffset + 1
-		const end = start + length
-
-		if (end > buffer.length) {
-			break
-		}
-
-		strings.push(buffer.toString('ascii', start, end))
-		stringOffset = end
-	}
-
-	return strings
-}
-
-const glyphIdByName = (fontBuffer: Buffer): Map<string, number> => {
+const glyphIdByName = (fontBuffer: Buffer) => {
 	const tables = parseSfntTables(fontBuffer)
-	const post = tables.find(table => table.tag === 'post')
-	const maxp = tables.find(table => table.tag === 'maxp')
-
-	if (post === undefined || maxp === undefined) {
-		throw new Error('Cannot map glyph names without post and maxp tables.')
-	}
-
-	if (post.data.readUInt32BE(0) !== 0x00020000) {
-		throw new Error('Cannot map glyph names unless the post table uses format 2.')
-	}
+	const post = tables.find(table => table.tag === 'post')!
+	const maxp = tables.find(table => table.tag === 'maxp')!
 
 	const glyphCount = maxp.data.readUInt16BE(4)
 	const nameIndexes = Array.from({ length: glyphCount }, (_value, glyphId) =>
@@ -394,7 +347,21 @@ const glyphIdByName = (fontBuffer: Buffer): Map<string, number> => {
 		0,
 		...nameIndexes.map(nameIndex => nameIndex - postCustomGlyphNameStart + 1),
 	)
-	const customNames = pascalStrings(post.data, 34 + glyphCount * 2, customNameCount)
+	const customNames: string[] = []
+	let customNameOffset = 34 + glyphCount * 2
+
+	while (customNameOffset < post.data.length && customNames.length < customNameCount) {
+		const length = post.data.readUInt8(customNameOffset)
+		const start = customNameOffset + 1
+		const end = start + length
+
+		if (end > post.data.length) {
+			break
+		}
+
+		customNames.push(post.data.toString('ascii', start, end))
+		customNameOffset = end
+	}
 	const result = new Map<string, number>()
 
 	for (const [glyphId, nameIndex] of nameIndexes.entries()) {
@@ -411,180 +378,11 @@ const glyphIdByName = (fontBuffer: Buffer): Map<string, number> => {
 	return result
 }
 
-// svgtofont maps emoji-presenting strings like "❤️" to the base Unicode codepoint,
-// but it does not add the cmap format-14 variation selector table. Browsers need
-// that table to pick this font's SVG glyph for U+2764 U+FE0F instead of falling
-// through to a platform color emoji font.
-const emojiVariationMappings = (
-	fontBuffer: Buffer,
-	iconUnicodeSequences: IconUnicodeSequences,
-): VariationSequenceMapping[] => {
-	const glyphIds = glyphIdByName(fontBuffer)
-
-	return Object.entries(iconUnicodeSequences)
-		.map(([iconName, iconSequence]): VariationSequenceMapping | null => {
-			const codepoints = [...iconSequence].map(codepoint => codepoint.codePointAt(0))
-
-			if (codepoints.length !== 2 || codepoints[0] === undefined || codepoints[1] !== 0xfe0f) {
-				return null
-			}
-
-			const glyphId = glyphIds.get(iconName)
-
-			if (glyphId === undefined) {
-				throw new Error(`Cannot find glyph named ${iconName} for emoji variation mapping.`)
-			}
-
-			return {
-				baseCodepoint: codepoints[0],
-				glyphId,
-				variationSelector: codepoints[1],
-			}
-		})
-		.filter((mapping): mapping is VariationSequenceMapping => mapping !== null)
-}
-
-const writeUInt24BE = (buffer: Buffer, value: number, offset: number): void => {
-	buffer.writeUInt8((value >> 16) & 0xff, offset)
-	buffer.writeUInt8((value >> 8) & 0xff, offset + 1)
-	buffer.writeUInt8(value & 0xff, offset + 2)
-}
-
-// cmap format 14 stores Unicode variation sequence mappings. We only emit
-// non-default mappings for base-codepoint + U+FE0F sequences that already have
-// named glyphs in the generated font.
-const cmapFormat14Table = (mappings: readonly VariationSequenceMapping[]): Buffer => {
-	const mappingsBySelector = new Map<number, VariationSequenceMapping[]>()
-
-	for (const mapping of mappings) {
-		const selectorMappings = mappingsBySelector.get(mapping.variationSelector) ?? []
-
-		selectorMappings.push(mapping)
-		mappingsBySelector.set(mapping.variationSelector, selectorMappings)
-	}
-
-	const selectorEntries = [...mappingsBySelector.entries()].sort(
-		([selectorA], [selectorB]) => selectorA - selectorB,
-	)
-	const headerLength = 10 + selectorEntries.length * 11
-	const mappingTables = selectorEntries.map(([variationSelector, selectorMappings]) => ({
-		variationSelector,
-		mappings: selectorMappings
-			.slice()
-			.sort(
-				(mappingA, mappingB) =>
-					mappingA.baseCodepoint - mappingB.baseCodepoint || mappingA.glyphId - mappingB.glyphId,
-			)
-			.map(mapping => ({
-				baseCodepoint: mapping.baseCodepoint,
-				glyphId: mapping.glyphId,
-			})),
-	}))
-	const length =
-		headerLength + mappingTables.reduce((size, table) => size + 4 + table.mappings.length * 5, 0)
-	const buffer = Buffer.alloc(length)
-
-	buffer.writeUInt16BE(14, 0)
-	buffer.writeUInt32BE(length, 2)
-	buffer.writeUInt32BE(mappingTables.length, 6)
-
-	let recordOffset = 10
-	let mappingTableOffset = headerLength
-
-	for (const table of mappingTables) {
-		writeUInt24BE(buffer, table.variationSelector, recordOffset)
-		buffer.writeUInt32BE(0, recordOffset + 3)
-		buffer.writeUInt32BE(mappingTableOffset, recordOffset + 7)
-		buffer.writeUInt32BE(table.mappings.length, mappingTableOffset)
-
-		let mappingOffset = mappingTableOffset + 4
-
-		for (const mapping of table.mappings) {
-			writeUInt24BE(buffer, mapping.baseCodepoint, mappingOffset)
-			buffer.writeUInt16BE(mapping.glyphId, mappingOffset + 3)
-			mappingOffset += 5
-		}
-
-		recordOffset += 11
-		mappingTableOffset = mappingOffset
-	}
-
-	return buffer
-}
-
-const cmapWithVariationSequences = (
-	cmap: Buffer,
-	mappings: readonly VariationSequenceMapping[],
-): Buffer => {
-	const subtableCount = cmap.readUInt16BE(2)
-	const retainedRecords: { platformId: number; encodingId: number; table: Buffer }[] = []
-	const seenOffsets = new Set<number>()
-
-	for (let index = 0; index < subtableCount; index++) {
-		const recordOffset = 4 + index * 8
-		const platformId = cmap.readUInt16BE(recordOffset)
-		const encodingId = cmap.readUInt16BE(recordOffset + 2)
-		const subtableOffset = cmap.readUInt32BE(recordOffset + 4)
-		const format = cmap.readUInt16BE(subtableOffset)
-
-		if (format === 14) {
-			continue
-		}
-
-		if (seenOffsets.has(subtableOffset)) {
-			continue
-		}
-
-		seenOffsets.add(subtableOffset)
-
-		const length =
-			format === 12 ? cmap.readUInt32BE(subtableOffset + 4) : cmap.readUInt16BE(subtableOffset + 2)
-
-		retainedRecords.push({
-			platformId,
-			encodingId,
-			table: cmap.subarray(subtableOffset, subtableOffset + length),
-		})
-	}
-
-	retainedRecords.push({
-		platformId: 0,
-		encodingId: 5,
-		table: cmapFormat14Table(mappings),
-	})
-
-	const headerLength = 4 + retainedRecords.length * 8
-	const length =
-		headerLength + retainedRecords.reduce((size, record) => size + record.table.length, 0)
-	const buffer = Buffer.alloc(length)
-
-	buffer.writeUInt16BE(0, 0)
-	buffer.writeUInt16BE(retainedRecords.length, 2)
-
-	let subtableOffset = headerLength
-
-	for (const [index, record] of retainedRecords.entries()) {
-		const recordOffset = 4 + index * 8
-
-		buffer.writeUInt16BE(record.platformId, recordOffset)
-		buffer.writeUInt16BE(record.encodingId, recordOffset + 2)
-		buffer.writeUInt32BE(subtableOffset, recordOffset + 4)
-		record.table.copy(buffer, subtableOffset)
-		subtableOffset += record.table.length
-	}
-
-	return buffer
-}
-
 // Replace a single SFNT table and recompute table checksums. This is intentionally
 // narrow: the only caller patches `cmap` after svgtofont writes the TTF.
-const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer): Buffer => {
+const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer) => {
 	const tables = parseSfntTables(fontBuffer)
-	const table = tables.find(entry => entry.tag === tag)
-
-	if (table === undefined) {
-		throw new Error(`Cannot replace missing ${tag} table.`)
-	}
+	const table = tables.find(entry => entry.tag === tag)!
 
 	table.data = tableData
 	table.length = tableData.length
@@ -615,11 +413,7 @@ const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer): Buff
 		entry.data.copy(output, entry.offset)
 	}
 
-	const head = tables.find(entry => entry.tag === 'head')
-
-	if (head === undefined) {
-		throw new Error('Cannot set font checksum without a head table.')
-	}
+	const head = tables.find(entry => entry.tag === 'head')!
 
 	output.writeUInt32BE(0, head.offset + 8)
 	output.writeUInt32BE((sfntChecksumAdjustment - checksumForTable(output)) >>> 0, head.offset + 8)
@@ -630,23 +424,163 @@ const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer): Buff
 const fontWithEmojiVariationSequences = (
 	fontBuffer: Buffer,
 	iconUnicodeSequences: IconUnicodeSequences,
-): Buffer => {
-	const mappings = emojiVariationMappings(fontBuffer, iconUnicodeSequences)
+) => {
+	// svgtofont maps emoji-presenting strings like "❤️" to the base Unicode codepoint,
+	// but it does not add the cmap format-14 variation selector table. Browsers need
+	// that table to pick this font's SVG glyph for U+2764 U+FE0F instead of falling
+	// through to a platform color emoji font.
+	const glyphIds = glyphIdByName(fontBuffer)
+	const mappings = Object.entries(iconUnicodeSequences).flatMap(([iconName, iconSequence]) => {
+		const codepoints = [...iconSequence].map(codepoint => codepoint.codePointAt(0))
+
+		if (codepoints.length !== 2 || codepoints[0] === undefined || codepoints[1] !== 0xfe0f) {
+			return []
+		}
+
+		return [
+			{
+				baseCodepoint: codepoints[0],
+				glyphId: glyphIds.get(iconName)!,
+				variationSelector: codepoints[1],
+			},
+		]
+	})
 
 	if (mappings.length === 0) {
 		return fontBuffer
 	}
 
-	const cmap = parseSfntTables(fontBuffer).find(table => table.tag === 'cmap')
+	const cmap = parseSfntTables(fontBuffer).find(table => table.tag === 'cmap')!
 
-	if (cmap === undefined) {
-		throw new Error('Cannot add emoji variation sequences without a cmap table.')
+	const subtableCount = cmap.data.readUInt16BE(2)
+	const retainedRecords: { platformId: number; encodingId: number; table: Buffer }[] = []
+	const seenOffsets = new Set<number>()
+
+	for (let index = 0; index < subtableCount; index++) {
+		const recordOffset = 4 + index * 8
+		const platformId = cmap.data.readUInt16BE(recordOffset)
+		const encodingId = cmap.data.readUInt16BE(recordOffset + 2)
+		const subtableOffset = cmap.data.readUInt32BE(recordOffset + 4)
+		const format = cmap.data.readUInt16BE(subtableOffset)
+
+		if (format === 14) {
+			continue
+		}
+
+		if (seenOffsets.has(subtableOffset)) {
+			continue
+		}
+
+		seenOffsets.add(subtableOffset)
+
+		const length =
+			format === 12
+				? cmap.data.readUInt32BE(subtableOffset + 4)
+				: cmap.data.readUInt16BE(subtableOffset + 2)
+
+		retainedRecords.push({
+			platformId,
+			encodingId,
+			table: cmap.data.subarray(subtableOffset, subtableOffset + length),
+		})
 	}
 
-	return fontWithTable(fontBuffer, 'cmap', cmapWithVariationSequences(cmap.data, mappings))
+	// cmap format 14 stores Unicode variation sequence mappings. We only emit
+	// non-default mappings for base-codepoint + U+FE0F sequences that already have
+	// named glyphs in the generated font.
+	const mappingsBySelector = new Map<
+		number,
+		Array<{ baseCodepoint: number; glyphId: number; variationSelector: number }>
+	>()
+
+	for (const mapping of mappings) {
+		const selectorMappings = mappingsBySelector.get(mapping.variationSelector) ?? []
+
+		selectorMappings.push(mapping)
+		mappingsBySelector.set(mapping.variationSelector, selectorMappings)
+	}
+
+	const selectorEntries = [...mappingsBySelector.entries()].sort(
+		([selectorA], [selectorB]) => selectorA - selectorB,
+	)
+	const format14HeaderLength = 10 + selectorEntries.length * 11
+	const mappingTables = selectorEntries.map(([variationSelector, selectorMappings]) => ({
+		variationSelector,
+		mappings: selectorMappings
+			.slice()
+			.sort(
+				(mappingA, mappingB) =>
+					mappingA.baseCodepoint - mappingB.baseCodepoint || mappingA.glyphId - mappingB.glyphId,
+			)
+			.map(mapping => ({
+				baseCodepoint: mapping.baseCodepoint,
+				glyphId: mapping.glyphId,
+			})),
+	}))
+	const format14Length =
+		format14HeaderLength +
+		mappingTables.reduce((size, table) => size + 4 + table.mappings.length * 5, 0)
+	const format14Table = Buffer.alloc(format14Length)
+
+	format14Table.writeUInt16BE(14, 0)
+	format14Table.writeUInt32BE(format14Length, 2)
+	format14Table.writeUInt32BE(mappingTables.length, 6)
+
+	let selectorRecordOffset = 10
+	let mappingTableOffset = format14HeaderLength
+
+	for (const table of mappingTables) {
+		format14Table.writeUInt8((table.variationSelector >> 16) & 0xff, selectorRecordOffset)
+		format14Table.writeUInt8((table.variationSelector >> 8) & 0xff, selectorRecordOffset + 1)
+		format14Table.writeUInt8(table.variationSelector & 0xff, selectorRecordOffset + 2)
+		format14Table.writeUInt32BE(0, selectorRecordOffset + 3)
+		format14Table.writeUInt32BE(mappingTableOffset, selectorRecordOffset + 7)
+		format14Table.writeUInt32BE(table.mappings.length, mappingTableOffset)
+
+		let mappingOffset = mappingTableOffset + 4
+
+		for (const mapping of table.mappings) {
+			format14Table.writeUInt8((mapping.baseCodepoint >> 16) & 0xff, mappingOffset)
+			format14Table.writeUInt8((mapping.baseCodepoint >> 8) & 0xff, mappingOffset + 1)
+			format14Table.writeUInt8(mapping.baseCodepoint & 0xff, mappingOffset + 2)
+			format14Table.writeUInt16BE(mapping.glyphId, mappingOffset + 3)
+			mappingOffset += 5
+		}
+
+		selectorRecordOffset += 11
+		mappingTableOffset = mappingOffset
+	}
+
+	retainedRecords.push({
+		platformId: 0,
+		encodingId: 5,
+		table: format14Table,
+	})
+
+	const headerLength = 4 + retainedRecords.length * 8
+	const length =
+		headerLength + retainedRecords.reduce((size, record) => size + record.table.length, 0)
+	const patchedCmap = Buffer.alloc(length)
+
+	patchedCmap.writeUInt16BE(0, 0)
+	patchedCmap.writeUInt16BE(retainedRecords.length, 2)
+
+	let subtableOffset = headerLength
+
+	for (const [index, record] of retainedRecords.entries()) {
+		const recordOffset = 4 + index * 8
+
+		patchedCmap.writeUInt16BE(record.platformId, recordOffset)
+		patchedCmap.writeUInt16BE(record.encodingId, recordOffset + 2)
+		patchedCmap.writeUInt32BE(subtableOffset, recordOffset + 4)
+		record.table.copy(patchedCmap, subtableOffset)
+		subtableOffset += record.table.length
+	}
+
+	return fontWithTable(fontBuffer, 'cmap', patchedCmap)
 }
 
-export const generatedIconFontCSS = (fontName: string, cssRules: readonly string[]): string => {
+export const generatedIconFontCSS = (fontName: string, cssRules: readonly string[]) => {
 	return [
 		'[data-icon~="wbicons"] {',
 		'\t&::before {',
@@ -710,7 +644,7 @@ export class SVGFont {
 		fontTypeName: string,
 		svgoConfig: Config,
 		iconUnicodeSequences: IconUnicodeSequences | null,
-	): Promise<string> {
+	) {
 		const entries = await fs.promises.readdir(svgIconsDir)
 
 		if (entries.length === 0) {
@@ -818,7 +752,7 @@ export class SVGFont {
 		)
 	}
 
-	public async nonMonochromeFiles(): Promise<Record<string, string[]>> {
+	public async nonMonochromeFiles() {
 		const result: Record<string, string[]> = {}
 		const entries = await fs.promises.readdir(this.svgIconsDir)
 
@@ -839,7 +773,7 @@ export class SVGFont {
 		return result
 	}
 
-	public isUpToDate(): boolean {
+	public isUpToDate() {
 		const hashFilePath = path.join(this.fontOutputDir, 'font_hash.sha256')
 
 		try {
@@ -855,7 +789,7 @@ export class SVGFont {
 		}
 	}
 
-	public writeCommand(): string {
+	public writeCommand() {
 		const repoRoot = getRepositoryRoot()
 		const relSvgIconsDir = path.relative(repoRoot, this.svgIconsDir)
 		const relFontOutputDir = path.relative(repoRoot, this.fontOutputDir)
@@ -920,18 +854,20 @@ export class SVGFont {
 		for (const [key, icon] of Object.entries(result).sort(([keyA, _valA], [keyB, _valB]) =>
 			keyA.localeCompare(keyB),
 		)) {
-			if (icon.encodedCode === undefined || typeof icon.encodedCode !== 'string') {
-				throw new Error(`Key ${key} not encoded: ${JSON.stringify(icon)}`)
-			}
-
 			const iconUnicodeSequence = iconUnicodeSequences?.[key]
 
 			if (iconUnicodeSequences !== null && iconUnicodeSequence === undefined) {
 				throw new Error(`Missing emoji unicode mapping for ${this.fontName} icon: ${key}`)
 			}
 
-			cssRules.push(iconFontCSSRuleForIcon(key, iconUnicodeSequence ?? icon.encodedCode))
-			generatedIconUnicodeSequences[key] = iconUnicodeSequence ?? icon.encodedCode
+			if (typeof icon.encodedCode !== 'string') {
+				throw new Error(`Key ${key} not encoded: ${JSON.stringify(icon)}`)
+			}
+
+			const iconContent = iconUnicodeSequence ?? icon.encodedCode
+
+			cssRules.push(iconFontCSSRuleForIcon(key, iconContent))
+			generatedIconUnicodeSequences[key] = iconContent
 		}
 		const generatedCSS = generatedIconFontCSS(this.fontName, cssRules)
 

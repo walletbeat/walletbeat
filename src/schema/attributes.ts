@@ -1005,12 +1005,6 @@ export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = null>(
 
 const isWBIconID = (icon: string): icon is WBIconID => icon in wbIconEmojiSequences
 
-const formatAttributeIcon = (icon: string | undefined, fallbackIcon: WBIconID): string => {
-	const resolvedIcon = icon ?? fallbackIcon
-
-	return isWBIconID(resolvedIcon) ? wbIconEmojiSequences[resolvedIcon] : resolvedIcon
-}
-
 /**
  * Format title text for an attribute pie slice.
  * @param attribute The evaluated attribute to format.
@@ -1020,8 +1014,10 @@ const formatAttributeIcon = (icon: string | undefined, fallbackIcon: WBIconID): 
 export const formatAttributeTitleText = (
 	attribute: EvaluatedAttribute<OutcomeMetadata>,
 	suffix?: string,
-) =>
-	`${formatAttributeIcon(attribute.evaluation.outcome.icon, attribute.attribute.icon)} ${
+) => {
+	const icon = attribute.evaluation.outcome.icon ?? attribute.attribute.icon
+
+	return `${isWBIconID(icon) ? wbIconEmojiSequences[icon] : icon} ${
 		attribute.attribute.displayName
 	}${suffix ?? ''} [${ratingIcons[attribute.evaluation.outcome.rating]} ${
 		attribute.evaluation.outcome.rating
@@ -1030,3 +1026,4 @@ export const formatAttributeTitleText = (
 			? `\n\n${attribute.evaluation.outcome.displayName}`
 			: ''
 	}`
+}
