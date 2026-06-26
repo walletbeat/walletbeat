@@ -1,3 +1,4 @@
+import { wbIconEmojiSequences } from '@/styles/wbicons'
 import { sentence } from '@/types/content'
 import type { Dict } from '@/types/utils/dict'
 import {
@@ -797,7 +798,7 @@ export const formatAttributeGroupTitleText = <Vs extends ValueSet>(
 	groupScore: MaybeUnratedScore,
 	showScores: boolean,
 ) =>
-	`${attrGroup.icon} ${attrGroup.displayName}${
+	`${wbIconEmojiSequences[attrGroup.icon]} ${attrGroup.displayName}${
 		showScores
 			? `\n\n${
 					groupScore !== null && groupScore.score !== null

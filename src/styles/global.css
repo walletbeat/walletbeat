@@ -37,6 +37,7 @@
 	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
+	--fontFamily-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 
 	--safeArea-insetTop: env(safe-area-inset-top, 0px);
 	--safeArea-insetBottom: env(safe-area-inset-bottom, 0px);

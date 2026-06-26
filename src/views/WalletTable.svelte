@@ -259,7 +259,7 @@
 
 
 	// Mobile filter helpers
-	const variantWbIconIds: Record<Variant, WBIconFontID> = {
+	const variantWbIconIds: Record<Variant, WBIconID> = {
 		[Variant.BROWSER]: 'wallet_browser',
 		[Variant.DESKTOP]: 'wallet_desktop',
 		[Variant.MOBILE]: 'wallet_mobile',
@@ -350,7 +350,7 @@
 
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
-	import type { WBIconFontID } from '@/styles/wbicons'
+	import type { WBIconID } from '@/styles/wbicons'
 
 
 	// Flower visualization helpers
@@ -422,7 +422,7 @@
 									aria-label={variantToName(variant, true)}
 									onclick={() => toggleFilterById?.(filterId)}
 								>
-									<span data-wbicon data-icon={variantWbIconIds[variant]}></span>
+									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
 								<span class="filter-circle-label">{variantToName(variant, false)}</span>
 							</div>
@@ -444,7 +444,7 @@
 								aria-label={label}
 								onclick={() => toggleFilterById?.(id)}
 							>
-								<span data-wbicon data-icon="account_type"></span>
+								<span data-icon="wbicons account_type"></span>
 							</button>
 							<span class="filter-circle-label">{label}</span>
 						</div>
@@ -1114,6 +1114,7 @@
 										offset: 3,
 										outerCornerRadius: 28,
 										innerCornerRadius: 16,
+										labelSize: 32,
 									},
 									{
 										outerRadiusFraction: 0.45,
@@ -1437,7 +1438,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon" data-wbicon data-icon={attrGroup.icon}></span>
+										<span class="pie-center-icon" data-icon="wbicons emoji {attrGroup.icon}"></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}
@@ -1597,7 +1598,7 @@
 									aria-pressed={variant === selectedVariant}
 									onclick={() => toggleFilterById?.(`variant-${variant}`, true)}
 								>
-									<span data-wbicon data-icon={variantWbIconIds[variant]}></span>
+									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
 							{/each}
 						</div>
@@ -1616,7 +1617,7 @@
 								class="mobile-attr-circle"
 								style:--attr-color={groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)'}
 							>
-								<span data-wbicon data-icon={attrGroup.icon}></span>
+								<span data-icon="wbicons {attrGroup.icon}"></span>
 							</div>
 							<span class="mobile-attr-label">{attrGroup.displayName}</span>
 						</a>
@@ -1638,6 +1639,7 @@
 								offset: 4,
 								outerCornerRadius: 35,
 								innerCornerRadius: 20,
+								labelSize: 40,
 							},
 							{
 								outerRadiusFraction: 0.45,
@@ -1987,7 +1989,7 @@
 		cursor: pointer;
 		transition-property: background-color, border-color, color;
 
-		[data-wbicon] {
+		> span {
 			font-size: 1.5rem;
 			line-height: 1;
 		}
@@ -2101,7 +2103,7 @@
 		padding: 0;
 		transition-property: color;
 
-		[data-wbicon] {
+		> span {
 			font-size: 1.25rem;
 			line-height: 1;
 		}
@@ -2148,7 +2150,7 @@
 		justify-content: center;
 		flex-shrink: 0;
 
-		[data-wbicon] {
+		> span {
 			font-size: 1.4rem;
 			line-height: 1;
 		}

@@ -1,11 +1,14 @@
-[data-wbicon] {
-	font-family: var(--fontFamily-wbicons);
-	font-style: normal;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-
+[data-icon~="wbicons"] {
 	&::before {
 		content: var(--icon-content);
+		font-family: var(--fontFamily-wbicons);
+		font-style: normal;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	&[data-icon~="emoji"]::before {
+		font-family: var(--fontFamily-emoji);
 	}
 
 	&[data-icon~="about"] {
@@ -13,7 +16,7 @@
 	}
 
 	&[data-icon~="account_abstraction"] {
-		--icon-content: "💼";
+		--icon-content: "👤";
 	}
 
 	&[data-icon~="account_portability"] {
@@ -81,7 +84,7 @@
 	}
 
 	&[data-icon~="hardware_wallet_interoperability"] {
-		--icon-content: "🧩";
+		--icon-content: "🧱";
 	}
 
 	&[data-icon~="hardware_wallet_support"] {
@@ -101,7 +104,7 @@
 	}
 
 	&[data-icon~="orderflow_transparency"] {
-		--icon-content: "💸";
+		--icon-content: "🔀";
 	}
 
 	&[data-icon~="passkey_verification"] {
@@ -129,11 +132,11 @@
 	}
 
 	&[data-icon~="release_process_transparency"] {
-		--icon-content: "🚢";
+		--icon-content: "📦";
 	}
 
 	&[data-icon~="repository"] {
-		--icon-content: "💻";
+		--icon-content: "🐱";
 	}
 
 	&[data-icon~="scam_prevention"] {
@@ -145,11 +148,11 @@
 	}
 
 	&[data-icon~="security_audits"] {
-		--icon-content: "🔏";
+		--icon-content: "📜";
 	}
 
 	&[data-icon~="security_best_practices"] {
-		--icon-content: "🔐";
+		--icon-content: "📋";
 	}
 
 	&[data-icon~="self_sovereignty"] {
@@ -169,7 +172,7 @@
 	}
 
 	&[data-icon~="transaction_legibility"] {
-		--icon-content: "🔏";
+		--icon-content: "🧾";
 	}
 
 	&[data-icon~="transparency"] {
@@ -177,7 +180,7 @@
 	}
 
 	&[data-icon~="user_privacy"] {
-		--icon-content: "🔒";
+		--icon-content: "🕶️";
 	}
 
 	&[data-icon~="wallet_address_privacy"] {
@@ -185,7 +188,7 @@
 	}
 
 	&[data-icon~="wallet_browser"] {
-		--icon-content: "🌐";
+		--icon-content: "🧩";
 	}
 
 	&[data-icon~="wallet_desktop"] {
@@ -193,11 +196,11 @@
 	}
 
 	&[data-icon~="wallet_embedded"] {
-		--icon-content: "🧩";
+		--icon-content: "🧬";
 	}
 
 	&[data-icon~="wallet_hardware"] {
-		--icon-content: "🔐";
+		--icon-content: "📟";
 	}
 
 	&[data-icon~="wallet_mobile"] {

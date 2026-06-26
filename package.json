@@ -100,6 +100,9 @@
 		"svgo": "^4.0.1",
 		"svgtofont": "^6.5.1",
 		"tsx": "^4.21.0",
+		"ttf2eot": "3.1.0",
+		"ttf2woff": "3.0.0",
+		"ttf2woff2": "8.0.1",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
 	},

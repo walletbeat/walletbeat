@@ -77,6 +77,7 @@
 		"chromewebstore",
 		"citrea",
 		"clineignore",
+		"cmap",
 		"codegen",
 		"coinbase",
 		"Coinspect",
@@ -145,8 +146,8 @@
 		"esbuild",
 		"eslintcache",
 		"eternalsafe",
-		"eth",
 		"ETH",
+		"eth",
 		"EthCC",
 		"Ethereans",
 		"Etherscan",
@@ -263,6 +264,7 @@
 		"Matomo",
 		"Matric",
 		"Mattmatt",
+		"maxp",
 		"maykelxyz",
 		"mempool",
 		"merch",
@@ -399,9 +401,11 @@
 		"screenshotted",
 		"SDK",
 		"seedphrase",
+		"Segoe",
 		"Seiryu",
 		"selectedcontent",
 		"setmonofont",
+		"sfnt",
 		"Shamir",
 		"shefi",
 		"sidepanel",
@@ -427,6 +431,7 @@
 		"subcolumns",
 		"subcriteria",
 		"subresource",
+		"subtable",
 		"svgtofont",
 		"takeoverable",
 		"Tangem",
@@ -529,14 +534,26 @@
 		"resources/contracts/images/**"
 	],
 	"patterns": [
-		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
-		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
+		{
+			"name": "Bitcoin addresses",
+			"pattern": "/\\bbtc:[0-9a-z]+/g"
+		},
+		{
+			"name": "CIDv1",
+			"pattern": "/\\bbafy\\w+/g"
+		},
 		{
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
-		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
-		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" }
+		{
+			"name": "Hexadecimal addresses",
+			"pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi"
+		},
+		{
+			"name": "svgicons2svgfont",
+			"pattern": "/svgicons2svgfont/g"
+		}
 	],
 	"ignoreRegExpList": [
 		"Bitcoin addresses",

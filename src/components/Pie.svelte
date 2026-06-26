@@ -322,7 +322,7 @@
 		this={slice.href ? 'a' : 'div'}
 		href={slice.href}
 
-		class={`slice ${slice.children !== undefined && slice.children.length > 0 ? 'slice-outer' : 'slice-inner'}`}
+		class="slice"
 		title={slice.titleText}
 
 		role="button"
@@ -363,7 +363,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-wbicon data-icon={slice.arcIconId}></span>
+				<span class="label" aria-hidden="true" data-icon="wbicons emoji {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
@@ -707,25 +707,6 @@
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
 					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
-				}
-
-				&:not(:hover, :focus-within) > .slice-shape > .label[data-wbicon] {
-					filter: none;
-					color: contrast-color(--slice-color);
-					opacity: 1;
-				}
-
-				&:hover > .slice-shape > .label[data-wbicon],
-				&:focus-within > .slice-shape > .label[data-wbicon] {
-					filter: none;
-					color: black;
-					opacity: 1;
-				}
-			}
-
-			.slice-outer {
-				.slice-shape > .label[data-wbicon] {
-					font-size: calc(var(--slice-labelSize) * 2px);
 				}
 			}
 
