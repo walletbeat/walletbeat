@@ -146,7 +146,64 @@ export const rainbow: SoftwareWallet = {
 		chainAbstraction: {
 			// Chain abstraction was evaluated on the mobile app only; the browser
 			// extension has not been tested for it yet.
-			[Variant.BROWSER]: null,
+			[Variant.BROWSER]: {
+				bridging: {
+					builtInBridging: supported({
+						ref: [
+							{
+								explanation:
+									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default (and "Hold to Bridge" is available there), so the fee shown by default is aggregated. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
+								lastRetrieved: '2026-06-26',
+								url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
+							},
+						],
+						feesLargerThan1bps: {
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							byDefault: FeeDisplayLevel.AGGREGATED,
+							fullySponsored: false,
+						},
+						risksExplained: 'NOT_IN_UI',
+					}),
+					suggestedBridging: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Rainbow browser extension app Send screen: attempting to send 200 USDC on Base to Vitalik.eth (1 USDC held there, but more held on another chain) shows an "Insufficient Funds" block, with no prompt to bridge the shortfall from the other chain.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-insufficient-funds-browser.png',
+							label:
+								'Rainbow browser extension app screenshot of the Send screen showing an Insufficient Funds block',
+							lastRetrieved: '2026-06-26',
+						},
+					}),
+				},
+				crossChainBalances: {
+					ref: [
+						{
+							explanation:
+								'Rainbow displays a single portfolio total summing the account value across all supported chains, and lists per-chain token balances as separate line items (e.g. ETH held on mainnet and on an L2 each appear as their own row with a chain badge). It does not, however, sum a single token across chains into one combined balance: the same asset on multiple chains is shown as multiple rows rather than a single total.',
+							lastRetrieved: '2026-06-26',
+							url: 'https://rainbow.me/support/app/supported-networks',
+						},
+						{
+							explanation:
+								'Sum of all token values shown. No per-network sum, or sum of all tokens across multiple chains.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-browser-extension-view.png',
+							label:
+								'Rainbow browser extension app screenshot of the home screen showing token balances',
+							lastRetrieved: '2026-06-26',
+						},
+					],
+					ether: {
+						crossChainSumView: notSupported,
+						perChainBalanceViewAcrossMultipleChains: featureSupported,
+					},
+					globalAccountValue: featureSupported,
+					perChainAccountValue: notSupported,
+					usdc: {
+						crossChainSumView: notSupported,
+						perChainBalanceViewAcrossMultipleChains: featureSupported,
+					},
+				},
+			},
 			[Variant.MOBILE]: {
 				bridging: {
 					builtInBridging: supported({
