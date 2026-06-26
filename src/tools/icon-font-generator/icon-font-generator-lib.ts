@@ -266,6 +266,8 @@ export const generatedIconFontTypescript = (
 const sfntChecksumAdjustment = 0xb1b0afba
 const postCustomGlyphNameStart = 258
 
+// SFNT tables are padded to 4-byte boundaries for checksum and table layout
+// purposes. The font file can become unreadable if offsets are not aligned.
 const align4 = (value: number) => (value + 3) & ~3
 
 const checksumForTable = (table: Buffer) => {
@@ -281,6 +283,9 @@ const checksumForTable = (table: Buffer) => {
 	return checksum
 }
 
+// TTF is an SFNT container: a short header plus a directory of named tables
+// such as `cmap`, `post`, `head`, and `maxp`. We only need enough structure to
+// replace one table after svgtofont writes the base font.
 const parseSfntTables = (fontBuffer: Buffer) => {
 	const tableCount = fontBuffer.readUInt16BE(4)
 	const tables: Array<{
@@ -314,6 +319,9 @@ const glyphIdByName = (fontBuffer: Buffer) => {
 	const post = tables.find(table => table.tag === 'post')!
 	const maxp = tables.find(table => table.tag === 'maxp')!
 
+	// svgtofont preserves SVG filenames as custom glyph names in the `post`
+	// table. The variation-sequence table stores glyph IDs, so we translate
+	// from icon name -> glyph ID before writing cmap format 14.
 	const glyphCount = maxp.data.readUInt16BE(4)
 	const nameIndexes = Array.from({ length: glyphCount }, (_value, glyphId) =>
 		post.data.readUInt16BE(34 + glyphId * 2),
@@ -367,6 +375,9 @@ const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer) => {
 	const headerLength = 12 + tableCount * 16
 	let nextOffset = headerLength
 
+	// Repack all tables after the modified table so each directory record has
+	// the new offset, length, and checksum. This avoids depending on the old
+	// table's byte length matching the replacement table.
 	for (const entry of tables) {
 		entry.offset = nextOffset
 		entry.length = entry.data.length
@@ -390,6 +401,9 @@ const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer) => {
 
 	const head = tables.find(entry => entry.tag === 'head')!
 
+	// The whole-font checksum adjustment lives inside `head`. The checksum must
+	// be computed with this field zeroed, then written back as the value that
+	// makes the full font checksum match the OpenType-required magic constant.
 	output.writeUInt32BE(0, head.offset + 8)
 	output.writeUInt32BE((sfntChecksumAdjustment - checksumForTable(output)) >>> 0, head.offset + 8)
 
@@ -442,6 +456,8 @@ const fontWithEmojiVariationSequences = (
 			continue
 		}
 
+		// Multiple cmap records may point at the same subtable. Retain each
+		// unique subtable once so offsets can be regenerated cleanly below.
 		if (seenOffsets.has(subtableOffset)) {
 			continue
 		}
@@ -478,6 +494,10 @@ const fontWithEmojiVariationSequences = (
 	const selectorEntries = [...mappingsBySelector.entries()].sort(
 		([selectorA], [selectorB]) => selectorA - selectorB,
 	)
+	// Format 14 stores one selector record per variation selector. Each selector
+	// points to a non-default UVS table containing base codepoint -> glyph ID
+	// mappings. Here that means U+FE0F plus every emoji base character that must
+	// select this SVG font instead of the platform emoji font.
 	const format14HeaderLength = 10 + selectorEntries.length * 11
 	const mappingTables = selectorEntries.map(([variationSelector, selectorMappings]) => ({
 		variationSelector,
@@ -505,6 +525,9 @@ const fontWithEmojiVariationSequences = (
 	let mappingTableOffset = format14HeaderLength
 
 	for (const table of mappingTables) {
+		// Format 14 uses 24-bit integers for Unicode scalar values. Node has no
+		// writeUInt24BE helper, so the selector and base codepoints are written
+		// one byte at a time.
 		format14Table.writeUInt8((table.variationSelector >> 16) & 0xff, selectorRecordOffset)
 		format14Table.writeUInt8((table.variationSelector >> 8) & 0xff, selectorRecordOffset + 1)
 		format14Table.writeUInt8(table.variationSelector & 0xff, selectorRecordOffset + 2)
@@ -537,6 +560,9 @@ const fontWithEmojiVariationSequences = (
 		headerLength + retainedRecords.reduce((size, record) => size + record.table.length, 0)
 	const patchedCmap = Buffer.alloc(length)
 
+	// The cmap table header is just a directory of encoding records and offsets
+	// to each subtable. After appending format 14, all subtable offsets are
+	// rewritten from scratch to keep the binary compact and deterministic.
 	patchedCmap.writeUInt16BE(0, 0)
 	patchedCmap.writeUInt16BE(retainedRecords.length, 2)
 
