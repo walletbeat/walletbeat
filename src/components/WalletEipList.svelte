@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Eip } from '@/schema/eips'
-	import { EipPrefix, EipStatus, eipEthereumDotOrgUrl, eipShortLabel } from '@/schema/eips'
-	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
+	import { EipPrefix, eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
 
@@ -25,14 +24,6 @@
 		activeFilter === 'ALL' ? eips : eips.filter((e) => e.prefix === activeFilter),
 	)
 
-	// Status badge helpers
-	const statusLabel: Record<EipStatus, string> = {
-		[EipStatus.FINAL]: 'Final',
-		[EipStatus.DRAFT]: 'Draft',
-		[EipStatus.LIVING]: 'Living',
-		[EipStatus.LAST_CALL]: 'Last Call',
-	}
-
 	// Accordion open state per EIP
 	let openStates = $state<Record<string, boolean>>(
 		Object.fromEntries(eips.map((e) => [e.number, false])),
@@ -54,60 +45,62 @@
 </nav>
 
 <!-- EIP list -->
-<ul class="eip-list" role="list">
+<div class="eip-list">
 	{#each filtered as eip (eip.number)}
-		<li class="eip-item">
-			<TooltipOrAccordion
-				bind:isExpanded={openStates[eip.number]}
-				showAccordionMarker
+		<div class="eip-item">
+			<details
+				bind:open={openStates[eip.number]}
+				data-card="secondary padding-0 radius-4"
+				class:open={openStates[eip.number]}
 			>
-				<div class="eip-row">
-					<span class="eip-label">{eipShortLabel(eip)}</span>
-					<span class="eip-name">{eip.friendlyName}</span>
-					<span class="eip-status" data-status={eip.status}>
-						{statusLabel[eip.status]}
-					</span>
-				</div>
-
-				{#snippet ExpandedContent()}
-					<div class="eip-detail">
-						<section class="eip-detail__section">
-							<h4>Summary</h4>
-							<Typography content={markdown(eip.summaryMarkdown)} />
-						</section>
-
-						<section class="eip-detail__section">
-							<h4>Why it matters for wallets</h4>
-							<Typography content={markdown(eip.whyItMattersMarkdown)} />
-						</section>
-
-						{#if eip.noteMarkdown}
-							<section class="eip-detail__section">
-								<h4>Notes</h4>
-								<Typography content={markdown(eip.noteMarkdown)} />
-							</section>
-						{/if}
-
-						<a
-							class="eip-detail__spec-link"
-							href={eipEthereumDotOrgUrl(eip)}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Read full spec ↗
-						</a>
+				<summary>
+					<div class="eip-row">
+						<span class="eip-label">{eipShortLabel(eip)}</span>
+						<span class="eip-name">{eip.friendlyName}</span>
+						<span class="eip-status" data-status={eip.status}>
+							{eipStatusLabel[eip.status]}
+						</span>
 					</div>
-				{/snippet}
-			</TooltipOrAccordion>
-		</li>
+				</summary>
+
+				<div class="eip-detail">
+					<section class="eip-detail__section">
+						<h4>Summary</h4>
+						<Typography content={markdown(eip.summaryMarkdown)} />
+					</section>
+
+					<section class="eip-detail__section">
+						<h4>Why it matters for wallets</h4>
+						<Typography content={markdown(eip.whyItMattersMarkdown)} />
+					</section>
+
+					{#if eip.noteMarkdown}
+						<section class="eip-detail__section">
+							<h4>Notes</h4>
+							<Typography content={markdown(eip.noteMarkdown)} />
+						</section>
+					{/if}
+
+					<a
+						class="eip-detail__spec-link"
+						href={eipEthereumDotOrgUrl(eip)}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Read full spec ↗
+					</a>
+				</div>
+			</details>
+		</div>
 	{/each}
-</ul>
+</div>
 
 {#if filtered.length === 0}
 	<p class="empty">No standards match the current filter.</p>
 {/if}
 
 <style>
+	/* Filter nav  */
 	.filter-nav {
 		display: flex;
 		align-items: center;
@@ -149,36 +142,56 @@
 		opacity: 0.6;
 	}
 
+	/* EIP list */
 	.eip-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0;
+		gap: 0.5rem;
 	}
 
 	.eip-item {
-		border-bottom: 1px solid var(--border);
+		details {
+			overflow: hidden;
+			transition: border-color 0.15s ease;
+			border: 1px solid transparent;
+			padding: 0.875rem 1rem 0.875rem 1.5rem;
 
-		&:first-child {
-			border-top: 1px solid var(--border);
-		}
+			&.open {
+				border-color: var(--accent);
+				padding-bottom: 1.25rem;
+			}
 
-		:global(details) {
-			padding: 0.875rem 0.25rem;
-		}
+			summary {
+				list-style: none;
+				cursor: pointer;
+				padding: 0;
+				user-select: none;
 
-		:global(summary) {
-			cursor: pointer;
-			list-style: none;
+				&::-webkit-details-marker {
+					display: none;
+				}
+
+				&::after {
+					content: '›';
+					font-size: 1.1rem;
+					color: var(--text-secondary);
+					opacity: 0.5;
+					transition: transform 0.2s ease;
+					flex-shrink: 0;
+				}
+			}
+
+			&.open summary::after {
+				transform: rotate(90deg);
+			}
 		}
 	}
 
+	/* Row (summary line) */
 	.eip-row {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 1.5rem;
 		width: 100%;
 	}
 
@@ -227,13 +240,14 @@
 		}
 	}
 
+	/* Expanded detail */
 	.eip-detail {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		padding: 0.5rem 0.25rem 0.75rem;
-		font-size: 1rem;
-		text-align: left;
+		padding-top: 1rem;
+		border-top: 1px solid var(--border);
+		margin-top: 0.875rem;
 	}
 
 	.eip-detail__section {
@@ -266,6 +280,7 @@
 		}
 	}
 
+	/* Empty state */
 	.empty {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
