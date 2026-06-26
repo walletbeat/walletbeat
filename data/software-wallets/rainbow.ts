@@ -216,7 +216,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Rainbow mobile app bridge amount-entry screen: by default only a gas estimate is shown (labelled "Free", roughly 0.0001 ETH), with the "Included Rainbow Fee" and slippage not visible. "Hold to Bridge" is available here, so a user can confirm without ever seeing the itemized fee.',
+									'Rainbow mobile app bridge amount-entry screen: by default only a gas estimate is shown (labeled "Free", roughly 0.0001 ETH), with the "Included Rainbow Fee" and slippage not visible. "Hold to Bridge" is available here, so a user can confirm without ever seeing the itemized fee.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-input-gas-only.jpg',
 								label:
 									'Rainbow mobile app screenshot of the bridge amount-entry screen showing only a gas estimate',
