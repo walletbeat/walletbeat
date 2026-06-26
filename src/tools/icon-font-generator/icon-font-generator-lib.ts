@@ -411,6 +411,10 @@ const glyphIdByName = (fontBuffer: Buffer): Map<string, number> => {
 	return result
 }
 
+// svgtofont maps emoji-presenting strings like "❤️" to the base Unicode codepoint,
+// but it does not add the cmap format-14 variation selector table. Browsers need
+// that table to pick this font's SVG glyph for U+2764 U+FE0F instead of falling
+// through to a platform color emoji font.
 const emojiVariationMappings = (
 	fontBuffer: Buffer,
 	iconUnicodeSequences: IconUnicodeSequences,
@@ -446,6 +450,9 @@ const writeUInt24BE = (buffer: Buffer, value: number, offset: number): void => {
 	buffer.writeUInt8(value & 0xff, offset + 2)
 }
 
+// cmap format 14 stores Unicode variation sequence mappings. We only emit
+// non-default mappings for base-codepoint + U+FE0F sequences that already have
+// named glyphs in the generated font.
 const cmapFormat14Table = (mappings: readonly VariationSequenceMapping[]): Buffer => {
 	const mappingsBySelector = new Map<number, VariationSequenceMapping[]>()
 
@@ -569,6 +576,8 @@ const cmapWithVariationSequences = (
 	return buffer
 }
 
+// Replace a single SFNT table and recompute table checksums. This is intentionally
+// narrow: the only caller patches `cmap` after svgtofont writes the TTF.
 const fontWithTable = (fontBuffer: Buffer, tag: string, tableData: Buffer): Buffer => {
 	const tables = parseSfntTables(fontBuffer)
 	const table = tables.find(entry => entry.tag === tag)
