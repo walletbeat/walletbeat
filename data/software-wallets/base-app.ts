@@ -103,7 +103,7 @@ export const baseApp: SoftwareWallet = {
 					'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 					{
 						explanation:
-							'First-hand (2026-06-27, fully signed out): the "More Options" sheet on the onboarding screen offers "Create recovery phrase" (BIP39 seed) alongside "Import Recovery Phrase" and "Import Passkey". Self-custody seed-phrase accounts are creatable in the current app, but sit behind "More Options" rather than the default flow.',
+							'First-hand (2026-06-27, fully signed out): the "More Options" sheet on the onboarding screen offers "Create recovery phrase" (`BIP39` seed) alongside "Import Recovery Phrase" and "Import Passkey". Self-custody seed-phrase accounts can be created in the current app, but sit behind "More Options" rather than the default flow.',
 						file: 'public/references/wallets/base-app/screenshots/2026-06-27-onboarding-more-options.png',
 						label:
 							'Onboarding "More Options" sheet: Create recovery phrase / Import Recovery Phrase / Import Passkey',
@@ -140,7 +140,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'First-hand (2026-06-27, fully signed out): the default "Welcome to Base App" onboarding surfaces only custodial sign-ins — Apple, Google, and a prominent "Continue with Email". No self-custody option appears until the user taps "More Options". This confirms the default new-account path yields a server-side-signer smart account.',
+							'First-hand (2026-06-27, fully signed out): the default "Welcome to Base App" onboarding surfaces only custodial sign-in methods — Apple, Google, and a prominent "Continue with Email". No self-custody option appears until the user taps "More Options". This confirms the default new-account path yields a server-side-signer smart account.',
 						file: 'public/references/wallets/base-app/screenshots/2026-06-27-onboarding-default-options.png',
 						label: 'Default signed-out onboarding: Apple / Google / Continue with Email only',
 					},
