@@ -1,0 +1,24 @@
+---
+// Functions
+import { staticMarkdownDir } from '@/utils/markdown-page-utils'
+
+// Components
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
+
+// Data
+import markdownFiles from '@/autogen/docs.gen'
+
+// Context
+export const { renderPage, prerender, getStaticPaths } = staticMarkdownDir({
+	markdownFiles,
+	stripPrefix: '/resources/docs/',
+})
+
+const { metadata, repoRootRelativePath, processedMarkdown } = renderPage(Astro.params)
+---
+
+<MarkdownPage
+	metadata={metadata}
+	repoRootRelativePath={repoRootRelativePath}
+	markdown={processedMarkdown}
+/>

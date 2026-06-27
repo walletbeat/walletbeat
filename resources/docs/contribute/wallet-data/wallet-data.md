@@ -1,3 +1,8 @@
+---
+title: Walletbeat contributor guide for wallet data entry
+description: "A guide explaining how to contribute data about wallets to Walletbeat's database."
+---
+
 # Walletbeat guide: Wallet data entry
 
 _This guide aims to help you contribute wallet data to Walletbeat. If you'd like to contribute to some other aspect of Walletbeat, see `CONTRIBUTING.md`._

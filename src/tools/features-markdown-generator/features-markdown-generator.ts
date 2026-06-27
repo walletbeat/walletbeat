@@ -17,7 +17,7 @@ const args = process.argv.slice(2)
 const config: FeaturesMarkdownConfig = {
 	featuresSrcFile: path.join(srcRoot, 'src', 'schema', 'features.ts'),
 	featuresDir: path.join(srcRoot, 'src', 'schema', 'features'),
-	outputPath: path.join(srcRoot, 'resources', 'docs', 'features.md'),
+	outputPath: path.join(srcRoot, 'resources', 'docs', 'features', 'features.md'),
 	srcRoot,
 	quiet: args.includes('--quiet'),
 	test: args.includes('--test'),

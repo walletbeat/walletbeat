@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat wallet testing: Chain verification'
+description: "A guide explaining how to verify a wallet's behavior when it comes to chain verification."
+---
+
 # Testing Chain Verification
 
 _This guide describes how to set up the L1 Lying RPC Proxy and use it to evaluate whether a wallet verifies the integrity of chain data using a light client._

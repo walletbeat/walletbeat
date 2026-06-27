@@ -9,6 +9,113 @@ import {
 import type { Strings } from '../types/utils/string-templates'
 
 /**
+ * Extract all markdown-style links from a document.
+ * Returns an array of { text, url, line, isImage } objects.
+ * Skips links inside code blocks and inline code.
+ */
+export interface ExtractedLink {
+	/** The display text of the link (or alt text for images). */
+	text: string
+	/** The URL of the link. */
+	url: string
+	/** The 1-based line number where the link appears. */
+	line: number
+	/** Whether this link is an image (`![alt](url)`). */
+	isImage: boolean
+}
+
+/**
+ * Extract all links from a Markdown document.
+ * Skips links inside code blocks (fenced and indented) and inline code.
+ * Handles both standard links `[text](url)` and images `![alt](url)`.
+ */
+export function extractMarkdownLinks(content: string): ExtractedLink[] {
+	const links: ExtractedLink[] = []
+	const lines = content.split('\n')
+	let inCodeBlock = false
+	let codeBlockFenceLength = 0
+
+	for (let lineNum = 0; lineNum < lines.length; lineNum++) {
+		const line = lines[lineNum]
+		const lineNum1 = lineNum + 1 // 1-based
+
+		// Track fenced code blocks
+		const trimmedLine = line.trimStart()
+		const backtickMatch = trimmedLine.match(/`+/)
+		const backtickLength = backtickMatch ? backtickMatch[0].length : 0
+
+		// Opening fence: 3+ backticks, optionally followed by a language specifier.
+		// Closing fence: 3+ backticks followed by only whitespace.
+		// Per CommonMark, the info string after opening backticks cannot contain backticks.
+		const hasFenceBackticks = backtickLength >= 3
+		const isOpeningFence = hasFenceBackticks && !inCodeBlock
+		const isClosingFence =
+			hasFenceBackticks &&
+			inCodeBlock &&
+			backtickLength >= codeBlockFenceLength &&
+			trimmedLine.slice(backtickLength).match(/^\s*$/)
+
+		if (isOpeningFence) {
+			inCodeBlock = true
+			codeBlockFenceLength = backtickLength
+			continue
+		}
+
+		if (isClosingFence) {
+			inCodeBlock = false
+			codeBlockFenceLength = 0
+			continue
+		}
+
+		if (inCodeBlock) {
+			continue
+		}
+
+		// Track indented code blocks (4+ spaces)
+		if (/^ {4,}/.test(line) && !line.trim().startsWith('[')) {
+			continue
+		}
+
+		// Remove inline code from the line before searching for links
+		const lineWithoutInlineCode = line.replace(/`[^`]+`/g, match => {
+			// Replace with same-length spaces to preserve positions
+			return ' '.repeat(match.length)
+		})
+
+		// Match standard links and images: [text](url) or [text](url "title")
+		const linkRegex = /(!?)\[([^\]]*)]\(([^)\s]+)(?:\s+\S*)?\)/g
+
+		let match: RegExpExecArray | null
+
+		while ((match = linkRegex.exec(lineWithoutInlineCode)) !== null) {
+			const isImage = match[1] === '!'
+			const text = match[2]
+			const url = match[3]
+
+			links.push({ text, url, line: lineNum1, isImage })
+		}
+
+		// Match reference link definitions: [ref]: url
+		const refRegex = /^\s*\[[^\]]+\]:\s+(\S+)/gm
+
+		let refMatch: RegExpExecArray | null
+
+		while ((refMatch = refRegex.exec(lineWithoutInlineCode)) !== null) {
+			const url = refMatch[1]
+
+			links.push({
+				text: refMatch[0].slice(0, refMatch[0].indexOf(':')),
+				url,
+				line: lineNum1,
+				isImage: false,
+			})
+		}
+	}
+
+	return links
+}
+
+/**
  * Collapse runs of 3+ newlines to exactly two (one blank line).
  */
 export function normalizeMarkdownBlankLines(content: string): string {

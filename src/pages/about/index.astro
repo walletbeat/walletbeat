@@ -1,21 +1,21 @@
 ---
 // Types
-import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
+import { staticSingleMarkdownPage } from '@/utils/markdown-page-utils'
 
 // Layouts
 import MarkdownPage from '@/layouts/MarkdownPage.astro'
 
 // Data
-import about from './about.md?raw'
+import rawMarkdown from './about.md?raw'
 
-const aboutContent = parseMarkdownWithFrontmatter<{ title: string; description: string }>(about, {
-	title: true,
-	description: true,
-} as const)
+const { metadata, processedMarkdown, repoRootRelativePath } = staticSingleMarkdownPage({
+	rawMarkdown,
+	repoRootRelativePath: '/src/pages/about/about.md',
+})
 ---
 
 <MarkdownPage
-	metadata={{}}
-	repoRootRelativePath='/src/pages/about/about.md'
-	markdown={aboutContent}
+	metadata={metadata}
+	repoRootRelativePath={repoRootRelativePath}
+	markdown={processedMarkdown}
 />

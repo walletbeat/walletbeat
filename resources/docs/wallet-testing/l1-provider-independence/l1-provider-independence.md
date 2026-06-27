@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat wallet testing: L1 Provider Independence'
+description: "A guide explaining how test wallets' L1 Provider Independence."
+---
+
 # Testing L1 Provider Independence
 
 _This guide describes how to set up a wallet with a custom L1 RPC provider such as a self-hosted node, and ensuring it can provide basic functionality without reliance on a specific external RPC provider._

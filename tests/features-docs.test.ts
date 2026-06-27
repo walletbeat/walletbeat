@@ -14,7 +14,7 @@ const repoRoot = getRepositoryRoot()
 const config = {
 	featuresSrcFile: path.join(repoRoot, 'src', 'schema', 'features.ts'),
 	featuresDir: path.join(repoRoot, 'src', 'schema', 'features'),
-	outputPath: path.join(repoRoot, 'resources', 'docs', 'features.md'),
+	outputPath: path.join(repoRoot, 'resources', 'docs', 'features', 'features.md'),
 	srcRoot: repoRoot,
 	quiet: true,
 	test: true,

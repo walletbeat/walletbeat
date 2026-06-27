@@ -6,6 +6,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/data/*": ["./data/*"],
+			"@/resources/*": ["./resources/*"],
 			"@/tests/*": ["./tests/*"],
 			"@/*": ["src/*"]
 		},

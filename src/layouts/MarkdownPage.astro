@@ -1,16 +1,6 @@
 ---
 // Types
-type MarkdownMetadata = {
-	title?: string
-	description?: string
-	keywordsBefore?: string[]
-	keywordsAfter?: string[]
-}
-
-type MarkdownFrontmatter = {
-	title: string
-	description: string
-}
+import type { MarkdownFrontmatter, MarkdownMetadata } from '@/utils/markdown-page-utils'
 
 type Props = {
 	metadata: MarkdownMetadata
@@ -35,16 +25,12 @@ const processedMarkdown = stripMarkdownTitle(
 		repoRootRelativePaths: {
 			'/public': '/',
 			'/src/pages': '/',
+			'/resources/docs': '/docs',
+			'/governance': '/governance',
 		},
 		forbiddenURLPrefixes: ['https://github.com/walletbeat/walletbeat'],
 		whitelistURLs: [
-			'https://github.com/walletbeat/walletbeat',
-			'https://github.com/walletbeat/walletbeat/blob/beta/governance/communications/communications-policy.md', // Temporary
-			'https://github.com/walletbeat/walletbeat/blob/beta/governance/communications/communication-channels.md', // Temporary
-			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round', // Temporary
-			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-07-ethereum-foundation-esp-grant-proposal', // Temporary
-			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2026-04-giveth-ethereum-security-qf-round', // Temporary
-			'https://github.com/walletbeat/walletbeat/blob/beta/governance/treasury/treasury-transparency.md', // Temporary
+			'https://github.com/walletbeat/walletbeat', // The repository itself (not a URL within it) is OK to link to.
 		],
 	}),
 )
@@ -54,8 +40,6 @@ const processedMarkdown = stripMarkdownTitle(
 	metadata={{
 		title: metadata.title ?? markdown.frontmatter.title,
 		description: metadata.description,
-		keywordsAfter: metadata.keywordsAfter,
-		keywordsBefore: metadata.keywordsBefore,
 	}}
 >
 	<Navigation navigationItems={defaultNavigationItems} />

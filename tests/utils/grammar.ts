@@ -222,8 +222,11 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 	}),
 ]
 
-/** Lint a string for grammar errors. */
-export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
+/** Lint a string for grammar errors; return raw error messages. */
+export async function grammarLintMessages(
+	text: string,
+	lintOptions?: harper.LintOptions,
+): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
 	let lints: Lint[] = []
 
@@ -282,6 +285,13 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 			}
 		}
 	}
+
+	return message
+}
+
+/** Lint a string for grammar errors. */
+export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
+	const message = await grammarLintMessages(text, lintOptions)
 
 	if (message.length > 0) {
 		// This assertion will never match and makes no sense on its own.
