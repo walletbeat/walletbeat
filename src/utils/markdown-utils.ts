@@ -164,6 +164,44 @@ export function collapseToSingleLine(text: string): string {
 }
 
 /**
+ * Un-escape the inner content of a YAML-quoted string.
+ * - Single-quoted: '' → '
+ * - Double-quoted: \\" → ", \\\\ → \
+ */
+function unescapeYamlString(content: string, quote: '"' | "'"): string {
+	if (quote === "'") {
+		// Single-quoted: only '' needs un-escaping.
+		return content.replace(/''/g, "'")
+	}
+
+	// Double-quoted: \\" → " and \\\\ → \
+	let result = ''
+	let i = 0
+
+	while (i < content.length) {
+		if (content[i] === '\\' && i + 1 < content.length) {
+			const next = content[i + 1]
+
+			if (next === '"') {
+				result += '"'
+			} else if (next === '\\') {
+				result += '\\'
+			} else {
+				// Unknown escape — keep as-is (pass through backslash + char).
+				result += content[i]
+			}
+
+			i += 2
+		} else {
+			result += content[i]
+			i++
+		}
+	}
+
+	return result
+}
+
+/**
  * Strip YAML-like block scalars from Frontmatter lines.
  * Handles `>` (folded) and `|` (literal) block indicators.
  * Returns { key, value, isBlockStart } where isBlockStart indicates
@@ -183,7 +221,29 @@ function parseFrontmatterLine(line: string): { key: string; value: string; isBlo
 		return { key, value: '', isBlockStart: true }
 	}
 
-	return { key, value: rawValue, isBlockStart: false }
+	// Strip surrounding YAML string quotes (single or double) and un-escape.
+	// In YAML, single-quoted strings use '' for a literal ', and double-quoted
+	// strings use \" for a literal " (and \\ for a literal \).
+	const strippedValue =
+		(rawValue[0] === '"' && rawValue[rawValue.length - 1] === '"') ||
+		(rawValue[0] === "'" && rawValue[rawValue.length - 1] === "'")
+			? unescapeYamlString(rawValue.slice(1, -1), rawValue[0])
+			: rawValue
+
+	return { key, value: strippedValue, isBlockStart: false }
+}
+
+export function assertIsFrontmatter<_Frontmatter extends Frontmatter>(
+	obj: Record<string, string | string[]>,
+	expected: { [_ in keyof _Frontmatter]: unknown },
+): asserts obj is _Frontmatter {
+	for (const key of Object.keys(expected)) {
+		const keyStr = String(key)
+
+		if (!(keyStr in obj)) {
+			throw new Error(`Missing required frontmatter key: ${keyStr}`)
+		}
+	}
 }
 
 /**
@@ -260,21 +320,17 @@ function parseFrontmatter<_Frontmatter extends Frontmatter = {}>(
 				}
 			}
 
-			// Trim trailing empty lines from the block
 			while (blockLines.length > 0 && blockLines[blockLines.length - 1] === '') {
 				blockLines.pop()
 			}
 
 			if (value === '') {
-				// We need to check the original indicator; re-parse the header line
 				const headerMatch = /^([A-Za-z_][\w-]*)\s*:\s*(>||)$/.exec(lines[i - blockLines.length - 1])
 				const indicator = headerMatch ? headerMatch[2] : '|'
 
 				if (indicator === '>') {
-					// Folded: collapse newlines to spaces
 					result[key] = blockLines.join(' ')
 				} else {
-					// Literal: preserve newlines
 					result[key] = blockLines.join('\n')
 				}
 			}
@@ -284,20 +340,7 @@ function parseFrontmatter<_Frontmatter extends Frontmatter = {}>(
 		}
 	}
 
-	// Validate all expected keys are present
-	function isFrontmatter<_Frontmatter extends Frontmatter>(
-		obj: Record<string, string>,
-	): asserts obj is _Frontmatter {
-		for (const key of Object.keys(expected)) {
-			const keyStr = String(key)
-
-			if (!(keyStr in obj)) {
-				throw new Error(`Missing required frontmatter key: ${keyStr}`)
-			}
-		}
-	}
-
-	isFrontmatter<_Frontmatter>(result)
+	assertIsFrontmatter<_Frontmatter>(result, expected)
 
 	return result
 }
@@ -758,30 +801,67 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		// Pattern to match markdown links and images:
 		// - Images: ![alt](url) or ![alt](url "title")
 		// - Links: [text](url) or [text](url 'title')
+		// - Bracket-style: [text](<url>) for URLs with special chars like parens
 		// We need to handle escaped brackets within the link text
 
 		// First handle links WITH titles (in quotes)
 		// Pattern: [text](url "title") or [text](url 'title')
+		// Also handle bracket-style: [text](<url> "title")
 		processed = processed.replace(
-			/(!?\[[^\]]*\])\(([^\s)]+)\s+((?:"[^"]*"|'[^']*')\s?)\)/g,
-			(_match: string, linkPart: string, url: string, titlePart: string) => {
+			/(!?\[[^\]]*\])\(([^<\s)]+|<([^>]+)>)\s+((?:"[^"]*"|'[^']*')\s?)\)/g,
+			(
+				_match: string,
+				linkPart: string,
+				plainUrl: string,
+				bracketUrl: string,
+				titlePart: string,
+			) => {
+				const url = bracketUrl ?? plainUrl
 				const rewrittenUrl = rewriteUrl(url)
+
+				// Preserve angle brackets if URL wasn't rewritten (e.g. https URLs with parens)
+				if (bracketUrl && rewrittenUrl === url) {
+					return `${linkPart}(<${rewrittenUrl}> ${titlePart})`
+				}
 
 				return `${linkPart}(${rewrittenUrl} ${titlePart})`
 			},
 		)
 
 		// Then handle links WITHOUT titles
+		// Combined: [text](<url>) and [text](url)
+		// Bracket-style URLs use angle brackets for special chars like parens
 		processed = processed.replace(
-			/(!?\[[^\]]*\])\(([^) \t]+)\)/g,
-			(_match: string, linkPart: string, url: string) => {
+			/(!?\[[^\]]*\])\((?:<([^>]+)>|([^) \t]+))\)/g,
+			(_match: string, linkPart: string, bracketUrl: string, plainUrl: string) => {
+				const url = bracketUrl ?? plainUrl
 				const rewrittenUrl = rewriteUrl(url)
+
+				// Preserve angle brackets if URL wasn't rewritten (e.g. https URLs with parens)
+				if (bracketUrl && rewrittenUrl === url) {
+					return `${linkPart}(<${rewrittenUrl}>)`
+				}
 
 				return `${linkPart}(${rewrittenUrl})`
 			},
 		)
+		// Pattern to match reference link definitions: [ref]: url or [ref]: <url>
+		// Bracket-style URLs first: [ref]: <url>
+		processed = processed.replace(
+			/^(\s*\[[^\]]+\]:\s+)(<([^>]+)>)(.*)$/gm,
+			(_match: string, prefix: string, _bracketedUrl: string, url: string, rest: string) => {
+				const rewrittenUrl = rewriteUrl(url)
 
-		// Pattern to match reference link definitions: [ref]: url
+				// Preserve angle brackets if URL wasn't rewritten
+				if (rewrittenUrl === url) {
+					return `${prefix}<${rewrittenUrl}>${rest}`
+				}
+
+				return `${prefix}${rewrittenUrl}${rest}`
+			},
+		)
+
+		// Plain URLs: [ref]: url
 		processed = processed.replace(
 			/^(\s*\[[^\]]+\]:\s+)([^\s]+)(.*)$/gm,
 			(_match: string, prefix: string, url: string, rest: string) => {

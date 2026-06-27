@@ -1,5 +1,21 @@
 ---
+// Types
+import { staticSingleMarkdownPage } from '@/utils/markdown-page-utils'
 
+// Layouts
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
+
+// Data
+import rawMarkdown from './about.md?raw'
+
+const { metadata, processedMarkdown, repoRootRelativePath } = staticSingleMarkdownPage({
+	rawMarkdown,
+	repoRootRelativePath: '/src/pages/about/about.md',
+})
 ---
 
-<p>TODO</p>
+<MarkdownPage
+	metadata={metadata}
+	repoRootRelativePath={repoRootRelativePath}
+	markdown={processedMarkdown}
+/>
