@@ -64,7 +64,15 @@ export const baseApp: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			// New accounts are ERC-4337 Base Accounts. The default signed-out
+			// New default accounts are EIP-7702-delegated EOAs, not raw ERC-4337
+			// contracts: the address is an EOA whose key is the server-held Coinbase
+			// "email signer", with delegation code pointing at the Coinbase EIP-7702
+			// proxy → Coinbase Smart Wallet (ERC-4337) implementation, operated via
+			// EntryPoint v0.6 (confirmed on-chain; see PR #845). `defaultAccountType`
+			// below is nonetheless kept as `rawErc4337` on purpose — it is the only
+			// slot the schema can use today to carry the non-self-custodial downgrade;
+			// the 7702 + provider-held-key custody combo is not expressible yet
+			// (schema follow-up). The default signed-out
 			// onboarding ("Welcome to Base App", v30.1.0, recorded 2026-06-27) offers only
 			// custodial sign-ins up front — Apple, Google, and the prominent
 			// "Continue with Email" — each provisioning an account whose sole
@@ -95,7 +103,7 @@ export const baseApp: SoftwareWallet = {
 					'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 					{
 						explanation:
-							'First-hand (2026-06-27, fully signed out): the "More Options" sheet on the onboarding screen offers "Create recovery phrase" (BIP39 seed) alongside "Import Recovery Phrase" and "Import Passkey". Self-custody seed-phrase accounts are thus creatable in the current app, not just inherited from legacy installs — but they sit behind "More Options" rather than the default flow.',
+							'First-hand (2026-06-27, fully signed out): the "More Options" sheet on the onboarding screen offers "Create recovery phrase" (BIP39 seed) alongside "Import Recovery Phrase" and "Import Passkey". Self-custody seed-phrase accounts are creatable in the current app, but sit behind "More Options" rather than the default flow.',
 						file: 'public/references/wallets/base-app/screenshots/2026-06-27-onboarding-more-options.png',
 						label:
 							'Onboarding "More Options" sheet: Create recovery phrase / Import Recovery Phrase / Import Passkey',
@@ -139,14 +147,9 @@ export const baseApp: SoftwareWallet = {
 				],
 				contract: coinbaseSmartWalletContract,
 				// The default email-onboarded account's signing key is operated by
-				// Coinbase server-side and is reachable with email auth alone. Two
-				// independent first-hand proofs: (1) signing from a passkey-less
-				// browser via an emailed one-time code (2026-06-19); and (2) re-running
-				// the email sign-up with a previously-used address (v30.1.0) recovered
-				// the SAME wallet from the email alone — no device secret, seed, or
-				// passkey — which only holds if Coinbase retains the key server-side.
+				// Coinbase server-side and is reachable with email auth alone.
 				// Passkey-import accounts remain self-custody, but that is not the
-				// create default.
+				// default.
 				controllingSharesInSelfCustodyByDefault: 'NO',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 				tokenTransferTransactionGeneration:
