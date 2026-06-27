@@ -36,6 +36,12 @@ _Keep list sorted by chronological "Established" date._
   - **Established**: 2026-04
   - **Fibonacci-approximate number of participants**: 5
   - **Medium**: Telegram
+- **Walletbeat ↔ Zerion**:
+  - **Walletbeat contributors**: 0xMattmatt, polymutex, ren2140
+  - **Wallet development teams represented**: Zerion
+  - **Established**: 2026-06
+  - **Fibonacci-approximate number of participants**: 5
+  - **Medium**: Telegram
 
 ## Conference panels
 
