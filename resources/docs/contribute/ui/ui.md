@@ -27,7 +27,7 @@ const {
 } = $props()
 ```
 
-- Create a content data type that will act as the input to your component. See `src/types/content/security-audits-details.ts` as an example:
+- Create a content datatype that will act as the input to your component. See `src/types/content/security-audits-details.ts` as an example:
 
 ```typescript
 import type { EvaluationData } from '@/schema/attributes'

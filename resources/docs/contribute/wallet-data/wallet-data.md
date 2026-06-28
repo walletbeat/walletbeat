@@ -88,7 +88,7 @@ _There is also a directory of wallet icons at `/public/images/wallets`._
 
 ### **Step 1**: Add a new wallet's basic information to Walletbeat
 
-#### **Step 1.a**: Add an entry for the wallet development entity behind My Little Wallet
+#### **Step 1.1**: Add an entry for the wallet development entity behind My Little Wallet
 
 - Create a copy of `/data/entities/example.ts` at `/data/entities/big-wallet-corp.ts`, then remove all constants from this file other than `exampleWalletDevelopmentCompany`. Rename it to `bigWalletCorp` and fill in the details.
 - Find an SVG icon of Big Wallet Corp LLC, and crop all the transparent edges out of the SVG. Save it as `/public/images/entities/bigWalletCorp.svg` (the filename matches the `id` field).
@@ -125,7 +125,7 @@ export const bigWalletCorp: CorporateEntity & WalletDeveloper = {
 }
 ```
 
-#### **Step 1.b**: Add yourself as a contributor and enter your affiliation details
+#### **Step 1.2**: Add yourself as a contributor and enter your affiliation details
 
 Create a copy of `/data/contributors/example.ts` at `/data/contributors/chain-monkey.ts`. Fill in the details.
 
@@ -149,7 +149,7 @@ export const chainMonkey: Contributor = {
 }
 ```
 
-#### **Step 1.c**: Add a skeleton wallet entry for My Little Wallet
+#### **Step 1.3**: Add a skeleton wallet entry for My Little Wallet
 
 - Create a copy of `/data/software-wallets/unrated.tmpl.ts` at `/data/software-wallets/my-little-wallet.ts`.
 - Rename the top-level object from `unratedTemplate` to `myLittleWallet`.
@@ -202,7 +202,7 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 }
 ```
 
-#### **Step 1.d**: Add the wallet to the list of known software wallets
+#### **Step 1.4**: Add the wallet to the list of known software wallets
 
 For the wallet to be shown on the site, it needs to be listed in `/data/software-wallets.ts`. Import your wallet and update the `softwareWallets` object as follows:
 
@@ -246,7 +246,7 @@ $ pnpm dev
 
 You can now browse the site at `http://localhost:4321/`. You should now see the wallet you added displayed in the comparison table. Of course, everything will be marked "unrated" at first (shown in gray).
 
-![](images/wallet-in-table-initial.png 'My Little Wallet in the comparison table page')
+![](../images/wallet-in-table-initial.png 'My Little Wallet in the comparison table page')
 
 You are now ready to iterate on populating the wallet data.
 
@@ -264,7 +264,7 @@ The general workflow to populate a `null` field with some real data is as follow
 
 Some fields are more complicated to populate than others. For this guide, we will walk through populating three fields with various degrees of complexity.
 
-#### Example field A (easy): Multi-address support (`features.multiAddress`)
+#### Example field A: (easy) Multi-address support (`features.multiAddress`)
 
 _This example walks through the use of the `VariantFeature` and `Support` types, which are used by nearly every feature field._
 
@@ -272,7 +272,7 @@ This field relates to whether or not the wallet lets you use multiple addresses.
 
 In your code editor, you should be able to click (perhaps `Ctrl+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
 
-![](images/navigate-to-type-definition.gif 'Navigating to a type definition in VSCode')
+![](../images/navigate-to-type-definition.gif 'Navigating to a type definition in VSCode')
 
 This brings you to:
 
@@ -289,7 +289,7 @@ export interface WalletBaseFeatures {
 
 `VariantFeature<T>` is a wrapper type you will see nearly everywhere when editing wallet data. It allows you to specify a value one of two ways:
 
-- Either using a value directly directly:
+- Either using a value directly:
 
 ```typescript
 export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
@@ -356,7 +356,7 @@ This means that Ambire only has a `BROWSER` version, and that this version suppo
 
 Once you have populated `features.multiAddress` for My Little Wallet, you may notice that **nothing may have changed** on the wallet rating page. Why is this? Because multi-address support is **not** an attribute that Walletbeat rates wallets for. Instead, it acts as input for other attributes that Walletbeat **does** rate wallets for.
 
-For example, the **Multi-Address Privacy** attribute only considers wallets that support multiple addresses in the first place to verify that they do not leak the correlation between two of the user's addresses. The rating logic is as follows:
+For example, the **Multi-Address Privacy** attribute only considers wallets that support multiple addresses in the first place to verify that they do not leak the correlation between two of the user's addresses. Rating logic:
 
 - If the wallet does **not** support multiple addresses, then multi-address correlation risk does not exist; therefore, the wallet is exempt from being rated on this attribute, and you will see the pie slice disappear from the wallet rating page.
 - If the wallet **does** support multiple addresses, then Walletbeat needs additional information to verify whether or not the wallet leaks the correlation between multiple addresses. This is populated in the `features.privacy.dataCollection` field, which you will populate later. As it is not populated yet, the pie slice will remain unrated (gray) for now.
@@ -449,7 +449,7 @@ export enum RpcEndpointConfiguration {
 }
 ```
 
-Putting all these together, let's write the value for the `features.chainConfigurability` for My Little Wallet. In practice, your task here would be to try out the wallet's browser and mobile version and see if you can find a way to configure the chain, and whether this is possible before the wallet makes any request to that chain's RPC endpoint (more later for how to do network traffic analysis).
+Putting all these together, let's write the value for the `features.chainConfigurability` for My Little Wallet. In practice, your task here would be to try out the wallet's browser and mobile version. You need to find a way to configure the chain, and determine whether this is possible before the wallet makes any request to that chain's RPC endpoint (we cover network traffic analysis later).
 
 For the sake of this example, we will assume that:
 
@@ -551,11 +551,11 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 
 Now that you have populated the `features.chainConfigurability` field, the **Self-Hosted Node** attribute will light up on the wallet rating!
 
-![](./images/self-hosted-node-rating.png)
+![](../images/self-hosted-node-rating.png)
 
 You can also see the detailed rating along with your `ref` links on the wallet page:
 
-![](./images/self-hosted-node-attribute-details.png)
+![](../images/self-hosted-node-attribute-details.png)
 
 This feature field is also used in other attributes such as **Chain Verification**, but these other attributes need yet more feature data before they can produce a rating.
 
@@ -563,11 +563,11 @@ This feature field is also used in other attributes such as **Chain Verification
 
 This is likely the most laborious field that Walletbeat collects about wallets, but one of the most important inputs for privacy attributes. The `features.privacy.dataCollection` field collects information on **all the network requests** that wallets make to external servers.
 
-In order to collect this information, you will need to set up your computer and your wallet to be able to capture the network traffic created by the wallet and to analyze this traffic. This is covered in a [**separate guide** at `/resources/mitmproxy-guide/mitmproxy-guide.md`](../mitmproxy-guide/mitmproxy-guide.md), which also covers how to populate the wallet feature data accordingly once you have the data.
+In order to collect this information, you will need to set up your computer and your wallet to be able to capture the network traffic created by the wallet and to analyze this traffic. This is covered in a [**separate guide** at `/resources/docs/wallet-testing/data-collection/data-collection.md`](../../wallet-testing/data-collection/data-collection.md), which also covers how to populate the wallet feature data accordingly once you have the data.
 
 After you have populated this data, you should see attributes that rely on this data (such as the **Address Privacy** and **Multi-Address Privacy**) attributes become populated! _(This data is also used by the **Orderflow Transparency** attribute, but that one needs more feature data still.)_
 
-![](images/privacy-rating.png)
+![](../images/privacy-rating.png)
 
 ### **Step 4**: Send a PR to Walletbeat and get it merged
 

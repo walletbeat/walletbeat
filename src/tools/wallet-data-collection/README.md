@@ -54,7 +54,7 @@ The following flows are defined:
 - `SEND_ETHER`: Recorded when sending Ether to another wallet. Requires `--wallet-addresses` to be set to the account address(es) that you will send **from** and send **to**.
 - `SEND_USDC`: Same as `SEND_ETHER`, but send USDC instead of Ether.
 - `NATIVE_SWAP`: Perform a swap using the wallet's built-in swap feature. Requires `--wallet-addresses` to be set to the account address doing the swapping.
-- `APP_CONNECTION`: Connect and sign in to Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
+- `APP_CONNECTION`: Connect and sign into Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
 - `MAKE_TRANSACTION`: Make transactions using Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the transactions.
 
 #### `delete-capture` subcommand
@@ -136,7 +136,7 @@ Purposes are case-insensitive on the command line.
 $ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
-Mark a string as conveying the given data type. The string will be classified and stored in the capture file's user data store.
+Mark a string as conveying the given datatype. The string will be classified and stored in the capture file's user data store.
 
 Marking a string as carrying user data has the following effect:
 

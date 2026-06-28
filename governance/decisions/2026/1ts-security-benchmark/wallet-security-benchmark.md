@@ -6,11 +6,11 @@ description: 'Security benchmark for wallets developed as part of the Ethereum F
 # 1TS Wallet Security Benchmark
 
 As part of the Ethereum Foundation's 1TS initiative, Walletbeat was tasked to come up with a security benchmark for wallets.
-This was the topic of a [long discussion](./wallet-security-benchmark-discussion.md) which has culminated in the following benchmark, which will be integrated in Walletbeat.
+This was the topic of a [long discussion](./discussion-archive/wallet-security-benchmark-discussion.md) which has culminated in the following benchmark, which will be integrated in Walletbeat.
 
 In addition, it was decided that these criteria would be folded into Walletbeat's own methodology, rather than creating a separate ladder.
 
-For details on what each criterion looks for and for rationale, please see [the discussion document](./wallet-security-benchmark-discussion.md). This document only lists the high-level bullet points of the benchmark, and where they fit into Walletbeat's own methodology.
+For details on what each criterion looks for and for rationale, please see [the discussion document](./discussion-archive/wallet-security-benchmark-discussion.md). This document only lists the high-level bullet points of the benchmark, and where they fit into Walletbeat's own methodology.
 
 ### Stage 0
 

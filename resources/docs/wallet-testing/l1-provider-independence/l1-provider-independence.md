@@ -63,7 +63,7 @@ Install the wallet in the browser/device as normal. **Do not set up an account**
 Once the wallet is installed, shut down the browser or device, and restart it with the correct proxy settings. You will need to configure your device to use `http://127.0.0.1:8080` (or whichever port you used) as a proxy. This is browser-dependent (or device-dependent).
 
 - **For browser extension wallet testing**: Set your browser's proxy settings. This is usually located in the settings. If using a dedicated `chromium` profile from earlier, you can also specify it on the command line: `chromium --user-data-dir=/tmp/walletbeat-test-browser --proxy-server=http://127.0.0.1:8080`
-- **For mobile app wallet testing**: Go to the the Android Studio's settings for the emulated device (**not** the "Settings" app inside the emulated device itself), and you can set device-wide proxy configuration here:
+- **For mobile app wallet testing**: Go to the Android Studio's settings for the emulated device (**not** the "Settings" app inside the emulated device itself), and you can set device-wide proxy configuration here:
 
 ![](./../data-collection/android-studio-1.png)
 ![](./../data-collection/android-studio-2.png)
@@ -85,13 +85,13 @@ Launch the browser or wallet application with the proxy settings in place, and t
   - Configure the RPC endpoint to use the one that the proxy _would_ allow.
   - Restart the browser or wallet app again with the proxy settings back on.
 
-In either case, you should now have the wallet set up, with an account created, configured to use your chosen RPC endpoint for L1, and the proxy settings enabled to enforce that this is the only RPC endpoint the wallet can use.
+In either case, you should now have the wallet set up with an account created and configured to use your chosen RPC endpoint for L1. The proxy settings are enabled to enforce that this is the only RPC endpoint the wallet can use.
 
 ### Step 6: Import an account that has an existing balance
 
 Try to import an account that you've already sent Ether and USDC to (using a separate wallet/browser). Populate the `features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountImport` accordingly.
 
-If you cannot create an account with the proxy settings enabled, undo the proxy settings and the custom JSON-RPC endpoint, import the account, and re-start the browser or wallet app with the proxy settings and custom JSON-RPC endpoint again.
+If you cannot create an account with the proxy settings enabled, undo the proxy settings and the custom JSON-RPC endpoint. Import the account, and re-start the browser or wallet app with the proxy settings and custom JSON-RPC endpoint again.
 
 ### Step 7: Check your balance
 

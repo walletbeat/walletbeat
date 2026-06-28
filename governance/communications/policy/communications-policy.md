@@ -27,7 +27,7 @@ To resolve this tension, this document aims to establish an upfront policy which
   - Venture capital firms that fund wallets. Example: a16z crypto.
 
 * **Not in scope**:
-  - Entities that wallet software or hardware development teams have exclusively-non-commercial relations with with, such as developers of unencumbered (free and open-source software) SDKs. Examples: Geth, Kohaku, Portal Network.
+  - Entities that wallet software or hardware development teams have exclusively-non-commercial relations with, such as developers of unencumbered (free and open-source software) SDKs. Examples: Geth, Kohaku, Portal Network.
   - Entities that wallet development teams rely on but have nothing to do with the wallet specifically, such as employee payroll/HR services that wallet development team rely on for their operations.
 
 ### Communication channels in scope
@@ -51,20 +51,20 @@ To resolve this tension, this document aims to establish an upfront policy which
   - Year and month (`YYYY-MM`) that the communication channel was established
   - Communications medium: Email, Signal, Farcaster DMs, X DMs, Discord, Telegram, SimpleX, etc.
 
-* Upon the first week of formation of an in-scope communication channel, at least one Walletbeat contributor must post a link to this policy page such that all members of the communication channel are aware.
+* Upon the first week of formation of any in-scope communication channel, at least one Walletbeat contributor must post a link to this policy page such that all members of the communication channel are aware.
   - New members later joining the communication channel must also be made aware, whether by explicit statement upon joining or by other means available depending on the communications channel (e.g. group chat topic).
-* Any member of the communication channel may **unilaterally decide to publish** part of or all of the conversation, so long as the following are respected:
+* Any member of the communication channel may **unilaterally decide to publish** part of or all the conversation, so long as the following are respected:
   - All personally-identifying information are removed; people's names or pseudonyms are replaced with their affiliation details ("Walletbeat contributor" or "Member of [some wallet development team]").
   - The contents being disclosed accurately depict the surrounding context of the conversation (i.e. no adversarial selective quoting). This is implicitly enforceable by other members of the communication channels being able to expand the subset of the conversation that is published.
   - The person publishing the subset of the conversation must publicly disclose:
     - Their own identity/pseudonym and affiliation
     - The communications channel that the subset of the conversation is from
     - The span of time that the conversation covers (start/end dates as `YYYY-MM-DD`).
-  - Exception: Large-scale communication channels (21 human participants or more) that feature both **ongoing open entry policy to wallet development teams** and **ability for new participants to look at past conversation history** are not subject to this publication, since other wallet development teams may join them and look back through the history at any time. The _existence_ of such communications channels must still be disclosed.
-* Questions about Walletbeat methodology/clarifications do not _need_ disclosure, as it is helpful for wallet development teams to request clarifications on Walletbeat criteria. However, if any such discussion ends up resulting in a methodology _change_ on the Walletbeat website/repository (even just a wording/clarification change without an underlying policy change), the change _must_ disclose which communication channel was at the source of this change.
+  - Exception: Large-scale communication channels (21 human participants or more) that feature both **ongoing open entry policy to wallet development teams** and **ability for new participants to look at past conversation history** are not subject to this publication. Other wallet development teams may join them and look back through the history at any time. The _existence_ of such communications channels must still be disclosed.
+* Questions about Walletbeat methodology/clarifications do not _need_ disclosure, as it is helpful for wallet development teams to request clarifications on Walletbeat criteria. However, if such a discussion leads to a methodology _change_ on the Walletbeat website or repository, the change _must_ disclose its source communication channel. This applies even to wording or clarification changes that do not involve an underlying policy change.
   - All methodology changes (whether the result of communications or not) must always come with accompanying rationale.
 * Discussions about financial compensation **must** always be disclosed in full, unless they match already-published universal terms that Walletbeat already publicly offers to any other wallet development team.
-  - Note: As of this writing (2026-03), Walletbeat does not have a business/funding model that involves financial compensation from wallet development teams, and there are no current plans to change this. However, if that _were_ to change in the future, this must change in a way where every wallet development team gets consistent, publicly-visible terms. Hence the principle that any compensation offer that deviates from such universal terms must be disclosed.
+  - Note: As of this writing (2026-03), Walletbeat does not have a business/funding model that involves financial compensation from wallet development teams, and there are no current plans to change this. However, if that _were_ to change in the future, this must change in a way where every wallet development team gets consistent, publicly-visible terms. From this comes the principle that any compensation offer deviating from such universal terms must be disclosed.
 
 ## Disclosure process
 
