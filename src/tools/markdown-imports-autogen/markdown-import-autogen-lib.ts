@@ -4,7 +4,9 @@ import * as path from 'node:path'
 import * as prettier from 'prettier'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
-import { trimWhitespacePrefix } from '@/types/utils/text'
+import { getErrorMessage } from '@/types/errors'
+import { assertStringHasPrefixAndSuffix, trimWhitespacePrefix } from '@/types/utils/text'
+import { staticSingleMarkdownPage } from '@/utils/markdown-page-utils'
 
 /** Configuration for a MarkdownImportsGenerator instance. */
 export interface MarkdownImportsConfig {
@@ -26,7 +28,6 @@ export class MarkdownImportsGenerator {
 	private readonly repoRoot: string
 	private readonly genFilePath: string
 	private readonly sourceDirs: string[]
-	private genFileRelativePathCache: string | undefined = undefined
 
 	public constructor(config: MarkdownImportsConfig) {
 		this.repoRoot = getRepositoryRoot()
@@ -34,20 +35,17 @@ export class MarkdownImportsGenerator {
 		this.sourceDirs = config.sourceDirs
 	}
 
-	// ── Public API ──
-
 	/**
 	 * Returns the repo-root-relative path of the generated file, with a leading `/`.
 	 */
-	public genFileRelativePath(): string {
-		if (this.genFileRelativePathCache !== undefined) {
-			return this.genFileRelativePathCache
-		}
-
-		this.genFileRelativePathCache =
-			'/' + path.relative(this.repoRoot, this.genFilePath).replaceAll(path.sep, '/')
-
-		return this.genFileRelativePathCache
+	public genFileRelativePath(): `/${string}.gen.ts` {
+		return assertStringHasPrefixAndSuffix(
+			'/' + path.relative(this.repoRoot, this.genFilePath).replaceAll(path.sep, '/'),
+			{
+				prefix: '/',
+				suffix: '.gen.ts',
+			},
+		)
 	}
 
 	/**
@@ -59,12 +57,29 @@ export class MarkdownImportsGenerator {
 		const errors: string[] = []
 
 		for (const [dirPath, mdFiles] of scan) {
-			if (mdFiles.length > 1) {
-				const relDir = path.relative(this.repoRoot, dirPath).replaceAll(path.sep, '/')
+			const relDir = path.relative(this.repoRoot, dirPath).replaceAll(path.sep, '/')
 
+			if (mdFiles.length > 1) {
 				errors.push(
 					`${relDir}: Found ${mdFiles.length} .md files, expected exactly 1: ${mdFiles.join(', ')}`,
 				)
+
+				continue
+			}
+
+			const fullPath = path.join(dirPath, mdFiles[0])
+			const relPath = '/' + path.relative(this.repoRoot, fullPath).replaceAll(path.sep, '/')
+
+			try {
+				const rawContent = fs.readFileSync(fullPath, 'utf-8')
+				const repoRootRelativePath = assertStringHasPrefixAndSuffix(relPath, {
+					prefix: '/',
+					suffix: '.md',
+				})
+
+				staticSingleMarkdownPage({ rawMarkdown: rawContent, repoRootRelativePath })
+			} catch (e) {
+				errors.push(`${relPath}: ${getErrorMessage(e)}`)
 			}
 		}
 
@@ -76,9 +91,9 @@ export class MarkdownImportsGenerator {
 	 * every eligible `.md` file — i.e. `.md` files that are the sole direct-child
 	 * markdown file in their parent directory.
 	 */
-	public getEligibleFiles(): string[] {
+	public getEligibleFiles(): `/${string}.md`[] {
 		const scan = this.scanDirectories()
-		const result: string[] = []
+		const result: `/${string}.md`[] = []
 
 		for (const [dirPath, mdFiles] of scan) {
 			if (mdFiles.length === 1) {
@@ -86,7 +101,7 @@ export class MarkdownImportsGenerator {
 
 				const relPath = '/' + path.relative(this.repoRoot, fullPath).replaceAll(path.sep, '/')
 
-				result.push(relPath)
+				result.push(assertStringHasPrefixAndSuffix(relPath, { prefix: '/', suffix: '.md' }))
 			}
 		}
 
@@ -224,11 +239,7 @@ export class MarkdownImportsGenerator {
 	 * Converts a repo-root-relative path (with leading `/`) to an `@/`-aliased
 	 * import path suitable for `import(...)`.
 	 */
-	private relativePathToImportPath(mdPath: string): string {
-		// Strip leading slash: '/resources/docs/foo.md' → 'resources/docs/foo.md'
-		const stripped = mdPath.slice(1)
-
-		// Prepend @ to create the alias path
-		return `@/${stripped}`
+	private relativePathToImportPath(mdPath: `/${string}.md`): `@/${string}.md` {
+		return assertStringHasPrefixAndSuffix(`@/${mdPath.slice(1)}`, { prefix: '@/', suffix: '.md' })
 	}
 }

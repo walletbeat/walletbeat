@@ -9,7 +9,7 @@ _This guide aims to help you contribute wallet data to Walletbeat. If you'd like
 
 ## Development setup & workflow
 
-Before you can contribute wallet data to Walletbeat, you need to make a copy of the site and its data and be able to run it on your computer so you can make changes. Please read the [`/CONTRIBUTING.md`](/CONTRIBUTING.md) guide if you need help with this. The rest of this guide **assumes you have already set up a Walletbeat development environment**.
+Before you can contribute wallet data to Walletbeat, you need to make a copy of the site and its data and be able to run it on your computer so you can make changes. Please read the [contributor setup guide](/resources/docs/contribute/setup/setup.md) guide if you need help with this. The rest of this guide **assumes you have already set up a Walletbeat development environment**.
 
 ## Wallet data changes
 

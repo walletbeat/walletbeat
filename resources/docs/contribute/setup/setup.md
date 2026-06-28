@@ -1,3 +1,8 @@
+---
+title: Contributor setup for Walletbeat
+description: 'Guide on setting up a development environment for Walletbeat.'
+---
+
 # Contributing to Walletbeat
 
 Thanks for your interest in contributing to Walletbeat!

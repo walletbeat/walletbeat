@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat ↔ wallet ecosystem communications policy'
+description: 'Policy governing Walletbeat communications with wallet ecosystem teams.'
+---
+
 # Walletbeat ↔ wallet ecosystem communications policy
 
 ## Motivation

@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat ↔ wallet ecosystem communication channels'
+description: 'Overview of the communication channels between Walletbeat and wallet development teams.'
+---
+
 # Walletbeat ↔ wallet ecosystem communication channels
 
 This document discloses the set of communication channels that exist between Walletbeat and wallet development teams. See the [Walletbeat communications policy](./communications-policy.md) for more information.

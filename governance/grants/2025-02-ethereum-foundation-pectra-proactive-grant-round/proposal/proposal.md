@@ -1,16 +1,18 @@
 ---
+title: Walletbeat beta EIP-7702 tracking
+description: 'EF Pectra Proactive Grant proposal for Walletbeat beta EIP-7702 tracking and wallet assessment.'
 Status: Funded
-Project name: Walletbeat beta EIP-7702 tracking
-Project category: Other
-Grant recipient: polymutex (Individual)
-Fiat currency: USD
+Project-name: Walletbeat beta EIP-7702 tracking
+Project-category: Other
+Grant-recipient: polymutex (Individual)
+Fiat-currency: USD
 Amount: 577.02
-How did you hear about this grant round: Other - Farcaster - https://warpcast.com/ef-esp/0xbe473fa9
-Twitter handle: polymutex
+How-did-you-hear-about-this-grant-round: Other - Farcaster - https://warpcast.com/ef-esp/0xbe473fa9
+Twitter-handle: polymutex
 Website: https://beta.walletbeat.eth.limo/
 Farcaster: '@polymutex.eth'
-Applied to any grants before: No
-Any questions about this grants round: No
+Applied-to-any-grants-before: No
+Any-questions-about-this-grants-round: No
 ---
 
 # Walletbeat beta EIP-7702 tracking
