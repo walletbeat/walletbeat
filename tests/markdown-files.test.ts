@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 
-import { beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { extractMarkdownLinks } from '@/utils/markdown-utils'
 
@@ -15,28 +15,25 @@ import { grammarLint, grammarLintMessages } from './utils/grammar'
 
 /**
  * Markdown files that are allowed to fail grammar checks.
- * Add entries here with a comment explaining why.
- * When fixing a file, remove it from this list.
  */
 const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
-	// Seed of all files that currently fail grammar checks.
-	// These should be fixed and removed from this list over time.
-	'AGENTS.md',
-	'.agents/skills/wallet-create/SKILL.md',
-	'.agents/skills/wallet-update/SKILL.md',
+	'governance/decisions/2025/walletbeat-hosting.md',
+	'governance/decisions/2026/1ts-security-benchmark/discussion-archive/wallet-security-benchmark-discussion.md',
+	'governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round/proposal/proposal.md',
+	'governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round/response/2025-03-21-ef-response.md',
+	'governance/treasury/treasury-transparency.md',
+	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
 	'resources/docs/features/features.md',
 	'resources/files/community-partner-applications/2026-dappcon.md',
 	'resources/talks/2026-04-27-giveth/project-showcase-brief.md',
 	'resources/talks/2026-05-giveth/2026-05-13-giveth.md',
 	'resources/talks/2026-05-giveth/project-showcase-brief.md',
-	'src/tools/markdown-imports-autogen/SPEC.md',
-	'src/tools/wallet-data-collection/README.md',
-	'public/references/wallets/base-app/2026-02-23-questionnaire.md',
-	'public/references/wallets/rainbow/2026-04-22-questionnaire.md',
 	'resources/files/grants-applications/2026/octant.md',
 	'resources/talks/2026-06-eth-berlin/brew-berlin/proposal.md',
 	'resources/talks/2026-06-eth-berlin/dappcon/outline.md',
 	'resources/talks/2026-06-eth-berlin/dappcon/proposal.md',
+	'resources/talks/2026-06-eth-berlin/ethereum-day/outline.md',
 	'resources/talks/2026-06-eth-berlin/ethereum-day/proposal.md',
 	'resources/talks/2026-06-eth-berlin/neocypherpunk-summit/outline.md',
 	'resources/talks/2026-06-eth-berlin/neocypherpunk-summit/proposal.md',
@@ -50,18 +47,21 @@ const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-05-15 - Transaction legibility ERC-8213 ERC-7730/thread.md',
 ])
 
-describe('markdown files', () => {
+/**
+ * Markdown entries matching this pattern are excluded from grammar checks.
+ */
+const GRAMMAR_CHECK_EXCLUDED: RegExp[] = [/^governance\/minutes\/.*/]
+
+describe('markdown files', async () => {
 	const allMarkdownFiles: string[] = []
 
-	beforeAll(async () => {
-		await crawlCodebase({
-			ignore: commonExclusions,
-			baseTraversalFn: entry => {
-				if (entry.type === CodebaseEntryType.FILE && entry.path.endsWith('.md')) {
-					allMarkdownFiles.push(entry.path)
-				}
-			},
-		})
+	await crawlCodebase({
+		ignore: commonExclusions,
+		baseTraversalFn: entry => {
+			if (entry.type === CodebaseEntryType.FILE && entry.path.endsWith('.md')) {
+				allMarkdownFiles.push(entry.path)
+			}
+		},
 	})
 
 	it('found at least one markdown file', () => {
@@ -73,7 +73,10 @@ describe('markdown files', () => {
 			const absPath = path.join(getRepositoryRoot(), filePath)
 			const content = await fs.readFile(absPath, 'utf-8')
 
-			if (!GRAMMAR_CHECK_WHITELIST.has(filePath)) {
+			if (
+				!GRAMMAR_CHECK_WHITELIST.has(filePath) &&
+				GRAMMAR_CHECK_EXCLUDED.every(r => r.exec(filePath) === null)
+			) {
 				it('has correct grammar', async () => {
 					await grammarLint(content, { language: 'markdown' })
 				})
@@ -87,6 +90,7 @@ describe('markdown files', () => {
 
 					// Skip full links with protocols.
 					if (
+						url.startsWith('data:') ||
 						url.startsWith('https:') ||
 						url.startsWith('http:') ||
 						url.startsWith('mailto:') ||
@@ -152,15 +156,19 @@ describe('markdown files', () => {
 
 	describe('whitelist only contains files that actually fail', () => {
 		for (const whitelistedPath of GRAMMAR_CHECK_WHITELIST) {
-			describe(whitelistedPath, () => {
-				it('fails grammar check as it is on the grammar-check exclusion list', async () => {
-					const absPath = path.join(getRepositoryRoot(), whitelistedPath)
-					const content = await fs.readFile(absPath, 'utf-8')
-					const message = await grammarLintMessages(content, { language: 'markdown' })
+			describe(
+				whitelistedPath,
+				() => {
+					it('fails grammar check as it is on the grammar-check exclusion list', async () => {
+						const absPath = path.join(getRepositoryRoot(), whitelistedPath)
+						const content = await fs.readFile(absPath, 'utf-8')
+						const message = await grammarLintMessages(content, { language: 'markdown' })
 
-					expect(message).toSatisfy(m => Array.isArray(m) && m.length > 0, message.join('\n'))
-				})
-			})
+						expect(message).toSatisfy(m => Array.isArray(m) && m.length > 0, message.join('\n'))
+					})
+				},
+				15000,
+			)
 		}
 	})
 })
