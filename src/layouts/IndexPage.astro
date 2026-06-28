@@ -1,0 +1,132 @@
+---
+// Types
+import type { MarkdownIndexEntry, RenderedMarkdownIndex } from '@/utils/markdown-page-utils'
+
+type Props = Omit<RenderedMarkdownIndex, 'type'>
+
+const { metadata, entries } = Astro.props
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+
+interface EntryProps {
+	entries: MarkdownIndexEntry[]
+}
+
+function IndexGrid(props: EntryProps): string {
+	const { entries } = props
+
+	const cards = entries
+		.map(entry => {
+			const desc =
+				entry.description !== null
+					? `<p class="index-card-description">${entry.description}</p>`
+					: ''
+
+			return `<a href="${entry.path}" class="index-card">
+				<div class="index-card-title-row">
+					<h2 class="index-card-title">${entry.title}</h2>
+					<span class="index-card-arrow" aria-hidden="true">→</span>
+				</div>
+				${desc}
+			</a>`
+		})
+		.join('\n')
+
+	return `<div class="index-grid">\n${cards}</div>`
+}
+
+const indexHtml = IndexGrid({ entries })
+---
+
+<Layout
+	metadata={{
+		title: metadata.title,
+		description: metadata.description,
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<h1>{metadata.title}</h1>
+		</header>
+
+		<div data-scroll-item='inline-detached padding-match-end' set:html={indexHtml} />
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 58rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+
+		h1 {
+			font-family: var(--fontFamily-spMonorium);
+		}
+
+		p {
+			font-family: var(--fontFamily-avenir);
+		}
+	}
+
+	.index-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.index-card {
+		text-decoration: none;
+		color: inherit;
+		display: block;
+	}
+
+	.index-card-title-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		transition: color 0.15s ease;
+	}
+
+	.index-card:hover .index-card-title-row {
+		color: var(--accent, #3b82f6);
+	}
+
+	.index-card-title {
+		font-family: var(--fontFamily-spMonorium);
+		font-size: 1.125rem;
+		font-weight: 600;
+		margin: 0;
+		line-height: 1.35;
+	}
+
+	.index-card-arrow {
+		font-size: 1.25rem;
+		color: var(--text-secondary);
+		flex-shrink: 0;
+		margin-left: 1rem;
+		transition:
+			color 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.index-card:hover .index-card-arrow {
+		color: var(--accent, #3b82f6);
+		transform: translateX(2px);
+	}
+
+	.index-card-description {
+		font-size: 0.875rem;
+		color: var(--text-secondary);
+		margin: 0.25rem 0 0 0;
+		line-height: 1.5;
+	}
+</style>

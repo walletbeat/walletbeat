@@ -58,7 +58,7 @@ export const navigationTesting = {
 
 export const navigationDocs = {
 	id: 'docs',
-	icon: 'TODO',
+	icon: 'about', // TODO: Change to some docs-like icon once it exists
 	title: 'Documentation',
 	href: '/docs',
 } as const satisfies NavigationItem

@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import { ContentType, type MarkdownContent } from '@/types/content'
-import { collapseToSingleLine, rewriteMarkdownURLs } from '@/utils/markdown-utils'
+import {
+	collapseToSingleLine,
+	extractMarkdownLinks,
+	parseMarkdownWithFrontmatter,
+	rewriteMarkdownURLs,
+} from '@/utils/markdown-utils'
 
 function makeContent(markdown: string): MarkdownContent<null> {
 	return { contentType: ContentType.MARKDOWN, markdown }
@@ -606,5 +611,172 @@ describe('rewriteMarkdownURLs', () => {
 				' [real](/real.html)',
 			].join('\n'),
 		)
+	})
+
+	// --- Bracket-style links: [text](<url>) ---
+
+	it('rewrites bracket-style links with parentheses in URL', () => {
+		const content = makeContent(
+			'[Gateways](<https://en.wikipedia.org/wiki/Gateway_(telecommunications)>)',
+		)
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		// https:// URLs are not rewritten
+		expect(result.markdown).toBe(
+			'[Gateways](<https://en.wikipedia.org/wiki/Gateway_(telecommunications)>)',
+		)
+	})
+
+	it('rewrites bracket-style links with local paths', () => {
+		const content = makeContent('[link](</src/docs/docs/page.html>)')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[link](/docs/page.html)')
+	})
+
+	it('rewrites bracket-style image links', () => {
+		const content = makeContent('![img](</src/docs/assets/img.png>)')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('![img](/assets/img.png)')
+	})
+})
+
+describe('extractMarkdownLinks', () => {
+	it('extracts standard links', () => {
+		const links = extractMarkdownLinks('[link](https://example.com)')
+
+		expect(links).toEqual([{ text: 'link', url: 'https://example.com', line: 1, isImage: false }])
+	})
+
+	it('extracts bracket-style links with parentheses in URL', () => {
+		const links = extractMarkdownLinks(
+			'[Gateways](<https://en.wikipedia.org/wiki/Gateway_(telecommunications)>)',
+		)
+
+		expect(links).toEqual([
+			{
+				text: 'Gateways',
+				url: 'https://en.wikipedia.org/wiki/Gateway_(telecommunications)',
+				line: 1,
+				isImage: false,
+			},
+		])
+	})
+
+	it('extracts bracket-style image links', () => {
+		const links = extractMarkdownLinks('![img](<https://example.com/img.png>)')
+
+		expect(links).toEqual([
+			{ text: 'img', url: 'https://example.com/img.png', line: 1, isImage: true },
+		])
+	})
+
+	it('extracts both standard and bracket-style links on same line', () => {
+		const links = extractMarkdownLinks(
+			'[a](https://example.com) and [b](<https://en.wikipedia.org/wiki/Gateway_(telecommunications)>)',
+		)
+
+		expect(links).toEqual([
+			{ text: 'a', url: 'https://example.com', line: 1, isImage: false },
+			{
+				text: 'b',
+				url: 'https://en.wikipedia.org/wiki/Gateway_(telecommunications)',
+				line: 1,
+				isImage: false,
+			},
+		])
+	})
+
+	it('skips bracket-style links inside code blocks', () => {
+		const links = extractMarkdownLinks('```\n[link](<https://example.com/path(foo)>)\n```')
+
+		expect(links).toEqual([])
+	})
+
+	it('skips bracket-style links inside inline code', () => {
+		const links = extractMarkdownLinks('Use `[link](<https://example.com/path(foo)>)` here')
+
+		expect(links).toEqual([])
+	})
+})
+
+describe('parseFrontmatterLine - quote handling', () => {
+	it('strips surrounding single quotes', () => {
+		const md = `---
+title: 'It's a test'
+description: 'A description'
+---
+# Test`
+
+		const result = parseMarkdownWithFrontmatter(md, { title: true, description: true })
+
+		expect(result.frontmatter.title).toBe("It's a test")
+		expect(result.frontmatter.description).toBe('A description')
+	})
+
+	it('strips surrounding double quotes', () => {
+		const md = `---
+title: "He said hi"
+description: "A description"
+---
+# Test`
+
+		const result = parseMarkdownWithFrontmatter(md, { title: true, description: true })
+
+		expect(result.frontmatter.title).toBe('He said hi')
+		expect(result.frontmatter.description).toBe('A description')
+	})
+
+	it('un-escapes single-quoted escaped single quote (YAML double single-quote)', () => {
+		// YAML: title: 'It''s a test' → value is It's a test
+		const md = `---
+title: 'It''s a test'
+description: 'A description'
+---
+# Test`
+
+		const result = parseMarkdownWithFrontmatter(md, { title: true, description: true })
+
+		expect(result.frontmatter.title).toBe("It's a test")
+	})
+
+	it('un-escapes double-quoted escaped double quote (YAML backslash-quote)', () => {
+		// YAML: title: "He said \"hi\"" → value is He said "hi"
+		const md = `---
+title: "He said \\"hi\\""
+description: A description
+---
+# Test`
+
+		const result = parseMarkdownWithFrontmatter(md, { title: true, description: true })
+
+		expect(result.frontmatter.title).toBe('He said "hi"')
+	})
+
+	it('un-escapes double-quoted backslash (YAML double backslash)', () => {
+		// YAML: title: "back\\slash" → value is back\slash
+		const md = `---
+title: "back\\\\slash"
+description: A description
+---
+# Test`
+
+		const result = parseMarkdownWithFrontmatter(md, { title: true, description: true })
+
+		expect(result.frontmatter.title).toBe('back\\slash')
+	})
+
+	it('leaves unquoted values untouched', () => {
+		const md = `---
+title: no quotes
+description: a description
+---
+# Test`
+
+		const result = parseMarkdownWithFrontmatter(md, { title: true, description: true })
+
+		expect(result.frontmatter.title).toBe('no quotes')
+		expect(result.frontmatter.description).toBe('a description')
 	})
 })

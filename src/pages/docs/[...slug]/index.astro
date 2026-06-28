@@ -4,6 +4,7 @@ import { staticMarkdownDir } from '@/utils/markdown-page-utils'
 
 // Components
 import MarkdownPage from '@/layouts/MarkdownPage.astro'
+import IndexPage from '@/layouts/IndexPage.astro'
 
 // Data
 import markdownFiles from '@/autogen/docs.gen'
@@ -12,13 +13,20 @@ import markdownFiles from '@/autogen/docs.gen'
 export const { renderPage, prerender, getStaticPaths } = staticMarkdownDir({
 	markdownFiles,
 	stripPrefix: '/resources/docs/',
+	urlPrefix: '/docs/',
 })
 
-const { metadata, repoRootRelativePath, processedMarkdown } = renderPage(Astro.params)
+const rendered = renderPage(Astro.params)
 ---
 
-<MarkdownPage
-	metadata={metadata}
-	repoRootRelativePath={repoRootRelativePath}
-	markdown={processedMarkdown}
-/>
+{
+	rendered.type === 'page' ? (
+		<MarkdownPage
+			metadata={rendered.metadata}
+			repoRootRelativePath={rendered.repoRootRelativePath}
+			markdown={rendered.processedMarkdown}
+		/>
+	) : (
+		<IndexPage metadata={rendered.metadata} entries={rendered.entries} />
+	)
+}
