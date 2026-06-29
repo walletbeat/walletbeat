@@ -8,6 +8,8 @@ To: Ethereum Foundation
 Context: Responding to request for additional information about Walletbeat's Pectra Proactive Grant application.
 ---
 
+# EF Pectra Proactive Grant response
+
 Hello,
 
 Thanks for the consideration and for the questions!

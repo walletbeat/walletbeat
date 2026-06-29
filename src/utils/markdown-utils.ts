@@ -390,11 +390,15 @@ export function parseMarkdownWithFrontmatter<_Frontmatter extends Frontmatter = 
 
 /**
  * Strip the single H1 title from a MarkdownContent body.
- * Validates that there is exactly one H1 heading and it is the first non-empty line.
+ * Validates that there is exactly one H1 heading in the first section
+ * (content before the first `---` horizontal rule, outside code blocks)
+ * and that it is the first non-empty line of the document.
+ * Additional H1 headings are permitted after the first section boundary.
  * Also strips blank lines between the H1 and the next content.
  *
  * @param content The Markdown content.
- * @throws Error if there is no H1, multiple H1s, or if the H1 is not the first non-empty line.
+ * @throws Error if the first section has no H1, multiple H1s, or if the H1
+ * is not the first non-empty line.
  * @returns MarkdownContent with the H1 and surrounding blank lines removed.
  */
 export function stripMarkdownTitle<_Strings extends Strings = null>(
@@ -403,6 +407,7 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 	const lines = content.markdown.split('\n')
 	const h1Indices: number[] = []
 	let inCodeBlock = false
+	let firstSectionEnd = -1
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i]
@@ -413,24 +418,35 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 			continue
 		}
 
+		// Find first horizontal rule (---) outside code blocks — marks end of first section
+		if (firstSectionEnd === -1 && !inCodeBlock && /^\s*[-*_]{3,}\s*$/.test(line)) {
+			firstSectionEnd = i
+			continue
+		}
+
 		// Only look for H1 headings outside code blocks
 		if (!inCodeBlock && /^# /.test(line)) {
 			h1Indices.push(i)
 		}
 	}
 
-	// Validate exactly one H1
-	if (h1Indices.length === 0) {
-		throw new Error('Markdown body must contain exactly one H1 heading, but found none')
-	}
+	// Collect H1s that fall within the first section
+	const firstSectionH1s = h1Indices.filter(idx => firstSectionEnd === -1 || idx < firstSectionEnd)
 
-	if (h1Indices.length > 1) {
+	// Validate exactly one H1 in the first section
+	if (firstSectionH1s.length === 0) {
 		throw new Error(
-			`Markdown body must contain exactly one H1 heading, but found ${h1Indices.length}. Found at indices: ${h1Indices.join(', ')}`,
+			'Markdown body must contain exactly one H1 heading in the first section (before the first ---), but found none',
 		)
 	}
 
-	const h1Index = h1Indices[0]
+	if (firstSectionH1s.length > 1) {
+		throw new Error(
+			`Markdown body must contain exactly one H1 heading in the first section, but found ${firstSectionH1s.length}. Found at indices: ${firstSectionH1s.join(', ')}`,
+		)
+	}
+
+	const h1Index = firstSectionH1s[0]
 
 	// Validate it's the first non-empty line
 	for (let i = 0; i < h1Index; i++) {
@@ -444,8 +460,6 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 	// Remove the H1 and any blank lines before and after it
 	const resultLines: string[] = []
 
-	// Keep blank lines before H1 (there shouldn't be any non-empty lines, validated above)
-	// Actually, we strip leading blank lines too since they come from the frontmatter separation
 	// Find the first non-empty line (which should be the H1)
 	let start = 0
 
@@ -538,10 +552,11 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		forbiddenURLPrefixes?: `https://${string}`[]
 
 		/**
-		 * Set of full URLs that are allowed to exist in the Markdown document even if
-		 * they are in `forbiddenURLPrefixes`.
+		 * Set of regular expressions that, when matched against a URL, allow it to
+		 * exist in the Markdown document even if it falls under `forbiddenURLPrefixes`.
+		 * Each regex is tested with `.test(url)` against the full URL string.
 		 */
-		whitelistURLs?: `https://${string}`[]
+		whitelistedURLRegexes?: RegExp[]
 	},
 ): MarkdownContent<_Strings> {
 	const markdown = content.markdown
@@ -550,7 +565,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		repoRootRelativePaths,
 		repoRootPagesDir,
 		forbiddenURLPrefixes,
-		whitelistURLs,
+		whitelistedURLRegexes,
 	} = options
 
 	// Resolve the directory of the source markdown file
@@ -667,7 +682,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		// Handle https:// URLs - check forbidden prefixes
 		if (stringHasPrefix(url, 'https://')) {
 			if (forbiddenURLPrefixes) {
-				const isWhitelisted = whitelistURLs?.includes(url)
+				const isWhitelisted = whitelistedURLRegexes?.some(regex => regex.test(url))
 
 				for (const forbiddenPrefix of forbiddenURLPrefixes) {
 					if (url.startsWith(forbiddenPrefix)) {

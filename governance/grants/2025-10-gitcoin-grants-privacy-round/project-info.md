@@ -39,7 +39,7 @@ Walletbeat upholds privacy in wallets by looking at, for example:
   - If the wallet implements **Stealth Addresses**, is there a central provider that learns about the correlation between your multiple stealth addresses?
 - Do wallets use invasive user analytics that track all of your actions as you use it? (You'd be surprised how many do!)
 
-Answering these privacy questions relies heavily on looking at wallets' source code and analyzing wallets' network traffic (we have published [a guide on how to do this](https://github.com/walletbeat/walletbeat/blob/beta/docs/mitmproxy-guide/mitmproxy-guide.md)!). Such analysis takes effort, and your funds help this work and the funding of more efficient tools for doing so at scale.
+Answering these privacy questions relies heavily on looking at wallets' source code and analyzing wallets' network traffic (we have published [a guide on how to do this](/resources/docs/wallet-testing/data-collection/data-collection.md)!). Such analysis takes effort, and your funds help this work and the funding of more efficient tools for doing so at scale.
 
 ## Impact statement
 

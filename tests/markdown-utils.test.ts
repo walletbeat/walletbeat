@@ -6,6 +6,7 @@ import {
 	extractMarkdownLinks,
 	parseMarkdownWithFrontmatter,
 	rewriteMarkdownURLs,
+	stripMarkdownTitle,
 } from '@/utils/markdown-utils'
 
 function makeContent(markdown: string): MarkdownContent<null> {
@@ -290,15 +291,44 @@ describe('rewriteMarkdownURLs', () => {
 		).toThrow()
 	})
 
-	it('does not throw for whitelisted URLs in forbidden prefixes', () => {
+	it('does not throw for URLs matching a whitelisted regex in forbidden prefixes', () => {
 		const content = makeContent('[link](https://forbidden.com/allowed)')
 		const result = rewriteMarkdownURLs(content, {
 			...defaultOptions,
 			forbiddenURLPrefixes: ['https://forbidden.com'],
-			whitelistURLs: ['https://forbidden.com/allowed'],
+			whitelistedURLRegexes: [/^https:\/\/forbidden\.com\/allowed/],
 		})
 
 		expect(result.markdown).toBe('[link](https://forbidden.com/allowed)')
+	})
+
+	it('does not throw for URLs matching a whitelisted regex with subpath segments', () => {
+		const content = makeContent('[link](https://forbidden.com/allowed/sub/page)')
+		const result = rewriteMarkdownURLs(content, {
+			...defaultOptions,
+			forbiddenURLPrefixes: ['https://forbidden.com'],
+			whitelistedURLRegexes: [/^https:\/\/forbidden\.com\/allowed/],
+		})
+
+		expect(result.markdown).toBe('[link](https://forbidden.com/allowed/sub/page)')
+	})
+
+	it('supports multiple whitelisted regex patterns', () => {
+		const content = makeContent(
+			'[link](https://forbidden.com/allowed-a) and [link2](https://forbidden.com/allowed-b/sub)',
+		)
+		const result = rewriteMarkdownURLs(content, {
+			...defaultOptions,
+			forbiddenURLPrefixes: ['https://forbidden.com'],
+			whitelistedURLRegexes: [
+				/^https:\/\/forbidden\.com\/allowed-a/,
+				/^https:\/\/forbidden\.com\/allowed-b/,
+			],
+		})
+
+		expect(result.markdown).toBe(
+			'[link](https://forbidden.com/allowed-a) and [link2](https://forbidden.com/allowed-b/sub)',
+		)
 	})
 
 	it('throws for URLs partially matching forbidden prefix', () => {
@@ -821,5 +851,222 @@ description: a description
 
 		expect(result.frontmatter.title).toBe('no quotes')
 		expect(result.frontmatter.description).toBe('a description')
+	})
+})
+
+describe('stripMarkdownTitle', () => {
+	// --- Basic single H1 (no section boundary) ---
+
+	it('strips a single H1 and surrounding blank lines', () => {
+		const content = makeContent(
+			['# My Title', '', '## Subheading', '', 'Some content here.'].join('\n'),
+		)
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(['## Subheading', '', 'Some content here.'].join('\n'))
+	})
+
+	it('strips leading blank lines before the H1', () => {
+		const content = makeContent(['', '', '# Title', '', 'Body.'].join('\n'))
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe('Body.')
+	})
+
+	it('strips trailing blank lines from the result', () => {
+		const content = makeContent(['# Title', '', 'Body.', '', ''].join('\n'))
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe('Body.')
+	})
+
+	it('allows additional H1s after the first ---', () => {
+		const content = makeContent(
+			[
+				'# First Title',
+				'',
+				'Some intro text.',
+				'',
+				'---',
+				'',
+				'# Second Title',
+				'',
+				'More content.',
+			].join('\n'),
+		)
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(
+			['Some intro text.', '', '---', '', '# Second Title', '', 'More content.'].join('\n'),
+		)
+	})
+
+	it('allows multiple H1s after the first ---', () => {
+		const content = makeContent(
+			[
+				'# Title',
+				'',
+				'Intro.',
+				'',
+				'---',
+				'',
+				'# Section A',
+				'',
+				'Content A.',
+				'',
+				'# Section B',
+				'',
+				'Content B.',
+			].join('\n'),
+		)
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(
+			[
+				'Intro.',
+				'',
+				'---',
+				'',
+				'# Section A',
+				'',
+				'Content A.',
+				'',
+				'# Section B',
+				'',
+				'Content B.',
+			].join('\n'),
+		)
+	})
+
+	it('allows a single H1 after --- when first section has one H1', () => {
+		const content = makeContent(['# Title', '', '---', '', '# Only one after.'].join('\n'))
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(['---', '', '# Only one after.'].join('\n'))
+	})
+
+	// --- Error cases ---
+
+	it('throws when the first section has no H1', () => {
+		const content = makeContent(['## Not an H1', '', 'Body.'].join('\n'))
+
+		expect(() => stripMarkdownTitle(content)).toThrow('exactly one H1 heading in the first section')
+	})
+
+	it('throws when the first section has no H1 but H1s exist after ---', () => {
+		const content = makeContent(['Intro text.', '', '---', '', '# Late H1'].join('\n'))
+
+		expect(() => stripMarkdownTitle(content)).toThrow('exactly one H1 heading in the first section')
+	})
+
+	it('throws when the first section has multiple H1s', () => {
+		const content = makeContent(
+			['# First H1', '', '# Second H1', '', '---', '', 'Body.'].join('\n'),
+		)
+
+		expect(() => stripMarkdownTitle(content)).toThrow('exactly one H1 heading in the first section')
+	})
+
+	it('throws when there is no H1 at all', () => {
+		const content = makeContent('Just some plain text.')
+
+		expect(() => stripMarkdownTitle(content)).toThrow('exactly one H1 heading in the first section')
+	})
+
+	it('throws when the H1 is not the first non-empty line', () => {
+		const content = makeContent(['Some preamble', '', '# Title'].join('\n'))
+
+		expect(() => stripMarkdownTitle(content)).toThrow('must be the first non-empty line')
+	})
+
+	// --- Code block exclusion ---
+
+	it('ignores H1 inside simple code blocks', () => {
+		const content = makeContent(
+			['# Real Title', '', '```', '# Not an H1', '```', '', 'Body.'].join('\n'),
+		)
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(['```', '# Not an H1', '```', '', 'Body.'].join('\n'))
+	})
+
+	it('ignores --- inside code blocks as section boundary', () => {
+		const content = makeContent(
+			[
+				'# Title',
+				'',
+				'```',
+				'---',
+				'```',
+				'',
+				'# Another H1 - should error if code block --- counted',
+			].join('\n'),
+		)
+
+		// Since the --- is inside a code block, it is NOT a section boundary,
+		// so the second H1 is still in the first section → error
+		expect(() => stripMarkdownTitle(content)).toThrow('exactly one H1 heading in the first section')
+	})
+
+	it('ignores --- inside code blocks when real --- exists later', () => {
+		const content = makeContent(
+			['# Title', '', '```', '---', '```', '', '---', '', '# Safe H1 after real ---'].join('\n'),
+		)
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(
+			['```', '---', '```', '', '---', '', '# Safe H1 after real ---'].join('\n'),
+		)
+	})
+
+	// --- Different horizontal rule styles ---
+
+	it('recognizes longer horizontal rules (e.g., -----)', () => {
+		const content = makeContent(['# Title', '', '-----', '', '# Second'].join('\n'))
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(['-----', '', '# Second'].join('\n'))
+	})
+
+	// --- No section boundary (existing behavior preserved) ---
+
+	it('requires exactly one H1 when no --- exists', () => {
+		const content = makeContent(['# Title', '', 'Body.'].join('\n'))
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe('Body.')
+	})
+
+	it('throws with multiple H1s and no ---', () => {
+		const content = makeContent(['# First', '', '# Second'].join('\n'))
+
+		expect(() => stripMarkdownTitle(content)).toThrow('exactly one H1 heading in the first section')
+	})
+
+	// --- Edge cases ---
+
+	it('preserves the strings property', () => {
+		const content: MarkdownContent<{ key: string }> = {
+			contentType: ContentType.MARKDOWN,
+			markdown: '# Title',
+			strings: { key: 'value' },
+		}
+		const result = stripMarkdownTitle(content)
+
+		expect(result.strings).toBe(content.strings)
+	})
+
+	it('preserves contentType as MARKDOWN', () => {
+		const content = makeContent('# Title\n\nBody.')
+		const result = stripMarkdownTitle(content)
+
+		expect(result.contentType).toBe(ContentType.MARKDOWN)
+	})
+
+	it('returns only the section boundary and content after when H1 is the only first-section content', () => {
+		const content = makeContent(['# Title', '', '---', '', 'Rest.'].join('\n'))
+		const result = stripMarkdownTitle(content)
+
+		expect(result.markdown).toBe(['---', '', 'Rest.'].join('\n'))
 	})
 })

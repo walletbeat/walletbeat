@@ -92,7 +92,7 @@ Walletbeat beta is built as an open-source static frontend hosted on IPFS. Devel
 
 EIP-7702 readiness and features criteria will be determined by discussion and issues on GitHub and Farcaster. Wallet data updates will be conducted by GitHub pull requests, as a result of wallet testing and wallet code review. Review research tasks may be posted to [Bountycaster](https://warpcast.com/~/channel/bounties) to shard out the work.
 
-This grant proposal itself is part of the [Walletbeat beta repository](https://github.com/fluidkey/walletbeat/blob/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round) as part of the intention to keep governance for Walletbeat as a project fully public and transparent.
+This grant proposal itself is part of the [Walletbeat beta repository](https://github.com/walletbeat/walletbeat) as part of the intention to keep governance for Walletbeat as a project fully public and transparent.
 
 ### Timeline
 
