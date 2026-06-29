@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
 import { AccountType } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -61,10 +62,14 @@ export const zerion: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: null,
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'OFFCHAIN',
+				offchainDataVerifiability: 'NOT_VERIFIABLE',
+				offchainProviderConnection: 'DIRECT_CONNECTION'
+			}),
 		},
 		chainAbstraction: null,
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
