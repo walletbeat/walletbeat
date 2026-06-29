@@ -1,6 +1,6 @@
 ---
 // Types/constants
-import { allRatedWallets, assertValidWalletName, attributeTreeForWallet } from '@/data/wallets'
+import { allRatedWallets, assertValidWalletName } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
 
 // Functions
@@ -21,13 +21,10 @@ assertValidWalletName(walletName)
 
 // Data
 const wallet = allRatedWallets[walletName]
-const attributeTree = attributeTreeForWallet(wallet)
-const { ladders: _ladders, ...walletPageWallet } = wallet
-
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
-import WalletPage from '@/views/WalletPage.svelte'
+import WalletPageContext from '@/views/WalletPageContext.svelte'
 ---
 
 <Layout
@@ -52,6 +49,6 @@ import WalletPage from '@/views/WalletPage.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletPage wallet={walletPageWallet} {attributeTree} client:idle />
+		<WalletPageContext walletId={wallet.metadata.id} client:idle />
 	</main>
 </Layout>

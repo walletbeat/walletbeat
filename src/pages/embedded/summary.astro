@@ -1,12 +1,11 @@
 ---
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
-import { embeddedWalletAttributeTree, ratedEmbeddedWallets } from '@/data/embedded-wallets'
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
-import WalletTable from '@/views/WalletTable.svelte'
+import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 ---
 
 <Layout
@@ -17,11 +16,6 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Embedded Wallets'
-			wallets={Object.values(ratedEmbeddedWallets)}
-			attributeTree={embeddedWalletAttributeTree}
-		/>
+		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
 	</main>
 </Layout>

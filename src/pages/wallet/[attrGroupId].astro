@@ -3,8 +3,7 @@
 import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { representativeWalletForType } from '@/data/wallets'
-import { softwareLadders } from '@/schema/ladders'
-import { softwareWalletAttributeTree, ratedSoftwareWallets } from '@/data/software-wallets'
+import { softwareWalletAttributeTree } from '@/data/software-wallets'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
@@ -34,7 +33,7 @@ if (!attrGroup) {
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
-import WalletTable from '@/views/WalletTable.svelte'
+import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 ---
 
 <Layout
@@ -47,12 +46,6 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Software Wallets'
-			ladders={softwareLadders}
-			wallets={Object.values(ratedSoftwareWallets)}
-			attributeTree={softwareWalletAttributeTree}
-		/>
+		<SoftwareWalletTable client:visible title='Software Wallets' />
 	</main>
 </Layout>

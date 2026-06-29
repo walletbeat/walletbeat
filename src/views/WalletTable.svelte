@@ -144,6 +144,10 @@
 		wallets
 	)
 
+	const filteredWalletIds = $derived(
+		new Set(filteredWallets.map(wallet => wallet.metadata.id))
+	)
+
 	let selectedAttribute: string | undefined = $state(
 		undefined
 	)
@@ -652,7 +656,7 @@
 			rowId={wallet => wallet.metadata.id}
 			rowIsDisabled={wallet => (
 				!(
-					filteredWallets.includes(wallet)
+					filteredWalletIds.has(wallet.metadata.id)
 					&& (!sortedColumn?.value || sortedColumn.value(wallet) !== undefined)
 				)
 			)}

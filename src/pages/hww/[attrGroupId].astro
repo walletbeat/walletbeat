@@ -1,7 +1,7 @@
 ---
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
-import { ratedHardwareWallets, hardwareWalletAttributeTree } from '@/data/hardware-wallets'
+import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { WalletType } from '@/schema/wallet-types'
 
@@ -33,7 +33,7 @@ if (!attrGroup) {
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
-import WalletTable from '@/views/WalletTable.svelte'
+import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 ---
 
 <Layout
@@ -46,11 +46,6 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Hardware Wallets'
-			wallets={Object.values(ratedHardwareWallets)}
-			attributeTree={hardwareWalletAttributeTree}
-		/>
+		<HardwareWalletTable client:visible title='Hardware Wallets' />
 	</main>
 </Layout>
