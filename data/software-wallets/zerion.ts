@@ -9,9 +9,10 @@ import {
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
+import { RpcEndpointConfiguration, type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
-import { refTodo } from '@/schema/reference'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -66,7 +67,23 @@ export const zerion: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: refTodo,
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: notSupported,
+					erc20TokenSend: notSupported,
+					etherBalanceLookup: notSupported,
+				},
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
 		ecosystem: {
 			delegation: null,
 		},
