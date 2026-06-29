@@ -28,9 +28,13 @@ const processedMarkdown = stripMarkdownTitle(
 			'/resources/docs': { path: '/docs', stripLast: true },
 			'/governance': { path: '/governance', stripLast: true },
 		},
-		forbiddenURLPrefixes: ['https://github.com/walletbeat/walletbeat'],
-		whitelistURLs: [
-			'https://github.com/walletbeat/walletbeat', // The repository itself (not a URL within it) is OK to link to.
+		forbiddenURLPrefixes: [
+			'https://github.com/walletbeat/walletbeat/blob/',
+			'https://github.com/walletbeat/walletbeat/tree/',
+		],
+		whitelistedURLRegexes: [
+			/^https:\/\/github\.com\/walletbeat\/walletbeat\/tree\/beta\/resources\/talks\//,
+			/^https:\/\/github\.com\/walletbeat\/walletbeat\/blob\/beta\/LICENSE$/,
 		],
 	}),
 )
