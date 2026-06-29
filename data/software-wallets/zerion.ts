@@ -5,18 +5,27 @@ import type { AddressResolutionData } from '@/schema/features/privacy/address-re
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
+	type BugBountyProgramImplementation,
+	BugBountyProgramAvailability,
+	BugBountyPlatform,
+} from '@/schema/features/security/bug-bounty-program'
+import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
-import { RpcEndpointConfiguration, type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	RpcEndpointConfiguration,
+	type ChainConfigurability,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 export const zerion: SoftwareWallet = {
 	metadata: {
 		id: 'zerion',
@@ -68,7 +77,7 @@ export const zerion: SoftwareWallet = {
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'OFFCHAIN',
 				offchainDataVerifiability: 'NOT_VERIFIABLE',
-				offchainProviderConnection: 'DIRECT_CONNECTION'
+				offchainProviderConnection: 'DIRECT_CONNECTION',
 			}),
 		},
 		chainAbstraction: null,
@@ -137,7 +146,26 @@ export const zerion: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: [
+					{
+						explanation: 'Since March 2022, Zerion has a live bug bounty program.',
+						url: 'https://immunefi.com/bug-bounty/zerion',
+					},
+				],
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2021-12-17' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.IMMUNEFI,
+				rewards: supported({
+					minimum: 1000,
+					maximum: 25000,
+					currency: 'USD',
+				}),
+				upgradePathAvailable: false,
+			}),
 			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: [
