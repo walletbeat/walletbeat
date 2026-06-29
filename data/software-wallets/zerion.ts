@@ -192,10 +192,10 @@ export const zerion: SoftwareWallet = {
 			},
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
