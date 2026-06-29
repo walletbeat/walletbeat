@@ -85,16 +85,16 @@ export const zerion: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
-			delegation: null,
+			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
-			walletCall: null,
+			walletCall: notSupported,
 		},
 		licensing: null,
 		monetization: {
