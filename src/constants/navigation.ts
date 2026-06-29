@@ -69,6 +69,13 @@ export const navigationNews = {
 	href: '/news',
 } as const satisfies NavigationItem
 
+export const navigationWalletEips = {
+	id: 'wallet-eips',
+	icon: 'transaction_legibility',
+	title: 'Wallet EIPs',
+	href: '/wallet-eips/',
+} as const satisfies NavigationItem
+
 export const topbarNavigationItems = [
 	navigationAbout,
 	navigationFaq,
@@ -152,5 +159,6 @@ export const defaultNavigationItems = [
 		],
 	},
 	navigationNews,
+	navigationWalletEips,
 	navigationTesting,
 ] as const satisfies NavigationItem[]
