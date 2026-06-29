@@ -23,10 +23,10 @@ const processedMarkdown = stripMarkdownTitle(
 		repoRootRelativePath: repoRootRelativePath,
 		repoRootPagesDir: '/src/pages/',
 		repoRootRelativePaths: {
-			'/public': '/',
-			'/src/pages': '/',
-			'/resources/docs': '/docs',
-			'/governance': '/governance',
+			'/public': { path: '/', stripLast: false },
+			'/src/pages': { path: '/', stripLast: true },
+			'/resources/docs': { path: '/docs', stripLast: true },
+			'/governance': { path: '/governance', stripLast: true },
 		},
 		forbiddenURLPrefixes: ['https://github.com/walletbeat/walletbeat'],
 		whitelistURLs: [

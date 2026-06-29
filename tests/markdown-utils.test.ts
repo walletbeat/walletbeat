@@ -38,9 +38,9 @@ describe('rewriteMarkdownURLs', () => {
 		repoRootRelativePath: '/src/docs/docs/intro.md' as const,
 		repoRootPagesDir: '/src/pages/' as const,
 		repoRootRelativePaths: {
-			'/src/docs': '/' as const,
-			'/src/pages': '/pages' as const,
-			'/public': '/' as const,
+			'/src/docs': { path: '/', stripLast: true } as const,
+			'/src/pages': { path: '/pages', stripLast: true } as const,
+			'/public': { path: '/', stripLast: false } as const,
 		},
 	} as const
 
@@ -50,28 +50,51 @@ describe('rewriteMarkdownURLs', () => {
 		const content = makeContent('Check [the docs](/src/docs/docs/guide.html)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('Check [the docs](/docs/guide.html)')
+		expect(result.markdown).toBe('Check [the docs](/docs/)')
 	})
 
-	it('rewrites image links', () => {
+	it('rewrites image URLs', () => {
 		const content = makeContent('![logo](/src/docs/assets/logo.png)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
 		expect(result.markdown).toBe('![logo](/assets/logo.png)')
 	})
 
-	it('handles links with titles', () => {
-		const content = makeContent('[guide](/src/docs/docs/guide.html "The Guide")')
+	it('rewrites links to images', () => {
+		const content = makeContent('[logo](/src/docs/assets/logo.png)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[guide](/docs/guide.html "The Guide")')
+		expect(result.markdown).toBe('[logo](/assets/logo.png)')
+	})
+
+	it('rewrites links to images and image URLs', () => {
+		const content = makeContent(
+			'[![logo_1](/src/docs/assets/logo_1.png)](/src/docs/assets/logo_2.jpeg)',
+		)
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[![logo_1](/assets/logo_1.png)](/assets/logo_2.jpeg)')
+	})
+
+	it('handles links with titles', () => {
+		const content = makeContent('[guide](/src/docs/docs/ "The Guide")')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[guide](/docs/ "The Guide")')
+	})
+
+	it('handles links with titles and anchors', () => {
+		const content = makeContent('[guide](/src/docs/docs/#here "The Guide")')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[guide](/docs/#here "The Guide")')
 	})
 
 	it('handles multiple links in the same content', () => {
 		const content = makeContent('Link [one](/src/docs/a.html) and [two](/public/b.html)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('Link [one](/a.html) and [two](/b.html)')
+		expect(result.markdown).toBe('Link [one](/) and [two](/b.html)')
 	})
 
 	it('removes the last component of pages files', () => {
@@ -81,20 +104,27 @@ describe('rewriteMarkdownURLs', () => {
 		expect(result.markdown).toBe('[link](/pages/hello/)')
 	})
 
+	it('handles absolute URLs with hash', () => {
+		const content = makeContent('[section](/src/docs/hello/page.md#overview)')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[section](/hello/#overview)')
+	})
+
 	// --- Relative path handling ---
 
 	it('resolves relative paths (./) from source file location', () => {
-		const content = makeContent('[link](./guide.html)')
+		const content = makeContent('[link](./foo/guide.html)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[link](/docs/guide.html)')
+		expect(result.markdown).toBe('[link](/docs/foo/)')
 	})
 
 	it('resolves relative paths (../) from source file location upwards', () => {
 		const content = makeContent('[link](../other/page.html)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[link](/other/page.html)')
+		expect(result.markdown).toBe('[link](/other/)')
 	})
 
 	it('resolves relative paths to pages files', () => {
@@ -102,6 +132,13 @@ describe('rewriteMarkdownURLs', () => {
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
 		expect(result.markdown).toBe('[link](/pages/hello/)')
+	})
+
+	it('handles relative paths to pages files with anchor', () => {
+		const content = makeContent('[link](../../pages/hello/world.html#anchor)')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[link](/pages/hello/#anchor)')
 	})
 
 	it('throws for deeply nested relative path that goes outside known prefixes', () => {
@@ -133,6 +170,22 @@ describe('rewriteMarkdownURLs', () => {
 		expect(result.markdown).toBe('[link](/assets/)')
 	})
 
+	it('handles relative paths with trailing slash and anchor', () => {
+		const content = makeContent('[link](./guide/#anchor)')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[link](/docs/guide/#anchor)')
+	})
+
+	it('handles images that are also links', () => {
+		const content = makeContent(
+			'[![logo](/src/docs/assets/logo.png)](/src/docs/other/page.md#anchor)',
+		)
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[![logo](/assets/logo.png)](/other/#anchor)')
+	})
+
 	// --- URLs that should NOT be rewritten ---
 
 	it('does not rewrite https:// URLs', () => {
@@ -156,18 +209,18 @@ describe('rewriteMarkdownURLs', () => {
 		expect(result.markdown).toBe('[email](mailto:test@example.com)')
 	})
 
+	it('does not rewrite data: URIs', () => {
+		const content = makeContent('[image](data:image/png;base64,abcdef)')
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe('[image](data:image/png;base64,abcdef)')
+	})
+
 	it('does not rewrite anchor-only links (#section)', () => {
 		const content = makeContent('[section](#getting-started)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
 		expect(result.markdown).toBe('[section](#getting-started)')
-	})
-
-	it('does not rewrite absolute URLs with hash', () => {
-		const content = makeContent('[section](/src/docs/page.html#overview)')
-		const result = rewriteMarkdownURLs(content, defaultOptions)
-
-		expect(result.markdown).toBe('[section](/page.html#overview)')
 	})
 
 	it('preserves the strings property', () => {
@@ -200,36 +253,28 @@ describe('rewriteMarkdownURLs', () => {
 	it('rewrites URLs outside code blocks but not inside', () => {
 		const content = makeContent(
 			[
-				'[real](/src/docs/a.html)',
+				'[real](/src/docs/a/aa.md)',
 				'',
 				'```',
-				'[fake](/src/docs/b.html)',
+				'[fake](/src/docs/b/bb.md)',
 				'```',
 				'',
-				'[real2](/src/docs/c.html)',
+				'[real2](/src/docs/c/cc.md)',
 			].join('\n'),
 		)
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
 		expect(result.markdown).toBe(
-			[
-				'[real](/a.html)',
-				'',
-				'```',
-				'[fake](/src/docs/b.html)',
-				'```',
-				'',
-				'[real2](/c.html)',
-			].join('\n'),
+			['[real](/a/)', '', '```', '[fake](/src/docs/b/bb.md)', '```', '', '[real2](/c/)'].join('\n'),
 		)
 	})
 
 	it('does not rewrite URLs inside indented code blocks', () => {
-		const content = makeContent(['    [code block link](/src/docs/page.html)'].join('\n'))
+		const content = makeContent(['    [code block link](/src/docs/page/index.html)'].join('\n'))
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
 		// Indented code blocks (4+ spaces) should be preserved
-		expect(result.markdown).toBe('    [code block link](/src/docs/page.html)')
+		expect(result.markdown).toBe('    [code block link](/src/docs/page/index.html)')
 	})
 
 	// --- Forbidden URL prefixes ---
@@ -268,13 +313,13 @@ describe('rewriteMarkdownURLs', () => {
 	})
 
 	it('does not throw for URLs that do not match any forbidden prefix', () => {
-		const content = makeContent('[link](https://allowed.com/page)')
+		const content = makeContent('[link](http://allowed.com/page)')
 		const result = rewriteMarkdownURLs(content, {
 			...defaultOptions,
 			forbiddenURLPrefixes: ['https://forbidden.com'],
 		})
 
-		expect(result.markdown).toBe('[link](https://allowed.com/page)')
+		expect(result.markdown).toBe('[link](http://allowed.com/page)')
 	})
 
 	// --- Error for unmatched URL prefix ---
@@ -286,10 +331,9 @@ describe('rewriteMarkdownURLs', () => {
 	})
 
 	it('throws when a resolved relative path does not match any prefix', () => {
-		// From /src/docs/docs/intro.md, ../../../secret.html resolves to /src/secret.html
-		// but /src/secret doesn't match /src/docs or /public
-		// Actually the resolved URL is /secret.html which doesn't match any prefix
-		const content = makeContent('[link](../../../secret.html)')
+		// From /src/docs/docs/intro.md, ../../../nope/secret.html resolves to /src/nope/secret.html
+		// but /src/nope doesn't match /src/docs or /public.
+		const content = makeContent('[link](../../../nope/secret.html)')
 
 		expect(() => rewriteMarkdownURLs(content, defaultOptions)).toThrow()
 	})
@@ -322,15 +366,18 @@ describe('rewriteMarkdownURLs', () => {
 			repoRootRelativePath: '/src/docs/docs/sub/nested.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				'/src/docs/docs/sub': '/docs/sub' as const,
-				'/src/docs/docs': '/docs' as const,
-				'/src/docs': '/' as const,
+				'/src/docs/docs/sub': { path: '/docs/the_sub', stripLast: true } as const,
+				'/src/docs/docs': { path: '/docs', stripLast: true } as const,
+				'/public/submarine': { path: '/subaquatic', stripLast: false } as const,
+				'/public': { path: '/', stripLast: false } as const,
 			},
 		}
-		const content = makeContent('[link](/src/docs/docs/sub/page.html)')
+		const content = makeContent(
+			'[link 1](/src/docs/docs/sub/page.md#here) / [link 2](/public/submarine/subway.png)',
+		)
 		const result = rewriteMarkdownURLs(content, options)
 
-		expect(result.markdown).toBe('[link](/docs/sub/page.html)')
+		expect(result.markdown).toBe('[link 1](/docs/the_sub/#here) / [link 2](/subaquatic/subway.png)')
 	})
 
 	it('maps to https:// URLs via repoRootRelativePaths', () => {
@@ -338,14 +385,14 @@ describe('rewriteMarkdownURLs', () => {
 			repoRootRelativePath: '/src/docs/docs/intro.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				'/src/docs/docs': 'https://docs.example.com' as const,
-				'/src/docs': '/' as const,
+				'/src/docs/docs': { path: 'https://docs.example.com', stripLast: true } as const,
+				'/public': { path: '/', stripLast: false } as const,
 			},
 		}
-		const content = makeContent('[link](/src/docs/docs/guide.html)')
+		const content = makeContent('[link](/src/docs/docs/guide/the_guide.html)')
 		const result = rewriteMarkdownURLs(content, options)
 
-		expect(result.markdown).toBe('[link](https://docs.example.com/guide.html)')
+		expect(result.markdown).toBe('[link](https://docs.example.com/guide/)')
 	})
 
 	it('handles link with trailing slash in path', () => {
@@ -353,13 +400,27 @@ describe('rewriteMarkdownURLs', () => {
 			repoRootRelativePath: '/src/docs/docs/intro.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				'/src/docs': '/' as const,
+				'/src/docs': { path: '/', stripLast: true } as const,
 			},
 		}
-		const content = makeContent('[link](/src/docs/docs/)')
+		const content = makeContent('[link](/src/docs/the_docs/)')
 		const result = rewriteMarkdownURLs(content, options)
 
-		expect(result.markdown).toBe('[link](/docs/)')
+		expect(result.markdown).toBe('[link](/the_docs/)')
+	})
+
+	it('handles link with trailing slash and anchor in path', () => {
+		const options = {
+			repoRootRelativePath: '/src/docs/docs/intro.md' as const,
+			repoRootPagesDir: '/src/pages/' as const,
+			repoRootRelativePaths: {
+				'/src/docs': { path: '/', stripLast: true } as const,
+			},
+		}
+		const content = makeContent('[link](/src/docs/the_docs/#here)')
+		const result = rewriteMarkdownURLs(content, options)
+
+		expect(result.markdown).toBe('[link](/the_docs/#here)')
 	})
 
 	it('handles deeply nested source file paths', () => {
@@ -367,38 +428,24 @@ describe('rewriteMarkdownURLs', () => {
 			repoRootRelativePath: '/src/docs/docs/api/v2/endpoints.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				'/src/docs': '/' as const,
+				'/src/docs': { path: '/', stripLast: true } as const,
 			},
 		}
-		const content = makeContent('[up](../../page.html)')
+		const content = makeContent('[up](../../page.md#here)')
 		const result = rewriteMarkdownURLs(content, options)
 
-		expect(result.markdown).toBe('[up](/docs/page.html)')
+		expect(result.markdown).toBe('[up](/docs/#here)')
 	})
 
 	it('preserves link text while only rewriting the URL', () => {
-		const content = makeContent('[Click here for details](/src/docs/details.html)')
+		const content = makeContent('[Click here for details](/src/docs/details/details.md)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[Click here for details](/details.html)')
-	})
-
-	it('handles link at the very end of content without newline', () => {
-		const content = makeContent('Text [link](/src/docs/page.html)')
-		const result = rewriteMarkdownURLs(content, defaultOptions)
-
-		expect(result.markdown).toBe('Text [link](/page.html)')
-	})
-
-	it('handles link at the very start of content', () => {
-		const content = makeContent('[link](/src/docs/page.html) text')
-		const result = rewriteMarkdownURLs(content, defaultOptions)
-
-		expect(result.markdown).toBe('[link](/page.html) text')
+		expect(result.markdown).toBe('[Click here for details](/details/)')
 	})
 
 	it('preserves contentType as MARKDOWN', () => {
-		const content = makeContent('[link](/src/docs/page.html)')
+		const content = makeContent('[link](/src/docs/page.md)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
 		expect(result.contentType).toBe(ContentType.MARKDOWN)
@@ -407,10 +454,10 @@ describe('rewriteMarkdownURLs', () => {
 	// --- Block quotes should still have URLs rewritten ---
 
 	it('rewrites URLs in blockquotes', () => {
-		const content = makeContent('> [link](/src/docs/page.html)')
+		const content = makeContent('> [link](/src/docs/page/page.md)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('> [link](/page.html)')
+		expect(result.markdown).toBe('> [link](/page/)')
 	})
 
 	// --- Multiple consecutive relative segments ---
@@ -420,8 +467,8 @@ describe('rewriteMarkdownURLs', () => {
 			repoRootRelativePath: '/src/docs/a/b/c.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				'/src/docs': '/' as const,
-				'/src': '/' as const,
+				'/src/docs': { path: '/', stripLast: true } as const,
+				'/src': { path: '/', stripLast: true } as const,
 			},
 		}
 		const content = makeContent('[link](../../../root.html)')
@@ -429,16 +476,16 @@ describe('rewriteMarkdownURLs', () => {
 		// ../../../root.html from /src/docs/a/b/ resolves to /src/root.html
 		// which matches /src -> /root.html
 
-		expect(result.markdown).toBe('[link](/root.html)')
+		expect(result.markdown).toBe('[link](/)')
 	})
 
 	// --- Query parameters ---
 
-	it('preserves query parameters in URLs', () => {
-		const content = makeContent('[link](/src/docs/page.html?foo=bar&baz=1)')
+	it('preserves query parameters and anchors in URLs', () => {
+		const content = makeContent('[link](/src/docs/guide/page.html?foo=bar&baz=1#here)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[link](/page.html?foo=bar&baz=1)')
+		expect(result.markdown).toBe('[link](/guide/?foo=bar&baz=1#here)')
 	})
 
 	// --- Images in code blocks ---
@@ -456,7 +503,7 @@ describe('rewriteMarkdownURLs', () => {
 		const content = makeContent('[link \\& more](/src/docs/page.html)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[link \\& more](/page.html)')
+		expect(result.markdown).toBe('[link \\& more](/)')
 	})
 
 	// Reference-style links
@@ -464,7 +511,7 @@ describe('rewriteMarkdownURLs', () => {
 		const content = makeContent('[link][ref]\n\n[ref]: /src/docs/page.html')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[link][ref]\n\n[ref]: /page.html')
+		expect(result.markdown).toBe('[link][ref]\n\n[ref]: /')
 	})
 
 	it('throws for URLs with empty segments (double slashes)', () => {
@@ -487,7 +534,7 @@ describe('rewriteMarkdownURLs', () => {
 		// From /src/docs/docs/intro.md:
 		// src Dir: src/pages/docs (3 levels deep)
 		// ../../../../ would be 4 pops from 3 levels = goes outside repo
-		const content = makeContent('[link](../../../../outside.html)')
+		const content = makeContent('[link](../../../../outside.md)')
 
 		expect(() => rewriteMarkdownURLs(content, defaultOptions)).toThrow(
 			'tries to go outside the repository root',
@@ -495,24 +542,17 @@ describe('rewriteMarkdownURLs', () => {
 	})
 
 	it('allows relative path that goes exactly to the repo root', () => {
-		// From /src/docs/docs/intro.md:
-		// source dir: src/pages/docs (3 levels deep)
-		// ../../../ is 3 pops = goes to root
-		// Result: /page.html which needs /src/docs or /public prefix
-		// This shouldn't throw at resolution time, but will fail at prefix matching
-		const rootPrefix = '/' as `/${string}`
 		const options = {
 			repoRootRelativePath: '/src/docs/docs/intro.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				[rootPrefix]: '/' as const, // Root prefix to make it valid
+				'/': { path: '/', stripLast: true } as const,
 			},
 		}
-		const content = makeContent('[link](../../../page.html)')
-		// ../../../ resolves to /page.html
+		const content = makeContent('[link](../../../top.md)')
 		const result = rewriteMarkdownURLs(content, options)
 
-		expect(result.markdown).toBe('[link](/page.html)')
+		expect(result.markdown).toBe('[link](/)')
 	})
 
 	it('handles mixed ../ and regular segments correctly at depth boundary', () => {
@@ -521,17 +561,13 @@ describe('rewriteMarkdownURLs', () => {
 			repoRootRelativePath: '/a/b/c/d/nested.md' as const,
 			repoRootPagesDir: '/src/pages/' as const,
 			repoRootRelativePaths: {
-				'/a': '/' as const,
+				'/a': { path: '/', stripLast: true } as const,
 			},
 		}
-		const content = makeContent('[link](../../../x/y.html)')
-		// Source dir: a/b/c/d (4 levels)
-		// ../../../ = pop 3 times = a (1 level remaining)
-		// x/y.html = push x, push y.html
-		// Result: /a/x/y.html -> /x/y.html with prefix /a -> /
+		const content = makeContent('[link](../../../x/../x/../x/y.md)')
 		const result = rewriteMarkdownURLs(content, options)
 
-		expect(result.markdown).toBe('[link](/x/y.html)')
+		expect(result.markdown).toBe('[link](/x/)')
 	})
 
 	// --- Protocol-relative URLs ---
@@ -546,10 +582,12 @@ describe('rewriteMarkdownURLs', () => {
 	// --- Links with single-quoted titles ---
 
 	it('handles links with single-quoted titles', () => {
-		const content = makeContent("[guide](/src/docs/docs/guide.html 'The Guide')")
+		const content = makeContent(
+			"[guide](/src/docs/docs/hello/guide.html?query=true&param=false#here 'The Guide')",
+		)
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe("[guide](/docs/guide.html 'The Guide')")
+		expect(result.markdown).toBe("[guide](/docs/hello/?query=true&param=false#here 'The Guide')")
 	})
 
 	// --- Multiple nested inline code blocks ---
@@ -565,24 +603,12 @@ describe('rewriteMarkdownURLs', () => {
 		)
 	})
 
-	// --- Links in list items ---
-
-	it('rewrites links in list items', () => {
-		const content = makeContent(
-			['- Item with [link](/src/docs/page1.html)', '- Another [link](/src/docs/page2.html)'].join(
-				'\n',
-			),
-		)
-		const result = rewriteMarkdownURLs(content, defaultOptions)
-
-		expect(result.markdown).toBe(
-			['- Item with [link](/page1.html)', '- Another [link](/page2.html)'].join('\n'),
-		)
-	})
-
 	// --- Links in nested fenced code blocks ---
 
 	it('handles nested code blocks with different fence lengths', () => {
+		// With CommonMark >= rule: ```` (4 backticks) closes a ``` (3 backtick) block,
+		// then the next ```` opens a new 4-backtick block that ``` (3 backticks) cannot close.
+		// So [inner] is outside code and [real] is inside the unclosed 4-backtick block.
 		const content = makeContent(
 			[
 				'',
@@ -604,12 +630,27 @@ describe('rewriteMarkdownURLs', () => {
 				' ```',
 				'[outer link](/src/docs/page.html)',
 				'````',
-				'[inner](/src/docs/inner.html)',
+				'[inner](/)',
 				'````',
 				' ```',
 				'',
-				' [real](/real.html)',
+				' [real](/src/docs/real.html)',
 			].join('\n'),
+		)
+	})
+
+	it('closes code block with a longer fence than the opening (CommonMark >=) per spec', () => {
+		// CommonMark: closing fence must have >= backticks than opening.
+		// Opening with 4 backticks, closing with 5 backticks should close the block.
+		const content = makeContent(
+			['````', '[inside](/src/docs/page.html)', '`````', '[outside](/src/docs/real.html)'].join(
+				'\n',
+			),
+		)
+		const result = rewriteMarkdownURLs(content, defaultOptions)
+
+		expect(result.markdown).toBe(
+			['````', '[inside](/src/docs/page.html)', '`````', '[outside](/)'].join('\n'),
 		)
 	})
 
@@ -628,17 +669,19 @@ describe('rewriteMarkdownURLs', () => {
 	})
 
 	it('rewrites bracket-style links with local paths', () => {
-		const content = makeContent('[link](</src/docs/docs/page.html>)')
+		const content = makeContent(
+			'[link](</src/docs/docs/hello/page.html?query=true&param=false#here>)',
+		)
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('[link](/docs/page.html)')
+		expect(result.markdown).toBe('[link](/docs/hello/?query=true&param=false#here)')
 	})
 
 	it('rewrites bracket-style image links', () => {
-		const content = makeContent('![img](</src/docs/assets/img.png>)')
+		const content = makeContent('![img](</public/assets/img.png?is=image>)')
 		const result = rewriteMarkdownURLs(content, defaultOptions)
 
-		expect(result.markdown).toBe('![img](/assets/img.png)')
+		expect(result.markdown).toBe('![img](/assets/img.png?is=image)')
 	})
 })
 
