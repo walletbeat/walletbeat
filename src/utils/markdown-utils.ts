@@ -481,8 +481,9 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 /**
  * Convert URLs (links, embedded images) in a Markdown document for
  * presentation on an HTML page at a different URL.
- * Does not touch URLs that contain `https://`; only affects
- * URLs that are absolute (`/foo/bar`) or relative (`./foo/bar`).
+ * Skips URLs with a protocol or special scheme: `https://`, `http://`,
+ * `mailto:`, `tel:`, `data:`, `#` (anchor-only), and `//` (protocol-relative).
+ * Only rewrites URLs that are absolute (`/foo/bar`) or relative (`./foo/bar`).
  *
  * @param content The Markdown document.
  * @param options Options for rewriting.
@@ -501,9 +502,9 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		 * Repo-root-relative path to a subtree where all Markdown files are
 		 * assumed to be unique to their specific subdirectory, and that there
 		 * exists an `index.astro` file next to them.
-		 * When a Markdown document links to a `.md` file that is found to be
+		 * When a Markdown document links to a file that is found to be
 		 * somewhere under `repoRootPagesDir`, the last component of the URL is
-		 * removed (e.g. `/foo/bar/baz.md` becomes `/foo/bar/` with the trailing
+		 * removed (e.g. `/foo/bar/baz.html` becomes `/foo/bar/` with the trailing
 		 * slash), such that the URL will resolve to the `index.astro` page at
 		 * this directory. This transformation happens before the
 		 * `repoRootRelativePaths` transformation.
@@ -512,16 +513,21 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		/**
 		 * Set of known repo-root-relative paths and corresponding URLs they should map to.
-		 * For example, if a link in the Markdown document links to `/foo/bar.html`
-		 * (or, equivalently, if the Markdown document is at `/foo/bar/baz.md` and links
-		 * to `../bar.html`), and `repoRootRelativePaths` contains `{"/foo": "/quux"}`,
-		 * then the URL will be rewritten to `/quux/bar.html`.
+		 * For example, if a link in the Markdown document links to `/foo/bar/file`
+		 * (or, equivalently, if the Markdown document is at `/foo/baz/quux.md` and links
+		 * to `../bar/file`), and `repoRootRelativePaths` contains
+		 * `{"/foo": { path: "/the_foo", stripLast: true }}`,
+		 * then the URL will be rewritten to `/the_foo/` (with trailing slash).
+		 * If `stripLast` is `false`, then it is rewritten to `/the_foo/bar/file`.
 		 *
 		 * This transformation must be applied exactly once per link found in the Markdown
 		 * document (other than links starting with `https://`). If a link does not
 		 * correspond to any of these prefixes, then an error is thrown.
 		 */
-		repoRootRelativePaths: Record<`/${string}`, `/${string}` | `https://${string}`>
+		repoRootRelativePaths: Record<
+			`/${string}`,
+			{ path: `/${string}` | `https://${string}`; stripLast: boolean }
+		>
 
 		/**
 		 * Set of URL prefixes that should never be present in the Markdown file, otherwise
@@ -613,7 +619,10 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 	 * Find the longest matching prefix from repoRootRelativePaths.
 	 * Returns null if no prefix matches.
 	 */
-	function findMatchingPrefix(url: string): { prefix: string; replacement: string } | null {
+	function findMatchingPrefix(url: string): {
+		prefix: string
+		replacement: { path: `/${string}` | `https://${string}`; stripLast: boolean }
+	} | null {
 		// Sort prefixes by length (descending) to get longest match first
 		const sortedPrefixes = Object.entries(repoRootRelativePaths).sort(
 			([a], [b]) => b.length - a.length,
@@ -643,11 +652,12 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 	 * Throws for invalid URLs.
 	 */
 	function rewriteUrl(url: string): string {
-		// Skip external URLs, mailto, tel, anchor-only, and protocol-relative
+		// Skip external URLs, mailto, tel, data, anchor-only, and protocol-relative
 		if (
 			url.startsWith('http://') ||
 			url.startsWith('mailto:') ||
 			url.startsWith('tel:') ||
+			url.startsWith('data:') ||
 			url.startsWith('#') ||
 			url.startsWith('//')
 		) {
@@ -676,13 +686,24 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		// Handle repoRootPagesDir: if URL is under the pages dir, remove the last path component
 		// (assumes an index.astro file exists at that directory)
+		// Preserve query parameters and anchors during the strip
 		if (resolvedUrl.startsWith(repoRootPagesDir)) {
-			// Remove the last path component (e.g., /foo/bar/baz.md -> /foo/bar/)
-			const lastSlashIndex = resolvedUrl.lastIndexOf('/')
+			let pathPart = resolvedUrl
+			let suffixPart = ''
+			const hashIndex = resolvedUrl.indexOf('#')
+
+			if (hashIndex !== -1) {
+				suffixPart = resolvedUrl.slice(hashIndex)
+				pathPart = resolvedUrl.slice(0, hashIndex)
+			}
+
+			const lastSlashIndex = pathPart.lastIndexOf('/')
 
 			if (lastSlashIndex > repoRootPagesDir.length - 1) {
-				resolvedUrl = resolvedUrl.slice(0, lastSlashIndex + 1)
+				pathPart = pathPart.slice(0, lastSlashIndex + 1)
 			}
+
+			resolvedUrl = pathPart + suffixPart
 		}
 
 		const match = findMatchingPrefix(resolvedUrl)
@@ -695,11 +716,57 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		const suffix = resolvedUrl.slice(match.prefix.length)
 
-		// Avoid double slashes: if replacement ends with / and suffix starts with /
-		const suffixToUse =
-			match.replacement.endsWith('/') && suffix.startsWith('/') ? suffix.slice(1) : suffix
+		// Apply stripLast: strip the last path component (preserving query/anchor)
+		// Applied uniformly regardless of file extension.
+		// Paths already handled by repoRootPagesDir are excluded.
+		// Files with known image/video extensions are excluded from stripLast
+		// since stripping their filename would break the reference.
+		const knownAssetExtensions = /\.(png|jpe?g|gif|webp|svg|ico|mp4|webm|ogg|avi|mov)(\?.*)?$/i
+		const hasAssetExtension = knownAssetExtensions.test(suffix)
+		const shouldStrip =
+			match.replacement.stripLast && !resolvedUrl.startsWith(repoRootPagesDir) && !hasAssetExtension
 
-		return match.replacement + suffixToUse
+		let suffixToUse = suffix
+
+		if (shouldStrip) {
+			// Extract path portion and suffix (query + anchor)
+			let pathPart = suffixToUse
+			let extraPart = ''
+			const queryIndex = pathPart.indexOf('?')
+			const hashIndex = pathPart.indexOf('#')
+			let cutIndex = -1
+
+			if (queryIndex !== -1 && (hashIndex === -1 || queryIndex < hashIndex)) {
+				cutIndex = queryIndex
+			} else if (hashIndex !== -1) {
+				cutIndex = hashIndex
+			}
+
+			if (cutIndex !== -1) {
+				extraPart = pathPart.slice(cutIndex)
+				pathPart = pathPart.slice(0, cutIndex)
+			}
+
+			// Strip last path segment
+			if (pathPart !== '/' && !pathPart.endsWith('/')) {
+				const lastSlash = pathPart.lastIndexOf('/')
+
+				if (lastSlash !== -1) {
+					pathPart = pathPart.slice(0, lastSlash + 1)
+				} else {
+					pathPart = ''
+				}
+			}
+
+			suffixToUse = pathPart + extraPart
+		}
+
+		// Avoid double slashes: if replacement ends with / and suffix starts with /
+		if (match.replacement.path.endsWith('/') && suffixToUse.startsWith('/')) {
+			suffixToUse = suffixToUse.slice(1)
+		}
+
+		return match.replacement.path + suffixToUse
 	}
 
 	/**
@@ -740,8 +807,8 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 						text: line + (isLastLine ? '' : '\n'),
 						inCode: currentInCode,
 					})
-				} else if (currentInCode && backtickLength === currentFenceLength) {
-					// Closing the code block (must match exactly the opening fence length)
+				} else if (currentInCode && backtickLength >= currentFenceLength) {
+					// Closing the code block (per CommonMark, must have at least as many backticks as the opening fence)
 					if (currentText) {
 						segments.push({ text: currentText, inCode: currentInCode })
 						currentText = ''
@@ -786,68 +853,149 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 	 * Process a single line/segment for URL rewriting, excluding inline code.
 	 */
 	function processTextForUrls(text: string): string {
-		// First, handle inline code by temporarily replacing it
-		const inlineCodeParts: string[] = []
-		const placeholder = 'MARKDOWN_INLINE_CODE{{n}}MARKDOWN_INLINE_CODE'
-		let processed = text.replace(/`([^`]+)`/g, (_match: string, code: string) => {
-			const idx = inlineCodeParts.length
+		// Scan for links character by character to handle nested structures
+		// like [![alt](img_url)](link_url)
+		interface LinkMatch {
+			start: number
+			end: number
+			replacement: string
+		}
+		const matches: LinkMatch[] = []
+		let i = 0
 
-			// Store WITH backticks to preserve them on restore
-			inlineCodeParts.push('`' + code + '`')
+		while (i < text.length) {
+			// Skip inline code segments
+			if (text[i] === '`') {
+				i++
+				while (i < text.length && text[i] !== '`') {
+					i++
+				}
+				i++ // skip closing backtick
+				continue
+			}
 
-			return placeholder.replace('{{n}}', String(idx))
-		})
+			// Look for [ or ![ to start of a link/image
+			if (text[i] === '[' || (text[i] === '!' && i + 1 < text.length && text[i + 1] === '[')) {
+				// Find matching ] by tracking nesting depth
+				let depth = 0
+				let j = i
+				const linkStart = i
 
-		// Pattern to match markdown links and images:
-		// - Images: ![alt](url) or ![alt](url "title")
-		// - Links: [text](url) or [text](url 'title')
-		// - Bracket-style: [text](<url>) for URLs with special chars like parens
-		// We need to handle escaped brackets within the link text
+				while (j < text.length) {
+					if (text[j] === '[') {
+						depth++
+					} else if (text[j] === ']') {
+						depth--
 
-		// First handle links WITH titles (in quotes)
-		// Pattern: [text](url "title") or [text](url 'title')
-		// Also handle bracket-style: [text](<url> "title")
-		processed = processed.replace(
-			/(!?\[[^\]]*\])\(([^<\s)]+|<([^>]+)>)\s+((?:"[^"]*"|'[^']*')\s?)\)/g,
-			(
-				_match: string,
-				linkPart: string,
-				plainUrl: string,
-				bracketUrl: string,
-				titlePart: string,
-			) => {
-				const url = bracketUrl ?? plainUrl
-				const rewrittenUrl = rewriteUrl(url)
+						if (depth === 0) {
+							break
+						}
+					}
 
-				// Preserve angle brackets if URL wasn't rewritten (e.g. https URLs with parens)
-				if (bracketUrl && rewrittenUrl === url) {
-					return `${linkPart}(<${rewrittenUrl}> ${titlePart})`
+					j++
 				}
 
-				return `${linkPart}(${rewrittenUrl} ${titlePart})`
-			},
-		)
+				// Check if followed by ( for URL
+				if (depth === 0 && j + 1 < text.length && text[j + 1] === '(') {
+					const parenStart = j + 1
 
-		// Then handle links WITHOUT titles
-		// Combined: [text](<url>) and [text](url)
-		// Bracket-style URLs use angle brackets for special chars like parens
-		processed = processed.replace(
-			/(!?\[[^\]]*\])\((?:<([^>]+)>|([^) \t]+))\)/g,
-			(_match: string, linkPart: string, bracketUrl: string, plainUrl: string) => {
-				const url = bracketUrl ?? plainUrl
-				const rewrittenUrl = rewriteUrl(url)
+					// Find the closing ) — handle nested parens (e.g. in bracket-style URLs)
+					let parenDepth = 0
+					let k = parenStart
 
-				// Preserve angle brackets if URL wasn't rewritten (e.g. https URLs with parens)
-				if (bracketUrl && rewrittenUrl === url) {
-					return `${linkPart}(<${rewrittenUrl}>)`
+					while (k < text.length) {
+						if (text[k] === '(') {
+							parenDepth++
+						} else if (text[k] === ')') {
+							parenDepth--
+
+							if (parenDepth === 0) {
+								break
+							}
+						}
+
+						k++
+					}
+
+					if (parenDepth === 0) {
+						const parenContent = text.slice(parenStart + 1, k)
+
+						// Parse paren content: <url> "title" or url "title" or <url> or url
+						let url: string
+						let hasAngleBrackets = false
+						let title: string | undefined
+
+						if (parenContent.startsWith('<')) {
+							const closeAngle = parenContent.indexOf('>')
+
+							if (closeAngle !== -1) {
+								url = parenContent.slice(1, closeAngle)
+								hasAngleBrackets = true
+								const afterUrl = parenContent.slice(closeAngle + 1).trimStart()
+
+								// Check for title
+								const titleMatch = afterUrl.match(/^("[^"]*"|'[^']*')\s*$/)
+
+								if (titleMatch) {
+									title = titleMatch[1]
+								}
+							} else {
+								// No closing >, not a bracket-style URL
+								url = parenContent
+							}
+						} else {
+							// Plain URL, possibly followed by title
+							const titleMatch = parenContent.match(/^(\S+)\s+("[^"]*"|'[^']*')\s*$/)
+
+							if (titleMatch) {
+								url = titleMatch[1]
+								title = titleMatch[2]
+							} else {
+								url = parenContent
+							}
+						}
+
+						const rewrittenUrl = rewriteUrl(url)
+
+						// Build the replacement, processing inner text for nested image links
+						const innerText = text.slice(linkStart, j + 1)
+						const processedInner = processTextForUrls(innerText)
+
+						const urlPart =
+							hasAngleBrackets && rewrittenUrl === url ? `<${rewrittenUrl}>` : rewrittenUrl
+						const titlePart = title !== undefined ? ` ${title}` : ''
+						const rebuiltParen = `(${urlPart}${titlePart})`
+
+						matches.push({
+							start: linkStart,
+							end: k + 1,
+							replacement: processedInner + rebuiltParen,
+						})
+
+						i = k + 1
+						continue
+					}
 				}
+			}
 
-				return `${linkPart}(${rewrittenUrl})`
-			},
-		)
-		// Pattern to match reference link definitions: [ref]: url or [ref]: <url>
+			i++
+		}
+
+		// Rebuild the text with rewritten links
+		let result = ''
+		let pos = 0
+
+		for (const match of matches) {
+			result += text.slice(pos, match.start)
+			result += match.replacement
+			pos = match.end
+		}
+
+		result += text.slice(pos)
+
+		// Handle reference link definitions: [ref]: url or [ref]: <url>
 		// Bracket-style URLs first: [ref]: <url>
-		processed = processed.replace(
+		result = result.replace(
 			/^(\s*\[[^\]]+\]:\s+)(<([^>]+)>)(.*)$/gm,
 			(_match: string, prefix: string, _bracketedUrl: string, url: string, rest: string) => {
 				const rewrittenUrl = rewriteUrl(url)
@@ -862,7 +1010,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		)
 
 		// Plain URLs: [ref]: url
-		processed = processed.replace(
+		result = result.replace(
 			/^(\s*\[[^\]]+\]:\s+)([^\s]+)(.*)$/gm,
 			(_match: string, prefix: string, url: string, rest: string) => {
 				const rewrittenUrl = rewriteUrl(url)
@@ -871,15 +1019,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 			},
 		)
 
-		// Restore inline code
-		const restorePattern = /MARKDOWN_INLINE_CODE(\d+)MARKDOWN_INLINE_CODE/g
-
-		processed = processed.replace(
-			restorePattern,
-			(_match: string, idx: string) => inlineCodeParts[parseInt(idx, 10)],
-		)
-
-		return processed
+		return result
 	}
 
 	// Process the markdown
