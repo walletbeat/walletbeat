@@ -100,7 +100,7 @@
 
 		<div data-row="gap-2">
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
-				<Tooltip>
+				<Tooltip buttonTriggerPlacement="behind">
 					<a
 						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
 						data-link="camouflaged"

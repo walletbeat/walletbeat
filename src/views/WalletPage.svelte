@@ -425,7 +425,7 @@
 						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
 						{#if stage !== null && ladderEvaluation !== null}
-							<Tooltip>
+							<Tooltip buttonTriggerPlacement="behind">
 								<WalletStageBadge
 									{stage}
 									{ladderEvaluation}
@@ -846,6 +846,7 @@
 
 									{#if stage && ladderEvaluation}
 										<Tooltip
+											buttonTriggerPlacement="behind"
 											style="--accent: var(--accent-color)"
 										>
 											<a
