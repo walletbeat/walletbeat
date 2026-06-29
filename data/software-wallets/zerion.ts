@@ -5,9 +5,9 @@ import type { AddressResolutionData } from '@/schema/features/privacy/address-re
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
-	type BugBountyProgramImplementation,
-	BugBountyProgramAvailability,
 	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
@@ -15,12 +15,20 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { BasicBenchmarkTransactions, CallDataDisplay, ComplexBenchmarkTransactions, DataDisplayOptions, MessageSigningDetails, SimulationBenchmarkTransactions, TransactionOutcome } from '@/schema/features/security/transaction-legibility'
 import {
-	RpcEndpointConfiguration,
+	BasicBenchmarkTransactions,
+	CallDataDisplay,
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
+} from '@/schema/features/security/transaction-legibility'
+import {
 	type ChainConfigurability,
+	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Support, TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -147,7 +155,7 @@ export const zerion: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
-								guardianRecovery: notSupported,
+				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
@@ -163,9 +171,9 @@ export const zerion: SoftwareWallet = {
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.IMMUNEFI,
 				rewards: supported({
-					minimum: 1000,
-					maximum: 25000,
 					currency: 'USD',
+					maximum: 25000,
+					minimum: 1000,
 				}),
 				upgradePathAvailable: false,
 			}),
