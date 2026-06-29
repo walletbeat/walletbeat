@@ -145,7 +145,9 @@ export const zerion: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+								guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
