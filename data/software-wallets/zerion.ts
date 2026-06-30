@@ -29,8 +29,14 @@ import {
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -328,11 +334,25 @@ export const zerion: SoftwareWallet = {
 		transparency: {
 			operationFees: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				artifactSigning: supported<ArtifactSigningDetails>({
+					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
+					publication: 'GITHUB_RELEASE',
+					signer: 'DEVELOPER_KEY',
+				}),
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The README documents a `.npmrc` `min-release-age=15` supply-chain cooldown that restricts `npm install` to dependency versions published more than 15 days ago, applied to every install "here and in CI."',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension#readme',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported({
+					ref: 'hhttps://github.com/zeriontech/zerion-wallet-extension/releases',
+				}),
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
