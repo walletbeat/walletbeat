@@ -32,7 +32,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const bitboxWallet: HardwareWallet = {
 	metadata: {
@@ -192,7 +191,7 @@ export const bitboxWallet: HardwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2023-06-08' as CalendarDate,
+				dateStarted: '2023-06-08' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,

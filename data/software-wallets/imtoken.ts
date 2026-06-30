@@ -38,7 +38,6 @@ import {
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { cure53 } from '../entities/cure53'
 import { imToken } from '../entities/imtoken'
@@ -256,7 +255,7 @@ export const imtoken: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2024-04-15' as CalendarDate,
+				dateStarted: '2024-04-15' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,

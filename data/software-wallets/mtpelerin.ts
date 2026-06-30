@@ -14,7 +14,6 @@ import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/tran
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const mtpelerin: SoftwareWallet = {
 	metadata: {
@@ -133,7 +132,7 @@ export const mtpelerin: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-02-08' as CalendarDate,
+				dateStarted: '2021-02-08' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.IMMUNEFI,

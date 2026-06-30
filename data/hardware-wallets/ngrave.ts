@@ -22,7 +22,6 @@ import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/tran
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const ngrave: HardwareWallet = {
 	metadata: {
@@ -115,7 +114,7 @@ export const ngrave: HardwareWallet = {
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2025-01-18' as CalendarDate,
+				dateStarted: '2025-01-18' as const,
 				disclosure: notSupported,
 				legalProtections: supported({
 					type: LegalProtectionType.SAFE_HARBOR,

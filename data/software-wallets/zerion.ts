@@ -34,7 +34,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 export const zerion: SoftwareWallet = {
 	metadata: {
 		id: 'zerion',
@@ -166,7 +165,7 @@ export const zerion: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-12-17' as CalendarDate,
+				dateStarted: '2021-12-17' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.IMMUNEFI,

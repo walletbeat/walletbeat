@@ -11,7 +11,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -120,7 +119,7 @@ export const uniswapWallet: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2024-11-26' as CalendarDate,
+				dateStarted: '2024-11-26' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.CANTINA,

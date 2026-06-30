@@ -76,14 +76,6 @@ export default [
 		},
 	},
 	{
-		files: ['data/**/*.ts', 'src/schema/attributes/security/bug-bounty-program.ts'],
-		rules: {
-			// CalendarDate is a template-literal union; object-property literals widen to string without `as CalendarDate`.
-			// typescript-eslint flags that cast as unnecessary even though tsc and astro check require it.
-			'@typescript-eslint/no-unnecessary-type-assertion': 'off',
-		},
-	},
-	{
 		files: ['**/*.{js,mjs,cjs,ts,svelte}'],
 		languageOptions: {
 			globals: {

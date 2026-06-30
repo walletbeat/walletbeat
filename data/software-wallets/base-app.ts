@@ -33,7 +33,6 @@ import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/tran
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const baseApp: SoftwareWallet = {
 	metadata: {
@@ -302,7 +301,7 @@ export const baseApp: SoftwareWallet = {
 				ref: 'https://hackerone.com/coinbase?type=team',
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2014-02-14' as CalendarDate,
+				dateStarted: '2014-02-14' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.HACKER_ONE,

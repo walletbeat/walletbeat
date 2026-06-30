@@ -24,7 +24,6 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 export const ledgerWalletMetadata: WalletMetadata = {
 	id: 'ledger',
 	displayName: 'Ledger Wallet',
@@ -146,7 +145,7 @@ export const ledgerWallet: HardwareWallet = {
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2020-03-07' as CalendarDate,
+				dateStarted: '2020-03-07' as const,
 				disclosure: supported({
 					numberOfDays: 90,
 				}),

@@ -22,7 +22,6 @@ import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/tran
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 
@@ -169,7 +168,7 @@ export const bitget: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2024-09-17' as CalendarDate,
+				dateStarted: '2024-09-17' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.BUGRAP,

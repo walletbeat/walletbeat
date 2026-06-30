@@ -23,7 +23,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { keylabs } from '../entities/keylabs'
 
@@ -125,7 +124,7 @@ export const cypherockWallet: HardwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2023-03-22' as CalendarDate,
+				dateStarted: '2023-03-22' as const,
 				disclosure: supported({
 					numberOfDays: 30,
 				}),

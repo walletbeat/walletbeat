@@ -23,7 +23,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { slowMist } from '../entities/slowmist'
 
@@ -121,7 +120,7 @@ export const onekeyWallet: HardwareWallet = {
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2023-04-20' as CalendarDate,
+				dateStarted: '2023-04-20' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.BUGRAP,

@@ -24,7 +24,6 @@ import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const trezorWallet: HardwareWallet = {
 	metadata: {
@@ -127,7 +126,7 @@ export const trezorWallet: HardwareWallet = {
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2018-08-25' as CalendarDate,
+				dateStarted: '2018-08-25' as const,
 				disclosure: notSupported,
 				legalProtections: supported({
 					type: LegalProtectionType.SAFE_HARBOR,

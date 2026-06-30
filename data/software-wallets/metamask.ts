@@ -60,7 +60,6 @@ import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { mdParagraph, paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
@@ -372,7 +371,7 @@ export const metamask: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2022-06-01' as CalendarDate,
+				dateStarted: '2022-06-01' as const,
 				disclosure: notSupported,
 				legalProtections: supported({
 					type: LegalProtectionType.SAFE_HARBOR,

@@ -70,7 +70,6 @@ import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
@@ -688,7 +687,7 @@ export const ambire: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.INACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-12-17' as CalendarDate,
+				dateStarted: '2021-12-17' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,

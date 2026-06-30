@@ -19,7 +19,6 @@ import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/tran
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 
@@ -165,7 +164,7 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2023-03-01' as CalendarDate,
+				dateStarted: '2023-03-01' as const,
 				disclosure: notSupported,
 				legalProtections: supported({
 					type: LegalProtectionType.SAFE_HARBOR,
