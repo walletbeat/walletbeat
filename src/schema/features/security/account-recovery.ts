@@ -474,6 +474,29 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 }
 
 /**
+ * Drills that a wallet runs to keep users prepared for account recovery.
+ */
+export interface AccountRecoveryDrills {
+	/**
+	 * Does the wallet run periodic private key check-ups for users to ensure
+	 * that they still have the private key for their account?
+	 */
+	periodicPrivateKeyQuiz: boolean
+
+	/**
+	 * Does the wallet run a periodic seed phrase quiz for users to ensure that
+	 * they still have the seed phrase for their account?
+	 */
+	periodicSeedPhraseQuiz: boolean
+
+	/**
+	 * Does the wallet ask users whether they still have access to their
+	 * guardian accounts to ensure that they can recover their account?
+	 */
+	periodicGuardianAccountCheck: boolean
+}
+
+/**
  * For wallets supporting social recovery (guardian-based), what policy does
  * it use for the guardians?
  */
@@ -514,4 +537,11 @@ export interface AccountRecovery {
 	 * documentation and source code as described above.
 	 */
 	guardianRecovery: Support<WithRef<GuardianRecovery>>
+
+	/**
+	 * Whether the wallet has "drills" to ensure that users will be able to
+	 * successfully recover their accounts.
+	 * Set to `null` if this has not been rated yet.
+	 */
+	drills: Support<AccountRecoveryDrills> | null
 }
