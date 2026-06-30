@@ -28,7 +28,7 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { comprehensiveWalletServiceFeesUnresearched } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -108,11 +108,7 @@ export const imtoken: SoftwareWallet = {
 							url: 'https://support.token.im/hc/en-us/articles/4404355206553-How-to-use-cBridge-with-imToken',
 						},
 					],
-					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
-					},
+					feesLargerThan1bps: comprehensiveWalletServiceFeesUnresearched,
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
@@ -361,8 +357,8 @@ export const imtoken: SoftwareWallet = {
 			operationFees: null,
 			/* TODO: Fill in; partial data: {
 				builtInErc20Swap: null,
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
+				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
+				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: null,
 			},*/
 			releaseTransparency: {

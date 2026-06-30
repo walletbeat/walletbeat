@@ -3537,6 +3537,18 @@ What level of information is shown about fees.
 
 ---
 
+### Enum: `WalletServiceFeeDenomination`
+
+How wallet service fees (platform fees on built-in swap or bridge flows) are denominated when shown in a comprehensive fee breakdown.
+
+Only built-in swap and cross-chain bridging flows are evaluated on this field. Other flows use `NOT_APPLICABLE` when no wallet service fee exists.
+
+- `PERCENTAGE_OR_BPS` = `'PERCENTAGE_OR_BPS'`: Wallet service fee line item(s) use % or bps.
+- `ABSOLUTE_OR_OTHER` = `'ABSOLUTE_OR_OTHER'`: Wallet service fee shown in flat $, fixed token amount, etc.
+- `NOT_APPLICABLE` = `'NOT_APPLICABLE'`: No wallet service fee exists on this flow. The user may still pay network gas or external protocol fees, but the wallet itself does not charge a platform fee whose units would be rated.
+
+---
+
 ### Interface: `FeeDisplay`
 
 How much fee information is displayed by default and after an action.
@@ -3544,6 +3556,14 @@ How much fee information is displayed by default and after an action.
 - `byDefault` (`FeeDisplayLevel`): Level of fee information shown with default wallet settings and zero fee-specific interactions on the transaction approval screen. To test: initiate the transaction on a freshly installed wallet with no settings changed. Record the fee display level visible on the approval screen before clicking anything fee-related.
 - `afterSingleAction` (`FeeDisplayLevel`): Level of fee information shown after at most one additional click/tap on the transaction approval screen (e.g. tapping a fee row, an info icon, or a "show details" chevron), with no settings changed. To test: from the same default approval screen, make exactly one fee-related interaction and record the highest level of detail then shown. If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
 - `fullySponsored` (`boolean`): Whether the wallet fully sponsors these fees on behalf of the user, so the user pays nothing. To test: complete the transaction and verify that no gas or protocol fee is deducted from the user's balance. Check the wallet's documentation or source code to confirm sponsorship is intentional and not a test-net artifact.
+- `walletServiceFeeDenomination` (`WalletServiceFeeDenomination | null`): How wallet service fees are denominated when a comprehensive breakdown is available. Only evaluated on built-in swap (`builtInErc20Swap`) and cross-chain bridging (`feesLargerThan1bps`) flows where the wallet charges an order-size-sensitive service fee.
+  - `PERCENTAGE_OR_BPS` — wallet service fee line item(s) use % or bps.
+  - `ABSOLUTE_OR_OTHER` — wallet service fee shown in flat $, fixed token
+    amount, etc.
+  - `NOT_APPLICABLE` — no wallet service fee on this flow. Use for L1
+    transfers, external app transactions, relayer fees, and other flows
+    where only network or external protocol fees apply.
+  - `null` — not yet researched (required on in-scope swap/bridge flows).
 
 ---
 

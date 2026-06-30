@@ -25,7 +25,7 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { comprehensiveWalletServiceFeesUnresearched } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -108,11 +108,7 @@ export const daimo: SoftwareWallet = {
 			bridging: {
 				builtInBridging: supported({
 					ref: refTodo,
-					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
-					},
+					feesLargerThan1bps: comprehensiveWalletServiceFeesUnresearched,
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,

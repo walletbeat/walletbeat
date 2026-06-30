@@ -22,7 +22,11 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // for level
+import {
+	comprehensiveWalletServiceFeesUnresearched,
+	FeeDisplayLevel,
+	WalletServiceFeeDenomination,
+} from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -304,28 +308,29 @@ export const safe: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
+					...comprehensiveWalletServiceFeesUnresearched,
 					ref: refTodo,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: false,
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
+					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
+					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
+					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
 				}),
 			},
 			releaseTransparency: {

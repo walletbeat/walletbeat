@@ -23,7 +23,8 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
+	comprehensiveGasOrExternalFees,
+	comprehensiveWalletServiceFeesUnresearched,
 	FeeDisplayLevel,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -95,6 +96,7 @@ export const zeus: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.AGGREGATED,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
+						walletServiceFeeDenomination: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -336,6 +338,7 @@ export const zeus: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
+					...comprehensiveWalletServiceFeesUnresearched,
 					ref: [
 						{
 							explanation:
@@ -343,11 +346,9 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
 				}),
 				erc20L1Transfer: supported({
+					...comprehensiveGasOrExternalFees,
 					ref: [
 						{
 							explanation:
@@ -355,11 +356,9 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
 				}),
 				ethL1Transfer: supported({
+					...comprehensiveGasOrExternalFees,
 					ref: [
 						{
 							explanation:
@@ -367,11 +366,9 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
 				}),
 				uniswapUSDCToEtherSwap: supported({
+					...comprehensiveGasOrExternalFees,
 					ref: [
 						{
 							explanation:
@@ -379,9 +376,6 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
 				}),
 			},
 			releaseTransparency: {

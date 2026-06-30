@@ -52,8 +52,9 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
+	comprehensiveGasOrExternalFees,
 	FeeDisplayLevel,
+	WalletServiceFeeDenomination,
 } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -148,6 +149,7 @@ export const rabby: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.NONE,
 						fullySponsored: false,
+						walletServiceFeeDenomination: WalletServiceFeeDenomination.PERCENTAGE_OR_BPS,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -851,20 +853,23 @@ export const rabby: SoftwareWallet = {
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDenomination: WalletServiceFeeDenomination.PERCENTAGE_OR_BPS,
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
 				}),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
 			},
 			releaseTransparency: {
 				artifactSigning: null,

@@ -27,7 +27,7 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
+import { comprehensiveWalletServiceFeesUnresearched } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -126,7 +126,7 @@ export const baseApp: SoftwareWallet = {
 			bridging: {
 				builtInBridging: supported({
 					ref: refTodo,
-					feesLargerThan1bps: comprehensiveFeesShownByDefault,
+					feesLargerThan1bps: comprehensiveWalletServiceFeesUnresearched,
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,

@@ -82,7 +82,8 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
+	comprehensiveGasOrExternalFees,
+	comprehensiveWalletServiceFeesPercentage,
 	fullySponsoredFees,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -250,7 +251,7 @@ export const completedTemplate: SoftwareWallet = {
 			bridging: {
 				builtInBridging: supported({
 					ref: refTodo,
-					feesLargerThan1bps: comprehensiveFeesShownByDefault,
+					feesLargerThan1bps: comprehensiveWalletServiceFeesPercentage,
 					risksExplained: 'VISIBLE_BY_DEFAULT',
 				}),
 				suggestedBridging: supported({
@@ -715,10 +716,10 @@ export const completedTemplate: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveFeesShownByDefault),
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				builtInErc20Swap: supported(comprehensiveWalletServiceFeesPercentage),
+				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
+				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
+				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
 			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({

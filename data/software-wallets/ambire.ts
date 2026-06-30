@@ -62,7 +62,10 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
+import {
+	comprehensiveGasOrExternalFees,
+	comprehensiveWalletServiceFeesPercentage,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
@@ -296,7 +299,7 @@ export const ambire: SoftwareWallet = {
 						explanation: 'All fees are displayed when agreeing to the bridge',
 						url: 'https://www.ambire.com/',
 					},
-					feesLargerThan1bps: comprehensiveFeesShownByDefault,
+					feesLargerThan1bps: comprehensiveWalletServiceFeesPercentage,
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
@@ -890,10 +893,10 @@ export const ambire: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveFeesShownByDefault),
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				builtInErc20Swap: supported(comprehensiveWalletServiceFeesPercentage),
+				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
+				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
+				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
 			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({
