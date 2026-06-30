@@ -30,6 +30,7 @@ import {
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -119,7 +120,13 @@ export const zerion: SoftwareWallet = {
 			},
 			walletCall: notSupported,
 		},
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+				license: FOSSLicense.GPL_3_0,
+			},
+		},
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,
