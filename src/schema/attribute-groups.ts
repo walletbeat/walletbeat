@@ -1,4 +1,4 @@
-import type { WBIconFontID } from '@/styles/wbicons'
+import type { WBIconID } from '@/styles/wbicons'
 import { type Sentence } from '@/types/content'
 import {
 	isNonEmptyArray,
@@ -35,7 +35,7 @@ export interface AttributeGroup<_AttributeGroupId extends string> {
 	id: _AttributeGroupId
 
 	/** A friendly icon for the group. */
-	icon: WBIconFontID
+	icon: WBIconID
 
 	/** A human-readable name for the group. */
 	displayName: string
