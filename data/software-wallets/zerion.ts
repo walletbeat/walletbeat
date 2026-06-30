@@ -11,15 +11,18 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
-	KeyGenerationLocation,
-	MultiPartyKeyReconstruction,
-} from '@/schema/features/security/keys-handling'
-import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { KeyStorageMechanism, SecureRngSource } from '@/schema/features/security/security-best-practices'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
 import {
 	BasicBenchmarkTransactions,
 	CallDataDisplay,
@@ -43,6 +46,7 @@ import type { SoftwareWallet } from '@/schema/wallet'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 
 export const zerion: SoftwareWallet = {
