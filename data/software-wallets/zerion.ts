@@ -11,10 +11,15 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { KeyStorageMechanism, SecureRngSource } from '@/schema/features/security/security-best-practices'
 import {
 	BasicBenchmarkTransactions,
 	CallDataDisplay,
@@ -35,8 +40,11 @@ import type { ArtifactSigningDetails } from '@/schema/features/transparency/rele
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
+
 export const zerion: SoftwareWallet = {
 	metadata: {
 		id: 'zerion',
@@ -220,14 +228,27 @@ export const zerion: SoftwareWallet = {
 					}),
 				},
 			},
-			keysHandling: null,
+			keysHandling: {
+				ref: refTodo,
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
 			scamAlerts: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: parseBrowserExtensionManifest(zerionRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'NOT_A_MOBILE_APP',
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				erc7730: supported({
