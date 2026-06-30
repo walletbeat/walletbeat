@@ -29,12 +29,7 @@ import {
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import {
-	featureSupported,
-	notSupported,
-	notSupportedWithRef,
-	supported,
-} from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
