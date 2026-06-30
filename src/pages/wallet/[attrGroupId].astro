@@ -2,7 +2,9 @@
 // Types/constants
 import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { representativeWalletForType, allRatedWallets } from '@/data/wallets'
+import { representativeWalletForType } from '@/data/wallets'
+import { softwareLadders } from '@/schema/ladders'
+import { softwareWalletAttributeTree, ratedSoftwareWallets } from '@/data/software-wallets'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
@@ -21,6 +23,7 @@ const { attrGroupId } = Astro.params
 // Data
 const attrGroup = getAttributeGroupById(
 	attrGroupId,
+	softwareWalletAttributeTree,
 	representativeWalletForType(WalletType.SOFTWARE).overall,
 )
 
@@ -47,8 +50,9 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:visible
 			title='Software Wallets'
-			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.SOFTWARE])}
-			attributeGroups={[attrGroup]}
+			ladders={softwareLadders}
+			wallets={Object.values(ratedSoftwareWallets)}
+			attributeTree={softwareWalletAttributeTree}
 		/>
 	</main>
 </Layout>

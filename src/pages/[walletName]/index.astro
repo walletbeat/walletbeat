@@ -1,20 +1,30 @@
 ---
 // Types/constants
-import { allRatedWalletsBySlug, allWallets } from '@/data/wallets'
+import { allRatedWallets, assertValidWalletName, attributeTreeForWallet } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { softwareLadders } from '@/schema/ladders'
+import type { Ladders } from '@/schema/ladders'
+
+// Functions
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Routes
 export const prerender = true
 
-export const getStaticPaths = () =>
-	Object.values(allWallets).map(wallet => ({
-		params: { walletName: wallet.metadata.id },
-	}))
+export const getStaticPaths = () => [
+	...nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({
+		params: { walletName },
+	})),
+]
 
 const { walletName } = Astro.params
 
+assertValidWalletName(walletName)
+
 // Data
-const wallet = allRatedWalletsBySlug[walletName]
+const wallet = allRatedWallets[walletName]
+const attributeTree = attributeTreeForWallet(wallet)
+const ladders: Ladders<string> = softwareLadders
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -44,6 +54,6 @@ import WalletPage from '@/views/WalletPage.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletPage {walletName} client:idle />
+		<WalletPage {wallet} {ladders} {attributeTree} client:idle />
 	</main>
 </Layout>

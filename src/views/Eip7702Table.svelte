@@ -2,7 +2,6 @@
 	// Types/constants
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
-	import { ratedSoftwareWallets } from '@/data/software-wallets'
 	import type { EVMAddress, SmartWalletContract } from '@/schema/contracts'
 	import { AccountType } from '@/schema/features/account-support'
 	import type { Variant } from '@/schema/variants'
@@ -29,9 +28,11 @@
 
 	// Props
 	let {
-		title
+		title,
+		softwareWallets,
 	}: {
 		title?: string
+		softwareWallets: RatedWallet<SoftwareAttributeGroupId>[]
 	} = $props()
 
 
@@ -43,7 +44,7 @@
 	import { getVariantResolvedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
 	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
 
-	const getWalletTypeFor7702 = (wallet: RatedWallet) => {
+	const getWalletTypeFor7702 = (wallet: typeof softwareWallets[number]) => {
 		const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
 		const hasErc4337 =
 			accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337)
@@ -62,7 +63,7 @@
 					: WalletTypeFor7702.OTHER
 	}
 
-	const getWalletContract = (wallet: RatedWallet): SmartWalletContract | 'UNKNOWN' | undefined => {
+	const getWalletContract = (wallet: typeof softwareWallets[number]): SmartWalletContract | 'UNKNOWN' | undefined => {
 		for (const variant of setItems<Variant>(getVariants(wallet.variants))) {
 			const variantWallet = getVariantResolvedWallet(wallet, variant)
 
@@ -79,21 +80,21 @@
 
 
 	// State
-	let activeFilters: Filters<RatedWallet>['$$prop_def']['activeFilters'] = $state(
+	let activeFilters: Filters<typeof softwareWallets[number]>['$$prop_def']['activeFilters'] = $state(
 		new Set()
 	)
 
-	let filteredWallets: RatedWallet[] = $state(
+	let filteredWallets: typeof softwareWallets[number][] = $state(
 		[]
 	)
 
 
 	// Actions
-	let toggleFilterById: Filters<RatedWallet>['$$prop_def']['toggleFilterById'] = $state(
+	let toggleFilterById: Filters<typeof softwareWallets[number]>['$$prop_def']['toggleFilterById'] = $state(
 		undefined
 	)
 
-	let toggleFilter: Filters<RatedWallet>['$$prop_def']['toggleFilter'] = $state(
+	let toggleFilter: Filters<typeof softwareWallets[number]>['$$prop_def']['toggleFilter'] = $state(
 		undefined
 	)
 
@@ -106,6 +107,7 @@
 	import Table, { SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import EipDetails from '@/views/EipDetails.svelte'
+	import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 </script>
 
 
@@ -123,7 +125,7 @@
 		{/if}
 
 		<Filters
-			items={Object.values(ratedSoftwareWallets)}
+			items={softwareWallets}
 			filterGroups={[
 				{
 					id: 'accountType',
@@ -204,9 +206,9 @@
 							src={`/images/wallets/${wallet.metadata.id}.svg`}
 							alt={wallet.metadata.displayName}
 							class="wallet-icon"
-							onerror={e => {
-								if (e.currentTarget)
-									e.currentTarget.src = '/images/wallets/default.svg'
+							onerror={event => {
+								if (event.currentTarget instanceof HTMLImageElement)
+									event.currentTarget.src = '/images/wallets/default.svg'
 							}}
 						/>
 
@@ -231,8 +233,8 @@
 							<button
 								data-tag="eip"
 								aria-label="Filter by EIP-7702"
-								onclick={e => {
-									e.stopPropagation()
+								onclick={event => {
+									event.stopPropagation()
 									toggleFilterById!('accountType-eip7702')
 								}}
 							>
@@ -251,8 +253,8 @@
 								<button
 									data-tag="eip"
 									aria-label="Filter by ERC-4337"
-									onclick={e => {
-										e.stopPropagation()
+									onclick={event => {
+										event.stopPropagation()
 										toggleFilterById!('accountType-erc4337')
 									}}
 								>
@@ -268,8 +270,8 @@
 								<button
 									data-tag="eoa"
 									aria-label="Filter by EOA"
-									onclick={e => {
-										e.stopPropagation()
+									onclick={event => {
+										event.stopPropagation()
 										toggleFilterById!('accountType-eoa')
 									}}
 								>

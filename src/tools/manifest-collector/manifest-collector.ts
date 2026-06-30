@@ -128,7 +128,7 @@ let targets: WalletEntry[] = []
 
 if (allMode) {
 	targets = Object.keys(allWallets)
-		.map(id => getWalletEntry(id as WalletName))
+		.map(id => getWalletEntry(id))
 		.filter(hasAnyManifest)
 
 	if (targets.length === 0) {

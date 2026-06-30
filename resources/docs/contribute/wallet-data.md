@@ -160,7 +160,7 @@ At the end of this process, you should have something that looks like this at `/
 // [... imports, including:]
 import { chainMonkey } from '@/data/contributors/chain-monkey'
 
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	metadata: {
 		id: 'myLittleWallet',
 		displayName: 'My Little Wallet',
@@ -287,7 +287,7 @@ export interface WalletBaseFeatures {
 - Either using a value directly directly:
 
 ```typescript
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		multiAddress: /* Some value here */,
@@ -298,7 +298,7 @@ export const myLittleWallet: SoftwareWallet = {
 - Either using one value per wallet variant, i.e. different values for each variant the wallet has. In this case, this would be a different value for the browser version and the mobile version.
 
 ```typescript
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		multiAddress: {
@@ -319,7 +319,7 @@ You would then use:
 ```typescript
 import { featureSupported, notSupported } from '@/schema/features/support' // Needed imports
 
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		multiAddress: {
@@ -335,7 +335,7 @@ The `featureSupported` and `notSupported` constants describe whether a feature i
 If you are confused about how to populate an attribute, you can also always look at another wallet that has the field defined in order to see how that wallet has it. In this case, here is the same field for Ambire (`/data/software-wallets/ambire.ts`):
 
 ```typescript
-export const ambire: SoftwareWallet = {
+export const ambire: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		// [...]
@@ -459,7 +459,7 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { refTodo } from '@/schema/reference'
 
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		chainConfigurability: {
@@ -485,7 +485,7 @@ Here's an example of how you could populate the `ref` field:
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		chainConfigurability: {
@@ -531,7 +531,7 @@ Some feature fields use `MustRef<T>` instead of `WithRef<T>`. For such features,
 _In some rare cases, TypeScript's type inference for the `supported(...)` object does not infer the correct type. If this happens, it may be necessary to explicitly specify its type parameter, like this:_
 
 ```typescript
-export const myLittleWallet: SoftwareWallet = {
+export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 	// [...]
 	features: {
 		chainConfigurability: {
