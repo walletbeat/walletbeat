@@ -20,7 +20,10 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+} from '@/schema/features/security/scam-alerts'
 import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
@@ -371,7 +374,32 @@ export const baseApp: SoftwareWallet = {
 					previousContractInteractionWarning: false,
 					recentContractWarning: true,
 				}),
-				scamUrlWarning: null,
+				// Base App screens each in-app dapp-browser navigation
+				// against a Coinbase-maintained blocklist (a mix of public and private
+				// databases) and warns the user before they proceed to a site flagged as
+				// dangerous. The existence of the warning is documented by Coinbase.
+				//
+				// LEAK FIELDS VERIFIED FIRST-HAND (2026-06-29) via an Android emulator
+				// + mitmproxy rig: every in-app-browser navigation triggers a
+				// `useBlocklistQueryQuery` GraphQL request to graphql-base.coinbase.com
+				// whose variables carry the FULL visited URL (path + query string), e.g.
+				// {"domain":"https://example.com/path?leaktest=SECRET12345"}, plus a
+				// second lookup of the bare origin. The entire URL — not just the domain,
+				// and not a privacy-preserving hash — is sent to Coinbase (=> FULL_URL,
+				// leaksIp true). No 0x address is in the request; the check runs before
+				// any wallet connection (=> leaksUserAddress false).
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							explanation:
+								'Verified first-hand on 2026-06-29: Base App v30.1.0, driven in an Android emulator with mitmproxy in the system trust store, issues a `useBlocklistQueryQuery` GraphQL persisted query to graphql-base.coinbase.com on every in-app-browser navigation. The request `variables` carry the FULL visited URL including path and query string (e.g. `{"domain":"https://example.com/path?leaktest=..."}`), plus a second lookup of the bare origin. No wallet address is included. Coinbase additionally documents that Base App warns users before they proceed to a flagged site.',
+							url: 'https://help.coinbase.com/en/wallet/security/avoiding-crypto-scams',
+						},
+					],
+					leaksIp: true,
+					leaksUserAddress: false,
+					leaksVisitedUrl: 'FULL_URL',
+				}),
 				sendTransactionWarning: notSupported,
 			},
 			// Base App is closed-source; no public URL hosts the AndroidManifest.xml
