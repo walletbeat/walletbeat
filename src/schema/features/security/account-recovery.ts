@@ -493,7 +493,7 @@ export interface AccountRecoveryDrills {
 	 * Does the wallet ask users whether they still have access to their
 	 * guardian accounts to ensure that they can recover their account?
 	 */
-	periodicGuardianAccountCheck: boolean
+	periodicGuardianAccountCheck: boolean | 'NO_GUARDIAN_RECOVERY'
 }
 
 /**
