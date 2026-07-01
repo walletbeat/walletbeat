@@ -136,31 +136,6 @@ describe('orderflow data-collection helpers', () => {
 		)
 	})
 
-	it('detects mempool collection without endpoint', () => {
-		const row: WithRef<DataCollectionByEntity> = {
-			ref: refNotNecessary,
-			byEntity: exampleOrderflowAuctioneer,
-			dataCollection: {
-				[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
-				endpoint: RegularEndpoint,
-			},
-			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
-		}
-
-		// Incomplete research: endpoint removed before row is fully documented.
-		Reflect.deleteProperty(row.dataCollection, 'endpoint')
-
-		const dataCollection = researchedDataCollection({
-			[UserFlow.MAKE_TRANSACTION]: {
-				collected: [row],
-			},
-		})
-
-		const facts = deriveOrderflowFacts(dataCollection)
-
-		expect(facts).toMatchObject({ status: 'complete', hasMempoolWithoutEndpoint: true })
-	})
-
 	it('concatenates pre-inclusion rows and filters auctioneers', () => {
 		const auctionRow: WithRef<DataCollectionByEntity> = {
 			ref: refNotNecessary,
@@ -191,7 +166,7 @@ describe('orderflow data-collection helpers', () => {
 
 		const facts = deriveOrderflowFacts(dataCollection)
 
-		expect(facts).toMatchObject({ status: 'complete', hasMempoolWithoutEndpoint: false })
+		expect(facts).toMatchObject({ status: 'complete' })
 
 		if (facts.status !== 'complete') {
 			return

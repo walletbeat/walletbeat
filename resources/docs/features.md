@@ -3869,7 +3869,6 @@ type OrderflowFacts =
 	| { status: 'incomplete' }
 	| {
 			status: 'complete'
-			hasMempoolWithoutEndpoint: boolean
 			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
 			auctioneers: WithRef<DataCollectionByEntity>[]
 	  }

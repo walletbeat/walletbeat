@@ -698,10 +698,6 @@ export const orderflowTransparency: Attribute = {
 			return unrated(ctx)
 		}
 
-		if (facts.hasMempoolWithoutEndpoint) {
-			return unrated(ctx)
-		}
-
 		if (facts.auctioneers.length > 0) {
 			// Auctioning wallets need orderflow practices and a fee-display baseline for prominence comparison.
 			const { orderflowPractices, operationFees } = ctx.features.transparency

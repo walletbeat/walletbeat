@@ -7,7 +7,6 @@ import {
 	type DataCollectionByEntity,
 	DataCollectionPurpose,
 	endpointIsVerifiablyNonExtractive,
-	isWithEndpoint,
 	qualifiedDataCollection,
 	UserFlow,
 	WalletInfo,
@@ -203,7 +202,6 @@ export type OrderflowFacts =
 	| { status: 'incomplete' }
 	| {
 			status: 'complete'
-			hasMempoolWithoutEndpoint: boolean
 			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
 			auctioneers: WithRef<DataCollectionByEntity>[]
 	  }
@@ -215,7 +213,6 @@ export function deriveOrderflowFacts(dataCollection: DataCollection | null): Ord
 	}
 
 	const preInclusionRecipients: WithRef<DataCollectionByEntity>[] = []
-	let hasMempoolWithoutEndpoint = false
 
 	for (const flow of orderflowTransactionFlows) {
 		const flowData = dataCollection[flow]
@@ -233,11 +230,6 @@ export function deriveOrderflowFacts(dataCollection: DataCollection | null): Ord
 				continue
 			}
 
-			if (!isWithEndpoint(collectionByEntity.dataCollection)) {
-				hasMempoolWithoutEndpoint = true
-				continue
-			}
-
 			preInclusionRecipients.push(collectionByEntity)
 		}
 	}
@@ -248,7 +240,6 @@ export function deriveOrderflowFacts(dataCollection: DataCollection | null): Ord
 
 	return {
 		status: 'complete',
-		hasMempoolWithoutEndpoint,
 		preInclusionRecipients,
 		auctioneers,
 	}
