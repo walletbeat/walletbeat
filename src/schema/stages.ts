@@ -1,3 +1,4 @@
+import { attributeTree } from '@/schema/attribute-tree'
 import { type Content, type Paragraph, type Sentence, sentence } from '@/types/content'
 import { getErrorMessage } from '@/types/errors'
 import {
@@ -27,7 +28,10 @@ import { type RatedWallet, type ResolvedWallet } from './wallet'
  * account), and stage rating information (because the purpose of this type
  * is to populate that).
  */
-export type StageEvaluatableWallet = Omit<RatedWallet, 'metadata' | 'ladders'>
+export type StageEvaluatableWallet<_AttributeGroupId extends string> = Omit<
+	RatedWallet<_AttributeGroupId>,
+	'metadata' | 'ladders'
+>
 
 /**
  * Whether a given wallet passes or fails a stage-specific criterion.
@@ -105,7 +109,7 @@ export type StageCriterionEvaluation = {
 /**
  * A single criterion for a wallet stage.
  */
-export interface WalletStageCriterion {
+export interface WalletStageCriterion<_AttributeGroupId extends string> {
 	/** An ID for this criterion. */
 	id: string
 
@@ -119,21 +123,23 @@ export interface WalletStageCriterion {
 	rationale: Paragraph
 
 	/** Evaluate a wallet for this given criterion. */
-	evaluate: (wallet: StageEvaluatableWallet) => StageCriterionEvaluation
+	evaluate: (wallet: StageEvaluatableWallet<_AttributeGroupId>) => StageCriterionEvaluation
 }
 
+type StageCriterionEvaluateFn = (wallet: StageEvaluatableWallet<string>) => StageCriterionEvaluation
+
 /** Map of evaluate functions to their associated attribute IDs. */
-const evaluateFunctionAttributeIds = new WeakMap<WalletStageCriterion['evaluate'], string>()
+const evaluateFunctionAttributeIds = new WeakMap<StageCriterionEvaluateFn, string>()
 
 /** Get the attribute ID associated with an evaluate function, if any. */
-export const getEvaluateFunctionAttributeId = (
-	evaluate: WalletStageCriterion['evaluate'],
+export const getEvaluateFunctionAttributeId = <_AttributeGroupId extends string>(
+	evaluate: WalletStageCriterion<_AttributeGroupId>['evaluate'],
 ): string | null => evaluateFunctionAttributeIds.get(evaluate) ?? null
 
 /**
  * A logical criteria group for a wallet stage.
  */
-export interface WalletStageGroup {
+export interface WalletStageGroup<_AttributeGroupId extends string> {
 	/** An ID for this criteria group. */
 	id: string
 
@@ -145,18 +151,21 @@ export interface WalletStageGroup {
 	 * Wallets must `PASS` all of these criteria in order to pass the
 	 * criteria group.
 	 */
-	criteria: NonEmptyArray<WalletStageCriterion>
+	criteria: NonEmptyArray<WalletStageCriterion<_AttributeGroupId>>
 }
 
 /**
  * A wallet stage definition.
  */
-export interface WalletStage {
+export interface WalletStage<_AttributeGroupId extends string> {
 	/** An ID for this stage. */
 	id: `stage:${string}`
 
 	/** A human-readable label for this stage (e.g., "Stage 0", "Stage 1"). */
 	label: string
+
+	/** The name of the stage. Short adjective or noun that describes the general principle of the stage. */
+	name: string
 
 	/** A description of what this stage represents. */
 	description: Content
@@ -167,7 +176,7 @@ export interface WalletStage {
 	 * as well as any criteria groups for past stages in the WalletLadder,
 	 * in order to pass this stage.
 	 */
-	criteriaGroups: NonEmptyArray<WalletStageGroup>
+	criteriaGroups: NonEmptyArray<WalletStageGroup<_AttributeGroupId>>
 }
 
 /**
@@ -176,7 +185,7 @@ export interface WalletStage {
  * Because a wallet may be of multiple types, a single wallet may be evaluated
  * on multiple ladders.
  */
-export interface WalletLadder {
+export interface WalletLadder<_AttributeGroupId extends string> {
 	/**
 	 * Stages, ordered from the lowest bar to the highest bar to meet.
 	 * A wallet passes the n-th stage if and only if it passes all previous
@@ -187,22 +196,22 @@ export interface WalletLadder {
 	 * rated on the entire ladder, even if prior stages resulted in a
 	 * non-`UNRATED` evaluation.
 	 */
-	stages: NonEmptyArray<WalletStage>
+	stages: NonEmptyArray<WalletStage<_AttributeGroupId>>
 
 	/**
 	 * Returns whether this ladder should apply to the given wallet.
 	 *
 	 * A single wallet may be applicable on multiple (or zero) ladders.
 	 */
-	applicableTo: (wallet: StageEvaluatableWallet) => boolean
+	applicableTo: (wallet: StageEvaluatableWallet<_AttributeGroupId>) => boolean
 }
 
 /**
  * The result of evaluating a wallet on a ladder.
  */
-export type WalletLadderEvaluation = {
+export type WalletLadderEvaluation<_AttributeGroupId extends string> = {
 	/** The ladder the wallet was rated on. */
-	ladder: WalletLadder
+	ladder: WalletLadder<_AttributeGroupId>
 
 	/**
 	 * The highest stage that the wallet reached on this ladder.
@@ -213,12 +222,12 @@ export type WalletLadderEvaluation = {
 	 * A value of 'QUALIFIED_FOR_NO_STAGES' means the wallet did not
 	 * qualify for even the zeroth stage of the ladder.
 	 */
-	stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES'
+	stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES'
 }
 
-export function stageCriterionEvaluationPerVariant(
+export function stageCriterionEvaluationPerVariant<_AttributeGroupId extends string>(
 	variants: NonEmptySet<Variant>,
-	variantEval: (variantWallet: ResolvedWallet) => StageCriterionEvaluation,
+	variantEval: (variantWallet: ResolvedWallet<_AttributeGroupId>) => StageCriterionEvaluation,
 	options?: {
 		/**
 		 * What to return if no wallet variants are in scope.
@@ -226,8 +235,8 @@ export function stageCriterionEvaluationPerVariant(
 		 */
 		ifNoVariantInScope: StageCriterionEvaluation | null
 	},
-): (wallet: StageEvaluatableWallet) => StageCriterionEvaluation {
-	return (wallet: StageEvaluatableWallet): StageCriterionEvaluation => {
+): (wallet: StageEvaluatableWallet<_AttributeGroupId>) => StageCriterionEvaluation {
+	return (wallet: StageEvaluatableWallet<_AttributeGroupId>): StageCriterionEvaluation => {
 		const evaluations: StageCriterionEvaluation[] = []
 
 		for (const variant of setItems(variants)) {
@@ -279,7 +288,10 @@ export function stageCriterionEvaluationPerVariant(
  * @param options More options for the behavior of this function.
  * @returns A function that can be used as `WalletStageCriterion.evaluate` for this attribute.
  */
-export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetadata>(
+export function variantsMustPassAttribute<
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata,
+>(
 	variants: NonEmptySet<Variant>,
 	attribute: Attribute<_OutcomeMetadata>,
 	options?: {
@@ -299,7 +311,7 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 		 */
 		ifNoVariantInScope: StageCriterionEvaluation | null
 	},
-): (wallet: StageEvaluatableWallet) => StageCriterionEvaluation {
+): (wallet: StageEvaluatableWallet<_AttributeGroupId>) => StageCriterionEvaluation {
 	if (options === undefined) {
 		if (attribute.wording.midSentenceName === null) {
 			throw new Error(
@@ -318,8 +330,8 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 
 	const evaluateFunction = stageCriterionEvaluationPerVariant(
 		variants,
-		(variantWallet: ResolvedWallet): StageCriterionEvaluation => {
-			const evalAttr = getAttributeFromTree<_OutcomeMetadata>(variantWallet.attributes, attribute)
+		(variantWallet): StageCriterionEvaluation => {
+			const evalAttr = getAttributeFromTree(attributeTree, variantWallet.attributes, attribute)
 
 			if (evalAttr === null) {
 				throw new Error(
@@ -404,15 +416,15 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 /**
  * Evaluate and rate a wallet on a single ladder.
  */
-export function evaluateWalletOnLadder(
-	wallet: StageEvaluatableWallet,
-	ladder: WalletLadder,
-): WalletLadderEvaluation {
+export function evaluateWalletOnLadder<_AttributeGroupId extends string>(
+	wallet: StageEvaluatableWallet<_AttributeGroupId>,
+	ladder: WalletLadder<_AttributeGroupId>,
+): WalletLadderEvaluation<_AttributeGroupId> {
 	if (!ladder.applicableTo(wallet)) {
 		return { ladder, stage: 'NOT_APPLICABLE' }
 	}
 
-	let clearedStage: WalletStage | null = null
+	let clearedStage: WalletStage<_AttributeGroupId> | null = null
 
 	for (const stage of ladder.stages) {
 		const stageEvaluations = (() => {
@@ -424,16 +436,18 @@ export function evaluateWalletOnLadder(
 								try {
 									return criterion.evaluate(wallet)
 								} catch (e) {
-									throw new Error(`Criterion ${criterion.id}: ${getErrorMessage(e)}`)
+									throw new Error(`Criterion ${criterion.id}: ${getErrorMessage(e)}`, { cause: e })
 								}
 							})
 						} catch (e) {
-							throw new Error(`Criteria group ${criteriaGroup.id}: ${getErrorMessage(e)}`)
+							throw new Error(`Criteria group ${criteriaGroup.id}: ${getErrorMessage(e)}`, {
+								cause: e,
+							})
 						}
 					}),
 				)
 			} catch (e) {
-				throw new Error(`Stage ${stage.id}: ${getErrorMessage(e)}`)
+				throw new Error(`Stage ${stage.id}: ${getErrorMessage(e)}`, { cause: e })
 			}
 		})()
 

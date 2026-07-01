@@ -1,20 +1,23 @@
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string
+">
 	// Types/constants
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
-	import { allRatedWalletsBySlug } from '@/data/wallets'
 	import {
 		type Attribute,
-		type AttributeGroup,
 		type EvaluatedAttribute,
-		type EvaluatedGroup,
 		type ExampleRating,
+		type OutcomeMetadata,
 		Rating,
+		normalizeExampleRatings,
 		ratingIcons,
 		ratingToColor,
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
-	import { VariantSpecificity } from '@/schema/wallet'
+	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
+	import type { Ladders } from '@/schema/ladders'
+	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
 	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
 	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
@@ -25,7 +28,6 @@
 	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
-	import type { OutcomeMetadata } from '@/schema/attributes'
 	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
 
 
@@ -37,7 +39,7 @@
 	} from '@/constants/variants'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import {
-		attributeTree,
+		type AttributeGroup,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 		formatAttributeGroupTitleText,
@@ -49,17 +51,25 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
-	import { getAttributeStagesForWallet, isAttributeUsedInStages } from '@/utils/stage-attributes'
-	import { WalletLadderType } from '@/schema/ladders'
+	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
+
+
+	type WalletPageWallet<_AttributeGroupId extends string> =
+		Omit<RatedWallet<_AttributeGroupId>, 'ladders'> &
+		Partial<Pick<RatedWallet<_AttributeGroupId>, 'ladders'>>
 
 
 	// Props
 	const {
-		walletName,
+		ladders,
+		attributeTree,
+		wallet,
 		showStage = true,
 		showScores = false,
 	}: {
-		walletName: string,
+		ladders: Ladders<_AttributeGroupId>
+		attributeTree: AttributeTree<_AttributeGroupId>
+		wallet: WalletPageWallet<_AttributeGroupId>
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
@@ -77,20 +87,44 @@
 	)
 
 	$effect(() => {
-		if(queryParams && queryParams.toString() !== globalThis.location.search)
-			globalThis.history.replaceState(null, '', `${globalThis.location.pathname}?${queryParams.toString()}`)
+		const queryString = queryParams?.toString()
+
+		if(queryString !== undefined && queryString !== globalThis.location.search.slice(1))
+			globalThis.history.replaceState(
+				null,
+				'',
+				`${globalThis.location.pathname}${queryString ? `?${queryString}` : ''}${globalThis.location.hash}`,
+			)
 	})
 
 	let highlightedAttributeId = $state<string | null>(
 		null
 	)
 
-	// (Derived)
-	const wallet = $derived(
-		allRatedWalletsBySlug[walletName]
-	)
+	function openHashDetails() {
+		const id = decodeURIComponent(globalThis.location.hash.slice(1))
+		const target = id ? globalThis.document.getElementById(id) : null
 
-	const walletNews = $derived(
+		if(target instanceof HTMLDetailsElement)
+			target.open = true
+
+		const containingDetails = target?.closest('details')
+
+		if(containingDetails)
+			containingDetails.open = true
+	}
+
+	$effect(() => {
+		openHashDetails()
+		globalThis.addEventListener('hashchange', openHashDetails)
+
+		return () => {
+			globalThis.removeEventListener('hashchange', openHashDetails)
+		}
+	})
+
+	// (Derived)
+	const walletNews = $derived.by(() =>
 		getNewsForWallet(wallet.metadata.id)
 	)
 
@@ -128,7 +162,7 @@
 		!newsIsStale
 	)
 
-	let selectedVariant = $derived<Variant | undefined>(
+	let selectedVariant = $state<Variant | undefined>(
 		hasSingleVariant(wallet.variants) ?
 			undefined
 		:
@@ -142,7 +176,7 @@
 			queryParams?.delete('variant')
 	})
 
-	let selectedModel = $derived(
+	let selectedModel = $state(
 		queryParams?.get('model') ?? undefined
 	)
 
@@ -154,10 +188,12 @@
 	})
 
 	const evalTree = $derived(
-		selectedVariant &&
-			wallet.variants[selectedVariant]?.attributes
-		||
-			wallet.overall
+		(
+			selectedVariant &&
+				wallet.variants[selectedVariant]?.attributes
+			||
+				wallet.overall
+		) satisfies EvaluationTree<_AttributeGroupId>
 	)
 
 	const attrToRelevantVariants = $derived.by(() => {
@@ -185,7 +221,7 @@
 	})
 
 	const overallScore = $derived(
-		calculateOverallScore(wallet.overall, () => true),
+		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
 
@@ -219,20 +255,19 @@
 
 
 <svelte:head>
-	{@html `<script type="application/ld+json">${
-		JSON.stringify({
+	{@html (
+		'<script type="application/ld+json">'
+		+ JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'FAQPage',
 			mainEntity: (
 				evalTree ?
-					Object.entries(attributeTree)
-						.flatMap(([attrGroupId, attrGroup]) => (
-							Object.entries(attrGroup.attributes)
-								.map(([attrId, attribute]) => ({
+					Object.values(attributeTree)
+						.flatMap(attrGroup => (
+							attrGroup.attributes
+								.map(({ attribute }) => ({
 									evalAttr: (
-										evalTree[attrGroupId][
-											attrId as keyof (typeof evalTree)[typeof attrGroupId]
-										] as EvaluatedAttribute<any> | undefined
+										evalTree[attrGroup.id][attribute.id]
 									),
 									attribute,
 								}))
@@ -303,7 +338,8 @@
 				),
 			},
 		})
-	}</script>`}
+		+ '<\/script>'
+	)}
 </svelte:head>
 
 
@@ -389,7 +425,7 @@
 						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
 						{#if stage !== null && ladderEvaluation !== null}
-							<Tooltip>
+							<Tooltip buttonTriggerPlacement="behind">
 								<WalletStageBadge
 									{stage}
 									{ladderEvaluation}
@@ -397,7 +433,7 @@
 								/>
 
 								{#snippet TooltipContent()}
-									<WalletStageSummary {wallet} {stage} {ladderEvaluation} />
+									<WalletStageSummary {wallet} {ladders} {stage} {ladderEvaluation} />
 								{/snippet}
 							</Tooltip>
 						{/if}
@@ -514,8 +550,8 @@
 			</section>
 		{/if}
 
-		{#each evalTree ? Object.entries(attributeTree) : [] as [attrGroupId, attrGroup]}
-			{@const evalGroup = evalTree?.[attrGroupId]}
+		{#each evalTree ? Object.values(attributeTree) : [] as attrGroup}
+			{@const evalGroup = evalTree[attrGroup.id]}
 
 			{#if evalGroup}
 				{@render attributeGroupSnippet({
@@ -537,25 +573,25 @@
 		{#each evalTree ? Object.entries(attributeTree) : [] as [attrGroupId, attrGroup]}
 			{@const evalGroup = evalTree?.[attrGroupId]}
 			{#if evalGroup}
-				{@const score = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
+				{@const score = calculateAttributeGroupScore(attrGroup, evalGroup)}
 				{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 				<a
 					class="toc-group"
 					href="#{slugifyCamelCase(attrGroup.id)}"
 					style:--accent={scoreColor}
 				>
-					<span class="toc-icon" data-wbicon data-icon={attrGroup.icon}></span>
+					<span class="toc-icon" data-icon="wbicons emoji {attrGroup.icon}"></span>
 					<span class="toc-label">{attrGroup.displayName}</span>
 				</a>
-				{#each Object.entries(attrGroup.attributes) as [, attribute]}
-					{@const evalAttr = evalGroup[attribute.id] as EvaluatedAttribute<any> | undefined}
+				{#each attrGroup.attributes as { attribute }}
+					{@const evalAttr = evalGroup[attribute.id]}
 					{#if evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT}
 						<a
 							class="toc-attr"
 							href="#{slugifyCamelCase(attribute.id)}"
 							style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 						>
-							<span class="toc-icon" data-wbicon data-icon={attribute.icon}></span>
+							<span class="toc-icon" data-icon="wbicons emoji {attribute.icon}"></span>
 							<span class="toc-label">{attribute.displayName}</span>
 						</a>
 					{/if}
@@ -570,22 +606,24 @@
 	attrGroup,
 	evalGroup,
 }: {
-	attrGroup: AttributeGroup<any>
-	evalGroup: EvaluatedGroup<any>
+	attrGroup: AttributeGroup<_AttributeGroupId>
+	evalGroup: EvaluationTree<_AttributeGroupId>[_AttributeGroupId]
 })}
-	{@const attributes = Object.entries(attrGroup.attributes)
-		.map(([attrId, attribute]) => ({
+	{@const attributes = attrGroup.attributes
+		.map(({ attribute, weight }) => ({
 			attribute,
-			evalAttr: evalGroup[attrId] as EvaluatedAttribute<any> | undefined,
+			weight,
+			evalAttr: evalGroup[attribute.id],
 		}))
 		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT)
-		.map(({ attribute, evalAttr }) => ({
+		.map(({ attribute, evalAttr, weight }) => ({
 			attribute,
 			evalAttr: evalAttr!,
+			weight,
 		}))}
 
 	{#if attributes.length > 0}
-		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup) : null}
+		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
@@ -596,7 +634,6 @@
 			id={slugifyCamelCase(attrGroup.id)}
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
-			data-icon={attrGroup.icon}
 			style:--accent={scoreColor}
 		>
 			<header
@@ -636,9 +673,9 @@
 					>
 						<div
 							class="attributes-pie"
+							data-icon="wbicons emoji {attrGroup.icon}"
 							data-row-item="wrap-center"
 						>
-							<span class="attributes-pie-icon" data-wbicon data-icon={attrGroup.icon}></span>
 							<Pie
 								title={formatAttributeGroupTitleText(attrGroup, score, showScores)}
 
@@ -656,10 +693,10 @@
 
 								slices={
 									attributes
-										.map(({ attribute, evalAttr }) => ({
+										.map(({ attribute, evalAttr, weight }) => ({
 											id: attribute.id,
 											color: ratingToColor(evalAttr.evaluation.outcome.rating),
-											weight: attrGroup.attributeWeights[attribute.id],
+											weight,
 											arcLabel: '',
 											arcIconId: evalAttr.attribute.icon,
 											titleText: formatAttributeTitleText(evalAttr),
@@ -743,8 +780,8 @@
 	evalAttr,
 }: {
 	attrGroupId: string
-	attribute: Attribute<any>
-	evalAttr: EvaluatedAttribute<any>
+	attribute: Attribute<OutcomeMetadata>
+	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
 
@@ -771,7 +808,6 @@
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
-		data-icon={attribute.icon}
 	>
 		<details
 			data-card="radius-8 padding-0 border-accent"
@@ -781,31 +817,19 @@
 				<header data-row="wrap">
 					<div data-row-item="flexible basis-2">
 						<div data-row="start gap-2 wrap">
-							{#if attribute.icon}
-								<span class="attribute-icon" data-wbicon data-icon={attribute.icon}></span>
-							{/if}
 							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
 								<h3
-									data-icon={attribute.icon}
 									title={formatAttributeTitleText(evalAttr)}
 								>
+									<span class="attribute-icon" data-icon="wbicons emoji {attribute.icon}"></span>
 									{attribute.displayName}
 								</h3>
 							</a>
 
 							{#if true}
-								{@const { ladderEvaluation } = getWalletStageAndLadder(wallet)}
+								{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
 
-								{@const ladderType = (
-									ladderEvaluation ?
-										Object.entries(wallet.ladders)
-											.find(([_, evaluation]) => evaluation === ladderEvaluation)
-											?.[0]
-									:
-										undefined
-								)}
-
-								{@const attributeStages = getAttributeStagesForWallet(attribute, wallet)}
+								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
 
 								{@const stageNumbers = (
 									ladderType &&
@@ -822,6 +846,7 @@
 
 									{#if stage && ladderEvaluation}
 										<Tooltip
+											buttonTriggerPlacement="behind"
 											style="--accent: var(--accent-color)"
 										>
 											<a
@@ -838,9 +863,10 @@
 											</a>
 
 											{#snippet TooltipContent()}
-												<WalletStageSummary 
-													{wallet} 
-													stage={stage} 
+												<WalletStageSummary
+													{wallet}
+													{ladders}
+													stage={stage}
 													{ladderEvaluation}
 													showNextStageCriteria={false}
 												/>
@@ -951,16 +977,16 @@
 								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
 								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
-							{:else if componentName === 'SecurityAuditsDetails' && outcome.metadata}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata} />
+							{:else if componentName === 'SecurityAuditsDetails'}
+								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'TransactionInclusionDetails'}
 								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
 							{:else if componentName === 'FundingDetails'}
 								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
-							{:else if componentName === 'AccountRecoveryDetails' && outcome.metadata}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata} />
-							{:else if componentName === 'AccountUnruggabilityDetails' && outcome.metadata}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata} />
+							{:else if componentName === 'AccountRecoveryDetails'}
+								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
+							{:else if componentName === 'AccountUnruggabilityDetails'}
+								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
 							{/if}
@@ -998,17 +1024,19 @@
 			{/if}
 
 			{#if (
-				!isTypographicContent(evalAttr.evaluation.details)
-				&& evalAttr.evaluation.references?.length
-				&& !(
-					// Custom components that render their own reference links
-					[
-						'ChainVerificationDetails',
-						'FundingDetails',
-						'ScamAlertDetails',
-						'SecurityAuditsDetails',
-					]
-						.includes(evalAttr.evaluation.details.component.component)
+				evalAttr.evaluation.references?.length &&
+				(
+					isTypographicContent(evalAttr.evaluation.details) ||
+					!(
+						// Custom components that render their own reference links
+						[
+							'ChainVerificationDetails',
+							'FundingDetails',
+							'ScamAlertDetails',
+							'SecurityAuditsDetails',
+						]
+							.includes(evalAttr.evaluation.details.component.component)
+					)
 				)
 			)}
 				<ReferenceLinks
@@ -1119,10 +1147,10 @@
 												.map(({ rating, label, exampleRatings }) => ({
 													rating,
 													label,
-													exampleRatings: [exampleRatings].flat() as ExampleRating<any>[],
+													exampleRatings: normalizeExampleRatings(exampleRatings),
 												}))
 												.filter(
-													(item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<any>> } => item.exampleRatings.length > 0,
+													(item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<OutcomeMetadata>> } => item.exampleRatings.length > 0,
 												)
 										) as { rating, label, exampleRatings }}
 											<li
@@ -1238,6 +1266,7 @@
 			scroll-padding-block-end: 1rem;
 
 			display: grid;
+			padding-block-end: calc(var(--topbar-height, 6.8rem) + 2rem);
 		}
 
 		.toc {
@@ -1256,7 +1285,7 @@
 
 			display: flex;
 			flex-direction: column;
-			padding: calc(2.5rem + 1rem) 0.75rem 1rem;
+			padding: calc(2.5rem + 1rem) 0.75rem calc(var(--topbar-height, 6.8rem) + 1rem);
 			gap: 2px;
 
 			background: var(--background-secondary);
@@ -1276,6 +1305,8 @@
 
 		.toc-group,
 		.toc-attr {
+			--icon-filter: brightness(0) opacity(0.35);
+
 			display: flex;
 			align-items: center;
 			gap: 0.75em;
@@ -1286,42 +1317,38 @@
 			transition: background-color 0.15s, color 0.15s;
 
 			&:hover {
+				--icon-filter: none;
+
 				background-color: var(--background-primary);
 				color: var(--accent);
 			}
 
 			.toc-icon {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				background: var(--accent);
+				display: grid;
+				place-items: center;
+				width: 1em;
+				aspect-ratio: 1;
 				border-radius: 50%;
-				flex-shrink: 0;
-				color: black;
-				font-weight: normal;
+				background-color: var(--accent);
+				font-size: 2.1em;
+			}
+
+			.toc-icon::before {
+				font-size: 0.5em;
+				line-height: 1;
+				filter: var(--icon-filter);
+				transition-property: filter;
 			}
 		}
 
 		.toc-group {
 			font-weight: 600;
 			font-size: 1.05em;
-
-			.toc-icon {
-				width: 2.5rem;
-				height: 2.5rem;
-				font-size: 1.2rem;
-			}
 		}
 
 		.toc-attr {
 			margin-left: 2rem;
 			font-size: 0.95em;
-
-			.toc-icon {
-				width: 2rem;
-				height: 2rem;
-				font-size: 1rem;
-			}
 		}
 	}
 
@@ -1558,6 +1585,10 @@
 			font-size: 2.5em;
 		}
 
+		> .attributes-pie::before {
+			display: none;
+		}
+
 		> .attributes-list {
 			transition-property: translate, scale, opacity;
 
@@ -1581,6 +1612,9 @@
 
 				li {
 					display: contents;
+					&::before {
+						content: none;
+					}
 				}
 
 				a {
@@ -1645,7 +1679,7 @@
 			;
 			animation-timeline: --AttributesViewTimeline;
 
-			.attributes-pie-icon {
+			&::before {
 				position: absolute;
 				inset: 0;
 				display: grid;
@@ -1739,19 +1773,35 @@
 	.attribute {
 		position: relative;
 
-		.attribute-icon {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			background: var(--accent);
-			border: 1px solid white;
-			border-radius: 50%;
-			width: 2.2em;
-			height: 2.2em;
-			font-size: 1.2em;
-			line-height: 1;
-			flex-shrink: 0;
-			color: black;
+		a:has(.attribute-icon) {
+			--icon-filter: brightness(0) opacity(0.35);
+
+			&:hover {
+				--icon-filter: none;
+			}
+
+			h3 {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.attribute-icon {
+				display: grid;
+				place-items: center;
+				width: 1em;
+				aspect-ratio: 1;
+				border-radius: 50%;
+				background-color: var(--accent);
+				font-size: 2.2em;
+
+				&::before {
+					font-size: 0.5em;
+					line-height: 1;
+					filter: var(--icon-filter);
+					transition-property: filter;
+				}
+			}
 		}
 
 		> details {

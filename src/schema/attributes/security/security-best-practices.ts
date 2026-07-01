@@ -589,8 +589,17 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.BLUETOOTH_CONNECT]: Rating.PASS,
 	// Discovers and pairs hardware wallets over Bluetooth (Android 12+).
 	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
+	// Posts notifications such as transaction confirmations and price alerts (Android 13+).
+	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
+	// Writes to shared storage, e.g. to export transaction receipts or QR codes.
+	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
+	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
+	// is a phishing vector (e.g. a fake seed-phrase prompt). On Android < 14 it is auto-granted
+	// at install, and the manifest gives no guarantee of the user's OS version, so we take the
+	// pessimistic view.
+	[AndroidPermission.USE_FULL_SCREEN_INTENT]: Rating.FAIL,
 	// Allows drawing overlays over other apps, can be used to phish seed phrases or intercept transaction confirmations.
 	[AndroidPermission.SYSTEM_ALERT_WINDOW]: Rating.FAIL,
 	// Microphone access enables covert audio recording of sensitive conversations near the device.
@@ -599,6 +608,8 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.ACCESS_FINE_LOCATION]: Rating.FAIL,
 	// Modifying global audio settings can suppress security alerts or notifications from other apps.
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
+	// Broad read of shared storage exposes private files.
+	[AndroidPermission.READ_EXTERNAL_STORAGE]: Rating.FAIL,
 }
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {

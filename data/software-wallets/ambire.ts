@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -67,10 +68,8 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
@@ -647,6 +646,20 @@ export const ambire: SoftwareWallet = {
 								DataCollectionPurpose.STATIC_ASSETS,
 							],
 						},
+						// ENS resolution when the user opens the wallet
+						{
+							ref: dataLeakReferences.ambire,
+							byEntity: ambireEntity,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+						},
 					],
 				},
 			},
@@ -674,7 +687,7 @@ export const ambire: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.INACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-12-17' as CalendarDate,
+				dateStarted: '2021-12-17' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,
@@ -768,30 +781,39 @@ export const ambire: SoftwareWallet = {
 				mobile: 'NOT_A_MOBILE_APP',
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						file: 'public/images/references/ambire/transaction_legibility_1.png',
+						label: 'Transaction legibility screenshot 1',
+					},
+					{
+						file: 'public/images/references/ambire/transaction_legibility_2.png',
+						label: 'Transaction legibility screenshot 2',
+					},
+				],
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
-							decoded: DataDisplayOptions.NOT_IN_UI,
+							decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						},
 					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
-						decoded: DataDisplayOptions.NOT_IN_UI,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 				}),
 				erc8213: supported({
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
-						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 					messageSigningLegibility: {

@@ -75,3 +75,8 @@ Date	From	To	Amount	Purpose	ID
 2026-05-20	treasury	walletbeat_social	0.01 ETH	Seed wallet with enough Ether for gas fees	0x28bcb85666f5d456686b7b00c2dc37f12e808f1839563fb68e54da8f37e0c2f5
 2026-05-31	treasury	treasury	1 ETH → 1,997.500184 USDC	Swap On Uniswap	0xad1f00725960ce70ac37059381559d8b17018290e60a651311a92f1cd8a2be48
 2026-05-31	treasury	ren2140	3500 USDC	Payment for Base App review and upcoming Walletbeat work	0x4788e3b66b47b478109f626d0412a2f560b2211f97612313073128e7a26daa8c
+2026-06-25	treasury	treasury	0 ETH	Approving 5.5 WETH for Uniswap	0xcc787c088aee0ea0b4e2de9353b81ea39ef7c298902a96314af9404998c9dd52
+2026-06-25	treasury	treasury	5.45 ETH -> 9,000 USDC	Swap on Uniswap	0xd097c1ec0ab4b3042bdbea8339bdbc61925295c517d78c09565f3a0a5bbaf5f0
+2026-06-25	treasury	mattmatt3	2,850 USDC	Travel reimbursement for Berlin Blockchain Week	0xa581ec5b34907437ca648d27f209a5c16600f8685641fef83f3dc0afbb15d18d
+2026-06-25	treasury	lucilajuliana.shefi.eth	357 USDC	Reimbursement for BBW shirts, and Tangem wallet	0xd9a086767b99d66b8c6955830b8fefdb410b297ff1a2ab5704a34433e6ab006c
+2026-06-25	treasury	mattmatt_sablier	5,500 USDC	Top-up of Sablier stream	0xdbac1eceb5cb9cab5360f93daad8207fc05b193e64dc4a2cd146ac83aa3cb840

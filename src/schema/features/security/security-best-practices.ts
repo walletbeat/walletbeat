@@ -329,6 +329,18 @@ export enum AndroidPermission {
 
 	/** Precise location, required for BLE scanning on Android < 12. */
 	ACCESS_FINE_LOCATION = 'android.permission.ACCESS_FINE_LOCATION',
+
+	/** Post notifications to the user (Android 13+). */
+	POST_NOTIFICATIONS = 'android.permission.POST_NOTIFICATIONS',
+
+	/** Display a full-screen intent, e.g. for incoming-call-style alerts. */
+	USE_FULL_SCREEN_INTENT = 'android.permission.USE_FULL_SCREEN_INTENT',
+
+	/** Read files from shared external storage (legacy, pre-scoped-storage). */
+	READ_EXTERNAL_STORAGE = 'android.permission.READ_EXTERNAL_STORAGE',
+
+	/** Write files to shared external storage (legacy, pre-scoped-storage). */
+	WRITE_EXTERNAL_STORAGE = 'android.permission.WRITE_EXTERNAL_STORAGE',
 }
 
 export const androidPermissions = new Enum<AndroidPermission>({
@@ -343,6 +355,10 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.BLUETOOTH_CONNECT]: true,
 	[AndroidPermission.BLUETOOTH_SCAN]: true,
 	[AndroidPermission.ACCESS_FINE_LOCATION]: true,
+	[AndroidPermission.POST_NOTIFICATIONS]: true,
+	[AndroidPermission.USE_FULL_SCREEN_INTENT]: true,
+	[AndroidPermission.READ_EXTERNAL_STORAGE]: true,
+	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: true,
 })
 
 /**

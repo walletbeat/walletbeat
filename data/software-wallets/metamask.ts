@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -56,11 +57,9 @@ import {
 } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { mdParagraph, paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
@@ -196,8 +195,8 @@ export const metamask: SoftwareWallet = {
 				withNoConnectivityExceptL1RPCEndpoint: {
 					accountCreation: featureSupported,
 					accountImport: featureSupported,
-					erc20BalanceLookup: notSupported, // Token import dialog is broken in this case
-					erc20TokenSend: notSupported, // Can't add token.
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
 					etherBalanceLookup: featureSupported,
 				},
 			}),
@@ -372,7 +371,7 @@ export const metamask: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2022-06-01' as CalendarDate,
+				dateStarted: '2022-06-01' as const,
 				disclosure: notSupported,
 				legalProtections: supported({
 					type: LegalProtectionType.SAFE_HARBOR,
@@ -555,7 +554,9 @@ export const metamask: SoftwareWallet = {
 						{
 							decoded: DataDisplayOptions.NOT_IN_UI,
 						},
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
 				}),
 				erc8213: supported({
 					calldataDisplay: {
@@ -602,9 +603,15 @@ export const metamask: SoftwareWallet = {
 						{
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
 						failure: 'DETECTED' as const,
 					},

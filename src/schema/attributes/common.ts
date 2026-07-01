@@ -168,7 +168,7 @@ export function aggregateVariantEvaluations<_OutcomeMetadata extends OutcomeMeta
 					? evaluation.details.text
 					: evaluation.details.markdown
 
-			return `**${variantLabel(variant as Variant)}:** ${text}`
+			return `**${variantLabel(variant)}:** ${text}`
 		})
 		.join('\n\n')
 

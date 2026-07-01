@@ -12,6 +12,8 @@
 		displayType?: 'select' | 'group'
 		filters: Filter<Item, FilterId>[]
 		operation?: 'union' | 'intersection'
+		/** When true, all filters in the group are shown even if their count is 0. */
+		alwaysShowFilters?: boolean
 	} & (
 		| {
 			exclusive: true
@@ -136,7 +138,7 @@
 
 
 {#snippet filterItemContent(
-	filter: Filter<any>,
+	filter: Filter<typeof items[number]>,
 	count: number
 )}
 	<span class="icon" aria-hidden="true">{@html filter.icon}</span>
@@ -157,8 +159,11 @@
 			.map(group => ({
 				group,
 				visibleFilters: (
-					group.filters
-						.filter(filter => filterItems(new Set([filter])).length > 0)
+					group.alwaysShowFilters ?
+						group.filters
+					:
+						group.filters
+							.filter(filter => filterItems(new Set([filter])).length > 0)
 				)
 			}))
 			.filter(({ visibleFilters }) => (
@@ -321,7 +326,7 @@
 										() => (
 											activeFilters.has(filter)
 										),
-										(checked) => {
+										checked => {
 											if (checked)
 												activeFilters.add(filter)
 											else

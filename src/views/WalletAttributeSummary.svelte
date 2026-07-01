@@ -5,9 +5,14 @@
 	}
 </script>
 
-<script lang="ts">
+
+<script lang="ts" generics="
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata
+">
 	// Types/constants
-	import { type EvaluatedAttribute, ratingIcons, ratingToColor } from '@/schema/attributes'
+	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor } from '@/schema/attributes'
+	import { type Ladders } from '@/schema/ladders'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
@@ -15,16 +20,18 @@
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 
-// Props
+	// Props
 	let {
+		ladders,
 		wallet,
 		attribute,
 		variant,
 		summaryType = WalletAttributeSummaryType.None,
 		isInTooltip = false,
 	}: {
-		wallet: RatedWallet
-		attribute: EvaluatedAttribute
+		ladders?: Ladders<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId>
+		attribute: EvaluatedAttribute<_OutcomeMetadata>
 		variant?: Variant
 		summaryType?: WalletAttributeSummaryType
 		isInTooltip?: boolean
@@ -45,27 +52,26 @@
 
 
 	// Derived
-	const ladderEvaluation = $derived(
+	const walletStageAndLadder = $derived(
 		getWalletStageAndLadder(wallet)
-			.ladderEvaluation
-		?? undefined
+	)
+
+	const ladderEvaluation = $derived(
+		walletStageAndLadder.ladderEvaluation ?? undefined
 	)
 
 	const ladderType = $derived(
-		ladderEvaluation &&
-			Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
-		||
-			undefined
+		walletStageAndLadder.ladderType ?? undefined
 	)
 
 	const attributeStages = $derived(
-		getAttributeStagesForWallet(attribute.attribute, wallet)
+		ladders && getAttributeStagesForWallet(ladders, attribute.attribute, wallet)
 	)
 
 	const relevantStages = $derived(
 		ladderType && ladderEvaluation &&
 			attributeStages
-				.find(stage => stage.ladderType === ladderType)
+				?.find(stage => stage.ladderType === ladderType)
 				?.stageNumbers
 		||
 			[]
@@ -88,13 +94,13 @@
 >
 	<header data-row="center gap-3 wrap">
 		<h4 data-row="gap-2">
-			<span data-wbicon data-icon={attribute.attribute.icon}></span>
+			<span data-icon="wbicons {attribute.attribute.icon}"></span>
 			{attribute.attribute.displayName}
 		</h4>
 
 		<div data-row="gap-2">
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
-				<Tooltip>
+				<Tooltip buttonTriggerPlacement="behind">
 					<a
 						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
 						data-link="camouflaged"
@@ -109,9 +115,10 @@
 					</a>
 
 					{#snippet TooltipContent()}
-						<WalletStageSummary 
-							{wallet} 
-							stage={firstStage} 
+						<WalletStageSummary
+							{wallet}
+							{ladders}
+							stage={firstStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}
 						/>

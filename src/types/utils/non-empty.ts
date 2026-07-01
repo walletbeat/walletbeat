@@ -106,11 +106,12 @@ export function nonEmptyMapToRecord<K extends string | number | symbol, R>(
 	arr: NonEmptyArray<K>,
 	fn: (val: K, index: number) => R,
 ): NonEmptyRecord<K, R> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` does not preserve `NonEmptyRecord`.
 	return Object.fromEntries(
 		nonEmptyMap(arr, (val: K, index: number): [K, R] => {
 			return [val, fn(val, index)]
 		}),
-	)
+	) as NonEmptyRecord<K, R>
 }
 
 /**
@@ -252,6 +253,7 @@ export function nonEmptySet<K extends string | number | symbol>(
 export function nonEmptySetFromArray<K extends string | number | symbol>(
 	keys: NonEmptyArray<K>,
 ): NonEmptySet<K> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `Object.fromEntries` does not preserve `NonEmptySet` typing.
 	return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>
 }
 

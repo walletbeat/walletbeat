@@ -521,8 +521,8 @@ export function resolveFeatures(
 					'security.passkeyVerification',
 					features => features.security.passkeyVerification,
 				),
-			bugBountyProgram: hardwareFeat(
-				'bugBountyProgram',
+			bugBountyProgram: baseFeat(
+				'security.bugBountyProgram',
 				features => features.security.bugBountyProgram,
 			),
 			firmware: hardwareFeat('security.firmware', features => features.security.firmware),

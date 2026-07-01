@@ -3,6 +3,7 @@ import { cantina } from '@/data/entities/cantina'
 import { certora } from '@/data/entities/certora'
 import { code4rena } from '@/data/entities/code4rena'
 import { coinbase } from '@/data/entities/coinbase'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { coinbaseEip7702ProxyContract } from '@/data/wallet-contracts/coinbase-eip7702-proxy'
 import { coinbaseSmartWalletContract } from '@/data/wallet-contracts/coinbase-smart-wallet'
 import type { WalletAnalytics } from '@/schema/features'
@@ -31,9 +32,7 @@ import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const baseApp: SoftwareWallet = {
 	metadata: {
@@ -68,11 +67,19 @@ export const baseApp: SoftwareWallet = {
 			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
 			defaultAccountType: AccountType.rawErc4337,
 			eip7702: supported({
-				ref: {
-					explanation:
-						'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of dApp interactions; there is no user-facing "upgrade my account" UI in the Base App. Per the Base team questionnaire response (2026-03-13), accounts are "EOA + 7702 delegation / 4337".',
-					url: 'https://blog.base.dev/securing-eip-7702-upgrades',
-				},
+				ref: [
+					{
+						explanation:
+							'Legacy Base App EOA users can be upgraded to smart-wallet behavior via EIP-7702 delegation to the EIP7702Proxy (an ERC-1967 proxy whose implementation can be set to the Coinbase Smart Wallet). The delegation is sponsored by Coinbase on Base mainnet and is performed transparently as part of app interactions. There is no user-facing "upgrade my account" UI in the Base App.',
+						url: 'https://blog.base.dev/securing-eip-7702-upgrades',
+					},
+					{
+						explanation:
+							'Per Base App team statement, supported account types are "EOA + 7702 delegation / 4337".',
+						file: 'public/references/wallets/base-app/2026-02-23-questionnaire.md',
+						label: 'Base App team statement (2026-02-23)',
+					},
+				],
 				contract: coinbaseEip7702ProxyContract,
 			}),
 			eoa: supported({
@@ -89,7 +96,7 @@ export const baseApp: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation:
-						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave); Coinbase does not hold a co-owner key per https://wallet.coinbase.com/terms-of-service. The underlying contract supports multi-owner via addOwner/removeOwnerAtIndex, but as of Base App v29.94.123 the mobile app does not expose any passkey or owner management UI (Account Management shows only Sign out). Optional recovery-key setup likely lives in keys.coinbase.com rather than the mobile app.',
+						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave). Coinbase does not hold a co-owner key per Terms of Service. The underlying contract supports multi-owner via `addOwner`/`removeOwnerAtIndex`, but the mobile app does not expose passkey or owner management UI. Account Management shows only "Sign out". Optional recovery-key setup lives in `keys.coinbase.com` rather than the mobile app.',
 					url: 'https://docs.base.org/base-account/overview/what-is-base-account',
 				},
 				contract: coinbaseSmartWalletContract,
@@ -150,7 +157,37 @@ export const baseApp: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: null,
+			// Base App accounts run Coinbase Smart Wallet logic, which exposes
+			// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
+			// contract-level property (executeBatch) that holds on every chain the
+			// wallet is deployed to, including Ethereum L1. Confirmed live on
+			// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
+			// UserOperation routed through the account's executeBatch (see refs).
+			walletCall: supported({
+				ref: [
+					{
+						explanation:
+							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
+						url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
+					},
+					{
+						explanation:
+							'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
+						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
+					},
+					{
+						explanation:
+							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
+						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+					},
+					{
+						explanation:
+							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
+						url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
+					},
+				],
+				atomicMultiTransactions: featureSupported,
+			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -180,10 +217,27 @@ export const baseApp: SoftwareWallet = {
 				ventureCapital: false,
 			},
 		},
-		// Base App has no UI for adding additional Ethereum addresses to a single
-		// install — verified in-app (Base App v29.94.123). The wallet manages a
-		// single account/address per install.
-		multiAddress: notSupported,
+		// A recent Base App update added multi-wallet support: the wallet picker
+		// lists multiple coexisting wallets (e.g. "Wallet 5", "Wallet 6") and an
+		// "Add Wallet" sheet offers both "Create Wallet" (a new multi-chain wallet)
+		// and "Import Wallet" (sign into an existing passkey). Verified in-app
+		// (Base App v29.99.7, 2026-06-19).
+		multiAddress: supported({
+			ref: [
+				{
+					explanation:
+						'The Base App wallet picker lists multiple coexisting wallets with an "Add Wallet" button, and the Add Wallet sheet offers "Create Wallet" (add a multi-chain wallet) and "Import Wallet" (sign into a passkey).',
+					file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png',
+					label: 'Base App "Add Wallet" sheet: Create Wallet / Import Wallet options',
+				},
+				{
+					explanation:
+						'Multiple wallets ("Wallet 5", "Wallet 6") coexist in the picker above the "Add Wallet" button, confirming more than one address per install.',
+					file: 'public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg',
+					label: 'Base App wallet picker showing multiple coexisting wallets',
+				},
+			],
+		}),
 		privacy: {
 			// Per direct in-app check (Settings > Privacy & Security, Base App v29.94.123):
 			// there is NO toggle to disable crash reporting, diagnostics, or usage
@@ -211,7 +265,7 @@ export const baseApp: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity, used for external advertising, developer advertising/marketing, AND analytics. The in-app "Personalized Advertising" toggle (defaulted ON) reduces advertising-related sharing but does not stop the underlying usage analytics collection.',
+								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity. It states that it is used for external advertising, developer advertising/marketing, and analytics. The in-app "Personalized Advertising" toggle (defaulted on) reduces sharing, but does not stop the underlying analytics collection.',
 							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
 						},
 						{
@@ -247,7 +301,7 @@ export const baseApp: SoftwareWallet = {
 				ref: 'https://hackerone.com/coinbase?type=team',
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2014-02-14' as CalendarDate,
+				dateStarted: '2014-02-14' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.HACKER_ONE,
@@ -306,7 +360,7 @@ export const baseApp: SoftwareWallet = {
 			passkeyVerification: supported({
 				ref: {
 					explanation:
-						'Coinbase Smart Wallet verifies passkey signatures on-chain via webauthn-sol, which uses the RIP-7212 precompile when available and falls back to FreshCryptoLib.',
+						'Coinbase Smart Wallet verifies passkey signatures on-chain via `webauthn-sol`, which uses the RIP-7212 precompile when available and falls back to `FreshCryptoLib`.',
 					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
 				},
 				details:
@@ -409,7 +463,7 @@ export const baseApp: SoftwareWallet = {
 				l1: {
 					ref: {
 						explanation:
-							"Base App and base/account-sdk are both built by Coinbase. The SDK (open-source) handles dApp-initiated transactions for Base accounts and uses viem's HTTP RPC transport — it does not implement Ethereum's devp2p protocol. It is reasonable to infer the closed-source Base App mobile binary uses the same approach for its native send/swap features: mobile platform constraints make running a devp2p node impractical, and Coinbase has never advertised doing so. URL pinned to the SDK's HTTP RPC fallback logic.",
+							"Base App and `base/account-sdk` are both built by Coinbase. The SDK (open-source) handles externally-initiated transactions for Base accounts and uses `viem`'s HTTP RPC transport. It does not implement Ethereum's `devp2p` protocol.",
 						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
 					},
 					selfBroadcastViaDirectGossip: notSupported,
@@ -422,7 +476,7 @@ export const baseApp: SoftwareWallet = {
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: {
 						explanation:
-							'Per the open-source base/account-sdk that backs Base App account flows, SUPPORTED_MAINNET_CHAINS includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
+							'Per the open-source `base/account-sdk` that backs Base App account flows, `SUPPORTED_MAINNET_CHAINS` includes Base, Optimism (both OP Stack), Arbitrum, and Ethereum mainnet (plus several other major chains). The Base App mobile UI confirms multi-L2 support but exposes no force-inclusion flow.',
 						url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
 					},
 				},

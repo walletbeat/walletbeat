@@ -63,7 +63,7 @@ function getOffchainProviderInfo(
 		offchainInfo:
 			'It relies on an offchain external provider to do so. This offchain provider may trick the wallet into sending funds to a different address than intended, and may learn your IP address.',
 		walletShould:
-			'contact the external provider using traffic anonymizing techniques (such as Tor or Oblivious HTTP), and ensure the response from the external provider is correct using onchain data verified by a light client',
+			'contact the external provider using traffic anonymizing techniques (such as Tor or Oblivious HTTP). {{WALLET_NAME}} should also ensure the response from the external provider is correct using onchain data verified by a light client',
 	}
 }
 

@@ -2764,6 +2764,10 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `BLUETOOTH_CONNECT` = `'android.permission.BLUETOOTH_CONNECT'`: Initiate connections to paired Bluetooth devices (Android 12+).
 - `BLUETOOTH_SCAN` = `'android.permission.BLUETOOTH_SCAN'`: Discover and pair Bluetooth devices (Android 12+).
 - `ACCESS_FINE_LOCATION` = `'android.permission.ACCESS_FINE_LOCATION'`: Precise location, required for BLE scanning on Android < 12.
+- `POST_NOTIFICATIONS` = `'android.permission.POST_NOTIFICATIONS'`: Post notifications to the user (Android 13+).
+- `USE_FULL_SCREEN_INTENT` = `'android.permission.USE_FULL_SCREEN_INTENT'`: Display a full-screen intent, e.g. for incoming-call-style alerts.
+- `READ_EXTERNAL_STORAGE` = `'android.permission.READ_EXTERNAL_STORAGE'`: Read files from shared external storage (legacy, pre-scoped-storage).
+- `WRITE_EXTERNAL_STORAGE` = `'android.permission.WRITE_EXTERNAL_STORAGE'`: Write files to shared external storage (legacy, pre-scoped-storage).
 
 ---
 

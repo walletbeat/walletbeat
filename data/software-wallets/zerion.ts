@@ -1,19 +1,38 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+} from '@/schema/features/security/bug-bounty-program'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
-import { refTodo } from '@/schema/reference'
+import {
+	BasicBenchmarkTransactions,
+	CallDataDisplay,
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
+} from '@/schema/features/security/transaction-legibility'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
+import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -60,24 +79,44 @@ export const zerion: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: null,
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'OFFCHAIN',
+				offchainDataVerifiability: 'NOT_VERIFIABLE',
+				offchainProviderConnection: 'DIRECT_CONNECTION',
+			}),
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: refTodo,
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: notSupported,
+					erc20TokenSend: notSupported,
+					etherBalanceLookup: notSupported,
+				},
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
 		ecosystem: {
-			delegation: null,
+			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
-			walletCall: null,
+			walletCall: notSupported,
 		},
 		licensing: null,
 		monetization: {
@@ -114,9 +153,41 @@ export const zerion: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
-			bugBountyProgram: null,
-			duressResistance: null,
+			accountRecovery: {
+				guardianRecovery: notSupported,
+			},
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: [
+					{
+						explanation: 'Since March 2022, Zerion has a live bug bounty program.',
+						url: 'https://immunefi.com/bug-bounty/zerion',
+					},
+				],
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2021-12-17' as const,
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.IMMUNEFI,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 25000,
+					minimum: 1000,
+				}),
+				upgradePathAvailable: false,
+			}),
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: true,
+						[BasicUnlockMechanism.PASSWORD]: false,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: {
 				ref: [
 					{
@@ -142,16 +213,46 @@ export const zerion: SoftwareWallet = {
 			},
 			keysHandling: null,
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [],
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
-				erc7730: null,
-				erc8213: null,
+				erc7730: supported({
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				erc8213: supported({
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -160,21 +261,59 @@ export const zerion: SoftwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				transactionSimulations: null,
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
 					ref: refTodo,
+					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
@@ -194,5 +333,6 @@ export const zerion: SoftwareWallet = {
 	},
 	variants: {
 		[Variant.MOBILE]: true,
+		[Variant.BROWSER]: true,
 	},
 }

@@ -1,214 +1,217 @@
-[data-wbicon] {
-	font-family: var(--fontFamily-wbicons);
-	font-style: normal;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-
+[data-icon~="wbicons"] {
 	&::before {
 		content: var(--icon-content);
+		font-family: var(--fontFamily-wbicons);
+		font-style: normal;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	&[data-icon~="emoji"]::before {
+		font-family: var(--fontFamily-emoji);
 	}
 
 	&[data-icon~="about"] {
-		--icon-content: "\ea01";
+		--icon-content: "ℹ️";
 	}
 
 	&[data-icon~="account_abstraction"] {
-		--icon-content: "\ea02";
+		--icon-content: "👤";
 	}
 
 	&[data-icon~="account_portability"] {
-		--icon-content: "\ea03";
+		--icon-content: "🧳";
 	}
 
 	&[data-icon~="account_recovery"] {
-		--icon-content: "\ea04";
+		--icon-content: "🛟";
 	}
 
 	&[data-icon~="account_type"] {
-		--icon-content: "\ea05";
+		--icon-content: "🪪";
 	}
 
 	&[data-icon~="account_unruggability"] {
-		--icon-content: "\ea06";
+		--icon-content: "🪚";
 	}
 
 	&[data-icon~="address_resolution"] {
-		--icon-content: "\ea07";
+		--icon-content: "📇";
 	}
 
 	&[data-icon~="app_isolation"] {
-		--icon-content: "\ea08";
+		--icon-content: "🏝️";
 	}
 
 	&[data-icon~="browser_integration"] {
-		--icon-content: "\ea09";
+		--icon-content: "🌐";
 	}
 
 	&[data-icon~="chain_abstraction"] {
-		--icon-content: "\ea0a";
+		--icon-content: "🌉";
 	}
 
 	&[data-icon~="chain_verification"] {
-		--icon-content: "\ea0b";
+		--icon-content: "⚓";
 	}
 
 	&[data-icon~="discuss"] {
-		--icon-content: "\ea0c";
+		--icon-content: "💬";
 	}
 
 	&[data-icon~="duress_resistance"] {
-		--icon-content: "\ea0d";
+		--icon-content: "🔧";
 	}
 
 	&[data-icon~="ecosystem"] {
-		--icon-content: "\ea0e";
+		--icon-content: "🌳";
 	}
 
 	&[data-icon~="faq"] {
-		--icon-content: "\ea0f";
+		--icon-content: "❓";
 	}
 
 	&[data-icon~="fee_transparency"] {
-		--icon-content: "\ea10";
+		--icon-content: "💸";
+	}
+
+	&[data-icon~="free_and_open_source_license"] {
+		--icon-content: "❤️";
 	}
 
 	&[data-icon~="funding_transparency"] {
-		--icon-content: "\ea11";
+		--icon-content: "💰";
 	}
 
 	&[data-icon~="hardware_wallet_interoperability"] {
-		--icon-content: "\ea12";
+		--icon-content: "🧱";
 	}
 
 	&[data-icon~="hardware_wallet_support"] {
-		--icon-content: "\ea13";
+		--icon-content: "🗝️";
 	}
 
 	&[data-icon~="l1_provider_independence"] {
-		--icon-content: "\ea14";
+		--icon-content: "🏠";
 	}
 
 	&[data-icon~="multi_address_privacy"] {
-		--icon-content: "\ea15";
+		--icon-content: "🖇️";
 	}
 
 	&[data-icon~="newsletter"] {
-		--icon-content: "\ea16";
-	}
-
-	&[data-icon~="open_source"] {
-		--icon-content: "\ea17";
+		--icon-content: "📰";
 	}
 
 	&[data-icon~="orderflow_transparency"] {
-		--icon-content: "\ea18";
+		--icon-content: "🔀";
 	}
 
 	&[data-icon~="passkey_verification"] {
-		--icon-content: "\ea19";
+		--icon-content: "🫆";
 	}
 
 	&[data-icon~="permissions_management"] {
-		--icon-content: "\ea1a";
+		--icon-content: "🔑";
 	}
 
 	&[data-icon~="privacy"] {
-		--icon-content: "\ea1b";
+		--icon-content: "😎";
 	}
 
 	&[data-icon~="privacy_hygiene"] {
-		--icon-content: "\ea1c";
+		--icon-content: "🧼";
 	}
 
 	&[data-icon~="private_token_transfers"] {
-		--icon-content: "\ea1d";
+		--icon-content: "📨";
 	}
 
 	&[data-icon~="question_mark"] {
-		--icon-content: "\ea1e";
+		--icon-content: "❔";
 	}
 
 	&[data-icon~="release_process_transparency"] {
-		--icon-content: "\ea1f";
+		--icon-content: "📦";
 	}
 
 	&[data-icon~="repository"] {
-		--icon-content: "\ea20";
+		--icon-content: "🐱";
 	}
 
 	&[data-icon~="scam_prevention"] {
-		--icon-content: "\ea21";
+		--icon-content: "🚨";
 	}
 
 	&[data-icon~="security"] {
-		--icon-content: "\ea22";
+		--icon-content: "🔒";
 	}
 
 	&[data-icon~="security_audits"] {
-		--icon-content: "\ea23";
+		--icon-content: "📜";
 	}
 
 	&[data-icon~="security_best_practices"] {
-		--icon-content: "\ea24";
+		--icon-content: "📋";
 	}
 
 	&[data-icon~="self_sovereignty"] {
-		--icon-content: "\ea25";
+		--icon-content: "🏰";
 	}
 
-	&[data-icon~="source_code_license"] {
-		--icon-content: "\ea26";
+	&[data-icon~="source_visibility"] {
+		--icon-content: "🔍";
 	}
 
 	&[data-icon~="transaction_batching"] {
-		--icon-content: "\ea27";
+		--icon-content: "🧺";
 	}
 
 	&[data-icon~="transaction_inclusion"] {
-		--icon-content: "\ea28";
+		--icon-content: "📡";
 	}
 
 	&[data-icon~="transaction_legibility"] {
-		--icon-content: "\ea29";
+		--icon-content: "🧾";
 	}
 
 	&[data-icon~="transparency"] {
-		--icon-content: "\ea2a";
+		--icon-content: "🕵️";
 	}
 
 	&[data-icon~="user_privacy"] {
-		--icon-content: "\ea2b";
+		--icon-content: "🕶️";
 	}
 
 	&[data-icon~="wallet_address_privacy"] {
-		--icon-content: "\ea2c";
+		--icon-content: "🔗";
 	}
 
 	&[data-icon~="wallet_browser"] {
-		--icon-content: "\ea2d";
+		--icon-content: "🧩";
 	}
 
 	&[data-icon~="wallet_desktop"] {
-		--icon-content: "\ea2e";
+		--icon-content: "🖥️";
 	}
 
 	&[data-icon~="wallet_embedded"] {
-		--icon-content: "\ea2f";
+		--icon-content: "🧬";
 	}
 
 	&[data-icon~="wallet_hardware"] {
-		--icon-content: "\ea30";
+		--icon-content: "📟";
 	}
 
 	&[data-icon~="wallet_mobile"] {
-		--icon-content: "\ea31";
+		--icon-content: "📱";
 	}
 
 	&[data-icon~="wallet_software"] {
-		--icon-content: "\ea32";
+		--icon-content: "💻";
 	}
 
 	&[data-icon~="wallet_test"] {
-		--icon-content: "\ea33";
+		--icon-content: "🧪";
 	}
 }

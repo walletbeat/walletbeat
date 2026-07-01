@@ -1,7 +1,8 @@
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string
+">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
-	import { ladders } from '@/schema/ladders'
 	import {
 		StageCriterionRating,
 		stageCriterionRatings,
@@ -22,15 +23,15 @@
 		ladderEvaluation,
 		showNextStageCriteria = true,
 	}: {
-		wallet: RatedWallet
-		stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
-		ladderEvaluation: WalletLadderEvaluation | null
+		wallet: RatedWallet<_AttributeGroupId>
+		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 		showNextStageCriteria?: boolean
 	} = $props()
 
 
 	// (Derived)
-	const stageEvaluatableWallet: StageEvaluatableWallet = $derived({
+	const stageEvaluatableWallet: StageEvaluatableWallet<_AttributeGroupId> = $derived({
 		types: wallet.types,
 		variants: wallet.variants,
 		variantSpecificity: wallet.variantSpecificity,
@@ -38,18 +39,8 @@
 		overrides: wallet.overrides,
 	})
 
-	const ladderType = $derived(
-		ladderEvaluation ?
-			Object.entries(wallet.ladders)
-				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0]
-			?? null
-		:
-			null
-	)
-
 	const ladderDefinition = $derived(
-		ladderType ? ladders[ladderType] : null
+		ladderEvaluation?.ladder ?? null
 	)
 
 	const stage0 = $derived(
@@ -60,7 +51,7 @@
 		(!stage || typeof stage === 'string' || !ladderDefinition) ?
 			null
 		:
-			ladderDefinition.stages.findIndex(s => s.id === stage.id)
+			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 	)
 
 	const currentStage = $derived(
@@ -195,10 +186,9 @@
 					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
 
 					<li
-						data-wbicon={attribute?.icon ? '' : undefined}
-									data-icon={attribute?.icon}
+						data-icon={attribute?.icon ? `wbicons ${attribute.icon}` : undefined}
 						data-stage-criterion-rating={evaluation.rating}
-						style:--accent={stageCriterionRatings[evaluation.rating as StageCriterionRating].color}
+						style:--accent={stageCriterionRatings[evaluation.rating].color}
 					>
 						<span data-row="start gap-2">
 							<span data-row-item="flexible">
@@ -228,9 +218,9 @@
 
 							<data
 								value={evaluation.rating}
-								title={stageCriterionRatings[evaluation.rating as StageCriterionRating].label}
+								title={stageCriterionRatings[evaluation.rating].label}
 							>
-								{stageCriterionRatings[evaluation.rating as StageCriterionRating].icon}
+								{stageCriterionRatings[evaluation.rating].icon}
 							</data>
 						</span>
 					</li>
@@ -252,11 +242,6 @@
 
 	li > span > span:last-child {
 		color: var(--text-secondary);
-	}
-
-	li[data-wbicon]::before {
-		font-family: var(--fontFamily-wbicons);
-		content: var(--icon-content);
 	}
 
 	[data-stage-criterion-rating] {

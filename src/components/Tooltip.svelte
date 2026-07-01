@@ -77,7 +77,7 @@
 			isTriggerHovered = false
 		},
 	}
-			
+
 	const supportsAnchorPositioning = (
 		globalThis.CSS?.supports('anchor-name: --test')
 	)
@@ -194,7 +194,6 @@
 				data-tooltip-trigger
 				style:anchor-name={anchorName}
 				popovertarget={popoverId}
-				
 				{...hoverTriggerPlacement === 'button' && hoverTriggerEvents}
 				{@attach useButtonTrigger}
 			></button>

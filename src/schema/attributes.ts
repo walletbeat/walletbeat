@@ -29,7 +29,7 @@ export interface ConcreteWalletEvalStrings {
 	WALLET_PSEUDONYM_PLURAL: string
 }
 
-import type { WBIconFontID } from '@/styles/wbicons'
+import type { WBIconID } from '@/styles/wbicons'
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
@@ -187,9 +187,9 @@ export function borderRatingToColor(rating: Rating): string {
 		case Rating.PASS:
 			return '#B5ED9D' // Green
 		case Rating.UNRATED:
-			return '#F8ECEC' // Gray
+			return '#bdc3c7' // Gray
 		case Rating.EXEMPT:
-			return '#D5D4FB' // Gray
+			return '#bdc3c7' // Gray
 	}
 }
 
@@ -391,7 +391,7 @@ export function compareExplicitRatings(rating1: ExplicitRating, rating2: Explici
 export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = null> {
 	outcome: Outcome<_OutcomeMetadata>
 	references: FullyQualifiedReference[]
-	wallet: RatedWallet
+	wallet: RatedWallet<string>
 }
 
 /**
@@ -484,12 +484,12 @@ export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata> {
 	 * Match function that determines whether the given outcome matches this
 	 * example.
 	 */
-	matchesValue: (outcome: Outcome<_OutcomeMetadata>) => boolean
+	matchesValue(outcome: Outcome<_OutcomeMetadata>): boolean
 
 	/**
 	 * Sample evaluations for this rating. Optional, may be empty.
 	 */
-	sampleEvaluations: Evaluation<_OutcomeMetadata>[]
+	sampleEvaluations: readonly Evaluation<_OutcomeMetadata>[]
 }
 
 /**
@@ -519,7 +519,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	id: string
 
 	/** An icon representing the attribute. Shown on rating charts. */
-	icon: WBIconFontID
+	icon: WBIconID
 
 	/**
 	 * A very short, human-readable title for the attribute.
@@ -619,7 +619,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	 * by preventing their evaluation code from taking any metadata into
 	 * account.
 	 */
-	evaluate: (ctx: EvaluationContext<_OutcomeMetadata>) => Evaluation<_OutcomeMetadata>
+	evaluate(ctx: EvaluationContext<_OutcomeMetadata>): Evaluation<_OutcomeMetadata>
 
 	/**
 	 * Check whether the attribute applies to a wallet, according to its
@@ -632,19 +632,19 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	 *
 	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
 	 */
-	exempted?: (
+	exempted?(
 		ctx: EvaluationContext<_OutcomeMetadata>,
 		metadata: WalletMetadata,
-	) => null | ExemptEvaluation<_OutcomeMetadata>
+	): null | ExemptEvaluation<_OutcomeMetadata>
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.
 	 * @param perVariant One or more per-variant evaluations.
 	 * @returns The aggregated evaluation for these per-variant evaluations.
 	 */
-	aggregate: (
+	aggregate(
 		perVariant: AtLeastOneVariant<Evaluation<_OutcomeMetadata>>,
-	) => Evaluation<_OutcomeMetadata>
+	): Evaluation<_OutcomeMetadata>
 }
 
 export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = null> {
@@ -664,9 +664,9 @@ export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata> = Omit<
 }
 
 /** A function that takes a wallet's evaluation context and returns a `Verifiability`. */
-export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = null> = (
-	ctx: EvaluationContext<_OutcomeMetadata>,
-) => Verifiability
+export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = null> = {
+	predicate(ctx: EvaluationContext<_OutcomeMetadata>): Verifiability
+}['predicate']
 
 /**
  * EvaluationContext is a helper class to build `Evaluation<_OutcomeMetadata>` objects,
@@ -862,54 +862,23 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 				}
 			})() as unknown as Outcome<_OutcomeMetadata, Rating>,
 
-			...(finalRefs.length === 0 && { references: finalRefs }),
+			...(finalRefs.length > 0 && { references: finalRefs }),
 		}
 	}
 }
 
 /**
- * A map of attribute IDs to their outcome metadata. Used to define attribute groups.
+ * A map of attribute IDs to their outcome metadata. Used with EvaluatedGroup and related helpers.
  */
-export type ValueSet = NonEmptyRecord<string, OutcomeMetadata>
-
-/**
- * An attribute group is a collection of attributes that are related to one
- * another. For example, all attributes about privacy would be in the same
- * attribute group.
- */
-export interface AttributeGroup<Vs extends ValueSet> {
-	/** Unique ID of the attribute group. */
-	id: string
-
-	/** A friendly icon for the group. */
-	icon: WBIconFontID
-
-	/** A human-readable name for the group. */
-	displayName: string
-
-	/**
-	 * A short question to which this attribute group is the answer.
-	 * For example, for an attribute group about privacy, a good question
-	 * might be "How well does {wallet} protect your privacy?".
-	 */
-	perWalletQuestion: Sentence<WalletNameStrings>
-
-	/** The actual set of attributes belonging to this group. */
-	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }
-
-	/**
-	 * The weights for each attribute when calculating the score for this attribute group.
-	 */
-	attributeWeights: { [K in keyof Vs]: number }
-}
+export type OutcomeMetadataSet = NonEmptyRecord<string, OutcomeMetadata>
 
 /**
  * An evaluated group is a collection of evaluated attributes that are related
  * to one another. For example, all evaluated attributed about privacy would
  * be in the same evaluation group.
  */
-export type EvaluatedGroup<Vs extends ValueSet> = {
-	[K in keyof Vs]: EvaluatedAttribute<Vs[K]>
+export type EvaluatedGroup<OutcomeMetadataByAttribute extends OutcomeMetadataSet> = {
+	[K in keyof OutcomeMetadataByAttribute]: EvaluatedAttribute<OutcomeMetadataByAttribute[K]>
 }
 
 /**
@@ -917,8 +886,8 @@ export type EvaluatedGroup<Vs extends ValueSet> = {
  * @param evaluatedGroup The group to iterate over.
  * @returns An array of all the evaluated attributes in the group.
  */
-export function evaluatedAttributes<Vs extends ValueSet>(
-	evaluatedGroup: EvaluatedGroup<Vs>,
+export function evaluatedAttributes<OutcomeMetadataByAttribute extends OutcomeMetadataSet>(
+	evaluatedGroup: EvaluatedGroup<OutcomeMetadataByAttribute>,
 ): NonEmptyArray<EvaluatedAttribute<OutcomeMetadata>> {
 	return assertNonEmptyArray(
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.values widens; each entry is an evaluated attribute for this group
@@ -932,12 +901,15 @@ export function evaluatedAttributes<Vs extends ValueSet>(
  * @param evaluatedGroup The group to iterate over.
  * @returns An array of all the evaluated attribute entries in the group.
  */
-export function evaluatedAttributesEntries<Vs extends ValueSet>(
-	evaluatedGroup: EvaluatedGroup<Vs>,
-): NonEmptyArray<[keyof Vs, EvaluatedAttribute<OutcomeMetadata>]> {
+export function evaluatedAttributesEntries<OutcomeMetadataByAttribute extends OutcomeMetadataSet>(
+	evaluatedGroup: EvaluatedGroup<OutcomeMetadataByAttribute>,
+): NonEmptyArray<[keyof OutcomeMetadataByAttribute, EvaluatedAttribute<OutcomeMetadata>]> {
 	return assertNonEmptyArray(
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.entries widens keys/values; shape matches EvaluatedGroup entries
-		Object.entries(evaluatedGroup) as unknown as [keyof Vs, EvaluatedAttribute<OutcomeMetadata>][],
+		Object.entries(evaluatedGroup) as unknown as [
+			keyof OutcomeMetadataByAttribute,
+			EvaluatedAttribute<OutcomeMetadata>,
+		][],
 	)
 }
 

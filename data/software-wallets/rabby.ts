@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -62,7 +63,6 @@ import {
 } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { cure53 } from '../entities/cure53'
@@ -486,7 +486,29 @@ export const rabby: SoftwareWallet = {
 						}),
 					},
 				},
-				[Variant.MOBILE]: null,
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'Rabby Wallet Mobile application supports Ledger, Trezor, OneKey, Keystone hardware wallets.',
+							url: 'https://rabby.io/download',
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.bluetooth],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
+						}),
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.QR],
+						}),
+						[HardwareWalletType.ONEKEY]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.bluetooth],
+						}),
+					},
+				},
 			},
 			keysHandling: {
 				ref: refTodo,
@@ -719,7 +741,9 @@ export const rabby: SoftwareWallet = {
 						{
 							decoded: DataDisplayOptions.NOT_IN_UI,
 						},
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
 				}),
 				erc8213: supported({
 					calldataDisplay: {
@@ -766,9 +790,15 @@ export const rabby: SoftwareWallet = {
 						{
 							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
-					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
-					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
-					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
 						failure: 'DETECTED' as const,
 					},
@@ -788,12 +818,16 @@ export const rabby: SoftwareWallet = {
 			permissionsManagement: {
 				[Variant.BROWSER]: supported({
 					ref: refTodo,
-					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
 					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 				}),
-				[Variant.DESKTOP]: null,
-				[Variant.MOBILE]: null,
+				[Variant.MOBILE]: supported({
+					ref: refTodo,
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				}),
 			},
 			transactionSubmission: {
 				l1: {
@@ -847,6 +881,5 @@ export const rabby: SoftwareWallet = {
 	variants: {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: true,
 	},
 }
