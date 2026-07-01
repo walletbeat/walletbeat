@@ -3792,29 +3792,12 @@ type Monetization = WithRef<{
 
 ## `src/schema/features/transparency/orderflow.ts`
 
-### Type: `OrderflowFacts`
-
-Derived from `privacy.dataCollection`.
-
-```typescript
-type OrderflowFacts =
-	| { status: 'incomplete' }
-	| {
-			status: 'complete'
-			hasMempoolWithoutEndpoint: boolean
-			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
-			auctioneers: WithRef<DataCollectionByEntity>[]
-	  }
-```
-
----
-
 ### Enum: `OrderflowDisclosureLevel`
 
 What level of orderflow / MEV auctioning information is shown by default and after a user action during transaction confirmation.
 
 - `NONE` = `'NONE'`: No mention of auction / orderflow / MEV.
-- `AGGREGATED` = `'AGGREGATED'`: Single line or toggle (e.g. "MEV protection", "Private tx") without full breakdown.
+- `MENTIONED` = `'MENTIONED'`: Single line or toggle (e.g. "MEV protection", "Private tx") without full breakdown.
 - `COMPREHENSIVE` = `'COMPREHENSIVE'`: Clear block: auctioning disclosed, stats or kickback called out, Learn more to practices page.
 
 ---
@@ -3825,13 +3808,13 @@ How much orderflow / MEV information is displayed by default and after a user ac
 
 `byDefault` and `afterSingleAction` must tell a consistent story: one user action may reveal the same or more detail, but never less. Enforced by `validateOrderflowDisclosure`.
 
-Valid pairs include `(NONE, NONE)`, `(NONE, AGGREGATED)`, `(AGGREGATED, AGGREGATED)`, `(AGGREGATED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
+Valid pairs include `(NONE, NONE)`, `(NONE, MENTIONED)`, `(MENTIONED, MENTIONED)`, `(MENTIONED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
 
 Invalid examples:
 
-- `(AGGREGATED, NONE)` — e.g. "MEV protection: on" is visible by default, but nothing
+- `(MENTIONED, NONE)` — e.g. "MEV protection: on" is visible by default, but nothing
   orderflow-related appears after the user taps it.
-- `(COMPREHENSIVE, AGGREGATED)` — a full orderflow block is shown by default, but one
+- `(COMPREHENSIVE, MENTIONED)` — a full orderflow block is shown by default, but one
   action collapses it to a single line.
 
 - `byDefault` (`OrderflowDisclosureLevel`): Level shown with default settings and no orderflow-related user action.
@@ -3866,16 +3849,30 @@ Contents researchers evaluate on the wallet's orderflow practices page.
 Orderflow transparency practices beyond data-collection entity rows.
 
 ```typescript
-type OrderflowPractices = WithRef<{
+type OrderflowPractices = {
 	disclosure: WithRef<OrderflowDisclosure>
-	userCanRemoveAuctioning: Support
+	userCanRemoveAuctioning: Support<WithRef<{}>>
 	practicesPage: Support<
 		MustRef<{
-			url: string
-			contents: WithRef<OrderflowPracticesPageContents>
+			contents: OrderflowPracticesPageContents
 		}>
 	>
-}>
+}
+```
+
+---
+
+### Type: `OrderflowFacts`
+
+```typescript
+type OrderflowFacts =
+	| { status: 'incomplete' }
+	| {
+			status: 'complete'
+			hasMempoolWithoutEndpoint: boolean
+			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
+			auctioneers: WithRef<DataCollectionByEntity>[]
+	  }
 ```
 
 ---

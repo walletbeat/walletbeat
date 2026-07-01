@@ -27,7 +27,7 @@ export enum OrderflowDisclosureLevel {
 	 * Single line or toggle (e.g. "MEV protection", "Private tx") without full
 	 * breakdown.
 	 */
-	AGGREGATED = 'AGGREGATED',
+	MENTIONED = 'MENTIONED',
 
 	/**
 	 * Clear block: auctioning disclosed, stats or kickback called out, Learn more
@@ -43,13 +43,13 @@ export enum OrderflowDisclosureLevel {
  * reveal the same or more detail, but never less. Enforced by
  * `validateOrderflowDisclosure`.
  *
- * Valid pairs include `(NONE, NONE)`, `(NONE, AGGREGATED)`, `(AGGREGATED, AGGREGATED)`,
- * `(AGGREGATED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
+ * Valid pairs include `(NONE, NONE)`, `(NONE, MENTIONED)`, `(MENTIONED, MENTIONED)`,
+ * `(MENTIONED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
  *
  * Invalid examples:
- * - `(AGGREGATED, NONE)` — e.g. "MEV protection: on" is visible by default, but nothing
+ * - `(MENTIONED, NONE)` — e.g. "MEV protection: on" is visible by default, but nothing
  *   orderflow-related appears after the user taps it.
- * - `(COMPREHENSIVE, AGGREGATED)` — a full orderflow block is shown by default, but one
+ * - `(COMPREHENSIVE, MENTIONED)` — a full orderflow block is shown by default, but one
  *   action collapses it to a single line.
  */
 export interface OrderflowDisclosure {
@@ -81,22 +81,21 @@ export interface OrderflowPracticesPageContents {
 }
 
 /** Orderflow transparency practices beyond data-collection entity rows. */
-export type OrderflowPractices = WithRef<{
+export type OrderflowPractices = {
 	disclosure: WithRef<OrderflowDisclosure>
-	userCanRemoveAuctioning: Support
+	userCanRemoveAuctioning: Support<WithRef<{}>>
 	practicesPage: Support<
 		MustRef<{
-			url: string
-			contents: WithRef<OrderflowPracticesPageContents>
+			contents: OrderflowPracticesPageContents
 		}>
 	>
-}>
+}
 
 /**
  * Validates that `OrderflowDisclosure` levels are consistent (parallel to fee display
  * rules).
  *
- * - Rule 1: `afterSingleAction` cannot be `NONE` when `byDefault` is `AGGREGATED` or
+ * - Rule 1: `afterSingleAction` cannot be `NONE` when `byDefault` is `MENTIONED` or
  *   `COMPREHENSIVE`.
  * - Rule 2: `byDefault` `COMPREHENSIVE` requires `afterSingleAction` `COMPREHENSIVE`.
  *
@@ -104,7 +103,7 @@ export type OrderflowPractices = WithRef<{
  */
 export function validateOrderflowDisclosure(orderflow: OrderflowDisclosure): void {
 	if (
-		(orderflow.byDefault === OrderflowDisclosureLevel.AGGREGATED ||
+		(orderflow.byDefault === OrderflowDisclosureLevel.MENTIONED ||
 			orderflow.byDefault === OrderflowDisclosureLevel.COMPREHENSIVE) &&
 		orderflow.afterSingleAction === OrderflowDisclosureLevel.NONE
 	) {
@@ -132,7 +131,7 @@ function compareProminenceLevels(
 			case OrderflowDisclosureLevel.COMPREHENSIVE:
 			case FeeDisplayLevel.COMPREHENSIVE:
 				return 2
-			case OrderflowDisclosureLevel.AGGREGATED:
+			case OrderflowDisclosureLevel.MENTIONED:
 			case FeeDisplayLevel.AGGREGATED:
 				return 1
 			case OrderflowDisclosureLevel.NONE:

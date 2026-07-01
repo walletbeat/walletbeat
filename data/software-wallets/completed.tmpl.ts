@@ -747,7 +747,6 @@ export const completedTemplate: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
 			orderflowPractices: {
-				ref: refTodo,
 				disclosure: {
 					ref: refTodo,
 					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
@@ -756,14 +755,12 @@ export const completedTemplate: SoftwareWallet = {
 				practicesPage: supported({
 					ref: 'https://example.com/orderflow-practices',
 					contents: {
-						ref: refTodo,
 						documentsHowToChangeDefaults: true,
 						explainsDefaultOrderflowAuctioning: true,
 						listsEntitiesAndWhatTheyDo: true,
 						onchainVerification: OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE,
 						pageLastUpdated: '2026-02-27' as CalendarDate,
 					},
-					url: 'https://example.com/orderflow-practices',
 				}),
 				userCanRemoveAuctioning: supported({ ref: refTodo }),
 			},

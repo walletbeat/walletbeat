@@ -92,7 +92,6 @@ const exampleExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
 const exampleOrderflowPracticesPageUrl = 'https://example.com/orderflow-practices'
 
 const examplePassAuctioningPractices: OrderflowPractices = {
-	ref: refNotNecessary,
 	disclosure: {
 		ref: refNotNecessary,
 		byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
@@ -100,9 +99,7 @@ const examplePassAuctioningPractices: OrderflowPractices = {
 	},
 	practicesPage: supported({
 		ref: exampleOrderflowPracticesPageUrl,
-		url: exampleOrderflowPracticesPageUrl,
 		contents: {
-			ref: refNotNecessary,
 			listsEntitiesAndWhatTheyDo: true,
 			explainsDefaultOrderflowAuctioning: true,
 			documentsHowToChangeDefaults: true,
@@ -114,7 +111,6 @@ const examplePassAuctioningPractices: OrderflowPractices = {
 }
 
 const examplePartialOnchainPractices: OrderflowPractices = {
-	ref: refNotNecessary,
 	disclosure: {
 		ref: refNotNecessary,
 		byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
@@ -122,9 +118,7 @@ const examplePartialOnchainPractices: OrderflowPractices = {
 	},
 	practicesPage: supported({
 		ref: exampleOrderflowPracticesPageUrl,
-		url: exampleOrderflowPracticesPageUrl,
 		contents: {
-			ref: refNotNecessary,
 			listsEntitiesAndWhatTheyDo: true,
 			explainsDefaultOrderflowAuctioning: true,
 			documentsHowToChangeDefaults: true,
@@ -136,7 +130,6 @@ const examplePartialOnchainPractices: OrderflowPractices = {
 }
 
 const exampleFailNoDisclosurePractices: OrderflowPractices = {
-	ref: refNotNecessary,
 	disclosure: {
 		ref: refNotNecessary,
 		byDefault: OrderflowDisclosureLevel.NONE,
@@ -147,17 +140,14 @@ const exampleFailNoDisclosurePractices: OrderflowPractices = {
 }
 
 const exampleFailLowProminencePractices: OrderflowPractices = {
-	ref: refNotNecessary,
 	disclosure: {
 		ref: refNotNecessary,
-		byDefault: OrderflowDisclosureLevel.AGGREGATED,
-		afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+		byDefault: OrderflowDisclosureLevel.MENTIONED,
+		afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 	},
 	practicesPage: supported({
 		ref: exampleOrderflowPracticesPageUrl,
-		url: exampleOrderflowPracticesPageUrl,
 		contents: {
-			ref: refNotNecessary,
 			listsEntitiesAndWhatTheyDo: true,
 			explainsDefaultOrderflowAuctioning: true,
 			documentsHowToChangeDefaults: true,
@@ -169,7 +159,6 @@ const exampleFailLowProminencePractices: OrderflowPractices = {
 }
 
 const exampleFailNoPracticesPagePractices: OrderflowPractices = {
-	ref: refNotNecessary,
 	disclosure: {
 		ref: refNotNecessary,
 		byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
@@ -193,7 +182,7 @@ function orderflowDisclosureUserDescription(level: OrderflowDisclosureLevel): st
 	switch (level) {
 		case OrderflowDisclosureLevel.NONE:
 			return 'no mention of orderflow auctioning'
-		case OrderflowDisclosureLevel.AGGREGATED:
+		case OrderflowDisclosureLevel.MENTIONED:
 			return 'only a brief orderflow or MEV line'
 		case OrderflowDisclosureLevel.COMPREHENSIVE:
 			return 'a full orderflow disclosure'
@@ -211,13 +200,13 @@ function feeDisplayUserDescription(level: FeeDisplayLevel): string {
 	}
 }
 
-function userControlPassDescription(userCanRemoveAuctioning: Support): string {
+function userControlPassDescription(userCanRemoveAuctioning: Support<WithRef<{}>>): string {
 	return isSupported(userCanRemoveAuctioning)
 		? 'documents how users can opt out of or change default orderflow auctioning'
 		: 'states that default orderflow auctioning cannot be changed by users'
 }
 
-function userControlFailShortExplanation(userCanRemoveAuctioning: Support): string {
+function userControlFailShortExplanation(userCanRemoveAuctioning: Support<WithRef<{}>>): string {
 	return isSupported(userCanRemoveAuctioning)
 		? 'does not explain how users can change default orderflow auctioning'
 		: 'does not state whether users can change default orderflow auctioning'
@@ -429,10 +418,10 @@ function evaluateAuctioningOrderflow(
 		})
 	}
 
-	const { url, contents } = practicesPage
+	const { contents } = practicesPage
 
 	if (!contents.listsEntitiesAndWhatTheyDo) {
-		ctx.addRef(practicesPage, contents)
+		ctx.addRef(practicesPage)
 
 		return ctx.build({
 			outcome: {
@@ -444,7 +433,7 @@ function evaluateAuctioningOrderflow(
 				),
 			},
 			details: mdSentence(
-				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. Its orderflow practices page at ${url} does not list which entities receive pre-inclusion transaction data and what they do with it.`,
+				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. Its orderflow practices page does not list which entities receive pre-inclusion transaction data and what they do with it.`,
 			),
 			howToImprove: mdSentence(
 				'{{WALLET_NAME}} should update its orderflow practices page to list each entity that receives pre-inclusion transaction data and describe what that entity does with it.',
@@ -453,7 +442,7 @@ function evaluateAuctioningOrderflow(
 	}
 
 	if (!contents.explainsDefaultOrderflowAuctioning) {
-		ctx.addRef(practicesPage, contents)
+		ctx.addRef(practicesPage)
 
 		return ctx.build({
 			outcome: {
@@ -465,7 +454,7 @@ function evaluateAuctioningOrderflow(
 				),
 			},
 			details: mdSentence(
-				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. Its orderflow practices page at ${url} does not explain that orderflow auctioning is enabled by default.`,
+				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. Its orderflow practices page does not explain that orderflow auctioning is enabled by default.`,
 			),
 			howToImprove: mdSentence(
 				'{{WALLET_NAME}} should update its orderflow practices page to explain that orderflow auctioning is enabled under default settings.',
@@ -474,7 +463,7 @@ function evaluateAuctioningOrderflow(
 	}
 
 	if (!contents.documentsHowToChangeDefaults) {
-		ctx.addRef(practicesPage, contents)
+		ctx.addRef(practicesPage, userCanRemoveAuctioning)
 
 		const userControlRequirement = isSupported(userCanRemoveAuctioning)
 			? 'explain how users can opt out of or change default orderflow auctioning settings'
@@ -490,7 +479,7 @@ function evaluateAuctioningOrderflow(
 				),
 			},
 			details: mdSentence(
-				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. Its orderflow practices page at ${url} does not ${userControlRequirement}.`,
+				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. Its orderflow practices page does not ${userControlRequirement}.`,
 			),
 			howToImprove: mdSentence(
 				`{{WALLET_NAME}} should update its orderflow practices page to ${userControlRequirement}.`,
@@ -502,7 +491,7 @@ function evaluateAuctioningOrderflow(
 		contents.onchainVerification !==
 		OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE
 	) {
-		ctx.addRef(orderflowPractices, disclosure, practicesPage)
+		ctx.addRef(disclosure, practicesPage, userCanRemoveAuctioning)
 
 		return ctx.build({
 			outcome: {
@@ -514,7 +503,7 @@ function evaluateAuctioningOrderflow(
 				),
 			},
 			details: mdSentence(
-				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default, discloses orderflow auctioning in the transaction UI with prominence comparable to fee display, and publishes an orderflow practices page at ${url} (last updated ${contents.pageLastUpdated}). However, ${onchainVerificationDetailsClause(contents.onchainVerification)}.`,
+				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default, discloses orderflow auctioning in the transaction UI with prominence comparable to fee display, and publishes an orderflow practices page (last updated ${contents.pageLastUpdated}). However, ${onchainVerificationDetailsClause(contents.onchainVerification)}.`,
 			),
 			howToImprove: mdSentence(
 				'{{WALLET_NAME}} should document on its orderflow practices page a method users can follow to verify on-chain outcomes, and confirm that method is effective.',
@@ -525,7 +514,7 @@ function evaluateAuctioningOrderflow(
 		})
 	}
 
-	ctx.addRef(orderflowPractices, disclosure, practicesPage)
+	ctx.addRef(disclosure, practicesPage, userCanRemoveAuctioning)
 	ctx.addRef(worstFees.references)
 
 	return ctx.build({
@@ -538,7 +527,7 @@ function evaluateAuctioningOrderflow(
 			),
 		},
 		details: mdSentence(
-			`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. The transaction UI shows ${orderflowDisclosureUserDescription(disclosure.byDefault)} by default and ${orderflowDisclosureUserDescription(disclosure.afterSingleAction)} after one interaction, with prominence comparable to its fee display. It links to an orderflow practices page at ${url} (last updated ${contents.pageLastUpdated}). The page lists recipient entities, explains default auctioning, ${userControlPassDescription(userCanRemoveAuctioning)}, and documents an effective on-chain verification method.`,
+			`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. The transaction UI shows ${orderflowDisclosureUserDescription(disclosure.byDefault)} by default and ${orderflowDisclosureUserDescription(disclosure.afterSingleAction)} after one interaction, with prominence comparable to its fee display. It links to an orderflow practices page (last updated ${contents.pageLastUpdated}). The page lists recipient entities, explains default auctioning, ${userControlPassDescription(userCanRemoveAuctioning)}, and documents an effective on-chain verification method.`,
 		),
 	})
 }

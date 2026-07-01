@@ -286,8 +286,8 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 		expect(
 			compareOrderflowDisclosureToFeeDisplay(
 				{
-					byDefault: OrderflowDisclosureLevel.AGGREGATED,
-					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+					byDefault: OrderflowDisclosureLevel.MENTIONED,
+					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 				},
 				comprehensiveFeeDisplay,
 			),
@@ -298,8 +298,8 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 		expect(
 			compareOrderflowDisclosureToFeeDisplay(
 				{
-					byDefault: OrderflowDisclosureLevel.AGGREGATED,
-					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+					byDefault: OrderflowDisclosureLevel.MENTIONED,
+					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 				},
 				fullySponsoredFeeDisplay,
 			),
@@ -310,8 +310,8 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 		expect(
 			compareOrderflowDisclosureToFeeDisplay(
 				{
-					byDefault: OrderflowDisclosureLevel.AGGREGATED,
-					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+					byDefault: OrderflowDisclosureLevel.MENTIONED,
+					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 				},
 				{
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
@@ -326,8 +326,8 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 		expect(
 			compareOrderflowDisclosureToFeeDisplay(
 				{
-					byDefault: OrderflowDisclosureLevel.AGGREGATED,
-					afterSingleAction: OrderflowDisclosureLevel.AGGREGATED,
+					byDefault: OrderflowDisclosureLevel.MENTIONED,
+					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
 				},
 				{
 					byDefault: FeeDisplayLevel.AGGREGATED,
@@ -338,11 +338,11 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 		).toBe(0)
 	})
 
-	it('returns -1 when comprehensive fees exceed aggregated orderflow disclosure', () => {
+	it('returns -1 when comprehensive fees exceed mentioned orderflow disclosure', () => {
 		expect(
 			compareOrderflowDisclosureToFeeDisplay(
 				{
-					byDefault: OrderflowDisclosureLevel.AGGREGATED,
+					byDefault: OrderflowDisclosureLevel.MENTIONED,
 					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
 				},
 				comprehensiveFeeDisplay,
@@ -355,7 +355,7 @@ describe('validateOrderflowDisclosure', () => {
 	it('rejects aggregated default with none after action', () => {
 		expect(() =>
 			validateOrderflowDisclosure({
-				byDefault: OrderflowDisclosureLevel.AGGREGATED,
+				byDefault: OrderflowDisclosureLevel.MENTIONED,
 				afterSingleAction: OrderflowDisclosureLevel.NONE,
 			}),
 		).toThrow()
