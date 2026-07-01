@@ -92,9 +92,10 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import {
 	OnchainVerificationDocumentation,
 	OrderflowDisclosureLevel,
+	type OrderflowPracticesPageContents,
 } from '@/schema/features/transparency/orderflow'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
-import { type References, refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
 
@@ -760,7 +761,7 @@ export const completedTemplate: SoftwareWallet = {
 						onchainVerification: OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE,
 						pageLastUpdated: '2026-02-27',
 					},
-				}),
+				} satisfies MustRef<{ contents: OrderflowPracticesPageContents }>),
 				userCanRemoveAuctioning: supported({ ref: refTodo }),
 			},
 			releaseTransparency: {
