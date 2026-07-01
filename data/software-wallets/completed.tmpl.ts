@@ -97,7 +97,6 @@ import type { ArtifactSigningDetails } from '@/schema/features/transparency/rele
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 /**
  * Fictitious data leak references for the completed template.
@@ -759,7 +758,7 @@ export const completedTemplate: SoftwareWallet = {
 						explainsDefaultOrderflowAuctioning: true,
 						listsEntitiesAndWhatTheyDo: true,
 						onchainVerification: OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE,
-						pageLastUpdated: '2026-02-27' as CalendarDate,
+						pageLastUpdated: '2026-02-27',
 					},
 				}),
 				userCanRemoveAuctioning: supported({ ref: refTodo }),
