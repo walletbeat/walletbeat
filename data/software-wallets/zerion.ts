@@ -363,8 +363,8 @@ export const zerion: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The README documents a `.npmrc` `min-release-age=15` supply-chain cooldown that restricts `npm install` to dependency versions published more than 15 days ago, applied to every install "here and in CI."',
-							url: 'https://github.com/zeriontech/zerion-wallet-extension#readme',
+								'A committed `package-lock.json` pins every dependency to an exact resolved version with an integrity hash.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json',
 						},
 					],
 				}),
