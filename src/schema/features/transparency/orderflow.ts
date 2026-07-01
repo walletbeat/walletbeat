@@ -1,6 +1,17 @@
 import type { MustRef, WithRef } from '@/schema/reference'
 import type { CalendarDate } from '@/types/date'
 
+import {
+	collectedByDefault,
+	type DataCollection,
+	type DataCollectionByEntity,
+	DataCollectionPurpose,
+	endpointIsVerifiablyNonExtractive,
+	isWithEndpoint,
+	qualifiedDataCollection,
+	UserFlow,
+	WalletInfo,
+} from '../privacy/data-collection'
 import { type Support } from '../support'
 import { type FeeDisplay, FeeDisplayLevel, validateFeeDisplay } from './fee-display'
 
@@ -169,4 +180,98 @@ export function compareOrderflowDisclosureToFeeDisplay(
 	}
 
 	return compareProminenceLevels(disclosure.afterSingleAction, feeDisplay.afterSingleAction)
+}
+
+/** Transaction flows used for orderflow transparency helpers derived from data collection. */
+export const orderflowTransactionFlows = [
+	UserFlow.SEND_ETHER,
+	UserFlow.SEND_USDC,
+	UserFlow.NATIVE_SWAP,
+	UserFlow.MAKE_TRANSACTION,
+] as const
+
+function mempoolCollectedByDefaultOrAlways(
+	collectionByEntity: WithRef<DataCollectionByEntity>,
+): boolean {
+	const policy = qualifiedDataCollection(collectionByEntity.dataCollection)[
+		WalletInfo.MEMPOOL_TRANSACTIONS
+	]
+
+	return collectedByDefault(policy)
+}
+
+export type OrderflowFacts =
+	| { status: 'incomplete' }
+	| {
+			status: 'complete'
+			hasMempoolWithoutEndpoint: boolean
+			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
+			auctioneers: WithRef<DataCollectionByEntity>[]
+	  }
+
+/** Derived orderflow-related facts from privacy data collection in a single pass. */
+export function deriveOrderflowFacts(dataCollection: DataCollection | null): OrderflowFacts {
+	if (dataCollection === null) {
+		return { status: 'incomplete' }
+	}
+
+	const preInclusionRecipients: WithRef<DataCollectionByEntity>[] = []
+	let hasMempoolWithoutEndpoint = false
+
+	for (const flow of orderflowTransactionFlows) {
+		const flowData = dataCollection[flow]
+
+		if (flowData === null) {
+			return { status: 'incomplete' }
+		}
+
+		if (flowData === 'FLOW_NOT_SUPPORTED') {
+			continue
+		}
+
+		for (const collectionByEntity of flowData.collected) {
+			if (!mempoolCollectedByDefaultOrAlways(collectionByEntity)) {
+				continue
+			}
+
+			if (!isWithEndpoint(collectionByEntity.dataCollection)) {
+				hasMempoolWithoutEndpoint = true
+				continue
+			}
+
+			preInclusionRecipients.push(collectionByEntity)
+		}
+	}
+
+	const auctioneers = preInclusionRecipients.filter(collectionByEntity =>
+		collectionByEntity.purposes.includes(DataCollectionPurpose.ORDERFLOW_AUCTION),
+	)
+
+	return {
+		status: 'complete',
+		hasMempoolWithoutEndpoint,
+		preInclusionRecipients,
+		auctioneers,
+	}
+}
+
+/** Partition default pre-inclusion recipients by whether their endpoint is verifiably non-extractive. */
+export function partitionPreInclusionRecipientsByExtractiveness(
+	recipients: WithRef<DataCollectionByEntity>[],
+): {
+	nonExtractive: WithRef<DataCollectionByEntity>[]
+	extractive: WithRef<DataCollectionByEntity>[]
+} {
+	const nonExtractive: WithRef<DataCollectionByEntity>[] = []
+	const extractive: WithRef<DataCollectionByEntity>[] = []
+
+	for (const row of recipients) {
+		if (endpointIsVerifiablyNonExtractive(row.dataCollection.endpoint)) {
+			nonExtractive.push(row)
+		} else {
+			extractive.push(row)
+		}
+	}
+
+	return { nonExtractive, extractive }
 }

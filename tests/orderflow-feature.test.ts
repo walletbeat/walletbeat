@@ -20,14 +20,12 @@ import {
 import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	compareOrderflowDisclosureToFeeDisplay,
-	OrderflowDisclosureLevel,
-	validateOrderflowDisclosure,
-} from '@/schema/features/transparency/orderflow'
-import {
 	deriveOrderflowFacts,
+	OrderflowDisclosureLevel,
 	orderflowTransactionFlows,
 	partitionPreInclusionRecipientsByExtractiveness,
-} from '@/schema/features/transparency/orderflow-derived'
+	validateOrderflowDisclosure,
+} from '@/schema/features/transparency/orderflow'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 
 const emptyFlow: DataCollectionForFlow = { collected: [] }
@@ -122,7 +120,7 @@ describe('endpointIsVerifiablyNonExtractive', () => {
 	})
 })
 
-describe('orderflow-derived helpers', () => {
+describe('orderflow data-collection helpers', () => {
 	it('exports the four transaction flows', () => {
 		expect(orderflowTransactionFlows).toEqual([
 			UserFlow.SEND_ETHER,

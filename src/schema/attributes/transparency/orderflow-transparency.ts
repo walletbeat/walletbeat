@@ -28,14 +28,12 @@ import {
 } from '@/schema/features/transparency/fee-display'
 import {
 	compareOrderflowDisclosureToFeeDisplay,
+	deriveOrderflowFacts,
 	OnchainVerificationDocumentation,
 	OrderflowDisclosureLevel,
 	type OrderflowPractices,
-} from '@/schema/features/transparency/orderflow'
-import {
-	deriveOrderflowFacts,
 	partitionPreInclusionRecipientsByExtractiveness,
-} from '@/schema/features/transparency/orderflow-derived'
+} from '@/schema/features/transparency/orderflow'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'

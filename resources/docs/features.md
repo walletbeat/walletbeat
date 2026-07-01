@@ -55,7 +55,6 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/transparency/license.ts`](#srcschemafeaturestransparencylicensets)
 - [`src/schema/features/transparency/maintenance.ts`](#srcschemafeaturestransparencymaintenancets)
 - [`src/schema/features/transparency/monetization.ts`](#srcschemafeaturestransparencymonetizationts)
-- [`src/schema/features/transparency/orderflow-derived.ts`](#srcschemafeaturestransparencyorderflow-derivedts)
 - [`src/schema/features/transparency/orderflow.ts`](#srcschemafeaturestransparencyorderflowts)
 - [`src/schema/features/transparency/release-transparency.ts`](#srcschemafeaturestransparencyrelease-transparencyts)
 - [`src/schema/features/transparency/reputation.ts`](#srcschemafeaturestransparencyreputationts)
@@ -3791,9 +3790,11 @@ type Monetization = WithRef<{
 
 ---
 
-## `src/schema/features/transparency/orderflow-derived.ts`
+## `src/schema/features/transparency/orderflow.ts`
 
 ### Type: `OrderflowFacts`
+
+Derived from `privacy.dataCollection`.
 
 ```typescript
 type OrderflowFacts =
@@ -3807,8 +3808,6 @@ type OrderflowFacts =
 ```
 
 ---
-
-## `src/schema/features/transparency/orderflow.ts`
 
 ### Enum: `OrderflowDisclosureLevel`
 
