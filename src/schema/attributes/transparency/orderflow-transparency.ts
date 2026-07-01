@@ -217,22 +217,22 @@ function onchainVerificationShortExplanation(
 ): string {
 	switch (documentation) {
 		case OnchainVerificationDocumentation.NO_METHOD_DOCUMENTED:
-			return 'does not document how users can verify on-chain outcomes'
+			return 'does not document how users can verify onchain outcomes'
 		case OnchainVerificationDocumentation.METHOD_DOCUMENTED:
-			return 'has not confirmed that the documented on-chain verification method works'
+			return 'has not confirmed that the documented onchain verification method works'
 		case OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE:
-			return 'documents effective on-chain verification'
+			return 'documents effective onchain verification'
 	}
 }
 
 function onchainVerificationDetailsClause(documentation: OnchainVerificationDocumentation): string {
 	switch (documentation) {
 		case OnchainVerificationDocumentation.NO_METHOD_DOCUMENTED:
-			return 'the page does not document any method users can follow to verify on-chain outcomes'
+			return 'the page does not document any method users can follow to verify onchain outcomes'
 		case OnchainVerificationDocumentation.METHOD_DOCUMENTED:
-			return 'the page documents an on-chain verification method, but Walletbeat has not confirmed it is effective'
+			return 'the page documents an onchain verification method, but Walletbeat has not confirmed it is effective'
 		case OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE:
-			return 'the page documents an effective on-chain verification method'
+			return 'the page documents an effective onchain verification method'
 	}
 }
 
@@ -248,7 +248,7 @@ function passFullyLocal(ctx: EvaluationContext): Evaluation {
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} does not send transaction data to external services for broadcast,
-			simulation, or orderflow auctioning before on-chain inclusion under default settings.
+			simulation, or orderflow auctioning before onchain inclusion under default settings.
 		`),
 	})
 }
@@ -304,7 +304,7 @@ function partialNonAuctioningExtractive(
 			'{{WALLET_NAME}} should route default pre-inclusion sharing through documented, independently verifiable non-extractive endpoints, or keep pre-inclusion transaction data fully local by default.',
 		),
 		impact: mdSentence(
-			'Users may not realize that external parties can retain or exploit their transaction data before it is included on-chain.',
+			'Users may not realize that external parties can retain or exploit their transaction data before it is included onchain.',
 		),
 	})
 }
@@ -497,7 +497,7 @@ function evaluateAuctioningOrderflow(
 			outcome: {
 				id: 'page_onchain_verification',
 				rating: Rating.PARTIAL,
-				displayName: 'Incomplete on-chain verification documentation',
+				displayName: 'Incomplete onchain verification documentation',
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} auctions orderflow to ${auctioneerNames} by default and publishes an orderflow practices page, but ${onchainVerificationShortExplanation(contents.onchainVerification)}.`,
 				),
@@ -506,7 +506,7 @@ function evaluateAuctioningOrderflow(
 				`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default, discloses orderflow auctioning in the transaction UI with prominence comparable to fee display, and publishes an orderflow practices page (last updated ${contents.pageLastUpdated}). However, ${onchainVerificationDetailsClause(contents.onchainVerification)}.`,
 			),
 			howToImprove: mdSentence(
-				'{{WALLET_NAME}} should document on its orderflow practices page a method users can follow to verify on-chain outcomes, and confirm that method is effective.',
+				'{{WALLET_NAME}} should document on its orderflow practices page a method users can follow to verify onchain outcomes, and confirm that method is effective.',
 			),
 			impact: mdSentence(
 				'Users cannot independently confirm whether auctioning behaved as described.',
@@ -527,7 +527,7 @@ function evaluateAuctioningOrderflow(
 			),
 		},
 		details: mdSentence(
-			`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. The transaction UI shows ${orderflowDisclosureUserDescription(disclosure.byDefault)} by default and ${orderflowDisclosureUserDescription(disclosure.afterSingleAction)} after one interaction, with prominence comparable to its fee display. It links to an orderflow practices page (last updated ${contents.pageLastUpdated}). The page lists recipient entities, explains default auctioning, ${userControlPassDescription(userCanRemoveAuctioning)}, and documents an effective on-chain verification method.`,
+			`{{WALLET_NAME}} auctions orderflow to ${auctioneerLinks} by default. The transaction UI shows ${orderflowDisclosureUserDescription(disclosure.byDefault)} by default and ${orderflowDisclosureUserDescription(disclosure.afterSingleAction)} after one interaction, with prominence comparable to its fee display. It links to an orderflow practices page (last updated ${contents.pageLastUpdated}). The page lists recipient entities, explains default auctioning, ${userControlPassDescription(userCanRemoveAuctioning)}, and documents an effective onchain verification method.`,
 		),
 	})
 }
@@ -544,13 +544,13 @@ export const orderflowTransparency: Attribute = {
 		),
 	},
 	question: sentence(
-		'Does the wallet transparently disclose orderflow auctioning, or avoid sharing pre-inclusion transaction data with extractive external parties by default?',
+		'Does the wallet transparently disclose how it monetizes your transaction data?',
 	),
 	why: markdown(`
-		Before a transaction is included on-chain, wallet software may send transaction
-		data to external services for broadcast, simulation, or orderflow auctioning (MEV).
-		Users cannot see this path as clearly as on-chain execution unless the wallet
-		discloses it.
+		Before a transaction is included onchain, or Ethereum implements an encrypted
+		mempool scheme, wallet software may send transaction data to external services
+		for broadcast, simulation, or orderflow auctioning (MEV). Users cannot see this
+		path as clearly as onchain execution unless the wallet discloses it.
 
 		Wallets that auction orderflow by default should tell users so in the transaction
 		UI, with prominence at least comparable to how they show transaction fees.
@@ -562,19 +562,7 @@ export const orderflowTransparency: Attribute = {
 		non-extractive, so external parties cannot retain or exploit transaction data.
 	`),
 	methodology: markdown(`
-		Wallets are **exempt** from this attribute when they are hardware or embedded
-		wallets.
-
-		Software wallets are **unrated** when Walletbeat has not yet researched where
-		the wallet sends transaction data before on-chain inclusion, which external
-		services receive it by default, or how those services handle it. This includes
-		common transaction flows such as sending Ether, built-in swaps, and general 
-		contract interactions, as well as cases where a default recipient is known 
-		but how data is handled at that endpoint is not.
-
-		Wallets that auction orderflow by default are also **unrated** when Walletbeat
-		lacks documented orderflow practices or enough fee-display information to compare
-		UI prominence across basic operations.
+		Wallets are **exempt** from this attribute when they are hardware wallets.
 
 		Software wallets that do not send pre-inclusion transaction data to external
 		parties by default **pass** on this attribute.
@@ -591,11 +579,11 @@ export const orderflowTransparency: Attribute = {
 		The practices page should list recipient entities and what they do, explain that
 		auctioning is enabled by default, document how users can change defaults (or
 		state that defaults cannot be changed), and describe how users can verify
-		on-chain outcomes.
+		onchain outcomes.
 
 		They **fail** when orderflow is not disclosed in the UI, disclosure is less
 		prominent than fees, no practices page is linked, or the page omits required
-		content. They receive **partial** when on-chain verification is documented but
+		content. They receive **partial** when onchain verification is documented but
 		not confirmed effective. They **pass** when all requirements are met.
 	`),
 	ratingScale: {
@@ -644,7 +632,7 @@ export const orderflowTransparency: Attribute = {
 			),
 			exampleRating(
 				paragraph(
-					'Auctions by default and publishes a practices page, but on-chain verification is documented but not confirmed effective.',
+					'Auctions by default and publishes a practices page, but onchain verification is documented but not confirmed effective.',
 				),
 				evaluateAuctioningOrderflow(
 					EvaluationContext.forTest(() => orderflowTransparency),
