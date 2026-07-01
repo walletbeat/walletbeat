@@ -403,3 +403,99 @@ describe('SVG optimization', async () => {
 		}
 	})
 })
+
+/**
+ * Threshold: if the raw text of embedded data: URIs (as they appear in the
+ * file) compose more than this fraction of the SVG file size, the file is
+ * flagged as a disguised raster image (PNG/JPEG/WebP inside an SVG wrapper).
+ */
+const EMBEDDED_IMAGE_RATIO_THRESHOLD = 0.95
+
+describe('SVG files should not be disguised raster images', async () => {
+	const disguised: {
+		filePath: string
+		fileSize: number
+		embeddedSize: number
+		ratio: number
+		mimeType: string
+	}[] = []
+
+	await crawlCodebase({
+		ignore: commonExclusions,
+		complexTraversalFn: async (entryBase, getFullEntry) => {
+			if (entryBase.type !== CodebaseEntryType.FILE) {
+				return
+			}
+
+			if (!entryBase.path.endsWith('.svg')) {
+				return
+			}
+
+			const entry = await getFullEntry()
+
+			if (entry.type !== CodebaseEntryType.FILE) {
+				throw new Error('inconsistent type')
+			}
+
+			const contents = entry.contents
+			const fileSize = entry.raw.byteLength
+
+			// Match data: URIs in attributes like xlink:href, href, src.
+			// Captures: data:<mime>;<params>,<raw-content>
+			const dataUriRegex = /data:\s*([\w/.+-]+);[^,]*,([^"'>\s]+)/g
+			let match
+			let embeddedSize = 0
+			let mimeType = ''
+
+			while ((match = dataUriRegex.exec(contents)) !== null) {
+				mimeType = match[1]
+
+				// Count the full data URI text as it appears in the file
+				// (the raw base64 or plain text, not the decoded bytes).
+				// This correctly reflects how much of the SVG is consumed
+				// by the embedded image wrapper.
+				embeddedSize += match[0].length
+			}
+
+			if (embeddedSize > 0) {
+				const ratio = embeddedSize / fileSize
+
+				if (ratio > EMBEDDED_IMAGE_RATIO_THRESHOLD) {
+					disguised.push({
+						filePath: entry.path,
+						fileSize,
+						embeddedSize,
+						ratio,
+						mimeType,
+					})
+				}
+			}
+		},
+	})
+
+	it('no SVGs should be disguised raster images', () => {
+		if (disguised.length > 0) {
+			disguised.sort((a, b) => b.ratio - a.ratio)
+
+			const message =
+				'The following SVG files are disguised raster images — they consist almost entirely of an embedded data: URI rather than real SVG vector data.\n' +
+				'Replace these with actual SVG vector files or use the raster image directly.\n\n' +
+				disguised
+					.map(
+						d =>
+							`  ${d.filePath}\n` +
+							`    File size:    ${d.fileSize.toLocaleString()} bytes\n` +
+							`    Embedded:     ${d.embeddedSize.toLocaleString()} bytes (${(d.ratio * 100).toFixed(1)}% of file)\n` +
+							`    MIME type:    ${d.mimeType}`,
+					)
+					.join('\n\n') +
+				'\n'
+
+			console.error(message)
+			expect(
+				disguised.length,
+				`${disguised.length} SVG file(s) contain embedded raster data exceeding ${EMBEDDED_IMAGE_RATIO_THRESHOLD * 100}% of the file size.`,
+			).toBe(0)
+		}
+	})
+})
