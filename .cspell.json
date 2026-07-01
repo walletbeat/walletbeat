@@ -435,6 +435,7 @@
 		"subcriteria",
 		"subresource",
 		"subtable",
+		"svgs",
 		"svgtofont",
 		"takeoverable",
 		"Tangem",
@@ -509,6 +510,7 @@
 		"WiFi",
 		"Wireshark",
 		"workstreams",
+		"xlink",
 		"xmattmatt",
 		"Yanssie",
 		"Zcash",
@@ -538,26 +540,14 @@
 		"resources/contracts/images/**"
 	],
 	"patterns": [
-		{
-			"name": "Bitcoin addresses",
-			"pattern": "/\\bbtc:[0-9a-z]+/g"
-		},
-		{
-			"name": "CIDv1",
-			"pattern": "/\\bbafy\\w+/g"
-		},
+		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
+		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
 		{
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
-		{
-			"name": "Hexadecimal addresses",
-			"pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi"
-		},
-		{
-			"name": "svgicons2svgfont",
-			"pattern": "/svgicons2svgfont/g"
-		}
+		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
+		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" }
 	],
 	"ignoreRegExpList": [
 		"Bitcoin addresses",

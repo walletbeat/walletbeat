@@ -1,4 +1,6 @@
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string
+">
 	// Types/constants
 	import { type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
@@ -10,8 +12,8 @@
 		ladderEvaluation,
 		size = 'medium',
 	}: {
-		stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
-		ladderEvaluation: WalletLadderEvaluation | null
+		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		ladderEvaluation: WalletLadderEvaluation<string> | null
 		size?: 'small' | 'medium' | 'large'
 	} = $props()
 
@@ -31,7 +33,7 @@
 
 	const stageIndex = $derived(
 		stage && typeof stage === 'object' && ladderEvaluation ?
-			ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
+			ladderEvaluation.ladder.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 		:
 			null
 	)

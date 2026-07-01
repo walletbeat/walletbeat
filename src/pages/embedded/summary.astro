@@ -1,16 +1,11 @@
 ---
 // Types/constants
-import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
-import { allRatedWallets } from '@/data/wallets'
-import { attributeTree } from '@/schema/attribute-groups'
-
-const attributeGroups = Object.values(attributeTree)
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
-import WalletTable from '@/views/WalletTable.svelte'
+import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 ---
 
 <Layout
@@ -21,11 +16,6 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletTable
-			client:visible
-			title='Embedded Wallets'
-			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.EMBEDDED])}
-			{attributeGroups}
-		/>
+		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
 	</main>
 </Layout>
