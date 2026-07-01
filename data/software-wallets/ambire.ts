@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -67,10 +68,8 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
@@ -689,7 +688,7 @@ export const ambire: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.INACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-12-17' as CalendarDate,
+				dateStarted: '2021-12-17' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,

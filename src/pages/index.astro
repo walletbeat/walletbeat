@@ -1,19 +1,14 @@
 ---
 // Constants
 import { defaultNavigationItems } from '@/constants/navigation'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedSoftwareWallets } from '@/data/software-wallets'
-
-import { attributeTree } from '@/schema/attribute-groups'
-
-const attributeGroups = Object.values(attributeTree)
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
 
 // Components
 import Navigation from '@/views/Navigation.astro'
-import WalletTable from '@/views/WalletTable.svelte'
+import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
+import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 ---
 
 <Layout
@@ -48,19 +43,9 @@ import WalletTable from '@/views/WalletTable.svelte'
 			</p>
 		</header>
 
-		<WalletTable
-			client:visible
-			title='Software Wallets'
-			wallets={Object.values(ratedSoftwareWallets)}
-			{attributeGroups}
-		/>
+		<SoftwareWalletTable client:visible title='Software Wallets' />
 
-		<WalletTable
-			client:visible
-			title='Hardware Wallets'
-			wallets={Object.values(ratedHardwareWallets)}
-			{attributeGroups}
-		/>
+		<HardwareWalletTable client:visible title='Hardware Wallets' />
 	</main>
 </Layout>
 

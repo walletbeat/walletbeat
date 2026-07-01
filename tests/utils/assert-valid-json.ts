@@ -58,7 +58,9 @@ class RatedWalletExportValidator {
 		try {
 			parsed = JSON.parse(jsonString)
 		} catch (error) {
-			throw new Error(`Invalid JSON: ${String(error)}\nSnippet: ${this.jsonSnippet(jsonString)}`)
+			throw new Error(`Invalid JSON: ${String(error)}\nSnippet: ${this.jsonSnippet(jsonString)}`, {
+				cause: error,
+			})
 		}
 
 		if (!this.validate(parsed)) {

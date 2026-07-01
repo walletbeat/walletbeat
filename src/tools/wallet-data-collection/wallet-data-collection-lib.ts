@@ -123,7 +123,7 @@ function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2
 			try {
 				return opt2(x)
 			} catch (e2) {
-				throw new Error(`${getErrorMessage(e1)} & ${getErrorMessage(e2)}`)
+				throw new Error(`${getErrorMessage(e1)} & ${getErrorMessage(e2)}`, { cause: e2 })
 			}
 		}
 	}
@@ -357,7 +357,7 @@ class Options<T extends object> {
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
-				throw new Error(`Flag --${fieldName.toString()}: ${getErrorMessage(e)}`)
+				throw new Error(`Flag --${fieldName.toString()}: ${getErrorMessage(e)}`, { cause: e })
 			}
 		}
 
@@ -822,7 +822,7 @@ export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
 
 			existingDomains = assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
 		} catch (e) {
-			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`)
+			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
 		}
 	}
 

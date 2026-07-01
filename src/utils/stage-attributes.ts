@@ -1,26 +1,21 @@
-import { attributeTree } from '@/schema/attribute-groups'
-import type { Attribute } from '@/schema/attributes'
-import { ladders, WalletLadderType } from '@/schema/ladders'
+import { attributeTree } from '@/schema/attribute-tree'
+import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
+import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
 import {
 	getEvaluateFunctionAttributeId,
 	StageCriterionRating,
 	type StageEvaluatableWallet,
+	type WalletLadder,
 	type WalletStage,
 	type WalletStageCriterion,
 } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
-/**
- * Get all stages across all ladders with their ladder type and index.
- */
-const allStages = Object.entries(ladders).flatMap(([ladderType, ladder]) =>
-	ladder.stages.map((stage, stageIndex) => ({ ladderType, ladder, stage, stageIndex })),
-)
 
 /**
  * Map of stage IDs to stage objects (using the first occurrence across all ladders).
  */
 export const stagesById = new Map(
-	Object.values(ladders)
+	Object.values(allWalletLadders)
 		.flatMap(ladder => ladder.stages)
 		.map(stage => [stage.id, stage] as const),
 )
@@ -30,14 +25,16 @@ export const stagesById = new Map(
  */
 export const attributesById = new Map(
 	Object.values(attributeTree)
-		.flatMap(attrGroup => Object.values(attrGroup.attributes))
+		.flatMap(attrGroup => attrGroup.attributes.map(({ attribute }) => attribute))
 		.map(attr => [attr.id, attr] as const),
 )
 
 /**
  * Get all criteria in a stage.
  */
-export const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
+export const allCriteriaInStage = <_AttributeGroupId extends string>(
+	stage: WalletStage<_AttributeGroupId>,
+): WalletStageCriterion<_AttributeGroupId>[] =>
 	stage.criteriaGroups.flatMap(criteriaGroup => criteriaGroup.criteria)
 
 /**
@@ -58,9 +55,9 @@ export interface StageCountsAndStatus {
  * "Applicable" = not EXEMPT. Status: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
  * Throws if every criterion is EXEMPT (invalid stage definition for this wallet).
  */
-export function computeCountsAndStatus(
-	criteria: WalletStageCriterion[],
-	wallet: StageEvaluatableWallet,
+export function computeCountsAndStatus<_AttributeGroupId extends string>(
+	criteria: WalletStageCriterion<_AttributeGroupId>[],
+	wallet: StageEvaluatableWallet<_AttributeGroupId>,
 ): StageCountsAndStatus {
 	const allEvaluations = criteria.map(criterion => criterion.evaluate(wallet))
 	const applicableEvaluations = allEvaluations.filter(e => e.rating !== StageCriterionRating.EXEMPT)
@@ -98,11 +95,13 @@ export function computeCountsAndStatus(
  * @param attribute The attribute to check
  * @returns true if the attribute is used in any stage criterion
  */
-export function isAttributeUsedInStages(attribute: Attribute): boolean {
+export function isAttributeUsedInStages<_OutcomeMetadata extends OutcomeMetadata>(
+	attribute: Attribute<_OutcomeMetadata>,
+): boolean {
 	// The attribute objects are referenced in the stage definitions via variantsMustPassAttribute
 	// We can check if the attribute ID appears in the ladder structure
 	// by serializing and checking for the attribute ID
-	const ladderString = JSON.stringify(ladders, (_, value: unknown) => {
+	const ladderString = JSON.stringify(allWalletLadders, (_, value: unknown) => {
 		// When we encounter an attribute object, include its ID
 		if (
 			value &&
@@ -126,7 +125,13 @@ export function isAttributeUsedInStages(attribute: Attribute): boolean {
  * @param stage The stage to check
  * @returns true if the attribute is used in the stage
  */
-const isAttributeUsedInStageObject = (attribute: Attribute, stage: WalletStage): boolean =>
+const isAttributeUsedInStageObject = <
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata,
+>(
+	attribute: Attribute<_OutcomeMetadata>,
+	stage: WalletStage<_AttributeGroupId>,
+): boolean =>
 	allCriteriaInStage(stage).some(criterion => getCriterionAttributeId(criterion) === attribute.id)
 
 /**
@@ -135,9 +140,12 @@ const isAttributeUsedInStageObject = (attribute: Attribute, stage: WalletStage):
  * @param stageId The stage ID to check
  * @returns true if the attribute is used in the stage
  */
-export const isAttributeUsedInStage = (
-	attribute: Attribute,
-	stageId: WalletStage['id'],
+export const isAttributeUsedInStage = <
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata,
+>(
+	attribute: Attribute<_OutcomeMetadata>,
+	stageId: WalletStage<_AttributeGroupId>['id'],
 ): boolean => {
 	const stage = stagesById.get(stageId)
 
@@ -149,8 +157,9 @@ export const isAttributeUsedInStage = (
  * @param criterion The criterion to check
  * @returns The attribute ID if found, null otherwise
  */
-export const getCriterionAttributeId = (criterion: WalletStageCriterion): string | null =>
-	getEvaluateFunctionAttributeId(criterion.evaluate)
+export const getCriterionAttributeId = <_AttributeGroupId extends string>(
+	criterion: WalletStageCriterion<_AttributeGroupId>,
+): string | null => getEvaluateFunctionAttributeId(criterion.evaluate)
 
 /**
  * Get all criteria that reference a specific attribute across all ladders.
@@ -158,11 +167,23 @@ export const getCriterionAttributeId = (criterion: WalletStageCriterion): string
  * @param wallet The wallet to find criteria for
  * @returns An array of objects containing ladder type, stage number, and criterion
  */
-export function getAttributeCriteriaForWallet(
-	attribute: Attribute,
-	wallet: StageEvaluatableWallet,
-): Array<{ ladderType: WalletLadderType; stageNumber: number; criterion: WalletStageCriterion }> {
-	return allStages
+export function getAttributeCriteriaForWallet<
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata,
+>(
+	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	attribute: Attribute<_OutcomeMetadata>,
+	wallet: StageEvaluatableWallet<_AttributeGroupId>,
+) {
+	return Object.entries(ladders)
+		.flatMap(([ladderType, ladder]) =>
+			ladder.stages.map((stage, stageIndex) => ({
+				ladderType,
+				ladder,
+				stage,
+				stageIndex,
+			})),
+		)
 		.filter(({ ladder }) => ladder.applicableTo(wallet))
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.flatMap(({ ladderType, stage, stageIndex }) =>
@@ -175,7 +196,9 @@ export function getAttributeCriteriaForWallet(
 /**
  * Stage-evaluatable view of a RatedWallet (omits metadata and ladders).
  */
-function toStageEvaluatable(wallet: RatedWallet): StageEvaluatableWallet {
+function toStageEvaluatable<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+): StageEvaluatableWallet<_AttributeGroupId> {
 	const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
 
 	return rest
@@ -187,12 +210,16 @@ function toStageEvaluatable(wallet: RatedWallet): StageEvaluatableWallet {
  * Returns only the highest stage passed per ladder (e.g. "Stage 2" not "Stage 1, 2"
  * when the wallet passes both).
  */
-export function getAttributeStagesForWallet(
-	attribute: Attribute,
-	wallet: RatedWallet,
+export function getAttributeStagesForWallet<
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata,
+>(
+	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	attribute: Attribute<_OutcomeMetadata>,
+	wallet: RatedWallet<_AttributeGroupId>,
 ): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
 	const stageEvaluatable = toStageEvaluatable(wallet)
-	const criteria = getAttributeCriteriaForWallet(attribute, wallet)
+	const criteria = getAttributeCriteriaForWallet(ladders, attribute, wallet)
 	const stagesPassed = criteria
 		.filter(
 			({ criterion }) => criterion.evaluate(stageEvaluatable).rating === StageCriterionRating.PASS,

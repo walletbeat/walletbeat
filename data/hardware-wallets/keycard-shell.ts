@@ -1,5 +1,6 @@
 import { mmlado } from '@/data/contributors/mmlado'
 import { phift } from '@/data/contributors/phift'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
@@ -25,7 +26,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const keycardShell: HardwareWallet = {

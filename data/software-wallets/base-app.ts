@@ -3,6 +3,7 @@ import { cantina } from '@/data/entities/cantina'
 import { certora } from '@/data/entities/certora'
 import { code4rena } from '@/data/entities/code4rena'
 import { coinbase } from '@/data/entities/coinbase'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { coinbaseEip7702ProxyContract } from '@/data/wallet-contracts/coinbase-eip7702-proxy'
 import { coinbaseSmartWalletContract } from '@/data/wallet-contracts/coinbase-smart-wallet'
 import type { WalletAnalytics } from '@/schema/features'
@@ -31,9 +32,7 @@ import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const baseApp: SoftwareWallet = {
 	metadata: {
@@ -302,7 +301,7 @@ export const baseApp: SoftwareWallet = {
 				ref: 'https://hackerone.com/coinbase?type=team',
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2014-02-14' as CalendarDate,
+				dateStarted: '2014-02-14' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.HACKER_ONE,

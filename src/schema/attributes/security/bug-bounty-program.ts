@@ -21,7 +21,6 @@ import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 import { nonEmptySet, setItems } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
@@ -269,7 +268,7 @@ export const bugBountyProgram: Attribute = {
 				bugBountyAvailable(
 					EvaluationContext.forTest(() => bugBountyProgram),
 					{
-						dateStarted: '2020-01-01' as CalendarDate,
+						dateStarted: '2020-01-01' as const,
 						availability: BugBountyProgramAvailability.ACTIVE,
 						coverageBreadth: 'FULL_SCOPE',
 						rewards: supported({
@@ -300,7 +299,7 @@ export const bugBountyProgram: Attribute = {
 				bugBountyAvailable(
 					EvaluationContext.forTest(() => bugBountyProgram),
 					{
-						dateStarted: '2020-01-01' as CalendarDate,
+						dateStarted: '2020-01-01' as const,
 						availability: BugBountyProgramAvailability.INACTIVE,
 						coverageBreadth: nonEmptySet(CoverageBreadth.APP_ONLY),
 						rewards: supported({

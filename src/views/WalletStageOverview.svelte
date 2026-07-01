@@ -1,8 +1,14 @@
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string
+">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
-	import { WalletLadderType, ladders } from '@/schema/ladders'
-	import { StageCriterionRating, stageCriterionRatings, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import {
+		StageCriterionRating,
+		stageCriterionRatings,
+		type WalletLadderEvaluation,
+		type WalletStage,
+	} from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
@@ -51,35 +57,25 @@
 		stage,
 		ladderEvaluation,
 	}: {
-		wallet: RatedWallet
-		stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
-		ladderEvaluation: WalletLadderEvaluation | null
+		wallet: RatedWallet<_AttributeGroupId>
+		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 	} = $props()
 
 
 	// Derived
-	let ladderType = $derived(
-		!ladderEvaluation ?
-			null
-		:
-			Object.entries(wallet.ladders)
-				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0]
-			?? null
+	const ladderDefinition = $derived(
+		ladderEvaluation?.ladder ?? null
 	)
 
-	let ladderDefinition = $derived(
-		ladderType ? ladders[ladderType] : null
-	)
-
-	let currentStageIndex = $derived(
+	const currentStageIndex = $derived(
 		(!stage || typeof stage === 'string' || !ladderDefinition) ?
 			null
 		:
-			ladderDefinition.stages.findIndex(s => s.id === stage.id)
+			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 	)
 
-	let defaultOpenStageIndex = $derived(
+	const defaultOpenStageIndex = $derived(
 		!ladderDefinition ?
 			null
 		: currentStageIndex === null ?
@@ -88,12 +84,11 @@
 			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
 	)
 
-	let stageEvaluatableWallet = $derived(
-		(() => {
-			const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
-			return rest
-		})(),
-	)
+	const stageEvaluatableWallet = $derived.by(() => {
+		const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
+
+		return rest
+	})
 
 
 	// Functions
@@ -118,7 +113,7 @@
 		}
 	>
 		<div data-column="gap-4">
-			{#each ladderDefinition.stages as s, index}
+			{#each ladderDefinition.stages as s, index (s.id)}
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
 				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
@@ -174,8 +169,15 @@
 					>
 						{#if s.criteriaGroups}
 							<div data-column>
-								{#each s.criteriaGroups as criteriaGroup}
-									{@const { passedCount: groupPassedCount, totalCount: groupTotalCount, status: groupRating } = computeCountsAndStatus(criteriaGroup.criteria, stageEvaluatableWallet)}
+								{#each s.criteriaGroups as criteriaGroup (criteriaGroup.id)}
+									{@const {
+										passedCount: groupPassedCount,
+										totalCount: groupTotalCount,
+										status: groupRating,
+									} = computeCountsAndStatus(
+										criteriaGroup.criteria,
+										stageEvaluatableWallet,
+									)}
 
 									<details
 										data-card="padding-5 secondary radius-4"
@@ -211,7 +213,7 @@
 													data-card="padding-4"
 													data-list="gap-3"
 												>
-													{#each criteriaGroup.criteria as criterion}
+													{#each criteriaGroup.criteria as criterion (criterion.id)}
 														{@const criterionEvaluation = ladderDefinition ? criterion.evaluate(wallet) : null}
 														{@const criterionRating = criterionEvaluation?.rating}
 														{@const attributeId = getCriterionAttributeId(criterion)}
@@ -221,8 +223,8 @@
 														{@const attributeTitle = attribute?.displayName ?? attributeId}
 
 														<li
-															data-icon={attribute?.icon ? `wbicons ${attribute.icon}` : undefined}
-															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].color}
+															data-list-item-marker={attribute?.icon}
+															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].color}
 															data-stage-criterion-rating={criterionRating}
 														>
 															<span data-row>
@@ -254,9 +256,9 @@
 
 																<data
 																	value={criterionRating}
-																	title={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].label}
+																	title={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].label}
 																>
-																	{stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].icon}
+																	{stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].icon}
 																</data>
 															</span>
 														</li>
@@ -289,6 +291,11 @@
 
 	h4 {
 		font-weight: normal;
+	}
+
+	li[data-wbicon]::before {
+		font-family: var(--fontFamily-wbicons);
+		content: var(--icon-content);
 	}
 
 	[data-stage-criterion-rating] {

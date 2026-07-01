@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
@@ -20,9 +21,7 @@ import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const ngrave: HardwareWallet = {
 	metadata: {
@@ -42,7 +41,7 @@ export const ngrave: HardwareWallet = {
 				url: 'https://ngrave.io/zero',
 			},
 		],
-		iconExtension: 'svg',
+		iconExtension: 'png',
 		lastUpdated: '2025-01-07',
 		urls: {
 			socials: {
@@ -115,7 +114,7 @@ export const ngrave: HardwareWallet = {
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2025-01-18' as CalendarDate,
+				dateStarted: '2025-01-18' as const,
 				disclosure: notSupported,
 				legalProtections: supported({
 					type: LegalProtectionType.SAFE_HARBOR,

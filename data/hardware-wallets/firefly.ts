@@ -1,11 +1,11 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { noDataExtraction } from '@/schema/features/security/transaction-legibility'
 import { notSupported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const fireflyWallet: HardwareWallet = {

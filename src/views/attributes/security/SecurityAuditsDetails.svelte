@@ -57,6 +57,27 @@
 		hasUnaddressedFlaws?: boolean
 	} = $props()
 
+	const securityAudits = $derived(
+		metadata
+			.securityAudits
+			.toSorted((a, b) => (
+				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()
+			))
+	)
+
+	const mostRecentAudit = $derived(
+		securityAudits[0]
+	)
+
+	const anyAuditHasUnfixedFlaws = $derived(
+		securityAudits
+			.some(audit => (
+				Array.isArray(audit.unpatchedFlaws)
+				&& audit.unpatchedFlaws
+					.some((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED')
+			))
+	)
+
 
 	// Functions
 	import { securityAuditId, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
@@ -78,29 +99,6 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 {:else}
-	{@const securityAudits = (
-		metadata
-			.securityAudits
-			.toSorted((a, b) => (
-				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()
-			))
-	)}
-
-	{@const mostRecentAudit = securityAudits[0]}
-
-	{@const anyAuditHasUnfixedFlaws = (
-		securityAudits
-			.some((audit) => (
-				Array.isArray(audit.unpatchedFlaws)
-				&& (
-					audit.unpatchedFlaws
-						.some((flaw: UnpatchedSecurityFlaw) => (
-							flaw.presentStatus === 'NOT_FIXED'
-						))
-				)
-			))
-	)}
-
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
@@ -152,7 +150,7 @@
 
 							{#if hasFlaws && flawGroups}
 								<div data-row="gap-1 wrap">
-									{#each [SecurityFlawSeverity.CRITICAL, SecurityFlawSeverity.HIGH, SecurityFlawSeverity.MEDIUM] as severity}
+									{#each [SecurityFlawSeverity.CRITICAL, SecurityFlawSeverity.HIGH, SecurityFlawSeverity.MEDIUM] as severity (severity)}
 										{#if flawGroups.has(severity)}
 											{@const flaws = flawGroups.get(severity)!}
 											{@const unfixedCount = flaws.filter((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED').length}
