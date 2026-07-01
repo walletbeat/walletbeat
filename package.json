@@ -41,7 +41,9 @@
 		"helios:wrap": "deploy/helios/helios-wrap.sh",
 		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts",
 		"wallet-data-collection": "tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
-		"wallet-data-collection:lint-fix": "pnpm run wallet-data-collection lint-fix"
+		"wallet-data-collection:lint-fix": "pnpm run wallet-data-collection lint-fix",
+		"test:e2e:wallet-playground": "playwright test tests/e2e/wallet-playground.fake-wallet.e2e.ts",
+		"test:e2e:wallet-playground:real": "PLAYWRIGHT_SKIP_WEBSERVER=1 playwright test tests/e2e/wallet-playground.real-wallet.e2e.ts --headed --project=chromium"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.2",
@@ -51,7 +53,6 @@
 		"@fontsource/space-grotesk": "^5.2.8",
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
-		"@wagmi/core": "^3.4.0",
 		"astro": "^6.2.1",
 		"autoprefixer": "^10.4.27",
 		"eslint-plugin-import": "^2.32.0",
@@ -60,16 +61,18 @@
 		"fflate": "^0.8.2",
 		"lucide-static": "^0.562.0",
 		"micromark": "^4.0.2",
+		"mipd": "^0.0.7",
 		"postcss": "^8.5.8",
 		"svelte": "5.56.1",
 		"typescript-eslint": "^8.60.1",
-		"wagmi": "2.16.9"
+		"viem": "^2.52.2"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
+		"@playwright/test": "1.59.1",
 		"@types/prompts": "^2.4.9",
 		"@xmldom/xmldom": "^0.8.11",
 		"ajv": "^8.18.0",

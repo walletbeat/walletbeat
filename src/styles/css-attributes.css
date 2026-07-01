@@ -518,6 +518,284 @@ summary {
 
 
 /**
+ * Native details tab layout. Use on a wrapper whose direct children are grouped `<details name="...">` elements. Each `<details>` owns one `<summary>` tab and one `[data-tab-panel]` body; the browser-managed `name` group keeps only one tab open without script-managed hidden panels.
+ *
+ * ### Tokens
+ * - orientation: `vertical`
+ * - density: `compact`
+ * - overflow: `scroll-inline`
+ *
+ * ### CSS Variables
+ * - `--tabs-paddingBlock`
+ * - `--tabs-paddingInline`
+ * - `--tabs-panel-paddingBlockStart`
+ * - `--tabs-panel-paddingInlineStart`
+ * - `--tabs-list-size`
+ *
+ * ### Examples
+ * - Horizontal native tabs:
+ *   ```html
+ *   <div data-tabs="scroll-inline">
+ *     <details name="settings-tabs" open>
+ *       <summary>Profile</summary>
+ *       <section data-tab-panel>...</section>
+ *     </details>
+ *     <details name="settings-tabs">
+ *       <summary>Security</summary>
+ *       <section data-tab-panel>...</section>
+ *     </details>
+ *   </div>
+ *   ```
+ * - Vertical native tabs:
+ *   ```html
+ *   <div data-tabs="vertical">
+ *     <details name="settings-tabs" open>
+ *       <summary>Profile</summary>
+ *       <section data-tab-panel>...</section>
+ *     </details>
+ *     <details name="settings-tabs">
+ *       <summary>Security</summary>
+ *       <section data-tab-panel>...</section>
+ *     </details>
+ *   </div>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tabs]`
+ */
+[data-tabs] {
+	/* Inputs */
+	--tabs-paddingBlock: 0.75em;
+	--tabs-paddingInline: 1em;
+	--tabs-panel-paddingBlockStart: 1rem;
+	--tabs-panel-paddingInlineStart: 1.25rem;
+	--tabs-list-size: 19rem;
+
+	/* Rules */
+	display: grid;
+	grid-template-columns: repeat(var(--tabs-count, 1), max-content);
+	grid-template-rows: [tabs] auto [panel] minmax(0, auto);
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+	align-items: end;
+	border-block-end: 1px solid var(--border-color);
+	overflow-x: clip;
+	min-inline-size: 0;
+	container-type: inline-size;
+
+	&:has(> details:nth-of-type(2)) {
+		--tabs-count: 2;
+	}
+	&:has(> details:nth-of-type(3)) {
+		--tabs-count: 3;
+	}
+	&:has(> details:nth-of-type(4)) {
+		--tabs-count: 4;
+	}
+	&:has(> details:nth-of-type(5)) {
+		--tabs-count: 5;
+	}
+	&:has(> details:nth-of-type(6)) {
+		--tabs-count: 6;
+	}
+	&:has(> details:nth-of-type(7)) {
+		--tabs-count: 7;
+	}
+	&:has(> details:nth-of-type(8)) {
+		--tabs-count: 8;
+	}
+	&:has(> details:nth-of-type(9)) {
+		--tabs-count: 9;
+	}
+	&:has(> details:nth-of-type(10)) {
+		--tabs-count: 10;
+	}
+	&:has(> details:nth-of-type(11)) {
+		--tabs-count: 11;
+	}
+	&:has(> details:nth-of-type(12)) {
+		--tabs-count: 12;
+	}
+
+	&[data-tabs~="compact"] {
+		--tabs-paddingBlock: 0.5em;
+		--tabs-paddingInline: 0.75em;
+		--tabs-panel-paddingBlockStart: 0.75rem;
+	}
+
+	&[data-tabs~="scroll-inline"] {
+		overflow-x: auto;
+	}
+
+	&[data-tabs~="vertical"] {
+		grid-template-columns: minmax(0, var(--tabs-list-size)) minmax(0, 1fr);
+		grid-template-rows: repeat(var(--tabs-count, 1), max-content) minmax(0, 1fr);
+		grid-auto-flow: row;
+		grid-auto-columns: auto;
+		align-items: start;
+		overflow-x: visible;
+		border-block-end: none;
+	}
+
+	> details {
+		display: contents;
+	}
+
+	> details > summary {
+		grid-row: tabs;
+		cursor: pointer;
+		display: block;
+		padding: var(--tabs-paddingBlock) var(--tabs-paddingInline);
+		border: 1px solid transparent;
+		border-block-end: none;
+		border-radius: 0.5em 0.5em 0 0;
+		font-weight: 700;
+		color: var(--text-secondary);
+		white-space: nowrap;
+		list-style: none;
+		min-inline-size: max-content;
+
+		&::marker,
+		&::-webkit-details-marker {
+			display: none;
+		}
+	}
+
+	> details::details-content {
+		grid-column: 1 / -1;
+		grid-row: panel;
+		min-inline-size: 0;
+		inline-size: 100cqi;
+		contain: inline-size;
+	}
+
+	> details[open] > summary {
+		background: var(--background-primary);
+		border-color: var(--border-color);
+		color: var(--accent);
+		margin-block-end: -1px;
+	}
+
+	> details:not([open]) > [data-tab-panel] {
+		display: none;
+	}
+
+	> details > [data-tab-panel] {
+		grid-column: 1 / -1;
+		grid-row: panel;
+		align-self: start;
+		min-inline-size: 0;
+		inline-size: 100cqi;
+		contain: inline-size;
+		padding-block-start: var(--tabs-panel-paddingBlockStart);
+		border-block-start: 1px solid var(--border-color);
+	}
+
+	&[data-tabs~="vertical"] > details > summary {
+		grid-column: 1 / 2;
+		grid-row: auto;
+		inline-size: 100%;
+		min-inline-size: 0;
+		border: 1px solid transparent;
+		border-inline-end: none;
+		border-radius: 0.5em 0 0 0.5em;
+		white-space: normal;
+	}
+
+	&[data-tabs~="vertical"] > details[open] > summary {
+		margin-block-end: 0;
+		margin-inline-end: -1px;
+	}
+
+	&[data-tabs~="vertical"] > details::details-content {
+		grid-column: 2 / -1;
+		grid-row: 1 / span calc(var(--tabs-count, 1) + 1);
+		align-self: start;
+		inline-size: auto;
+		contain: none;
+	}
+
+	&[data-tabs~="vertical"] > details > [data-tab-panel] {
+		grid-column: 2 / -1;
+		grid-row: 1 / span calc(var(--tabs-count, 1) + 1);
+		align-self: start;
+		inline-size: auto;
+		contain: none;
+		padding-block-start: 0;
+		padding-inline-start: var(--tabs-panel-paddingInlineStart);
+		border-block-start: none;
+		border-inline-start: 1px solid var(--border-color);
+	}
+}
+
+/**
+ * Panel body for `[data-tabs]`. Place it inside the `<details>` whose `<summary>` labels it.
+ *
+ * ### Placement
+ * - Child of a direct `<details>` child of `[data-tabs]`.
+ *
+ * ### Examples
+ * ```html
+ * <details name="example-tabs" open>
+ *   <summary>Overview</summary>
+ *   <section data-tab-panel>...</section>
+ * </details>
+ * ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tab-panel]`
+ */
+[data-tab-panel] {
+	min-inline-size: 0;
+}
+
+@media (max-width: 864px) {
+	[data-tabs] {
+		padding-block-end: 0.25rem;
+
+		> details > [data-tab-panel] {
+			display: flex;
+			flex-direction: column;
+		}
+
+		&[data-tabs~="vertical"] {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto;
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+			overflow-x: auto;
+
+			> details > summary {
+				grid-column: auto;
+				grid-row: 1 / 2;
+				justify-content: center;
+				border-inline-end: 1px solid transparent;
+				border-block-end: none;
+				border-radius: 0.5em 0.5em 0 0;
+				white-space: nowrap;
+			}
+
+			> details[open] > summary {
+				margin-inline-end: 0;
+				margin-block-end: -1px;
+			}
+
+			> details > [data-tab-panel] {
+				grid-column: 1 / -1;
+				grid-row: 2 / 3;
+				inline-size: auto;
+				max-inline-size: none;
+				padding-block-start: var(--tabs-panel-paddingBlockStart);
+				padding-inline-start: 0;
+				border-block-start: 1px solid var(--border-color);
+				border-inline-start: none;
+			}
+		}
+	}
+}
+
+
+/**
  * Card surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.
  *
  * ### Tokens

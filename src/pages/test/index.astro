@@ -5,7 +5,6 @@ import Layout from '../../layouts/Layout.astro'
 // Components
 import Navigation from '@/views/Navigation.astro'
 import { defaultNavigationItems } from '@/constants/navigation'
-import WalletTest from '../../components/WalletTest.svelte'
 ---
 
 <Layout
@@ -25,9 +24,116 @@ import WalletTest from '../../components/WalletTest.svelte'
 			</p>
 		</header>
 
-		<WalletTest client:load />
+		<section
+			class='wallet-playground'
+			data-scroll-item='inline-detached padding-match-start'
+			data-column='gap-5'
+		>
+			<header data-row='gap-3 wrap'>
+				<p data-account-status data-badge='medium'>Finding wallet providers...</p>
+				<div data-row='gap-2 wrap'>
+					<button type='button' data-action='open-provider-dialog'>Choose wallet</button>
+					<button type='button' data-action='connect'>Connect</button>
+				</div>
+			</header>
+
+			<div data-tabs='compact scroll-inline'>
+				<details name='wallet-playground-section' data-tab='transactions' open>
+					<summary>Transactions</summary>
+					<div data-tab-panel data-tab='transactions'>
+						<div data-tabs='vertical' data-playground-nav aria-label='Transaction tests'></div>
+					</div>
+				</details>
+
+				<details name='wallet-playground-section' data-tab='signatures'>
+					<summary>Signatures</summary>
+					<div data-tab-panel data-tab='signatures'>
+						<div data-tabs='vertical' data-playground-nav aria-label='Signature tests'></div>
+					</div>
+				</details>
+
+				<details name='wallet-playground-section' data-tab='eip-support'>
+					<summary>EIP Support</summary>
+					<div data-tab-panel data-tab='eip-support'>
+						<div data-tabs='vertical' data-playground-nav aria-label='EIP support steps'></div>
+					</div>
+				</details>
+
+				<details name='wallet-playground-section' data-tab='app-isolation'>
+					<summary>App Isolation</summary>
+					<div data-tab-panel data-tab='app-isolation'>
+						<div data-tabs='vertical' data-playground-nav aria-label='App isolation tests'></div>
+					</div>
+				</details>
+
+				<details name='wallet-playground-section' data-tab='tx-simulations'>
+					<summary>Tx Simulations</summary>
+					<div data-tab-panel data-tab='tx-simulations'>
+						<div data-tabs='vertical' data-playground-nav aria-label='Transaction simulation tests'>
+						</div>
+					</div>
+				</details>
+
+				<details name='wallet-playground-section' data-tab='scam-alerts'>
+					<summary>Scam Alerts</summary>
+					<div data-tab-panel data-tab='scam-alerts'>
+						<div data-tabs='vertical' data-playground-nav aria-label='Scam alert tests'></div>
+					</div>
+				</details>
+
+				<details name='wallet-playground-section' data-tab='erc-8213'>
+					<summary>ERC-8213</summary>
+					<div data-tab-panel data-tab='erc-8213'>
+						<div data-tabs='vertical' data-playground-nav aria-label='ERC-8213 digest tools'></div>
+					</div>
+				</details>
+			</div>
+		</section>
+
+		<dialog id='provider-dialog'>
+			<form method='dialog' data-card='radius-8 padding-5' data-column='gap-4'>
+				<header data-row='gap-3 wrap'>
+					<h2>Choose wallet</h2>
+					<button type='submit' aria-label='Close'>Close</button>
+				</header>
+				<div data-provider-list data-column='gap-2'></div>
+			</form>
+		</dialog>
+
+		<dialog id='chain-dialog'>
+			<form method='dialog' data-card='radius-8 padding-5' data-column='gap-4'>
+				<h2>Switch network</h2>
+				<p>This test sends on Ethereum mainnet. Switch before continuing.</p>
+				<div data-row='gap-2 wrap'>
+					<button type='button' data-action='switch-mainnet'>Switch to mainnet</button>
+					<button type='submit'>Cancel</button>
+				</div>
+			</form>
+		</dialog>
+
+		<dialog id='error-dialog'>
+			<form method='dialog' data-card='radius-8 padding-5' data-column='gap-4'>
+				<h2>Wallet action failed</h2>
+				<p data-error-message></p>
+				<button type='submit'>Close</button>
+			</form>
+		</dialog>
+
+		<dialog id='eip-results-dialog'>
+			<form method='dialog' data-card='radius-8 padding-5' data-column='gap-4'>
+				<header data-row='gap-3 wrap'>
+					<h2>EIP test results</h2>
+					<button type='submit' aria-label='Close'>Close</button>
+				</header>
+				<div data-eip-results data-column='gap-3'></div>
+			</form>
+		</dialog>
 	</main>
 </Layout>
+
+<script>
+	import '@/lib/wallet-playground'
+</script>
 
 <style>
 	main {
@@ -57,5 +163,122 @@ import WalletTest from '../../components/WalletTest.svelte'
 				max-width: 60ch;
 			}
 		}
+	}
+
+	.wallet-playground {
+		max-width: 80rem;
+		margin-inline: auto;
+	}
+
+	[data-playground-nav] {
+		min-inline-size: 0;
+	}
+
+	[data-playground-nav] summary {
+		line-height: 1.3;
+		min-inline-size: 0;
+
+		span,
+		small {
+			display: block;
+			min-inline-size: 0;
+			white-space: normal;
+			overflow-wrap: anywhere;
+		}
+
+		small {
+			color: var(--text-secondary);
+			font-weight: 400;
+		}
+	}
+
+	[data-playground-detail] {
+		min-inline-size: 0;
+
+		dl,
+		dd {
+			margin: 0;
+		}
+
+		dt {
+			font-weight: 700;
+		}
+
+		pre,
+		textarea,
+		output {
+			display: block;
+			max-inline-size: 100%;
+		}
+
+		:not(pre) > code,
+		textarea,
+		output {
+			display: block;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+		}
+
+		pre {
+			margin: 0;
+			overflow: auto;
+			white-space: pre;
+
+			> code {
+				display: inline;
+				white-space: inherit;
+				overflow-wrap: normal;
+			}
+
+			&[data-code-block~='wrap'] {
+				white-space: pre-wrap;
+
+				> code {
+					overflow-wrap: anywhere;
+				}
+			}
+		}
+
+		textarea {
+			inline-size: 100%;
+		}
+	}
+
+	[data-provider-list] button,
+	[data-eip-provider] {
+		justify-content: flex-start;
+		text-align: start;
+	}
+
+	[data-provider-list] img {
+		inline-size: 1.5em;
+		block-size: 1.5em;
+	}
+
+	dialog {
+		max-inline-size: min(42rem, calc(100vw - 2rem));
+		max-block-size: calc(100dvb - 2rem);
+		margin: auto;
+		padding: 0;
+		background: transparent;
+		color: var(--text-primary);
+	}
+
+	dialog:not([open]) {
+		display: none;
+	}
+
+	dialog[open] {
+		display: block;
+	}
+
+	dialog::backdrop {
+		background-color: color-mix(in srgb, var(--background-primary) 70%, transparent);
+		backdrop-filter: blur(0.25rem);
+	}
+
+	dialog > [data-card] {
+		max-block-size: calc(100dvb - 2rem);
+		overflow: auto;
 	}
 </style>

@@ -893,6 +893,82 @@ interface CssAttributes {
 	'data-sticky-container'?: string | boolean
 
 	/**
+	 * ## [data-tab-panel]
+	 *
+	 * Panel body for `[data-tabs]`. Place it inside the `<details>` whose `<summary>` labels it.
+	 *
+	 * ### Placement
+	 * - Child of a direct `<details>` child of `[data-tabs]`.
+	 *
+	 * ### Examples
+	 * ```html
+	 * <details name="example-tabs" open>
+	 *   <summary>Overview</summary>
+	 *   <section data-tab-panel>...</section>
+	 * </details>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tab-panel]`
+	 */
+	'data-tab-panel'?: string | boolean
+
+	/**
+	 * ## [data-tabs]
+	 *
+	 * Native details tab layout. Use on a wrapper whose direct children are grouped `<details name="...">` elements. Each `<details>` owns one `<summary>` tab and one `[data-tab-panel]` body; the browser-managed `name` group keeps only one tab open without script-managed hidden panels.
+	 *
+	 * ### Tokens
+	 * - orientation: `vertical`
+	 * - density: `compact`
+	 * - overflow: `scroll-inline`
+	 *
+	 * ### CSS Variables
+	 * - `--tabs-paddingBlock`
+	 * - `--tabs-paddingInline`
+	 * - `--tabs-panel-paddingBlockStart`
+	 * - `--tabs-panel-paddingInlineStart`
+	 * - `--tabs-list-size`
+	 *
+	 * ### Examples
+	 * - Horizontal native tabs:
+	 *   ```html
+	 *   <div data-tabs="scroll-inline">
+	 *     <details name="settings-tabs" open>
+	 *       <summary>Profile</summary>
+	 *       <section data-tab-panel>...</section>
+	 *     </details>
+	 *     <details name="settings-tabs">
+	 *       <summary>Security</summary>
+	 *       <section data-tab-panel>...</section>
+	 *     </details>
+	 *   </div>
+	 *   ```
+	 * - Vertical native tabs:
+	 *   ```html
+	 *   <div data-tabs="vertical">
+	 *     <details name="settings-tabs" open>
+	 *       <summary>Profile</summary>
+	 *       <section data-tab-panel>...</section>
+	 *     </details>
+	 *     <details name="settings-tabs">
+	 *       <summary>Security</summary>
+	 *       <section data-tab-panel>...</section>
+	 *     </details>
+	 *   </div>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tabs]`
+	 */
+	'data-tabs'?:
+		| 'vertical'
+		| 'compact'
+		| 'scroll-inline'
+		| `${'vertical' | 'compact' | 'scroll-inline'} ${string}`
+		| boolean
+
+	/**
 	 * ## [data-tag]
 	 *
 	 * Semantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.

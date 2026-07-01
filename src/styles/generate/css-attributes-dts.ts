@@ -39,7 +39,25 @@ const attributeValueType = (name: string): string =>
 		? "'camouflaged' | boolean"
 		: name === 'data-pressable'
 			? "'to-containing' | boolean"
-			: 'string | boolean'
+			: name === 'data-tabs'
+				? [
+						"| 'vertical'",
+						"| 'compact'",
+						"| 'scroll-inline'",
+						"| `${'vertical' | 'compact' | 'scroll-inline'} ${string}`",
+						'| boolean',
+					].join('\n')
+				: 'string | boolean'
+
+const buildAttributeLines = (entry: CssAttributeEntry): string[] => {
+	const valueType = attributeValueType(entry.name)
+
+	if (!valueType.includes('\n')) {
+		return [`\t${quote(entry.name)}?: ${valueType}`]
+	}
+
+	return [`\t${quote(entry.name)}?:`, ...valueType.split('\n').map(line => `\t\t${line}`)]
+}
 
 const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 	(() => {
@@ -49,7 +67,7 @@ const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 			'interface CssAttributes {',
 			...sortedEntries.flatMap((entry, i) => [
 				...buildDocLines(entry),
-				`\t${quote(entry.name)}?: ${attributeValueType(entry.name)}`,
+				...buildAttributeLines(entry),
 				...(i < sortedEntries.length - 1 ? [''] : []),
 			]),
 			'}',

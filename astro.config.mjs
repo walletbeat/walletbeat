@@ -32,6 +32,9 @@ export default defineConfig({
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
 		},
+		optimizeDeps: {
+			include: ['mipd', 'viem', 'viem/actions', 'viem/chains'],
+		},
 	},
 	fonts: [
 		{
