@@ -45,7 +45,6 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 
