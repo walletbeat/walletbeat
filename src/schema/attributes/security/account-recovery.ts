@@ -13,11 +13,12 @@ import {
 } from '@/schema/attributes'
 import {
 	type AccountRecovery,
+	type AccountRecoveryDrills,
 	type GuardianPolicy,
 	GuardianPolicyType,
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
-import { isSupported, notSupported, supported } from '@/schema/features/support'
+import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
@@ -29,6 +30,7 @@ import {
 } from '@/types/content'
 import { accountRecoveryDetailsContent } from '@/types/content/account-recovery-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
 import {
 	type AccountRecoveryOutcomeCannotBeRecovered,
@@ -117,33 +119,113 @@ function evaluateGuardianRecoveryPolicy(
 	})
 }
 
-function evaluateAccountRecovery(
+function evaluateAccountRecoveryDrills(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
-	accountRecovery: AccountRecovery,
+	drills: Support<AccountRecoveryDrills>,
 ): Evaluation<AccountRecoveryMetadata> {
-	if (isSupported(accountRecovery.guardianRecovery)) {
-		return evaluateGuardianRecoveryPolicy(
-			ctx,
-			accountRecovery.guardianRecovery.minimumGuardianPolicy,
-		)
+	if (isSupported(drills)) {
+		const hasPrivateKeyQuiz = drills.periodicPrivateKeyQuiz
+		const hasSeedPhraseQuiz = drills.periodicSeedPhraseQuiz
+		const hasGuardianCheck = drills.periodicGuardianAccountCheck
+
+		if (hasPrivateKeyQuiz && hasSeedPhraseQuiz && hasGuardianCheck) {
+			return ctx.build({
+				outcome: {
+					id: 'recovery_drills_supported',
+					rating: Rating.PASS,
+					displayName: 'Account recovery drills implemented',
+					shortExplanation: sentence(`
+						{{WALLET_NAME}} periodically asks users to make sure that their private key,
+						seed phrase, and guardian accounts are still accessible.
+					`),
+					metadata: { minimumGuardianPolicy: null, outcomes: null },
+				},
+				details: accountRecoveryDetailsContent({}),
+			})
+		}
+
+		const missing: string[] = []
+
+		if (!hasPrivateKeyQuiz) {
+			missing.push('private key check-ups')
+		}
+
+		if (!hasSeedPhraseQuiz) {
+			missing.push('seed phrase check-ups')
+		}
+
+		if (!hasGuardianCheck) {
+			missing.push('guardian account check-ups')
+		}
+
+		return ctx.build({
+			outcome: {
+				id: 'recovery_drills_incomplete',
+				rating: Rating.PARTIAL,
+				displayName: 'Incomplete account recovery drills',
+				shortExplanation: sentence(`
+					{{WALLET_NAME}} does not run all recommended periodic
+					account recovery check-ups.
+				`),
+				metadata: { minimumGuardianPolicy: null, outcomes: null },
+			},
+			details: accountRecoveryDetailsContent({}),
+			howToImprove: sentence(`
+				{{WALLET_NAME}} should periodically ask users to complete
+				${commaListFormat(missing)} to ensure they can recover their account when needed.
+			`),
+		})
 	}
 
 	return ctx.build({
 		outcome: {
-			id: 'no_guardian_recovery',
-			displayName: 'No account recovery mechanism',
-			rating: Rating.FAIL,
+			id: 'no_recovery_drills',
+			rating: Rating.PARTIAL,
+			displayName: 'No account recovery drills',
 			shortExplanation: sentence(`
-				{{WALLET_NAME}} does not implement guardian-based account recovery.
-				The user will lose access to their account if they lose their seed phrase.
+				{{WALLET_NAME}} does not periodically remind users to verify
+				they can still access their account recovery.
 			`),
-			metadata: {
-				minimumGuardianPolicy: null,
-				outcomes: null,
-			},
+			metadata: { minimumGuardianPolicy: null, outcomes: null },
 		},
 		details: accountRecoveryDetailsContent({}),
+		howToImprove: sentence(`
+			{{WALLET_NAME}} should periodically ask users to verify their
+			private key, seed phrase, and guardian accounts are still accessible.
+		`),
 	})
+}
+
+function evaluateAccountRecovery(
+	ctx: EvaluationContext<AccountRecoveryMetadata>,
+	accountRecovery: AccountRecovery,
+): Evaluation<AccountRecoveryMetadata> {
+	if (accountRecovery.drills === null) {
+		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
+	}
+
+	const drillsEval = evaluateAccountRecoveryDrills(ctx, accountRecovery.drills)
+
+	const guardianEval = isSupported(accountRecovery.guardianRecovery)
+		? evaluateGuardianRecoveryPolicy(ctx, accountRecovery.guardianRecovery.minimumGuardianPolicy)
+		: ctx.build({
+				outcome: {
+					id: 'no_guardian_recovery',
+					displayName: 'No account recovery mechanism',
+					rating: Rating.FAIL,
+					shortExplanation: sentence(`
+						{{WALLET_NAME}} does not implement guardian-based account recovery.
+						The user will lose access to their account if they lose their seed phrase.
+					`),
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
+				},
+				details: accountRecoveryDetailsContent({}),
+			})
+
+	return pickWorstRating<AccountRecoveryMetadata>([guardianEval, drillsEval])
 }
 
 export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
@@ -202,6 +284,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 					EvaluationContext.forTest(() => accountRecovery),
 					{
 						guardianRecovery: notSupported,
+						drills: notSupported,
 					},
 				),
 			),
@@ -243,6 +326,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 								secretReconstitution: 'CLIENT_SIDE',
 							},
 						}),
+						drills: notSupported,
 					},
 				),
 			),
@@ -280,11 +364,94 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 								secretReconstitution: exampleWalletDevelopmentCompany,
 							},
 						}),
+						drills: notSupported,
 					},
 				),
 			),
 		],
-		partial: [],
+		partial: [
+			exampleRating(
+				paragraph(`
+						The wallet securely distributes a recovery secret across at least 3
+						external services with client-side reconstitution, but does not
+						periodically remind users to verify they can still access their
+						account recovery.
+					`),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						guardianRecovery: supported({
+							ref: refNotNecessary,
+							minimumGuardianPolicy: {
+								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+								descriptionMarkdown: '',
+								requiredGuardians: [],
+								optionalGuardians: [
+									{
+										type: GuardianType.WALLET_PROVIDER,
+										entity: exampleWalletDevelopmentCompany,
+										description: 'Wallet developer storage cloud',
+									},
+									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
+									{
+										type: GuardianType.USER_EXTERNAL_ACCOUNT,
+										entity: exampleSecurityAuditor,
+										description: '',
+									},
+								],
+								optionalGuardiansMinimumConfigurable: 3,
+								optionalGuardiansMinimumNeededForRecovery: 2,
+								secretReconstitution: 'CLIENT_SIDE',
+							},
+						}),
+						drills: notSupported,
+					},
+				),
+			),
+			exampleRating(
+				paragraph(`
+						The wallet securely distributes a recovery secret across at least 3
+						external services with client-side reconstitution, and periodically
+						reminds users to verify their private key is still accessible, but
+						does not run the recommended seed phrase or guardian account
+						check-ups.
+					`),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						guardianRecovery: supported({
+							ref: refNotNecessary,
+							minimumGuardianPolicy: {
+								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+								descriptionMarkdown: '',
+								requiredGuardians: [],
+								optionalGuardians: [
+									{
+										type: GuardianType.WALLET_PROVIDER,
+										entity: exampleWalletDevelopmentCompany,
+										description: 'Wallet developer storage cloud',
+									},
+									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
+									{
+										type: GuardianType.USER_EXTERNAL_ACCOUNT,
+										entity: exampleSecurityAuditor,
+										description: '',
+									},
+								],
+								optionalGuardiansMinimumConfigurable: 3,
+								optionalGuardiansMinimumNeededForRecovery: 2,
+								secretReconstitution: 'CLIENT_SIDE',
+							},
+						}),
+						drills: supported({
+							periodicPrivateKeyQuiz: true,
+							periodicSeedPhraseQuiz: false,
+							periodicGuardianAccountCheck: false,
+						}),
+					},
+				),
+			),
+		],
 		pass: [
 			exampleRating(
 				paragraph(`
@@ -294,6 +461,8 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 					the recovery process.
 					The recovery secret is reconstituted on the user's device using
 					2 or more shares from these external services.
+					The wallet also periodically reminds users to verify their recovery
+					setup is intact.
 				`),
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
@@ -321,6 +490,11 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 								optionalGuardiansMinimumNeededForRecovery: 2,
 								secretReconstitution: 'CLIENT_SIDE',
 							},
+						}),
+						drills: supported({
+							periodicPrivateKeyQuiz: true,
+							periodicSeedPhraseQuiz: true,
+							periodicGuardianAccountCheck: true,
 						}),
 					},
 				),
