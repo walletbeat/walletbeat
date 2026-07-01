@@ -40,7 +40,6 @@ import {
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -353,11 +352,7 @@ export const zerion: SoftwareWallet = {
 		transparency: {
 			operationFees: null,
 			releaseTransparency: {
-				artifactSigning: supported<ArtifactSigningDetails>({
-					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
-					publication: 'GITHUB_RELEASE',
-					signer: 'DEVELOPER_KEY',
-				}),
+				artifactSigning:notSupported,
 				dependencyLocking: supported({
 					ref: [
 						{
