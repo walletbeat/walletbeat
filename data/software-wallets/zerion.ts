@@ -370,7 +370,7 @@ export const zerion: SoftwareWallet = {
 				}),
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
-					ref: 'hhttps://github.com/zeriontech/zerion-wallet-extension/releases',
+					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
 				}),
 				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
