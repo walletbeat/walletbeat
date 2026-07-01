@@ -13,11 +13,17 @@ import {
 	type FeeDisplay,
 	FeeDisplayLevel,
 	validateFeeDisplay,
-	WalletServiceFeeDenomination,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import {
+	type NonEmptyArray,
+	nonEmptyMap,
+	type NonEmptySet,
+	nonEmptySet,
+	setContains,
+} from '@/types/utils/non-empty'
 import { markdownListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
@@ -158,28 +164,43 @@ function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
 }
 
 /**
- * Tiebreaker for `compareFeeDisplay` when display level and sponsorship match.
- * Returns 1 if denomination1 is better, 0 if equal, -1 if denomination2 is better.
- * Ranking: PERCENTAGE_OR_BPS and NOT_APPLICABLE (tied) > ABSOLUTE_OR_OTHER > null.
+ * Whether the given set of wallet service fee display units includes at
+ * least one unit that expresses a rate (as opposed to a flat amount),
+ * making it possible to compare the effective cost across order sizes.
  */
-function compareWalletServiceFeeDenomination(
-	denomination1: WalletServiceFeeDenomination | null,
-	denomination2: WalletServiceFeeDenomination | null,
+function hasRelativeWalletServiceFeeUnit(units: NonEmptySet<WalletServiceFeeDisplayUnit>): boolean {
+	return (
+		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.PERCENTAGE) ||
+		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.BASIS_POINTS)
+	)
+}
+
+/**
+ * Tiebreaker for `compareFeeDisplay` when display level and sponsorship match.
+ * Returns 1 if units1 is better, 0 if equal, -1 if units2 is better.
+ * Ranking: NOT_APPLICABLE and any set containing a relative unit (tied) >
+ * a set with only absolute units > null.
+ */
+function compareWalletServiceFeeDisplayUnits(
+	units1: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+	units2: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
 ): -1 | 0 | 1 {
-	const rank = (denomination: WalletServiceFeeDenomination | null): number => {
-		switch (denomination) {
-			case WalletServiceFeeDenomination.PERCENTAGE_OR_BPS:
-			case WalletServiceFeeDenomination.NOT_APPLICABLE:
-				return 3
-			case WalletServiceFeeDenomination.ABSOLUTE_OR_OTHER:
-				return 2
-			case null:
-				return 1
+	const rank = (
+		units: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+	): number => {
+		if (units === null) {
+			return 1
 		}
+
+		if (units === 'NOT_APPLICABLE' || hasRelativeWalletServiceFeeUnit(units)) {
+			return 3
+		}
+
+		return 2
 	}
 
-	const rank1 = rank(denomination1)
-	const rank2 = rank(denomination2)
+	const rank1 = rank(units1)
+	const rank2 = rank(units2)
 
 	if (rank1 > rank2) {
 		return 1
@@ -207,9 +228,9 @@ function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDisplay): -1
 		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
 		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
 	) {
-		return compareWalletServiceFeeDenomination(
-			feeDisplay1.walletServiceFeeDenomination,
-			feeDisplay2.walletServiceFeeDenomination,
+		return compareWalletServiceFeeDisplayUnits(
+			feeDisplay1.walletServiceFeeDisplayUnits,
+			feeDisplay2.walletServiceFeeDisplayUnits,
 		)
 	}
 
@@ -464,15 +485,16 @@ function evaluateWorstFeeDisplay(
 		throw new Error('Logic error')
 	}
 
-	// Reached only when the worst case is COMPREHENSIVE and denomination
-	// is still unresearched. FAIL/PARTIAL paths above already fired if applicable.
-	if (worstFeeDisplay.feeDisplay.walletServiceFeeDenomination === null) {
+	// Reached only when the worst case is COMPREHENSIVE and the wallet
+	// service fee display units are still unresearched. FAIL/PARTIAL paths
+	// above already fired if applicable.
+	if (worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits === null) {
 		return unrated(ctx, { worstFeeDisplay })
 	}
 
 	if (
-		worstFeeDisplay.feeDisplay.walletServiceFeeDenomination ===
-		WalletServiceFeeDenomination.ABSOLUTE_OR_OTHER
+		worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
+		!hasRelativeWalletServiceFeeUnit(worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits)
 	) {
 		return ctx.build({
 			outcome: {
@@ -581,7 +603,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 						byDefault: FeeDisplayLevel.NONE,
 						afterSingleAction: FeeDisplayLevel.NONE,
 						fullySponsored: false,
-						walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+						walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 					},
 					feeTypes: [FeeType.ETH_L1_TRANSFER],
 					isUniform: true,
@@ -601,7 +623,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							afterSingleAction: FeeDisplayLevel.AGGREGATED,
 							fullySponsored: false,
-							walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 						},
 						feeTypes: [FeeType.ETH_L1_TRANSFER],
 						isUniform: true,
@@ -611,7 +633,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 			),
 			exampleRating(
 				paragraph(
-					'The wallet shows a comprehensive fee breakdown, but displays wallet service fees in absolute units rather than as a percentage or basis points.',
+					'The wallet shows a comprehensive fee breakdown, but displays wallet service fees in absolute units (e.g. a flat dollar amount) rather than as a percentage or basis points.',
 				),
 				evaluateWorstFeeDisplay(
 					EvaluationContext.forTest(() => feeTransparency),
@@ -620,7 +642,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 							byDefault: FeeDisplayLevel.COMPREHENSIVE,
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							fullySponsored: false,
-							walletServiceFeeDenomination: WalletServiceFeeDenomination.ABSOLUTE_OR_OTHER,
+							walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
 						},
 						feeTypes: [FeeType.BUILT_IN_ERC20_SWAP],
 						isUniform: true,
@@ -641,7 +663,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 							byDefault: FeeDisplayLevel.COMPREHENSIVE,
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							fullySponsored: false,
-							walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 						},
 						feeTypes: [FeeType.ETH_L1_TRANSFER],
 						isUniform: true,
@@ -660,9 +682,31 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							fullySponsored: false,
-							walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 						},
 						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						isUniform: true,
+						references: [],
+					},
+				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet shows a comprehensive fee breakdown for its built-in swap feature, displaying the wallet service fee as both a percentage and its flat dollar equivalent.',
+				),
+				evaluateWorstFeeDisplay(
+					EvaluationContext.forTest(() => feeTransparency),
+					{
+						feeDisplay: {
+							byDefault: FeeDisplayLevel.COMPREHENSIVE,
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+							walletServiceFeeDisplayUnits: nonEmptySet(
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+								WalletServiceFeeDisplayUnit.FIAT,
+							),
+						},
+						feeTypes: [FeeType.BUILT_IN_ERC20_SWAP],
 						isUniform: true,
 						references: [],
 					},

@@ -84,7 +84,7 @@ export const bitget: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.AGGREGATED,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
-						walletServiceFeeDenomination: null,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),

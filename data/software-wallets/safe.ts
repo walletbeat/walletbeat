@@ -25,7 +25,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import {
 	comprehensiveWalletServiceFeesUnresearched,
 	FeeDisplayLevel,
-	WalletServiceFeeDenomination,
 } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
@@ -316,21 +315,21 @@ export const safe: SoftwareWallet = {
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
-					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
-					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.COMPREHENSIVE,
 					fullySponsored: false,
-					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
 			releaseTransparency: {

@@ -54,7 +54,7 @@ import {
 import {
 	comprehensiveGasOrExternalFees,
 	FeeDisplayLevel,
-	WalletServiceFeeDenomination,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -65,6 +65,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
@@ -149,7 +150,7 @@ export const rabby: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.NONE,
 						fullySponsored: false,
-						walletServiceFeeDenomination: WalletServiceFeeDenomination.PERCENTAGE_OR_BPS,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -853,21 +854,21 @@ export const rabby: SoftwareWallet = {
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
-					walletServiceFeeDenomination: WalletServiceFeeDenomination.PERCENTAGE_OR_BPS,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
-					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
-					walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
 			},

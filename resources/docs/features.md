@@ -3537,15 +3537,14 @@ What level of information is shown about fees.
 
 ---
 
-### Enum: `WalletServiceFeeDenomination`
+### Enum: `WalletServiceFeeDisplayUnit`
 
-How wallet service fees (platform fees on built-in swap or bridge flows) are denominated when shown in a comprehensive fee breakdown.
+A unit that a wallet service fee (platform fee on built-in swap or bridge flows) line item may be displayed in, within a comprehensive fee breakdown. A single fee line item may show more than one of these at once (e.g. a percentage next to its fiat-equivalent amount).
 
-Only built-in swap and cross-chain bridging flows are evaluated on this field. Other flows use `NOT_APPLICABLE` when no wallet service fee exists.
-
-- `PERCENTAGE_OR_BPS` = `'PERCENTAGE_OR_BPS'`: Wallet service fee line item(s) use % or bps.
-- `ABSOLUTE_OR_OTHER` = `'ABSOLUTE_OR_OTHER'`: Wallet service fee shown in flat $, fixed token amount, etc.
-- `NOT_APPLICABLE` = `'NOT_APPLICABLE'`: No wallet service fee exists on this flow. The user may still pay network gas or external protocol fees, but the wallet itself does not charge a platform fee whose units would be rated.
+- `PERCENTAGE` = `'PERCENTAGE'`: Wallet service fee line item shows a percentage (e.g. "0.3%").
+- `BASIS_POINTS` = `'BASIS_POINTS'`: Wallet service fee line item shows basis points (e.g. "30 bps").
+- `FIAT` = `'FIAT'`: Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24").
+- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an on-chain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
 
 ---
 
@@ -3556,13 +3555,13 @@ How much fee information is displayed by default and after an action.
 - `byDefault` (`FeeDisplayLevel`): Level of fee information shown with default wallet settings and zero fee-specific interactions on the transaction approval screen. To test: initiate the transaction on a freshly installed wallet with no settings changed. Record the fee display level visible on the approval screen before clicking anything fee-related.
 - `afterSingleAction` (`FeeDisplayLevel`): Level of fee information shown after at most one additional click/tap on the transaction approval screen (e.g. tapping a fee row, an info icon, or a "show details" chevron), with no settings changed. To test: from the same default approval screen, make exactly one fee-related interaction and record the highest level of detail then shown. If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
 - `fullySponsored` (`boolean`): Whether the wallet fully sponsors these fees on behalf of the user, so the user pays nothing. To test: complete the transaction and verify that no gas or protocol fee is deducted from the user's balance. Check the wallet's documentation or source code to confirm sponsorship is intentional and not a test-net artifact.
-- `walletServiceFeeDenomination` (`WalletServiceFeeDenomination | null`): How wallet service fees are denominated when a comprehensive breakdown is available. Only evaluated on built-in swap (`builtInErc20Swap`) and cross-chain bridging (`feesLargerThan1bps`) flows where the wallet charges an order-size-sensitive service fee.
-  - `PERCENTAGE_OR_BPS` — wallet service fee line item(s) use % or bps.
-  - `ABSOLUTE_OR_OTHER` — wallet service fee shown in flat $, fixed token
-    amount, etc.
-  - `NOT_APPLICABLE` — no wallet service fee on this flow. Use for L1
-    transfers, external app transactions, relayer fees, and other flows
-    where only network or external protocol fees apply.
+- `walletServiceFeeDisplayUnits` (`NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null`): Which unit(s) the wallet service fee line item(s) are shown in, when a comprehensive breakdown is available. Meaningful when the flow includes a wallet-charged platform fee line item in the breakdown (e.g. built-in swap or cross-chain bridging).
+  - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
+    shown on the wallet service fee line item(s) (e.g. a wallet showing
+    both a percentage and its fiat equivalent would use both units here).
+  - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
+    flow. Use for L1 transfers, external app transactions, relayer fees,
+    and other flows where only network or external protocol fees apply.
   - `null` — not yet researched (required on in-scope swap/bridge flows).
 
 ---

@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import { type NonEmptySet, nonEmptySet } from '@/types/utils/non-empty'
 
 import { type Support } from '../support'
 
@@ -37,25 +38,26 @@ export enum FeeDisplayLevel {
 }
 
 /**
- * How wallet service fees (platform fees on built-in swap or bridge flows)
- * are denominated when shown in a comprehensive fee breakdown.
- *
- * Only built-in swap and cross-chain bridging flows are evaluated on this
- * field. Other flows use `NOT_APPLICABLE` when no wallet service fee exists.
+ * A unit that a wallet service fee (platform fee on built-in swap or bridge
+ * flows) line item may be displayed in, within a comprehensive fee breakdown.
+ * A single fee line item may show more than one of these at once (e.g. a
+ * percentage next to its fiat-equivalent amount).
  */
-export enum WalletServiceFeeDenomination {
-	/** Wallet service fee line item(s) use % or bps. */
-	PERCENTAGE_OR_BPS = 'PERCENTAGE_OR_BPS',
+export enum WalletServiceFeeDisplayUnit {
+	/** Wallet service fee line item shows a percentage (e.g. "0.3%"). */
+	PERCENTAGE = 'PERCENTAGE',
 
-	/** Wallet service fee shown in flat $, fixed token amount, etc. */
-	ABSOLUTE_OR_OTHER = 'ABSOLUTE_OR_OTHER',
+	/** Wallet service fee line item shows basis points (e.g. "30 bps"). */
+	BASIS_POINTS = 'BASIS_POINTS',
+
+	/** Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24"). */
+	FIAT = 'FIAT',
 
 	/**
-	 * No wallet service fee exists on this flow. The user may still pay network
-	 * gas or external protocol fees, but the wallet itself does not charge a
-	 * platform fee whose units would be rated.
+	 * Wallet service fee line item shows a fixed amount of an on-chain asset,
+	 * native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
 	 */
-	NOT_APPLICABLE = 'NOT_APPLICABLE',
+	TOKEN_AMOUNT = 'TOKEN_AMOUNT',
 }
 
 /** How much fee information is displayed by default and after an action. */
@@ -90,20 +92,20 @@ export interface FeeDisplay {
 	fullySponsored: boolean
 
 	/**
-	 * How wallet service fees are denominated when a comprehensive breakdown
-	 * is available. Only evaluated on built-in swap (`builtInErc20Swap`) and
-	 * cross-chain bridging (`feesLargerThan1bps`) flows where the wallet
-	 * charges an order-size-sensitive service fee.
+	 * Which unit(s) the wallet service fee line item(s) are shown in, when a
+	 * comprehensive breakdown is available. Meaningful when the flow includes
+	 * a wallet-charged platform fee line item in the breakdown (e.g. built-in
+	 * swap or cross-chain bridging).
 	 *
-	 * - `PERCENTAGE_OR_BPS` — wallet service fee line item(s) use % or bps.
-	 * - `ABSOLUTE_OR_OTHER` — wallet service fee shown in flat $, fixed token
-	 *   amount, etc.
-	 * - `NOT_APPLICABLE` — no wallet service fee on this flow. Use for L1
-	 *   transfers, external app transactions, relayer fees, and other flows
-	 *   where only network or external protocol fees apply.
+	 * - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
+	 *   shown on the wallet service fee line item(s) (e.g. a wallet showing
+	 *   both a percentage and its fiat equivalent would use both units here).
+	 * - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
+	 *   flow. Use for L1 transfers, external app transactions, relayer fees,
+	 *   and other flows where only network or external protocol fees apply.
 	 * - `null` — not yet researched (required on in-scope swap/bridge flows).
 	 */
-	walletServiceFeeDenomination: WalletServiceFeeDenomination | null
+	walletServiceFeeDisplayUnits: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null
 }
 
 export function validateFeeDisplay(feeDisplay: FeeDisplay) {
@@ -127,22 +129,12 @@ export function validateFeeDisplay(feeDisplay: FeeDisplay) {
 	}
 
 	if (
-		(feeDisplay.walletServiceFeeDenomination === WalletServiceFeeDenomination.PERCENTAGE_OR_BPS ||
-			feeDisplay.walletServiceFeeDenomination === WalletServiceFeeDenomination.ABSOLUTE_OR_OTHER) &&
-		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
-	) {
-		throw new Error(
-			'Invalid fee display: PERCENTAGE_OR_BPS and ABSOLUTE_OR_OTHER require afterSingleAction=COMPREHENSIVE',
-		)
-	}
-
-	if (
 		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE &&
-		feeDisplay.walletServiceFeeDenomination !== WalletServiceFeeDenomination.NOT_APPLICABLE &&
-		feeDisplay.walletServiceFeeDenomination !== null
+		feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
+		feeDisplay.walletServiceFeeDisplayUnits !== null
 	) {
 		throw new Error(
-			'Invalid fee display: when afterSingleAction is not COMPREHENSIVE, walletServiceFeeDenomination must be NOT_APPLICABLE or null',
+			'Invalid fee display: when afterSingleAction is not COMPREHENSIVE, walletServiceFeeDisplayUnits must be NOT_APPLICABLE or null',
 		)
 	}
 }
@@ -156,7 +148,7 @@ export const comprehensiveGasOrExternalFees: WithRef<FeeDisplay> = {
 	byDefault: FeeDisplayLevel.COMPREHENSIVE,
 	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 	fullySponsored: false,
-	walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 	ref: [],
 }
 
@@ -168,33 +160,33 @@ export const fullySponsoredFees: WithRef<FeeDisplay> = {
 	byDefault: FeeDisplayLevel.NONE,
 	afterSingleAction: FeeDisplayLevel.NONE,
 	fullySponsored: true,
-	walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 	ref: [],
 }
 
 /**
  * Shorthand for comprehensive built-in swap or cross-chain bridging fee display
- * pending wallet service fee denomination research. Use on `builtInErc20Swap` and
- * `feesLargerThan1bps` when display levels are known to be comprehensive but
- * whether wallet service fees use %/bps vs flat amounts is not yet researched.
+ * pending wallet service fee display unit research. Use on `builtInErc20Swap`
+ * and `feesLargerThan1bps` when display levels are known to be comprehensive
+ * but which units wallet service fees are shown in is not yet researched.
  */
 export const comprehensiveWalletServiceFeesUnresearched: WithRef<FeeDisplay> = {
 	byDefault: FeeDisplayLevel.COMPREHENSIVE,
 	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 	fullySponsored: false,
-	walletServiceFeeDenomination: null,
+	walletServiceFeeDisplayUnits: null,
 	ref: [],
 }
 
 /**
  * Shorthand for fully researched built-in swap or bridge fee display where
- * wallet service fees are shown as a percentage or basis points.
+ * wallet service fees are shown as a percentage.
  */
 export const comprehensiveWalletServiceFeesPercentage: WithRef<FeeDisplay> = {
 	byDefault: FeeDisplayLevel.COMPREHENSIVE,
 	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 	fullySponsored: false,
-	walletServiceFeeDenomination: WalletServiceFeeDenomination.PERCENTAGE_OR_BPS,
+	walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 	ref: [],
 }
 

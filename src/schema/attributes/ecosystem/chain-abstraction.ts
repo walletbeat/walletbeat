@@ -20,7 +20,6 @@ import {
 import {
 	comprehensiveWalletServiceFeesPercentage,
 	FeeDisplayLevel,
-	WalletServiceFeeDenomination,
 } from '@/schema/features/transparency/fee-display'
 import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
@@ -459,7 +458,7 @@ export const chainAbstraction: Attribute = {
 									byDefault: FeeDisplayLevel.NONE,
 									afterSingleAction: FeeDisplayLevel.NONE,
 									fullySponsored: false,
-									walletServiceFeeDenomination: WalletServiceFeeDenomination.NOT_APPLICABLE,
+									walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 								},
 								risksExplained: 'VISIBLE_BY_DEFAULT',
 							}),
