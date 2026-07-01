@@ -16,7 +16,7 @@ export const family: SoftwareWallet = {
 		tableName: 'Family',
 		blurb: paragraph(''),
 		contributors: [lucemans],
-		iconExtension: 'svg',
+		iconExtension: 'png',
 		lastUpdated: '2025-04-22',
 		urls: {
 			docs: ['https://family.co/docs'],
