@@ -676,6 +676,7 @@ export const ambire: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: notSupported,
 				// Supported in v1 but not v2.
 				guardianRecovery: notSupported,
 			},

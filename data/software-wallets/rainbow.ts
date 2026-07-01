@@ -620,6 +620,7 @@ export const rainbow: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: null,
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				// Rainbow supports cloud backup (iCloud/Google Drive) but not guardian-based recovery.
 				guardianRecovery: supported({

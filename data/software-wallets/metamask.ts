@@ -316,6 +316,7 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: null,
 				guardianRecovery: supported({
 					ref: [
 						{

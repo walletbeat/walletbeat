@@ -486,6 +486,11 @@ export const completedTemplate: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: supported({
+					periodicGuardianAccountCheck: true,
+					periodicPrivateKeyQuiz: true,
+					periodicSeedPhraseQuiz: true,
+				}),
 				guardianRecovery: supported({
 					ref: refTodo,
 					minimumGuardianPolicy: {
