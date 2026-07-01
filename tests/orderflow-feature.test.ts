@@ -17,7 +17,7 @@ import {
 	validateDataCollectionByEntityRow,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
-import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	compareOrderflowDisclosureToFeeDisplay,
 	deriveOrderflowFacts,
@@ -214,115 +214,62 @@ describe('orderflow data-collection helpers', () => {
 	})
 })
 
-const comprehensiveFeeDisplay: FeeDisplay = {
-	byDefault: FeeDisplayLevel.COMPREHENSIVE,
-	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-	fullySponsored: false,
-}
-
-const aggregatedFeeDisplay: FeeDisplay = {
-	byDefault: FeeDisplayLevel.AGGREGATED,
-	afterSingleAction: FeeDisplayLevel.AGGREGATED,
-	fullySponsored: false,
-}
-
-const fullySponsoredFeeDisplay: FeeDisplay = {
-	byDefault: FeeDisplayLevel.NONE,
-	afterSingleAction: FeeDisplayLevel.NONE,
-	fullySponsored: true,
-}
-
 describe('compareOrderflowDisclosureToFeeDisplay', () => {
-	it('returns 0 when prominence levels match', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
-					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
-				},
-				comprehensiveFeeDisplay,
-			),
-		).toBe(0)
-	})
-
-	it('returns 1 when orderflow disclosure is more prominent', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
-					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
-				},
-				aggregatedFeeDisplay,
-			),
-		).toBe(1)
-	})
-
-	it('returns -1 when orderflow disclosure is less prominent', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.MENTIONED,
-					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-				},
-				comprehensiveFeeDisplay,
-			),
-		).toBe(-1)
-	})
-
-	it('ranks sponsored fees with no fee UI as NONE when orderflow is visible', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.MENTIONED,
-					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-				},
-				fullySponsoredFeeDisplay,
-			),
-		).toBe(1)
-	})
-
-	it('returns -1 when fees are fully sponsored but fee UI is still shown', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.MENTIONED,
-					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-				},
-				{
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
-					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					fullySponsored: true,
-				},
-			),
-		).toBe(-1)
-	})
-
-	it('returns 0 when fully sponsored fees match orderflow prominence levels', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.MENTIONED,
-					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-				},
-				{
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					afterSingleAction: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: true,
-				},
-			),
-		).toBe(0)
-	})
-
-	it('returns -1 when comprehensive fees exceed mentioned orderflow disclosure', () => {
-		expect(
-			compareOrderflowDisclosureToFeeDisplay(
-				{
-					byDefault: OrderflowDisclosureLevel.MENTIONED,
-					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
-				},
-				comprehensiveFeeDisplay,
-			),
-		).toBe(-1)
+	it.each([
+		{
+			description: 'MENTIONED orderflow matches AGGREGATED fees',
+			disclosure: {
+				byDefault: OrderflowDisclosureLevel.MENTIONED,
+				afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
+			},
+			feeDisplay: {
+				byDefault: FeeDisplayLevel.AGGREGATED,
+				afterSingleAction: FeeDisplayLevel.AGGREGATED,
+				fullySponsored: false,
+			},
+			expected: 0,
+		},
+		{
+			description: 'orderflow more prominent than fees',
+			disclosure: {
+				byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
+				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+			},
+			feeDisplay: {
+				byDefault: FeeDisplayLevel.AGGREGATED,
+				afterSingleAction: FeeDisplayLevel.AGGREGATED,
+				fullySponsored: false,
+			},
+			expected: 1,
+		},
+		{
+			description: 'orderflow less prominent than fees',
+			disclosure: {
+				byDefault: OrderflowDisclosureLevel.MENTIONED,
+				afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
+			},
+			feeDisplay: {
+				byDefault: FeeDisplayLevel.COMPREHENSIVE,
+				afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+				fullySponsored: false,
+			},
+			expected: -1,
+		},
+		{
+			description: 'uses afterSingleAction when byDefault levels tie',
+			disclosure: {
+				byDefault: OrderflowDisclosureLevel.MENTIONED,
+				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+			},
+			feeDisplay: {
+				byDefault: FeeDisplayLevel.AGGREGATED,
+				afterSingleAction: FeeDisplayLevel.AGGREGATED,
+				fullySponsored: false,
+			},
+			expected: 1,
+		},
+	])('$description', ({ disclosure, feeDisplay, expected }) => {
+		expect(compareOrderflowDisclosureToFeeDisplay(disclosure, feeDisplay)).toBe(expected)
 	})
 })
 
