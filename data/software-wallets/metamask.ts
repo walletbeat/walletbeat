@@ -47,7 +47,7 @@ import {
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
 	comprehensiveGasOrExternalFees,
-	comprehensiveWalletServiceFeesUnresearched,
+	FeeDisplayLevel,
 } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -150,7 +150,12 @@ export const metamask: SoftwareWallet = {
 							'MetaMask has a built-in bridge feature that allows users to bridge assets between chains.',
 						url: 'https://support.metamask.io/more-web3/learn/field-guide-to-bridges/',
 					},
-					feesLargerThan1bps: comprehensiveWalletServiceFeesUnresearched,
+					feesLargerThan1bps: {
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
+					},
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
@@ -637,7 +642,13 @@ export const metamask: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveWalletServiceFeesUnresearched),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: null,
+				}),
 				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
 				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),

@@ -7,7 +7,7 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
 	comprehensiveGasOrExternalFees,
-	comprehensiveWalletServiceFeesUnresearched,
+	FeeDisplayLevel,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
@@ -199,7 +199,13 @@ export const gemwallet: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveWalletServiceFeesUnresearched),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: null,
+				}),
 				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
 				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),

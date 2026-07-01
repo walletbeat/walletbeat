@@ -165,20 +165,6 @@ export const fullySponsoredFees: WithRef<FeeDisplay> = {
 }
 
 /**
- * Shorthand for comprehensive built-in swap or cross-chain bridging fee display
- * pending wallet service fee display unit research. Use on `builtInErc20Swap`
- * and `feesLargerThan1bps` when display levels are known to be comprehensive
- * but which units wallet service fees are shown in is not yet researched.
- */
-export const comprehensiveWalletServiceFeesUnresearched: WithRef<FeeDisplay> = {
-	byDefault: FeeDisplayLevel.COMPREHENSIVE,
-	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-	fullySponsored: false,
-	walletServiceFeeDisplayUnits: null,
-	ref: [],
-}
-
-/**
  * Shorthand for fully researched built-in swap or bridge fee display where
  * wallet service fees are shown as a percentage.
  */

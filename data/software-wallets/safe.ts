@@ -22,10 +22,7 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import {
-	comprehensiveWalletServiceFeesUnresearched,
-	FeeDisplayLevel,
-} from '@/schema/features/transparency/fee-display' // for level
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // for level
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -307,8 +304,11 @@ export const safe: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
-					...comprehensiveWalletServiceFeesUnresearched,
 					ref: refTodo,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: null,
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
