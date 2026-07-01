@@ -352,7 +352,7 @@ export const zerion: SoftwareWallet = {
 		transparency: {
 			operationFees: null,
 			releaseTransparency: {
-				artifactSigning:notSupported,
+				artifactSigning: notSupported,
 				dependencyLocking: supported({
 					ref: [
 						{
