@@ -1,4 +1,5 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -9,9 +10,7 @@ import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -120,7 +119,7 @@ export const uniswapWallet: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE' as const,
-				dateStarted: '2024-11-26' as CalendarDate,
+				dateStarted: '2024-11-26' as const,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.CANTINA,

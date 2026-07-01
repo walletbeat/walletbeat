@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
@@ -21,9 +22,7 @@ import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 import { keylabs } from '../entities/keylabs'
 
@@ -125,7 +124,7 @@ export const cypherockWallet: HardwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2023-03-22' as CalendarDate,
+				dateStarted: '2023-03-22' as const,
 				disclosure: supported({
 					numberOfDays: 30,
 				}),

@@ -6,6 +6,7 @@
 	}
 </script>
 
+
 <script lang="ts">
 	// Types/constants
 	import type { MaybeUnratedScore } from '@/schema/score'
@@ -20,7 +21,7 @@
 		summaryType = WalletSummaryType.None,
 		isInTooltip = false,
 	}: {
-		wallet: RatedWallet
+		wallet: RatedWallet<string>
 		score: MaybeUnratedScore
 		summaryType?: WalletSummaryType
 		isInTooltip?: boolean
@@ -68,14 +69,14 @@
 			{#if stage !== null && ladderEvaluation !== null}
 				Walletbeat stage:
 				<WalletStageBadge {stage} {ladderEvaluation} size="large" />
-			{:else}
+			{:else if !isInTooltip}
 				Walletbeat score:
 				<ScoreBadge {score} size="large" />
 				{#if score?.hasUnratedComponent}
 					<small>*contains unrated components</small>
 				{/if}
 			{/if}
-		{:else if summaryType === WalletSummaryType.Score}
+		{:else if summaryType === WalletSummaryType.Score && !isInTooltip}
 			Walletbeat score:
 			<ScoreBadge {score} size="large" />
 			{#if score?.hasUnratedComponent}

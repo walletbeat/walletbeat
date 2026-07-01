@@ -1,4 +1,5 @@
 import { exampleContributor } from '@/data/contributors/example'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -9,9 +10,7 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const unratedHardwareTemplate: HardwareWallet = {
 	metadata: {
@@ -82,7 +81,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2024-01-01' as CalendarDate,
+				dateStarted: '2024-01-01' as const,
 				disclosure: supported({
 					numberOfDays: 30,
 				}),
