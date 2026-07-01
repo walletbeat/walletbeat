@@ -192,7 +192,6 @@ export const imkeyWallet: HardwareWallet = {
 				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
 				uniswapUSDCToEtherSwap: notSupported,
 			},
-			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

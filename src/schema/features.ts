@@ -175,9 +175,6 @@ export interface WalletBaseFeatures {
 		/** Information on how fees are displayed for basic operations. */
 		operationFees: VariantFeature<Nullable<BasicOperationFees>>
 
-		/** Orderflow auctioning disclosure and practices page. */
-		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
-
 		/** Release transparency features. */
 		releaseTransparency: {
 			artifactSigning: VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>
@@ -257,6 +254,11 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 	/** How well does the wallet abstract over chains? */
 	chainAbstraction: VariantFeature<Nullable<ChainAbstraction>>
+
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+	}
 }
 
 /**
@@ -330,6 +332,10 @@ export function isWalletEmbeddedFeatures(
 export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
+	}
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 	}
 }
 
@@ -586,10 +592,14 @@ export function resolveFeatures(
 				baseFeat('transparency.operationFees', features => features.transparency.operationFees),
 			),
 			orderflowPractices: nullable(
-				baseFeat(
+				embeddedFeat(
 					'transparency.orderflowPractices',
 					features => features.transparency.orderflowPractices,
-				),
+				) ??
+					softwareFeat(
+						'transparency.orderflowPractices',
+						features => features.transparency.orderflowPractices,
+					),
 			),
 			reputation: hardwareFeat(
 				'transparency.reputation',

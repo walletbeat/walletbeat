@@ -104,7 +104,6 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 - `selfSovereignty` (`object`): Self-sovereignty features.
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
-  - `orderflowPractices` (`VariantFeature<Nullable<OrderflowPractices>>`): Orderflow auctioning disclosure and practices page.
   - `releaseTransparency` (object): Release transparency features.
     - `artifactSigning` (`VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>`)
     - `dependencyLocking` (`VariantFeature<DependencyLocking>`)
@@ -171,6 +170,11 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 	/** How well does the wallet abstract over chains? */
 	chainAbstraction: VariantFeature<Nullable<ChainAbstraction>>
+
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+	}
 }
 ```
 
@@ -220,6 +224,10 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
+	}
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 	}
 }
 ```
@@ -3848,17 +3856,9 @@ Contents researchers evaluate on the wallet's orderflow practices page.
 
 Orderflow transparency practices beyond data-collection entity rows.
 
-```typescript
-type OrderflowPractices = {
-	disclosure: WithRef<OrderflowDisclosure>
-	userCanRemoveAuctioning: Support<WithRef<{}>>
-	practicesPage: Support<
-		MustRef<{
-			contents: OrderflowPracticesPageContents
-		}>
-	>
-}
-```
+- `disclosure` (`WithRef<OrderflowDisclosure>`)
+- `userCanRemoveAuctioning` (`Support<WithRef<{}>>`)
+- `practicesPage` (`Support< MustRef<{ contents: OrderflowPracticesPageContents }> >`)
 
 ---
 
