@@ -411,7 +411,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 			exampleRating(
 				paragraph(`
 						The wallet securely distributes a recovery secret across at least 3
-						external services with client-side reconstitution, and periodically
+						external services with client-side reconstitution. It periodically
 						reminds users to verify their private key is still accessible, but
 						does not run the recommended seed phrase or guardian account
 						check-ups.
