@@ -474,26 +474,37 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 }
 
 /**
- * Drills that a wallet runs to keep users prepared for account recovery.
+ * The type of account recovery drill.
  */
-export interface AccountRecoveryDrills {
+export enum AccountRecoveryDrillType {
 	/**
-	 * Does the wallet run periodic private key check-ups for users to ensure
-	 * that they still have the private key for their account?
+	 * Periodically asks the user to demonstrate that they still have the
+	 * private key for their account.
 	 */
-	periodicPrivateKeyQuiz: boolean
+	PRIVATE_KEY_QUIZ = 'PRIVATE_KEY_QUIZ',
 
 	/**
-	 * Does the wallet run a periodic seed phrase quiz for users to ensure that
-	 * they still have the seed phrase for their account?
+	 * Periodically asks the user to demonstrate that they still have the
+	 * seed phrase for their account.
 	 */
-	periodicSeedPhraseQuiz: boolean
+	SEED_PHRASE_QUIZ = 'SEED_PHRASE_QUIZ',
 
 	/**
-	 * Does the wallet ask users whether they still have access to their
-	 * guardian accounts to ensure that they can recover their account?
+	 * Periodically asks the user to confirm they still have access to their
+	 * configured guardian accounts.
 	 */
-	periodicGuardianAccountCheck: boolean | 'NO_GUARDIAN_RECOVERY'
+	GUARDIAN_ACCOUNT_CHECK = 'GUARDIAN_ACCOUNT_CHECK',
+}
+
+/**
+ * A single drill that a wallet runs to keep users prepared for account recovery.
+ */
+export interface AccountRecoveryDrill {
+	/** Which kind of drill this is. */
+	type: AccountRecoveryDrillType
+
+	/** How often the wallet prompts the user to complete this drill, in days. */
+	reminderEveryNDays: number
 }
 
 /**
@@ -539,9 +550,22 @@ export interface AccountRecovery {
 	guardianRecovery: Support<WithRef<GuardianRecovery>>
 
 	/**
-	 * Whether the wallet has "drills" to ensure that users will be able to
-	 * successfully recover their accounts.
+	 * Drills the wallet runs to ensure that users will be able to
+	 * successfully recover their accounts. Wallets that support 
+	 * must implement at least one drill type.
 	 * Set to `null` if this has not been rated yet.
 	 */
-	drills: Support<AccountRecoveryDrills> | null
+	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }> | null
+}
+
+export const accountRecoveryDrillCheckupLabels: Record<AccountRecoveryDrillType, string> = {
+	[AccountRecoveryDrillType.PRIVATE_KEY_QUIZ]: 'private key check-ups',
+	[AccountRecoveryDrillType.SEED_PHRASE_QUIZ]: 'seed phrase check-ups',
+	[AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK]: 'guardian account check-ups',
+}
+
+export const accountRecoveryDrillNouns: Record<AccountRecoveryDrillType, string> = {
+	[AccountRecoveryDrillType.PRIVATE_KEY_QUIZ]: 'private key',
+	[AccountRecoveryDrillType.SEED_PHRASE_QUIZ]: 'seed phrase',
+	[AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK]: 'guardian accounts',
 }
