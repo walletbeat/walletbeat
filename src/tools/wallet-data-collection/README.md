@@ -130,13 +130,27 @@ Requests can be assigned to the following purposes:
 
 Purposes are case-insensitive on the command line.
 
+#### `review-strings` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> review-strings
+```
+
+Review high-entropy strings from network capture to flag the user data they are carrying.
+
+This is useful to avoid repetitive flagging of user data during the `review-requests` phase.
+By going through these strings contained in network requests, things like tracking cookies, EOA addresses, wallet-connect domains, etc. can be tagged as corresponding to one or more pieces of user-identifying information (or simply as `TRACKING_IDENTIFIER` when repeated across requests).
+The benefit of doing so is that requests containing these strings will be automatically identified as carrying this user information without having to repeat yourself.
+
+Alternatively, you can use the `mark-string` subcommand to mark a given string as carrying a given piece of user information. `review-strings` is just a pretty UI over it.
+
 #### `mark-string` subcommand
 
 ```
 $ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
-Mark a string as conveying the given data type. The string will be classified and stored in the capture file's user data store.
+Mark a string as conveying the given data type. This is the same operation as the one `review-strings` does, but with a more machine-friendly interface. The string will be classified and stored in the capture file's user data store.
 
 Marking a string as carrying user data has the following effect:
 
@@ -183,9 +197,12 @@ After a request is manually reviewed, it will never be prompted for in future ex
 - Record a network capture with `--flow=ONBOARDING_NEW`.
 - Start the browser with `mitmproxy` and create two new wallet addresses.
 - Stop the browser, end the capture.
-- Create a new browser profile, install the wallet again (do not go through user onboarding). Stop the browser.
-- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses you had created.
+- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to two addresses you have pre-seeded with Ether and USDC.
 - Start the browser and import the two wallet addresses you had created (e.g. by using the same seed phrase).
+  - If you cannot import these two addresses in the wallet after a user account was already created in `ONBOARDING_NEW`:
+    - Stop there, reinstall the wallet from scratch.
+    - Record a capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses are about to import (pre-seeded with Ether and USDC) and the two you had created during `ONBOARDING_NEW`.
+    - Go through the wallet's account import or account recovery flow, and import the two addresses you have pre-seeded with Ether and USDC. Do _not_ import the two addresses from the `ONBOARDING_NEW` float.
 - Stop the browser, end the capture.
 - For each remaining flow (`SEND_ETHER`, `SEND_USDC`, `NATIVE_SWAP`, `APP_CONNECTION`, `MAKE_TRANSACTION`):
   - If the wallet does not support this flow, run the `mark-flow-unsupported` subcommand to tag it as such. Otherwise:
@@ -195,7 +212,7 @@ After a request is manually reviewed, it will never be prompted for in future ex
 - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
   - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
   - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
-  - Run the `mark-string` subcommand to classify personal data strings and automatically associate requests to the data they send.
+  - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send.
   - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
   - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
 - Once the `check` subcommand is successful, you are done!

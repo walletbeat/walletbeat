@@ -2241,7 +2241,12 @@ export class WalletCaptureFile {
 					issue: `There are ${numUnreviewedRequests} unreviewed requests.`,
 					suggestions: [
 						{
-							suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers before doing so)' : ''}`,
+							suggestion:
+								'Tag high-entropy strings as benign, tracking identifiers, or user information (makes `review-requests` less tedious)',
+							subcommand: 'review-strings',
+						},
+						{
+							suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers or `review-strings` before doing so)' : ''}`,
 							subcommand: 'review-requests',
 						},
 					],
@@ -2282,6 +2287,12 @@ export class WalletCaptureFile {
 		}
 
 		if (!userFlowMayBeMarkedUnsupported(f)) {
+			if (f === UserFlow.ONBOARDING_IMPORT) {
+				throw new Error(
+					`Flow ${f} may not be marked as unsupported. If the wallet does not support e.g. importing a new seed phrase after already having created an account, then restart from a blank wallet and go through the account import flow from there.`,
+				)
+			}
+
 			throw new Error(`Flow ${f} may not be marked as unsupported.`)
 		}
 
