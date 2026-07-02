@@ -6,7 +6,39 @@ import * as prettier from 'prettier'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 import { getErrorMessage } from '@/types/errors'
 import { assertStringHasPrefixAndSuffix, trimWhitespacePrefix } from '@/types/utils/text'
-import { staticSingleMarkdownPage } from '@/utils/markdown-page-utils'
+import { knownContentTypes, staticSingleMarkdownPage } from '@/utils/markdown-page-utils'
+
+/**
+ * Single source of truth for every served markdown directory.
+ * Each entry maps a source directory to its generated imports file,
+ * URL prefix, and Astro endpoint directory.
+ */
+export const SERVED_DIRS: {
+	/** Repo-root-relative path to the generated `.gen.ts` file. */
+	genFile: `/${string}`
+
+	/** Repo-root-relative source directory containing the markdown files. */
+	sourceDir: `/${string}`
+
+	/** URL prefix where the pages are served (e.g. `/docs/`). */
+	urlPrefix: `/${string}`
+
+	/** Directory under `src/pages/` where the Astro endpoint files live. */
+	endpointDir: string
+}[] = [
+	{
+		genFile: '/src/autogen/docs.gen.ts',
+		sourceDir: '/resources/docs',
+		urlPrefix: '/docs/',
+		endpointDir: 'src/pages/docs',
+	},
+	{
+		genFile: '/src/autogen/governance.gen.ts',
+		sourceDir: '/governance',
+		urlPrefix: '/governance/',
+		endpointDir: 'src/pages/governance',
+	},
+]
 
 /** Configuration for a MarkdownImportsGenerator instance. */
 export interface MarkdownImportsConfig {
@@ -194,6 +226,81 @@ export class MarkdownImportsGenerator {
 		return 'pnpm tsx src/tools/markdown-imports-autogen/markdown-import-autogen.ts --mode write'
 	}
 
+	/**
+	 * Recursively scans all source directories for image files and returns the set
+	 * of unique file extensions found (including the leading dot, e.g. `.png`).
+	 */
+	public getImageExtensionsOnDisk(): Set<string> {
+		const extensions = new Set<string>()
+
+		for (const sourceDir of this.sourceDirs) {
+			this.collectImageExtensions(sourceDir, extensions)
+		}
+
+		return extensions
+	}
+
+	/**
+	 * Validates that every image extension found on disk has a corresponding Astro
+	 * endpoint file and a registered Content-Type.
+	 *
+	 * @param endpointDir Repo-root-relative path to the directory containing the
+	 * endpoint files (e.g. `src/pages/docs`).
+	 * @returns An array of human-readable error strings (empty = no errors).
+	 */
+	public validateImageEndpoints(endpointDir: string): string[] {
+		const errors: string[] = []
+		const diskExtensions = this.getImageExtensionsOnDisk()
+		const endpointExtensions = this.discoverEndpointExtensions(endpointDir)
+
+		for (const ext of diskExtensions) {
+			const cleanExt = ext.slice(1)
+
+			if (!endpointExtensions.has(ext)) {
+				errors.push(
+					`No endpoint file for ${ext} images. ` +
+						`Create ${endpointDir}/[...img]${ext}.ts and call staticMarkdownMedia({ extension: '${cleanExt}' }).`,
+				)
+			}
+
+			if (knownContentTypes[cleanExt] === undefined) {
+				errors.push(
+					`${ext} is not in knownContentTypes in markdown-page-utils.ts. ` +
+						`Add '${cleanExt}': '<mime type>' to the mapping.`,
+				)
+			}
+		}
+
+		return errors
+	}
+
+	/**
+	 * Scans the endpoint directory for `[...img].<ext>.ts` files and returns the
+	 * set of extensions (with leading dot) that have an endpoint.
+	 */
+	public discoverEndpointExtensions(endpointDir: string): Set<string> {
+		const extensions = new Set<string>()
+		const absEndpointDir = path.join(this.repoRoot, endpointDir)
+
+		if (!fs.existsSync(absEndpointDir)) {
+			return extensions
+		}
+
+		const pattern = /^\[\.\.\.img\]\.(.+?)\.ts$/
+
+		const entries = fs.readdirSync(absEndpointDir)
+
+		for (const entry of entries) {
+			const match = pattern.exec(entry)
+
+			if (match) {
+				extensions.add(`.${match[1]}`)
+			}
+		}
+
+		return extensions
+	}
+
 	// ── Private helpers ──
 
 	/**
@@ -241,5 +348,26 @@ export class MarkdownImportsGenerator {
 	 */
 	private relativePathToImportPath(mdPath: `/${string}.md`): `@/${string}.md` {
 		return assertStringHasPrefixAndSuffix(`@/${mdPath.slice(1)}`, { prefix: '@/', suffix: '.md' })
+	}
+
+	/**
+	 * Recursively walks a directory tree and collects image file extensions
+	 * into the provided set.  Only extensions registered in `knownContentTypes`
+	 * are collected.
+	 */
+	private collectImageExtensions(dir: string, extensions: Set<string>): void {
+		const entries = fs.readdirSync(dir, { withFileTypes: true })
+
+		for (const entry of entries) {
+			if (entry.isDirectory()) {
+				this.collectImageExtensions(path.join(dir, entry.name), extensions)
+			} else if (entry.isFile()) {
+				const ext = path.extname(entry.name).toLowerCase()
+
+				if (ext && knownContentTypes[ext.slice(1)] !== undefined) {
+					extensions.add(ext)
+				}
+			}
+		}
 	}
 }
