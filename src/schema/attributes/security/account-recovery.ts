@@ -13,13 +13,16 @@ import {
 } from '@/schema/attributes'
 import {
 	type AccountRecovery,
-	type AccountRecoveryDrills,
+	type AccountRecoveryDrill,
+	accountRecoveryDrillCheckupLabels,
+	accountRecoveryDrillNouns,
+	AccountRecoveryDrillType,
 	type GuardianPolicy,
 	GuardianPolicyType,
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
-import { refNotNecessary } from '@/schema/reference'
+import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
 	markdown,
@@ -121,14 +124,22 @@ function evaluateGuardianRecoveryPolicy(
 
 function evaluateAccountRecoveryDrills(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
-	drills: Support<AccountRecoveryDrills>,
+	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }>,
+	hasGuardianRecovery: boolean,
 ): Evaluation<AccountRecoveryMetadata> {
-	if (isSupported(drills)) {
-		const hasPrivateKeyQuiz = drills.periodicPrivateKeyQuiz
-		const hasSeedPhraseQuiz = drills.periodicSeedPhraseQuiz
-		const hasGuardianCheck = drills.periodicGuardianAccountCheck
+	// Guardian account check-ups are only meaningful for wallets that
+	// actually implement guardian-based recovery.
+	const recommendedDrillTypes: AccountRecoveryDrillType[] = [
+		AccountRecoveryDrillType.PRIVATE_KEY_QUIZ,
+		AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+		...(hasGuardianRecovery ? [AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK] : []),
+	]
 
-		if (hasPrivateKeyQuiz && hasSeedPhraseQuiz && hasGuardianCheck) {
+	if (isSupported(drills)) {
+		const configuredDrillTypes = new Set(drills.entries.map(drill => drill.type))
+		const missing = recommendedDrillTypes.filter(type => !configuredDrillTypes.has(type))
+
+		if (!isNonEmptyArray(missing)) {
 			return ctx.build({
 				outcome: {
 					id: 'recovery_drills_supported',
@@ -142,20 +153,6 @@ function evaluateAccountRecoveryDrills(
 				},
 				details: accountRecoveryDetailsContent({}),
 			})
-		}
-
-		const missing: string[] = []
-
-		if (!hasPrivateKeyQuiz) {
-			missing.push('private key check-ups')
-		}
-
-		if (!hasSeedPhraseQuiz) {
-			missing.push('seed phrase check-ups')
-		}
-
-		if (!hasGuardianCheck) {
-			missing.push('guardian account check-ups')
 		}
 
 		return ctx.build({
@@ -172,7 +169,7 @@ function evaluateAccountRecoveryDrills(
 			details: accountRecoveryDetailsContent({}),
 			howToImprove: sentence(`
 				{{WALLET_NAME}} should periodically ask users to complete
-				${commaListFormat(missing)} to ensure they can recover their account when needed.
+				${commaListFormat(missing.map(type => accountRecoveryDrillCheckupLabels[type]))} to ensure they can recover their account when needed.
 			`),
 		})
 	}
@@ -191,7 +188,7 @@ function evaluateAccountRecoveryDrills(
 		details: accountRecoveryDetailsContent({}),
 		howToImprove: sentence(`
 			{{WALLET_NAME}} should periodically ask users to verify their
-			private key, seed phrase, and guardian accounts are still accessible.
+			${commaListFormat(recommendedDrillTypes.map(type => accountRecoveryDrillNouns[type]))} are still accessible.
 		`),
 	})
 }
@@ -204,7 +201,8 @@ function evaluateAccountRecovery(
 		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
 	}
 
-	const drillsEval = evaluateAccountRecoveryDrills(ctx, accountRecovery.drills)
+	const hasGuardianRecovery = isSupported(accountRecovery.guardianRecovery)
+	const drillsEval = evaluateAccountRecoveryDrills(ctx, accountRecovery.drills, hasGuardianRecovery)
 
 	const guardianEval = isSupported(accountRecovery.guardianRecovery)
 		? evaluateGuardianRecoveryPolicy(ctx, accountRecovery.guardianRecovery.minimumGuardianPolicy)
@@ -444,9 +442,13 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							},
 						}),
 						drills: supported({
-							periodicPrivateKeyQuiz: true,
-							periodicSeedPhraseQuiz: false,
-							periodicGuardianAccountCheck: false,
+							entries: [
+								{
+									type: AccountRecoveryDrillType.PRIVATE_KEY_QUIZ,
+									ref: refNotNecessary,
+									reminderEveryNDays: 90,
+								},
+							] satisfies NonEmptyArray<WithRef<AccountRecoveryDrill>>,
 						}),
 					},
 				),
@@ -492,9 +494,23 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							},
 						}),
 						drills: supported({
-							periodicPrivateKeyQuiz: true,
-							periodicSeedPhraseQuiz: true,
-							periodicGuardianAccountCheck: true,
+							entries: [
+								{
+									type: AccountRecoveryDrillType.PRIVATE_KEY_QUIZ,
+									ref: refNotNecessary,
+									reminderEveryNDays: 90,
+								},
+								{
+									type: AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+									ref: refNotNecessary,
+									reminderEveryNDays: 90,
+								},
+								{
+									type: AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK,
+									ref: refNotNecessary,
+									reminderEveryNDays: 90,
+								},
+							] satisfies NonEmptyArray<WithRef<AccountRecoveryDrill>>,
 						}),
 					},
 				),
