@@ -12,7 +12,7 @@ The Ethereum wallet landscape lacks a neutral source of truth. Wallets compete o
 
 Walletbeat is an open-source public good dedicated to bringing transparency to the Ethereum wallet ecosystem.
 
-As L2BEAT has done for Layer 2s, Walletbeat does for wallets: providing objective, verifiable evaluations that help users make informed decisions.
+As L2BEAT has done for L2s, Walletbeat does for wallets: providing objective, verifiable evaluations that help users make informed decisions.
 
 ## Our Values
 

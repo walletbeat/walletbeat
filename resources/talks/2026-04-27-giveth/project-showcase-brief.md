@@ -22,4 +22,4 @@ We achieve this by advocating for why these values matter. Setting clear example
 
 ## Updates / Future Plans / Roadmap
 
-Our main goal right now is to launch at most 1ˢᵗ week of June. Lots has been ongoing in the background, branding redesign, currently finishing methodologies, and fully rating three or more software wallets. Currently focusing on software wallets, then come hardware wallets, embedded wallets.
+Our main goal right now is to launch at most 1st week of June. Lots has been ongoing in the background, branding redesign, currently finishing methodologies, and fully rating three or more software wallets. Currently focusing on software wallets, then come hardware wallets, embedded wallets.

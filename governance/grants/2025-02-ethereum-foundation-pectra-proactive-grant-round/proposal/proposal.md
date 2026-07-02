@@ -2,17 +2,17 @@
 title: Walletbeat beta EIP-7702 tracking
 description: 'EF Pectra Proactive Grant proposal for Walletbeat beta EIP-7702 tracking and wallet assessment.'
 Status: Funded
-Project name: Walletbeat beta EIP-7702 tracking
-Project category: Other
-Grant recipient: polymutex (Individual)
-Fiat currency: USD
+Project-name: Walletbeat beta EIP-7702 tracking
+Project-category: Other
+Grant-recipient: polymutex (Individual)
+Fiat-currency: USD
 Amount: 577.02
-How did you hear about this grant round: Other - Farcaster - https://warpcast.com/ef-esp/0xbe473fa9
-Twitter handle: polymutex
+How-did-you-hear-about-this-grant-round: Other - Farcaster - https://warpcast.com/ef-esp/0xbe473fa9
+Twitter-handle: polymutex
 Website: https://beta.walletbeat.eth.limo/
 Farcaster: '@polymutex.eth'
-Applied to any grants before: No
-Any questions about this grants round: No
+Applied-to-any-grants-before: No
+Any-questions-about-this-grants-round: No
 ---
 
 # Walletbeat beta EIP-7702 tracking
@@ -92,7 +92,7 @@ Walletbeat beta is built as an open-source static frontend hosted on IPFS. Devel
 
 EIP-7702 readiness and features criteria will be determined by discussion and issues on GitHub and Farcaster. Wallet data updates will be conducted by GitHub pull requests, as a result of wallet testing and wallet code review. Review research tasks may be posted to [Bountycaster](https://warpcast.com/~/channel/bounties) to shard out the work.
 
-This grant proposal itself is part of the [Walletbeat beta repository](https://github.com/fluidkey/walletbeat/blob/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round) as part of the intention to keep governance for Walletbeat as a project fully public and transparent.
+This grant proposal itself is part of the [Walletbeat beta repository](https://github.com/walletbeat/walletbeat) as part of the intention to keep governance for Walletbeat as a project fully public and transparent.
 
 ### Timeline
 

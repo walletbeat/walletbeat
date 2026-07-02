@@ -1,7 +1,9 @@
 ---
 title: Walletbeat UI development guide
-description: 'Explains how to contribute to Walletbeat's UI code.'
+description: "Explains how to contribute to Walletbeat's UI code."
 ---
+
+# Walletbeat UI development guide
 
 _Not complete yet!_
 
@@ -25,7 +27,7 @@ const {
 } = $props()
 ```
 
-- Create a content data type that will act as the input to your component. See `src/types/content/security-audits-details.ts` as an example:
+- Create a content datatype that will act as the input to your component. See `src/types/content/security-audits-details.ts` as an example:
 
 ```typescript
 import type { EvaluationData } from '@/schema/attributes'

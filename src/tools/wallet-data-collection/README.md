@@ -54,7 +54,7 @@ The following flows are defined:
 - `SEND_ETHER`: Recorded when sending Ether to another wallet. Requires `--wallet-addresses` to be set to the account address(es) that you will send **from** and send **to**.
 - `SEND_USDC`: Same as `SEND_ETHER`, but send USDC instead of Ether.
 - `NATIVE_SWAP`: Perform a swap using the wallet's built-in swap feature. Requires `--wallet-addresses` to be set to the account address doing the swapping.
-- `APP_CONNECTION`: Connect and sign in to Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
+- `APP_CONNECTION`: Connect and sign into Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
 - `MAKE_TRANSACTION`: Make transactions using Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the transactions.
 
 #### `delete-capture` subcommand

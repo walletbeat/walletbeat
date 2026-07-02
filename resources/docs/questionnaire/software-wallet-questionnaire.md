@@ -75,7 +75,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 
 **Malicious website warnings:**
 
-- Do you warn users before connecting to potentially malicious websites or dapps? (yes / no)
+- Do you warn users before connecting to potentially malicious websites or apps? (yes / no)
   - If so, which database or external service is used?
   - Does this check send the visited URL to an external service? (yes / no)
   - Does it send the user's wallet address to an external service? (yes / no)
@@ -185,7 +185,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - **If yes, is this possible before the wallet makes any network requests on first launch?** (yes / no)
 - **Can users configure custom RPC endpoints for L2 networks?** (yes / no)
 - **Can users add entirely custom or non-default chains?** (yes / no)
-- **If a user points the wallet at a self-hosted node, can they do all of the following without requests going to your servers?**
+- **If a user points the wallet at a self-hosted node, can they do all the following without requests going to your servers?**
   - Create new accounts (yes / no)
   - Check balances (yes / no)
   - Send transactions (yes / no)

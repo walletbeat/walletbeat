@@ -2,7 +2,7 @@
 title: Walletbeat 2025 EF funding grant proposal
 description: 'Ethereum Foundation ESP grant proposal for Walletbeat 2025 collective funding.'
 Status: Funded
-Grant recipient: Walletbeat (collective)
+Grant-recipient: Walletbeat (collective)
 Amount: 106100
 Currency: USD
 ---
@@ -208,7 +208,7 @@ This work has been ongoing since January 2025, and is nearing completion. It rev
 
 #### Milestone: EIP-7702 tracker
 
-This work is already funded by [a 577.02 USD grant from the EF as part of the Pectra Proactive Grant round](https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round). This work is therefore not part of this grant, but is nonetheless part of Walletbeat's pre-launch roadmap.
+This work is already funded by [a 577.02 USD grant from the EF as part of the Pectra Proactive Grant round](/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round/proposal/proposal.md). This work is therefore not part of this grant, but is nonetheless part of Walletbeat's pre-launch roadmap.
 
 This milestone is only about the incremental work of exposing Walletbeat's EIP-7702 data on a dedicated EIP-7702 tracker page. The bulk of the 7702-related work (determining the data to track from wallets and gathering it) is already part of the "Wallet methodology stabilization" and "Wallet data collection" tracks.
 
@@ -397,7 +397,7 @@ On a **governance** level:
 
 On a **technical** level:
 
-- All GitHub contributors submitting PRs must disclose their affiliation; this is [enforced by the type system](https://github.com/walletbeat/walletbeat/blob/7c22d4ae04067df2a280ce761bbab4279a09692d/src/schema/wallet.ts#L47-L66).
+- All GitHub contributors submitting PRs must disclose their affiliation; this is enforced by the type system.
 - Walletbeat maintains strong decoupling between wallet _feature data_ (data about wallets, designed to be as objective as possible) vs _attribute methodology_ (a non-wallet-specific pipeline that takes _feature data_ as input and turns it into a subjective rating on a specific attribute). This decoupling ensures that the wallet-specific data entry is unambiguous, difficult to bias, and minimizes the chance of debate being possible on a per-wallet basis, as all the subjective decisions happen at a later non-wallet-specific stage.
 
 ### Risk: Walletbeat rating methodology is miscalibrated at launch
@@ -437,7 +437,7 @@ After this grant, Walletbeat would be in a "launched" state. As described earlie
 - General open-source project maintenance duties: reviewing PRs, fixing bugs, keeping the website up-to-date, etc.
 - General project governance duties: Handling potential churn in contributors and governance.
 
-Walletbeat has a [longer-term roadmap document](https://github.com/walletbeat/walletbeat/tree/roadmap-2025/governance/roadmap) describing some of this work in more detail.
+Walletbeat has a [longer-term roadmap document](/governance/roadmap/2025/2025-roadmap.md) describing some of this work in more detail.
 
 ## If you didn't work on this project, what would you work on instead?
 
@@ -445,7 +445,7 @@ Walletbeat has been a passion project so far, both in its Fluidkey era and in th
 
 ## Have you applied for or received other funding?
 
-Walletbeat has applied for and received [a 577.02 USD grant from the EF as part of the Pectra Proactive Grant round](https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round) to fund its EIP-7702 tracking efforts.
+Walletbeat has applied for and received [a 577.02 USD grant from the EF as part of the Pectra Proactive Grant round](/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round/proposal/proposal.md) to fund its EIP-7702 tracking efforts.
 
 No other funding has been sought or received as of this writing, but Walletbeat plans to apply for retroactive funding where possible (e.g. Gitcoin Grants) after launch.
 

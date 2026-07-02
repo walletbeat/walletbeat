@@ -264,6 +264,8 @@ Because the stage system currently matches L2BEAT's "Stage 0" / "Stage 1" / "Sta
 - Anything missing from the benchmark, or any further details needed for existing benchmark items?
 - How to best integrate this benchmark into Walletbeat?
 
+---
+
 # Feedback
 
 ## Comment 1
