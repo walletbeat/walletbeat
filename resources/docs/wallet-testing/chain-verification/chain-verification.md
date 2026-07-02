@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat wallet testing: Chain verification'
+description: "A guide explaining how to verify a wallet's behavior when it comes to chain verification."
+---
+
 # Testing Chain Verification
 
 _This guide describes how to set up the L1 Lying RPC Proxy and use it to evaluate whether a wallet verifies the integrity of chain data using a light client._
@@ -6,7 +11,7 @@ _This guide describes how to set up the L1 Lying RPC Proxy and use it to evaluat
 
 This analysis is necessary to ensure that the wallet meets the **Chain Verification** attribute in Walletbeat: does the wallet independently verify that the data returned by its RPC provider is consistent with the actual chain?
 
-Most wallets blindly trust whatever their configured RPC provider returns. This matters because a dishonest RPC provider is a real attack vector — not just a theoretical one. A well-known scam works as follows: a scammer gives out the seed phrase to a wallet that holds funds locked in Tether, and asks a victim to "help move the crypto out" in exchange for a cut of the proceeds. The victim imports the seed phrase, sees a large token balance in their wallet, and believes the story — not realizing the funds are frozen. With a lying RPC provider, this scam works even without any real locked funds at all: the provider simply reports a large fake balance for any address the scammer chooses. A wallet that integrates a light client can detect this by verifying balance data against the actual chain state, making this class of scam impossible.
+Most wallets blindly trust whatever their configured RPC provider returns. This matters because a dishonest RPC provider is a real attack vector — not just a theoretical one. A well-known scam works as follows: a scammer gives out the seed phrase to a wallet that holds funds locked in Tether, and asks a victim to "help move the crypto out" in exchange for a cut. The victim imports the seed phrase, sees a large token balance in their wallet, and believes the story — not realizing the funds are frozen. With a lying RPC provider, this scam works even without any real locked funds at all: the provider simply reports a large fake balance for any address the scammer chooses. A wallet that integrates a light client can detect this by verifying balance data against the actual chain state, making this class of scam impossible.
 
 More generally, a dishonest or compromised RPC provider could:
 
@@ -14,7 +19,7 @@ More generally, a dishonest or compromised RPC provider could:
 - Lie about transaction receipts or contract state to manipulate your decisions.
 - Hide pending or confirmed transactions from you.
 
-A wallet that integrates a light client (e.g. [Helios](https://github.com/a16z/helios)) can detect such lies by independently verifying block headers against a trusted beacon checkpoint and re-checking `eth_call` results against Merkle proofs. The goal of this test is to determine whether the wallet under test does any such verification, or whether it can be trivially deceived.
+A wallet that integrates a light client (e.g. [Helios](https://github.com/a16z/helios)) can detect such lies by independently verifying block headers against a trusted beacon checkpoint and re-checking `eth_call` results against Merkle proofs. The goal of this test: determining whether the wallet under test does any such verification, or whether it can be trivially deceived.
 
 ## High-level guide
 
@@ -124,7 +129,7 @@ Save the setting and switch to that network.
 
 ### Step 5: Import a funded account
 
-Import (or connect) an account that holds a non-zero ERC-20 balance. It is important to use a non-zero balance; a zero balance multiplied by any factor is still displayed as zero (the proxy invents a small non-zero value in this case, but it may fall below the wallet's display threshold).
+Import (or connect) an account that holds a non-zero ERC-20 balance. It is important to use a non-zero balance. A zero balance multiplied by any factor is still displayed as zero (the proxy invents a small non-zero value in this case, but it may fall below the wallet's display threshold).
 
 Use a separate wallet or browser that is **not** pointing at the proxy to confirm the real balance beforehand.
 

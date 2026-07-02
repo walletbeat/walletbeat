@@ -1,6 +1,11 @@
+---
+title: 'Walletbeat ↔ wallet ecosystem communication channels'
+description: 'Overview of the communication channels between Walletbeat and wallet development teams.'
+---
+
 # Walletbeat ↔ wallet ecosystem communication channels
 
-This document discloses the set of communication channels that exist between Walletbeat and wallet development teams. See the [Walletbeat communications policy](./communications-policy.md) for more information.
+This document discloses the set of communication channels that exist between Walletbeat and wallet development teams. See the [Walletbeat communications policy](../policy/communications-policy.md) for more information.
 
 ## Group chats
 
@@ -53,7 +58,7 @@ _Keep list sorted by chronological "Established" date._
 
 _Keep list sorted chronologically._
 
-- 2025-11: **1TS DevConnect discussion**:
+- 2025-11: **1TS Devconnect discussion**:
   - **Walletbeat contributors**: nconsigny, polymutex
   - **Wallet development teams represented**: Ledger, Blocknative, Coinspect
   - **Fibonacci-approximate number of participants**: 13

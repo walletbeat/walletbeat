@@ -117,7 +117,7 @@ Walk through substeps C.1 through C.4 in order, one at a time, waiting for the c
 
 Ask the contributor for the wallet developer's company name and legal name.
 
-Then check whether the entity already exists in `data/entities/`. If so, skip to C.2. If not, create `data/entities/[kebab-case-company-name].ts` yourself by copying `data/entities/example.ts` and filling in the known fields:
+Then check whether the entity already exists in `data/entities/`. If so, skip to step `C.2`. If not, create `data/entities/[kebab-case-company-name].ts` yourself by copying `data/entities/example.ts` and filling in the known fields:
 
 - `id`, `name`, `legalName`, `type`, `jurisdiction`, `url`, `repoUrl`, `privacyPolicy`, and social/profile URLs.
 - Ask the contributor to find an SVG icon, crop transparent edges, and save it to `/public/images/entities/[entityId].svg`. If only PNG is available, save as `.png` and set `icon: { extension: 'png', width: N, height: N }`.
@@ -133,11 +133,11 @@ Key type fields:
 
 Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallets/[kebab-wallet-name].ts` yourself, then fill in `metadata`:
 
-- `id`: camelCase wallet name (e.g., `'rainbow'`) — must match the icon filename
+- `id`: Camel case wallet name (e.g., `'rainbow'`) — must match the icon filename
 - `displayName`: The wallet's official display name
-- `tableName`: Short name for table display (often same as displayName)
+- `tableName`: Short name for table display (often same as `displayName`)
 - `blurb`: Use the blurb collected in step 4, wrapped in `paragraph(\`...\`)`
-- Rename the exported constant from `unratedTemplate` / `unratedHardwareTemplate` / `unratedEmbeddedTemplate` to the camelCase wallet name (e.g., `rainbow`, `ledgerNano`, `privySdk`).
+- Rename the exported constant from `unratedTemplate` / `unratedHardwareTemplate` / `unratedEmbeddedTemplate` to the camel case wallet name (e.g., `rainbow`, `ledgerNano`, `privySdk`).
 - `contributors`: `[yourContributorConstant]`
 - `iconExtension`: `'svg'` (or `'png'` if no SVG available)
 - `lastUpdated`: Today's date as `'YYYY-MM-DD'`

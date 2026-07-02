@@ -1,10 +1,14 @@
 ---
+title: EF Pectra Proactive Grant response
+description: 'Response from polymutex to the Ethereum Foundation regarding additional information about the Pectra Proactive Grant application.'
 Status: Sent
 Date: 2025-03-21
 From: polymutex
 To: Ethereum Foundation
 Context: Responding to request for additional information about Walletbeat's Pectra Proactive Grant application.
 ---
+
+# EF Pectra Proactive Grant response
 
 Hello,
 

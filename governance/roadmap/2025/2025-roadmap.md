@@ -1,3 +1,8 @@
+---
+title: Walletbeat 2025 Roadmap
+description: 'Roadmap for Walletbeat objectives in 2025 leading up to the launch of its revamped version.'
+---
+
 # Walletbeat 2025 Roadmap
 
 - _Date_: July 2025

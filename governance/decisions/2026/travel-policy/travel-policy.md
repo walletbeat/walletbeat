@@ -1,3 +1,8 @@
+---
+title: Walletbeat travel policy
+description: 'Policy for travel expense reimbursement for Walletbeat contributors.'
+---
+
 # Walletbeat travel policy
 
 This document describes the policy for travel expense reimbursement for Walletbeat contributors.
@@ -23,7 +28,7 @@ This policy aims to balance this tension by delineating what constitutes reasona
 
 ## Qualifying events
 
-Walletbeat will only reimburse expenses for events that meet all of the following:
+Walletbeat will only reimburse expenses for events that meet all the following:
 
 - The event is a recurring event (e.g. yearly conference) or is organized by a group that has a history of running events longer than 3 years (e.g. Web3Privacy, Devcon).
   - Rationale: Unproven events have unproven impact and unpredictable attendance numbers.
@@ -35,7 +40,7 @@ NOTE: Walletbeat contributors can still go to non-qualifying events; they simply
 
 ## Qualifying contributors
 
-Contributors that apply for reimbursement must meet all of the following criteria:
+Contributors that apply for reimbursement must meet all the following criteria:
 
 - The contributor must be a _significant_ Walletbeat contributor, as defined by the following:
   - Started contributing to Walletbeat at least 180 days ago.
@@ -116,7 +121,7 @@ If a contributor finds a cheaper option than this figure, they can choose to eit
 
 ### Capping lodging accommodation expenses
 
-To encourage contributors to book lodging accommodations at competitive prices, the maximum amount of reimbursed lodging costs is determined to be the modal nightly price of a hotel in the city the event is held in, as determined using Google Hotel Search. To obtain this figure:
+To encourage contributors to book lodging accommodations at competitive prices, the maximum amount of reimbursed lodging costs is determined using Google Hotel Search. It is set to the modal nightly price of a hotel in the city the event is held in. To obtain this figure:
 
 - Go to [Google Hotel Search](https://www.google.com/travel/search).
 - Go to the bottom of the page and select:
@@ -200,7 +205,7 @@ Focus on enjoying the event and fulfilling Walletbeat's mission.
 
 ### After the event
 
-Within 30 days of return, contributors that were approved for reimbursement must produce and publish some form of trip report or artifact that shows the impact of their attendance. This can take the shape of a public talk recording, interview or podcast recording, or a document reporting the impact of the contributor's attendance to the event. Quantified forms of impact are encouraged, e.g. number of wallet teams reached, number of potential new Walletbeat contributors engaged, etc.
+Within 30 days of return, contributors that were approved for reimbursement must produce and publish some form of trip report or artifact that shows the impact of their attendance. This can take the shape of a public talk recording, interview, podcast recording, or a document reporting the impact of the contributor's attendance to the event. Quantified forms of impact are encouraged, e.g. number of wallet teams reached, number of potential new Walletbeat contributors engaged, etc.
 
 Contributors are **not** required to produce receipts of their expenses; the policy and amounts reimbursed are designed to not require this information to be made available, which is necessary to allow anonymous maintainers to preserve their anonymity.
 
@@ -215,7 +220,7 @@ If the contributor is a treasury signer, they **can** contribute to signing the 
 
 Lodging expenses only extend up to the night before the first day of the event, and the night immediately following the last day of the event. In other words, for an event spanning 7 days, reimbursement covers 8 hotel nights. This allows contributors to arrive the day before the event starts, and to leave the day after the event ends. Contributors wishing to extend their stay must pay for the remainder.
 
-### What if I want to combine the transportation tickets to go somewhere else afterwards, rather than a roundtrip?
+### What if I want to combine the transportation tickets to go somewhere else afterward, rather than a roundtrip?
 
 The amount of covered airfare is the average price of a roundtrip ticket from your current location. If you purchase any other itinerary, only the amount of the airfare up to that amount is covered; the rest is your expense. If your airfare expenses are lower than the cost of a roundtrip ticket, you can pocket the difference.
 

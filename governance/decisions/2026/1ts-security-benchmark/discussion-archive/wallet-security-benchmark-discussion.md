@@ -1,3 +1,8 @@
+---
+title: 1TS Wallet Security Benchmark discussion
+description: 'Archive of the GitHub discussion on defining a wallet security benchmark.'
+---
+
 # 1TS Wallet Security Benchmark discussion
 
 _This discussion was [posted on GitHub](https://github.com/walletbeat/walletbeat/discussions/407) for comment from 2025-12-16 to 2026-03-14. Its latest version is archived here._
@@ -258,6 +263,8 @@ Because the stage system currently matches L2BEAT's "Stage 0" / "Stage 1" / "Sta
 - Are these criteria meaningful for accomplishing 1TS's high-level goal?
 - Anything missing from the benchmark, or any further details needed for existing benchmark items?
 - How to best integrate this benchmark into Walletbeat?
+
+---
 
 # Feedback
 
