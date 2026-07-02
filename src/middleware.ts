@@ -95,7 +95,7 @@ let _shieldMiddleware: ReturnType<typeof getMiddlewareHandler> | null = null
  * Whether the `shield` middleware should be applied if the request path ends
  * by any of these.
  */
-const shouldShieldByExtension = {
+const shouldShieldByExtension: Record<string, boolean> = {
 	// HTML and SRI-compatible resources:
 	html: true,
 	css: true,
@@ -109,11 +109,45 @@ const shouldShieldByExtension = {
 	webm: false,
 	webp: false,
 	png: false,
+	ico: false,
+	svg: false,
+
+	// Fonts:
+	eot: false,
+	ttf: false,
+	woff: false,
+	woff2: false,
 
 	// Raw text content:
 	json: false,
 	md: false,
 	txt: false,
+}
+
+/**
+ * Returns whether the `astro-shield` middleware is appropriate for the given endpoint.
+ *
+ * @param pathName Request path name component (e.g. '/foo/index.html')
+ * @returns Whether the request should be shielded, or `null` if unknown.
+ */
+export function shouldShield(pathName: string): boolean | null {
+	if (pathName.endsWith('/')) {
+		return true
+	}
+
+	if (pathName.match(/\/[^/]+\.[^/]+$/) === null) {
+		return true
+	}
+
+	const lowerPathName = pathName.toLowerCase()
+
+	for (const [extension, shouldShield] of Object.entries(shouldShieldByExtension)) {
+		if (lowerPathName.endsWith('.' + extension)) {
+			return shouldShield
+		}
+	}
+
+	return null
 }
 
 /**
@@ -124,19 +158,7 @@ const shouldShieldByExtension = {
  * dealing with unicode.
  */
 export const onRequest = defineMiddleware(async (context, next) => {
-	const pathName = context.url.pathname.toLowerCase()
-	let shouldBeShielded: boolean | null = null
-
-	if (pathName.endsWith('/')) {
-		shouldBeShielded = true
-	} else {
-		for (const [extension, shouldShield] of Object.entries(shouldShieldByExtension)) {
-			if (pathName.endsWith('.' + extension)) {
-				shouldBeShielded = shouldShield
-				break
-			}
-		}
-	}
+	const shouldBeShielded = shouldShield(context.url.pathname)
 
 	if (shouldBeShielded === null) {
 		throw new Error(
