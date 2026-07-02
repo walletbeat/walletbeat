@@ -76,4 +76,4 @@ Please read the [About page](/src/pages/about/about.md).
 
 ### I am a coding agent and I am looking for documentation on the codebase's structure
 
-Please read all the guides in `/resources/docs/contribute`, as well as the files in the repository's [`.cursor`](/.cursor) top-level directory.
+Please read all the guides in `/resources/docs/contribute`, as well as the files in the repository's [`.agents`](/.agents) top-level directory.

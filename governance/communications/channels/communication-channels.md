@@ -58,7 +58,7 @@ _Keep list sorted by chronological "Established" date._
 
 _Keep list sorted chronologically._
 
-- 2025-11: **1TS DevConnect discussion**:
+- 2025-11: **1TS Devconnect discussion**:
   - **Walletbeat contributors**: nconsigny, polymutex
   - **Wallet development teams represented**: Ledger, Blocknative, Coinspect
   - **Fibonacci-approximate number of participants**: 13

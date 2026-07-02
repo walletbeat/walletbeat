@@ -150,7 +150,7 @@ Alternatively, you can use the `mark-string` subcommand to mark a given string a
 $ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
-Mark a string as conveying the given data type. This is the same operation as the one `review-strings` does, but with a more machine-friendly interface. The string will be classified and stored in the capture file's user data store.
+Mark a string as conveying the given datatype. This is the same operation as the one `review-strings` does, but with a more machine-friendly interface. The string will be classified and stored in the capture file's user data store.
 
 Marking a string as carrying user data has the following effect:
 
