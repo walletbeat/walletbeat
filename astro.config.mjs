@@ -21,7 +21,7 @@ export default defineConfig({
 					sitemap(),
 					shield({
 						sri: {
-							enableMiddleware: true,
+							enableMiddleware: false,
 							hashesModule: modulePath,
 						},
 					}),
