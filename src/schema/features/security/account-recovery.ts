@@ -551,7 +551,7 @@ export interface AccountRecovery {
 
 	/**
 	 * Drills the wallet runs to ensure that users will be able to
-	 * successfully recover their accounts. Wallets that support 
+	 * successfully recover their accounts. Wallets that support
 	 * must implement at least one drill type.
 	 * Set to `null` if this has not been rated yet.
 	 */
