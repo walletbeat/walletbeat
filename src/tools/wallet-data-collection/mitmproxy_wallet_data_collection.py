@@ -332,7 +332,12 @@ class WalletRequest:
 
     @classmethod
     def from_request(cls, req: http.Request, session_time: int):
-        url = urllib.parse.urlparse(req.url)
+        # Use `pretty_url`/`pretty_host` (derived from the Host header / HTTP/2
+        # `:authority`) rather than `url`/`host`, which resolve to the connection
+        # destination. On some setups (e.g. an Android emulator routed through an
+        # upstream proxy) the latter is the raw IP address, which is useless for
+        # attributing a request to an entity. `pretty_*` yields the real hostname.
+        url = urllib.parse.urlparse(req.pretty_url)
         json_rpc_method: Tuple[str, ...] = ()
         text = req.get_text()
         if text is not None and text == "":
@@ -764,7 +769,7 @@ class WalletDataCollectionAddon:
             f"Received a request before being fully configured! (wallet_data={str(self._wallet_data)}, current_ux_flow={str(self._current_ux_flow)})"
         )
         req = flow.request
-        host = req.host
+        host = req.pretty_host
         req.anticache()
         req.constrain_encoding()
         wallet_data_req = WalletRequest.from_request(
