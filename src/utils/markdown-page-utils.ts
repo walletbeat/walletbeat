@@ -1,3 +1,8 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+import type { APIRoute, GetStaticPaths } from 'astro'
+
 import type { MarkdownContentWithFrontmatter } from '@/types/content'
 import { assertStringHasPrefix, assertStringHasPrefixAndSuffix } from '@/types/utils/text'
 import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
@@ -282,5 +287,108 @@ export function staticSingleMarkdownPage({
 		metadata: processedMarkdown.frontmatter,
 		repoRootRelativePath,
 		processedMarkdown,
+	}
+}
+
+/**
+ * Helper for serving static media from a directory tree via Astro endpoints.
+ * Returns `{ prerender, getStaticPaths, GET }` to be destructure-exported from
+ * an endpoint file such as `src/pages/docs/[...img].png.ts`.
+ */
+export const knownContentTypes: Record<string, string> = {
+	png: 'image/png',
+	gif: 'image/gif',
+	jpg: 'image/jpeg',
+	jpeg: 'image/jpeg',
+	webp: 'image/webp',
+}
+
+export function staticMarkdownMedia({
+	imageDir,
+	extension,
+}: {
+	/**
+	 * Repo-root-relative directory that contains the image files.
+	 * Must start with `/` (e.g. `/resources/docs`, `/governance`).
+	 */
+	imageDir: `/${string}`
+
+	/** File extension without the leading dot (e.g. `png`, `gif`). */
+	extension: string
+}): {
+	prerender: true
+	getStaticPaths: GetStaticPaths
+	GET: APIRoute
+} {
+	const contentType = knownContentTypes[extension]
+
+	if (contentType === undefined) {
+		throw new Error(
+			`Unknown media extension: '${extension}'. Supported: ${Object.keys(knownContentTypes).join(', ')}`,
+		)
+	}
+
+	const extWithDot = `.${extension}`
+	const absDir = join(process.cwd(), imageDir)
+
+	function findImageFiles(dir: string, ext: string): string[] {
+		const files: string[] = []
+
+		const entries = readdirSync(dir, { withFileTypes: true })
+
+		for (const entry of entries) {
+			const fullPath = join(dir, entry.name)
+
+			if (entry.isDirectory()) {
+				files.push(...findImageFiles(fullPath, ext))
+			} else if (entry.name.endsWith(ext)) {
+				const relativePath = fullPath.replace(absDir, '')
+
+				files.push(relativePath)
+			}
+		}
+
+		return files
+	}
+
+	return {
+		prerender: true,
+		getStaticPaths: (): Array<{ params: { img: string } }> => {
+			const files = findImageFiles(absDir, extWithDot)
+
+			if (files.length === 0) {
+				throw new Error(
+					`Cannot find any media file with extension '.${extension}' under ${imageDir}; either ensure there actually should be one, or delete this endpoint`,
+				)
+			}
+
+			return files.map(filePath => {
+				const withoutExtension = filePath.replace(extWithDot, '')
+
+				return { params: { img: withoutExtension } }
+			})
+		},
+		GET: (({ params }) => {
+			const img = params.img
+
+			if (!img) {
+				return new Response('Not found', { status: 404 })
+			}
+
+			const filePath = join(absDir, img + extWithDot)
+
+			try {
+				const buffer = readFileSync(filePath)
+
+				return new Response(buffer, {
+					headers: {
+						'Content-Type': contentType,
+						'Cache-Control': 'public, max-age=31536000, immutable',
+					},
+				})
+			} catch {
+				return new Response('Not found', { status: 404 })
+			}
+		}) satisfies APIRoute,
 	}
 }
