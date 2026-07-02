@@ -1,3 +1,8 @@
+---
+title: Walletbeat UI development guide
+description: 'Explains how to contribute to Walletbeat's UI code.'
+---
+
 _Not complete yet!_
 
 ## Custom UI components for attributes

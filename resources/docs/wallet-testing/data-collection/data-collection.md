@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat wallet testing: `mitmproxy` setup'
+description: 'A guide explaining how to set up `mitmproxy`, a critical step to testing wallets on their data collection practices.'
+---
+
 # `mitmproxy` guide
 
 _This guide describes how to set up [`mitmproxy`](https://mitmproxy.org) to inspect the network traffic that a wallet generates._

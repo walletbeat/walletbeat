@@ -1,4 +1,6 @@
 ---
+title: Walletbeat beta EIP-7702 tracking
+description: 'EF Pectra Proactive Grant proposal for Walletbeat beta EIP-7702 tracking and wallet assessment.'
 Status: Funded
 Project name: Walletbeat beta EIP-7702 tracking
 Project category: Other

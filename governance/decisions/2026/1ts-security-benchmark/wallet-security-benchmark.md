@@ -1,3 +1,8 @@
+---
+title: 1TS Wallet Security Benchmark
+description: 'Security benchmark for wallets developed as part of the Ethereum Foundation 1TS initiative.'
+---
+
 # 1TS Wallet Security Benchmark
 
 As part of the Ethereum Foundation's 1TS initiative, Walletbeat was tasked to come up with a security benchmark for wallets.

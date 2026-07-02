@@ -59,11 +59,11 @@ Once the PR is merged, you are done!
 
 ### I want to add or update wallet data to the site
 
-Please read [`/resources/docs/contribute/wallet-data.md`](/resources/docs/contribute/wallet-data.md).
+Please read [`/resources/docs/contribute/wallet-data/wallet-data.md`](/resources/docs/contribute/wallet-data/wallet-data.md).
 
 ### I want to make UI/UX changes
 
-Please read [`/resources/docs/contribute/ui.md`](/resources/docs/contribute/ui.md).
+Please read [`/resources/docs/contribute/ui/ui.md`](/resources/docs/contribute/ui/ui.md).
 
 ### I want to understand or change the wallet rating methodology
 

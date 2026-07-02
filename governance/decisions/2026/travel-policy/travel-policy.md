@@ -1,3 +1,8 @@
+---
+title: Walletbeat travel policy
+description: 'Policy for travel expense reimbursement for Walletbeat contributors.'
+---
+
 # Walletbeat travel policy
 
 This document describes the policy for travel expense reimbursement for Walletbeat contributors.

@@ -1,3 +1,8 @@
+---
+title: Gitcoin Grants application 2025
+description: 'Walletbeat application for the 2025 Gitcoin Grants privacy round.'
+---
+
 # Gitcoin Grants application 2025
 
 ## Project name

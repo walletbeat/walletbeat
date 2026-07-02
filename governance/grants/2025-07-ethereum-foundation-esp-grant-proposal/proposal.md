@@ -1,4 +1,6 @@
 ---
+title: Walletbeat 2025 EF funding grant proposal
+description: 'Ethereum Foundation ESP grant proposal for Walletbeat 2025 collective funding.'
 Status: Funded
 Grant recipient: Walletbeat (collective)
 Amount: 106100
