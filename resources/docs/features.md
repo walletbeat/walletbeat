@@ -1926,7 +1926,7 @@ type GuardianPolicy = GuardianPolicySecretSplitAcrossGuardians | GuardianPolicyK
 
 ### Enum: `AccountRecoveryDrillType`
 
-The type of a single account recovery drill.
+The type of account recovery drill.
 
 - `PRIVATE_KEY_QUIZ` = `'PRIVATE_KEY_QUIZ'`: Periodically asks the user to demonstrate that they still have the private key for their account.
 - `SEED_PHRASE_QUIZ` = `'SEED_PHRASE_QUIZ'`: Periodically asks the user to demonstrate that they still have the seed phrase for their account.
@@ -1960,7 +1960,7 @@ Note: account recovery features generally cannot be fully verified through hands
 1. Walk through the wallet's recovery/backup settings UI to see what options are presented to the user. 2. Read the wallet's official security or recovery documentation for the high-level policy (guardian types, thresholds, timelocks). 3. Inspect the wallet's source code or published security audits for technical details that are not visible in the UI (e.g. where the recovery secret is reconstituted, or smart contract thresholds).
 
 - `guardianRecovery` (`Support<WithRef<GuardianRecovery>>`): If the wallet supports "social recovery" (guardian-based), what policy does it use for the guardians? To identify: look for a "Recovery", "Backup", or "Guardian" section in the wallet's security settings. If no such feature exists, set to not supported. If it exists, fill in `GuardianRecovery` using the wallet's documentation and source code as described above.
-- `drills` (`Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }> | null`): Drills the wallet runs to ensure that users will be able to successfully recover their accounts. Supported wallets must implement at least one drill type. Set to `null` if this has not been rated yet.
+- `drills` (`Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }> | null`): Drills the wallet runs to ensure that users will be able to successfully recover their accounts. Wallets that support must implement at least one drill type. Set to `null` if this has not been rated yet.
 
 ---
 
