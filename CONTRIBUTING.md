@@ -10,7 +10,7 @@ Please read [`/resources/docs/contribute/setup/setup.md`](/resources/docs/contri
 
 ### I want to add or update wallet data to the site
 
-Please read [`/resources/docs/contribute/wallet-data.md`](/resources/docs/contribute/wallet-data/wallet-data.md).
+Please read [`/resources/docs/contribute/wallet-data/wallet-data.md`](/resources/docs/contribute/wallet-data/wallet-data.md).
 
 ### I want to make UI/UX changes
 
