@@ -149,8 +149,9 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: {
-			// Chain abstraction was evaluated on the mobile app only; the browser
-			// extension has not been tested for it yet.
+			// Chain abstraction was primarily evaluated on the mobile app; the
+			// browser extension's built-in bridge fee display was additionally
+			// verified first-hand (2026-07-03, see the bridge Review refs below).
 			[Variant.BROWSER]: {
 				bridging: {
 					builtInBridging: supported({
@@ -161,12 +162,28 @@ export const rainbow: SoftwareWallet = {
 								lastRetrieved: '2026-06-26',
 								url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
 							},
+							{
+								explanation:
+									'First-hand: the Rainbow browser extension "Review & Bridge" panel (reached by clicking "Review", one action) for a USDC cross-chain bridge itemizes the fee as minimum received, the bridging provider (Relay), and an "Included Rainbow fee" shown as a token amount (0.000586 USDC), alongside the estimated network fee. Confirms afterSingleAction COMPREHENSIVE and that the Rainbow service fee is displayed as a TOKEN_AMOUNT on the browser extension.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review.png',
+								label:
+									'Rainbow browser extension bridge Review panel itemizing the "Included Rainbow fee" (0.000586 USDC) alongside the network fee',
+								lastRetrieved: '2026-07-03',
+							},
+							{
+								explanation:
+									'Expanding "More details" on the browser extension bridge Review additionally shows the exchange rate and token contracts; the "Included Rainbow fee" remains a token amount (0.000586 USDC).',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review-details.png',
+								label:
+									'Rainbow browser extension bridge Review with "More details" expanded (exchange rate and token contracts)',
+								lastRetrieved: '2026-07-03',
+							},
 						],
 						feesLargerThan1bps: {
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							fullySponsored: false,
-							walletServiceFeeDisplayUnits: null,
+							walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -230,7 +247,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Rainbow mobile app bridge "Review" screen (reached by tapping "Review", one action): fees are itemized as the destination network, minimum received, "Included Rainbow Fee", and max slippage, with no warning explaining bridge trust assumptions or cross-chain risk.',
+									'Rainbow mobile app bridge "Review" screen (reached by tapping "Review", one action): fees are itemized as the destination network, minimum received, "Included Rainbow Fee" (shown as a token amount, e.g. 0.00125 USDC), and max slippage, with no warning explaining bridge trust assumptions or cross-chain risk. The Rainbow service fee is thus displayed as a TOKEN_AMOUNT.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-review-fees.jpg',
 								label:
 									'Rainbow mobile app screenshot of the bridge Review screen with itemized fees',
@@ -241,7 +258,7 @@ export const rainbow: SoftwareWallet = {
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							fullySponsored: false,
-							walletServiceFeeDisplayUnits: null,
+							walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
