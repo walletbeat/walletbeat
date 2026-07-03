@@ -3839,11 +3839,11 @@ What level of orderflow / MEV auctioning information is shown by default and aft
 
 ---
 
-### Interface: `OrderflowDisclosure`
+### Type: `OrderflowDisclosure`
 
 How much orderflow / MEV information is displayed by default and after a user action.
 
-`byDefault` and `afterSingleAction` must tell a consistent story: one user action may reveal the same or more detail, but never less. Enforced by `validateOrderflowDisclosure`.
+`byDefault` and `afterSingleAction` must tell a consistent story: one user action may reveal the same or more detail, but never less. Valid pairs are enforced by the discriminated union below.
 
 Valid pairs include `(NONE, NONE)`, `(NONE, MENTIONED)`, `(MENTIONED, MENTIONED)`, `(MENTIONED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
 
@@ -3854,8 +3854,26 @@ Invalid examples:
 - `(COMPREHENSIVE, MENTIONED)` — a full orderflow block is shown by default, but one
   action collapses it to a single line.
 
-- `byDefault` (`OrderflowDisclosureLevel`): Level shown with default settings and no orderflow-related user action.
-- `afterSingleAction` (`OrderflowDisclosureLevel`): Level shown after at most one orderflow-related user action (e.g. tapping a row, toggle, or "Learn more"), with no settings changed.
+```typescript
+type OrderflowDisclosure =
+	| {
+			/** Level shown with default settings and no orderflow-related user action. */
+			byDefault: OrderflowDisclosureLevel.NONE
+			/**
+			 * Level shown after at most one orderflow-related user action (e.g. tapping a
+			 * row, toggle, or "Learn more"), with no settings changed.
+			 */
+			afterSingleAction: OrderflowDisclosureLevel
+	  }
+	| {
+			byDefault: OrderflowDisclosureLevel.MENTIONED
+			afterSingleAction: OrderflowDisclosureLevel.MENTIONED | OrderflowDisclosureLevel.COMPREHENSIVE
+	  }
+	| {
+			byDefault: OrderflowDisclosureLevel.COMPREHENSIVE
+			afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE
+	  }
+```
 
 ---
 

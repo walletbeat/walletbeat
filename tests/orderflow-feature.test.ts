@@ -21,10 +21,10 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	compareOrderflowDisclosureToFeeDisplay,
 	deriveOrderflowFacts,
+	type OrderflowDisclosure,
 	OrderflowDisclosureLevel,
 	orderflowTransactionFlows,
 	partitionPreInclusionRecipientsByExtractiveness,
-	validateOrderflowDisclosure,
 } from '@/schema/features/transparency/orderflow'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 
@@ -221,7 +221,7 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 			disclosure: {
 				byDefault: OrderflowDisclosureLevel.MENTIONED,
 				afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-			},
+			} satisfies OrderflowDisclosure,
 			feeDisplay: {
 				byDefault: FeeDisplayLevel.AGGREGATED,
 				afterSingleAction: FeeDisplayLevel.AGGREGATED,
@@ -235,7 +235,7 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 			disclosure: {
 				byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
 				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
-			},
+			} satisfies OrderflowDisclosure,
 			feeDisplay: {
 				byDefault: FeeDisplayLevel.AGGREGATED,
 				afterSingleAction: FeeDisplayLevel.AGGREGATED,
@@ -249,7 +249,7 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 			disclosure: {
 				byDefault: OrderflowDisclosureLevel.MENTIONED,
 				afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-			},
+			} satisfies OrderflowDisclosure,
 			feeDisplay: {
 				byDefault: FeeDisplayLevel.COMPREHENSIVE,
 				afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
@@ -263,7 +263,7 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 			disclosure: {
 				byDefault: OrderflowDisclosureLevel.MENTIONED,
 				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
-			},
+			} satisfies OrderflowDisclosure,
 			feeDisplay: {
 				byDefault: FeeDisplayLevel.AGGREGATED,
 				afterSingleAction: FeeDisplayLevel.AGGREGATED,
@@ -274,26 +274,6 @@ describe('compareOrderflowDisclosureToFeeDisplay', () => {
 		},
 	])('$description', ({ disclosure, feeDisplay, expected }) => {
 		expect(compareOrderflowDisclosureToFeeDisplay(disclosure, feeDisplay)).toBe(expected)
-	})
-})
-
-describe('validateOrderflowDisclosure', () => {
-	it('rejects aggregated default with none after action', () => {
-		expect(() =>
-			validateOrderflowDisclosure({
-				byDefault: OrderflowDisclosureLevel.MENTIONED,
-				afterSingleAction: OrderflowDisclosureLevel.NONE,
-			}),
-		).toThrow()
-	})
-
-	it('accepts comprehensive default and after action', () => {
-		expect(() =>
-			validateOrderflowDisclosure({
-				byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
-				afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
-			}),
-		).not.toThrow()
 	})
 })
 

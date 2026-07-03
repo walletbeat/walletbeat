@@ -301,7 +301,7 @@ function partialNonAuctioningExtractive(
 		outcome: {
 			id: 'non_auctioning_extractive',
 			rating: Rating.PARTIAL,
-			displayName: 'Extractive pre-inclusion sharing',
+			displayName: 'Potentially extractive pre-inclusion sharing',
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} does not auction orderflow by default, but sends pre-inclusion transaction data to ${names} through endpoints that are not documented and verifiable as non-extractive.`,
 			),
@@ -313,7 +313,7 @@ function partialNonAuctioningExtractive(
 			'{{WALLET_NAME}} should route default pre-inclusion sharing through documented, independently verifiable non-extractive endpoints, or keep pre-inclusion transaction data fully local by default.',
 		),
 		impact: mdSentence(
-			'Users may not realize that external parties can retain or exploit their transaction data before it is included onchain.',
+			'Users may not realize that external parties can retain or monetize their transaction data before it is included onchain.',
 		),
 	})
 }
@@ -556,10 +556,10 @@ export const orderflowTransparency: Attribute = {
 		'Does the wallet transparently disclose how it monetizes your transaction data?',
 	),
 	why: markdown(`
-		Before a transaction is included onchain, or Ethereum implements an encrypted
-		mempool scheme, wallet software may send transaction data to external services
-		for broadcast, simulation, or orderflow auctioning (MEV). Users cannot see this
-		path as clearly as onchain execution unless the wallet discloses it.
+		Before a transaction is included onchain, wallet software may send transaction
+		data to external services for broadcast, simulation, or orderflow auctioning
+		(MEV). Users cannot see this path as clearly as onchain execution unless the
+		wallet discloses it.
 
 		Wallets that auction orderflow by default should tell users so in the transaction
 		UI, with prominence at least comparable to how they show transaction fees.
@@ -569,6 +569,10 @@ export const orderflowTransparency: Attribute = {
 		Wallets that share pre-inclusion data without auctioning should route that data
 		through endpoints that are documented and independently verifiable as
 		non-extractive, so external parties cannot retain or exploit transaction data.
+
+		If the Ethereum protocol later implements a native mempool encryption mechanism,
+		wallets may also protect their users from orderflow extraction by using this
+		mechanism to shield transaction data before it is executed onchain.
 	`),
 	methodology: markdown(`
 		Wallets are **exempt** from this attribute when they are hardware wallets.
@@ -594,6 +598,10 @@ export const orderflowTransparency: Attribute = {
 		prominent than fees, no practices page is linked, or the page omits required
 		content. They receive **partial** when onchain verification is documented but
 		not confirmed effective. They **pass** when all requirements are met.
+
+		If the Ethereum protocol later implements a native mempool encryption mechanism,
+		wallets that use this mechanism to shield transaction data before it is included
+		onchain would also pass this attribute.
 	`),
 	ratingScale: {
 		display: 'fail-pass',

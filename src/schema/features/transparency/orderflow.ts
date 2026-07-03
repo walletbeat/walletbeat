@@ -39,8 +39,8 @@ export enum OrderflowDisclosureLevel {
  * How much orderflow / MEV information is displayed by default and after a user action.
  *
  * `byDefault` and `afterSingleAction` must tell a consistent story: one user action may
- * reveal the same or more detail, but never less. Enforced by
- * `validateOrderflowDisclosure`.
+ * reveal the same or more detail, but never less. Valid pairs are enforced by the
+ * discriminated union below.
  *
  * Valid pairs include `(NONE, NONE)`, `(NONE, MENTIONED)`, `(MENTIONED, MENTIONED)`,
  * `(MENTIONED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
@@ -51,16 +51,24 @@ export enum OrderflowDisclosureLevel {
  * - `(COMPREHENSIVE, MENTIONED)` — a full orderflow block is shown by default, but one
  *   action collapses it to a single line.
  */
-export interface OrderflowDisclosure {
-	/** Level shown with default settings and no orderflow-related user action. */
-	byDefault: OrderflowDisclosureLevel
-
-	/**
-	 * Level shown after at most one orderflow-related user action (e.g. tapping a
-	 * row, toggle, or "Learn more"), with no settings changed.
-	 */
-	afterSingleAction: OrderflowDisclosureLevel
-}
+export type OrderflowDisclosure =
+	| {
+			/** Level shown with default settings and no orderflow-related user action. */
+			byDefault: OrderflowDisclosureLevel.NONE
+			/**
+			 * Level shown after at most one orderflow-related user action (e.g. tapping a
+			 * row, toggle, or "Learn more"), with no settings changed.
+			 */
+			afterSingleAction: OrderflowDisclosureLevel
+	  }
+	| {
+			byDefault: OrderflowDisclosureLevel.MENTIONED
+			afterSingleAction: OrderflowDisclosureLevel.MENTIONED | OrderflowDisclosureLevel.COMPREHENSIVE
+	  }
+	| {
+			byDefault: OrderflowDisclosureLevel.COMPREHENSIVE
+			afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE
+	  }
 
 /** Whether the wallet documents how users can verify onchain outcomes. */
 export enum OnchainVerificationDocumentation {
@@ -88,37 +96,6 @@ export type OrderflowPractices = {
 			contents: OrderflowPracticesPageContents
 		}>
 	>
-}
-
-/**
- * Validates that `OrderflowDisclosure` levels are consistent (parallel to fee display
- * rules).
- *
- * - Rule 1: `afterSingleAction` cannot be `NONE` when `byDefault` is `MENTIONED` or
- *   `COMPREHENSIVE`.
- * - Rule 2: `byDefault` `COMPREHENSIVE` requires `afterSingleAction` `COMPREHENSIVE`.
- *
- * @throws When either rule is violated.
- */
-export function validateOrderflowDisclosure(orderflow: OrderflowDisclosure): void {
-	if (
-		(orderflow.byDefault === OrderflowDisclosureLevel.MENTIONED ||
-			orderflow.byDefault === OrderflowDisclosureLevel.COMPREHENSIVE) &&
-		orderflow.afterSingleAction === OrderflowDisclosureLevel.NONE
-	) {
-		throw new Error(
-			'Invalid orderflow disclosure: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
-		)
-	}
-
-	if (
-		orderflow.byDefault === OrderflowDisclosureLevel.COMPREHENSIVE &&
-		orderflow.afterSingleAction !== OrderflowDisclosureLevel.COMPREHENSIVE
-	) {
-		throw new Error(
-			'Invalid orderflow disclosure: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
-		)
-	}
 }
 
 function compareProminenceLevels(
@@ -168,7 +145,6 @@ export function compareOrderflowDisclosureToFeeDisplay(
 	disclosure: OrderflowDisclosure,
 	feeDisplay: FeeDisplay,
 ): -1 | 0 | 1 {
-	validateOrderflowDisclosure(disclosure)
 	validateFeeDisplay(feeDisplay)
 
 	const byDefaultCompare = compareProminenceLevels(disclosure.byDefault, feeDisplay.byDefault)
