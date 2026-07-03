@@ -10,6 +10,7 @@ import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -472,6 +473,7 @@ export const ambire: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -491,6 +493,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -504,6 +507,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -517,6 +521,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
@@ -537,6 +542,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -550,6 +556,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -563,6 +570,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
@@ -586,6 +594,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -610,6 +619,7 @@ export const ambire: SoftwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.TRANSACTION_BROADCAST,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: dataLeakReferences.pimlico,
@@ -624,6 +634,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: dataLeakReferences.biconomy,
@@ -638,6 +649,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -654,6 +666,7 @@ export const ambire: SoftwareWallet = {
 								DataCollectionPurpose.UPDATE_CHECKING,
 								DataCollectionPurpose.STATIC_ASSETS,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						// ENS resolution when the user opens the wallet
 						{
@@ -668,6 +681,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},

@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-import { assertValidEntityId, type EntityId } from '@/data/entities'
-import { entityForDomain } from '@/data/entities/domains/entity-domains'
+import { assertValidEntityId } from '@/data/entities'
+import { entitiesForDomain } from '@/data/entities/domains/entity-domains'
 import type { Entity } from '@/schema/entity'
 import {
 	CollectionPolicy,
@@ -14,6 +14,7 @@ import {
 	type DataCollectionForFlowWithOnchainData,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	EntityRole,
 	leastConfigurableCollectionPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -1937,19 +1938,22 @@ export class WalletCaptureFile {
 				throw new Error(error)
 			}
 		}
+		// Keyed by entity ID and role, so that an entity that operates one
+		// domain and fronts another gets one entry per role.
 		const perEntity = new Map<
-			EntityId,
+			string,
 			{
 				entity: Entity
+				role: EntityRole
 				info: Map<UserInfo, CollectionPolicy>
 				purposes: Set<DataCollectionPurpose>
 			}
 		>()
 
 		for (const request of flow.requests) {
-			const entity = entityForDomain(request.domain)
+			const resolved = entitiesForDomain(request.domain)
 
-			if (entity === null) {
+			if (resolved === null) {
 				maybeThrow(`no entity for domain ${request.domain}`)
 				continue
 			}
@@ -1980,35 +1984,48 @@ export class WalletCaptureFile {
 				purposes.add(purpose)
 			}
 
-			const entityId = assertValidEntityId(entity.id)
-			let entData = perEntity.get(entityId)
-
-			if (entData === undefined) {
-				entData = {
+			// The data is seen by the operator and by every intermediary on the
+			// way there, so record one receipt per entity with its role.
+			const receivingEntities: Array<{ entity: Entity; role: EntityRole }> = [
+				{ entity: resolved.operator, role: EntityRole.OPERATOR },
+				...resolved.intermediaries.map(entity => ({
 					entity,
-					info: new Map<UserInfo, CollectionPolicy>(),
-					purposes: new Set<DataCollectionPurpose>(),
+					role: EntityRole.INTERMEDIARY,
+				})),
+			]
+
+			for (const { entity, role } of receivingEntities) {
+				const perEntityKey = `${assertValidEntityId(entity.id)} ${role}`
+				let entData = perEntity.get(perEntityKey)
+
+				if (entData === undefined) {
+					entData = {
+						entity,
+						role,
+						info: new Map<UserInfo, CollectionPolicy>(),
+						purposes: new Set<DataCollectionPurpose>(),
+					}
+					perEntity.set(perEntityKey, entData)
 				}
-				perEntity.set(entityId, entData)
-			}
 
-			for (const [info, policy] of userInfos.entries()) {
-				if (policy === null) {
-					maybeThrow(`Cannot figure out collection policy of request: ${request.toString()}`)
-					continue
+				for (const [info, policy] of userInfos.entries()) {
+					if (policy === null) {
+						maybeThrow(`Cannot figure out collection policy of request: ${request.toString()}`)
+						continue
+					}
+
+					const existingPolicy = entData.info.get(info)
+
+					if (existingPolicy === undefined) {
+						entData.info.set(info, policy)
+					} else {
+						entData.info.set(info, leastConfigurableCollectionPolicy(existingPolicy, policy))
+					}
 				}
 
-				const existingPolicy = entData.info.get(info)
-
-				if (existingPolicy === undefined) {
-					entData.info.set(info, policy)
-				} else {
-					entData.info.set(info, leastConfigurableCollectionPolicy(existingPolicy, policy))
+				for (const purpose of purposes) {
+					entData.purposes.add(purpose)
 				}
-			}
-
-			for (const purpose of purposes) {
-				entData.purposes.add(purpose)
 			}
 		}
 
@@ -2030,6 +2047,7 @@ export class WalletCaptureFile {
 
 			collected.push({
 				byEntity: entData.entity,
+				role: entData.role,
 				dataCollection: {
 					// TODO: Implement support for other values here once any wallet supports this...
 					endpoint: RegularEndpoint,
@@ -2214,7 +2232,7 @@ export class WalletCaptureFile {
 		let hasUnassociatedDomain = false
 
 		for (const domain of Array.from(domainsToCheck).sort()) {
-			const entity = entityForDomain(domain)
+			const entity = entitiesForDomain(domain)
 
 			if (entity === null) {
 				hasUnassociatedDomain = true

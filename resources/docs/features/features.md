@@ -1200,11 +1200,21 @@ type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 
 ---
 
+### Enum: `EntityRole`
+
+The role an entity plays in receiving data.
+
+- `OPERATOR` = `'OPERATOR'`: The intended recipient of the data (data controller).
+- `INTERMEDIARY` = `'INTERMEDIARY'`: An entity that sees the data in transit without being its intended recipient, e.g. a TLS-terminating CDN.
+
+---
+
 ### Interface: `DataCollectionByEntity`
 
 Describes the data that an entity may be sent.
 
 - `byEntity` (`Entity`): The entity to which the data may be sent.
+- `role` (`EntityRole`): The role the entity plays in receiving the data.
 - `dataCollection` (`EndpointCollection`): The type of data that an entity may be sent.
 - `purposes` (`NonEmptyArray<DataCollectionPurpose>`): Why is the data collected?
 

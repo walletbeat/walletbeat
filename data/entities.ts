@@ -3,6 +3,7 @@ import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
 import { citrea } from '@/data/entities/citrea'
+import { cloudflare } from '@/data/entities/cloudflare'
 import { deBank } from '@/data/entities/debank'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
 import { monad } from '@/data/entities/monad'
@@ -21,6 +22,7 @@ export const allEntities = {
 	ambire: ambireEntity,
 	apple,
 	citrea,
+	cloudflare,
 	debank: deBank,
 	hyperFoundation,
 	monad,

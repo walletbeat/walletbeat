@@ -1021,11 +1021,33 @@ export function qualifiedDataCollectionWithEndpoint<T extends UserInfo>(
 }
 
 /**
+ * The role an entity plays in receiving data.
+ */
+export enum EntityRole {
+	/** The intended recipient of the data (data controller). */
+	OPERATOR = 'OPERATOR',
+
+	/**
+	 * An entity that sees the data in transit without being its intended
+	 * recipient, e.g. a TLS-terminating CDN.
+	 */
+	INTERMEDIARY = 'INTERMEDIARY',
+}
+
+export const entityRoleEnum = new Enum<EntityRole>({
+	[EntityRole.OPERATOR]: true,
+	[EntityRole.INTERMEDIARY]: true,
+})
+
+/**
  * Describes the data that an entity may be sent.
  */
 export interface DataCollectionByEntity {
 	/** The entity to which the data may be sent. */
 	byEntity: Entity
+
+	/** The role the entity plays in receiving the data. */
+	role: EntityRole
 
 	/** The type of data that an entity may be sent. */
 	dataCollection: EndpointCollection
