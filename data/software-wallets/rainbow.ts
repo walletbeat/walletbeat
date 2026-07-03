@@ -54,7 +54,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -831,9 +831,84 @@ export const rainbow: SoftwareWallet = {
 					fullySponsored: false,
 					walletServiceFeeDisplayUnits: null,
 				}),
-				erc20L1Transfer: null,
-				ethL1Transfer: null,
-				uniswapUSDCToEtherSwap: null,
+				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
+				// For all three flows below, the transaction screen shows a single
+				// aggregate "Estimated fee" figure by default, and one tap on the gas
+				// control opens a sheet itemizing base fee / miner tip / max
+				// transaction fee. None of these flows carry a Rainbow platform fee,
+				// so walletServiceFeeDisplayUnits is NOT_APPLICABLE.
+				erc20L1Transfer: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'By default the USDC (ERC-20) L1 send screen shows only a single aggregate "Estimated fee" figure with no itemized breakdown, so byDefault is AGGREGATED.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-erc20-l1-send-screen.png',
+							label:
+								'Rainbow iOS USDC (ERC-20) send screen showing a single aggregate "Estimated fee" figure by default, with no itemized breakdown',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ERC-20 transfer, so this network-fee breakdown is the complete breakdown (COMPREHENSIVE). The same sheet is reachable from every transaction type tested.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
+							label:
+								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
+							lastRetrieved: '2026-07-03',
+						},
+					],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'By default the ETH L1 send screen shows only a single aggregate "Estimated fee" figure with no itemized breakdown, so byDefault is AGGREGATED.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-eth-l1-send-screen.png',
+							label:
+								'Rainbow iOS ETH send screen showing a single aggregate "Estimated fee" figure by default, with no itemized breakdown',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ETH transfer, so this network-fee breakdown is the complete breakdown (COMPREHENSIVE). The same sheet is reachable from every transaction type tested.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
+							label:
+								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
+							lastRetrieved: '2026-07-03',
+						},
+					],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default alongside the simulated result; the Uniswap protocol fee is reflected in the simulated receive amount rather than itemized, so byDefault is AGGREGATED.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-approval.png',
+							label:
+								'Rainbow iOS transaction approval popup for a USDC-to-ETH swap initiated on app.uniswap.org, showing a single aggregate "Estimated fee" by default',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee (COMPREHENSIVE). This is a swap through an external app, so no Rainbow platform fee applies (walletServiceFeeDisplayUnits NOT_APPLICABLE). The same sheet is reachable from every transaction type tested.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
+							label:
+								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
+							lastRetrieved: '2026-07-03',
+						},
+					],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
 			releaseTransparency: {
 				artifactSigning: notSupported,
