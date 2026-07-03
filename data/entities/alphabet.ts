@@ -9,6 +9,7 @@ export const alphabet: CorporateEntity = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

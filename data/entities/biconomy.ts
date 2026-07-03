@@ -9,6 +9,7 @@ export const biconomy: CorporateEntity & TransactionBroadcastProvider = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: true,

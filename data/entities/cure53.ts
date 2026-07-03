@@ -9,6 +9,7 @@ export const cure53: CorporateEntity & SecurityAuditor = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: true,
 		transactionBroadcastProvider: false,
