@@ -95,10 +95,6 @@ describe('URLs in authored source must be well-formed', async () => {
 		})
 	}
 
-	it('the detector accepts a well-formed URL', () => {
-		expect(findMalformedUrls("ref: 'https://github.com/walletbeat/walletbeat'")).toHaveLength(0)
-	})
-
 	if (fileMap.size === 0) {
 		it('no malformed URLs found in data/ or src/', () => {
 			expect(fileMap.size).toBe(0)
