@@ -54,13 +54,18 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	type FeeDisplay,
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
 import rainbowIosParsed from './manifests/rainbow/ios.parsed.json'
@@ -823,13 +828,35 @@ export const rainbow: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				// Source: Rainbow team responses via Walletbeat questionnaire
-				builtInErc20Swap: supported({
-					ref: refTodo,
+				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
+				// Corrects an earlier questionnaire-sourced NONE: the default swap
+				// screen already shows a network fee (so byDefault is AGGREGATED, not
+				// NONE), and tapping "Review" (one action) reveals a comprehensive
+				// breakdown including an itemized "Included Rainbow Fee" line, shown as
+				// a token amount (ETH).
+				builtInErc20Swap: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'By default the Rainbow built-in swap screen shows the exchange rate and a single network-fee estimate (e.g. "$0.07"), but does not itemize the Rainbow service fee, so byDefault is AGGREGATED (not NONE).',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-default.png',
+							label:
+								'Rainbow iOS built-in swap screen showing a network-fee estimate by default, with the Rainbow service fee not itemized',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'Tapping "Review" (a single action) reveals a comprehensive breakdown: network, minimum received, an itemized "Included Rainbow Fee" (0.00000262 ETH, i.e. a token amount), max slippage, and the estimated network fee. So afterSingleAction is COMPREHENSIVE and the wallet service fee line item is shown as a TOKEN_AMOUNT.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-review.png',
+							label:
+								'Rainbow iOS built-in swap Review panel itemizing the "Included Rainbow Fee" (in ETH) alongside network fee, minimum received, and max slippage',
+							lastRetrieved: '2026-07-03',
+						},
+					],
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.NONE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
 					fullySponsored: false,
-					walletServiceFeeDisplayUnits: null,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
 				}),
 				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
 				// For all three flows below, the transaction screen shows a single
