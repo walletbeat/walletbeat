@@ -319,6 +319,8 @@ describe('codebase integrity', () => {
 			'Ỳ',
 			'ỳ',
 			'‖',
+			'𜱭',
+			'𜱫',
 		])
 
 		// Characters used in font files generated from SVG.
@@ -456,6 +458,40 @@ describe('codebase integrity', () => {
 			expect(
 				filesWithBom,
 				`Files with BOM (Byte Order Mark):\n\n${filesWithBom.join('\n')}\n\nPlease remove the BOM.`,
+			).toEqual([])
+		})
+	})
+
+	describe('SVG files must not contain <script> tags', async () => {
+		const svgsWithScript: string[] = []
+
+		await crawlCodebase({
+			ignore: commonExclusions,
+			complexTraversalFn: async (entryBase, getFullEntry) => {
+				if (entryBase.type !== CodebaseEntryType.FILE) {
+					return
+				}
+
+				if (!entryBase.path.endsWith('.svg')) {
+					return
+				}
+
+				const entry = await getFullEntry()
+
+				if (entry.type !== CodebaseEntryType.FILE) {
+					throw new Error('inconsistent type')
+				}
+
+				if (/<(?:script|SCRIPT)[\s>]/.test(entry.contents)) {
+					svgsWithScript.push(entry.path)
+				}
+			},
+		})
+
+		it('no SVGs contain <script> tags', () => {
+			expect(
+				svgsWithScript,
+				`SVG files containing <script> tags:\n\n${svgsWithScript.join('\n')}\n\nRemove any <script> elements.`,
 			).toEqual([])
 		})
 	})

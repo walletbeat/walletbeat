@@ -25,7 +25,6 @@ function getVocabulary(): string[] {
 		const walletNames: string[] = Object.values(allWallets).map(
 			wallet => wallet.metadata.displayName,
 		)
-		// TODO: https://github.com/walletbeat/walletbeat/issues/547
 		// Wallet IDs (URL slugs) are not fully in cspell; add them so Harper accepts them in generated markdown URLs (e.g. .../trezor#maintenance).
 		const walletIds: string[] = Object.values(allWallets).map(wallet => wallet.metadata.id)
 
@@ -223,8 +222,11 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 	}),
 ]
 
-/** Lint a string for grammar errors. */
-export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
+/** Lint a string for grammar errors; return raw error messages. */
+export async function grammarLintMessages(
+	text: string,
+	lintOptions?: harper.LintOptions,
+): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
 	let lints: Lint[] = []
 
@@ -254,11 +256,41 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'lockdown',
 	)
 
+	// Ignore Readability (sentence too long) lints when "etc." appears inside the span
+	// followed by a non-uppercase letter, since Harper does not recognize "etc." as a
+	// sentence terminator and merges what should be separate sentences into one span.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Readability') {
+			return true
+		}
+
+		const spanText = trimmedText.substring(lint.span().start, lint.span().end)
+		const etcIdx = spanText.indexOf('etc.')
+
+		if (etcIdx === -1 || etcIdx + 4 >= spanText.length) {
+			return true
+		}
+
+		const charAfterEtc = spanText[etcIdx + 4]
+
+		// "etc." followed by a non-uppercase letter (e.g. "etc. they", "etc. however")
+		// means Harper merged sentences Harper should have split at "etc."
+		return charAfterEtc.toUpperCase() !== charAfterEtc
+	})
+
 	const message: string[] = []
 
 	for (const lint of lints) {
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 16), lint.span().start)
+		const after = trimmedText.substring(
+			lint.span().end,
+			Math.min(trimmedText.length, lint.span().end + 16),
+		)
+		const badText = trimmedText.substring(lint.span().start, lint.span().end)
+		const span = `…${before}𜱭${badText}𜱫${after}…`
+
 		message.push(
-			`- ${lint.span().start}:${lint.span().end}: ${lint.lint_kind_pretty()}: ${lint.message()}`,
+			`- ${lint.span().start}:${lint.span().end} (${JSON.stringify(span)}): ${lint.lint_kind_pretty()}: ${lint.message()}`,
 		)
 
 		if (lint.suggestions().length !== 0) {
@@ -283,6 +315,13 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 			}
 		}
 	}
+
+	return message
+}
+
+/** Lint a string for grammar errors. */
+export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
+	const message = await grammarLintMessages(text, lintOptions)
 
 	if (message.length > 0) {
 		// This assertion will never match and makes no sense on its own.

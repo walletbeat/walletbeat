@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
+import { AttributeGroupId } from '@/schema/attribute-tree'
 import { getExtensionId } from '@/schema/extension-url'
 import type { BaseWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
@@ -17,7 +18,7 @@ import { getRepositoryRoot } from './utils/codebase'
 
 describe('wallets', () => {
 	const walletMaps: {
-		walletMap: { [K: string]: BaseWallet }
+		walletMap: { [K: string]: BaseWallet<AttributeGroupId> }
 		walletType: WalletType | null
 		walletMapName: string
 		dataSubdir: string
@@ -192,7 +193,12 @@ describe('wallets', () => {
 								walletVariants: wallet.variants,
 							})
 						} catch (e) {
-							throw new Error(`${getErrorMessage(e)} (run \`pnpm fix\` to fix this automatically)`)
+							throw new Error(
+								`${getErrorMessage(e)} (run \`pnpm fix\` to fix this automatically)`,
+								{
+									cause: e,
+								},
+							)
 						}
 					}
 				})

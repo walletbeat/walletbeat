@@ -2,6 +2,7 @@
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
 import { repositoryUrl } from '@/constants'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { markdown } from '@/types/content'
 
 // Components
@@ -34,7 +35,11 @@ import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 			/>
 		</header>
 
-		<Eip7702Table title='Software Wallets by EIP-7702 Support' client:visible />
+		<Eip7702Table
+			title='Software Wallets by EIP-7702 Support'
+			softwareWallets={Object.values(ratedSoftwareWallets)}
+			client:visible
+		/>
 
 		<footer data-scroll-item='inline-detached padding-match-end' data-row='center'>
 			<p>

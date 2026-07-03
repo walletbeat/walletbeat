@@ -32,16 +32,12 @@ export default [
 			// Ignore generated files
 			'src/generated/**',
 
-			// Ignore Svelte files with ESLint errors due to inaccurate generic parameter type inference
-			'src/views/Eip7702Table.svelte',
-
-			// Ignore Svelte files with ESLint errors due to inaccurate parsing
+			// svelte-eslint-parser incorrectly fails to parse valid CSS/template syntax in these files.
+			// Ignored — we will not rewrite valid CSS/template to satisfy a broken parser.
 			'src/components/Filters.svelte',
 			'src/components/Table.svelte',
 			'src/views/WalletPage.svelte',
-			'src/views/WalletStageOverview.svelte',
 			'src/views/WalletTable.svelte',
-			'src/views/attributes/security/SecurityAuditsDetails.svelte',
 		],
 	},
 	eslintPluginEslintComments.recommended,
@@ -225,6 +221,10 @@ export default [
 			// Not useful for props.
 			'prefer-const': 'off',
 
+			// ESLint 10 incorrectly flags `$bindable()` in `$props()` destructuring as a useless assignment.
+			// Disabled — bindable props are consumed via binding/`$effect`, not reads in `<script>`; svelte-check is clean.
+			'no-useless-assignment': 'off',
+
 			// Respect import groupings.
 			'simple-import-sort/imports': 'off',
 			'simple-import-sort/exports': 'off',
@@ -244,13 +244,14 @@ export default [
 			// Prevent crashes due to duplicate keys.
 			'svelte/require-each-key': 'warn',
 
-			// ESLint's type checker doesn't perfectly match TypeScript's, especially for Svelte-specific syntax (e.g., {@attach pattern, $bindable inference).
-			// These rules have false positives when TypeScript compiler is happy.
+			// typescript-eslint incorrectly reports values from `$props()` destructuring and inline template literals as unsafe.
 			'@typescript-eslint/no-unsafe-argument': 'warn',
 			'@typescript-eslint/no-unsafe-assignment': 'warn',
+			'@typescript-eslint/no-unsafe-return': 'warn',
+
+			// svelte-eslint-parser incorrectly types extracted template handlers as `(event) => …` with an implicit-any `event`.
 			'@typescript-eslint/no-unsafe-call': 'warn',
 			'@typescript-eslint/no-unsafe-member-access': 'warn',
-			'@typescript-eslint/no-unsafe-return': 'warn',
 		},
 	},
 ]

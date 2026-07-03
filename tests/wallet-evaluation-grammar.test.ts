@@ -1,22 +1,21 @@
 import { describe } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
-import { allRatedWallets } from '@/data/wallets'
+import { allRatedWallets, attributeTreeForWallet } from '@/data/wallets'
 import {
-	type EvaluationTree,
+	type AttributeGroup,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
+import { AttributeGroupId } from '@/schema/attribute-tree'
 import {
 	type Attribute,
-	type AttributeGroup,
 	type EvaluatedAttribute,
 	type Evaluation,
 	type OutcomeMetadata,
 	Rating,
 	ratingEnum,
 	ratingToText,
-	type ValueSet,
 } from '@/schema/attributes'
 import { isTypographicContent } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
@@ -34,15 +33,18 @@ describe('evaluations', () => {
 		attribute: Attribute<_OutcomeMetadata>
 		perRating: Map<Rating, NamedEvaluation<_OutcomeMetadata>[]>
 	}
-	type PerGroup = {
-		attributeGroup: AttributeGroup<ValueSet>
+	type PerGroup<_AttributeGroupId extends AttributeGroupId> = {
+		attributeGroup: AttributeGroup<_AttributeGroupId>
 		attributes: Map<string, PerAttribute<OutcomeMetadata>>
 	}
-	const evaluationsPerGroup: Map<string, PerGroup> = new Map()
-	const addEvaluation = (
-		attrGroup: AttributeGroup<ValueSet>,
+	const evaluationsPerGroup: Map<string, PerGroup<AttributeGroupId>> = new Map()
+	const addEvaluation = <
+		_AttributeGroupId extends AttributeGroupId,
+		_OutcomeMetadata extends OutcomeMetadata,
+	>(
+		attrGroup: AttributeGroup<_AttributeGroupId>,
 		attribute: Attribute<OutcomeMetadata>,
-		evaluation: NamedEvaluation<OutcomeMetadata>,
+		evaluation: NamedEvaluation<_OutcomeMetadata>,
 	) => {
 		let perGroup = evaluationsPerGroup.get(attrGroup.id)
 
@@ -76,66 +78,64 @@ describe('evaluations', () => {
 	}
 
 	for (const ratedWallet of Object.values(allRatedWallets)) {
-		const trees: { tree: EvaluationTree; variantName: string }[] = [
-			{ tree: ratedWallet.overall, variantName: 'overall' },
-		].concat(
-			Object.values(ratedWallet.variants)
+		for (const { evalTree, variantName } of [
+			{ evalTree: ratedWallet.overall, variantName: 'overall' },
+			...Object.values(ratedWallet.variants)
 				.filter((w): w is NonNullable<typeof w> => w != null)
 				.map(resolvedWallet => ({
-					tree: resolvedWallet.attributes,
+					evalTree: resolvedWallet.attributes,
 					variantName: variantToName(resolvedWallet.variant, true),
 				})),
-		)
+		]) {
+			mapNonExemptAttributeGroupsInTree(
+				attributeTreeForWallet(ratedWallet),
+				evalTree,
+				(attrGroup, evalGroup) => {
+					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend OutcomeMetadata.
+						const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<OutcomeMetadata>
 
-		for (const { tree, variantName } of trees) {
-			mapNonExemptAttributeGroupsInTree(tree, (attrGroup, evalGroup) => {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute groups type parameters extend ValueSet.
-				const genericAttrGroup = attrGroup as unknown as AttributeGroup<ValueSet>
+						addEvaluation(attrGroup, genericEvalAttr.attribute, {
+							name: `${ratedWallet.metadata.displayName} ${variantName} rating`,
+							evaluation: genericEvalAttr.evaluation,
+						})
+						const ratingScale = genericEvalAttr.attribute.ratingScale
 
-				mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend OutcomeMetadata.
-					const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<OutcomeMetadata>
+						switch (ratingScale.display) {
+							case 'simple':
+								break
+							case 'fail-pass':
+							// Fall through
+							case 'pass-fail':
+								for (const row of [
+									{ rating: Rating.PASS, exampleRatings: ratingScale.pass },
+									{ rating: Rating.PARTIAL, exampleRatings: ratingScale.partial },
+									{ rating: Rating.FAIL, exampleRatings: ratingScale.fail },
+								]) {
+									let { exampleRatings } = row
+									const { rating } = row
 
-					addEvaluation(genericAttrGroup, genericEvalAttr.attribute, {
-						name: `${ratedWallet.metadata.displayName} ${variantName} rating`,
-						evaluation: genericEvalAttr.evaluation,
-					})
-					const ratingScale = genericEvalAttr.attribute.ratingScale
+									if (exampleRatings === undefined) {
+										continue
+									}
 
-					switch (ratingScale.display) {
-						case 'simple':
-							break
-						case 'fail-pass':
-						// Fall through
-						case 'pass-fail':
-							for (const row of [
-								{ rating: Rating.PASS, exampleRatings: ratingScale.pass },
-								{ rating: Rating.PARTIAL, exampleRatings: ratingScale.partial },
-								{ rating: Rating.FAIL, exampleRatings: ratingScale.fail },
-							]) {
-								let { exampleRatings } = row
-								const { rating } = row
+									if (!Array.isArray(exampleRatings)) {
+										exampleRatings = [exampleRatings]
+									}
 
-								if (exampleRatings === undefined) {
-									continue
-								}
-
-								if (!Array.isArray(exampleRatings)) {
-									exampleRatings = [exampleRatings]
-								}
-
-								for (const exampleRating of exampleRatings) {
-									for (const sampleEvaluation of exampleRating.sampleEvaluations) {
-										addEvaluation(genericAttrGroup, genericEvalAttr.attribute, {
-											name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.outcome.id}`,
-											evaluation: sampleEvaluation,
-										})
+									for (const exampleRating of exampleRatings) {
+										for (const sampleEvaluation of exampleRating.sampleEvaluations) {
+											addEvaluation(attrGroup, genericEvalAttr.attribute, {
+												name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.outcome.id}`,
+												evaluation: sampleEvaluation,
+											})
+										}
 									}
 								}
-							}
-					}
-				})
-			})
+						}
+					})
+				},
+			)
 		}
 	}
 

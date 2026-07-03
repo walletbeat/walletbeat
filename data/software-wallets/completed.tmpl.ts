@@ -19,6 +19,7 @@ import {
 	exampleSecurityAuditor,
 	exampleWalletDevelopmentCompany,
 } from '@/data/entities/example'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -90,7 +91,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 

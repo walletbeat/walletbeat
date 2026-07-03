@@ -1,3 +1,4 @@
+import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 import { sentence } from '@/types/content'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
@@ -33,7 +34,6 @@ import {
 	type StageCriterionEvaluation,
 	stageCriterionEvaluationPerVariant,
 	StageCriterionRating,
-	type StageEvaluatableWallet,
 	variantsMustPassAttribute,
 	type WalletLadder,
 	type WalletStage,
@@ -43,7 +43,7 @@ import { WalletType, walletTypeToVariants } from '../wallet-types'
 
 export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
-export const softwareWalletStageZero: WalletStage = {
+export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-0',
 	label: 'Stage 0',
 	name: 'Verifiable',
@@ -67,7 +67,7 @@ export const softwareWalletStageZero: WalletStage = {
 	],
 }
 
-export const softwareWalletStageZeroFive: WalletStage = {
+export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-0-5',
 	label: 'Stage 0.5',
 	name: 'Foundational',
@@ -168,7 +168,7 @@ export const softwareWalletStageZeroFive: WalletStage = {
 	],
 }
 
-export const softwareWalletStageOne: WalletStage = {
+export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-1',
 	name: 'Ethereum standard',
 	label: 'Stage 1',
@@ -520,7 +520,7 @@ export const softwareWalletStageOne: WalletStage = {
 	],
 }
 
-const softwareWalletStageTwo: WalletStage = {
+const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-2',
 	name: 'Trust-minimized',
 	label: 'Stage 2',
@@ -821,14 +821,12 @@ const softwareWalletStageTwo: WalletStage = {
 /**
  * Ladder for software wallets.
  */
-export const softwareWalletLadder: WalletLadder = {
+export const softwareWalletLadder = {
 	stages: [
 		softwareWalletStageZero,
 		softwareWalletStageZeroFive,
 		softwareWalletStageOne,
 		softwareWalletStageTwo,
 	],
-	applicableTo: (wallet: StageEvaluatableWallet): boolean => {
-		return setContains<WalletType>(wallet.types, WalletType.SOFTWARE)
-	},
-}
+	applicableTo: wallet => setContains<WalletType>(wallet.types, WalletType.SOFTWARE),
+} as const satisfies WalletLadder<SoftwareAttributeGroupId>

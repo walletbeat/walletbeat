@@ -194,7 +194,6 @@
 				data-tooltip-trigger
 				style:anchor-name={anchorName}
 				popovertarget={popoverId}
-
 				{...hoverTriggerPlacement === 'button' && hoverTriggerEvents}
 				{@attach useButtonTrigger}
 			></button>

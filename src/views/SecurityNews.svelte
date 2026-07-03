@@ -20,6 +20,7 @@
 	} = $props()
 </script>
 
+
 <section
 	class="attribute security-news"
 	id="security-news"
@@ -142,6 +143,7 @@
 		</div>
 	</details>
 </section>
+
 
 <style>
 	.security-news {

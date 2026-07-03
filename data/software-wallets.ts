@@ -1,4 +1,9 @@
-import { type RatedWallet, rateWallet } from '@/schema/wallet'
+import type { AttributeTree } from '@/schema/attribute-groups'
+import { AttributeGroupId, attributeTreeForIds } from '@/schema/attribute-tree'
+import type { WalletSoftwareFeatures } from '@/schema/features'
+import { softwareLadders } from '@/schema/ladders'
+import type { Variant } from '@/schema/variants'
+import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
 import { baseApp } from './software-wallets/base-app'
@@ -23,6 +28,40 @@ import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/u
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
 
+const softwareWalletAttributeGroupIds = [
+	AttributeGroupId.Security,
+	AttributeGroupId.Privacy,
+	AttributeGroupId.SelfSovereignty,
+	AttributeGroupId.Transparency,
+	AttributeGroupId.Ecosystem,
+] as const
+
+export type SoftwareAttributeGroupId = (typeof softwareWalletAttributeGroupIds)[number]
+
+export const softwareWalletAttributeTree = attributeTreeForIds(
+	softwareWalletAttributeGroupIds,
+) satisfies AttributeTree<SoftwareAttributeGroupId>
+
+/**
+ * The interface used to describe software wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
+	features: WalletSoftwareFeatures
+	variants:
+		| {
+				[Variant.BROWSER]: true
+		  }
+		| {
+				[Variant.DESKTOP]: true
+		  }
+		| {
+				[Variant.MOBILE]: true
+		  }
+}
+
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
@@ -46,27 +85,24 @@ export const softwareWallets = {
 	uniswapWallet,
 	zerion,
 	zeus,
-}
+} as const satisfies Record<string, SoftwareWallet>
 
-/** A valid software wallet name. */
-export type SoftwareWalletName = keyof typeof softwareWallets
-
-/** Type predicate for SoftwareWalletName. */
-export function isValidSoftwareWalletName(name: string): name is SoftwareWalletName {
+/** Type predicate for software wallet names. */
+export function isValidSoftwareWalletName(name: string): name is keyof typeof softwareWallets {
 	return Object.prototype.hasOwnProperty.call(softwareWallets, name)
 }
 
 /** All rated software wallets. */
-export const ratedSoftwareWallets: Record<SoftwareWalletName, RatedWallet> = Object.fromEntries(
-	Object.entries(softwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
-)
-
-/**
- * Map the given function to all rated software wallets.
- */
-export function mapSoftwareWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
-	return Object.values(ratedSoftwareWallets).map(fn)
-}
+export const ratedSoftwareWallets = Object.fromEntries(
+	Object.entries(softwareWallets).map(([name, wallet]) => [
+		name,
+		rateWallet(softwareWalletAttributeTree, softwareLadders, wallet),
+	]),
+) satisfies Record<string, RatedWallet<SoftwareAttributeGroupId>>
 
 /** The unrated software wallet as a rated wallet. */
-export const unratedSoftwareWallet = rateWallet(unratedSoftwareTemplate)
+export const unratedSoftwareWallet = rateWallet(
+	softwareWalletAttributeTree,
+	softwareLadders,
+	unratedSoftwareTemplate,
+)

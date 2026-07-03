@@ -123,7 +123,7 @@ function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2
 			try {
 				return opt2(x)
 			} catch (e2) {
-				throw new Error(`${getErrorMessage(e1)} & ${getErrorMessage(e2)}`)
+				throw new Error(`${getErrorMessage(e1)} & ${getErrorMessage(e2)}`, { cause: e2 })
 			}
 		}
 	}
@@ -357,7 +357,7 @@ class Options<T extends object> {
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
-				throw new Error(`Flag --${fieldName.toString()}: ${getErrorMessage(e)}`)
+				throw new Error(`Flag --${fieldName.toString()}: ${getErrorMessage(e)}`, { cause: e })
 			}
 		}
 
@@ -506,6 +506,27 @@ export const explainRequestOptions = new Options<ExplainRequestOptions>(
 		policy: optionalOption(enumOption(collectionPolicyEnum)),
 		global: optionalOption(booleanOption),
 		force: optionalOption(booleanOption),
+	},
+	globalOptions,
+)
+
+export enum CheckFormat {
+	SUMMARY = 'SUMMARY',
+	FULL = 'FULL',
+}
+
+const checkFormat = new Enum<CheckFormat>({
+	[CheckFormat.SUMMARY]: true,
+	[CheckFormat.FULL]: true,
+})
+
+export interface CheckOptions extends GlobalOptions {
+	format: CheckFormat | null
+}
+
+export const checkOptions = new Options<CheckOptions>(
+	{
+		format: optionalOption(enumOption(checkFormat)),
 	},
 	globalOptions,
 )
@@ -689,6 +710,9 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 			extraInstructions.push(
 				'(Make sure the two wallet addresses you import into the wallet are pre-funded with Ether and USDC!)',
 			)
+			extraInstructions.push(
+				'(If the wallet cannot import addresses after having already created a new account, then reinstall the wallet from scratch, import two or your pre-seeded accounts through the wallet account import flow. You do not need to actually re-import the two accounts you created during the ONBOARDING_NEW flow, but you should specify them in the --wallet-addresses flag nonetheless.)',
+			)
 		}
 
 		const nextInstructions: string[] = []
@@ -700,6 +724,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 				'  ➡️ If you forgot to actually run the flow, simply re-run the previous command and do it.',
 				`  ➡️ Otherwise, move on to the next flow: ${nextFlow}.`,
 				`    ⚙️ ${getCommandPrefix(opts)} capture${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')} --flow=${nextFlow}`,
+				`    🏁 Your goal during this next flow: ${nextFlow}`,
 			)
 		} else if (sessionsDiff.size > 1) {
 			throw new Error(
@@ -720,6 +745,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 				`    ⚙️ ${getCommandPrefix(opts)} delete-capture --session=${onlySession}`,
 				`  ➡️ Otherwise, move on to the next flow: ${nextFlow}.`,
 				`    ⚙️ ${getCommandPrefix(opts)} capture --flow=${nextFlow}${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')}`,
+				`    🏁 Your goal during this next flow: ${nextFlow}`,
 			)
 		}
 
@@ -739,7 +765,7 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 	log(`✅ Successfully deleted all data for session ${opts.session}.`)
 }
 
-export async function handleCheck(opts: GlobalOptions): Promise<number> {
+export async function handleCheck(opts: CheckOptions): Promise<number> {
 	const capture = await openCaptureFile(opts)
 	const issues = await capture.check()
 
@@ -764,6 +790,9 @@ export async function handleCheck(opts: GlobalOptions): Promise<number> {
 		}
 	}
 
+	const isSummary = opts.format === null || opts.format === CheckFormat.SUMMARY
+	let numSectionsLogged = 0
+
 	for (const strSection of sectionOrder) {
 		const sectionIssues = perSection.get(strSection)
 
@@ -772,8 +801,25 @@ export async function handleCheck(opts: GlobalOptions): Promise<number> {
 		}
 
 		log(`# ${strSection} (${sectionIssues.length} issue${sectionIssues.length === 1 ? '' : 's'}):`)
+		numSectionsLogged++
+
+		if (isSummary && numSectionsLogged > 3) {
+			log('  (Elided until the above issues are addressed first; use --format=FULL to show all)')
+			continue
+		}
+
+		let issuesLogged = 0
 
 		for (const issue of sectionIssues) {
+			issuesLogged++
+
+			if (isSummary && issuesLogged > 5) {
+				log(
+					'  > (Other issues elided until the above issues are addressed first; use --format=FULL to show all)',
+				)
+				break
+			}
+
 			log(`  > ${issue.issue}`)
 
 			if (issue.suggestions.length > 0) {
@@ -822,7 +868,7 @@ export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
 
 			existingDomains = assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
 		} catch (e) {
-			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`)
+			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
 		}
 	}
 

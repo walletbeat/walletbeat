@@ -56,20 +56,14 @@ const optimizedSvgHashes: Record<string, string> = {
 		'f711cabcb0a956f368aaae02ccb2e9eb94e5923399e9ccd131dd1e23d697ca3b',
 	'public/images/wallets/ambire.svg':
 		'6f948cf0ae3177732723a00143d9870fe81108dc54a2e0bfa34ff25f9b83e738',
-	'public/images/wallets/bitbox.svg':
-		'6acb6bcd76238fb193ca4583b0707f68b1690751e3e46bbb7850922347510bca',
 	'public/images/wallets/bitget.svg':
 		'e152a09dcb2edec856e49e7ba548779a1243341d2d856f2fb34fee9d8c05b3f9',
-	'public/images/wallets/cypherock.svg':
-		'7e24a84745af52fa9f58562622044e087b954ae978a712d533c8e6c57ea6ed9b',
 	'public/images/wallets/daimo.svg':
 		'2db6b9a699150448d412a4328282ef6ebcb07afb5178f36b7cfb18414e0cba12',
 	'public/images/wallets/default.svg':
 		'42695ab5cb6fb3727fd39a0c0f9b29f4653fac76377f4c080476cef7af1fffba',
 	'public/images/wallets/elytro.svg':
 		'1a4f7a9a38e9093e68a60b4cca6e6c17e9b6b8d1813b4ea295e4c4c9a422c8b3',
-	'public/images/wallets/family.svg':
-		'0d3752028fcf496704c2b3e9e81b4e8ed651abcd9f19fe5f742c60ac258023b3',
 	'public/images/wallets/firefly.svg':
 		'e4f29ef5710fbe55f3e6c75fd5d66fa84ac293109a761a075bff3476d9041d0e',
 	'public/images/wallets/frame.svg':
@@ -92,8 +86,6 @@ const optimizedSvgHashes: Record<string, string> = {
 		'15d3e1ebc57320688fab839d040fc7a7e4557aea9f2ce388cb4736e8ff3bc353',
 	'public/images/wallets/mtpelerin.svg':
 		'2ef9baac2e6b46f7144d62afae8777abf433fffa3f8cfc6d41b64e4b1a2fa52e',
-	'public/images/wallets/ngrave.svg':
-		'ac3d5291593158a0152f9c0b546ff31453a2ba23b308e6f8845950ad917d0351',
 	'public/images/wallets/nufi.svg':
 		'84b00f3f0b3286455b585970d20a25ed9e85307e8654db0cf8fa1d72cde6c5c7',
 	'public/images/wallets/onekey.svg':
@@ -116,8 +108,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'5410793b34c576acf880bb16a42e537e98e3185bb76840888ceec26f517f0fdc',
 	'public/images/wallets/zeus.svg':
 		'81d3248eb033216dad88005dbaca90e637709c66351ad1f5e3a6a0a65b6b051b',
-	'public/logo-dark.svg': '6c03ad9b5ce0f67df71ec63bd8bd8cab727ae228245ff42be4916b32681d7583',
-	'public/logo-light.svg': '71041426882663d14be10fe6cecf718a68797b9858509b0e512ab8912284314a',
+	'public/logo-dark.svg': '1724b327def6bdb066c6b47629986b0d4a83625df6399177da2e7386de4cc6b2',
+	'public/logo-light.svg': '80cb26c313cc96082a0254e95110536f8326b5c7086e1eead8b6efd1884b28bf',
 	'resources/branding/icon_dark.svg':
 		'e88bce5e2c9a34c9bbc169bab233ad07103f4f1409ffa93ce1e54134ff2fbbc0',
 	'resources/branding/icon_light.svg':
@@ -399,6 +391,102 @@ describe('SVG optimization', async () => {
 			expect(
 				staleKeys.length,
 				`${staleKeys.length} optimizedSvgHashes entry/entries reference non-existent SVG file(s). See error output for keys to remove.`,
+			).toBe(0)
+		}
+	})
+})
+
+/**
+ * Threshold: if the raw text of embedded data: URIs (as they appear in the
+ * file) compose more than this fraction of the SVG file size, the file is
+ * flagged as a disguised raster image (PNG/JPEG/WebP inside an SVG wrapper).
+ */
+const EMBEDDED_IMAGE_RATIO_THRESHOLD = 0.95
+
+describe('SVG files should not be disguised raster images', async () => {
+	const disguised: {
+		filePath: string
+		fileSize: number
+		embeddedSize: number
+		ratio: number
+		mimeType: string
+	}[] = []
+
+	await crawlCodebase({
+		ignore: commonExclusions,
+		complexTraversalFn: async (entryBase, getFullEntry) => {
+			if (entryBase.type !== CodebaseEntryType.FILE) {
+				return
+			}
+
+			if (!entryBase.path.endsWith('.svg')) {
+				return
+			}
+
+			const entry = await getFullEntry()
+
+			if (entry.type !== CodebaseEntryType.FILE) {
+				throw new Error('inconsistent type')
+			}
+
+			const contents = entry.contents
+			const fileSize = entry.raw.byteLength
+
+			// Match data: URIs in attributes like xlink:href, href, src.
+			// Captures: data:<mime>;<params>,<raw-content>
+			const dataUriRegex = /data:\s*([\w/.+-]+);[^,]*,([^"'>\s]+)/g
+			let match
+			let embeddedSize = 0
+			let mimeType = ''
+
+			while ((match = dataUriRegex.exec(contents)) !== null) {
+				mimeType = match[1]
+
+				// Count the full data URI text as it appears in the file
+				// (the raw base64 or plain text, not the decoded bytes).
+				// This correctly reflects how much of the SVG is consumed
+				// by the embedded image wrapper.
+				embeddedSize += match[0].length
+			}
+
+			if (embeddedSize > 0) {
+				const ratio = embeddedSize / fileSize
+
+				if (ratio > EMBEDDED_IMAGE_RATIO_THRESHOLD) {
+					disguised.push({
+						filePath: entry.path,
+						fileSize,
+						embeddedSize,
+						ratio,
+						mimeType,
+					})
+				}
+			}
+		},
+	})
+
+	it('no SVGs should be disguised raster images', () => {
+		if (disguised.length > 0) {
+			disguised.sort((a, b) => b.ratio - a.ratio)
+
+			const message =
+				'The following SVG files are disguised raster images — they consist almost entirely of an embedded data: URI rather than real SVG vector data.\n' +
+				'Replace these with actual SVG vector files or use the raster image directly.\n\n' +
+				disguised
+					.map(
+						d =>
+							`  ${d.filePath}\n` +
+							`    File size:    ${d.fileSize.toLocaleString()} bytes\n` +
+							`    Embedded:     ${d.embeddedSize.toLocaleString()} bytes (${(d.ratio * 100).toFixed(1)}% of file)\n` +
+							`    MIME type:    ${d.mimeType}`,
+					)
+					.join('\n\n') +
+				'\n'
+
+			console.error(message)
+			expect(
+				disguised.length,
+				`${disguised.length} SVG file(s) contain embedded raster data exceeding ${EMBEDDED_IMAGE_RATIO_THRESHOLD * 100}% of the file size.`,
 			).toBe(0)
 		}
 	})
