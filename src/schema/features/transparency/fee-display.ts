@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import { type NonEmptySet } from '@/types/utils/non-empty'
 
 import { type Support } from '../support'
 
@@ -36,6 +37,29 @@ export enum FeeDisplayLevel {
 	COMPREHENSIVE = 'COMPREHENSIVE',
 }
 
+/**
+ * A unit that a wallet service fee (platform fee on built-in swap or bridge
+ * flows) line item may be displayed in, within a comprehensive fee breakdown.
+ * A single fee line item may show more than one of these at once (e.g. a
+ * percentage next to its fiat-equivalent amount).
+ */
+export enum WalletServiceFeeDisplayUnit {
+	/** Wallet service fee line item shows a percentage (e.g. "0.3%"). */
+	PERCENTAGE = 'PERCENTAGE',
+
+	/** Wallet service fee line item shows basis points (e.g. "30 bps"). */
+	BASIS_POINTS = 'BASIS_POINTS',
+
+	/** Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24"). */
+	FIAT = 'FIAT',
+
+	/**
+	 * Wallet service fee line item shows a fixed amount of an on-chain asset,
+	 * native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+	 */
+	TOKEN_AMOUNT = 'TOKEN_AMOUNT',
+}
+
 /** How much fee information is displayed by default and after an action. */
 export interface FeeDisplay {
 	/**
@@ -66,21 +90,64 @@ export interface FeeDisplay {
 	 * artifact.
 	 */
 	fullySponsored: boolean
+
+	/**
+	 * Which unit(s) the wallet service fee line item(s) are shown in, when a
+	 * comprehensive breakdown is available. Meaningful when the flow includes
+	 * a wallet-charged platform fee line item in the breakdown (e.g. built-in
+	 * swap or cross-chain bridging).
+	 *
+	 * - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
+	 *   shown on the wallet service fee line item(s) (e.g. a wallet showing
+	 *   both a percentage and its fiat equivalent would use both units here).
+	 * - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
+	 *   flow. Use for L1 transfers, external app transactions, relayer fees,
+	 *   and other flows where only network or external protocol fees apply.
+	 * - `null` — not yet researched (required on in-scope swap/bridge flows).
+	 */
+	walletServiceFeeDisplayUnits: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null
 }
 
-/** Shorthand for fees that are comprehensive by default. */
-export const comprehensiveFeesShownByDefault: WithRef<FeeDisplay> = {
-	byDefault: FeeDisplayLevel.COMPREHENSIVE,
-	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-	fullySponsored: false,
-	ref: [],
+export function validateFeeDisplay(feeDisplay: FeeDisplay) {
+	if (
+		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
+			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
+		feeDisplay.afterSingleAction === FeeDisplayLevel.NONE
+	) {
+		throw new Error(
+			'Invalid fee display: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
+		)
+	}
+
+	if (
+		feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE &&
+		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
+	) {
+		throw new Error(
+			'Invalid fee display: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
+		)
+	}
+
+	if (
+		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE &&
+		feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
+		feeDisplay.walletServiceFeeDisplayUnits !== null
+	) {
+		throw new Error(
+			'Invalid fee display: when afterSingleAction is not COMPREHENSIVE, walletServiceFeeDisplayUnits must be NOT_APPLICABLE or null',
+		)
+	}
 }
 
-/** Shorthand for fees that are fully sponsored and not shown. */
+/**
+ * Shorthand for fully sponsored fees with no user-visible fee line items.
+ * `NOT_APPLICABLE` because there is no wallet service fee to denominate.
+ */
 export const fullySponsoredFees: WithRef<FeeDisplay> = {
 	byDefault: FeeDisplayLevel.NONE,
 	afterSingleAction: FeeDisplayLevel.NONE,
 	fullySponsored: true,
+	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 	ref: [],
 }
 
