@@ -65,7 +65,6 @@ import {
 } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -895,11 +894,7 @@ export const ambire: SoftwareWallet = {
 				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
 			},
 			releaseTransparency: {
-				artifactSigning: supported<ArtifactSigningDetails>({
-					ref: 'https://github.com/AmbireTech/extension/releases',
-					publication: 'GITHUB_RELEASE',
-					signer: 'DEVELOPER_KEY',
-				}),
+				artifactSigning: notSupported,
 				dependencyLocking: supported({
 					ref: [
 						{
