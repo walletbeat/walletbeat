@@ -63,8 +63,8 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveGasOrExternalFees,
-	comprehensiveWalletServiceFeesPercentage,
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
@@ -73,7 +73,7 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
@@ -299,7 +299,13 @@ export const ambire: SoftwareWallet = {
 						explanation: 'All fees are displayed when agreeing to the bridge',
 						url: 'https://www.ambire.com/',
 					},
-					feesLargerThan1bps: comprehensiveWalletServiceFeesPercentage,
+					feesLargerThan1bps: {
+						ref: [],
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
@@ -691,7 +697,7 @@ export const ambire: SoftwareWallet = {
 				],
 				availability: BugBountyProgramAvailability.INACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-12-17' as CalendarDate,
+				dateStarted: '2021-12-17',
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.SELF_HOSTED,
@@ -893,10 +899,34 @@ export const ambire: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveWalletServiceFeesPercentage),
-				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
-				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
-				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+				}),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({

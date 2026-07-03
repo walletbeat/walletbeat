@@ -82,9 +82,9 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
-	comprehensiveGasOrExternalFees,
-	comprehensiveWalletServiceFeesPercentage,
+	FeeDisplayLevel,
 	fullySponsoredFees,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
@@ -92,6 +92,7 @@ import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 /**
  * Fictitious data leak references for the completed template.
@@ -251,7 +252,13 @@ export const completedTemplate: SoftwareWallet = {
 			bridging: {
 				builtInBridging: supported({
 					ref: refTodo,
-					feesLargerThan1bps: comprehensiveWalletServiceFeesPercentage,
+					feesLargerThan1bps: {
+						ref: [],
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
 					risksExplained: 'VISIBLE_BY_DEFAULT',
 				}),
 				suggestedBridging: supported({
@@ -716,10 +723,34 @@ export const completedTemplate: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveWalletServiceFeesPercentage),
-				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
-				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
-				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+				}),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({

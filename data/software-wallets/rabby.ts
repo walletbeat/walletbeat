@@ -52,7 +52,6 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveGasOrExternalFees,
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
@@ -870,7 +869,13 @@ export const rabby: SoftwareWallet = {
 					fullySponsored: false,
 					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
-				uniswapUSDCToEtherSwap: supported(comprehensiveGasOrExternalFees),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
 			releaseTransparency: {
 				artifactSigning: null,

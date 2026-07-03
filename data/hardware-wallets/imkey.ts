@@ -10,7 +10,7 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { comprehensiveGasOrExternalFees } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -188,8 +188,20 @@ export const imkeyWallet: HardwareWallet = {
 			maintenance: null,
 			operationFees: {
 				builtInErc20Swap: notSupported,
-				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
-				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 				uniswapUSDCToEtherSwap: notSupported,
 			},
 			releaseTransparency: {

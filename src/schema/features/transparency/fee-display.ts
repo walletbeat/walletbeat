@@ -1,5 +1,5 @@
 import type { WithRef } from '@/schema/reference'
-import { type NonEmptySet, nonEmptySet } from '@/types/utils/non-empty'
+import { type NonEmptySet } from '@/types/utils/non-empty'
 
 import { type Support } from '../support'
 
@@ -140,19 +140,6 @@ export function validateFeeDisplay(feeDisplay: FeeDisplay) {
 }
 
 /**
- * Shorthand for comprehensive fee display on flows with no wallet service fee
- * (e.g. L1 transfers, Uniswap approval popups). Do not use on `builtInErc20Swap`
- * or `feesLargerThan1bps` without explicit denomination research.
- */
-export const comprehensiveGasOrExternalFees: WithRef<FeeDisplay> = {
-	byDefault: FeeDisplayLevel.COMPREHENSIVE,
-	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-	fullySponsored: false,
-	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
-	ref: [],
-}
-
-/**
  * Shorthand for fully sponsored fees with no user-visible fee line items.
  * `NOT_APPLICABLE` because there is no wallet service fee to denominate.
  */
@@ -161,18 +148,6 @@ export const fullySponsoredFees: WithRef<FeeDisplay> = {
 	afterSingleAction: FeeDisplayLevel.NONE,
 	fullySponsored: true,
 	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
-	ref: [],
-}
-
-/**
- * Shorthand for fully researched built-in swap or bridge fee display where
- * wallet service fees are shown as a percentage.
- */
-export const comprehensiveWalletServiceFeesPercentage: WithRef<FeeDisplay> = {
-	byDefault: FeeDisplayLevel.COMPREHENSIVE,
-	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-	fullySponsored: false,
-	walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 	ref: [],
 }
 

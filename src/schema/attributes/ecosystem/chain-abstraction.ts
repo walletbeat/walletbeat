@@ -18,12 +18,13 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveWalletServiceFeesPercentage,
 	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, sentence } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -320,7 +321,13 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 	builtInBridging: supported({
 		ref: refNotNecessary,
 		risksExplained: 'VISIBLE_BY_DEFAULT',
-		feesLargerThan1bps: comprehensiveWalletServiceFeesPercentage,
+		feesLargerThan1bps: {
+			ref: [],
+			afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+			byDefault: FeeDisplayLevel.COMPREHENSIVE,
+			fullySponsored: false,
+			walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+		},
 	}),
 	suggestedBridging: featureSupportedNoRef,
 }
@@ -478,7 +485,13 @@ export const chainAbstraction: Attribute = {
 						bridging: {
 							builtInBridging: supported({
 								ref: refNotNecessary,
-								feesLargerThan1bps: comprehensiveWalletServiceFeesPercentage,
+								feesLargerThan1bps: {
+									ref: [],
+									afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+									byDefault: FeeDisplayLevel.COMPREHENSIVE,
+									fullySponsored: false,
+									walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+								},
 								risksExplained: 'HIDDEN_BY_DEFAULT',
 							}),
 							suggestedBridging: notSupported,
