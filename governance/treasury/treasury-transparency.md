@@ -1,3 +1,8 @@
+---
+title: Walletbeat Treasury Transparency Report
+description: 'Overview of Walletbeat treasury addresses and their operational history.'
+---
+
 # Walletbeat Treasury Transparency Report
 
 _Latest operation: 2026-06-25_

@@ -1,3 +1,8 @@
+---
+title: The road to decentralized hosting
+description: 'Decision on decentralized hosting solutions prior to launch.'
+---
+
 # The road to decentralized hosting
 
 Prior to launch, Walletbeat is looking for decentralized hosting solutions.

@@ -21,7 +21,6 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
 	computeWorstOperationFees,
 	FeeDisplayLevel,
 	type WorstOperationFees,
@@ -169,12 +168,22 @@ const exampleFailNoPracticesPagePractices: OrderflowPractices = {
 }
 
 const exampleComprehensiveWorstFees: WorstOperationFees = {
-	feeDisplay: comprehensiveFeesShownByDefault,
+	feeDisplay: {
+		byDefault: FeeDisplayLevel.COMPREHENSIVE,
+		afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+		fullySponsored: false,
+		walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+	},
 	references: [],
 }
 
 const exampleProminenceGapWorstFees: WorstOperationFees = {
-	feeDisplay: comprehensiveFeesShownByDefault,
+	feeDisplay: {
+		byDefault: FeeDisplayLevel.COMPREHENSIVE,
+		afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+		fullySponsored: false,
+		walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+	},
 	references: [],
 }
 

@@ -53,8 +53,8 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
 	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -64,6 +64,7 @@ import {
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
@@ -148,6 +149,7 @@ export const rabby: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.NONE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -851,20 +853,29 @@ export const rabby: SoftwareWallet = {
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
 			orderflowPractices: null,
 			releaseTransparency: {

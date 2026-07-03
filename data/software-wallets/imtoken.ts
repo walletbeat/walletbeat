@@ -111,6 +111,7 @@ export const imtoken: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -360,8 +361,8 @@ export const imtoken: SoftwareWallet = {
 			operationFees: null,
 			/* TODO: Fill in; partial data: {
 				builtInErc20Swap: null,
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
+				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
+				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: null,
 			},*/
 			orderflowPractices: null,

@@ -1,3 +1,8 @@
+---
+title: Giveth Ethereum Security QF Round application 2026
+description: 'Walletbeat application for the 2026 Giveth Ethereum Security Quadratic Funding round.'
+---
+
 # Giveth Ethereum Security QF Round application 2026
 
 ## Round details

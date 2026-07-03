@@ -96,3 +96,11 @@ export function eipMarkdownLink(eip: Eip): string {
 export function eipMarkdownLinkAndTitle(eip: Eip): string {
 	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
 }
+
+/** Return a human-readable label for an EIP status. */
+export const eipStatusLabel: Record<EipStatus, string> = {
+	[EipStatus.FINAL]: 'Final',
+	[EipStatus.DRAFT]: 'Draft',
+	[EipStatus.LIVING]: 'Living',
+	[EipStatus.LAST_CALL]: 'Last Call',
+}

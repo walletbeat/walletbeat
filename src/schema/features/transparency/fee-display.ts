@@ -1,4 +1,5 @@
 import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
+import { type NonEmptySet, setContains } from '@/types/utils/non-empty'
 
 import { isSupported, type Support } from '../support'
 
@@ -34,6 +35,29 @@ export enum FeeDisplayLevel {
 	 * and/or the wallet.
 	 */
 	COMPREHENSIVE = 'COMPREHENSIVE',
+}
+
+/**
+ * A unit that a wallet service fee (platform fee on built-in swap or bridge
+ * flows) line item may be displayed in, within a comprehensive fee breakdown.
+ * A single fee line item may show more than one of these at once (e.g. a
+ * percentage next to its fiat-equivalent amount).
+ */
+export enum WalletServiceFeeDisplayUnit {
+	/** Wallet service fee line item shows a percentage (e.g. "0.3%"). */
+	PERCENTAGE = 'PERCENTAGE',
+
+	/** Wallet service fee line item shows basis points (e.g. "30 bps"). */
+	BASIS_POINTS = 'BASIS_POINTS',
+
+	/** Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24"). */
+	FIAT = 'FIAT',
+
+	/**
+	 * Wallet service fee line item shows a fixed amount of an on-chain asset,
+	 * native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+	 */
+	TOKEN_AMOUNT = 'TOKEN_AMOUNT',
 }
 
 /** How much fee information is displayed by default and after an action. */
@@ -72,21 +96,70 @@ export interface FeeDisplay {
 	 * `NONE` even when the wallet fully sponsors fees.
 	 */
 	fullySponsored: boolean
+
+	/**
+	 * Which unit(s) the wallet service fee line item(s) are shown in, when a
+	 * comprehensive breakdown is available. Meaningful when the flow includes
+	 * a wallet-charged platform fee line item in the breakdown (e.g. built-in
+	 * swap or cross-chain bridging).
+	 *
+	 * - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
+	 *   shown on the wallet service fee line item(s) (e.g. a wallet showing
+	 *   both a percentage and its fiat equivalent would use both units here).
+	 * - `'NOT_APPLICABLE'` — no wallet-charged platform fee exists on this
+	 *   flow. Use for L1 transfers, external app transactions, relayer fees,
+	 *   and other flows where only network or external protocol fees apply.
+	 * - `null` — not yet researched (required on in-scope swap/bridge flows).
+	 */
+	walletServiceFeeDisplayUnits: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null
 }
 
-/** Shorthand for fees that are comprehensive by default. */
-export const comprehensiveFeesShownByDefault: WithRef<FeeDisplay> = {
-	byDefault: FeeDisplayLevel.COMPREHENSIVE,
-	afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-	fullySponsored: false,
-	ref: [],
+/**
+ * Validates that `FeeDisplay` fields are consistent.
+ *
+ * @throws When fee display level pairs violate the by-default / after-action rules,
+ *   or when `walletServiceFeeDisplayUnits` is set without a comprehensive breakdown.
+ */
+export function validateFeeDisplay(feeDisplay: FeeDisplay): void {
+	if (
+		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
+			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
+		feeDisplay.afterSingleAction === FeeDisplayLevel.NONE
+	) {
+		throw new Error(
+			'Invalid fee display: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
+		)
+	}
+
+	if (
+		feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE &&
+		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
+	) {
+		throw new Error(
+			'Invalid fee display: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
+		)
+	}
+
+	if (
+		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE &&
+		feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
+		feeDisplay.walletServiceFeeDisplayUnits !== null
+	) {
+		throw new Error(
+			'Invalid fee display: when afterSingleAction is not COMPREHENSIVE, walletServiceFeeDisplayUnits must be NOT_APPLICABLE or null',
+		)
+	}
 }
 
-/** Shorthand for fees that are fully sponsored and not shown. */
+/**
+ * Shorthand for fully sponsored fees with no user-visible fee line items.
+ * `NOT_APPLICABLE` because there is no wallet service fee to denominate.
+ */
 export const fullySponsoredFees: WithRef<FeeDisplay> = {
 	byDefault: FeeDisplayLevel.NONE,
 	afterSingleAction: FeeDisplayLevel.NONE,
 	fullySponsored: true,
+	walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 	ref: [],
 }
 
@@ -133,6 +206,58 @@ export interface BasicOperationFees {
 }
 
 /**
+ * Whether the given set of wallet service fee display units includes at
+ * least one unit that expresses a rate (as opposed to a flat amount),
+ * making it possible to compare the effective cost across order sizes.
+ */
+export function hasRelativeWalletServiceFeeUnit(
+	units: NonEmptySet<WalletServiceFeeDisplayUnit>,
+): boolean {
+	return (
+		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.PERCENTAGE) ||
+		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.BASIS_POINTS)
+	)
+}
+
+/**
+ * Tiebreaker for `compareFeeDisplay` when display level and sponsorship match.
+ * Returns 1 if units1 is better, 0 if equal, -1 if units2 is better.
+ * Ranking: NOT_APPLICABLE and any set containing a relative unit (tied) >
+ * a set with only absolute units > null.
+ */
+function compareWalletServiceFeeDisplayUnits(
+	units1: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+	units2: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+): -1 | 0 | 1 {
+	const rank = (
+		units: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+	): number => {
+		if (units === null) {
+			return 1
+		}
+
+		if (units === 'NOT_APPLICABLE' || hasRelativeWalletServiceFeeUnit(units)) {
+			return 3
+		}
+
+		return 2
+	}
+
+	const rank1 = rank(units1)
+	const rank2 = rank(units2)
+
+	if (rank1 > rank2) {
+		return 1
+	}
+
+	if (rank1 < rank2) {
+		return -1
+	}
+
+	return 0
+}
+
+/**
  * Returns;
  *   * 1 if feeDisplay1 is better
  *   * 0 if feeDisplay1 and feeDisplay2 are completely equal
@@ -147,7 +272,10 @@ export function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDispl
 		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
 		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
 	) {
-		return 0
+		return compareWalletServiceFeeDisplayUnits(
+			feeDisplay1.walletServiceFeeDisplayUnits,
+			feeDisplay2.walletServiceFeeDisplayUnits,
+		)
 	}
 
 	if (feeDisplay1.fullySponsored !== feeDisplay2.fullySponsored) {
@@ -233,30 +361,4 @@ export function computeWorstOperationFees(
 	}
 
 	return worstOperationFees
-}
-
-/**
- * Validates that `FeeDisplay` levels are consistent.
- *
- * @throws When fee display level pairs violate the by-default / after-action rules.
- */
-export function validateFeeDisplay(feeDisplay: FeeDisplay): void {
-	if (
-		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
-			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
-		feeDisplay.afterSingleAction === FeeDisplayLevel.NONE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
-		)
-	}
-
-	if (
-		feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE &&
-		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
-		)
-	}
 }

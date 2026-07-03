@@ -18,6 +18,7 @@ import { trimWhitespacePrefix } from '@/types/utils/text'
 import { recordedFlow } from './wallet-capture-file'
 import {
 	captureOptions,
+	checkOptions,
 	deleteCaptureOptions,
 	explainRequestOptions,
 	globalOptions,
@@ -80,9 +81,15 @@ cli
 // check subcommand
 cli
 	.command('check', 'Examine capture file and flag missing information needing triage')
-	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' check")
+	.option(
+		'--format <SUMMARY|FULL>',
+		'Whether to show a full dump of all missing information (--format=FULL) or just a summary (--format=SUMMARY).',
+	)
+	.example(
+		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' check [--format=SUMMARY|FULL]",
+	)
 	.action(async options => {
-		await handleCheck(globalOptions.process(options))
+		await handleCheck(checkOptions.process(options))
 	})
 
 // mark-flow-unsupported subcommand
@@ -212,7 +219,10 @@ cli
 
 // mark-string subcommand
 cli
-	.command('review-strings', 'Review strings from network capture.')
+	.command(
+		'review-strings',
+		'Review high-entropy strings from network capture to flag the user data they are carrying.',
+	)
 	.usage(
 		'review-strings' +
 			trimWhitespacePrefix(`

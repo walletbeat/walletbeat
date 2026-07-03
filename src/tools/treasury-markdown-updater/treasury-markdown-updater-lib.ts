@@ -213,7 +213,12 @@ export function treasuryMarkdownUpdate(config: TreasuryMarkdownUpdaterConfig): v
 	const addresses = parseTSV<AddressRow>(addressesRaw)
 	const operations = parseTSV<OperationRow>(operationsRaw)
 	const timestamp = operations[operations.length - 1].Date
-	const markdownContent = `# Walletbeat Treasury Transparency Report
+	const markdownContent = `---
+title: Walletbeat Treasury Transparency Report
+description: 'Overview of Walletbeat treasury addresses and their operational history.'
+---
+
+# Walletbeat Treasury Transparency Report
 
 _Latest operation: ${timestamp}_
 
