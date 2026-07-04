@@ -17,6 +17,9 @@ import rawData from './entity-domains.json'
 export type DomainMapping =
 	| EntityId
 	| {
+			/** The intended recipient of the request data (data controller). */
+			operator: EntityId
+
 			/**
 			 * Entities that see the request data in transit without being its
 			 * intended recipient, e.g. TLS-terminating CDNs.
@@ -24,9 +27,6 @@ export type DomainMapping =
 			 * duplicates, sorted alphabetically, and must not contain `operator`.
 			 */
 			intermediaries: NonEmptyArray<EntityId>
-
-			/** The intended recipient of the request data (data controller). */
-			operator: EntityId
 	  }
 
 /** Type for entity-domains.json */
@@ -52,14 +52,14 @@ function assertValidDomainMapping(domain: string, val: unknown): DomainMapping {
 
 	const keys = Object.keys(val)
 
-	const hasExpectedKeys = (v: object): v is { intermediaries: unknown; operator: unknown } =>
-		Object.hasOwn(v, 'intermediaries') && Object.hasOwn(v, 'operator')
+	const hasExpectedKeys = (v: object): v is { operator: unknown; intermediaries: unknown } =>
+		Object.hasOwn(v, 'operator') && Object.hasOwn(v, 'intermediaries')
 
 	if (keys.toSorted().join(',') !== 'intermediaries,operator' || !hasExpectedKeys(val)) {
 		throw invalid('object form must have exactly the keys `operator` and `intermediaries`')
 	}
 
-	const { intermediaries, operator } = val
+	const { operator, intermediaries } = val
 
 	if (typeof operator !== 'string' || !isValidEntityId(operator)) {
 		throw invalid(`unknown operator entity ID '${String(operator)}'`)
@@ -95,7 +95,7 @@ function assertValidDomainMapping(domain: string, val: unknown): DomainMapping {
 		throw invalid(`operator '${operator}' must not also be listed in \`intermediaries\``)
 	}
 
-	return { intermediaries: intermediaryIds, operator }
+	return { operator, intermediaries: intermediaryIds }
 }
 
 export function assertValidDomainToEntityIdMapping(data: unknown): DomainToEntityIdMapping {
@@ -122,14 +122,14 @@ const domainToEntityIdMapping = assertValidDomainToEntityIdMapping(rawData)
  * The set of entities that see the data sent to a domain.
  */
 export interface ResolvedDomain {
+	/** The intended recipient of the request data (data controller). */
+	operator: Entity
+
 	/**
 	 * Entities that see the request data in transit without being its
 	 * intended recipient, e.g. TLS-terminating CDNs. Possibly empty.
 	 */
 	intermediaries: Entity[]
-
-	/** The intended recipient of the request data (data controller). */
-	operator: Entity
 }
 
 /**
@@ -137,6 +137,12 @@ export interface ResolvedDomain {
  * Exact matches take precedence over parent-domain (suffix) matches, so a
  * CDN-fronted subdomain can carry intermediaries without asserting them for
  * the whole apex domain.
+ *
+ * Parameterized over `mapping` (rather than using the module-level mapping)
+ * because the `mark-domain` / `mark-domain-update` CLI subcommands need to
+ * resolve against the freshly-read working copy of the file they are editing,
+ * which the module-level mapping (loaded at import time) may not reflect.
+ * Use `entitiesForDomain` for lookups against the committed data.
  */
 export function domainMappingIn(
 	mapping: DomainToEntityIdMapping,
@@ -162,6 +168,9 @@ export function domainMappingIn(
 
 /**
  * Resolve a domain mapping into entities within a given mapping.
+ *
+ * Parameterized over `mapping` for the same reason as `domainMappingIn`, and
+ * so unit tests can exercise resolution precedence with synthetic mappings.
  */
 export function entitiesForDomainIn(
 	mapping: DomainToEntityIdMapping,
@@ -174,12 +183,12 @@ export function entitiesForDomainIn(
 	}
 
 	if (typeof domainMapping === 'string') {
-		return { intermediaries: [], operator: entityById(domainMapping) }
+		return { operator: entityById(domainMapping), intermediaries: [] }
 	}
 
 	return {
-		intermediaries: domainMapping.intermediaries.map(entityById),
 		operator: entityById(domainMapping.operator),
+		intermediaries: domainMapping.intermediaries.map(entityById),
 	}
 }
 

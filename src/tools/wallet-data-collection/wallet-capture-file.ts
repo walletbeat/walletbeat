@@ -1996,7 +1996,7 @@ export class WalletCaptureFile {
 			]
 
 			for (const { entity, role } of receivingEntities) {
-				const perEntityKey = `${assertValidEntityId(entity.id)} ${role}`
+				const perEntityKey = `${assertValidEntityId(entity.id)}:${role}`
 				let entData = perEntity.get(perEntityKey)
 
 				if (entData === undefined) {
