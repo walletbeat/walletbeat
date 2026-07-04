@@ -367,6 +367,7 @@ export const imtoken: SoftwareWallet = {
 				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: null,
 			},*/
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

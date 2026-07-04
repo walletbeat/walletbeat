@@ -1,7 +1,7 @@
-import type { WithRef } from '@/schema/reference'
-import { type NonEmptySet } from '@/types/utils/non-empty'
+import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
+import { type NonEmptySet, setContains } from '@/types/utils/non-empty'
 
-import { type Support } from '../support'
+import { isSupported, type Support } from '../support'
 
 /**
  * What level of information is shown about fees.
@@ -88,6 +88,12 @@ export interface FeeDisplay {
 	 * is deducted from the user's balance. Check the wallet's documentation
 	 * or source code to confirm sponsorship is intentional and not a test-net
 	 * artifact.
+	 *
+	 * This field describes payment (whether the user pays nothing), while
+	 * `byDefault` and `afterSingleAction` describe UI visibility. Orderflow
+	 * prominence comparison uses the recorded display levels as-is; if no
+	 * fee-related copy appears on the approval screen, set both levels to
+	 * `NONE` even when the wallet fully sponsors fees.
 	 */
 	fullySponsored: boolean
 
@@ -108,7 +114,13 @@ export interface FeeDisplay {
 	walletServiceFeeDisplayUnits: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null
 }
 
-export function validateFeeDisplay(feeDisplay: FeeDisplay) {
+/**
+ * Validates that `FeeDisplay` fields are consistent.
+ *
+ * @throws When fee display level pairs violate the by-default / after-action rules,
+ *   or when `walletServiceFeeDisplayUnits` is set without a comprehensive breakdown.
+ */
+export function validateFeeDisplay(feeDisplay: FeeDisplay): void {
 	if (
 		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
 			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
@@ -191,4 +203,162 @@ export interface BasicOperationFees {
 	// Private token transfer transactions are already encoded in their
 	// respective types, so no need to redeclare them here.
 	// Same for native cross-chain bridging.
+}
+
+/**
+ * Whether the given set of wallet service fee display units includes at
+ * least one unit that expresses a rate (as opposed to a flat amount),
+ * making it possible to compare the effective cost across order sizes.
+ */
+export function hasRelativeWalletServiceFeeUnit(
+	units: NonEmptySet<WalletServiceFeeDisplayUnit>,
+): boolean {
+	return (
+		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.PERCENTAGE) ||
+		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.BASIS_POINTS)
+	)
+}
+
+/**
+ * Tiebreaker for `compareFeeDisplay` when display level and sponsorship match.
+ * Returns 1 if units1 is better, 0 if equal, -1 if units2 is better.
+ * Ranking: NOT_APPLICABLE and any set containing a relative unit (tied) >
+ * a set with only absolute units > null.
+ */
+function compareWalletServiceFeeDisplayUnits(
+	units1: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+	units2: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+): -1 | 0 | 1 {
+	const rank = (
+		units: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
+	): number => {
+		if (units === null) {
+			return 1
+		}
+
+		if (units === 'NOT_APPLICABLE' || hasRelativeWalletServiceFeeUnit(units)) {
+			return 3
+		}
+
+		return 2
+	}
+
+	const rank1 = rank(units1)
+	const rank2 = rank(units2)
+
+	if (rank1 > rank2) {
+		return 1
+	}
+
+	if (rank1 < rank2) {
+		return -1
+	}
+
+	return 0
+}
+
+/**
+ * Returns;
+ *   * 1 if feeDisplay1 is better
+ *   * 0 if feeDisplay1 and feeDisplay2 are completely equal
+ *   * -1 if feeDisplay2 is better
+ */
+export function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDisplay): -1 | 0 | 1 {
+	validateFeeDisplay(feeDisplay1)
+	validateFeeDisplay(feeDisplay2)
+
+	if (
+		feeDisplay1.byDefault === feeDisplay2.byDefault &&
+		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
+		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
+	) {
+		return compareWalletServiceFeeDisplayUnits(
+			feeDisplay1.walletServiceFeeDisplayUnits,
+			feeDisplay2.walletServiceFeeDisplayUnits,
+		)
+	}
+
+	if (feeDisplay1.fullySponsored !== feeDisplay2.fullySponsored) {
+		return feeDisplay1.fullySponsored ? 1 : -1
+	}
+
+	const compareFeeDisplayLevel = (
+		displayLevel1: FeeDisplayLevel,
+		displayLevel2: FeeDisplayLevel,
+	): -1 | 0 | 1 => {
+		if (displayLevel1 === FeeDisplayLevel.COMPREHENSIVE) {
+			return 1
+		}
+
+		if (displayLevel2 === FeeDisplayLevel.COMPREHENSIVE) {
+			return -1
+		}
+
+		if (displayLevel1 === FeeDisplayLevel.AGGREGATED) {
+			return 1
+		}
+
+		if (displayLevel2 === FeeDisplayLevel.AGGREGATED) {
+			return -1
+		}
+
+		throw new Error('Unreachable')
+	}
+
+	if (feeDisplay1.byDefault !== feeDisplay2.byDefault) {
+		return compareFeeDisplayLevel(feeDisplay1.byDefault, feeDisplay2.byDefault)
+	}
+
+	if (feeDisplay1.afterSingleAction !== feeDisplay2.afterSingleAction) {
+		return compareFeeDisplayLevel(feeDisplay1.afterSingleAction, feeDisplay2.afterSingleAction)
+	}
+
+	throw new Error('Unreachable')
+}
+
+/** Worst basic-operation fee display with contributing research refs. */
+export type WorstOperationFees = {
+	feeDisplay: FeeDisplay
+	references: FullyQualifiedReference[]
+}
+
+/** Worst-case fee display among basic operation fees, with contributing refs. */
+export function computeWorstOperationFees(
+	operationFees: BasicOperationFees,
+): WorstOperationFees | null {
+	const supportedOperationFees = [
+		operationFees.ethL1Transfer,
+		operationFees.erc20L1Transfer,
+		operationFees.builtInErc20Swap,
+		operationFees.uniswapUSDCToEtherSwap,
+	].filter(isSupported)
+
+	if (supportedOperationFees.length === 0) {
+		return null
+	}
+
+	let worstOperationFees: WorstOperationFees = {
+		feeDisplay: supportedOperationFees[0],
+		references: refs(supportedOperationFees[0]),
+	}
+
+	for (const feeDisplay of supportedOperationFees.slice(1)) {
+		switch (compareFeeDisplay(worstOperationFees.feeDisplay, feeDisplay)) {
+			case -1:
+				break
+			case 0:
+				worstOperationFees = {
+					feeDisplay: worstOperationFees.feeDisplay,
+					references: mergeRefs(worstOperationFees.references, refs(feeDisplay)),
+				}
+				break
+			case 1:
+				worstOperationFees = {
+					feeDisplay,
+					references: refs(feeDisplay),
+				}
+		}
+	}
+
+	return worstOperationFees
 }

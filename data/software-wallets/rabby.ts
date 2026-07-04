@@ -880,6 +880,7 @@ export const rabby: SoftwareWallet = {
 					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

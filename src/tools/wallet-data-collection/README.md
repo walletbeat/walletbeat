@@ -132,6 +132,7 @@ Requests can be assigned to the following purposes:
 - `UPDATE_CHECKING`: Checking for updates to the wallet.
 - `CHAIN_DATA_LOOKUP`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST`: Broadcasting transactions for inclusion.
+- `ORDERFLOW_AUCTION`: Auctioning orderflow (MEV) from pre-inclusion transaction data. Requires qualified `MEMPOOL_TRANSACTIONS` of `BY_DEFAULT` or `ALWAYS` on the same entity row.
 - `TRANSACTION_SIMULATION`: Simulating transaction outcome.
 - `SWAP_QUOTE`: Getting a quote for a swap operation.
 - `SCAM_DETECTION`: Checking for scams.

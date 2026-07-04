@@ -386,6 +386,7 @@ export const zeus: SoftwareWallet = {
 					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

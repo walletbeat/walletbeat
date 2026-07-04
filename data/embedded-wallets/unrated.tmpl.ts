@@ -78,6 +78,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

@@ -23,6 +23,7 @@ import {
 	userFlowMayBeMarkedUnsupported,
 	type UserInfo,
 	userInfoEnums,
+	validateDataCollectionByEntityRow,
 } from '@/schema/features/privacy/data-collection'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type Variant, variantEnum } from '@/schema/variants'
@@ -2045,7 +2046,7 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			collected.push({
+			const row: WithRef<DataCollectionByEntity> = {
 				byEntity: entData.entity,
 				role: entData.role,
 				dataCollection: {
@@ -2067,7 +2068,17 @@ export class WalletCaptureFile {
 				},
 				purposes: purposes,
 				ref: refNotNecessary,
-			})
+			}
+
+			if (strict) {
+				try {
+					validateDataCollectionByEntityRow(row)
+				} catch (e) {
+					maybeThrow(getErrorMessage(e))
+				}
+			}
+
+			collected.push(row)
 		}
 
 		return collected
