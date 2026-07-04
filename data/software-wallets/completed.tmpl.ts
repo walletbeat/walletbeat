@@ -414,6 +414,7 @@ export const completedTemplate: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: dataLeakReferences.walletBackend,
