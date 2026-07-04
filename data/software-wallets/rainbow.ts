@@ -835,6 +835,7 @@ export const rainbow: SoftwareWallet = {
 				ethL1Transfer: null,
 				uniswapUSDCToEtherSwap: null,
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
 				dependencyLocking: supported({

@@ -50,6 +50,7 @@ import {
 } from './features/transparency/license'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
+import type { OrderflowPractices } from './features/transparency/orderflow'
 import type {
 	ArtifactSigning,
 	ArtifactSigningDetails,
@@ -253,6 +254,11 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 	/** How well does the wallet abstract over chains? */
 	chainAbstraction: VariantFeature<Nullable<ChainAbstraction>>
+
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+	}
 }
 
 /**
@@ -327,6 +333,10 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
 	}
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+	}
 }
 
 /**
@@ -388,6 +398,7 @@ export interface ResolvedFeatures {
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
+		orderflowPractices: ResolvedFeature<OrderflowPractices>
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
 		releaseTransparency: {
@@ -579,6 +590,16 @@ export function resolveFeatures(
 		transparency: {
 			operationFees: nullable(
 				baseFeat('transparency.operationFees', features => features.transparency.operationFees),
+			),
+			orderflowPractices: nullable(
+				embeddedFeat(
+					'transparency.orderflowPractices',
+					features => features.transparency.orderflowPractices,
+				) ??
+					softwareFeat(
+						'transparency.orderflowPractices',
+						features => features.transparency.orderflowPractices,
+					),
 			),
 			reputation: hardwareFeat(
 				'transparency.reputation',
