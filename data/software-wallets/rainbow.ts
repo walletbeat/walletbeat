@@ -161,7 +161,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'The Rainbow browser extension "Review & Bridge" panel (reached by clicking "Review", one action) on a USDC cross-chain bridge itemizes the minimum received, the bridging provider (Relay), and an "Included Rainbow fee" shown as a token amount (0.000586 USDC), alongside the estimated network fee.',
+									'The Rainbow browser extension "Review & Bridge" panel, reached by clicking "Review" (one action) on a USDC cross-chain bridge, itemizes the fee breakdown. It lists the minimum received, the bridging provider (Relay), and an "Included Rainbow fee" shown as a token amount (0.000586 USDC), alongside the estimated network fee.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review.png',
 								label:
 									'Rainbow browser extension bridge Review panel itemizing the "Included Rainbow fee" (0.000586 USDC) alongside the network fee',
