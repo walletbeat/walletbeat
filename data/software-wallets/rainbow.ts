@@ -149,9 +149,6 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: {
-			// Chain abstraction was primarily evaluated on the mobile app; the
-			// browser extension's built-in bridge fee display was additionally
-			// verified first-hand (2026-07-03, see the bridge Review refs below).
 			[Variant.BROWSER]: {
 				bridging: {
 					builtInBridging: supported({
