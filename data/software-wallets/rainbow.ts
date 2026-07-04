@@ -155,13 +155,13 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default (and "Hold to Bridge" is available there), so the fee shown by default is aggregated. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
+									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default, and "Hold to Bridge" is available there. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
 								lastRetrieved: '2026-06-26',
 								url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
 							},
 							{
 								explanation:
-									'First-hand: the Rainbow browser extension "Review & Bridge" panel (reached by clicking "Review", one action) on a USDC cross-chain bridge. It itemizes the fee as minimum received, the bridging provider (Relay), and an "Included Rainbow fee" shown as a token amount (0.000586 USDC), alongside the estimated network fee. This confirms the breakdown is comprehensive after a single action, and that the Rainbow service fee is displayed as a token amount on the browser extension.',
+									'The Rainbow browser extension "Review & Bridge" panel (reached by clicking "Review", one action) on a USDC cross-chain bridge itemizes the minimum received, the bridging provider (Relay), and an "Included Rainbow fee" shown as a token amount (0.000586 USDC), alongside the estimated network fee.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review.png',
 								label:
 									'Rainbow browser extension bridge Review panel itemizing the "Included Rainbow fee" (0.000586 USDC) alongside the network fee',
@@ -169,7 +169,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Clicking the info icon on the "Included Rainbow fee" line in the browser extension bridge Review surfaces a "Rainbow Fee" note stating "Rainbow takes a 0.25% fee from bridges." So on the browser extension the Rainbow bridge fee is also disclosed as a percentage, not only as a token amount.',
+									'Clicking the info icon on the "Included Rainbow fee" line in the browser extension bridge Review surfaces a "Rainbow Fee" note stating "Rainbow takes a 0.25% fee from bridges."',
 								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-rainbow-fee.png',
 								label:
 									'Rainbow browser extension "Rainbow Fee" note disclosing the bridge fee as 0.25%',
@@ -233,7 +233,7 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default (and "Hold to Bridge" is available there), so the fee shown by default is aggregated. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
+									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default, and "Hold to Bridge" is available there. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
 								lastRetrieved: '2026-06-17',
 								url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
 							},
@@ -247,7 +247,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Rainbow mobile app bridge "Review" screen, reached by tapping "Review" (one action). Fees are itemized as separate line items: destination network, minimum received, the "Included Rainbow Fee", and max slippage. The "Included Rainbow Fee" is shown as a token amount (e.g. 0.00125 USDC), so the Rainbow service fee is a token amount. There is no warning explaining bridge trust assumptions or cross-chain risk.',
+									'Rainbow mobile app bridge "Review" screen, reached by tapping "Review" (one action). Fees are itemized as separate line items: destination network, minimum received, the "Included Rainbow Fee", and max slippage. The "Included Rainbow Fee" is shown as a token amount (e.g. 0.00125 USDC). There is no warning explaining bridge trust assumptions or cross-chain risk.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-review-fees.jpg',
 								label:
 									'Rainbow mobile app screenshot of the bridge Review screen with itemized fees',
@@ -255,7 +255,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'On mobile, tapping the "Included Rainbow Fee" line on the bridge Review screen (a second tap, after Review) reveals the fee as a percentage: "Included Rainbow Fee 0.25%". So the bridge fee is disclosed as a percentage on mobile, gated behind one extra tap.',
+									'On mobile, a tap on the "Included Rainbow Fee" line of the bridge Review screen (a second tap, after Review) is required to reveal the fee as a percentage: "Included Rainbow Fee 0.25%".',
 								file: 'public/references/wallets/rainbow/screenshots/2026-07-04-chain-abstraction-mobile-bridge-percentage-fee.png',
 								label:
 									'Rainbow iOS bridge Review showing the Included Rainbow Fee as 0.25% after tapping the fee line',
@@ -868,7 +868,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'By default the Rainbow built-in swap screen shows the exchange rate and a single network-fee estimate (e.g. "$0.07"), but does not itemize the Rainbow service fee. So the fee shown by default is aggregated, not hidden.',
+								'By default the Rainbow built-in swap screen shows the exchange rate and a single network-fee estimate (e.g. "$0.07"), but does not itemize the Rainbow service fee.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-default.png',
 							label:
 								'Rainbow iOS built-in swap screen showing a network-fee estimate by default, with the Rainbow service fee not itemized',
@@ -876,7 +876,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Tapping "Review" (a single action) reveals a comprehensive breakdown: network, minimum received, an itemized "Included Rainbow Fee" (0.00000262 ETH, i.e. a token amount), max slippage, and the estimated network fee. So a single tap yields a comprehensive breakdown, and the wallet service fee is shown as a token amount.',
+								'Tapping "Review" (a single action) reveals an itemized breakdown: network, minimum received, the "Included Rainbow Fee" shown as a token amount (0.00000262 ETH), max slippage, and the estimated network fee.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-review.png',
 							label:
 								'Rainbow iOS built-in swap Review panel itemizing the "Included Rainbow Fee" (in ETH) alongside network fee, minimum received, and max slippage',
@@ -884,7 +884,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'On mobile, tapping the "Included Rainbow Fee" line on the swap Review screen (a second tap, after Review) reveals the fee as a percentage: "Included Rainbow Fee 0.85%". So the swap fee is disclosed as a percentage, gated behind one extra tap.',
+								'On mobile, a tap on the "Included Rainbow Fee" line of the swap Review screen (a second tap, after Review) is required to reveal the fee as a percentage: "Included Rainbow Fee 0.85%".',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-04-operation-fees-mobile-swap-percentage-fee.png',
 							label:
 								'Rainbow iOS swap Review showing the Included Rainbow Fee as 0.85% after tapping the fee line',
@@ -892,7 +892,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'On the browser extension, clicking the info icon on the swap Rainbow fee surfaces a "Rainbow Fee" note: "Rainbow takes a 0.85% fee from swaps." So the swap fee is disclosed as a percentage on the browser extension too.',
+								'On the browser extension, clicking the info icon on the swap Rainbow fee surfaces a "Rainbow Fee" note: "Rainbow takes a 0.85% fee from swaps."',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-04-operation-fees-browser-swap-percentage-fee.png',
 							label:
 								'Rainbow browser extension "Rainbow Fee" note disclosing the swap fee as 0.85%',
@@ -917,7 +917,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'By default the USDC (ERC-20) L1 send screen shows only a single aggregate "Estimated fee" figure with no itemized breakdown. The fee shown by default is therefore aggregated.',
+								'By default the USDC (ERC-20) L1 send screen shows only a single aggregate "Estimated fee" figure with no itemized breakdown.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-erc20-l1-send-screen.png',
 							label:
 								'Rainbow iOS USDC (ERC-20) send screen showing a single aggregate "Estimated fee" figure by default, with no itemized breakdown',
@@ -925,7 +925,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ERC-20 transfer, so this network-fee breakdown is the complete breakdown (COMPREHENSIVE). The same sheet is reachable from every transaction type tested.',
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ERC-20 transfer, so this network-fee breakdown is the complete breakdown. The same sheet is reachable from every transaction type tested.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
 							label:
 								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
@@ -949,7 +949,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ETH transfer, so this network-fee breakdown is the complete breakdown (COMPREHENSIVE). The same sheet is reachable from every transaction type tested.',
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ETH transfer, so this network-fee breakdown is the complete breakdown. The same sheet is reachable from every transaction type tested.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
 							label:
 								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
@@ -965,7 +965,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default, alongside the simulated result. The Uniswap protocol fee is reflected in the simulated receive amount, not itemized separately. The fee shown by default is thus aggregated.',
+								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default, alongside the simulated result. The Uniswap protocol fee is reflected in the simulated receive amount, not itemized separately.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-swap.png',
 							label:
 								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded; the fee is the single aggregate "Estimated fee"',
@@ -973,7 +973,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee (COMPREHENSIVE). This is a swap through an external app, so no Rainbow platform fee applies. The same sheet is reachable from every transaction type tested.',
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. This is a swap through an external app, so no Rainbow platform fee applies. The same sheet is reachable from every transaction type tested.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
 							label:
 								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
