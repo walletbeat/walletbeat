@@ -959,9 +959,12 @@ async function writeDomainMappingFile(mapping: DomainToEntityIdMapping): Promise
 	// Re-validate to enforce all invariants before writing.
 	assertValidDomainToEntityIdMapping(sortedDomains)
 
-	// Save file with formatting
+	// Save file with formatting, atomically (write to a temp file, then rename).
+	const tmpPath = domainFile + '.tmp'
+
 	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
-	await fs.promises.writeFile(domainFile, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
+	await fs.promises.writeFile(tmpPath, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
+	await fs.promises.rename(tmpPath, domainFile)
 }
 
 export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
@@ -993,7 +996,7 @@ export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
 
 			if (domainMappingOperator(existingMapping) !== domainMappingOperator(targetMapping)) {
 				throw new Error(
-					`Domain '${targetDomain}' is a subdomain of already marked '${existingDomain}' (${domainMappingToString(existingMapping)}), which has a different operator. Fix the parent domain mapping instead.`,
+					`Domain '${targetDomain}' is a subdomain of already marked '${existingDomain}' (${domainMappingToString(existingMapping)}), which has a different operator. Fix the parent domain mapping instead, or remove it in case it was made in error.`,
 				)
 			}
 
