@@ -172,10 +172,10 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Expanding "More details" on the browser extension bridge Review additionally shows the exchange rate and token contracts; the "Included Rainbow fee" remains a token amount (0.000586 USDC).',
-								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review-details.png',
+									'Clicking the info icon on the "Included Rainbow fee" line in the browser extension bridge Review surfaces a "Rainbow Fee" note stating "Rainbow takes a 0.25% fee from bridges." So on the browser extension the Rainbow bridge fee is also disclosed as a percentage, not only as a token amount.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-rainbow-fee.png',
 								label:
-									'Rainbow browser extension bridge Review with "More details" expanded (exchange rate and token contracts)',
+									'Rainbow browser extension "Rainbow Fee" note disclosing the bridge fee as 0.25%',
 								lastRetrieved: '2026-07-03',
 							},
 						],
@@ -183,7 +183,10 @@ export const rainbow: SoftwareWallet = {
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							fullySponsored: false,
-							walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.TOKEN_AMOUNT),
+							walletServiceFeeDisplayUnits: nonEmptySet(
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+							),
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -934,9 +937,9 @@ export const rainbow: SoftwareWallet = {
 						{
 							explanation:
 								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default alongside the simulated result; the Uniswap protocol fee is reflected in the simulated receive amount rather than itemized. The fee shown by default is thus aggregated.',
-							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-approval.png',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-swap.png',
 							label:
-								'Rainbow iOS transaction approval popup for a USDC-to-ETH swap initiated on app.uniswap.org, showing a single aggregate "Estimated fee" by default',
+								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded; the fee is the single aggregate "Estimated fee"',
 							lastRetrieved: '2026-07-03',
 						},
 						{
