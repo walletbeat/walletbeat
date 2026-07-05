@@ -158,7 +158,7 @@ export const cypherockWallet: HardwareWallet = {
 				{
 					ref: [
 						{
-							explanation: 'Public Response to Keylabs Audit of Cypherock',
+							explanation: 'Public Response to KeyLabs Audit of Cypherock',
 							url: 'https://www.cypherock.com/keylabs.pdf',
 						},
 					],

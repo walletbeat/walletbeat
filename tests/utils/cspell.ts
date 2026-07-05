@@ -10,6 +10,8 @@ interface CSpellConfig {
 	words: string[]
 	flagWords: string[]
 	ignorePaths: string[]
+	patterns: { name: string; pattern: string }[]
+	ignoreRegExpList: string[]
 }
 
 function getCSpellConfigPath(): string {
@@ -29,6 +31,33 @@ function getCSpellConfig(): CSpellConfig {
 /** Read cSpell vocabulary from config. */
 export function getCSpellWords(): string[] {
 	return getCSpellConfig().words
+}
+
+/** Parse a cspell pattern string like "/\\bbtc:[0-9a-z]+/g" into a RegExp. */
+function parseCspellPattern(patternStr: string): RegExp {
+	const match = patternStr.match(/^\/(.*)\/([gimsuy]*)$/)!
+
+	return new RegExp(match[1], match[2])
+}
+
+let cspellPatterns: RegExp[] | null = null
+
+/**
+ * Read the cspell "patterns" whose names appear in `ignoreRegExpList` and
+ * return them compiled as `RegExp` objects.  Cached so the filesystem is
+ * only read once.
+ */
+export function getCSpellPatterns(): RegExp[] {
+	if (cspellPatterns === null) {
+		const config = getCSpellConfig()
+		const allowedNames = new Set(config.ignoreRegExpList ?? [])
+
+		cspellPatterns = config.patterns
+			.filter(p => allowedNames.has(p.name))
+			.map(p => parseCspellPattern(p.pattern))
+	}
+
+	return cspellPatterns
 }
 
 /** Overwrite cSpell vocabulary with new list of words. */

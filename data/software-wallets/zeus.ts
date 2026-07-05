@@ -272,7 +272,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Zeus performs local EVM simulations to verify and display exact transaction outcomes, including decoding of common events like erc20 transfers, swaps, approvals etc...',
+							'Zeus performs local EVM simulations to verify and display exact transaction outcomes, including decoding of common events like ERC-20 transfers, swaps, approvals etc.',
 						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
 					},
 				],

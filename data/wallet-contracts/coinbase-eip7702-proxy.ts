@@ -11,7 +11,7 @@ export const coinbaseEip7702ProxyContract: SmartWalletContract = {
 	},
 	sourceCode: {
 		ref: {
-			label: 'Coinbase EIP-7702 Proxy (base/eip-7702-proxy)',
+			label: 'Coinbase EIP-7702 Proxy (`base/eip-7702-proxy`)',
 			url: 'https://github.com/base/eip-7702-proxy/blob/429ba3c76186a72949235e23cc84267bf456b48a/src/EIP7702Proxy.sol',
 		},
 		available: true,
