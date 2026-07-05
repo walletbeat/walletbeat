@@ -293,11 +293,6 @@
 		font-weight: normal;
 	}
 
-	li[data-wbicon]::before {
-		font-family: var(--fontFamily-wbicons);
-		content: var(--icon-content);
-	}
-
 	[data-stage-criterion-rating] {
 		&[data-stage-criterion-rating="EXEMPT"] {
 			text-decoration: line-through;

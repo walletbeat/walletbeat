@@ -1,46 +1,55 @@
 <script lang="ts">
 	// Types
 	import type { LucideNavigationIcon, NavigationItem } from '@/constants/navigation'
+	import type { Snippet } from 'svelte'
 
 	// Icons
 	import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
 	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+	import { FarcasterIcon } from '@/icons/farcaster'
+	import SearchIcon from 'lucide-static/icons/search.svg?raw'
+	import TwitterIcon from 'lucide-static/icons/twitter.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	const LUCIDE_ICONS: Record<LucideNavigationIcon, string> = {
 		ICON_CHART_BAR: ChartBarIcon,
 		ICON_CHART_PIE: ChartPieIcon,
+		ICON_FARCASTER: FarcasterIcon,
+		ICON_TWITTER: TwitterIcon,
 		ICON_WALLET: WalletIcon,
 	}
 
+	type NavigationGroup = {
+		items: NavigationItem[]
+	}
 
 	// Props
 	let {
 		items,
+		groups,
 		currentPathname,
+		ariaLabel = 'Navigation',
+		defaultOpen = false,
+		iconSnippet,
 		showSearch = true,
 	}: {
 		items: NavigationItem[]
+		groups?: NavigationGroup[]
 		currentPathname: string
+		ariaLabel?: string
+		defaultOpen?: boolean
+		iconSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
 	} = $props()
 
+	let navigationGroups = $derived(groups ?? [{ items }])
 
 	// State
 	import { SvelteMap } from 'svelte/reactivity'
 
-	let isOpen = $state(
-		new SvelteMap<NavigationItem, boolean>()
-	)
-
-	let searchValue = $state(
-		''
-	)
-
-	const effectiveSearchValue = $derived(
-		searchValue.trim().toLowerCase()
-	)
-
+	let isOpen = $state(new SvelteMap<NavigationItem, boolean>())
+	let searchValue = $state('')
+	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
 	// Functions
 	const hasCurrentPage = (item: NavigationItem) => (
@@ -74,7 +83,11 @@
 	const matchesSearch = (item: NavigationItem, query: string): boolean => (
 		!query
 		|| !!fuzzyMatch(item.title, query)
-		|| (item.children?.some(child => matchesSearch(child, query)) ?? false)
+		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
+	)
+
+	const hasNestedNavigation = (items: NavigationItem[]): boolean => (
+		items.some(item => item.children?.length)
 	)
 
 	const highlightText = (text: string, query: string) => {
@@ -83,8 +96,8 @@
 		return (
 			ranges ?
 				[
-					...ranges.flatMap(([start, end], i, allRanges) => [
-						text.slice(allRanges[i - 1]?.[1] ?? 0, start),
+					...ranges.flatMap(([start, end], i, arr) => [
+						text.slice(arr[i - 1]?.[1] ?? 0, start),
 						`<mark>${text.slice(start, end)}</mark>`,
 					]),
 					text.slice(ranges.at(-1)?.[1] ?? 0),
@@ -98,71 +111,95 @@
 
 
 {#if showSearch}
-<search data-column="gap-3">
-	<input
-		type="search"
-		data-sticky
-		bind:value={searchValue}
-		placeholder="Search (⌘+K)"
-		{@attach (element: HTMLInputElement) => {
-			const abortController = new AbortController()
+	<search
+		class="navigation-items"
+		data-column="gap-3"
+		data-column-item="flexible"
+		data-sticky-container
+	>
+		<label
+			data-sticky="block"
+		>
+			<span class="navigation-search-icon" aria-hidden="true">{@html SearchIcon}</span>
 
-			let lastFocusedElement: HTMLElement | undefined = $state()
+			<input
+				type="search"
+				bind:value={searchValue}
+				placeholder="Search..."
+				{@attach (element: HTMLInputElement) => {
+					const abortController = new AbortController()
 
-			globalThis.addEventListener(
-				'keydown',
-				event => {
-					if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-						event.preventDefault()
+					let lastFocusedElement: HTMLElement | undefined = $state()
 
-						if(document.activeElement instanceof HTMLElement)
-							lastFocusedElement = document.activeElement
+					globalThis.addEventListener(
+						'keydown',
+						event => {
+							if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+								event.preventDefault()
 
-						element.focus()
+								if (document.activeElement instanceof HTMLElement)
+									lastFocusedElement = document.activeElement
+
+								element.focus()
+							}
+						},
+						{ signal: abortController.signal }
+					)
+
+					element.addEventListener(
+						'blur',
+						() => {
+							lastFocusedElement?.focus()
+							lastFocusedElement = undefined
+						},
+						{ signal: abortController.signal }
+					)
+
+					return () => {
+						abortController.abort()
+						lastFocusedElement?.focus()
+						lastFocusedElement = undefined
 					}
-				},
-				{ signal: abortController.signal }
-			)
+				}}
+				onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
+					if (event.key === 'Escape')
+						event.currentTarget.blur()
+				}}
+			/>
 
-			element.addEventListener(
-				'blur',
-				() => {
-					lastFocusedElement?.focus()
-					lastFocusedElement = undefined
-				},
-				{ signal: abortController.signal }
-			)
+			<kbd class="navigation-search-shortcut" aria-hidden="true">⌘+K</kbd>
+		</label>
 
-			return () => {
-				abortController.abort()
-				lastFocusedElement?.focus()
-				lastFocusedElement = undefined
-			}
-		}}
-		onkeyup={event => {
-			if (event.key === 'Escape')
-				event.currentTarget.blur()
-		}}
-	/>
-
-	{@render navigationItems(items)}
-</search>
+		{@render navigationGroupsList(navigationGroups)}
+	</search>
 {:else}
-<div data-column="gap-3">
-	{@render navigationItems(items)}
-</div>
+	<nav class="navigation-items" data-column="gap-3" data-column-item="flexible" aria-label={ariaLabel}>
+		{@render navigationGroupsList(navigationGroups)}
+	</nav>
 {/if}
 
 
+{#snippet navigationGroupsList(groups: NavigationGroup[])}
+	{#each groups as group, groupIndex (groupIndex)}
+		{@render navigationItems(group.items, 0)}
+	{/each}
+{/snippet}
+
+
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
-	<menu>
+	{@const ownsStickyStep = depth > 0 || hasNestedNavigation(items)}
+	<menu
+		data-navigation-depth={depth}
+		data-sticky-container={ownsStickyStep ? true : undefined}
+		data-column
+	>
 		{#each (
 			effectiveSearchValue ?
 				items.filter(item => matchesSearch(item, effectiveSearchValue))
 			:
 				items
 		) as item (item.id)}
-			<li>
+			<li data-current={currentPathname === item.href ? true : undefined}>
 				{@render navigationItem(item, depth)}
 			</li>
 		{/each}
@@ -172,24 +209,23 @@
 
 {#snippet navigationItem(item: NavigationItem, depth = 0)}
 	{#if !item.children?.length}
-		{@render linkable(item, depth)}
+		{@render linkable(item, depth, true)}
 	{:else}
 		<details
 			bind:open={
 				() => (
 					effectiveSearchValue
 						? matchesSearch(item, effectiveSearchValue)
-						: (isOpen.get(item) ?? isOpen.set(item, hasCurrentPage(item)).get(item) ?? false)
+						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item)))
 				),
 				(_: boolean) => {
 					if (!effectiveSearchValue && _ !== undefined)
 						isOpen.set(item, _)
 				}
 			}
-			data-sticky-container
 		>
 			<summary
-				data-sticky
+				data-sticky="block"
 				data-row="gap-2"
 			>
 				{@render linkable(item, depth)}
@@ -201,7 +237,7 @@
 {/snippet}
 
 
-{#snippet linkable(item: NavigationItem, depth = 0)}
+{#snippet linkable(item: NavigationItem, depth = 0, sticky = false)}
 	{#if item.href}
 		<a
 			href={item.href}
@@ -210,170 +246,278 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
+			data-sticky={sticky ? 'block' : undefined}
 			data-row="start gap-2"
+			style:--accent={item.accentColor ?? undefined}
 		>
-			{#if item.icon}
-				<span class="icon" class:circle={depth === 0}>
-					{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-						<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
-					{:else if item.icon in LUCIDE_ICONS}
-						{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
-					{:else}
-						<span data-icon="wbicons {item.icon}"></span>
-					{/if}
-				</span>
-			{/if}
+			{@render navigationIcon(item, depth)}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
-		{#if item.icon}
-			<span class="icon" class:circle={depth === 0}>
-				{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-					<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
-				{:else if item.icon in LUCIDE_ICONS}
-					{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
-				{:else}
-					<span data-icon="wbicons {item.icon}"></span>
-				{/if}
-			</span>
-		{/if}
+		{@render navigationIcon(item, depth)}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 	{/if}
 {/snippet}
 
 
+{#snippet navigationIcon(item: NavigationItem, depth = 0)}
+	{#if iconSnippet}
+		{@render iconSnippet(item, depth)}
+	{:else if item.icon}
+		{@const iconShape = depth === 0 ? 'circle' : ''}
+		{#if item.icon.startsWith('ICON_WALLET_IMG:')}
+			<span data-icon>
+				<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+			</span>
+		{:else if item.icon in LUCIDE_ICONS}
+			<span data-icon={iconShape}>
+				{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
+			</span>
+		{:else}
+			<span
+				data-icon="{iconShape} wbicons {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
+			></span>
+		{/if}
+	{/if}
+{/snippet}
+
+
 <style>
-	input[type='search'] {
-		border-radius: 0.75rem;
-		border-color: var(--icon-navigation-borderColor);
-	}
+	.navigation-items {
+		--navigation-search-blockSize: 2.375rem;
+		--navigation-search-gap: 0.75rem;
+		--navigation-search-sidestepBlock: calc(
+			var(--navigation-search-blockSize) + var(--navigation-search-gap)
+		);
 
-	menu {
-		display: grid;
-		gap: 8px;
-		list-style: none;
-		font-size: 0.975em;
+		label {
+			--navigation-search-paddingInlineStart: 2.35rem;
+			--navigation-search-paddingInlineEnd: 3.15rem;
 
-		li {
-			display: grid;
-		}
-	}
+			block-size: var(--navigation-search-blockSize);
+			min-block-size: var(--navigation-search-blockSize);
+			position: relative;
+			inline-size: 100%;
+			border-color: var(--icon-navigation-borderColor);
+			font-size: inherit;
+			inset-block-end: auto;
 
-	details {
-		&[data-sticky-container] {
-			--sticky-marginBlockStart: 1.75rem;
-			--sticky-paddingBlockStart: 0.5rem;
-		}
-	}
+			@media (max-width: 1024px) {
+				order: 10;
 
-	a {
-		color: var(--text-primary);
-		font-weight: inherit;
+				&[data-sticky] {
+					inset-block-start: auto;
+					inset-block-end: var(--sticky-insetBlockEnd);
+				}
 
-		&:hover {
-			color: var(--accent);
-			text-decoration: none;
-		}
+				.navigation-search-shortcut {
+					display: none;
+				}
+			}
 
-		&[aria-current] {
-			background-color: var(--background-primary);
-		}
-	}
+			input[type='search'] {
+				position: absolute;
+				inset: calc(-1 * var(--separator-width));
+				padding-inline-start: var(--navigation-search-paddingInlineStart);
+				padding-inline-end: var(--navigation-search-paddingInlineEnd);
+				padding-block: 0;
+				text-overflow: ellipsis;
+			}
 
-	summary,
-	a {
-		> .icon {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 1.25em;
-			font-weight: 500;
-			width: 1em;
-			height: 1em;
-			line-height: 1;
-			flex-shrink: 0;
-			color: var(--icon-navigation-color);
+			.navigation-search-icon,
+			.navigation-search-shortcut {
+				position: absolute;
+				inset-block: 0;
+				display: inline-flex;
+				align-items: center;
+				pointer-events: none;
+			}
 
-			:global(
-				img,
-				svg
-			) {
-				border-radius: 0.125rem;
-				width: 100%;
-				height: 100%;
+			.navigation-search-icon {
+				inset-inline-start: 0.75rem;
+				color: var(--text-secondary);
+
+				:global(svg) {
+					inline-size: 1rem;
+					block-size: 1rem;
+				}
+			}
+
+			.navigation-search-shortcut {
+				inset-inline-end: 0.625rem;
+				block-size: 1.35rem;
+				margin-block: auto;
+				display: inline-flex;
+				padding-inline: 0;
+				color: var(--text-secondary);
+				font: inherit;
+				font-size: 0.75em;
+				line-height: 1;
+				white-space: nowrap;
+
+				&::before {
+					content: none;
+				}
+
+				&::after {
+					content: none;
+				}
 			}
 		}
 
-		> .icon.circle {
-			width: 1.75em;
-			height: 1.75em;
-			border-radius: 50%;
-			border: 1px solid var(--icon-navigation-borderColor);
+		menu {
+			--navigation-item-gap: 0.5rem;
+			--navigation-item-paddingBlock: 0.45rem;
+			--navigation-item-paddingInline: 0.45rem;
+			--navigation-item-rowGap: 0.5em;
+			--navigation-item-submenuGap: 0.33rem;
+			--navigation-icon-size: 1.25em;
 
-			:global(
-				img,
-				svg
-			) {
-				border-radius: 0;
-				width: 60%;
-				height: 60%;
+			font-size: 0.975em;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+
+			&[data-navigation-depth='0'] {
+				--navigation-icon-size: 2em;
+			}
+
+			&[data-navigation-depth='1'] {
+				--navigation-icon-size: 1.5em;
+			}
+
+			&[data-sticky-container][data-navigation-depth='0'] {
+				--sticky-marginBlockStart: var(--navigation-search-sidestepBlock);
+			}
+
+			&[data-sticky-container]:not([data-navigation-depth='0']) {
+				--sticky-marginBlockStart: calc(
+					var(--navigation-submenu-parentIconSize) + 2 * var(--navigation-item-paddingBlock) +
+						var(--navigation-item-submenuGap)
+				);
+				--sticky-marginBlockEnd: var(--navigation-item-gap);
+			}
+
+			details {
+				--navigation-submenu-parentIconSize: var(--navigation-icon-size);
+			}
+
+			a {
+				color: var(--text-primary);
+
+				&:hover {
+					color: var(--accent);
+					text-decoration: none;
+				}
+
+				&[href^='#']::scroll-marker {
+					content: '';
+				}
+			}
+
+			summary,
+			li > a {
+				--icon-size: var(--navigation-icon-size);
+				--navigation-item-startRadius: calc(
+					(var(--navigation-icon-size) + 2 * var(--navigation-item-paddingBlock)) / 2
+				);
+				--navigation-item-endRadius: 0.5em;
+
+				:global(mark) {
+					font-weight: 600;
+					text-decoration: underline;
+					background-color: transparent;
+					color: inherit;
+				}
+			}
+
+			summary,
+			li > a {
+				padding: var(--navigation-item-paddingBlock) var(--navigation-item-paddingInline);
+				border-radius:
+					var(--navigation-item-startRadius)
+					var(--navigation-item-endRadius)
+					var(--navigation-item-endRadius)
+					var(--navigation-item-startRadius)
+				;
+				font-weight: 500;
+				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 62%, transparent);
+				--sticky-backdropFilter: blur(16px);
+
+				transition-property: opacity, scale, background-color, color, backdrop-filter;
+
+				&:hover:not(:has(a:hover)) {
+					background-color: var(--background-primary);
+					color: var(--accent);
+				}
+
+				&:active {
+					background-color: var(--background-primary);
+				}
+
+				[data-current] > details > &:is(summary),
+				[data-current] > &:is(a),
+				&::scroll-marker:target-current {
+					background-color: color-mix(in oklch, var(--background-primary) 62%, transparent);
+					backdrop-filter: blur(16px);
+				}
+			}
+
+			summary {
+				> a {
+					border-radius: inherit;
+				}
+
+				&::after {
+					margin-inline-start: auto;
+				}
+
+				details:not([open]) > &::after {
+					transform: perspective(100px) rotateX(180deg) rotate(-90deg);
+				}
+
+				> a {
+					flex: 0 auto;
+				}
+
+				~ * {
+					margin-block-start: var(--navigation-item-submenuGap);
+					margin-inline-start: calc(
+						var(--navigation-submenu-parentIconSize) + var(--navigation-item-rowGap)
+					);
+					padding-inline-start: 0;
+					position: relative;
+
+					&::before {
+						content: '';
+						position: absolute;
+						inset-block: 0;
+						inset-inline-start: calc(
+							var(--navigation-item-paddingInline) + var(--navigation-submenu-parentIconSize) / 2 -
+								var(--navigation-submenu-parentIconSize) - var(--navigation-item-rowGap)
+						);
+						inline-size: 1px;
+						background-color: var(--border-color);
+					}
+				}
 			}
 		}
 
-		:global(mark) {
-			font-weight: 600;
-			text-decoration: underline;
-			background-color: transparent;
-			color: inherit;
-		}
-	}
-
-	summary,
-	a:not(summary a) {
-		padding: 0.45rem 0.45rem;
-		border-radius: 0.375rem;
-		font-weight: 500;
-
-		transition-property: opacity, scale, background-color, color, outline;
-
-		&:hover:not(:has(a:hover)) {
-			background-color: var(--background-primary);
-			color: var(--accent);
+		> menu + menu {
+			margin-block-start: auto;
 		}
 
-		&:focus {
-			outline: 2px solid var(--accent);
-			outline-offset: -1px;
+		@media (max-width: 1024px) {
+			&:has(> label) {
+				display: contents;
+			}
+
+			menu[data-sticky-container][data-navigation-depth='0'] {
+				--sticky-marginBlockStart: 0px;
+				--sticky-marginBlockEnd: var(--navigation-search-sidestepBlock);
+			}
 		}
-
-		&:active {
-			background-color: var(--background-primary);
-		}
-	}
-
-	summary {
-		&::after {
-			margin-inline-start: auto;
-		}
-
-		details:not([open]) > &::after {
-			transform: perspective(100px) rotateX(180deg) rotate(-90deg);
-		}
-	}
-
-	summary > a {
-		flex: 0 auto;
-	}
-
-	summary ~ * {
-		margin-inline-start: 2em;
-		margin-block-start: 2px;
-
-		margin-inline-start: 1.25em;
-		margin-block-start: 2px;
-		padding-inline-start: 0.75em;
-		box-shadow: -1px 0 var(--border-color);
 	}
 </style>
