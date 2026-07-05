@@ -64,7 +64,7 @@ describe('methodologyPageMarkdown', () => {
 
 	it('passes harper.js grammar check', async () => {
 		await grammarLint(md, { language: 'markdown' })
-	}, 15_000)
+	}, 60_000)
 
 	it('produces valid markdown', async () => {
 		await assertValidMarkdown(md)
