@@ -164,6 +164,44 @@ export function collapseToSingleLine(text: string): string {
 }
 
 /**
+ * Un-escape the inner content of a YAML-quoted string.
+ * - Single-quoted: '' → '
+ * - Double-quoted: \\" → ", \\\\ → \
+ */
+function unescapeYamlString(content: string, quote: '"' | "'"): string {
+	if (quote === "'") {
+		// Single-quoted: only '' needs un-escaping.
+		return content.replace(/''/g, "'")
+	}
+
+	// Double-quoted: \\" → " and \\\\ → \
+	let result = ''
+	let i = 0
+
+	while (i < content.length) {
+		if (content[i] === '\\' && i + 1 < content.length) {
+			const next = content[i + 1]
+
+			if (next === '"') {
+				result += '"'
+			} else if (next === '\\') {
+				result += '\\'
+			} else {
+				// Unknown escape — keep as-is (pass through backslash + char).
+				result += content[i]
+			}
+
+			i += 2
+		} else {
+			result += content[i]
+			i++
+		}
+	}
+
+	return result
+}
+
+/**
  * Strip YAML-like block scalars from Frontmatter lines.
  * Handles `>` (folded) and `|` (literal) block indicators.
  * Returns { key, value, isBlockStart } where isBlockStart indicates
@@ -183,7 +221,29 @@ function parseFrontmatterLine(line: string): { key: string; value: string; isBlo
 		return { key, value: '', isBlockStart: true }
 	}
 
-	return { key, value: rawValue, isBlockStart: false }
+	// Strip surrounding YAML string quotes (single or double) and un-escape.
+	// In YAML, single-quoted strings use '' for a literal ', and double-quoted
+	// strings use \" for a literal " (and \\ for a literal \).
+	const strippedValue =
+		(rawValue[0] === '"' && rawValue[rawValue.length - 1] === '"') ||
+		(rawValue[0] === "'" && rawValue[rawValue.length - 1] === "'")
+			? unescapeYamlString(rawValue.slice(1, -1), rawValue[0])
+			: rawValue
+
+	return { key, value: strippedValue, isBlockStart: false }
+}
+
+export function assertIsFrontmatter<_Frontmatter extends Frontmatter>(
+	obj: Record<string, string | string[]>,
+	expected: { [_ in keyof _Frontmatter]: unknown },
+): asserts obj is _Frontmatter {
+	for (const key of Object.keys(expected)) {
+		const keyStr = String(key)
+
+		if (!(keyStr in obj)) {
+			throw new Error(`Missing required frontmatter key: ${keyStr}`)
+		}
+	}
 }
 
 /**
@@ -260,21 +320,17 @@ function parseFrontmatter<_Frontmatter extends Frontmatter = {}>(
 				}
 			}
 
-			// Trim trailing empty lines from the block
 			while (blockLines.length > 0 && blockLines[blockLines.length - 1] === '') {
 				blockLines.pop()
 			}
 
 			if (value === '') {
-				// We need to check the original indicator; re-parse the header line
 				const headerMatch = /^([A-Za-z_][\w-]*)\s*:\s*(>||)$/.exec(lines[i - blockLines.length - 1])
 				const indicator = headerMatch ? headerMatch[2] : '|'
 
 				if (indicator === '>') {
-					// Folded: collapse newlines to spaces
 					result[key] = blockLines.join(' ')
 				} else {
-					// Literal: preserve newlines
 					result[key] = blockLines.join('\n')
 				}
 			}
@@ -284,20 +340,7 @@ function parseFrontmatter<_Frontmatter extends Frontmatter = {}>(
 		}
 	}
 
-	// Validate all expected keys are present
-	function isFrontmatter<_Frontmatter extends Frontmatter>(
-		obj: Record<string, string>,
-	): asserts obj is _Frontmatter {
-		for (const key of Object.keys(expected)) {
-			const keyStr = String(key)
-
-			if (!(keyStr in obj)) {
-				throw new Error(`Missing required frontmatter key: ${keyStr}`)
-			}
-		}
-	}
-
-	isFrontmatter<_Frontmatter>(result)
+	assertIsFrontmatter<_Frontmatter>(result, expected)
 
 	return result
 }
@@ -347,11 +390,15 @@ export function parseMarkdownWithFrontmatter<_Frontmatter extends Frontmatter = 
 
 /**
  * Strip the single H1 title from a MarkdownContent body.
- * Validates that there is exactly one H1 heading and it is the first non-empty line.
+ * Validates that there is exactly one H1 heading in the first section
+ * (content before the first `---` horizontal rule, outside code blocks)
+ * and that it is the first non-empty line of the document.
+ * Additional H1 headings are permitted after the first section boundary.
  * Also strips blank lines between the H1 and the next content.
  *
  * @param content The Markdown content.
- * @throws Error if there is no H1, multiple H1s, or if the H1 is not the first non-empty line.
+ * @throws Error if the first section has no H1, multiple H1s, or if the H1
+ * is not the first non-empty line.
  * @returns MarkdownContent with the H1 and surrounding blank lines removed.
  */
 export function stripMarkdownTitle<_Strings extends Strings = null>(
@@ -360,6 +407,7 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 	const lines = content.markdown.split('\n')
 	const h1Indices: number[] = []
 	let inCodeBlock = false
+	let firstSectionEnd = -1
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i]
@@ -370,24 +418,35 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 			continue
 		}
 
+		// Find first horizontal rule (---) outside code blocks — marks end of first section
+		if (firstSectionEnd === -1 && !inCodeBlock && /^\s*[-*_]{3,}\s*$/.test(line)) {
+			firstSectionEnd = i
+			continue
+		}
+
 		// Only look for H1 headings outside code blocks
 		if (!inCodeBlock && /^# /.test(line)) {
 			h1Indices.push(i)
 		}
 	}
 
-	// Validate exactly one H1
-	if (h1Indices.length === 0) {
-		throw new Error('Markdown body must contain exactly one H1 heading, but found none')
-	}
+	// Collect H1s that fall within the first section
+	const firstSectionH1s = h1Indices.filter(idx => firstSectionEnd === -1 || idx < firstSectionEnd)
 
-	if (h1Indices.length > 1) {
+	// Validate exactly one H1 in the first section
+	if (firstSectionH1s.length === 0) {
 		throw new Error(
-			`Markdown body must contain exactly one H1 heading, but found ${h1Indices.length}. Found at indices: ${h1Indices.join(', ')}`,
+			'Markdown body must contain exactly one H1 heading in the first section (before the first ---), but found none',
 		)
 	}
 
-	const h1Index = h1Indices[0]
+	if (firstSectionH1s.length > 1) {
+		throw new Error(
+			`Markdown body must contain exactly one H1 heading in the first section, but found ${firstSectionH1s.length}. Found at indices: ${firstSectionH1s.join(', ')}`,
+		)
+	}
+
+	const h1Index = firstSectionH1s[0]
 
 	// Validate it's the first non-empty line
 	for (let i = 0; i < h1Index; i++) {
@@ -401,8 +460,6 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 	// Remove the H1 and any blank lines before and after it
 	const resultLines: string[] = []
 
-	// Keep blank lines before H1 (there shouldn't be any non-empty lines, validated above)
-	// Actually, we strip leading blank lines too since they come from the frontmatter separation
 	// Find the first non-empty line (which should be the H1)
 	let start = 0
 
@@ -438,8 +495,9 @@ export function stripMarkdownTitle<_Strings extends Strings = null>(
 /**
  * Convert URLs (links, embedded images) in a Markdown document for
  * presentation on an HTML page at a different URL.
- * Does not touch URLs that contain `https://`; only affects
- * URLs that are absolute (`/foo/bar`) or relative (`./foo/bar`).
+ * Skips URLs with a protocol or special scheme: `https://`, `http://`,
+ * `mailto:`, `tel:`, `data:`, `#` (anchor-only), and `//` (protocol-relative).
+ * Only rewrites URLs that are absolute (`/foo/bar`) or relative (`./foo/bar`).
  *
  * @param content The Markdown document.
  * @param options Options for rewriting.
@@ -458,9 +516,9 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		 * Repo-root-relative path to a subtree where all Markdown files are
 		 * assumed to be unique to their specific subdirectory, and that there
 		 * exists an `index.astro` file next to them.
-		 * When a Markdown document links to a `.md` file that is found to be
+		 * When a Markdown document links to a file that is found to be
 		 * somewhere under `repoRootPagesDir`, the last component of the URL is
-		 * removed (e.g. `/foo/bar/baz.md` becomes `/foo/bar/` with the trailing
+		 * removed (e.g. `/foo/bar/baz.html` becomes `/foo/bar/` with the trailing
 		 * slash), such that the URL will resolve to the `index.astro` page at
 		 * this directory. This transformation happens before the
 		 * `repoRootRelativePaths` transformation.
@@ -469,16 +527,21 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		/**
 		 * Set of known repo-root-relative paths and corresponding URLs they should map to.
-		 * For example, if a link in the Markdown document links to `/foo/bar.html`
-		 * (or, equivalently, if the Markdown document is at `/foo/bar/baz.md` and links
-		 * to `../bar.html`), and `repoRootRelativePaths` contains `{"/foo": "/quux"}`,
-		 * then the URL will be rewritten to `/quux/bar.html`.
+		 * For example, if a link in the Markdown document links to `/foo/bar/file`
+		 * (or, equivalently, if the Markdown document is at `/foo/baz/quux.md` and links
+		 * to `../bar/file`), and `repoRootRelativePaths` contains
+		 * `{"/foo": { path: "/the_foo", stripLast: true }}`,
+		 * then the URL will be rewritten to `/the_foo/` (with trailing slash).
+		 * If `stripLast` is `false`, then it is rewritten to `/the_foo/bar/file`.
 		 *
 		 * This transformation must be applied exactly once per link found in the Markdown
 		 * document (other than links starting with `https://`). If a link does not
 		 * correspond to any of these prefixes, then an error is thrown.
 		 */
-		repoRootRelativePaths: Record<`/${string}`, `/${string}` | `https://${string}`>
+		repoRootRelativePaths: Record<
+			`/${string}`,
+			{ path: `/${string}` | `https://${string}`; stripLast: boolean }
+		>
 
 		/**
 		 * Set of URL prefixes that should never be present in the Markdown file, otherwise
@@ -489,10 +552,11 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		forbiddenURLPrefixes?: `https://${string}`[]
 
 		/**
-		 * Set of full URLs that are allowed to exist in the Markdown document even if
-		 * they are in `forbiddenURLPrefixes`.
+		 * Set of regular expressions that, when matched against a URL, allow it to
+		 * exist in the Markdown document even if it falls under `forbiddenURLPrefixes`.
+		 * Each regex is tested with `.test(url)` against the full URL string.
 		 */
-		whitelistURLs?: `https://${string}`[]
+		whitelistedURLRegexes?: RegExp[]
 	},
 ): MarkdownContent<_Strings> {
 	const markdown = content.markdown
@@ -501,7 +565,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		repoRootRelativePaths,
 		repoRootPagesDir,
 		forbiddenURLPrefixes,
-		whitelistURLs,
+		whitelistedURLRegexes,
 	} = options
 
 	// Resolve the directory of the source markdown file
@@ -570,7 +634,10 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 	 * Find the longest matching prefix from repoRootRelativePaths.
 	 * Returns null if no prefix matches.
 	 */
-	function findMatchingPrefix(url: string): { prefix: string; replacement: string } | null {
+	function findMatchingPrefix(url: string): {
+		prefix: string
+		replacement: { path: `/${string}` | `https://${string}`; stripLast: boolean }
+	} | null {
 		// Sort prefixes by length (descending) to get longest match first
 		const sortedPrefixes = Object.entries(repoRootRelativePaths).sort(
 			([a], [b]) => b.length - a.length,
@@ -600,11 +667,12 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 	 * Throws for invalid URLs.
 	 */
 	function rewriteUrl(url: string): string {
-		// Skip external URLs, mailto, tel, anchor-only, and protocol-relative
+		// Skip external URLs, mailto, tel, data, anchor-only, and protocol-relative
 		if (
 			url.startsWith('http://') ||
 			url.startsWith('mailto:') ||
 			url.startsWith('tel:') ||
+			url.startsWith('data:') ||
 			url.startsWith('#') ||
 			url.startsWith('//')
 		) {
@@ -614,7 +682,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		// Handle https:// URLs - check forbidden prefixes
 		if (stringHasPrefix(url, 'https://')) {
 			if (forbiddenURLPrefixes) {
-				const isWhitelisted = whitelistURLs?.includes(url)
+				const isWhitelisted = whitelistedURLRegexes?.some(regex => regex.test(url))
 
 				for (const forbiddenPrefix of forbiddenURLPrefixes) {
 					if (url.startsWith(forbiddenPrefix)) {
@@ -633,13 +701,24 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		// Handle repoRootPagesDir: if URL is under the pages dir, remove the last path component
 		// (assumes an index.astro file exists at that directory)
+		// Preserve query parameters and anchors during the strip
 		if (resolvedUrl.startsWith(repoRootPagesDir)) {
-			// Remove the last path component (e.g., /foo/bar/baz.md -> /foo/bar/)
-			const lastSlashIndex = resolvedUrl.lastIndexOf('/')
+			let pathPart = resolvedUrl
+			let suffixPart = ''
+			const hashIndex = resolvedUrl.indexOf('#')
+
+			if (hashIndex !== -1) {
+				suffixPart = resolvedUrl.slice(hashIndex)
+				pathPart = resolvedUrl.slice(0, hashIndex)
+			}
+
+			const lastSlashIndex = pathPart.lastIndexOf('/')
 
 			if (lastSlashIndex > repoRootPagesDir.length - 1) {
-				resolvedUrl = resolvedUrl.slice(0, lastSlashIndex + 1)
+				pathPart = pathPart.slice(0, lastSlashIndex + 1)
 			}
+
+			resolvedUrl = pathPart + suffixPart
 		}
 
 		const match = findMatchingPrefix(resolvedUrl)
@@ -652,11 +731,57 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		const suffix = resolvedUrl.slice(match.prefix.length)
 
-		// Avoid double slashes: if replacement ends with / and suffix starts with /
-		const suffixToUse =
-			match.replacement.endsWith('/') && suffix.startsWith('/') ? suffix.slice(1) : suffix
+		// Apply stripLast: strip the last path component (preserving query/anchor)
+		// Applied uniformly regardless of file extension.
+		// Paths already handled by repoRootPagesDir are excluded.
+		// Files with known image/video extensions are excluded from stripLast
+		// since stripping their filename would break the reference.
+		const knownAssetExtensions = /\.(png|jpe?g|gif|webp|svg|ico|mp4|webm|ogg|avi|mov)(\?.*)?$/i
+		const hasAssetExtension = knownAssetExtensions.test(suffix)
+		const shouldStrip =
+			match.replacement.stripLast && !resolvedUrl.startsWith(repoRootPagesDir) && !hasAssetExtension
 
-		return match.replacement + suffixToUse
+		let suffixToUse = suffix
+
+		if (shouldStrip) {
+			// Extract path portion and suffix (query + anchor)
+			let pathPart = suffixToUse
+			let extraPart = ''
+			const queryIndex = pathPart.indexOf('?')
+			const hashIndex = pathPart.indexOf('#')
+			let cutIndex = -1
+
+			if (queryIndex !== -1 && (hashIndex === -1 || queryIndex < hashIndex)) {
+				cutIndex = queryIndex
+			} else if (hashIndex !== -1) {
+				cutIndex = hashIndex
+			}
+
+			if (cutIndex !== -1) {
+				extraPart = pathPart.slice(cutIndex)
+				pathPart = pathPart.slice(0, cutIndex)
+			}
+
+			// Strip last path segment
+			if (pathPart !== '/' && !pathPart.endsWith('/')) {
+				const lastSlash = pathPart.lastIndexOf('/')
+
+				if (lastSlash !== -1) {
+					pathPart = pathPart.slice(0, lastSlash + 1)
+				} else {
+					pathPart = ''
+				}
+			}
+
+			suffixToUse = pathPart + extraPart
+		}
+
+		// Avoid double slashes: if replacement ends with / and suffix starts with /
+		if (match.replacement.path.endsWith('/') && suffixToUse.startsWith('/')) {
+			suffixToUse = suffixToUse.slice(1)
+		}
+
+		return match.replacement.path + suffixToUse
 	}
 
 	/**
@@ -697,8 +822,8 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 						text: line + (isLastLine ? '' : '\n'),
 						inCode: currentInCode,
 					})
-				} else if (currentInCode && backtickLength === currentFenceLength) {
-					// Closing the code block (must match exactly the opening fence length)
+				} else if (currentInCode && backtickLength >= currentFenceLength) {
+					// Closing the code block (per CommonMark, must have at least as many backticks as the opening fence)
 					if (currentText) {
 						segments.push({ text: currentText, inCode: currentInCode })
 						currentText = ''
@@ -743,46 +868,164 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 	 * Process a single line/segment for URL rewriting, excluding inline code.
 	 */
 	function processTextForUrls(text: string): string {
-		// First, handle inline code by temporarily replacing it
-		const inlineCodeParts: string[] = []
-		const placeholder = 'MARKDOWN_INLINE_CODE{{n}}MARKDOWN_INLINE_CODE'
-		let processed = text.replace(/`([^`]+)`/g, (_match: string, code: string) => {
-			const idx = inlineCodeParts.length
+		// Scan for links character by character to handle nested structures
+		// like [![alt](img_url)](link_url)
+		interface LinkMatch {
+			start: number
+			end: number
+			replacement: string
+		}
+		const matches: LinkMatch[] = []
+		let i = 0
 
-			// Store WITH backticks to preserve them on restore
-			inlineCodeParts.push('`' + code + '`')
+		while (i < text.length) {
+			// Skip inline code segments
+			if (text[i] === '`') {
+				i++
+				while (i < text.length && text[i] !== '`') {
+					i++
+				}
+				i++ // skip closing backtick
+				continue
+			}
 
-			return placeholder.replace('{{n}}', String(idx))
-		})
+			// Look for [ or ![ to start of a link/image
+			if (text[i] === '[' || (text[i] === '!' && i + 1 < text.length && text[i + 1] === '[')) {
+				// Find matching ] by tracking nesting depth
+				let depth = 0
+				let j = i
+				const linkStart = i
 
-		// Pattern to match markdown links and images:
-		// - Images: ![alt](url) or ![alt](url "title")
-		// - Links: [text](url) or [text](url 'title')
-		// We need to handle escaped brackets within the link text
+				while (j < text.length) {
+					if (text[j] === '[') {
+						depth++
+					} else if (text[j] === ']') {
+						depth--
 
-		// First handle links WITH titles (in quotes)
-		// Pattern: [text](url "title") or [text](url 'title')
-		processed = processed.replace(
-			/(!?\[[^\]]*\])\(([^\s)]+)\s+((?:"[^"]*"|'[^']*')\s?)\)/g,
-			(_match: string, linkPart: string, url: string, titlePart: string) => {
+						if (depth === 0) {
+							break
+						}
+					}
+
+					j++
+				}
+
+				// Check if followed by ( for URL
+				if (depth === 0 && j + 1 < text.length && text[j + 1] === '(') {
+					const parenStart = j + 1
+
+					// Find the closing ) — handle nested parens (e.g. in bracket-style URLs)
+					let parenDepth = 0
+					let k = parenStart
+
+					while (k < text.length) {
+						if (text[k] === '(') {
+							parenDepth++
+						} else if (text[k] === ')') {
+							parenDepth--
+
+							if (parenDepth === 0) {
+								break
+							}
+						}
+
+						k++
+					}
+
+					if (parenDepth === 0) {
+						const parenContent = text.slice(parenStart + 1, k)
+
+						// Parse paren content: <url> "title" or url "title" or <url> or url
+						let url: string
+						let hasAngleBrackets = false
+						let title: string | undefined
+
+						if (parenContent.startsWith('<')) {
+							const closeAngle = parenContent.indexOf('>')
+
+							if (closeAngle !== -1) {
+								url = parenContent.slice(1, closeAngle)
+								hasAngleBrackets = true
+								const afterUrl = parenContent.slice(closeAngle + 1).trimStart()
+
+								// Check for title
+								const titleMatch = afterUrl.match(/^("[^"]*"|'[^']*')\s*$/)
+
+								if (titleMatch) {
+									title = titleMatch[1]
+								}
+							} else {
+								// No closing >, not a bracket-style URL
+								url = parenContent
+							}
+						} else {
+							// Plain URL, possibly followed by title
+							const titleMatch = parenContent.match(/^(\S+)\s+("[^"]*"|'[^']*')\s*$/)
+
+							if (titleMatch) {
+								url = titleMatch[1]
+								title = titleMatch[2]
+							} else {
+								url = parenContent
+							}
+						}
+
+						const rewrittenUrl = rewriteUrl(url)
+
+						// Build the replacement, processing inner text for nested image links
+						const innerText = text.slice(linkStart, j + 1)
+						const processedInner = processTextForUrls(innerText)
+
+						const urlPart =
+							hasAngleBrackets && rewrittenUrl === url ? `<${rewrittenUrl}>` : rewrittenUrl
+						const titlePart = title !== undefined ? ` ${title}` : ''
+						const rebuiltParen = `(${urlPart}${titlePart})`
+
+						matches.push({
+							start: linkStart,
+							end: k + 1,
+							replacement: processedInner + rebuiltParen,
+						})
+
+						i = k + 1
+						continue
+					}
+				}
+			}
+
+			i++
+		}
+
+		// Rebuild the text with rewritten links
+		let result = ''
+		let pos = 0
+
+		for (const match of matches) {
+			result += text.slice(pos, match.start)
+			result += match.replacement
+			pos = match.end
+		}
+
+		result += text.slice(pos)
+
+		// Handle reference link definitions: [ref]: url or [ref]: <url>
+		// Bracket-style URLs first: [ref]: <url>
+		result = result.replace(
+			/^(\s*\[[^\]]+\]:\s+)(<([^>]+)>)(.*)$/gm,
+			(_match: string, prefix: string, _bracketedUrl: string, url: string, rest: string) => {
 				const rewrittenUrl = rewriteUrl(url)
 
-				return `${linkPart}(${rewrittenUrl} ${titlePart})`
+				// Preserve angle brackets if URL wasn't rewritten
+				if (rewrittenUrl === url) {
+					return `${prefix}<${rewrittenUrl}>${rest}`
+				}
+
+				return `${prefix}${rewrittenUrl}${rest}`
 			},
 		)
 
-		// Then handle links WITHOUT titles
-		processed = processed.replace(
-			/(!?\[[^\]]*\])\(([^) \t]+)\)/g,
-			(_match: string, linkPart: string, url: string) => {
-				const rewrittenUrl = rewriteUrl(url)
-
-				return `${linkPart}(${rewrittenUrl})`
-			},
-		)
-
-		// Pattern to match reference link definitions: [ref]: url
-		processed = processed.replace(
+		// Plain URLs: [ref]: url
+		result = result.replace(
 			/^(\s*\[[^\]]+\]:\s+)([^\s]+)(.*)$/gm,
 			(_match: string, prefix: string, url: string, rest: string) => {
 				const rewrittenUrl = rewriteUrl(url)
@@ -791,15 +1034,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 			},
 		)
 
-		// Restore inline code
-		const restorePattern = /MARKDOWN_INLINE_CODE(\d+)MARKDOWN_INLINE_CODE/g
-
-		processed = processed.replace(
-			restorePattern,
-			(_match: string, idx: string) => inlineCodeParts[parseInt(idx, 10)],
-		)
-
-		return processed
+		return result
 	}
 
 	// Process the markdown

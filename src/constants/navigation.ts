@@ -56,6 +56,13 @@ export const navigationTesting = {
 	href: '/test/',
 } as const satisfies NavigationItem
 
+export const navigationDocs = {
+	id: 'docs',
+	icon: 'about', // TODO: Change to some docs-like icon once it exists
+	title: 'Documentation',
+	href: '/docs',
+} as const satisfies NavigationItem
+
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
 	icon: 'discuss',
@@ -187,4 +194,5 @@ export const defaultNavigationItems = [
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,
+	navigationDocs,
 ] as const satisfies NavigationItem[]

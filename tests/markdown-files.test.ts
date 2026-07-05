@@ -84,7 +84,9 @@ describe('markdown files', async () => {
 			it('has correct links', async () => {
 				const links = extractMarkdownLinks(content)
 
-				for (const { url, line } of links) {
+				for (const link of links) {
+					const { url, line } = link
+
 					// Skip full links with protocols.
 					if (
 						url.startsWith('data:') ||

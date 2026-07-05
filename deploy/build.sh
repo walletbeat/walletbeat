@@ -30,9 +30,11 @@ do_build() {
 		# Using `script` preserves terminal colors.
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true script -q -e -f -c 'pnpm astro build' /dev/null 2>&1 | tee /dev/tty | sed -r "s/\x1B\[[0-9;]*[A-Za-z]//g"
 	elif has_tty; then
+		# Use TTY to preserve colors.
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/tty
 	else
-		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/stderr
+		# If all else fails, duplicate the stream with pure bash.
+		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | while IFS= read -r l; do echo "$l"; echo "$l" >&2; done
 	fi
 }
 

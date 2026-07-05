@@ -515,6 +515,9 @@ describe('codebase integrity', () => {
 			'eternalsafe.Containerfile',
 			'[attrGroupId].astro',
 			'[walletName]',
+			'[...slug]',
+			'[...img].gif.ts',
+			'[...img].png.ts',
 		])
 
 		const componentsFailed: string[] = []
