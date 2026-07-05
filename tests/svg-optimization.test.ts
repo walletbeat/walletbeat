@@ -110,6 +110,7 @@ const optimizedSvgHashes: Record<string, string> = {
 		'81d3248eb033216dad88005dbaca90e637709c66351ad1f5e3a6a0a65b6b051b',
 	'public/logo-dark.svg': '1724b327def6bdb066c6b47629986b0d4a83625df6399177da2e7386de4cc6b2',
 	'public/logo-light.svg': '80cb26c313cc96082a0254e95110536f8326b5c7086e1eead8b6efd1884b28bf',
+	'public/logo.svg': '6de5674417b300ce7562e58416628872bf10fe74031c26d6ce6f803c293bb64b',
 	'resources/branding/icon_dark.svg':
 		'e88bce5e2c9a34c9bbc169bab233ad07103f4f1409ffa93ce1e54134ff2fbbc0',
 	'resources/branding/icon_light.svg':
