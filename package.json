@@ -6,7 +6,7 @@
 	"scripts": {
 		"astro": "cross-env ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "deploy/build.sh",
-		"check:all": "pnpm run \"/^check:(astro|vitest|lint|syntax|spelling:quiet|misc|build:post:quiet)$/\"",
+		"check:all": "pnpm run \"/^check:(astro|vitest|lint|syntax|spelling:quiet|misc|build:post:quiet|signed-commit:quiet)$/\"",
 		"check:quick": "pnpm run \"/^check:(lint:quick|syntax|spelling:quiet|misc)$/\"",
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
 		"check:build:post": "tests/postbuild.sh",
@@ -24,6 +24,8 @@
 		"check:syntax": "prettier --check .",
 		"check:treasury:markdown": "tsx src/tools/treasury-markdown-updater/treasury-markdown-updater.ts",
 		"check:features:markdown": "tsx src/tools/features-markdown-generator/features-markdown-generator.ts",
+		"check:signed-commit": "bash tests/signed-commit.test.sh",
+		"check:signed-commit:quiet": "bash tests/signed-commit.test.sh --quiet",
 		"check:vitest": "vitest --typecheck --cache --run",
 		"generate:css-attributes": "pnpm run \"/^generate:css-attributes:.+/\"",
 		"generate:css-attributes:typescript": "tsx src/styles/generate/css-attributes-typescript.ts",
