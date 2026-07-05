@@ -14,6 +14,7 @@ import rawData from './entity-domains.json'
  *   one or more intermediaries (e.g. a TLS-terminating CDN) also see the
  *   request data on its way to the operator.
  */
+/* eslint-disable sort-keys-custom-order/type-keys -- `operator` is deliberately listed first */
 export type DomainMapping =
 	| EntityId
 	| {
@@ -28,6 +29,7 @@ export type DomainMapping =
 			 */
 			intermediaries: NonEmptyArray<EntityId>
 	  }
+/* eslint-enable sort-keys-custom-order/type-keys */
 
 /** Type for entity-domains.json */
 export type DomainToEntityIdMapping = Record<string, DomainMapping>
@@ -52,14 +54,14 @@ function assertValidDomainMapping(domain: string, val: unknown): DomainMapping {
 
 	const keys = Object.keys(val)
 
-	const hasExpectedKeys = (v: object): v is { operator: unknown; intermediaries: unknown } =>
+	const hasExpectedKeys = (v: object): v is { intermediaries: unknown; operator: unknown } =>
 		Object.hasOwn(v, 'operator') && Object.hasOwn(v, 'intermediaries')
 
 	if (keys.toSorted().join(',') !== 'intermediaries,operator' || !hasExpectedKeys(val)) {
 		throw invalid('object form must have exactly the keys `operator` and `intermediaries`')
 	}
 
-	const { operator, intermediaries } = val
+	const { intermediaries, operator } = val
 
 	if (typeof operator !== 'string' || !isValidEntityId(operator)) {
 		throw invalid(`unknown operator entity ID '${String(operator)}'`)
@@ -95,7 +97,7 @@ function assertValidDomainMapping(domain: string, val: unknown): DomainMapping {
 		throw invalid(`operator '${operator}' must not also be listed in \`intermediaries\``)
 	}
 
-	return { operator, intermediaries: intermediaryIds }
+	return { intermediaries: intermediaryIds, operator }
 }
 
 export function assertValidDomainToEntityIdMapping(data: unknown): DomainToEntityIdMapping {
@@ -116,11 +118,23 @@ export function assertValidDomainToEntityIdMapping(data: unknown): DomainToEntit
 	return mapping
 }
 
-const domainToEntityIdMapping = assertValidDomainToEntityIdMapping(rawData)
+let domainToEntityIdMapping = assertValidDomainToEntityIdMapping(rawData)
+
+/**
+ * Replace the module-level mapping used by `domainMappingForDomain` and
+ * `entitiesForDomain`, which is otherwise loaded from entity-domains.json at
+ * import time. The `mark-domain` / `mark-domain-update` CLI subcommands call
+ * this after reading the working copy of the file they edit; tests call it
+ * with synthetic mappings.
+ */
+export function updateDomainMapping(mapping: DomainToEntityIdMapping): void {
+	domainToEntityIdMapping = mapping
+}
 
 /**
  * The set of entities that see the data sent to a domain.
  */
+/* eslint-disable sort-keys-custom-order/type-keys -- `operator` is deliberately listed first */
 export interface ResolvedDomain {
 	/** The intended recipient of the request data (data controller). */
 	operator: Entity
@@ -131,25 +145,17 @@ export interface ResolvedDomain {
 	 */
 	intermediaries: Entity[]
 }
+/* eslint-enable sort-keys-custom-order/type-keys */
 
 /**
- * Look up the domain mapping for a domain within a given mapping.
+ * Look up the domain mapping for a domain.
  * Exact matches take precedence over parent-domain (suffix) matches, so a
  * CDN-fronted subdomain can carry intermediaries without asserting them for
  * the whole apex domain.
- *
- * Parameterized over `mapping` (rather than using the module-level mapping)
- * because the `mark-domain` / `mark-domain-update` CLI subcommands need to
- * resolve against the freshly-read working copy of the file they are editing,
- * which the module-level mapping (loaded at import time) may not reflect.
- * Use `entitiesForDomain` for lookups against the committed data.
  */
-export function domainMappingIn(
-	mapping: DomainToEntityIdMapping,
-	domain: string,
-): DomainMapping | null {
-	if (Object.hasOwn(mapping, domain)) {
-		return mapping[domain]
+export function domainMappingForDomain(domain: string): DomainMapping | null {
+	if (Object.hasOwn(domainToEntityIdMapping, domain)) {
+		return domainToEntityIdMapping[domain]
 	}
 
 	// Prefer the longest (most specific) matching parent domain, so that
@@ -157,39 +163,13 @@ export function domainMappingIn(
 	// `deep.sub.example.com` even when `example.com` is mapped too.
 	let bestMatch: string | null = null
 
-	for (const d of Object.keys(mapping)) {
+	for (const d of Object.keys(domainToEntityIdMapping)) {
 		if (domain.endsWith('.' + d) && (bestMatch === null || d.length > bestMatch.length)) {
 			bestMatch = d
 		}
 	}
 
-	return bestMatch === null ? null : mapping[bestMatch]
-}
-
-/**
- * Resolve a domain mapping into entities within a given mapping.
- *
- * Parameterized over `mapping` for the same reason as `domainMappingIn`, and
- * so unit tests can exercise resolution precedence with synthetic mappings.
- */
-export function entitiesForDomainIn(
-	mapping: DomainToEntityIdMapping,
-	domain: string,
-): ResolvedDomain | null {
-	const domainMapping = domainMappingIn(mapping, domain)
-
-	if (domainMapping === null) {
-		return null
-	}
-
-	if (typeof domainMapping === 'string') {
-		return { operator: entityById(domainMapping), intermediaries: [] }
-	}
-
-	return {
-		operator: entityById(domainMapping.operator),
-		intermediaries: domainMapping.intermediaries.map(entityById),
-	}
+	return bestMatch === null ? null : domainToEntityIdMapping[bestMatch]
 }
 
 /**
@@ -200,5 +180,18 @@ export function entitiesForDomainIn(
  *          or `null` if the domain is not associated with any entity.
  */
 export function entitiesForDomain(domain: string): ResolvedDomain | null {
-	return entitiesForDomainIn(domainToEntityIdMapping, domain)
+	const domainMapping = domainMappingForDomain(domain)
+
+	if (domainMapping === null) {
+		return null
+	}
+
+	if (typeof domainMapping === 'string') {
+		return { intermediaries: [], operator: entityById(domainMapping) }
+	}
+
+	return {
+		intermediaries: domainMapping.intermediaries.map(entityById),
+		operator: entityById(domainMapping.operator),
+	}
 }

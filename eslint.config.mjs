@@ -24,7 +24,6 @@ const firstOrderedKeys = [
 	'type',
 	'metadata',
 	'ref',
-	'operator',
 ]
 
 export default [

@@ -10,10 +10,11 @@ import { type EntityId, isValidEntityId } from '@/data/entities'
 import {
 	assertValidDomainToEntityIdMapping,
 	type DomainMapping,
-	domainMappingIn,
+	domainMappingForDomain,
 	type DomainToEntityIdMapping,
 	entitiesForDomain,
 	type ResolvedDomain,
+	updateDomainMapping,
 } from '@/data/entities/domains/entity-domains'
 import { allWallets, isValidWalletName, type WalletName } from '@/data/wallets'
 import {
@@ -891,18 +892,23 @@ function domainMappingFilePath(): string {
 
 async function readDomainMappingFile(): Promise<DomainToEntityIdMapping> {
 	const domainFile = domainMappingFilePath()
+	let mapping: DomainToEntityIdMapping = {}
 
-	if (!fs.existsSync(domainFile)) {
-		return {}
+	if (fs.existsSync(domainFile)) {
+		try {
+			const content = await fs.promises.readFile(domainFile, 'utf8')
+
+			mapping = assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
+		} catch (e) {
+			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
+		}
 	}
 
-	try {
-		const content = await fs.promises.readFile(domainFile, 'utf8')
+	// Later lookups (e.g. `domainMappingForDomain`) must resolve against the
+	// working copy just read, not the mapping loaded at import time.
+	updateDomainMapping(mapping)
 
-		return assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
-	} catch (e) {
-		throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
-	}
+	return mapping
 }
 
 /**
@@ -1062,7 +1068,7 @@ export async function handleMarkDomainUpdate(opts: MarkDomainUpdateOptions): Pro
 	const existingDomains = await readDomainMappingFile()
 
 	if (!Object.hasOwn(existingDomains, targetDomain)) {
-		const suffixMapping = domainMappingIn(existingDomains, targetDomain)
+		const suffixMapping = domainMappingForDomain(targetDomain)
 
 		throw new Error(
 			`Domain '${targetDomain}' has no exact mapping entry to update.${

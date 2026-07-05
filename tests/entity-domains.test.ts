@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import {
 	assertValidDomainToEntityIdMapping,
 	entitiesForDomain,
-	entitiesForDomainIn,
+	updateDomainMapping,
 } from '@/data/entities/domains/entity-domains'
+import rawData from '@/data/entities/domains/entity-domains.json'
 
 describe('assertValidDomainToEntityIdMapping', () => {
 	it('accepts the bare entity ID form', () => {
@@ -78,54 +79,62 @@ describe('assertValidDomainToEntityIdMapping', () => {
 	})
 })
 
-describe('entitiesForDomainIn', () => {
-	const mapping = assertValidDomainToEntityIdMapping({
-		'example.walletbeat.eth': { operator: 'walletbeat', intermediaries: ['cloudflare'] },
-		'sentry.io': 'sentry',
-		'walletbeat.eth': 'walletbeat',
+describe('entitiesForDomain with a synthetic mapping', () => {
+	beforeAll(() => {
+		updateDomainMapping(
+			assertValidDomainToEntityIdMapping({
+				'example.walletbeat.eth': { operator: 'walletbeat', intermediaries: ['cloudflare'] },
+				'sentry.io': 'sentry',
+				'walletbeat.eth': 'walletbeat',
+			}),
+		)
+	})
+
+	afterAll(() => {
+		updateDomainMapping(assertValidDomainToEntityIdMapping(rawData))
 	})
 
 	it('resolves an exact bare mapping with no intermediaries', () => {
-		const resolved = entitiesForDomainIn(mapping, 'sentry.io')
+		const resolved = entitiesForDomain('sentry.io')
 
 		expect(resolved?.operator.id).toBe('sentry')
 		expect(resolved?.intermediaries).toEqual([])
 	})
 
 	it('resolves subdomains through the parent domain', () => {
-		const resolved = entitiesForDomainIn(mapping, 'o1234.ingest.sentry.io')
+		const resolved = entitiesForDomain('o1234.ingest.sentry.io')
 
 		expect(resolved?.operator.id).toBe('sentry')
 		expect(resolved?.intermediaries).toEqual([])
 	})
 
 	it('resolves intermediaries on an exact hostname without affecting the apex', () => {
-		const withIntermediary = entitiesForDomainIn(mapping, 'example.walletbeat.eth')
+		const withIntermediary = entitiesForDomain('example.walletbeat.eth')
 
 		expect(withIntermediary?.operator.id).toBe('walletbeat')
 		expect(withIntermediary?.intermediaries.map(e => e.id)).toEqual(['cloudflare'])
 
-		const apex = entitiesForDomainIn(mapping, 'walletbeat.eth')
+		const apex = entitiesForDomain('walletbeat.eth')
 
 		expect(apex?.operator.id).toBe('walletbeat')
 		expect(apex?.intermediaries).toEqual([])
 
-		const sibling = entitiesForDomainIn(mapping, 'other.walletbeat.eth')
+		const sibling = entitiesForDomain('other.walletbeat.eth')
 
 		expect(sibling?.operator.id).toBe('walletbeat')
 		expect(sibling?.intermediaries).toEqual([])
 	})
 
 	it('prefers the longest matching parent domain', () => {
-		const resolved = entitiesForDomainIn(mapping, 'deep.example.walletbeat.eth')
+		const resolved = entitiesForDomain('deep.example.walletbeat.eth')
 
 		expect(resolved?.operator.id).toBe('walletbeat')
 		expect(resolved?.intermediaries.map(e => e.id)).toEqual(['cloudflare'])
 	})
 
 	it('returns null for unassociated domains', () => {
-		expect(entitiesForDomainIn(mapping, 'unrelated.com')).toBeNull()
-		expect(entitiesForDomainIn(mapping, 'not-sentry.io')).toBeNull()
+		expect(entitiesForDomain('unrelated.com')).toBeNull()
+		expect(entitiesForDomain('not-sentry.io')).toBeNull()
 	})
 })
 
