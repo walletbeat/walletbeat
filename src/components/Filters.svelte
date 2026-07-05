@@ -32,8 +32,8 @@
 ">
 	// Types/constants
 	import type { SvelteHTMLElements } from 'svelte/elements'
-	
-	
+
+
 	// Props
 	import { SvelteSet } from 'svelte/reactivity'
 
@@ -141,9 +141,19 @@
 	filter: Filter<typeof items[number]>,
 	count: number
 )}
-	<span class="icon" aria-hidden="true">{@html filter.icon}</span>
-	<span class="label">{filter.label}</span>
-	<span class="count">
+	<span
+		data-icon
+		aria-hidden="true"
+	>{@html filter.icon}</span>
+
+	<span
+		class="label"
+		data-row-item="flexible"
+	>{filter.label}</span>
+
+	<span
+		class="count"
+	>
 		<span hidden>(</span>{count}<span hidden>)</span>
 	</span>
 {/snippet}
@@ -233,7 +243,7 @@
 
 							<label
 								data-filter={filter.id}
-								data-column="gap-3"
+								data-row="gap-3"
 								class:disabled={count === 0}
 							>
 								<input
@@ -316,7 +326,7 @@
 
 							<label
 								data-filter={filter.id}
-								data-column="gap-3"
+								data-row="gap-3"
 								class:disabled={count === 0 && !isChecked}
 							>
 								<input
@@ -420,8 +430,11 @@
 					display: none;
 				}
 
+				[data-icon] {
+					--icon-size: 1.25em;
+				}
+
 				.label {
-					flex: 1 0 auto;
 					text-align: left;
 				}
 			}
