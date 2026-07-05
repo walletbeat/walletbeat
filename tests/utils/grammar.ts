@@ -255,6 +255,26 @@ function overlapsAnyRange(
 	return false
 }
 
+let cspellWordsSet: Set<string> | null = null
+
+function getCspellWordsSet(): Set<string> {
+	if (cspellWordsSet === null) {
+		const s = new Set<string>()
+
+		for (const word of getCSpellWords()) {
+			s.add(word.toLowerCase())
+		}
+		cspellWordsSet = s
+	}
+
+	return cspellWordsSet
+}
+
+/** Return true if `word` appears in .cspell.json's `words` list (case-insensitive). */
+function isInCspellWords(word: string): boolean {
+	return getCspellWordsSet().has(word.toLowerCase())
+}
+
 /** Lint a string for grammar errors; return raw error messages. */
 export async function grammarLintMessages(
 	text: string,
@@ -290,6 +310,25 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
 	)
+
+	// Ignore Spelling lints for possessive proper nouns whose base word is in the cspell
+	// vocabulary (e.g. "Gnosis's": "Gnosis" is in .cspell.json so it is a valid proper noun).
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Spelling') {
+			return true
+		}
+
+		const text = lint.get_problem_text()
+		const firstChar = text[0]
+
+		if (!text.endsWith("'s") || !firstChar || firstChar.toUpperCase() !== firstChar) {
+			return true
+		}
+
+		const baseWord = text.slice(0, -2)
+
+		return !isInCspellWords(baseWord)
+	})
 
 	// Ignore Word Choice lints for "lockdown" — used intentionally as a compound noun (e.g. "onchain lockdown").
 	lints = lints.filter(
