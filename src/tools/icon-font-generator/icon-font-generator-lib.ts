@@ -244,7 +244,12 @@ export const repeatedIconFontUnicodeSequences = (iconUnicodeSequences: IconUnico
 	)
 
 const iconFontCSSRuleForIcon = (key: string, iconContent: string) =>
-	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
+	[
+		`:is(&[data-icon~="${key}"], [data-list-item-marker="${key}"]) {`,
+		`\t--icon-content: "${iconContent}";`,
+		'\t--list-marker-fontFamily: var(--fontFamily-wbicons);',
+		'}',
+	].join('\n')
 
 export const generatedIconFontTypescript = (
 	fontTypeName: string,
@@ -584,15 +589,21 @@ const fontWithEmojiVariationSequences = (
 export const generatedIconFontCSS = (fontName: string, cssRules: readonly string[]) => {
 	return [
 		'[data-icon~="wbicons"] {',
+		`\tfont-family: var(--fontFamily-${fontName});`,
+		'\tfont-style: normal;',
+		'\t-webkit-font-smoothing: subpixel-antialiased;',
+		'\t-moz-osx-font-smoothing: grayscale;',
+		'',
 		'\t&::before {',
 		'\t\tcontent: var(--icon-content);',
-		`\t\tfont-family: var(--fontFamily-${fontName});`,
-		'\t\tfont-style: normal;',
-		'\t\t-webkit-font-smoothing: antialiased;',
-		'\t\t-moz-osx-font-smoothing: grayscale;',
+		'\t\tfont-size: var(--icon-size, 1em);',
 		'\t}',
 		'',
-		'\t&[data-icon~="emoji"]::before {',
+		'\t&[data-icon~="circle"]::before {',
+		'\t\tfont-size: calc(var(--icon-size, 2rem) * 0.55);',
+		'\t}',
+		'',
+		'\t&[data-icon~="emoji"] {',
 		'\t\tfont-family: var(--fontFamily-emoji);',
 		'\t}',
 		'',

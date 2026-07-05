@@ -130,6 +130,42 @@
 	touch-action: none;
 }
 
+label:has(> input) {
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	padding: 0;
+	gap: 0;
+	background-color: var(--background-primary);
+	border: 1px solid var(--border-color);
+	border-radius: 999em;
+	color: inherit;
+	font: inherit;
+	font-size: smaller;
+	line-height: 1;
+	transition-property: opacity, scale;
+	transition-duration: var(--pressable-transitionOutDuration);
+
+	&:active {
+		opacity: var(--pressable-pressed-opacity);
+		scale: var(--pressable-pressed-scale);
+		transition-duration: var(--pressable-transitionInDuration);
+	}
+
+	&:has(> input:focus-visible) {
+		outline: 2px solid var(--accent);
+		outline-offset: -1px;
+	}
+
+	> input {
+		min-inline-size: 0;
+		border: 0;
+		background: transparent;
+		font: inherit;
+		outline: 0;
+	}
+}
+
 *,
 ::before,
 ::after,

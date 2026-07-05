@@ -230,6 +230,76 @@ label:has(
 	scale: var(--pressable-pressed-scale);
 }
 
+
+/**
+ * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control.
+ *
+ * ### Tokens
+ * - shape: `circle`, `filled`
+ * - source: `wbicons`
+ *
+ * ### CSS Variables
+ * - `--icon-size`
+ * - `--icon-navigation-borderColor`
+ * - `--icon-navigation-color`
+ *
+ * ### Examples
+ * ```html
+ * <span data-icon="wbicons security" aria-hidden="true"></span>
+ * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
+ * ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`
+ */
+[data-icon] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--icon-size, 1em);
+	block-size: var(--icon-size, 1em);
+	line-height: 1;
+	flex-shrink: 0;
+
+	> span {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	> :is(img, svg),
+	> span > :is(img, svg) {
+		border-radius: 0;
+		inline-size: 100%;
+		block-size: 100%;
+	}
+
+	&[data-icon~="circle"] {
+		inline-size: var(--icon-size, 2rem);
+		block-size: var(--icon-size, 2rem);
+		border-radius: 50%;
+		border: 1px solid var(--icon-navigation-borderColor);
+		padding: 0;
+		color: var(--icon-navigation-color);
+
+		> :is(img, svg),
+		> span > :is(img, svg) {
+			inline-size: calc(var(--icon-size, 2rem) * 0.55);
+			block-size: calc(var(--icon-size, 2rem) * 0.55);
+		}
+
+		&[data-stack] {
+			display: inline-grid;
+			place-items: center;
+		}
+	}
+
+	&[data-icon~="filled"] {
+		background-color: var(--accent);
+		border-color: transparent;
+	}
+}
+
 span svg {
 	display: inline-flex;
 	justify-content: center;
@@ -315,19 +385,23 @@ span svg {
  */
 [data-column],
 [data-card] {
-	display: grid;
-	grid-template-columns: 1fr;
-	/* grid-template-columns: minmax(0, 1fr); */
-	gap: 1em;
+	display: flex;
+	flex-direction: column;
+
+	&[data-row] {
+		flex-direction: row;
+	}
+
+	gap: 0.5em;
 	align-content: start;
 
-	&[data-column~="start"] {
+	&[data-column~='start'] {
 		justify-items: start;
 	}
-	&[data-column~="center"] {
+	&[data-column~='center'] {
 		justify-items: center;
 	}
-	&[data-column~="end"] {
+	&[data-column~='end'] {
 		justify-items: end;
 	}
 
@@ -354,6 +428,52 @@ span svg {
 	}
 	&[data-column~="gap-8"] {
 		gap: 2em;
+	}
+
+	/**
+	 * Column child sizing tokens for direct children of `[data-column]` / `[data-card]`.
+	 *
+	 * ### Tokens
+	 * - growth: `flexible`
+	 *
+	 * ### Examples
+	 * ```html
+	 * <section data-column>
+	 *   <div data-column-item="flexible">Main</div>
+	 * </section>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column-item]`
+	 */
+	[data-column-item~='flexible'] {
+		flex: 1;
+	}
+
+	[data-column-item~='basis-1'] {
+		flex-basis: 16ch;
+	}
+	[data-column-item~='basis-2'] {
+		flex-basis: 22ch;
+	}
+	[data-column-item~='basis-3'] {
+		flex-basis: 28ch;
+	}
+	[data-column-item~='basis-4'] {
+		flex-basis: 34ch;
+	}
+
+	[data-column-item~='start'] {
+		align-self: start;
+	}
+	[data-column-item~='center'] {
+		align-self: center;
+	}
+	[data-column-item~='end'] {
+		align-self: end;
+	}
+	[data-column-item~='baseline'] {
+		align-self: baseline;
 	}
 }
 
@@ -862,11 +982,25 @@ ol {
 	--list-gap: 0.5lh;
 
 	/* Rules */
-	display: grid;
-	gap: var(--list-gap);
-	list-style-type: disc;
-	list-style-position: outside;
-	padding-inline-start: var(--list-marker-inlineSize);
+	&:not([data-list~='unstyled']) {
+		display: grid;
+		gap: var(--list-gap);
+		list-style-type: disc;
+		list-style-position: outside;
+		padding-inline-start: var(--list-marker-inlineSize);
+	}
+
+	&[data-list~='unstyled'] {
+		list-style-type: none;
+		list-style-position: inside;
+		padding-inline-start: 0;
+
+		> li,
+		> [data-list-item] {
+			list-style-type: none;
+			padding-inline-start: 0;
+		}
+	}
 
 	&[data-card] {
 		padding-inline-start: calc(var(--card-padding) + var(--list-marker-inlineSize));
@@ -895,15 +1029,15 @@ ol {
 	}
 
 	/**
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. Marker names matching generated `wbicons` IDs render through the icon font; other marker strings render as literal text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
-	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string or generated `wbicons` ID (otherwise the default bullet glyph applies).
 	 *
 	 * ### Tokens
 	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
-	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+	 * - marker: the displayed marker string or generated `wbicons` ID via `[data-list-item-marker]` (not space-separated tokens)
 	 *
 	 * ### CSS Variables
 	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -918,7 +1052,7 @@ ol {
 	 *     </li>
 	 *   </ul>
 	 *   ```
-	 * - Custom marker string (`[data-list-item-marker]`):
+	 * - Custom marker string or `wbicons` ID (`[data-list-item-marker]`):
 	 *   ```html
 	 *   <ul>
 	 *     <li data-list-item-marker="*">First step</li>
@@ -929,8 +1063,10 @@ ol {
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
 	 */
-	> li,
-	> [data-list-item] {
+	&:not([data-list~='unstyled']) > :is(
+		li,
+		[data-list-item]
+	) {
 		position: relative;
 		--listItem-gap: 0.25lh;
 
@@ -976,11 +1112,12 @@ ol {
 				width: var(--list-marker-inlineSize);
 
 				content: '●';
+				font-family: var(--list-marker-fontFamily, inherit);
 				font-size: 1em;
 				text-align: center;
 			}
 			&[data-list-item-marker]::before {
-				content: attr(data-list-item-marker);
+				content: var(--icon-content, attr(data-list-item-marker));
 			}
 		/* } */
 
@@ -1031,15 +1168,23 @@ ol {
 	/* Inputs */
 	--scrollContainer-sizeBlock: 100cqb;
 	--scrollContainer-sizeInline: 100cqi;
+	--scrollContainer-perspective: 900px;
 
 	/* Rules */
 	overscroll-behavior: none;
+	scrollbar-gutter: stable;
+	scrollbar-width: none;
 	touch-action: pan-x pan-y;
+	perspective: var(--scrollContainer-perspective);
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 
 	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
 		container-type: size;
 		container-type: scroll-state size;
-		overflow: hidden auto;
+		overflow: auto auto;
 	}
 	&[data-scroll-container~="block"] {
 		container-type: inline-size;
@@ -1049,6 +1194,8 @@ ol {
 	&[data-scroll-container~="inline"] {
 		container-type: block-size;
 		container-type: scroll-state block-size;
+		min-inline-size: 0;
+		max-inline-size: 100%;
 		overflow-x: auto;
 	}
 
@@ -1076,13 +1223,12 @@ ol {
 	--sticky-sizeBlock: var(--sticky0-sizeBlock);
 	--sticky-sizeInline: var(--sticky0-sizeInline);
 
-	/* Firefox: not supported (find workaround to support resetting nested `[data-scroll-container]`s) */
-	/* @scope (
-		&
-	) to (
-		[data-scroll-container] > *
-	) { */
-		[data-sticky-container]:not(&) {
+	/* Scope sticky levels to the nearest scroll container so nested scroll containers reset their own stack. */
+	@scope (&) to ([data-scroll-container] > *) {
+		:scope
+			[data-sticky-container]:not(
+				:scope [data-sticky-container] [data-sticky-container]
+			) {
 			--sticky-level: 1;
 
 			--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1106,7 +1252,7 @@ ol {
 			--sticky-sizeBlock: var(--sticky1-sizeBlock);
 			--sticky-sizeInline: var(--sticky1-sizeInline);
 
-			[data-sticky-container] {
+			& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
 				--sticky-level: 2;
 
 				--sticky2-insetBlockStart: calc(var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1130,7 +1276,7 @@ ol {
 				--sticky-sizeBlock: var(--sticky2-sizeBlock);
 				--sticky-sizeInline: var(--sticky2-sizeInline);
 
-				[data-sticky-container] {
+				& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
 					--sticky-level: 3;
 
 					--sticky3-insetBlockStart: calc(var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1154,7 +1300,7 @@ ol {
 					--sticky-sizeBlock: var(--sticky3-sizeBlock);
 					--sticky-sizeInline: var(--sticky3-sizeInline);
 
-					[data-sticky-container] {
+					& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
 						--sticky-level: 4;
 
 						--sticky4-insetBlockStart: calc(var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1177,11 +1323,36 @@ ol {
 
 						--sticky-sizeBlock: var(--sticky4-sizeBlock);
 						--sticky-sizeInline: var(--sticky4-sizeInline);
+
+						& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
+							--sticky-level: 5;
+
+							--sticky5-insetBlockStart: calc(var(--sticky4-insetBlockStart) + var(--sticky4-paddingBlockStart) + var(--sticky-marginBlockStart));
+							--sticky5-insetBlockEnd: calc(var(--sticky4-insetBlockEnd) + var(--sticky4-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+							--sticky5-insetInlineStart: calc(var(--sticky4-insetInlineStart) + var(--sticky4-paddingInlineStart) + var(--sticky-marginInlineStart));
+							--sticky5-insetInlineEnd: calc(var(--sticky4-insetInlineEnd) + var(--sticky4-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+
+							--sticky5-paddingBlockStart: var(--sticky-paddingBlockStart);
+							--sticky5-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+							--sticky5-paddingInlineStart: var(--sticky-paddingInlineStart);
+							--sticky5-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+							--sticky5-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky5-insetBlockStart) - var(--sticky5-insetBlockEnd));
+							--sticky5-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky5-insetInlineStart) - var(--sticky5-insetInlineEnd));
+
+							--sticky-insetBlockStart: var(--sticky5-insetBlockStart);
+							--sticky-insetBlockEnd: var(--sticky5-insetBlockEnd);
+							--sticky-insetInlineStart: var(--sticky5-insetInlineStart);
+							--sticky-insetInlineEnd: var(--sticky5-insetInlineEnd);
+
+							--sticky-sizeBlock: var(--sticky5-sizeBlock);
+							--sticky-sizeInline: var(--sticky5-sizeInline);
+						}
 					}
 				}
 			}
 		}
-	/* } */
+	}
 
 
 	/**
@@ -1227,6 +1398,10 @@ ol {
 		/* Rules */
 		isolation: isolate;
 
+		&:has(> [data-scroll-item~="inline-attached"]) {
+			inline-size: min-content;
+			min-inline-size: var(--sticky-sizeInline);
+		}
 
 		/**
 		 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
@@ -1278,11 +1453,11 @@ ol {
 				max-block-size: calc(var(--scrollContainer-sizeBlock) - var(--sticky-insetBlockStart) - var(--sticky-insetBlockEnd));
 
 				&[data-sticky~="block-start"] {
-					inset-inline-end: auto;
+					inset-block-end: auto;
 				}
 
 				&[data-sticky~="block-end"] {
-					inset-inline-start: auto;
+					inset-block-start: auto;
 				}
 			}
 			&:not([data-sticky~="block"]):not([data-sticky~="inline"]),
@@ -1304,6 +1479,7 @@ ol {
 			&:not([data-sticky~="backdrop-none"]) {
 				&[data-scroll-container],
 				&:not([data-scroll-container])::before {
+					background-color: var(--sticky-backgroundColor);
 					backdrop-filter: var(--sticky-backdropFilter);
 					border-radius: inherit;
 
@@ -1392,7 +1568,7 @@ ol {
 			}
 			&[data-scroll-item~="inline-attached"] {
 				display: grid;
-				inline-size: min-content;
+				inline-size: max-content;
 				min-inline-size: var(--sticky-sizeInline);
 
 				&[data-scroll-item~="underflow-start"] {

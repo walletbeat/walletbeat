@@ -132,6 +132,82 @@ interface CssAttributes {
 	'data-column'?: string | boolean
 
 	/**
+	 * ## [data-column-item]
+	 *
+	 * One-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the
+	 * same column/grid defaults before card-specific rules apply below. Single-column grid with theme gap and alignment defaults. Add space-separated tokens on `[data-column]`.
+	 *
+	 * ### Applied to
+	 * - `[data-card]`
+	 *
+	 * ### Tokens
+	 * - alignment: `start`, `center`, `end`
+	 * - spacing: `gap-0`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `gap-6`, `gap-8`
+	 *
+	 * ### Examples
+	 * - Default column grid (`1em` gap, start-aligned content):
+	 *   ```html
+	 *   <section data-column>
+	 *     <h2>Overview</h2>
+	 *     <p>Supporting copy.</p>
+	 *   </section>
+	 *   ```
+	 * - Start-aligned items, tighter gap (`gap-2`):
+	 *   ```html
+	 *   <section data-column="start gap-2">
+	 *     <h2>Overview</h2>
+	 *     <p>Supporting copy.</p>
+	 *   </section>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`
+	 *
+	 * ---
+	 *
+	 * Column child sizing tokens for direct children of `[data-column]` / `[data-card]`.
+	 *
+	 * ### Tokens
+	 * - growth: `flexible`
+	 *
+	 * ### Examples
+	 * ```html
+	 * <section data-column>
+	 *   <div data-column-item="flexible">Main</div>
+	 * </section>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column-item]`
+	 */
+	'data-column-item'?: string | boolean
+
+	/**
+	 * ## [data-icon]
+	 *
+	 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control.
+	 *
+	 * ### Tokens
+	 * - shape: `circle`, `filled`
+	 * - source: `wbicons`
+	 *
+	 * ### CSS Variables
+	 * - `--icon-size`
+	 * - `--icon-navigation-borderColor`
+	 * - `--icon-navigation-color`
+	 *
+	 * ### Examples
+	 * ```html
+	 * <span data-icon="wbicons security" aria-hidden="true"></span>
+	 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`
+	 */
+	'data-icon'?: string | boolean
+
+	/**
 	 * ## [data-input]
 	 *
 	 * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
@@ -224,6 +300,42 @@ interface CssAttributes {
 	 *
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`
+	 *
+	 * ---
+	 *
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. Marker names matching generated `wbicons` IDs render through the icon font; other marker strings render as literal text.
+	 *
+	 * ### Placement
+	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string or generated `wbicons` ID (otherwise the default bullet glyph applies).
+	 *
+	 * ### Tokens
+	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
+	 * - marker: the displayed marker string or generated `wbicons` ID via `[data-list-item-marker]` (not space-separated tokens)
+	 *
+	 * ### CSS Variables
+	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
+	 *
+	 * ### Examples
+	 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):
+	 *   ```html
+	 *   <ul>
+	 *     <li data-list-item="gap-4">
+	 *       <p>Lead</p>
+	 *       <p>Detail</p>
+	 *     </li>
+	 *   </ul>
+	 *   ```
+	 * - Custom marker string or `wbicons` ID (`[data-list-item-marker]`):
+	 *   ```html
+	 *   <ul>
+	 *     <li data-list-item-marker="*">First step</li>
+	 *     <li data-list-item-marker="1.">Second step</li>
+	 *   </ul>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
 	 */
 	'data-list'?: string | boolean
 
@@ -264,15 +376,15 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. Marker names matching generated `wbicons` IDs render through the icon font; other marker strings render as literal text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
-	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string or generated `wbicons` ID (otherwise the default bullet glyph applies).
 	 *
 	 * ### Tokens
 	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
-	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+	 * - marker: the displayed marker string or generated `wbicons` ID via `[data-list-item-marker]` (not space-separated tokens)
 	 *
 	 * ### CSS Variables
 	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -287,7 +399,7 @@ interface CssAttributes {
 	 *     </li>
 	 *   </ul>
 	 *   ```
-	 * - Custom marker string (`[data-list-item-marker]`):
+	 * - Custom marker string or `wbicons` ID (`[data-list-item-marker]`):
 	 *   ```html
 	 *   <ul>
 	 *     <li data-list-item-marker="*">First step</li>
@@ -337,15 +449,15 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. Marker names matching generated `wbicons` IDs render through the icon font; other marker strings render as literal text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
-	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string or generated `wbicons` ID (otherwise the default bullet glyph applies).
 	 *
 	 * ### Tokens
 	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
-	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+	 * - marker: the displayed marker string or generated `wbicons` ID via `[data-list-item-marker]` (not space-separated tokens)
 	 *
 	 * ### CSS Variables
 	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
@@ -360,7 +472,7 @@ interface CssAttributes {
 	 *     </li>
 	 *   </ul>
 	 *   ```
-	 * - Custom marker string (`[data-list-item-marker]`):
+	 * - Custom marker string or `wbicons` ID (`[data-list-item-marker]`):
 	 *   ```html
 	 *   <ul>
 	 *     <li data-list-item-marker="*">First step</li>
