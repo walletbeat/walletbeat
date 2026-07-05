@@ -2,7 +2,7 @@ import * as harper from 'harper.js'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
-import { getCSpellWords } from '@/tests/utils/cspell'
+import { getCSpellPatterns, getCSpellWords } from '@/tests/utils/cspell'
 import {
 	ContentType,
 	prerenderTypographicContent,
@@ -222,12 +222,49 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 	}),
 ]
 
+/**
+ * Return all character ranges in `text` matched by any active cspell pattern.
+ */
+function collectCspellPatternRanges(text: string): { start: number; end: number }[] {
+	const ranges: { start: number; end: number }[] = []
+	const patterns = getCSpellPatterns()
+
+	for (const regex of patterns) {
+		for (const m of text.matchAll(regex)) {
+			const start = m.index ?? 0
+
+			ranges.push({ start, end: start + m[0].length })
+		}
+	}
+
+	return ranges
+}
+
+/** Return true if `[spanStart, spanEnd)` overlaps any entry in `ranges`. */
+function overlapsAnyRange(
+	spanStart: number,
+	spanEnd: number,
+	ranges: { start: number; end: number }[],
+): boolean {
+	for (const r of ranges) {
+		if (spanStart < r.end && spanEnd > r.start) {
+			return true
+		}
+	}
+
+	return false
+}
+
 /** Lint a string for grammar errors; return raw error messages. */
 export async function grammarLintMessages(
 	text: string,
 	lintOptions?: harper.LintOptions,
 ): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
+
+	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
+	const cspellRanges = collectCspellPatternRanges(trimmedText)
+
 	let lints: Lint[] = []
 
 	for (const grammarLinterFn of grammarLinters) {
@@ -238,6 +275,9 @@ export async function grammarLintMessages(
 
 	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
 	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
+
+	// Ignore lints that fall inside text matched by a cspell pattern (hex addresses, CIDs, …).
+	lints = lints.filter(lint => !overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges))
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(
