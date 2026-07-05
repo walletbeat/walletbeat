@@ -13,9 +13,9 @@ import WalletTest from '../../components/WalletTest.svelte'
 		title: 'Walletbeat – Wallet test playground',
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column='gap-6'>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
 		<header data-sticky='inline' data-scroll-item='inline-detached padding-match-start'>
 			<h1>Wallet test playground</h1>
 

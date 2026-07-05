@@ -46,9 +46,9 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container>
 		<WalletPageContext walletId={wallet.metadata.id} client:idle />
 	</main>
 </Layout>

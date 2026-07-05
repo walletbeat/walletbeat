@@ -12,14 +12,14 @@ import Navigation from '@/views/Navigation.astro'
 		title: 'Page not found | Walletbeat',
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column='gap-4'>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-4'>
 		<h1>404</h1>
 
 		<p>Page not found.</p>
 
-		<p>
+		<p data-scroll-item='padding-match-end'>
 			<a href='/'>Home</a>
 		</p>
 	</main>

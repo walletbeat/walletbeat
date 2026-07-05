@@ -13,9 +13,9 @@ import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 		title: 'Ethereum Hardware Wallets - Walletbeat',
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container>
 		<HardwareWalletTable client:visible title='Hardware Wallets' />
 	</main>
 </Layout>

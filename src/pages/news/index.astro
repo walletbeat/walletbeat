@@ -29,9 +29,9 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 		keywordsAfter: ['news', 'security', 'incidents'],
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column='gap-8'>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
 		<header data-scroll-item='inline-detached padding-match-start'>
 			<hgroup data-column='gap-4'>
 				<h1>Wallet Security News</h1>
