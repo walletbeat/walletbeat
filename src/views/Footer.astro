@@ -1,0 +1,88 @@
+---
+import LuGithub from 'lucide-static/icons/github.svg?raw'
+import LuTwitter from 'lucide-static/icons/twitter.svg?raw'
+import { FarcasterIcon } from '@/icons/farcaster'
+
+const socialLinks = [
+	{
+		label: 'Walletbeat on GitHub',
+		href: 'https://github.com/walletbeat/walletbeat',
+		icon: LuGithub,
+	},
+	{
+		label: 'Walletbeat on X/Twitter',
+		href: 'https://x.com/walletbeat',
+		icon: LuTwitter,
+	},
+	{
+		label: 'Walletbeat on Farcaster',
+		href: 'https://farcaster.xyz/~/channel/walletbeat',
+		icon: FarcasterIcon,
+	},
+] as const
+---
+
+<footer data-row='center wrap align-center gap-6'>
+	<a href='/' data-link='camouflaged' data-row-item='wrap-center' aria-label='Walletbeat'>
+		<img src='/logo.svg' alt='Walletbeat' />
+	</a>
+
+	<p data-row-item='wrap-center basis-6'>
+		made with ❤️ + 🌸 by{' '}
+		<a
+			href='https://github.com/walletbeat/walletbeat/graphs/contributors?all=1'
+			target='_blank'
+			rel='noreferrer'
+		>
+			the Walletbeat contributors
+		</a>
+	</p>
+
+	<nav data-row='center' data-row-item='wrap-center' aria-label='Walletbeat links'>
+		<ul data-list='unstyled' data-row='center'>
+			{
+				socialLinks.map(link => (
+					<li>
+						<a
+							data-icon='circle'
+							href={link.href}
+							target='_blank'
+							rel='noreferrer'
+							aria-label={link.label}
+							title={link.label}
+						>
+							<span set:html={link.icon} />
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</footer>
+
+<style>
+	footer {
+		--footer-backgroundColor: light-dark(#f8e6ff, #080412);
+		--footer-color: light-dark(#2d123d, white);
+		--footer-mutedColor: color-mix(in oklch, var(--footer-color) 68%, transparent);
+		--icon-navigation-borderColor: color-mix(in oklch, var(--footer-color) 42%, transparent);
+		--icon-navigation-color: var(--footer-color);
+
+		background-color: var(--footer-backgroundColor);
+		color: var(--footer-color);
+		padding: 1.5rem;
+		text-align: center;
+
+		img {
+			display: block;
+			block-size: 2.5rem;
+			inline-size: auto;
+		}
+
+		p {
+			color: var(--footer-mutedColor);
+			font-size: 0.8125rem;
+			line-height: 1.4;
+		}
+	}
+</style>
