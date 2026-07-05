@@ -154,7 +154,7 @@ function getRegexpLinter({
 }: {
 	name: string
 	regExp: RegExp
-	replace: (substring: string) => string
+	replace: ((substring: string) => string) | null
 }): () => Promise<AbstractLinter> {
 	return (): Promise<AbstractLinter> => {
 		let linter = specificWordingLinters.get(name)
@@ -172,16 +172,19 @@ function getRegexpLinter({
 							continue
 						}
 
-						const replacement = replace(matchedText)
+						const replacement = replace === null ? null : replace(matchedText)
 						const end = start + matchedText.length
-						const suggestion: Suggestion = {
-							get_replacement_text(): string {
-								return replacement
-							},
-							kind(): harper.SuggestionKind {
-								return harper.SuggestionKind.Replace
-							},
-						}
+						const suggestion: Suggestion | null =
+							replacement === null
+								? null
+								: {
+										get_replacement_text(): string {
+											return replacement
+										},
+										kind(): harper.SuggestionKind {
+											return harper.SuggestionKind.Replace
+										},
+									}
 						const lint: Lint = {
 							get_problem_text(): string {
 								return matchedText
@@ -190,7 +193,7 @@ function getRegexpLinter({
 								return 'Site convention'
 							},
 							suggestions(): Suggestion[] {
-								return [suggestion]
+								return suggestion === null ? [] : [suggestion]
 							},
 							span(): Span {
 								return { start, end }

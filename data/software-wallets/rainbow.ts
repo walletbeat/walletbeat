@@ -400,7 +400,7 @@ export const rainbow: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Rainbow token has ~180M circulating of 1B total supply (~18% float) as of April 2026.',
+						'Rainbow token has ~180 million tokens circulating of 1 billion total supply (~18% float) as of April 2026.',
 					url: 'https://www.coingecko.com/en/coins/rainbow-3',
 				},
 			],
@@ -453,7 +453,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The mobile app collects product usage analytics via RudderStack; analytics default to enabled and are disabled only when the `doNotTrack` device flag is set.',
+								'The mobile app collects product usage analytics via RudderStack; analytics are active by default and become disabled only when the `doNotTrack` device flag is set.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
 						},
 						{
@@ -543,7 +543,7 @@ export const rainbow: SoftwareWallet = {
 					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
 						ref: {
 							explanation:
-								'After connecting the Rainbow browser extension to an app with one account, disconnecting, switching the active account in the wallet, and reconnecting to the same app, the connection dialog defaults to the now-active account rather than the previously-connected one. Rainbow does not remember the per-app last-connected address.',
+								'When reconnecting to the same app after disconnecting and switching the active account in the wallet, the connection dialog defaults to the now-active account rather than the previously-connected one. Rainbow does not remember the per-app last-connected address.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-defaults-to-active-account.png',
 							label:
 								'Rainbow browser extension reconnect dialog defaulting to the active account, not the previously-connected one',
@@ -570,7 +570,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen rather than connecting the app with the new account, so a fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
+									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen. A fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet-add-account.jpg',
 								label:
 									'Rainbow mobile connection sheet account picker expanded, showing the "+ Add" option among existing accounts',
@@ -621,7 +621,7 @@ export const rainbow: SoftwareWallet = {
 									'Rainbow mobile after switching the active account in-wallet (from "Test" to "Test 2"): the already-connected test page\'s "Connected as" indicator updates on its own to the newly-active account, without reconnecting.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-after-account-switch.png',
 								label:
-									'Walletbeat test page in the Rainbow mobile in-app browser, connected account following an in-wallet active-account switch',
+									"Walletbeat test page in the Rainbow mobile in-app browser, connected account following the wallet's active account switch",
 								lastRetrieved: '2026-06-19',
 							},
 						],
@@ -633,7 +633,7 @@ export const rainbow: SoftwareWallet = {
 					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
 						ref: {
 							explanation:
-								'After connecting the Rainbow mobile app to an app with one account, disconnecting, switching the active account in the wallet, and reconnecting to the same app, the connection sheet defaults to the now-active account rather than the previously-connected one. Rainbow mobile does not remember the per-app last-connected address.',
+								'When reconnecting to the same app after disconnecting and switching the active account in the wallet, the connection sheet defaults to the now-active account rather than the previously-connected one. Rainbow mobile does not remember the per-app last-connected address.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet.png',
 							label:
 								'Rainbow mobile connection sheet defaulting to the active account rather than a remembered per-app address',

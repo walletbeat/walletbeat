@@ -15,7 +15,7 @@ export const rainbowCaliburContract: SmartWalletContract = {
 	sourceCode: {
 		ref: {
 			explanation:
-				'Rainbow delegates EOAs to its deployment of Calibur, Uniswap’s open-source EIP-7702 smart-wallet delegate contract.',
+				"Rainbow delegates EOAs to its deployment of Calibur, Uniswap's open-source EIP-7702 smart-wallet delegate contract.",
 			label: 'Calibur (Uniswap)',
 			url: 'https://github.com/Uniswap/calibur',
 		},
