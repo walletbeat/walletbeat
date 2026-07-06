@@ -16,7 +16,10 @@
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
-	import { guardianPolicyMarkdown } from '@/schema/features/security/account-recovery'
+	import {
+		accountRecoveryDrillCheckupLabels,
+		guardianPolicyMarkdown,
+	} from '@/schema/features/security/account-recovery'
 	import { isAccountRecoverable } from '@/schema/features/guardian-scenario/guardian-scenario-common'
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
@@ -150,6 +153,49 @@
 						/>
 					{/if}
 				</li>
+			{/each}
+		</ul>
+	{/if}
+{/if}
+
+{#if metadata.drills !== null}
+	<Typography
+		content={{
+			contentType: ContentType.MARKDOWN,
+			markdown: '### Account recovery drills',
+		}}
+	/>
+	{#if metadata.drills.configured.length > 0}
+		<Typography
+			content={{
+				contentType: ContentType.MARKDOWN,
+				markdown: trimWhitespacePrefix(`
+					{{WALLET_NAME}} periodically runs the following account recovery drills:
+				`),
+			}}
+			strings={{ WALLET_NAME: wallet.metadata.displayName }}
+		/>
+		<ul>
+			{#each metadata.drills.configured as drill (drill.type)}
+				<li>
+					{accountRecoveryDrillCheckupLabels[drill.type]} (every {drill.reminderEveryNDays} days)
+				</li>
+			{/each}
+		</ul>
+	{/if}
+	{#if metadata.drills.missing.length > 0}
+		<Typography
+			content={{
+				contentType: ContentType.MARKDOWN,
+				markdown: trimWhitespacePrefix(`
+					{{WALLET_NAME}} does not run the following recommended account recovery drills:
+				`),
+			}}
+			strings={{ WALLET_NAME: wallet.metadata.displayName }}
+		/>
+		<ul>
+			{#each metadata.drills.missing as drillType (drillType)}
+				<li>{accountRecoveryDrillCheckupLabels[drillType]}</li>
 			{/each}
 		</ul>
 	{/if}

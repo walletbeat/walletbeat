@@ -47,6 +47,10 @@ import { pickWorstRating, unrated } from '../common'
 export type AccountRecoveryMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
+	drills: {
+		configured: AccountRecoveryDrill[]
+		missing: AccountRecoveryDrillType[]
+	} | null
 }
 
 function evaluateGuardianRecoveryPolicy(
@@ -80,6 +84,7 @@ function evaluateGuardianRecoveryPolicy(
 				metadata: {
 					minimumGuardianPolicy: guardianPolicy,
 					outcomes,
+					drills: null,
 				},
 			},
 			details: accountRecoveryDetailsContent({}),
@@ -98,6 +103,7 @@ function evaluateGuardianRecoveryPolicy(
 				metadata: {
 					minimumGuardianPolicy: guardianPolicy,
 					outcomes,
+					drills: null,
 				},
 			},
 			details: accountRecoveryDetailsContent({}),
@@ -116,6 +122,7 @@ function evaluateGuardianRecoveryPolicy(
 			metadata: {
 				minimumGuardianPolicy: guardianPolicy,
 				outcomes,
+				drills: null,
 			},
 		},
 		details: accountRecoveryDetailsContent({}),
@@ -138,6 +145,10 @@ function evaluateAccountRecoveryDrills(
 	if (isSupported(drills)) {
 		const configuredDrillTypes = new Set(drills.entries.map(drill => drill.type))
 		const missing = recommendedDrillTypes.filter(type => !configuredDrillTypes.has(type))
+		const configured = drills.entries.map(({ type, reminderEveryNDays }) => ({
+			type,
+			reminderEveryNDays,
+		}))
 
 		if (!isNonEmptyArray(missing)) {
 			return ctx.build({
@@ -149,7 +160,11 @@ function evaluateAccountRecoveryDrills(
 						{{WALLET_NAME}} periodically asks users to make sure that their private key,
 						seed phrase, and guardian accounts are still accessible.
 					`),
-					metadata: { minimumGuardianPolicy: null, outcomes: null },
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+						drills: { configured, missing: [] },
+					},
 				},
 				details: accountRecoveryDetailsContent({}),
 			})
@@ -164,7 +179,7 @@ function evaluateAccountRecoveryDrills(
 					{{WALLET_NAME}} does not run all recommended periodic
 					account recovery check-ups.
 				`),
-				metadata: { minimumGuardianPolicy: null, outcomes: null },
+				metadata: { minimumGuardianPolicy: null, outcomes: null, drills: { configured, missing } },
 			},
 			details: accountRecoveryDetailsContent({}),
 			howToImprove: sentence(`
@@ -183,7 +198,11 @@ function evaluateAccountRecoveryDrills(
 				{{WALLET_NAME}} does not periodically remind users to verify
 				they can still recover their account.
 			`),
-			metadata: { minimumGuardianPolicy: null, outcomes: null },
+			metadata: {
+				minimumGuardianPolicy: null,
+				outcomes: null,
+				drills: { configured: [], missing: recommendedDrillTypes },
+			},
 		},
 		details: accountRecoveryDetailsContent({}),
 		howToImprove: sentence(`
@@ -198,7 +217,7 @@ function evaluateAccountRecovery(
 	accountRecovery: AccountRecovery,
 ): Evaluation<AccountRecoveryMetadata> {
 	if (accountRecovery.drills === null) {
-		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
+		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
 	}
 
 	const hasGuardianRecovery = isSupported(accountRecovery.guardianRecovery)
@@ -218,12 +237,27 @@ function evaluateAccountRecovery(
 					metadata: {
 						minimumGuardianPolicy: null,
 						outcomes: null,
+						drills: null,
 					},
 				},
 				details: accountRecoveryDetailsContent({}),
 			})
 
-	return pickWorstRating<AccountRecoveryMetadata>([guardianEval, drillsEval])
+	// `pickWorstRating` returns one sub-evaluation wholesale, so whichever
+	// side "wins" the worst rating would otherwise silently drop the other
+	// side's metadata (e.g. a worse drills rating would wipe out the
+	// guardian scenario details). Merge both halves into a single metadata
+	// object first so the details view always has the full picture.
+	const mergedMetadata: AccountRecoveryMetadata = {
+		minimumGuardianPolicy: guardianEval.outcome.metadata.minimumGuardianPolicy,
+		outcomes: guardianEval.outcome.metadata.outcomes,
+		drills: drillsEval.outcome.metadata.drills,
+	}
+
+	return pickWorstRating<AccountRecoveryMetadata>([
+		{ ...guardianEval, outcome: { ...guardianEval.outcome, metadata: mergedMetadata } },
+		{ ...drillsEval, outcome: { ...drillsEval.outcome, metadata: mergedMetadata } },
+	])
 }
 
 export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
@@ -523,7 +557,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
 		if (ctx.features.security.accountRecovery === null) {
-			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
+			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
 		}
 
 		// Collect references
