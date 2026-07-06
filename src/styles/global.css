@@ -124,6 +124,7 @@
 	background-color: var(--background-primary);
 	outline-color: var(--accent);
 
+	transition-duration: 0.2s;
 	transition-property: background-color, color;
 
 	touch-action: none;
@@ -234,7 +235,7 @@ h6 {
 h3,
 h4,
 h5,
-h6, 
+h6,
 p {
 	font-family: var(--fontFamily-avenir);
 }
