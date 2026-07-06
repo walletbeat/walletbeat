@@ -124,7 +124,6 @@
 	background-color: var(--background-primary);
 	outline-color: var(--accent);
 
-	transition-duration: 0.2s;
 	transition-property: background-color, color;
 
 	touch-action: none;
@@ -188,6 +187,7 @@ label:has(> input) {
 ::before,
 ::after,
 [popover] {
+	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
 }
 
