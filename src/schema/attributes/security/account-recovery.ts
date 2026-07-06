@@ -282,7 +282,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		for everyday users. Properly implemented, this keeps users safer while still
 		providing the self-sovereignty benefits of self-custody in the day-to-day.
 
-		But a recovery mechanism that is never exercised can silently become usesless:
+		But a recovery mechanism that is never exercised can silently become useless:
 		a guardian account gets abandoned, a written-down seed phrase becomes
 		unreadable or gets thrown out, or the user simply forgets which of
 		several backup methods they actually set up. None of this is
