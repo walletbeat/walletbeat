@@ -1,11 +1,13 @@
 <script module lang="ts">
+	import type { WBIconID } from '@/styles/wbicons'
+
 	// Types/constants
 	export type Slice = {
 		id: string
 		color: string
 		weight: number
 		arcLabel: string
-		arcIconId?: string
+		arcIconId?: WBIconID
 		titleText: string
 		href?: string
 		gradient?: {
@@ -55,6 +57,7 @@
 
 <script lang="ts">
 	// Types
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -363,7 +366,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-icon="wbicons emoji {slice.arcIconId}"></span>
+				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
