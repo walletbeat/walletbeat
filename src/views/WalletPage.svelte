@@ -605,7 +605,7 @@
 		data-column
 	>
 		<h2
-			data-sticky
+			data-sticky="block"
 			class="nav-title"
 		>
 			Table of contents
@@ -1315,6 +1315,7 @@
 			align-self: start;
 			width: var(--nav-width);
 			max-height: 100dvh;
+			overflow: auto;
 
 			scroll-behavior: smooth;
 
@@ -1322,10 +1323,10 @@
 			border-inline: 1px solid var(--border-color);
 
 			&[data-sticky-container] {
-				--sticky-paddingBlockStart: 1rem;
-				--sticky-paddingBlockEnd: calc(var(--topbar-height, 6.8rem) + 1rem);
-				--sticky-paddingInlineStart: 0.75rem;
-				--sticky-paddingInlineEnd: 0.75rem;
+				--sticky-paddingBlockStart: 0px;
+				--sticky-paddingBlockEnd: 0.75rem;
+				--sticky-paddingInlineStart: 0px;
+				--sticky-paddingInlineEnd: 0px;
 			}
 
 			.nav-title {
@@ -1338,6 +1339,8 @@
 				text-transform: uppercase;
 				letter-spacing: 0.05em;
 				font-weight: 500;
+				--sticky-backgroundColor: color-mix(in oklch, var(--background-secondary) 88%, transparent);
+				--sticky-backdropFilter: blur(16px);
 			}
 
 			:global(> .navigation-items) {
