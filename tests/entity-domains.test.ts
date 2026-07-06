@@ -1,11 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import {
-	assertValidDomainToEntityIdMapping,
-	entitiesForDomain,
-	updateDomainMapping,
-} from '@/data/entities/domains/entity-domains'
+import { entitiesForDomain, updateDomainMapping } from '@/data/entities/domains/entity-domains'
 import rawData from '@/data/entities/domains/entity-domains.json'
+import { assertValidDomainToEntityIdMapping } from '@/schema/entity-domains'
 
 describe('assertValidDomainToEntityIdMapping', () => {
 	it('accepts the bare entity ID form', () => {
