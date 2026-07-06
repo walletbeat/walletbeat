@@ -196,8 +196,7 @@ const secondaryNavigationItems = [
 			header ~ * {
 				opacity: 1;
 				translate: 0 0 0;
-				scale: 1;
-				transition-property: opacity, translate, scale, display, overlay;
+				transition-property: opacity, translate, display, overlay;
 				transition-behavior: allow-discrete;
 				transform-style: preserve-3d;
 			}
@@ -210,7 +209,6 @@ const secondaryNavigationItems = [
 					interactivity: inert;
 					opacity: 0;
 					translate: 0 -0.75rem 2rem;
-					scale: 0.98;
 					pointer-events: none;
 				}
 			}
@@ -226,7 +224,6 @@ const secondaryNavigationItems = [
 					header ~ * {
 						opacity: 0;
 						translate: 0 -0.75rem 2rem;
-						scale: 0.98;
 					}
 				}
 			}

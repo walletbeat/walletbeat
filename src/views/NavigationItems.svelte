@@ -127,7 +127,7 @@
 				placeholder="Search..."
 				{@attach (input: HTMLInputElement) => {
 					const abortController = new AbortController()
-					const { signal } = abortController
+
 					const navPopover = input.closest('nav[popover]')
 					const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
 
@@ -149,10 +149,10 @@
 								input.focus()
 							}
 						},
-						{ signal }
+						{ signal: abortController.signal }
 					)
 
-					input.addEventListener('focus', openNavPopover, { signal })
+					input.addEventListener('focus', openNavPopover, { signal: abortController.signal })
 
 					return () => {
 						abortController.abort()
@@ -285,9 +285,11 @@
 	.navigation-items {
 		--navigation-search-blockSize: 2.375rem;
 		--navigation-search-gap: 0.75rem;
-		--navigation-search-sidestepBlock: calc(
-			var(--navigation-search-blockSize) + var(--navigation-search-gap)
-		);
+		--navigation-search-sidestepBlock: 0px;
+
+		&:has(> label) {
+			--navigation-search-sidestepBlock: calc(var(--navigation-search-blockSize) + var(--navigation-search-gap));
+		}
 
 		label {
 			--navigation-search-paddingInlineStart: 2.35rem;
@@ -378,6 +380,7 @@
 			padding: 0;
 
 			&[data-navigation-depth='0'] {
+				--icon-navigation-borderColor: currentColor;
 				--navigation-icon-size: 2em;
 			}
 
