@@ -246,7 +246,7 @@ label:has(
  *
  * ### Examples
  * ```html
- * <span data-icon="↵"></span>
+ * <span data-icon="&#x21b5;"></span>
  * <span data-icon="wbicons security"></span>
  * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
  * ```

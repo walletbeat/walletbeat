@@ -199,8 +199,8 @@ interface CssAttributes {
 	 *
 	 * ### Examples
 	 * ```html
-	 * <span data-icon="↵" aria-hidden="true"></span>
-	 * <span data-icon="wbicons security" aria-hidden="true"></span>
+	 * <span data-icon="&#x21b5;"></span>
+	 * <span data-icon="wbicons security"></span>
 	 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
 	 * ```
 	 *
@@ -655,7 +655,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
@@ -746,7 +746,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
@@ -864,7 +864,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
@@ -955,7 +955,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
