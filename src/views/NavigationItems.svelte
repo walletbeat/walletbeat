@@ -109,7 +109,6 @@
 	}
 </script>
 
-
 {#if showSearch}
 	<search
 		class="navigation-items"
@@ -126,39 +125,37 @@
 				type="search"
 				bind:value={searchValue}
 				placeholder="Search..."
-				{@attach (element: HTMLInputElement) => {
+				{@attach (input: HTMLInputElement) => {
 					const abortController = new AbortController()
+					const { signal } = abortController
+					const navPopover = input.closest('nav[popover]')
+					const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
 
-					let lastFocusedElement: HTMLElement | undefined = $state()
+					const openNavPopover = () => {
+						if (
+							isMobileNav.matches
+							&& navPopover instanceof HTMLElement
+							&& !navPopover.matches(':popover-open')
+						)
+							navPopover.showPopover()
+					}
 
 					globalThis.addEventListener(
 						'keydown',
-						event => {
+						(event) => {
 							if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
 								event.preventDefault()
-
-								if (document.activeElement instanceof HTMLElement)
-									lastFocusedElement = document.activeElement
-
-								element.focus()
+								openNavPopover()
+								input.focus()
 							}
 						},
-						{ signal: abortController.signal }
+						{ signal }
 					)
 
-					element.addEventListener(
-						'blur',
-						() => {
-							lastFocusedElement?.focus()
-							lastFocusedElement = undefined
-						},
-						{ signal: abortController.signal }
-					)
+					input.addEventListener('focus', openNavPopover, { signal })
 
 					return () => {
 						abortController.abort()
-						lastFocusedElement?.focus()
-						lastFocusedElement = undefined
 					}
 				}}
 				onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
