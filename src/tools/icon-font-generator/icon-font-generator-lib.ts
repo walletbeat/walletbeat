@@ -244,12 +244,7 @@ export const repeatedIconFontUnicodeSequences = (iconUnicodeSequences: IconUnico
 	)
 
 const iconFontCSSRuleForIcon = (key: string, iconContent: string) =>
-	[
-		`:is(&[data-icon~="${key}"], [data-list-item-marker="${key}"]) {`,
-		`\t--icon-content: "${iconContent}";`,
-		'\t--list-marker-fontFamily: var(--fontFamily-wbicons);',
-		'}',
-	].join('\n')
+	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
 
 export const generatedIconFontTypescript = (
 	fontTypeName: string,

@@ -17,258 +17,207 @@
 		font-family: var(--fontFamily-emoji);
 	}
 
-	:is(&[data-icon~="about"], [data-list-item-marker="about"]) {
+	&[data-icon~="about"] {
 		--icon-content: "ℹ️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="account_abstraction"], [data-list-item-marker="account_abstraction"]) {
+	&[data-icon~="account_abstraction"] {
 		--icon-content: "👤";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="account_portability"], [data-list-item-marker="account_portability"]) {
+	&[data-icon~="account_portability"] {
 		--icon-content: "🧳";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="account_recovery"], [data-list-item-marker="account_recovery"]) {
+	&[data-icon~="account_recovery"] {
 		--icon-content: "🛟";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="account_type"], [data-list-item-marker="account_type"]) {
+	&[data-icon~="account_type"] {
 		--icon-content: "🪪";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="account_unruggability"], [data-list-item-marker="account_unruggability"]) {
+	&[data-icon~="account_unruggability"] {
 		--icon-content: "🪚";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="address_resolution"], [data-list-item-marker="address_resolution"]) {
+	&[data-icon~="address_resolution"] {
 		--icon-content: "📇";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="app_isolation"], [data-list-item-marker="app_isolation"]) {
+	&[data-icon~="app_isolation"] {
 		--icon-content: "🏝️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="browser_integration"], [data-list-item-marker="browser_integration"]) {
+	&[data-icon~="browser_integration"] {
 		--icon-content: "🌐";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="chain_abstraction"], [data-list-item-marker="chain_abstraction"]) {
+	&[data-icon~="chain_abstraction"] {
 		--icon-content: "🌉";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="chain_verification"], [data-list-item-marker="chain_verification"]) {
+	&[data-icon~="chain_verification"] {
 		--icon-content: "⚓";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="discuss"], [data-list-item-marker="discuss"]) {
+	&[data-icon~="discuss"] {
 		--icon-content: "💬";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="duress_resistance"], [data-list-item-marker="duress_resistance"]) {
+	&[data-icon~="duress_resistance"] {
 		--icon-content: "🔧";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="ecosystem"], [data-list-item-marker="ecosystem"]) {
+	&[data-icon~="ecosystem"] {
 		--icon-content: "🌳";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="faq"], [data-list-item-marker="faq"]) {
+	&[data-icon~="faq"] {
 		--icon-content: "❓";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="fee_transparency"], [data-list-item-marker="fee_transparency"]) {
+	&[data-icon~="fee_transparency"] {
 		--icon-content: "💸";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="free_and_open_source_license"], [data-list-item-marker="free_and_open_source_license"]) {
+	&[data-icon~="free_and_open_source_license"] {
 		--icon-content: "❤️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="funding_transparency"], [data-list-item-marker="funding_transparency"]) {
+	&[data-icon~="funding_transparency"] {
 		--icon-content: "💰";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="hardware_wallet_interoperability"], [data-list-item-marker="hardware_wallet_interoperability"]) {
+	&[data-icon~="hardware_wallet_interoperability"] {
 		--icon-content: "🧱";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="hardware_wallet_support"], [data-list-item-marker="hardware_wallet_support"]) {
+	&[data-icon~="hardware_wallet_support"] {
 		--icon-content: "🗝️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="l1_provider_independence"], [data-list-item-marker="l1_provider_independence"]) {
+	&[data-icon~="l1_provider_independence"] {
 		--icon-content: "🏠";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="multi_address_privacy"], [data-list-item-marker="multi_address_privacy"]) {
+	&[data-icon~="multi_address_privacy"] {
 		--icon-content: "🖇️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="newsletter"], [data-list-item-marker="newsletter"]) {
+	&[data-icon~="newsletter"] {
 		--icon-content: "📰";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="orderflow_transparency"], [data-list-item-marker="orderflow_transparency"]) {
+	&[data-icon~="orderflow_transparency"] {
 		--icon-content: "🔀";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="passkey_verification"], [data-list-item-marker="passkey_verification"]) {
+	&[data-icon~="passkey_verification"] {
 		--icon-content: "🫆";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="permissions_management"], [data-list-item-marker="permissions_management"]) {
+	&[data-icon~="permissions_management"] {
 		--icon-content: "🔑";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="privacy"], [data-list-item-marker="privacy"]) {
+	&[data-icon~="privacy"] {
 		--icon-content: "😎";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="privacy_hygiene"], [data-list-item-marker="privacy_hygiene"]) {
+	&[data-icon~="privacy_hygiene"] {
 		--icon-content: "🧼";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="private_token_transfers"], [data-list-item-marker="private_token_transfers"]) {
+	&[data-icon~="private_token_transfers"] {
 		--icon-content: "📨";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="question_mark"], [data-list-item-marker="question_mark"]) {
+	&[data-icon~="question_mark"] {
 		--icon-content: "❔";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="release_process_transparency"], [data-list-item-marker="release_process_transparency"]) {
+	&[data-icon~="release_process_transparency"] {
 		--icon-content: "📦";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="repository"], [data-list-item-marker="repository"]) {
+	&[data-icon~="repository"] {
 		--icon-content: "🐱";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="scam_prevention"], [data-list-item-marker="scam_prevention"]) {
+	&[data-icon~="scam_prevention"] {
 		--icon-content: "🚨";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="security"], [data-list-item-marker="security"]) {
+	&[data-icon~="security"] {
 		--icon-content: "🔒";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="security_audits"], [data-list-item-marker="security_audits"]) {
+	&[data-icon~="security_audits"] {
 		--icon-content: "📜";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="security_best_practices"], [data-list-item-marker="security_best_practices"]) {
+	&[data-icon~="security_best_practices"] {
 		--icon-content: "📋";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="self_sovereignty"], [data-list-item-marker="self_sovereignty"]) {
+	&[data-icon~="self_sovereignty"] {
 		--icon-content: "🏰";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="source_visibility"], [data-list-item-marker="source_visibility"]) {
+	&[data-icon~="source_visibility"] {
 		--icon-content: "🔍";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="transaction_batching"], [data-list-item-marker="transaction_batching"]) {
+	&[data-icon~="transaction_batching"] {
 		--icon-content: "🧺";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="transaction_inclusion"], [data-list-item-marker="transaction_inclusion"]) {
+	&[data-icon~="transaction_inclusion"] {
 		--icon-content: "📡";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="transaction_legibility"], [data-list-item-marker="transaction_legibility"]) {
+	&[data-icon~="transaction_legibility"] {
 		--icon-content: "🧾";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="transparency"], [data-list-item-marker="transparency"]) {
+	&[data-icon~="transparency"] {
 		--icon-content: "🕵️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="user_privacy"], [data-list-item-marker="user_privacy"]) {
+	&[data-icon~="user_privacy"] {
 		--icon-content: "🕶️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_address_privacy"], [data-list-item-marker="wallet_address_privacy"]) {
+	&[data-icon~="wallet_address_privacy"] {
 		--icon-content: "🔗";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_browser"], [data-list-item-marker="wallet_browser"]) {
+	&[data-icon~="wallet_browser"] {
 		--icon-content: "🧩";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_desktop"], [data-list-item-marker="wallet_desktop"]) {
+	&[data-icon~="wallet_desktop"] {
 		--icon-content: "🖥️";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_embedded"], [data-list-item-marker="wallet_embedded"]) {
+	&[data-icon~="wallet_embedded"] {
 		--icon-content: "🧬";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_hardware"], [data-list-item-marker="wallet_hardware"]) {
+	&[data-icon~="wallet_hardware"] {
 		--icon-content: "📟";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_mobile"], [data-list-item-marker="wallet_mobile"]) {
+	&[data-icon~="wallet_mobile"] {
 		--icon-content: "📱";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_software"], [data-list-item-marker="wallet_software"]) {
+	&[data-icon~="wallet_software"] {
 		--icon-content: "💻";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
-	:is(&[data-icon~="wallet_test"], [data-list-item-marker="wallet_test"]) {
+	&[data-icon~="wallet_test"] {
 		--icon-content: "🧪";
-		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 }
