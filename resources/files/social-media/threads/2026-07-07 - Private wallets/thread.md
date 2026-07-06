@@ -55,7 +55,7 @@ Users shouldn't have to wonder whether their wallet is sending analytics, crash 
 
 ---
 
-"Privacy is no longer an afterthought." - VitalikButerin. Privacy, in Etheum values, is present. Users experience Ethereum through wallets. But without wallets practicing these values, users can't experience them.
+"Privacy is no longer an afterthought." - VitalikButerin. Privacy, in Ethereum values, is present. Users experience Ethereum through wallets. But without wallets practicing these values, users can't experience them.
 
 ---
 
