@@ -94,7 +94,10 @@ import Footer from '@/views/Footer.astro'
 			}}
 		/>
 		<div id='layout' data-scroll-container data-sticky-container>
-			<a class='skip-link' href='#content'>Skip to main content</a>
+			<a class='skip-link' href='#content' data-badge='large' data-row>
+				<span data-icon='↵'></span>
+				<span>Skip to main content</span>
+			</a>
 			<slot name='nav' />
 			<div id='content' tabindex='-1' data-column='gap-0'>
 				<slot />
@@ -149,6 +152,20 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
+		> .skip-link {
+			position: fixed;
+			z-index: 2;
+			inset: calc(var(--safeArea-insetTop) + 1rem) auto auto 50%;
+
+			translate: -50% 0;
+			transition-property: translate, opacity;
+
+			&:not(:focus-visible) {
+				opacity: 0;
+				translate: -50% -150%;
+			}
+		}
+
 		> nav {
 			grid-area: Nav;
 			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
@@ -172,24 +189,6 @@ import Footer from '@/views/Footer.astro'
 					translate: 0 0 -4rem;
 				}
 			}
-		}
-	}
-
-	.skip-link {
-		position: fixed;
-		z-index: 10;
-		inset-block-start: calc(var(--safeArea-insetTop) + 0.5rem);
-		inset-inline-start: calc(var(--safeArea-insetLeft) + 0.5rem);
-		padding: 0.75rem 1rem;
-		border-radius: 999em;
-		background-color: var(--background-primary);
-		color: var(--text-primary);
-		box-shadow: 0 0 0 1px var(--border-color);
-		translate: 0 -150%;
-		transition-property: translate;
-
-		&:focus-visible {
-			translate: 0;
 		}
 	}
 </style>
