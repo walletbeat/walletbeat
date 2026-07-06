@@ -181,7 +181,7 @@ function evaluateAccountRecoveryDrills(
 			displayName: 'No account recovery drills',
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} does not periodically remind users to verify
-				they can still access their account recovery.
+				they can still recover their account.
 			`),
 			metadata: { minimumGuardianPolicy: null, outcomes: null },
 		},
@@ -464,7 +464,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 					The recovery secret is reconstituted on the user's device using
 					2 or more shares from these external services.
 					The wallet also periodically reminds users to verify their recovery
-					setup is intact.
+					setup is functional.
 				`),
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
