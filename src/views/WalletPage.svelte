@@ -600,13 +600,11 @@
 
 	<aside
 		class="toc"
-		aria-labelledby="wallet-toc-title"
 		data-scroll-container="block"
-		data-sticky-container
-		data-column="gap-3"
+		data-column
 	>
 		<h2
-			id="wallet-toc-title"
+			data-sticky
 			class="nav-title"
 		>
 			Table of contents
@@ -1289,10 +1287,6 @@
 
 		position: relative;
 
-		&[data-sticky-container] {
-			--sticky-paddingInlineEnd: var(--nav-width);
-		}
-
 		article {
 			grid-area: Content;
 
@@ -1313,8 +1307,6 @@
 
 			scroll-behavior: smooth;
 
-			padding: 1rem 0.75rem calc(var(--topbar-height, 6.8rem) + 1rem);
-
 			background: var(--background-secondary);
 			border-inline: 1px solid var(--border-color);
 
@@ -1327,7 +1319,7 @@
 
 			.nav-title {
 				margin: 0;
-				padding-block: 0.5rem 0.75rem;
+				padding: 1.5rem 0.75rem 0.75rem;
 				border-bottom: 1px solid var(--border-color);
 
 				font-size: 0.875rem;
@@ -1335,6 +1327,10 @@
 				text-transform: uppercase;
 				letter-spacing: 0.05em;
 				font-weight: 500;
+			}
+
+			:global(> .navigation-items) {
+				padding: 0.75rem;
 			}
 
 			:global(a) {
