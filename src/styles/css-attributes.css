@@ -1233,12 +1233,8 @@ ol {
 	--sticky-sizeBlock: var(--sticky0-sizeBlock);
 	--sticky-sizeInline: var(--sticky0-sizeInline);
 
-	/* Scope sticky levels to the nearest scroll container so nested scroll containers reset their own stack. */
 	@scope (&) to ([data-scroll-container] > *) {
-		:scope
-			[data-sticky-container]:not(
-				:scope [data-sticky-container] [data-sticky-container]
-			) {
+		& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
 			--sticky-level: 1;
 
 			--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1366,7 +1362,7 @@ ol {
 
 
 	/**
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
