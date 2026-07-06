@@ -601,6 +601,7 @@
 	<aside
 		class="toc"
 		data-scroll-container="block"
+		data-sticky-container
 		data-column
 	>
 		<h2
@@ -1255,6 +1256,7 @@
 			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
 			--scrollItem-inlineDetached-paddingEnd: 2rem;
 			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+			--sticky-marginInlineEnd: var(--nav-width);
 		}
 
 		--wallet-icon-size: 3rem;
@@ -1269,12 +1271,21 @@
 			/ minmax(0, 1fr) auto
 		;
 		@media (max-width: 1024px) {
+			&[data-sticky-container] {
+				--sticky-marginInlineStart: var(--nav-width);
+				--sticky-marginInlineEnd: 0px;
+			}
+
 			grid-template:
 				'Nav Content'
 				/ auto minmax(0, 1fr)
 			;
 		}
 		@media (max-width: 864px) {
+			&[data-sticky-container] {
+				--sticky-marginInlineStart: 0px;
+			}
+
 			grid-template:
 				[Nav-start]
 				'Content'
