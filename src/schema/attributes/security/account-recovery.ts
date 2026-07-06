@@ -281,10 +281,22 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		(also known as "Social recovery") helps make self-custody safe and practical
 		for everyday users. Properly implemented, this keeps users safer while still
 		providing the self-sovereignty benefits of self-custody in the day-to-day.
+
+		But a recovery mechanism that is never exercised can silently become usesless:
+		a guardian account gets abandoned, a written-down seed phrase becomes
+		unreadable or gets thrown out, or the user simply forgets which of
+		several backup methods they actually set up. None of this is
+		discovered until the user actually needs to recover their account,
+		at which point it is too late. Wallets that periodically
+		drill users on their recovery setup catch these failures while
+		there's still time to make sure users can **actually** recover 
+		their accounts.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on their implementation of
-		[guardian-based recovery](https://vitalik.eth.limo/general/2021/01/11/recovery.html).
+		[guardian-based recovery](https://vitalik.eth.limo/general/2021/01/11/recovery.html)
+		and on whether they periodically verify that users still have access to their
+		account recovery methods.
 
 		To qualify, wallets must implement at least one form of guardian-based
 		recovery. They must also ensure that whatever option the user picks (as allowed by the
@@ -301,6 +313,19 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		This attribute explicitly does **not** consider the scenario of the user's
 		own self-custody key being compromised, as defenses against such scenarios
 		are covered by a separate attribute in the Self-Sovereignty category.
+
+		Separately, wallets are evaluated on whether they periodically prompt
+		users to demonstrate that their recovery setup still works. Wallets
+		should run all of the following drills that are relevant to their
+		implementation:
+
+		- A private key check-up, confirming the user still has access to
+		  their private key.
+		- A seed phrase check-up, confirming the user still has access to
+		  their seed phrase.
+		- If the wallet implements guardian-based recovery, a guardian
+		  account check-up, confirming the user still has access to each
+		  configured guardian account.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
