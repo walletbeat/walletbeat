@@ -108,17 +108,17 @@ const optimizedSvgHashes: Record<string, string> = {
 		'5410793b34c576acf880bb16a42e537e98e3185bb76840888ceec26f517f0fdc',
 	'public/images/wallets/zeus.svg':
 		'81d3248eb033216dad88005dbaca90e637709c66351ad1f5e3a6a0a65b6b051b',
-	'public/logo-dark.svg': '1724b327def6bdb066c6b47629986b0d4a83625df6399177da2e7386de4cc6b2',
-	'public/logo-light.svg': '80cb26c313cc96082a0254e95110536f8326b5c7086e1eead8b6efd1884b28bf',
-	'public/logo.svg': '6de5674417b300ce7562e58416628872bf10fe74031c26d6ce6f803c293bb64b',
+	'public/logo-dark.svg': '04cf9870dd9479a652d32cbeafa1296df0ad410f995b739157fdc5ccae3c5a5c',
+	'public/logo-light.svg': 'be70e0dcb42ee49e13ccaead8eefd3b7199e8a0c53c4f55c644dbf839ca15cc3',
+	'public/logo.svg': '04cf9870dd9479a652d32cbeafa1296df0ad410f995b739157fdc5ccae3c5a5c',
 	'resources/branding/icon_dark.svg':
-		'e88bce5e2c9a34c9bbc169bab233ad07103f4f1409ffa93ce1e54134ff2fbbc0',
+		'01b1f93889464312f873bfcad2cd5b428f34114671c9a9113f55a2331935fc31',
 	'resources/branding/icon_light.svg':
-		'27c38a5cfcd479eef565adf119c49b4251ade40d49a5a73804db8f3c36db96b0',
+		'3fdcfcb71e3583b0292a12a37d7dc65369b8c2fffc437a7752deac877ec6c7a1',
 	'resources/branding/logo_dark.svg':
-		'1724b327def6bdb066c6b47629986b0d4a83625df6399177da2e7386de4cc6b2',
+		'04cf9870dd9479a652d32cbeafa1296df0ad410f995b739157fdc5ccae3c5a5c',
 	'resources/branding/logo_light.svg':
-		'80cb26c313cc96082a0254e95110536f8326b5c7086e1eead8b6efd1884b28bf',
+		'be70e0dcb42ee49e13ccaead8eefd3b7199e8a0c53c4f55c644dbf839ca15cc3',
 	'resources/contracts/images/Walletbeat.svg':
 		'0c93bc98c4fd6e0770d5658e0860061c879457c79262ac014e49db5c6a033de6',
 	'resources/files/wbicons/about.svg':
