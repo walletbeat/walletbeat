@@ -283,18 +283,31 @@
 
 <style>
 	.navigation-items {
+		--navigationItem-gap: 0.5rem;
+		--navigationItem-paddingBlock: 0.45rem;
+		--navigationItem-paddingInline: 0.45rem;
+		--navigationItem-rowGap: 0.5em;
+		--navigationItem-endRadius: 0.5em;
+		--navigationItem-currentBackground: color-mix(in oklch, var(--accent) 24%, transparent);
+		--navigationItem-hoverBackground: var(--background-primary);
+		--navigationItem-currentHoverBackground: color-mix(in oklch, var(--accent) 34%, var(--background-primary));
+		--navigationIcon-size: 1.25em;
+
+		--navigationSubmenu-gap: 0.33rem;
+
 		--navigation-search-blockSize: 2.375rem;
 		--navigation-search-gap: 0.75rem;
 		--navigation-search-sidestepBlock: 0px;
+		--navigation-search-paddingInlineStart: 2.35rem;
+		--navigation-search-paddingInlineEnd: 3.15rem;
 
 		&:has(> label) {
 			--navigation-search-sidestepBlock: calc(var(--navigation-search-blockSize) + var(--navigation-search-gap));
 		}
 
-		label {
-			--navigation-search-paddingInlineStart: 2.35rem;
-			--navigation-search-paddingInlineEnd: 3.15rem;
+		scroll-target-group: auto;
 
+		label {
 			block-size: var(--navigation-search-blockSize);
 			min-block-size: var(--navigation-search-blockSize);
 			position: relative;
@@ -309,6 +322,7 @@
 				&[data-sticky] {
 					inset-block-start: auto;
 					inset-block-end: var(--sticky-insetBlockEnd);
+					z-index: 2;
 				}
 
 				.navigation-search-shortcut {
@@ -367,12 +381,6 @@
 		}
 
 		menu {
-			--navigation-item-gap: 0.5rem;
-			--navigation-item-paddingBlock: 0.45rem;
-			--navigation-item-paddingInline: 0.45rem;
-			--navigation-item-rowGap: 0.5em;
-			--navigation-item-submenuGap: 0.33rem;
-			--navigation-icon-size: 1.25em;
 
 			font-size: 0.975em;
 			list-style: none;
@@ -381,11 +389,16 @@
 
 			&[data-navigation-depth='0'] {
 				--icon-navigation-borderColor: currentColor;
-				--navigation-icon-size: 2em;
+				--navigationIcon-size: 2em;
 			}
 
 			&[data-navigation-depth='1'] {
-				--navigation-icon-size: 1.5em;
+				--navigationIcon-size: 1.5em;
+			}
+
+			&[data-navigation-depth='2'] {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
 			}
 
 			&[data-sticky-container][data-navigation-depth='0'] {
@@ -394,14 +407,14 @@
 
 			&[data-sticky-container]:not([data-navigation-depth='0']) {
 				--sticky-marginBlockStart: calc(
-					var(--navigation-submenu-parentIconSize) + 2 * var(--navigation-item-paddingBlock) +
-						var(--navigation-item-submenuGap)
+					var(--navigationSubmenu-parentIconSize) + 2 * var(--navigationItem-paddingBlock) +
+						var(--navigationSubmenu-gap)
 				);
-				--sticky-marginBlockEnd: var(--navigation-item-gap);
+				--sticky-marginBlockEnd: var(--navigationItem-gap);
 			}
 
 			details {
-				--navigation-submenu-parentIconSize: var(--navigation-icon-size);
+				--navigationSubmenu-parentIconSize: var(--navigationIcon-size);
 			}
 
 			a {
@@ -414,17 +427,31 @@
 
 				&[href^='#']::scroll-marker {
 					content: '';
+					border-radius: inherit;
 				}
+
+				&[href^='#']:target-current,
+				&[href^='#']::scroll-marker:target-current {
+					--navigationItem-background: var(--navigationItem-currentBackground);
+				}
+			}
+
+			li[data-current] > a,
+			li[data-current] > details > summary {
+				--navigationItem-background: var(--navigationItem-currentBackground);
+			}
+
+			li[data-current] > a:hover,
+			li[data-current] > a:focus-visible,
+			li[data-current] > details > summary:hover,
+			li[data-current] > details > summary:is(:focus-visible, :focus-within),
+			a[href^='#']:target-current:hover,
+			a[href^='#']:target-current:focus-visible {
+				--navigationItem-background: var(--navigationItem-currentHoverBackground);
 			}
 
 			summary,
 			li > a {
-				--icon-size: var(--navigation-icon-size);
-				--navigation-item-startRadius: calc(
-					(var(--navigation-icon-size) + 2 * var(--navigation-item-paddingBlock)) / 2
-				);
-				--navigation-item-endRadius: 0.5em;
-
 				:global(mark) {
 					font-weight: 600;
 					text-decoration: underline;
@@ -435,33 +462,43 @@
 
 			summary,
 			li > a {
-				padding: var(--navigation-item-paddingBlock) var(--navigation-item-paddingInline);
+				--icon-size: var(--navigationIcon-size);
+				--navigationItem-startRadius: var(--navigationItem-endRadius);
+
+				padding: var(--navigationItem-paddingBlock) var(--navigationItem-paddingInline);
 				border-radius:
-					var(--navigation-item-startRadius)
-					var(--navigation-item-endRadius)
-					var(--navigation-item-endRadius)
-					var(--navigation-item-startRadius)
+					var(--navigationItem-startRadius)
+					var(--navigationItem-endRadius)
+					var(--navigationItem-endRadius)
+					var(--navigationItem-startRadius)
 				;
 				font-weight: 500;
 				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 62%, transparent);
 				--sticky-backdropFilter: blur(16px);
+				background-color: var(--navigationItem-background, transparent);
 
-				transition-property: opacity, scale, background-color, color, backdrop-filter;
+				transition-property:
+					opacity,
+					scale,
+					background-color,
+					color
+				;
+
+				&:has(
+					> [data-icon~='circle'],
+					> a > [data-icon~='circle']
+				) {
+					--navigationItem-startRadius: calc((var(--navigationIcon-size) + 2 * var(--navigationItem-paddingBlock)) / 2);
+				}
 
 				&:hover:not(:has(a:hover)) {
-					background-color: var(--background-primary);
+					--navigationItem-background: var(--navigationItem-hoverBackground);
 					color: var(--accent);
 				}
 
-				&:active {
-					background-color: var(--background-primary);
-				}
-
-				[data-current] > details > &:is(summary),
-				[data-current] > &:is(a),
-				&::scroll-marker:target-current {
-					background-color: color-mix(in oklch, var(--background-primary) 62%, transparent);
-					backdrop-filter: blur(16px);
+				&:is(:focus-visible, :focus-within) {
+					--navigationItem-background: var(--navigationItem-hoverBackground);
+					color: var(--accent);
 				}
 			}
 
@@ -483,9 +520,9 @@
 				}
 
 				~ * {
-					margin-block-start: var(--navigation-item-submenuGap);
+					margin-block-start: var(--navigationSubmenu-gap);
 					margin-inline-start: calc(
-						var(--navigation-submenu-parentIconSize) + var(--navigation-item-rowGap)
+						var(--navigationSubmenu-parentIconSize) + var(--navigationItem-rowGap)
 					);
 					padding-inline-start: 0;
 					position: relative;
@@ -495,8 +532,8 @@
 						position: absolute;
 						inset-block: 0;
 						inset-inline-start: calc(
-							var(--navigation-item-paddingInline) + var(--navigation-submenu-parentIconSize) / 2 -
-								var(--navigation-submenu-parentIconSize) - var(--navigation-item-rowGap)
+							var(--navigationItem-paddingInline) + var(--navigationSubmenu-parentIconSize) / 2 -
+								var(--navigationSubmenu-parentIconSize) - var(--navigationItem-rowGap)
 						);
 						inline-size: 1px;
 						background-color: var(--border-color);
