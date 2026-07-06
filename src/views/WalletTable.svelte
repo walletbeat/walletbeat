@@ -392,7 +392,6 @@
 	data-column="gap-6"
 >
 	<header
-		data-sticky="inline"
 		data-scroll-item="inline-detached padding-match-start"
 		data-row="wrap"
 	>
@@ -779,7 +778,7 @@
 
 				{#if column.id === 'stage'}
 					{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-					
+
 					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
 						<small>N/A</small>
 					{:else}
@@ -1323,7 +1322,7 @@
 										{wallet}
 										{score}
 										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
-										{isInTooltip}	
+										{isInTooltip}
 									/>
 								{/if}
 							{/snippet}
@@ -1985,12 +1984,6 @@
 
 		.filters {
 			display: none;
-		}
-
-		/* Make header stack vertically on mobile */
-		:global(section[data-sticky-container]) header[data-sticky~="inline"] {
-			flex-direction: column;
-			align-items: flex-start;
 		}
 
 		:global(
