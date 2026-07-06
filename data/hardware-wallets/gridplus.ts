@@ -118,12 +118,12 @@ export const gridplusWallet: HardwareWallet = {
 		monetization: {
 			ref: [
 				{
-					explanation: 'Grid+ is the first internally incubated venture to spin out of ConsenSys.',
+					explanation: 'Grid+ is the first internally incubated venture to spin out of Consensys.',
 					url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
 				},
 				{
 					explanation:
-						'GridPlus VC funding includes Bankless Ventures, ConsenSys Mesh, Allatus Ventures, Dlab, and Game7.',
+						'GridPlus VC funding includes Bankless Ventures, Consensys Mesh, Allatus Ventures, Dlab, and Game7.',
 					url: 'https://pitchbook.com/profiles/company/184644-55',
 				},
 			],

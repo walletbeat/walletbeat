@@ -33,6 +33,8 @@ jobs:
             command: pnpm run check:misc
           - name: Build – Astro
             command: pnpm run check:build:post:quiet
+          - name: Commit signature
+            command: pnpm run check:signed-commit
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3

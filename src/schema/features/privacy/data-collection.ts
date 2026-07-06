@@ -251,6 +251,12 @@ export type Endpoint =
 				reproducibleBuilds: boolean
 
 				/**
+				 * Reference to an independent audit of the server software running in the
+				 * enclave (independent of client verification code).
+				 */
+				independentCodeAudit: MustRef<{}>
+
+				/**
 				 * How the client verifies that the endpoint is running in a secure enclave.
 				 */
 				clientVerification:
@@ -270,6 +276,12 @@ export type Endpoint =
 							 * The client verifies this. Must also come with a code reference.
 							 */
 							type: 'VERIFIED'
+
+							/**
+							 * Reference to an independent audit of the wallet's attestation
+							 * verification code.
+							 */
+							verificationCodeAudit: MustRef<{}>
 					  }>
 			}>
 
@@ -361,6 +373,38 @@ export function endpointLearnsUserIpAddress(endpoint: Endpoint): 'YES' | 'NO' | 
 									return 'NO'
 							}
 					}
+			}
+	}
+}
+
+/**
+ * Whether an endpoint is verifiably non-extractive for pre-inclusion transaction data.
+ * Regular endpoints never qualify; secure enclaves require full verifiability, no
+ * external logging, E2E termination inside the enclave, and audited client verification.
+ */
+export function endpointIsVerifiablyNonExtractive(endpoint: Endpoint): boolean {
+	switch (endpoint.type) {
+		case 'REGULAR':
+			return false
+		case 'SECURE_ENCLAVE':
+			if (endpoint.externalLogging.type !== 'NO') {
+				return false
+			}
+
+			if (!endpoint.verifiability.sourceAvailable || !endpoint.verifiability.reproducibleBuilds) {
+				return false
+			}
+
+			if (endpoint.endToEndEncryption.type !== 'TERMINATED_INSIDE_ENCLAVE') {
+				return false
+			}
+
+			switch (endpoint.verifiability.clientVerification.type) {
+				case 'NOT_VERIFIED':
+				case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+					return false
+				case 'VERIFIED':
+					return true
 			}
 	}
 }
@@ -798,6 +842,9 @@ export enum DataCollectionPurpose {
 	/** Broadcasting transactions for inclusion. */
 	TRANSACTION_BROADCAST = 'TRANSACTION_BROADCAST',
 
+	/** Auctioning orderflow (MEV) from pre-inclusion transaction data. */
+	ORDERFLOW_AUCTION = 'ORDERFLOW_AUCTION',
+
 	/** Simulating transaction outcome. */
 	TRANSACTION_SIMULATION = 'TRANSACTION_SIMULATION',
 
@@ -840,6 +887,7 @@ export const dataCollectionPurpose = new Enum<DataCollectionPurpose>({
 	[DataCollectionPurpose.CHAIN_DATA_LOOKUP]: true,
 	[DataCollectionPurpose.TOKEN_PRICE_LOOKUP]: true,
 	[DataCollectionPurpose.TRANSACTION_BROADCAST]: true,
+	[DataCollectionPurpose.ORDERFLOW_AUCTION]: true,
 	[DataCollectionPurpose.SCAM_DETECTION]: true,
 	[DataCollectionPurpose.UPDATE_CHECKING]: true,
 	[DataCollectionPurpose.ACCOUNT_SIGNUP]: true,
@@ -874,6 +922,8 @@ export function dataCollectionPurposeToText(dataCollectionPurpose: DataCollectio
 			return 'Token price lookup'
 		case DataCollectionPurpose.TRANSACTION_BROADCAST:
 			return 'Transaction broadcasting'
+		case DataCollectionPurpose.ORDERFLOW_AUCTION:
+			return 'Orderflow auction'
 		case DataCollectionPurpose.TRANSACTION_SIMULATION:
 			return 'Transaction simulation'
 		case DataCollectionPurpose.GAS_QUOTE:
@@ -1034,6 +1084,24 @@ export interface DataCollectionByEntity {
 	purposes: NonEmptyArray<DataCollectionPurpose>
 }
 
+/**
+ * Validates that ORDERFLOW_AUCTION is only recorded when mempool transactions are
+ * collected by default or always on the same row.
+ */
+export function validateDataCollectionByEntityRow(row: DataCollectionByEntity): void {
+	if (!row.purposes.includes(DataCollectionPurpose.ORDERFLOW_AUCTION)) {
+		return
+	}
+
+	const mempoolPolicy = qualifiedDataCollection(row.dataCollection)[WalletInfo.MEMPOOL_TRANSACTIONS]
+
+	if (mempoolPolicy !== CollectionPolicy.BY_DEFAULT && mempoolPolicy !== CollectionPolicy.ALWAYS) {
+		throw new Error(
+			`Invalid data collection for entity ${row.byEntity.id}: ORDERFLOW_AUCTION requires MEMPOOL_TRANSACTIONS to be BY_DEFAULT or ALWAYS on the same row`,
+		)
+	}
+}
+
 export interface DataCollectionForFlow {
 	/** The data collected by entities. */
 	collected: WithRef<DataCollectionByEntity>[]
@@ -1052,6 +1120,18 @@ export type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
 }
 
 /**
+ * A {@link DataCollection} user-flow field when the wallet may not offer that flow.
+ *
+ * - `null` — not researched
+ * - `'FLOW_NOT_SUPPORTED'` — wallet does not offer this flow (not unknown)
+ * - {@link DataCollectionForFlow} — researched
+ */
+export type DataCollectionForUserFlowOrUnsupported =
+	| DataCollectionForFlow
+	| null
+	| 'FLOW_NOT_SUPPORTED'
+
+/**
  * A collection of data that a wallet collects.
  * See /docs/mitmproxy-guide for how to collect this.
  */
@@ -1066,19 +1146,19 @@ export interface DataCollection {
 	[UserFlow.ONBOARDING_IMPORT]: DataCollectionForFlowWithOnchainData | null
 
 	/** What data is collected when sending Ether? */
-	[UserFlow.SEND_ETHER]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.SEND_ETHER]: DataCollectionForUserFlowOrUnsupported
 
 	/** What data is collected when sending USDC? */
-	[UserFlow.SEND_USDC]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.SEND_USDC]: DataCollectionForUserFlowOrUnsupported
 
 	/** What data is collected when swapping tokens using the wallet's native swap feature? */
-	[UserFlow.NATIVE_SWAP]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.NATIVE_SWAP]: DataCollectionForUserFlowOrUnsupported
 
 	/** What data is collected during the transaction review/signing flow? */
-	[UserFlow.MAKE_TRANSACTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.MAKE_TRANSACTION]: DataCollectionForUserFlowOrUnsupported
 
 	/** What data is collected when connecting to an app? */
-	[UserFlow.APP_CONNECTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.APP_CONNECTION]: DataCollectionForUserFlowOrUnsupported
 
 	/** What other data is collected but not covered in the other flows, if any? */
 	[UserFlow.UNCLASSIFIED]?: DataCollectionForFlow

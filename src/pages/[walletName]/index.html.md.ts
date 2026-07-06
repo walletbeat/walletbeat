@@ -5,28 +5,29 @@ import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
 import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 import { softwareWalletAttributeTree } from '@/data/software-wallets'
 import {
-	allRatedWallets,
+	allRatedWalletsBySlug,
 	isEmbeddedRatedWallet,
 	isHardwareRatedWallet,
 	isSoftwareRatedWallet,
-	isValidWalletName,
+	isValidWalletSlug,
 } from '@/data/wallets'
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
 export const prerender = true
 
 export const getStaticPaths: GetStaticPaths = () =>
-	nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({ params: { walletName } }))
+	Object.values(allRatedWalletsBySlug).map(wallet => ({
+		params: { walletName: wallet.metadata.id },
+	}))
 
 export const GET: APIRoute = ({ params }) => {
 	const { walletName } = params
 
-	if (walletName === undefined || !isValidWalletName(walletName)) {
+	if (walletName === undefined || !isValidWalletSlug(walletName)) {
 		return new Response('Not found', { status: 404 })
 	}
 
-	const wallet = allRatedWallets[walletName]
+	const wallet = allRatedWalletsBySlug[walletName]
 
 	return new Response(
 		isSoftwareRatedWallet(wallet)

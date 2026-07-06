@@ -228,7 +228,7 @@ export const appIsolation: Attribute = {
 		On the web, website \`A\` is not allowed to query your browsing history from
 		website \`B\` by default. This ensures your browsing activity remains private
 		across websites. This principle is enshrined in the HTTP protocol as the
-		[**Same-Origin Policy**](hhttps://en.wikipedia.org/wiki/Same-origin_policy):
+		[**Same-Origin Policy**](https://en.wikipedia.org/wiki/Same-origin_policy):
 		by default, each website has its own isolated data about a user,
 		and may not obtain any other information without explicit consent.
 

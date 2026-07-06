@@ -23,10 +23,7 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import {
-	comprehensiveFeesShownByDefault,
-	FeeDisplayLevel,
-} from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -95,6 +92,7 @@ export const zeus: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.AGGREGATED,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -275,7 +273,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Zeus performs local EVM simulations to verify and display exact transaction outcomes, including decoding of common events like erc20 transfers, swaps, approvals etc...',
+							'Zeus performs local EVM simulations to verify and display exact transaction outcomes, including decoding of common events like ERC-20 transfers, swaps, approvals etc.',
 						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
 					},
 				],
@@ -344,9 +342,10 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: null,
 				}),
 				erc20L1Transfer: supported({
 					ref: [
@@ -356,9 +355,10 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				ethL1Transfer: supported({
 					ref: [
@@ -368,9 +368,10 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				uniswapUSDCToEtherSwap: supported({
 					ref: [
@@ -380,11 +381,13 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus#features',
 						},
 					],
-					afterSingleAction: comprehensiveFeesShownByDefault.afterSingleAction,
-					byDefault: comprehensiveFeesShownByDefault.byDefault,
-					fullySponsored: comprehensiveFeesShownByDefault.fullySponsored,
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
