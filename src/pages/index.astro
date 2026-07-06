@@ -53,22 +53,23 @@ import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 </Layout>
 
 <style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 60.5rem;
-			--scrollItem-inlineDetached-paddingStart: clamp(
-				1.5rem,
-				0.04 * var(--scrollContainer-sizeInline),
-				3rem
-			);
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
-			--scrollItem-inlineDetached-paddingEnd: clamp(
-				1.5rem,
-				0.04 * var(--scrollContainer-sizeInline),
-				3rem
-			);
-		}
+	:global(#content),
+	main[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 60.5rem;
+		--scrollItem-inlineDetached-paddingStart: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
+		--scrollItem-inlineDetached-paddingEnd: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+	}
 
+	main {
 		> header {
 			--homeHero-backgroundColor: light-dark(#f8e6ff, #3f165e);
 			--homeHero-glowColor: light-dark(#f0c6ff, var(--homeHero-backgroundColor));
