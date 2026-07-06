@@ -473,7 +473,7 @@
 					var(--navigationItem-startRadius)
 				;
 				font-weight: 500;
-				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 62%, transparent);
+				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 88%, transparent);
 				--sticky-backdropFilter: blur(16px);
 				background-color: var(--navigationItem-background, transparent);
 
