@@ -27,7 +27,7 @@ Multi address Privacy
 
 Can your multiple wallet addresses be correlated with one another?
 
-Just like people have multiple emails for different purporses, they also have multiple addresses for different reasons. A private wallet should avoid unnecessarily revealing that those addresses belong to the same person.
+Just like people have multiple emails for different purposes, they also have multiple addresses for different reasons. A private wallet should avoid unnecessarily revealing that those addresses belong to the same person.
 
 ---
 
