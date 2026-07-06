@@ -192,12 +192,14 @@ interface CssAttributes {
 	 * - source: `wbicons`
 	 *
 	 * ### CSS Variables
+	 * - `--icon-content`
 	 * - `--icon-size`
 	 * - `--icon-navigation-borderColor`
 	 * - `--icon-navigation-color`
 	 *
 	 * ### Examples
 	 * ```html
+	 * <span data-icon="↵" aria-hidden="true"></span>
 	 * <span data-icon="wbicons security" aria-hidden="true"></span>
 	 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
 	 * ```

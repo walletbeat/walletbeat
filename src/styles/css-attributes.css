@@ -239,13 +239,15 @@ label:has(
  * - source: `wbicons`
  *
  * ### CSS Variables
+ * - `--icon-content`
  * - `--icon-size`
  * - `--icon-navigation-borderColor`
  * - `--icon-navigation-color`
  *
  * ### Examples
  * ```html
- * <span data-icon="wbicons security" aria-hidden="true"></span>
+ * <span data-icon="↵"></span>
+ * <span data-icon="wbicons security"></span>
  * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
  * ```
  *
@@ -253,6 +255,8 @@ label:has(
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`
  */
 [data-icon] {
+	--icon-content: attr(data-icon);
+
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -272,6 +276,10 @@ label:has(
 		border-radius: 0;
 		inline-size: 100%;
 		block-size: 100%;
+	}
+
+	&:is(:empty)::before {
+		content: var(--icon-content);
 	}
 
 	&[data-icon~="circle"] {
