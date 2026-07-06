@@ -27,7 +27,6 @@
 	aria-label="Security News"
 	style:--accent="#e564bc"
 	data-rating="pass"
-	data-icon="📰"
 >
 	<details
 		data-card="radius-8 padding-0 border-accent"
@@ -39,7 +38,8 @@
 				<div>
 					<div data-row="start gap-2">
 						<a data-link="camouflaged" href="#security-news">
-							<h3 data-icon="📰">
+							<h3 data-row="start gap-2">
+								<span data-icon="📰" aria-hidden="true"></span>
 								Security News
 							</h3>
 						</a>
