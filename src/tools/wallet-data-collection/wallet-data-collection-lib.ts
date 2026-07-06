@@ -8,15 +8,17 @@ import { fileURLToPath } from 'url'
 
 import { type EntityId, isValidEntityId } from '@/data/entities'
 import {
-	assertValidDomainToEntityIdMapping,
-	type DomainMapping,
 	domainMappingForDomain,
-	type DomainToEntityIdMapping,
 	entitiesForDomain,
-	type ResolvedDomain,
 	updateDomainMapping,
 } from '@/data/entities/domains/entity-domains'
 import { allWallets, isValidWalletName, type WalletName } from '@/data/wallets'
+import {
+	assertValidDomainToEntityIdMapping,
+	type DomainMapping,
+	type DomainToEntityIdMapping,
+	type ResolvedDomain,
+} from '@/schema/entity-domains'
 import {
 	CollectionPolicy,
 	collectionPolicyEnum,
@@ -892,23 +894,18 @@ function domainMappingFilePath(): string {
 
 async function readDomainMappingFile(): Promise<DomainToEntityIdMapping> {
 	const domainFile = domainMappingFilePath()
-	let mapping: DomainToEntityIdMapping = {}
 
-	if (fs.existsSync(domainFile)) {
-		try {
-			const content = await fs.promises.readFile(domainFile, 'utf8')
-
-			mapping = assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
-		} catch (e) {
-			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
-		}
+	if (!fs.existsSync(domainFile)) {
+		return {}
 	}
 
-	// Later lookups (e.g. `domainMappingForDomain`) must resolve against the
-	// working copy just read, not the mapping loaded at import time.
-	updateDomainMapping(mapping)
+	try {
+		const content = await fs.promises.readFile(domainFile, 'utf8')
 
-	return mapping
+		return assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
+	} catch (e) {
+		throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
+	}
 }
 
 /**
@@ -971,6 +968,9 @@ async function writeDomainMappingFile(mapping: DomainToEntityIdMapping): Promise
 	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
 	await fs.promises.writeFile(tmpPath, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
 	await fs.promises.rename(tmpPath, domainFile)
+
+	// Keep the module-level mapping in sync with the file it was loaded from.
+	updateDomainMapping(sortedDomains)
 }
 
 export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
