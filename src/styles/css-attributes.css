@@ -404,12 +404,15 @@ span svg {
 	align-content: start;
 
 	&[data-column~='start'] {
+		align-items: start;
 		justify-items: start;
 	}
 	&[data-column~='center'] {
+		align-items: center;
 		justify-items: center;
 	}
 	&[data-column~='end'] {
+		align-items: end;
 		justify-items: end;
 	}
 
@@ -1502,8 +1505,8 @@ ol {
 				&:not([data-sticky~="backdrop-always"]) {
 					&:not([data-scroll-container])::before {
 						@container scroll-state(stuck: none) {
-							background-color: transparent !important;
-							backdrop-filter: blur(0px);
+							background-color: transparent;
+							backdrop-filter: none;
 						}
 					}
 				}
@@ -1548,7 +1551,11 @@ ol {
 				--scrollItem-paddingInlineEnd: max(var(--scrollItem-inlineDetached-paddingEnd), (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2);
 				--scrollItem-paddingInlineMatch: min(var(--scrollItem-paddingInlineStart), var(--scrollItem-paddingInlineEnd));
 
-				inline-size: 100%;
+				position: sticky;
+				inset-inline-start: var(--sticky-insetInlineStart);
+				inset-inline-end: var(--sticky-insetInlineEnd);
+
+				inline-size: var(--sticky-sizeInline);
 				padding-inline-start: var(--scrollItem-paddingInlineStart);
 				padding-inline-end: var(--scrollItem-paddingInlineEnd);
 
