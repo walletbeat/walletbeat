@@ -282,15 +282,14 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		for everyday users. Properly implemented, this keeps users safer while still
 		providing the self-sovereignty benefits of self-custody in the day-to-day.
 
-		But a recovery mechanism that is never exercised can silently become useless:
-		a guardian account gets abandoned, a written-down seed phrase becomes
-		unreadable or gets thrown out, or the user simply forgets which of
-		several backup methods they actually set up. None of this is
-		discovered until the user actually needs to recover their account,
-		at which point it is too late. Wallets that periodically
-		drill users on their recovery setup catch these failures while
-		there's still time to make sure users can **actually** recover 
-		their accounts.
+		But a recovery mechanism that is never exercised can silently become useless.
+		A guardian account gets abandoned. A written-down seed phrase becomes
+		unreadable or gets thrown out. The user simply forgets which of several
+		backup methods they actually set up. None of this is discovered until
+		the user actually needs to recover their account, at which point it is
+		too late. Wallets that periodically drill users on their recovery setup
+		catch these failures while there's still time to make sure users can
+		**actually** recover their accounts.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on their implementation of
@@ -316,7 +315,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 
 		Separately, wallets are evaluated on whether they periodically prompt
 		users to demonstrate that their recovery setup still works. Wallets
-		should run all of the following drills that are relevant to their
+		should run all the following drills that are relevant to their
 		implementation:
 
 		- A private key check-up, confirming the user still has access to
