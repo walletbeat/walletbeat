@@ -19,13 +19,13 @@
     	* Dappcon Workshop
     	* Interview w/ Paul
     	* Dappcon 1TS security breakfast
-    	* Lead to meet w/ Hester & Fred next week (June 22 - 26)
+			* Meet w/ Hester & Fred
 
-### June 18 - Meeting w/ Nico @ Ethereum Foundation office
+### June 18 - Meeting w/ Nico
 
-    	* Grant funding lead (Martin still to have a contact)
+    	* Grant funding lead
     	* Strategy suggestions
-    	* Kohaku collaboration (already made a GC)
+    	* Kohaku collaboration
     	* ERC-7730 registry on chain
 
 ### June 20 - Brew Privacy
