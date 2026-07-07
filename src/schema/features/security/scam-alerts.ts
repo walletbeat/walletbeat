@@ -120,7 +120,7 @@ export interface ScamAlerts {
 	sendTransactionWarning: Support<SendTransactionWarning>
 
 	/**
-	 * Does the wallet warn the user before a transaction or signature 
+	 * Does the wallet warn the user before a transaction or signature
 	 * that grants unlimited/infinite ERC-20 token allowance?
 	 */
 	unlimitedApprovalWarning: Support<UnlimitedApprovalWarning>
