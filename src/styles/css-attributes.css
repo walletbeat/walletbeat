@@ -784,10 +784,9 @@ summary {
 	--badge-textColor: currentColor;
 
 	display: inline-flex;
+	gap: 0.15em;
 	flex-shrink: 0;
 	flex-basis: auto;
-
-	column-gap: 0;
 
 	border-radius: 0.375em;
 	background-color: var(--badge-backgroundColor);
