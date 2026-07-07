@@ -254,18 +254,20 @@ export const safe: SoftwareWallet = {
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksIp: true,
 					leaksUserAddress: true,
+					leaksUserIp: true,
 					leaksVisitedUrl: 'FULL_URL',
 				}),
 				sendTransactionWarning: supported({
 					ref: refTodo,
+					addressPoisoningDetection: false,
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					newRecipientWarning: true, //blockaid
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: {

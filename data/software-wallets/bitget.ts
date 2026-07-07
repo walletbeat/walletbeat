@@ -203,6 +203,7 @@ export const bitget: SoftwareWallet = {
 				contractTransactionWarning: notSupported,
 				scamUrlWarning: notSupported,
 				sendTransactionWarning: notSupported,
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: {

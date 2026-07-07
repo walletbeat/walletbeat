@@ -780,18 +780,20 @@ export const ambire: SoftwareWallet = {
 							},
 						],
 					},
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: scamAlertsAndSendTxWarningRefs,
+					addressPoisoningDetection: true,
 					leaksRecipient: true,
 					leaksUserAddress: false,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {

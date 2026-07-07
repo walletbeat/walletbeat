@@ -502,8 +502,8 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/eth-phishing-detect',
 						},
 					],
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported({
@@ -514,12 +514,14 @@ export const metamask: SoftwareWallet = {
 							url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
