@@ -629,7 +629,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-none`, `backdrop-always`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -678,7 +678,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and background/backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 	 *
 	 * ### Placement
 	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -687,10 +687,12 @@ interface CssAttributes {
 	 * - axis: `block`, `inline`
 	 * - block edges: `block-start`, `block-end`
 	 * - inline edges: `inline-start`, `inline-end`
+	 * - background: `background`, `background-always`
 	 * - backdrop: `backdrop-none`, `backdrop-always`
 	 *
 	 * ### CSS Variables
-	 * - `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`
+	 * - `--sticky-backgroundColor`
+	 * - `--sticky-backdrop-backgroundColor`, `--sticky-backdrop-filter`
 	 *
 	 * ### Examples
 	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
@@ -720,7 +722,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-none`, `backdrop-always`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -838,7 +840,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-none`, `backdrop-always`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -887,7 +889,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and background/backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 	 *
 	 * ### Placement
 	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -896,10 +898,12 @@ interface CssAttributes {
 	 * - axis: `block`, `inline`
 	 * - block edges: `block-start`, `block-end`
 	 * - inline edges: `inline-start`, `inline-end`
+	 * - background: `background`, `background-always`
 	 * - backdrop: `backdrop-none`, `backdrop-always`
 	 *
 	 * ### CSS Variables
-	 * - `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`
+	 * - `--sticky-backgroundColor`
+	 * - `--sticky-backdrop-backgroundColor`, `--sticky-backdrop-filter`
 	 *
 	 * ### Examples
 	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
@@ -929,7 +933,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-none`, `backdrop-always`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples

@@ -1153,7 +1153,7 @@ ol {
  *
  * ### Tokens
  * - scroll container: `block`, `inline`
- * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+ * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-none`, `backdrop-always`
  * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
  *
  * ### Examples
@@ -1413,7 +1413,7 @@ ol {
 		}
 
 		/**
-		 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+		 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and background/backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 		 *
 		 * ### Placement
 		 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -1422,10 +1422,12 @@ ol {
 		 * - axis: `block`, `inline`
 		 * - block edges: `block-start`, `block-end`
 		 * - inline edges: `inline-start`, `inline-end`
+		 * - background: `background`, `background-always`
 		 * - backdrop: `backdrop-none`, `backdrop-always`
 		 *
 		 * ### CSS Variables
-		 * - `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`
+		 * - `--sticky-backgroundColor`
+		 * - `--sticky-backdrop-backgroundColor`, `--sticky-backdrop-filter`
 		 *
 		 * ### Examples
 		 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
@@ -1445,8 +1447,9 @@ ol {
 		[data-sticky] {
 			/* Inputs */
 			--sticky-backgroundColor: light-dark(#F8EDFF, #130a2b3c);
-			--sticky-backdropFilter: blur(20px);
-			--sticky-backdropMaskImage: none;
+			--sticky-effective-backgroundColor: var(--sticky-backgroundColor);
+			--sticky-backdrop-backgroundColor: var(--sticky-backgroundColor);
+			--sticky-backdrop-filter: blur(20px);
 
 			/* Rules */
 			z-index: 1;
@@ -1488,8 +1491,8 @@ ol {
 			&:not([data-sticky~="backdrop-none"]) {
 				&[data-scroll-container],
 				&:not([data-scroll-container])::before {
-					background-color: var(--sticky-backgroundColor);
-					backdrop-filter: var(--sticky-backdropFilter);
+					background-color: var(--sticky-backdrop-backgroundColor);
+					backdrop-filter: var(--sticky-backdrop-filter);
 					border-radius: inherit;
 
 					transition-property: background-color, backdrop-filter;
@@ -1508,6 +1511,16 @@ ol {
 							background-color: transparent;
 							backdrop-filter: none;
 						}
+					}
+				}
+			}
+
+			&:is([data-sticky~="background"], [data-sticky~="background-always"]) {
+				background-color: var(--sticky-effective-backgroundColor);
+
+				&:not([data-sticky~="background-always"]) {
+					@container scroll-state(stuck: none) {
+						--sticky-effective-backgroundColor: transparent;
 					}
 				}
 			}

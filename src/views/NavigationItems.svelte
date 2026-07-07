@@ -222,7 +222,7 @@
 			}
 		>
 			<summary
-				data-sticky="block"
+				data-sticky="block background"
 				data-row="gap-2"
 			>
 				{@render linkable(item, depth)}
@@ -243,7 +243,7 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
-			data-sticky={sticky ? 'block' : undefined}
+			data-sticky={sticky ? 'block background' : undefined}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
 		>
@@ -473,9 +473,10 @@
 					var(--navigationItem-startRadius)
 				;
 				font-weight: 500;
-				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 96%, transparent);
-				--sticky-backdropFilter: blur(16px);
-				background-color: var(--navigationItem-background, transparent);
+				--sticky-backdrop-backgroundColor: color-mix(in oklch, var(--background-primary) 92%, transparent);
+				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 72%, transparent);
+				--sticky-backdrop-filter: blur(16px);
+				background-color: var(--navigationItem-background, var(--sticky-effective-backgroundColor, transparent));
 
 				transition-property:
 					opacity,
