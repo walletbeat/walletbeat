@@ -2480,7 +2480,7 @@ type SendTransactionWarning = WithRef<
 
 		/**
 		 * Does the wallet warn the user when they are sending to an address that
-		 * closely resembles — and may be a "poisoned" look-alike of — an address
+		 * closely resembles, and may be a "poisoned" look-alike of, an address
 		 * already in their transaction history or whitelist?
 		 */
 		addressPoisoningDetection: boolean
@@ -2503,7 +2503,7 @@ type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
 		 * Does the wallet warn the user before a transaction or signature that
-		 * grants an unlimited/infinite token allowance?
+		 * grants unlimited/infinite token allowance?
 		 */
 		warnsOnUnlimitedApproval: boolean
 
@@ -2525,7 +2525,7 @@ Whether the wallet supports scam alerts.
 - `scamUrlWarning` (`Support<ScamUrlWarning>`): Does the wallet warn the user when visiting a known-scam site?
 - `contractTransactionWarning` (`Support<ContractTransactionWarning>`): Does the wallet warn the user before executing a contract transaction?
 - `sendTransactionWarning` (`Support<SendTransactionWarning>`): Does the wallet warn the user before executing a send transaction?
-- `unlimitedApprovalWarning` (`Support<UnlimitedApprovalWarning>`): Does the wallet warn the user before a transaction or signature grants an unlimited/infinite ERC-20 token allowance?
+- `unlimitedApprovalWarning` (`Support<UnlimitedApprovalWarning>`): Does the wallet warn the user before a transaction or signature that grants unlimited/infinite ERC-20 token allowance?
 
 ---
 
