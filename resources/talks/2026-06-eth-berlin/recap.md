@@ -7,7 +7,7 @@
     	* Privacy in Web3 Panel
     	* Spontaneous privacy in web3 working group
     	* Interview with Kassandra (Kohaku)
-    	* Interview with Sergey (L2beat)
+    	* Interview with Sergey (L2BEAT)
 
 ### June 15 - Ethereum day
 
