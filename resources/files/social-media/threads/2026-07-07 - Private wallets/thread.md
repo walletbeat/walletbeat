@@ -2,6 +2,8 @@
 
 What does it actually mean for an Ethereum wallet to be "private"?
 
+Hint: It's not just about private token transfers
+
 A Walletbeat thread 🧵
 
 --- 
@@ -10,7 +12,7 @@ Privacy is one of the core values of Ethereum, yet it's often treated as a nice-
 
 Wallet privacy is more than just "Does your wallet support private transfers?".
 
-Here's how Walletbeat evaluates privacy, and why these attribute matters.
+Here's how Walletbeat evaluates privacy, and why these attributes matter.
 
 ---
 ![Wallet Address Privacy](./wallet_address_privacy.png)
@@ -56,7 +58,7 @@ Users shouldn't have to wonder whether their wallet is sending analytics, crash 
 
 ---
 
-"Privacy is no longer an afterthought." - VitalikButerin. Privacy, in Ethereum values, is present. Users experience Ethereum through wallets. But without wallets practicing these values, users can't experience them.
+"Privacy is no longer an afterthought." - @VitalikButerin. Privacy is the P in CROPS. As users' gateway into Ethereum, wallets themselves need to embody Privacy such that users actually get to have any.
 
 ---
 
