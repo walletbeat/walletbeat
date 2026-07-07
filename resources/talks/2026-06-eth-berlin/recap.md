@@ -17,11 +17,11 @@
 ### June 16 & 17 - Dappcon
 
     	* Dappcon Workshop
-    	* Interview w/ Paul
+    	* Interview with Paul
     	* Dappcon 1TS security breakfast
-    	* Meet w/ Hester & Fred
+    	* Meet with Hester & Fred
 
-### June 18 - Meeting w/ Nico
+### June 18 - Meeting with Nico
 
     	* Grant funding lead
     	* Strategy suggestions
@@ -31,4 +31,4 @@
 ### June 20 - Brew Privacy
 
     	* Wallet privacy talk
-    	* Interview w/ Luca Donnoh (L2BEAT)
+    	* Interview with Luca Donnoh (L2BEAT)
