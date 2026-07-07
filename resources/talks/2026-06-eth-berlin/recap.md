@@ -19,7 +19,7 @@
     	* Dappcon Workshop
     	* Interview w/ Paul
     	* Dappcon 1TS security breakfast
-			* Meet w/ Hester & Fred
+    	* Meet w/ Hester & Fred
 
 ### June 18 - Meeting w/ Nico
 
