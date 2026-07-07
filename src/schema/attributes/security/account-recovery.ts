@@ -430,8 +430,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 				paragraph(`
 						The wallet securely distributes a recovery secret across at least 3
 						external services with client-side reconstitution, but does not
-						periodically remind users to verify they can still access their
-						account recovery.
+						periodically remind users to verify they can still recover their account.
 					`),
 				evaluateAccountRecovery(
 					EvaluationContext.forTest(() => accountRecovery),
