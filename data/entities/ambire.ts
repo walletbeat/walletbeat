@@ -19,6 +19,7 @@ export const ambireEntity: OffchainDataProvider &
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: true,
 		securityAuditor: false,
 		transactionBroadcastProvider: true,

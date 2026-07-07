@@ -12,6 +12,7 @@ import {
 	DataCollectionPurpose,
 	type Endpoint,
 	endpointIsVerifiablyNonExtractive,
+	EntityRole,
 	RegularEndpoint,
 	UserFlow,
 	validateDataCollectionByEntityRow,
@@ -38,6 +39,7 @@ const invalidOrderflowAuctionRow: DataCollectionByEntity = {
 		endpoint: RegularEndpoint,
 	},
 	purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
+	role: EntityRole.OPERATOR,
 }
 
 function researchedDataCollection(
@@ -145,6 +147,7 @@ describe('orderflow data-collection helpers', () => {
 				endpoint: RegularEndpoint,
 			},
 			purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
+			role: EntityRole.OPERATOR,
 		}
 
 		const dataCollection = researchedDataCollection({
@@ -159,6 +162,7 @@ describe('orderflow data-collection helpers', () => {
 							endpoint: RegularEndpoint,
 						},
 						purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+						role: EntityRole.OPERATOR,
 					},
 				],
 			},
@@ -185,6 +189,7 @@ describe('orderflow data-collection helpers', () => {
 				endpoint: fullEnclaveEndpoint,
 			},
 			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+			role: EntityRole.OPERATOR,
 		}
 
 		const regularRow: WithRef<DataCollectionByEntity> = {
@@ -195,6 +200,7 @@ describe('orderflow data-collection helpers', () => {
 				endpoint: RegularEndpoint,
 			},
 			purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+			role: EntityRole.OPERATOR,
 		}
 
 		expect(partitionPreInclusionRecipientsByExtractiveness([])).toEqual({

@@ -28,11 +28,13 @@ import {
 	handleExplainRequest,
 	handleLintFix,
 	handleMarkDomain,
+	handleMarkDomainUpdate,
 	handleMarkFlowUnsupported,
 	handleMarkString,
 	handleReviewRequests,
 	handleReviewStrings,
 	markDomainOptions,
+	markDomainUpdateOptions,
 	markFlowUnsupportedOptions,
 	markStringOptions,
 } from './wallet-data-collection-lib'
@@ -112,10 +114,14 @@ cli
 	)
 	.option(
 		'--entity <entity ID>',
-		'Entity to assign the domain to. Entities must exist in the codebase first.',
+		'Entity operating the domain (the intended recipient of the data). Entities must exist in the codebase first.',
+	)
+	.option(
+		'--intermediaries <entity IDs>',
+		'Comma-separated list of entities that see the data in transit without being its intended recipient (e.g. TLS-terminating CDNs).',
 	)
 	.usage(
-		'mark-domain --domain=<domain-pattern> --entity=<entity-id>' +
+		'mark-domain --domain=<domain-pattern> --entity=<entity-id> [--intermediaries=<entity-id>,...]' +
 			trimWhitespacePrefix(`
 
 				Entities must be defined in the codebase first.
@@ -125,8 +131,43 @@ cli
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain --domain='infura.io' --entity='consensys'",
 	)
+	.example(
+		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain --domain='graphql-base.coinbase.com' --entity='coinbase' --intermediaries='cloudflare'",
+	)
 	.action(async options => {
 		await handleMarkDomain(markDomainOptions.process(options))
+	})
+
+// mark-domain-update subcommand
+cli
+	.command('mark-domain-update', 'Update an existing domain-to-entity mapping.')
+	.option('--domain <domain>', 'Domain whose existing mapping should be updated.')
+	.option('--set-operator <entity ID>', 'Set the entity operating the domain.')
+	.option(
+		'--set-intermediaries <entity IDs>',
+		'Replace the intermediary list with the given comma-separated entities. Cannot be combined with --add-intermediaries or --remove-intermediaries.',
+	)
+	.option(
+		'--add-intermediaries <entity IDs>',
+		'Add the given comma-separated entities to the intermediary list.',
+	)
+	.option(
+		'--remove-intermediaries <entity IDs>',
+		'Remove the given comma-separated entities from the intermediary list.',
+	)
+	.usage(
+		'mark-domain-update --domain=<domain-pattern> [--set-operator=<entity-id>] [--set-intermediaries=<entity-id>,...|--add-intermediaries=<entity-id>,...|--remove-intermediaries=<entity-id>,...]' +
+			trimWhitespacePrefix(`
+
+				Entities must be defined in the codebase first.
+				Known entity IDs: ${Object.keys(allEntities).toSorted().join(', ')}
+	`),
+	)
+	.example(
+		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain-update --domain='graphql-base.coinbase.com' --add-intermediaries='cloudflare'",
+	)
+	.action(async options => {
+		await handleMarkDomainUpdate(markDomainUpdateOptions.process(options))
 	})
 
 // explain-request subcommand

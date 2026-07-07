@@ -9,6 +9,7 @@ export const pillar: CorporateEntity & WalletDeveloper = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

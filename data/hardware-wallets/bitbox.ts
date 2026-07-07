@@ -11,6 +11,7 @@ import {
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
@@ -136,6 +137,7 @@ export const bitboxWallet: HardwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -156,6 +158,7 @@ export const bitboxWallet: HardwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.ASSET_METADATA,
 							],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},

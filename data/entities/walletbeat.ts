@@ -9,6 +9,7 @@ export const walletbeat: Entity = {
 		corporate: false,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,
