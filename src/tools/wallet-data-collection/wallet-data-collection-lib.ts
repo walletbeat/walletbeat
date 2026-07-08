@@ -8,10 +8,17 @@ import { fileURLToPath } from 'url'
 
 import { type EntityId, isValidEntityId } from '@/data/entities'
 import {
-	assertValidDomainToEntityIdMapping,
-	entityForDomain,
+	domainMappingForDomain,
+	entitiesForDomain,
+	updateDomainMapping,
 } from '@/data/entities/domains/entity-domains'
 import { allWallets, isValidWalletName, type WalletName } from '@/data/wallets'
+import {
+	assertValidDomainToEntityIdMapping,
+	type DomainMapping,
+	type DomainToEntityIdMapping,
+	type ResolvedDomain,
+} from '@/schema/entity-domains'
 import {
 	CollectionPolicy,
 	collectionPolicyEnum,
@@ -463,19 +470,46 @@ export const markStringOptions = new Options<MarkStringOptions>(
 	globalOptions,
 )
 
+const entityIdOption = typedStringOption(
+	'entity ID',
+	isValidEntityId,
+	'ensure the entity is registered in `/data/entities.ts` → `allEntities`',
+)
+
+function entityIdListOption(x: unknown): NonEmptyArray<EntityId> {
+	return nonEmptyMap(stringListOption(x), entityIdOption)
+}
+
 export interface MarkDomainOptions extends GlobalOptions {
 	domain: string
 	entity: EntityId
+	intermediaries: NonEmptyArray<EntityId> | null
 }
 
 export const markDomainOptions = new Options<MarkDomainOptions>(
 	{
 		domain: stringOption,
-		entity: typedStringOption(
-			'entity ID',
-			isValidEntityId,
-			'ensure the entity is registered in `/data/entities.ts` → `allEntities`',
-		),
+		entity: entityIdOption,
+		intermediaries: optionalOption(entityIdListOption),
+	},
+	globalOptions,
+)
+
+export interface MarkDomainUpdateOptions extends GlobalOptions {
+	domain: string
+	setOperator: EntityId | null
+	setIntermediaries: NonEmptyArray<EntityId> | null
+	addIntermediaries: NonEmptyArray<EntityId> | null
+	removeIntermediaries: NonEmptyArray<EntityId> | null
+}
+
+export const markDomainUpdateOptions = new Options<MarkDomainUpdateOptions>(
+	{
+		domain: stringOption,
+		setOperator: optionalOption(entityIdOption),
+		setIntermediaries: optionalOption(entityIdListOption),
+		addIntermediaries: optionalOption(entityIdListOption),
+		removeIntermediaries: optionalOption(entityIdListOption),
 	},
 	globalOptions,
 )
@@ -854,76 +888,241 @@ export async function handleMarkFlowUnsupported(opts: MarkFlowUnsupportedOptions
 	log(`Run \`${getCommandPrefix(opts)} check\` to see if there are any more issues to address.`)
 }
 
-export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
-	const domainFile = path.join(repoDir(), 'data/entities/domains/entity-domains.json')
-	const targetDomain = opts.domain.toLowerCase().trim()
-	const targetEntityId = opts.entity
+function domainMappingFilePath(): string {
+	return path.join(repoDir(), 'data/entities/domains/entity-domains.json')
+}
 
-	let existingDomains: Record<string, EntityId> = {}
+async function readDomainMappingFile(): Promise<DomainToEntityIdMapping> {
+	const domainFile = domainMappingFilePath()
 
-	// Read existing domains
-	if (fs.existsSync(domainFile)) {
-		try {
-			const content = await fs.promises.readFile(domainFile, 'utf8')
-
-			existingDomains = assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
-		} catch (e) {
-			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
-		}
+	if (!fs.existsSync(domainFile)) {
+		return {}
 	}
+
+	try {
+		const content = await fs.promises.readFile(domainFile, 'utf8')
+
+		return assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
+	} catch (e) {
+		throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`, { cause: e })
+	}
+}
+
+/**
+ * Build the canonical `DomainMapping` for an operator and a set of
+ * intermediaries: intermediaries are deduplicated and sorted, the bare
+ * entity ID form is used when there are no intermediaries, and an operator
+ * that is also listed as an intermediary is rejected.
+ */
+function canonicalDomainMapping(operator: EntityId, intermediaries: EntityId[]): DomainMapping {
+	const sorted = Array.from(new Set(intermediaries)).toSorted()
+
+	if (sorted.some(id => id === operator)) {
+		throw new Error(`Entity '${operator}' cannot be both the operator and an intermediary.`)
+	}
+
+	if (!isNonEmptyArray(sorted)) {
+		return operator
+	}
+
+	return { operator, intermediaries: sorted }
+}
+
+function domainMappingOperator(mapping: DomainMapping): EntityId {
+	return typeof mapping === 'string' ? mapping : mapping.operator
+}
+
+function domainMappingIntermediaries(mapping: DomainMapping): EntityId[] {
+	return typeof mapping === 'string' ? [] : mapping.intermediaries
+}
+
+function domainMappingEquals(a: DomainMapping, b: DomainMapping): boolean {
+	return (
+		domainMappingOperator(a) === domainMappingOperator(b) &&
+		domainMappingIntermediaries(a).join(',') === domainMappingIntermediaries(b).join(',')
+	)
+}
+
+function domainMappingToString(mapping: DomainMapping): string {
+	const intermediaries = domainMappingIntermediaries(mapping)
+
+	return `operator '${domainMappingOperator(mapping)}'${intermediaries.length === 0 ? '' : ` via intermediaries ${intermediaries.map(i => `'${i}'`).join(', ')}`}`
+}
+
+async function writeDomainMappingFile(mapping: DomainToEntityIdMapping): Promise<void> {
+	const domainFile = domainMappingFilePath()
+
+	// Sort keys alphabetically
+	const sortedDomains: DomainToEntityIdMapping = {}
+
+	for (const key of Object.keys(mapping).toSorted()) {
+		sortedDomains[key] = mapping[key]
+	}
+
+	// Re-validate to enforce all invariants before writing.
+	assertValidDomainToEntityIdMapping(sortedDomains)
+
+	// Save file with formatting, atomically (write to a temp file, then rename).
+	const tmpPath = domainFile + '.tmp'
+
+	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
+	await fs.promises.writeFile(tmpPath, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
+	await fs.promises.rename(tmpPath, domainFile)
+
+	// Keep the module-level mapping in sync with the file it was loaded from.
+	updateDomainMapping(sortedDomains)
+}
+
+export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
+	const targetDomain = opts.domain.toLowerCase().trim()
+	const targetMapping = canonicalDomainMapping(opts.entity, opts.intermediaries ?? [])
+
+	const existingDomains = await readDomainMappingFile()
 
 	// Validation: Check for conflicts with existing domains
 	for (const existingDomain of Object.keys(existingDomains)) {
+		const existingMapping = existingDomains[existingDomain]
+
 		// Check if target matches exactly
 		if (existingDomain === targetDomain) {
 			throw new Error(
-				`Domain '${targetDomain}' is already marked as belonging to entity '${existingDomains[existingDomain]}'.`,
+				`Domain '${targetDomain}' is already marked with ${domainMappingToString(existingMapping)}. Use \`mark-domain-update\` to modify it.`,
 			)
 		}
 
-		// Check if target is a subdomain of an existing domain (e.g., target 'api.foo.com' vs existing 'foo.com')
+		// Check if target is a subdomain of an existing domain (e.g., target 'api.foo.com' vs existing 'foo.com').
+		// This is only useful if the new mapping differs (e.g. a CDN-fronted subdomain with extra intermediaries);
+		// a redundant identical entry is rejected.
 		if (targetDomain.endsWith('.' + existingDomain)) {
-			throw new Error(
-				`Domain '${targetDomain}' is a subdomain of already marked '${existingDomain}' (${existingDomains[existingDomain]}). You do not need to mark it separately.`,
+			if (domainMappingEquals(existingMapping, targetMapping)) {
+				throw new Error(
+					`Domain '${targetDomain}' is a subdomain of already marked '${existingDomain}' with the same mapping (${domainMappingToString(existingMapping)}). You do not need to mark it separately.`,
+				)
+			}
+
+			if (domainMappingOperator(existingMapping) !== domainMappingOperator(targetMapping)) {
+				throw new Error(
+					`Domain '${targetDomain}' is a subdomain of already marked '${existingDomain}' (${domainMappingToString(existingMapping)}), which has a different operator. Fix the parent domain mapping instead, or remove it in case it was made in error.`,
+				)
+			}
+
+			log(
+				`ℹ️ '${targetDomain}' overrides parent domain '${existingDomain}' (${domainMappingToString(existingMapping)}); the more specific entry takes precedence.`,
 			)
 		}
 
 		// Check if an existing domain is a subdomain of the target (e.g., target 'foo.com' vs existing 'api.foo.com')
 		// This suggests the user should have marked the parent domain instead of the child previously.
 		if (existingDomain.endsWith('.' + targetDomain)) {
-			const existingEntity = entityForDomain(existingDomain)
-
-			if (existingEntity !== null && targetEntityId !== existingEntity.id) {
+			if (domainMappingOperator(existingMapping) !== domainMappingOperator(targetMapping)) {
 				throw new Error(
-					`Existing domain ${existingDomain} is already marked as belonging to entity ID ${existingEntity.id}, so cannot mark ${targetDomain} as belonging to ${targetEntityId}.`,
+					`Existing domain ${existingDomain} is already marked with ${domainMappingToString(existingMapping)}, so cannot mark ${targetDomain} as belonging to a different operator.`,
 				)
 			}
 
-			log(
-				`ℹ️ Consolidating: Removing '${existingDomain}' as it is a subdomain of the new target '${targetDomain}'.`,
-			)
-			delete existingDomains[existingDomain]
-			// We continue the loop to ensure no other subdomains exist (e.g. both api.foo.com and images.foo.com existed)
+			if (domainMappingEquals(existingMapping, targetMapping)) {
+				log(
+					`ℹ️ Consolidating: Removing '${existingDomain}' as it is a subdomain of the new target '${targetDomain}' with the same mapping.`,
+				)
+				delete existingDomains[existingDomain]
+				// We continue the loop to ensure no other subdomains exist (e.g. both api.foo.com and images.foo.com existed)
+			} else {
+				log(
+					`ℹ️ Keeping '${existingDomain}' (${domainMappingToString(existingMapping)}): it is a subdomain of '${targetDomain}' but has a different mapping, so the more specific entry takes precedence.`,
+				)
+			}
 		}
 	}
 
 	// Add new entry
-	existingDomains[targetDomain] = targetEntityId
+	existingDomains[targetDomain] = targetMapping
 
-	// Sort keys alphabetically
-	const sortedDomains: Record<string, string> = {}
+	await writeDomainMappingFile(existingDomains)
 
-	Object.keys(existingDomains)
-		.sort()
-		.forEach(key => {
-			sortedDomains[key] = existingDomains[key]
-		})
+	log(`✅ Successfully marked '${targetDomain}' with ${domainMappingToString(targetMapping)}.`)
+}
 
-	// Save file with formatting
-	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
-	await fs.promises.writeFile(domainFile, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
+export async function handleMarkDomainUpdate(opts: MarkDomainUpdateOptions): Promise<void> {
+	const targetDomain = opts.domain.toLowerCase().trim()
 
-	log(`✅ Successfully marked '${targetDomain}' as belonging to entity '${targetEntityId}'.`)
+	if (
+		opts.setIntermediaries !== null &&
+		(opts.addIntermediaries !== null || opts.removeIntermediaries !== null)
+	) {
+		throw new Error(
+			'--set-intermediaries cannot be combined with --add-intermediaries or --remove-intermediaries.',
+		)
+	}
+
+	if (
+		opts.setOperator === null &&
+		opts.setIntermediaries === null &&
+		opts.addIntermediaries === null &&
+		opts.removeIntermediaries === null
+	) {
+		throw new Error(
+			'Nothing to update; specify at least one of --set-operator, --set-intermediaries, --add-intermediaries, --remove-intermediaries.',
+		)
+	}
+
+	const existingDomains = await readDomainMappingFile()
+
+	if (!Object.hasOwn(existingDomains, targetDomain)) {
+		const suffixMapping = domainMappingForDomain(targetDomain)
+
+		throw new Error(
+			`Domain '${targetDomain}' has no exact mapping entry to update.${
+				suffixMapping === null
+					? ''
+					: ` It currently resolves through a parent domain entry (${domainMappingToString(suffixMapping)}); use \`mark-domain\` to create a more specific entry for it.`
+			}`,
+		)
+	}
+
+	const existingMapping = existingDomains[targetDomain]
+	const operator = opts.setOperator ?? domainMappingOperator(existingMapping)
+	let intermediaries = domainMappingIntermediaries(existingMapping)
+
+	if (opts.setIntermediaries !== null) {
+		intermediaries = opts.setIntermediaries
+	}
+
+	if (opts.addIntermediaries !== null) {
+		for (const id of opts.addIntermediaries) {
+			if (intermediaries.includes(id)) {
+				throw new Error(`Entity '${id}' is already an intermediary for '${targetDomain}'.`)
+			}
+		}
+
+		intermediaries = intermediaries.concat(opts.addIntermediaries)
+	}
+
+	if (opts.removeIntermediaries !== null) {
+		const toRemove = opts.removeIntermediaries
+
+		for (const id of toRemove) {
+			if (!intermediaries.includes(id)) {
+				throw new Error(`Entity '${id}' is not an intermediary for '${targetDomain}'.`)
+			}
+		}
+
+		intermediaries = intermediaries.filter(id => !toRemove.includes(id))
+	}
+
+	const newMapping = canonicalDomainMapping(operator, intermediaries)
+
+	if (domainMappingEquals(existingMapping, newMapping)) {
+		log(`ℹ️ Mapping for '${targetDomain}' is unchanged (${domainMappingToString(newMapping)}).`)
+
+		return
+	}
+
+	existingDomains[targetDomain] = newMapping
+	await writeDomainMappingFile(existingDomains)
+
+	log(
+		`✅ Updated '${targetDomain}': ${domainMappingToString(existingMapping)} → ${domainMappingToString(newMapping)}.`,
+	)
 }
 
 export async function handleExplainRequest(opts: ExplainRequestOptions): Promise<void> {
@@ -1015,10 +1214,19 @@ function displayRequestInfo(
 			)
 			.join(`${fadedOut(';')} `)
 	}
-	const entity = entityForDomain(request.domain)
+	const resolved = entitiesForDomain(request.domain)
 
-	if (entity === null) {
+	if (resolved === null) {
 		throw new Error(`no entity associated with ${request.domain}`)
+	}
+
+	function resolvedDomainNames(r: ResolvedDomain): string {
+		return (
+			chalk.cyan(r.operator.name) +
+			(r.intermediaries.length === 0
+				? ''
+				: fadedOut(' via ') + r.intermediaries.map(i => chalk.cyan(i.name)).join(fadedOut(', ')))
+		)
 	}
 
 	function header(header: string): string {
@@ -1033,7 +1241,7 @@ function displayRequestInfo(
 
 	log(`${header('URL')}${fadedOut('https://')}${chalk.blue(request.domain)}${request.path}`)
 	log(
-		`${header('Domain')}${chalk.blue(request.domain)} ${fadedOut('(')}${chalk.cyan(entity.name)}${fadedOut(')')}`,
+		`${header('Domain')}${chalk.blue(request.domain)} ${fadedOut('(')}${resolvedDomainNames(resolved)}${fadedOut(')')}`,
 	)
 
 	if (Object.keys(request.query).length > 0) {
@@ -1053,14 +1261,14 @@ function displayRequestInfo(
 	}
 
 	if (request.refererDomain !== null) {
-		const refEntity = entityForDomain(request.refererDomain)
+		const refResolved = entitiesForDomain(request.refererDomain)
 
-		if (refEntity === null) {
+		if (refResolved === null) {
 			throw new Error(`no entity associated with referer domain ${request.refererDomain}`)
 		}
 
 		log(
-			`${header('Referer')}${chalk.blue(request.refererDomain)} ${fadedOut('(')}${chalk.cyan(refEntity.name)}${fadedOut(')')}`,
+			`${header('Referer')}${chalk.blue(request.refererDomain)} ${fadedOut('(')}${resolvedDomainNames(refResolved)}${fadedOut(')')}`,
 		)
 	}
 
@@ -1349,7 +1557,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 		for (const req of flow.requests) {
 			for (const domain of req.domains()) {
-				if (entityForDomain(domain) === null) {
+				if (entitiesForDomain(domain) === null) {
 					throw new Error(
 						`There are still unassociated domains (e.g. ${domain}); please address these first before reviewing requests manually.`,
 					)

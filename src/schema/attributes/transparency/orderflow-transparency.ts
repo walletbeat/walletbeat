@@ -16,6 +16,7 @@ import {
 	type DataCollectionByEntity,
 	DataCollectionPurpose,
 	type Endpoint,
+	EntityRole,
 	RegularEndpoint,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
@@ -66,6 +67,7 @@ const exampleAuctioneerRow: WithRef<DataCollectionByEntity> = {
 		endpoint: RegularEndpoint,
 	},
 	purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
+	role: EntityRole.OPERATOR,
 }
 
 const exampleNonExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
@@ -76,6 +78,7 @@ const exampleNonExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
 		endpoint: exampleVerifiedEnclaveEndpoint,
 	},
 	purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+	role: EntityRole.OPERATOR,
 }
 
 const exampleExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
@@ -86,6 +89,7 @@ const exampleExtractiveRecipientRow: WithRef<DataCollectionByEntity> = {
 		endpoint: RegularEndpoint,
 	},
 	purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+	role: EntityRole.OPERATOR,
 }
 
 const exampleOrderflowPracticesPageUrl = 'https://example.com/orderflow-practices'

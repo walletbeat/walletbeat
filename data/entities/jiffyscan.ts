@@ -10,6 +10,7 @@ export const jiffylabs: ChainDataProvider & OffchainDataProvider = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: true,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

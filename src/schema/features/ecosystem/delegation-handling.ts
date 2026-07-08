@@ -28,7 +28,7 @@ interface DelegationOffer {
 				/**
 				 * Is the delegation step done as a standalone step before other operations?
 				 * (i.e. The wallet shows a "Set up your smart account" screen and waits for it to confirm
-				 * on-chain before proceeding with the user's original transaction.)
+				 * onchain before proceeding with the user's original transaction.)
 				 */
 				type: 'STANDALONE_UPFRONT_DELEGATION'
 		  }

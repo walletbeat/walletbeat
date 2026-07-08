@@ -33,7 +33,7 @@ export enum AccountType {
 	 * MPC wallets, behind a key with split shards.
 	 * To test: check the wallet's documentation for "MPC", "threshold
 	 * signatures", or "key sharding". MPC wallets typically do not show a
-	 * seed phrase and the address has no on-chain contract code.
+	 * seed phrase and the address has no onchain contract code.
 	 */
 	mpc = 'mpc',
 

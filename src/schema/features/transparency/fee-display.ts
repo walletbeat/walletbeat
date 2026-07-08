@@ -54,7 +54,7 @@ export enum WalletServiceFeeDisplayUnit {
 	FIAT = 'FIAT',
 
 	/**
-	 * Wallet service fee line item shows a fixed amount of an on-chain asset,
+	 * Wallet service fee line item shows a fixed amount of an onchain asset,
 	 * native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
 	 */
 	TOKEN_AMOUNT = 'TOKEN_AMOUNT',

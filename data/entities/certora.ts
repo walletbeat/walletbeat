@@ -9,6 +9,7 @@ export const certora: CorporateEntity & SecurityAuditor = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: true,
 		transactionBroadcastProvider: false,

@@ -1,87 +1,71 @@
-import { entityById, type EntityId, isValidEntityId } from '@/data/entities'
-import type { Entity } from '@/schema/entity'
+import { entityById } from '@/data/entities'
+import {
+	assertValidDomainToEntityIdMapping,
+	type DomainMapping,
+	type DomainToEntityIdMapping,
+	type ResolvedDomain,
+} from '@/schema/entity-domains'
 
 import rawData from './entity-domains.json'
 
-/** Type for entity-domains.json */
-export type DomainToEntityIdMapping = Record<string, EntityId>
+let domainToEntityIdMapping = assertValidDomainToEntityIdMapping(rawData)
 
-/** Type predicate for DomainToEntityIdMapping. */
-export function isValidDomainToEntityMapping(data: unknown): data is DomainToEntityIdMapping {
-	if (typeof data !== 'object' || data === null) {
-		return false
-	}
-
-	for (const [key, val] of Object.entries(data)) {
-		if (
-			typeof key !== 'string' ||
-			key === '' ||
-			typeof val !== 'string' ||
-			val === '' ||
-			!isValidEntityId(val)
-		) {
-			return false
-		}
-	}
-
-	return true
-}
-
-export function assertValidDomainToEntityIdMapping(data: unknown): DomainToEntityIdMapping {
-	if (!isValidDomainToEntityMapping(data)) {
-		throw new Error('invalid/malformed data in entity-domains.json')
-	}
-
-	return data
-}
-
-const domainToEntityIdMapping = assertValidDomainToEntityIdMapping(rawData)
-
-function assertEntityId(entityId: string): EntityId {
-	if (!isValidEntityId(entityId)) {
-		throw new Error(
-			`Unknown entity ID \`${entityId}\` in \`entity-domain.json\`; if you've added it, make sure it is also listed in \`/data/entities.ts\` → \`allEntities\`.`,
-		)
-	}
-
-	return entityId
+/**
+ * Replace the module-level mapping used by `domainMappingForDomain` and
+ * `entitiesForDomain`, which is otherwise loaded from entity-domains.json at
+ * import time. Called whenever entity-domains.json is overwritten (by the
+ * `mark-domain` / `mark-domain-update` CLI subcommands), and by tests with
+ * synthetic mappings.
+ */
+export function updateDomainMapping(mapping: DomainToEntityIdMapping): void {
+	domainToEntityIdMapping = mapping
 }
 
 /**
- * Look up the entity ID associated with a domain.
+ * Look up the domain mapping for a domain.
+ * Exact matches take precedence over parent-domain (suffix) matches, so a
+ * CDN-fronted subdomain can carry intermediaries without asserting them for
+ * the whole apex domain.
  */
-function entityIdForDomain(domain: string): EntityId | null {
+export function domainMappingForDomain(domain: string): DomainMapping | null {
 	if (Object.hasOwn(domainToEntityIdMapping, domain)) {
 		return domainToEntityIdMapping[domain]
 	}
 
+	// Prefer the longest (most specific) matching parent domain, so that
+	// e.g. an intermediary recorded on `sub.example.com` also applies to
+	// `deep.sub.example.com` even when `example.com` is mapped too.
+	let bestMatch: string | null = null
+
 	for (const d of Object.keys(domainToEntityIdMapping)) {
-		if (domain.endsWith('.' + d)) {
-			return assertEntityId(domainToEntityIdMapping[d])
+		if (domain.endsWith('.' + d) && (bestMatch === null || d.length > bestMatch.length)) {
+			bestMatch = d
 		}
 	}
 
-	return null
+	return bestMatch === null ? null : domainToEntityIdMapping[bestMatch]
 }
 
 /**
- * Look up the entity associated with a domain.
+ * Look up all entities that see the data sent to a domain.
  *
  * @param domain The domain to look up. Subdomains are OK.
- * @returns The Entity the domain is associated with, or `null` if the domain is not associated.
+ * @returns The operator and intermediaries the domain is associated with,
+ *          or `null` if the domain is not associated with any entity.
  */
-export function entityForDomain(domain: string): Entity | null {
-	const entityId = entityIdForDomain(domain)
+export function entitiesForDomain(domain: string): ResolvedDomain | null {
+	const domainMapping = domainMappingForDomain(domain)
 
-	if (entityId === null) {
+	if (domainMapping === null) {
 		return null
 	}
 
-	const entity = entityById(entityId)
-
-	if (entity === null) {
-		throw new Error(`Unknown entity ID \`${entityId}\` in \`entity-domain.json\``)
+	if (typeof domainMapping === 'string') {
+		return { intermediaries: [], operator: entityById(domainMapping) }
 	}
 
-	return entity
+	return {
+		intermediaries: domainMapping.intermediaries.map(entityById),
+		operator: entityById(domainMapping.operator),
+	}
 }

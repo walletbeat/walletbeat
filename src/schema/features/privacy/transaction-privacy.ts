@@ -476,7 +476,7 @@ export type RailgunSupport = WithRef<{
 
 	/**
 	 * Does the wallet warn users about correlation risks when shielding tokens?
-	 * Shielding transactions are public on-chain and can be analyzed to link
+	 * Shielding transactions are public onchain and can be analyzed to link
 	 * a user's 0x address to their 0zk address through amount, timing, and token
 	 * type correlation. Similar to how Privacy Pools tracks deposit correlation risks.
 	 */

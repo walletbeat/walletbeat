@@ -59,7 +59,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 
 - **Do you support passkeys (FIDO2/WebAuthn) as an authentication or signing method?** (yes / no)
   - Currently, no. Our engineering team is currently working to add passkey support.
-- **If yes, which library do you use for on-chain P-256 verification? N/A**
+- **If yes, which library do you use for onchain P-256 verification? N/A**
   - [ ] Smooth Crypto Lib
   - [ ] Daimo P256 Verifier
   - [ ] OpenZeppelin P256 Verifier
