@@ -12,6 +12,12 @@ import {
 	Rating,
 } from '@/schema/attributes'
 import {
+	type AccountSupport,
+	AccountType,
+	type AccountTypeEoa,
+	isAccountTypeSupported,
+} from '@/schema/features/account-support'
+import {
 	type AccountRecovery,
 	type AccountRecoveryDrill,
 	AccountRecoveryDrillType,
@@ -131,16 +137,8 @@ function evaluateGuardianRecoveryPolicy(
 function evaluateAccountRecoveryDrills(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }>,
-	hasGuardianRecovery: boolean,
+	recommendedDrillTypes: AccountRecoveryDrillType[],
 ): Evaluation<AccountRecoveryMetadata> {
-	// Guardian account check-ups are only meaningful for wallets that
-	// actually implement guardian-based recovery.
-	const recommendedDrillTypes: AccountRecoveryDrillType[] = [
-		AccountRecoveryDrillType.PRIVATE_KEY_QUIZ,
-		AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
-		...(hasGuardianRecovery ? [AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK] : []),
-	]
-
 	if (isSupported(drills)) {
 		const configuredDrillTypes = new Set(drills.entries.map(drill => drill.type))
 		const missing = recommendedDrillTypes.filter(type => !configuredDrillTypes.has(type))
@@ -156,8 +154,8 @@ function evaluateAccountRecoveryDrills(
 					rating: Rating.PASS,
 					displayName: 'Account recovery drills implemented',
 					shortExplanation: sentence(`
-						{{WALLET_NAME}} periodically asks users to make sure that their private key,
-						seed phrase, and guardian accounts are still accessible.
+						{{WALLET_NAME}} periodically asks users to confirm access to their
+						${commaListFormat(configured.map(drill => accountRecoveryDrillWording(drill.type).noun))}.
 					`),
 					metadata: {
 						minimumGuardianPolicy: null,
@@ -187,6 +185,26 @@ function evaluateAccountRecoveryDrills(
 			`),
 		})
 	}
+	// For empty recommended drill types
+	if (!isNonEmptyArray(recommendedDrillTypes)) {
+		return ctx.build({
+			outcome: {
+				id: 'no_applicable_recovery_drills',
+				rating: Rating.PASS,
+				displayName: 'No account recovery drills applicable',
+				shortExplanation: sentence(`
+					{{WALLET_NAME}}'s account type has no user-held recovery material
+					that periodic check-ups could verify.
+				`),
+				metadata: {
+					minimumGuardianPolicy: null,
+					outcomes: null,
+					drills: { configured: [], missing: [] },
+				},
+			},
+			details: accountRecoveryDetailsContent({}),
+		})
+	}
 
 	return ctx.build({
 		outcome: {
@@ -211,16 +229,57 @@ function evaluateAccountRecoveryDrills(
 	})
 }
 
+/**
+ * Which account recovery drills the wallet is expected to run.
+ * Wallets should only be expected to drill users on recovery material
+ * that is necessary to them: a private key check-up only makes sense if the
+ * wallet ever exposes a raw private key to the user, and a seed phrase
+ * check-up only makes sense if EOA keys are derived from a seed phrase.
+ *
+ * Wallets without EOA support (MPC, smart contract accounts) have no
+ * such user-held key material to quiz the user on. Guardian account
+ * check-ups are only meaningful for wallets that actually implement
+ * guardian-based recovery.
+ */
+function getRecommendedDrillTypes(
+	accountSupport: AccountSupport,
+	hasGuardianRecovery: boolean,
+): AccountRecoveryDrillType[] {
+	const keyMaterialDrillTypes: AccountRecoveryDrillType[] = isAccountTypeSupported<AccountTypeEoa>(
+		accountSupport.eoa,
+	)
+		? [
+				...(accountSupport.eoa.canExportPrivateKey
+					? [AccountRecoveryDrillType.PRIVATE_KEY_QUIZ]
+					: []),
+				...(accountSupport.eoa.keyDerivation.type === 'BIP32'
+					? [AccountRecoveryDrillType.SEED_PHRASE_QUIZ]
+					: []),
+			]
+		: []
+
+	return [
+		...keyMaterialDrillTypes,
+		...(hasGuardianRecovery ? [AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK] : []),
+	]
+}
+
 function evaluateAccountRecovery(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	accountRecovery: AccountRecovery,
+	accountSupport: AccountSupport,
 ): Evaluation<AccountRecoveryMetadata> {
 	if (accountRecovery.drills === null) {
 		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
 	}
 
 	const hasGuardianRecovery = isSupported(accountRecovery.guardianRecovery)
-	const drillsEval = evaluateAccountRecoveryDrills(ctx, accountRecovery.drills, hasGuardianRecovery)
+	const recommendedDrillTypes = getRecommendedDrillTypes(accountSupport, hasGuardianRecovery)
+	const drillsEval = evaluateAccountRecoveryDrills(
+		ctx,
+		accountRecovery.drills,
+		recommendedDrillTypes,
+	)
 
 	const guardianEval = isSupported(accountRecovery.guardianRecovery)
 		? evaluateGuardianRecoveryPolicy(ctx, accountRecovery.guardianRecovery.minimumGuardianPolicy)
@@ -259,6 +318,25 @@ function evaluateAccountRecovery(
 	])
 }
 
+/** A sample seed-phrase-based EOA account support, used by example ratings. */
+const exampleEoaAccountSupport: AccountSupport = {
+	defaultAccountType: AccountType.eoa,
+	eoa: supported({
+		ref: refNotNecessary,
+		keyDerivation: {
+			type: 'BIP32',
+			derivationPath: 'BIP44',
+			seedPhrase: 'BIP39',
+			canExportSeedPhrase: true,
+		},
+		canExportPrivateKey: true,
+	}),
+	mpc: notSupported,
+	eip7702: notSupported,
+	rawErc4337: notSupported,
+	safe: notSupported,
+}
+
 export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 	id: 'accountRecovery',
 	icon: 'account_recovery',
@@ -281,14 +359,13 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		for everyday users. Properly implemented, this keeps users safer while still
 		providing the self-sovereignty benefits of self-custody in the day-to-day.
 
-		But a recovery mechanism that is never exercised can silently become useless.
-		A guardian account gets abandoned. A written-down seed phrase becomes
-		unreadable or gets thrown out. The user simply forgets which of several
-		backup methods they actually set up. None of this is discovered until
-		the user actually needs to recover their account, at which point it is
-		too late. Wallets that periodically drill users on their recovery setup
-		catch these failures while there's still time to make sure users can
-		**actually** recover their accounts.
+		However, recovery methods can themselves silently become inaccessible over time.
+		For example, a guardian account may get abandoned, or a written-down seed
+		phrase may be lost or become unreadable. Users rarely notice this until
+		the day they need to recover their account, at which point it is too late.
+		Wallets can address this by periodically asking users to verify that their
+		recovery methods are still accessible, catching such problems while there
+		is still time to fix them.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on their implementation of
@@ -313,14 +390,19 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		are covered by a separate attribute in the Self-Sovereignty category.
 
 		Separately, wallets are evaluated on whether they periodically prompt
-		users to demonstrate that their recovery setup still works. Wallets
-		should run all the following drills that are relevant to their
-		implementation:
+		users to demonstrate that their recovery setup still works. Which
+		check-ups are expected depends on the wallet's features, since wallets
+		can only drill users on recovery material that actually exists:
 
-		- A private key check-up, confirming the user still has access to
-		  their private key.
-		- A seed phrase check-up, confirming the user still has access to
-		  their seed phrase.
+		- If the wallet supports EOA accounts and lets the user export their
+		  private key, a private key check-up, confirming the user still has
+		  access to their private key.
+		- If the wallet supports EOA accounts derived from a seed phrase, a
+		  seed phrase check-up, confirming the user still has access to their
+		  seed phrase.
+		- Wallets without EOA support (such as MPC-based wallets) have no
+		  such user-held key material, so no key material check-ups are
+		  expected for them.
 		- If the wallet implements guardian-based recovery, a guardian
 		  account check-up, confirming the user still has access to each
 		  configured guardian account.
@@ -341,6 +423,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 						guardianRecovery: notSupported,
 						drills: notSupported,
 					},
+					exampleEoaAccountSupport,
 				),
 			),
 			exampleRating(
@@ -383,6 +466,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 						}),
 						drills: notSupported,
 					},
+					exampleEoaAccountSupport,
 				),
 			),
 			exampleRating(
@@ -421,6 +505,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 						}),
 						drills: notSupported,
 					},
+					exampleEoaAccountSupport,
 				),
 			),
 		],
@@ -460,6 +545,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 						}),
 						drills: notSupported,
 					},
+					exampleEoaAccountSupport,
 				),
 			),
 			exampleRating(
@@ -507,6 +593,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							] satisfies NonEmptyArray<WithRef<AccountRecoveryDrill>>,
 						}),
 					},
+					exampleEoaAccountSupport,
 				),
 			),
 		],
@@ -569,6 +656,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							] satisfies NonEmptyArray<WithRef<AccountRecoveryDrill>>,
 						}),
 					},
+					exampleEoaAccountSupport,
 				),
 			),
 		],
@@ -578,7 +666,9 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 	): Evaluation<AccountRecoveryMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
-		if (ctx.features.security.accountRecovery === null) {
+		// Account support data is also required, to determine which specific
+		// account recovery drills are expected of the wallet.
+		if (ctx.features.security.accountRecovery === null || ctx.features.accountSupport === null) {
 			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
 		}
 
@@ -587,7 +677,11 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 			ctx.addRef(ctx.features.security.accountRecovery.guardianRecovery)
 		}
 
-		return evaluateAccountRecovery(ctx, ctx.features.security.accountRecovery)
+		return evaluateAccountRecovery(
+			ctx,
+			ctx.features.security.accountRecovery,
+			ctx.features.accountSupport,
+		)
 	},
 	aggregate: pickWorstRating<AccountRecoveryMetadata>,
 }
