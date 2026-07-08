@@ -179,35 +179,37 @@
 			</li>
 		{/if}
 
-		<li data-list-item="gap-2">
-			<Typography
-				content={{
-					contentType: ContentType.MARKDOWN,
-					markdown: isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning)
-						? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.${leakClause([
-								[
-									outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksUserIp,
-									'your IP',
-								],
-								[
-									outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksUserAddress,
-									'your Ethereum address',
-								],
-								[
-									outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksSpenderAddress,
-									'the spender address',
-								],
-							])}`
-						: '**{{WALLET_NAME}}** does not warn you when granting unlimited token approvals.',
-				}}
-				strings={getWalletEvalStrings(wallet)}
-			/>
-
-			{#if isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning) && outcome.metadata.scamAlerts.unlimitedApprovalWarning.ref}
-				<ReferenceLinks
-					references={toFullyQualified(outcome.metadata.scamAlerts.unlimitedApprovalWarning.ref)}
+		{#if outcome.metadata.unlimitedApprovalWarning?.required}
+			<li data-list-item="gap-2">
+				<Typography
+					content={{
+						contentType: ContentType.MARKDOWN,
+						markdown: isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning)
+							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.${leakClause([
+									[
+										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksUserIp,
+										'your IP',
+									],
+									[
+										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksUserAddress,
+										'your Ethereum address',
+									],
+									[
+										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksSpenderAddress,
+										'the spender address',
+									],
+								])}`
+							: '**{{WALLET_NAME}}** does not warn you when granting unlimited token approvals.',
+					}}
+					strings={getWalletEvalStrings(wallet)}
 				/>
-			{/if}
-		</li>
+
+				{#if isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning) && outcome.metadata.scamAlerts.unlimitedApprovalWarning.ref}
+					<ReferenceLinks
+						references={toFullyQualified(outcome.metadata.scamAlerts.unlimitedApprovalWarning.ref)}
+					/>
+				{/if}
+			</li>
+		{/if}
 	</ul>
 {/if}
