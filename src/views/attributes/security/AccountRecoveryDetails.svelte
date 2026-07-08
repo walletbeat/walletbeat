@@ -17,7 +17,7 @@
 	// Components
 	import Typography from '@/components/Typography.svelte'
 	import {
-		accountRecoveryDrillCheckupLabels,
+		accountRecoveryDrillWording,
 		guardianPolicyMarkdown,
 	} from '@/schema/features/security/account-recovery'
 	import { isAccountRecoverable } from '@/schema/features/guardian-scenario/guardian-scenario-common'
@@ -178,7 +178,7 @@
 		<ul>
 			{#each metadata.drills.configured as drill (drill.type)}
 				<li>
-					{accountRecoveryDrillCheckupLabels[drill.type]} (every {drill.reminderEveryNDays} days)
+					{accountRecoveryDrillWording(drill.type).label} (every {drill.reminderEveryNDays} days)
 				</li>
 			{/each}
 		</ul>
@@ -195,7 +195,7 @@
 		/>
 		<ul>
 			{#each metadata.drills.missing as drillType (drillType)}
-				<li>{accountRecoveryDrillCheckupLabels[drillType]}</li>
+				<li>{accountRecoveryDrillWording(drillType).label}</li>
 			{/each}
 		</ul>
 	{/if}

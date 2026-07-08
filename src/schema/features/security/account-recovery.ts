@@ -558,14 +558,25 @@ export interface AccountRecovery {
 	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }> | null
 }
 
-export const accountRecoveryDrillCheckupLabels: Record<AccountRecoveryDrillType, string> = {
-	[AccountRecoveryDrillType.PRIVATE_KEY_QUIZ]: 'private key check-ups',
-	[AccountRecoveryDrillType.SEED_PHRASE_QUIZ]: 'seed phrase check-ups',
-	[AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK]: 'guardian account check-ups',
-}
-
-export const accountRecoveryDrillNouns: Record<AccountRecoveryDrillType, string> = {
-	[AccountRecoveryDrillType.PRIVATE_KEY_QUIZ]: 'private key',
-	[AccountRecoveryDrillType.SEED_PHRASE_QUIZ]: 'seed phrase',
-	[AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK]: 'guardian accounts',
+export function accountRecoveryDrillWording(type: AccountRecoveryDrillType): {
+	label: string
+	noun: string
+} {
+	switch (type) {
+		case AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK:
+			return {
+				label: 'guadian account check-ups',
+				noun: 'guardian accounts',
+			}
+		case AccountRecoveryDrillType.PRIVATE_KEY_QUIZ:
+			return {
+				label: 'private key check-ups',
+				noun: 'private key',
+			}
+		case AccountRecoveryDrillType.SEED_PHRASE_QUIZ:
+			return {
+				label: 'seed phrase check-ups',
+				noun: 'seed phrase',
+			}
+	}
 }

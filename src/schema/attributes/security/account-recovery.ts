@@ -14,9 +14,8 @@ import {
 import {
 	type AccountRecovery,
 	type AccountRecoveryDrill,
-	accountRecoveryDrillCheckupLabels,
-	accountRecoveryDrillNouns,
 	AccountRecoveryDrillType,
+	accountRecoveryDrillWording,
 	type GuardianPolicy,
 	GuardianPolicyType,
 	GuardianType,
@@ -184,7 +183,7 @@ function evaluateAccountRecoveryDrills(
 			details: accountRecoveryDetailsContent({}),
 			howToImprove: sentence(`
 				{{WALLET_NAME}} should periodically ask users to complete
-				${commaListFormat(missing.map(type => accountRecoveryDrillCheckupLabels[type]))} to ensure they can recover their account when needed.
+				${commaListFormat(missing.map(type => accountRecoveryDrillWording(type).label))} to ensure they can recover their account when needed.
 			`),
 		})
 	}
@@ -207,7 +206,7 @@ function evaluateAccountRecoveryDrills(
 		details: accountRecoveryDetailsContent({}),
 		howToImprove: sentence(`
 			{{WALLET_NAME}} should periodically ask users to verify their
-			${commaListFormat(recommendedDrillTypes.map(type => accountRecoveryDrillNouns[type]))} are still accessible.
+			${commaListFormat(recommendedDrillTypes.map(type => accountRecoveryDrillWording(type).noun))} are still accessible.
 		`),
 	})
 }
