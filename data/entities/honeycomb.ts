@@ -9,6 +9,7 @@ export const honeycomb: CorporateEntity & DataBroker = {
 		corporate: true,
 		dataBroker: true,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

@@ -316,7 +316,7 @@ type AccountTypeSupport<T extends object> = Support<WithRef<T>>
 Set of possible account types.
 
 - `eoa` = `'eoa'`: EOA account type, behind a private key. To test: create a new wallet and check whether it shows a seed phrase during onboarding. Verify the address starts with `0x` and has no associated contract code (e.g. check on Etherscan — "Contract" tab should be absent).
-- `mpc` = `'mpc'`: MPC wallets, behind a key with split shards. To test: check the wallet's documentation for "MPC", "threshold signatures", or "key sharding". MPC wallets typically do not show a seed phrase and the address has no on-chain contract code.
+- `mpc` = `'mpc'`: MPC wallets, behind a key with split shards. To test: check the wallet's documentation for "MPC", "threshold signatures", or "key sharding". MPC wallets typically do not show a seed phrase and the address has no onchain contract code.
 - `eip7702` = `'eip7702'`: EOA account that is used as a smart contract account with EIP-7702. To test: check the wallet's documentation for EIP-7702 support. The address is an EOA but will have contract code attached when the delegation is active (visible on Etherscan under "Contract").
 - `rawErc4337` = `'rawErc4337'`: Raw ERC-4337 account, i.e. an account for which the address matches the smart contract code. To test: look up the wallet address on Etherscan — the "Contract" tab should be present and show deployed bytecode. The wallet typically does not show a seed phrase; authentication uses a separate signer key.
 - `safe` = `'safe'`: Safe multisig smart contract account. To test: check whether the wallet lets you connect to or create a Safe. The address should resolve to a Safe contract on Etherscan (look for "GnosisSafe" or "Safe" in the contract name).
@@ -819,7 +819,7 @@ type AddressResolutionData =
 			 * This is generally not visible in the UI — check the wallet's source code
 			 * or privacy/security documentation to determine the correct value.
 			 *   - `VERIFIABLE`: the wallet cross-checks the offchain result against
-			 *     on-chain data or uses a light client to verify it.
+			 *     onchain data or uses a light client to verify it.
 			 *   - `NOT_VERIFIABLE`: the wallet trusts the offchain provider's response as-is.
 			 */
 			offchainDataVerifiability: 'VERIFIABLE' | 'NOT_VERIFIABLE'
@@ -1224,11 +1224,21 @@ type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 
 ---
 
+### Enum: `EntityRole`
+
+The role an entity plays in receiving data.
+
+- `OPERATOR` = `'OPERATOR'`: The intended recipient of the data (data controller).
+- `INTERMEDIARY` = `'INTERMEDIARY'`: An entity that sees the data in transit without being its intended recipient, e.g. a TLS-terminating CDN.
+
+---
+
 ### Interface: `DataCollectionByEntity`
 
 Describes the data that an entity may be sent.
 
 - `byEntity` (`Entity`): The entity to which the data may be sent.
+- `role` (`EntityRole`): The role the entity plays in receiving the data.
 - `dataCollection` (`EndpointCollection`): The type of data that an entity may be sent.
 - `purposes` (`NonEmptyArray<DataCollectionPurpose>`): Why is the data collected?
 
@@ -1648,7 +1658,7 @@ type RailgunSupport = WithRef<{
 
 	/**
 	 * Does the wallet warn users about correlation risks when shielding tokens?
-	 * Shielding transactions are public on-chain and can be analyzed to link
+	 * Shielding transactions are public onchain and can be analyzed to link
 	 * a user's 0x address to their 0zk address through amount, timing, and token
 	 * type correlation. Similar to how Privacy Pools tracks deposit correlation risks.
 	 */
@@ -2374,7 +2384,7 @@ type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient>
 
 On-chain P-256 verifier libraries used to validate passkey (WebAuthn) signatures in smart contract wallets.
 
-This is not about whether the wallet uses passkeys for login — it refers specifically to the smart contract library the wallet uses to verify passkey signatures on-chain when passkeys are used as a signing key.
+This is not about whether the wallet uses passkeys for login — it refers specifically to the smart contract library the wallet uses to verify passkey signatures onchain when passkeys are used as a signing key.
 
 Not visible in the UI — identify by inspecting the wallet's smart contract source code for the verifier contract it imports or calls, or by checking the wallet's technical documentation.
 
@@ -2382,7 +2392,7 @@ Not visible in the UI — identify by inspecting the wallet's smart contract sou
 - `FRESH_CRYPTO_LIB` = `'FRESH_CRYPTO_LIB'`: FreshCryptoLib — a P-256 verification library.
 - `DAIMO_P256_VERIFIER` = `'DAIMO_P256_VERIFIER'`: Daimo's P-256 verifier contract.
 - `OPEN_ZEPPELIN_P256_VERIFIER` = `'OPEN_ZEPPELIN_P256_VERIFIER'`: OpenZeppelin's P-256 verifier.
-- `WEB_AUTHN_SOL` = `'WEB_AUTHN_SOL'`: WebAuthn.sol — a Solidity library for on-chain WebAuthn verification.
+- `WEB_AUTHN_SOL` = `'WEB_AUTHN_SOL'`: WebAuthn.sol — a Solidity library for onchain WebAuthn verification.
 - `OTHER` = `'OTHER'`: A verifier library not listed above. Set `libraryUrl` to the repository or documentation URL.
 
 ---
@@ -2391,7 +2401,7 @@ Not visible in the UI — identify by inspecting the wallet's smart contract sou
 
 Information about the passkey verification implementation. To identify: look at the wallet's smart contract source code for the P-256 verifier it imports or delegates to.
 
-- `library` (`PasskeyVerificationLibrary`): The on-chain library used to verify passkey signatures. Use OTHER if the library is not listed in `PasskeyVerificationLibrary`, and set `libraryUrl` to its repository.
+- `library` (`PasskeyVerificationLibrary`): The onchain library used to verify passkey signatures. Use OTHER if the library is not listed in `PasskeyVerificationLibrary`, and set `libraryUrl` to its repository.
 - `libraryUrl` (`string`, optional): URL to the library's repository or documentation. Required when `library` is OTHER; optional otherwise.
 - `details` (`string`, optional): Any additional implementation details worth noting. (e.g. a specific contract address, a fork of an upstream library, etc.)
 
@@ -2399,7 +2409,7 @@ Information about the passkey verification implementation. To identify: look at 
 
 ### Type: `PasskeyVerificationImplementation`
 
-A record of passkey verification support. Set to not supported if the wallet does not use passkeys as a signing key and therefore has no on-chain P-256 verifier.
+A record of passkey verification support. Set to not supported if the wallet does not use passkeys as a signing key and therefore has no onchain P-256 verifier.
 
 ```typescript
 type PasskeyVerificationImplementation = WithRef<PasskeyVerificationSupport>
@@ -3607,7 +3617,7 @@ A unit that a wallet service fee (platform fee on built-in swap or bridge flows)
 - `PERCENTAGE` = `'PERCENTAGE'`: Wallet service fee line item shows a percentage (e.g. "0.3%").
 - `BASIS_POINTS` = `'BASIS_POINTS'`: Wallet service fee line item shows basis points (e.g. "30 bps").
 - `FIAT` = `'FIAT'`: Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24").
-- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an on-chain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an onchain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
 
 ---
 

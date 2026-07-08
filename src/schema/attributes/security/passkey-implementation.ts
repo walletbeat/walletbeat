@@ -214,7 +214,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 		Passkeys provide a secure and phishing-resistant way to authenticate users without relying on seed phrases. 
 		Using gas-efficient and well-audited libraries for verification is crucial both for security and cost-effectiveness.
 		
-		P256 signature verification is computationally expensive on-chain, so using optimized libraries reduces transaction costs.
+		P256 signature verification is computationally expensive onchain, so using optimized libraries reduces transaction costs.
 		
 		Some verification libraries have undergone multiple security audits while others may have fewer or no publicly available audits.
 	`),

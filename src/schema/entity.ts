@@ -7,6 +7,7 @@ export enum EntityType {
 	corporate = 'corporate',
 	dataBroker = 'dataBroker',
 	exchange = 'exchange',
+	infrastructureProvider = 'infrastructureProvider',
 	offchainDataProvider = 'offchainDataProvider',
 	transactionBroadcastProvider = 'transactionBroadcastProvider',
 	walletDeveloper = 'walletDeveloper',
@@ -95,6 +96,7 @@ export type ChainDataProvider = EntityWithType<EntityType.chainDataProvider>
 export type CorporateEntity = EntityWithType<EntityType.corporate>
 export type DataBroker = EntityWithType<EntityType.dataBroker>
 export type Exchange = EntityWithType<EntityType.exchange>
+export type InfrastructureProvider = EntityWithType<EntityType.infrastructureProvider>
 export type OffchainDataProvider = EntityWithType<EntityType.offchainDataProvider>
 export type TransactionBroadcastProvider = EntityWithType<EntityType.transactionBroadcastProvider>
 export type SecurityAuditor = EntityWithType<EntityType.securityAuditor>

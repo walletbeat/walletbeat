@@ -19,7 +19,7 @@ Any-questions-about-this-grants-round: No
 
 ## Brief project summary
 
-Walletbeat aims to be the L2Beat of wallets. It reviews wallets in an effort to ensure the Ethereum wallet ecosystem remains competitive, interoperable, and upholds Ethereum values. As part of this effort, Walletbeat's beta version wishes to assess and track wallets' EIP-7702 readiness and features. This grant is specific to this EIP-7702 effort.
+Walletbeat aims to be the L2BEAT of wallets. It reviews wallets in an effort to ensure the Ethereum wallet ecosystem remains competitive, interoperable, and upholds Ethereum values. As part of this effort, Walletbeat's beta version wishes to assess and track wallets' EIP-7702 readiness and features. This grant is specific to this EIP-7702 effort.
 
 - Beta version of Walletbeat: [https://beta.walletbeat.eth.limo/](https://beta.walletbeat.eth.limo/)
 - Example of a wallet assessment: [https://beta.walletbeat.eth.limo/rabby/?browser](https://beta.walletbeat.eth.limo/rabby/?browser)
@@ -38,7 +38,7 @@ _Following template_: [`https://notes.ethereum.org/@BOR4/HJVaegyByl`](https://no
 
 ### Project Abstract
 
-[Walletbeat beta](https://beta.walletbeat.eth.limo/) is a public good, [open-source](https://github.com/fluidkey/walletbeat) MIT-licensed project that brings transparency to the Ethereum wallet ecosystem. As L2Beat has done for Ethereum Layer 2s, Walletbeat beta aims to do the same for Ethereum wallets. As a wallet review site, Walletbeat beta will assess wallets' EIP-7702 readiness, as well as the set of features enabled by EIP-7702 that each wallet implements. The main goal of this grant is to provide an objective and up-to-date look at the adoption and progression of EIP-7702 and the security and user experience features it enables for Ethereum users. Wallet users may use Walletbeat beta to inform their choice of which wallet to use, and wallet development teams may use Walletbeat beta to get a sense of what their competitors are doing and which features they can implement to differentiate themselves.
+[Walletbeat beta](https://beta.walletbeat.eth.limo/) is a public good, [open-source](https://github.com/fluidkey/walletbeat) MIT-licensed project that brings transparency to the Ethereum wallet ecosystem. As L2BEAT has done for Ethereum Layer 2s, Walletbeat beta aims to do the same for Ethereum wallets. As a wallet review site, Walletbeat beta will assess wallets' EIP-7702 readiness, as well as the set of features enabled by EIP-7702 that each wallet implements. The main goal of this grant is to provide an objective and up-to-date look at the adoption and progression of EIP-7702 and the security and user experience features it enables for Ethereum users. Wallet users may use Walletbeat beta to inform their choice of which wallet to use, and wallet development teams may use Walletbeat beta to get a sense of what their competitors are doing and which features they can implement to differentiate themselves.
 
 ### Project Team
 
@@ -47,7 +47,7 @@ _Following template_: [`https://notes.ethereum.org/@BOR4/HJVaegyByl`](https://no
 
 ### Background
 
-Walletbeat is a public good, [open-source](https://github.com/fluidkey/walletbeat) MIT-licensed project that brings transparency to the Ethereum wallet ecosystem. As L2Beat has done for Ethereum Layer 2s, Walletbeat aims to do the same for Ethereum wallets.
+Walletbeat is a public good, [open-source](https://github.com/fluidkey/walletbeat) MIT-licensed project that brings transparency to the Ethereum wallet ecosystem. As L2BEAT has done for Ethereum Layer 2s, Walletbeat aims to do the same for Ethereum wallets.
 
 Walletbeat was kicked off by [Fluidkey](https://fluidkey.com/) at [https://walletbeat.fyi](https://walletbeat.fyi) - but currently mostly in maintenance mode. However, in recent months, polymutex has kicked off an effort to revamp it from scratch (referred to as "Walletbeat beta" in this proposal) which goes deeper into each wallet and change the way wallets are evaluated to align with Ethereum values. See [Ethereum Magicians thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). This effort has been a building-in-public endeavor, with week-by-week progress posted on the [`/walletbeat` Farcaster channel](https://warpcast.com/~/channel/walletbeat).
 

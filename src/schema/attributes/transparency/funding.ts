@@ -235,48 +235,47 @@ export const funding: Attribute = {
 		const verifiabilityPredicates: VerifiabilityPredicate[] = []
 
 		for (const { strategy, value } of monetizationStrategies(ctx.features.monetization)) {
-			verifiabilityPredicates.push(
-				((): VerifiabilityPredicate => {
-					switch (strategy) {
-						case MonetizationStrategy.DONATIONS:
-							return verifiabilityRequiresAtLeastOneReference({
-								referenceCountsAs: Verifiability.VERIFIABLE,
-							})
-						case MonetizationStrategy.ECOSYSTEM_GRANTS:
-							return verifiabilityRequiresAtLeastOneReference({
-								referenceCountsAs: Verifiability.VERIFIABLE,
-							})
-						case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
-							return () => Verifiability.VERIFIABLE
-						case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
-							return () => Verifiability.VERIFIABLE
-						case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
-							return verifiabilityRequiresAtLeastOneReference({
-								referenceCountsAs: Verifiability.VERIFIABLE,
-							})
-						case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
-							return verifiabilityRequiresAtLeastOneReference({
-								referenceCountsAs: Verifiability.VERIFIABLE,
-							})
-						case MonetizationStrategy.PUBLIC_OFFERING:
-							return verifiabilityRequiresAtLeastOneReference({
-								referenceCountsAs: Verifiability.VERIFIABLE,
-							})
-						case MonetizationStrategy.SELF_FUNDED:
-							return () => Verifiability.UNVERIFIABLE
-						case MonetizationStrategy.VENTURE_CAPITAL:
-							return verifiabilityRequiresAtLeastOneReference({
-								referenceCountsAs: Verifiability.VERIFIABLE,
-							})
-					}
-				})(),
-			)
-
 			switch (value) {
 				case null:
 					return unrated(ctx)
 				case true:
 					strategies.push(strategy)
+					verifiabilityPredicates.push(
+						((): VerifiabilityPredicate => {
+							switch (strategy) {
+								case MonetizationStrategy.DONATIONS:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.ECOSYSTEM_GRANTS:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
+									return () => Verifiability.VERIFIABLE
+								case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
+									return () => Verifiability.VERIFIABLE
+								case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.PUBLIC_OFFERING:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+								case MonetizationStrategy.SELF_FUNDED:
+									return () => Verifiability.UNVERIFIABLE
+								case MonetizationStrategy.VENTURE_CAPITAL:
+									return verifiabilityRequiresAtLeastOneReference({
+										referenceCountsAs: Verifiability.VERIFIABLE,
+									})
+							}
+						})(),
+					)
 					break
 				case false:
 					break // Do nothing.
