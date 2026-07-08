@@ -80,7 +80,7 @@ export const imkeyWallet: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'imKey Pro is a one-time hardware purchase with no subscription or custodial service fees. Transactions incur only standard on-chain gas fees.',
+						'imKey Pro is a one-time hardware purchase with no subscription or custodial service fees. Transactions incur only standard onchain gas fees.',
 					url: 'https://imkey.im/products/imkey-pro-crypto-hardware-wallet',
 				},
 			],
