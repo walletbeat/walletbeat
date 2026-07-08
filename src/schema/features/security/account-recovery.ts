@@ -565,7 +565,7 @@ export function accountRecoveryDrillWording(type: AccountRecoveryDrillType): {
 	switch (type) {
 		case AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK:
 			return {
-				label: 'guadian account check-ups',
+				label: 'guardian account check-ups',
 				noun: 'guardian accounts',
 			}
 		case AccountRecoveryDrillType.PRIVATE_KEY_QUIZ:
