@@ -2439,7 +2439,7 @@ type ContractTransactionWarning = WithRef<
 
 		/**
 		 * Does the wallet warn the user when they are interacting with a contract
-		 * that has only recently been deployed to the chain.
+		 * that has only recently been deployed to the chain?
 		 */
 		recentContractWarning: boolean
 
