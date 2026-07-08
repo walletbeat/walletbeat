@@ -42,15 +42,11 @@ const secondaryNavigationItems = [
 	id='nav'
 	popover='auto'
 	data-column='gap-0'
-	data-sticky='backdrop-always'
+	data-sticky='backdrop-self backdrop-always'
 	data-scroll-container
 	data-sticky-container
 >
-	<header
-		data-sticky
-		data-row
-		style='--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 78%, transparent); z-index: 2;'
-	>
+	<header data-sticky='backdrop-self backdrop-always' data-row>
 		<a href='/' class='navigation-logo'>
 			<img src='/logo.svg' alt='Walletbeat Logo' />
 		</a>
@@ -80,8 +76,8 @@ const secondaryNavigationItems = [
 			currentPathname={currentPathname}
 		/>
 
-		<footer data-sticky data-sticky-container>
-			<p data-card>
+		<footer data-card data-sticky='backdrop-self backdrop-always' data-sticky-container>
+			<p>
 				Wallets listed on Walletbeat do not represent endorsements and are for informational
 				purposes only.
 			</p>
@@ -93,6 +89,10 @@ const secondaryNavigationItems = [
 	nav {
 		width: 100%;
 		height: 100dvh;
+
+		&[data-sticky][data-sticky] {
+			--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 90%, transparent);
+		}
 
 		> header {
 			block-size: var(--navigation-mobile-blockSize);
@@ -149,16 +149,18 @@ const secondaryNavigationItems = [
 			}
 
 			footer {
-				[data-card] {
+				&[data-card] {
 					--card-backgroundColor: color-mix(
 						in oklch,
 						var(--background-secondary) 82%,
 						var(--accent)
 					);
 
-					line-height: 1.4;
-					font-size: 0.875rem;
-					color: var(--text-secondary);
+					p {
+						line-height: 1.4;
+						font-size: 0.875rem;
+						color: var(--text-secondary);
+					}
 				}
 			}
 		}
@@ -174,9 +176,6 @@ const secondaryNavigationItems = [
 		#nav {
 			--navigation-menu-maskFade: 9rem;
 
-			background-color: var(--sticky-backgroundColor);
-			-webkit-backdrop-filter: var(--sticky-backdropFilter);
-			backdrop-filter: var(--sticky-backdropFilter);
 			clip-path: inset(0 0 calc(100% - var(--navigation-mobile-blockSize)) 0);
 			transition-property:
 				background-color,

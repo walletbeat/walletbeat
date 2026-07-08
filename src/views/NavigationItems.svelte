@@ -109,71 +109,72 @@
 	}
 </script>
 
-{#if showSearch}
-	<search
-		class="navigation-items"
-		data-column="gap-3"
-		data-column-item="flexible"
-		data-sticky-container
-	>
-		<label
-			data-sticky="block"
+<div
+	class="navigation-items"
+	data-column="gap-3"
+	data-column-item="flexible"
+	aria-label={ariaLabel}
+	data-sticky-container
+>
+	{#if showSearch}
+		<search
+			data-sticky="block backdrop-before backdrop-stuck"
 		>
-			<span class="navigation-search-icon" aria-hidden="true">{@html SearchIcon}</span>
+			<label data-row="gap-0">
+				<span class="search-icon" aria-hidden="true">{@html SearchIcon}</span>
 
-			<input
-				type="search"
-				bind:value={searchValue}
-				placeholder="Search..."
-				{@attach (input: HTMLInputElement) => {
-					const abortController = new AbortController()
+				<input
+					type="search"
+					bind:value={searchValue}
+					placeholder="Search..."
+					data-row-item="flexible"
 
-					const navPopover = input.closest('nav[popover]')
-					const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
+					{@attach (input: HTMLInputElement) => {
+						const abortController = new AbortController()
 
-					const openNavPopover = () => {
-						if (
-							isMobileNav.matches
-							&& navPopover instanceof HTMLElement
-							&& !navPopover.matches(':popover-open')
+						const navPopover = input.closest('nav[popover]')
+						const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
+
+						const openNavPopover = () => {
+							if (
+								isMobileNav.matches
+								&& navPopover instanceof HTMLElement
+								&& !navPopover.matches(':popover-open')
+							)
+								navPopover.showPopover()
+						}
+
+						globalThis.addEventListener(
+							'keydown',
+							(event) => {
+								if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+									event.preventDefault()
+									openNavPopover()
+									input.focus()
+								}
+							},
+							{ signal: abortController.signal }
 						)
-							navPopover.showPopover()
-					}
 
-					globalThis.addEventListener(
-						'keydown',
-						(event) => {
-							if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-								event.preventDefault()
-								openNavPopover()
-								input.focus()
-							}
-						},
-						{ signal: abortController.signal }
-					)
+						input.addEventListener('focus', openNavPopover, { signal: abortController.signal })
 
-					input.addEventListener('focus', openNavPopover, { signal: abortController.signal })
+						return () => {
+							abortController.abort()
+						}
+					}}
+					onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
+						if (event.key === 'Escape')
+							event.currentTarget.blur()
+					}}
+				/>
 
-					return () => {
-						abortController.abort()
-					}
-				}}
-				onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
-					if (event.key === 'Escape')
-						event.currentTarget.blur()
-				}}
-			/>
+				<kbd aria-hidden="true">⌘+K</kbd>
+			</label>
+		</search>
+	{/if}
 
-			<kbd class="navigation-search-shortcut" aria-hidden="true">⌘+K</kbd>
-		</label>
-
-		{@render navigationGroupsList(navigationGroups)}
-	</search>
-{:else}
-	<nav class="navigation-items" data-column="gap-3" data-column-item="flexible" aria-label={ariaLabel}>
-		{@render navigationGroupsList(navigationGroups)}
-	</nav>
-{/if}
+	{@render navigationGroupsList(navigationGroups)}
+</div>
 
 
 {#snippet navigationGroupsList(groups: NavigationGroup[])}
@@ -196,7 +197,7 @@
 			:
 				items
 		) as item (item.id)}
-			<li data-current={currentPathname === item.href ? true : undefined}>
+			<li>
 				{@render navigationItem(item, depth)}
 			</li>
 		{/each}
@@ -206,7 +207,7 @@
 
 {#snippet navigationItem(item: NavigationItem, depth = 0)}
 	{#if !item.children?.length}
-		{@render linkable(item, depth, true)}
+		{@render linkable(item, depth)}
 	{:else}
 		<details
 			bind:open={
@@ -222,7 +223,7 @@
 			}
 		>
 			<summary
-				data-sticky="block background"
+				data-sticky="block backdrop-before backdrop-stuck"
 				data-row="gap-2"
 			>
 				{@render linkable(item, depth)}
@@ -234,7 +235,7 @@
 {/snippet}
 
 
-{#snippet linkable(item: NavigationItem, depth = 0, sticky = false)}
+{#snippet linkable(item: NavigationItem, depth = 0)}
 	{#if item.href}
 		<a
 			href={item.href}
@@ -243,7 +244,6 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
-			data-sticky={sticky ? 'block background' : undefined}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
 		>
@@ -294,94 +294,50 @@
 		--navigationIcon-size: 1.25em;
 
 		--navigationSubmenu-gap: 0.33rem;
+		--navigation-search-sidestepBlock: 0rem;
 
-		--navigation-search-blockSize: 2.375rem;
-		--navigation-search-gap: 0.75rem;
-		--navigation-search-sidestepBlock: 0px;
-		--navigation-search-paddingInlineStart: 2.35rem;
-		--navigation-search-paddingInlineEnd: 3.15rem;
-
-		&:has(> label) {
-			--navigation-search-sidestepBlock: calc(var(--navigation-search-blockSize) + var(--navigation-search-gap));
+		&:has(> search) {
+			--navigation-search-sidestepBlock: 3rem;
 		}
 
 		scroll-target-group: auto;
 
-		label {
-			block-size: var(--navigation-search-blockSize);
-			min-block-size: var(--navigation-search-blockSize);
-			position: relative;
-			inline-size: 100%;
-			border-color: var(--icon-navigation-borderColor);
-			font-size: inherit;
-			inset-block-end: auto;
-
+		search {
 			@media (max-width: 1024px) {
-				order: 10;
-
-				&[data-sticky] {
-					inset-block-start: auto;
-					inset-block-end: var(--sticky-insetBlockEnd);
-					z-index: 2;
-				}
-
-				.navigation-search-shortcut {
-					display: none;
-				}
+				order: 1;
 			}
 
-			input[type='search'] {
-				position: absolute;
-				inset: calc(-1 * var(--separator-width));
-				padding-inline-start: var(--navigation-search-paddingInlineStart);
-				padding-inline-end: var(--navigation-search-paddingInlineEnd);
-				padding-block: 0;
-				text-overflow: ellipsis;
-			}
+			label {
+				border-color: var(--icon-navigation-borderColor);
 
-			.navigation-search-icon,
-			.navigation-search-shortcut {
-				position: absolute;
-				inset-block: 0;
-				display: inline-flex;
-				align-items: center;
-				pointer-events: none;
-			}
+				> .search-icon {
+					padding-inline-start: 1em;
+					color: var(--text-secondary);
 
-			.navigation-search-icon {
-				inset-inline-start: 0.75rem;
-				color: var(--text-secondary);
-
-				:global(svg) {
-					inline-size: 1rem;
-					block-size: 1rem;
-				}
-			}
-
-			.navigation-search-shortcut {
-				inset-inline-end: 0.625rem;
-				block-size: 1.35rem;
-				margin-block: auto;
-				display: inline-flex;
-				padding-inline: 0;
-				color: var(--text-secondary);
-				font: inherit;
-				font-size: 0.75em;
-				line-height: 1;
-				white-space: nowrap;
-
-				&::before {
-					content: none;
+					:global(svg) {
+						inline-size: 1rem;
+						block-size: 1rem;
+					}
 				}
 
-				&::after {
-					content: none;
+				> kbd {
+					color: var(--text-secondary);
+					user-select: none;
+					padding-inline-end: 1em;
+					font-size: smaller;
+
+					input:not(:placeholder-shown) ~ & {
+						display: none;
+					}
+
+					@media (max-aspect-ratio: 1/2) {
+						display: none;
+					}
 				}
 			}
 		}
 
 		menu {
-
 			font-size: 0.975em;
 			list-style: none;
 			margin: 0;
@@ -390,27 +346,32 @@
 			&[data-navigation-depth='0'] {
 				--icon-navigation-borderColor: currentColor;
 				--navigationIcon-size: 2em;
-			}
 
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: var(--navigation-search-sidestepBlock);
+
+					@media (max-width: 1024px) {
+						--sticky-marginBlockStart: 0px;
+						--sticky-marginBlockEnd: var(--navigation-search-sidestepBlock);
+					}
+				}
+			}
 			&[data-navigation-depth='1'] {
 				--navigationIcon-size: 1.5em;
-			}
 
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: calc(var(--navigationSubmenu-parentIconSize) + 2 * var(--navigationItem-paddingBlock) + var(--navigationSubmenu-gap));
+					--sticky-marginBlockEnd: var(--navigationItem-gap);
+				}
+			}
 			&[data-navigation-depth='2'] {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
-			}
 
-			&[data-sticky-container][data-navigation-depth='0'] {
-				--sticky-marginBlockStart: var(--navigation-search-sidestepBlock);
-			}
-
-			&[data-sticky-container]:not([data-navigation-depth='0']) {
-				--sticky-marginBlockStart: calc(
-					var(--navigationSubmenu-parentIconSize) + 2 * var(--navigationItem-paddingBlock) +
-						var(--navigationSubmenu-gap)
-				);
-				--sticky-marginBlockEnd: var(--navigationItem-gap);
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: calc(var(--navigationSubmenu-parentIconSize) + 2 * var(--navigationItem-paddingBlock) + var(--navigationSubmenu-gap));
+					--sticky-marginBlockEnd: var(--navigationItem-gap);
+				}
 			}
 
 			details {
@@ -425,39 +386,29 @@
 					text-decoration: none;
 				}
 
-				&[href^='#']::scroll-marker {
-					content: '';
-					border-radius: inherit;
-				}
+				&[href^='#'] {
+					&::scroll-marker {
+						content: '';
+						border-radius: inherit;
+					}
 
-				&[href^='#']:target-current,
-				&[href^='#']::scroll-marker:target-current {
-					--navigationItem-background: var(--navigationItem-currentBackground);
+					&:target-current,
+					&::scroll-marker:target-current {
+						--navigationItem-background: var(--navigationItem-currentBackground);
+					}
 				}
 			}
 
-			li[data-current] > a,
-			li[data-current] > details > summary {
+			li > a[aria-current='page'],
+			li > details > summary:has(a[aria-current='page']) {
 				--navigationItem-background: var(--navigationItem-currentBackground);
 			}
 
-			li[data-current] > a:hover,
-			li[data-current] > a:focus-visible,
-			li[data-current] > details > summary:hover,
-			li[data-current] > details > summary:is(:focus-visible, :focus-within),
+			li > a[aria-current='page']:is(:hover, :focus-visible),
+			li > details > summary:has(a[aria-current='page']):is(:hover, :focus-visible, :focus-within),
 			a[href^='#']:target-current:hover,
 			a[href^='#']:target-current:focus-visible {
 				--navigationItem-background: var(--navigationItem-currentHoverBackground);
-			}
-
-			summary,
-			li > a {
-				:global(mark) {
-					font-weight: 600;
-					text-decoration: underline;
-					background-color: transparent;
-					color: inherit;
-				}
 			}
 
 			summary,
@@ -473,10 +424,6 @@
 					var(--navigationItem-startRadius)
 				;
 				font-weight: 500;
-				--sticky-backdrop-backgroundColor: color-mix(in oklch, var(--background-primary) 92%, transparent);
-				--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 72%, transparent);
-				--sticky-backdrop-filter: blur(16px);
-				background-color: var(--navigationItem-background, var(--sticky-effective-backgroundColor, transparent));
 
 				transition-property:
 					opacity,
@@ -501,11 +448,19 @@
 					--navigationItem-background: var(--navigationItem-hoverBackground);
 					color: var(--accent);
 				}
+
+				:global(mark) {
+					font-weight: 600;
+					text-decoration: underline;
+					background-color: transparent;
+					color: inherit;
+				}
 			}
 
 			summary {
-				> a {
-					border-radius: inherit;
+				&[data-sticky] {
+					--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 72%, transparent);
+					--sticky-backdropFilter: blur(16px);
 				}
 
 				&::after {
@@ -517,6 +472,7 @@
 				}
 
 				> a {
+					border-radius: inherit;
 					flex: 0 auto;
 				}
 
@@ -541,20 +497,9 @@
 					}
 				}
 			}
-		}
 
-		> menu + menu {
-			margin-block-start: auto;
-		}
-
-		@media (max-width: 1024px) {
-			&:has(> label) {
-				display: contents;
-			}
-
-			menu[data-sticky-container][data-navigation-depth='0'] {
-				--sticky-marginBlockStart: 0px;
-				--sticky-marginBlockEnd: var(--navigation-search-sidestepBlock);
+			+ menu {
+				margin-block-start: auto;
 			}
 		}
 	}
