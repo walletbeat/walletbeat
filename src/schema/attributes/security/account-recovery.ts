@@ -185,6 +185,7 @@ function evaluateAccountRecoveryDrills(
 			`),
 		})
 	}
+
 	// For empty recommended drill types
 	if (!isNonEmptyArray(recommendedDrillTypes)) {
 		return ctx.build({
