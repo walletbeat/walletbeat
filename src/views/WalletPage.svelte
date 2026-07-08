@@ -564,7 +564,7 @@
 
 			<section id="stages">
 				<header
-					data-sticky="block"
+					data-sticky="block backdrop-before backdrop-stuck"
 					data-row
 					data-scroll-item="inline-detached"
 				>
@@ -605,7 +605,7 @@
 		data-column
 	>
 		<h2
-			data-sticky="block"
+			data-sticky="block backdrop-self backdrop-always"
 			class="nav-title"
 		>
 			Table of contents
@@ -668,7 +668,7 @@
 			style:--accent={scoreColor}
 		>
 			<header
-				data-sticky="block"
+				data-sticky="block backdrop-before backdrop-stuck"
 				data-row
 				data-scroll-item="inline-detached"
 			>
@@ -1278,7 +1278,7 @@
 
 			grid-template:
 				'Nav Content'
-				/ auto minmax(0, 1fr)
+				/ auto minmax(max-content, 1fr)
 			;
 		}
 		@media (max-width: 864px) {

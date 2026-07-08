@@ -132,7 +132,7 @@ import Footer from '@/views/Footer.astro'
 		@media (min-width: 1025px) {
 			grid-template:
 				'Nav Content' minmax(0, 1fr)
-				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
+				/ var(--navigation-desktop-inlineSize) minmax(max-content, 1fr);
 
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: var(--separator-width);
@@ -176,18 +176,16 @@ import Footer from '@/views/Footer.astro'
 			align-self: stretch;
 			min-block-size: 0;
 			min-inline-size: 0;
-		}
 
-		@media (max-width: 1024px) and (prefers-reduced-motion: no-preference) {
-			> #content {
+			@media (max-width: 1024px) and (prefers-reduced-motion: no-preference) {
 				transform-style: preserve-3d;
 				transform: translateZ(0);
 
 				transition-property: transform;
-			}
 
-			> nav:popover-open ~ #content {
-				transform: translateZ(-2.5rem);
+				nav:popover-open ~ & {
+					transform: translateZ(-2.5rem);
+				}
 			}
 		}
 	}
