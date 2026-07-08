@@ -1152,7 +1152,7 @@ ol {
  *
  * ### Tokens
  * - scroll container: `block`, `inline`
- * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-none`, `backdrop-always`
+ * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
  * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
  *
  * ### Examples
@@ -1189,10 +1189,6 @@ ol {
 	touch-action: pan-x pan-y;
 	perspective: var(--scrollContainer-perspective);
 
-	&::-webkit-scrollbar {
-		display: none;
-	}
-
 	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
 		container-type: size;
 		container-type: scroll-state size;
@@ -1209,6 +1205,10 @@ ol {
 		min-inline-size: 0;
 		max-inline-size: 100%;
 		overflow-x: auto;
+	}
+
+	&::-webkit-scrollbar {
+		display: none;
 	}
 
 	/* Derived */
@@ -1412,7 +1412,7 @@ ol {
 		}
 
 		/**
-		 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and background/backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+		 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 		 *
 		 * ### Placement
 		 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -1422,11 +1422,13 @@ ol {
 		 * - block edges: `block-start`, `block-end`
 		 * - inline edges: `inline-start`, `inline-end`
 		 * - background: `background`, `background-always`
-		 * - backdrop: `backdrop-none`, `backdrop-always`
+		 * - backdrop placement: `backdrop-self`, `backdrop-before`, `backdrop-after`
+		 * - backdrop condition: `backdrop-always`, `backdrop-stuck`, `backdrop-none`
+		 *   Backdrop conditions require an explicit backdrop placement token.
 		 *
 		 * ### CSS Variables
 		 * - `--sticky-backgroundColor`
-		 * - `--sticky-backdrop-backgroundColor`, `--sticky-backdrop-filter`
+		 * - `--sticky-backdropFilter`
 		 *
 		 * ### Examples
 		 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
@@ -1446,9 +1448,11 @@ ol {
 		[data-sticky] {
 			/* Inputs */
 			--sticky-backgroundColor: light-dark(#F8EDFF, #130a2b3c);
-			--sticky-effective-backgroundColor: var(--sticky-backgroundColor);
-			--sticky-backdrop-backgroundColor: var(--sticky-backgroundColor);
-			--sticky-backdrop-filter: blur(20px);
+			--sticky-backdropFilter: blur(20px);
+
+			&[data-card] {
+				--sticky-backgroundColor: var(--card-backgroundColor);
+			}
 
 			/* Rules */
 			z-index: 1;
@@ -1456,7 +1460,10 @@ ol {
 
 			position: sticky;
 
-			&:not([data-sticky~="block"]):not([data-sticky~="inline"]),
+			&:not(
+				[data-sticky~="block"],
+				[data-sticky~="inline"]
+			),
 			&[data-sticky~="block"] {
 				inset-block-start: var(--sticky-insetBlockStart);
 				inset-block-end: var(--sticky-insetBlockEnd);
@@ -1471,7 +1478,10 @@ ol {
 					inset-block-start: auto;
 				}
 			}
-			&:not([data-sticky~="block"]):not([data-sticky~="inline"]),
+			&:not(
+				[data-sticky~="block"],
+				[data-sticky~="inline"]
+			),
 			&[data-sticky~="inline"] {
 				inset-inline-start: var(--sticky-insetInlineStart);
 				inset-inline-end: var(--sticky-insetInlineEnd);
@@ -1488,39 +1498,43 @@ ol {
 			}
 
 			&:not([data-sticky~="backdrop-none"]) {
-				&[data-scroll-container],
-				&:not([data-scroll-container])::before {
-					background-color: var(--sticky-backdrop-backgroundColor);
-					backdrop-filter: var(--sticky-backdrop-filter);
-					border-radius: inherit;
+				&[data-sticky~="backdrop-always"] {
+					&[data-sticky~="backdrop-self"],
+					&[data-sticky~="backdrop-before"]::before,
+					&[data-sticky~="backdrop-after"]::after {
+						background-color: var(--sticky-backgroundColor);
+						backdrop-filter: var(--sticky-backdropFilter);
+					}
+				}
+				&[data-sticky~="backdrop-stuck"] {
+					&[data-sticky~="backdrop-self"],
+					&[data-sticky~="backdrop-before"]::before,
+					&[data-sticky~="backdrop-after"]::after {
+						@container not scroll-state(stuck: none) {
+							background-color: var(--sticky-backgroundColor);
+							backdrop-filter: var(--sticky-backdropFilter);
+						}
 
+						@supports not (container-type: scroll-state) {
+							background-color: var(--sticky-backgroundColor);
+							backdrop-filter: var(--sticky-backdropFilter);
+						}
+					}
+				}
+
+				&[data-sticky~="backdrop-self"],
+				&[data-sticky~="backdrop-before"]::before,
+				&[data-sticky~="backdrop-after"]::after {
 					transition-property: background-color, backdrop-filter;
 				}
 
-				&:not([data-scroll-container])::before {
+				&[data-sticky~="backdrop-before"]::before,
+				&[data-sticky~="backdrop-after"]::after {
 					content: '';
 					z-index: -1;
 					position: absolute;
 					inset: 0;
-				}
-
-				&:not([data-sticky~="backdrop-always"]) {
-					&:not([data-scroll-container])::before {
-						@container scroll-state(stuck: none) {
-							background-color: transparent;
-							backdrop-filter: none;
-						}
-					}
-				}
-			}
-
-			&:is([data-sticky~="background"], [data-sticky~="background-always"]) {
-				background-color: var(--sticky-effective-backgroundColor);
-
-				&:not([data-sticky~="background-always"]) {
-					@container scroll-state(stuck: none) {
-						--sticky-effective-backgroundColor: transparent;
-					}
+					border-radius: inherit;
 				}
 			}
 		}

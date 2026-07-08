@@ -16,8 +16,6 @@
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
 	--background-secondary: light-dark(#FFFFFF80, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
-	/* Sidebar uses the same background as the sticky elements */
-	--navigation-backgroundColor: var(--sticky-backgroundColor);
 	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
