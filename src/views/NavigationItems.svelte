@@ -27,7 +27,7 @@
 	let {
 		items,
 		groups,
-		currentPathname,
+		currentHref,
 		ariaLabel = 'Navigation',
 		defaultOpen = false,
 		iconSnippet,
@@ -35,7 +35,7 @@
 	}: {
 		items: NavigationItem[]
 		groups?: NavigationGroup[]
-		currentPathname: string
+		currentHref?: string
 		ariaLabel?: string
 		defaultOpen?: boolean
 		iconSnippet?: Snippet<[NavigationItem, number]>
@@ -53,7 +53,7 @@
 
 	// Functions
 	const hasCurrentPage = (item: NavigationItem) => (
-		currentPathname === item.href
+		currentHref === item.href
 		|| (item.children?.some(hasCurrentPage) ?? false)
 	)
 
@@ -239,7 +239,7 @@
 	{#if item.href}
 		<a
 			href={item.href}
-			aria-current={currentPathname === item.href ? 'page' : undefined}
+			{...currentHref === item.href && { 'aria-current': 'page' }}
 			{...item.href.startsWith('http') && {
 				target: '_blank',
 				rel: 'noreferrer',

@@ -17,7 +17,7 @@ interface Props {
 }
 
 const { navigationItems } = Astro.props
-const currentPathname = Astro.url.pathname
+const currentHref = Astro.url.pathname
 const secondaryNavigationItems = [
 	navigationAbout,
 	navigationFaq,
@@ -73,7 +73,7 @@ const secondaryNavigationItems = [
 			transition:persist
 			items={navigationItems}
 			groups={[{ items: navigationItems }, { items: secondaryNavigationItems }]}
-			currentPathname={currentPathname}
+			currentHref={currentHref}
 		/>
 
 		<footer data-card data-sticky='backdrop-self backdrop-always' data-sticky-container>
