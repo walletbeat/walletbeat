@@ -45,17 +45,29 @@ export type ScamPreventionMetadata =
 	  }
 	| { scamAlerts: null }
 
-function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
-	feature: 'sendTransactionWarning'
-} {
-	const baseProps = {
-		feature: 'sendTransactionWarning',
-		humanFeature: 'outgoing transactions to unknown addresses',
-		listFeature: 'Warning you when sending funds to unknown addresses',
-		required: false,
-	} as const
+/** Number of leak flags that are `true`. */
+function leakCount(...leaks: boolean[]): number {
+	return leaks.filter(x => x).length
+}
 
-	if (!isSupported(scamAlerts.sendTransactionWarning)) {
+/**
+ * Shared rating logic for scam-alert warnings whose privacy score is a
+ * simple leak count (threshold: at most one leaking flag is tolerated).
+ *
+ * `rateScamUrlWarning` is not using this helper because its privacy
+ * logic uses a different logic.
+ */
+function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(
+	feature: F,
+	humanFeature: string,
+	listFeature: string,
+	support: Support<WithRef<T>>,
+	isEnabled: (data: T) => boolean,
+	leakFlags: (data: T) => boolean[],
+): ScamAlertSupport & { feature: F } {
+	const baseProps = { feature, humanFeature, listFeature, required: false } as const
+
+	if (!isSupported(support)) {
 		return {
 			supported: false,
 			privacyPreserving: true,
@@ -64,70 +76,59 @@ function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & 
 		}
 	}
 
-	const supported =
-		scamAlerts.sendTransactionWarning.newRecipientWarning ||
-		scamAlerts.sendTransactionWarning.userWhitelist
+	const enabled = isEnabled(support)
 
-	if (!supported) {
+	if (!enabled) {
 		throw new Error(
-			'sendTransactionWarning: If supported, at least one implementation mechanism must be enabled',
+			`${feature}: If supported, at least one implementation mechanism must be enabled`,
 		)
 	}
 
 	return {
-		supported,
-		privacyPreserving:
-			[
-				scamAlerts.sendTransactionWarning.leaksRecipient,
-				scamAlerts.sendTransactionWarning.leaksUserAddress,
-				scamAlerts.sendTransactionWarning.leaksUserIp,
-			].filter(x => x).length <= 1,
-		ref: scamAlerts.sendTransactionWarning.ref,
+		supported: enabled,
+		privacyPreserving: leakCount(...leakFlags(support)) <= 1,
+		ref: support.ref,
 		...baseProps,
 	}
+}
+
+function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
+	feature: 'sendTransactionWarning'
+} {
+	return rateLeakBasedWarning(
+		'sendTransactionWarning',
+		'outgoing transactions to unknown addresses',
+		'Warning you when sending funds to unknown addresses',
+		scamAlerts.sendTransactionWarning,
+		d => d.newRecipientWarning || d.userWhitelist || d.addressPoisoningDetection,
+		d => [d.leaksRecipient, d.leaksUserAddress, d.leaksUserIp],
+	)
 }
 
 function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'contractTransactionWarning'
 } {
-	const baseProps = {
-		feature: 'contractTransactionWarning',
-		humanFeature: 'transactions with potential scam contracts',
-		listFeature: 'Warning you when interacting with potential scam contracts',
-		required: false,
-	} as const
+	return rateLeakBasedWarning(
+		'contractTransactionWarning',
+		'transactions with potential scam contracts',
+		'Warning you when interacting with potential scam contracts',
+		scamAlerts.contractTransactionWarning,
+		d => d.contractRegistry || d.previousContractInteractionWarning || d.recentContractWarning,
+		d => [d.leaksUserIp, d.leaksUserAddress, d.leaksContractAddress],
+	)
+}
 
-	if (!isSupported(scamAlerts.contractTransactionWarning)) {
-		return {
-			supported: false,
-			privacyPreserving: true,
-			ref: refNotNecessary,
-			...baseProps,
-		}
-	}
-
-	const supported =
-		scamAlerts.contractTransactionWarning.contractRegistry ||
-		scamAlerts.contractTransactionWarning.previousContractInteractionWarning ||
-		scamAlerts.contractTransactionWarning.recentContractWarning
-
-	if (!supported) {
-		throw new Error(
-			'contractTransactionWarning: If supported, at least one implementation mechanism must be enabled',
-		)
-	}
-
-	return {
-		supported,
-		privacyPreserving:
-			[
-				scamAlerts.contractTransactionWarning.leaksUserIp,
-				scamAlerts.contractTransactionWarning.leaksUserAddress,
-				scamAlerts.contractTransactionWarning.leaksContractAddress,
-			].filter(x => x).length <= 1,
-		ref: scamAlerts.contractTransactionWarning.ref,
-		...baseProps,
-	}
+function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
+	feature: 'unlimitedApprovalWarning'
+} {
+	return rateLeakBasedWarning(
+		'unlimitedApprovalWarning',
+		'transactions that grant unlimited token approvals',
+		'Warning you before granting an unlimited ERC-20 token approval',
+		scamAlerts.unlimitedApprovalWarning,
+		d => d.warnsOnUnlimitedApproval,
+		d => [d.leaksUserIp, d.leaksUserAddress, d.leaksSpenderAddress],
+	)
 }
 
 function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
