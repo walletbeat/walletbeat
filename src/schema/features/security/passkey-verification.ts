@@ -6,7 +6,7 @@ import type { WithRef } from '@/schema/reference'
  *
  * This is not about whether the wallet uses passkeys for login — it refers
  * specifically to the smart contract library the wallet uses to verify
- * passkey signatures on-chain when passkeys are used as a signing key.
+ * passkey signatures onchain when passkeys are used as a signing key.
  *
  * Not visible in the UI — identify by inspecting the wallet's smart contract
  * source code for the verifier contract it imports or calls, or by checking
@@ -25,7 +25,7 @@ export enum PasskeyVerificationLibrary {
 	/** OpenZeppelin's P-256 verifier. */
 	OPEN_ZEPPELIN_P256_VERIFIER = 'OPEN_ZEPPELIN_P256_VERIFIER',
 
-	/** WebAuthn.sol — a Solidity library for on-chain WebAuthn verification. */
+	/** WebAuthn.sol — a Solidity library for onchain WebAuthn verification. */
 	WEB_AUTHN_SOL = 'WEB_AUTHN_SOL',
 
 	/**
@@ -62,7 +62,7 @@ export function passkeyLibraryName(library: PasskeyVerificationLibrary): string 
  */
 export interface PasskeyVerificationSupport {
 	/**
-	 * The on-chain library used to verify passkey signatures.
+	 * The onchain library used to verify passkey signatures.
 	 * Use OTHER if the library is not listed in `PasskeyVerificationLibrary`,
 	 * and set `libraryUrl` to its repository.
 	 */
@@ -84,6 +84,6 @@ export interface PasskeyVerificationSupport {
 /**
  * A record of passkey verification support.
  * Set to not supported if the wallet does not use passkeys as a signing key
- * and therefore has no on-chain P-256 verifier.
+ * and therefore has no onchain P-256 verifier.
  */
 export type PasskeyVerificationImplementation = WithRef<PasskeyVerificationSupport>

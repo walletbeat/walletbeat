@@ -709,11 +709,11 @@ function evaluatePasskeySubEval(
 					rating: Rating.PASS,
 					displayName: 'Audited passkey verification',
 					shortExplanation: mdSentence(
-						`{{WALLET_NAME}} uses ${libraryName}, a well-audited on-chain passkey verification library.`,
+						`{{WALLET_NAME}} uses ${libraryName}, a well-audited onchain passkey verification library.`,
 					),
 				},
 				details: paragraph(
-					`{{WALLET_NAME}} uses ${libraryName} for on-chain passkey signature verification, a well-audited P-256 library.`,
+					`{{WALLET_NAME}} uses ${libraryName} for onchain passkey signature verification, a well-audited P-256 library.`,
 				),
 			})
 		case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
@@ -724,7 +724,7 @@ function evaluatePasskeySubEval(
 					rating: Rating.PARTIAL,
 					displayName: 'Suboptimal passkey verification',
 					shortExplanation: mdSentence(
-						`{{WALLET_NAME}} uses ${libraryName} for on-chain passkey verification, which has received less auditing than preferred alternatives.`,
+						`{{WALLET_NAME}} uses ${libraryName} for onchain passkey verification, which has received less auditing than preferred alternatives.`,
 					),
 				},
 				details: paragraph(
@@ -745,7 +745,7 @@ function evaluatePasskeySubEval(
 					),
 				},
 				details: paragraph(
-					'{{WALLET_NAME}} does not use a recognized or audited library for on-chain P-256 passkey signature verification.',
+					'{{WALLET_NAME}} does not use a recognized or audited library for onchain P-256 passkey signature verification.',
 				),
 				howToImprove: mdParagraph(
 					'{{WALLET_NAME}} should implement passkey verification using a well-audited P-256 library such as Smooth Crypto Lib.',

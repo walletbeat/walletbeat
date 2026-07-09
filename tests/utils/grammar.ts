@@ -223,6 +223,16 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 		regExp: /\bdapps?\b/gi,
 		replace: (substring: string) => (substring.endsWith('s') ? 'apps' : 'app'),
 	}),
+	getRegexpLinter({
+		name: 'L2BEAT', // Always uppercase
+		regExp: /\bL2B(?!EAT\b)[Ee][Aa][Tt]\b/g,
+		replace: () => 'L2BEAT',
+	}),
+	getRegexpLinter({
+		name: 'onchain', // Use onchain not on-chain
+		regExp: /\bon-chain\b/g,
+		replace: () => 'onchain',
+	}),
 ]
 
 /**
