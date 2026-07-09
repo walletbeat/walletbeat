@@ -44,7 +44,7 @@ export const cypherockWallet: HardwareWallet = {
 				url: 'https://www.cypherock.com/product/cypherock-x1',
 			},
 		],
-		iconExtension: 'png',
+		iconExtension: 'svg',
 		lastUpdated: '2025-01-06',
 		urls: {
 			docs: ['https://docs.cypherock.com/'],

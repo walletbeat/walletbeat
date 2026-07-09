@@ -17,11 +17,7 @@ export const keylabs: CorporateEntity & SecurityAuditor = {
 	},
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: {
-		extension: 'png',
-		height: 200,
-		width: 200,
-	},
+	icon: { extension: 'svg' },
 	jurisdiction: 'United States',
 	linkedin: 'https://www.linkedin.com/company/keylabsio/',
 	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
