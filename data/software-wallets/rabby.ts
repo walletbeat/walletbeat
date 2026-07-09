@@ -8,6 +8,7 @@ import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -356,6 +357,7 @@ export const rabby: SoftwareWallet = {
 									},
 								},
 								purposes: [DataCollectionPurpose.SCAM_DETECTION],
+								role: EntityRole.OPERATOR,
 							},
 						],
 					},
@@ -398,6 +400,7 @@ export const rabby: SoftwareWallet = {
 									DataCollectionPurpose.TRANSACTION_BROADCAST,
 									DataCollectionPurpose.TRANSACTION_SIMULATION,
 								],
+								role: EntityRole.OPERATOR,
 							},
 						],
 					},
@@ -877,6 +880,7 @@ export const rabby: SoftwareWallet = {
 					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

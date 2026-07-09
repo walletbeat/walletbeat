@@ -1,0 +1,117 @@
+---
+// Types
+type MarkdownMetadata = {
+	title?: string
+	description?: string
+	keywordsBefore?: string[]
+	keywordsAfter?: string[]
+}
+
+type MarkdownFrontmatter = {
+	title: string
+	description: string
+}
+
+type Props = {
+	metadata: MarkdownMetadata
+	repoRootRelativePath: `/${string}.md`
+	markdown: MarkdownContentWithFrontmatter<null, MarkdownFrontmatter>
+}
+
+const { metadata, repoRootRelativePath, markdown } = Astro.props
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import type { MarkdownContentWithFrontmatter } from '@/types/content'
+import { stripMarkdownTitle, rewriteMarkdownURLs } from '@/utils/markdown-utils'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+import Typography from '@/components/Typography.svelte'
+
+const processedMarkdown = stripMarkdownTitle(
+	rewriteMarkdownURLs(markdown, {
+		repoRootRelativePath: repoRootRelativePath,
+		repoRootPagesDir: '/src/pages/',
+		repoRootRelativePaths: {
+			'/public': '/',
+			'/src/pages': '/',
+			'/governance': '/',
+		},
+		forbiddenURLPrefixes: ['https://github.com/walletbeat/walletbeat'],
+		whitelistURLs: [
+			'https://github.com/walletbeat/walletbeat',
+			'https://github.com/walletbeat/walletbeat/blob/beta/governance/communications/communications-policy.md', // Temporary
+			'https://github.com/walletbeat/walletbeat/blob/beta/governance/communications/communication-channels.md', // Temporary
+			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round', // Temporary
+			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-07-ethereum-foundation-esp-grant-proposal', // Temporary
+			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2026-04-giveth-ethereum-security-qf-round', // Temporary
+			'https://github.com/walletbeat/walletbeat/blob/beta/governance/treasury/treasury-transparency.md', // Temporary
+		],
+	}),
+)
+---
+
+<Layout
+	metadata={{
+		title: metadata.title ?? markdown.frontmatter.title,
+		description: metadata.description,
+		keywordsAfter: metadata.keywordsAfter,
+		keywordsBefore: metadata.keywordsBefore,
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>{markdown.frontmatter.title}</h1>
+			</hgroup>
+		</header>
+
+		<div data-scroll-item='inline-detached padding-match-end'>
+			<Typography client:visible content={processedMarkdown} />
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 58rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+
+		hgroup p {
+			font-size: 1.25rem;
+			font-style: italic;
+			color: var(--text-secondary);
+			opacity: 0.75;
+		}
+
+		p {
+			font-family: var(--fontFamily-avenir);
+		}
+
+		div {
+			line-height: 1.8;
+		}
+
+		div :global(ul) {
+			padding-inline-start: 1.5em;
+		}
+
+		div :global(hr) {
+			border: none;
+			border-top: 1px solid var(--border);
+			margin-block: 1rem;
+		}
+		h1,
+		h2,
+		h3 {
+			font-family: var(--fontFamily-spMonorium);
+		}
+	}
+</style>

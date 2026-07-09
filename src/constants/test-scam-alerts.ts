@@ -132,7 +132,7 @@ export const scamAlertTests: ScamAlertTest[] = [
 		expectedBehavior:
 			'Wallet should clearly show the allowance amount (infinite) and the spender (address(0)) in the signing prompt.',
 		requirements: [
-			'This signs a message — no on-chain transaction is sent',
+			'This signs a message — no onchain transaction is sent',
 			'Check whether the wallet shows the allowance amount and spender clearly',
 			'Use only a disposable test wallet',
 		],

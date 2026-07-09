@@ -10,20 +10,16 @@ import type { ResolvedFeatures } from '@/schema/features'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import {
+	type BasicOperationFees,
+	compareFeeDisplay,
 	type FeeDisplay,
 	FeeDisplayLevel,
-	validateFeeDisplay,
+	hasRelativeWalletServiceFeeUnit,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
-import {
-	type NonEmptyArray,
-	nonEmptyMap,
-	type NonEmptySet,
-	nonEmptySet,
-	setContains,
-} from '@/types/utils/non-empty'
+import { type NonEmptyArray, nonEmptyMap, nonEmptySet } from '@/types/utils/non-empty'
 import { markdownListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
@@ -164,118 +160,9 @@ function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
 }
 
 /**
- * Whether the given set of wallet service fee display units includes at
- * least one unit that expresses a rate (as opposed to a flat amount),
- * making it possible to compare the effective cost across order sizes.
- */
-function hasRelativeWalletServiceFeeUnit(units: NonEmptySet<WalletServiceFeeDisplayUnit>): boolean {
-	return (
-		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.PERCENTAGE) ||
-		setContains<WalletServiceFeeDisplayUnit>(units, WalletServiceFeeDisplayUnit.BASIS_POINTS)
-	)
-}
-
-/**
- * Tiebreaker for `compareFeeDisplay` when display level and sponsorship match.
- * Returns 1 if units1 is better, 0 if equal, -1 if units2 is better.
- * Ranking: NOT_APPLICABLE and any set containing a relative unit (tied) >
- * a set with only absolute units > null.
- */
-function compareWalletServiceFeeDisplayUnits(
-	units1: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
-	units2: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
-): -1 | 0 | 1 {
-	const rank = (
-		units: NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null,
-	): number => {
-		if (units === null) {
-			return 1
-		}
-
-		if (units === 'NOT_APPLICABLE' || hasRelativeWalletServiceFeeUnit(units)) {
-			return 3
-		}
-
-		return 2
-	}
-
-	const rank1 = rank(units1)
-	const rank2 = rank(units2)
-
-	if (rank1 > rank2) {
-		return 1
-	}
-
-	if (rank1 < rank2) {
-		return -1
-	}
-
-	return 0
-}
-
-/**
- * Returns;
- *   * 1 if feeDisplay1 is better
- *   * 0 if feeDisplay1 and feeDisplay2 are completely equal
- *   * -1 if feeDisplay2 is better
- */
-function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDisplay): -1 | 0 | 1 {
-	validateFeeDisplay(feeDisplay1)
-	validateFeeDisplay(feeDisplay2)
-
-	if (
-		feeDisplay1.byDefault === feeDisplay2.byDefault &&
-		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
-		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
-	) {
-		return compareWalletServiceFeeDisplayUnits(
-			feeDisplay1.walletServiceFeeDisplayUnits,
-			feeDisplay2.walletServiceFeeDisplayUnits,
-		)
-	}
-
-	if (feeDisplay1.fullySponsored !== feeDisplay2.fullySponsored) {
-		return feeDisplay1.fullySponsored ? 1 : -1
-	}
-
-	const compareFeeDisplayLevel = (
-		displayLevel1: FeeDisplayLevel,
-		displayLevel2: FeeDisplayLevel,
-	): -1 | 0 | 1 => {
-		if (displayLevel1 === FeeDisplayLevel.COMPREHENSIVE) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.COMPREHENSIVE) {
-			return -1
-		}
-
-		if (displayLevel1 === FeeDisplayLevel.AGGREGATED) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.AGGREGATED) {
-			return -1
-		}
-
-		throw new Error('Unreachable')
-	}
-
-	if (feeDisplay1.byDefault !== feeDisplay2.byDefault) {
-		return compareFeeDisplayLevel(feeDisplay1.byDefault, feeDisplay2.byDefault)
-	}
-
-	if (feeDisplay1.afterSingleAction !== feeDisplay2.afterSingleAction) {
-		return compareFeeDisplayLevel(feeDisplay1.afterSingleAction, feeDisplay2.afterSingleAction)
-	}
-
-	throw new Error('Unreachable')
-}
-
-/**
  * How a wallet handles the worst type of fees it does handle.
  */
-type WorstFeeDisplay = {
+export type WorstFeeDisplay = {
 	/** The way the wallet displays fees. */
 	feeDisplay: FeeDisplay
 
@@ -334,6 +221,21 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	}
 
 	return worstFeeTypes
+}
+
+/** Worst-case fee display among basic operation fees only. */
+export function worstOperationFeeDisplay(operationFees: BasicOperationFees): FeeDisplay | null {
+	return (
+		computeWorstFees({
+			[FeeType.ETH_L1_TRANSFER]: operationFees.ethL1Transfer,
+			[FeeType.ERC20_L1_TRANSFER]: operationFees.erc20L1Transfer,
+			[FeeType.BUILT_IN_ERC20_SWAP]: operationFees.builtInErc20Swap,
+			[FeeType.UNISWAP_USDC_TO_ETHER_SWAP]: operationFees.uniswapUSDCToEtherSwap,
+			[FeeType.CROSS_CHAIN_BRIDGING]: null,
+			[FeeType.TORNADO_CASH_NOVA_RELAYER]: null,
+			[FeeType.STEALTH_ADDRESS_SENDING]: null,
+		})?.feeDisplay ?? null
+	)
 }
 
 export type FeeTransparencyMetadata = {

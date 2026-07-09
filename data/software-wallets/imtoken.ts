@@ -6,6 +6,7 @@ import type { AddressResolutionData } from '@/schema/features/privacy/address-re
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	RegularEndpoint,
 	UserFlow,
@@ -222,6 +223,7 @@ export const imtoken: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -365,6 +367,7 @@ export const imtoken: SoftwareWallet = {
 				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: null,
 			},*/
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

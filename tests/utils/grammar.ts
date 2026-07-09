@@ -2,7 +2,7 @@ import * as harper from 'harper.js'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
-import { getCSpellWords } from '@/tests/utils/cspell'
+import { getCSpellPatterns, getCSpellWords } from '@/tests/utils/cspell'
 import {
 	ContentType,
 	prerenderTypographicContent,
@@ -154,7 +154,7 @@ function getRegexpLinter({
 }: {
 	name: string
 	regExp: RegExp
-	replace: (substring: string) => string
+	replace: ((substring: string) => string) | null
 }): () => Promise<AbstractLinter> {
 	return (): Promise<AbstractLinter> => {
 		let linter = specificWordingLinters.get(name)
@@ -172,16 +172,19 @@ function getRegexpLinter({
 							continue
 						}
 
-						const replacement = replace(matchedText)
+						const replacement = replace === null ? null : replace(matchedText)
 						const end = start + matchedText.length
-						const suggestion: Suggestion = {
-							get_replacement_text(): string {
-								return replacement
-							},
-							kind(): harper.SuggestionKind {
-								return harper.SuggestionKind.Replace
-							},
-						}
+						const suggestion: Suggestion | null =
+							replacement === null
+								? null
+								: {
+										get_replacement_text(): string {
+											return replacement
+										},
+										kind(): harper.SuggestionKind {
+											return harper.SuggestionKind.Replace
+										},
+									}
 						const lint: Lint = {
 							get_problem_text(): string {
 								return matchedText
@@ -190,7 +193,7 @@ function getRegexpLinter({
 								return 'Site convention'
 							},
 							suggestions(): Suggestion[] {
-								return [suggestion]
+								return suggestion === null ? [] : [suggestion]
 							},
 							span(): Span {
 								return { start, end }
@@ -220,7 +223,70 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 		regExp: /\bdapps?\b/gi,
 		replace: (substring: string) => (substring.endsWith('s') ? 'apps' : 'app'),
 	}),
+	getRegexpLinter({
+		name: 'L2BEAT', // Always uppercase
+		regExp: /\bL2B(?!EAT\b)[Ee][Aa][Tt]\b/g,
+		replace: () => 'L2BEAT',
+	}),
+	getRegexpLinter({
+		name: 'onchain', // Use onchain not on-chain
+		regExp: /\bon-chain\b/g,
+		replace: () => 'onchain',
+	}),
 ]
+
+/**
+ * Return all character ranges in `text` matched by any active cspell pattern.
+ */
+function collectCspellPatternRanges(text: string): { start: number; end: number }[] {
+	const ranges: { start: number; end: number }[] = []
+	const patterns = getCSpellPatterns()
+
+	for (const regex of patterns) {
+		for (const m of text.matchAll(regex)) {
+			const start = m.index ?? 0
+
+			ranges.push({ start, end: start + m[0].length })
+		}
+	}
+
+	return ranges
+}
+
+/** Return true if `[spanStart, spanEnd)` overlaps any entry in `ranges`. */
+function overlapsAnyRange(
+	spanStart: number,
+	spanEnd: number,
+	ranges: { start: number; end: number }[],
+): boolean {
+	for (const r of ranges) {
+		if (spanStart < r.end && spanEnd > r.start) {
+			return true
+		}
+	}
+
+	return false
+}
+
+let cspellWordsSet: Set<string> | null = null
+
+function getCspellWordsSet(): Set<string> {
+	if (cspellWordsSet === null) {
+		const s = new Set<string>()
+
+		for (const word of getCSpellWords()) {
+			s.add(word.toLowerCase())
+		}
+		cspellWordsSet = s
+	}
+
+	return cspellWordsSet
+}
+
+/** Return true if `word` appears in .cspell.json's `words` list (case-insensitive). */
+function isInCspellWords(word: string): boolean {
+	return getCspellWordsSet().has(word.toLowerCase())
+}
 
 /** Lint a string for grammar errors; return raw error messages. */
 export async function grammarLintMessages(
@@ -228,6 +294,10 @@ export async function grammarLintMessages(
 	lintOptions?: harper.LintOptions,
 ): Promise<string[]> {
 	const trimmedText = trimWhitespacePrefix(text)
+
+	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
+	const cspellRanges = collectCspellPatternRanges(trimmedText)
+
 	let lints: Lint[] = []
 
 	for (const grammarLinterFn of grammarLinters) {
@@ -238,6 +308,9 @@ export async function grammarLintMessages(
 
 	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
 	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
+
+	// Ignore lints that fall inside text matched by a cspell pattern (hex addresses, CIDs, …).
+	lints = lints.filter(lint => !overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges))
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(
@@ -250,6 +323,25 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
 	)
+
+	// Ignore Spelling lints for possessive proper nouns whose base word is in the cspell
+	// vocabulary (e.g. "Gnosis's": "Gnosis" is in .cspell.json so it is a valid proper noun).
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Spelling') {
+			return true
+		}
+
+		const text = lint.get_problem_text()
+		const firstChar = text[0]
+
+		if (!text.endsWith("'s") || !firstChar || firstChar.toUpperCase() !== firstChar) {
+			return true
+		}
+
+		const baseWord = text.slice(0, -2)
+
+		return !isInCspellWords(baseWord)
+	})
 
 	// Ignore Word Choice lints for "lockdown" — used intentionally as a compound noun (e.g. "onchain lockdown").
 	lints = lints.filter(

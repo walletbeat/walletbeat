@@ -365,7 +365,7 @@ export const baseApp: SoftwareWallet = {
 			passkeyVerification: supported({
 				ref: {
 					explanation:
-						'Coinbase Smart Wallet verifies passkey signatures on-chain via `webauthn-sol`, which uses the RIP-7212 precompile when available and falls back to `FreshCryptoLib`.',
+						'Coinbase Smart Wallet verifies passkey signatures onchain via `webauthn-sol`, which uses the RIP-7212 precompile when available and falls back to `FreshCryptoLib`.',
 					url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
 				},
 				details:
@@ -489,6 +489,7 @@ export const baseApp: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

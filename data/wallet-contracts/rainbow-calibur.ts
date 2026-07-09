@@ -1,7 +1,7 @@
 import type { SmartWalletContract } from '@/schema/contracts'
 import { featureSupported } from '@/schema/features/support'
 
-// Address verified on-chain: live EOAs carry the EIP-7702 delegation
+// Address verified onchain: live EOAs carry the EIP-7702 delegation
 // indicator `0xef0100` followed by this address, and the deployed code exposes
 // the isValidSignature (0x1626ba7e) and validateUserOp (0x19822f7c) selectors.
 export const rainbowCaliburContract: SmartWalletContract = {
@@ -15,7 +15,7 @@ export const rainbowCaliburContract: SmartWalletContract = {
 	sourceCode: {
 		ref: {
 			explanation:
-				'Rainbow delegates EOAs to its deployment of Calibur, Uniswap’s open-source EIP-7702 smart-wallet delegate contract.',
+				"Rainbow delegates EOAs to its deployment of Calibur, Uniswap's open-source EIP-7702 smart-wallet delegate contract.",
 			label: 'Calibur (Uniswap)',
 			url: 'https://github.com/Uniswap/calibur',
 		},

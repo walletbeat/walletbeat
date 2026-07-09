@@ -351,6 +351,7 @@ export const zerion: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
 				dependencyLocking: supported({

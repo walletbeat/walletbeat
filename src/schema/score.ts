@@ -24,13 +24,17 @@ export type MaybeUnratedScore = null | {
 
 /** Compute a weighted aggregate score. */
 export const weightedScore = (scores: NonEmptyArray<WeightedScore>): Score => {
-	if (scores.every(({ score }) => score === null)) {
+	const nonNullScores = scores.filter(
+		(s): s is WeightedScore & { score: number } => s.score !== null,
+	)
+
+	if (nonNullScores.length === 0) {
 		return null
 	}
 
-	const [totalScore, totalWeight] = scores.reduce(
+	const [totalScore, totalWeight] = nonNullScores.reduce(
 		([totalScore, totalWeight], { score, weight }) => [
-			totalScore + (score === null ? 0 : score) * weight,
+			totalScore + score * weight,
 			totalWeight + weight,
 		],
 		[0, 0] as [number, number],

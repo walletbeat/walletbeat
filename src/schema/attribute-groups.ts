@@ -295,7 +295,7 @@ export function calculateAttributeGroupScore<
 
 			return { score, weight }
 		})
-		.filter((s): s is WeightedScore => s !== null)
+		.filter((s): s is WeightedScore => s.score !== null)
 
 	if (isNonEmptyArray(subScores)) {
 		let hasUnratedComponent = false

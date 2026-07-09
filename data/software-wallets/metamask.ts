@@ -375,7 +375,7 @@ export const metamask: SoftwareWallet = {
 					type: LegalProtectionType.SAFE_HARBOR,
 					ref: {
 						explanation:
-							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here..',
+							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here.',
 						url: 'https://hackerone.com/metamask/safe_harbor',
 					},
 				}),
@@ -667,6 +667,7 @@ export const metamask: SoftwareWallet = {
 					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

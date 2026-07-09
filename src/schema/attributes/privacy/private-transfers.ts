@@ -1317,7 +1317,7 @@ function rateRailgunSupport(
 				sendingDetails: mdParagraph(`
 					Shielding tokens into Railgun is done directly to the smart contract,
 					requiring no broadcaster. However, shielding transactions are public
-					on-chain and can be analyzed to correlate a user's \`0x\` address with their
+					onchain and can be analyzed to correlate a user's \`0x\` address with their
 					\`0zk\` address through amount, timing, and token type analysis. The wallet
 					does not warn users about these correlation risks. Private transfers
 					between Railgun wallets are supported.

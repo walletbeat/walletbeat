@@ -7,6 +7,7 @@ import { appConnectionNotSupported } from '@/schema/features/privacy/app-isolati
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -224,6 +225,7 @@ export const daimo: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -241,6 +243,7 @@ export const daimo: SoftwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -258,6 +261,7 @@ export const daimo: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
+							role: EntityRole.OPERATOR,
 						},
 					],
 					publishedOnchain: {
@@ -292,6 +296,7 @@ export const daimo: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -318,6 +323,7 @@ export const daimo: SoftwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.ACCOUNT_SIGNUP,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: {
@@ -338,6 +344,7 @@ export const daimo: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -356,6 +363,7 @@ export const daimo: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -453,6 +461,7 @@ export const daimo: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,

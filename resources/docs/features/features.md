@@ -60,6 +60,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/transparency/license.ts`](#srcschemafeaturestransparencylicensets)
 - [`src/schema/features/transparency/maintenance.ts`](#srcschemafeaturestransparencymaintenancets)
 - [`src/schema/features/transparency/monetization.ts`](#srcschemafeaturestransparencymonetizationts)
+- [`src/schema/features/transparency/orderflow.ts`](#srcschemafeaturestransparencyorderflowts)
 - [`src/schema/features/transparency/release-transparency.ts`](#srcschemafeaturestransparencyrelease-transparencyts)
 - [`src/schema/features/transparency/reputation.ts`](#srcschemafeaturestransparencyreputationts)
 
@@ -174,6 +175,11 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 	/** How well does the wallet abstract over chains? */
 	chainAbstraction: VariantFeature<Nullable<ChainAbstraction>>
+
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+	}
 }
 ```
 
@@ -224,6 +230,10 @@ type WalletEmbeddedFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
 	}
+	transparency: WalletBaseFeatures['transparency'] & {
+		/** Orderflow auctioning disclosure and practices page. */
+		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
+	}
 }
 ```
 
@@ -268,6 +278,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
+  - `orderflowPractices` (`ResolvedFeature<OrderflowPractices>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
   - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
   - `releaseTransparency` (object)
@@ -305,7 +316,7 @@ type AccountTypeSupport<T extends object> = Support<WithRef<T>>
 Set of possible account types.
 
 - `eoa` = `'eoa'`: EOA account type, behind a private key. To test: create a new wallet and check whether it shows a seed phrase during onboarding. Verify the address starts with `0x` and has no associated contract code (e.g. check on Etherscan — "Contract" tab should be absent).
-- `mpc` = `'mpc'`: MPC wallets, behind a key with split shards. To test: check the wallet's documentation for "MPC", "threshold signatures", or "key sharding". MPC wallets typically do not show a seed phrase and the address has no on-chain contract code.
+- `mpc` = `'mpc'`: MPC wallets, behind a key with split shards. To test: check the wallet's documentation for "MPC", "threshold signatures", or "key sharding". MPC wallets typically do not show a seed phrase and the address has no onchain contract code.
 - `eip7702` = `'eip7702'`: EOA account that is used as a smart contract account with EIP-7702. To test: check the wallet's documentation for EIP-7702 support. The address is an EOA but will have contract code attached when the delegation is active (visible on Etherscan under "Contract").
 - `rawErc4337` = `'rawErc4337'`: Raw ERC-4337 account, i.e. an account for which the address matches the smart contract code. To test: look up the wallet address on Etherscan — the "Contract" tab should be present and show deployed bytecode. The wallet typically does not show a seed phrase; authentication uses a separate signer key.
 - `safe` = `'safe'`: Safe multisig smart contract account. To test: check whether the wallet lets you connect to or create a Safe. The address should resolve to a Safe contract on Etherscan (look for "GnosisSafe" or "Safe" in the contract name).
@@ -808,7 +819,7 @@ type AddressResolutionData =
 			 * This is generally not visible in the UI — check the wallet's source code
 			 * or privacy/security documentation to determine the correct value.
 			 *   - `VERIFIABLE`: the wallet cross-checks the offchain result against
-			 *     on-chain data or uses a light client to verify it.
+			 *     onchain data or uses a light client to verify it.
 			 *   - `NOT_VERIFIABLE`: the wallet trusts the offchain provider's response as-is.
 			 */
 			offchainDataVerifiability: 'VERIFIABLE' | 'NOT_VERIFIABLE'
@@ -984,6 +995,12 @@ type Endpoint =
 				reproducibleBuilds: boolean
 
 				/**
+				 * Reference to an independent audit of the server software running in the
+				 * enclave (independent of client verification code).
+				 */
+				independentCodeAudit: MustRef<{}>
+
+				/**
 				 * How the client verifies that the endpoint is running in a secure enclave.
 				 */
 				clientVerification:
@@ -1003,6 +1020,12 @@ type Endpoint =
 							 * The client verifies this. Must also come with a code reference.
 							 */
 							type: 'VERIFIED'
+
+							/**
+							 * Reference to an independent audit of the wallet's attestation
+							 * verification code.
+							 */
+							verificationCodeAudit: MustRef<{}>
 					  }>
 			}>
 
@@ -1136,6 +1159,7 @@ Why is data being collected?
 - `UPDATE_CHECKING` = `'UPDATE_CHECKING'`: Checking for updates to the wallet.
 - `CHAIN_DATA_LOOKUP` = `'CHAIN_DATA_LOOKUP'`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST` = `'TRANSACTION_BROADCAST'`: Broadcasting transactions for inclusion.
+- `ORDERFLOW_AUCTION` = `'ORDERFLOW_AUCTION'`: Auctioning orderflow (MEV) from pre-inclusion transaction data.
 - `TRANSACTION_SIMULATION` = `'TRANSACTION_SIMULATION'`: Simulating transaction outcome.
 - `GAS_QUOTE` = `'GAS_QUOTE'`: Getting the present price of gas on the chain.
 - `SWAP_QUOTE` = `'SWAP_QUOTE'`: Getting a quote for a swap or bridge operation.
@@ -1200,11 +1224,21 @@ type QualifiedDataCollection = Record<UserInfo, CollectionPolicy> & {
 
 ---
 
+### Enum: `EntityRole`
+
+The role an entity plays in receiving data.
+
+- `OPERATOR` = `'OPERATOR'`: The intended recipient of the data (data controller).
+- `INTERMEDIARY` = `'INTERMEDIARY'`: An entity that sees the data in transit without being its intended recipient, e.g. a TLS-terminating CDN.
+
+---
+
 ### Interface: `DataCollectionByEntity`
 
 Describes the data that an entity may be sent.
 
 - `byEntity` (`Entity`): The entity to which the data may be sent.
+- `role` (`EntityRole`): The role the entity plays in receiving the data.
 - `dataCollection` (`EndpointCollection`): The type of data that an entity may be sent.
 - `purposes` (`NonEmptyArray<DataCollectionPurpose>`): Why is the data collected?
 
@@ -1234,6 +1268,20 @@ type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
 
 ---
 
+### Type: `DataCollectionForUserFlowOrUnsupported`
+
+A {@link DataCollection} user-flow field when the wallet may not offer that flow.
+
+- `null` — not researched
+- `'FLOW_NOT_SUPPORTED'` — wallet does not offer this flow (not unknown)
+- {@link DataCollectionForFlow} — researched
+
+```typescript
+type DataCollectionForUserFlowOrUnsupported = DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+```
+
+---
+
 ### Interface: `DataCollection`
 
 A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
@@ -1241,11 +1289,11 @@ A collection of data that a wallet collects. See /docs/mitmproxy-guide for how t
 - `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
 - `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
 - `[UserFlow.ONBOARDING_IMPORT]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during account import?
-- `[UserFlow.SEND_ETHER]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending Ether?
-- `[UserFlow.SEND_USDC]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending USDC?
-- `[UserFlow.NATIVE_SWAP]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when swapping tokens using the wallet's native swap feature?
-- `[UserFlow.MAKE_TRANSACTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected during the transaction review/signing flow?
-- `[UserFlow.APP_CONNECTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when connecting to an app?
+- `[UserFlow.SEND_ETHER]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when sending Ether?
+- `[UserFlow.SEND_USDC]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when sending USDC?
+- `[UserFlow.NATIVE_SWAP]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when swapping tokens using the wallet's native swap feature?
+- `[UserFlow.MAKE_TRANSACTION]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected during the transaction review/signing flow?
+- `[UserFlow.APP_CONNECTION]` (`DataCollectionForUserFlowOrUnsupported`): What data is collected when connecting to an app?
 - `[UserFlow.UNCLASSIFIED]` (`DataCollectionForFlow`, optional): What other data is collected but not covered in the other flows, if any?
 
 ---
@@ -1610,7 +1658,7 @@ type RailgunSupport = WithRef<{
 
 	/**
 	 * Does the wallet warn users about correlation risks when shielding tokens?
-	 * Shielding transactions are public on-chain and can be analyzed to link
+	 * Shielding transactions are public onchain and can be analyzed to link
 	 * a user's 0x address to their 0zk address through amount, timing, and token
 	 * type correlation. Similar to how Privacy Pools tracks deposit correlation risks.
 	 */
@@ -2316,7 +2364,7 @@ type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient>
 
 On-chain P-256 verifier libraries used to validate passkey (WebAuthn) signatures in smart contract wallets.
 
-This is not about whether the wallet uses passkeys for login — it refers specifically to the smart contract library the wallet uses to verify passkey signatures on-chain when passkeys are used as a signing key.
+This is not about whether the wallet uses passkeys for login — it refers specifically to the smart contract library the wallet uses to verify passkey signatures onchain when passkeys are used as a signing key.
 
 Not visible in the UI — identify by inspecting the wallet's smart contract source code for the verifier contract it imports or calls, or by checking the wallet's technical documentation.
 
@@ -2324,7 +2372,7 @@ Not visible in the UI — identify by inspecting the wallet's smart contract sou
 - `FRESH_CRYPTO_LIB` = `'FRESH_CRYPTO_LIB'`: FreshCryptoLib — a P-256 verification library.
 - `DAIMO_P256_VERIFIER` = `'DAIMO_P256_VERIFIER'`: Daimo's P-256 verifier contract.
 - `OPEN_ZEPPELIN_P256_VERIFIER` = `'OPEN_ZEPPELIN_P256_VERIFIER'`: OpenZeppelin's P-256 verifier.
-- `WEB_AUTHN_SOL` = `'WEB_AUTHN_SOL'`: WebAuthn.sol — a Solidity library for on-chain WebAuthn verification.
+- `WEB_AUTHN_SOL` = `'WEB_AUTHN_SOL'`: WebAuthn.sol — a Solidity library for onchain WebAuthn verification.
 - `OTHER` = `'OTHER'`: A verifier library not listed above. Set `libraryUrl` to the repository or documentation URL.
 
 ---
@@ -2333,7 +2381,7 @@ Not visible in the UI — identify by inspecting the wallet's smart contract sou
 
 Information about the passkey verification implementation. To identify: look at the wallet's smart contract source code for the P-256 verifier it imports or delegates to.
 
-- `library` (`PasskeyVerificationLibrary`): The on-chain library used to verify passkey signatures. Use OTHER if the library is not listed in `PasskeyVerificationLibrary`, and set `libraryUrl` to its repository.
+- `library` (`PasskeyVerificationLibrary`): The onchain library used to verify passkey signatures. Use OTHER if the library is not listed in `PasskeyVerificationLibrary`, and set `libraryUrl` to its repository.
 - `libraryUrl` (`string`, optional): URL to the library's repository or documentation. Required when `library` is OTHER; optional otherwise.
 - `details` (`string`, optional): Any additional implementation details worth noting. (e.g. a specific contract address, a fork of an upstream library, etc.)
 
@@ -2341,7 +2389,7 @@ Information about the passkey verification implementation. To identify: look at 
 
 ### Type: `PasskeyVerificationImplementation`
 
-A record of passkey verification support. Set to not supported if the wallet does not use passkeys as a signing key and therefore has no on-chain P-256 verifier.
+A record of passkey verification support. Set to not supported if the wallet does not use passkeys as a signing key and therefore has no onchain P-256 verifier.
 
 ```typescript
 type PasskeyVerificationImplementation = WithRef<PasskeyVerificationSupport>
@@ -3549,7 +3597,7 @@ A unit that a wallet service fee (platform fee on built-in swap or bridge flows)
 - `PERCENTAGE` = `'PERCENTAGE'`: Wallet service fee line item shows a percentage (e.g. "0.3%").
 - `BASIS_POINTS` = `'BASIS_POINTS'`: Wallet service fee line item shows basis points (e.g. "30 bps").
 - `FIAT` = `'FIAT'`: Wallet service fee line item shows a flat fiat-currency amount (e.g. "$1.24").
-- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an on-chain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
+- `TOKEN_AMOUNT` = `'TOKEN_AMOUNT'`: Wallet service fee line item shows a fixed amount of an onchain asset, native or ERC-20 (e.g. "0.001 ETH", "0.5 USDC").
 
 ---
 
@@ -3560,6 +3608,9 @@ How much fee information is displayed by default and after an action.
 - `byDefault` (`FeeDisplayLevel`): Level of fee information shown with default wallet settings and zero fee-specific interactions on the transaction approval screen. To test: initiate the transaction on a freshly installed wallet with no settings changed. Record the fee display level visible on the approval screen before clicking anything fee-related.
 - `afterSingleAction` (`FeeDisplayLevel`): Level of fee information shown after at most one additional click/tap on the transaction approval screen (e.g. tapping a fee row, an info icon, or a "show details" chevron), with no settings changed. To test: from the same default approval screen, make exactly one fee-related interaction and record the highest level of detail then shown. If `byDefault` is already `COMPREHENSIVE`, this should be the same value.
 - `fullySponsored` (`boolean`): Whether the wallet fully sponsors these fees on behalf of the user, so the user pays nothing. To test: complete the transaction and verify that no gas or protocol fee is deducted from the user's balance. Check the wallet's documentation or source code to confirm sponsorship is intentional and not a test-net artifact.
+
+  This field describes payment (whether the user pays nothing), while `byDefault` and `afterSingleAction` describe UI visibility. Orderflow prominence comparison uses the recorded display levels as-is; if no fee-related copy appears on the approval screen, set both levels to `NONE` even when the wallet fully sponsors fees.
+
 - `walletServiceFeeDisplayUnits` (`NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null`): Which unit(s) the wallet service fee line item(s) are shown in, when a comprehensive breakdown is available. Meaningful when the flow includes a wallet-charged platform fee line item in the breakdown (e.g. built-in swap or cross-chain bridging).
   - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
     shown on the wallet service fee line item(s) (e.g. a wallet showing
@@ -3579,6 +3630,15 @@ Details about how the wallet displays fees for basic operations.
 - `erc20L1Transfer` (`Support<WithRef<FeeDisplay>>`): How does the wallet display fees for a simple ERC-20 transfer on L1? To test: initiate a send of any ERC-20 token (e.g. USDC) to a different address on Ethereum mainnet and evaluate the fee display on the approval screen.
 - `builtInErc20Swap` (`Support<WithRef<FeeDisplay>>`): If the wallet has a built-in ERC-20 swap feature, how are fees displayed? To test: use the wallet's own swap UI (not an external app) to swap one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee display on the approval screen. Set to not supported if the wallet has no built-in swap feature.
 - `uniswapUSDCToEtherSwap` (`Support<WithRef<FeeDisplay>>`): For a Uniswap transaction exchanging USDC for Ether, initiated through the Uniswap frontend (not the wallet's built-in swap feature, if any), how are fees displayed in the wallet's transaction approval dialog? To test: go to app.uniswap.org, connect the wallet, set up a USDC→ETH swap, and evaluate the fee display shown in the wallet's approval popup — not the Uniswap UI itself.
+
+---
+
+### Type: `WorstOperationFees`
+
+Worst basic-operation fee display with contributing research refs.
+
+- `feeDisplay` (`FeeDisplay`)
+- `references` (`FullyQualifiedReference[]`)
 
 ---
 
@@ -3773,6 +3833,102 @@ type Monetization = WithRef<{
 	revenueBreakdownIsPublic: boolean
 	strategies: Record<MonetizationStrategy, boolean | null>
 }>
+```
+
+---
+
+## `src/schema/features/transparency/orderflow.ts`
+
+### Enum: `OrderflowDisclosureLevel`
+
+What level of orderflow / MEV auctioning information is shown by default and after a user action during transaction confirmation.
+
+- `NONE` = `'NONE'`: No mention of auction / orderflow / MEV.
+- `MENTIONED` = `'MENTIONED'`: Single line or toggle (e.g. "MEV protection", "Private tx") without full breakdown.
+- `COMPREHENSIVE` = `'COMPREHENSIVE'`: Clear block: auctioning disclosed, stats or kickback called out, Learn more to practices page.
+
+---
+
+### Type: `OrderflowDisclosure`
+
+How much orderflow / MEV information is displayed by default and after a user action.
+
+`byDefault` and `afterSingleAction` must tell a consistent story: one user action may reveal the same or more detail, but never less. Valid pairs are enforced by the discriminated union below.
+
+Valid pairs include `(NONE, NONE)`, `(NONE, MENTIONED)`, `(MENTIONED, MENTIONED)`, `(MENTIONED, COMPREHENSIVE)`, and `(COMPREHENSIVE, COMPREHENSIVE)`.
+
+Invalid examples:
+
+- `(MENTIONED, NONE)` — e.g. "MEV protection: on" is visible by default, but nothing
+  orderflow-related appears after the user taps it.
+- `(COMPREHENSIVE, MENTIONED)` — a full orderflow block is shown by default, but one
+  action collapses it to a single line.
+
+```typescript
+type OrderflowDisclosure =
+	| {
+			/** Level shown with default settings and no orderflow-related user action. */
+			byDefault: OrderflowDisclosureLevel.NONE
+			/**
+			 * Level shown after at most one orderflow-related user action (e.g. tapping a
+			 * row, toggle, or "Learn more"), with no settings changed.
+			 */
+			afterSingleAction: OrderflowDisclosureLevel
+	  }
+	| {
+			byDefault: OrderflowDisclosureLevel.MENTIONED
+			afterSingleAction: OrderflowDisclosureLevel.MENTIONED | OrderflowDisclosureLevel.COMPREHENSIVE
+	  }
+	| {
+			byDefault: OrderflowDisclosureLevel.COMPREHENSIVE
+			afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE
+	  }
+```
+
+---
+
+### Enum: `OnchainVerificationDocumentation`
+
+Whether the wallet documents how users can verify onchain outcomes.
+
+- `NO_METHOD_DOCUMENTED` = `'NO_METHOD_DOCUMENTED'`
+- `METHOD_DOCUMENTED` = `'METHOD_DOCUMENTED'`
+- `METHOD_DOCUMENTED_AND_EFFECTIVE` = `'METHOD_DOCUMENTED_AND_EFFECTIVE'`
+
+---
+
+### Interface: `OrderflowPracticesPageContents`
+
+Contents researchers evaluate on the wallet's orderflow practices page.
+
+- `listsEntitiesAndWhatTheyDo` (`boolean`)
+- `explainsDefaultOrderflowAuctioning` (`boolean`)
+- `documentsHowToChangeDefaults` (`boolean`)
+- `onchainVerification` (`OnchainVerificationDocumentation`)
+- `pageLastUpdated` (`CalendarDate`): Calendar date shown on the wallet's practices page (YYYY-MM-DD).
+
+---
+
+### Type: `OrderflowPractices`
+
+Orderflow transparency practices beyond data-collection entity rows.
+
+- `disclosure` (`WithRef<OrderflowDisclosure>`)
+- `userCanRemoveAuctioning` (`Support<WithRef<{}>>`)
+- `practicesPage` (`Support< MustRef<{ contents: OrderflowPracticesPageContents }> >`)
+
+---
+
+### Type: `OrderflowFacts`
+
+```typescript
+type OrderflowFacts =
+	| { status: 'incomplete' }
+	| {
+			status: 'complete'
+			preInclusionRecipients: WithRef<DataCollectionByEntity>[]
+			auctioneers: WithRef<DataCollectionByEntity>[]
+	  }
 ```
 
 ---

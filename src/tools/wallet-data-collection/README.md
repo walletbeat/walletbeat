@@ -87,14 +87,29 @@ Mark a flow as not being supported by the wallet, which means capturing its netw
 #### `mark-domain` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-domain --domain='<domain>' --entity='<entity ID>'
+$ pnpm wallet-data-collection <global flags> mark-domain --domain='<domain>' --entity='<entity ID>' [--intermediaries='<entity ID>,...']
 ```
 
-Mark a domain name and all its subdomains as belonging to the given entity ID.
+Mark a domain name and all its subdomains as operated by the given entity ID.
 Note that domain assignments are **not** wallet-specific, and will not need to be redone in future network captures.
 Domains for requests that were not actually initiated by the wallet (e.g. browser/OS built-in analytics) should **still** be marked,
 as this will help mark them appropriately for other wallets' captures. Such requests can be marked as not-wallet-initiated
 using request matchers (see `explain-request` below).
+
+If the domain is fronted by TLS-terminating infrastructure (e.g. a CDN), the data sent to it is also seen by
+that infrastructure entity without it being the intended recipient. Record this with `--intermediaries='<entity ID>,...'`.
+Since CDN fronting is often per-hostname, record intermediaries on the exact hostname observed to be fronted,
+not on the apex domain; the most specific matching entry takes precedence when resolving.
+
+#### `mark-domain-update` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> mark-domain-update --domain='<domain>' [--set-operator='<entity ID>'] [--set-intermediaries='<entity ID>,...'] [--add-intermediaries='<entity ID>,...'] [--remove-intermediaries='<entity ID>,...']
+```
+
+Update an existing domain mapping, e.g. when an intermediary is discovered later.
+`--set-intermediaries` replaces the whole intermediary list and cannot be combined with
+`--add-intermediaries` or `--remove-intermediaries`.
 
 #### `explain-request` subcommand
 
@@ -117,6 +132,7 @@ Requests can be assigned to the following purposes:
 - `UPDATE_CHECKING`: Checking for updates to the wallet.
 - `CHAIN_DATA_LOOKUP`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST`: Broadcasting transactions for inclusion.
+- `ORDERFLOW_AUCTION`: Auctioning orderflow (MEV) from pre-inclusion transaction data. Requires qualified `MEMPOOL_TRANSACTIONS` of `BY_DEFAULT` or `ALWAYS` on the same entity row.
 - `TRANSACTION_SIMULATION`: Simulating transaction outcome.
 - `SWAP_QUOTE`: Getting a quote for a swap operation.
 - `SCAM_DETECTION`: Checking for scams.
