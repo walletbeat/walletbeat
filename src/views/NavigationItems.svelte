@@ -433,7 +433,18 @@
 					---startRadius: 1.5rem;
 				}
 
-				background-color: var(---backgroundColor);
+				&:not([data-sticky]) {
+					background-color: var(---backgroundColor);
+				}
+				&[data-sticky] {
+					--sticky-backgroundColor: var(---backgroundColor);
+					--sticky-backdropFilter: blur(16px);
+
+					&[data-sticky~='backdrop-stuck'][data-sticky~="backdrop-before"]::before {
+						background-color: var(---backgroundColor);
+					}
+				}
+
 				border-radius:
 					var(---startRadius)
 					var(---endRadius)
@@ -464,11 +475,6 @@
 			}
 
 			summary {
-				&[data-sticky] {
-					--sticky-backgroundColor: var(---backgroundColor);
-					--sticky-backdropFilter: blur(16px);
-				}
-
 				&::after {
 					margin-inline-start: auto;
 				}
