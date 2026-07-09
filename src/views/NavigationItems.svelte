@@ -283,21 +283,21 @@
 
 <style>
 	.navigation-items {
-		--navigationItem-gap: 0.5rem;
-		--navigationItem-paddingBlock: 0.45rem;
-		--navigationItem-paddingInline: 0.45rem;
-		--navigationItem-rowGap: 0.5em;
-		--navigationItem-endRadius: 0.5em;
-		--navigationItem-currentBackground: color-mix(in oklch, var(--accent) 24%, transparent);
-		--navigationItem-hoverBackground: var(--background-primary);
-		--navigationItem-currentHoverBackground: color-mix(in oklch, var(--accent) 34%, var(--background-primary));
-		--navigationIcon-size: 1.25em;
+		--navItem-gap: 0.5rem;
+		--navItem-paddingBlock: 0.45rem;
+		--navItem-paddingInline: 0.45rem;
+		--navItem-rowGap: 0.5em;
+		--navItem-radius: 0.5em;
+		--navItem-current-backgroundColor: color-mix(in oklch, var(--accent) 25%, transparent);
+		--navItem-hover-backgroundColor: color-mix(in oklch, var(--accent) 15%, var(--background-primary));
+		--navItem-current-hover-backgroundColor: color-mix(in oklch, var(--accent) 30%, var(--background-primary) 20%);
+		--navIcon-size: 1.25em;
 
-		--navigationSubmenu-gap: 0.33rem;
-		--navigation-search-sidestepBlock: 0rem;
+		--nav-submenu-gap: 0.33rem;
+		--nav-search-blockSize: 0rem;
 
 		&:has(> search) {
-			--navigation-search-sidestepBlock: 3rem;
+			--nav-search-blockSize: 3rem;
 		}
 
 		scroll-target-group: auto;
@@ -345,23 +345,23 @@
 
 			&[data-navigation-depth='0'] {
 				--icon-navigation-borderColor: currentColor;
-				--navigationIcon-size: 2em;
+				--navIcon-size: 2em;
 
 				&[data-sticky-container] {
-					--sticky-marginBlockStart: var(--navigation-search-sidestepBlock);
+					--sticky-marginBlockStart: var(--nav-search-blockSize);
 
 					@media (max-width: 1024px) {
 						--sticky-marginBlockStart: 0px;
-						--sticky-marginBlockEnd: var(--navigation-search-sidestepBlock);
+						--sticky-marginBlockEnd: var(--nav-search-blockSize);
 					}
 				}
 			}
 			&[data-navigation-depth='1'] {
-				--navigationIcon-size: 1.5em;
+				--navIcon-size: 1.5em;
 
 				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(var(--navigationSubmenu-parentIconSize) + 2 * var(--navigationItem-paddingBlock) + var(--navigationSubmenu-gap));
-					--sticky-marginBlockEnd: var(--navigationItem-gap);
+					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
+					--sticky-marginBlockEnd: var(--navItem-gap);
 				}
 			}
 			&[data-navigation-depth='2'] {
@@ -369,13 +369,13 @@
 				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
 
 				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(var(--navigationSubmenu-parentIconSize) + 2 * var(--navigationItem-paddingBlock) + var(--navigationSubmenu-gap));
-					--sticky-marginBlockEnd: var(--navigationItem-gap);
+					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
+					--sticky-marginBlockEnd: var(--navItem-gap);
 				}
 			}
 
 			details {
-				--navigationSubmenu-parentIconSize: var(--navigationIcon-size);
+				--nav-submenu-parentIconSize: var(--navIcon-size);
 			}
 
 			a {
@@ -394,35 +394,58 @@
 
 					&:target-current,
 					&::scroll-marker:target-current {
-						--navigationItem-background: var(--navigationItem-currentBackground);
+						---backgroundColor: var(--navItem-current-backgroundColor);
 					}
 				}
 			}
 
-			li > a[aria-current='page'],
-			li > details > summary:has(a[aria-current='page']) {
-				--navigationItem-background: var(--navigationItem-currentBackground);
-			}
-
-			li > a[aria-current='page']:is(:hover, :focus-visible),
-			li > details > summary:has(a[aria-current='page']):is(:hover, :focus-visible, :focus-within),
-			a[href^='#']:target-current:hover,
-			a[href^='#']:target-current:focus-visible {
-				--navigationItem-background: var(--navigationItem-currentHoverBackground);
-			}
-
-			summary,
+			li > details > summary,
 			li > a {
-				--icon-size: var(--navigationIcon-size);
-				--navigationItem-startRadius: var(--navigationItem-endRadius);
+				--icon-size: var(--navIcon-size);
 
-				padding: var(--navigationItem-paddingBlock) var(--navigationItem-paddingInline);
+				---backgroundColor: transparent;
+				---color: inherit;
+
+				&:hover,
+				&:focus-visible,
+				&:focus-within {
+					---backgroundColor: var(--navItem-hover-backgroundColor);
+					---color: var(--accent);
+				}
+
+				&:is(a)[aria-current='page'],
+				&:is(summary):has(a[aria-current='page']),
+			 	&:target-current {
+					---backgroundColor: var(--navItem-current-backgroundColor);
+
+					&:hover,
+					&:focus-visible,
+					&:focus-within {
+						---backgroundColor: var(--navItem-current-hover-backgroundColor);
+					}
+				}
+
+				---startRadius: var(--navItem-radius);
+				---endRadius: var(--navItem-radius);
+
+				&:is(a):has(> [data-icon~='circle']),
+				&:is(summary):has(> a > [data-icon~='circle']) {
+					---startRadius: 1.5rem;
+				}
+
+				background-color: var(---backgroundColor);
 				border-radius:
-					var(--navigationItem-startRadius)
-					var(--navigationItem-endRadius)
-					var(--navigationItem-endRadius)
-					var(--navigationItem-startRadius)
+					var(---startRadius)
+					var(---endRadius)
+					var(---endRadius)
+					var(---startRadius)
 				;
+				padding:
+					var(--navItem-paddingBlock)
+					var(--navItem-paddingInline)
+				;
+
+				color: var(---color);
 				font-weight: 500;
 
 				transition-property:
@@ -431,23 +454,6 @@
 					background-color,
 					color
 				;
-
-				&:has(
-					> [data-icon~='circle'],
-					> a > [data-icon~='circle']
-				) {
-					--navigationItem-startRadius: calc((var(--navigationIcon-size) + 2 * var(--navigationItem-paddingBlock)) / 2);
-				}
-
-				&:hover:not(:has(a:hover)) {
-					--navigationItem-background: var(--navigationItem-hoverBackground);
-					color: var(--accent);
-				}
-
-				&:is(:focus-visible, :focus-within) {
-					--navigationItem-background: var(--navigationItem-hoverBackground);
-					color: var(--accent);
-				}
 
 				:global(mark) {
 					font-weight: 600;
@@ -459,7 +465,7 @@
 
 			summary {
 				&[data-sticky] {
-					--sticky-backgroundColor: color-mix(in oklch, var(--background-primary) 72%, transparent);
+					--sticky-backgroundColor: var(---backgroundColor);
 					--sticky-backdropFilter: blur(16px);
 				}
 
@@ -475,26 +481,28 @@
 					border-radius: inherit;
 					flex: 0 auto;
 				}
+			}
 
-				~ * {
-					margin-block-start: var(--navigationSubmenu-gap);
-					margin-inline-start: calc(
-						var(--navigationSubmenu-parentIconSize) + var(--navigationItem-rowGap)
+			menu {
+				margin-block-start: var(--nav-submenu-gap);
+				margin-inline-start: calc(
+					var(--nav-submenu-parentIconSize) + var(--navItem-rowGap)
+				);
+
+				position: relative;
+				padding-inline-start: 0;
+
+				&::before {
+					content: '';
+					position: absolute;
+					inset-block: 0;
+					inset-inline-start: calc(
+						var(--navItem-paddingInline)
+						- var(--nav-submenu-parentIconSize) / 2
+						- var(--navItem-rowGap)
 					);
-					padding-inline-start: 0;
-					position: relative;
-
-					&::before {
-						content: '';
-						position: absolute;
-						inset-block: 0;
-						inset-inline-start: calc(
-							var(--navigationItem-paddingInline) + var(--navigationSubmenu-parentIconSize) / 2 -
-								var(--navigationSubmenu-parentIconSize) - var(--navigationItem-rowGap)
-						);
-						inline-size: 1px;
-						background-color: var(--border-color);
-					}
+					inline-size: 1px;
+					background-color: var(--border-color);
 				}
 			}
 
