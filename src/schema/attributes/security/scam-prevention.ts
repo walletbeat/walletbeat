@@ -6,8 +6,8 @@ import {
 	Rating,
 } from '@/schema/attributes'
 import { WalletProfile } from '@/schema/features/profile'
-import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
-import { isSupported, notSupported, supported } from '@/schema/features/support'
+import type { ScamAlertLeaks, ScamAlerts } from '@/schema/features/security/scam-alerts'
+import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -38,6 +38,9 @@ export type ScamPreventionMetadata =
 			}
 			contractTransactionWarning: ScamAlertSupport & {
 				feature: 'contractTransactionWarning'
+			}
+			unlimitedApprovalWarning: ScamAlertSupport & {
+				feature: 'unlimitedApprovalWarning'
 			}
 	  }
 	| { scamAlerts: null }
@@ -158,7 +161,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 				case 'FULL_URL':
 					return false
 				case 'DOMAIN_ONLY':
-					return !scamUrlWarning.leaksIp && !scamUrlWarning.leaksUserAddress
+					return !scamUrlWarning.leaksUserIp && !scamUrlWarning.leaksUserAddress
 			}
 		})(),
 		ref: scamUrlWarning.ref,
@@ -174,12 +177,30 @@ function evaluateScamAlerts(
 	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
 	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
+	const unlimitedApprovalWarning = rateUnlimitedApprovalWarning(scamAlerts)
 
-	ctx.addRef(sendTransactionWarning, contractTransactionWarning, scamUrlWarning)
+	ctx.addRef(
+		sendTransactionWarning,
+		contractTransactionWarning,
+		scamUrlWarning,
+		unlimitedApprovalWarning,
+	)
+	const metadata: ScamPreventionMetadata = {
+		scamAlerts,
+		sendTransactionWarning,
+		contractTransactionWarning,
+		scamUrlWarning,
+		unlimitedApprovalWarning,
+	}
 	const requiredFeatures = ((): NonEmptyArray<ScamAlertSupport> => {
 		switch (walletProfile) {
 			case WalletProfile.GENERIC:
-				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
+				return [
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+					unlimitedApprovalWarning,
+				]
 			case WalletProfile.PAYMENTS:
 				return [sendTransactionWarning, scamUrlWarning]
 		}
@@ -201,12 +222,7 @@ function evaluateScamAlerts(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} makes no attempt to warn the user about potential scams.',
 				),
-				metadata: {
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
-				},
+				metadata,
 			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
@@ -230,12 +246,7 @@ function evaluateScamAlerts(
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.',
 					),
-					metadata: {
-						scamAlerts,
-						sendTransactionWarning,
-						contractTransactionWarning,
-						scamUrlWarning,
-					},
+					metadata,
 				},
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
@@ -248,7 +259,7 @@ function evaluateScamAlerts(
 
 		if (
 			scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
-			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksIp)
+			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksUserIp)
 		) {
 			return ctx.build({
 				outcome: {
@@ -258,12 +269,7 @@ function evaluateScamAlerts(
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.',
 					),
-					metadata: {
-						scamAlerts,
-						sendTransactionWarning,
-						contractTransactionWarning,
-						scamUrlWarning,
-					},
+					metadata,
 				},
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
@@ -285,12 +291,7 @@ function evaluateScamAlerts(
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}`,
 				),
-				metadata: {
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
-				},
+				metadata,
 			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
@@ -320,12 +321,7 @@ function evaluateScamAlerts(
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} in a privacy-invasive way.`,
 				),
-				metadata: {
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
-				},
+				metadata,
 			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
@@ -344,6 +340,10 @@ function evaluateScamAlerts(
 						`
 				* Checking arbitrary transactions for potential scams should not allow an external service to link your browsing history with your IP or Ethereum address.
 				`,
+					!needsImprovement(unlimitedApprovalWarning) &&
+						`
+				* Checking whether a token approval is unlimited should not allow an external service to link your IP or Ethereum address to the spender you are about to approve.
+				`,
 				]
 					.filter(Boolean)
 					.join('\n\n')}
@@ -360,12 +360,7 @@ function evaluateScamAlerts(
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.`,
 			),
-			metadata: {
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
-			},
+			metadata,
 		},
 		details: scamAlertsDetailsContent({}),
 	})
@@ -384,21 +379,24 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
-		scams. This is measured along three scenarios:
+		scams. This is measured along four scenarios:
 		**Does the wallet *warn* the user when...**
 
 		* Sending funds to an address the user has never previously sent or
 			received funds from before
+		* Sending funds to an address that closely resembles ("poisons") one
+			already in the user's history
 		* Interacting with a contract that is known to be a scam
 		* Interacting with a contract that the user has never previously
 			interacted with before
 		* Interacting with a contract that has only recently been deployed
 			onchain
 		* Connecting to an app that is known to be a scam
+		* Granting an unlimited ERC-20 token approval
 
 		For payments-focused wallets that do not support interacting with
-		arbitrary contracts or external applications, only the payment scenario
-		applies.
+		arbitrary contracts or external applications, only the scenarios related
+		to sending funds, connecting to apps, and granting token approvals apply.
 
 		Note that wallets should only *warn* the user about such scenarios, not
 		outright *prevent* the user from making such transactions, as preventing
@@ -438,6 +436,14 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 				maintaining a local, frequently-updated cache of known-scam contract
 				URLs, or by looking up such a list based on a domain hash prefix
 				like [Safe Browsing](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
+
+		* When checking whether a token approval is unlimited, does the lookup
+			of the spender/contract reveal the spender address together with the
+			user's IP or Ethereum address to an external provider?
+
+			* Wallets can implement this feature in a privacy-preserving manner by
+				maintaining a local set of known spenders, or by detecting unlimited
+				approvals entirely from the transaction data being signed.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -452,6 +458,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						contractTransactionWarning: notSupported,
 						scamUrlWarning: notSupported,
 						sendTransactionWarning: notSupported,
+						unlimitedApprovalWarning: notSupported,
 					},
 				),
 			),
@@ -468,9 +475,10 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 							ref: refNotNecessary,
 							leaksVisitedUrl: 'FULL_URL',
 							leaksUserAddress: false,
-							leaksIp: false,
+							leaksUserIp: false,
 						}),
 						sendTransactionWarning: notSupported,
+						unlimitedApprovalWarning: notSupported,
 					},
 				),
 			),
@@ -487,16 +495,18 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 							ref: refNotNecessary,
 							leaksVisitedUrl: 'NO',
 							leaksUserAddress: false,
-							leaksIp: true,
+							leaksUserIp: true,
 						}),
 						sendTransactionWarning: supported({
 							ref: refNotNecessary,
 							newRecipientWarning: true,
 							userWhitelist: false,
+							addressPoisoningDetection: false,
 							leaksRecipient: false,
 							leaksUserAddress: false,
 							leaksUserIp: false,
 						}),
+						unlimitedApprovalWarning: notSupported,
 					},
 				),
 			),
@@ -521,13 +531,21 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 							ref: refNotNecessary,
 							leaksVisitedUrl: 'NO',
 							leaksUserAddress: true,
-							leaksIp: true,
+							leaksUserIp: true,
 						}),
 						sendTransactionWarning: supported({
 							ref: refNotNecessary,
 							newRecipientWarning: true,
 							userWhitelist: false,
+							addressPoisoningDetection: false,
 							leaksRecipient: false,
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+						unlimitedApprovalWarning: supported({
+							ref: refNotNecessary,
+							warnsOnUnlimitedApproval: true,
+							leaksSpenderAddress: false,
 							leaksUserAddress: false,
 							leaksUserIp: false,
 						}),
@@ -556,13 +574,21 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						ref: refNotNecessary,
 						leaksVisitedUrl: 'PARTIAL_HASH_OF_DOMAIN',
 						leaksUserAddress: false,
-						leaksIp: true,
+						leaksUserIp: true,
 					}),
 					sendTransactionWarning: supported({
 						ref: refNotNecessary,
 						newRecipientWarning: true,
 						userWhitelist: false,
+						addressPoisoningDetection: false,
 						leaksRecipient: true,
+						leaksUserAddress: false,
+						leaksUserIp: false,
+					}),
+					unlimitedApprovalWarning: supported({
+						ref: refNotNecessary,
+						warnsOnUnlimitedApproval: true,
+						leaksSpenderAddress: false,
 						leaksUserAddress: false,
 						leaksUserIp: false,
 					}),
