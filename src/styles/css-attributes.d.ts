@@ -65,6 +65,64 @@ interface CssAttributes {
 	 *
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`
+	 *
+	 * ---
+	 *
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 *
+	 * ### Placement
+	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
+	 *
+	 * ### CSS Variables
+	 * - `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`
+	 * - `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`
+	 * - `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`
+	 *
+	 * ### Examples
+	 * - Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):
+	 *   ```html
+	 *   <aside data-sticky-container>
+	 *     <nav data-sticky="block-start">Sidebar</nav>
+	 *   </aside>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`
+	 *
+	 * ---
+	 *
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 *
+	 * ### Placement
+	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
+	 *
+	 * ### Tokens
+	 * - axis: `block`, `inline`
+	 * - block edges: `block-start`, `block-end`
+	 * - inline edges: `inline-start`, `inline-end`
+	 * - background: `background`, `background-always`
+	 * - backdrop placement: `backdrop-self`, `backdrop-before`, `backdrop-after`
+	 * - backdrop condition: `backdrop-always`, `backdrop-stuck`, `backdrop-none`
+	 *   Backdrop conditions require an explicit backdrop placement token.
+	 *
+	 * ### CSS Variables
+	 * - `--sticky-backgroundColor`
+	 * - `--sticky-backdropFilter`
+	 *
+	 * ### Examples
+	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
+	 *   ```html
+	 *   <header data-sticky>
+	 *     <h1>Title</h1>
+	 *   </header>
+	 *   ```
+	 * - `block-start` (narrow column sidebar):
+	 *   ```html
+	 *   <nav data-sticky="block-start">Sections</nav>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`
 	 */
 	'data-card'?: string | boolean
 
@@ -619,6 +677,16 @@ interface CssAttributes {
 	'data-row-item'?: string | boolean
 
 	/**
+	 * ## [data-safari]
+	 *
+	 * Workarounds for unsupported features in Safari
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-safari]`
+	 */
+	'data-safari'?: string | boolean
+
+	/**
 	 * ## [data-scroll-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
@@ -675,41 +743,6 @@ interface CssAttributes {
 	 *
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`
-	 *
-	 * ---
-	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background/backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
-	 *
-	 * ### Placement
-	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
-	 *
-	 * ### Tokens
-	 * - axis: `block`, `inline`
-	 * - block edges: `block-start`, `block-end`
-	 * - inline edges: `inline-start`, `inline-end`
-	 * - background: `background`, `background-always`
-	 * - backdrop placement: `backdrop-self`, `backdrop-before`, `backdrop-after`
-	 * - backdrop condition: `backdrop-stuck`, `backdrop-always`, `backdrop-none`
-	 *   Backdrop conditions require an explicit backdrop placement token.
-	 *
-	 * ### CSS Variables
-	 * - `--sticky-backgroundColor`
-	 * - `--sticky-backdropFilter`
-	 *
-	 * ### Examples
-	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
-	 *   ```html
-	 *   <header data-sticky>
-	 *     <h1>Title</h1>
-	 *   </header>
-	 *   ```
-	 * - `block-start` (narrow column sidebar):
-	 *   ```html
-	 *   <nav data-sticky="block-start">Sections</nav>
-	 *   ```
-	 *
-	 * ### Source
-	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`
 	 */
 	'data-scroll-container'?: string | boolean
 
@@ -891,7 +924,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background/backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 	 *
 	 * ### Placement
 	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -902,7 +935,7 @@ interface CssAttributes {
 	 * - inline edges: `inline-start`, `inline-end`
 	 * - background: `background`, `background-always`
 	 * - backdrop placement: `backdrop-self`, `backdrop-before`, `backdrop-after`
-	 * - backdrop condition: `backdrop-stuck`, `backdrop-always`, `backdrop-none`
+	 * - backdrop condition: `backdrop-always`, `backdrop-stuck`, `backdrop-none`
 	 *   Backdrop conditions require an explicit backdrop placement token.
 	 *
 	 * ### CSS Variables
