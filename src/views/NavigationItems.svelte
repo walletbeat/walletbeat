@@ -385,18 +385,6 @@
 					color: var(--accent);
 					text-decoration: none;
 				}
-
-				&[href^='#'] {
-					&::scroll-marker {
-						content: '';
-						border-radius: inherit;
-					}
-
-					&:target-current,
-					&::scroll-marker:target-current {
-						---backgroundColor: var(--navItem-current-backgroundColor);
-					}
-				}
 			}
 
 			li > details > summary,
@@ -413,9 +401,24 @@
 					---color: var(--accent);
 				}
 
-				&:is(a)[aria-current='page'],
-				&:is(summary):has(a[aria-current='page']),
-			 	&:target-current {
+				&:is(a):is(
+					[aria-current='page'],
+					:target-current
+				),
+				&:is(summary):is(
+					:has(
+						a:is(
+							[aria-current='page'],
+							:target-current
+						)
+					),
+					:not(details:open > &):has(
+						~ menu a:is(
+							[aria-current='page'],
+							:target-current
+						)
+					)
+				) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
 
 					&:hover,
