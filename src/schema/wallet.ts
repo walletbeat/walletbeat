@@ -102,7 +102,7 @@ export interface WalletMetadata {
 	 * Wallet icons should be cropped to touch all edges, then minimal margins
 	 * added to make the image aspect ratio be 1:1 (square).
 	 */
-	iconExtension: 'png' | 'svg'
+	iconExtension: 'jpg' | 'png' | 'svg'
 
 	/**
 	 * A short (two or three sentences) description about the wallet.
