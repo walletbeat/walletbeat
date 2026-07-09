@@ -147,7 +147,10 @@ function drillsHowToImprove(missing: NonEmptyArray<AccountRecoveryDrillType>) {
 		{{WALLET_NAME}} should periodically ask users to complete the following
 		check-ups to ensure they can recover their account when needed:
 
-		${missing.map(type => `: ${accountRecoveryDrillWording(type).recommendation}`).join('\n\t\t')}
+		${missing
+			.map(type => accountRecoveryDrillWording(type).recommendation)
+			.map(rec => `- ${rec.charAt(0).toUpperCase()}${rec.slice(1)}`)
+			.join('\n\t\t')}
 	`)
 }
 
