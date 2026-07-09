@@ -134,6 +134,23 @@ function evaluateGuardianRecoveryPolicy(
 	})
 }
 
+function drillsHowToImprove(missing: NonEmptyArray<AccountRecoveryDrillType>) {
+	if (missing.length === 1) {
+		return sentence(`
+			{{WALLET_NAME}} should periodically ask users to complete
+			${accountRecoveryDrillWording(missing[0]).recommendation} to ensure
+			they can recover their account when needed.
+		`)
+	}
+
+	return markdown(`
+		{{WALLET_NAME}} should periodically ask users to complete the following
+		check-ups to ensure they can recover their account when needed:
+
+		${missing.map(type => `: ${accountRecoveryDrillWording(type).recommendation}`).join('\n\t\t')}
+	`)
+}
+
 function evaluateAccountRecoveryDrills(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }>,
@@ -179,10 +196,7 @@ function evaluateAccountRecoveryDrills(
 				metadata: { minimumGuardianPolicy: null, outcomes: null, drills: { configured, missing } },
 			},
 			details: accountRecoveryDetailsContent({}),
-			howToImprove: sentence(`
-				{{WALLET_NAME}} should periodically ask users to complete
-				${commaListFormat(missing.map(type => accountRecoveryDrillWording(type).label))} to ensure they can recover their account when needed.
-			`),
+			howToImprove: drillsHowToImprove(missing),
 		})
 	}
 
@@ -223,10 +237,7 @@ function evaluateAccountRecoveryDrills(
 			},
 		},
 		details: accountRecoveryDetailsContent({}),
-		howToImprove: sentence(`
-			{{WALLET_NAME}} should periodically ask users to verify their
-			${commaListFormat(recommendedDrillTypes.map(type => accountRecoveryDrillWording(type).noun))} are still accessible.
-		`),
+		howToImprove: drillsHowToImprove(recommendedDrillTypes),
 	})
 }
 
@@ -392,15 +403,17 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 
 		Separately, wallets are evaluated on whether they periodically prompt
 		users to demonstrate that their recovery setup still works. Which
-		check-ups are expected depends on the wallet's features, since wallets
-		can only drill users on recovery material that actually exists:
+		check-ups are expected depends on the wallet's features and on how
+		each account was created, since wallets can only drill users on
+		recovery material that actually exists:
 
 		- If the wallet supports EOA accounts and lets the user export their
-		  private key, a private key check-up, confirming the user still has
-		  access to their private key.
+		  private key, a private key check-up for accounts imported from a
+		  raw private key, confirming the user still has access to their
+		  private key.
 		- If the wallet supports EOA accounts derived from a seed phrase, a
-		  seed phrase check-up, confirming the user still has access to their
-		  seed phrase.
+		  seed phrase check-up for accounts created from a seed phrase,
+		  confirming the user still has access to their seed phrase.
 		- Wallets without EOA support (such as MPC-based wallets) have no
 		  such user-held key material, so no key material check-ups are
 		  expected for them.

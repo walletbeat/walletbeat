@@ -561,22 +561,26 @@ export interface AccountRecovery {
 export function accountRecoveryDrillWording(type: AccountRecoveryDrillType): {
 	label: string
 	noun: string
+	recommendation: string
 } {
 	switch (type) {
 		case AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK:
 			return {
 				label: 'guardian account check-ups',
 				noun: 'guardian accounts',
+				recommendation: 'guardian account check-ups for accounts with configured guardians',
 			}
 		case AccountRecoveryDrillType.PRIVATE_KEY_QUIZ:
 			return {
 				label: 'private key check-ups',
 				noun: 'private key',
+				recommendation: 'private key check-ups for accounts imported from a raw private key',
 			}
 		case AccountRecoveryDrillType.SEED_PHRASE_QUIZ:
 			return {
 				label: 'seed phrase check-ups',
 				noun: 'seed phrase',
+				recommendation: 'seed phrase check-ups for accounts created from a seed phrase',
 			}
 	}
 }
