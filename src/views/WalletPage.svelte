@@ -599,38 +599,41 @@
 	</article>
 
 	<aside
-		class="toc"
+		class="page-navigation"
 		data-scroll-container="block"
 		data-sticky-container
-		data-column
+		data-column="gap-0"
 	>
-		<h2
+		<header
 			data-sticky="block backdrop-self backdrop-always"
-			class="nav-title"
+			data-row
 		>
-			Table of contents
-		</h2>
+			<h2>Table of contents</h2>
+		</header>
 
-		<NavigationItems
-			items={tocNavigationItems}
-			currentPathname=""
-			showSearch={false}
-			defaultOpen
-			ariaLabel="Table of contents"
-			iconSnippet={tocIcon}
-		/>
+		<nav
+			data-column
+			data-column-item="flexible"
+			data-sticky-container
+		>
+			<NavigationItems
+				items={tocNavigationItems}
+				showSearch={false}
+				defaultOpen
+				ariaLabel="Table of contents"
+			>
+				{#snippet iconSnippet(item: NavigationItem, depth: number)}
+					{#if item.icon}
+						<span
+							class="toc-icon"
+							data-icon="circle filled wbicons emoji {item.icon}"
+						></span>
+					{/if}
+				{/snippet}
+			</NavigationItems>
+		</nav>
 	</aside>
 </div>
-
-
-{#snippet tocIcon(item: NavigationItem, depth: number)}
-	{#if item.icon}
-		<span
-			class="toc-icon"
-			data-icon="circle filled wbicons emoji {item.icon}"
-		></span>
-	{/if}
-{/snippet}
 
 
 {#snippet attributeGroupSnippet({
@@ -1250,6 +1253,12 @@
 
 <style>
 	.container {
+		--wallet-icon-size: 3rem;
+		--border-radius-lg: 1rem;
+		--border-radius: 0.5rem;
+		--border-radius-sm: 0.25rem;
+		--nav-width: 20rem;
+
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 54rem;
 			--scrollItem-inlineDetached-paddingStart: 2rem;
@@ -1259,16 +1268,10 @@
 			--sticky-marginInlineEnd: var(--nav-width);
 		}
 
-		--wallet-icon-size: 3rem;
-		--border-radius-lg: 1rem;
-		--border-radius: 0.5rem;
-		--border-radius-sm: 0.25rem;
-		--nav-width: 20rem;
-
 		display: grid;
 		grid-template:
 			'Content Nav'
-			/ minmax(0, 1fr) auto
+			/ minmax(max-content, 1fr) auto
 		;
 		@media (max-width: 1024px) {
 			&[data-sticky-container] {
@@ -1290,7 +1293,7 @@
 				[Nav-start]
 				'Content'
 				[Nav-end]
-				/ [Nav-start] minmax(0, 1fr) [Nav-end]
+				/ [Nav-start] minmax(max-content, 1fr) [Nav-end]
 			;
 		}
 
@@ -1305,46 +1308,69 @@
 			scroll-padding-block-end: 1rem;
 		}
 
-		.toc {
+		.page-navigation {
+			/* Nested scroll root: don't inherit page content's TOC clearance as sticky insets. */
+			--sticky-marginInlineStart: 0px;
+			--sticky-marginInlineEnd: 0px;
+			--sticky-marginBlockStart: 0px;
+			--sticky-marginBlockEnd: 0px;
+			--sticky0-insetInlineStart: 0px;
+			--sticky0-insetInlineEnd: 0px;
+			--sticky0-insetBlockStart: 0px;
+			--sticky0-insetBlockEnd: 0px;
+			--sticky-insetInlineStart: 0px;
+			--sticky-insetInlineEnd: 0px;
+			--sticky-insetBlockStart: 0px;
+			--sticky-insetBlockEnd: 0px;
+
+			--pageNavigation-header-blockSize: 3.5rem;
+			--sticky-backgroundColor: var(--background-secondary);
+
 			grid-area: Nav;
 			z-index: 2;
 
-			box-sizing: border-box;
 			position: sticky;
 			top: 0;
 			align-self: start;
 			width: var(--nav-width);
-			max-height: 100dvh;
-			overflow: auto;
+			height: 100cqb;
 
 			scroll-behavior: smooth;
 
-			background: var(--background-secondary);
-			border-inline: 1px solid var(--border-color);
+			background-color: var(--background-secondary);
+			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
-			&[data-sticky-container] {
-				--sticky-paddingBlockStart: 0px;
-				--sticky-paddingBlockEnd: 0.75rem;
-				--sticky-paddingInlineStart: 0px;
-				--sticky-paddingInlineEnd: 0px;
-			}
-
-			.nav-title {
-				margin: 0;
-				padding: 1.5rem 0.75rem 0.75rem;
-				border-bottom: 1px solid var(--border-color);
+			> header {
+				flex-shrink: 0;
+				block-size: var(--pageNavigation-header-blockSize);
+				box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
+				padding-inline: 1rem;
 
 				font-size: 0.875rem;
 				color: var(--text-secondary);
 				text-transform: uppercase;
 				letter-spacing: 0.05em;
 				font-weight: 500;
-				--sticky-backgroundColor: color-mix(in oklch, var(--background-secondary) 88%, transparent);
-				--sticky-backdropFilter: blur(16px);
+
+				h2 {
+					margin: 0;
+					font: inherit;
+					color: inherit;
+				}
 			}
 
-			:global(> .navigation-items) {
+			> nav {
+				position: relative;
+				z-index: 0;
+				align-content: stretch;
+				min-block-size: max-content;
 				padding: 0.75rem;
+
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: var(--pageNavigation-header-blockSize);
+					--sticky-paddingBlockStart: 0.75rem;
+					--sticky-paddingBlockEnd: 0.75rem;
+				}
 			}
 
 			:global(a) {
@@ -1372,7 +1398,6 @@
 				}
 			}
 		}
-
 	}
 
 	a:has(> :is(h1, h2, h3)) {
