@@ -392,11 +392,11 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 		* Interacting with a contract that has only recently been deployed
 			onchain
 		* Connecting to an app that is known to be a scam
-		* Granting an unlimited ERC-20 token approval
+		* Granting unlimited ERC-20 token approval
 
 		For payments-focused wallets that do not support interacting with
-		arbitrary contracts or external applications, only the scenarios related
-		to sending funds, connecting to apps, and granting token approvals apply.
+		arbitrary contracts or external applications, only the payment scenario
+		applies.
 
 		Note that wallets should only *warn* the user about such scenarios, not
 		outright *prevent* the user from making such transactions, as preventing
