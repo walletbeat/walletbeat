@@ -1769,3 +1769,31 @@ details {
 		}
 	}
 }
+
+
+/**
+ * Workarounds for unsupported features in Safari
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-safari]`
+ */
+@supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
+	[data-safari] {
+		/* @media queries not yet supported in .svg files */
+		&[data-safari~="invert-lightness"] {
+			transition-property: filter, outline-color;
+
+			:root[style*="color-scheme: dark;"] & {
+				filter: invert() hue-rotate(0.5turn);
+				outline-color: hsl(from var(--accent) calc(h + 0.5turn) s l);
+			}
+
+			@media (prefers-color-scheme: dark) {
+				:root:not([style*="color-scheme: light;"]) & {
+					filter: invert() hue-rotate(0.5turn);
+					outline-color: hsl(from var(--accent) calc(h + 0.5turn) s l);
+				}
+			}
+		}
+	}
+}
