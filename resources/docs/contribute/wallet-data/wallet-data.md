@@ -92,7 +92,7 @@ _There is also a directory of wallet icons at `/public/images/wallets`._
 
 - Create a copy of `/data/entities/example.ts` at `/data/entities/big-wallet-corp.ts`, then remove all constants from this file other than `exampleWalletDevelopmentCompany`. Rename it to `bigWalletCorp` and fill in the details.
 - Find an SVG icon of Big Wallet Corp LLC, and crop all the transparent edges out of the SVG. Save it as `/public/images/entities/bigWalletCorp.svg` (the filename matches the `id` field).
-  - _(If you cannot find an SVG version of the icon, find a PNG version instead, crop it similarly, save it as `/public/images/wallet/bigWalletCorp.png`, and set `icon.extension` to `'png'` in the wallet data file. If you do this, you need to set the `icon.width` and `icon.height` fields as well.)_
+  - _(If you cannot find an SVG version of the icon, find a PNG or JPG version instead, crop it similarly, save it as `/public/images/wallet/bigWalletCorp.png` or `/public/images/wallet/bigWalletCorp.jpg`, and set `icon.extension` to `'png'` or `'jpg'` in the wallet data file. If you do this, you need to set the `icon.width` and `icon.height` fields as well.)_
 
 You should now have something like this at `/data/entities/big-wallet-corp.ts`:
 
@@ -155,7 +155,7 @@ export const chainMonkey: Contributor = {
 - Rename the top-level object from `unratedTemplate` to `myLittleWallet`.
 - Change all `metadata.*` fields such as `id` (set to `'myLittleWallet'`), `displayName`, `blurb`, `lastUpdated` (set to today's date in `YYYY-MM-DD` format), `urls`, etc.
 - Find an SVG icon of the wallet and crop all the transparent edges out of the SVG. Save it as `/public/images/wallet/myLittleWallet.svg` (the filename matches the `metadata.id` field).
-  - _(If you cannot find an SVG version of the icon, find a PNG version instead, crop it similarly, save it as `/public/images/wallet/myLittleWallet.png`, and set `metadata.iconExtension` to `'png'` in the wallet data file.)_
+  - _(If you cannot find an SVG version of the icon, find a PNG or JPG version instead, crop it similarly, save it as `/public/images/wallet/myLittleWallet.png` or `/public/images/wallet/myLittleWallet.jpg`, and set `metadata.iconExtension` to `'png'` or `'jpg'` in the wallet data file.)_
 - Set yourself as the sole contributor in `metadata.contributors`.
 - Update the `variants` field to the set of versions that the wallet has. In this case, since My Little Wallet has a browser extension version and a mobile version, you would set `[Variant.MOBILE]` and `[Variant.BROWSER]` to `true`, and remove the `[Variant.DESKTOP]` field.
 
