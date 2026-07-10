@@ -555,7 +555,6 @@
 		"wagmi",
 		"waitlisted",
 		"Waku",
-		"Walle",
 		"Walletbeat",
 		"WalletConnect",
 		"WalletScrutiny",
@@ -622,6 +621,10 @@
 		{ "name": "GitHub line anchors", "pattern": "/\\bL\\d+(?:-\\d+)?\\b/g" },
 		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
 		{ "name": "Million-dollar and billion-dollar amounts", "pattern": "/\\$[.0-9a]+[BM]/g" },
+		{
+			"name": "Rabby Walle audit PDF filename",
+			"pattern": "/Debank Rabby Walle Audit Report\\.pdf/g"
+		},
 		{ "name": "Seven Seven Six", "pattern": "/Seven Seven Six/g" },
 		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" },
 		{ "name": "Version numbers", "pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g" }
@@ -635,6 +638,7 @@
 		"GitHub line anchors",
 		"Hexadecimal addresses",
 		"Million-dollar and billion-dollar amounts",
+		"Rabby Walle audit PDF filename",
 		"Seven Seven Six",
 		"svgicons2svgfont",
 		"Version numbers"
