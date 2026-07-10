@@ -291,6 +291,18 @@ export function toFullyQualified(
 		]
 	}
 
+	// Number labels to disambiguate, but only those that would otherwise
+	// appear more than once (e.g. two unlabeled URLs on the same domain).
+	const labelTotals = new Map<string, number>()
+
+	for (const url of urlRef.url) {
+		if (!isLabeledUrl(url)) {
+			const label = getUrlLabel(url)
+
+			labelTotals.set(label, (labelTotals.get(label) ?? 0) + 1)
+		}
+	}
+
 	const labelCounter = new Map<string, number>()
 
 	return urlRef.url.map(url => {
@@ -311,7 +323,7 @@ export function toFullyQualified(
 			urls: [
 				{
 					url,
-					label: `${label} ${count + 1}`,
+					label: (labelTotals.get(label) ?? 0) > 1 ? `${label} ${count + 1}` : label,
 				},
 			],
 			explanation,
