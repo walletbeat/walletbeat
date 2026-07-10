@@ -120,20 +120,21 @@ const optimizedSvgHashes: Record<string, string> = {
 		'446e789e7c40c2a0d2b6ef449c31c2821d141cb2b3c1cf396dd7833639cdeaa1',
 	'public/images/wallets/zeus.svg':
 		'77f09595591add0c4f1e59dae323a8cac1c0348c41d240b2109095c91287b689',
-	'public/logo-dark.svg': 'f0b0a7ecfd232053e7ddcc0272c0641fad9fcf0af42c66b0dfbf906d20a27aac',
-	'public/logo-light.svg': '29806e7b501fec7ba1d5976b0d9678718105bdbb1d335e2d86e24343222bf8ea',
+	'public/logo-dark.svg': 'c7c2d36025c4e7034e0cc398f5cb917b387e44f3d3625848f7707ec074381166',
+	'public/logo-light.svg': '738f4da22092cbceef4bc4476f2eb85fdd0225734a156fd5011a46f95e10633d',
+	'public/logo.svg': 'c7c2d36025c4e7034e0cc398f5cb917b387e44f3d3625848f7707ec074381166',
 	'resources/branding/glow-0.svg':
 		'e1271b8b1b7d1ce750f5be925ac31b3957759d62ef87a3ba1690494853caf9c5',
 	'resources/branding/glow-1.svg':
 		'24462ccda85de96e2f69a824f1a4022ccb9a10e9b79f804b18d573edba59c450',
 	'resources/branding/icon_dark.svg':
-		'889f23e4533e024e4d413efcf6fa98d319b845ef361eef05c720887100ff9ca2',
+		'fddc9798a53bedcf91fa14df3ba9e346e7b2c5f7d0084dd4d3b881b2acd155d1',
 	'resources/branding/icon_light.svg':
-		'f938e8f8fed2450e97c699c30862278012bab970a62c0f6e8792f4773ab992e6',
+		'61f0235e10483d2eb796d7f220766d6d4c5e6abe80893dcd63e81f5282267528',
 	'resources/branding/logo_dark.svg':
-		'f0b0a7ecfd232053e7ddcc0272c0641fad9fcf0af42c66b0dfbf906d20a27aac',
+		'c7c2d36025c4e7034e0cc398f5cb917b387e44f3d3625848f7707ec074381166',
 	'resources/branding/logo_light.svg':
-		'29806e7b501fec7ba1d5976b0d9678718105bdbb1d335e2d86e24343222bf8ea',
+		'738f4da22092cbceef4bc4476f2eb85fdd0225734a156fd5011a46f95e10633d',
 	'resources/contracts/images/Walletbeat.svg':
 		'8fb03ae00cfd0cedcea4a2bc893e3a24e0c2c51441bc3c00bd641fbbe2e0ca40',
 	'resources/files/wbicons/about.svg':

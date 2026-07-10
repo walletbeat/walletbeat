@@ -9,6 +9,7 @@
 		type WalletLadderEvaluation,
 		type WalletStage,
 	} from '@/schema/stages'
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
@@ -223,7 +224,7 @@
 														{@const attributeTitle = attribute?.displayName ?? attributeId}
 
 														<li
-															data-list-item-marker={attribute?.icon}
+															data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
 															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].color}
 															data-stage-criterion-rating={criterionRating}
 														>
@@ -291,11 +292,6 @@
 
 	h4 {
 		font-weight: normal;
-	}
-
-	li[data-wbicon]::before {
-		font-family: var(--fontFamily-wbicons);
-		content: var(--icon-content);
 	}
 
 	[data-stage-criterion-rating] {

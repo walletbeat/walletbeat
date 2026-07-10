@@ -65,6 +65,64 @@ interface CssAttributes {
 	 *
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`
+	 *
+	 * ---
+	 *
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 *
+	 * ### Placement
+	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
+	 *
+	 * ### CSS Variables
+	 * - `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`
+	 * - `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`
+	 * - `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`
+	 *
+	 * ### Examples
+	 * - Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):
+	 *   ```html
+	 *   <aside data-sticky-container>
+	 *     <nav data-sticky="block-start">Sidebar</nav>
+	 *   </aside>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`
+	 *
+	 * ---
+	 *
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 *
+	 * ### Placement
+	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
+	 *
+	 * ### Tokens
+	 * - axis: `block`, `inline`
+	 * - block edges: `block-start`, `block-end`
+	 * - inline edges: `inline-start`, `inline-end`
+	 * - background: `background`, `background-always`
+	 * - backdrop placement: `backdrop-self`, `backdrop-before`, `backdrop-after`
+	 * - backdrop condition: `backdrop-always`, `backdrop-stuck`, `backdrop-none`
+	 *   Backdrop conditions require an explicit backdrop placement token.
+	 *
+	 * ### CSS Variables
+	 * - `--sticky-backgroundColor`
+	 * - `--sticky-backdropFilter`
+	 *
+	 * ### Examples
+	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
+	 *   ```html
+	 *   <header data-sticky>
+	 *     <h1>Title</h1>
+	 *   </header>
+	 *   ```
+	 * - `block-start` (narrow column sidebar):
+	 *   ```html
+	 *   <nav data-sticky="block-start">Sections</nav>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`
 	 */
 	'data-card'?: string | boolean
 
@@ -130,6 +188,84 @@ interface CssAttributes {
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`
 	 */
 	'data-column'?: string | boolean
+
+	/**
+	 * ## [data-column-item]
+	 *
+	 * One-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the
+	 * same column/grid defaults before card-specific rules apply below. Single-column grid with theme gap and alignment defaults. Add space-separated tokens on `[data-column]`.
+	 *
+	 * ### Applied to
+	 * - `[data-card]`
+	 *
+	 * ### Tokens
+	 * - alignment: `start`, `center`, `end`
+	 * - spacing: `gap-0`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `gap-6`, `gap-8`
+	 *
+	 * ### Examples
+	 * - Default column grid (`1em` gap, start-aligned content):
+	 *   ```html
+	 *   <section data-column>
+	 *     <h2>Overview</h2>
+	 *     <p>Supporting copy.</p>
+	 *   </section>
+	 *   ```
+	 * - Start-aligned items, tighter gap (`gap-2`):
+	 *   ```html
+	 *   <section data-column="start gap-2">
+	 *     <h2>Overview</h2>
+	 *     <p>Supporting copy.</p>
+	 *   </section>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`
+	 *
+	 * ---
+	 *
+	 * Column child sizing tokens for direct children of `[data-column]` / `[data-card]`.
+	 *
+	 * ### Tokens
+	 * - growth: `flexible`
+	 *
+	 * ### Examples
+	 * ```html
+	 * <section data-column>
+	 *   <div data-column-item="flexible">Main</div>
+	 * </section>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column-item]`
+	 */
+	'data-column-item'?: string | boolean
+
+	/**
+	 * ## [data-icon]
+	 *
+	 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control.
+	 *
+	 * ### Tokens
+	 * - shape: `circle`, `filled`
+	 * - source: `wbicons`
+	 *
+	 * ### CSS Variables
+	 * - `--icon-content`
+	 * - `--icon-size`
+	 * - `--icon-navigation-borderColor`
+	 * - `--icon-navigation-color`
+	 *
+	 * ### Examples
+	 * ```html
+	 * <span data-icon="&#x21b5;"></span>
+	 * <span data-icon="wbicons security"></span>
+	 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`
+	 */
+	'data-icon'?: string | boolean
 
 	/**
 	 * ## [data-input]
@@ -202,46 +338,10 @@ interface CssAttributes {
 	 * - list gap: `gap-0` … `gap-6`
 	 *
 	 * ### CSS Variables
-	 * - `--list-marker-inlineSize`
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 *
-	 * ### Examples
-	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
-	 *   ```html
-	 *   <ul>
-	 *     <li>First item</li>
-	 *     <li>Second item</li>
-	 *   </ul>
-	 *   ```
-	 * - Tighter list gap (`gap-0`; default without a token is `0.5lh`):
-	 *   ```html
-	 *   <ul data-list="gap-0">
-	 *     <li>First</li>
-	 *     <li>Second</li>
-	 *   </ul>
-	 *   ```
-	 *
-	 * ### Source
-	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`
-	 */
-	'data-list'?: string | boolean
-
-	/**
-	 * ## [data-list-item]
-	 *
-	 * List layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.
-	 *
-	 * ### Placement
-	 * - On the list host: `[data-list]`, `ul`, or `ol` (including inside `[data-card]`).
-	 *
-	 * ### Tokens
-	 * - list gap: `gap-0` … `gap-6`
-	 *
-	 * ### CSS Variables
+	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
-	 * - `--list-markerGap`
-	 * - `--list-gap`
 	 *
 	 * ### Examples
 	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
@@ -264,7 +364,81 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 *
+	 * ### Placement
+	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
+	 * - `[data-list-item-marker]` is an optional attribute on that same row when you want a custom marker string (otherwise the default bullet glyph applies).
+	 *
+	 * ### Tokens
+	 * - item vertical gap: `gap-0` … `gap-6` on `[data-list-item]`
+	 * - marker: the displayed marker string via `[data-list-item-marker]` (not space-separated tokens)
+	 *
+	 * ### CSS Variables
+	 * - `--listItem-gap` (per row, driven by `[data-list-item]`)
+	 *
+	 * ### Examples
+	 * - Per-row vertical rhythm (`gap-4` between blocks inside one item — omit `[data-list-item]` when default `gap-1` / `0.25lh` is fine):
+	 *   ```html
+	 *   <ul>
+	 *     <li data-list-item="gap-4">
+	 *       <p>Lead</p>
+	 *       <p>Detail</p>
+	 *     </li>
+	 *   </ul>
+	 *   ```
+	 * - Custom marker string (`[data-list-item-marker]`):
+	 *   ```html
+	 *   <ul>
+	 *     <li data-list-item-marker="*">First step</li>
+	 *     <li data-list-item-marker="1.">Second step</li>
+	 *   </ul>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
+	 */
+	'data-list'?: string | boolean
+
+	/**
+	 * ## [data-list-item]
+	 *
+	 * List layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.
+	 *
+	 * ### Placement
+	 * - On the list host: `[data-list]`, `ul`, or `ol` (including inside `[data-card]`).
+	 *
+	 * ### Tokens
+	 * - list gap: `gap-0` … `gap-6`
+	 *
+	 * ### CSS Variables
+	 * - `--list-markerGap`
+	 * - `--list-gap`
+	 * - `--list-marker-content`
+	 * - `--list-marker-inlineSize`
+	 *
+	 * ### Examples
+	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
+	 *   ```html
+	 *   <ul>
+	 *     <li>First item</li>
+	 *     <li>Second item</li>
+	 *   </ul>
+	 *   ```
+	 * - Tighter list gap (`gap-0`; default without a token is `0.5lh`):
+	 *   ```html
+	 *   <ul data-list="gap-0">
+	 *     <li>First</li>
+	 *     <li>Second</li>
+	 *   </ul>
+	 *   ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`
+	 *
+	 * ---
+	 *
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -312,9 +486,10 @@ interface CssAttributes {
 	 * - list gap: `gap-0` … `gap-6`
 	 *
 	 * ### CSS Variables
-	 * - `--list-marker-inlineSize`
 	 * - `--list-markerGap`
 	 * - `--list-gap`
+	 * - `--list-marker-content`
+	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
 	 * - Native list (`ul` / `ol` use the same rules as `[data-list]` — omit `[data-list]` when defaults suffice):
@@ -337,7 +512,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -502,6 +677,16 @@ interface CssAttributes {
 	'data-row-item'?: string | boolean
 
 	/**
+	 * ## [data-safari]
+	 *
+	 * Workarounds for unsupported features in Safari
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-safari]`
+	 */
+	'data-safari'?: string | boolean
+
+	/**
 	 * ## [data-scroll-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
@@ -512,7 +697,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -538,7 +723,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
@@ -558,37 +743,6 @@ interface CssAttributes {
 	 *
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`
-	 *
-	 * ---
-	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
-	 *
-	 * ### Placement
-	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
-	 *
-	 * ### Tokens
-	 * - axis: `block`, `inline`
-	 * - block edges: `block-start`, `block-end`
-	 * - inline edges: `inline-start`, `inline-end`
-	 * - backdrop: `backdrop-none`, `backdrop-always`
-	 *
-	 * ### CSS Variables
-	 * - `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`
-	 *
-	 * ### Examples
-	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
-	 *   ```html
-	 *   <header data-sticky>
-	 *     <h1>Title</h1>
-	 *   </header>
-	 *   ```
-	 * - `block-start` (narrow column sidebar):
-	 *   ```html
-	 *   <nav data-sticky="block-start">Sections</nav>
-	 *   ```
-	 *
-	 * ### Source
-	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`
 	 */
 	'data-scroll-container'?: string | boolean
 
@@ -603,7 +757,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -629,7 +783,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
@@ -721,7 +875,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -747,7 +901,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).
@@ -770,7 +924,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky panel: `position: sticky` with scroll-state container queries for optional frosted backdrop (`::before` or nested `[data-scroll-container]`). Space-separated attribute tokens select block vs inline axis, which edges stick, and backdrop visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
+	 * Sticky panel: `position: sticky` with scroll-state container queries for optional item backgrounds and frosted backdrop. Space-separated attribute tokens select block vs inline axis, which edges stick, and background visibility; max sizes use `--scrollContainer-size*` minus resolved sticky insets from ancestor containers.
 	 *
 	 * ### Placement
 	 * - On the element that should stick, inside a subtree bounded by `[data-sticky-container]` (and under `[data-scroll-container]`).
@@ -779,10 +933,14 @@ interface CssAttributes {
 	 * - axis: `block`, `inline`
 	 * - block edges: `block-start`, `block-end`
 	 * - inline edges: `inline-start`, `inline-end`
-	 * - backdrop: `backdrop-none`, `backdrop-always`
+	 * - background: `background`, `background-always`
+	 * - backdrop placement: `backdrop-self`, `backdrop-before`, `backdrop-after`
+	 * - backdrop condition: `backdrop-always`, `backdrop-stuck`, `backdrop-none`
+	 *   Backdrop conditions require an explicit backdrop placement token.
 	 *
 	 * ### CSS Variables
-	 * - `--sticky-backgroundColor`, `--sticky-backdropFilter`, `--sticky-backdropMaskImage`
+	 * - `--sticky-backgroundColor`
+	 * - `--sticky-backdropFilter`
 	 *
 	 * ### Examples
 	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
@@ -812,7 +970,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - scroll container: `block`, `inline`
-	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
 	 * ### Examples
@@ -838,7 +996,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky4-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
+	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
 	 *
 	 * ### Placement
 	 * - Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).

@@ -16,8 +16,6 @@
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
 	--background-secondary: light-dark(#FFFFFF80, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
-	/* Sidebar uses the same background as the sticky elements */
-	--navigation-backgroundColor: var(--sticky-backgroundColor);
 	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
@@ -27,7 +25,6 @@
 	--text-secondary: light-dark(#130A2B, #B6AEC1);
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
 	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
-	--icon-navigation-color: light-dark(#000000, #FFFFFF);
 
 	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
 	--rating-fail: light-dark(#FF969699,#FB6682);
@@ -130,6 +127,42 @@
 	touch-action: none;
 }
 
+label:has(> input) {
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	padding: 0;
+	gap: 0;
+	background-color: var(--background-primary);
+	border: 1px solid var(--border-color);
+	border-radius: 999em;
+	color: inherit;
+	font: inherit;
+	font-size: smaller;
+	line-height: 1;
+	transition-property: opacity, scale;
+	transition-duration: var(--pressable-transitionOutDuration);
+
+	&:active {
+		opacity: var(--pressable-pressed-opacity);
+		scale: var(--pressable-pressed-scale);
+		transition-duration: var(--pressable-transitionInDuration);
+	}
+
+	&:has(> input:focus-visible) {
+		outline: 2px solid var(--accent);
+		outline-offset: -1px;
+	}
+
+	> input {
+		min-inline-size: 0;
+		border: 0;
+		background: transparent;
+		font: inherit;
+		outline: 0;
+	}
+}
+
 *,
 ::before,
 ::after,
@@ -152,6 +185,7 @@
 ::before,
 ::after,
 [popover] {
+	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
 }
 
@@ -199,7 +233,7 @@ h6 {
 h3,
 h4,
 h5,
-h6, 
+h6,
 p {
 	font-family: var(--fontFamily-avenir);
 }

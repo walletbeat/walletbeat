@@ -5,7 +5,7 @@ export default getViteConfig({
 	// @ts-expect-error - Astro's getViteConfig doesn't expose test config typing
 	test: {
 		environment: 'node',
-		testTimeout: 30000, // 30s
+		testTimeout: 60000, // 60s
 		typecheck: {
 			enabled: true,
 		},

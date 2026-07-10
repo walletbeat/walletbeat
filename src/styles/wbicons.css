@@ -1,13 +1,19 @@
 [data-icon~="wbicons"] {
+	font-family: var(--fontFamily-wbicons);
+	font-style: normal;
+	-webkit-font-smoothing: subpixel-antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
 	&::before {
 		content: var(--icon-content);
-		font-family: var(--fontFamily-wbicons);
-		font-style: normal;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
+		font-size: var(--icon-size, 1em);
 	}
 
-	&[data-icon~="emoji"]::before {
+	&[data-icon~="circle"]::before {
+		font-size: calc(var(--icon-size, 2rem) * 0.55);
+	}
+
+	&[data-icon~="emoji"] {
 		font-family: var(--fontFamily-emoji);
 	}
 

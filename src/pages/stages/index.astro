@@ -13,9 +13,9 @@ import StagesPage from '@/views/StagesPage.svelte'
 		keywordsAfter: ['stages', 'criteria', 'roadmap', 'evaluation'],
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container>
 		<StagesPage client:load />
 	</main>
 </Layout>
