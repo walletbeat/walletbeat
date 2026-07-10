@@ -96,7 +96,8 @@ function shortGitRef(ref: string): string {
  * Generate a concrete label for a GitHub URL.
  * Code permalinks get a `foo.ts L123-156 @abcdef1` style label
  * (filename + line range + abbreviated ref); other repo-scoped URLs
- * fall back to `org/repo`, and org/user profile pages to `GitHub: org`.
+ * fall back to `org/repo` plus the page type (`org/repo releases`,
+ * `org/repo #123`), and org/user profile pages to `GitHub: org`.
  * Returns null for URLs with no more concrete label than the domain
  * (github.com root, search, other site pages).
  *
@@ -163,11 +164,23 @@ function getGitHubUrlLabel(url: URL): string | null {
 
 			return `${orgRepo} @${shortGitRef(ref)}`
 		}
-		default:
-			// Repo root, or a repo page (issues, releases, ...) for which
-			// we have no more specific format: the repo name is still more
-			// informative than the bare domain label.
+		case undefined:
+			// Repo root.
 			return orgRepo
+		case 'issues':
+		case 'pull':
+		case 'discussions':
+			// Numbered items get GitHub's own #N idiom.
+			if (ref !== undefined && /^\d+$/.test(ref)) {
+				return `${orgRepo} #${ref}`
+			}
+
+			return `${orgRepo} ${view}`
+		default:
+			// Other repo pages (releases, wiki, actions, ...): the repo name
+			// plus the page type is still more informative than the bare
+			// domain label.
+			return `${orgRepo} ${view}`
 	}
 }
 

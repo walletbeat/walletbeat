@@ -127,9 +127,15 @@ describe('getUrlLabel for GitHub URLs', () => {
 			expect(getUrlLabel('https://github.com/org/repo/')).toBe('org/repo')
 		})
 
-		it('labels other repo pages as org/repo', () => {
-			expect(getUrlLabel('https://github.com/org/repo/releases')).toBe('org/repo')
-			expect(getUrlLabel('https://github.com/org/repo/issues/123')).toBe('org/repo')
+		it('labels repo pages with their page type', () => {
+			expect(getUrlLabel('https://github.com/org/repo/releases')).toBe('org/repo releases')
+			expect(getUrlLabel('https://github.com/org/repo/wiki')).toBe('org/repo wiki')
+		})
+
+		it('labels issues and pull requests with the #N idiom', () => {
+			expect(getUrlLabel('https://github.com/org/repo/issues/123')).toBe('org/repo #123')
+			expect(getUrlLabel('https://github.com/org/repo/pull/456')).toBe('org/repo #456')
+			expect(getUrlLabel('https://github.com/org/repo/issues')).toBe('org/repo issues')
 		})
 	})
 
