@@ -153,7 +153,11 @@
 			}))
 			.filter(({ weight }) => weight > 0)
 
-		if (colorWeights.length <= 1) return colorWeights[0]?.color ?? slice.color
+		if (colorWeights.length <= 1) {
+			const color = colorWeights[0]?.color ?? slice.color
+
+			return color === slice.gradient.transparentStopColor ? 'transparent' : color
+		}
 
 		const areaRadiusStops = slice.gradient.areaRadiusStops
 		const totalWeight = colorWeights.reduce((sum, entry) => sum + entry.weight, 0)
@@ -197,7 +201,7 @@
 				[],
 			)
 
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), ${slice.color}`
+		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')})`
 	}
 
 	const computeSlices = (
