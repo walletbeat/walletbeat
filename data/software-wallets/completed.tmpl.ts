@@ -47,6 +47,12 @@ import {
 	GuardianPolicyType,
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramSupport,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
@@ -192,6 +198,36 @@ const recentAudit: SecurityAudit = {
 	},
 	unpatchedFlaws: 'NONE_FOUND',
 	variantsScope: { [Variant.BROWSER]: true, [Variant.MOBILE]: true },
+}
+
+/**
+ * Comprehensive bug bounty program.
+ *
+ * The bug bounty part of security-audits requires:
+ * - availability = ACTIVE
+ * - coverageBreadth = 'FULL_SCOPE'
+ * - non-zero minimum and maximum rewards
+ * - legalProtections supported (ref must be a real URL, not refTodo)
+ */
+const activeBugBountyProgram: BugBountyProgramSupport = {
+	ref: refTodo,
+	availability: BugBountyProgramAvailability.ACTIVE,
+	coverageBreadth: 'FULL_SCOPE',
+	dateStarted: '2024-01-01',
+	disclosure: supported({
+		numberOfDays: 90,
+	}),
+	legalProtections: supported({
+		type: LegalProtectionType.SAFE_HARBOR,
+		ref: 'https://example.com', // Replace with URL to the Safe Harbor / legal protection language
+	}),
+	platform: BugBountyPlatform.IMMUNEFI,
+	rewards: supported({
+		currency: 'USD',
+		maximum: 100000,
+		minimum: 1000,
+	}),
+	upgradePathAvailable: true,
 }
 
 export const completedTemplate: SoftwareWallet = {
@@ -581,7 +617,7 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported(activeBugBountyProgram),
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,
