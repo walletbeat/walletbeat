@@ -215,6 +215,20 @@ function getDefaultUrlLabel(url: string): string {
  */
 export const gitCommitRefPinRegExp = /@(?:[0-9a-f]{40}|[0-9a-f]{7})\b/g
 
+/** File extensions of URLs that browsers render as images. */
+const imageFileExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif', '.svg']
+
+/**
+ * Whether a URL points to an image file, based on its path extension.
+ * Handles root-relative URLs (e.g. file-based references under public/),
+ * which `getDomain`-based helpers would reject.
+ */
+export function isImageUrl(url: Url): boolean {
+	const path = (isLabeledUrl(url) ? url.url : url).split(/[?#]/)[0].toLowerCase()
+
+	return imageFileExtensions.some(extension => path.endsWith(extension))
+}
+
 /** Return the label for a URL. */
 export function getUrlLabel(url: Url): string {
 	if (isLabeledUrl(url)) {
