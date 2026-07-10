@@ -220,6 +220,7 @@ export const zeus: SoftwareWallet = {
 						url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
 					},
 				],
+				drills: null,
 				guardianRecovery: notSupported,
 			}),
 			bugBountyProgram: notSupported,

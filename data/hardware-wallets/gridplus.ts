@@ -176,6 +176,7 @@ export const gridplusWallet: HardwareWallet = {
 			// This does not qualify as guardian-based recovery under Walletbeat's schema,
 			// but it does mitigate seed phrase loss for users.
 			accountRecovery: {
+				drills: null,
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
