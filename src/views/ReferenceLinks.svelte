@@ -162,7 +162,7 @@
 				{#if isLightboxOpen}
 					{@const image = imageUrls[lightboxIndex]}
 
-					<div class="lightbox-content" data-column="gap-3">
+					<div class="lightbox-content">
 						<figure>
 							<img
 								src={image.url}
@@ -249,8 +249,10 @@
 	}
 
 	.lightbox {
-		max-width: min(60rem, calc(100vw - 2rem));
-		max-height: calc(100vh - 2rem);
+		/* Fixed dimensions: the dialog must not resize while stepping
+		   through images of varying sizes and caption lengths. */
+		width: min(60rem, calc(100vw - 2rem));
+		height: min(45rem, calc(100vh - 2rem));
 		margin: auto;
 		padding: 0;
 
@@ -265,25 +267,32 @@
 	}
 
 	.lightbox-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+
+		height: 100%;
 		padding: 1rem;
 	}
 
 	.lightbox figure {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		flex: 1;
+		min-height: 0;
 		margin: 0;
 
 		img {
-			display: block;
-			max-width: 100%;
-			max-height: calc(100vh - 10rem);
-			margin-inline: auto;
+			flex: 1;
+			min-height: 0;
+			width: 100%;
 
-			border: 1px solid var(--border-color);
-			border-radius: 0.25rem;
+			object-fit: contain;
 		}
 
 		figcaption {
-			margin-top: 0.5rem;
-
 			color: var(--text-secondary);
 			font-size: 0.875em;
 			text-align: center;
