@@ -70,6 +70,23 @@ function gitHubLineRange(fragment: string): string | null {
 	return `L${first}-${last}`
 }
 
+/**
+ * GitHub top-level routes that are site pages, not org/user profiles.
+ * Not exhaustive; covers routes plausibly used as references.
+ */
+const gitHubReservedTopLevelRoutes = new Set([
+	'about',
+	'collections',
+	'features',
+	'marketplace',
+	'orgs',
+	'pricing',
+	'search',
+	'sponsors',
+	'topics',
+	'trending',
+])
+
 /** Abbreviate a git ref for display: short hash for commit hashes, as-is otherwise. */
 function shortGitRef(ref: string): string {
 	return fullCommitHashRegExp.test(ref) ? ref.substring(0, 7) : ref
@@ -79,9 +96,9 @@ function shortGitRef(ref: string): string {
  * Generate a concrete label for a GitHub URL.
  * Code permalinks get a `foo.ts L123-156 @abcdef1` style label
  * (filename + line range + abbreviated ref); other repo-scoped URLs
- * fall back to `org/repo`.
- * Returns null for URLs that are not repo-scoped (org pages, search, ...),
- * for which the generic domain label should be used instead.
+ * fall back to `org/repo`, and org/user profile pages to `GitHub: org`.
+ * Returns null for URLs with no more concrete label than the domain
+ * (github.com root, search, other site pages).
  *
  * Note: for `blob`/`tree` URLs, the segment right after the view is taken
  * as the ref. Branch names containing slashes are thus truncated, which is
@@ -100,8 +117,18 @@ function getGitHubUrlLabel(url: URL): string | null {
 			}
 		})
 
-	if (segments.length < 2) {
+	if (segments.length === 0) {
 		return null
+	}
+
+	if (segments.length === 1) {
+		// A single path segment is an org/user profile page, unless it is
+		// one of GitHub's reserved top-level routes.
+		if (gitHubReservedTopLevelRoutes.has(segments[0])) {
+			return null
+		}
+
+		return `GitHub: ${segments[0]}`
 	}
 
 	const [org, repo, view, ref, ...pathSegments] = segments

@@ -134,9 +134,9 @@ describe('getUrlLabel for GitHub URLs', () => {
 	})
 
 	describe('non-repo-scoped GitHub URLs', () => {
-		it('keeps the generic label for org pages', () => {
-			expect(getUrlLabel('https://github.com/mtpelerin')).toBe('GitHub')
-			expect(getUrlLabel('https://github.com/LedgerHQ/')).toBe('GitHub')
+		it('labels org/user profile pages', () => {
+			expect(getUrlLabel('https://github.com/mtpelerin')).toBe('GitHub: mtpelerin')
+			expect(getUrlLabel('https://github.com/LedgerHQ/')).toBe('GitHub: LedgerHQ')
 		})
 
 		it('keeps the generic label for search URLs', () => {
@@ -214,7 +214,7 @@ describe('toFullyQualified label disambiguation', () => {
 
 	it('numbers duplicate auto-generated labels', () => {
 		const refs = toFullyQualified({
-			url: ['https://github.com/org1', 'https://github.com/org2'],
+			url: ['https://github.com/search?q=foo', 'https://github.com/search?q=bar'],
 			explanation: 'Example explanation.',
 		})
 
