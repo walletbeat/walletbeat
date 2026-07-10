@@ -41,7 +41,7 @@ export const ngrave: HardwareWallet = {
 				url: 'https://ngrave.io/zero',
 			},
 		],
-		iconExtension: 'png',
+		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
 		urls: {
 			socials: {

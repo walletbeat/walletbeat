@@ -186,6 +186,22 @@ describe('reference integrity', () => {
 							}
 						}
 					})
+
+					it('no URL uses the www.github.com hostname', () => {
+						for (const fq of fqRefs) {
+							for (const urlEntry of fq.urls) {
+								if (!URL.canParse(urlEntry.url)) {
+									continue
+								}
+
+								expect(
+									new URL(urlEntry.url).hostname,
+									`"${urlEntry.url}" uses the www.github.com hostname; ` +
+										'use plain github.com instead.',
+								).not.toBe('www.github.com')
+							}
+						}
+					})
 				})
 			}
 		})

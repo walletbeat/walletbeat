@@ -1,50 +1,59 @@
 <script lang="ts">
 	// Types
 	import type { LucideNavigationIcon, NavigationItem } from '@/constants/navigation'
+	import type { Snippet } from 'svelte'
 
 	// Icons
 	import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
 	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+	import { FarcasterIcon } from '@/icons/farcaster'
+	import SearchIcon from 'lucide-static/icons/search.svg?raw'
+	import TwitterIcon from 'lucide-static/icons/twitter.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	const LUCIDE_ICONS: Record<LucideNavigationIcon, string> = {
 		ICON_CHART_BAR: ChartBarIcon,
 		ICON_CHART_PIE: ChartPieIcon,
+		ICON_FARCASTER: FarcasterIcon,
+		ICON_TWITTER: TwitterIcon,
 		ICON_WALLET: WalletIcon,
 	}
 
+	type NavigationGroup = {
+		items: NavigationItem[]
+	}
 
 	// Props
 	let {
 		items,
-		currentPathname,
+		groups,
+		currentHref,
+		ariaLabel = 'Navigation',
+		defaultOpen = false,
+		iconSnippet,
 		showSearch = true,
 	}: {
 		items: NavigationItem[]
-		currentPathname: string
+		groups?: NavigationGroup[]
+		currentHref?: string
+		ariaLabel?: string
+		defaultOpen?: boolean
+		iconSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
 	} = $props()
 
+	let navigationGroups = $derived(groups ?? [{ items }])
 
 	// State
 	import { SvelteMap } from 'svelte/reactivity'
 
-	let isOpen = $state(
-		new SvelteMap<NavigationItem, boolean>()
-	)
-
-	let searchValue = $state(
-		''
-	)
-
-	const effectiveSearchValue = $derived(
-		searchValue.trim().toLowerCase()
-	)
-
+	let isOpen = $state(new SvelteMap<NavigationItem, boolean>())
+	let searchValue = $state('')
+	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
 	// Functions
 	const hasCurrentPage = (item: NavigationItem) => (
-		currentPathname === item.href
+		currentHref === item.href
 		|| (item.children?.some(hasCurrentPage) ?? false)
 	)
 
@@ -74,7 +83,11 @@
 	const matchesSearch = (item: NavigationItem, query: string): boolean => (
 		!query
 		|| !!fuzzyMatch(item.title, query)
-		|| (item.children?.some(child => matchesSearch(child, query)) ?? false)
+		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
+	)
+
+	const hasNestedNavigation = (items: NavigationItem[]): boolean => (
+		items.some(item => item.children?.length)
 	)
 
 	const highlightText = (text: string, query: string) => {
@@ -83,8 +96,8 @@
 		return (
 			ranges ?
 				[
-					...ranges.flatMap(([start, end], i, allRanges) => [
-						text.slice(allRanges[i - 1]?.[1] ?? 0, start),
+					...ranges.flatMap(([start, end], i, arr) => [
+						text.slice(arr[i - 1]?.[1] ?? 0, start),
 						`<mark>${text.slice(start, end)}</mark>`,
 					]),
 					text.slice(ranges.at(-1)?.[1] ?? 0),
@@ -96,66 +109,88 @@
 	}
 </script>
 
+<div
+	class="navigation-items"
+	data-column="gap-3"
+	data-column-item="flexible"
+	aria-label={ariaLabel}
+	data-sticky-container
+>
+	{#if showSearch}
+		<search
+			data-sticky="block backdrop-before backdrop-stuck"
+		>
+			<label data-row="gap-0">
+				<span class="search-icon" aria-hidden="true">{@html SearchIcon}</span>
 
-{#if showSearch}
-<search data-column="gap-3">
-	<input
-		type="search"
-		data-sticky
-		bind:value={searchValue}
-		placeholder="Search (⌘+K)"
-		{@attach (element: HTMLInputElement) => {
-			const abortController = new AbortController()
+				<input
+					type="search"
+					bind:value={searchValue}
+					placeholder="Search..."
+					data-row-item="flexible"
 
-			let lastFocusedElement: HTMLElement | undefined = $state()
+					{@attach (input: HTMLInputElement) => {
+						const abortController = new AbortController()
 
-			globalThis.addEventListener(
-				'keydown',
-				event => {
-					if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-						event.preventDefault()
+						const navPopover = input.closest('nav[popover]')
+						const isMobileNav = globalThis.matchMedia('(max-width: 1024px)')
 
-						if(document.activeElement instanceof HTMLElement)
-							lastFocusedElement = document.activeElement
+						const openNavPopover = () => {
+							if (
+								isMobileNav.matches
+								&& navPopover instanceof HTMLElement
+								&& !navPopover.matches(':popover-open')
+							)
+								navPopover.showPopover()
+						}
 
-						element.focus()
-					}
-				},
-				{ signal: abortController.signal }
-			)
+						globalThis.addEventListener(
+							'keydown',
+							(event) => {
+								if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+									event.preventDefault()
+									openNavPopover()
+									input.focus()
+								}
+							},
+							{ signal: abortController.signal }
+						)
 
-			element.addEventListener(
-				'blur',
-				() => {
-					lastFocusedElement?.focus()
-					lastFocusedElement = undefined
-				},
-				{ signal: abortController.signal }
-			)
+						input.addEventListener('focus', openNavPopover, { signal: abortController.signal })
 
-			return () => {
-				abortController.abort()
-				lastFocusedElement?.focus()
-				lastFocusedElement = undefined
-			}
-		}}
-		onkeyup={event => {
-			if (event.key === 'Escape')
-				event.currentTarget.blur()
-		}}
-	/>
+						return () => {
+							abortController.abort()
+						}
+					}}
+					onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
+						if (event.key === 'Escape')
+							event.currentTarget.blur()
+					}}
+				/>
 
-	{@render navigationItems(items)}
-</search>
-{:else}
-<div data-column="gap-3">
-	{@render navigationItems(items)}
+				<kbd aria-hidden="true">⌘+K</kbd>
+			</label>
+		</search>
+	{/if}
+
+	{@render navigationGroupsList(navigationGroups)}
 </div>
-{/if}
+
+
+{#snippet navigationGroupsList(groups: NavigationGroup[])}
+	{#each groups as group, groupIndex (groupIndex)}
+		{@render navigationItems(group.items, 0)}
+	{/each}
+{/snippet}
 
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
-	<menu>
+	{@const ownsStickyStep = depth > 0 || hasNestedNavigation(items)}
+	<menu
+		data-navigation-depth={depth}
+		data-sticky-container={ownsStickyStep ? true : undefined}
+		data-column
+	>
 		{#each (
 			effectiveSearchValue ?
 				items.filter(item => matchesSearch(item, effectiveSearchValue))
@@ -179,17 +214,16 @@
 				() => (
 					effectiveSearchValue
 						? matchesSearch(item, effectiveSearchValue)
-						: (isOpen.get(item) ?? isOpen.set(item, hasCurrentPage(item)).get(item) ?? false)
+						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item)))
 				),
 				(_: boolean) => {
 					if (!effectiveSearchValue && _ !== undefined)
 						isOpen.set(item, _)
 				}
 			}
-			data-sticky-container
 		>
 			<summary
-				data-sticky
+				data-sticky="block backdrop-before backdrop-stuck"
 				data-row="gap-2"
 			>
 				{@render linkable(item, depth)}
@@ -205,175 +239,285 @@
 	{#if item.href}
 		<a
 			href={item.href}
-			aria-current={currentPathname === item.href ? 'page' : undefined}
+			{...currentHref === item.href && { 'aria-current': 'page' }}
 			{...item.href.startsWith('http') && {
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
 			data-row="start gap-2"
+			style:--accent={item.accentColor ?? undefined}
 		>
-			{#if item.icon}
-				<span class="icon" class:circle={depth === 0}>
-					{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-						<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
-					{:else if item.icon in LUCIDE_ICONS}
-						{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
-					{:else}
-						<span data-icon="wbicons {item.icon}"></span>
-					{/if}
-				</span>
-			{/if}
+			{@render navigationIcon(item, depth)}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
-		{#if item.icon}
-			<span class="icon" class:circle={depth === 0}>
-				{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-					<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
-				{:else if item.icon in LUCIDE_ICONS}
-					{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
-				{:else}
-					<span data-icon="wbicons {item.icon}"></span>
-				{/if}
-			</span>
-		{/if}
+		{@render navigationIcon(item, depth)}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 	{/if}
 {/snippet}
 
 
+{#snippet navigationIcon(item: NavigationItem, depth = 0)}
+	{#if iconSnippet}
+		{@render iconSnippet(item, depth)}
+	{:else if item.icon}
+		{@const iconShape = depth === 0 ? 'circle' : ''}
+		{#if item.icon.startsWith('ICON_WALLET_IMG:')}
+			<span data-icon>
+				<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
+			</span>
+		{:else if item.icon in LUCIDE_ICONS}
+			<span data-icon={iconShape}>
+				{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
+			</span>
+		{:else}
+			<span
+				data-icon="{iconShape} wbicons {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
+			></span>
+		{/if}
+	{/if}
+{/snippet}
+
+
 <style>
-	input[type='search'] {
-		border-radius: 0.75rem;
-		border-color: var(--icon-navigation-borderColor);
-	}
+	.navigation-items {
+		--navItem-gap: 0.5rem;
+		--navItem-paddingBlock: 0.45rem;
+		--navItem-paddingInline: 0.45rem;
+		--navItem-rowGap: 0.5em;
+		--navItem-radius: 0.5em;
+		--navItem-current-backgroundColor: color-mix(in oklch, var(--accent) 25%, transparent);
+		--navItem-hover-backgroundColor: color-mix(in oklch, var(--accent) 15%, var(--background-primary));
+		--navItem-current-hover-backgroundColor: color-mix(in oklch, var(--accent) 30%, var(--background-primary) 20%);
+		--navIcon-size: 1.25em;
 
-	menu {
-		display: grid;
-		gap: 8px;
-		list-style: none;
-		font-size: 0.975em;
+		--nav-submenu-gap: 0.33rem;
+		--nav-search-blockSize: 0rem;
 
-		li {
-			display: grid;
-		}
-	}
-
-	details {
-		&[data-sticky-container] {
-			--sticky-marginBlockStart: 1.75rem;
-			--sticky-paddingBlockStart: 0.5rem;
-		}
-	}
-
-	a {
-		color: var(--text-primary);
-		font-weight: inherit;
-
-		&:hover {
-			color: var(--accent);
-			text-decoration: none;
+		&:has(> search) {
+			--nav-search-blockSize: 3rem;
 		}
 
-		&[aria-current] {
-			background-color: var(--background-primary);
-		}
-	}
+		scroll-target-group: auto;
 
-	summary,
-	a {
-		> .icon {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 1.25em;
-			font-weight: 500;
-			width: 1em;
-			height: 1em;
-			line-height: 1;
-			flex-shrink: 0;
-			color: var(--icon-navigation-color);
+		search {
+			@media (max-width: 1024px) {
+				order: 1;
+			}
 
-			:global(
-				img,
-				svg
-			) {
-				border-radius: 0.125rem;
-				width: 100%;
-				height: 100%;
+			label {
+				border-color: var(--icon-navigation-borderColor);
+
+				> .search-icon {
+					padding-inline-start: 1em;
+					color: var(--text-secondary);
+
+					:global(svg) {
+						inline-size: 1rem;
+						block-size: 1rem;
+					}
+				}
+
+				> kbd {
+					color: var(--text-secondary);
+					user-select: none;
+					padding-inline-end: 1em;
+					font-size: smaller;
+
+					input:not(:placeholder-shown) ~ & {
+						display: none;
+					}
+
+					@media (max-aspect-ratio: 1/2) {
+						display: none;
+					}
+				}
 			}
 		}
 
-		> .icon.circle {
-			width: 1.75em;
-			height: 1.75em;
-			border-radius: 50%;
-			border: 1px solid var(--icon-navigation-borderColor);
+		menu {
+			font-size: 0.975em;
+			list-style: none;
+			margin: 0;
+			padding: 0;
 
-			:global(
-				img,
-				svg
-			) {
-				border-radius: 0;
-				width: 60%;
-				height: 60%;
+			&[data-navigation-depth='0'] {
+				--icon-navigation-borderColor: currentColor;
+				--navIcon-size: 2em;
+
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: var(--nav-search-blockSize);
+
+					@media (max-width: 1024px) {
+						--sticky-marginBlockStart: 0px;
+						--sticky-marginBlockEnd: var(--nav-search-blockSize);
+					}
+				}
+			}
+			&[data-navigation-depth='1'] {
+				--navIcon-size: 1.5em;
+
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
+					--sticky-marginBlockEnd: var(--navItem-gap);
+				}
+			}
+			&[data-navigation-depth='2'] {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
+					--sticky-marginBlockEnd: var(--navItem-gap);
+				}
+			}
+
+			details {
+				--nav-submenu-parentIconSize: var(--navIcon-size);
+			}
+
+			a {
+				color: var(--text-primary);
+
+				&:hover {
+					color: var(--accent);
+					text-decoration: none;
+				}
+			}
+
+			li > details > summary,
+			li > a {
+				--icon-size: var(--navIcon-size);
+
+				---backgroundColor: transparent;
+				---color: inherit;
+
+				&:hover,
+				&:focus-visible,
+				&:focus-within {
+					---backgroundColor: var(--navItem-hover-backgroundColor);
+					---color: var(--accent);
+				}
+
+				&:is(a):is(
+					[aria-current='page'],
+					:target-current
+				),
+				&:is(summary):is(
+					:has(
+						a:is(
+							[aria-current='page'],
+							:target-current
+						)
+					),
+					:not(details:open > &):has(
+						~ menu a:is(
+							[aria-current='page'],
+							:target-current
+						)
+					)
+				) {
+					---backgroundColor: var(--navItem-current-backgroundColor);
+
+					&:hover,
+					&:focus-visible,
+					&:focus-within {
+						---backgroundColor: var(--navItem-current-hover-backgroundColor);
+					}
+				}
+
+				---startRadius: var(--navItem-radius);
+				---endRadius: var(--navItem-radius);
+
+				&:is(a):has(> [data-icon~='circle']),
+				&:is(summary):has(> a > [data-icon~='circle']) {
+					---startRadius: 1.5rem;
+				}
+
+				&:not([data-sticky]) {
+					background-color: var(---backgroundColor);
+				}
+				&[data-sticky] {
+					--sticky-backgroundColor: var(---backgroundColor);
+					--sticky-backdropFilter: blur(16px);
+
+					&[data-sticky~='backdrop-stuck'][data-sticky~="backdrop-before"]::before {
+						background-color: var(---backgroundColor);
+					}
+				}
+
+				border-radius:
+					var(---startRadius)
+					var(---endRadius)
+					var(---endRadius)
+					var(---startRadius)
+				;
+				padding:
+					var(--navItem-paddingBlock)
+					var(--navItem-paddingInline)
+				;
+
+				color: var(---color);
+				font-weight: 500;
+
+				transition-property:
+					opacity,
+					scale,
+					background-color,
+					color
+				;
+
+				:global(mark) {
+					font-weight: 600;
+					text-decoration: underline;
+					background-color: transparent;
+					color: inherit;
+				}
+			}
+
+			summary {
+				&::after {
+					margin-inline-start: auto;
+				}
+
+				details:not([open]) > &::after {
+					transform: perspective(100px) rotateX(180deg) rotate(-90deg);
+				}
+
+				> a {
+					border-radius: inherit;
+					flex: 0 auto;
+				}
+			}
+
+			menu {
+				margin-block-start: var(--nav-submenu-gap);
+				margin-inline-start: calc(
+					var(--nav-submenu-parentIconSize) + var(--navItem-rowGap)
+				);
+
+				position: relative;
+				padding-inline-start: 0;
+
+				&::before {
+					content: '';
+					position: absolute;
+					inset-block: 0;
+					inset-inline-start: calc(
+						var(--navItem-paddingInline)
+						- var(--nav-submenu-parentIconSize) / 2
+						- var(--navItem-rowGap)
+					);
+					inline-size: 1px;
+					background-color: var(--border-color);
+				}
+			}
+
+			+ menu {
+				margin-block-start: auto;
 			}
 		}
-
-		:global(mark) {
-			font-weight: 600;
-			text-decoration: underline;
-			background-color: transparent;
-			color: inherit;
-		}
-	}
-
-	summary,
-	a:not(summary a) {
-		padding: 0.45rem 0.45rem;
-		border-radius: 0.375rem;
-		font-weight: 500;
-
-		transition-property: opacity, scale, background-color, color, outline;
-
-		&:hover:not(:has(a:hover)) {
-			background-color: var(--background-primary);
-			color: var(--accent);
-		}
-
-		&:focus {
-			outline: 2px solid var(--accent);
-			outline-offset: -1px;
-		}
-
-		&:active {
-			background-color: var(--background-primary);
-		}
-	}
-
-	summary {
-		&::after {
-			margin-inline-start: auto;
-		}
-
-		details:not([open]) > &::after {
-			transform: perspective(100px) rotateX(180deg) rotate(-90deg);
-		}
-	}
-
-	summary > a {
-		flex: 0 auto;
-	}
-
-	summary ~ * {
-		margin-inline-start: 2em;
-		margin-block-start: 2px;
-
-		margin-inline-start: 1.25em;
-		margin-block-start: 2px;
-		padding-inline-start: 0.75em;
-		box-shadow: -1px 0 var(--border-color);
 	}
 </style>

@@ -13,9 +13,9 @@ import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
 		title: 'Ethereum Wallets - Walletbeat',
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container>
 		<SoftwareWalletTable client:visible title='Software Wallets' />
 	</main>
 </Layout>

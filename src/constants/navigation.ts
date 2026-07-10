@@ -1,7 +1,12 @@
 // Types
 import type { WBIconID } from '@/styles/wbicons'
 
-export type LucideNavigationIcon = 'ICON_CHART_BAR' | 'ICON_CHART_PIE' | 'ICON_WALLET'
+export type LucideNavigationIcon =
+	| 'ICON_CHART_BAR'
+	| 'ICON_FARCASTER'
+	| 'ICON_CHART_PIE'
+	| 'ICON_TWITTER'
+	| 'ICON_WALLET'
 
 export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
 
@@ -11,6 +16,8 @@ export type NavigationItem = {
 	id: string
 	title: string
 	icon?: NavigationIconID
+	iconVariant?: 'emoji'
+	accentColor?: string | null
 	href?: string
 	children?: NavigationItem[]
 }
@@ -31,49 +38,56 @@ import { getWalletUrl } from '@/utils/wallet-url'
 export const navigationFaq = {
 	id: 'faq',
 	icon: 'faq',
-	title: 'faq',
+	title: 'FAQ',
 	href: '/faq/',
 } as const satisfies NavigationItem
 
 export const navigationAbout = {
 	id: 'about',
 	icon: 'about',
-	title: 'about',
+	title: 'About',
 	href: '/about/',
 } as const satisfies NavigationItem
 
 export const navigationRepository = {
 	id: 'code-repository',
 	icon: 'repository',
-	title: 'code',
+	title: 'GitHub',
 	href: 'https://github.com/walletbeat/walletbeat',
+} as const satisfies NavigationItem
+
+export const navigationTwitter = {
+	id: 'twitter',
+	icon: 'ICON_TWITTER',
+	title: 'X/Twitter',
+	href: 'https://x.com/walletbeat',
 } as const satisfies NavigationItem
 
 export const navigationTesting = {
 	id: 'testing-page',
 	icon: 'wallet_test',
-	title: 'Test your wallet',
+	title: 'Playground',
 	href: '/test/',
 } as const satisfies NavigationItem
 
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
-	icon: 'discuss',
-	title: 'farcaster',
+	icon: 'ICON_FARCASTER',
+	title: 'Farcaster',
 	href: 'https://farcaster.xyz/~/channel/walletbeat',
 } as const satisfies NavigationItem
 
 export const navigationNews = {
 	id: 'news',
 	icon: 'newsletter',
-	title: 'Wallet Security News',
+	title: 'Security News',
 	href: '/news/',
 } as const satisfies NavigationItem
 
 export const navigationWalletEips = {
 	id: 'wallet-eips',
 	icon: 'transaction_legibility',
-	title: 'Wallet EIPs',
+	title: 'Standards',
 	href: '/wallet-eips/',
 } as const satisfies NavigationItem
 
@@ -81,6 +95,7 @@ export const topbarNavigationItems = [
 	navigationAbout,
 	navigationFaq,
 	navigationRepository,
+	navigationTwitter,
 	navigationFarcasterChannel,
 ] as const satisfies NavigationItem[]
 
@@ -102,6 +117,7 @@ export const defaultNavigationItems = [
 						id: `software-${attrGroup.id}`,
 						title: attrGroup.displayName,
 						icon: attrGroup.icon,
+						iconVariant: 'emoji' as const,
 						href: `/wallet/${attrGroup.id}/`,
 					}),
 				),
@@ -143,6 +159,7 @@ export const defaultNavigationItems = [
 							id: `hardware-${attrGroup.id}`,
 							title: attrGroup.displayName,
 							icon: attrGroup.icon,
+							iconVariant: 'emoji' as const,
 							href: `/hww/${attrGroup.id}/`,
 						}),
 					),
@@ -178,6 +195,7 @@ export const defaultNavigationItems = [
 						id: `embedded-${attrGroup.id}`,
 						title: attrGroup.displayName,
 						icon: attrGroup.icon,
+						iconVariant: 'emoji' as const,
 						href: `/embedded/${attrGroup.id}/`,
 					}),
 				),

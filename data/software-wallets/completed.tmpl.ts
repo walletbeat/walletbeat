@@ -41,7 +41,12 @@ import {
 	StealthAddressUnlabeledBehavior,
 } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
+import {
+	type AccountRecoveryDrill,
+	AccountRecoveryDrillType,
+	GuardianPolicyType,
+	GuardianType,
+} from '@/schema/features/security/account-recovery'
 import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
@@ -101,6 +106,7 @@ import type { ArtifactSigningDetails } from '@/schema/features/transparency/rele
 import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 /**
@@ -527,6 +533,25 @@ export const completedTemplate: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: supported({
+					entries: [
+						{
+							type: AccountRecoveryDrillType.PRIVATE_KEY_QUIZ,
+							ref: refTodo,
+							reminderEveryNDays: 90,
+						},
+						{
+							type: AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+							ref: refTodo,
+							reminderEveryNDays: 90,
+						},
+						{
+							type: AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK,
+							ref: refTodo,
+							reminderEveryNDays: 90,
+						},
+					] satisfies NonEmptyArray<WithRef<AccountRecoveryDrill>>,
+				}),
 				guardianRecovery: supported({
 					ref: refTodo,
 					minimumGuardianPolicy: {

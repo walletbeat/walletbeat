@@ -44,8 +44,160 @@ const wellKnownDomainsToLabels: Record<string, string> = {
 	'farcaster.xyz': 'Farcaster',
 }
 
+/** A full 40-character git commit hash. */
+const fullCommitHashRegExp = /^[0-9a-f]{40}$/
+
+/**
+ * A GitHub line-anchor URL fragment: `L123`, `L123-L456`,
+ * or the column-qualified form `L123C4-L456C7`.
+ */
+const lineFragmentRegExp = /^L(?<first>\d+)(?:C\d+)?(?:-L(?<last>\d+)(?:C\d+)?)?$/
+
+/** Format a GitHub line-anchor fragment as `L123` / `L123-456`, or null if not one. */
+function gitHubLineRange(fragment: string): string | null {
+	const match = lineFragmentRegExp.exec(fragment)
+
+	if (match?.groups === undefined) {
+		return null
+	}
+
+	const { first, last } = match.groups
+
+	if (last === undefined || last === first) {
+		return `L${first}`
+	}
+
+	return `L${first}-${last}`
+}
+
+/**
+ * GitHub top-level routes that are site pages, not org/user profiles.
+ * Not exhaustive; covers routes plausibly used as references.
+ */
+const gitHubReservedTopLevelRoutes = new Set([
+	'about',
+	'collections',
+	'features',
+	'marketplace',
+	'orgs',
+	'pricing',
+	'search',
+	'sponsors',
+	'topics',
+	'trending',
+])
+
+/** Abbreviate a git ref for display: short hash for commit hashes, as-is otherwise. */
+function shortGitRef(ref: string): string {
+	return fullCommitHashRegExp.test(ref) ? ref.substring(0, 7) : ref
+}
+
+/**
+ * Generate a concrete label for a GitHub URL.
+ * Code permalinks get a `foo.ts L123-156 @abcdef1` style label
+ * (filename + line range + abbreviated ref); other repo-scoped URLs
+ * fall back to `org/repo` plus the page type (`org/repo releases`,
+ * `org/repo #123`), and org/user profile pages to `GitHub: org`.
+ * Returns null for URLs with no more concrete label than the domain
+ * (github.com root, search, other site pages).
+ *
+ * Note: for `blob`/`tree` URLs, the segment right after the view is taken
+ * as the ref. Branch names containing slashes are thus truncated, which is
+ * acceptable: references are expected to pin a commit hash instead
+ * (enforced for wallet data by tests/github-ref-commit-hash.test.ts).
+ */
+function getGitHubUrlLabel(url: URL): string | null {
+	const segments = url.pathname
+		.split('/')
+		.filter(segment => segment !== '')
+		.map(segment => {
+			try {
+				return decodeURIComponent(segment)
+			} catch {
+				return segment
+			}
+		})
+
+	if (segments.length === 0) {
+		return null
+	}
+
+	if (segments.length === 1) {
+		// A single path segment is an org/user profile page, unless it is
+		// one of GitHub's reserved top-level routes.
+		if (gitHubReservedTopLevelRoutes.has(segments[0])) {
+			return null
+		}
+
+		return `GitHub: ${segments[0]}`
+	}
+
+	const [org, repo, view, ref, ...pathSegments] = segments
+	const orgRepo = `${org}/${repo}`
+
+	switch (view) {
+		case 'blob': {
+			if (ref === undefined || pathSegments.length === 0) {
+				return orgRepo
+			}
+
+			const filename = pathSegments[pathSegments.length - 1]
+			const lineRange = gitHubLineRange(url.hash.replace(/^#/, ''))
+
+			return `${filename}${lineRange === null ? '' : ` ${lineRange}`} @${shortGitRef(ref)}`
+		}
+		case 'tree': {
+			if (ref === undefined) {
+				return orgRepo
+			}
+
+			if (pathSegments.length === 0) {
+				return `${orgRepo} @${shortGitRef(ref)}`
+			}
+
+			return `${pathSegments[pathSegments.length - 1]}/ @${shortGitRef(ref)}`
+		}
+		case 'commit': {
+			if (ref === undefined) {
+				return orgRepo
+			}
+
+			return `${orgRepo} @${shortGitRef(ref)}`
+		}
+		case undefined:
+			// Repo root.
+			return orgRepo
+		case 'issues':
+		case 'pull':
+		case 'discussions':
+			// Numbered items get GitHub's own #N idiom.
+			if (ref !== undefined && /^\d+$/.test(ref)) {
+				return `${orgRepo} #${ref}`
+			}
+
+			return `${orgRepo} ${view}`
+		case 'releases':
+			// The repo name plus the page type is still more informative
+			// than the bare domain label.
+			return `${orgRepo} ${view}`
+		default:
+			throw new Error(
+				`Unhandled GitHub URL path type "${view}" in ${url.href}; ` +
+					'add it to getGitHubUrlLabel() in src/schema/url.ts.',
+			)
+	}
+}
+
 function getDefaultUrlLabel(url: string): string {
 	const hostname = getDomain(url)
+
+	if (hostname === 'github.com') {
+		const gitHubLabel = getGitHubUrlLabel(new URL(url))
+
+		if (gitHubLabel !== null) {
+			return gitHubLabel
+		}
+	}
 
 	if (Object.hasOwn(wellKnownDomainsToLabels, hostname)) {
 		return wellKnownDomainsToLabels[hostname]
@@ -53,6 +205,15 @@ function getDefaultUrlLabel(url: string): string {
 
 	return hostname
 }
+
+/**
+ * A commit-hash version pin inside an auto-generated GitHub label,
+ * e.g. the `@fa9d098` in `controller.ts L402-407 @fa9d098`.
+ * Hashes are either the 7-character git abbreviation or the full
+ * 40 characters, never a length in between.
+ * Kept in sync with the "Git commit ref pins" pattern in .cspell.json.
+ */
+export const gitCommitRefPinRegExp = /@(?:[0-9a-f]{40}|[0-9a-f]{7})\b/g
 
 /** Return the label for a URL. */
 export function getUrlLabel(url: Url): string {

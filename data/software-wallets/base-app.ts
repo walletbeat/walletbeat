@@ -44,7 +44,7 @@ export const baseApp: SoftwareWallet = {
 			control of your crypto, NFTs, DeFi activity, and digital assets.
 		`),
 		contributors: [ren2140],
-		iconExtension: 'png',
+		iconExtension: 'svg',
 		lastUpdated: '2026-03-19',
 		urls: {
 			docs: ['https://docs.base.org/get-started/base'],

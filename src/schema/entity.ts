@@ -48,7 +48,7 @@ export interface Entity<Ts extends EntityType[] = []> {
 	icon:
 		| 'NO_ICON'
 		| {
-				extension: 'png'
+				extension: 'jpg' | 'png'
 				width: number
 				height: number
 		  }

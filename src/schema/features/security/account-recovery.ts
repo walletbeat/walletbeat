@@ -474,6 +474,40 @@ export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 }
 
 /**
+ * The type of account recovery drill.
+ */
+export enum AccountRecoveryDrillType {
+	/**
+	 * Periodically asks the user to demonstrate that they still have the
+	 * private key for their account.
+	 */
+	PRIVATE_KEY_QUIZ = 'PRIVATE_KEY_QUIZ',
+
+	/**
+	 * Periodically asks the user to demonstrate that they still have the
+	 * seed phrase for their account.
+	 */
+	SEED_PHRASE_QUIZ = 'SEED_PHRASE_QUIZ',
+
+	/**
+	 * Periodically asks the user to confirm they still have access to their
+	 * configured guardian accounts.
+	 */
+	GUARDIAN_ACCOUNT_CHECK = 'GUARDIAN_ACCOUNT_CHECK',
+}
+
+/**
+ * A single drill that a wallet runs to keep users prepared for account recovery.
+ */
+export interface AccountRecoveryDrill {
+	/** Which kind of drill this is. */
+	type: AccountRecoveryDrillType
+
+	/** How often the wallet prompts the user to complete this drill, in days. */
+	reminderEveryNDays: number
+}
+
+/**
  * For wallets supporting social recovery (guardian-based), what policy does
  * it use for the guardians?
  */
@@ -514,4 +548,39 @@ export interface AccountRecovery {
 	 * documentation and source code as described above.
 	 */
 	guardianRecovery: Support<WithRef<GuardianRecovery>>
+
+	/**
+	 * Drills the wallet runs to ensure that users will be able to
+	 * successfully recover their accounts. Wallets that support
+	 * must implement at least one drill type.
+	 * Set to `null` if this has not been rated yet.
+	 */
+	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }> | null
+}
+
+export function accountRecoveryDrillWording(type: AccountRecoveryDrillType): {
+	label: string
+	noun: string
+	recommendation: string
+} {
+	switch (type) {
+		case AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK:
+			return {
+				label: 'guardian account check-ups',
+				noun: 'guardian accounts',
+				recommendation: 'guardian account check-ups for accounts with configured guardians',
+			}
+		case AccountRecoveryDrillType.PRIVATE_KEY_QUIZ:
+			return {
+				label: 'private key check-ups',
+				noun: 'private key',
+				recommendation: 'private key check-ups for accounts imported from a raw private key',
+			}
+		case AccountRecoveryDrillType.SEED_PHRASE_QUIZ:
+			return {
+				label: 'seed phrase check-ups',
+				noun: 'seed phrase',
+				recommendation: 'seed phrase check-ups for accounts created from a seed phrase',
+			}
+	}
 }

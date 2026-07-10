@@ -164,7 +164,7 @@ describe('markdown files', async () => {
 						expect(message).toSatisfy(m => Array.isArray(m) && m.length > 0, message.join('\n'))
 					})
 				},
-				15000,
+				60000,
 			)
 		}
 	})

@@ -1,0 +1,207 @@
+import { describe, expect, it } from 'vitest'
+
+import { toFullyQualified } from '@/schema/reference'
+import { getUrlLabel } from '@/schema/url'
+
+describe('getUrlLabel for GitHub URLs', () => {
+	describe('blob (code file) URLs', () => {
+		it('formats filename + line range + short commit hash', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+				),
+			).toBe('controller.ts L402-407 @fa9d098')
+		})
+
+		it('formats a single line anchor', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/apps/daimo-mobile/src/view/sheet/FarcasterBottomSheet.tsx#L141',
+				),
+			).toBe('FarcasterBottomSheet.tsx L141 @e1ddce7')
+		})
+
+		it('collapses a single-line range to a single line anchor', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/file.ts#L141-L141',
+				),
+			).toBe('file.ts L141 @e1ddce7')
+		})
+
+		it('formats a column-qualified line range', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/org/repo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/file.ts#L10C5-L20C7',
+				),
+			).toBe('file.ts L10-20 @e1ddce7')
+		})
+
+		it('formats a file without a line anchor', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+				),
+			).toBe('CoinbaseSmartWallet.sol @9edcf7f')
+		})
+
+		it('ignores a query string between path and line anchor', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/org/repo/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/README.md?plain=1#L5',
+				),
+			).toBe('README.md L5 @9edcf7f')
+		})
+
+		it('keeps a branch name ref as-is instead of abbreviating', () => {
+			expect(getUrlLabel('https://github.com/org/repo/blob/main/src/file.ts#L1-L2')).toBe(
+				'file.ts L1-2 @main',
+			)
+		})
+
+		it('ignores a non-line-anchor fragment', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/org/repo/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/README.md#features',
+				),
+			).toBe('README.md @9edcf7f')
+		})
+
+		it('decodes percent-encoded filenames', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/org/repo/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/docs/My%20File.md',
+				),
+			).toBe('My File.md @9edcf7f')
+		})
+
+		it('falls back to org/repo for a blob URL without a file path', () => {
+			expect(getUrlLabel('https://github.com/org/repo/blob/main')).toBe('org/repo')
+		})
+	})
+
+	describe('tree (directory) URLs', () => {
+		it('formats directory name + ref', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/safe-fndn/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
+				),
+			).toBe('FCL/ @main')
+		})
+
+		it('abbreviates a commit hash ref', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/org/repo/tree/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src',
+				),
+			).toBe('src/ @9edcf7f')
+		})
+
+		it('formats a repo-root tree URL as org/repo + ref', () => {
+			expect(getUrlLabel('https://github.com/org/repo/tree/main')).toBe('org/repo @main')
+		})
+	})
+
+	describe('commit URLs', () => {
+		it('formats org/repo + short commit hash', () => {
+			expect(
+				getUrlLabel('https://github.com/org/repo/commit/9edcf7f174c3ebef100a4400e6a17c746ea521a4'),
+			).toBe('org/repo @9edcf7f')
+		})
+	})
+
+	describe('other repo-scoped URLs', () => {
+		it('labels a repo root as org/repo', () => {
+			expect(getUrlLabel('https://github.com/keycard-tech/keycard-shell')).toBe(
+				'keycard-tech/keycard-shell',
+			)
+		})
+
+		it('labels a repo root with a README anchor as org/repo', () => {
+			expect(getUrlLabel('https://github.com/greekfetacheese/zeus#features')).toBe(
+				'greekfetacheese/zeus',
+			)
+		})
+
+		it('labels a repo root with a trailing slash as org/repo', () => {
+			expect(getUrlLabel('https://github.com/org/repo/')).toBe('org/repo')
+		})
+
+		it('labels releases pages with their page type', () => {
+			expect(getUrlLabel('https://github.com/org/repo/releases')).toBe('org/repo releases')
+		})
+
+		it('throws for unhandled repo page types', () => {
+			expect(() => getUrlLabel('https://github.com/org/repo/wiki')).toThrowError(
+				/Unhandled GitHub URL path type "wiki"/,
+			)
+		})
+
+		it('labels issues and pull requests with the #N idiom', () => {
+			expect(getUrlLabel('https://github.com/org/repo/issues/123')).toBe('org/repo #123')
+			expect(getUrlLabel('https://github.com/org/repo/pull/456')).toBe('org/repo #456')
+			expect(getUrlLabel('https://github.com/org/repo/issues')).toBe('org/repo issues')
+		})
+	})
+
+	describe('non-repo-scoped GitHub URLs', () => {
+		it('labels org/user profile pages', () => {
+			expect(getUrlLabel('https://github.com/mtpelerin')).toBe('GitHub: mtpelerin')
+			expect(getUrlLabel('https://github.com/LedgerHQ/')).toBe('GitHub: LedgerHQ')
+		})
+
+		it('keeps the generic label for search URLs', () => {
+			expect(
+				getUrlLabel(
+					'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
+				),
+			).toBe('GitHub')
+		})
+
+		it('keeps the generic label for the GitHub root', () => {
+			expect(getUrlLabel('https://github.com')).toBe('GitHub')
+		})
+	})
+
+	describe('non-GitHub and explicitly labeled URLs are unaffected', () => {
+		it('keeps domain-based labels for other domains', () => {
+			expect(getUrlLabel('https://example.com/org/repo/blob/main/file.ts')).toBe('example.com')
+		})
+
+		it('keeps other well-known domain labels', () => {
+			expect(getUrlLabel('https://www.crunchbase.com/organization/foo')).toBe('Crunchbase')
+		})
+
+		it('never overrides an explicit label', () => {
+			expect(
+				getUrlLabel({
+					url: 'https://github.com/org/repo/blob/main/file.ts#L1',
+					label: 'Hand-written label',
+				}),
+			).toBe('Hand-written label')
+		})
+	})
+})
+
+describe('toFullyQualified label disambiguation', () => {
+	it('does not number distinct auto-generated labels', () => {
+		const refs = toFullyQualified({
+			url: [
+				'https://github.com/org/repo/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/a.ts',
+				'https://github.com/org/repo/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/b.ts',
+			],
+			explanation: 'Example explanation.',
+		})
+
+		expect(refs.map(ref => ref.urls[0].label)).toEqual(['a.ts @fa9d098', 'b.ts @fa9d098'])
+	})
+
+	it('numbers duplicate auto-generated labels', () => {
+		const refs = toFullyQualified({
+			url: ['https://github.com/search?q=foo', 'https://github.com/search?q=bar'],
+			explanation: 'Example explanation.',
+		})
+
+		expect(refs.map(ref => ref.urls[0].label)).toEqual(['GitHub 1', 'GitHub 2'])
+	})
+})

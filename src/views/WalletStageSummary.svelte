@@ -10,6 +10,7 @@
 		type WalletLadderEvaluation,
 		type WalletStage,
 	} from '@/schema/stages'
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/wallet-url'
@@ -186,7 +187,7 @@
 					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
 
 					<li
-						data-icon={attribute?.icon ? `wbicons ${attribute.icon}` : undefined}
+						data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
 						data-stage-criterion-rating={evaluation.rating}
 						style:--accent={stageCriterionRatings[evaluation.rating].color}
 					>
