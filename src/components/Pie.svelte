@@ -71,6 +71,7 @@
 
 		// View options
 		layout = PieLayout.HalfTop,
+		centerFirstSlice = true,
 		padding = 0,
 		radius = 47,
 		labelSize = radius / 4,
@@ -116,6 +117,7 @@
 
 		// View options
 		layout?: (typeof PieLayout)[keyof typeof PieLayout]
+		centerFirstSlice?: boolean
 		radius?: number
 		padding?: number
 		labelSize?: number
@@ -203,10 +205,12 @@
 			slices,
 			startAngle,
 			endAngle,
+			firstSliceMidAngle,
 		}: {
 			slices: Slice[]
 			startAngle: number
 			endAngle: number
+			firstSliceMidAngle?: number
 		},
 		cy = 0,
 		level = 0,
@@ -230,8 +234,10 @@
 		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - orientation * totalGapAngle
 
 		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
+		const computedFirstSliceMidAngle = effectiveStartAngle + effectiveTotalAngle * ((slices[0]?.weight ?? 0) / (totalWeight || 1)) / 2
+		const angleOffset = (firstSliceMidAngle ?? computedFirstSliceMidAngle) - computedFirstSliceMidAngle
 
-		let currentAngle = effectiveStartAngle
+		let currentAngle = effectiveStartAngle + angleOffset
 
 		return slices.map(({ children, ...slice }, i) => {
 			const totalAngle = effectiveTotalAngle * (slice.weight / totalWeight)
@@ -278,6 +284,7 @@
 		computeSlices(
 			{
 				slices,
+				firstSliceMidAngle: centerFirstSlice ? 0 : undefined,
 				...(
 					layout === PieLayout.FullLeft ?
 						{
@@ -289,7 +296,7 @@
 							startAngle: 360 - getLevelConfig(0).angleGap / 2,
 							endAngle: 0 + getLevelConfig(0).angleGap / 2,
 						}
-					: // layout === PieLayout.HalfTop ?
+					: // layout === PieLayout.HalfTop
 						{
 							startAngle: -90,
 							endAngle: 90,
