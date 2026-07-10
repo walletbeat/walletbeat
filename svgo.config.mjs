@@ -1,6 +1,12 @@
 /**
- * @type {import('svgo').Config}
+ * @typedef {import('svgo').XastRoot} XastRoot
+ * @typedef {import('svgo').XastNode} XastNode
+ * @typedef {import('svgo').XastElement} XastElement
+ * @typedef {import('svgo').Visitor} Visitor
+ * @typedef {import('svgo').Config} Config
  */
+
+/** @type {Config} */
 export default {
 	multipass: true,
 	plugins: [
@@ -26,12 +32,20 @@ export default {
 			// blocks. SVGO has no built-in that shortens those names while
 			// keeping both in sync. Skip already-short names (`a`, `b`, …).
 			name: 'minifyGeneratedClassNames',
+			/**
+			 * @param {XastRoot} root
+			 * @returns {Visitor | null}
+			 */
 			fn(root) {
 				// Letters + optional hyphen + digits, e.g. cls-1, st0, fil12.
 				const generatedClass = /^[a-z]{2,5}-?\d+$/i
+				/** @type {Set<string>} */
 				const classNames = new Set()
 
 				// 1. Collect every generated class referenced on elements or in CSS.
+				/**
+				 * @param {XastNode} node
+				 */
 				const visit = node => {
 					if (node.type === 'element') {
 						if (node.attributes.class) {
@@ -53,8 +67,10 @@ export default {
 						}
 					}
 
-					for (const child of node.children ?? []) {
-						visit(child)
+					if (node.type === 'root' || node.type === 'element') {
+						for (const child of node.children) {
+							visit(child)
+						}
 					}
 				}
 
@@ -82,6 +98,9 @@ export default {
 				// 3. Rewrite `class` attributes and matching selectors together.
 				return {
 					element: {
+						/**
+						 * @param {XastElement} node
+						 */
 						enter(node) {
 							if (node.attributes.class) {
 								node.attributes.class = node.attributes.class

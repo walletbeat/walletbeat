@@ -65,7 +65,7 @@ const optimizedSvgHashes: Record<string, string> = {
 	'public/images/wallets/base-app.svg':
 		'ec95eb6414626e6827f4419209a1925d28918ac39a5e6b5cf92910b3d0d8690a',
 	'public/images/wallets/bitbox.svg':
-		'bcf07f051b9ee66a8ea3c6857929585b2fbdb356511442723aec5a9383d45c79',
+		'739f74f32a4d369c1327ca90743f8d8afb5d0e53348e284f433964bb34fc3e73',
 	'public/images/wallets/bitget.svg':
 		'1dba6b20429d10a37693df6919ed533318a7843a1119a1099ead592c808cd938',
 	'public/images/wallets/cypherock.svg':
@@ -120,10 +120,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'446e789e7c40c2a0d2b6ef449c31c2821d141cb2b3c1cf396dd7833639cdeaa1',
 	'public/images/wallets/zeus.svg':
 		'77f09595591add0c4f1e59dae323a8cac1c0348c41d240b2109095c91287b689',
-	'public/logo-dark.svg':
-		'f0b0a7ecfd232053e7ddcc0272c0641fad9fcf0af42c66b0dfbf906d20a27aac',
-	'public/logo-light.svg':
-		'29806e7b501fec7ba1d5976b0d9678718105bdbb1d335e2d86e24343222bf8ea',
+	'public/logo-dark.svg': 'f0b0a7ecfd232053e7ddcc0272c0641fad9fcf0af42c66b0dfbf906d20a27aac',
+	'public/logo-light.svg': '29806e7b501fec7ba1d5976b0d9678718105bdbb1d335e2d86e24343222bf8ea',
 	'resources/branding/glow-0.svg':
 		'e1271b8b1b7d1ce750f5be925ac31b3957759d62ef87a3ba1690494853caf9c5',
 	'resources/branding/glow-1.svg':
