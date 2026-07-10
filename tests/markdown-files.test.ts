@@ -44,6 +44,7 @@ const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-01-30 - Okx Wallet/thread.md',
 	'resources/files/social-media/threads/2026-04-22 - Security Best Practices/thread.md',
 	'resources/files/social-media/threads/2026-05-15 - Transaction legibility ERC-8213 ERC-7730/thread.md',
+	'resources/files/social-media/threads/2026-07-09 - Orderflow Transparency/thread.md',
 ])
 
 /**
