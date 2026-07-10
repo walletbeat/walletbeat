@@ -610,6 +610,12 @@
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
 		{ "name": "Git short commit hashes", "pattern": "/\\b[0-9a-f]{8}\\b/g" },
+		{
+			"name": "GitHub code reference labels",
+			"pattern": "/\\S[^\\n]*? (?:L\\d+(?:-\\d+)? )?`?@[0-9a-f]{7,40}\\b/g"
+		},
+		{ "name": "GitHub profile labels", "pattern": "/\\bGitHub: [\\w.-]+/g" },
+		{ "name": "GitHub repository slugs", "pattern": "/\\b[\\w.-]+\\/[\\w.-]+\\b/g" },
 		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
 		{ "name": "Million-dollar and billion-dollar amounts", "pattern": "/\\$[.0-9a]+[BM]/g" },
 		{ "name": "Seven Seven Six", "pattern": "/Seven Seven Six/g" },
@@ -621,6 +627,9 @@
 		"CIDv1",
 		"Chrome extension IDs",
 		"Git short commit hashes",
+		"GitHub code reference labels",
+		"GitHub profile labels",
+		"GitHub repository slugs",
 		"Hexadecimal addresses",
 		"Million-dollar and billion-dollar amounts",
 		"Seven Seven Six",
