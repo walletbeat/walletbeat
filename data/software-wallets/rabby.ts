@@ -572,6 +572,9 @@ export const rabby: SoftwareWallet = {
 					variantsScope: { [Variant.DESKTOP]: true },
 				},
 				{
+					// "Rabby Walle" is not a typo on our end: the file in the
+					// upstream repository really is named "... Rabby Walle Audit
+					// Report.pdf".
 					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
 					auditDate: '2024-10-18',
 					auditor: leastAuthority,

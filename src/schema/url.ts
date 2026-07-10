@@ -209,9 +209,11 @@ function getDefaultUrlLabel(url: string): string {
 /**
  * A commit-hash version pin inside an auto-generated GitHub label,
  * e.g. the `@fa9d098` in `controller.ts L402-407 @fa9d098`.
+ * Hashes are either the 7-character git abbreviation or the full
+ * 40 characters, never a length in between.
  * Kept in sync with the "Git commit ref pins" pattern in .cspell.json.
  */
-export const gitCommitRefPinRegExp = /@[0-9a-f]{7,40}\b/g
+export const gitCommitRefPinRegExp = /@(?:[0-9a-f]{40}|[0-9a-f]{7})\b/g
 
 /** Return the label for a URL. */
 export function getUrlLabel(url: Url): string {
