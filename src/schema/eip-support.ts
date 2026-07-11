@@ -221,8 +221,9 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}),
 	'7828': features => addressResolutionEipSupport(features, 'erc7828'),
 	'7831': features => addressResolutionEipSupport(features, 'erc7831'),
-	// A wallet implements ERC-8213 if it exposes the calldata digest or the
-	// EIP-712 digest when the user is asked to sign.
+	// A wallet implements ERC-8213 if it displays the calldata digest, or
+	// satisfies the ERC's EIP-712 signing display requirement: the EIP-712
+	// digest, or the domain hash and message hash together.
 	'8213': features =>
 		transactionLegibilityEipSupport(features, transactionLegibility => {
 			const erc8213 = transactionLegibility.erc8213
@@ -241,12 +242,16 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 				return null
 			}
 
-			return (
-				(calldataDisplay !== null &&
-					displayEntryIsShown(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])) ||
-				(messageSigningLegibility !== null &&
-					displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.EIP712_DIGEST]))
-			)
+			const calldataDigestShown =
+				calldataDisplay !== null &&
+				displayEntryIsShown(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])
+			const signatureDigestShown =
+				messageSigningLegibility !== null &&
+				(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.EIP712_DIGEST]) ||
+					(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]) &&
+						displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH])))
+
+			return calldataDigestShown || signatureDigestShown
 		}),
 }
 

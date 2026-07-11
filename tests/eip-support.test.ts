@@ -4,7 +4,6 @@ import { eips } from '@/data/eips'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { type EipSupport, walletEipSupport } from '@/schema/eip-support'
-import type { EipNumber } from '@/schema/eips'
 import { type ResolvedFeatures, resolveFeatures } from '@/schema/features'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
@@ -127,8 +126,7 @@ describe('walletEipSupport', () => {
 		const eipSupport = walletEipSupport(unknownResolvedFeatures())
 
 		for (const eipNumber of Object.keys(eips)) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Iterating over the keys of a `Record<EipNumber, Eip>`.
-			expect(eipSupport[eipNumber as EipNumber]).toBeNull()
+			expect(eipSupport[eipNumber]).toBeNull()
 		}
 	})
 
@@ -241,6 +239,34 @@ describe('walletEipSupport', () => {
 		expect(refUrls(eipSupport['712'])).toContain('https://example.com/legibility')
 		expect(refUrls(eipSupport['8213'])).toContain('https://example.com/legibility')
 		expect(refUrls(eipSupport['7730'])).toContain('https://example.com/legibility')
+	})
+
+	it('credits ERC-8213 when the domain hash and message hash are shown together', () => {
+		const eipSupport = walletEipSupport({
+			...unknownResolvedFeatures(),
+			security: {
+				...unknownResolvedFeatures().security,
+				transactionLegibility: {
+					ref: { url: 'https://example.com/legibility' },
+					erc8213: supported({
+						calldataDisplay: null,
+						messageSigningLegibility: {
+							[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
+							[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+						},
+					}),
+					erc7730: null,
+					transactionSimulations: null,
+					transactionDetailsDisplay: null,
+				},
+			},
+		})
+
+		// Per ERC-8213, displaying the domain hash and message hash together is
+		// an accepted alternative to displaying the EIP-712 digest.
+		expectSupported(eipSupport['8213'])
 	})
 
 	it('derives ERC-7730 from hardware transaction legibility', () => {
