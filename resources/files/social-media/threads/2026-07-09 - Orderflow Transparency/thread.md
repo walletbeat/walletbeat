@@ -1,6 +1,6 @@
 ![Orderflow Transparency](./cover.png)
 
-What happens to your transaction before it hits the chain?
+Your transaction data is valuable. How does your wallet monetize it?
 
 Walletbeat now rates Orderflow transparency.
 
@@ -10,7 +10,7 @@ Does the wallet transparently disclose how it monetizes your transaction data?
 
 Before a transaction is included onchain, wallet software may send your transaction data to external services for broadcast, simulation, or orderflow auctioning.
 
-Some wallets do this by default. Users see the onchain result, but often not what happens off-chain beforehand. If so, they should know before they confirm.
+Orderflow auctioning is crypto's version of payment for order flow (PFOF): third parties pay for access to your pending transaction before it executes. It's another form of fee-taking — wallets disclose transaction fees before you confirm, and auctioning deserves the same transparency.
 
 ---
 
@@ -32,7 +32,7 @@ Shares externally, does not auction.
 
 Some wallets send pre-inclusion data externally for broadcast or simulation, but do not auction orderflow.
 
-PASS if every default recipient is documented and checkably unable to exploit pending transactions. PARTIAL if any cannot be checked that way.
+PASS if every default recipient is documented and verifiably unable to monetize pending transactions. PARTIAL if any recipient cannot be checked that way.
 
 ---
 
@@ -72,15 +72,7 @@ PARTIAL when a method is documented but not confirmed to work.
 
 ---
 
-Why this matters:
-
-You see fees before you confirm. You should see orderflow handling the same way.
-
-A wallet can show a polished approval screen and still auction your transaction data by default without telling you.
-
----
-
-Hardware wallets are exempt from this attribute.
+Hardware wallets are exempt from this attribute, as they are dependent on a software wallet component to perform auctioning.
 
 Embedded wallets are exempt for now while that category is still thin on Walletbeat.
 
