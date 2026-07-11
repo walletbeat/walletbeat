@@ -163,12 +163,6 @@ export const baseApp: SoftwareWallet = {
 				'6963': featureSupported,
 			},
 		},
-		// Base App accounts run Coinbase Smart Wallet logic, which exposes
-		// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
-		// contract-level property (executeBatch) that holds on every chain the
-		// wallet is deployed to, including Ethereum L1. Confirmed live on
-		// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
-		// UserOperation routed through the account's executeBatch (see refs).
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
@@ -475,6 +469,12 @@ export const baseApp: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		// Base App accounts run Coinbase Smart Wallet logic, which exposes
+		// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
+		// contract-level property (executeBatch) that holds on every chain the
+		// wallet is deployed to, including Ethereum L1. Confirmed live on
+		// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
+		// UserOperation routed through the account's executeBatch (see refs).
 		walletCall: supported({
 			ref: [
 				{
