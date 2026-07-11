@@ -162,38 +162,13 @@ export const baseApp: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			// Base App accounts run Coinbase Smart Wallet logic, which exposes
-			// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
-			// contract-level property (executeBatch) that holds on every chain the
-			// wallet is deployed to, including Ethereum L1. Confirmed live on
-			// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
-			// UserOperation routed through the account's executeBatch (see refs).
-			walletCall: supported({
-				ref: [
-					{
-						explanation:
-							'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
-						url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
-					},
-					{
-						explanation:
-							'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
-						url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
-					},
-					{
-						explanation:
-							'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
-						url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
-					},
-					{
-						explanation:
-							"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
-						url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
-					},
-				],
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
+		// Base App accounts run Coinbase Smart Wallet logic, which exposes
+		// EIP-5792 wallet_sendCalls with atomic batching. Atomicity is a
+		// contract-level property (executeBatch) that holds on every chain the
+		// wallet is deployed to, including Ethereum L1. Confirmed live on
+		// mainnet: a wallet_sendCalls batch was executed as an ERC-4337
+		// UserOperation routed through the account's executeBatch (see refs).
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
@@ -500,6 +475,31 @@ export const baseApp: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: [
+				{
+					explanation:
+						'Base Account documents EIP-5792 batch transactions via `wallet_sendCalls` with an `atomicRequired` flag ("all calls must succeed or all fail"); apps check support via `wallet_getCapabilities` (`atomicBatch`).',
+					url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
+				},
+				{
+					explanation:
+						'Supporting evidence: the open-source `base/account-sdk` (the SDK applications use for Base Account flows) exposes `wallet_sendCalls` with an `atomicRequired` parameter, with no chain restriction. This shows the interface, but the atomicity guarantee itself comes from the account contract, below.',
+					url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
+				},
+				{
+					explanation:
+						'Atomicity is enforced by the Coinbase Smart Wallet contract itself: `executeBatch(Call[])` runs every sub-call in a single transaction via `_call`, which bubbles the revert on any failed sub-call — so one failure reverts the whole batch (all-or-nothing). This is the load-bearing guarantee behind the EIP-5792 atomic capability.',
+					url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+				},
+				{
+					explanation:
+						"Live confirmation on Ethereum L1 (2026-06-20, via Walletbeat's own EIP-5792 test page): a `wallet_sendCalls` batch from a Base App account was executed on Ethereum mainnet as an ERC-4337 `UserOperation` through `EntryPoint` v0.6, routed through the account's `executeBatch` (selector `0x34fcd5be`), and succeeded.",
+					url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
+				},
+			],
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,

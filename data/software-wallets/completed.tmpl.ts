@@ -341,10 +341,6 @@ export const completedTemplate: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -848,6 +844,10 @@ export const completedTemplate: SoftwareWallet = {
 				reproducibleBuilds: supported({ ref: refTodo }),
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.BROWSER]: true,
