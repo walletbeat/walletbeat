@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import { eips } from '@/data/eips'
+import { unratedHardwareWallet } from '@/data/hardware-wallets'
 import { unratedHardwareTemplate } from '@/data/hardware-wallets/unrated.tmpl'
+import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { unratedTemplate } from '@/data/software-wallets/unrated.tmpl'
 import type { SmartWalletContract } from '@/schema/contracts'
-import { type EipSupport, walletEipSupport } from '@/schema/eip-support'
+import {
+	aggregateEipSupport,
+	type EipSupport,
+	ratedWalletEipSupport,
+	walletEipSupport,
+} from '@/schema/eip-support'
 import { type ResolvedFeatures, resolveFeatures } from '@/schema/features'
 import {
 	type AccountSupport,
@@ -25,7 +32,7 @@ import {
 	type Support,
 	supported,
 } from '@/schema/features/support'
-import { refs } from '@/schema/reference'
+import { refs, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 /** Resolved features of the unrated software wallet template. */
@@ -386,5 +393,76 @@ describe('walletEipSupport', () => {
 		// Every assessed benchmark decodes, but some benchmarks have not been
 		// assessed, so full registry coverage cannot be confirmed either way.
 		expect(eipSupport['7730']).toBe('UNKNOWN')
+	})
+})
+
+/** A supported EIP support value referencing the given URL. */
+function supportedEip(url: string): WithRef<Support> {
+	return { ...featureSupported, ref: { url } }
+}
+
+/** A verified-unsupported EIP support value referencing the given URL. */
+function notSupportedEip(url: string): WithRef<Support> {
+	return { ...notSupported, ref: { url } }
+}
+
+describe('aggregateEipSupport', () => {
+	it('returns UNKNOWN when there is nothing to aggregate', () => {
+		expect(aggregateEipSupport([])).toBe('UNKNOWN')
+	})
+
+	it('is supported when any variant supports the EIP, with the supporting refs', () => {
+		const aggregated = aggregateEipSupport([
+			notSupportedEip('https://example.com/mobile'),
+			supportedEip('https://example.com/browser'),
+			'UNKNOWN',
+			'NOT_APPLICABLE',
+		])
+
+		expectSupported(aggregated)
+		expect(refUrls(aggregated)).toContain('https://example.com/browser')
+		expect(refUrls(aggregated)).not.toContain('https://example.com/mobile')
+	})
+
+	it('is unknown when no variant supports the EIP but some are unassessed', () => {
+		expect(aggregateEipSupport([notSupportedEip('https://example.com/mobile'), 'UNKNOWN'])).toBe(
+			'UNKNOWN',
+		)
+	})
+
+	it('is not supported only when no variant might support the EIP', () => {
+		const aggregated = aggregateEipSupport([
+			notSupportedEip('https://example.com/mobile'),
+			notSupportedEip('https://example.com/browser'),
+			'NOT_APPLICABLE',
+		])
+
+		expectNotSupported(aggregated)
+		expect(refUrls(aggregated)).toContain('https://example.com/mobile')
+		expect(refUrls(aggregated)).toContain('https://example.com/browser')
+	})
+
+	it('is not applicable only when the EIP applies to no variant', () => {
+		expect(aggregateEipSupport(['NOT_APPLICABLE', 'NOT_APPLICABLE'])).toBe('NOT_APPLICABLE')
+	})
+})
+
+describe('ratedWalletEipSupport', () => {
+	it('returns UNKNOWN with per-variant detail for the unrated wallet', () => {
+		const walletSupport = ratedWalletEipSupport(unratedSoftwareWallet, '5792')
+
+		expect(walletSupport.overall).toBe('UNKNOWN')
+
+		const perVariant = Object.values(walletSupport.perVariant)
+
+		expect(perVariant.length).toBeGreaterThan(0)
+
+		for (const variantSupport of perVariant) {
+			expect(variantSupport).toBe('UNKNOWN')
+		}
+	})
+
+	it('marks browser integration EIPs as not applicable for hardware wallets', () => {
+		expect(ratedWalletEipSupport(unratedHardwareWallet, '1193').overall).toBe('NOT_APPLICABLE')
 	})
 })

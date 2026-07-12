@@ -1,3 +1,4 @@
+import { setItems } from '@/types/utils/non-empty'
 import { remap } from '@/types/utils/remap'
 
 import type { EipNumber } from './eips'
@@ -18,6 +19,8 @@ import {
 } from './features/security/transaction-legibility'
 import { featureSupported, isSupported, notSupported, type Support } from './features/support'
 import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
+import { getVariants, type Variant } from './variants'
+import { getVariantResolvedWallet, type RatedWallet } from './wallet'
 
 /**
  * Whether a wallet implements a specific EIP.
@@ -307,4 +310,65 @@ export function walletEipSupport(features: ResolvedFeatures): WalletEipSupport {
 		eipSupportResolvers,
 		(_: EipNumber, resolve: (features: ResolvedFeatures) => EipSupport) => resolve(features),
 	)
+}
+
+/** A rated wallet's support for a single EIP. */
+export interface RatedWalletEipSupport {
+	/** Support aggregated across all of the wallet's variants. */
+	overall: EipSupport
+
+	/** Support for each variant the wallet exists in. */
+	perVariant: Partial<Record<Variant, EipSupport>>
+}
+
+/**
+ * Aggregate EIP support values across a wallet's variants.
+ * The wallet supports the EIP if any variant supports it, and verifiably does
+ * not support it only if no variant might (i.e. none is unknown). The EIP is
+ * not applicable to the wallet only if it applies to no variant at all.
+ */
+export function aggregateEipSupport(supports: EipSupport[]): EipSupport {
+	const assessed = supports.filter(support => typeof support !== 'string')
+	const supporting = assessed.filter(support => isSupported(support))
+
+	if (supporting.length > 0) {
+		return eipSupport(true, ...supporting.map(support => support.ref))
+	}
+
+	if (supports.includes('UNKNOWN') || supports.length === 0) {
+		return 'UNKNOWN'
+	}
+
+	if (assessed.length > 0) {
+		return eipSupport(false, ...assessed.map(support => support.ref))
+	}
+
+	return 'NOT_APPLICABLE'
+}
+
+/**
+ * Determine a rated wallet's support for a single EIP, per variant and
+ * aggregated across all variants.
+ */
+export function ratedWalletEipSupport<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): RatedWalletEipSupport {
+	const perVariant: Partial<Record<Variant, EipSupport>> = {}
+	const variantSupports: EipSupport[] = []
+
+	for (const variant of setItems(getVariants(wallet.variants))) {
+		const resolvedWallet = getVariantResolvedWallet(wallet, variant)
+
+		if (resolvedWallet === null) {
+			continue
+		}
+
+		const support = eipSupportResolvers[eipNumber](resolvedWallet.features)
+
+		perVariant[variant] = support
+		variantSupports.push(support)
+	}
+
+	return { overall: aggregateEipSupport(variantSupports), perVariant }
 }
