@@ -735,6 +735,15 @@ export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLeg
 export const isShown = (field: DataDisplayOptions): boolean =>
 	field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
 
+/**
+ * Whether a display entry is shown to the user.
+ * Handles both the software wallet shape (a bare `DataDisplayOptions`) and
+ * the hardware wallet shape (a `DisplayCapability` object).
+ */
+export function displayEntryIsShown(entry: DataDisplayOptions | DisplayCapability): boolean {
+	return isShown(typeof entry === 'object' ? entry.display : entry)
+}
+
 export const isFullBasicTransactionDetails = (
 	details: DisplayedBasicTransactionDetails,
 ): boolean => {

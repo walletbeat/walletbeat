@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import { eips } from '@/data/eips'
-import { hardwareWallets } from '@/data/hardware-wallets'
-import { softwareWallets } from '@/data/software-wallets'
+import { unratedHardwareTemplate } from '@/data/hardware-wallets/unrated.tmpl'
+import { unratedTemplate } from '@/data/software-wallets/unrated.tmpl'
 import { type EipSupport, walletEipSupport } from '@/schema/eip-support'
 import { type ResolvedFeatures, resolveFeatures } from '@/schema/features'
-import { AccountType } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
+import {
+	AccountType,
+	TransactionGenerationCapability,
+} from '@/schema/features/account-support'
 import {
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
@@ -14,107 +16,44 @@ import {
 	DataLocation,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
-import {
-	featureSupported,
-	isMaybeSupported,
-	isSupported,
-	notSupported,
-	supported,
-} from '@/schema/features/support'
+import { featureSupported, isSupported, notSupported, supported } from '@/schema/features/support'
 import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { BaseWallet } from '@/schema/wallet'
-import { WalletType } from '@/schema/wallet-types'
 
-/** A resolved feature set where every feature is unknown. */
-function unknownResolvedFeatures(): ResolvedFeatures {
-	return {
-		variant: Variant.BROWSER,
-		type: WalletType.SOFTWARE,
-		profile: WalletProfile.GENERIC,
-		security: {
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: null,
-			transactionLegibility: null,
-			passkeyVerification: null,
-			bugBountyProgram: null,
-			firmware: null,
-			keysHandling: null,
-			securityBestPractices: null,
-			supplyChainDIY: null,
-			supplyChainFactory: null,
-			userSafety: null,
-			accountRecovery: null,
-			duressResistance: null,
-		},
-		privacy: {
-			analytics: {
-				usage: null,
-				crashReports: null,
-			},
-			dataCollection: null,
-			privacyPolicy: null,
-			hardwarePrivacy: null,
-			transactionPrivacy: null,
-			appIsolation: null,
-		},
-		selfSovereignty: {
-			transactionSubmission: null,
-			interoperability: null,
-			permissionsManagement: null,
-		},
-		transparency: {
-			operationFees: null,
-			orderflowPractices: null,
-			reputation: null,
-			maintenance: null,
-			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
-				repositoryChangeControls: null,
-				reproducibleBuilds: null,
-			},
-		},
-		chainAbstraction: null,
-		chainConfigurability: null,
-		accountSupport: null,
-		multiAddress: null,
-		integration: {
-			browser: 'NOT_A_BROWSER_WALLET',
-		},
-		walletCall: null,
-		addressResolution: null,
-		licensing: null,
-		monetization: null,
-		appConnectionSupport: null,
-	}
+/** Resolved features of the unrated software wallet template. */
+function unratedFeatures(): ResolvedFeatures {
+	return resolveFeatures(unratedTemplate.features, unratedTemplate.variants, Variant.BROWSER)
+}
+
+/** Resolved features of the unrated hardware wallet template. */
+function unratedHardwareFeatures(): ResolvedFeatures {
+	return resolveFeatures(
+		unratedHardwareTemplate.features,
+		unratedHardwareTemplate.variants,
+		Variant.HARDWARE,
+	)
 }
 
 function expectSupported(eipSupport: EipSupport): void {
-	expect(eipSupport).not.toBeNull()
+	expect(eipSupport).not.toBe('UNKNOWN')
+	expect(eipSupport).not.toBe('NOT_APPLICABLE')
 
-	if (eipSupport !== null) {
+	if (typeof eipSupport !== 'string') {
 		expect(isSupported(eipSupport)).toBe(true)
 	}
 }
 
 function expectNotSupported(eipSupport: EipSupport): void {
-	expect(eipSupport).not.toBeNull()
+	expect(eipSupport).not.toBe('UNKNOWN')
+	expect(eipSupport).not.toBe('NOT_APPLICABLE')
 
-	if (eipSupport !== null) {
+	if (typeof eipSupport !== 'string') {
 		expect(isSupported(eipSupport)).toBe(false)
 	}
 }
 
 function refUrls(eipSupport: EipSupport): string[] {
-	if (eipSupport === null) {
+	if (typeof eipSupport === 'string') {
 		return []
 	}
 
@@ -122,17 +61,25 @@ function refUrls(eipSupport: EipSupport): string[] {
 }
 
 describe('walletEipSupport', () => {
-	it('returns null for all EIPs when all features are unknown', () => {
-		const eipSupport = walletEipSupport(unknownResolvedFeatures())
+	it('returns UNKNOWN for all EIPs when the wallet is unrated', () => {
+		const eipSupport = walletEipSupport(unratedFeatures())
 
 		for (const eipNumber of Object.keys(eips)) {
-			expect(eipSupport[eipNumber]).toBeNull()
+			expect(eipSupport[eipNumber]).toBe('UNKNOWN')
 		}
+	})
+
+	it('marks browser integration EIPs as not applicable for non-browser wallets', () => {
+		const eipSupport = walletEipSupport(unratedHardwareFeatures())
+
+		expect(eipSupport['1193']).toBe('NOT_APPLICABLE')
+		expect(eipSupport['2700']).toBe('NOT_APPLICABLE')
+		expect(eipSupport['6963']).toBe('NOT_APPLICABLE')
 	})
 
 	it('derives browser integration EIPs from the browser integration record', () => {
 		const eipSupport = walletEipSupport({
-			...unknownResolvedFeatures(),
+			...unratedFeatures(),
 			integration: {
 				browser: {
 					ref: { url: 'https://example.com/browser-integration' },
@@ -145,16 +92,44 @@ describe('walletEipSupport', () => {
 
 		expectSupported(eipSupport['1193'])
 		expectNotSupported(eipSupport['2700'])
-		expect(eipSupport['6963']).toBeNull()
+		expect(eipSupport['6963']).toBe('UNKNOWN')
 
 		// The browser integration record's references apply to each browser EIP.
 		expect(refUrls(eipSupport['1193'])).toContain('https://example.com/browser-integration')
 		expect(refUrls(eipSupport['2700'])).toContain('https://example.com/browser-integration')
 	})
 
-	it('derives account abstraction EIPs from account support', () => {
+	it('derives ERC-4337 from raw ERC-4337 account support', () => {
 		const eipSupport = walletEipSupport({
-			...unknownResolvedFeatures(),
+			...unratedFeatures(),
+			accountSupport: {
+				defaultAccountType: AccountType.rawErc4337,
+				eoa: notSupported,
+				mpc: notSupported,
+				rawErc4337: supported({
+					ref: { url: 'https://example.com/4337' },
+					contract: 'UNKNOWN',
+					controllingSharesInSelfCustodyByDefault: 'YES',
+					tokenTransferTransactionGeneration:
+						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					keyRotationTransactionGeneration:
+						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				}),
+				eip7702: notSupported,
+				safe: notSupported,
+			},
+		})
+
+		expectSupported(eipSupport['4337'])
+		expectNotSupported(eipSupport['7702'])
+
+		// References attached to the account type support are preserved.
+		expect(refUrls(eipSupport['4337'])).toContain('https://example.com/4337')
+	})
+
+	it('credits ERC-4337 support to EIP-7702 wallets', () => {
+		const eipSupport = walletEipSupport({
+			...unratedFeatures(),
 			accountSupport: {
 				defaultAccountType: AccountType.eip7702,
 				eoa: notSupported,
@@ -169,15 +144,17 @@ describe('walletEipSupport', () => {
 		})
 
 		expectSupported(eipSupport['7702'])
-		expectNotSupported(eipSupport['4337'])
-
-		// References attached to the account type support are preserved.
 		expect(refUrls(eipSupport['7702'])).toContain('https://example.com/7702')
+
+		// An EIP-7702 wallet supports a smart-account-based account type, which
+		// counts as ERC-4337 support, backed by the EIP-7702 references.
+		expectSupported(eipSupport['4337'])
+		expect(refUrls(eipSupport['4337'])).toContain('https://example.com/7702')
 	})
 
 	it('derives EIP-5792 from wallet call support', () => {
 		const eipSupport = walletEipSupport({
-			...unknownResolvedFeatures(),
+			...unratedFeatures(),
 			walletCall: supported({
 				ref: { url: 'https://example.com/5792' },
 				atomicMultiTransactions: featureSupported,
@@ -188,11 +165,25 @@ describe('walletEipSupport', () => {
 		expect(refUrls(eipSupport['5792'])).toContain('https://example.com/5792')
 	})
 
+	it('derives EIP-5792 regardless of atomic multi-transaction support', () => {
+		const eipSupport = walletEipSupport({
+			...unratedFeatures(),
+			walletCall: supported({
+				ref: { url: 'https://example.com/5792' },
+				atomicMultiTransactions: notSupported,
+			}),
+		})
+
+		// The wallet implements the EIP-5792 wallet call API, even though it
+		// does not support the atomic capability.
+		expectSupported(eipSupport['5792'])
+	})
+
 	it('derives EIP-712, ERC-7730 and ERC-8213 from software transaction legibility', () => {
 		const eipSupport = walletEipSupport({
-			...unknownResolvedFeatures(),
+			...unratedFeatures(),
 			security: {
-				...unknownResolvedFeatures().security,
+				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
 					erc8213: supported({
@@ -231,8 +222,8 @@ describe('walletEipSupport', () => {
 		expectSupported(eipSupport['712'])
 		// The wallet does not display the calldata digest nor the EIP-712 digest.
 		expectNotSupported(eipSupport['8213'])
-		// The wallet claims ERC-7730 support but decodes none of the benchmark
-		// transactions.
+		// The wallet claims ERC-7730 support but was verified not to decode some
+		// of the benchmark transactions.
 		expectNotSupported(eipSupport['7730'])
 
 		// All three EIPs inherit the transaction legibility references.
@@ -243,9 +234,9 @@ describe('walletEipSupport', () => {
 
 	it('credits ERC-8213 when the domain hash and message hash are shown together', () => {
 		const eipSupport = walletEipSupport({
-			...unknownResolvedFeatures(),
+			...unratedFeatures(),
 			security: {
-				...unknownResolvedFeatures().security,
+				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
 					erc8213: supported({
@@ -269,74 +260,78 @@ describe('walletEipSupport', () => {
 		expectSupported(eipSupport['8213'])
 	})
 
-	it('derives ERC-7730 from hardware transaction legibility', () => {
-		const eipSupport = walletEipSupport({
-			...unknownResolvedFeatures(),
-			variant: Variant.HARDWARE,
-			type: WalletType.HARDWARE,
+	/** Hardware wallet features with the given per-benchmark ERC-7730 data. */
+	function hardwareErc7730Features(
+		benchmarks: Record<ComplexBenchmarkTransactions, DataLocation | null>,
+	): ResolvedFeatures {
+		return {
+			...unratedHardwareFeatures(),
 			security: {
-				...unknownResolvedFeatures().security,
+				...unratedHardwareFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/hardware-legibility' },
 					erc8213: null,
-					erc7730: supported({
-						[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
-						[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
-						[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
-						[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-							DataLocation.NOT_PROVIDED,
-						[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-							DataLocation.NOT_PROVIDED,
-					}),
+					erc7730: supported(benchmarks),
 					detailsDisplayed: null,
 					dataExtraction: null,
 				},
 			},
-		})
+		}
+	}
 
-		// The wallet decodes at least one benchmark transaction on-device.
+	it('derives ERC-7730 from hardware transaction legibility when all benchmarks decode', () => {
+		const eipSupport = walletEipSupport(
+			hardwareErc7730Features({
+				[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+				[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+				[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.OFF_DEVICE,
+				[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+					DataLocation.OFF_DEVICE,
+				[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+					DataLocation.OFF_DEVICE,
+			}),
+		)
+
+		// The wallet decodes every benchmark transaction, on-device or through
+		// the companion app.
 		expectSupported(eipSupport['7730'])
 		// The ERC-8213 data was not assessed.
-		expect(eipSupport['8213']).toBeNull()
-		expect(eipSupport['712']).toBeNull()
+		expect(eipSupport['8213']).toBe('UNKNOWN')
+		expect(eipSupport['712']).toBe('UNKNOWN')
 	})
 
-	describe('handles all wallets', () => {
-		// TODO: Add embedded wallets here once we have some.
-		const walletMaps: Array<[string, Record<string, BaseWallet<string>>]> = [
-			['software wallets', softwareWallets],
-			['hardware wallets', hardwareWallets],
-		]
+	it('does not credit ERC-7730 when only some benchmark transactions decode', () => {
+		const eipSupport = walletEipSupport(
+			hardwareErc7730Features({
+				[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+				[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+				[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
+				[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+					DataLocation.NOT_PROVIDED,
+				[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+					DataLocation.NOT_PROVIDED,
+			}),
+		)
 
-		for (const [title, walletMap] of walletMaps) {
-			describe(title, () => {
-				for (const walletName in walletMap) {
-					const wallet = walletMap[walletName]
+		// ERC-7730 is registry-based: a wallet that decodes only some of the
+		// benchmark transactions does not implement it.
+		expectNotSupported(eipSupport['7730'])
+	})
 
-					it(`derives EIP support for all variants of ${walletName}`, () => {
-						for (const variant of Object.values(Variant)) {
-							if (wallet.variants[variant] !== true) {
-								continue
-							}
+	it('leaves ERC-7730 unknown when unassessed benchmarks could still decode', () => {
+		const eipSupport = walletEipSupport(
+			hardwareErc7730Features({
+				[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+				[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+				[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: null,
+				[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+					null,
+				[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: null,
+			}),
+		)
 
-							const eipSupport = walletEipSupport(
-								resolveFeatures(wallet.features, wallet.variants, variant),
-							)
-
-							// One entry per tracked EIP, each either unknown or a
-							// reference-annotated Support value.
-							expect(Object.keys(eipSupport).sort()).toEqual(Object.keys(eips).sort())
-
-							for (const support of Object.values(eipSupport)) {
-								if (support !== null) {
-									expect(isMaybeSupported(support)).toBe(true)
-									expect(Object.hasOwn(support, 'ref')).toBe(true)
-								}
-							}
-						}
-					})
-				}
-			})
-		}
+		// Every assessed benchmark decodes, but some benchmarks have not been
+		// assessed, so full registry coverage cannot be confirmed either way.
+		expect(eipSupport['7730']).toBe('UNKNOWN')
 	})
 })

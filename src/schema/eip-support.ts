@@ -2,65 +2,57 @@ import { remap } from '@/types/utils/remap'
 
 import type { EipNumber } from './eips'
 import type { ResolvedFeatures } from './features'
-import { AccountType } from './features/account-support'
 import type { BrowserIntegrationEip } from './features/ecosystem/integration'
 import { PrivateTransferTechnology } from './features/privacy/transaction-privacy'
 import {
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
-	type DataDisplayOptions,
 	DataLocation,
-	type HardwareTransactionLegibilityImplementation,
+	displayEntryIsShown,
 	type HardwareWalletErc7730,
 	type HardwareWalletErc8213,
 	isShown,
 	MessageSigningDetails,
-	type SoftwareTransactionLegibilityImplementation,
 	type SoftwareWalletErc7730,
 	type SoftwareWalletErc8213,
 } from './features/security/transaction-legibility'
 import { featureSupported, isSupported, notSupported, type Support } from './features/support'
-import { hasRefs, refNotNecessary, type WithRef } from './reference'
+import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
 
 /**
  * Whether a wallet implements a specific EIP.
  *
  * - `SUPPORTED` means the wallet implements the EIP, at least partially.
  * - `NOT_SUPPORTED` means the wallet was verified not to implement the EIP.
- * - `null` means the implementation status is unknown, or that the EIP does
- *   not apply to this type of wallet (e.g. browser integration EIPs for
- *   wallets that have no browser variant).
+ * - `'UNKNOWN'` means the implementation status has not been assessed yet.
+ * - `'NOT_APPLICABLE'` means the EIP does not apply to this type of wallet
+ *   (e.g. browser integration EIPs for wallets that have no browser variant).
  */
-export type EipSupport = WithRef<Support> | null
+export type EipSupport = WithRef<Support> | 'UNKNOWN' | 'NOT_APPLICABLE'
 
 /** EIP implementation status for every EIP tracked by Walletbeat. */
 export type WalletEipSupport = Record<EipNumber, EipSupport>
 
-/** A `Support` value annotated with references. */
-function supportWithRef(
+/**
+ * An implemented/not-implemented EIP support value, annotated with the
+ * given hand-picked reference sources merged together.
+ * Falls back to `refTodo` when none of the sources carry references.
+ */
+function eipSupport(
 	implemented: boolean,
-	ref: WithRef<unknown>['ref'] | undefined,
+	...refSources: Array<WithRef<unknown>['ref'] | undefined>
 ): WithRef<Support> {
+	const mergedRefs = mergeRefs(...refSources)
+
 	return {
 		...(implemented ? featureSupported : notSupported),
-		ref: ref ?? refNotNecessary,
+		ref: mergedRefs.length > 0 ? mergedRefs : refTodo,
 	}
 }
 
-/**
- * Normalize a feature-level `Support` value into an `EipSupport`, preserving
- * references attached to the value itself and falling back to `fallbackRef`
- * (typically the references of the enclosing feature) otherwise.
- */
-function normalizeSupport(
-	support: Support<object> | null,
-	fallbackRef?: WithRef<unknown>['ref'],
-): EipSupport {
-	if (support === null) {
-		return null
-	}
-
-	return supportWithRef(isSupported(support), hasRefs(support) ? support.ref : fallbackRef)
+/** The references attached to `value` itself, if any. */
+function ownRefs(value: unknown): WithRef<unknown>['ref'] | undefined {
+	return hasRefs(value) ? value.ref : undefined
 }
 
 /** EIP support based on the browser integration record. */
@@ -71,24 +63,17 @@ function browserIntegrationEipSupport(
 	const browser = features.integration.browser
 
 	if (browser === 'NOT_A_BROWSER_WALLET') {
-		return null
+		return 'NOT_APPLICABLE'
 	}
 
-	return normalizeSupport(browser[eip], browser.ref)
-}
+	const support = browser[eip]
 
-/** EIP support based on the wallet supporting a specific account type. */
-function accountTypeEipSupport(
-	features: ResolvedFeatures,
-	accountType: AccountType.eip7702 | AccountType.rawErc4337,
-): EipSupport {
-	const accountSupport = features.accountSupport
-
-	if (accountSupport === null) {
-		return null
+	if (support === null) {
+		return 'UNKNOWN'
 	}
 
-	return normalizeSupport(accountSupport[accountType])
+	// The browser integration record's references document all browser EIPs.
+	return eipSupport(isSupported(support), ownRefs(support), browser.ref)
 }
 
 /** EIP support based on chain-specific address resolution. */
@@ -99,47 +84,17 @@ function addressResolutionEipSupport(
 	const addressResolution = features.addressResolution
 
 	if (addressResolution === null) {
-		return null
+		return 'UNKNOWN'
 	}
 
-	return normalizeSupport(addressResolution.chainSpecificAddressing[erc], addressResolution.ref)
-}
+	const support = addressResolution.chainSpecificAddressing[erc]
 
-/**
- * EIP support derived from the transaction legibility feature.
- * `derive` returns whether the EIP is implemented, or `null` if the
- * transaction legibility data does not answer that question.
- */
-function transactionLegibilityEipSupport(
-	features: ResolvedFeatures,
-	derive: (
-		transactionLegibility:
-			| HardwareTransactionLegibilityImplementation
-			| SoftwareTransactionLegibilityImplementation,
-	) => boolean | null,
-): EipSupport {
-	const transactionLegibility = features.security.transactionLegibility
-
-	if (transactionLegibility === null) {
-		return null
+	if (support === null) {
+		return 'UNKNOWN'
 	}
 
-	const implemented = derive(transactionLegibility)
-
-	if (implemented === null) {
-		return null
-	}
-
-	return supportWithRef(implemented, transactionLegibility.ref)
-}
-
-/**
- * Whether a display entry is shown to the user.
- * Handles both the software wallet shape (a bare `DataDisplayOptions`) and
- * the hardware wallet shape (a `DisplayCapability` object).
- */
-function displayEntryIsShown(entry: DataDisplayOptions | { display: DataDisplayOptions }): boolean {
-	return isShown(typeof entry === 'object' ? entry.display : entry)
+	// The address resolution record's references document both address ERCs.
+	return eipSupport(isSupported(support), ownRefs(support), addressResolution.ref)
 }
 
 /**
@@ -153,63 +108,119 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 	// message signing data. A wallet implements EIP-712 if it surfaces any
 	// EIP-712-specific data (decoded struct, domain/message hash or digest)
 	// when signing typed data.
-	'712': features =>
-		transactionLegibilityEipSupport(features, transactionLegibility => {
-			const erc8213 = transactionLegibility.erc8213
+	'712': features => {
+		const transactionLegibility = features.security.transactionLegibility
 
-			if (erc8213 === null) {
-				return null
-			}
+		if (transactionLegibility === null) {
+			return 'UNKNOWN'
+		}
 
-			if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
-				return false
-			}
+		const erc8213 = transactionLegibility.erc8213
 
-			const messageSigningLegibility = erc8213.messageSigningLegibility
+		if (erc8213 === null) {
+			return 'UNKNOWN'
+		}
 
-			if (messageSigningLegibility === null) {
-				return null
-			}
+		if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
+			return eipSupport(false, transactionLegibility.ref)
+		}
 
-			return Object.values(MessageSigningDetails).some(detail =>
+		const messageSigningLegibility = erc8213.messageSigningLegibility
+
+		if (messageSigningLegibility === null) {
+			return 'UNKNOWN'
+		}
+
+		return eipSupport(
+			Object.values(MessageSigningDetails).some(detail =>
 				displayEntryIsShown(messageSigningLegibility[detail]),
-			)
-		}),
+			),
+			transactionLegibility.ref,
+		)
+	},
 	'1193': features => browserIntegrationEipSupport(features, '1193'),
 	'2700': features => browserIntegrationEipSupport(features, '2700'),
-	'4337': features => accountTypeEipSupport(features, AccountType.rawErc4337),
+	// A wallet supporting EIP-7702 accounts runs smart-account code for its
+	// users, so either raw ERC-4337 or EIP-7702 account support counts as
+	// supporting a smart-account-based account type.
+	'4337': features => {
+		const accountSupport = features.accountSupport
+
+		if (accountSupport === null) {
+			return 'UNKNOWN'
+		}
+
+		const { rawErc4337, eip7702 } = accountSupport
+
+		if (!isSupported(rawErc4337) && !isSupported(eip7702)) {
+			return eipSupport(false)
+		}
+
+		return eipSupport(
+			true,
+			isSupported(rawErc4337) ? ownRefs(rawErc4337) : undefined,
+			isSupported(eip7702) ? ownRefs(eip7702) : undefined,
+		)
+	},
 	'5564': features => {
 		const transactionPrivacy = features.privacy.transactionPrivacy
 
 		if (transactionPrivacy === null) {
-			return null
+			return 'UNKNOWN'
 		}
 
-		return normalizeSupport(transactionPrivacy[PrivateTransferTechnology.STEALTH_ADDRESSES])
+		const stealthAddresses = transactionPrivacy[PrivateTransferTechnology.STEALTH_ADDRESSES]
+
+		return eipSupport(isSupported(stealthAddresses), ownRefs(stealthAddresses))
 	},
-	'5792': features => normalizeSupport(features.walletCall),
+	'5792': features => {
+		const walletCall = features.walletCall
+
+		if (walletCall === null) {
+			return 'UNKNOWN'
+		}
+
+		return eipSupport(isSupported(walletCall), ownRefs(walletCall))
+	},
 	'6963': features => browserIntegrationEipSupport(features, '6963'),
-	'7702': features => accountTypeEipSupport(features, AccountType.eip7702),
-	// A wallet implements ERC-7730 if it decodes at least one of the complex
+	'7702': features => {
+		const accountSupport = features.accountSupport
+
+		if (accountSupport === null) {
+			return 'UNKNOWN'
+		}
+
+		const eip7702 = accountSupport.eip7702
+
+		return eipSupport(isSupported(eip7702), ownRefs(eip7702))
+	},
+	// ERC-7730 is registry-based: a wallet that implements it decodes every
+	// transaction in the registry, so it must decode *all* of the complex
 	// benchmark transactions into a human-readable description (for hardware
 	// wallets: on-device or through the companion app).
-	'7730': features =>
-		transactionLegibilityEipSupport(features, transactionLegibility => {
-			const erc7730 = transactionLegibility.erc7730
+	'7730': features => {
+		const transactionLegibility = features.security.transactionLegibility
 
-			if (erc7730 === null) {
-				return null
-			}
+		if (transactionLegibility === null) {
+			return 'UNKNOWN'
+		}
 
-			if (!isSupported<HardwareWalletErc7730 | SoftwareWalletErc7730>(erc7730)) {
-				return false
-			}
+		const erc7730 = transactionLegibility.erc7730
 
-			return Object.values(ComplexBenchmarkTransactions).some(benchmark => {
+		if (erc7730 === null) {
+			return 'UNKNOWN'
+		}
+
+		if (!isSupported<HardwareWalletErc7730 | SoftwareWalletErc7730>(erc7730)) {
+			return eipSupport(false, transactionLegibility.ref)
+		}
+
+		const decoded = Object.values(ComplexBenchmarkTransactions).map(
+			(benchmark): boolean | null => {
 				const entry = erc7730[benchmark]
 
 				if (entry === null) {
-					return false
+					return null
 				}
 
 				if (typeof entry === 'string') {
@@ -217,42 +228,58 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 				}
 
 				return isShown(entry.decoded)
-			})
-		}),
+			},
+		)
+
+		if (decoded.includes(false)) {
+			return eipSupport(false, transactionLegibility.ref)
+		}
+
+		if (decoded.includes(null)) {
+			return 'UNKNOWN'
+		}
+
+		return eipSupport(true, transactionLegibility.ref)
+	},
 	'7828': features => addressResolutionEipSupport(features, 'erc7828'),
 	'7831': features => addressResolutionEipSupport(features, 'erc7831'),
 	// A wallet implements ERC-8213 if it displays the calldata digest, or
 	// satisfies the ERC's EIP-712 signing display requirement: the EIP-712
 	// digest, or the domain hash and message hash together.
-	'8213': features =>
-		transactionLegibilityEipSupport(features, transactionLegibility => {
-			const erc8213 = transactionLegibility.erc8213
+	'8213': features => {
+		const transactionLegibility = features.security.transactionLegibility
 
-			if (erc8213 === null) {
-				return null
-			}
+		if (transactionLegibility === null) {
+			return 'UNKNOWN'
+		}
 
-			if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
-				return false
-			}
+		const erc8213 = transactionLegibility.erc8213
 
-			const { calldataDisplay, messageSigningLegibility } = erc8213
+		if (erc8213 === null) {
+			return 'UNKNOWN'
+		}
 
-			if (calldataDisplay === null && messageSigningLegibility === null) {
-				return null
-			}
+		if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
+			return eipSupport(false, transactionLegibility.ref)
+		}
 
-			const calldataDigestShown =
-				calldataDisplay !== null &&
-				displayEntryIsShown(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])
-			const signatureDigestShown =
-				messageSigningLegibility !== null &&
-				(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.EIP712_DIGEST]) ||
-					(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]) &&
-						displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH])))
+		const { calldataDisplay, messageSigningLegibility } = erc8213
 
-			return calldataDigestShown || signatureDigestShown
-		}),
+		if (calldataDisplay === null && messageSigningLegibility === null) {
+			return 'UNKNOWN'
+		}
+
+		const calldataDigestShown =
+			calldataDisplay !== null &&
+			displayEntryIsShown(calldataDisplay[CallDataDisplay.CALLDATA_DIGEST])
+		const signatureDigestShown =
+			messageSigningLegibility !== null &&
+			(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.EIP712_DIGEST]) ||
+				(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]) &&
+					displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH])))
+
+		return eipSupport(calldataDigestShown || signatureDigestShown, transactionLegibility.ref)
+	},
 }
 
 /**
