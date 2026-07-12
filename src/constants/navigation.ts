@@ -27,13 +27,40 @@ function walletImageIcon(id: string, ext: string): WalletImageNavigationIcon {
 }
 
 // Constants
-import { hardwareWallets } from '@/data/hardware-wallets'
-import { softwareWallets } from '@/data/software-wallets'
+import { eips } from '@/data/eips'
+import { hardwareWallets, ratedHardwareWallets } from '@/data/hardware-wallets'
+import { ratedSoftwareWallets, softwareWallets } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { attributeTree } from '@/schema/attribute-tree'
+import { ratedWalletEipSupport } from '@/schema/eip-support'
+import { eipShortLabel } from '@/schema/eips'
+import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
+import { getEipTrackerUrl } from '@/utils/eip-url'
 import { getWalletUrl } from '@/utils/wallet-url'
+
+/**
+ * Navigation entries for the per-EIP adoption tracker pages, limited to the
+ * EIPs that apply to at least one of the given wallets.
+ */
+function eipTrackerNavigationItems(
+	idPrefix: string,
+	wallets: Array<RatedWallet<string>>,
+): NavigationItem[] {
+	return Object.values(eips)
+		.filter(eip =>
+			wallets.some(
+				wallet => ratedWalletEipSupport(wallet, eip.number).overall !== 'NOT_APPLICABLE',
+			),
+		)
+		.map(eip => ({
+			id: `${idPrefix}-eip-${eip.number}-tracker`,
+			title: `${eipShortLabel(eip)} Tracker`,
+			href: getEipTrackerUrl(eip),
+			icon: 'ICON_CHART_BAR' as const,
+		}))
+}
 
 export const navigationFaq = {
 	id: 'faq',
@@ -134,10 +161,10 @@ export const defaultNavigationItems = [
 				})),
 			},
 			{
-				id: 'eip-7702-tracker',
-				title: 'EIP-7702 Tracker',
-				href: '/wallet/7702/',
+				id: 'software-eip-trackers',
+				title: 'EIP Trackers',
 				icon: 'ICON_CHART_BAR',
+				children: eipTrackerNavigationItems('software', Object.values(ratedSoftwareWallets)),
 			},
 		],
 	},
@@ -175,6 +202,12 @@ export const defaultNavigationItems = [
 					href: getWalletUrl(wallet),
 					icon: walletImageIcon(wallet.metadata.id, wallet.metadata.iconExtension),
 				})),
+			},
+			{
+				id: 'hardware-eip-trackers',
+				title: 'EIP Trackers',
+				icon: 'ICON_CHART_BAR',
+				children: eipTrackerNavigationItems('hardware', Object.values(ratedHardwareWallets)),
 			},
 		],
 	},
