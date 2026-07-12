@@ -6,8 +6,9 @@ While the primary purpose of the grant was to support Walletbeat's launch (we ha
 
 ### Launch
 
-- [ ] beta.walletbeat.eth -> walletbeat.eth
-- [ ] walletbeat.fyi -> walletbeat.eth
+- [x] walletbeat.fyi -> beta.walletbeat.eth
+- [x] walletbeat.eth -> beta.walletbeat.eth
+- [ ] beta.walletbeat.eth -> walletbeat.eth (official launch)
 
 ### Tracks
 
@@ -26,28 +27,26 @@ While the primary purpose of the grant was to support Walletbeat's launch (we ha
     - [x] Orderflow transparency
   - [ ] Ecosystem
     - [ ] Sign in with Ethereum support
-    - [ ] Warnings for app-specified EIP-7702 delegation requests
     - [x] Unified cross-chain balances
     - [x] EIP-7702 transaction batching support
   - [x] Software and hardware wallet attribute consolidation.
 - [x] Wallet stage rating system
 - [ ] Wallet data collection
-  - [ ] Software wallets - 5 software wallets
-    - [ ] Coinbase
-      - [ ] Mobile
-      - [ ] Browser extension
-    - [ ] Rainbow
-      - [ ] Mobile
-      - [ ] Browser Extension
-    - [ ] Metamask
-      - [ ] Mobile
-      - [ ] Browser extension
+  - [x] Software wallets - 5 software wallets
+    - [x] Coinbase
+      - (59%) Mobile
+    - [x] Rainbow
+      - (79%) Mobile
+      - (79%) Browser Extension
+    - [x] Metamask
+      - (79%) Mobile
+      - (79%) Browser extension
     - [ ] Phantom
-      - [ ] Mobile
-      - [ ] Browser extension
-    - [ ] Zerion
-      - [ ] Mobile
-      - [ ] Browser extension
+      - (25%) Mobile
+      - (25%) Browser extension
+    - [x] Zerion
+      - (67%) Mobile
+      - (68%) Browser extension
   - [ ] Hardware wallets - 3 Hardware wallets
     - [ ] Ledger
     - [ ] Trezor
@@ -62,8 +61,8 @@ While the primary purpose of the grant was to support Walletbeat's launch (we ha
   - [ ] Governance structure of Walletbeat as an organization
   - [x] Secure endorsements from other parts of the ecosystem
   - [x] Research and implement a social media strategy - Grow 10 times to 100 times.
-  - [ ] Prepare conference materials for wallet attributes
-  - [ ] Organize a public donation campaign
+  - [x] Prepare conference materials for wallet attributes
+  - [x] Organize a public donation campaign
 
 #### Tracks - Walletbeat response
 
@@ -72,12 +71,13 @@ One of the things Walletbeat didn't expect is how software wallets rating method
 Having that said, contributors focus was on making Walletbeat's software wallet rating methodology to be stable. Data collection, and hardware wallet rating methodology rating methodology was set aside, in which, Walletbeat plans to accomplish in the following weeks / months pushing for launch.
 
 For legitimacy, Walletbeat is also trying to cover this through multiple ways:
--> Already secured endorsement & funding from other parts of the ecosystem. Recently, Walletbeat participated in the Giveth funding and secured additional funding.
--> Walletbeat recently got more than 1k+ followers on X, which we also plan to focus on growing post-launch.
--> Walletbeat team also attended the recent Berlin Blockchain week and presented on multiple occasions:
--> Neocypherpunk summit - joined a panel discussing privacy in Web3 and hosted a small session discussing Ethereum wallets privacy.
--> Ethereum day - Spoke at the conference about CROPS in wallets.
--> Dappcon - Hosted a workshop discussing & pushing Ethereum standards like ERC-7730 (clear signing) & ERC-8213 (Calldata & EIP-712 digest) helps in improving user experience & security.
+
+- Already secured endorsement & funding from other parts of the ecosystem. Recently, Walletbeat participated in the Giveth funding and secured additional funding.
+- Walletbeat recently surpassed 1k followers on X, which we also plan to focus on growing post-launch. This is needed for Walletbeat to succeed, as wallets won't change if no one cares about what Walletbeat says about them.
+- Walletbeat team also attended the recent Berlin Blockchain week and presented on multiple occasions:
+  - Neocypherpunk summit - joined a panel discussing privacy in Web3 and hosted a small session discussing Ethereum wallets privacy.
+  - Ethereum day - Spoke at the conference about CROPS in wallets.
+  - Dappcon - Hosted a workshop discussing & pushing Ethereum standards like ERC-7730 (clear signing) & ERC-8213 (Calldata & EIP-712 digest) helps in improving user experience & security.
 
 ## Key risks & challenges mentioned
 
