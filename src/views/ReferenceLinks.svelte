@@ -15,19 +15,14 @@
 
 
 	// Internal state
-	let lightbox = $state<HTMLDialogElement>()
-	let lightboxIndex = $state(0)
-	let isLightboxOpen = $state(false)
+	let lightbox = $state<{ open: (url: string) => void }>()
 
 	// (Derived)
 
-	// The same image may back multiple references; the lightbox and the
-	// single-image inline display both work on distinct images only.
+	// References arrive deduplicated by `mergeRefs`, so every image URL
+	// appears at most once here.
 	const imageUrls = $derived(
-		references
-			.flatMap(ref => ref.urls)
-			.filter(url => isImageUrl(url.url))
-			.filter((url, index, urls) => urls.findIndex(other => other.url === url.url) === index),
+		references.flatMap(ref => ref.urls).filter(url => isImageUrl(url.url)),
 	)
 
 	// When the whole section references a single distinct image, it is
@@ -41,15 +36,6 @@
 
 
 	// Actions
-	const openLightbox = (url: string) => {
-		lightboxIndex = Math.max(
-			0,
-			imageUrls.findIndex(image => image.url === url),
-		)
-		isLightboxOpen = true
-		lightbox?.showModal()
-	}
-
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
 		// Plain left-clicks open the lightbox; modified clicks
 		// (middle, ctrl/cmd/shift) keep default link behavior
@@ -59,22 +45,16 @@
 			!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey
 		) {
 			event.preventDefault()
-			openLightbox(url)
+			lightbox?.open(url)
 		}
-	}
-
-	const stepLightbox = (delta: number) => {
-		lightboxIndex = (lightboxIndex + delta + imageUrls.length) % imageUrls.length
 	}
 
 
 	// Components
+	import ImageLightbox from '@/components/ImageLightbox.svelte'
 	import Typography from '@/components/Typography.svelte'
-	import ChevronLeftIcon from 'lucide-static/icons/chevron-left.svg?raw'
-	import ChevronRightIcon from 'lucide-static/icons/chevron-right.svg?raw'
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 	import ImageIcon from 'lucide-static/icons/image.svg?raw'
-	import XIcon from 'lucide-static/icons/x.svg?raw'
 	import { markdown } from '@/types/content'
 </script>
 
@@ -223,95 +203,10 @@
 			{/each}
 		</ul>
 
-		{#if imageUrls.length > 0}
-			<dialog
-				bind:this={lightbox}
-				class="lightbox"
-				aria-label="Reference image viewer"
-				onclose={() => {
-					isLightboxOpen = false
-				}}
-				onclick={(event: MouseEvent) => {
-					if (event.target === lightbox) {
-						lightbox?.close()
-					}
-				}}
-				onkeydown={(event: KeyboardEvent) => {
-					if (event.key === 'ArrowLeft') {
-						stepLightbox(-1)
-					} else if (event.key === 'ArrowRight') {
-						stepLightbox(1)
-					}
-				}}
-			>
-				{#if isLightboxOpen}
-					{@const image = imageUrls[lightboxIndex]}
-
-					<div class="lightbox-content" data-card data-column="gap-3">
-						<figure data-column="gap-2" data-column-item="flexible">
-							<img
-								src={image.url}
-								alt={image.label}
-							/>
-							<figcaption>{image.label}</figcaption>
-						</figure>
-
-						<div data-row="center gap-2 wrap">
-							{#if imageUrls.length > 1}
-								<button
-									type="button"
-									data-icon="circle"
-									aria-label="Previous image"
-									onclick={() => {
-										stepLightbox(-1)
-									}}
-								>
-									{@html ChevronLeftIcon}
-								</button>
-
-								<span
-									class="lightbox-counter"
-									aria-live="polite"
-								>
-									{lightboxIndex + 1} / {imageUrls.length}
-								</span>
-
-								<button
-									type="button"
-									data-icon="circle"
-									aria-label="Next image"
-									onclick={() => {
-										stepLightbox(1)
-									}}
-								>
-									{@html ChevronRightIcon}
-								</button>
-							{/if}
-
-							<a
-								href={image.url}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								Open original
-								<span>{@html ExternalLinkIcon}</span>
-							</a>
-
-							<button
-								type="button"
-								data-icon="circle"
-								aria-label="Close image viewer"
-								onclick={() => {
-									lightbox?.close()
-								}}
-							>
-								{@html XIcon}
-							</button>
-						</div>
-					</div>
-				{/if}
-			</dialog>
-		{/if}
+		<ImageLightbox
+			bind:this={lightbox}
+			images={imageUrls}
+		/>
 	</section>
 {/if}
 
@@ -363,51 +258,5 @@
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
 		}
-	}
-
-	.lightbox {
-		/* Fixed dimensions: the dialog must not resize while stepping
-		   through images of varying sizes and caption lengths. */
-		width: min(60rem, calc(100vw - 2rem));
-		height: min(45rem, calc(100vh - 2rem));
-		margin: auto;
-		padding: 0;
-		overflow: hidden;
-
-		background: transparent;
-		border: 1px solid var(--border-color);
-		border-radius: 0.5em;
-		color: var(--text-primary);
-
-		&::backdrop {
-			background: rgba(0, 0, 0, 0.6);
-		}
-	}
-
-	.lightbox-content {
-		height: 100%;
-	}
-
-	.lightbox figure {
-		min-height: 0;
-		margin: 0;
-
-		img {
-			flex: 1;
-			min-height: 0;
-			width: 100%;
-
-			object-fit: contain;
-		}
-
-		figcaption {
-			color: var(--text-secondary);
-			font-size: 0.875em;
-			text-align: center;
-		}
-	}
-
-	.lightbox-counter {
-		color: var(--text-secondary);
 	}
 </style>
