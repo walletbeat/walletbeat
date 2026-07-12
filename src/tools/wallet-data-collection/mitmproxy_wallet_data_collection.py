@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import base64
 import enum
+import hashlib
 import json
 import logging
 import os
+import re
 import time
 import threading
 import urllib.parse
@@ -73,6 +76,8 @@ _KNOWN_BENIGN_RESPONSE_ONLY_HEADERS = frozenset(
     h.lower()
     for h in (
         "Accept-CH",
+        "Age",
+        "access-control-allow-headers",
         "Date",
         "Expires",
         "Last-Modified",
@@ -81,6 +86,7 @@ _KNOWN_BENIGN_RESPONSE_ONLY_HEADERS = frozenset(
         "X-XSS-Protection",
         "X-Frame-Options",
         "Content-Security-Policy",
+        "Content-Security-Policy-Report-Only",
         "Permissions-Policy",
         "X-Identity-Content-Length",
         "Etag",
@@ -90,6 +96,7 @@ _KNOWN_BENIGN_RESPONSE_ONLY_HEADERS = frozenset(
         "Cross-Origin-Opener-Policy",
         "Cross-Origin-Resource-Policy",
         "Cross-Origin-Opener-Policy-Report-Only",
+        "Source-Age",
     )
 )
 
@@ -233,6 +240,266 @@ def _multidict_to_dict_of_tuples(
             result[k] = []
         result[k].append(v)
     return {k: tuple(v) for k, v in result.items()}
+
+
+def _is_ethereum_hex_string(s: str, length: int) -> bool:
+    """Check if a string is a valid Ethereum hex string (0x + `length` hex chars).
+    Case-insensitive for the hex portion."""
+    if len(s) != 2 + length:
+        return False
+    if s[0].lower() != "0" or s[1].lower() != "x":
+        return False
+    hex_part = s[2:]
+    return all(c in "0123456789abcdefABCDEF" for c in hex_part)
+
+
+def _is_ethereum_txid(s: str) -> bool:
+    """Check if a string is a valid Ethereum transaction hash (0x + 64 hex chars)."""
+    return _is_ethereum_hex_string(s, 64)
+
+
+def _is_ethereum_address(s: str) -> bool:
+    """Check if a string is a valid Ethereum address (0x + 40 hex chars)."""
+    return _is_ethereum_hex_string(s, 40)
+
+
+def _extract_ethereum_values(text: str) -> list[str] | None:
+    """Scan text case-insensitively for Ethereum txids and addresses.
+
+    Returns a sorted, deduplicated list of unique values found, or None if no matches.
+    Scans for all token-like substrings starting with 0x followed by hex characters,
+    then classifies each as a txid (64 hex) or address (40 hex).
+    """
+
+    matches = re.findall(r"(?:[^0-9a-fA-F]|^)(0x[0-9a-fA-F]+)(?:[^0-9a-fA-F]|$)", text)
+    if not matches:
+        return None
+
+    found: set[str] = set()
+    for m in matches:
+        lower = m.lower()
+        if _is_ethereum_txid(lower) or _is_ethereum_address(lower):
+            found.add(lower)
+
+    if not found:
+        return None
+    return list(sorted(found))
+
+
+def _collect_unique_keys_from_obj(obj: object) -> set[str]:
+    """Recursively collect all keys from nested dicts."""
+    keys: set[str] = set()
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            keys.add(k)
+            keys.update(_collect_unique_keys_from_obj(v))
+    elif isinstance(obj, list):
+        for item in obj:
+            keys.update(_collect_unique_keys_from_obj(item))
+    return keys
+
+
+def _maybe_truncate_key(key: str, max_bytes: int = 300) -> str:
+    """Truncate long keys to first128...last128 if they exceed max_bytes bytes."""
+    if len(key.encode("utf-8")) <= max_bytes:
+        return key
+    return key[:128] + "..." + key[-128:]
+
+
+def _compact_unique_keys(
+    unique_keys: list[str],
+) -> dict:
+    """Compact unique_keys to reduce size for abbreviated payloads.
+
+    Returns a dict with 'keys' (the final keys), 'as_string' (whether to
+    store as pipe-separated string), and 'pruned_count' (keys removed by pruning).
+    """
+    # Step A: Filter empty string
+    keys = set(unique_keys)
+    keys.discard("")
+
+    # Step B: Truncate keys > 300 bytes
+    keys = {_maybe_truncate_key(k) for k in keys}
+
+    # Re-deduplicate in case truncation created collisions
+
+    # Step C: Prune if > 48 unique keys
+    pruned_count = 0
+
+    if len(keys) > 48:
+        # Bucket by byte length
+        buckets: dict[int, set[str]] = {}
+        for k in keys:
+            bucket_len = len(k.encode("utf-8"))
+            if bucket_len not in buckets:
+                buckets[bucket_len] = set()
+            buckets[bucket_len].add(k)
+
+        # Step C1: Reduce byte-length buckets to at most 32
+        while len(buckets) > 32:
+            byte_lengths = sorted(buckets.keys())
+            concat = "|".join(str(bl) for bl in byte_lengths)
+            h = int(
+                hashlib.sha256(concat.encode("utf-8")).hexdigest(),
+                16,
+            )
+            chosen_index = h % len(byte_lengths)
+            if chosen_index == 0:
+                chosen_index = 1
+            elif chosen_index == len(byte_lengths) - 1:
+                chosen_index = len(byte_lengths) - 2
+            remove_bl = byte_lengths[chosen_index]
+            removed_count = len(buckets[remove_bl])
+            pruned_count += removed_count
+            del buckets[remove_bl]
+
+        # Step C2: Per-bucket pruning to 16 keys per bucket
+        final_keys: set[str] = set()
+        for _, bucket in buckets.items():
+            if len(bucket) <= 16:
+                final_keys.update(bucket)
+            else:
+                keys_in_bucket = sorted(bucket)
+                while len(keys_in_bucket) > 16:
+                    choice_count = len(keys_in_bucket)
+                    concat = "|".join(keys_in_bucket)
+                    h = int(
+                        hashlib.sha256(concat.encode("utf-8")).hexdigest(),
+                        16,
+                    )
+                    chosen_index = h % choice_count
+                    if chosen_index == 0:
+                        chosen_index = 1
+                    elif chosen_index == choice_count - 1:
+                        chosen_index = choice_count - 2
+                    keys_in_bucket.pop(chosen_index)
+                    pruned_count += 1
+                final_keys.update(keys_in_bucket)
+
+        keys = final_keys
+
+    # Sort for deterministic output
+    keys_sorted = list(sorted(keys))
+
+    # Step D: Check if pipe-separated string fits in 1024 bytes
+    as_string = False
+    if "|" not in keys_sorted and len(keys_sorted) > 0:
+        joined = "|".join(keys_sorted)
+        if len(joined.encode("utf-8")) <= 1024:
+            as_string = True
+
+    return {
+        "keys": keys_sorted,
+        "as_string": as_string,
+        "pruned_count": pruned_count,
+    }
+
+
+def _encode_response_payload(text: str | None) -> str | dict | None:
+    """Encode a response payload string for storage.
+
+    Returns None for trivial payloads, a plain string for small ASCII,
+    a base64 dict for small non-ASCII, or an abbreviated dict for large.
+    """
+    if text is None:
+        return None
+    if not text.strip():
+        return None
+    stripped = text.strip()
+    if stripped == "{}":
+        return None
+
+    utf8_bytes = text.encode("utf-8")
+    byte_len = len(utf8_bytes)
+    is_ascii = all(ord(c) < 128 for c in text)
+    sha256_hex = hashlib.sha256(utf8_bytes).hexdigest()
+
+    if byte_len <= 4096:
+        if is_ascii:
+            return text
+        else:
+            b64 = base64.b64encode(utf8_bytes).decode("ascii").rstrip("=")
+            return {"type": "base64", "base64": b64}
+
+    # --- abbreviated (> 4096 bytes) ---
+    prefix_bytes = utf8_bytes[:2048]
+    suffix_bytes = utf8_bytes[-2048:]
+
+    if is_ascii:
+        prefix = text[:2048]
+        suffix = text[-2048:]
+        encoding = "raw"
+    else:
+        prefix = base64.b64encode(prefix_bytes).decode("ascii").rstrip("=")
+        suffix = base64.b64encode(suffix_bytes).decode("ascii").rstrip("=")
+        encoding = "base64"
+
+    # Try parsing to extract format and uniqueKeys
+    unique_keys: list[str] | None = None
+    fmt: str = "unknown"
+
+    # Attempt JSON
+    try:
+        parsed = json.loads(text)
+        fmt = "json"
+        keys = _collect_unique_keys_from_obj(parsed)
+        if keys:
+            unique_keys = list(sorted(k for k in keys if k.isascii()))
+    except (json.JSONDecodeError, TypeError, ValueError):
+        # Attempt NDJSON
+        if "\n" in text:
+            ndjson_lines = [line for line in text.split("\n") if line.strip()]
+            all_keys: set[str] = set()
+            ndjson_ok = True
+            for line in ndjson_lines:
+                try:
+                    parsed_line = json.loads(line.strip())
+                    all_keys.update(_collect_unique_keys_from_obj(parsed_line))
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    ndjson_ok = False
+                    break
+            if ndjson_ok and ndjson_lines and all_keys:
+                fmt = "ndjson"
+                unique_keys = list(sorted(k for k in all_keys if k.isascii()))
+    if fmt == "unknown":
+        # Attempt query string
+        if "&" in text or "=" in text:
+            try:
+                decoded_qs = urllib.parse.unquote(text)
+                qs_keys: set[str] = set()
+                for pair in decoded_qs.split("&"):
+                    if not pair:
+                        continue
+                    eq_idx = pair.index("=") if "=" in pair else -1
+                    key = pair[:eq_idx] if eq_idx >= 0 else pair
+                    qs_keys.add(key)
+                if qs_keys:
+                    fmt = "query"
+                    unique_keys = list(sorted(k for k in qs_keys if k.isascii()))
+            except ValueError:
+                pass
+
+    result: dict = {
+        "type": "abbreviated",
+        "length": byte_len,
+        "encoding": encoding,
+        "prefix": prefix,
+        "suffix": suffix,
+        "sha256": sha256_hex,
+        "format": fmt,
+    }
+    if unique_keys is not None:
+        compacted = _compact_unique_keys(unique_keys)
+        if compacted["as_string"]:
+            result["uniqueKeys"] = "|".join(compacted["keys"])
+        else:
+            result["uniqueKeys"] = compacted["keys"]
+        if compacted["pruned_count"] > 0:
+            result["prunedUniqueKeys"] = compacted["pruned_count"]
+    ethereum = _extract_ethereum_values(text)
+    if ethereum is not None:
+        result["ethereum"] = ethereum
+    return result
 
 
 class WalletRequest:
@@ -451,24 +718,14 @@ class WalletRequest:
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
 
-        def _response_payload_is_trivial(payload: Optional[str]) -> bool:
-            if payload is None:
-                return True
-            if not payload.strip():
-                return True
-            stripped = payload.strip()
-            if stripped == "{}":
-                return True  # Empty JSON object.
-            return False
-
         if self._response_status is not None and self._response_status != 200:
             data["responseStatus"] = self._response_status
 
         _encode_multidict("responseOddHeaders", self._response_headers)
 
-        payload = self._response_payload
-        if not _response_payload_is_trivial(payload):
-            data["responsePayload"] = payload
+        payload_data = _encode_response_payload(self._response_payload)
+        if payload_data is not None:
+            data["responsePayload"] = payload_data
 
         if self._review is not None:
             data["review"] = self._review

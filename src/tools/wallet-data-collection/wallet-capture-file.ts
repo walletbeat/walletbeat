@@ -30,6 +30,7 @@ import { type Variant, variantEnum } from '@/schema/variants'
 import { type WalletType, walletTypes } from '@/schema/wallet-types'
 import { isInVocabulary, isLikelyEnglish } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
+import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -139,12 +140,44 @@ interface EncodedWalletDataRequest {
 
 	/**
 	 * Encoded as omitted if absent or trivial (empty / "{}"),
-	 * otherwise a plain string.
+	 * otherwise one of:
+	 * - a plain string (≤4096 bytes, ASCII)
+	 * - a { type: 'base64', base64: ... } object (≤4096 bytes, non-ASCII)
+	 * - a { type: 'abbreviated', ... } object (>4096 bytes)
 	 */
-	responsePayload?: string
+	responsePayload?: EncodedResponsePayload
 
 	review?: EncodedWalletRequestReview
 }
+
+/**
+ * Encoded representation of a response payload.
+ * - plain string: ≤4096 bytes, ASCII only
+ * - base64 object: ≤4096 bytes, contains non-ASCII
+ * - abbreviated object: >4096 bytes
+ */
+interface EncodedResponsePayloadBase64 {
+	type: 'base64'
+	base64: string
+}
+
+interface EncodedResponsePayloadAbbreviated {
+	type: 'abbreviated'
+	length: number
+	encoding: 'raw' | 'base64'
+	prefix: string
+	suffix: string
+	sha256: string
+	format: 'unknown' | 'json' | 'ndjson' | 'query'
+	uniqueKeys?: string[] | string
+	prunedUniqueKeys?: number
+	ethereum?: string[]
+}
+
+type EncodedResponsePayload =
+	| string
+	| EncodedResponsePayloadBase64
+	| EncodedResponsePayloadAbbreviated
 
 /**
  * How query params / cookies / headers are encoded.
@@ -240,20 +273,405 @@ function parseEncodedMultiDict(v: unknown, at: string): EncodedMultiDict {
 	return out
 }
 
-function responsePayloadIsTrivial(payload: string): boolean {
-	if (payload === null || payload === undefined) {
-		return true
+function _collectUniqueKeysFromObj(obj: unknown): Set<string> {
+	const keys = new Set<string>()
+
+	if (typeof obj === 'object' && obj !== null) {
+		if (Array.isArray(obj)) {
+			for (const item of obj) {
+				const subKeys = _collectUniqueKeysFromObj(item)
+
+				for (const key of subKeys) {
+					keys.add(key)
+				}
+			}
+		} else {
+			for (const [key, value] of Object.entries(obj)) {
+				keys.add(key)
+				const subKeys = _collectUniqueKeysFromObj(value)
+
+				for (const key of subKeys) {
+					keys.add(key)
+				}
+			}
+		}
 	}
 
-	if (!payload.trim()) {
-		return true
+	return keys
+}
+
+/** Regex that matches 0x-prefixed hex strings (case-insensitive), bounded by non-hex chars. */
+const ethereumHexPattern = /(?<![0-9a-fA-F])(0x[0-9a-fA-F]+)(?![0-9a-fA-F])/gi
+
+function _isEthereumTxid(s: string): boolean {
+	return s.length === 66 && s.startsWith('0x', 0)
+}
+
+function _isEthereumAddress(s: string): boolean {
+	return s.length === 42 && s.startsWith('0x', 0)
+}
+
+function _extractEthereumValues(
+	text: string,
+): { addresses: Erc55Address[]; txids: string[] } | null {
+	const matches = text.match(ethereumHexPattern)
+
+	if (!matches) {
+		return null
 	}
 
-	if (payload.trim() === '{}') {
-		return true
+	const addresses = new Set<Erc55Address>()
+	const txids = new Set<string>()
+
+	for (const m of matches) {
+		const lower = m.toLowerCase()
+
+		if (_isEthereumTxid(lower)) {
+			txids.add(lower)
+		} else if (_isEthereumAddress(lower)) {
+			addresses.add(ethereumErc55Address(lower))
+		}
 	}
 
-	return false
+	if (addresses.size === 0 && txids.size === 0) {
+		return null
+	}
+
+	return {
+		addresses: [...addresses].sort(),
+		txids: [...txids].sort(),
+	}
+}
+
+function _tryParseUniqueKeys(str: string): {
+	format: 'unknown' | 'json' | 'ndjson' | 'query'
+	uniqueKeys: string[] | null
+} {
+	// Attempt JSON
+	try {
+		const parsed: unknown = JSON.parse(str.trim())
+		const keys = _collectUniqueKeysFromObj(parsed)
+
+		if (keys.size > 0) {
+			return { format: 'json', uniqueKeys: [...keys].sort() }
+		}
+
+		return { format: 'json', uniqueKeys: null }
+	} catch {
+		/* Not JSON */
+	}
+
+	// Attempt NDJSON
+	if (str.includes('\n')) {
+		const lines = str.split('\n').filter(line => line.trim() !== '')
+
+		if (lines.length > 0) {
+			const allKeys = new Set<string>()
+			let ndjsonOk = true
+
+			for (const line of lines) {
+				try {
+					const parsed: unknown = JSON.parse(line.trim())
+					const keys = _collectUniqueKeysFromObj(parsed)
+
+					for (const key of keys) {
+						allKeys.add(key)
+					}
+				} catch {
+					ndjsonOk = false
+					break
+				}
+			}
+
+			if (ndjsonOk) {
+				if (allKeys.size > 0) {
+					return { format: 'ndjson', uniqueKeys: [...allKeys].sort() }
+				}
+
+				return { format: 'ndjson', uniqueKeys: null }
+			}
+		}
+	}
+
+	// Attempt query string
+	if (str.includes('&') || str.includes('=')) {
+		try {
+			const decoded = decodeURIComponent(str)
+			const qsKeys = new Set<string>()
+
+			for (const pair of decoded.split('&')) {
+				if (!pair) {
+					continue
+				}
+
+				const eqIdx = pair.indexOf('=')
+				const key = eqIdx >= 0 ? pair.slice(0, eqIdx) : pair
+
+				qsKeys.add(key)
+			}
+
+			if (qsKeys.size > 0) {
+				return { format: 'query', uniqueKeys: [...qsKeys].sort() }
+			}
+
+			return { format: 'query', uniqueKeys: null }
+		} catch {
+			/* Not a valid query string */
+		}
+	}
+
+	return { format: 'unknown', uniqueKeys: null }
+}
+
+function _decodeBase64ToBytes(b64: string): Uint8Array {
+	const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4)
+	const binaryStr = atob(padded)
+	const bytes = new Uint8Array(binaryStr.length)
+
+	for (let i = 0; i < binaryStr.length; i++) {
+		bytes[i] = binaryStr.charCodeAt(i)
+	}
+
+	return bytes
+}
+
+function _validateResponsePayloadEncoding(
+	v: unknown,
+	at: string,
+): asserts v is EncodedResponsePayload {
+	if (typeof v === 'string') {
+		return
+	}
+
+	const obj = expectRecord(v, at)
+
+	if (obj.type === 'base64') {
+		if (typeof obj.base64 !== 'string') {
+			throw new Error(`Expected string at ${at}.base64`)
+		}
+
+		if (Object.keys(obj).length !== 2) {
+			throw new Error(`Unexpected extra keys in ${at}: expected only 'type' and 'base64'`)
+		}
+
+		return
+	}
+
+	if (obj.type === 'abbreviated') {
+		if (typeof obj.length !== 'number') {
+			throw new Error(`Expected number at ${at}.length`)
+		}
+
+		if (obj.encoding !== 'raw' && obj.encoding !== 'base64') {
+			throw new Error(`Expected 'raw' or 'base64' at ${at}.encoding, got ${String(obj.encoding)}`)
+		}
+
+		if (typeof obj.prefix !== 'string') {
+			throw new Error(`Expected string at ${at}.prefix`)
+		}
+
+		if (typeof obj.suffix !== 'string') {
+			throw new Error(`Expected string at ${at}.suffix`)
+		}
+
+		if (typeof obj.sha256 !== 'string') {
+			throw new Error(`Expected string at ${at}.sha256`)
+		}
+
+		const validFormats = ['unknown', 'json', 'ndjson', 'query']
+
+		if (typeof obj.format !== 'string' || !validFormats.includes(obj.format)) {
+			throw new Error(
+				`Expected format in [${validFormats.join(', ')}] at ${at}.format, got ${String(obj.format)}`,
+			)
+		}
+
+		if (obj.uniqueKeys !== undefined) {
+			if (typeof obj.uniqueKeys === 'string') {
+				expectString(obj.uniqueKeys, `${at}.uniqueKeys`)
+			} else {
+				const keys = expectArray(obj.uniqueKeys, `${at}.uniqueKeys`)
+
+				keys.forEach((k, i) => expectString(k, `${at}.uniqueKeys[${i}]`))
+			}
+		}
+
+		if (obj.prunedUniqueKeys !== undefined) {
+			expectNumber(obj.prunedUniqueKeys, `${at}.prunedUniqueKeys`)
+		}
+
+		return
+	}
+
+	throw new Error(`Unexpected type at ${at}.type: ${String(obj.type)}`)
+}
+
+function parseEncodedResponsePayload(v: unknown, at: string): EncodedResponsePayload {
+	_validateResponsePayloadEncoding(v, at)
+
+	return v
+}
+
+/**
+ * Decoded representation of a response payload.
+ * The full string is only available for payloads ≤4096 bytes (cases a/b).
+ * For abbreviated payloads, str() returns null and metadata is available.
+ */
+export class DecodedResponsePayload {
+	private readonly _encoded: EncodedResponsePayload
+	private _str: string | null = null
+	private _uniqueKeys: string[] = []
+	private _byteLength: number = 0
+	private _format: 'unknown' | 'json' | 'ndjson' | 'query' = 'unknown'
+	private _sha256: string | null = null
+	private _prefix: string | null = null
+	private _suffix: string | null = null
+	private _ethereumAddresses: Erc55Address[] = []
+	private _ethereumTransactions: string[] = []
+	private _computed = false
+
+	private constructor(encoded: EncodedResponsePayload) {
+		this._encoded = encoded
+	}
+
+	/** Returns the full string if available, or null otherwise. */
+	public str(): string | null {
+		this._ensureComputed()
+
+		return this._str
+	}
+
+	/** Returns unique keys. */
+	public uniqueKeys(): string[] {
+		this._ensureComputed()
+
+		return this._uniqueKeys
+	}
+
+	/** Byte length of the full response. */
+	public byteLength(): number {
+		this._ensureComputed()
+
+		return this._byteLength
+	}
+
+	/** Format. */
+	public format(): 'unknown' | 'json' | 'ndjson' | 'query' {
+		this._ensureComputed()
+
+		return this._format
+	}
+
+	/** SHA-256 hex digest. Only available for abbreviated payloads. */
+	public sha256(): string | null {
+		this._ensureComputed()
+
+		return this._sha256
+	}
+
+	/** Returns prefix for abbreviated payloads, or null for full payloads. */
+	public prefix(): string | null {
+		this._ensureComputed()
+
+		return this._str === null ? this._prefix : null
+	}
+
+	/** Returns suffix for abbreviated payloads, or null for full payloads. */
+	public suffix(): string | null {
+		this._ensureComputed()
+
+		return this._str === null ? this._suffix : null
+	}
+
+	/**
+	 * Returns Ethereum addresses found in the payload.
+	 * For abbreviated payloads with the pre-extracted `ethereum` field,
+	 * uses that data. For full payloads (string/base64), scans the raw text.
+	 * Returns addresses normalized to lowercase.
+	 */
+	public ethereumAddresses(): Erc55Address[] {
+		this._ensureComputed()
+
+		return this._ethereumAddresses
+	}
+
+	/**
+	 * Returns Ethereum transaction hashes found in the payload.
+	 * For abbreviated payloads with the pre-extracted `ethereum` field,
+	 * uses that data. For full payloads (string/base64), scans the raw text.
+	 * Returns txids normalized to lowercase.
+	 */
+	public ethereumTransactions(): string[] {
+		this._ensureComputed()
+
+		return this._ethereumTransactions
+	}
+
+	private _ensureComputed(): void {
+		if (this._computed) {
+			return
+		}
+
+		if (typeof this._encoded === 'string') {
+			this._str = this._encoded
+			this._byteLength = new TextEncoder().encode(this._encoded).byteLength
+			const { format, uniqueKeys } = _tryParseUniqueKeys(this._encoded)
+
+			this._format = format
+			this._uniqueKeys = uniqueKeys ?? []
+
+			const ethValues = _extractEthereumValues(this._encoded)
+
+			if (ethValues) {
+				this._ethereumAddresses = ethValues.addresses
+				this._ethereumTransactions = ethValues.txids
+			}
+		} else if (this._encoded.type === 'base64') {
+			const bytes = _decodeBase64ToBytes(this._encoded.base64)
+
+			this._str = new TextDecoder('utf-8').decode(bytes)
+			this._byteLength = bytes.byteLength
+			const { format, uniqueKeys } = _tryParseUniqueKeys(this._str)
+
+			this._format = format
+			this._uniqueKeys = uniqueKeys ?? []
+
+			const ethValues = _extractEthereumValues(this._str)
+
+			if (ethValues) {
+				this._ethereumAddresses = ethValues.addresses
+				this._ethereumTransactions = ethValues.txids
+			}
+		} else {
+			this._str = null
+			this._byteLength = this._encoded.length
+			this._format = this._encoded.format
+			this._uniqueKeys =
+				typeof this._encoded.uniqueKeys === 'string'
+					? this._encoded.uniqueKeys.split('|')
+					: (this._encoded.uniqueKeys ?? [])
+			this._sha256 = this._encoded.sha256
+			this._prefix = this._encoded.prefix
+			this._suffix = this._encoded.suffix
+
+			if (this._encoded.ethereum) {
+				// Pre-extracted ethereum field: split by length (txids = 66, addresses = 42)
+				for (const val of this._encoded.ethereum) {
+					if (val.length === 66) {
+						this._ethereumTransactions.push(val)
+					} else {
+						this._ethereumAddresses.push(ethereumErc55Address(val))
+					}
+				}
+			}
+		}
+
+		this._computed = true
+	}
+
+	public static fromEncoded(encoded: EncodedResponsePayload): DecodedResponsePayload {
+		return new DecodedResponsePayload(encoded)
+	}
 }
 
 function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataRequest {
@@ -329,10 +747,10 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		responseOddHeaders = parseEncodedMultiDict(obj.responseOddHeaders, `${at}.responseOddHeaders`)
 	}
 
-	let responsePayload: string | undefined
+	let responsePayload: EncodedResponsePayload | undefined
 
 	if (obj.responsePayload !== undefined) {
-		responsePayload = expectString(obj.responsePayload, `${at}.responsePayload`)
+		responsePayload = parseEncodedResponsePayload(obj.responsePayload, `${at}.responsePayload`)
 	}
 
 	return {
@@ -1322,7 +1740,8 @@ export class WalletRequest {
 	public readonly oddTrailers: UserDataDict
 	public readonly responseStatus: number | null
 	public readonly responseOddHeaders: UserDataDict
-	public readonly responsePayload: string | null
+	private readonly _responsePayloadEncoded: EncodedResponsePayload | null
+	private readonly _responsePayload: DecodedResponsePayload | null
 	public readonly review: WalletRequestReview
 	private readonly _key: string
 
@@ -1340,7 +1759,7 @@ export class WalletRequest {
 		oddTrailers: UserDataDict
 		responseStatus: number | null
 		responseOddHeaders: UserDataDict
-		responsePayload: string | null
+		responsePayloadEncoded: EncodedResponsePayload | null
 		review: EncodedWalletRequestReview | null
 	}) {
 		this._captureFile = args.captureFile
@@ -1356,7 +1775,11 @@ export class WalletRequest {
 		this.oddTrailers = args.oddTrailers
 		this.responseStatus = args.responseStatus
 		this.responseOddHeaders = args.responseOddHeaders
-		this.responsePayload = args.responsePayload
+		this._responsePayloadEncoded = args.responsePayloadEncoded
+		this._responsePayload =
+			args.responsePayloadEncoded !== null
+				? DecodedResponsePayload.fromEncoded(args.responsePayloadEncoded)
+				: null
 		this._key = `${this.sessionTime.toString()}:${this.domain}:${this.path}`
 		this.review =
 			args.review === null
@@ -1393,7 +1816,7 @@ export class WalletRequest {
 			oddTrailers: decodeUserDataDict(req.oddTrailers, `${at}.oddTrailers`),
 			responseStatus: req.responseStatus ?? null,
 			responseOddHeaders: decodeUserDataDict(req.responseOddHeaders, `${at}.responseOddHeaders`),
-			responsePayload: req.responsePayload ?? null,
+			responsePayloadEncoded: req.responsePayload ?? null,
 			review: req.review ?? null,
 		})
 	}
@@ -1430,7 +1853,7 @@ export class WalletRequest {
 					? this.jsonRpcMethods[0]
 					: [...this.jsonRpcMethods]
 
-		const responsePayload = this.responsePayload
+		const responsePayloadEncoded = this._responsePayloadEncoded
 
 		return {
 			domain: this.domain,
@@ -1447,9 +1870,7 @@ export class WalletRequest {
 				? { responseStatus: this.responseStatus }
 				: {}),
 			...(responseOddHeaders ? { responseOddHeaders } : {}),
-			...(responsePayload !== null && !responsePayloadIsTrivial(responsePayload)
-				? { responsePayload }
-				: {}),
+			...(responsePayloadEncoded !== null ? { responsePayload: responsePayloadEncoded } : {}),
 			...(this.review.toJSON() === undefined ? {} : { review: this.review.toJSON() }),
 		}
 	}
@@ -1480,7 +1901,12 @@ export class WalletRequest {
 		const refererDomain = this.refererDomain ? ` referer=${this.refererDomain.toString()}` : ''
 
 		const responseStatus = this.responseStatus !== null ? ` status=${this.responseStatus}` : ''
-		const responsePayload = this.responsePayload ? ` resp=${this.responsePayload}` : ''
+		const responsePayload =
+			this._responsePayload === null
+				? ''
+				: this._responsePayload.str() !== null
+					? ` resp=${this._responsePayload.str()}`
+					: ` resp=[${this._responsePayload.byteLength()} bytes, sha256=${(this._responsePayload.sha256() ?? '??').slice(0, 12)}...]`
 
 		return (
 			`${this.domain}: ${this.path}` +
@@ -1510,6 +1936,10 @@ export class WalletRequest {
 		}
 
 		return [this.domain]
+	}
+
+	public response(): DecodedResponsePayload | null {
+		return this._responsePayload
 	}
 
 	public async userInfo(
