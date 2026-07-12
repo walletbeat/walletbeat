@@ -510,6 +510,16 @@ class WalletRequest:
                 return None
             return str(data[k])
 
+        def _decode_content(k):
+            if k not in data:
+                return None
+            val = data[k]
+            if isinstance(val, dict) and val.get("type") == "base64":
+                b64 = val["base64"]
+                padded = b64 + "=" * ((4 - len(b64) % 4) % 4)
+                return base64.b64decode(padded).decode("utf-8")
+            return str(val)
+
         def _decode_str_multidict(k):
             decoded: Dict[str, Tuple[str, ...]] = {}
             for key, v in data.get(k, {}).items():
@@ -531,7 +541,7 @@ class WalletRequest:
             path=data["path"],
             query=_decode_str_multidict("query"),
             json_rpc_method=json_rpc_method,
-            content=_decode_if_set("content"),
+            content=_decode_content("content"),
             cookies=_decode_str_multidict("cookies"),
             referer_domain=data.get("refererDomain"),
             odd_headers=_decode_str_multidict("oddHeaders"),
@@ -708,7 +718,15 @@ class WalletRequest:
             data["jsonRpcMethod"] = list(self._json_rpc_method)
 
         if self._content is not None:
-            data["content"] = self._content
+            if self._content.isascii():
+                data["content"] = self._content
+            else:
+                b64 = (
+                    base64.b64encode(self._content.encode("utf-8"))
+                    .decode("ascii")
+                    .rstrip("=")
+                )
+                data["content"] = {"type": "base64", "base64": b64}
 
         _encode_multidict("cookies", self._cookies)
 
@@ -864,26 +882,36 @@ class WalletCaptureFile:
                 if isinstance(f, WalletCaptureFlow)
             ]
 
+            # Serialize to string and verify ASCII-only before writing
+            content = json.dumps(
+                {
+                    "identity": self._identity,
+                    "flows": {
+                        flow_name: (
+                            "NOT_SUPPORTED"
+                            if isinstance(flow, str) and flow == "NOT_SUPPORTED"
+                            else flow.encode()
+                        )
+                        for flow_name, flow in self._flows.items()
+                    },
+                    "userData": self._user_data_store.encode(),
+                    "sessions": self._session_number,
+                },
+                indent="\t",
+                ensure_ascii=False,
+            )
+            if not content.isascii():
+                bad_idx = next(i for i, c in enumerate(content) if ord(c) >= 128)
+                context = content[max(0, bad_idx - 40) : bad_idx + 40]
+                raise ValueError(
+                    f"Non-ASCII character detected in JSON output for {self.path}. "
+                    f"Found U+{ord(content[bad_idx]):04X} at offset {bad_idx}. "
+                    f"Surrounding context: {repr(context)}"
+                )
+
             # Write to temp file then rename for atomicity
             with open(self.path + ".tmp", "w") as f:
-                json.dump(
-                    {
-                        "identity": self._identity,
-                        "flows": {
-                            flow_name: (
-                                "NOT_SUPPORTED"
-                                if isinstance(flow, str) and flow == "NOT_SUPPORTED"
-                                else flow.encode()
-                            )
-                            for flow_name, flow in self._flows.items()
-                        },
-                        "userData": self._user_data_store.encode(),
-                        "sessions": self._session_number,
-                    },
-                    f,
-                    indent="\t",
-                    ensure_ascii=False,
-                )
+                f.write(content)
                 f.write("\n")
 
             os.rename(self.path + ".tmp", self.path)

@@ -119,8 +119,11 @@ interface EncodedWalletDataRequest {
 	 */
 	jsonRpcMethod?: string | string[]
 
-	/** Encoded as omitted if absent, otherwise a plain string. */
-	content?: string
+	/**
+	 * Encoded as omitted if absent, otherwise a plain string for ASCII content,
+	 * or a base64 object for non-ASCII content.
+	 */
+	content?: string | EncodedContentBase64
 
 	cookies?: EncodedMultiDict
 	refererDomain?: string
@@ -148,6 +151,14 @@ interface EncodedWalletDataRequest {
 	responsePayload?: EncodedResponsePayload
 
 	review?: EncodedWalletRequestReview
+}
+
+/**
+ * Encoded representation of request content when it contains non-ASCII characters.
+ */
+interface EncodedContentBase64 {
+	type: 'base64'
+	base64: string
 }
 
 /**
@@ -714,7 +725,24 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 	let content: string | undefined
 
 	if (obj.content !== undefined) {
-		content = expectString(obj.content, `${at}.content`)
+		if (typeof obj.content === 'string') {
+			content = expectString(obj.content, `${at}.content`)
+		} else {
+			const record = expectRecord(obj.content, `${at}.content`)
+
+			if (record.type !== 'base64') {
+				throw new Error(`Expected 'base64' at ${at}.content.type, got ${String(record.type)}`)
+			}
+
+			if (typeof record.base64 !== 'string') {
+				throw new Error(`Expected string at ${at}.content.base64`)
+			}
+
+			const b64 = record.base64
+			const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4)
+
+			content = new TextDecoder('utf-8').decode(Uint8Array.from(atob(padded), c => c.charCodeAt(0)))
+		}
 	}
 
 	let jsonRpcMethod: string | string[] | undefined
@@ -1809,7 +1837,24 @@ export class WalletRequest {
 			sessionTime: new WalletCaptureSessionTime(req.sessionTime),
 			query: decodeUserDataDict(req.query, `${at}.query`),
 			jsonRpcMethods,
-			content: req.content ?? null,
+			content:
+				(() => {
+					const raw = req.content
+
+					if (raw === undefined) {
+						return null
+					}
+
+					if (typeof raw === 'string') {
+						return raw
+					}
+
+					const padded = raw.base64 + '='.repeat((4 - (raw.base64.length % 4)) % 4)
+
+					return new TextDecoder('utf-8').decode(
+						Uint8Array.from(atob(padded), c => c.charCodeAt(0)),
+					)
+				})() ?? null,
 			cookies: decodeUserDataDict(req.cookies, `${at}.cookies`),
 			refererDomain: req.refererDomain ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, `${at}.oddHeaders`),
@@ -1855,13 +1900,30 @@ export class WalletRequest {
 
 		const responsePayloadEncoded = this._responsePayloadEncoded
 
+		const contentEncoded =
+			this.content === null
+				? undefined
+				: (() => {
+						const bytes = new TextEncoder().encode(this.content)
+
+						const isAscii = bytes.every(b => b < 128)
+
+						if (isAscii) {
+							return this.content
+						}
+
+						const b64 = btoa(String.fromCharCode(...bytes)).replace(/=+$/, '')
+
+						return { type: 'base64' as const, base64: b64 }
+					})()
+
 		return {
 			domain: this.domain,
 			path: this.path,
 			sessionTime: this.sessionTime.toNumber(),
 			...(query ? { query } : {}),
 			...(jsonRpcMethod ? { jsonRpcMethod } : {}),
-			...(this.content ? { content: this.content } : {}),
+			...(contentEncoded !== undefined ? { content: contentEncoded } : {}),
 			...(cookies ? { cookies } : {}),
 			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
@@ -2604,6 +2666,20 @@ export class WalletCaptureFile {
 
 		const data = this.toJSON()
 		const content = JSON.stringify(data, null, '\t') + '\n'
+
+		// Verify no non-ASCII characters are present before writing
+		const badIdx = content.search(/[\x80-\uFFFF]/)
+
+		if (badIdx !== -1) {
+			const badChar = content[badIdx]
+			const context = content.slice(Math.max(0, badIdx - 40), badIdx + 40)
+
+			throw new Error(
+				`Non-ASCII character detected in JSON output for ${this.path}. ` +
+					`Found U+${badChar.charCodeAt(0).toString(16).padStart(4, '0').toUpperCase()} at offset ${badIdx}. ` +
+					`Surrounding context: ${JSON.stringify(context)}`,
+			)
+		}
 
 		// Check if content differs from what's on disk
 		let needsWrite = true
