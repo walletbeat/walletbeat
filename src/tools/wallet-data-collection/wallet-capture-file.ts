@@ -49,6 +49,7 @@ import {
 	expectRecord,
 	expectString,
 	isSameJson,
+	stableJSONStringify,
 } from './json-utils'
 import { StringEntropy } from './string-entropy'
 import {
@@ -128,6 +129,27 @@ interface EncodedWalletDataRequest {
 	refererDomain?: string
 	oddHeaders?: EncodedMultiDict
 	oddTrailers?: EncodedMultiDict
+
+	/**
+	 * Encoded only when present and not 200.
+	 */
+	responseStatus?: number
+
+	/**
+	 * Encoded as omitted if empty, otherwise EncodedMultiDict.
+	 * Mirrors the structure of oddHeaders/oddTrailers.
+	 */
+	responseOddHeaders?: EncodedMultiDict
+
+	/**
+	 * Encoded as omitted if absent or trivial (empty / "{}"),
+	 * otherwise either a plain string (no classification) or
+	 * an EncodedUserDataString object (with classification).
+	 * Mirrors Python UserDataPieces.encode() which returns:
+	 * - plain string if no pieces
+	 * - { sample, piece?, pieces? } if pieces present
+	 */
+	responsePayload?: string | EncodedUserDataString
 
 	review?: EncodedWalletRequestReview
 }
@@ -226,6 +248,84 @@ function parseEncodedMultiDict(v: unknown, at: string): EncodedMultiDict {
 	return out
 }
 
+function responsePayloadIsTrivial(payload: string): boolean {
+	if (payload === null || payload === undefined) {
+		return true
+	}
+
+	if (!payload.trim()) {
+		return true
+	}
+
+	if (payload.trim() === '{}') {
+		return true
+	}
+
+	return false
+}
+
+/**
+ * Extract the raw string from a responsePayload value.
+ * Python UserDataPieces.encode() returns either:
+ * - a plain string (when no pieces)
+ * - an object { sample/str, piece?, pieces? } (when pieces present)
+ */
+function extractResponsePayloadString(
+	value: string | EncodedUserDataString | undefined,
+): string | null {
+	if (value === undefined || value === null) {
+		return null
+	}
+
+	if (typeof value === 'string') {
+		return value
+	}
+
+	// Object format: { str: ..., sample: ... }
+	if ('str' in value) {
+		return value.str ?? null
+	}
+
+	if ('sample' in value) {
+		const val = value as Record<string, unknown>
+
+		return typeof val.sample === 'string' ? val.sample : null
+	}
+
+	return null
+}
+
+/**
+ * Parse a responsePayload encoded as an object (with classification).
+ * Python UserDataPieces.encode() can produce { sample/str, piece?, pieces? }.
+ */
+function parseResponsePayload(data: unknown, at: string): EncodedUserDataString {
+	const obj = expectRecord(data, at)
+
+	// Accept either 'str' (TypeScript convention) or 'sample' (Python convention).
+	const str =
+		typeof obj.str === 'string'
+			? obj.str
+			: typeof obj.sample === 'string'
+				? obj.sample
+				: expectString(obj.str ?? obj.sample, `${at}.str`)
+
+	if (obj.piece !== undefined) {
+		return { str, piece: userInfoEnums.assert(expectString(obj.piece, `${at}.piece`)) }
+	}
+
+	if (obj.pieces !== undefined) {
+		const piecesArr = expectArray(obj.pieces, `${at}.pieces`)
+
+		return {
+			str,
+			pieces: piecesArr.map((p, i) => userInfoEnums.assert(expectString(p, `${at}.pieces[${i}]`))),
+		}
+	}
+
+	return { str }
+}
+
 function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataRequest {
 	const obj = expectRecord(v, at)
 
@@ -287,6 +387,28 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		review = parseEncodedWalletRequestReview(obj.review, `${at}.review`)
 	}
 
+	let responseStatus: number | undefined
+
+	if (obj.responseStatus !== undefined) {
+		responseStatus = expectNumber(obj.responseStatus, `${at}.responseStatus`)
+	}
+
+	let responseOddHeaders: EncodedMultiDict | undefined
+
+	if (obj.responseOddHeaders !== undefined) {
+		responseOddHeaders = parseEncodedMultiDict(obj.responseOddHeaders, `${at}.responseOddHeaders`)
+	}
+
+	let responsePayload: string | EncodedUserDataString | undefined
+
+	if (obj.responsePayload !== undefined) {
+		if (typeof obj.responsePayload === 'string') {
+			responsePayload = obj.responsePayload
+		} else {
+			responsePayload = parseResponsePayload(obj.responsePayload, `${at}.responsePayload`)
+		}
+	}
+
 	return {
 		domain,
 		path,
@@ -298,6 +420,9 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		...(oddTrailers && Object.keys(oddTrailers).length ? { oddTrailers } : {}),
 		...(content ? { content } : {}),
 		...(jsonRpcMethod ? { jsonRpcMethod } : {}),
+		...(responseStatus !== undefined ? { responseStatus } : {}),
+		...(responseOddHeaders && Object.keys(responseOddHeaders).length ? { responseOddHeaders } : {}),
+		...(responsePayload ? { responsePayload } : {}),
 		...(review ? { review } : {}),
 	}
 }
@@ -308,22 +433,6 @@ function parseWalletDataFlow(v: unknown, at: string): EncodedWalletDataFlow {
 	const requests = requestsRaw.map((x, i) => parseWalletDataRequest(x, `${at}.requests[${i}]`))
 
 	return { requests }
-}
-
-function stableJSONStringify(v: unknown): string {
-	if (v === null || typeof v !== 'object') {
-		return JSON.stringify(v)
-	}
-
-	if (Array.isArray(v)) {
-		return `[${v.map(stableJSONStringify).join(',')}]`
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we checked it was an object and not an array.
-	const obj = v as Record<string, unknown>
-	const keys = Object.keys(obj).sort()
-
-	return `{${keys.map(k => `${JSON.stringify(k)}:${stableJSONStringify(obj[k])}`).join(',')}}`
 }
 
 // ============  UserDataString  ============
@@ -452,6 +561,8 @@ enum WalletStringOccurrenceType {
 	QUERY = 'QUERY',
 	COOKIE = 'COOKIE',
 	PAYLOAD = 'PAYLOAD',
+	RESPONSE_HEADER = 'RESPONSE_HEADER',
+	RESPONSE_PAYLOAD = 'RESPONSE_PAYLOAD',
 }
 
 const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
@@ -460,6 +571,8 @@ const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
 	[WalletStringOccurrenceType.QUERY]: true,
 	[WalletStringOccurrenceType.COOKIE]: true,
 	[WalletStringOccurrenceType.PAYLOAD]: true,
+	[WalletStringOccurrenceType.RESPONSE_HEADER]: true,
+	[WalletStringOccurrenceType.RESPONSE_PAYLOAD]: true,
 })
 
 export type WalletDataStringBreadcrumb =
@@ -477,6 +590,12 @@ export type WalletDataStringBreadcrumb =
 	  }
 	| {
 			type: WalletStringOccurrenceType.PAYLOAD
+	  }
+	| {
+			type: WalletStringOccurrenceType.RESPONSE_HEADER
+	  }
+	| {
+			type: WalletStringOccurrenceType.RESPONSE_PAYLOAD
 	  }
 	| {
 			type: 'INDEX'
@@ -575,7 +694,11 @@ export class WalletDataStringBreadcrumbs {
 			case WalletStringOccurrenceType.QUERY:
 				return `Query: ${second('MULTI_KEY').key}`
 			case WalletStringOccurrenceType.PAYLOAD:
-				return 'payload'
+				return 'Payload'
+			case WalletStringOccurrenceType.RESPONSE_HEADER:
+				return `RespHeader: ${second('MULTI_KEY').key}`
+			case WalletStringOccurrenceType.RESPONSE_PAYLOAD:
+				return 'Response'
 			case 'BASE64_DECODE':
 				return ''
 			case 'INDEX':
@@ -1271,6 +1394,9 @@ export class WalletRequest {
 	public readonly refererDomain: string | null
 	public readonly oddHeaders: UserDataDict
 	public readonly oddTrailers: UserDataDict
+	public readonly responseStatus: number | null
+	public readonly responseOddHeaders: UserDataDict
+	public readonly responsePayload: string | null
 	public readonly review: WalletRequestReview
 	private readonly _key: string
 
@@ -1286,6 +1412,9 @@ export class WalletRequest {
 		refererDomain: string | null
 		oddHeaders: UserDataDict
 		oddTrailers: UserDataDict
+		responseStatus: number | null
+		responseOddHeaders: UserDataDict
+		responsePayload: string | null
 		review: EncodedWalletRequestReview | null
 	}) {
 		this._captureFile = args.captureFile
@@ -1299,6 +1428,9 @@ export class WalletRequest {
 		this.refererDomain = args.refererDomain
 		this.oddHeaders = args.oddHeaders
 		this.oddTrailers = args.oddTrailers
+		this.responseStatus = args.responseStatus
+		this.responseOddHeaders = args.responseOddHeaders
+		this.responsePayload = args.responsePayload
 		this._key = `${this.sessionTime.toString()}:${this.domain}:${this.path}`
 		this.review =
 			args.review === null
@@ -1333,6 +1465,9 @@ export class WalletRequest {
 			refererDomain: req.refererDomain ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, `${at}.oddHeaders`),
 			oddTrailers: decodeUserDataDict(req.oddTrailers, `${at}.oddTrailers`),
+			responseStatus: req.responseStatus ?? null,
+			responseOddHeaders: decodeUserDataDict(req.responseOddHeaders, `${at}.responseOddHeaders`),
+			responsePayload: extractResponsePayloadString(req.responsePayload) ?? null,
 			review: req.review ?? null,
 		})
 	}
@@ -1360,6 +1495,7 @@ export class WalletRequest {
 		const cookies = encodeDict(this.cookies)
 		const oddHeaders = encodeDict(this.oddHeaders)
 		const oddTrailers = encodeDict(this.oddTrailers)
+		const responseOddHeaders = encodeDict(this.responseOddHeaders)
 
 		const jsonRpcMethod =
 			this.jsonRpcMethods.length === 0
@@ -1367,6 +1503,8 @@ export class WalletRequest {
 				: this.jsonRpcMethods.length === 1
 					? this.jsonRpcMethods[0]
 					: [...this.jsonRpcMethods]
+
+		const responsePayload = this.responsePayload
 
 		return {
 			domain: this.domain,
@@ -1379,6 +1517,13 @@ export class WalletRequest {
 			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
 			...(oddTrailers ? { oddTrailers } : {}),
+			...(this.responseStatus !== null && this.responseStatus !== 200
+				? { responseStatus: this.responseStatus }
+				: {}),
+			...(responseOddHeaders ? { responseOddHeaders } : {}),
+			...(responsePayload !== null && !responsePayloadIsTrivial(responsePayload)
+				? { responsePayload }
+				: {}),
 			...(this.review.toJSON() === undefined ? {} : { review: this.review.toJSON() }),
 		}
 	}
@@ -1408,6 +1553,9 @@ export class WalletRequest {
 		const content = this.content ? ` content=${this.content.toString()}` : ''
 		const refererDomain = this.refererDomain ? ` referer=${this.refererDomain.toString()}` : ''
 
+		const responseStatus = this.responseStatus !== null ? ` status=${this.responseStatus}` : ''
+		const responsePayload = this.responsePayload ? ` resp=${this.responsePayload}` : ''
+
 		return (
 			`${this.domain}: ${this.path}` +
 			fmtMultiDict('query', this.query) +
@@ -1416,7 +1564,10 @@ export class WalletRequest {
 			fmtMultiDict('cookie', this.cookies) +
 			refererDomain +
 			fmtMultiDict('headers', this.oddHeaders) +
-			fmtMultiDict('trailers', this.oddTrailers)
+			fmtMultiDict('trailers', this.oddTrailers) +
+			responseStatus +
+			fmtMultiDict('resp_headers', this.responseOddHeaders) +
+			responsePayload
 		)
 	}
 
@@ -1517,6 +1668,12 @@ export class WalletRequest {
 				strings.add(ds)
 			}
 		}
+
+		// Note: Response headers and payload are explicitly excluded here.
+		// We want to measure the data that the wallet is sending, not what it is
+		// receiving. The response headers and payload data are only useful for
+		// understanding the purpose of a request, but by itself has no user
+		// privacy implications.
 	}
 
 	private async _processUserDataDict(

@@ -30,16 +30,23 @@ _KNOWN_BENIGN_HEADERS = frozenset(
     h.lower()
     for h in (
         "Accept-Encoding",
+        "Accept-Ranges",
         "User-Agent",
         "Cookie",  # Handled separately
         "Host",
         "Accept",
-        "Accept-Encoding",
         "Accept-Language",
         "Cache-Control",
         "Content-Length",
         "Content-Type",
+        "Content-Encoding",
+        "Connection",
+        "Origin",
+        "Pragma",
+        "Upgrade",
         "Upgrade-Insecure-Requests",
+        "Vary",
+        "Sec-Fetch-Dest",
         "Sec-Fetch-Site",
         "Sec-Fetch-User",
         "Sec-Fetch-Mode",
@@ -55,21 +62,45 @@ _KNOWN_BENIGN_HEADERS = frozenset(
         "sec-ch-ua-model",
         "sec-ch-ua-platform-version",
         "sec-ch-ua-wow64",
-        "Connection",
-        "Origin",
-        "Sec-Fetch-Dest",
-        "Pragma",
-        "Upgrade",
-        "User-Agent",
         "Sec-WebSocket-Version",
         "Sec-WebSocket-Key",
         "Sec-WebSocket-Extensions",
+        "Transfer-Encoding",
+    )
+)
+
+_KNOWN_BENIGN_RESPONSE_ONLY_HEADERS = frozenset(
+    h.lower()
+    for h in (
+        "Accept-CH",
+        "Date",
+        "Expires",
+        "Last-Modified",
+        "X-Content-Type-Options",
+        "Server",
+        "X-XSS-Protection",
+        "X-Frame-Options",
+        "Content-Security-Policy",
+        "Permissions-Policy",
+        "X-Identity-Content-Length",
+        "Etag",
+        "Content-Disposition",
+        "Strict-Transport-Security",
+        "Access-Control-Allow-Origin",
+        "Cross-Origin-Opener-Policy",
+        "Cross-Origin-Resource-Policy",
+        "Cross-Origin-Opener-Policy-Report-Only",
     )
 )
 
 
 def is_benign_header(header: str) -> bool:
     return header.lower() in _KNOWN_BENIGN_HEADERS
+
+
+def is_benign_response_header(header: str) -> bool:
+    h = header.lower()
+    return h in _KNOWN_BENIGN_HEADERS or h in _KNOWN_BENIGN_RESPONSE_ONLY_HEADERS
 
 
 class UserInfo(enum.StrEnum):
@@ -162,7 +193,7 @@ class UserDataStringStore:
 
     def add(self, item: UserDataString) -> None:
         with self._lock:
-            existing =  self._strings.get(item.str, None)
+            existing = self._strings.get(item.str, None)
             if existing is None:
                 self._strings[item.str] = item
                 self._needs_flushing += 1
@@ -183,7 +214,10 @@ class UserDataStringStore:
 
     def encode(self) -> list[dict]:
         with self._lock:
-            return [item.encode() for item in sorted(self._strings.values(), key=lambda x: x.str)]
+            return [
+                item.encode()
+                for item in sorted(self._strings.values(), key=lambda x: x.str)
+            ]
 
 
 class WalletCaptureContext(enum.StrEnum):
@@ -241,13 +275,10 @@ class UserDataPieces:
         for k, v in data.items():
             if isinstance(v, list):
                 classified[k] = tuple(
-                    cls.classify_str(data=s, context=context)
-                    for s in v
+                    cls.classify_str(data=s, context=context) for s in v
                 )
             else:
-                classified[k] = (
-                    cls.classify_str(data=v, context=context),
-                )
+                classified[k] = (cls.classify_str(data=v, context=context),)
         return classified
 
     def __init__(self, pieces: FrozenSet[UserInfo], sample: UserDataString):
@@ -302,9 +333,7 @@ class WalletRequest:
             decoded = {}
             for key, v in data.get(k, {}).items():
                 if isinstance(v, list):
-                    decoded[key] = tuple(
-                        UserDataPieces.decode(data=x) for x in v
-                    )
+                    decoded[key] = tuple(UserDataPieces.decode(data=x) for x in v)
                 else:
                     decoded[key] = (UserDataPieces.decode(data=v),)
             return decoded
@@ -328,6 +357,9 @@ class WalletRequest:
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
             review=data.get("review"),
+            response_status=data.get("responseStatus"),
+            response_headers=_decode_str_multidict("responseOddHeaders") or None,
+            response_payload=_decode_if_set("responsePayload"),
         )
 
     @classmethod
@@ -411,6 +443,9 @@ class WalletRequest:
         odd_trailers: Dict[str, Tuple[UserDataPieces, ...]],
         session_time: int,
         review: Optional[object],
+        response_status: Optional[int] = None,
+        response_headers: Dict[str, Tuple[UserDataPieces, ...]] | None = None,
+        response_payload: Optional[UserDataPieces] = None,
     ):
         self._domain = domain
         self._path = path
@@ -423,6 +458,32 @@ class WalletRequest:
         self._odd_trailers = odd_trailers
         self._session_time = session_time
         self._review = review
+        self._response_status: Optional[int] = response_status
+        self._response_headers: Dict[str, Tuple[UserDataPieces, ...]] = (
+            response_headers if response_headers is not None else {}
+        )
+        self._response_payload: Optional[UserDataPieces] = response_payload
+
+    @classmethod
+    def set_response_data(
+        cls,
+        wallet_request: WalletRequest,
+        resp: http.Response,
+    ) -> None:
+        """Populate response fields on an existing WalletRequest from an HTTP response."""
+        wallet_request._response_status = resp.status_code
+        wallet_request._response_headers = UserDataPieces.classify_multidict(
+            _multidict_to_dict_of_lists(
+                resp.headers, filter_fn=lambda k: not is_benign_response_header(k)
+            ),
+            context=WalletCaptureContext.OTHER_HEADER,
+        )
+        text = resp.get_text()
+        wallet_request._response_payload = (
+            UserDataPieces.classify_str(text, WalletCaptureContext.POST_BODY)
+            if text is not None
+            else None
+        )
 
     def __str__(self):
         def _maybe_multidict(
@@ -446,6 +507,14 @@ class WalletRequest:
             "" if self._referer_domain is None else f" referer={self._referer_domain}"
         )
         content = "" if self._content is None else f" content={str(self._content)}"
+        response_status = (
+            "" if self._response_status is None else f" status={self._response_status}"
+        )
+        response_payload = (
+            ""
+            if self._response_payload is None or len(self._response_payload) == 0
+            else f" resp=[{str(len(self._response_payload))} bytes]"
+        )
         return (
             f"{self._domain}: {self._path}"
             f"{_maybe_multidict('query', self._query)}"
@@ -454,6 +523,9 @@ class WalletRequest:
             f"{referer_domain}"
             f"{_maybe_multidict('headers', self._odd_headers)}"
             f"{_maybe_multidict('trailers', self._odd_trailers)}"
+            f"{response_status}"
+            f"{_maybe_multidict('resp_headers', self._response_headers)}"
+            f"{response_payload}"
         )
 
     def encode(self):
@@ -492,6 +564,26 @@ class WalletRequest:
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
 
+        def _response_payload_is_trivial(payload: Optional[UserDataPieces]) -> bool:
+            if payload is None:
+                return True
+            raw = payload._sample.str
+            if not raw.strip():
+                return True
+            stripped = raw.strip()
+            if stripped == "{}":
+                return True  # Empty JSON object.
+            return False
+
+        if self._response_status is not None and self._response_status != 200:
+            data["responseStatus"] = self._response_status
+
+        _encode_multidict("responseOddHeaders", self._response_headers)
+
+        payload = self._response_payload
+        if not _response_payload_is_trivial(payload):
+            data["responsePayload"] = payload.encode()
+
         if self._review is not None:
             data["review"] = self._review
 
@@ -521,6 +613,11 @@ class WalletCaptureFlow:
         """Add a new request (increments flush counter)."""
         with self._lock:
             self._requests.append(wallet_request)
+            self._needs_flushing += 1
+
+    def notify_update(self):
+        """Increments flush counter."""
+        with self._lock:
             self._needs_flushing += 1
 
     def needs_flushing(self) -> int:
@@ -769,15 +866,28 @@ class WalletDataCollectionAddon:
             f"Received a request before being fully configured! (wallet_data={str(self._wallet_data)}, current_ux_flow={str(self._current_ux_flow)})"
         )
         req = flow.request
-        host = req.pretty_host
         req.anticache()
         req.constrain_encoding()
         wallet_data_req = WalletRequest.from_request(
             req=req,
             session_time=self._wallet_data.session_time(),
         )
+        # Stash on the flow so response() can retrieve the correct match
+        flow._wallet_data_req = wallet_data_req  # type: ignore[attr-defined]
         self._wallet_data.flow(self._current_ux_flow).add(wallet_data_req)
-        logging.info("[%s] %s", host, wallet_data_req)
+
+    def response(self, flow: http.HTTPFlow) -> None:
+        assert self._wallet_data is not None and self._current_ux_flow is not None
+        wallet_data_req = getattr(flow, "_wallet_data_req", None)
+        assert wallet_data_req is not None, (
+            "Got a mitmproxy HTTP flow without associated wallet_data_req"
+        )
+        assert flow.response is not None, (
+            "No response data on mitmproxy HTTP flow object during response handling"
+        )
+        WalletRequest.set_response_data(wallet_data_req, flow.response)
+        self._wallet_data.flow(self._current_ux_flow).notify_update()
+        logging.info("[%s] %s", flow.request.pretty_host, wallet_data_req)
 
 
 addons = [WalletDataCollectionAddon()]
