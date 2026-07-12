@@ -10,6 +10,8 @@ Does the wallet transparently disclose how it monetizes your transaction data?
 
 Before a transaction is included onchain, wallet software may send your transaction data to external services for broadcast, simulation, or orderflow auctioning.
 
+---
+
 Orderflow auctioning is crypto's version of payment for order flow (PFOF): external parties pay for access to your pending transaction before it executes. It's another form of fee-taking — wallets disclose transaction fees before you confirm, and auctioning deserves the same transparency.
 
 ---
