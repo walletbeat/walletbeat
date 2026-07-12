@@ -92,6 +92,22 @@ describe('walletEipSupport', () => {
 		expect(eipSupport['6963']).toBe('NOT_APPLICABLE')
 	})
 
+	it('marks software-wallet-only EIPs as not applicable for hardware wallets', () => {
+		const eipSupport = walletEipSupport(unratedHardwareFeatures())
+
+		// Wallet call API and address resolution are software-wallet-only
+		// features, so their EIPs cannot apply to hardware wallets.
+		expect(eipSupport['5792']).toBe('NOT_APPLICABLE')
+		expect(eipSupport['7828']).toBe('NOT_APPLICABLE')
+		expect(eipSupport['7831']).toBe('NOT_APPLICABLE')
+
+		// Account type support is a base feature: hardware wallets can
+		// meaningfully support signing EIP-7702 authorizations and ERC-4337
+		// user operations, so unassessed data stays unknown.
+		expect(eipSupport['4337']).toBe('UNKNOWN')
+		expect(eipSupport['7702']).toBe('UNKNOWN')
+	})
+
 	it('derives browser integration EIPs from the browser integration record', () => {
 		const eipSupport = walletEipSupport({
 			...unratedFeatures(),

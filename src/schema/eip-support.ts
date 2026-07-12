@@ -21,6 +21,7 @@ import { featureSupported, isSupported, notSupported, type Support } from './fea
 import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
 import { getVariants, type Variant } from './variants'
 import { getVariantResolvedWallet, type RatedWallet } from './wallet'
+import { WalletType } from './wallet-types'
 
 /**
  * Whether a wallet implements a specific EIP.
@@ -74,6 +75,15 @@ function browserIntegrationEipSupport(
 	return eipSupport(isSupported(support), hasRefs(support) ? support.ref : undefined, browser.ref)
 }
 
+/**
+ * Interpret a `null` software-wallet-only feature: `resolveFeatures`
+ * hard-nulls such features for other wallet kinds, so for those `null` means
+ * the feature (and its EIPs) cannot apply rather than "unassessed".
+ */
+function softwareOnlyFeatureUnset(features: ResolvedFeatures): EipSupport {
+	return features.type === WalletType.SOFTWARE ? 'UNKNOWN' : 'NOT_APPLICABLE'
+}
+
 /** EIP support based on chain-specific address resolution. */
 function addressResolutionEipSupport(
 	features: ResolvedFeatures,
@@ -82,7 +92,7 @@ function addressResolutionEipSupport(
 	const addressResolution = features.addressResolution
 
 	if (addressResolution === null) {
-		return 'UNKNOWN'
+		return softwareOnlyFeatureUnset(features)
 	}
 
 	const support = addressResolution.chainSpecificAddressing[erc]
@@ -197,7 +207,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		const walletCall = features.walletCall
 
 		if (walletCall === null) {
-			return 'UNKNOWN'
+			return softwareOnlyFeatureUnset(features)
 		}
 
 		return eipSupport(isSupported(walletCall), hasRefs(walletCall) ? walletCall.ref : undefined)
