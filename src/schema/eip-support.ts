@@ -160,9 +160,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 
 		if (isSupported(eip7702)) {
 			delegateIsErc4337 =
-				eip7702.contract === 'UNKNOWN'
-					? null
-					: isSupported(eip7702.contract.methods.validateUserOp)
+				eip7702.contract === 'UNKNOWN' ? null : isSupported(eip7702.contract.methods.validateUserOp)
 		}
 
 		if (isSupported(rawErc4337) || delegateIsErc4337 === true) {
@@ -232,21 +230,19 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 			return eipSupport(false, transactionLegibility.ref)
 		}
 
-		const decoded = Object.values(ComplexBenchmarkTransactions).map(
-			(benchmark): boolean | null => {
-				const entry = erc7730[benchmark]
+		const decoded = Object.values(ComplexBenchmarkTransactions).map((benchmark): boolean | null => {
+			const entry = erc7730[benchmark]
 
-				if (entry === null) {
-					return null
-				}
+			if (entry === null) {
+				return null
+			}
 
-				if (typeof entry === 'string') {
-					return entry === DataLocation.ON_DEVICE || entry === DataLocation.OFF_DEVICE
-				}
+			if (typeof entry === 'string') {
+				return entry === DataLocation.ON_DEVICE || entry === DataLocation.OFF_DEVICE
+			}
 
-				return isShown(entry.decoded)
-			},
-		)
+			return isShown(entry.decoded)
+		})
 
 		if (decoded.includes(false)) {
 			return eipSupport(false, transactionLegibility.ref)
