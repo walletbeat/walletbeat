@@ -140,9 +140,11 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 	},
 	'1193': features => browserIntegrationEipSupport(features, '1193'),
 	'2700': features => browserIntegrationEipSupport(features, '2700'),
-	// A wallet supporting EIP-7702 accounts runs smart-account code for its
-	// users, so either raw ERC-4337 or EIP-7702 account support counts as
-	// supporting a smart-account-based account type.
+	// A wallet supports ERC-4337 if it supports raw ERC-4337 accounts, or if
+	// its EIP-7702 delegate contract is itself an ERC-4337 account (i.e. it
+	// implements `validateUserOp`). EIP-7702 alone does not imply ERC-4337:
+	// the delegate contract may not be an ERC-4337 account, so a wallet whose
+	// delegate contract is unknown stays unknown.
 	'4337': features => {
 		const accountSupport = features.accountSupport
 
@@ -152,15 +154,30 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 
 		const { rawErc4337, eip7702 } = accountSupport
 
-		if (!isSupported(rawErc4337) && !isSupported(eip7702)) {
-			return eipSupport(false)
+		// Whether the EIP-7702 delegate contract is an ERC-4337 account, or
+		// `null` if the delegate contract is not known.
+		let delegateIsErc4337: boolean | null = false
+
+		if (isSupported(eip7702)) {
+			delegateIsErc4337 =
+				eip7702.contract === 'UNKNOWN'
+					? null
+					: isSupported(eip7702.contract.methods.validateUserOp)
 		}
 
-		return eipSupport(
-			true,
-			isSupported(rawErc4337) ? ownRefs(rawErc4337) : undefined,
-			isSupported(eip7702) ? ownRefs(eip7702) : undefined,
-		)
+		if (isSupported(rawErc4337) || delegateIsErc4337 === true) {
+			return eipSupport(
+				true,
+				isSupported(rawErc4337) ? ownRefs(rawErc4337) : undefined,
+				delegateIsErc4337 === true ? ownRefs(eip7702) : undefined,
+			)
+		}
+
+		if (delegateIsErc4337 === null) {
+			return 'UNKNOWN'
+		}
+
+		return eipSupport(false)
 	},
 	'5564': features => {
 		const transactionPrivacy = features.privacy.transactionPrivacy

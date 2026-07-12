@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { eips } from '@/data/eips'
 import { unratedHardwareTemplate } from '@/data/hardware-wallets/unrated.tmpl'
 import { unratedTemplate } from '@/data/software-wallets/unrated.tmpl'
+import type { SmartWalletContract } from '@/schema/contracts'
 import { type EipSupport, walletEipSupport } from '@/schema/eip-support'
 import { type ResolvedFeatures, resolveFeatures } from '@/schema/features'
 import {
+	type AccountSupport,
 	AccountType,
 	TransactionGenerationCapability,
 } from '@/schema/features/account-support'
@@ -16,7 +18,13 @@ import {
 	DataLocation,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { featureSupported, isSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	isSupported,
+	notSupported,
+	type Support,
+	supported,
+} from '@/schema/features/support'
 import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
@@ -127,29 +135,74 @@ describe('walletEipSupport', () => {
 		expect(refUrls(eipSupport['4337'])).toContain('https://example.com/4337')
 	})
 
-	it('credits ERC-4337 support to EIP-7702 wallets', () => {
+	/** Account support for an EIP-7702-only wallet with the given delegate. */
+	function eip7702AccountSupport(contract: 'UNKNOWN' | SmartWalletContract): AccountSupport {
+		return {
+			defaultAccountType: AccountType.eip7702,
+			eoa: notSupported,
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			eip7702: supported({
+				ref: { url: 'https://example.com/7702' },
+				contract,
+			}),
+			safe: notSupported,
+		}
+	}
+
+	/** An EIP-7702 delegate contract with the given ERC-4337 support. */
+	function delegateContract(validateUserOp: Support): SmartWalletContract {
+		return {
+			name: 'Example delegate',
+			address: '0x0000000000000000000000000000000000000001',
+			eip7702Delegatable: true,
+			sourceCode: { available: false },
+			methods: {
+				isValidSignature: featureSupported,
+				validateUserOp,
+			},
+		}
+	}
+
+	it('credits ERC-4337 when the EIP-7702 delegate is an ERC-4337 account', () => {
 		const eipSupport = walletEipSupport({
 			...unratedFeatures(),
-			accountSupport: {
-				defaultAccountType: AccountType.eip7702,
-				eoa: notSupported,
-				mpc: notSupported,
-				rawErc4337: notSupported,
-				eip7702: supported({
-					ref: { url: 'https://example.com/7702' },
-					contract: 'UNKNOWN',
-				}),
-				safe: notSupported,
-			},
+			accountSupport: eip7702AccountSupport(delegateContract(featureSupported)),
 		})
 
 		expectSupported(eipSupport['7702'])
 		expect(refUrls(eipSupport['7702'])).toContain('https://example.com/7702')
 
-		// An EIP-7702 wallet supports a smart-account-based account type, which
-		// counts as ERC-4337 support, backed by the EIP-7702 references.
+		// The delegate contract implements validateUserOp, so the wallet
+		// supports ERC-4337 accounts, backed by the EIP-7702 references.
 		expectSupported(eipSupport['4337'])
 		expect(refUrls(eipSupport['4337'])).toContain('https://example.com/7702')
+	})
+
+	it('leaves ERC-4337 unknown when the EIP-7702 delegate contract is unknown', () => {
+		const eipSupport = walletEipSupport({
+			...unratedFeatures(),
+			accountSupport: eip7702AccountSupport('UNKNOWN'),
+		})
+
+		expectSupported(eipSupport['7702'])
+
+		// EIP-7702 alone does not imply ERC-4337: the unknown delegate
+		// contract may or may not be an ERC-4337 account.
+		expect(eipSupport['4337']).toBe('UNKNOWN')
+	})
+
+	it('does not credit ERC-4337 when the EIP-7702 delegate is not an ERC-4337 account', () => {
+		const eipSupport = walletEipSupport({
+			...unratedFeatures(),
+			accountSupport: eip7702AccountSupport(delegateContract(notSupported)),
+		})
+
+		expectSupported(eipSupport['7702'])
+
+		// The delegate contract was verified not to implement validateUserOp,
+		// and the wallet supports no raw ERC-4337 accounts.
+		expectNotSupported(eipSupport['4337'])
 	})
 
 	it('derives EIP-5792 from wallet call support', () => {
