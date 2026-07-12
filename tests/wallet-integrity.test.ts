@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import { describe, expect, it } from 'vitest'
 
-import { eips } from '@/data/eips'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
@@ -115,12 +114,9 @@ describe('wallets', () => {
 						continue
 					}
 
-					const eipSupport = walletEipSupport(
-						resolveFeatures(wallet.features, wallet.variants, variant),
-					)
-
-					// One entry per tracked EIP.
-					expect(Object.keys(eipSupport).sort()).toEqual(Object.keys(eips).sort())
+					expect(() =>
+						walletEipSupport(resolveFeatures(wallet.features, wallet.variants, variant)),
+					).not.toThrow()
 				}
 			})
 

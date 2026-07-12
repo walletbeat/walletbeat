@@ -22,8 +22,8 @@ import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
 /**
  * Whether a wallet implements a specific EIP.
  *
- * - `SUPPORTED` means the wallet implements the EIP, at least partially.
- * - `NOT_SUPPORTED` means the wallet was verified not to implement the EIP.
+ * - `Supported` means the wallet implements the EIP, at least partially.
+ * - `NotSupported` means the wallet was verified not to implement the EIP.
  * - `'UNKNOWN'` means the implementation status has not been assessed yet.
  * - `'NOT_APPLICABLE'` means the EIP does not apply to this type of wallet
  *   (e.g. browser integration EIPs for wallets that have no browser variant).
@@ -50,11 +50,6 @@ function eipSupport(
 	}
 }
 
-/** The references attached to `value` itself, if any. */
-function ownRefs(value: unknown): WithRef<unknown>['ref'] | undefined {
-	return hasRefs(value) ? value.ref : undefined
-}
-
 /** EIP support based on the browser integration record. */
 function browserIntegrationEipSupport(
 	features: ResolvedFeatures,
@@ -73,7 +68,7 @@ function browserIntegrationEipSupport(
 	}
 
 	// The browser integration record's references document all browser EIPs.
-	return eipSupport(isSupported(support), ownRefs(support), browser.ref)
+	return eipSupport(isSupported(support), hasRefs(support) ? support.ref : undefined, browser.ref)
 }
 
 /** EIP support based on chain-specific address resolution. */
@@ -94,7 +89,11 @@ function addressResolutionEipSupport(
 	}
 
 	// The address resolution record's references document both address ERCs.
-	return eipSupport(isSupported(support), ownRefs(support), addressResolution.ref)
+	return eipSupport(
+		isSupported(support),
+		hasRefs(support) ? support.ref : undefined,
+		addressResolution.ref,
+	)
 }
 
 /**
@@ -166,8 +165,8 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		if (isSupported(rawErc4337) || delegateIsErc4337 === true) {
 			return eipSupport(
 				true,
-				isSupported(rawErc4337) ? ownRefs(rawErc4337) : undefined,
-				delegateIsErc4337 === true ? ownRefs(eip7702) : undefined,
+				isSupported(rawErc4337) ? rawErc4337.ref : undefined,
+				delegateIsErc4337 === true && isSupported(eip7702) ? eip7702.ref : undefined,
 			)
 		}
 
@@ -186,7 +185,10 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 
 		const stealthAddresses = transactionPrivacy[PrivateTransferTechnology.STEALTH_ADDRESSES]
 
-		return eipSupport(isSupported(stealthAddresses), ownRefs(stealthAddresses))
+		return eipSupport(
+			isSupported(stealthAddresses),
+			hasRefs(stealthAddresses) ? stealthAddresses.ref : undefined,
+		)
 	},
 	'5792': features => {
 		const walletCall = features.walletCall
@@ -195,7 +197,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 			return 'UNKNOWN'
 		}
 
-		return eipSupport(isSupported(walletCall), ownRefs(walletCall))
+		return eipSupport(isSupported(walletCall), hasRefs(walletCall) ? walletCall.ref : undefined)
 	},
 	'6963': features => browserIntegrationEipSupport(features, '6963'),
 	'7702': features => {
@@ -207,7 +209,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 
 		const eip7702 = accountSupport.eip7702
 
-		return eipSupport(isSupported(eip7702), ownRefs(eip7702))
+		return eipSupport(isSupported(eip7702), isSupported(eip7702) ? eip7702.ref : undefined)
 	},
 	// ERC-7730 is registry-based: a wallet that implements it decodes every
 	// transaction in the registry, so it must decode *all* of the complex
