@@ -28,6 +28,13 @@
 		[EipSupportStatus.NOT_APPLICABLE]: 'N/A',
 	} as const
 
+	const eipSupportStatusIcon = {
+		[EipSupportStatus.SUPPORTED]: '✅',
+		[EipSupportStatus.NOT_SUPPORTED]: '❌',
+		[EipSupportStatus.UNKNOWN]: '?',
+		[EipSupportStatus.NOT_APPLICABLE]: '–',
+	} as const
+
 
 	// Props
 	let {
@@ -143,6 +150,8 @@
 							src={`/images/wallets/${wallet.metadata.id}.svg`}
 							alt={wallet.metadata.displayName}
 							class="wallet-icon"
+							width="36"
+							height="36"
 							onerror={event => {
 								if (event.currentTarget instanceof HTMLImageElement)
 									event.currentTarget.src = '/images/wallets/default.svg'
@@ -164,12 +173,8 @@
 					{@const status = eipSupportStatus(walletSupport.overall)}
 
 					<span class="support-status" data-support-status={status}>
-						{#if status === EipSupportStatus.SUPPORTED}
-							✅
-						{:else if status === EipSupportStatus.NOT_SUPPORTED}
-							❌
-						{/if}
-						{eipSupportStatusLabel[status]}
+						<span class="status-icon">{eipSupportStatusIcon[status]}</span>
+						<span class="status-label">{eipSupportStatusLabel[status]}</span>
 					</span>
 
 				{:else if column.id === 'variants'}
@@ -178,12 +183,13 @@
 					{#if perVariant.length <= 1}
 						<span class="muted-text">–</span>
 					{:else}
-						<ul class="variant-list" data-column="gap-1">
+						<ul class="variant-list" data-list="unstyled gap-1">
 							{#each perVariant as { variant, support } (variant)}
 								{@const status = eipSupportStatus(support)}
 
 								<li data-variant-status={status}>
-									{variantLabel(variant)}: {eipSupportStatusLabel[status].toLowerCase()}
+									<span class="status-icon">{eipSupportStatusIcon[status]}</span>
+									{variantLabel(variant)}
 								</li>
 							{/each}
 						</ul>
@@ -199,7 +205,7 @@
 					{#if sourceUrls.length === 0}
 						<span class="muted-text">–</span>
 					{:else}
-						<ul class="source-list" data-column="gap-1">
+						<ul class="source-list" data-list="unstyled gap-1">
 							{#each sourceUrls as url (url.url)}
 								<li>
 									<a
@@ -232,9 +238,37 @@
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 		}
+
+		/*
+		 * Fixed column widths so every EIP support table on a page lines up.
+		 * The scroll container sizes tables by intrinsic width on a huge
+		 * canvas, so widths must be absolute — percentages blow up.
+		 */
+		:global(table) {
+			table-layout: fixed;
+			width: 56rem;
+			min-width: 0;
+		}
+
+		:global(col:nth-child(1)) {
+			width: 20rem;
+		}
+
+		:global(col:nth-child(2)) {
+			width: 11rem;
+		}
+
+		:global(col:nth-child(3)) {
+			width: 13rem;
+		}
+
+		:global(col:nth-child(4)) {
+			width: 12rem;
+		}
 	}
 
 	.wallet-info {
+		justify-content: flex-start;
 		gap: 0.85em;
 		padding: 0.5em 0;
 
@@ -271,27 +305,38 @@
 		}
 	}
 
+	.status-icon {
+		display: inline-block;
+		width: 1.5em;
+		flex-shrink: 0;
+		text-align: center;
+	}
+
 	.support-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6em;
 		white-space: nowrap;
 
 		&[data-support-status='UNKNOWN'],
 		&[data-support-status='NOT_APPLICABLE'] {
 			color: var(--text-secondary);
+
+			.status-icon {
+				font-weight: 600;
+			}
 		}
 	}
 
 	.variant-list,
 	.source-list {
-		list-style: none;
 		font-size: 0.85em;
-
-		li {
-			white-space: nowrap;
-		}
 	}
 
 	.variant-list {
 		li {
+			white-space: nowrap;
+
 			&[data-variant-status='UNKNOWN'],
 			&[data-variant-status='NOT_APPLICABLE'] {
 				color: var(--text-secondary);
