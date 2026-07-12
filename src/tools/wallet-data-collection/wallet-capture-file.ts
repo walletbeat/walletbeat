@@ -106,9 +106,7 @@ interface EncodedWalletDataRequest {
 	sessionTime: number
 
 	/**
-	 * Encoded as:
-	 * - omitted if empty
-	 * - otherwise: Record<key, EncodedUserDataPieces | EncodedUserDataPieces[]>
+	 * Encoded as omitted if empty, otherwise Record<key, string | string[]>.
 	 */
 	query?: EncodedMultiDict
 
@@ -120,9 +118,7 @@ interface EncodedWalletDataRequest {
 	 */
 	jsonRpcMethod?: string | string[]
 
-	/**
-	 * Encoded as omitted if absent, otherwise EncodedUserDataPieces.
-	 */
+	/** Encoded as omitted if absent, otherwise a plain string. */
 	content?: string
 
 	cookies?: EncodedMultiDict
@@ -143,13 +139,9 @@ interface EncodedWalletDataRequest {
 
 	/**
 	 * Encoded as omitted if absent or trivial (empty / "{}"),
-	 * otherwise either a plain string (no classification) or
-	 * an EncodedUserDataString object (with classification).
-	 * Mirrors Python UserDataPieces.encode() which returns:
-	 * - plain string if no pieces
-	 * - { sample, piece?, pieces? } if pieces present
+	 * otherwise a plain string.
 	 */
-	responsePayload?: string | EncodedUserDataString
+	responsePayload?: string
 
 	review?: EncodedWalletRequestReview
 }
@@ -264,68 +256,6 @@ function responsePayloadIsTrivial(payload: string): boolean {
 	return false
 }
 
-/**
- * Extract the raw string from a responsePayload value.
- * Python UserDataPieces.encode() returns either:
- * - a plain string (when no pieces)
- * - an object { sample/str, piece?, pieces? } (when pieces present)
- */
-function extractResponsePayloadString(
-	value: string | EncodedUserDataString | undefined,
-): string | null {
-	if (value === undefined || value === null) {
-		return null
-	}
-
-	if (typeof value === 'string') {
-		return value
-	}
-
-	// Object format: { str: ..., sample: ... }
-	if ('str' in value) {
-		return value.str ?? null
-	}
-
-	if ('sample' in value) {
-		const val = value as Record<string, unknown>
-
-		return typeof val.sample === 'string' ? val.sample : null
-	}
-
-	return null
-}
-
-/**
- * Parse a responsePayload encoded as an object (with classification).
- * Python UserDataPieces.encode() can produce { sample/str, piece?, pieces? }.
- */
-function parseResponsePayload(data: unknown, at: string): EncodedUserDataString {
-	const obj = expectRecord(data, at)
-
-	// Accept either 'str' (TypeScript convention) or 'sample' (Python convention).
-	const str =
-		typeof obj.str === 'string'
-			? obj.str
-			: typeof obj.sample === 'string'
-				? obj.sample
-				: expectString(obj.str ?? obj.sample, `${at}.str`)
-
-	if (obj.piece !== undefined) {
-		return { str, piece: userInfoEnums.assert(expectString(obj.piece, `${at}.piece`)) }
-	}
-
-	if (obj.pieces !== undefined) {
-		const piecesArr = expectArray(obj.pieces, `${at}.pieces`)
-
-		return {
-			str,
-			pieces: piecesArr.map((p, i) => userInfoEnums.assert(expectString(p, `${at}.pieces[${i}]`))),
-		}
-	}
-
-	return { str }
-}
-
 function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataRequest {
 	const obj = expectRecord(v, at)
 
@@ -399,14 +329,10 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		responseOddHeaders = parseEncodedMultiDict(obj.responseOddHeaders, `${at}.responseOddHeaders`)
 	}
 
-	let responsePayload: string | EncodedUserDataString | undefined
+	let responsePayload: string | undefined
 
 	if (obj.responsePayload !== undefined) {
-		if (typeof obj.responsePayload === 'string') {
-			responsePayload = obj.responsePayload
-		} else {
-			responsePayload = parseResponsePayload(obj.responsePayload, `${at}.responsePayload`)
-		}
+		responsePayload = expectString(obj.responsePayload, `${at}.responsePayload`)
 	}
 
 	return {
@@ -1467,7 +1393,7 @@ export class WalletRequest {
 			oddTrailers: decodeUserDataDict(req.oddTrailers, `${at}.oddTrailers`),
 			responseStatus: req.responseStatus ?? null,
 			responseOddHeaders: decodeUserDataDict(req.responseOddHeaders, `${at}.responseOddHeaders`),
-			responsePayload: extractResponsePayloadString(req.responsePayload) ?? null,
+			responsePayload: req.responsePayload ?? null,
 			review: req.review ?? null,
 		})
 	}

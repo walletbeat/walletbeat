@@ -7,7 +7,7 @@ import os
 import time
 import threading
 import urllib.parse
-from typing import Set, Tuple, Dict, Optional, FrozenSet, List, Union
+from typing import Set, Tuple, Dict, Optional, List, Union
 
 from mitmproxy import ctx
 from mitmproxy import http
@@ -208,7 +208,7 @@ class UserDataStringStore:
         with self._lock:
             return self._needs_flushing
 
-    def mark_flushed(self, amount: int) -> None:
+    def mark_flushing_done(self, amount: int) -> None:
         with self._lock:
             self._needs_flushing -= amount
 
@@ -220,96 +220,10 @@ class UserDataStringStore:
             ]
 
 
-class WalletCaptureContext(enum.StrEnum):
-    COOKIE = "COOKIE"
-    OTHER_HEADER = "OTHER_HEADER"
-    QUERY = "QUERY"
-    POST_BODY = "POST_BODY"
-
-
-class UserDataPieces:
-    @classmethod
-    def decode(cls, data: Union[dict, str]) -> UserDataPieces:
-        if isinstance(data, str):
-            # Legacy format: just a string sample with no pieces
-            return cls(
-                pieces=frozenset(),
-                sample=UserDataString(str=data, pieces=set()),
-            )
-        else:
-            pieces_list = []
-            if "pieces" in data:
-                pieces_list = data["pieces"]
-            elif "piece" in data:
-                pieces_list = [data["piece"]]
-
-            pieces = set(UserInfo[p] for p in pieces_list)
-            sample_str = data["sample"]
-            # Sample can be a plain string or a dict with "str" field
-            if isinstance(sample_str, dict):
-                sample = UserDataString.decode(sample_str)
-                # Merge pieces from sample with pieces from outer dict
-                all_pieces = set(pieces)
-                for p in sample.pieces:
-                    all_pieces.add(p)
-                pieces = all_pieces
-            else:
-                sample = UserDataString(str=sample_str, pieces=set())
-
-        return cls(pieces=frozenset(pieces), sample=sample)
-
-    @classmethod
-    def classify_str(cls, data: str, context: WalletCaptureContext) -> UserDataPieces:
-        return cls(
-            pieces=frozenset(),
-            sample=UserDataString(str=data, pieces=set()),
-        )
-
-    @classmethod
-    def classify_multidict(
-        cls,
-        data: Dict[str, Union[str, List[str]]],
-        context: WalletCaptureContext,
-    ) -> Dict[str, Tuple[UserDataPieces, ...]]:
-        classified = {}
-        for k, v in data.items():
-            if isinstance(v, list):
-                classified[k] = tuple(
-                    cls.classify_str(data=s, context=context) for s in v
-                )
-            else:
-                classified[k] = (cls.classify_str(data=v, context=context),)
-        return classified
-
-    def __init__(self, pieces: FrozenSet[UserInfo], sample: UserDataString):
-        self._pieces = pieces
-        self._sample = sample
-
-    def __str__(self):
-        return repr(self._sample)
-
-    def __repr__(self):
-        return str(self)
-
-    def encode(self):
-        if len(self._pieces) == 0:
-            return self._sample.str
-
-        data = {
-            "sample": self._sample.str,
-        }
-
-        sorted_pieces = list(sorted(str(p) for p in self._pieces))
-        if len(sorted_pieces) == 1:
-            data["piece"] = sorted_pieces[0]
-        elif len(sorted_pieces) > 1:
-            data["pieces"] = sorted_pieces
-
-        return data
-
-
-def _multidict_to_dict_of_lists(multidict, filter_fn=None) -> Dict[str, List[str]]:
-    """Convert a MultiDictView to Dict[str, List[str]], preserving all values."""
+def _multidict_to_dict_of_tuples(
+    multidict, filter_fn=None
+) -> Dict[str, Tuple[str, ...]]:
+    """Convert a MultiDictView to Dict[str, Tuple[str, ...]], preserving all values."""
     result: Dict[str, List[str]] = {}
     items = multidict.items(multi=True) if hasattr(multidict, "items") else []
     for k, v in items:
@@ -318,7 +232,7 @@ def _multidict_to_dict_of_lists(multidict, filter_fn=None) -> Dict[str, List[str
         if k not in result:
             result[k] = []
         result[k].append(v)
-    return result
+    return {k: tuple(v) for k, v in result.items()}
 
 
 class WalletRequest:
@@ -327,15 +241,15 @@ class WalletRequest:
         def _decode_if_set(k):
             if k not in data:
                 return None
-            return UserDataPieces.decode(data=data[k])
+            return str(data[k])
 
         def _decode_str_multidict(k):
-            decoded = {}
+            decoded: Dict[str, Tuple[str, ...]] = {}
             for key, v in data.get(k, {}).items():
                 if isinstance(v, list):
-                    decoded[key] = tuple(UserDataPieces.decode(data=x) for x in v)
+                    decoded[key] = tuple(str(x) for x in v)
                 else:
-                    decoded[key] = (UserDataPieces.decode(data=v),)
+                    decoded[key] = (str(v),)
             return decoded
 
         json_rpc_method: Tuple[str, ...] = ()
@@ -395,37 +309,19 @@ class WalletRequest:
         return cls(
             domain=url.hostname,
             path=url.path,
-            query=UserDataPieces.classify_multidict(
-                _multidict_to_dict_of_lists(req.query),
-                context=WalletCaptureContext.QUERY,
-            ),
+            query=_multidict_to_dict_of_tuples(req.query),
             json_rpc_method=json_rpc_method,
-            content=(
-                UserDataPieces.classify_str(
-                    text, context=WalletCaptureContext.POST_BODY
-                )
-                if text is not None
-                else None
-            ),
-            cookies=UserDataPieces.classify_multidict(
-                _multidict_to_dict_of_lists(req.cookies),
-                context=WalletCaptureContext.COOKIE,
-            ),
+            content=text,
+            cookies=_multidict_to_dict_of_tuples(req.cookies),
             referer_domain=referer_domain,
-            odd_headers=UserDataPieces.classify_multidict(
-                _multidict_to_dict_of_lists(
-                    req.headers, filter_fn=lambda k: not is_benign_header(k)
-                ),
-                context=WalletCaptureContext.OTHER_HEADER,
+            odd_headers=_multidict_to_dict_of_tuples(
+                req.headers, filter_fn=lambda k: not is_benign_header(k)
             ),
-            odd_trailers=UserDataPieces.classify_multidict(
-                _multidict_to_dict_of_lists(
-                    req.trailers, filter_fn=lambda k: not is_benign_header(k)
-                )
-                if req.trailers
-                else {},
-                context=WalletCaptureContext.OTHER_HEADER,
-            ),
+            odd_trailers=_multidict_to_dict_of_tuples(
+                req.trailers, filter_fn=lambda k: not is_benign_header(k)
+            )
+            if req.trailers
+            else {},
             session_time=session_time,
             review=None,
         )
@@ -434,18 +330,18 @@ class WalletRequest:
         self,
         domain: str,
         path: str,
-        query: Dict[str, Tuple[UserDataPieces, ...]],
+        query: Dict[str, Tuple[str, ...]],
         json_rpc_method: Tuple[str, ...],
-        content: Optional[UserDataPieces],
-        cookies: Dict[str, Tuple[UserDataPieces, ...]],
+        content: Optional[str],
+        cookies: Dict[str, Tuple[str, ...]],
         referer_domain: Optional[str],
-        odd_headers: Dict[str, Tuple[UserDataPieces, ...]],
-        odd_trailers: Dict[str, Tuple[UserDataPieces, ...]],
+        odd_headers: Dict[str, Tuple[str, ...]],
+        odd_trailers: Dict[str, Tuple[str, ...]],
         session_time: int,
         review: Optional[object],
         response_status: Optional[int] = None,
-        response_headers: Dict[str, Tuple[UserDataPieces, ...]] | None = None,
-        response_payload: Optional[UserDataPieces] = None,
+        response_headers: Dict[str, Tuple[str, ...]] | None = None,
+        response_payload: Optional[str] = None,
     ):
         self._domain = domain
         self._path = path
@@ -459,10 +355,10 @@ class WalletRequest:
         self._session_time = session_time
         self._review = review
         self._response_status: Optional[int] = response_status
-        self._response_headers: Dict[str, Tuple[UserDataPieces, ...]] = (
+        self._response_headers: Dict[str, Tuple[str, ...]] = (
             response_headers if response_headers is not None else {}
         )
-        self._response_payload: Optional[UserDataPieces] = response_payload
+        self._response_payload: Optional[str] = response_payload
 
     @classmethod
     def set_response_data(
@@ -472,23 +368,14 @@ class WalletRequest:
     ) -> None:
         """Populate response fields on an existing WalletRequest from an HTTP response."""
         wallet_request._response_status = resp.status_code
-        wallet_request._response_headers = UserDataPieces.classify_multidict(
-            _multidict_to_dict_of_lists(
-                resp.headers, filter_fn=lambda k: not is_benign_response_header(k)
-            ),
-            context=WalletCaptureContext.OTHER_HEADER,
+        wallet_request._response_headers = _multidict_to_dict_of_tuples(
+            resp.headers, filter_fn=lambda k: not is_benign_response_header(k)
         )
         text = resp.get_text()
-        wallet_request._response_payload = (
-            UserDataPieces.classify_str(text, WalletCaptureContext.POST_BODY)
-            if text is not None
-            else None
-        )
+        wallet_request._response_payload = text
 
     def __str__(self):
-        def _maybe_multidict(
-            name: str, md: Dict[str, Tuple[UserDataPieces, ...]]
-        ) -> str:
+        def _maybe_multidict(name: str, md: Dict[str, Tuple[str, ...]]) -> str:
             if len(md) == 0:
                 return ""
             values = {}
@@ -506,7 +393,7 @@ class WalletRequest:
         referer_domain = (
             "" if self._referer_domain is None else f" referer={self._referer_domain}"
         )
-        content = "" if self._content is None else f" content={str(self._content)}"
+        content = "" if self._content is None else f" content={self._content}"
         response_status = (
             "" if self._response_status is None else f" status={self._response_status}"
         )
@@ -535,15 +422,15 @@ class WalletRequest:
             "sessionTime": self._session_time,
         }
 
-        def _encode_multidict(name: str, md: Dict[str, Tuple[UserDataPieces, ...]]):
+        def _encode_multidict(name: str, md: Dict[str, Tuple[str, ...]]):
             if len(md) == 0:
                 return
             encoded = {}
             for k, v in md.items():
                 if len(v) == 1:
-                    encoded[k] = v[0].encode()
+                    encoded[k] = v[0]
                 else:
-                    encoded[k] = [x.encode() for x in v]
+                    encoded[k] = list(v)
             data[name] = encoded
 
         _encode_multidict("query", self._query)
@@ -554,7 +441,7 @@ class WalletRequest:
             data["jsonRpcMethod"] = list(self._json_rpc_method)
 
         if self._content is not None:
-            data["content"] = self._content.encode()
+            data["content"] = self._content
 
         _encode_multidict("cookies", self._cookies)
 
@@ -564,13 +451,12 @@ class WalletRequest:
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
 
-        def _response_payload_is_trivial(payload: Optional[UserDataPieces]) -> bool:
+        def _response_payload_is_trivial(payload: Optional[str]) -> bool:
             if payload is None:
                 return True
-            raw = payload._sample.str
-            if not raw.strip():
+            if not payload.strip():
                 return True
-            stripped = raw.strip()
+            stripped = payload.strip()
             if stripped == "{}":
                 return True  # Empty JSON object.
             return False
@@ -582,7 +468,7 @@ class WalletRequest:
 
         payload = self._response_payload
         if not _response_payload_is_trivial(payload):
-            data["responsePayload"] = payload.encode()
+            data["responsePayload"] = payload
 
         if self._review is not None:
             data["review"] = self._review
@@ -747,7 +633,7 @@ class WalletCaptureFile:
 
             # Mark as flushed
             self._needs_flushing -= file_flush_amount
-            self._user_data_store.mark_flushed(user_data_flush_amount)
+            self._user_data_store.mark_flushing_done(user_data_flush_amount)
             for f, amount in per_flow_amounts:
                 f.mark_flushed(amount)
 
@@ -831,7 +717,7 @@ class WalletDataCollectionAddon:
         )
 
     def running(self):
-        self.configure({})
+        self.configure(set())
         with self._lock:
             if self._flush_thread is None:
                 self._flush_thread = threading.Thread(
