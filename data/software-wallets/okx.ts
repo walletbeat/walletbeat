@@ -105,10 +105,6 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -251,6 +247,10 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,

@@ -8,8 +8,7 @@ import type { DelegationHandling } from './features/ecosystem/delegation-handlin
 import type { AppConnectionSupport } from './features/ecosystem/hw-app-connection-support'
 import {
 	notApplicableWalletIntegration,
-	type ResolvedWalletIntegration,
-	resolveWalletIntegrationFeatures,
+	type WalletCallIntegration,
 	type WalletIntegration,
 } from './features/ecosystem/integration'
 import type { AddressResolution } from './features/privacy/address-resolution'
@@ -259,6 +258,19 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 	}
+
+	/**
+	 * EIP-5792: Wallet Call API support.
+	 * The wallet must support all of the following calls:
+	 * - wallet_sendCalls
+	 * - wallet_getCallsStatus
+	 * - wallet_showCallsStatus
+	 * - wallet_getCapabilities
+	 *
+	 * Wallets may implement EIP-5792 via WalletConnect, injected provider in
+	 * an in-app browser, deep links, or custom SDKs.
+	 */
+	walletCall: VariantFeature<Support<WithRef<WalletCallIntegration>>>
 }
 
 /**
@@ -415,7 +427,8 @@ export interface ResolvedFeatures {
 	chainConfigurability: ResolvedFeature<Support<WithRef<ChainConfigurability>>>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
-	integration: ResolvedWalletIntegration
+	integration: WalletIntegration
+	walletCall: ResolvedFeature<Support<WithRef<WalletCallIntegration>>>
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
 	licensing: ResolvedWalletLicensing
 	monetization: ResolvedFeature<Monetization>
@@ -652,11 +665,10 @@ export function resolveFeatures(
 		),
 		accountSupport: baseFeat('accountSupport', features => features.accountSupport),
 		multiAddress: baseFeat('multiAddress', features => features.multiAddress),
-		integration: resolveWalletIntegrationFeatures(
-			isWalletSoftwareFeatures(features) ? features.integration : notApplicableWalletIntegration,
-			expectedVariants,
-			variant,
-		),
+		integration: isWalletSoftwareFeatures(features)
+			? features.integration
+			: notApplicableWalletIntegration,
+		walletCall: softwareFeat('walletCall', features => features.walletCall),
 		addressResolution: nullable(
 			softwareFeat('addressResolution', features => features.addressResolution),
 		),

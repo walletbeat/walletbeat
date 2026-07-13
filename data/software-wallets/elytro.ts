@@ -101,7 +101,6 @@ export const elytro: SoftwareWallet = {
 				'2700': null,
 				'6963': null,
 			},
-			walletCall: null,
 		},
 		licensing: null,
 		monetization: {
@@ -195,6 +194,7 @@ export const elytro: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

@@ -404,6 +404,25 @@ export function popRefs<T>(withRef: WithRef<T>): {
 	return { withoutRefs, refs: refs(withRef) }
 }
 
+/** Check if two fully-qualified references are deeply equal. */
+function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boolean {
+	if (a.explanation !== b.explanation || a.lastRetrieved !== b.lastRetrieved) {
+		return false
+	}
+
+	if (a.urls.length !== b.urls.length) {
+		return false
+	}
+
+	for (let i = 0; i < a.urls.length; i++) {
+		if (a.urls[i].url !== b.urls[i].url || a.urls[i].label !== b.urls[i].label) {
+			return false
+		}
+	}
+
+	return true
+}
+
 /** Deduplicate and merge references in `refs`. */
 export function mergeRefs(
 	...refs: Array<References | ReferenceArray | FullyQualifiedReference | NoRef | undefined>
@@ -421,10 +440,20 @@ export function mergeRefs(
 			qualifiedRefs.push(...toFullyQualified(ref))
 		}
 	}
+
+	// Remove completely-duplicate refs before merging by explanation.
+	const dedupedRefs: FullyQualifiedReference[] = []
+
+	for (const ref of qualifiedRefs) {
+		if (!dedupedRefs.some(existing => isRefEqual(existing, ref))) {
+			dedupedRefs.push(ref)
+		}
+	}
+
 	const byExplanation = new Map<string, FullyQualifiedReference>()
 	const mergedRefs: FullyQualifiedReference[] = []
 
-	for (const ref of qualifiedRefs) {
+	for (const ref of dedupedRefs) {
 		if (ref.explanation === undefined) {
 			mergedRefs.push(ref)
 			continue

@@ -180,6 +180,19 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 		/** Orderflow auctioning disclosure and practices page. */
 		orderflowPractices: VariantFeature<Nullable<OrderflowPractices>>
 	}
+
+	/**
+	 * EIP-5792: Wallet Call API support.
+	 * The wallet must support all of the following calls:
+	 * - wallet_sendCalls
+	 * - wallet_getCallsStatus
+	 * - wallet_showCallsStatus
+	 * - wallet_getCapabilities
+	 *
+	 * Wallets may implement EIP-5792 via WalletConnect, injected provider in
+	 * an in-app browser, deep links, or custom SDKs.
+	 */
+	walletCall: VariantFeature<Support<WithRef<WalletCallIntegration>>>
 }
 ```
 
@@ -293,7 +306,8 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
 - `multiAddress` (`ResolvedFeature<Support>`)
-- `integration` (`ResolvedWalletIntegration`)
+- `integration` (`WalletIntegration`)
+- `walletCall` (`ResolvedFeature<Support<WithRef<WalletCallIntegration>>>`)
 - `addressResolution` (`ResolvedFeature<WithRef<AddressResolution>>`)
 - `licensing` (`ResolvedWalletLicensing`)
 - `monetization` (`ResolvedFeature<Monetization>`)
@@ -624,30 +638,27 @@ type BrowserIntegrationEip = '1193' | '2700' | '6963'
 
 ---
 
+### Type: `WalletBrowserIntegration`
+
+Browser-level integration of a wallet. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version.
+
+Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
+
+```typescript
+type WalletBrowserIntegration =
+	| 'NOT_A_BROWSER_WALLET'
+	| WithRef<Record<BrowserIntegrationEip, Support | null>>
+```
+
+---
+
 ### Interface: `WalletIntegration`
 
 Level of integration of a wallet within browsers, mobile phones, etc.
 
-- `browser` (`'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>`): Browser-level integrations. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version.
+- `browser` (`WalletBrowserIntegration`): Browser-level integrations. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version.
 
   Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
-
-- `walletCall` (`VariantFeature<Support<WithRef<WalletCallIntegration>>>`): EIP-5792: Wallet Call API support. The wallet must support all of the following calls:
-  - wallet_sendCalls
-  - wallet_getCallsStatus
-  - wallet_showCallsStatus
-  - wallet_getCapabilities
-
-  Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
-
----
-
-### Interface: `ResolvedWalletIntegration`
-
-Variant-specific resolution of `WalletIntegration`.
-
-- `browser` (`WalletIntegration['browser']`)
-- `walletCall` (`ResolvedFeature<Support<WithRef<WalletCallIntegration>>>`)
 
 ---
 

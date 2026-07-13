@@ -31,7 +31,7 @@ $ pnpm check:all   # All CI tests
 $ pnpm fix         # Automatically fix formatting problems
 ```
 
-If you are not familiar with using a terminal, `git`, `pnpm`, or TypeScript development in general, ask your friendly neighborhood LLM to help you out; these can be very helpful in helping you set up the required dependencies.
+If you are not familiar with using a terminal, `git`, `pnpm`, or TypeScript development in general, ask your friendly neighborhood LLM to help you out; these can be very helpful in helping you set up the required dependencies. Note that you need to [sign your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key) in order to pass CI, i.e. your git `commit.gpgsign` setting needs to be set to `true` and you should have a valid SSH or GPG key set up for commits. If you use GitHub, ensure to [add it to your GitHub profile](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) to get the "Verified" commit badge.
 
 ### Contribution workflow
 
