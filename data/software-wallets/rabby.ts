@@ -732,8 +732,14 @@ export const rabby: SoftwareWallet = {
 			},
 			securityBestPractices: null,
 			transactionLegibility: {
-				ref: refTodo,
-				erc4361: null,
+				ref: [
+					{
+						explanation: 'Rabby does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/rabby/screenshots/2026-07-13-rabby-erc4361-siwe.png',
+						label: 'Rabby sign-in dialog for an ERC-4361 signature request',
+					},
+				],
+				erc4361: notSupported,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
