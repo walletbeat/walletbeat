@@ -52,14 +52,15 @@ export type ScamPreventionMetadata =
  * `rateScamUrlWarning` is not using this helper because its privacy
  * logic uses a different logic.
  */
-function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(
-	feature: F,
-	humanFeature: string,
-	listFeature: string,
-	support: Support<WithRef<T>>,
-	isEnabled: (data: T) => boolean,
-	leakFlags: (data: T) => boolean[],
-): ScamAlertSupport & { feature: F } {
+function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(args: {
+	feature: F
+	humanFeature: string
+	listFeature: string
+	support: Support<WithRef<T>>
+	isValid: (data: T) => boolean
+	leakFlags: (data: T) => boolean[]
+}): ScamAlertSupport & { feature: F } {
+	const { feature, humanFeature, listFeature, support, isValid, leakFlags } = args
 	const baseProps = { feature, humanFeature, listFeature, required: false } as const
 
 	if (!isSupported(support)) {
@@ -71,7 +72,7 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(
 		}
 	}
 
-	if (!isEnabled(support)) {
+	if (!isValid(support)) {
 		throw new Error(
 			`${feature}: If supported, at least one implementation mechanism must be enabled`,
 		)
@@ -88,40 +89,41 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(
 function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'sendTransactionWarning'
 } {
-	return rateLeakBasedWarning(
-		'sendTransactionWarning',
-		'outgoing transactions to unknown addresses',
-		'Warning you when sending funds to unknown addresses',
-		scamAlerts.sendTransactionWarning,
-		d => d.newRecipientWarning || d.userWhitelist || d.addressPoisoningDetection,
-		d => [d.leaksRecipient, d.leaksUserAddress, d.leaksUserIp],
-	)
+	return rateLeakBasedWarning({
+		feature: 'sendTransactionWarning',
+		humanFeature: 'outgoing transactions to unknown addresses',
+		listFeature: 'Warning you when sending funds to unknown addresses',
+		support: scamAlerts.sendTransactionWarning,
+		isValid: d => d.newRecipientWarning || d.userWhitelist || d.addressPoisoningDetection,
+		leakFlags: d => [d.leaksRecipient, d.leaksUserAddress, d.leaksUserIp],
+	})
 }
 
 function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'contractTransactionWarning'
 } {
-	return rateLeakBasedWarning(
-		'contractTransactionWarning',
-		'transactions with potential scam contracts',
-		'Warning you when interacting with potential scam contracts',
-		scamAlerts.contractTransactionWarning,
-		d => d.contractRegistry || d.previousContractInteractionWarning || d.recentContractWarning,
-		d => [d.leaksUserIp, d.leaksUserAddress, d.leaksContractAddress],
-	)
+	return rateLeakBasedWarning({
+		feature: 'contractTransactionWarning',
+		humanFeature: 'transactions with potential scam contracts',
+		listFeature: 'Warning you when interacting with potential scam contracts',
+		support: scamAlerts.contractTransactionWarning,
+		isValid: d =>
+			d.contractRegistry || d.previousContractInteractionWarning || d.recentContractWarning,
+		leakFlags: d => [d.leaksUserIp, d.leaksUserAddress, d.leaksContractAddress],
+	})
 }
 
 function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'unlimitedApprovalWarning'
 } {
-	return rateLeakBasedWarning(
-		'unlimitedApprovalWarning',
-		'transactions that grant unlimited token approvals',
-		'Warning you before granting an unlimited ERC-20 token approval',
-		scamAlerts.unlimitedApprovalWarning,
-		d => d.warnsOnUnlimitedApproval,
-		d => [d.leaksUserIp, d.leaksUserAddress, d.leaksSpenderAddress],
-	)
+	return rateLeakBasedWarning({
+		feature: 'unlimitedApprovalWarning',
+		humanFeature: 'transactions that grant unlimited token approvals',
+		listFeature: 'Warning you before granting an unlimited ERC-20 token approval',
+		support: scamAlerts.unlimitedApprovalWarning,
+		isValid: d => d.warnsOnUnlimitedApproval,
+		leakFlags: d => [d.leaksUserIp, d.leaksUserAddress, d.leaksSpenderAddress],
+	})
 }
 
 function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
