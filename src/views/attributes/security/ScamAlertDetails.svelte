@@ -24,8 +24,20 @@
 	import Typography from '@/components/Typography.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 
-	/** Builds the "However, in doing so, it leaks X to an external provider" clause shared by every scam-alert warning block. */
-	function leakClause(leaks: Array<[boolean, string]>): string {
+	/**
+	 * Builds the "However, in doing so, it leaks X to an external provider" clause shared by every
+	 * scam-alert warning block. The user IP and address leaks are common to all warnings; leaks
+	 * specific to one warning type are passed as extra [leaked, label] pairs.
+	 */
+	function leakClause(
+		warning: { leaksUserIp: boolean; leaksUserAddress: boolean },
+		extraLeaks: Array<[boolean, string]> = [],
+	): string {
+		const leaks: Array<[boolean, string]> = [
+			[warning.leaksUserIp, 'your IP'],
+			[warning.leaksUserAddress, 'your Ethereum address'],
+			...extraLeaks,
+		]
 		const leaking = leaks.filter(([leak]) => leak).map(([, label]) => label)
 
 		if (leaking.length === 0) {
@@ -61,12 +73,7 @@
 											: outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
 												? 'allowing you to build a contact book of addresses and warning you when sending funds to addresses not in it.'
 												: 'providing transaction warnings.'
-								}${leakClause([
-									[outcome.metadata.scamAlerts.sendTransactionWarning.leaksUserIp, 'your IP'],
-									[
-										outcome.metadata.scamAlerts.sendTransactionWarning.leaksUserAddress,
-										'your Ethereum address',
-									],
+								}${leakClause(outcome.metadata.scamAlerts.sendTransactionWarning, [
 									[
 										outcome.metadata.scamAlerts.sendTransactionWarning.leaksRecipient,
 										"the recipient's Ethereum address",
@@ -121,12 +128,7 @@
 												: outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning
 													? 'warning you when interacting with a contract that has only recently been created onchain.'
 													: 'providing contract warnings.'
-								}${leakClause([
-									[outcome.metadata.scamAlerts.contractTransactionWarning.leaksUserIp, 'your IP'],
-									[
-										outcome.metadata.scamAlerts.contractTransactionWarning.leaksUserAddress,
-										'your Ethereum address',
-									],
+								}${leakClause(outcome.metadata.scamAlerts.contractTransactionWarning, [
 									[
 										outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress,
 										'the contract address',
@@ -151,12 +153,7 @@
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(outcome.metadata.scamAlerts.scamUrlWarning)
-							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.${leakClause([
-									[outcome.metadata.scamAlerts.scamUrlWarning.leaksUserIp, 'your IP'],
-									[
-										outcome.metadata.scamAlerts.scamUrlWarning.leaksUserAddress,
-										'your Ethereum address',
-									],
+							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.${leakClause(outcome.metadata.scamAlerts.scamUrlWarning, [
 									[
 										outcome.metadata.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL',
 										'the full URL of the app',
@@ -185,15 +182,7 @@
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning)
-							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.${leakClause([
-									[
-										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksUserIp,
-										'your IP',
-									],
-									[
-										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksUserAddress,
-										'your Ethereum address',
-									],
+							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.${leakClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning, [
 									[
 										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksSpenderAddress,
 										'the spender address',
