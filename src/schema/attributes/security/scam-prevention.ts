@@ -71,16 +71,14 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(
 		}
 	}
 
-	const enabled = isEnabled(support)
-
-	if (!enabled) {
+	if (!isEnabled(support)) {
 		throw new Error(
 			`${feature}: If supported, at least one implementation mechanism must be enabled`,
 		)
 	}
 
 	return {
-		supported: enabled,
+		supported: true,
 		privacyPreserving: leakFlags(support).filter(Boolean).length <= 1,
 		ref: support.ref,
 		...baseProps,
