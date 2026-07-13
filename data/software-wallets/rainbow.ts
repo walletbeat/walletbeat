@@ -404,7 +404,7 @@ export const rainbow: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Rainbow ran a public RNBW token sale on CoinList (11-18 December 2025): 30 million tokens (3% of supply) at $0.10, followed by a public Uniswap continuous auction at the 5 February 2026 TGE.',
+						'Rainbow sold RNBW tokens to the public on CoinList (11-18 December 2025): 30 million tokens (3% of supply) at $0.10, followed by an open Uniswap continuous auction at the 5 February 2026 TGE.',
 					url: 'https://coinlist.co/rainbow',
 				},
 			],
