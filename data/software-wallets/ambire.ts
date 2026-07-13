@@ -803,11 +803,11 @@ export const ambire: SoftwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						file: 'public/images/references/ambire/transaction_legibility_1.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_1.png',
 						label: 'Transaction legibility screenshot 1',
 					},
 					{
-						file: 'public/images/references/ambire/transaction_legibility_2.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_2.png',
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
