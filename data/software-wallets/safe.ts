@@ -263,6 +263,7 @@ export const safe: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {

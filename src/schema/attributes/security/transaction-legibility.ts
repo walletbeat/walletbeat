@@ -1,4 +1,5 @@
 import { eip712 } from '@/data/eips/eip-712'
+import { erc4361 } from '@/data/eips/erc-4361'
 import { erc7730 } from '@/data/eips/erc-7730'
 import { erc8213 } from '@/data/eips/erc-8213'
 import {
@@ -35,7 +36,7 @@ import {
 	type SoftwareWalletErc8213,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
-import { isSupported, notSupported, supported } from '@/schema/features/support'
+import { featureSupported, isSupported, notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
@@ -95,10 +96,16 @@ interface HardwareFeatureDetails {
 		decodedLocation: DataLocation | null
 	}
 	calldataDigest: DataLocation | null
+	erc4361Supported: boolean
 }
 
 function analyzeHardwareFeatures(
-	{ erc7730, detailsDisplayed, dataExtraction }: HardwareTransactionLegibilityImplementation,
+	{
+		erc7730,
+		detailsDisplayed,
+		dataExtraction,
+		erc4361,
+	}: HardwareTransactionLegibilityImplementation,
 	calldataDigestLocation: DataLocation | null,
 	messageSigningLegibility: HardwareWalletErc8213['messageSigningLegibility'] | null,
 ): HardwareFeatureDetails {
@@ -108,6 +115,7 @@ function analyzeHardwareFeatures(
 		dataExtraction: { supported: [], missing: [] },
 		messageSigning: { supported: [], missing: [], decodedLocation: null },
 		calldataDigest: calldataDigestLocation,
+		erc4361Supported: erc4361 !== null && isSupported(erc4361),
 	}
 
 	if (erc7730 !== null && isSupported(erc7730)) {
@@ -351,6 +359,12 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 		)
 	}
 
+	if (!features.erc4361Supported) {
+		improvements.push(
+			'**Sign-In with Ethereum (ERC-4361):** Implement Sign-In with Ethereum to clearly present sign-in requests.',
+		)
+	}
+
 	if (improvements.length === 0) {
 		return undefined
 	}
@@ -479,6 +493,42 @@ function hardwarePartialTransactionLegibility(
 	})
 }
 
+function hardwareMissingErc4361TransactionLegibility(
+	ctx: EvaluationContext,
+	support: HardwareTransactionLegibilityImplementation,
+): Evaluation {
+	const { calldataDigestLocation, messageSigningLegibility } = unwrapHardwareErc8213(support)
+	const features = analyzeHardwareFeatures(
+		support,
+		calldataDigestLocation,
+		messageSigningLegibility,
+	)
+	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
+	const improvementsMarkdown = generateHardwareHowToImprove(features)
+
+	return ctx.build({
+		outcome: {
+			id: 'hardware_missing_erc4361_transaction_legibility',
+			rating: Rating.PARTIAL,
+			displayName: 'Missing Sign-In with Ethereum support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} has full transaction legibility but lacks Sign-In with Ethereum support.',
+			),
+		},
+		details: markdown(
+			`{{WALLET_NAME}} implements comprehensive transaction legibility on the hardware device, including calldata decoding and transaction detail display, but does not support ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum). This standard allows wallets to clearly present sign-in authentication requests to users.
+
+${featureDetailsMarkdown}`,
+		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
+					),
+	})
+}
+
 function hardwareFullTransactionLegibility(
 	ctx: EvaluationContext,
 	support: HardwareTransactionLegibilityImplementation,
@@ -525,11 +575,13 @@ interface SoftwareFeatureDetails {
 		calldataDigest: boolean
 		eip712Digest: boolean
 	}
+	erc4361Supported: boolean
 }
 
 function analyzeSoftwareFeatures({
 	erc8213,
 	erc7730,
+	erc4361,
 	transactionSimulations,
 	transactionDetailsDisplay,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
@@ -556,6 +608,7 @@ function analyzeSoftwareFeatures({
 			calldataDigest: erc8213CalldataDigest,
 			eip712Digest: erc8213Eip712Digest,
 		},
+		erc4361Supported: erc4361 !== null && isSupported(erc4361),
 	}
 
 	// Analyze calldata display
@@ -935,6 +988,12 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 		)
 	}
 
+	if (!features.erc4361Supported) {
+		improvements.push(
+			'**Sign-In with Ethereum (ERC-4361):** Implement Sign-In with Ethereum to clearly present sign-in requests.',
+		)
+	}
+
 	if (improvements.length === 0) {
 		return undefined
 	}
@@ -989,6 +1048,37 @@ function softwarePartialTransactionLegibility(
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet displays basic transaction details but may be missing calldata display formats, clear transaction outcome explanations for complex interactions, or simulation capabilities. Showing full transaction details is crucial for security.\n\n${featureDetailsMarkdown}`,
+		),
+		howToImprove:
+			improvementsMarkdown === undefined
+				? undefined
+				: markdown(
+						`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
+					),
+	})
+}
+
+function softwareMissingErc4361TransactionLegibility(
+	ctx: EvaluationContext,
+	support: SoftwareTransactionLegibilityImplementation,
+): Evaluation {
+	const features = analyzeSoftwareFeatures(support)
+	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
+	const improvementsMarkdown = generateSoftwareHowToImprove(features)
+
+	return ctx.build({
+		outcome: {
+			id: 'software_missing_erc4361_transaction_legibility',
+			rating: Rating.PARTIAL,
+			displayName: 'Missing Sign-In with Ethereum support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} has full transaction legibility but lacks Sign-In with Ethereum support.',
+			),
+		},
+		details: markdown(
+			`{{WALLET_NAME}} implements comprehensive transaction legibility, including full calldata display, complex transaction decoding, and simulation capabilities, but does not support ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum). This standard allows wallets to clearly present sign-in authentication requests to users.
+
+${featureDetailsMarkdown}`,
 		),
 		howToImprove:
 			improvementsMarkdown === undefined
@@ -1075,8 +1165,17 @@ function evaluateHardwareWalletTransactionLegibility(
 		return hardwareNoTransactionLegibility(ctx, hardwareTransactionLegibility)
 	}
 
-	// PASS: both fully supported
 	if (erc8213Full && erc7730Full) {
+		const { erc4361 } = hardwareTransactionLegibility
+
+		if (erc4361 === null) {
+			return unrated(ctx)
+		}
+
+		if (!isSupported(erc4361)) {
+			return hardwareMissingErc4361TransactionLegibility(ctx, hardwareTransactionLegibility)
+		}
+
 		return hardwareFullTransactionLegibility(ctx, hardwareTransactionLegibility)
 	}
 
@@ -1186,8 +1285,17 @@ function evaluateSoftwareWalletTransactionLegibility(
 		return softwareNoTransactionLegibility(ctx, softwareTransactionLegibility)
 	}
 
-	// PASS: both fully supported
 	if (erc8213Full && erc7730Full) {
+		const { erc4361 } = transactionLegibilitySupport
+
+		if (erc4361 === null) {
+			return unrated(ctx)
+		}
+
+		if (!isSupported(erc4361)) {
+			return softwareMissingErc4361TransactionLegibility(ctx, softwareTransactionLegibility)
+		}
+
 		return softwareFullTransactionLegibility(ctx, softwareTransactionLegibility)
 	}
 
@@ -1222,6 +1330,7 @@ export const transactionLegibility: Attribute = {
 		allowing users to make informed decisions before authorizing transactions.
 
 		**${eipMarkdownLink(erc7730)}: Standardizing Calldata Decoding**
+
 		${eipMarkdownShortLink(erc7730)} defines a standard JSON descriptor format for structured calldata,
 		enabling wallets to display human-readable descriptions of smart contract calls.
 		Instead of showing raw hex calldata, wallets that implement ${eipMarkdownShortLink(erc7730)} can show
@@ -1235,6 +1344,7 @@ export const transactionLegibility: Attribute = {
 		measure how broad their ${eipMarkdownShortLink(erc7730)} coverage is.
 
 		**${eipMarkdownLink(erc8213)}: Standardizing What Users Sign**
+
 		${eipMarkdownShortLink(erc8213)} introduces two cryptographic digests that give users a
 		machine-verifiable way to confirm exactly what they are approving:
 
@@ -1242,6 +1352,13 @@ export const transactionLegibility: Attribute = {
 		- **EIP-712 digest**, \`"\\x19\\x01" || domainSeparator || hashStruct(message)\`: the final hash that gets signed for typed structured data.
 
 		A full ${eipMarkdownShortLink(erc8213)} implementation means the wallet shows both digests, enabling users to independently verify every transaction and signature: not just trust what the UI displays.
+
+		**${eipMarkdownLink(erc4361)}: Sign-In with Ethereum**
+
+		${eipMarkdownShortLink(erc4361)} standardizes authentication for Ethereum accounts.
+		Wallets that support this standard must clearly present sign-in requests to users,
+		including the requesting domain, statement, and expiration details.
+		This enables consistent sign-in UX for Ethereum users.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on key aspects of transaction legibility, with different criteria for software and hardware wallets:
@@ -1290,12 +1407,12 @@ export const transactionLegibility: Attribute = {
 		**Rating Criteria:**
 
 		For software wallets:
-		- A wallet receives a passing rating if it displays calldata in all formats (raw hex, formatted, copyable, digest), displays all essential transaction details, supports complex calldata decoding, and shows the ${eipMarkdownShortLink(eip712)} digest for message signing (full ${eipMarkdownShortLink(erc8213)} compliance).
+		- A wallet receives a passing rating if it fully supports ${eipMarkdownShortLink(erc7730)} calldata decoding, displays calldata in all required formats (raw hex, formatted, copyable, digest), shows all essential transaction details, and implements ${eipMarkdownShortLink(erc8213)} along with ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum).
 		- A wallet receives a partial rating if it has some combination of these features but not all.
 		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
 
 		For hardware wallets:
-		- A wallet receives a passing rating if it supports on-device ${eipMarkdownShortLink(erc7730)} decoding for complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes). It must also implement ${eipMarkdownLink(erc8213)} (Calldata digest and ${eipMarkdownShortLink(eip712)} digest on-device).
+		- A wallet receives a passing rating if it supports on-device ${eipMarkdownShortLink(erc7730)} decoding for complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes). It must also implement ${eipMarkdownLink(erc8213)} (Calldata digest and ${eipMarkdownShortLink(eip712)} digest on-device) and support ${eipMarkdownShortLink(erc4361)} (Sign-In with Ethereum).
 		- A wallet receives a partial rating if it has some combination of these features but not all at the full level.
 		- A wallet receives a failing rating if it lacks ${eipMarkdownShortLink(erc7730)} support, does not display essential transaction details on the device, and provides no effective data extraction methods.
 	`),
@@ -1311,6 +1428,7 @@ export const transactionLegibility: Attribute = {
 				hardwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: featureSupported,
 						erc8213: null,
 						erc7730: supported({
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
@@ -1339,6 +1457,7 @@ export const transactionLegibility: Attribute = {
 				hardwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: featureSupported,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: {
@@ -1392,6 +1511,7 @@ export const transactionLegibility: Attribute = {
 				softwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: featureSupported,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1474,6 +1594,7 @@ export const transactionLegibility: Attribute = {
 				hardwarePartialTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: null,
 						erc7730: null,
 						detailsDisplayed: {
@@ -1497,6 +1618,7 @@ export const transactionLegibility: Attribute = {
 				hardwareBasicTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: null,
 						erc7730: supported({
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
@@ -1527,6 +1649,7 @@ export const transactionLegibility: Attribute = {
 				hardwareBasicTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: {
@@ -1580,6 +1703,7 @@ export const transactionLegibility: Attribute = {
 				softwarePartialTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1661,6 +1785,7 @@ export const transactionLegibility: Attribute = {
 				softwarePartialTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1733,6 +1858,153 @@ export const transactionLegibility: Attribute = {
 					},
 				),
 			),
+			exampleRating(
+				sentence(`
+					The hardware wallet has full transaction legibility other than ERC-4361
+					(Sign-In with Ethereum) support.
+				`),
+				hardwareMissingErc4361TransactionLegibility(
+					EvaluationContext.forTest(() => transactionLegibility),
+					{
+						erc4361: notSupported,
+						erc8213: supported({
+							calldataDisplay: {
+								[CallDataDisplay.RAW_HEX]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[CallDataDisplay.FORMATTED]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[CallDataDisplay.CALLDATA_DIGEST]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+							},
+							messageSigningLegibility: {
+								[MessageSigningDetails.EIP712_STRUCT]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[MessageSigningDetails.DOMAIN_HASH]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[MessageSigningDetails.MESSAGE_HASH]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[MessageSigningDetails.EIP712_DIGEST]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+							},
+						}),
+						erc7730: supported({
+							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								DataLocation.ON_DEVICE,
+							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								DataLocation.ON_DEVICE,
+						}),
+						detailsDisplayed: displaysFullTransactionDetails,
+						dataExtraction: {
+							[DataExtraction.EYES]: true,
+							[DataExtraction.QRCODE]: true,
+							[DataExtraction.HASHES]: true,
+						},
+						ref: refNotNecessary,
+					},
+				),
+			),
+			exampleRating(
+				sentence(`
+					The software wallet has full transaction legibility other than ERC-4361
+					(Sign-In with Ethereum) support.
+				`),
+				softwareMissingErc4361TransactionLegibility(
+					EvaluationContext.forTest(() => transactionLegibility),
+					{
+						erc4361: notSupported,
+						erc8213: supported({
+							calldataDisplay: {
+								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							},
+							messageSigningLegibility: {
+								[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							},
+						}),
+						erc7730: supported({
+							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							},
+							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							},
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							},
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								{
+									decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+								},
+							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							},
+						}),
+						transactionSimulations: supported<SoftwareTransactionSimulations>({
+							[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+							[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: null,
+							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								{
+									transactionOutcome: TransactionOutcome.EXPLAINED,
+								},
+							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+								transactionOutcome: TransactionOutcome.EXPLAINED,
+							},
+							[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+								failure: 'DETECTED',
+							},
+							[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+								nondeterminism: 'RESIMULATES_WITH_WARNING',
+							},
+						}),
+						transactionDetailsDisplay: displaysFullTransactionDetails,
+						ref: refNotNecessary,
+					},
+				),
+			),
 		],
 		fail: [
 			exampleRating(
@@ -1742,6 +2014,7 @@ export const transactionLegibility: Attribute = {
 				hardwareNoTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: null,
 						erc7730: notSupported,
 						detailsDisplayed: displaysNoTransactionDetails,
@@ -1757,6 +2030,7 @@ export const transactionLegibility: Attribute = {
 				softwareNoTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1837,6 +2111,7 @@ export const transactionLegibility: Attribute = {
 				softwareNoTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
+						erc4361: null,
 						erc8213: supported({
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.NOT_IN_UI,

@@ -733,6 +733,7 @@ export const rabby: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,

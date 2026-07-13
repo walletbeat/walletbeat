@@ -811,6 +811,7 @@ export const ambire: SoftwareWallet = {
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
+				erc4361: null,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,

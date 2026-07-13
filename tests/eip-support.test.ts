@@ -239,6 +239,7 @@ describe('walletEipSupport', () => {
 				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
+					erc4361: null,
 					erc8213: supported({
 						calldataDisplay: {
 							[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -292,6 +293,7 @@ describe('walletEipSupport', () => {
 				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
+					erc4361: null,
 					erc8213: supported({
 						calldataDisplay: null,
 						messageSigningLegibility: {
@@ -323,6 +325,7 @@ describe('walletEipSupport', () => {
 				...unratedHardwareFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/hardware-legibility' },
+					erc4361: null,
 					erc8213: null,
 					erc7730: supported(benchmarks),
 					detailsDisplayed: null,
