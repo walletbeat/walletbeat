@@ -782,6 +782,7 @@ summary {
 	--badge-backgroundColor: color-mix(in srgb, var(--accent) 33%, transparent);
 	--badge-borderColor: color-mix(in srgb, var(--accent) 40%, transparent);
 	--badge-textColor: currentColor;
+	--badge-backdropFilter: none;
 
 	display: inline-flex;
 	gap: 0.15em;
@@ -791,6 +792,7 @@ summary {
 	border-radius: 0.375em;
 	background-color: var(--badge-backgroundColor);
 	border: 1px solid var(--badge-borderColor);
+	backdrop-filter: var(--badge-backdropFilter);
 
 	color: var(--badge-textColor);
 	font-weight: 600;

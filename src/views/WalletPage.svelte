@@ -1730,12 +1730,12 @@
 			from {
 				--isTransformed: 1;
 				--pie-slice-highlightIndex: 0;
-				--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount));
+				--pie-rotate: 0turn;
 			}
 			to {
 				--isTransformed: 1;
 				--pie-slice-highlightIndex: var(--attributesCount);
-				--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount) + 1turn);
+				--pie-rotate: 1turn;
 			}
 			100% {
 				--isTransformed: 0;
