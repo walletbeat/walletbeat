@@ -12,10 +12,10 @@ import {
 import { trimWhitespacePrefix } from '@/types/utils/text'
 
 /**
- * Brand names that are spelled with a leading lowercase letter (e.g. imKey).
+ * Proper nouns that are spelled with a leading lowercase letter (e.g. imKey).
  * We ignore Capitalization lints for these so the grammar rule does not force "ImKey" etc.
  */
-const BRAND_NAMES_LOWERCASE_FIRST = new Set(['imKey', 'imToken'])
+const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
 
 let vocabulary: string[] | null = null
 
@@ -316,7 +316,7 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint =>
 			lint.lint_kind_pretty() !== 'Capitalization' ||
-			!BRAND_NAMES_LOWERCASE_FIRST.has(lint.get_problem_text()),
+			!PROPER_NOUNS_LOWERCASE_FIRST.has(lint.get_problem_text()),
 	)
 
 	// Ignore Spelling lints for standalone "s" (false positive from markdown/punctuation tokenization).
@@ -334,11 +334,15 @@ export async function grammarLintMessages(
 		const text = lint.get_problem_text()
 		const firstChar = text[0]
 
-		if (!text.endsWith("'s") || !firstChar || firstChar.toUpperCase() !== firstChar) {
+		if (!text.endsWith("'s") || !firstChar) {
 			return true
 		}
 
 		const baseWord = text.slice(0, -2)
+
+		if (firstChar.toUpperCase() !== firstChar && !PROPER_NOUNS_LOWERCASE_FIRST.has(baseWord)) {
+			return true
+		}
 
 		return !isInCspellWords(baseWord)
 	})
@@ -346,6 +350,14 @@ export async function grammarLintMessages(
 	// Ignore Word Choice lints for "lockdown" — used intentionally as a compound noun (e.g. "onchain lockdown").
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'lockdown',
+	)
+
+	// Ignore hyphenization for known words.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Miscellaneous' ||
+			!lint.message().includes('Hyphenate') ||
+			!isInCspellWords(lint.get_problem_text()),
 	)
 
 	// Ignore Readability (sentence too long) lints when "etc." appears inside the span
