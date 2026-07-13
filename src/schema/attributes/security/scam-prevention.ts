@@ -45,11 +45,6 @@ export type ScamPreventionMetadata =
 	  }
 	| { scamAlerts: null }
 
-/** Number of leak flags that are `true`. */
-function leakCount(...leaks: boolean[]): number {
-	return leaks.filter(x => x).length
-}
-
 /**
  * Shared rating logic for scam-alert warnings whose privacy score is a
  * simple leak count (threshold: at most one leaking flag is tolerated).
@@ -86,7 +81,7 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(
 
 	return {
 		supported: enabled,
-		privacyPreserving: leakCount(...leakFlags(support)) <= 1,
+		privacyPreserving: leakFlags(support).filter(Boolean).length <= 1,
 		ref: support.ref,
 		...baseProps,
 	}
