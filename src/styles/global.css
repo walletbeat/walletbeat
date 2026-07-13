@@ -30,7 +30,8 @@
 	--rating-fail: light-dark(#FF969699,#FB6682);
 	--rating-partial: light-dark(#FFCC7399,#FFCC73);
 	--rating-neutral: #bdc3c7;
-	--rating-unrated: light-dark(oklch(0.75 0.02 244.87), oklch(0.67 0.01 264.61));
+	--rating-unrated: light-dark(oklch(0.75 0.02 244.87 / 0.45), oklch(0.72 0.015 264.61 / 0.35));
+	--rating-unrated-backdropFilter: blur(6px);
 	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");

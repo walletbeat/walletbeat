@@ -156,7 +156,7 @@
 		if (colorWeights.length <= 1) {
 			const color = colorWeights[0]?.color ?? slice.color
 
-			return color === slice.gradient.transparentStopColor ? 'transparent' : color
+			return color === slice.gradient.transparentStopColor ? 'var(--rating-unrated)' : color
 		}
 
 		const areaRadiusStops = slice.gradient.areaRadiusStops
@@ -201,8 +201,14 @@
 				[],
 			)
 
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')})`
+		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), var(--rating-unrated)`
 	}
+
+	const sliceBackdropFilter = (slice: ComputedSlice) => (
+		slice.gradient || slice.color === 'var(--rating-unrated)'
+			? 'var(--rating-unrated-backdropFilter)'
+			: 'none'
+	)
 
 	const computeSlices = (
 		{
@@ -368,6 +374,7 @@
 
 		style:--slice-color={slice.color}
 		style:--slice-fill={sliceFill(slice)}
+		style:--slice-backdropFilter={sliceBackdropFilter(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
 
 		data-slice-id={slice.id}
@@ -595,6 +602,7 @@
 					--slice-outerStartY: calc(var(--pie-originY) - cos(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
 
 					background: var(--slice-fill);
+					backdrop-filter: var(--slice-backdropFilter, none);
 
 					clip-path: shape(
 						from
