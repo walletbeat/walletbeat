@@ -810,8 +810,13 @@ export const ambire: SoftwareWallet = {
 						file: 'public/images/references/ambire/transaction_legibility_2.png',
 						label: 'Transaction legibility screenshot 2',
 					},
+					{
+						explanation: 'Ambire does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/ambire/screenshots/2026-07-13-ambire-erc4361-siwe.png',
+						label: 'Ambire sign-in dialog for an ERC-4361 signature request',
+					},
 				],
-				erc4361: null,
+				erc4361: notSupported,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
