@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { FullyQualifiedReference } from '@/schema/reference'
-	import { isImageUrl } from '@/schema/url'
+	import { isRepoImageUrl } from '@/schema/url'
 
 
 	// Props
@@ -22,7 +22,7 @@
 	// References arrive deduplicated by `mergeRefs`, so every image URL
 	// appears at most once here.
 	const imageUrls = $derived(
-		references.flatMap(ref => ref.urls).filter(url => isImageUrl(url.url)),
+		references.flatMap(ref => ref.urls).filter(url => isRepoImageUrl(url.url)),
 	)
 
 	// When the whole section references a single distinct image, it is
@@ -75,7 +75,7 @@
 
 		<ul class="references-list" data-list="gap-2">
 			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
-				{@const refImages = ref.urls.filter(url => isImageUrl(url.url))}
+				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
 				{@const linkUrls =
 					inlineImage === undefined
@@ -83,7 +83,7 @@
 						: ref.urls.filter(url => url.url !== inlineImage.url)}
 
 				{#snippet Url({ url, label }: { url: string, label: string })}
-					{#if isImageUrl(url)}
+					{#if isRepoImageUrl(url)}
 						<a
 							href={url}
 							target="_blank"

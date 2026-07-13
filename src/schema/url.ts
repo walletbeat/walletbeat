@@ -219,12 +219,19 @@ export const gitCommitRefPinRegExp = /@(?:[0-9a-f]{40}|[0-9a-f]{7})\b/g
 const imageFileExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif', '.svg']
 
 /**
- * Whether a URL points to an image file, based on its path extension.
- * Handles root-relative URLs (e.g. file-based references under public/),
- * which `getDomain`-based helpers would reject.
+ * Whether a URL points to an image file hosted in the Walletbeat repo
+ * itself, i.e. the root-relative URL that a file-based reference under
+ * `public/` qualifies to. External image URLs deliberately do not match:
+ * rendering them inline would leak visitor traffic to external hosts.
  */
-export function isImageUrl(url: Url): boolean {
+export function isRepoImageUrl(url: Url): boolean {
 	const path = (isLabeledUrl(url) ? url.url : url).split(/[?#]/)[0].toLowerCase()
+
+	// Root-relative, but not protocol-relative (`//host/...`), URLs are
+	// served from this site's own origin.
+	if (!path.startsWith('/') || path.startsWith('//')) {
+		return false
+	}
 
 	return imageFileExtensions.some(extension => path.endsWith(extension))
 }
