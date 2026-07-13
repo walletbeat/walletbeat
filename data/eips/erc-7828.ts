@@ -5,7 +5,7 @@ export const erc7828: Eip = {
 	formalTitle: 'Chain-specific addresses using ENS',
 	number: '7828',
 	prefix: EipPrefix.ERC,
-	status: EipStatus.DRAFT,
+	status: EipStatus.REVIEW,
 	summaryMarkdown: `
 		Chain-specific address format that allows specifying both an
 		account and the chain on which that account intends to transact.

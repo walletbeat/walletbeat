@@ -7,7 +7,7 @@ export const erc4337: Eip = {
 	formalTitle: 'Account Abstraction Using Alt Mempool',
 	number: '4337',
 	prefix: EipPrefix.ERC,
-	status: EipStatus.DRAFT,
+	status: EipStatus.FINAL,
 	summaryMarkdown: `
 		ERC-4337 defines a standard for account abstraction without changes to
 		the Ethereum protocol, relying on a separate transaction mempool that
