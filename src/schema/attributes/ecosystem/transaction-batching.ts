@@ -291,15 +291,11 @@ export const transactionBatching: Attribute = {
 			)
 		}
 
-		if (ctx.features.accountSupport === null || ctx.features.integration.walletCall === null) {
+		if (ctx.features.accountSupport === null || ctx.features.walletCall === null) {
 			return unrated(ctx)
 		}
 
-		return evaluateTransactionBatching(
-			ctx,
-			ctx.features.accountSupport,
-			ctx.features.integration.walletCall,
-		)
+		return evaluateTransactionBatching(ctx, ctx.features.accountSupport, ctx.features.walletCall)
 	},
 	aggregate: pickWorstRating,
 }

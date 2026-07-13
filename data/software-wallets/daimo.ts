@@ -146,7 +146,6 @@ export const daimo: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -474,6 +473,7 @@ export const daimo: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupported,
 	},
 	overrides: {
 		attributes: {

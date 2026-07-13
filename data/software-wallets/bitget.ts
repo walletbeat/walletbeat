@@ -114,7 +114,6 @@ export const bitget: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -245,6 +244,7 @@ export const bitget: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

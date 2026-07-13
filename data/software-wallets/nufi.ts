@@ -100,10 +100,6 @@ export const nufi: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -224,6 +220,10 @@ export const nufi: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.BROWSER]: true,

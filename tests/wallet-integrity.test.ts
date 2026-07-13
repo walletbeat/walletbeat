@@ -6,7 +6,10 @@ import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
 import { AttributeGroupId } from '@/schema/attribute-tree'
+import { walletEipSupport } from '@/schema/eip-support'
 import { getExtensionId } from '@/schema/extension-url'
+import { resolveFeatures } from '@/schema/features'
+import { Variant } from '@/schema/variants'
 import type { BaseWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
@@ -103,6 +106,18 @@ describe('wallets', () => {
 						),
 					),
 				).toBe(true)
+			})
+
+			it('derives EIP support for each variant', () => {
+				for (const variant of Object.values(Variant)) {
+					if (wallet.variants[variant] !== true) {
+						continue
+					}
+
+					expect(() =>
+						walletEipSupport(resolveFeatures(wallet.features, wallet.variants, variant)),
+					).not.toThrow()
+				}
 			})
 
 			const dataSubdir = walletIdToDataSubdir.get(wallet.metadata.id)

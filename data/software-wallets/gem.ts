@@ -80,7 +80,6 @@ export const gemwallet: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
-			walletCall: null,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -238,6 +237,7 @@ export const gemwallet: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,
