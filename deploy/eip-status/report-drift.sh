@@ -35,7 +35,7 @@ if [[ "$drift" -gt 0 ]]; then
 		echo
 		echo '| EIP | Walletbeat | Upstream | Spec |'
 		echo '| --- | --- | --- | --- |'
-		jq -r '.drift[] | "| \(.eip) | `\(.ours)` | `\(.upstream)` | \(.url) |"' <<<"$report"
+		jq -r '.drift[] | "| \(.eip) | `\(.ours)` | `\(.upstream // .upstreamRaw)` | \(.url) |"' <<<"$report"
 
 		if [[ "$unverifiable" -gt 0 ]]; then
 			echo
