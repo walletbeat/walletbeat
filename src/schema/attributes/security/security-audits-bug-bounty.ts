@@ -1,55 +1,85 @@
 import { exampleSecurityAuditor } from '@/data/entities/example'
 import {
 	type Attribute,
+	compareExplicitRatings,
 	type Evaluation,
 	EvaluationContext,
 	exampleRating,
 	Rating,
 	Verifiability,
+	type WalletNameAndPseudonymStrings,
+	type WalletNameStrings,
 } from '@/schema/attributes'
+import {
+	type AtLeastOneCoverageBreadth,
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramSupport,
+	CoverageBreadth,
+	type LegalProtection,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
+import { isSupported, supported } from '@/schema/features/support'
+import { refNotNecessary } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { markdown, mdSentence, paragraph, type Sentence, sentence } from '@/types/content'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { daysSince } from '@/types/date'
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
+import { isNonEmptyArray, type NonEmptyArray, nonEmptySet, setItems } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common'
 
 export type SecurityAuditsMetadata = {
 	securityAudits: SecurityAudit[]
 }
 
-const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
-	ctx.build({
-		outcome: {
-			id: 'no_audits',
-			rating: Rating.FAIL,
-			displayName: 'No security audits',
-			shortExplanation: sentence('{{WALLET_NAME}} has not undergone security auditing.'),
-			metadata: {
-				securityAudits: [],
-			},
-		},
-		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
-	})
+type BugBountyProgramSubResult = {
+	rating: Rating.PASS | Rating.PARTIAL | Rating.FAIL
+	outcomeId: string
+	displayName: string
+	shortExplanation: Sentence<WalletNameStrings>
+	detailsMarkdown: string
+	howToImproveMarkdown: string | null
+}
+
+type SecurityAuditsSubResult = {
+	rating: Rating.PASS | Rating.PARTIAL | Rating.FAIL
+	outcomeId: string
+	displayName: string
+	shortExplanation: Sentence<WalletNameStrings>
+	howToImproveMarkdown: string | null
+	audits: SecurityAudit[]
+	auditedInLastYear: boolean
+	hasUnaddressedFlaws: boolean
+}
+
+function noAudits(): SecurityAuditsSubResult {
+	return {
+		rating: Rating.FAIL,
+		outcomeId: 'no_audits',
+		displayName: 'No security audits',
+		shortExplanation: sentence('{{WALLET_NAME}} has not undergone security auditing.'),
+		howToImproveMarkdown:
+			'{{WALLET_NAME}} should undergo a security audit by an independent security auditor.',
+		audits: [],
+		auditedInLastYear: false,
+		hasUnaddressedFlaws: false,
+	}
+}
 
 function audited(
-	ctx: EvaluationContext<SecurityAuditsMetadata>,
 	audits: NonEmptyArray<SecurityAudit>,
 	auditedInLastYear: boolean,
 	hasUnaddressedFlaws: boolean,
-): Evaluation<SecurityAuditsMetadata> {
-	ctx.addRef(...audits)
-
-	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
-		Evaluation<SecurityAuditsMetadata>['outcome'],
-		'rating' | 'displayName' | 'shortExplanation'
-	> & {
-		howToImprove: Evaluation<SecurityAuditsMetadata>['howToImprove']
-	} => {
+): SecurityAuditsSubResult {
+	const { rating, displayName, shortExplanation, howToImproveMarkdown } = ((): Pick<
+		SecurityAuditsSubResult,
+		'rating' | 'displayName' | 'shortExplanation' | 'howToImproveMarkdown'
+	> => {
 		if (!auditedInLastYear && hasUnaddressedFlaws) {
 			return {
 				rating: Rating.FAIL,
@@ -57,9 +87,8 @@ function audited(
 				shortExplanation: sentence(
 					'The most recent security audit for {{WALLET_NAME}} is over a year old and some security flaws remain.',
 				),
-				howToImprove: paragraph(
+				howToImproveMarkdown:
 					'{{WALLET_NAME}} should fix the security flaws pointed out in past audits, then should undergo a new security audit.',
-				),
 			}
 		}
 
@@ -70,7 +99,7 @@ function audited(
 				shortExplanation: sentence(
 					'The most recent security audit for {{WALLET_NAME}} is over a year old.',
 				),
-				howToImprove: paragraph('{{WALLET_NAME}} should undergo a new security audit.'),
+				howToImproveMarkdown: '{{WALLET_NAME}} should undergo a new security audit.',
 			}
 		}
 
@@ -81,9 +110,8 @@ function audited(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} has undergone a recent security audit, but some security flaws have not been addressed.',
 				),
-				howToImprove: paragraph(
+				howToImproveMarkdown:
 					'{{WALLET_NAME}} should fix the security flaws pointed out in past security audits, then should consider undergoing a new security audit.',
-				),
 			}
 		}
 
@@ -93,25 +121,328 @@ function audited(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} has undergone a recent security audit with all faults addressed.',
 			),
-			howToImprove: undefined,
+			howToImproveMarkdown: null,
 		}
 	})()
 
+	return {
+		rating,
+		outcomeId: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
+		displayName,
+		shortExplanation,
+		howToImproveMarkdown,
+		audits,
+		auditedInLastYear,
+		hasUnaddressedFlaws,
+	}
+}
+
+function getCoverageDescription(breadth: AtLeastOneCoverageBreadth): string {
+	const items = setItems(breadth)
+	const descriptions = items
+		.map(item => {
+			switch (item) {
+				case CoverageBreadth.APP_ONLY:
+					return 'the application layer'
+				case CoverageBreadth.FIRMWARE_ONLY:
+					return 'firmware vulnerabilities'
+				case CoverageBreadth.HARDWARE_ONLY:
+					return 'hardware vulnerabilities'
+				default:
+					return ''
+			}
+		})
+		.filter(Boolean)
+
+	if (descriptions.length === 0) {
+		return ''
+	}
+
+	return `The program covers only ${commaListFormat(descriptions)}.`
+}
+
+function getRewardDescription(support: BugBountyProgramSupport): string {
+	if (!isSupported(support.rewards)) {
+		return ''
+	}
+
+	const min = support.rewards.minimum
+	const max = support.rewards.maximum
+
+	if (min != null && max != null) {
+		if (min === max) {
+			return `with a $${min.toLocaleString()} reward`
+		} else {
+			return `with rewards ranging from $${min.toLocaleString()} to $${max.toLocaleString()}`
+		}
+	} else if (max != null) {
+		return `with rewards up to $${max.toLocaleString()}`
+	} else if (typeof min === 'number') {
+		return `with rewards starting at $${min.toLocaleString()}`
+	}
+
+	return ''
+}
+
+function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
+	if (!isSupported(support.rewards)) {
+		return ''
+	}
+
+	const min = support.rewards.minimum
+	const max = support.rewards.maximum
+	const currency = support.rewards.currency || 'USD'
+	const currencySymbol = currency === 'USD' ? '$' : ''
+
+	if (min != null && max != null) {
+		if (min === max) {
+			return `Rewards are ${currencySymbol}${min.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
+		} else {
+			return `Rewards range from ${currencySymbol}${min.toLocaleString()} to ${currencySymbol}${max.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
+		}
+	} else if (max != null) {
+		return `Rewards are up to ${currencySymbol}${max.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
+	} else if (typeof min === 'number') {
+		return `Rewards start at ${currencySymbol}${min.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
+	}
+
+	return ''
+}
+
+function getLegalProtectionDescription(legalProtection: LegalProtection): string {
+	const protectionType =
+		legalProtection.type === LegalProtectionType.SAFE_HARBOR ? 'Safe Harbor' : 'Legal Assurance'
+
+	return `**Legal Protection**: The program provides ${protectionType} protections for security researchers conducting good faith security research.`
+}
+
+/**
+ * Sub-result for wallets that do not implement any bug bounty program.
+ */
+function noBugBountyProgram(): BugBountyProgramSubResult {
+	return {
+		rating: Rating.FAIL,
+		outcomeId: 'no_bug_bounty_program',
+		displayName: 'No bug bounty program',
+		shortExplanation: sentence(
+			"{{WALLET_NAME}} does not implement a bug bounty program and doesn't provide security updates.",
+		),
+		detailsMarkdown:
+			'{{WALLET_NAME}} does not implement a bug bounty program and does not provide a clear path for security researchers to report vulnerabilities. The wallet also lacks a documented process for providing security updates to address critical issues.',
+		howToImproveMarkdown:
+			'{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.',
+	}
+}
+
+/**
+ * Sub-result for wallets that implement a bug bounty program.
+ */
+function evaluateBugBountyProgram(support: BugBountyProgramSupport): BugBountyProgramSubResult {
+	const rewardInfo = getRewardDescription(support)
+	const rewardDetailsInfo = getRewardDetailsDescription(support)
+	const coverageInfo =
+		support.coverageBreadth === 'FULL_SCOPE'
+			? 'The program covers all aspects of the wallet.'
+			: getCoverageDescription(support.coverageBreadth)
+	const legalProtectionInfo = isSupported(support.legalProtections)
+		? getLegalProtectionDescription(support.legalProtections)
+		: ''
+
+	const hasRewards =
+		isSupported(support.rewards) &&
+		support.rewards.minimum != null &&
+		support.rewards.maximum != null &&
+		support.rewards.minimum !== 0 &&
+		support.rewards.maximum !== 0
+	const hasFullCoverage = support.coverageBreadth === 'FULL_SCOPE'
+	const hasLegalProtection = isSupported(support.legalProtections)
+	const isActive = support.availability === BugBountyProgramAvailability.ACTIVE
+
+	const passesAll = isActive && hasFullCoverage && hasRewards && hasLegalProtection
+
+	const rating = passesAll
+		? Rating.PASS
+		: isActive || hasRewards || hasFullCoverage || hasLegalProtection
+			? Rating.PARTIAL
+			: Rating.FAIL
+
+	const platformInfo =
+		support.platform === BugBountyPlatform.SELF_HOSTED
+			? 'The program is self-hosted.'
+			: support.platform
+				? `The program is hosted on ${support.platform}.`
+				: ''
+
+	const availabilityInfo = isActive
+		? 'The program is currently active and accepting vulnerability reports.'
+		: support.availability === BugBountyProgramAvailability.INACTIVE
+			? 'Note that the program is currently inactive and not accepting new reports.'
+			: 'No bug bounty program has been announced or is publicly available.'
+
+	return {
+		rating,
+		outcomeId: isActive ? 'bug_bounty_available' : 'bug_bounty_not_available',
+		displayName: isActive ? 'Bug bounty program available' : 'Bug bounty program inactive',
+		shortExplanation: mdSentence<WalletNameStrings>(
+			`{{WALLET_NAME}} has a bug bounty program${rewardInfo ? ` ${rewardInfo}` : ''}${isActive ? '' : ', but it is currently inactive'}.`,
+		),
+		detailsMarkdown: `
+			${coverageInfo}
+
+			${availabilityInfo}
+
+			${platformInfo}
+
+			${rewardDetailsInfo}
+
+			${legalProtectionInfo}
+
+
+			${isSupported(support.disclosure) ? `**Disclosure Process**: ${support.disclosure.numberOfDays} days` : ''}
+
+			${
+				support.upgradePathAvailable
+					? 'Positively, the wallet does provide an upgrade path for users when security issues are identified.'
+					: 'Unfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.'
+			}
+
+		`,
+		howToImproveMarkdown: passesAll
+			? null
+			: `
+			{{WALLET_NAME}} should:
+			${!isActive ? '- Activate or relaunch their bug bounty program to encourage vulnerability reporting' : ''}
+			${!hasRewards ? '- Clearly define the reward range (minimum and maximum) to attract more security researchers' : ''}
+			${!hasFullCoverage ? '- Expand coverage to include all hardware and software components' : ''}
+			${!hasLegalProtection ? '- Implement Safe Harbor or legal assurance language to protect security researchers from legal action' : ''}
+			${!support.upgradePathAvailable ? '- Establish or improve a clear upgrade path for users after vulnerabilities are fixed' : ''}
+		`,
+	}
+}
+
+/** Example of a bug bounty program that passes all checks. Used in rating scale examples. */
+const exampleActiveBugBountyProgram: BugBountyProgramSupport = {
+	dateStarted: '2020-01-01' as const,
+	availability: BugBountyProgramAvailability.ACTIVE,
+	coverageBreadth: 'FULL_SCOPE',
+	rewards: supported({
+		minimum: 1000,
+		maximum: 50000,
+		currency: 'USD',
+	}),
+	platform: BugBountyPlatform.HACKER_ONE,
+	disclosure: supported({
+		numberOfDays: 30,
+	}),
+	legalProtections: supported({
+		type: LegalProtectionType.SAFE_HARBOR,
+		ref: 'https://example.com/bug-bounty-safe-harbor',
+	}),
+	upgradePathAvailable: true,
+	ref: refNotNecessary,
+}
+
+/** Example of a bug bounty program that is inactive. Used in rating scale examples. */
+const exampleInactiveBugBountyProgram: BugBountyProgramSupport = {
+	dateStarted: '2020-01-01' as const,
+	availability: BugBountyProgramAvailability.INACTIVE,
+	coverageBreadth: nonEmptySet(CoverageBreadth.APP_ONLY),
+	rewards: supported({
+		minimum: 5000,
+		maximum: 5000,
+		currency: 'USD',
+	}),
+	platform: BugBountyPlatform.SELF_HOSTED,
+	disclosure: supported({
+		numberOfDays: 90,
+	}),
+	legalProtections: supported({
+		type: LegalProtectionType.LEGAL_ASSURANCE,
+		ref: 'https://example.com/bug-bounty-legal-assurance',
+	}),
+	upgradePathAvailable: true,
+	ref: refNotNecessary,
+}
+
+/**
+ * Combine the security audits and bug bounty program sub-evaluations into a
+ * single evaluation. The overall rating is the worst of the two sub-ratings
+ * (i.e. a wallet must do well on both to get a passing rating).
+ * Hardware wallets are not rated on security audits, so their evaluation is
+ * based on the bug bounty program alone.
+ */
+function combineEvaluation(
+	ctx: EvaluationContext<SecurityAuditsMetadata>,
+	auditsPart: SecurityAuditsSubResult | 'EXEMPT',
+	bugBountyPart: BugBountyProgramSubResult,
+): Evaluation<SecurityAuditsMetadata> {
+	if (auditsPart === 'EXEMPT') {
+		return ctx.build({
+			outcome: {
+				id: bugBountyPart.outcomeId,
+				rating: bugBountyPart.rating,
+				displayName: bugBountyPart.displayName,
+				shortExplanation: bugBountyPart.shortExplanation,
+				metadata: {
+					securityAudits: [],
+				},
+			},
+			details: markdown<WalletNameStrings>(bugBountyPart.detailsMarkdown),
+			howToImprove:
+				bugBountyPart.howToImproveMarkdown === null
+					? undefined
+					: markdown<WalletNameAndPseudonymStrings>(bugBountyPart.howToImproveMarkdown),
+		})
+	}
+
+	const rating =
+		compareExplicitRatings(auditsPart.rating, bugBountyPart.rating) <= 0
+			? auditsPart.rating
+			: bugBountyPart.rating
+
+	const { displayName, shortExplanation } = ((): Pick<
+		SecurityAuditsSubResult,
+		'displayName' | 'shortExplanation'
+	> => {
+		if (auditsPart.rating === Rating.PASS && bugBountyPart.rating === Rating.PASS) {
+			return {
+				displayName: 'Recent security audit and active bug bounty program',
+				shortExplanation: sentence(
+					'{{WALLET_NAME}} has undergone a recent security audit with all faults addressed, and maintains an active bug bounty program.',
+				),
+			}
+		}
+
+		// The headline reflects the sub-evaluation that drags the rating down.
+		return compareExplicitRatings(bugBountyPart.rating, auditsPart.rating) < 0
+			? bugBountyPart
+			: auditsPart
+	})()
+
+	const howToImproveParts = [
+		auditsPart.howToImproveMarkdown,
+		bugBountyPart.howToImproveMarkdown,
+	].filter((part): part is string => part !== null)
+
 	return ctx.build({
 		outcome: {
-			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
+			id: `${auditsPart.outcomeId}__${bugBountyPart.outcomeId}`,
 			rating,
 			displayName,
 			shortExplanation,
 			metadata: {
-				securityAudits: audits,
+				securityAudits: auditsPart.audits,
 			},
 		},
 		details: securityAuditsDetailsContent({
-			auditedInLastYear,
-			hasUnaddressedFlaws,
+			auditedInLastYear: auditsPart.auditedInLastYear,
+			hasUnaddressedFlaws: auditsPart.hasUnaddressedFlaws,
+			bugBountyDetails: bugBountyPart.detailsMarkdown,
 		}),
-		howToImprove,
+		howToImprove:
+			howToImproveParts.length === 0
+				? undefined
+				: markdown<WalletNameAndPseudonymStrings>(howToImproveParts.join('\n\n')),
 	})
 }
 
@@ -124,17 +455,19 @@ const sampleSecurityAudit: SecurityAudit = {
 }
 
 export const securityAudits: Attribute<SecurityAuditsMetadata> = {
-	id: 'securityAudits',
+	id: 'securityAuditsAndBugBounties',
 	icon: 'security_audits',
-	displayName: 'Security audits',
+	displayName: 'Audits & Bug bounties',
 	wording: {
 		midSentenceName: null,
-		howIsEvaluated: "How is a wallet's security auditing track record evaluated?",
+		howIsEvaluated: "How are a wallet's security audits and bug bounty program evaluated?",
 		whatCanWalletDoAboutIts: sentence(
-			'What can {{WALLET_NAME}} do on the security auditing front?',
+			'What can {{WALLET_NAME}} do on the security auditing and bug bounty front?',
 		),
 	},
-	question: sentence("Has the wallet's source code been reviewed by security auditors?"),
+	question: sentence(
+		"Has the wallet's source code been reviewed by security auditors, and does the wallet maintain an active bug bounty program?",
+	),
 	why: markdown(`
 		Wallets are high-stakes pieces of software that deal with sensitive
 		user data and funds. To ensure that their code is secure, industry best
@@ -148,74 +481,128 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 		is secure, and remains that way over time. Wallet development teams
 		typically publish such audits so that wallet users can feel safer knowing
 		that the wallet's source code was independently audited.
+
+		However, even audited software is not free of vulnerabilities. Bug bounty
+		programs incentivize security researchers to responsibly discover and
+		disclose vulnerabilities, rather than exploit them.
+
+		A well-structured bug bounty program:
+
+		1. Provides clear guidelines for researchers to report vulnerabilities
+		2. Offers appropriate rewards based on severity of findings
+		3. Demonstrates a commitment to addressing security issues quickly
+		4. Communicates transparently about discovered vulnerabilities and their resolution
+
+		Additionally, wallets should provide upgrade paths for users when critical
+		security issues are discovered, so that fixes actually reach existing users.
 	`),
 	methodology: markdown(`
-		Wallets are evaluated by their track record of published security audits.
+		Wallets are evaluated on two closely-related aspects: their track record
+		of published security audits, and their bug bounty program. The overall
+		rating is the worse of the two, so a wallet must do well on both aspects
+		in order to get a passing rating.
 
-		Walletbeat examines the set of published security audits of the wallet.
-		To qualify, a security audit must be publicly available, and must be
-		from a security auditor that has a traceable corporate entity distinct
-		from the wallet's own development team.
+		**Security audits**: Walletbeat examines the set of published security
+		audits of the wallet. To qualify, a security audit must be publicly
+		available, and must be from a security auditor that has a traceable
+		corporate entity distinct from the wallet's own development team.
 
 		Security audits typically come with one or more security flaws found,
 		categorized by level of severity. Definitions of severity vary across
 		auditors, but generally anything "medium" or above is worth paying
 		attention to.
 
-		A wallet gets a passing rating if it has been audited at least once
-		within the last 365 days, and that all medium-or-higher severity flaws
+		A wallet does well on this aspect if it has been audited at least once
+		within the last 365 days, and all medium-or-higher severity flaws
 		that were found across *all* audits (including older ones) are addressed.
+		Hardware wallets are not rated on this aspect, and are rated solely on
+		their bug bounty program.
+
+		**Bug bounty program**: Wallets do well on this aspect if they implement
+		a comprehensive bug bounty program with:
+
+		- An active program accepting vulnerability reports
+		- Full coverage of the wallet's components
+		- Financial rewards based on severity
+		- Legal protections (such as Safe Harbor language) for security researchers
+		- A clear upgrade path for users when security issues are fixed
+
+		Programs with limitations (limited coverage, unclear rewards, inactive or
+		paused programs, no legal protections) are rated as partial. Wallets with
+		no formal process for reporting vulnerabilities fail this aspect.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
-		exhaustive: true,
-		pass: exampleRating(
-			paragraph(
-				'The wallet was audited within the last year, and all flaws of severity "medium" or higher are addressed.',
+		exhaustive: false,
+		pass: [
+			exampleRating(
+				paragraph(
+					'The wallet was audited within the last year with all flaws of severity "medium" or higher addressed, and it maintains an active bug bounty program with rewards, full scope coverage, and legal protections for security researchers.',
+				),
+				combineEvaluation(
+					EvaluationContext.forTest(() => securityAudits),
+					audited([sampleSecurityAudit], true, false),
+					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
+				),
 			),
-			audited(
-				EvaluationContext.forTest(() => securityAudits),
-				[sampleSecurityAudit],
-				true,
-				false,
-			),
-		),
+		],
 		partial: [
 			exampleRating(
 				paragraph('The wallet was audited over a year ago, and has not been audited since.'),
-				audited(
+				combineEvaluation(
 					EvaluationContext.forTest(() => securityAudits),
-					[sampleSecurityAudit],
-					false,
-					false,
+					audited([sampleSecurityAudit], false, false),
+					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
 				),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
-				audited(
+				combineEvaluation(
 					EvaluationContext.forTest(() => securityAudits),
-					[sampleSecurityAudit],
-					true,
-					true,
+					audited([sampleSecurityAudit], true, true),
+					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
+				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet has a recent flawless security audit, but its bug bounty program is inactive or has significant limitations.',
+				),
+				combineEvaluation(
+					EvaluationContext.forTest(() => securityAudits),
+					audited([sampleSecurityAudit], true, false),
+					evaluateBugBountyProgram(exampleInactiveBugBountyProgram),
 				),
 			),
 		],
 		fail: [
 			exampleRating(
 				paragraph('The wallet was never audited by an independent security auditor.'),
-				noAudits(EvaluationContext.forTest(() => securityAudits)),
+				combineEvaluation(
+					EvaluationContext.forTest(() => securityAudits),
+					noAudits(),
+					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
+				),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
-				audited(
+				combineEvaluation(
 					EvaluationContext.forTest(() => securityAudits),
-					[sampleSecurityAudit],
-					false,
-					true,
+					audited([sampleSecurityAudit], false, true),
+					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
+				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet does not implement any bug bounty program or vulnerability disclosure policy.',
+				),
+				combineEvaluation(
+					EvaluationContext.forTest(() => securityAudits),
+					audited([sampleSecurityAudit], true, false),
+					noBugBountyProgram(),
 				),
 			),
 		],
@@ -229,39 +616,70 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 			}),
 		)
 
-		if (ctx.features.type === WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is not applicable to hardware wallets.'), {
-				securityAudits: [],
-			})
-		}
-
-		if (ctx.features.security.publicSecurityAudits === null) {
-			return unrated(ctx, { securityAudits: [] })
-		}
-
-		if (!isNonEmptyArray(ctx.features.security.publicSecurityAudits)) {
-			return noAudits(ctx)
-		}
-
-		const audits = ctx.features.security.publicSecurityAudits
-		let auditedInLastYear = false
-		let hasUnaddressedFlaws = false
-
-		for (const audit of audits) {
-			if (daysSince(audit.auditDate) <= 366) {
-				auditedInLastYear = true
+		// Bug bounty program sub-evaluation: applies to all wallet types.
+		const bugBountyFeature = ctx.features.security.bugBountyProgram
+		const bugBountyPart = ((): BugBountyProgramSubResult | 'UNRATED' => {
+			if (bugBountyFeature === null) {
+				return 'UNRATED'
 			}
 
-			if (Array.isArray(audit.unpatchedFlaws)) {
-				for (const flaw of audit.unpatchedFlaws) {
-					if (flaw.presentStatus === 'NOT_FIXED') {
-						hasUnaddressedFlaws = true
+			if (!isSupported(bugBountyFeature)) {
+				return noBugBountyProgram()
+			}
+
+			ctx.addRef(
+				bugBountyFeature,
+				isSupported(bugBountyFeature.legalProtections) ? bugBountyFeature.legalProtections : null,
+			)
+
+			return evaluateBugBountyProgram(bugBountyFeature)
+		})()
+
+		// Security audits sub-evaluation: not applicable to hardware wallets.
+		const auditsFeature = ctx.features.security.publicSecurityAudits
+		const auditsPart = ((): SecurityAuditsSubResult | 'EXEMPT' | 'UNRATED' => {
+			if (ctx.features.type === WalletType.HARDWARE) {
+				return 'EXEMPT'
+			}
+
+			if (auditsFeature === null) {
+				return 'UNRATED'
+			}
+
+			if (!isNonEmptyArray(auditsFeature)) {
+				return noAudits()
+			}
+
+			ctx.addRef(...auditsFeature)
+
+			let auditedInLastYear = false
+			let hasUnaddressedFlaws = false
+
+			for (const audit of auditsFeature) {
+				if (daysSince(audit.auditDate) <= 366) {
+					auditedInLastYear = true
+				}
+
+				if (Array.isArray(audit.unpatchedFlaws)) {
+					for (const flaw of audit.unpatchedFlaws) {
+						if (flaw.presentStatus === 'NOT_FIXED') {
+							hasUnaddressedFlaws = true
+						}
 					}
 				}
 			}
+
+			return audited(auditsFeature, auditedInLastYear, hasUnaddressedFlaws)
+		})()
+
+		if (auditsPart === 'UNRATED' || bugBountyPart === 'UNRATED') {
+			return unrated(ctx, {
+				securityAudits:
+					auditsPart === 'EXEMPT' || auditsPart === 'UNRATED' ? [] : auditsPart.audits,
+			})
 		}
 
-		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
+		return combineEvaluation(ctx, auditsPart, bugBountyPart)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsMetadata>>) => {
 		const worstEvaluation = pickWorstRating<SecurityAuditsMetadata>(perVariant)

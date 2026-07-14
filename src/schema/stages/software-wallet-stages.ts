@@ -10,10 +10,9 @@ import { addressCorrelation } from '../attributes/privacy/address-correlation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import { bugBountyProgram } from '../attributes/security/bug-bounty-program'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
-import { securityAudits } from '../attributes/security/security-audits'
+import { securityAudits } from '../attributes/security/security-audits-bug-bounty'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
@@ -547,7 +546,13 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, bugBountyProgram),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits, {
+						allowPartial: false,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
 					displayName: 'Bug Bounty Program',
 				},
 				{
