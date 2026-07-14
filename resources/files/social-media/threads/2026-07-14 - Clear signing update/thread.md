@@ -1,4 +1,4 @@
-QT-ing https://x.com/ethereumfndn/status/2066568147230961679
+Quoting https://x.com/ethereumfndn/status/2066568147230961679
 ---
 
 It's been almost a month since clear signing has launched and here's the list of software wallets that have adopted the ERC:
@@ -12,7 +12,7 @@ Standards are important, but what's more important is that the ecosystem adopts 
 
 A Walletbeat thread 
 
-[thread cover photo]
+![Clear signing](./cover.png)
 
 ---
 
@@ -28,7 +28,7 @@ Clear signing introduces a human readable transaction to users, instead of signi
 
 Rather than trying to understand the raw calldata, clear signing shows you what the transaction is really all about.
 
-[Photos of raw calldata and ERC-7730 side by side] 
+![Walletbeat slide](./walletbeat_slide.jpg)
 
 ---
 
