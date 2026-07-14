@@ -282,6 +282,7 @@
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
+	import WalletPageNavigationBadge from '@/views/WalletPageNavigationBadge.svelte'
 	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
 	import WalletStageSummary from '@/views/WalletStageSummary.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
@@ -621,6 +622,7 @@
 				showSearch={false}
 				defaultOpen
 				ariaLabel="Table of contents"
+				afterLabelSnippet={navigationBadgeSnippet}
 			>
 				{#snippet iconSnippet(item: NavigationItem, depth: number)}
 					{#if item.icon}
@@ -634,6 +636,20 @@
 		</nav>
 	</aside>
 </div>
+
+
+{#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
+	<WalletPageNavigationBadge
+		{item}
+		{depth}
+		{attributeTree}
+		{evalTree}
+		{ladders}
+		{wallet}
+		{showScores}
+		{showStage}
+	/>
+{/snippet}
 
 
 {#snippet attributeGroupSnippet({
