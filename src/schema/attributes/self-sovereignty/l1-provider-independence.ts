@@ -4,6 +4,7 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
+	Verifiability,
 } from '@/schema/attributes'
 import { isSupported, notSupported } from '@/schema/features/support'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
@@ -197,6 +198,9 @@ export const l1ProviderIndependence: Attribute = {
 		],
 	},
 	evaluate: ctx => {
+		// Self-verifiable via RPC configuration or selective traffic blocking.
+		ctx.setVerifiability(Verifiability.VERIFIABLE)
+
 		if (ctx.features.chainConfigurability === null) {
 			return unrated(ctx)
 		}
