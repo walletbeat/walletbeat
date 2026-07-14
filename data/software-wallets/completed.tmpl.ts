@@ -63,6 +63,7 @@ import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
 	SendTransactionWarning,
+	UnlimitedApprovalWarning,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
@@ -645,17 +646,25 @@ export const completedTemplate: SoftwareWallet = {
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: refTodo,
+					addressPoisoningDetection: true,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: true,
 					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: supported<UnlimitedApprovalWarning>({
+					ref: refTodo,
+					leaksSpenderAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					warnsOnUnlimitedApproval: true,
 				}),
 			},
 			securityBestPractices: {
