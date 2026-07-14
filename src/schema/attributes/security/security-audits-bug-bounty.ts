@@ -432,10 +432,10 @@ const sampleSecurityAudit: SecurityAudit = {
 	variantsScope: 'ALL_VARIANTS',
 }
 
-export const securityAudits: Attribute<SecurityAuditsMetadata> = {
+export const securityAuditsAndBugBounties: Attribute<SecurityAuditsMetadata> = {
 	id: 'securityAuditsAndBugBounties',
 	icon: 'security_audits',
-	displayName: 'Audits & Bug bounties',
+	displayName: 'Security Audits & Bug Bounties',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How are a wallet's security audits and bug bounty program evaluated?",
@@ -517,7 +517,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 					'The wallet was audited within the last year with all flaws of severity "medium" or higher addressed, and it maintains an active bug bounty program with rewards, full scope coverage, and legal protections for security researchers.',
 				),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					audited([sampleSecurityAudit], true, false),
 					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
 				),
@@ -527,7 +527,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 			exampleRating(
 				paragraph('The wallet was audited over a year ago, and has not been audited since.'),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					audited([sampleSecurityAudit], false, false),
 					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
 				),
@@ -537,7 +537,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 					'The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					audited([sampleSecurityAudit], true, true),
 					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
 				),
@@ -547,7 +547,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 					'The wallet has a recent flawless security audit, but its bug bounty program is inactive or has significant limitations.',
 				),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					audited([sampleSecurityAudit], true, false),
 					evaluateBugBountyProgram(exampleInactiveBugBountyProgram),
 				),
@@ -557,7 +557,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 			exampleRating(
 				paragraph('The wallet was never audited by an independent security auditor.'),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					noAudits(),
 					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
 				),
@@ -567,7 +567,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 					'The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					audited([sampleSecurityAudit], false, true),
 					evaluateBugBountyProgram(exampleActiveBugBountyProgram),
 				),
@@ -577,7 +577,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 					'The wallet does not implement any bug bounty program or vulnerability disclosure policy.',
 				),
 				combineEvaluation(
-					EvaluationContext.forTest(() => securityAudits),
+					EvaluationContext.forTest(() => securityAuditsAndBugBounties),
 					audited([sampleSecurityAudit], true, false),
 					noBugBountyProgram(),
 				),
