@@ -1115,13 +1115,15 @@ function evaluateHardwareWalletTransactionLegibility(
 ): Evaluation {
 	ctx.addRef(hardwareTransactionLegibility)
 
-	const { erc7730, detailsDisplayed, dataExtraction, erc8213 } = hardwareTransactionLegibility
+	const { erc7730, detailsDisplayed, dataExtraction, erc8213, erc4361 } =
+		hardwareTransactionLegibility
 
 	if (
 		erc7730 === null ||
 		detailsDisplayed === null ||
 		dataExtraction === null ||
-		erc8213 === null
+		erc8213 === null ||
+		erc4361 === null
 	) {
 		return unrated(ctx)
 	}
@@ -1166,12 +1168,6 @@ function evaluateHardwareWalletTransactionLegibility(
 	}
 
 	if (erc8213Full && erc7730Full) {
-		const { erc4361 } = hardwareTransactionLegibility
-
-		if (erc4361 === null) {
-			return unrated(ctx)
-		}
-
 		if (!isSupported(erc4361)) {
 			return hardwareMissingErc4361TransactionLegibility(ctx, hardwareTransactionLegibility)
 		}
@@ -1193,14 +1189,15 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation {
 	const transactionLegibilitySupport = ctx.popRefs(softwareTransactionLegibility)
 
-	const { erc8213, erc7730, transactionDetailsDisplay, transactionSimulations } =
+	const { erc8213, erc7730, transactionDetailsDisplay, transactionSimulations, erc4361 } =
 		transactionLegibilitySupport
 
 	if (
 		transactionDetailsDisplay === null ||
 		erc8213 === null ||
 		erc7730 === null ||
-		transactionSimulations === null
+		transactionSimulations === null ||
+		erc4361 === null
 	) {
 		return unrated(ctx)
 	}
@@ -1286,12 +1283,6 @@ function evaluateSoftwareWalletTransactionLegibility(
 	}
 
 	if (erc8213Full && erc7730Full) {
-		const { erc4361 } = transactionLegibilitySupport
-
-		if (erc4361 === null) {
-			return unrated(ctx)
-		}
-
 		if (!isSupported(erc4361)) {
 			return softwareMissingErc4361TransactionLegibility(ctx, softwareTransactionLegibility)
 		}
