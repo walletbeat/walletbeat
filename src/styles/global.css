@@ -238,3 +238,14 @@ h6,
 p {
 	font-family: var(--fontFamily-avenir);
 }
+
+@keyframes WalletPageIconLayerAnimation {
+	from,
+	79% {
+		opacity: 0;
+	}
+	80%,
+	to {
+		opacity: 1;
+	}
+}
