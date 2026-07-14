@@ -1667,14 +1667,14 @@ ol {
  *   ```html
  *   <details>
  *     <summary>More</summary>
- *     <p>Hidden body.</p>
+ *     <div><p>Hidden body.</p></div>
  *   </details>
  *   ```
  * - `[data-collapsible]` + `[data-card]` padding split between summary and body:
  *   ```html
  *   <details data-card="padding-6">
  *     <summary data-row="wrap wrap-first-last">Title row</summary>
- *     <p>Body</p>
+ *     <div><p>Body</p></div>
  *   </details>
  *   ```
  *
@@ -1765,9 +1765,10 @@ details {
 			padding: var(--card-padding);
 		}
 
-		> summary + :last-child {
+		&:has(> summary + :not(:last-child))::details-content,
+		> summary + div:last-child {
 			padding: var(--card-padding);
-			padding-top: 0;
+			padding-block-start: 0;
 		}
 	}
 }

@@ -277,7 +277,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
 			{
 				frequentlyAskedQuestions.map(entry => (
-					<details id={entry.anchor}>
+					<details id={entry.anchor} data-card='padding-5'>
 						<summary>
 							<h4>{entry.question}</h4>
 						</summary>
@@ -316,7 +316,6 @@ import { defaultNavigationItems } from '@/constants/navigation'
 	details {
 		border: var(--separator-width) solid var(--border-color);
 		border-radius: 0.5rem;
-		padding: 1.25rem 1.5rem;
 
 		summary {
 			cursor: pointer;

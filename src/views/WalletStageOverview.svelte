@@ -156,10 +156,10 @@
 								data-row-item="wrap-end"
 								data-row="gap-2"
 							>
-							<span>{passedCount}/{totalCount}</span>
-							<data value={stageRating} title={stageStatuses[stageRating].label}>
-								{stageStatuses[stageRating].icon}
-							</data>
+									<span>{passedCount}/{totalCount}</span>
+									<data value={stageRating} title={stageStatuses[stageRating].label}>
+										{stageStatuses[stageRating].icon}
+									</data>
 							</div>
 						</div>
 					</summary>
@@ -208,8 +208,8 @@
 											</div>
 										</summary>
 
-										{#if criteriaGroup.criteria}
-											<div>
+										<div>
+											{#if criteriaGroup.criteria}
 												<ul
 													data-card="padding-4"
 													data-list="gap-3"
@@ -265,8 +265,8 @@
 														</li>
 													{/each}
 												</ul>
-											</div>
-										{/if}
+											{/if}
+										</div>
 									</details>
 								{/each}
 							</div>

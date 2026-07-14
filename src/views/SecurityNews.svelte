@@ -29,7 +29,7 @@
 	data-rating="pass"
 >
 	<details
-		data-card="radius-8 padding-0 border-accent"
+		data-card="radius-8 padding-6 border-accent"
 		data-column="gap-0"
 		open={shouldExpandNews}
 	>
@@ -73,7 +73,7 @@
 				{@const typeInfo = newsTypes[newsItem.type]}
 				{@const impactInfo = impactCategories[newsItem.impact.category]}
 				{@const newsRefs = extractRefs(newsItem)}
-				<details data-card="padding-2 secondary radius-4" data-column="gap-0">
+				<details data-card="padding-5 secondary radius-4" data-column="gap-0">
 					<summary data-row="gap-2">
 						<div data-column="gap-1" data-row-item="flexible">
 							<h4>{newsItem.title}</h4>
@@ -99,7 +99,7 @@
 						</div>
 					</summary>
 
-					<section data-column="gap-4">
+					<div><section data-column="gap-4">
 						<p class="news-summary">{newsItem.summary}</p>
 
 						<div class="news-details" data-column="gap-2">
@@ -137,7 +137,7 @@
 								/>
 							{/if}
 						</div>
-					</section>
+					</section></div>
 				</details>
 			{/each}
 		</div>
@@ -161,8 +161,6 @@
 			}
 
 			> summary {
-				padding: 1.5rem;
-
 				> header {
 					flex-grow: 1;
 
@@ -177,16 +175,9 @@
 				}
 			}
 
-			&::details-content {
-				padding: 1.5rem;
-				padding-top: 0;
-
+			> summary + div:last-child {
 				display: grid;
 				gap: 1.5rem;
-			}
-
-			&:not([open])::details-content {
-				padding-block: 0;
 			}
 
 			.subsection-caption {
@@ -201,8 +192,6 @@
 			overflow: hidden;
 
 			summary {
-				padding: 1.25rem;
-
 				h4 {
 					max-width: 60ch;
 					word-wrap: break-word;

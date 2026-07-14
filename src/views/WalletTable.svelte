@@ -1809,15 +1809,21 @@
 					summary {
 						box-sizing: content-box;
 						margin: calc(-1 * var(--table-cell-padding));
-						padding: var(--table-cell-padding);
 
-						transition-property: opacity, scale, min-block-size, padding-block-end;
+						transition-property: opacity, scale, min-block-size;
 						min-block-size: var(--walletTable-rowClosed-blockSize);
+
+						> * {
+							padding: var(--table-cell-padding);
+						}
 					}
 
 					&:open summary {
 						min-block-size: 5rem;
-						padding-block-end: 0.25rem;
+
+						> * {
+							padding-block-end: 0.25rem;
+						}
 					}
 				}
 			}
