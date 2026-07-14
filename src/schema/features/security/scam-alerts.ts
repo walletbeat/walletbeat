@@ -2,86 +2,11 @@ import type { WithRef } from '@/schema/reference'
 
 import type { Support } from '../support'
 
-export type ScamUrlWarning = WithRef<{
-	/**
-	 * Whether the scam site lookup process leaks the visited URL to an
-	 * external service, as opposed to something like a partial hash match
-	 * like the Google Safe Browsing API for checking spam domains without
-	 * leaking the domains being visited to Google.
-	 */
-	leaksVisitedUrl: 'FULL_URL' | 'DOMAIN_ONLY' | 'PARTIAL_HASH_OF_DOMAIN' | 'NO'
-
-	/**
-	 * Whether the contract lookup process leaks the user's Ethereum address
-	 * to an external service.
-	 */
-	leaksUserAddress: boolean
-
-	/**
-	 * Whether the scam site lookup process leaks the user's IP to an external
-	 * service, as opposed to using an anonymizing proxy.
-	 */
-	leaksIp: boolean
-}>
-
-export type ContractTransactionWarning = WithRef<{
-	/**
-	 * Does the wallet warn the user when they are interacting with a contract
-	 * they have not interacted with before?
-	 */
-	previousContractInteractionWarning: boolean
-
-	/**
-	 * Does the wallet warn the user when they are interacting with a contract
-	 * that has only recently been deployed to the chain.
-	 */
-	recentContractWarning: boolean
-
-	/**
-	 * Does the wallet check a registry of known scam/non-scam contracts and
-	 * use it to warn the user?
-	 */
-	contractRegistry: boolean
-
-	/**
-	 * Whether the contract lookup process leaks the contract address to an
-	 * external service, as opposed to something like a partial match against
-	 * a static list.
-	 */
-	leaksContractAddress: boolean
-
-	/**
-	 * Whether the contract lookup process leaks the user's Ethereum address
-	 * to an external service.
-	 */
-	leaksUserAddress: boolean
-
-	/**
-	 * Whether the contract lookup process leaks the user's IP address to an
-	 * external service.
-	 */
-	leaksUserIp: boolean
-}>
-
-export type SendTransactionWarning = WithRef<{
-	/**
-	 * Does the wallet feature a user-editable whitelist, outside of which
-	 * the wallet warns when sending to other addresses?
-	 */
-	userWhitelist: boolean
-
-	/**
-	 * Does the wallet warn the user when they are sending to an address they
-	 * have not sent funds to before?
-	 */
-	newRecipientWarning: boolean
-
-	/**
-	 * Whether the lookup process leaks the recipient address to an external
-	 * service.
-	 */
-	leaksRecipient: boolean
-
+/**
+ * Fields shared by every scam-alert warning: does the lookup process leak
+ * identifying information about the user to an external service?
+ */
+export interface ScamAlertLeaks {
 	/**
 	 * Whether the lookup process leaks the user's Ethereum address to an
 	 * external service.
@@ -90,10 +15,96 @@ export type SendTransactionWarning = WithRef<{
 
 	/**
 	 * Whether the lookup process leaks the user's IP address to an external
-	 * service.
+	 * service, as opposed to using an anonymizing proxy.
 	 */
 	leaksUserIp: boolean
-}>
+}
+
+export type ScamUrlWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Whether the scam site lookup process leaks the visited URL to an
+		 * external service, as opposed to something like a partial hash match
+		 * like the Google Safe Browsing API for checking spam domains without
+		 * leaking the domains being visited to Google.
+		 */
+		leaksVisitedUrl: 'FULL_URL' | 'DOMAIN_ONLY' | 'PARTIAL_HASH_OF_DOMAIN' | 'NO'
+	}
+>
+
+export type ContractTransactionWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Does the wallet warn the user when they are interacting with a contract
+		 * they have not interacted with before?
+		 */
+		previousContractInteractionWarning: boolean
+
+		/**
+		 * Does the wallet warn the user when they are interacting with a contract
+		 * that has only recently been deployed to the chain?
+		 */
+		recentContractWarning: boolean
+
+		/**
+		 * Does the wallet check a registry of known scam/non-scam contracts and
+		 * use it to warn the user?
+		 */
+		contractRegistry: boolean
+
+		/**
+		 * Whether the contract lookup process leaks the contract address to an
+		 * external service, as opposed to something like a partial match against
+		 * a static list.
+		 */
+		leaksContractAddress: boolean
+	}
+>
+
+export type SendTransactionWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Does the wallet feature a user-editable whitelist, outside of which
+		 * the wallet warns when sending to other addresses?
+		 */
+		userWhitelist: boolean
+
+		/**
+		 * Does the wallet warn the user when they are sending to an address they
+		 * have not sent funds to before?
+		 */
+		newRecipientWarning: boolean
+
+		/**
+		 * Does the wallet warn the user when they are sending to an address that
+		 * closely resembles, and may be a "poisoned" look-alike of, an address
+		 * already in their transaction history or whitelist?
+		 */
+		addressPoisoningDetection: boolean
+
+		/**
+		 * Whether the lookup process leaks the recipient address to an external
+		 * service.
+		 */
+		leaksRecipient: boolean
+	}
+>
+
+export type UnlimitedApprovalWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Does the wallet warn the user before a transaction or signature that
+		 * grants unlimited/infinite token allowance?
+		 */
+		warnsOnUnlimitedApproval: boolean
+
+		/**
+		 * Whether the spender/contract lookup process leaks the spender address
+		 * to an external service.
+		 */
+		leaksSpenderAddress: boolean
+	}
+>
 
 /**
  * Whether the wallet supports scam alerts.
@@ -107,4 +118,10 @@ export interface ScamAlerts {
 
 	/** Does the wallet warn the user before executing a send transaction? */
 	sendTransactionWarning: Support<SendTransactionWarning>
+
+	/**
+	 * Does the wallet warn the user before a transaction or signature
+	 * that grants unlimited/infinite ERC-20 token allowance?
+	 */
+	unlimitedApprovalWarning: Support<UnlimitedApprovalWarning>
 }

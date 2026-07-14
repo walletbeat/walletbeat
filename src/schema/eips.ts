@@ -20,6 +20,7 @@ export type EipNumber =
  */
 export enum EipStatus {
 	DRAFT = 'DRAFT',
+	REVIEW = 'REVIEW',
 	FINAL = 'FINAL',
 	LIVING = 'LIVING',
 	LAST_CALL = 'LAST_CALL',
@@ -101,6 +102,7 @@ export function eipMarkdownLinkAndTitle(eip: Eip): string {
 export const eipStatusLabel: Record<EipStatus, string> = {
 	[EipStatus.FINAL]: 'Final',
 	[EipStatus.DRAFT]: 'Draft',
+	[EipStatus.REVIEW]: 'Review',
 	[EipStatus.LIVING]: 'Living',
 	[EipStatus.LAST_CALL]: 'Last Call',
 }
