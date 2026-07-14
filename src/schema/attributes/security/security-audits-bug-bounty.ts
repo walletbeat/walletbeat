@@ -24,7 +24,6 @@ import { isSupported, supported } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
-import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdSentence, paragraph, type Sentence, sentence } from '@/types/content'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { daysSince } from '@/types/date'
@@ -368,33 +367,12 @@ const exampleInactiveBugBountyProgram: BugBountyProgramSupport = {
  * Combine the security audits and bug bounty program sub-evaluations into a
  * single evaluation. The overall rating is the worst of the two sub-ratings
  * (i.e. a wallet must do well on both to get a passing rating).
- * Hardware wallets are not rated on security audits, so their evaluation is
- * based on the bug bounty program alone.
  */
 function combineEvaluation(
 	ctx: EvaluationContext<SecurityAuditsMetadata>,
-	auditsPart: SecurityAuditsSubResult | 'EXEMPT',
+	auditsPart: SecurityAuditsSubResult,
 	bugBountyPart: BugBountyProgramSubResult,
 ): Evaluation<SecurityAuditsMetadata> {
-	if (auditsPart === 'EXEMPT') {
-		return ctx.build({
-			outcome: {
-				id: bugBountyPart.outcomeId,
-				rating: bugBountyPart.rating,
-				displayName: bugBountyPart.displayName,
-				shortExplanation: bugBountyPart.shortExplanation,
-				metadata: {
-					securityAudits: [],
-				},
-			},
-			details: markdown<WalletNameStrings>(bugBountyPart.detailsMarkdown),
-			howToImprove:
-				bugBountyPart.howToImproveMarkdown === null
-					? undefined
-					: markdown<WalletNameAndPseudonymStrings>(bugBountyPart.howToImproveMarkdown),
-		})
-	}
-
 	const rating =
 		compareExplicitRatings(auditsPart.rating, bugBountyPart.rating) <= 0
 			? auditsPart.rating
@@ -515,8 +493,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 		A wallet does well on this aspect if it has been audited at least once
 		within the last 365 days, and all medium-or-higher severity flaws
 		that were found across *all* audits (including older ones) are addressed.
-		Hardware wallets are not rated on this aspect, and are rated solely on
-		their bug bounty program.
+		This applies to all wallet types, including hardware wallets.
 
 		**Bug bounty program**: Wallets do well on this aspect if they implement
 		a comprehensive bug bounty program with:
@@ -635,13 +612,9 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 			return evaluateBugBountyProgram(bugBountyFeature)
 		})()
 
-		// Security audits sub-evaluation: not applicable to hardware wallets.
+		// Security audits sub-evaluation: applies to all wallet types.
 		const auditsFeature = ctx.features.security.publicSecurityAudits
-		const auditsPart = ((): SecurityAuditsSubResult | 'EXEMPT' | 'UNRATED' => {
-			if (ctx.features.type === WalletType.HARDWARE) {
-				return 'EXEMPT'
-			}
-
+		const auditsPart = ((): SecurityAuditsSubResult | 'UNRATED' => {
 			if (auditsFeature === null) {
 				return 'UNRATED'
 			}
@@ -674,8 +647,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 
 		if (auditsPart === 'UNRATED' || bugBountyPart === 'UNRATED') {
 			return unrated(ctx, {
-				securityAudits:
-					auditsPart === 'EXEMPT' || auditsPart === 'UNRATED' ? [] : auditsPart.audits,
+				securityAudits: auditsPart === 'UNRATED' ? [] : auditsPart.audits,
 			})
 		}
 
