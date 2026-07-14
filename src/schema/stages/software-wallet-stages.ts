@@ -12,7 +12,7 @@ import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
-import { securityAudits } from '../attributes/security/security-audits-bug-bounty'
+import { securityAuditsAndBugBounties } from '../attributes/security/security-audits-bug-bounty'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
@@ -185,7 +185,7 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits, {
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBugBounties, {
 						allowPartial: false,
 						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
@@ -546,7 +546,7 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits, {
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBugBounties, {
 						allowPartial: false,
 						ifUnverifiable: sentence(
 							"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
