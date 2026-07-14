@@ -19,8 +19,11 @@
 
 	// (Derived)
 
-	// References arrive deduplicated by `mergeRefs`, so every image URL
-	// appears at most once here.
+	// Only repo-hosted images are rendered inline or as thumbnails;
+	// rendering an externally-hosted image would leak visitor traffic to
+	// that host, so `isRepoImageUrl` filters those out and they stay plain
+	// links. References arrive deduplicated by `mergeRefs`, so every image
+	// URL appears at most once here.
 	const imageUrls = $derived(
 		references.flatMap(ref => ref.urls).filter(url => isRepoImageUrl(url.url)),
 	)

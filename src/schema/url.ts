@@ -221,8 +221,8 @@ const imageFileExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif', 
 /**
  * Whether a URL points to an image file hosted in the Walletbeat repo
  * itself, i.e. the root-relative URL that a file-based reference under
- * `public/` qualifies to. External image URLs deliberately do not match:
- * rendering them inline would leak visitor traffic to external hosts.
+ * `public/` qualifies to. External (absolute or protocol-relative) image
+ * URLs do not match.
  */
 export function isRepoImageUrl(url: Url): boolean {
 	const path = (isLabeledUrl(url) ? url.url : url).split(/[?#]/)[0].toLowerCase()
