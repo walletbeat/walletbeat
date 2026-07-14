@@ -1,45 +1,76 @@
 import { type Eip, type EipNumber, EipPrefix, EipStatus } from '@/schema/eips'
 import { getErrorMessage } from '@/types/errors'
+import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
 
 /** Outcome of comparing one EIP's Walletbeat status against its upstream spec. */
 export enum EipStatusCheckKind {
-	/** Walletbeat's status matches the upstream spec's front-matter. */
+	/** Walletbeat's status matches the upstream spec's frontmatter. */
 	MATCH = 'MATCH',
-	/** Both statuses are known but disagree — actionable drift. */
+	/**
+	 * Upstream and Walletbeat disagree — actionable drift. Covers both a mapped
+	 * status mismatch and an upstream status Walletbeat does not model (e.g.
+	 * Stagnant, Withdrawn, Moved), which still means our recorded status is wrong.
+	 */
 	DRIFT = 'DRIFT',
 	/**
 	 * The upstream status could not be determined: network error, a 404 in both
-	 * the EIPs and ERCs repositories (e.g. an as-yet-unmerged spec), or a
-	 * front-matter status Walletbeat does not model. Surfaced as a warning,
-	 * never fatal.
+	 * the EIPs and ERCs repositories (e.g. an as-yet-unmerged spec), or a spec
+	 * with no `status:` frontmatter at all. Surfaced as a warning, never fatal.
 	 */
 	UNVERIFIABLE = 'UNVERIFIABLE',
 }
 
-/** Result of checking a single EIP's status. */
-export interface EipStatusCheckResult {
+/** Fields common to every check result, regardless of outcome. */
+export interface EipCheckResultBase {
 	number: EipNumber
 	prefix: EipPrefix
 	friendlyName: string
 	/** Status recorded in Walletbeat. */
 	ours: EipStatus
-	/** Status read from upstream, or null when unverifiable. */
-	upstream: EipStatus | null
-	/** Raw upstream `status:` front-matter value, when one was found. */
-	upstreamRaw: string | null
-	/** URL the status was read from, when a spec was found. */
-	url: string | null
-	kind: EipStatusCheckKind
-	/** Human-readable reason; set for UNVERIFIABLE results, otherwise null. */
-	note: string | null
 }
+
+/** Walletbeat's status agrees with the upstream spec. */
+export interface EipCheckResultMatch extends EipCheckResultBase {
+	kind: EipStatusCheckKind.MATCH
+	/** Mapped upstream status (equal to `ours`). */
+	upstream: EipStatus
+	/** Raw upstream `status:` frontmatter value. */
+	upstreamRaw: string
+	/** URL the status was read from. */
+	url: string
+}
+
+/** Walletbeat's status disagrees with the upstream spec. */
+export interface EipCheckResultDrift extends EipCheckResultBase {
+	kind: EipStatusCheckKind.DRIFT
+	/** Mapped upstream status, or null when upstream reports a status Walletbeat does not model. */
+	upstream: EipStatus | null
+	/** Raw upstream `status:` frontmatter value — the source of truth for display. */
+	upstreamRaw: string
+	/** URL the status was read from. */
+	url: string
+}
+
+/** The upstream status could not be determined. */
+export interface EipCheckResultUnverifiable extends EipCheckResultBase {
+	kind: EipStatusCheckKind.UNVERIFIABLE
+	/** URL a spec was found at, or null when no spec was located. */
+	url: string | null
+	/** Human-readable reason the check could not be completed. */
+	note: string
+}
+
+/** Result of checking a single EIP's status. */
+export type EipStatusCheckResult =
+	| EipCheckResultMatch
+	| EipCheckResultDrift
+	| EipCheckResultUnverifiable
 
 /** Aggregate report over every checked EIP. */
 export interface EipStatusReport {
-	results: EipStatusCheckResult[]
-	matches: EipStatusCheckResult[]
-	drift: EipStatusCheckResult[]
-	unverifiable: EipStatusCheckResult[]
+	matches: EipCheckResultMatch[]
+	drift: EipCheckResultDrift[]
+	unverifiable: EipCheckResultUnverifiable[]
 }
 
 /** Options controlling the network behavior of the checker. */
@@ -72,17 +103,17 @@ export function upstreamUrls(eip: Eip): string[] {
 		: [eipsRepoUrl(eip.number), ercsRepoUrl(eip.number)]
 }
 
-/** Extracts the raw `status:` value from a spec's YAML front-matter. */
+/**
+ * Extracts the raw `status:` value from a spec's YAML frontmatter, or null when
+ * the document has no frontmatter or no `status:` field.
+ */
 export function parseUpstreamStatus(markdown: string): string | null {
-	const frontMatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(markdown)
-
-	if (frontMatter === null) {
+	try {
+		return parseMarkdownWithFrontmatter<{ status: string }>(markdown, { status: true }).frontmatter
+			.status
+	} catch {
 		return null
 	}
-
-	const status = /^status:[ \t]*(.+?)[ \t]*$/m.exec(frontMatter[1])
-
-	return status === null ? null : status[1]
 }
 
 const UPSTREAM_STATUS_MAP = new Map<string, EipStatus>([
@@ -94,7 +125,7 @@ const UPSTREAM_STATUS_MAP = new Map<string, EipStatus>([
 ])
 
 /**
- * Maps an upstream front-matter status string to a Walletbeat `EipStatus`.
+ * Maps an upstream frontmatter status string to a Walletbeat `EipStatus`.
  * Returns null for statuses Walletbeat does not model (e.g. Stagnant,
  * Withdrawn, Moved).
  */
@@ -121,21 +152,14 @@ async function fetchSpec(url: string, timeoutMs: number): Promise<string | null>
 	}
 }
 
-function unverifiable(
-	eip: Eip,
-	url: string | null,
-	note: string,
-	upstreamRaw: string | null = null,
-): EipStatusCheckResult {
+function unverifiable(eip: Eip, url: string | null, note: string): EipCheckResultUnverifiable {
 	return {
 		number: eip.number,
 		prefix: eip.prefix,
 		friendlyName: eip.friendlyName,
 		ours: eip.status,
-		upstream: null,
-		upstreamRaw,
-		url,
 		kind: EipStatusCheckKind.UNVERIFIABLE,
+		url,
 		note,
 	}
 }
@@ -164,26 +188,25 @@ export async function checkEip(
 		const raw = parseUpstreamStatus(markdown)
 
 		if (raw === null) {
-			return unverifiable(eip, url, 'no `status:` field found in upstream front-matter')
+			return unverifiable(eip, url, 'no `status:` field found in upstream frontmatter')
 		}
 
+		// A status we cannot map (Stagnant, Withdrawn, Moved, …) is still a
+		// verified upstream value that disagrees with ours: report it as drift.
 		const upstream = mapUpstreamStatus(raw)
 
-		if (upstream === null) {
-			return unverifiable(eip, url, `upstream status "${raw}" is not modeled by Walletbeat`, raw)
-		}
-
-		return {
+		const base: EipCheckResultBase = {
 			number: eip.number,
 			prefix: eip.prefix,
 			friendlyName: eip.friendlyName,
 			ours: eip.status,
-			upstream,
-			upstreamRaw: raw,
-			url,
-			kind: upstream === eip.status ? EipStatusCheckKind.MATCH : EipStatusCheckKind.DRIFT,
-			note: null,
 		}
+
+		if (upstream === eip.status) {
+			return { ...base, kind: EipStatusCheckKind.MATCH, upstream, upstreamRaw: raw, url }
+		}
+
+		return { ...base, kind: EipStatusCheckKind.DRIFT, upstream, upstreamRaw: raw, url }
 	}
 
 	return unverifiable(
@@ -203,14 +226,20 @@ export async function checkEipStatuses(
 	results.sort((a, b) => Number(a.number) - Number(b.number))
 
 	return {
-		results,
-		matches: results.filter(result => result.kind === EipStatusCheckKind.MATCH),
-		drift: results.filter(result => result.kind === EipStatusCheckKind.DRIFT),
-		unverifiable: results.filter(result => result.kind === EipStatusCheckKind.UNVERIFIABLE),
+		matches: results.filter(
+			(result): result is EipCheckResultMatch => result.kind === EipStatusCheckKind.MATCH,
+		),
+		drift: results.filter(
+			(result): result is EipCheckResultDrift => result.kind === EipStatusCheckKind.DRIFT,
+		),
+		unverifiable: results.filter(
+			(result): result is EipCheckResultUnverifiable =>
+				result.kind === EipStatusCheckKind.UNVERIFIABLE,
+		),
 	}
 }
 
-function label(result: EipStatusCheckResult): string {
+function label(result: EipCheckResultBase): string {
 	return `${result.prefix}-${result.number}`
 }
 
@@ -220,12 +249,12 @@ export function formatReport(report: EipStatusReport, options: { quiet: boolean 
 
 	for (const result of report.drift) {
 		lines.push(
-			`DRIFT  ${label(result)}: Walletbeat=${result.ours} upstream=${result.upstream ?? '?'} (${result.url ?? ''})`,
+			`DRIFT  ${label(result)}: Walletbeat=${result.ours} upstream=${result.upstream ?? result.upstreamRaw} (${result.url})`,
 		)
 	}
 
 	for (const result of report.unverifiable) {
-		lines.push(`WARN   ${label(result)}: unverifiable — ${result.note ?? ''}`)
+		lines.push(`WARN   ${label(result)}: unverifiable — ${result.note}`)
 	}
 
 	if (!options.quiet) {
@@ -234,9 +263,11 @@ export function formatReport(report: EipStatusReport, options: { quiet: boolean 
 		}
 	}
 
+	const total = report.matches.length + report.drift.length + report.unverifiable.length
+
 	lines.push('')
 	lines.push(
-		`${report.results.length.toString()} EIPs checked — ` +
+		`${total.toString()} EIPs checked — ` +
 			`${report.matches.length.toString()} ok, ` +
 			`${report.drift.length.toString()} drifted, ` +
 			`${report.unverifiable.length.toString()} unverifiable.`,
@@ -247,11 +278,13 @@ export function formatReport(report: EipStatusReport, options: { quiet: boolean 
 
 /** Serializes a report to JSON (consumed by automation, e.g. a CI workflow). */
 export function reportToJson(report: EipStatusReport): string {
+	const total = report.matches.length + report.drift.length + report.unverifiable.length
+
 	return JSON.stringify(
 		{
 			checkedAt: new Date().toISOString(),
 			summary: {
-				total: report.results.length,
+				total,
 				matches: report.matches.length,
 				drift: report.drift.length,
 				unverifiable: report.unverifiable.length,
@@ -260,6 +293,7 @@ export function reportToJson(report: EipStatusReport): string {
 				eip: label(result),
 				ours: result.ours,
 				upstream: result.upstream,
+				upstreamRaw: result.upstreamRaw,
 				url: result.url,
 			})),
 			unverifiable: report.unverifiable.map(result => ({
