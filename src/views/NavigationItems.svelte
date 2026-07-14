@@ -31,6 +31,7 @@
 		ariaLabel = 'Navigation',
 		defaultOpen = false,
 		iconSnippet,
+		afterLabelSnippet,
 		showSearch = true,
 	}: {
 		items: NavigationItem[]
@@ -39,6 +40,7 @@
 		ariaLabel?: string
 		defaultOpen?: boolean
 		iconSnippet?: Snippet<[NavigationItem, number]>
+		afterLabelSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
 	} = $props()
 
@@ -252,11 +254,23 @@
 			{@render navigationIcon(item, depth)}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+
+			{#if afterLabelSnippet}
+				<span class="navigation-item-after" data-row="gap-1">
+					{@render afterLabelSnippet(item, depth)}
+				</span>
+			{/if}
 		</a>
 	{:else}
 		{@render navigationIcon(item, depth)}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+
+		{#if afterLabelSnippet}
+			<span class="navigation-item-after" data-row="gap-1">
+				{@render afterLabelSnippet(item, depth)}
+			</span>
+		{/if}
 	{/if}
 {/snippet}
 
@@ -391,6 +405,11 @@
 					color: var(--accent);
 					text-decoration: none;
 				}
+			}
+
+			.navigation-item-after {
+				flex: none;
+				margin-inline-start: auto;
 			}
 
 			li > details > summary,
