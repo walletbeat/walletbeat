@@ -139,6 +139,17 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 	},
 	'1193': features => browserIntegrationEipSupport(features, '1193'),
 	'2700': features => browserIntegrationEipSupport(features, '2700'),
+	// A wallet supports ERC-4361 if the transaction legibility record explicitly
+	// tracks Sign-In with Ethereum support.
+	'4361': features => {
+		const transactionLegibility = features.security.transactionLegibility
+
+		if (transactionLegibility === null || transactionLegibility.erc4361 === null) {
+			return 'UNKNOWN'
+		}
+
+		return eipSupport(isSupported(transactionLegibility.erc4361), transactionLegibility.ref)
+	},
 	// A wallet supports ERC-4337 if it supports raw ERC-4337 accounts, or if
 	// its EIP-7702 delegate contract is itself an ERC-4337 account (i.e. it
 	// implements `validateUserOp`). EIP-7702 alone does not imply ERC-4337:

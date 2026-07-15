@@ -761,6 +761,7 @@ export const rainbow: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,

@@ -633,6 +633,18 @@ type DisplayCapability = {
 }
 
 export interface BaseTransactionLegibilitySupport {
+	/**
+	 * ERC-4361 (Sign-In with Ethereum) support.
+	 * Whether the wallet can clearly present Sign-In with Ethereum
+	 * authentication requests to the user.
+	 */
+	erc4361: Support | null
+
+	/**
+	 * ERC-8123 (Wallet Signature and Calldata Digest Display)
+	 * Whether the wallet follows the "Wallet Display Requirements"
+	 * section of ERC-8123.
+	 */
 	erc8213: Support | null
 }
 
