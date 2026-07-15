@@ -1,24 +1,55 @@
 import { type Eip, type EipNumber, EipPrefix, EipStatus } from '@/schema/eips'
 import { getErrorMessage } from '@/types/errors'
+import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
 
-/** Outcome of comparing one EIP's Walletbeat status against its upstream spec. */
+/** Outcome of comparing one EIP's Walletbeat record against its upstream spec. */
 export enum EipStatusCheckKind {
-	/** Walletbeat's status matches the upstream spec's frontmatter. */
+	/** Every field Walletbeat records agrees with the upstream spec. */
 	MATCH = 'MATCH',
-	/**
-	 * Upstream and Walletbeat disagree — actionable drift. Covers both a mapped
-	 * status mismatch and an upstream status Walletbeat does not model (e.g.
-	 * Stagnant, Withdrawn, Moved), which still means our recorded status is wrong.
-	 */
+	/** At least one recorded field disagrees with upstream — actionable drift. */
 	DRIFT = 'DRIFT',
 	/**
-	 * The upstream status could not be determined: network error, a 404 in both
-	 * the EIPs and ERCs repositories (e.g. an as-yet-unmerged spec), or a spec
-	 * with no `status:` frontmatter at all. Surfaced as a warning, never fatal.
+	 * The upstream spec could not be read: network error, a 404 in both the EIPs
+	 * and ERCs repositories (e.g. an as-yet-unmerged spec), or a spec with no
+	 * `status:` frontmatter at all. Surfaced as a warning, never fatal.
 	 */
 	UNVERIFIABLE = 'UNVERIFIABLE',
 }
+
+/** A field Walletbeat records about an EIP and checks against upstream. */
+export enum EipMismatchField {
+	STATUS = 'status',
+	PREFIX = 'prefix',
+}
+
+/** Walletbeat's recorded status disagrees with the upstream spec's. */
+export interface EipStatusMismatch {
+	field: EipMismatchField.STATUS
+	/** Status recorded in Walletbeat. */
+	ours: EipStatus
+	/** Mapped upstream status, or null for a status Walletbeat does not model. */
+	upstream: EipStatus | null
+	/** Raw upstream `status:` frontmatter value. */
+	upstreamRaw: string
+}
+
+/**
+ * Walletbeat's recorded prefix disagrees with the upstream spec's `category:`.
+ * Happens when a spec moves between the EIPs and ERCs repositories.
+ */
+export interface EipPrefixMismatch {
+	field: EipMismatchField.PREFIX
+	/** Prefix recorded in Walletbeat. */
+	ours: EipPrefix
+	/** Prefix implied by the upstream spec's `category:` frontmatter. */
+	upstream: EipPrefix
+	/** Raw upstream `category:` frontmatter value. */
+	upstreamRaw: string
+}
+
+/** One way in which Walletbeat's record disagrees with the upstream spec. */
+export type EipMismatch = EipStatusMismatch | EipPrefixMismatch
 
 /** Fields common to every check result, regardless of outcome. */
 export interface EipCheckResultBase {
@@ -40,14 +71,12 @@ export interface EipCheckResultMatch extends EipCheckResultBase {
 	url: string
 }
 
-/** Walletbeat's status disagrees with the upstream spec. */
+/** At least one field Walletbeat records disagrees with the upstream spec. */
 export interface EipCheckResultDrift extends EipCheckResultBase {
 	kind: EipStatusCheckKind.DRIFT
-	/** Mapped upstream status, or null when upstream reports a status Walletbeat does not model. */
-	upstream: EipStatus | null
-	/** Raw upstream `status:` frontmatter value — the source of truth for display. */
-	upstreamRaw: string
-	/** URL the status was read from. */
+	/** Every field found to disagree. Non-empty: a drift result always names what drifted. */
+	mismatches: NonEmptyArray<EipMismatch>
+	/** URL the spec was read from. */
 	url: string
 }
 
@@ -93,9 +122,14 @@ function ercsRepoUrl(number: EipNumber): string {
 }
 
 /**
- * Candidate upstream URLs for an EIP, most-likely repository first. EIPs and
- * ERCs occasionally move between the two repositories, so both are tried
- * regardless of the recorded prefix.
+ * Candidate upstream URLs for an EIP, most-likely repository first. Both are
+ * tried regardless of the recorded prefix, because a spec that has moved
+ * between the EIPs and ERCs repositories will only answer on one of them.
+ *
+ * Falling back to the second repository is not on its own treated as drift: the
+ * repository a spec answers from is a weaker signal than its `category:`
+ * frontmatter, which is what {@link upstreamPrefix} compares the recorded
+ * prefix against.
  */
 export function upstreamUrls(eip: Eip): string[] {
 	return eip.prefix === EipPrefix.ERC
@@ -114,6 +148,44 @@ export function parseUpstreamStatus(markdown: string): string | null {
 	} catch {
 		return null
 	}
+}
+
+/**
+ * Extracts the raw `category:` value from a spec's YAML frontmatter, or null
+ * when the document has no frontmatter or no `category:` field. Meta and
+ * Informational EIPs carry no category.
+ */
+export function parseUpstreamCategory(markdown: string): string | null {
+	try {
+		return parseMarkdownWithFrontmatter<{ category: string }>(markdown, { category: true })
+			.frontmatter.category
+	} catch {
+		return null
+	}
+}
+
+/**
+ * The prefix implied by a spec's upstream `category:`, or null when the spec has
+ * no category and therefore implies nothing. `category: ERC` denotes an ERC;
+ * every other category (Interface, Core, Networking) denotes an EIP. This
+ * mirrors how eips.ethereum.org labels specs, and is authoritative over which
+ * repository the spec happens to answer from.
+ */
+export function upstreamPrefix(rawCategory: string | null): EipPrefix | null {
+	if (rawCategory === null) {
+		return null
+	}
+
+	return rawCategory.trim().toLowerCase() === 'erc' ? EipPrefix.ERC : EipPrefix.EIP
+}
+
+/**
+ * Whether an upstream `status:` marks a tombstone left behind by a spec that
+ * moved to the other repository. The tombstone carries no real status, so the
+ * checker skips it and reads the destination spec instead.
+ */
+function isMovedTombstone(rawStatus: string): boolean {
+	return rawStatus.trim().toLowerCase() === 'moved'
 }
 
 const UPSTREAM_STATUS_MAP = new Map<string, EipStatus>([
@@ -164,12 +236,13 @@ function unverifiable(eip: Eip, url: string | null, note: string): EipCheckResul
 	}
 }
 
-/** Checks a single EIP's Walletbeat status against its upstream spec. */
+/** Checks a single EIP's Walletbeat record against its upstream spec. */
 export async function checkEip(
 	eip: Eip,
 	options: EipStatusCheckOptions = defaultOptions,
 ): Promise<EipStatusCheckResult> {
 	let networkError: string | null = null
+	let tombstoneUrl: string | null = null
 
 	for (const url of upstreamUrls(eip)) {
 		let markdown: string | null
@@ -185,15 +258,16 @@ export async function checkEip(
 			continue // Not found in this repository; try the next candidate.
 		}
 
-		const raw = parseUpstreamStatus(markdown)
+		const rawStatus = parseUpstreamStatus(markdown)
 
-		if (raw === null) {
+		if (rawStatus === null) {
 			return unverifiable(eip, url, 'no `status:` field found in upstream frontmatter')
 		}
 
-		// A status we cannot map (Stagnant, Withdrawn, Moved, …) is still a
-		// verified upstream value that disagrees with ours: report it as drift.
-		const upstream = mapUpstreamStatus(raw)
+		if (isMovedTombstone(rawStatus)) {
+			tombstoneUrl = url
+			continue // Stale pointer; the real spec lives in the other repository.
+		}
 
 		const base: EipCheckResultBase = {
 			number: eip.number,
@@ -202,11 +276,54 @@ export async function checkEip(
 			ours: eip.status,
 		}
 
-		if (upstream === eip.status) {
-			return { ...base, kind: EipStatusCheckKind.MATCH, upstream, upstreamRaw: raw, url }
+		const mismatches: EipMismatch[] = []
+
+		// A status we cannot map (Stagnant, Withdrawn, …) is still a verified
+		// upstream value that disagrees with ours: report it as drift.
+		const upstreamStatus = mapUpstreamStatus(rawStatus)
+
+		if (upstreamStatus !== eip.status) {
+			mismatches.push({
+				field: EipMismatchField.STATUS,
+				ours: eip.status,
+				upstream: upstreamStatus,
+				upstreamRaw: rawStatus,
+			})
 		}
 
-		return { ...base, kind: EipStatusCheckKind.DRIFT, upstream, upstreamRaw: raw, url }
+		// A spec that has moved between the EIPs and ERCs repositories leaves our
+		// recorded prefix stale, which is drift in a field we publish.
+		const rawCategory = parseUpstreamCategory(markdown)
+		const prefix = upstreamPrefix(rawCategory)
+
+		if (prefix !== null && rawCategory !== null && prefix !== eip.prefix) {
+			mismatches.push({
+				field: EipMismatchField.PREFIX,
+				ours: eip.prefix,
+				upstream: prefix,
+				upstreamRaw: rawCategory,
+			})
+		}
+
+		if (!isNonEmptyArray(mismatches)) {
+			return {
+				...base,
+				kind: EipStatusCheckKind.MATCH,
+				upstream: eip.status,
+				upstreamRaw: rawStatus,
+				url,
+			}
+		}
+
+		return { ...base, kind: EipStatusCheckKind.DRIFT, mismatches, url }
+	}
+
+	if (tombstoneUrl !== null) {
+		return unverifiable(
+			eip,
+			tombstoneUrl,
+			'upstream spec is marked `Moved`, but the spec it moved to was not found',
+		)
 	}
 
 	return unverifiable(
@@ -243,13 +360,23 @@ function label(result: EipCheckResultBase): string {
 	return `${result.prefix}-${result.number}`
 }
 
+/** Formats one mismatch as `<field> Walletbeat=<ours> upstream=<theirs>`. */
+function formatMismatch(mismatch: EipMismatch): string {
+	const upstream =
+		mismatch.field === EipMismatchField.STATUS
+			? (mismatch.upstream ?? mismatch.upstreamRaw)
+			: mismatch.upstream
+
+	return `${mismatch.field} Walletbeat=${mismatch.ours} upstream=${upstream}`
+}
+
 /** Formats a human-readable report for terminal output. */
 export function formatReport(report: EipStatusReport, options: { quiet: boolean }): string {
 	const lines: string[] = []
 
 	for (const result of report.drift) {
 		lines.push(
-			`DRIFT  ${label(result)}: Walletbeat=${result.ours} upstream=${result.upstream ?? result.upstreamRaw} (${result.url})`,
+			`DRIFT  ${label(result)}: ${result.mismatches.map(formatMismatch).join('; ')} (${result.url})`,
 		)
 	}
 
@@ -276,6 +403,23 @@ export function formatReport(report: EipStatusReport, options: { quiet: boolean 
 	return `${lines.join('\n')}\n`
 }
 
+/**
+ * A drifted EIP as serialized for automation. `mismatches` is declared
+ * non-empty so that a serializer which filters it down to nothing fails to
+ * compile, rather than emitting an entry that claims drift but names none.
+ */
+interface EipDriftJson {
+	eip: string
+	mismatches: NonEmptyArray<EipMismatch>
+	url: string
+}
+
+/** An unverifiable EIP as serialized for automation. */
+interface EipUnverifiableJson {
+	eip: string
+	note: string
+}
+
 /** Serializes a report to JSON (consumed by automation, e.g. a CI workflow). */
 export function reportToJson(report: EipStatusReport): string {
 	const total = report.matches.length + report.drift.length + report.unverifiable.length
@@ -289,17 +433,19 @@ export function reportToJson(report: EipStatusReport): string {
 				drift: report.drift.length,
 				unverifiable: report.unverifiable.length,
 			},
-			drift: report.drift.map(result => ({
-				eip: label(result),
-				ours: result.ours,
-				upstream: result.upstream,
-				upstreamRaw: result.upstreamRaw,
-				url: result.url,
-			})),
-			unverifiable: report.unverifiable.map(result => ({
-				eip: label(result),
-				note: result.note,
-			})),
+			drift: report.drift.map(
+				(result): EipDriftJson => ({
+					eip: label(result),
+					mismatches: result.mismatches,
+					url: result.url,
+				}),
+			),
+			unverifiable: report.unverifiable.map(
+				(result): EipUnverifiableJson => ({
+					eip: label(result),
+					note: result.note,
+				}),
+			),
 		},
 		null,
 		2,
