@@ -70,6 +70,7 @@
 		&[value='NO_STAGES'],
 		&[value='NOT_APPLICABLE'] {
 			--accent: var(--rating-unrated);
+			--badge-backdropFilter: var(--rating-unrated-backdropFilter);
 		}
 
 		&[value='NO_STAGES'] {

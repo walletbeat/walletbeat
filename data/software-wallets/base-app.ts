@@ -401,6 +401,7 @@ export const baseApp: SoftwareWallet = {
 				}),
 				scamUrlWarning: null,
 				sendTransactionWarning: notSupported,
+				unlimitedApprovalWarning: null,
 			},
 			// Base App is closed-source; no public URL hosts the AndroidManifest.xml
 			// or Info.plist, so the `pnpm collect:manifests` tool cannot fetch them.

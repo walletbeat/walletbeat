@@ -777,18 +777,20 @@ export const ambire: SoftwareWallet = {
 							},
 						],
 					},
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: scamAlertsAndSendTxWarningRefs,
+					addressPoisoningDetection: true,
 					leaksRecipient: true,
 					leaksUserAddress: false,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
@@ -803,11 +805,11 @@ export const ambire: SoftwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						file: 'public/images/references/ambire/transaction_legibility_1.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_1.png',
 						label: 'Transaction legibility screenshot 1',
 					},
 					{
-						file: 'public/images/references/ambire/transaction_legibility_2.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_2.png',
 						label: 'Transaction legibility screenshot 2',
 					},
 				],

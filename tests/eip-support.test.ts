@@ -232,14 +232,14 @@ describe('walletEipSupport', () => {
 		expectSupported(eipSupport['5792'])
 	})
 
-	it('derives EIP-712, ERC-7730 and ERC-8213 from software transaction legibility', () => {
+	it('derives EIP-712, ERC-7730, ERC-4361, and ERC-8213 from software transaction legibility', () => {
 		const eipSupport = walletEipSupport({
 			...unratedFeatures(),
 			security: {
 				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
-					erc4361: null,
+					erc4361: featureSupported,
 					erc8213: supported({
 						calldataDisplay: {
 							[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -274,16 +274,19 @@ describe('walletEipSupport', () => {
 
 		// The wallet displays the decoded EIP-712 struct.
 		expectSupported(eipSupport['712'])
-		// The wallet does not display the calldata digest nor the EIP-712 digest.
-		expectNotSupported(eipSupport['8213'])
+		// The wallet supports ERC-4361.
+		expectSupported(eipSupport['4361'])
 		// The wallet claims ERC-7730 support but was verified not to decode some
 		// of the benchmark transactions.
 		expectNotSupported(eipSupport['7730'])
+		// The wallet does not display the calldata digest nor the EIP-712 digest.
+		expectNotSupported(eipSupport['8213'])
 
 		// All three EIPs inherit the transaction legibility references.
 		expect(refUrls(eipSupport['712'])).toContain('https://example.com/legibility')
-		expect(refUrls(eipSupport['8213'])).toContain('https://example.com/legibility')
+		expect(refUrls(eipSupport['4361'])).toContain('https://example.com/legibility')
 		expect(refUrls(eipSupport['7730'])).toContain('https://example.com/legibility')
+		expect(refUrls(eipSupport['8213'])).toContain('https://example.com/legibility')
 	})
 
 	it('credits ERC-8213 when the domain hash and message hash are shown together', () => {
