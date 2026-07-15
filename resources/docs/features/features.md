@@ -3324,8 +3324,8 @@ type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation |
 
 ### Interface: `BaseTransactionLegibilitySupport`
 
-- `erc4361` (`Support | null`): ERC-4361 (Sign-In with Ethereum) support. Whether the wallet can clearly present Sign-In with Ethereum authentication requests to the user.
-- `erc8213` (`Support | null`): ERC-8123 (Wallet Signature and Calldata Digest Display) Whether the wallet follows the "Wallet Display Requirements" section of ERC-8123.
+- `erc4361` (`WithRef<Support> | null`): ERC-4361 (Sign-In with Ethereum) support. Whether the wallet can clearly present Sign-In with Ethereum authentication requests to the user. The `ref` block should document ERC-4361 support specifically.
+- `erc8213` (`WithRef<Support> | null`): ERC-8123 (Wallet Signature and Calldata Digest Display) Whether the wallet follows the "Wallet Display Requirements" section of ERC-8123. The `ref` block should document ERC-8213 support specifically.
 
 ---
 
@@ -3333,8 +3333,8 @@ type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation |
 
 A record of transaction legibility support (both message and transaction)
 
-- `erc8213` (`Support<HardwareWalletErc8213> | null`)
-- `erc7730` (`Support<HardwareWalletErc7730> | null`)
+- `erc8213` (`WithRef<Support<HardwareWalletErc8213>> | null`)
+- `erc7730` (`WithRef<Support<HardwareWalletErc7730>> | null`)
 - `detailsDisplayed` (`DisplayedBasicTransactionDetails | null`): Does a wallet display transaction details clearly?
 - `dataExtraction` (`DataExtractionMethods | null`): Does a wallet allow for data extraction?
 
@@ -3366,8 +3366,8 @@ ERC-8213 (Transaction Legibility) support for software wallets. Tracks which cal
 
 A record of transaction legibility support (both message and transaction)
 
-- `erc8213` (`Support<SoftwareWalletErc8213> | null`)
-- `erc7730` (`Support<SoftwareWalletErc7730> | null`): ERC-7730 calldata decoding support per complex benchmark transaction.
+- `erc8213` (`WithRef<Support<SoftwareWalletErc8213>> | null`)
+- `erc7730` (`WithRef<Support<SoftwareWalletErc7730>> | null`): ERC-7730 calldata decoding support per complex benchmark transaction. The `ref` block should document ERC-7730 support specifically.
 - `transactionSimulations` (`Support<SoftwareTransactionSimulations> | null`): Per-benchmark simulation data: transaction outcomes for token and complex transactions, plus failure/nondeterminism detection for simulation-specific benchmarks.
 - `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Global basic transaction details display (gas, nonce, from, to, chain, value). Applied across all transaction types.
 
