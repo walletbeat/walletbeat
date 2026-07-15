@@ -69,6 +69,10 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 - Never use `eslint-disable` or `as any` workarounds
 - Add spelling exceptions to `.cspell.json` only for valid terms
 
+### Commit signing
+
+CI requires every commit to be GPG/SSH-signed. The `check:signed-commit` check verifies the HEAD commit has a `gpgsig` field. Ensure your git configuration includes `commit.gpgsign true` with a valid signing key before pushing.
+
 ### CSS rules and system
 
 Read `src/styles/css-attributes.css` to understand how to work with the site's CSS rule system.

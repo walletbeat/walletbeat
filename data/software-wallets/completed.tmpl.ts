@@ -63,6 +63,7 @@ import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
 	SendTransactionWarning,
+	UnlimitedApprovalWarning,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
@@ -341,10 +342,6 @@ export const completedTemplate: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -649,17 +646,25 @@ export const completedTemplate: SoftwareWallet = {
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: refTodo,
+					addressPoisoningDetection: true,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: true,
 					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: supported<UnlimitedApprovalWarning>({
+					ref: refTodo,
+					leaksSpenderAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					warnsOnUnlimitedApproval: true,
 				}),
 			},
 			securityBestPractices: {
@@ -680,6 +685,7 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: featureSupported,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -848,6 +854,10 @@ export const completedTemplate: SoftwareWallet = {
 				reproducibleBuilds: supported({ ref: refTodo }),
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.BROWSER]: true,

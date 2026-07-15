@@ -229,10 +229,6 @@ export const metamask: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
@@ -503,8 +499,8 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/eth-phishing-detect',
 						},
 					],
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported({
@@ -515,12 +511,14 @@ export const metamask: SoftwareWallet = {
 							url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
@@ -538,7 +536,14 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation: 'MetaMask does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/metamask/screenshots/2026-07-13-metamask-erc4361-siwe.png',
+						label: 'MetaMask sign-in dialog for an ERC-4361 signature request',
+					},
+				],
+				erc4361: notSupported,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -679,6 +684,10 @@ export const metamask: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	overrides: {
 		attributes: {

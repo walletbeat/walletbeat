@@ -782,6 +782,7 @@ summary {
 	--badge-backgroundColor: color-mix(in srgb, var(--accent) 33%, transparent);
 	--badge-borderColor: color-mix(in srgb, var(--accent) 40%, transparent);
 	--badge-textColor: currentColor;
+	--badge-backdropFilter: none;
 
 	display: inline-flex;
 	gap: 0.15em;
@@ -791,6 +792,7 @@ summary {
 	border-radius: 0.375em;
 	background-color: var(--badge-backgroundColor);
 	border: 1px solid var(--badge-borderColor);
+	backdrop-filter: var(--badge-backdropFilter);
 
 	color: var(--badge-textColor);
 	font-weight: 600;
@@ -1236,7 +1238,7 @@ ol {
 	--sticky-sizeInline: var(--sticky0-sizeInline);
 
 	@scope (&) to ([data-scroll-container] > *) {
-		& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
+		:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 			--sticky-level: 1;
 
 			--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1260,7 +1262,7 @@ ol {
 			--sticky-sizeBlock: var(--sticky1-sizeBlock);
 			--sticky-sizeInline: var(--sticky1-sizeInline);
 
-			& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
+			:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 				--sticky-level: 2;
 
 				--sticky2-insetBlockStart: calc(var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1284,7 +1286,7 @@ ol {
 				--sticky-sizeBlock: var(--sticky2-sizeBlock);
 				--sticky-sizeInline: var(--sticky2-sizeInline);
 
-				& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
+				:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 					--sticky-level: 3;
 
 					--sticky3-insetBlockStart: calc(var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1308,7 +1310,7 @@ ol {
 					--sticky-sizeBlock: var(--sticky3-sizeBlock);
 					--sticky-sizeInline: var(--sticky3-sizeInline);
 
-					& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
+					:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 						--sticky-level: 4;
 
 						--sticky4-insetBlockStart: calc(var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) + var(--sticky-marginBlockStart));
@@ -1332,7 +1334,7 @@ ol {
 						--sticky-sizeBlock: var(--sticky4-sizeBlock);
 						--sticky-sizeInline: var(--sticky4-sizeInline);
 
-						& [data-sticky-container]:not(& [data-sticky-container] [data-sticky-container]) {
+						:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 							--sticky-level: 5;
 
 							--sticky5-insetBlockStart: calc(var(--sticky4-insetBlockStart) + var(--sticky4-paddingBlockStart) + var(--sticky-marginBlockStart));

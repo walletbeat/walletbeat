@@ -111,13 +111,6 @@ export const safe: SoftwareWallet = {
 				'2700': null,
 				'6963': null,
 			},
-			walletCall: supported({
-				ref: {
-					explanation: 'Safe supports EIP-5792 for transaction batching.',
-					url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/f918ceb9b561dd3a27af96903071cd56c1fb5ddd/apps/web/src/services/safe-wallet-provider/index.ts#L184',
-				},
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -254,22 +247,25 @@ export const safe: SoftwareWallet = {
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksIp: true,
 					leaksUserAddress: true,
+					leaksUserIp: true,
 					leaksVisitedUrl: 'FULL_URL',
 				}),
 				sendTransactionWarning: supported({
 					ref: refTodo,
+					addressPoisoningDetection: false,
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					newRecipientWarning: true, //blockaid
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {
@@ -343,6 +339,13 @@ export const safe: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: {
+				explanation: 'Safe supports EIP-5792 for transaction batching.',
+				url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/f918ceb9b561dd3a27af96903071cd56c1fb5ddd/apps/web/src/services/safe-wallet-provider/index.ts#L184',
+			},
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,

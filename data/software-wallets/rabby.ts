@@ -203,9 +203,6 @@ export const rabby: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupportedWithRef({
-				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
-			}),
 		},
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
@@ -711,8 +708,8 @@ export const rabby: SoftwareWallet = {
 							url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 						},
 					],
-					leaksIp: true,
 					leaksUserAddress: true,
+					leaksUserIp: true,
 					leaksVisitedUrl: 'DOMAIN_ONLY',
 				}),
 				sendTransactionWarning: supported({
@@ -726,16 +723,25 @@ export const rabby: SoftwareWallet = {
 							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/send.ts#L113-L132',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: false,
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation: 'Rabby does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/rabby/screenshots/2026-07-13-rabby-erc4361-siwe.png',
+						label: 'Rabby sign-in dialog for an ERC-4361 signature request',
+					},
+				],
+				erc4361: notSupported,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -895,6 +901,9 @@ export const rabby: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupportedWithRef({
+			ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,

@@ -229,6 +229,11 @@
 			color: var(--text-secondary);
 		}
 
+		&[data-status='REVIEW'] {
+			background: color-mix(in srgb, #a78bfa 15%, transparent);
+			color: #a78bfa;
+		}
+
 		&[data-status='LIVING'] {
 			background: color-mix(in srgb, #38bdf8 15%, transparent);
 			color: #38bdf8;

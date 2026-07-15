@@ -187,6 +187,7 @@ export const trezorWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_IN_UI,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
+				erc4361: null,
 				erc7730: notSupported,
 				erc8213: null,
 			},

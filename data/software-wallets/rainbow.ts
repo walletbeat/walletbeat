@@ -367,7 +367,6 @@ export const rainbow: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -403,16 +402,21 @@ export const rainbow: SoftwareWallet = {
 						'Rainbow token has ~180 million tokens circulating of 1 billion total supply (~18% float) as of April 2026.',
 					url: 'https://www.coingecko.com/en/coins/rainbow-3',
 				},
+				{
+					explanation:
+						'Rainbow sold RNBW tokens to the public on CoinList (11-18 December 2025): 30 million tokens (3% of supply) at $0.10, followed by an open Uniswap continuous auction at the 5 February 2026 TGE.',
+					url: 'https://coinlist.co/rainbow',
+				},
 			],
 			revenueBreakdownIsPublic: true,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
+				donations: false, // Rainbow's public investor page enumerates its funding sources; it does not solicit user donations
+				ecosystemGrants: false, // Rainbow's public investor page enumerates its funding sources; no ecosystem/foundation grants are listed
 				governanceTokenLowFloat: true, // ~180M circulating of 1B total supply (~18% float) per CoinGecko as of 2026 04 24
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: true, // Questionnaire: fees on perpetual futures and prediction markets are not explicitly displayed
-				publicOffering: null,
-				selfFunded: null,
+				publicOffering: true, // Public RNBW sale on CoinList (Dec 2025, 3% of supply at $0.10) plus a public Uniswap continuous auction at the Feb 2026 TGE
+				selfFunded: false, // VC-backed ($19.5M across seed + Series A) and token-funded, not developer self-funded
 				transparentConvenienceFees: true, // Questionnaire: swap review sheet shows fees
 				ventureCapital: true, // $18M Series A led by Seven Seven Six, $1.5M seed including Y Combinator
 			},
@@ -757,6 +761,7 @@ export const rainbow: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: supported({
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
@@ -1064,6 +1069,7 @@ export const rainbow: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

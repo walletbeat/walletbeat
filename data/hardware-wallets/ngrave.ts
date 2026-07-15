@@ -165,6 +165,7 @@ export const ngrave: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				erc4361: null,
 				erc7730: notSupported,
 				erc8213: null,
 			},

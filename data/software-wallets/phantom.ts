@@ -82,7 +82,6 @@ export const phantom: SoftwareWallet = {
 				'2700': null,
 				'6963': null,
 			},
-			walletCall: null,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -146,6 +145,7 @@ export const phantom: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: null,
 				transactionDetailsDisplay: {
@@ -187,6 +187,7 @@ export const phantom: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

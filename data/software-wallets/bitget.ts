@@ -114,7 +114,6 @@ export const bitget: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -204,10 +203,12 @@ export const bitget: SoftwareWallet = {
 				contractTransactionWarning: notSupported,
 				scamUrlWarning: notSupported,
 				sendTransactionWarning: notSupported,
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: supported({
 					calldataDisplay: {
@@ -244,6 +245,7 @@ export const bitget: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,
