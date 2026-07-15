@@ -187,10 +187,6 @@ export const cypherockWallet: HardwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						explanation: "Independent video demonstration of Cypherock's signing implementation.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=534',
-					},
-					{
 						explanation:
 							"Independent video demonstration of Cypherock's transaction implementation.",
 						url: 'https://youtube.com/shorts/YG6lzwTUojE',
@@ -211,7 +207,13 @@ export const cypherockWallet: HardwareWallet = {
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: {
+					...notSupported,
+					ref: {
+						explanation: "Independent video demonstration of Cypherock's signing implementation.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=534',
+					},
+				},
 				erc8213: null,
 			},
 			userSafety: null,

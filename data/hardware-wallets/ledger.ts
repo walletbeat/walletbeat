@@ -184,13 +184,7 @@ export const ledgerWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation:
-							"Independent video demonstration of Ledger's signing implementation on a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
-					},
-				],
+				ref: refTodo,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -198,7 +192,14 @@ export const ledgerWallet: HardwareWallet = {
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: {
+					...notSupported,
+					ref: {
+						explanation:
+							"Independent video demonstration of Ledger's signing implementation on a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
+					},
+				},
 				erc8213: null,
 			},
 			userSafety: null,

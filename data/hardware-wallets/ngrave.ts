@@ -150,12 +150,7 @@ export const ngrave: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation: 'Independent video demonstration of NGRAVE Zero signing issues',
-						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
-					},
-				],
+				ref: refTodo,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: {
 					chain: DataDisplayOptions.NOT_IN_UI,
@@ -166,7 +161,13 @@ export const ngrave: HardwareWallet = {
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: {
+					...notSupported,
+					ref: {
+						explanation: 'Independent video demonstration of NGRAVE Zero signing issues',
+						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
+					},
+				},
 				erc8213: null,
 			},
 			userSafety: null,

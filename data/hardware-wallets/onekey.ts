@@ -181,11 +181,6 @@ export const onekeyWallet: HardwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						explanation:
-							"Independent video demonstration of OneKey Pro's signing implementation with a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
-					},
-					{
 						explanation: "Independent video showing OneKey Pro's transaction details",
 						url: 'https://youtube.com/shorts/J_XG7cNOVhM',
 					},
@@ -201,7 +196,14 @@ export const onekeyWallet: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: {
+					...notSupported,
+					ref: {
+						explanation:
+							"Independent video demonstration of OneKey Pro's signing implementation with a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
+					},
+				},
 				erc8213: null,
 			},
 			userSafety: null,

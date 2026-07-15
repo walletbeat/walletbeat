@@ -83,7 +83,7 @@ export const fireflyWallet: HardwareWallet = {
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: null,
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: { ...notSupported, ref: refTodo },
 				erc8213: null,
 			},
 			userSafety: null,

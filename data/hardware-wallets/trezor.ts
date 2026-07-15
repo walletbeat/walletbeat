@@ -168,11 +168,6 @@ export const trezorWallet: HardwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						explanation:
-							"Independent video demonstration of Trezor's signing implementation on Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
-					},
-					{
 						explanation: 'Independent video showing transaction details on Trezor Safe 5',
 						url: 'https://youtube.com/shorts/4LayLrSuHNg',
 					},
@@ -188,7 +183,14 @@ export const trezorWallet: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: {
+					...notSupported,
+					ref: {
+						explanation:
+							"Independent video demonstration of Trezor's signing implementation on Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
+					},
+				},
 				erc8213: null,
 			},
 			userSafety: null,

@@ -534,15 +534,17 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: [
-					{
+				ref: refTodo,
+				erc4361: {
+					...notSupported,
+					ref: {
 						explanation: 'MetaMask does not format SIWE requests for easy readability.',
 						file: 'public/references/wallets/metamask/screenshots/2026-07-13-metamask-erc4361-siwe.png',
 						label: 'MetaMask sign-in dialog for an ERC-4361 signature request',
 					},
-				],
-				erc4361: notSupported,
+				},
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
@@ -561,6 +563,7 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
