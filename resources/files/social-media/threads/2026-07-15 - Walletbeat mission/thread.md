@@ -19,7 +19,7 @@ The challenge has never been about defining these values. The challenge has alwa
 
 You can't improve what nobody measures.
 
-Walletbeat brings Ethereums values into something wallets can actually compete on.
+Walletbeat brings Ethereum's values into something wallets can actually compete on.
 
 We make these values visible, measurable, and actionable.
 
@@ -27,7 +27,7 @@ We make these values visible, measurable, and actionable.
 
 We've already seen wallet teams respond. @Ambire @Metamask. Through discussions, we've seen them push changes towards improving.
 
-Because when expectations become visible, wallets responds.
+Because when expectations become visible, wallets respond.
 
 Quoting: https://x.com/walletbeat/status/2017683283664879872
 
