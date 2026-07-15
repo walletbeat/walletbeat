@@ -21,12 +21,13 @@ const appConfig: TreasuryMarkdownUpdaterConfig = {
 	addressesPath: path.join(GOVERNANCE_TREASURY_DIR, 'addresses.tsv'),
 	operationsPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-operations.tsv'),
 	outputPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-transparency.md'),
+	priceDataPath: path.join(GOVERNANCE_TREASURY_DIR, 'price-data.tsv'),
 	quiet: args.includes('--quiet'),
 	test: args.includes('--test'),
 }
 
 try {
-	treasuryMarkdownUpdate(appConfig)
+	await treasuryMarkdownUpdate(appConfig)
 } catch (error) {
 	process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 	process.exit(1)
