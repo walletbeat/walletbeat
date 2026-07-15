@@ -31,11 +31,16 @@ existing="$(gh issue list --label "$LABEL" --state open --json number --jq '.[0]
 if [[ "$drift" -gt 0 ]]; then
 	body="$(mktemp)"
 	{
-		echo 'The scheduled `EIP status drift` workflow found tracked EIP statuses that differ from their upstream specs.'
+		echo 'The scheduled `EIP status drift` workflow found tracked EIPs whose recorded fields differ from their upstream specs.'
 		echo
-		echo '| EIP | Walletbeat | Upstream | Spec |'
-		echo '| --- | --- | --- | --- |'
-		jq -r '.drift[] | "| \(.eip) | `\(.ours)` | `\(.upstream // .upstreamRaw)` | \(.url) |"' <<<"$report"
+		echo '| EIP | Field | Walletbeat | Upstream | Spec |'
+		echo '| --- | --- | --- | --- | --- |'
+		# One row per mismatch: an EIP can drift on both its status and its prefix.
+		# `.upstream` is null for an upstream status Walletbeat does not model
+		# (Stagnant, Withdrawn, …), so fall back to the raw frontmatter value.
+		jq -r '.drift[] as $d | $d.mismatches[]
+			| "| \($d.eip) | \(.field) | `\(.ours)` | `\(.upstream // .upstreamRaw)` | \($d.url) |"' \
+			<<<"$report"
 
 		if [[ "$unverifiable" -gt 0 ]]; then
 			echo
@@ -47,7 +52,7 @@ if [[ "$drift" -gt 0 ]]; then
 		fi
 
 		echo
-		echo "_Last checked: ${checked_at}. Update the \`status\` field in \`data/eips/\` to match upstream (or the upstream spec if Walletbeat is ahead)._"
+		echo "_Last checked: ${checked_at}. Update the drifted field in \`data/eips/\` to match upstream (or the upstream spec if Walletbeat is ahead)._"
 	} >"$body"
 
 	if [[ -n "$existing" ]]; then
