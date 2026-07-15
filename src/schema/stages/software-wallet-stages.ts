@@ -1,5 +1,6 @@
 import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 import { sentence } from '@/types/content'
+import { daysSince } from '@/types/date'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
 import { accountAbstraction } from '../attributes/ecosystem/account-abstraction'
@@ -185,11 +186,34 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBugBounties, {
-						allowPartial: false,
-						ifUnverifiable: 'THROW',
-						ifNoVariantInScope: null,
-					}),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (variantWallet.features.security.publicSecurityAudits === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							const auditedInLastYear = variantWallet.features.security.publicSecurityAudits.some(
+								audit => daysSince(audit.auditDate) <= 366,
+							)
+
+							if (!auditedInLastYear) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} has not undergone a security audit within the last year.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} has undergone a security audit within the last year.',
+								),
+							}
+						},
+					),
 					displayName: 'Security Audits',
 				},
 				{
@@ -546,13 +570,17 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBugBounties, {
-						allowPartial: false,
-						ifUnverifiable: sentence(
-							"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
-						),
-						ifNoVariantInScope: null,
-					}),
+					evaluate: variantsMustPassAttribute(
+						softwareWalletVariants,
+						securityAuditsAndBugBounties,
+						{
+							allowPartial: false,
+							ifUnverifiable: sentence(
+								"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
+							),
+							ifNoVariantInScope: null,
+						},
+					),
 					displayName: 'Bug Bounty Program',
 				},
 				{
