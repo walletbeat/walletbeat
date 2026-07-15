@@ -511,9 +511,10 @@ export const metamask: SoftwareWallet = {
 							url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
 						},
 						{
-							explanation: 'Metamask provides address poisoning alerts live on Metamask and Extension across all networks',
-							url: 'https://x.com/MetaMask/status/2067299428680265791'
-						}
+							explanation:
+								'Metamask provides address poisoning alerts live on Metamask and Extension across all networks',
+							url: 'https://x.com/MetaMask/status/2067299428680265791',
+						},
 					],
 					addressPoisoningDetection: true,
 					leaksRecipient: true,
