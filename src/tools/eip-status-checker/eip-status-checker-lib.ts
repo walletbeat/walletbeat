@@ -36,7 +36,8 @@ export interface EipStatusMismatch {
 
 /**
  * Walletbeat's recorded prefix disagrees with the upstream spec's `category:`.
- * Happens when a spec moves between the EIPs and ERCs repositories.
+ * Happens when a spec moves between the EIPs and ERCs repositories, or its
+ * upstream `category:` changes.
  */
 export interface EipPrefixMismatch {
 	field: EipMismatchField.PREFIX
@@ -44,8 +45,11 @@ export interface EipPrefixMismatch {
 	ours: EipPrefix
 	/** Prefix implied by the upstream spec's `category:` frontmatter. */
 	upstream: EipPrefix
-	/** Raw upstream `category:` frontmatter value. */
-	upstreamRaw: string
+	/**
+	 * Raw upstream `category:` frontmatter value, or null when the spec carries no
+	 * category — which is itself what makes it an EIP rather than an ERC.
+	 */
+	upstreamRaw: string | null
 }
 
 /** One way in which Walletbeat's record disagrees with the upstream spec. */
@@ -165,18 +169,22 @@ export function parseUpstreamCategory(markdown: string): string | null {
 }
 
 /**
- * The prefix implied by a spec's upstream `category:`, or null when the spec has
- * no category and therefore implies nothing. `category: ERC` denotes an ERC;
- * every other category (Interface, Core, Networking) denotes an EIP. This
- * mirrors how eips.ethereum.org labels specs, and is authoritative over which
- * repository the spec happens to answer from.
+ * The prefix a spec's upstream `category:` implies, per EIP-1: "When referring
+ * to an EIP with a `category` of `ERC`, it must be written in the hyphenated
+ * form `ERC-X` [...]. When referring to EIPs with any other `category`, it must
+ * be written in the hyphenated form `EIP-X`."
+ *
+ * `category` is optional upstream — only Standards Track specs carry one — so a
+ * missing category is not an unknown. It means the spec is Meta or
+ * Informational, and therefore an EIP. Callers must only pass a category read
+ * from a spec whose `status:` already parsed, which establishes that the
+ * frontmatter is well-formed and so that a null here means "no category field"
+ * rather than "could not be read".
+ *
+ * This is authoritative over which repository the spec happens to answer from.
  */
-export function upstreamPrefix(rawCategory: string | null): EipPrefix | null {
-	if (rawCategory === null) {
-		return null
-	}
-
-	return rawCategory.trim().toLowerCase() === 'erc' ? EipPrefix.ERC : EipPrefix.EIP
+export function upstreamPrefix(rawCategory: string | null): EipPrefix {
+	return rawCategory?.trim().toLowerCase() === 'erc' ? EipPrefix.ERC : EipPrefix.EIP
 }
 
 /**
@@ -291,12 +299,13 @@ export async function checkEip(
 			})
 		}
 
-		// A spec that has moved between the EIPs and ERCs repositories leaves our
-		// recorded prefix stale, which is drift in a field we publish.
+		// A spec that has moved between the EIPs and ERCs repositories, or whose
+		// upstream `category:` changed, leaves our recorded prefix stale. That is
+		// drift in a field we publish.
 		const rawCategory = parseUpstreamCategory(markdown)
 		const prefix = upstreamPrefix(rawCategory)
 
-		if (prefix !== null && rawCategory !== null && prefix !== eip.prefix) {
+		if (prefix !== eip.prefix) {
 			mismatches.push({
 				field: EipMismatchField.PREFIX,
 				ours: eip.prefix,
