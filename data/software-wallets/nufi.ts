@@ -186,6 +186,7 @@ export const nufi: SoftwareWallet = {
 				// 	to: DataDisplayOptions.SHOWN_OPTIONALLY,
 				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// },
+				erc4361: null,
 				erc7730: null,
 				erc8213: null,
 				transactionDetailsDisplay: null,
