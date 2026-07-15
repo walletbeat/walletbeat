@@ -1,6 +1,53 @@
 import * as fs from 'fs'
 
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+import { Enum } from '@/utils/enum'
+
 import { fetchPrices, normalizeAsset, type PriceDataRow, priceKey } from './crypto-prices-lib'
+
+// --- Treasury Category Enum ---
+
+/** Categories used to classify treasury transactions. */
+export enum TreasuryCategory {
+	'expense:swag' = 'expense:swag',
+	'expense:travel' = 'expense:travel',
+	'expense:wallet' = 'expense:wallet',
+	grant = 'grant',
+	'hosting-infra' = 'hosting-infra',
+	'ignored:multi_tx_swap' = 'ignored:multi_tx_swap',
+	'ignored:reverted' = 'ignored:reverted',
+	'labor:branding' = 'labor:branding',
+	'labor:comms' = 'labor:comms',
+	'labor:data_entry' = 'labor:data_entry',
+	'labor:dev' = 'labor:dev',
+	multi_step_swap = 'multi_step_swap',
+	operational = 'operational',
+	'services:email' = 'services:email',
+	'services:social_media' = 'services:social_media',
+	swap = 'swap',
+	test = 'test',
+}
+
+/** Enum for `TreasuryCategory`. */
+export const treasuryCategory = new Enum<TreasuryCategory>({
+	[TreasuryCategory['expense:swag']]: true,
+	[TreasuryCategory['expense:travel']]: true,
+	[TreasuryCategory['expense:wallet']]: true,
+	[TreasuryCategory.grant]: true,
+	[TreasuryCategory['hosting-infra']]: true,
+	[TreasuryCategory['ignored:multi_tx_swap']]: true,
+	[TreasuryCategory['ignored:reverted']]: true,
+	[TreasuryCategory['labor:branding']]: true,
+	[TreasuryCategory['labor:comms']]: true,
+	[TreasuryCategory['labor:data_entry']]: true,
+	[TreasuryCategory['labor:dev']]: true,
+	[TreasuryCategory.multi_step_swap]: true,
+	[TreasuryCategory.operational]: true,
+	[TreasuryCategory['services:email']]: true,
+	[TreasuryCategory['services:social_media']]: true,
+	[TreasuryCategory.swap]: true,
+	[TreasuryCategory.test]: true,
+})
 
 // --- Interfaces ---
 
@@ -163,6 +210,63 @@ function generateAddressesTable(rows: AddressRow[]): string {
 	return generateAlignedTable(headers, formattedRows)
 }
 
+/** Returns a human-readable label for a treasury category. */
+export function categoryLabel(category: TreasuryCategory): string {
+	switch (category) {
+		case TreasuryCategory['expense:swag']:
+			return 'Merch'
+		case TreasuryCategory['expense:travel']:
+			return 'Travel'
+		case TreasuryCategory['expense:wallet']:
+			return 'Wallet'
+		case TreasuryCategory.grant:
+			return 'Grant'
+		case TreasuryCategory['hosting-infra']:
+			return 'Hosting'
+		case TreasuryCategory['ignored:multi_tx_swap']:
+			return 'Swap'
+		case TreasuryCategory['ignored:reverted']:
+			return '(reverted)'
+		case TreasuryCategory['labor:branding']:
+			return 'Branding'
+		case TreasuryCategory['labor:comms']:
+			return 'Comms'
+		case TreasuryCategory['labor:data_entry']:
+			return 'Data entry'
+		case TreasuryCategory['labor:dev']:
+			return 'Dev'
+		case TreasuryCategory.multi_step_swap:
+			return 'Swap'
+		case TreasuryCategory.operational:
+			return 'Ops'
+		case TreasuryCategory['services:email']:
+			return 'Email'
+		case TreasuryCategory['services:social_media']:
+			return 'Social media'
+		case TreasuryCategory.swap:
+			return 'Swap'
+		case TreasuryCategory.test:
+			return 'Test'
+	}
+}
+
+/** Formats a parsed amount for display in the markdown table. */
+function formatAmountForTable(parsed: ParsedAmount): string {
+	switch (parsed.type) {
+		case 'zero':
+			return '(zero)'
+		case 'swap':
+			return `${parsed.input.value} ${parsed.input.asset} → ${parsed.output.value} ${parsed.output.asset}`
+		case 'expense': {
+			const parts = parsed.assets.map(
+				asset => `${asset.value} ${asset.asset} [${categoryLabel(asset.category)}]`,
+			)
+
+			return parts.join(' + ')
+		}
+	}
+}
+
 /**
  * Generates the Operations Markdown Table
  */
@@ -187,11 +291,14 @@ function generateOperationsTable(operations: OperationRow[], addresses: AddressR
 			return escapeMd(operation.ID)
 		})()
 
+		const parsedAmount = parseAmounts(operation.Amount)
+		const formattedAmount = formatAmountForTable(parsedAmount)
+
 		return [
 			escapeMd(operation.Date),
 			`${markdownAddressLink(getAddressRowByName(operation.From, addresses), operation.From, true)}`,
 			`${markdownAddressLink(getAddressRowByName(operation.To, addresses), operation.To, true)}`,
-			`\`${escapeMd(operation.Amount)}\``,
+			`\`${escapeMd(formattedAmount)}\``,
 			escapeMd(operation.Purpose),
 			txLink,
 		]
@@ -202,48 +309,132 @@ function generateOperationsTable(operations: OperationRow[], addresses: AddressR
 
 // --- Price Data ---
 
-/** A parsed monetary amount: a numeric value and its asset symbol. */
+/** A parsed monetary amount: a numeric value, its asset symbol, and a required category. */
 interface AssetAmount {
 	value: number
 	asset: string
+	category: TreasuryCategory
 }
+
+/** A parsed swap: input and output asset amounts, both categorized as "swap". */
+interface ParsedSwap {
+	type: 'swap'
+	category: 'swap'
+	input: AssetAmount
+	output: AssetAmount
+}
+
+/** A parsed expense: one or more asset amounts, each with a required category. */
+interface ParsedExpense {
+	type: 'expense'
+	assets: NonEmptyArray<AssetAmount>
+}
+
+/** A parsed zero amount: the cell contains a bare "0" with no asset or category. */
+interface ParsedZeroAmount {
+	type: 'zero'
+}
+
+/** Union of all parsed amount types. */
+export type ParsedAmount = ParsedSwap | ParsedExpense | ParsedZeroAmount
 
 /**
  * Parse the contents of an "Amount" cell into one or more asset amounts.
  *
  * Supported formats:
- *   - Simple:  "0.05 ETH", "1,360.95 USDC"
- *   - Swap:    "0.05 ETH → 0.00157093 BTC"
+ *   - Zero:            "0"
+ *   - Simple expense:  "0.05 ETH [dev]" or "0.05 ETH"
+ *   - Multi expense:   "0.05 ETH [dev] + 100 USDC [comms]"
+ *   - Swap:            "0.05 ETH → 0.00157093 BTC"
  *
+ * Categories must match kebab-case identifiers (letters, digits, hyphens).
  * Throws when no amounts can be parsed or the format is unrecognized.
  */
-export function parseAmounts(cellContents: string): [AssetAmount, ...AssetAmount[]] {
-	const amountRe = /^([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)$/
-	const swapRe =
-		/^([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)\s+→\s+([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)$/
-
+export function parseAmounts(cellContents: string): ParsedAmount {
 	const trimmed = cellContents.trim()
 
-	// Try swap first (more specific)
-	const swapMatch = trimmed.match(swapRe)
+	// Zero amount: bare "0" with no unit, category, or arrow
+	if (trimmed === '0') {
+		return { type: 'zero' }
+	}
 
-	if (swapMatch) {
-		const parsed: [AssetAmount, AssetAmount] = [
-			{ value: parseFloat(swapMatch[1].replace(/,/g, '')), asset: swapMatch[2] },
-			{ value: parseFloat(swapMatch[3].replace(/,/g, '')), asset: swapMatch[4] },
+	// Try swap format first (contains →)
+	if (trimmed.includes(' → ')) {
+		const parts = trimmed.split(' → ')
+
+		if (parts.length !== 2) {
+			throw new Error(`Invalid swap format (expected exactly one →): "${cellContents}"`)
+		}
+
+		// Swaps must NOT contain categories
+		if (parts[0].includes('[') || parts[1].includes('[')) {
+			throw new Error(`Swap amounts must not contain categories: "${cellContents}"`)
+		}
+
+		const input = parseSimpleAmount(parts[0].trim(), TreasuryCategory.swap)
+		const output = parseSimpleAmount(parts[1].trim(), TreasuryCategory.swap)
+
+		return { type: 'swap', category: TreasuryCategory.swap, input, output }
+	}
+
+	// Try multi-expense format (contains " + ")
+	if (trimmed.includes(' + ')) {
+		const parts = trimmed.split(' + ')
+		const assets: [AssetAmount, ...AssetAmount[]] = [
+			parseSimpleAmountWithCategory(parts[0].trim()),
+			...parts.slice(1).map(part => parseSimpleAmountWithCategory(part.trim())),
 		]
 
-		return parsed
+		return { type: 'expense', assets }
 	}
 
-	// Try simple amount
-	const simpleMatch = trimmed.match(amountRe)
+	// Simple amount (with optional category)
+	const asset = parseSimpleAmountWithCategory(trimmed)
 
-	if (simpleMatch) {
-		return [{ value: parseFloat(simpleMatch[1].replace(/,/g, '')), asset: simpleMatch[2] }]
+	return { type: 'expense', assets: [asset] }
+}
+
+/**
+ * Parse a simple amount string like "0.05 ETH" (no category, no →, no +).
+ * The category is provided externally since the format doesn't include one.
+ * Throws if the format is invalid or the category is not a valid enum value.
+ */
+function parseSimpleAmount(text: string, category: TreasuryCategory): AssetAmount {
+	const trimmed = text.trim()
+	const match = trimmed.match(/^([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)$/)
+
+	if (!match) {
+		throw new Error(`Cannot parse amount: "${text}"`)
 	}
 
-	throw new Error(`Cannot parse amount from: "${cellContents}"`)
+	treasuryCategory.assert(category)
+
+	return {
+		value: parseFloat(match[1].replace(/,/g, '')),
+		asset: match[2],
+		category,
+	}
+}
+
+/**
+ * Parse a simple amount string with a required category like "0.05 ETH [dev]".
+ * Throws if the format is invalid or the category is not a valid enum value.
+ */
+function parseSimpleAmountWithCategory(text: string): AssetAmount {
+	const trimmed = text.trim()
+	const match = trimmed.match(/^([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)\s+\[([a-z][a-z0-9_:~-]*)\]$/)
+
+	if (!match) {
+		throw new Error(`Cannot parse amount with category: "${text}"`)
+	}
+
+	const category = treasuryCategory.assert(match[3])
+
+	return {
+		value: parseFloat(match[1].replace(/,/g, '')),
+		asset: match[2],
+		category,
+	}
 }
 
 /**
@@ -254,10 +445,18 @@ function extractAssetPairs(operations: OperationRow[]): Map<string, Set<string>>
 	const pairs = new Map<string, Set<string>>()
 
 	for (const op of operations) {
-		const amounts = parseAmounts(op.Amount)
+		const parsed = parseAmounts(op.Amount)
+
+		// Zero amounts contribute no assets
+		if (parsed.type === 'zero') {
+			continue
+		}
+
 		const assets = new Set<string>()
 
-		for (const { asset } of amounts) {
+		const amountEntries = parsed.type === 'swap' ? [parsed.input, parsed.output] : parsed.assets
+
+		for (const { asset } of amountEntries) {
 			assets.add(normalizeAsset(asset))
 		}
 
@@ -426,8 +625,6 @@ async function populatePriceData(
 	}
 
 	if (missing.length === 0 && extra.length === 0) {
-		logger.info('Price data is already up to date.')
-
 		return
 	}
 
