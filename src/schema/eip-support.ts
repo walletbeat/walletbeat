@@ -148,10 +148,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 			return 'UNKNOWN'
 		}
 
-		return eipSupport(
-			isSupported(transactionLegibility.erc4361),
-			transactionLegibility.erc4361.ref,
-		)
+		return eipSupport(isSupported(transactionLegibility.erc4361), transactionLegibility.erc4361.ref)
 	},
 	// A wallet supports ERC-4337 if it supports raw ERC-4337 accounts, or if
 	// its EIP-7702 delegate contract is itself an ERC-4337 account (i.e. it

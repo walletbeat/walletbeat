@@ -34,8 +34,8 @@ import {
 	type SoftwareTransactionLegibilityImplementation,
 	type SoftwareTransactionSimulations,
 	type SoftwareWalletErc8213,
-	TransactionOutcome,
 	transactionLegibilityErcRefs,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
 import {
 	featureSupportedNoRef,
