@@ -2,7 +2,7 @@ Talking about wallets alone does not improve wallets
 
 So how does Walletbeat actually push the ecosystem to get better?
 
-[Cover image]
+![Cover](./cover.png)
 
 ---
 
