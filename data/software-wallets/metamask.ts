@@ -511,7 +511,7 @@ export const metamask: SoftwareWallet = {
 							url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
 						},
 					],
-					addressPoisoningDetection: false,
+					addressPoisoningDetection: true,
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
