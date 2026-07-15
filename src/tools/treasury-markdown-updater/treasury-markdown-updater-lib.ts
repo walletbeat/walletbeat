@@ -1,4 +1,6 @@
 import * as fs from 'fs'
+import * as path from 'path'
+import { loadConfig, optimize } from 'svgo'
 
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
@@ -53,6 +55,7 @@ export const treasuryCategory = new Enum<TreasuryCategory>({
 
 export interface TreasuryMarkdownUpdaterConfig {
 	addressesPath: string
+	chartOutputPath: string
 	operationsPath: string
 	outputPath: string
 	priceDataPath: string
@@ -247,6 +250,46 @@ export function categoryLabel(category: TreasuryCategory): string {
 			return 'Swap'
 		case TreasuryCategory.test:
 			return 'Test'
+	}
+}
+
+/** Determines if a category should appear in the expense breakdown chart. */
+export function includeInExpenseBreakdown(category: TreasuryCategory): boolean {
+	switch (category) {
+		case TreasuryCategory['expense:swag']:
+			return true
+		case TreasuryCategory['expense:travel']:
+			return true
+		case TreasuryCategory['expense:wallet']:
+			return true
+		case TreasuryCategory['labor:branding']:
+			return true
+		case TreasuryCategory['labor:comms']:
+			return true
+		case TreasuryCategory['labor:data_entry']:
+			return true
+		case TreasuryCategory['labor:dev']:
+			return true
+		case TreasuryCategory['services:email']:
+			return true
+		case TreasuryCategory['services:social_media']:
+			return true
+		case TreasuryCategory['hosting-infra']:
+			return true
+		case TreasuryCategory.operational:
+			return true
+		case TreasuryCategory.test:
+			return true
+		case TreasuryCategory.grant:
+			return false
+		case TreasuryCategory.swap:
+			return false
+		case TreasuryCategory.multi_step_swap:
+			return false
+		case TreasuryCategory['ignored:multi_tx_swap']:
+			return false
+		case TreasuryCategory['ignored:reverted']:
+			return false
 	}
 }
 
@@ -652,6 +695,268 @@ async function populatePriceData(
 	logger.info(`Price data synced: ${messages.join(', ')}.`)
 }
 
+// --- Chart Generation ---
+
+/** Map of category label → hex color for the expense chart. */
+const CHART_COLORS: Record<string, string> = {
+	Branding: '#9d4edd',
+	Comms: '#10b981',
+	'Data entry': '#f59e0b',
+	Dev: '#7c3aed',
+	Email: '#eab308',
+	Hosting: '#ef4444',
+	Merch: '#14b8a6',
+	Ops: '#6b7280',
+	'Social media': '#ec4899',
+	Test: '#52525b',
+	Travel: '#a855f7',
+	Wallet: '#6366f1',
+}
+
+/** Format a USD amount for display in labels. */
+function formatUsd(value: number): string {
+	if (value >= 1_000_000) {
+		return `$${(value / 1_000_000).toFixed(1)}M`
+	}
+
+	if (value >= 1_000) {
+		return `$${(value / 1_000).toFixed(1)}k`
+	}
+
+	return `$${value.toFixed(0)}`
+}
+
+/** Format a full USD amount for tooltips. */
+function formatUsdFull(value: number): string {
+	return `$${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+}
+
+/**
+ * Collect all YYYY-MM months between two dates (inclusive).
+ */
+function collectMonths(fromDate: string, toDate: string): string[] {
+	const [fromYear, fromMonth] = fromDate.substring(0, 7).split('-').map(Number)
+	const [toYear, toMonth] = toDate.substring(0, 7).split('-').map(Number)
+
+	const months: string[] = []
+	let y = fromYear
+	let m = fromMonth
+
+	while (y < toYear || (y === toYear && m <= toMonth)) {
+		months.push(`${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}`)
+		m++
+
+		if (m > 12) {
+			m = 1
+			y++
+		}
+	}
+
+	return months
+}
+
+interface ExpenseChartSegment {
+	label: string
+	usd: number
+}
+
+interface ExpenseChartMonth {
+	month: string
+	segments: ExpenseChartSegment[]
+	total: number
+}
+
+/**
+ * Generate a stacked bar chart SVG of monthly expenses by category.
+ * Reads operations and price data, converts amounts to USD,
+ * and returns the SVG contents.
+ */
+export async function generateExpensesChart(
+	operationsPath: string,
+	priceDataPath: string,
+	chartOutputPath: string,
+): Promise<string> {
+	const operationsRaw = readFile(operationsPath)
+	const operations = parseTSV<OperationRow>(operationsRaw)
+
+	const priceData = readPriceData(priceDataPath)
+
+	// Aggregate expenses by (month, category) → USD
+	const aggregated = new Map<string, Map<string, number>>()
+
+	for (const op of operations) {
+		const parsed = parseAmounts(op.Amount)
+
+		if (parsed.type !== 'expense') {
+			continue
+		}
+
+		const yearMonth = op.Date.substring(0, 7)
+
+		if (!aggregated.has(yearMonth)) {
+			aggregated.set(yearMonth, new Map<string, number>())
+		}
+
+		const monthData = aggregated.get(yearMonth)!
+
+		for (const { value, asset, category } of parsed.assets) {
+			if (!includeInExpenseBreakdown(category)) {
+				continue
+			}
+
+			const normalized = normalizeAsset(asset)
+			const priceKeyStr = priceKey(op.Date, normalized)
+			const priceRow = priceData.get(priceKeyStr)
+
+			if (!priceRow) {
+				throw new Error(`Missing price data for ${normalized} on ${op.Date}`)
+			}
+
+			const price = parseFloat(priceRow.Value)
+			const usd = value * price
+			const label = categoryLabel(category)
+
+			monthData.set(label, (monthData.get(label) ?? 0) + usd)
+		}
+	}
+
+	if (aggregated.size === 0) {
+		throw new Error('no data detected in TSV')
+	}
+
+	// Collect all months (including gaps)
+	const firstDate = operations[0].Date
+	const lastDate = operations[operations.length - 1].Date
+	const allMonths = collectMonths(firstDate, lastDate)
+
+	// Build chart data with consistent segment ordering
+	const allLabels = new Set<string>()
+
+	for (const monthData of aggregated.values()) {
+		for (const label of monthData.keys()) {
+			allLabels.add(label)
+		}
+	}
+
+	const sortedLabels = [...allLabels].sort()
+
+	const chartData: ExpenseChartMonth[] = allMonths.map(month => {
+		const monthData = aggregated.get(month) ?? new Map<string, number>()
+		const segments = sortedLabels
+			.map(label => ({
+				label,
+				usd: monthData.get(label) ?? 0,
+			}))
+			.filter(seg => seg.usd > 0)
+
+		const total = segments.reduce((sum, seg) => sum + seg.usd, 0)
+
+		return { month, segments, total }
+	})
+
+	// --- Generate SVG ---
+
+	const barWidth = 40
+	const barGap = 18
+	const marginLeft = 65
+	const marginRight = 20
+	const marginTop = 20
+	const marginBottom = 50
+
+	const width = marginLeft + chartData.length * (barWidth + barGap) - barGap + marginRight
+	const maxTotal = Math.max(...chartData.map(d => d.total), 1)
+
+	// Round up to a nice number
+	const niceMax = Math.ceil(maxTotal / 2000) * 2000
+	const chartHeight = 240
+	const height = marginTop + chartHeight + marginBottom
+
+	// Y-axis ticks
+	const tickCount = 5
+	const ticks = Array.from({ length: tickCount + 1 }, (_, i) => (niceMax / tickCount) * i)
+
+	const svgParts: string[] = []
+
+	svgParts.push(
+		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Monthly expenses chart stacked by category">`,
+	)
+
+	// Styles
+	svgParts.push(
+		'<style>',
+		'  text { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; fill: #374151; }',
+		'  .axis-line { stroke: #d1d5db; stroke-width: 1; }',
+		'  .tick-line { stroke: #e5e7eb; stroke-width: 0.5; }',
+		'  .bar-segment { cursor: pointer; }',
+		'  .bar-segment:hover { opacity: 0.8; }',
+		'</style>',
+	)
+
+	// Grid lines and Y-axis labels
+	for (const tick of ticks) {
+		const y = marginTop + chartHeight - (tick / niceMax) * chartHeight
+
+		svgParts.push(
+			`<line x1="${marginLeft}" y1="${y}" x2="${width - marginRight}" y2="${y}" class="tick-line"/>`,
+		)
+		svgParts.push(
+			`<text x="${marginLeft - 8}" y="${y + 4}" text-anchor="end">${formatUsd(tick)}</text>`,
+		)
+	}
+
+	// X-axis baseline
+	svgParts.push(
+		`<line x1="${marginLeft}" y1="${marginTop + chartHeight}" x2="${width - marginRight}" y2="${marginTop + chartHeight}" class="axis-line"/>`,
+	)
+
+	// Bars
+	for (let i = 0; i < chartData.length; i++) {
+		const d = chartData[i]
+		const x = marginLeft + i * (barWidth + barGap)
+
+		// Month label
+		const labelX = x + barWidth / 2
+		const labelY = marginTop + chartHeight + 16
+		const label = d.month
+
+		svgParts.push(`<text x="${labelX}" y="${labelY}" text-anchor="middle">${label}</text>`)
+
+		// Stacked segments
+		let cumulativeY = marginTop + chartHeight
+
+		for (const seg of d.segments) {
+			const segHeight = (seg.usd / niceMax) * chartHeight
+			const color = CHART_COLORS[seg.label] ?? '#9ca3af'
+			const tooltip = `${seg.label}: ${formatUsdFull(seg.usd)}`
+
+			if (segHeight > 0) {
+				const y = cumulativeY - segHeight
+
+				svgParts.push(
+					`<rect x="${x}" y="${y}" width="${barWidth}" height="${segHeight}" fill="${color}" class="bar-segment"><title>${tooltip}</title></rect>`,
+				)
+			}
+
+			cumulativeY -= segHeight
+		}
+	}
+
+	svgParts.push('</svg>')
+
+	const svgString = svgParts.join('')
+
+	// Optimize with SVGO
+	const repoRoot = path.dirname(path.dirname(path.dirname(path.resolve(chartOutputPath))))
+	const svgoConfig = await loadConfig(path.join(repoRoot, 'tests/utils/svgo.config.mjs'))
+
+	const optimized = optimize(svgString, {
+		path: chartOutputPath,
+		...svgoConfig,
+	})
+
+	return optimized.data
+}
+
 // --- Main Execution ---
 
 export async function treasuryMarkdownUpdate(config: TreasuryMarkdownUpdaterConfig): Promise<void> {
@@ -683,6 +988,13 @@ export async function treasuryMarkdownUpdate(config: TreasuryMarkdownUpdaterConf
 		}
 	}
 
+	// Chart generation
+	const chartContent = await generateExpensesChart(
+		config.operationsPath,
+		config.priceDataPath,
+		config.chartOutputPath,
+	)
+
 	// Markdown generation
 	const timestamp = operations[operations.length - 1].Date
 	const markdownContent = `---
@@ -695,6 +1007,8 @@ description: 'Overview of Walletbeat treasury addresses and their operational hi
 _Latest operation: ${timestamp}_
 
 This document tracks known treasury addresses and their operational history.
+
+![Expenses over time](treasury-chart.svg)
 
 ## 1. Walletbeat addresses
 
@@ -714,6 +1028,7 @@ _Generated automatically from source TSV files._
 `
 
 	if (config.test) {
+		// Verify markdown is up to date
 		if (!fs.existsSync(config.outputPath)) {
 			throw new Error('Test Failed: Output file does not exist.')
 		}
@@ -726,8 +1041,25 @@ _Generated automatically from source TSV files._
 			)
 		}
 
-		logger.info('File is up to date.')
+		// Verify chart is up to date
+		if (chartContent !== '') {
+			if (!fs.existsSync(config.chartOutputPath)) {
+				throw new Error('Test Failed: Chart output file does not exist: ' + config.chartOutputPath)
+			}
+
+			const existingChart = fs.readFileSync(config.chartOutputPath, 'utf-8')
+
+			if (existingChart !== chartContent) {
+				throw new Error(
+					'Chart mismatch. The existing chart SVG does not match the generated output.\n' +
+						'Run `pnpm fix` to automatically fix this.',
+				)
+			}
+		}
+
+		logger.info('Treasury files up to date.')
 	} else {
+		// Write markdown if changed
 		if (fs.existsSync(config.outputPath)) {
 			const existingContent = fs.readFileSync(config.outputPath, 'utf-8')
 
@@ -738,6 +1070,26 @@ _Generated automatically from source TSV files._
 		}
 
 		fs.writeFileSync(config.outputPath, markdownContent)
+
+		// Write chart if non-empty
+		if (chartContent !== '') {
+			const outputDir = path.dirname(config.chartOutputPath)
+
+			fs.mkdirSync(outputDir, { recursive: true })
+
+			if (fs.existsSync(config.chartOutputPath)) {
+				const existingChart = fs.readFileSync(config.chartOutputPath, 'utf-8')
+
+				if (existingChart !== chartContent) {
+					fs.writeFileSync(config.chartOutputPath, chartContent)
+					logger.info('Treasury chart updated.')
+				}
+			} else {
+				fs.writeFileSync(config.chartOutputPath, chartContent)
+				logger.info('Treasury chart generated.')
+			}
+		}
+
 		logger.info('Treasury transparency report updated.')
 	}
 }

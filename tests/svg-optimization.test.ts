@@ -241,6 +241,17 @@ const optimizedSvgHashes: Record<string, string> = {
 		'cd3951d27fd220b5b1d6f3c116ce4465635bda5c0fb30d19bf7e9b61f0cc03dc',
 }
 
+/**
+ * Set of excluded SVG files excluded from this test.
+ */
+const optimizedWhitelist: Set<string> = new Set([
+	// Auto-generated treasury chart SVG.
+	// Already written optimized by the generator, and keeps changing often
+	// as it is refreshed every time a new treasury transaction occurs, so
+	// it would be silly to have to update this test every time this happens.
+	'governance/treasury/treasury-chart.svg',
+])
+
 interface SvgResult {
 	filePath: string
 	status: 'needs_optimization' | 'already_optimized' | 'skipped'
@@ -257,6 +268,7 @@ describe('SVG optimization', async () => {
 
 	await crawlCodebase({
 		ignore: commonExclusions.concat([
+			filePath => optimizedWhitelist.has(filePath),
 			// Generated font output is covered by the icon font generator hash.
 			filePath => filePath.startsWith('src/assets/fonts/'),
 		]),

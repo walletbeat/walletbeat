@@ -12,6 +12,7 @@ describe('treasury operations transparency', () => {
 			try {
 				await treasuryMarkdownUpdate({
 					addressesPath: path.join(GOVERNANCE_TREASURY_DIR, 'addresses.tsv'),
+					chartOutputPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-chart.svg'),
 					operationsPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-operations.tsv'),
 					outputPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-transparency.md'),
 					priceDataPath: path.join(GOVERNANCE_TREASURY_DIR, 'price-data.tsv'),
