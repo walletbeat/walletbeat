@@ -510,6 +510,10 @@ export const metamask: SoftwareWallet = {
 								'MetaMask provides address labeling and warns about address poisoning attacks using local address book and transaction history. For enhanced security validation, MetaMask may use Consensys services which share recipient and user addresses along with IP addresses. Users can disable external services to prevent this data sharing.',
 							url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
 						},
+						{
+							explanation: 'Metamask provides address poisoning alerts live on Metamask and Extension across all networks',
+							url: 'https://x.com/MetaMask/status/2067299428680265791'
+						}
 					],
 					addressPoisoningDetection: true,
 					leaksRecipient: true,
