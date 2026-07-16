@@ -887,7 +887,11 @@
 				data-row
 				data-scroll-item="inline-detached"
 			>
-				<a data-link="camouflaged" href={`#${slugifyCamelCase(attrGroup.id)}`}>
+				<a
+					data-link="camouflaged"
+					href={`#${slugifyCamelCase(attrGroup.id)}`}
+					interestfor={slugifyCamelCase(attrGroup.id)}
+				>
 					<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 						{attrGroup.displayName}
 					</h2>
@@ -985,7 +989,11 @@
 
 					<div data-row-item="flexible basis-2" data-column="gap-2">
 						<div data-row="start gap-2 wrap">
-							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
+							<a
+								data-link="camouflaged"
+								href={`#${slugifyCamelCase(attribute.id)}`}
+								interestfor={slugifyCamelCase(attribute.id)}
+							>
 								<h3
 									title={formatAttributeTitleText(evalAttr)}
 								>
@@ -2454,7 +2462,7 @@
 				transition-property: opacity, transform;
 			}
 
-			:global(.navigation-items a:is(:hover, :focus-visible, :target-current)),
+			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)),
 			:global(.navigation-items summary:has(~ div menu a:target-current) > a) {
 				---slice-scale: 1.045;
 				opacity: 1;
@@ -2488,7 +2496,7 @@
 				transition-property: rotate, filter;
 			}
 
-			:global(.navigation-items a:is(:hover, :focus-visible, :target-current) > .pie-navigation-icon) {
+			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current) > .pie-navigation-icon) {
 				filter: none;
 			}
 		}
@@ -2716,6 +2724,12 @@
 		> header {
 			padding-block: 1rem;
 
+			> a:is(:hover, :focus-visible, :interest-source),
+			.attribute-group:interest-target > & > a {
+				color: var(--accent);
+				text-decoration: none;
+			}
+
 			&[data-sticky]::before {
 				content: '';
 				inset: -0.5rem -6rem;
@@ -2764,8 +2778,15 @@
 			--icon-filter: brightness(0) opacity(0.35);
 			min-inline-size: 0;
 
-			&:has(h3 a:hover, a:has(h3):hover) {
+			&:has(a:is(:hover, :focus-visible, :interest-source)),
+			.attribute:interest-target & {
 				--icon-filter: none;
+			}
+
+			a:is(:hover, :focus-visible, :interest-source),
+			.attribute:interest-target & a:has(h3) {
+				color: var(--accent);
+				text-decoration: none;
 			}
 
 			> [data-row-item~='flexible'] {
