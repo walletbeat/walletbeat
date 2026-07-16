@@ -10,7 +10,9 @@ eth:0xc3632e3c63b1e9643358aafed0660cf6522b94e5	teresa5	teresa5	EOA owned by tere
 eth:0xA64b19Ac3245fD8C0e2B2c906f38540C94030493	mattmatt2	0xMattmatt	EOA owned by 0xMattmatt
 eth:0x7a86d3e6894f9c5B5f25FFBDAaE658CFc7569623	mattmatt_sablier	0xMattmatt	Sablier stream delivered to 0xMattmatt
 eth:0x0c38377530cc4d9604c99fb3DB1c2AA9e3DAe57a	chainflip1	Chainflip	One-time EOA owned by Chainflip
+eth:0x53DF77e44a66212E7BC674354c7ED0bCA1871918	chainflip2	Chainflip	One-time EOA owned by Chainflip
 btc:bc1qw5yq9fqe7gvlnwvwwu9zf0n0pxk8mwkdndw9jl	proton1	Proton	One-time Bitcoin payment address for Walletbeat Proton mail account
+btc:bc1qkzrh837ypwnkkwmtdws9wf42js8hgr6us436u6	proton2	Proton	One-time Bitcoin payment address for Walletbeat Proton mail account
 eth:0x41C36c21b31C67e1c645CeE831dd5E4BfBF0cbC9	mattmatt_test1	0xMattmatt	EOA owned by 0xMattmatt, used exclusively for wallet testing (#1). Expect random swaps and transfers to other test accounts.
 eth:0xedb22965D0Dd7fe8fe4dae8E89F1d958D6b2F0A4	mattmatt_test2	0xMattmatt	WalletbeatSafe Testing Multisig (1-of-1 for Mattmatt), used exclusively for testing safe transactions. Expect random swaps transactions, and transfers to other test accounts.
 eth:0xeDc1e0ac5372ff8B2144506B74f7264e1DA0015a	polymutex2	polymutex	Temporary EOA owned by polymutex; never used.
