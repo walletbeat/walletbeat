@@ -964,7 +964,6 @@ summary {
  * ### CSS Variables
  * - `--list-markerGap`
  * - `--list-gap`
- * - `--list-marker-content`
  * - `--list-marker-inlineSize`
  *
  * ### Examples
@@ -992,7 +991,6 @@ ol {
 	/* Inputs */
 	--list-markerGap: 0.66em;
 	--list-gap: 0.5lh;
-	--list-marker-content: attr(data-list-item-marker);
 	--list-marker-inlineSize: 1.15em;
 
 	/* Rules */
@@ -1043,7 +1041,7 @@ ol {
 	}
 
 	/**
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -1111,7 +1109,7 @@ ol {
 			font-size: 1em;
 		}
 		&[data-list-item-marker]::marker {
-			content: var(--list-marker-content);
+			content: attr(data-list-item-marker);
 			font-size: 0.875em;
 		}
 
@@ -1131,7 +1129,7 @@ ol {
 				text-align: center;
 			}
 			&[data-list-item-marker]::before {
-				content: var(--list-marker-content);
+				content: attr(data-list-item-marker);
 			}
 		/* } */
 
