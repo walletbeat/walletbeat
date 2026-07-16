@@ -184,7 +184,7 @@
 					</header>
 				</summary>
 
-				<div><section data-column="gap-4">
+				<section data-column="gap-4">
 					{#if audit.unpatchedFlaws === 'NONE_FOUND'}
 						<p>No security flaws of severity level medium or higher were found.</p>
 					{:else if audit.unpatchedFlaws === 'ALL_FIXED'}
@@ -224,7 +224,7 @@
 					{#if audit.ref}
 						<ReferenceLinks references={toFullyQualified(audit.ref)} />
 					{/if}
-				</section></div>
+				</section>
 			</details>
 		{/each}
 	</section>

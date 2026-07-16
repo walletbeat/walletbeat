@@ -99,7 +99,7 @@
 						</div>
 					</summary>
 
-					<div><section data-column="gap-4">
+					<section data-column="gap-4">
 						<p class="news-summary">{newsItem.summary}</p>
 
 						<div class="news-details" data-column="gap-2">
@@ -137,7 +137,7 @@
 								/>
 							{/if}
 						</div>
-					</section></div>
+					</section>
 				</details>
 			{/each}
 		</div>
@@ -175,7 +175,7 @@
 				}
 			}
 
-			> summary + div:last-child {
+			> summary + :last-child {
 				display: grid;
 				gap: 1.5rem;
 			}
