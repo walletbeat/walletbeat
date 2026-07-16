@@ -439,7 +439,7 @@
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
 	import NestedTimelineScopes from '@/components/NestedTimelineScopes.svelte'
-	import ScrollRotationSteps from '@/components/ScrollRotationSteps.svelte'
+	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
 
@@ -805,7 +805,7 @@
 			aria-label="Attribute pie navigation"
 			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
-			<ScrollRotationSteps steps={pieRotationSteps}>
+			<ScrollAngleSteps steps={pieRotationSteps}>
 				<NavigationItems
 					items={pieNavigationItems}
 					showSearch={false}
@@ -821,7 +821,7 @@
 						{/if}
 					{/snippet}
 				</NavigationItems>
-			</ScrollRotationSteps>
+			</ScrollAngleSteps>
 		</nav>
 
 		<header
@@ -2207,7 +2207,10 @@
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
 				---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
-				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
+				---slice-mid-angle: calc(
+					var(--slice-midAngle) * 1deg
+					+ var(---pie-start-angle, 0deg)
+				);
 				---slice-offset: var(--slice-offset);
 				---slice-gap: var(--slice-gap);
 				---slice-outer-r: var(--slice-outerR);
@@ -2451,6 +2454,10 @@
 				---slice-scale: 1.045;
 				opacity: 1;
 				outline: none;
+			}
+
+			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
+				z-index: 1;
 			}
 
 			:global(.navigation-items a:target-current) {
