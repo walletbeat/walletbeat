@@ -25,6 +25,7 @@ export enum TreasuryCategory {
 	multi_step_swap = 'multi_step_swap',
 	operational = 'operational',
 	'services:email' = 'services:email',
+	'services:storage' = 'services:storage',
 	'services:social_media' = 'services:social_media',
 	swap = 'swap',
 	test = 'test',
@@ -46,6 +47,7 @@ export const treasuryCategory = new Enum<TreasuryCategory>({
 	[TreasuryCategory.multi_step_swap]: true,
 	[TreasuryCategory.operational]: true,
 	[TreasuryCategory['services:email']]: true,
+	[TreasuryCategory['services:storage']]: true,
 	[TreasuryCategory['services:social_media']]: true,
 	[TreasuryCategory.swap]: true,
 	[TreasuryCategory.test]: true,
@@ -129,6 +131,15 @@ function parseTSV<T>(content: string): T[] {
  */
 function escapeMd(text: string): string {
 	return text.replace(/\|/g, '\\|')
+}
+
+/** Escapes characters that are special in SVG text content. */
+function escapeSvg(text: string): string {
+	return text
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
 }
 
 /**
@@ -218,15 +229,15 @@ function generateAddressesTable(rows: AddressRow[]): string {
 export function categoryLabel(category: TreasuryCategory | 'Other'): string {
 	switch (category) {
 		case TreasuryCategory['expense:swag']:
-			return 'Merch'
+			return 'Walletbeat merch'
 		case TreasuryCategory['expense:travel']:
-			return 'Travel'
+			return 'Travel reimbursement'
 		case TreasuryCategory['expense:wallet']:
-			return 'Wallet'
+			return 'Hardware wallet reimbursement'
 		case TreasuryCategory.grant:
-			return 'Grant'
+			return 'Grant funds'
 		case TreasuryCategory['hosting-infra']:
-			return 'Hosting'
+			return 'Online hosting'
 		case TreasuryCategory['ignored:multi_tx_swap']:
 			return 'Swap'
 		case TreasuryCategory['ignored:reverted']:
@@ -234,19 +245,21 @@ export function categoryLabel(category: TreasuryCategory | 'Other'): string {
 		case TreasuryCategory['labor:branding']:
 			return 'Branding'
 		case TreasuryCategory['labor:comms']:
-			return 'Comms'
+			return 'Social media & Comms'
 		case TreasuryCategory['labor:data_entry']:
-			return 'Data entry'
+			return 'Wallet data entry'
 		case TreasuryCategory['labor:dev']:
-			return 'Dev'
+			return 'Development'
 		case TreasuryCategory.multi_step_swap:
 			return 'Swap'
 		case TreasuryCategory.operational:
-			return 'Ops'
+			return 'Operations & fees'
 		case TreasuryCategory['services:email']:
-			return 'Email'
+			return 'Email storage'
+		case TreasuryCategory['services:storage']:
+			return 'Online storage'
 		case TreasuryCategory['services:social_media']:
-			return 'Social media'
+			return 'Social media subscription'
 		case TreasuryCategory.swap:
 			return 'Swap'
 		case TreasuryCategory.test:
@@ -274,6 +287,8 @@ export function includeInExpenseBreakdown(category: TreasuryCategory): boolean {
 		case TreasuryCategory['labor:dev']:
 			return true
 		case TreasuryCategory['services:email']:
+			return true
+		case TreasuryCategory['services:storage']:
 			return true
 		case TreasuryCategory['services:social_media']:
 			return true
@@ -727,6 +742,8 @@ export function getChartColor(category: TreasuryCategory | 'Other'): string {
 			return '#7209b7'
 		case TreasuryCategory['services:email']:
 			return '#ff6d00'
+		case TreasuryCategory['services:storage']:
+			return '#ff6d00'
 		case TreasuryCategory['services:social_media']:
 			return '#80b918'
 		case TreasuryCategory.operational:
@@ -958,7 +975,7 @@ export async function generateExpensesOverTimeChart(
 				const y = cumulativeY - segHeight
 
 				svgParts.push(
-					`<rect x="${x}" y="${y}" width="${barWidth}" height="${segHeight}" fill="${color}" class="bar-segment"><title>${tooltip}</title></rect>`,
+					`<rect x="${x}" y="${y}" width="${barWidth}" height="${segHeight}" fill="${color}" class="bar-segment"><title>${escapeSvg(tooltip)}</title></rect>`,
 				)
 			}
 
@@ -1148,7 +1165,7 @@ export async function generateExpensesBreakdownChart(
 		const tooltip = `${seg.label}: ${formatUsd(seg.usd, true)} (${seg.percentage.toFixed(1)}%)`
 
 		svgParts.push(
-			`<path d="${d}" fill="${seg.color}" class="pie-segment"><title>${tooltip}</title></path>`,
+			`<path d="${d}" fill="${seg.color}" class="pie-segment"><title>${escapeSvg(tooltip)}</title></path>`,
 		)
 
 		// Label on the slice (at midpoint angle, 70% of radius)
@@ -1202,7 +1219,7 @@ export async function generateExpensesBreakdownChart(
 		svgParts.push(
 			`<rect x="${x}" y="${y - 10}" width="14" height="14" fill="${seg.color}" rx="2" ry="2"/>`,
 		)
-		svgParts.push(`<text x="${labelX}" y="${y}" class="legend-text">${labelText}</text>`)
+		svgParts.push(`<text x="${labelX}" y="${y}" class="legend-text">${escapeSvg(labelText)}</text>`)
 		svgParts.push(
 			`<text x="${percentageX}" y="${y}" class="legend-text" text-anchor="end" fill="#6b7280">${percentageLabel}</text>`,
 		)

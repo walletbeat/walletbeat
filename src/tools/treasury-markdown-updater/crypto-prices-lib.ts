@@ -140,6 +140,7 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promi
 export async function fetchPrices(pairs: [string, string][]): Promise<PriceDataRow[]> {
 	const today = new Date().toISOString().slice(0, 10)
 	const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
+	const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
 
 	const results: PriceDataRow[] = []
 
@@ -151,7 +152,7 @@ export async function fetchPrices(pairs: [string, string][]): Promise<PriceDataR
 
 		let price: number
 
-		if (date === today || date === yesterday) {
+		if (date === today || date === yesterday || date === tomorrow) {
 			price = await withRetry(() => fetchCurrentPrice(asset))
 		} else {
 			price = await withRetry(() => fetchHistoricalPrice(asset, date))
