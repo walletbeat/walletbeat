@@ -317,9 +317,6 @@
 		display: grid;
 		justify-content: center;
 
-		transform: translateZ(0);
-		will-change: transform;
-		backface-visibility: hidden;
 		transition-duration: 0.4s;
 
 		.pie {
@@ -457,6 +454,10 @@
 					background: var(--slice-fill);
 					backdrop-filter: var(--slice-backdropFilter, none);
 
+					@media (prefers-reduced-transparency: reduce) {
+						backdrop-filter: none;
+					}
+
 					clip-path: shape(
 						from
 							var(--slice-outerStartX)
@@ -554,7 +555,6 @@
 
 					opacity: var(--slice-opacity);
 
-					will-change: transform;
 					transition-property:
 						clip-path,
 						transform,
