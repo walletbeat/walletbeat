@@ -85,5 +85,7 @@ Date	From	To	Amount	Purpose	ID
 2026-07-06	treasury	thegeekygrower	1,000 USDC [labor:dev]	Payment for implementation of Orderflow Transparency attribute	0xe24178abd9e87a8f95f32c30119bac2b5d24543269e1916f786e00100e1f1a23
 2026-07-06	treasury	lucilajuliana.shefi.eth	1,500 USDC [labor:comms]	Compensation for social media	0x45cca27f75a540b905aa929463d5d45feee02473cf04a7795e65bc877cfadf19
 2026-07-06	treasury	ren2140	1,500 USDC [labor:data_entry]	Compensation for wallet data entry	0x7b96b2acc5a66eb507f38007c5dc001c4a367b00b677f8c4dc63f8a8c41c9c66
+2026-07-16	treasury	treasury	0	Replace polymutex2 with ren2140 as signer	0x40854e56c62b3a9fcb131a49a0d5b523c7a22f3b2514c25b8532e39711336b85
+2026-07-16	treasury	treasury	0.260752232321898743 WETH → 500 USDC	CoW Swap from WETH to USDC	0x6baa3ebb8a194885856c073362fee8acad55e5c8b1028a27f8fd9b75b122fbcd
 2026-07-17	treasury	chainflip2	0.063 ETH [ignored:multi_tx_swap] + 0.00157093 BTC [multi_step_swap]	Chainflip swap to BTC https://scan.chainflip.io/swaps/1663183	0x0fc454c0fd1781e95d68de23ab17d9d9c9f1456cd13efb150f55abaffc54fd44
 2026-07-17	chainflip2	proton2	0.00184883 BTC [services:storage]	Payment for 2 years of Proton Drive for Walletbeat	btc:7cb5aa40ae5ef45da6d159a5f39203dd0149659be26d1d68429d34e67ab386b3
