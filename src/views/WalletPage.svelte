@@ -29,6 +29,15 @@
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
 	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
+	import {
+		computePieSlices,
+		overallRatingPieLevels,
+		overallRatingPieMaxRadius,
+		overallRatingPiePadding,
+		overallRatingPieRadius,
+		PieLayout,
+		type Slice,
+	} from '@/components/pie-geometry'
 
 
 	// Functions
@@ -300,7 +309,37 @@
 
 	const pieCurrentStyles = $derived.by(() => {
 		const groupCount = tocNavigationItems.length
+		const referenceSlices = tocNavigationItems.map<Slice>(group => {
+			const sourceGroup = Object.values(attributeTree).find(
+				candidate => `toc-${candidate.id}` === group.id
+			)
+
+			return {
+				id: group.id,
+				color: group.accentColor ?? 'transparent',
+				weight: 1,
+				arcLabel: '',
+				titleText: group.title,
+				children: (group.children ?? []).map(attribute => ({
+					id: attribute.id,
+					color: attribute.accentColor ?? 'transparent',
+					weight: sourceGroup?.attributes.find(
+						({ attribute: sourceAttribute }) => `#${slugifyCamelCase(sourceAttribute.id)}` === attribute.href
+					)?.weight ?? 1,
+					arcLabel: '',
+					titleText: attribute.title,
+				})),
+			}
+		})
+		const computedReferenceSlices = computePieSlices({
+			slices: referenceSlices,
+			radius: overallRatingPieRadius,
+			levels: overallRatingPieLevels(),
+			layout: PieLayout.FullTop,
+			centerFirstSlice: true,
+		})
 		const geometryRules: string[] = []
+		const linkedInterestRules: string[] = []
 		const indexFallbackRules: string[] = []
 		const nativeCurrentRules: string[] = [
 			'#wallet-page .page-navigation>.pie-navigation a:target-current{---slice-scale:1.075;opacity:1;outline:none;}',
@@ -311,19 +350,13 @@
 
 		for (const [groupIndex, group] of tocNavigationItems.entries()) {
 			const groupPosition = groupIndex + 1
+			const computedGroup = computedReferenceSlices[groupIndex]
+
+			if (!computedGroup) continue
+
 			const groupSelector = `#wallet-page .page-navigation > .pie-navigation:has(.navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) summary > a:target-current)`
 			const attributeCount = group.children?.length ?? 0
-			const sourceGroup = Object.values(attributeTree).find(
-				candidate => `toc-${candidate.id}` === group.id
-			)
-			const attributeWeights = (group.children ?? []).map(item => (
-				sourceGroup?.attributes.find(
-					({ attribute }) => `#${slugifyCamelCase(attribute.id)}` === item.href
-				)?.weight ?? 1
-			))
-			const attributeWeightTotal = attributeWeights.reduce((sum, weight) => sum + weight, 0)
-			let precedingAttributeWeight = 0
-			const groupMidAngle = `calc((${groupPosition} - .5) * 1turn / var(---group-count))`
+			const groupMidAngle = `${computedGroup.computed.midAngle}deg`
 			const groupItemSelector = `#wallet-page .page-navigation > .pie-navigation .navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition})`
 			const tocGroupIconSelector = `#wallet-page aside .navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) .toc-icon`
 
@@ -331,8 +364,9 @@
 				`${groupItemSelector}{---group-index:${groupPosition};---group-count:${groupCount};}`
 			)
 			geometryRules.push(
-				`${tocGroupIconSelector}{---slice-total-angle:calc(1turn/${groupCount});---slice-outer-r:59;---slice-inner-r:18;---slice-gap:7;---slice-outer-corner-radius:13;---slice-inner-corner-radius:13;---slice-label-size:22;}`
+				`${groupItemSelector} summary>a,${tocGroupIconSelector}{--slice-totalAngle:${computedGroup.computed.totalAngle}deg;--slice-midAngle:${computedGroup.computed.midAngle}deg;--slice-offset:${computedGroup.computed.offset};--slice-gap:${computedGroup.computed.gap};--slice-outerR:${computedGroup.computed.outerR};--slice-innerR:${computedGroup.computed.innerR};--slice-outerCornerRadius:${computedGroup.computed.outerCornerRadius};--slice-innerCornerRadius:${computedGroup.computed.innerCornerRadius};--slice-labelSize:${computedGroup.computed.labelSize};--slice-arcSize:${Math.abs(computedGroup.computed.totalAngle) > 180 ? 'large' : 'small'};}`
 			)
+			addLinkedInterest(group)
 			nativeCurrentRules.push(
 				`${groupSelector}{---current-slice-mid-angle:${groupMidAngle};}`
 			)
@@ -340,36 +374,53 @@
 
 			for (const [attributeIndex, attribute] of (group.children ?? []).entries()) {
 				const attributePosition = attributeIndex + 1
-				const attributeWeight = attributeWeights[attributeIndex] ?? 1
+				const computedAttribute = computedGroup.children?.[attributeIndex]
+
+				if (!computedAttribute) continue
+
 				const attributeSelector = `#wallet-page .page-navigation > .pie-navigation:has(.navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) menu[data-navigation-depth='1'] > li:nth-child(${attributePosition}) > a:target-current)`
-				const attributeStartFraction = precedingAttributeWeight / attributeWeightTotal
-				const attributeFraction = attributeWeight / attributeWeightTotal
-				const attributeMidAngle = `calc((${groupPosition} - 1 + ${attributeStartFraction + attributeFraction / 2}) * 1turn / var(---group-count))`
+				const attributeMidAngle = `${computedAttribute.computed.midAngle}deg`
 				const attributeItemSelector = `${groupItemSelector} menu[data-navigation-depth='1'] > li:nth-child(${attributePosition})`
 				const tocAttributeIconSelector = `#wallet-page aside .navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) menu[data-navigation-depth='1'] > li:nth-child(${attributePosition}) .toc-icon`
 				const attributeSummaryIconSelector = `#wallet-page #${attribute.href?.slice(1)} > details > summary .attribute-icon`
 
 				geometryRules.push(
-					`${attributeItemSelector}{---attribute-start-angle:calc((${groupPosition} - 1 + ${attributeStartFraction}) * 1turn / var(---group-count));---attribute-angle:calc(${attributeFraction} * 1turn / var(---group-count));}`,
-					`:is(${tocAttributeIconSelector},${attributeSummaryIconSelector}){---slice-total-angle:calc(${attributeFraction}turn/${groupCount});---slice-outer-r:113;---slice-inner-r:65;---slice-gap:5;---slice-outer-corner-radius:11;---slice-inner-corner-radius:11;---slice-label-size:18;---slice-arc-size:small;}`
+					`${attributeItemSelector}>a,:is(${tocAttributeIconSelector},${attributeSummaryIconSelector}){--slice-totalAngle:${computedAttribute.computed.totalAngle}deg;--slice-midAngle:${computedAttribute.computed.midAngle}deg;--slice-offset:${computedAttribute.computed.offset};--slice-gap:${computedAttribute.computed.gap};--slice-outerR:${computedAttribute.computed.outerR};--slice-innerR:${computedAttribute.computed.innerR};--slice-outerCornerRadius:${computedAttribute.computed.outerCornerRadius};--slice-innerCornerRadius:${computedAttribute.computed.innerCornerRadius};--slice-labelSize:${computedAttribute.computed.labelSize};--slice-arcSize:${Math.abs(computedAttribute.computed.totalAngle) > 180 ? 'large' : 'small'};}`
 				)
 				indexFallbackRules.push(
 					`${attributeItemSelector}{---attribute-index:${attributePosition};---attribute-count:${attributeCount};}`
 				)
+				addLinkedInterest(attribute)
 				nativeCurrentRules.push(
 					`${attributeSelector}{---current-slice-mid-angle:${attributeMidAngle};}`
 				)
 				addTargetFallback(attribute, attributeMidAngle, group)
-				precedingAttributeWeight += attributeWeight
 			}
 		}
 
 		return [
 			geometryRules.join(''),
+			linkedInterestRules.join(''),
 			`@supports not (top:calc(sibling-index() * 1px)){${indexFallbackRules.join('')}}`,
 			nativeCurrentRules.join(''),
 			`@supports not selector(:target-current){${targetFallbackRules.join('')}}`,
 		].join('')
+
+		function addLinkedInterest(item: NavigationItem) {
+			if (!item.href) return
+
+			const link = `.navigation-items a[href='${item.href}']`
+			const summary = `.navigation-items summary:has(>a[href='${item.href}'])`
+			const summaryLink = `.navigation-items summary:is(:hover,:focus-within)>a[href='${item.href}']`
+			const scope = `#wallet-page#wallet-page:has(:is(${link}:is(:hover,:focus-visible),${summaryLink}))`
+			const targets = `${scope} :is(${link},${summary})`
+
+			linkedInterestRules.push(
+				`${targets}{---backgroundColor:var(--navItem-hover-backgroundColor);---color:var(--accent);---slice-scale:1.045;opacity:1;outline:none;}`,
+				`${targets}:is(a[aria-current='page'],a:target-current,summary:has(>a:is([aria-current='page'],:target-current))){---backgroundColor:var(--navItem-current-hover-backgroundColor);}`,
+				`${scope} ${link}:is([aria-current='page'],:target-current){---slice-scale:1.075;}`,
+			)
+		}
 
 		function addTargetFallback(
 			item: NavigationItem,
@@ -815,7 +866,7 @@
 			class="pie-navigation"
 			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
-			style={`---group-count: ${tocNavigationItems.length}`}
+			style={`---group-count: ${tocNavigationItems.length}; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
 			<NavigationItems
 				items={tocNavigationItems}
@@ -1611,6 +1662,7 @@
 		padding: 0.5rem;
 		overflow-x: auto;
 		overflow-y: clip;
+		scroll-snap-type: inline mandatory;
 		scrollbar-width: none;
 		border-radius: 100vmax;
 		background-color: color-mix(
@@ -1620,6 +1672,7 @@
 		);
 		box-shadow: 0 0 var(--separator-width) var(--border-color);
 		backdrop-filter: blur(1rem);
+		transition: scroll-snap-type 0s 500ms allow-discrete;
 		position-anchor: --wallet-page-navigation;
 
 		@supports (inset-block-end: calc(100dvb - anchor(bottom))) {
@@ -1630,6 +1683,15 @@
 				+ 1.5rem
 			);
 		}
+	}
+
+	:global(#layout:has(#wallet-page))::scroll-marker-group:is(
+		:hover,
+		:focus-within,
+		:active
+	) {
+		scroll-snap-type: none;
+		transition-delay: 0s;
 	}
 
 	:global(#layout:has(#wallet-page))::scroll-marker-group::-webkit-scrollbar {
@@ -1646,6 +1708,10 @@
 		border-radius: 50%;
 		background-color: var(--background-secondary);
 		transition-property: scale, background-color, border-color;
+	}
+
+	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker:target-current {
+		scroll-snap-align: center;
 	}
 
 	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker:is(
@@ -1883,6 +1949,13 @@
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 		:is(.toc-icon, .attribute-icon) {
+			---slice-total-angle: var(--slice-totalAngle);
+			---slice-gap: var(--slice-gap);
+			---slice-outer-r: var(--slice-outerR);
+			---slice-inner-r: var(--slice-innerR);
+			---slice-outer-corner-radius: var(--slice-outerCornerRadius, calc(var(--slice-gap) / 2));
+			---slice-inner-corner-radius: var(--slice-innerCornerRadius, calc(var(--slice-gap) / 2));
+
 			position: relative;
 			isolation: isolate;
 			border: 0;
@@ -1899,21 +1972,55 @@
 				content: '';
 				---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
 				---slice-half-gap: calc(var(---slice-gap) / 2);
-				---slice-outer-angle: max(
-					0deg,
-					var(---slice-half-angle)
-					- asin(var(---slice-half-gap) / var(---slice-outer-r))
+				---slice-outer-corner-r: max(
+					0,
+					min(
+						var(---slice-outer-corner-radius),
+						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
+						calc(
+							(
+								sin(var(---slice-half-angle)) * var(---slice-outer-r)
+								- var(---slice-half-gap)
+							)
+							/ (1 + sin(var(---slice-half-angle)))
+						)
+					)
 				);
-				---slice-inner-angle: max(
-					0deg,
-					var(---slice-half-angle)
-					- asin(var(---slice-half-gap) / var(---slice-inner-r))
+				---slice-inner-corner-r: max(
+					0,
+					min(
+						var(---slice-inner-corner-radius),
+						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
+						calc(
+							(
+								sin(var(---slice-half-angle)) * var(---slice-inner-r)
+								- var(---slice-half-gap)
+							)
+							/ max(0.000001, 1 - sin(var(---slice-half-angle)))
+						)
+					)
 				);
+				---slice-outer-corner-offset: calc(var(---slice-half-gap) + var(---slice-outer-corner-r));
+				---slice-inner-corner-offset: calc(var(---slice-half-gap) + var(---slice-inner-corner-r));
+				---slice-outer-corner-center-r: calc(var(---slice-outer-r) - var(---slice-outer-corner-r));
+				---slice-inner-corner-center-r: calc(var(---slice-inner-r) + var(---slice-inner-corner-r));
+				---slice-outer-angle-inset: asin(var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r));
+				---slice-inner-angle-inset: asin(var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r));
+				---slice-outer-side-r: sqrt(pow(var(---slice-outer-corner-center-r), 2) - pow(var(---slice-outer-corner-offset), 2));
+				---slice-inner-side-r: sqrt(pow(var(---slice-inner-corner-center-r), 2) - pow(var(---slice-inner-corner-offset), 2));
+				---slice-angle-outer-start: calc(var(---slice-outer-angle-inset) - var(---slice-half-angle));
+				---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
+				---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
+				---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
 				---slice-icon-span: max(
 					var(---slice-outer-r) - var(---slice-inner-r),
-					2 * sin(var(---slice-outer-angle)) * var(---slice-outer-r)
+					2 * sin(var(---slice-half-angle)) * var(---slice-outer-r)
 				);
-				---slice-unit: calc(var(--icon-size) / var(---slice-icon-span));
+				---slice-unit: 1px;
+				---slice-icon-scale: calc(
+					var(--icon-size)
+					/ (var(---slice-icon-span) * 1px)
+				);
 				---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
 				---slice-center-r: calc(
 					(var(---slice-outer-r) + var(---slice-inner-r)) / 2
@@ -1935,48 +2042,55 @@
 					from
 						calc(
 							var(---slice-origin)
-							- sin(var(---slice-outer-angle)) * var(---slice-outer-r) * var(---slice-unit)
+							+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
 						)
 						calc(
 							var(---slice-origin)
-							- cos(var(---slice-outer-angle)) * var(---slice-outer-r) * var(---slice-unit)
+							- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
 						),
 					arc to
 						calc(
 							var(---slice-origin)
-							+ sin(var(---slice-outer-angle)) * var(---slice-outer-r) * var(---slice-unit)
+							+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
 						)
 						calc(
 							var(---slice-origin)
-							- cos(var(---slice-outer-angle)) * var(---slice-outer-r) * var(---slice-unit)
+							- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
 						)
-						of var(---slice-origin) cw small,
+						of calc(var(---slice-outer-r) * var(---slice-unit)) cw small,
+					arc to
+						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-outer-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
+						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
+						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
 					line to
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-inner-angle)) * var(---slice-inner-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-inner-angle)) * var(---slice-inner-r) * var(---slice-unit)
-						),
+						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-inner-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
+						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
 					arc to
-						calc(
-							var(---slice-origin)
-							- sin(var(---slice-inner-angle)) * var(---slice-inner-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-inner-angle)) * var(---slice-inner-r) * var(---slice-unit)
-						)
+						calc(var(---slice-origin) + sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
+						calc(var(---slice-origin) - cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
+						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
+					arc to
+						calc(var(---slice-origin) + sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
+						calc(var(---slice-origin) - cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
 						of calc(var(---slice-inner-r) * var(---slice-unit)) ccw small,
+					arc to
+						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-inner-side-r)) * var(---slice-unit))
+						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
+						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
+					line to
+						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-outer-side-r)) * var(---slice-unit))
+						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
+					arc to
+						calc(var(---slice-origin) + sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
+						calc(var(---slice-origin) - cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
+						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
 					close
 				);
 				pointer-events: none;
 				transform-origin:
 					var(---slice-origin)
 					calc(var(---slice-origin) - var(---slice-center-r));
-				transform: rotate(-0.25turn);
+				transform: rotate(-0.25turn) scale(var(---slice-icon-scale));
 				z-index: 0;
 			}
 		}
@@ -1990,9 +2104,10 @@
 		}
 
 		.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-			---pie-diameter: 240;
-			---pie-origin-x: calc(var(---pie-diameter) / 2 * 1px);
-			---pie-origin-y: calc(var(---pie-diameter) / 2 * 1px);
+			/* Match Pie's inline-configured view box, including its padding. */
+			---pie-diameter: calc(2 * (var(--pie-maxR) + var(--pie-padding)));
+			---pie-origin-x: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+			---pie-origin-y: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
 			---pie-size: var(--nav-width);
 			/* 20rem / (240px / 16px-per-rem). Length division is not yet in Firefox. */
 			---pie-scale: calc(20 / (var(---pie-diameter) / 16));
@@ -2036,6 +2151,7 @@
 				scale: var(---pie-scale);
 				transform: rotate(var(---pie-rotate)) translateZ(0);
 				transform-origin: center;
+				clip-path: circle(50%);
 				pointer-events: none;
 				isolation: isolate;
 				transition-property: transform;
@@ -2044,10 +2160,13 @@
 			:global(.navigation-items),
 			:global(.navigation-items menu),
 			:global(.navigation-items li),
-			:global(.navigation-items details) {
+			:global(.navigation-items details),
+			:global(.navigation-items summary),
+			:global(.navigation-items .navigation-item-children) {
 				margin: 0;
 				padding: 0;
 				list-style: none;
+				background: transparent;
 			}
 
 			:global(.navigation-items menu),
@@ -2057,8 +2176,8 @@
 				display: block;
 				position: absolute;
 				inset: 0;
-				inline-size: 100%;
-				block-size: 100%;
+				inline-size: calc(var(---pie-diameter) * 1px);
+				block-size: calc(var(---pie-diameter) * 1px);
 				pointer-events: none;
 			}
 
@@ -2099,22 +2218,21 @@
 			}
 
 			:global(.navigation-items summary > a) {
-				---slice-total-angle: var(---group-angle);
-				---slice-mid-angle: calc(
-					var(---group-start-angle) + var(---group-angle) / 2
-				);
-				---slice-outer-r: 59;
-				---slice-inner-r: 18;
-				---slice-gap: 7;
-				---slice-outer-corner-radius: 13;
-				---slice-inner-corner-radius: 13;
-				---slice-label-size: 22;
+				--slice-totalAngle: calc((1turn - 5deg * var(---group-count)) / var(---group-count));
+				--slice-midAngle: calc((1 - var(---group-index)) * 1turn / var(---group-count));
+				--slice-offset: 3;
+				--slice-outerR: 80;
+				--slice-innerR: 12;
+				--slice-gap: 4;
+				--slice-outerCornerRadius: 28;
+				--slice-innerCornerRadius: 16;
+				--slice-labelSize: 20;
 				---slice-label-offset: calc(var(---slice-label-r) * 1px);
 			}
 
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				---slice-total-angle: var(---attribute-angle);
-				---slice-mid-angle: calc(
+				--slice-totalAngle: var(---attribute-angle);
+				--slice-midAngle: calc(
 					var(
 						---attribute-start-angle,
 						calc(
@@ -2124,14 +2242,15 @@
 					)
 					+ var(---attribute-angle) / 2
 				);
-				---slice-outer-r: 113;
-				---slice-inner-r: 65;
-				---slice-gap: 5;
-				---slice-outer-corner-radius: 11;
-				---slice-inner-corner-radius: 11;
-				---slice-label-size: 18;
+				--slice-offset: 80;
+				--slice-outerR: 36;
+				--slice-innerR: 8;
+				--slice-gap: 0;
+				--slice-outerCornerRadius: 8;
+				--slice-innerCornerRadius: 8;
+				--slice-labelSize: 9;
 				---slice-label-offset: calc(var(---slice-label-r) * 1px);
-				---slice-arc-size: small;
+				--slice-arcSize: small;
 			}
 
 			/* Firefox lacks typed length division/multiplication outside shape(). */
@@ -2147,6 +2266,16 @@
 
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
+				---slice-total-angle: var(--slice-totalAngle);
+				---slice-mid-angle: var(--slice-midAngle);
+				---slice-offset: var(--slice-offset);
+				---slice-gap: var(--slice-gap);
+				---slice-outer-r: var(--slice-outerR);
+				---slice-inner-r: var(--slice-innerR);
+				---slice-outer-corner-radius: var(--slice-outerCornerRadius);
+				---slice-inner-corner-radius: var(--slice-innerCornerRadius);
+				---slice-label-size: var(--slice-labelSize);
+				---slice-arc-size: var(--slice-arcSize, small);
 				---slice-scale: 1;
 				---slice-label-radius: calc(var(---slice-label-size) / 2);
 				---slice-label-r: clamp(
@@ -2274,7 +2403,8 @@
 				transform-origin: var(---pie-origin-x) var(---pie-origin-y);
 				transform:
 					rotate(var(---slice-mid-angle))
-					scale(var(---slice-scale));
+					scale(var(---slice-scale))
+					translateY(calc(var(---slice-offset) * -1px));
 				clip-path: shape(
 					from var(---slice-outer-start-x) var(---slice-outer-start-y),
 					arc to
