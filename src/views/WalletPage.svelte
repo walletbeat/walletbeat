@@ -1935,29 +1935,54 @@
 				---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
 				---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
 				---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-				---slice-icon-span: max(
-					var(---slice-outer-r) - var(---slice-inner-r),
-					2 * sin(var(---slice-half-angle)) * var(---slice-outer-r)
-				);
 				---slice-unit: 1px;
 				---slice-icon-scale: calc(
 					var(--icon-size)
-					/ (var(---slice-icon-span) * 1px)
+					/ (var(--slice-labelSize) * var(---slice-unit))
 				);
 				---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
-				---slice-center-r: calc(
-					(var(---slice-outer-r) + var(---slice-inner-r)) / 2
+				---slice-label-radius: calc(var(--pie-radius) / 8);
+				---slice-label-r: clamp(
+					pow(
+						(
+							(var(---slice-outer-r) - var(---slice-label-radius))
+							* (var(---slice-inner-r) + var(---slice-label-radius))
+						),
+						0.5
+					),
+					(
+						2 / 3
+						* (
+							(
+								pow(var(---slice-outer-r), 3)
+								- pow(var(---slice-inner-r), 3)
+							)
+							/ (
+								pow(var(---slice-outer-r), 2)
+								- pow(var(---slice-inner-r), 2)
+							)
+						)
+						* (
+							sin(abs(var(--slice-totalAngle)) * 1deg / 2)
+							/ (abs(var(--slice-totalAngle)) * pi / 180 / 2)
+						)
+					),
+					var(---slice-outer-r) - var(---slice-label-radius)
+				);
+				---slice-scaled-label-r: calc(
+					var(---slice-label-r)
+					* var(---slice-icon-scale)
 					* var(---slice-unit)
 				);
 
 				display: block;
 				position: absolute;
-				inset-inline-start: calc(50% - var(---slice-origin));
-				inset-block-start: calc(
+				inset-inline-start: calc(
 					50%
+					+ var(---slice-scaled-label-r)
 					- var(---slice-origin)
-					+ var(---slice-center-r)
 				);
+				inset-block-start: calc(50% - var(---slice-origin));
 				inline-size: calc(2 * var(---slice-origin));
 				block-size: calc(2 * var(---slice-origin));
 				background: var(--accent, var(--background-tertiary));
@@ -2012,7 +2037,7 @@
 				pointer-events: none;
 				transform-origin:
 					var(---slice-origin)
-					calc(var(---slice-origin) - var(---slice-center-r));
+					var(---slice-origin);
 				transform: rotate(-0.25turn) scale(var(---slice-icon-scale));
 				z-index: 0;
 			}
