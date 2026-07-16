@@ -348,7 +348,14 @@
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
-	import Pie, { PieLayout, type Slice } from '@/components/Pie.svelte'
+	import Pie from '@/components/Pie.svelte'
+	import {
+		overallRatingPieLevels,
+		overallRatingPiePadding,
+		overallRatingPieRadius,
+		PieLayout,
+		type Slice,
+	} from '@/components/pie-geometry'
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
@@ -1116,35 +1123,14 @@
 							) : null}
 							<Pie
 								layout={PieLayout.FullTop}
-								padding={8}
-								radius={80}
-								levels={[
-									{
-										outerRadiusFraction: 1,
-										innerRadiusFraction: (
+								padding={overallRatingPiePadding}
+								radius={overallRatingPieRadius}
+								levels={overallRatingPieLevels(
 											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage || summaryVisualization === SummaryVisualization.Icon) ?
 												0.15
 											:
 												0.1
-										),
-										gap: 4,
-										angleGap: 5,
-										offset: 3,
-										outerCornerRadius: 28,
-										innerCornerRadius: 16,
-									},
-									{
-										outerRadiusFraction: 0.45,
-										innerRadiusFraction: 0.1,
-										gap: 0,
-										anglePadding: -20,
-										angleGap: -30,
-										offset: 80,
-										outerCornerRadius: 8,
-										innerCornerRadius: 8,
-										labelSize: 9,
-									}
-								]}
+								)}
 
 								slices={
 									displayedAttributeGroups.map(attrGroup => {
