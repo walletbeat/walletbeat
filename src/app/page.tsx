@@ -1,10 +1,16 @@
+'use client';
+
 import type React from 'react';
+import { useEffect } from 'react';
 import { Box, Button, Link, Typography } from '@mui/material';
 import ComparisonTable from '@/components/ui/organisms/Table';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
 
 export default function Home(): React.JSX.Element {
+  useEffect(() => {
+    window.location.replace('https://beta.walletbeat.eth.limo');
+  }, []);
   return (
     <Box maxWidth="100vw" display="flex" flexDirection="column" alignItems="center">
       <Box
@@ -23,10 +29,8 @@ export default function Home(): React.JSX.Element {
           An open repository of EVM-compatible wallets.
         </Typography>
         <Typography variant="h4" mb={4} textAlign="center" fontWeight={300} maxWidth="90vw">
-          Redirecting to our new beta website at <Link href='https://beta.walletbeat.eth.limo'>beta.walletbeat.eth</Link>.
-          <script>
-            window.location.replace('https://beta.walletbeat.eth.limo');
-          </script>
+          Redirecting to our new beta website at{' '}
+          <Link href="https://beta.walletbeat.eth.limo">beta.walletbeat.eth</Link>.
         </Typography>
         <ComparisonTable />
         <Box my={6} mb={10} mx={1}>
