@@ -248,6 +248,9 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
+			{...item.href.startsWith('#') && {
+				interestfor: item.href.slice(1),
+			}}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
 			style:--slice-totalAngle={item.sliceStyle?.totalAngle}
@@ -431,7 +434,8 @@
 
 				&:hover,
 				&:focus-visible,
-				&:focus-within {
+				&:focus-within,
+				&:interest-source {
 					---backgroundColor: var(--navItem-hover-backgroundColor);
 					---color: var(--accent);
 				}
