@@ -1764,7 +1764,7 @@ details {
 		}
 
 		&:has(> summary + :not(:last-child))::details-content,
-		> summary + div:last-child {
+		> summary + :last-child {
 			padding: var(--card-padding);
 			padding-block-start: 0;
 		}

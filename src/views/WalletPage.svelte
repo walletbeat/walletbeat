@@ -1254,7 +1254,7 @@
 						</h4>
 					</summary>
 
-					<div><section data-column="gap-6">
+					<section data-column="gap-6">
 						{#if attribute.why}
 							<Typography
 								content={attribute.why}
@@ -1262,7 +1262,7 @@
 						{:else}
 							<p>No explanation available.</p>
 						{/if}
-					</section></div>
+					</section>
 				</details>
 
 				<details open data-card="secondary padding-5 radius-4" data-column="gap-0">
@@ -1272,7 +1272,7 @@
 						</h4>
 					</summary>
 
-					<div><section
+					<section
 						class="attribute-rating-methodology"
 						data-column="gap-6"
 					>
@@ -1354,7 +1354,7 @@
 								</aside>
 							{/if}
 						{/if}
-					</section></div>
+					</section>
 				</details>
 
 				{#if howToImprove}
@@ -1365,7 +1365,7 @@
 							</h4>
 						</summary>
 
-						<div><section data-column>
+						<section data-column>
 							<Typography
 								content={howToImprove}
 								strings={getWalletEvalStrings(wallet)}
@@ -1379,7 +1379,7 @@
 									</p>
 								</div>
 							{/if}
-						</section></div>
+						</section>
 					</details>
 				{/if}
 			</div>
@@ -2075,8 +2075,7 @@
 			:global(.navigation-items menu),
 			:global(.navigation-items li),
 			:global(.navigation-items details),
-			:global(.navigation-items summary),
-			:global(.navigation-items .navigation-item-children) {
+			:global(.navigation-items summary) {
 				margin: 0;
 				padding: 0;
 				list-style: none;
@@ -2085,8 +2084,7 @@
 
 			:global(.navigation-items menu),
 			:global(.navigation-items li),
-			:global(.navigation-items details),
-			:global(.navigation-items .navigation-item-children) {
+			:global(.navigation-items details) {
 				display: block;
 				position: absolute;
 				inset: 0;
@@ -2421,7 +2419,7 @@
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)),
-			:global(.navigation-items summary:has(~ div menu a:target-current) > a) {
+			:global(.navigation-items summary:has(~ menu a:target-current) > a) {
 				---slice-scale: 1.045;
 				opacity: 1;
 				outline: none;

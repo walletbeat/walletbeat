@@ -198,8 +198,8 @@
 											</div>
 										</summary>
 
-										<div>
-											{#if criteriaGroup.criteria}
+										{#if criteriaGroup.criteria}
+											<div>
 												<ul
 													data-card="padding-4"
 													data-list="gap-3"
@@ -255,8 +255,8 @@
 														</li>
 													{/each}
 												</ul>
-											{/if}
-										</div>
+											</div>
+										{/if}
 									</details>
 								{/each}
 							</div>

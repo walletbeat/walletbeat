@@ -231,9 +231,7 @@
 				{@render linkable(item, depth)}
 			</summary>
 
-			<div class="navigation-item-children">
-				{@render navigationItems(item.children, depth + 1)}
-			</div>
+			{@render navigationItems(item.children, depth + 1)}
 		</details>
 	{/if}
 {/snippet}
@@ -407,10 +405,6 @@
 				--nav-submenu-parentIconSize: var(--navIcon-size);
 			}
 
-			.navigation-item-children {
-				display: contents;
-			}
-
 			a {
 				color: var(--text-primary);
 
@@ -452,7 +446,7 @@
 						)
 					),
 					:not(details:open > &):has(
-						~ div menu a:is(
+						~ menu a:is(
 							[aria-current='page'],
 							:target-current
 						)

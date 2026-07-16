@@ -76,18 +76,16 @@
 		</Tooltip>
 	</summary>
 
-	<div>
-		{#if isExpanded}
-			<div
-				class="expanded-content"
-				transition:fade={{ duration: 200, easing: expoOut }}
-			>
-				<BlockTransition>
-					{@render ExpandedContent({ isInTooltip: false })}
-				</BlockTransition>
-			</div>
-		{/if}
-	</div>
+	{#if isExpanded}
+		<div
+			class="expanded-content"
+			transition:fade={{ duration: 200, easing: expoOut }}
+		>
+			<BlockTransition>
+				{@render ExpandedContent({ isInTooltip: false })}
+			</BlockTransition>
+		</div>
+	{/if}
 </details>
 
 
