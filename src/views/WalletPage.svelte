@@ -1604,16 +1604,6 @@
 		box-shadow: 0 0 var(--separator-width) var(--border-color);
 		backdrop-filter: blur(1rem);
 		transition: scroll-snap-type 0s 500ms allow-discrete;
-		position-anchor: --wallet-page-navigation;
-
-		@supports (inset-block-end: calc(100dvb - anchor(bottom))) {
-			inset-block-end: calc(100dvb - anchor(bottom) + 0.75rem);
-			inset-inline-end: calc(
-				100dvi - anchor(right)
-				+ var(---anchor-button-size)
-				+ 1.5rem
-			);
-		}
 	}
 
 	:global(#layout:has(#wallet-page))::scroll-marker-group:is(
@@ -1672,12 +1662,6 @@
 		font-size: 1.25rem;
 		line-height: 1;
 		transition-property: scale, background-color, border-color, opacity;
-		position-anchor: --wallet-page-navigation;
-
-		@supports (inset-block-end: calc(100dvb - anchor(bottom))) {
-			inset-block-end: calc(100dvb - anchor(bottom) + 1.25rem);
-		}
-
 		&:is(:hover, :focus-visible) {
 			background-color: var(--background-tertiary);
 			border-color: var(--text-secondary);
@@ -1697,44 +1681,23 @@
 		);
 		content: '↑' / 'Scroll toward the previous rating section';
 
-		@supports (inset-inline-end: calc(100dvi - anchor(right))) {
-			inset-inline-end: calc(
-				100dvi - anchor(right)
-				+ var(---anchor-navigation-width)
-				- var(---anchor-button-size)
-				- 0.75rem
-			);
-		}
 	}
 
 	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
 		inset-inline: auto 0.75rem;
 		content: '↓' / 'Scroll toward the next rating section';
 
-		@supports (inset-inline-end: calc(100dvi - anchor(right))) {
-			inset-inline-end: calc(100dvi - anchor(right) + 0.75rem);
-		}
 	}
 
 	@media (max-width: 1024px) {
 		:global(#layout:has(#wallet-page))::scroll-marker-group {
 			inset-inline: calc(var(---anchor-button-size) + 1.5rem) auto;
 
-			@supports (inset-inline-start: anchor(left)) {
-				inset-inline-start: calc(
-					anchor(left)
-					+ var(---anchor-button-size)
-					+ 1.5rem
-				);
-			}
 		}
 
 		:global(#layout:has(#wallet-page))::scroll-button(block-start) {
 			inset-inline: 0.75rem auto;
 
-			@supports (inset-inline-start: anchor(left)) {
-				inset-inline-start: calc(anchor(left) + 0.75rem);
-			}
 		}
 
 		:global(#layout:has(#wallet-page))::scroll-button(block-end) {
@@ -1744,14 +1707,6 @@
 				- 0.75rem
 			) auto;
 
-			@supports (inset-inline-start: anchor(left)) {
-				inset-inline-start: calc(
-					anchor(left)
-					+ var(---anchor-navigation-width)
-					- var(---anchor-button-size)
-					- 0.75rem
-				);
-			}
 		}
 	}
 
@@ -1897,6 +1852,7 @@
 			&::before {
 				position: relative;
 				z-index: 1;
+				font-size: calc(var(--icon-size) * 0.55);
 			}
 
 			&::after {
@@ -1943,10 +1899,13 @@
 				---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
 				---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
 				---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-				---slice-unit: 1px;
-				---slice-icon-scale: calc(
+				---slice-icon-span: max(
+					var(---slice-outer-r) - var(---slice-inner-r),
+					2 * sin(var(---slice-half-angle)) * var(---slice-outer-r)
+				);
+				---slice-unit: calc(
 					var(--icon-size)
-					/ (var(--slice-labelSize) * var(---slice-unit))
+					/ var(---slice-icon-span)
 				);
 				---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
 				---slice-label-radius: calc(var(--pie-radius) / 8);
@@ -1979,7 +1938,6 @@
 				);
 				---slice-scaled-label-r: calc(
 					var(---slice-label-r)
-					* var(---slice-icon-scale)
 					* var(---slice-unit)
 				);
 
@@ -2046,7 +2004,7 @@
 				transform-origin:
 					var(---slice-origin)
 					var(---slice-origin);
-				transform: rotate(-0.25turn) scale(var(---slice-icon-scale));
+				transform: rotate(-0.25turn);
 				z-index: 0;
 			}
 		}
