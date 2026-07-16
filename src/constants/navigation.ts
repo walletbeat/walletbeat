@@ -19,6 +19,17 @@ export type NavigationItem = {
 	iconVariant?: 'emoji'
 	accentColor?: string | null
 	href?: string
+	sliceStyle?: {
+		totalAngle: number
+		midAngle: number
+		offset: number
+		gap: number
+		outerR: number
+		innerR: number
+		outerCornerRadius: number
+		innerCornerRadius: number
+		labelSize: number
+	}
 	children?: NavigationItem[]
 }
 

@@ -307,8 +307,7 @@
 			[]
 	))
 
-	const pieCurrentStyles = $derived.by(() => {
-		const groupCount = tocNavigationItems.length
+	const pieNavigationItems = $derived.by(() => {
 		const referenceSlices = tocNavigationItems.map<Slice>(group => {
 			const sourceGroup = Object.values(attributeTree).find(
 				candidate => `toc-${candidate.id}` === group.id
@@ -338,113 +337,28 @@
 			layout: PieLayout.FullTop,
 			centerFirstSlice: true,
 		})
-		const geometryRules: string[] = []
-		const linkedInterestRules: string[] = []
-		const indexFallbackRules: string[] = []
-		const nativeCurrentRules: string[] = [
-			'#wallet-page .page-navigation>.pie-navigation a:target-current{---slice-scale:1.075;opacity:1;outline:none;}',
-			'#wallet-page .page-navigation>.pie-navigation a:target-current>.pie-navigation-icon{filter:none;}',
-			'#wallet-page .page-navigation>.pie-navigation summary:has(~div menu a:target-current)>a{---slice-scale:1.045;opacity:1;outline:none;}',
-		]
-		const targetFallbackRules: string[] = []
 
-		for (const [groupIndex, group] of tocNavigationItems.entries()) {
-			const groupPosition = groupIndex + 1
+		return tocNavigationItems.map((group, groupIndex) => {
 			const computedGroup = computedReferenceSlices[groupIndex]
 
-			if (!computedGroup) continue
-
-			const groupSelector = `#wallet-page .page-navigation > .pie-navigation:has(.navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) summary > a:target-current)`
-			const attributeCount = group.children?.length ?? 0
-			const groupMidAngle = `${computedGroup.computed.midAngle}deg`
-			const groupItemSelector = `#wallet-page .page-navigation > .pie-navigation .navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition})`
-			const tocGroupIconSelector = `#wallet-page aside .navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) .toc-icon`
-
-			indexFallbackRules.push(
-				`${groupItemSelector}{---group-index:${groupPosition};---group-count:${groupCount};}`
-			)
-			geometryRules.push(
-				`${groupItemSelector} summary>a,${tocGroupIconSelector}{--slice-totalAngle:${computedGroup.computed.totalAngle}deg;--slice-midAngle:${computedGroup.computed.midAngle}deg;--slice-offset:${computedGroup.computed.offset};--slice-gap:${computedGroup.computed.gap};--slice-outerR:${computedGroup.computed.outerR};--slice-innerR:${computedGroup.computed.innerR};--slice-outerCornerRadius:${computedGroup.computed.outerCornerRadius};--slice-innerCornerRadius:${computedGroup.computed.innerCornerRadius};--slice-labelSize:${computedGroup.computed.labelSize};--slice-arcSize:${Math.abs(computedGroup.computed.totalAngle) > 180 ? 'large' : 'small'};}`
-			)
-			addLinkedInterest(group)
-			nativeCurrentRules.push(
-				`${groupSelector}{---current-slice-mid-angle:${groupMidAngle};}`
-			)
-			addTargetFallback(group, groupMidAngle)
-
-			for (const [attributeIndex, attribute] of (group.children ?? []).entries()) {
-				const attributePosition = attributeIndex + 1
-				const computedAttribute = computedGroup.children?.[attributeIndex]
-
-				if (!computedAttribute) continue
-
-				const attributeSelector = `#wallet-page .page-navigation > .pie-navigation:has(.navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) menu[data-navigation-depth='1'] > li:nth-child(${attributePosition}) > a:target-current)`
-				const attributeMidAngle = `${computedAttribute.computed.midAngle}deg`
-				const attributeItemSelector = `${groupItemSelector} menu[data-navigation-depth='1'] > li:nth-child(${attributePosition})`
-				const tocAttributeIconSelector = `#wallet-page aside .navigation-items menu[data-navigation-depth='0'] > li:nth-child(${groupPosition}) menu[data-navigation-depth='1'] > li:nth-child(${attributePosition}) .toc-icon`
-				const attributeSummaryIconSelector = `#wallet-page #${attribute.href?.slice(1)} > details > summary .attribute-icon`
-
-				geometryRules.push(
-					`${attributeItemSelector}>a,:is(${tocAttributeIconSelector},${attributeSummaryIconSelector}){--slice-totalAngle:${computedAttribute.computed.totalAngle}deg;--slice-midAngle:${computedAttribute.computed.midAngle}deg;--slice-offset:${computedAttribute.computed.offset};--slice-gap:${computedAttribute.computed.gap};--slice-outerR:${computedAttribute.computed.outerR};--slice-innerR:${computedAttribute.computed.innerR};--slice-outerCornerRadius:${computedAttribute.computed.outerCornerRadius};--slice-innerCornerRadius:${computedAttribute.computed.innerCornerRadius};--slice-labelSize:${computedAttribute.computed.labelSize};--slice-arcSize:${Math.abs(computedAttribute.computed.totalAngle) > 180 ? 'large' : 'small'};}`
-				)
-				indexFallbackRules.push(
-					`${attributeItemSelector}{---attribute-index:${attributePosition};---attribute-count:${attributeCount};}`
-				)
-				addLinkedInterest(attribute)
-				nativeCurrentRules.push(
-					`${attributeSelector}{---current-slice-mid-angle:${attributeMidAngle};}`
-				)
-				addTargetFallback(attribute, attributeMidAngle, group)
+			return {
+				...group,
+				sliceStyle: computedGroup?.computed,
+				children: group.children?.map((attribute, attributeIndex) => ({
+					...attribute,
+					sliceStyle: computedGroup?.children?.[attributeIndex]?.computed,
+				})),
 			}
-		}
-
-		return [
-			geometryRules.join(''),
-			linkedInterestRules.join(''),
-			`@supports not (top:calc(sibling-index() * 1px)){${indexFallbackRules.join('')}}`,
-			nativeCurrentRules.join(''),
-			`@supports not selector(:target-current){${targetFallbackRules.join('')}}`,
-		].join('')
-
-		function addLinkedInterest(item: NavigationItem) {
-			if (!item.href) return
-
-			const link = `.navigation-items a[href='${item.href}']`
-			const summary = `.navigation-items summary:has(>a[href='${item.href}'])`
-			const summaryLink = `.navigation-items summary:is(:hover,:focus-within)>a[href='${item.href}']`
-			const scope = `#wallet-page#wallet-page:has(:is(${link}:is(:hover,:focus-visible),${summaryLink}))`
-			const targets = `${scope} :is(${link},${summary})`
-
-			linkedInterestRules.push(
-				`${targets}{---backgroundColor:var(--navItem-hover-backgroundColor);---color:var(--accent);---slice-scale:1.045;opacity:1;outline:none;}`,
-				`${targets}:is(a[aria-current='page'],a:target-current,summary:has(>a:is([aria-current='page'],:target-current))){---backgroundColor:var(--navItem-current-hover-backgroundColor);}`,
-				`${scope} ${link}:is([aria-current='page'],:target-current){---slice-scale:1.075;}`,
-			)
-		}
-
-		function addTargetFallback(
-			item: NavigationItem,
-			midAngle: string,
-			parent?: NavigationItem,
-		) {
-			if (!item.href?.startsWith('#')) return
-
-			const id = item.href.slice(1)
-			const scope = `#wallet-page:has(#${id}:target)`
-			const itemLink = `${scope} .page-navigation > .pie-navigation a[href='${item.href}']`
-
-			targetFallbackRules.push(
-				`${scope} .page-navigation > .pie-navigation{---current-slice-mid-angle:${midAngle};}`,
-				`${itemLink}{---slice-scale:1.075;opacity:1;}`,
-				`${itemLink}>.pie-navigation-icon{filter:none;}`,
-			)
-
-			if (parent)
-				targetFallbackRules.push(
-					`${scope} .page-navigation > .pie-navigation summary:has(~ div menu a[href='${item.href}'])>a{---slice-scale:1.045;opacity:1;}`
-				)
-		}
+		})
 	})
+
+	const attributeSliceStyles = $derived(
+		new Map(
+			pieNavigationItems.flatMap(group => (
+				group.children?.map(attribute => [attribute.href, attribute.sliceStyle] as const) ?? []
+			))
+		)
+	)
 
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
@@ -869,7 +783,7 @@
 			style={`---group-count: ${tocNavigationItems.length}; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
 			<NavigationItems
-				items={tocNavigationItems}
+				items={pieNavigationItems}
 				showSearch={false}
 				defaultOpen
 				ariaLabel="Attribute pie navigation"
@@ -898,7 +812,7 @@
 			data-sticky-container
 		>
 			<NavigationItems
-				items={tocNavigationItems}
+				items={pieNavigationItems}
 				showSearch={false}
 				defaultOpen
 				ariaLabel="Table of contents"
@@ -917,7 +831,6 @@
 
 	</aside>
 
-	<svelte:element this={'style'}>{pieCurrentStyles}</svelte:element>
 </div>
 
 
@@ -1023,6 +936,7 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
+	{@const sliceStyle = attributeSliceStyles.get(`#${slugifyCamelCase(attribute.id)}`)}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
@@ -1058,6 +972,15 @@
 					<span
 						class="attribute-icon"
 						data-icon="wbicons emoji {attribute.icon}"
+						style:--slice-totalAngle={sliceStyle?.totalAngle}
+						style:--slice-midAngle={sliceStyle?.midAngle}
+						style:--slice-offset={sliceStyle?.offset}
+						style:--slice-gap={sliceStyle?.gap}
+						style:--slice-outerR={sliceStyle?.outerR}
+						style:--slice-innerR={sliceStyle?.innerR}
+						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
+						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
+						style:--slice-labelSize={sliceStyle?.labelSize}
 					></span>
 
 					<div data-row-item="flexible basis-2" data-column="gap-2">
@@ -1949,7 +1872,7 @@
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 		:is(.toc-icon, .attribute-icon) {
-			---slice-total-angle: var(--slice-totalAngle);
+			---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
 			---slice-gap: var(--slice-gap);
 			---slice-outer-r: var(--slice-outerR);
 			---slice-inner-r: var(--slice-innerR);
@@ -2266,8 +2189,8 @@
 
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				---slice-total-angle: var(--slice-totalAngle);
-				---slice-mid-angle: var(--slice-midAngle);
+				---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
+				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
 				---slice-offset: var(--slice-offset);
 				---slice-gap: var(--slice-gap);
 				---slice-outer-r: var(--slice-outerR);
