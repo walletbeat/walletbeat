@@ -1927,13 +1927,9 @@
 				---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
 				---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
 				---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-				---slice-icon-span: max(
-					var(---slice-outer-r) - var(---slice-inner-r),
-					2 * sin(var(---slice-half-angle)) * var(---slice-outer-r)
-				);
 				---slice-unit: calc(
-					var(--icon-size)
-					/ var(---slice-icon-span)
+					var(--icon-size) * 0.55
+					/ var(--slice-labelSize)
 				);
 				---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
 				---slice-label-radius: calc(var(--pie-radius) / 8);
