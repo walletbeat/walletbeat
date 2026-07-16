@@ -250,6 +250,16 @@
 			}}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
+			style:--slice-totalAngle={item.sliceStyle?.totalAngle}
+			style:--slice-midAngle={item.sliceStyle?.midAngle}
+			style:--slice-offset={item.sliceStyle?.offset}
+			style:--slice-gap={item.sliceStyle?.gap}
+			style:--slice-outerR={item.sliceStyle?.outerR}
+			style:--slice-innerR={item.sliceStyle?.innerR}
+			style:--slice-outerCornerRadius={item.sliceStyle?.outerCornerRadius}
+			style:--slice-innerCornerRadius={item.sliceStyle?.innerCornerRadius}
+			style:--slice-labelSize={item.sliceStyle?.labelSize}
+			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
 			{@render navigationIcon(item, depth)}
 
