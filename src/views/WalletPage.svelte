@@ -352,6 +352,26 @@
 		})
 	})
 
+	const pieRotationItems = $derived(
+		pieNavigationItems.flatMap(group => [group, ...(group.children ?? [])])
+	)
+	const pieInitialSliceMidAngle = $derived(
+		pieRotationItems[0]?.sliceStyle?.midAngle ?? 0
+	)
+	const pieRotationSteps = $derived(
+		pieRotationItems.slice(1).map((item, index) => ({
+			href: item.href,
+			timeline: `--pie-section-${index + 1}`,
+			delta: (
+				(pieRotationItems[index]?.sliceStyle?.midAngle ?? 0)
+				- (item.sliceStyle?.midAngle ?? 0)
+			),
+		}))
+	)
+	const pieTimelineByHref = $derived(
+		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
+	)
+
 	const attributeSliceStyles = $derived(
 		new Map(
 			pieNavigationItems.flatMap(group => (
@@ -418,6 +438,8 @@
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
+	import NestedTimelineScopes from '@/components/NestedTimelineScopes.svelte'
+	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
 
@@ -523,6 +545,7 @@
 		/>
 	</div>
 
+	<NestedTimelineScopes timelines={pieRotationSteps.map(step => step.timeline)}>
 	<article
 		data-column="gap-8"
 	>
@@ -780,23 +803,25 @@
 			class="pie-navigation"
 			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
-			style={`---group-count: ${tocNavigationItems.length}; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
+			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
-			<NavigationItems
-				items={pieNavigationItems}
-				showSearch={false}
-				defaultOpen
-				ariaLabel="Attribute pie navigation"
-			>
-				{#snippet iconSnippet(item: NavigationItem)}
-					{#if item.icon}
-						<span
-							class="pie-navigation-icon"
-							data-icon="wbicons emoji {item.icon}"
-						></span>
-					{/if}
-				{/snippet}
-			</NavigationItems>
+			<ScrollAngleSteps steps={pieRotationSteps}>
+				<NavigationItems
+					items={pieNavigationItems}
+					showSearch={false}
+					defaultOpen
+					ariaLabel="Attribute pie navigation"
+				>
+					{#snippet iconSnippet(item: NavigationItem)}
+						{#if item.icon}
+							<span
+								class="pie-navigation-icon"
+								data-icon="wbicons emoji {item.icon}"
+							></span>
+						{/if}
+					{/snippet}
+				</NavigationItems>
+			</ScrollAngleSteps>
 		</nav>
 
 		<header
@@ -830,6 +855,7 @@
 		</nav>
 
 	</aside>
+	</NestedTimelineScopes>
 
 </div>
 
@@ -881,6 +907,7 @@
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
+			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
 		>
 			<header
 				data-sticky="block backdrop-before backdrop-stuck"
@@ -964,6 +991,7 @@
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
 		<details
@@ -2029,7 +2057,7 @@
 			---pie-rotate: calc(
 				var(---pie-target-angle)
 				- var(
-					---current-slice-mid-angle,
+					---initial-slice-mid-angle,
 					calc(0.5turn / var(---group-count))
 				)
 			);
@@ -2179,7 +2207,10 @@
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
 				---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
-				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
+				---slice-mid-angle: calc(
+					var(--slice-midAngle) * 1deg
+					+ var(---pie-start-angle, 0deg)
+				);
 				---slice-offset: var(--slice-offset);
 				---slice-gap: var(--slice-gap);
 				---slice-outer-r: var(--slice-outerR);
@@ -2425,6 +2456,10 @@
 				outline: none;
 			}
 
+			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
+				z-index: 1;
+			}
+
 			:global(.navigation-items a:target-current) {
 				---slice-scale: 1.075;
 			}
@@ -2519,6 +2554,12 @@
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		.container {
 			timeline-scope: --header-timeline;
+		}
+
+		.attribute-group,
+		.attribute {
+			view-timeline-name: var(---pie-timeline, none);
+			view-timeline-axis: block;
 		}
 
 		.wallet-icon-layer {
