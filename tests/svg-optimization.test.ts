@@ -249,7 +249,8 @@ const optimizedWhitelist: Set<string> = new Set([
 	// Already written optimized by the generator, and keeps changing often
 	// as it is refreshed every time a new treasury transaction occurs, so
 	// it would be silly to have to update this test every time this happens.
-	'governance/treasury/treasury-chart.svg',
+	'governance/treasury/treasury-expenses-over-time.svg',
+	'governance/treasury/treasury-expenses-breakdown.svg',
 ])
 
 interface SvgResult {

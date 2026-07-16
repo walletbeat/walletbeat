@@ -9,7 +9,9 @@ _Latest operation: 2026-07-06_
 
 This document tracks known treasury addresses and their operational history.
 
-![Expenses over time](treasury-chart.svg)
+![Total expenses breakdown](treasury-expenses-breakdown.svg)
+
+![Expenses over time](treasury-expenses-over-time.svg)
 
 ## 1. Walletbeat addresses
 

@@ -55,7 +55,8 @@ export const treasuryCategory = new Enum<TreasuryCategory>({
 
 export interface TreasuryMarkdownUpdaterConfig {
 	addressesPath: string
-	chartOutputPath: string
+	expensesOverTimePath: string
+	expensesBreakdownPath: string
 	operationsPath: string
 	outputPath: string
 	priceDataPath: string
@@ -214,7 +215,7 @@ function generateAddressesTable(rows: AddressRow[]): string {
 }
 
 /** Returns a human-readable label for a treasury category. */
-export function categoryLabel(category: TreasuryCategory): string {
+export function categoryLabel(category: TreasuryCategory | 'Other'): string {
 	switch (category) {
 		case TreasuryCategory['expense:swag']:
 			return 'Merch'
@@ -250,6 +251,8 @@ export function categoryLabel(category: TreasuryCategory): string {
 			return 'Swap'
 		case TreasuryCategory.test:
 			return 'Test'
+		case 'Other':
+			return 'Other'
 	}
 }
 
@@ -697,38 +700,59 @@ async function populatePriceData(
 
 // --- Chart Generation ---
 
-/** Map of category label → hex color for the expense chart. */
-const CHART_COLORS: Record<string, string> = {
-	Branding: '#9d4edd',
-	Comms: '#10b981',
-	'Data entry': '#f59e0b',
-	Dev: '#7c3aed',
-	Email: '#eab308',
-	Hosting: '#ef4444',
-	Merch: '#14b8a6',
-	Ops: '#6b7280',
-	'Social media': '#ec4899',
-	Test: '#52525b',
-	Travel: '#a855f7',
-	Wallet: '#6366f1',
+/**
+ * Returns the hex color for a given expense category label.
+ * Used by both the pie chart and the bar chart to ensure consistent
+ * coloring across all treasury visualizations.
+ * Colors are chosen for high mutual distinguishability and good
+ * contrast on both light and dark backgrounds.
+ */
+export function getChartColor(category: TreasuryCategory | 'Other'): string {
+	switch (category) {
+		case TreasuryCategory['expense:swag']:
+			return '#e76f51'
+		case TreasuryCategory['expense:travel']:
+			return '#0077b6'
+		case TreasuryCategory['expense:wallet']:
+			return '#00b894'
+		case TreasuryCategory['hosting-infra']:
+			return '#c9184e'
+		case TreasuryCategory['labor:branding']:
+			return '#e76f51'
+		case TreasuryCategory['labor:comms']:
+			return '#00b4d8'
+		case TreasuryCategory['labor:data_entry']:
+			return '#e09f3e'
+		case TreasuryCategory['labor:dev']:
+			return '#7209b7'
+		case TreasuryCategory['services:email']:
+			return '#ff6d00'
+		case TreasuryCategory['services:social_media']:
+			return '#80b918'
+		case TreasuryCategory.operational:
+			return '#6b7280'
+		case TreasuryCategory.test:
+			return '#434343'
+		case 'Other':
+			return '#9e9e9e'
+	}
+
+	throw new Error(`Unknown category: ${category}`)
 }
 
-/** Format a USD amount for display in labels. */
-function formatUsd(value: number): string {
+/** Format a USD amount compactly (no locale). Append " USD" when showCurrency is true. */
+function formatUsd(value: number, showCurrency = false): string {
+	let result: string
+
 	if (value >= 1_000_000) {
-		return `$${(value / 1_000_000).toFixed(1)}M`
+		result = `${(value / 1_000_000).toFixed(3)}M`
+	} else if (value >= 1_000) {
+		result = `${(value / 1_000).toFixed(3)}k`
+	} else {
+		result = `${value.toFixed(0)}`
 	}
 
-	if (value >= 1_000) {
-		return `$${(value / 1_000).toFixed(1)}k`
-	}
-
-	return `$${value.toFixed(0)}`
-}
-
-/** Format a full USD amount for tooltips. */
-function formatUsdFull(value: number): string {
-	return `$${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+	return showCurrency ? `${result} USD` : result
 }
 
 /**
@@ -756,7 +780,7 @@ function collectMonths(fromDate: string, toDate: string): string[] {
 }
 
 interface ExpenseChartSegment {
-	label: string
+	category: TreasuryCategory | 'Other'
 	usd: number
 }
 
@@ -771,10 +795,10 @@ interface ExpenseChartMonth {
  * Reads operations and price data, converts amounts to USD,
  * and returns the SVG contents.
  */
-export async function generateExpensesChart(
+export async function generateExpensesOverTimeChart(
 	operationsPath: string,
 	priceDataPath: string,
-	chartOutputPath: string,
+	outputPath: string,
 ): Promise<string> {
 	const operationsRaw = readFile(operationsPath)
 	const operations = parseTSV<OperationRow>(operationsRaw)
@@ -782,7 +806,7 @@ export async function generateExpensesChart(
 	const priceData = readPriceData(priceDataPath)
 
 	// Aggregate expenses by (month, category) → USD
-	const aggregated = new Map<string, Map<string, number>>()
+	const aggregated = new Map<string, Map<TreasuryCategory, number>>()
 
 	for (const op of operations) {
 		const parsed = parseAmounts(op.Amount)
@@ -794,7 +818,7 @@ export async function generateExpensesChart(
 		const yearMonth = op.Date.substring(0, 7)
 
 		if (!aggregated.has(yearMonth)) {
-			aggregated.set(yearMonth, new Map<string, number>())
+			aggregated.set(yearMonth, new Map<TreasuryCategory, number>())
 		}
 
 		const monthData = aggregated.get(yearMonth)!
@@ -814,9 +838,8 @@ export async function generateExpensesChart(
 
 			const price = parseFloat(priceRow.Value)
 			const usd = value * price
-			const label = categoryLabel(category)
 
-			monthData.set(label, (monthData.get(label) ?? 0) + usd)
+			monthData.set(category, (monthData.get(category) ?? 0) + usd)
 		}
 	}
 
@@ -830,22 +853,24 @@ export async function generateExpensesChart(
 	const allMonths = collectMonths(firstDate, lastDate)
 
 	// Build chart data with consistent segment ordering
-	const allLabels = new Set<string>()
+	const allCategories = new Set<TreasuryCategory>()
 
 	for (const monthData of aggregated.values()) {
-		for (const label of monthData.keys()) {
-			allLabels.add(label)
+		for (const category of monthData.keys()) {
+			allCategories.add(category)
 		}
 	}
 
-	const sortedLabels = [...allLabels].sort()
+	const sortedCategories = [...allCategories].sort((a, b) =>
+		categoryLabel(a).localeCompare(categoryLabel(b)),
+	)
 
 	const chartData: ExpenseChartMonth[] = allMonths.map(month => {
-		const monthData = aggregated.get(month) ?? new Map<string, number>()
-		const segments = sortedLabels
-			.map(label => ({
-				label,
-				usd: monthData.get(label) ?? 0,
+		const monthData = aggregated.get(month) ?? new Map<TreasuryCategory, number>()
+		const segments = sortedCategories
+			.map(category => ({
+				category,
+				usd: monthData.get(category) ?? 0,
 			}))
 			.filter(seg => seg.usd > 0)
 
@@ -926,8 +951,8 @@ export async function generateExpensesChart(
 
 		for (const seg of d.segments) {
 			const segHeight = (seg.usd / niceMax) * chartHeight
-			const color = CHART_COLORS[seg.label] ?? '#9ca3af'
-			const tooltip = `${seg.label}: ${formatUsdFull(seg.usd)}`
+			const color = getChartColor(seg.category)
+			const tooltip = `${categoryLabel(seg.category)}: ${formatUsd(seg.usd, true)}`
 
 			if (segHeight > 0) {
 				const y = cumulativeY - segHeight
@@ -946,11 +971,254 @@ export async function generateExpensesChart(
 	const svgString = svgParts.join('')
 
 	// Optimize with SVGO
-	const repoRoot = path.dirname(path.dirname(path.dirname(path.resolve(chartOutputPath))))
+	const repoRoot = path.dirname(path.dirname(path.dirname(path.resolve(outputPath))))
 	const svgoConfig = await loadConfig(path.join(repoRoot, 'tests/utils/svgo.config.mjs'))
 
 	const optimized = optimize(svgString, {
-		path: chartOutputPath,
+		path: outputPath,
+		...svgoConfig,
+	})
+
+	return optimized.data
+}
+
+/**
+ * Aggregate expenses by category across all time (in USD).
+ * Shared by both the monthly bar chart and the pie chart.
+ */
+function aggregateExpensesByCategory(
+	operations: OperationRow[],
+	priceData: Map<string, PriceDataRow>,
+): Map<TreasuryCategory, number> {
+	const totals = new Map<TreasuryCategory, number>()
+
+	for (const op of operations) {
+		const parsed = parseAmounts(op.Amount)
+
+		if (parsed.type !== 'expense') {
+			continue
+		}
+
+		for (const { value, asset, category } of parsed.assets) {
+			if (!includeInExpenseBreakdown(category)) {
+				continue
+			}
+
+			const normalized = normalizeAsset(asset)
+			const priceKeyStr = priceKey(op.Date, normalized)
+			const priceRow = priceData.get(priceKeyStr)
+
+			if (!priceRow) {
+				throw new Error(`Missing price data for ${normalized} on ${op.Date}`)
+			}
+
+			const price = parseFloat(priceRow.Value)
+			const usd = value * price
+
+			totals.set(category, (totals.get(category) ?? 0) + usd)
+		}
+	}
+
+	return totals
+}
+
+interface PieSegment {
+	category: TreasuryCategory | 'Other'
+	label: string
+	usd: number
+	percentage: number
+	color: string
+}
+
+/**
+ * Generate a pie chart SVG of aggregate expenses by category across all time.
+ * Reads operations and price data, converts amounts to USD,
+ * and returns the SVG contents.
+ */
+export async function generateExpensesBreakdownChart(
+	operationsPath: string,
+	priceDataPath: string,
+	outputPath: string,
+): Promise<string> {
+	const operationsRaw = readFile(operationsPath)
+	const operations = parseTSV<OperationRow>(operationsRaw)
+	const priceData = readPriceData(priceDataPath)
+
+	// Aggregate expenses by category across all time
+	const totals = aggregateExpensesByCategory(operations, priceData)
+
+	if (totals.size === 0) {
+		throw new Error('no expense data detected in TSV')
+	}
+
+	const totalUsd = [...totals.values()].reduce((sum, v) => sum + v, 0)
+
+	// Build segments sorted by USD descending
+	const allSegments: PieSegment[] = [...totals.entries()]
+		.sort((a, b) => b[1] - a[1])
+		.map(([category, usd]) => ({
+			category,
+			label: categoryLabel(category),
+			usd,
+			percentage: (usd / totalUsd) * 100,
+			color: getChartColor(category),
+		}))
+
+	// Group small tail into "Other" (categories whose combined total is ≤ 1%)
+	let otherStart = allSegments.length
+
+	for (let i = allSegments.length - 1; i >= 0; i--) {
+		const tailSum = allSegments.slice(i).reduce((sum, s) => sum + s.percentage, 0)
+
+		if (tailSum <= 1) {
+			otherStart = i
+		} else {
+			break
+		}
+	}
+
+	const segments: PieSegment[] =
+		otherStart < allSegments.length
+			? [
+					...allSegments.slice(0, otherStart),
+					{
+						category: 'Other',
+						label: 'Other',
+						usd: allSegments.slice(otherStart).reduce((sum, s) => sum + s.usd, 0),
+						percentage: allSegments.slice(otherStart).reduce((sum, s) => sum + s.percentage, 0),
+						color: getChartColor('Other'),
+					},
+				]
+			: allSegments
+
+	// --- Generate SVG ---
+	const svgWidth = 600
+	const svgHeight = 400
+	const pieCenterX = 220
+	const pieCenterY = 200
+	const pieRadius = 160
+
+	const svgParts: string[] = []
+
+	svgParts.push(
+		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgWidth} ${svgHeight}" role="img" aria-label="Total expenses breakdown pie chart by category">`,
+	)
+
+	// Styles
+	svgParts.push(
+		'<style>',
+		'  text { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; fill: #374151; }',
+		'  .pie-segment { cursor: pointer; }',
+		'  .pie-segment:hover { opacity: 0.8; }',
+		'  .pie-label { font-size: 10px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }',
+		'  .pie-title { font-size: 16px; font-weight: 600; fill: #111827; text-anchor: middle; }',
+		'  .legend-item { cursor: pointer; }',
+		'  .legend-item:hover { opacity: 0.8; }',
+		'  .legend-text { font-size: 11px; }',
+		'</style>',
+	)
+
+	// Title
+	svgParts.push(
+		`<text x="${pieCenterX}" y="${pieCenterY - pieRadius - 28}" class="pie-title">Total Expenses</text>`,
+	)
+	svgParts.push(
+		`<text x="${pieCenterX}" y="${pieCenterY - pieRadius - 10}" font-size="12px" fill="#6b7280" text-anchor="middle">${formatUsd(totalUsd, true)}</text>`,
+	)
+
+	// Draw pie slices
+	let cumulativeAngle = -90 // Start from top
+
+	for (const seg of segments) {
+		const sliceAngle = (seg.usd / totalUsd) * 360
+		const startAngle = cumulativeAngle
+		const endAngle = cumulativeAngle + sliceAngle
+
+		const startRad = (startAngle * Math.PI) / 180
+		const endRad = (endAngle * Math.PI) / 180
+
+		const x1 = pieCenterX + pieRadius * Math.cos(startRad)
+		const y1 = pieCenterY + pieRadius * Math.sin(startRad)
+		const x2 = pieCenterX + pieRadius * Math.cos(endRad)
+		const y2 = pieCenterY + pieRadius * Math.sin(endRad)
+
+		const largeArc = sliceAngle > 180 ? 1 : 0
+
+		const d = `M${pieCenterX},${pieCenterY}L${x1.toFixed(2)},${y1.toFixed(2)}A${pieRadius},${pieRadius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)}Z`
+		const tooltip = `${seg.label}: ${formatUsd(seg.usd, true)} (${seg.percentage.toFixed(1)}%)`
+
+		svgParts.push(
+			`<path d="${d}" fill="${seg.color}" class="pie-segment"><title>${tooltip}</title></path>`,
+		)
+
+		// Label on the slice (at midpoint angle, 70% of radius)
+		const midAngle = (startAngle + endAngle) / 2
+		const midRad = (midAngle * Math.PI) / 180
+		const labelR = pieRadius * 0.7
+		const lx = pieCenterX + labelR * Math.cos(midRad)
+		const ly = pieCenterY + labelR * Math.sin(midRad)
+
+		if (seg.percentage >= 2) {
+			let label: string
+
+			if (seg.percentage < 1) {
+				label = '<1'
+			} else if (seg.percentage < 5) {
+				label = `${seg.percentage.toFixed(1)}%`
+			} else {
+				label = `${Math.round(seg.percentage)}%`
+			}
+
+			svgParts.push(
+				`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" class="pie-label">${label}</text>`,
+			)
+		}
+
+		cumulativeAngle += sliceAngle
+	}
+
+	// Legend (right side, single column)
+	const legendX = 410
+	const legendYStart = 40
+	const legendRowHeight = 22
+	const labelPadding = 18
+	const percentagePadding = 8
+	const percentageRightX = 560
+
+	for (let i = 0; i < segments.length; i++) {
+		const x = legendX
+		const y = legendYStart + i * legendRowHeight
+
+		const seg = segments[i]
+		const percentageLabel = `${seg.percentage.toFixed(1)}%`
+		const labelText = seg.label
+		const labelX = x + labelPadding
+		const percentageX = Math.max(
+			labelX + labelText.length * 6.5 + percentagePadding,
+			percentageRightX,
+		)
+
+		svgParts.push('<g class="legend-item">')
+		svgParts.push(
+			`<rect x="${x}" y="${y - 10}" width="14" height="14" fill="${seg.color}" rx="2" ry="2"/>`,
+		)
+		svgParts.push(`<text x="${labelX}" y="${y}" class="legend-text">${labelText}</text>`)
+		svgParts.push(
+			`<text x="${percentageX}" y="${y}" class="legend-text" text-anchor="end" fill="#6b7280">${percentageLabel}</text>`,
+		)
+		svgParts.push('</g>')
+	}
+
+	svgParts.push('</svg>')
+
+	const svgString = svgParts.join('')
+
+	// Optimize with SVGO
+	const repoRoot = path.dirname(path.dirname(path.dirname(path.resolve(outputPath))))
+	const svgoConfig = await loadConfig(path.join(repoRoot, 'tests/utils/svgo.config.mjs'))
+
+	const optimized = optimize(svgString, {
+		path: outputPath,
 		...svgoConfig,
 	})
 
@@ -989,10 +1257,15 @@ export async function treasuryMarkdownUpdate(config: TreasuryMarkdownUpdaterConf
 	}
 
 	// Chart generation
-	const chartContent = await generateExpensesChart(
+	const expensesOverTimeContent = await generateExpensesOverTimeChart(
 		config.operationsPath,
 		config.priceDataPath,
-		config.chartOutputPath,
+		config.expensesOverTimePath,
+	)
+	const expensesBreakdownContent = await generateExpensesBreakdownChart(
+		config.operationsPath,
+		config.priceDataPath,
+		config.expensesBreakdownPath,
 	)
 
 	// Markdown generation
@@ -1008,7 +1281,9 @@ _Latest operation: ${timestamp}_
 
 This document tracks known treasury addresses and their operational history.
 
-![Expenses over time](treasury-chart.svg)
+![Total expenses breakdown](treasury-expenses-breakdown.svg)
+
+![Expenses over time](treasury-expenses-over-time.svg)
 
 ## 1. Walletbeat addresses
 
@@ -1041,17 +1316,39 @@ _Generated automatically from source TSV files._
 			)
 		}
 
-		// Verify chart is up to date
-		if (chartContent !== '') {
-			if (!fs.existsSync(config.chartOutputPath)) {
-				throw new Error('Test Failed: Chart output file does not exist: ' + config.chartOutputPath)
+		// Verify expenses over time chart is up to date
+		if (expensesOverTimeContent !== '') {
+			if (!fs.existsSync(config.expensesOverTimePath)) {
+				throw new Error(
+					'Test Failed: Expenses over time chart output file does not exist: ' +
+						config.expensesOverTimePath,
+				)
 			}
 
-			const existingChart = fs.readFileSync(config.chartOutputPath, 'utf-8')
+			const existingExpensesOverTime = fs.readFileSync(config.expensesOverTimePath, 'utf-8')
 
-			if (existingChart !== chartContent) {
+			if (existingExpensesOverTime !== expensesOverTimeContent) {
 				throw new Error(
-					'Chart mismatch. The existing chart SVG does not match the generated output.\n' +
+					'Expenses over time chart mismatch. The existing chart SVG does not match the generated output.\n' +
+						'Run `pnpm fix` to automatically fix this.',
+				)
+			}
+		}
+
+		// Verify expenses breakdown chart is up to date
+		if (expensesBreakdownContent !== '') {
+			if (!fs.existsSync(config.expensesBreakdownPath)) {
+				throw new Error(
+					'Test Failed: Expenses breakdown chart output file does not exist: ' +
+						config.expensesBreakdownPath,
+				)
+			}
+
+			const existingExpensesBreakdown = fs.readFileSync(config.expensesBreakdownPath, 'utf-8')
+
+			if (existingExpensesBreakdown !== expensesBreakdownContent) {
+				throw new Error(
+					'Expenses breakdown chart mismatch. The existing chart SVG does not match the generated output.\n' +
 						'Run `pnpm fix` to automatically fix this.',
 				)
 			}
@@ -1059,37 +1356,31 @@ _Generated automatically from source TSV files._
 
 		logger.info('Treasury files up to date.')
 	} else {
-		// Write markdown if changed
-		if (fs.existsSync(config.outputPath)) {
-			const existingContent = fs.readFileSync(config.outputPath, 'utf-8')
+		let updated = false
+		const existingContent = fs.readFileSync(config.outputPath, 'utf-8')
 
-			if (existingContent.trim() === markdownContent.trim()) {
-				// Contents already up-to-date, nothing to do.
-				return
-			}
+		if (existingContent.trim() !== markdownContent.trim()) {
+			fs.writeFileSync(config.outputPath, markdownContent)
+			updated = true
 		}
 
-		fs.writeFileSync(config.outputPath, markdownContent)
+		const existingExpensesOverTime = fs.readFileSync(config.expensesOverTimePath, 'utf-8')
 
-		// Write chart if non-empty
-		if (chartContent !== '') {
-			const outputDir = path.dirname(config.chartOutputPath)
-
-			fs.mkdirSync(outputDir, { recursive: true })
-
-			if (fs.existsSync(config.chartOutputPath)) {
-				const existingChart = fs.readFileSync(config.chartOutputPath, 'utf-8')
-
-				if (existingChart !== chartContent) {
-					fs.writeFileSync(config.chartOutputPath, chartContent)
-					logger.info('Treasury chart updated.')
-				}
-			} else {
-				fs.writeFileSync(config.chartOutputPath, chartContent)
-				logger.info('Treasury chart generated.')
-			}
+		if (existingExpensesOverTime !== expensesOverTimeContent) {
+			fs.writeFileSync(config.expensesOverTimePath, expensesOverTimeContent)
+			updated = true
 		}
 
-		logger.info('Treasury transparency report updated.')
+		const existingExpensesBreakdown = fs.readFileSync(config.expensesBreakdownPath, 'utf-8')
+
+		if (existingExpensesBreakdown !== expensesBreakdownContent) {
+			fs.writeFileSync(config.expensesBreakdownPath, expensesBreakdownContent)
+
+			updated = true
+		}
+
+		if (updated) {
+			logger.info('Treasury transparency report updated.')
+		}
 	}
 }

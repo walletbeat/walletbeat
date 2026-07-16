@@ -19,7 +19,8 @@ const args = process.argv.slice(2)
 
 const appConfig: TreasuryMarkdownUpdaterConfig = {
 	addressesPath: path.join(GOVERNANCE_TREASURY_DIR, 'addresses.tsv'),
-	chartOutputPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-chart.svg'),
+	expensesOverTimePath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-expenses-over-time.svg'),
+	expensesBreakdownPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-expenses-breakdown.svg'),
 	operationsPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-operations.tsv'),
 	outputPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-transparency.md'),
 	priceDataPath: path.join(GOVERNANCE_TREASURY_DIR, 'price-data.tsv'),
