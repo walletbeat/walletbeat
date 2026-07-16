@@ -193,7 +193,6 @@
 	}
 
 	.eip-label {
-		font-family: var(--fontFamily-spMonorium);
 		font-size: 0.85rem;
 		font-weight: 600;
 		color: var(--accent);

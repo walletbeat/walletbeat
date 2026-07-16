@@ -133,7 +133,6 @@
 		}
 
 		line-height: 1.6;
-		font-family: var(--fontFamily-avenir);
 
 		article {
 			max-height: 100dvh;
@@ -146,7 +145,6 @@
 	}
 
 	h1 {
-		font-family: var(--fontFamily-avenir);
 		font-size: 2rem;
 	}
 
