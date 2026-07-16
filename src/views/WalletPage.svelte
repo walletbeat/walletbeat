@@ -1964,12 +1964,17 @@
 					var(---slice-label-r)
 					* var(---slice-unit)
 				);
+				---slice-scaled-offset: calc(
+					var(--slice-offset)
+					* var(---slice-unit)
+				);
 
 				display: block;
 				position: absolute;
 				inset-inline-start: calc(
 					50%
 					+ var(---slice-scaled-label-r)
+					+ var(---slice-scaled-offset)
 					- var(---slice-origin)
 				);
 				inset-block-start: calc(50% - var(---slice-origin));
@@ -2028,7 +2033,9 @@
 				transform-origin:
 					var(---slice-origin)
 					var(---slice-origin);
-				transform: rotate(-0.25turn);
+				transform:
+					rotate(-0.25turn)
+					translateY(calc(-1 * var(---slice-scaled-offset)));
 				z-index: 0;
 			}
 		}
