@@ -260,6 +260,7 @@
 			style:--slice-outerCornerRadius={item.sliceStyle?.outerCornerRadius}
 			style:--slice-innerCornerRadius={item.sliceStyle?.innerCornerRadius}
 			style:--slice-labelSize={item.sliceStyle?.labelSize}
+			style:--slice-labelR={item.sliceStyle?.labelR}
 			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
 			{@render navigationIcon(item, depth)}

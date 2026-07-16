@@ -1013,6 +1013,7 @@
 						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
 						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
 						style:--slice-labelSize={sliceStyle?.labelSize}
+						style:--slice-labelR={sliceStyle?.labelR}
 					></span>
 
 					<div data-row-item="flexible basis-2" data-column="gap-2">
@@ -1927,45 +1928,17 @@
 				---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
 				---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
 				---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-				---slice-icon-span: max(
-					var(---slice-outer-r) - var(---slice-inner-r),
-					2 * sin(var(---slice-half-angle)) * var(---slice-outer-r)
-				);
 				---slice-unit: calc(
-					var(--icon-size)
-					/ var(---slice-icon-span)
+					var(--icon-size) * 0.55
+					/ var(--slice-labelSize)
 				);
 				---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
-				---slice-label-radius: calc(var(--pie-radius) / 8);
-				---slice-label-r: clamp(
-					pow(
-						(
-							(var(---slice-outer-r) - var(---slice-label-radius))
-							* (var(---slice-inner-r) + var(---slice-label-radius))
-						),
-						0.5
-					),
-					(
-						2 / 3
-						* (
-							(
-								pow(var(---slice-outer-r), 3)
-								- pow(var(---slice-inner-r), 3)
-							)
-							/ (
-								pow(var(---slice-outer-r), 2)
-								- pow(var(---slice-inner-r), 2)
-							)
-						)
-						* (
-							sin(abs(var(--slice-totalAngle)) * 1deg / 2)
-							/ (abs(var(--slice-totalAngle)) * pi / 180 / 2)
-						)
-					),
-					var(---slice-outer-r) - var(---slice-label-radius)
-				);
 				---slice-scaled-label-r: calc(
-					var(---slice-label-r)
+					var(--slice-labelR)
+					* var(---slice-unit)
+				);
+				---slice-scaled-offset: calc(
+					var(--slice-offset)
 					* var(---slice-unit)
 				);
 
@@ -2032,7 +2005,10 @@
 				transform-origin:
 					var(---slice-origin)
 					var(---slice-origin);
-				transform: rotate(-0.25turn);
+				transform:
+					translateX(var(---slice-scaled-offset))
+					rotate(-0.25turn)
+					translateY(calc(-1 * var(---slice-scaled-offset)));
 				z-index: 0;
 			}
 		}

@@ -229,6 +229,7 @@
 		style:--slice-fill={sliceFill(slice)}
 		style:--slice-backdropFilter={sliceBackdropFilter(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
+		style:--slice-labelR={slice.computed.labelR}
 
 		data-slice-id={slice.id}
 		class:highlighted={highlightedSliceId === slice.id}
@@ -366,40 +367,6 @@
 				}
 
 				.slice-shape {
-					--slice-labelRadius: calc(var(--pie-labelSize) / 2);
-					--slice-labelR: clamp(
-						/* Geometric mean of the inner and outer radii (with label radius carved out) */
-						pow(
-							(
-								(var(--slice-outerR) - var(--slice-labelRadius))
-								* (var(--slice-innerR) + var(--slice-labelRadius))
-							),
-							0.5
-						),
-
-						/* Centroid of the trimmed annular sector (with inner radius adjusted by label radius) */
-						(
-							2 / 3
-							* (
-								(
-									pow(var(--slice-outerR), 3)
-									- pow(var(--slice-innerR), 3)
-								)
-								/ (
-									pow(var(--slice-outerR), 2)
-									- pow(var(--slice-innerR), 2)
-								)
-							)
-							* (
-								sin(abs(var(--slice-totalAngle)) * 1deg / 2)
-								/ (abs(var(--slice-totalAngle)) * pi/180 / 2)
-							)
-						),
-
-						/* Outer radius minus label radius */
-						var(--slice-outerR) - var(--slice-labelRadius)
-					);
-
 					--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
 					--slice-halfGap: calc(var(--slice-gap) / 2);
 					--slice-outerCornerR: max(
