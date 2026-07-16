@@ -878,7 +878,7 @@
 					{#if item.icon}
 						<span
 							class="pie-navigation-icon"
-							data-icon="circle filled wbicons emoji {item.icon}"
+							data-icon="wbicons emoji {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -908,7 +908,7 @@
 					{#if item.icon}
 						<span
 							class="toc-icon"
-							data-icon="circle filled wbicons emoji {item.icon}"
+							data-icon="wbicons emoji {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -1057,7 +1057,7 @@
 				<header data-row="start gap-3">
 					<span
 						class="attribute-icon"
-						data-icon="circle filled wbicons emoji {attribute.icon}"
+						data-icon="wbicons emoji {attribute.icon}"
 					></span>
 
 					<div data-row-item="flexible basis-2" data-column="gap-2">
@@ -1595,7 +1595,7 @@
 				}
 			}
 
-			:global(.toc-icon[data-icon~='filled']::before) {
+			:global(.toc-icon::before) {
 				line-height: 1;
 				filter: var(--icon-filter);
 				transition-property: filter;
