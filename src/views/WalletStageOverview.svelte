@@ -76,15 +76,6 @@
 			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 	)
 
-	const defaultOpenStageIndex = $derived(
-		!ladderDefinition ?
-			null
-		: currentStageIndex === null ?
-			0
-		:
-			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
-	)
-
 	const stageEvaluatableWallet = $derived.by(() => {
 		const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
 
@@ -118,11 +109,9 @@
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
 				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
-				{@const isDefaultOpen = defaultOpenStageIndex === stageIndex}
-
 				<details
 					id={s.id}
-					open={isDefaultOpen}
+					open
 					data-card="radius-8 padding-6 {isCurrent ? 'border-accent' : ''}"
 					data-column="gap-0"
 					style:--accent={stageToColor(stageIndex, ladderDefinition?.stages.length ?? 3)}
@@ -181,6 +170,7 @@
 									)}
 
 									<details
+										open
 										data-card="padding-5 secondary radius-4"
 										style:--accent={stageStatuses[groupRating].color}
 									>
