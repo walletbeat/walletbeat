@@ -721,8 +721,11 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				erc4361: featureSupported,
+				erc4361: supported({
+					ref: refTodo,
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -741,6 +744,7 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: displaysFullCallData,
 					messageSigningLegibility: {
 						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,

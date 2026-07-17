@@ -239,8 +239,11 @@ describe('walletEipSupport', () => {
 				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
-					erc4361: featureSupported,
+					erc4361: supported({
+						ref: { url: 'https://example.com/4361' },
+					}),
 					erc8213: supported({
+						ref: { url: 'https://example.com/8213' },
 						calldataDisplay: {
 							[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 							[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
@@ -255,6 +258,7 @@ describe('walletEipSupport', () => {
 						},
 					}),
 					erc7730: supported({
+						ref: { url: 'https://example.com/7730' },
 						[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 							decoded: DataDisplayOptions.NOT_IN_UI,
 						},
@@ -282,11 +286,12 @@ describe('walletEipSupport', () => {
 		// The wallet does not display the calldata digest nor the EIP-712 digest.
 		expectNotSupported(eipSupport['8213'])
 
-		// All three EIPs inherit the transaction legibility references.
-		expect(refUrls(eipSupport['712'])).toContain('https://example.com/legibility')
-		expect(refUrls(eipSupport['4361'])).toContain('https://example.com/legibility')
-		expect(refUrls(eipSupport['7730'])).toContain('https://example.com/legibility')
-		expect(refUrls(eipSupport['8213'])).toContain('https://example.com/legibility')
+		// Each EIP cites its own per-ERC reference block, not the top-level
+		// transaction legibility references.
+		expect(refUrls(eipSupport['712'])).toEqual(['https://example.com/8213'])
+		expect(refUrls(eipSupport['4361'])).toEqual(['https://example.com/4361'])
+		expect(refUrls(eipSupport['7730'])).toEqual(['https://example.com/7730'])
+		expect(refUrls(eipSupport['8213'])).toEqual(['https://example.com/8213'])
 	})
 
 	it('credits ERC-8213 when the domain hash and message hash are shown together', () => {
@@ -298,6 +303,7 @@ describe('walletEipSupport', () => {
 					ref: { url: 'https://example.com/legibility' },
 					erc4361: null,
 					erc8213: supported({
+						ref: { url: 'https://example.com/8213' },
 						calldataDisplay: null,
 						messageSigningLegibility: {
 							[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
@@ -330,7 +336,10 @@ describe('walletEipSupport', () => {
 					ref: { url: 'https://example.com/hardware-legibility' },
 					erc4361: null,
 					erc8213: null,
-					erc7730: supported(benchmarks),
+					erc7730: supported({
+						ref: { url: 'https://example.com/hardware-7730' },
+						...benchmarks,
+					}),
 					detailsDisplayed: null,
 					dataExtraction: null,
 				},

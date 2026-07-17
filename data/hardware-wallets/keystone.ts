@@ -183,11 +183,6 @@ export const keystoneWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Independent video demonstration of Keystone's signing implementation on a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=759',
-					},
-					{
-						explanation:
 							"Independent video demonstration of Keystone's transaction implementation on a Safe.",
 						url: 'https://youtube.com/shorts/Ly9lo4g5NpA',
 					},
@@ -203,6 +198,11 @@ export const keystoneWallet: HardwareWallet = {
 				},
 				erc4361: null,
 				erc7730: supported({
+					ref: {
+						explanation:
+							"Independent video demonstration of Keystone's signing implementation on a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=759',
+					},
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,
