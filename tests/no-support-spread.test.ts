@@ -19,7 +19,7 @@ const bannedSpreads: BannedSpread[] = [
 		name: '...notSupported',
 		regexp: /\.\.\.\s*notSupported\b/,
 		explanation:
-			'Do not spread `notSupported` to build an unsupported feature object; use the `notSupportedWithRef({ ... })` helpers from `@/schema/features/support` instead.',
+			'Do not spread `notSupported` to build an unsupported feature object; if a `ref` is needed, use the `notSupportedWithRef({ ... })` helper from `@/schema/features/support`, otherwise use `notSupportedWith({ ... })`.',
 	},
 ]
 
@@ -55,6 +55,9 @@ async function codebaseBannedSpreadIndex(): Promise<Map<string, Set<string>>> {
 
 			// Exclude test files
 			/\.test\.ts$/i,
+
+			// Only .ts files can reference these constants.
+			(filePath: string) => !filePath.endsWith('.ts'),
 		]),
 	})
 
