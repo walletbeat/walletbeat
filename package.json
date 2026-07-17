@@ -22,6 +22,7 @@
 		"check:spelling:reorder": "tests/cspell/reorder-cspell.sh",
 		"check:spelling:quiet": "cspell lint --quiet --no-progress .",
 		"check:syntax": "prettier --check .",
+		"check:eip-status": "tsx src/tools/eip-status-checker/eip-status-checker.ts",
 		"check:treasury:markdown": "tsx src/tools/treasury-markdown-updater/treasury-markdown-updater.ts",
 		"check:features:markdown": "tsx src/tools/features-markdown-generator/features-markdown-generator.ts",
 		"check:signed-commit": "bash tests/signed-commit.test.sh",

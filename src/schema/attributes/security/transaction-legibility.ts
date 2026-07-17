@@ -34,9 +34,15 @@ import {
 	type SoftwareTransactionLegibilityImplementation,
 	type SoftwareTransactionSimulations,
 	type SoftwareWalletErc8213,
+	transactionLegibilityErcRefs,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
-import { featureSupported, isSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupportedNoRef,
+	isSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
@@ -1114,6 +1120,7 @@ function evaluateHardwareWalletTransactionLegibility(
 	hardwareTransactionLegibility: HardwareTransactionLegibilityImplementation,
 ): Evaluation {
 	ctx.addRef(hardwareTransactionLegibility)
+	ctx.addRef(transactionLegibilityErcRefs(hardwareTransactionLegibility))
 
 	const { erc7730, detailsDisplayed, dataExtraction, erc8213, erc4361 } =
 		hardwareTransactionLegibility
@@ -1188,6 +1195,8 @@ function evaluateSoftwareWalletTransactionLegibility(
 	softwareTransactionLegibility: SoftwareTransactionLegibilityImplementation,
 ): Evaluation {
 	const transactionLegibilitySupport = ctx.popRefs(softwareTransactionLegibility)
+
+	ctx.addRef(transactionLegibilityErcRefs(softwareTransactionLegibility))
 
 	const { erc8213, erc7730, transactionDetailsDisplay, transactionSimulations, erc4361 } =
 		transactionLegibilitySupport
@@ -1419,9 +1428,10 @@ export const transactionLegibility: Attribute = {
 				hardwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: featureSupported,
+						erc4361: featureSupportedNoRef,
 						erc8213: null,
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
 							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
@@ -1448,8 +1458,9 @@ export const transactionLegibility: Attribute = {
 				hardwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: featureSupported,
+						erc4361: featureSupportedNoRef,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: {
 									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1502,8 +1513,9 @@ export const transactionLegibility: Attribute = {
 				softwareFullTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: featureSupported,
+						erc4361: featureSupportedNoRef,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1518,6 +1530,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							},
@@ -1612,6 +1625,7 @@ export const transactionLegibility: Attribute = {
 						erc4361: null,
 						erc8213: null,
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
 							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
 							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]:
@@ -1642,6 +1656,7 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: {
 									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1696,6 +1711,7 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
@@ -1710,6 +1726,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							},
@@ -1778,6 +1795,7 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1792,6 +1810,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							},
@@ -1857,8 +1876,11 @@ export const transactionLegibility: Attribute = {
 				hardwareMissingErc4361TransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: notSupported,
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: {
 									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1897,6 +1919,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
 							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
@@ -1923,8 +1946,11 @@ export const transactionLegibility: Attribute = {
 				softwareMissingErc4361TransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: notSupported,
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -1939,6 +1965,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							},
@@ -2007,7 +2034,9 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: null,
-						erc7730: notSupported,
+						erc7730: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						detailsDisplayed: displaysNoTransactionDetails,
 						dataExtraction: noDataExtraction,
 						ref: refNotNecessary,
@@ -2023,6 +2052,7 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
@@ -2037,6 +2067,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 								decoded: DataDisplayOptions.NOT_IN_UI,
 							},
@@ -2104,6 +2135,7 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: supported({
+							ref: refNotNecessary,
 							calldataDisplay: {
 								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.NOT_IN_UI,
 								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
@@ -2118,6 +2150,7 @@ export const transactionLegibility: Attribute = {
 							},
 						}),
 						erc7730: supported({
+							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 								decoded: DataDisplayOptions.NOT_IN_UI,
 							},
