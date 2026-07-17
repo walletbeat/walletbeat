@@ -56,6 +56,11 @@ type SecurityAuditsSubResult = {
 	hasUnaddressedFlaws: boolean
 }
 
+/** Whether at least one of the given audits was performed within the last year. */
+export function isAuditedInLastYear(audits: readonly SecurityAudit[]): boolean {
+	return audits.some(audit => daysSince(audit.auditDate) <= 366)
+}
+
 function noAudits(): SecurityAuditsSubResult {
 	return {
 		rating: Rating.FAIL,
@@ -620,14 +625,10 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 
 			ctx.addRef(...auditsFeature)
 
-			let auditedInLastYear = false
+			const auditedInLastYear = isAuditedInLastYear(auditsFeature)
 			let hasUnaddressedFlaws = false
 
 			for (const audit of auditsFeature) {
-				if (daysSince(audit.auditDate) <= 366) {
-					auditedInLastYear = true
-				}
-
 				if (Array.isArray(audit.unpatchedFlaws)) {
 					for (const flaw of audit.unpatchedFlaws) {
 						if (flaw.presentStatus === 'NOT_FIXED') {

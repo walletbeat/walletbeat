@@ -1,6 +1,5 @@
 import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 import { sentence } from '@/types/content'
-import { daysSince } from '@/types/date'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
 import { accountAbstraction } from '../attributes/ecosystem/account-abstraction'
@@ -13,7 +12,10 @@ import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
-import { securityAuditsAndBounties } from '../attributes/security/security-audits-bounties'
+import {
+	isAuditedInLastYear,
+	securityAuditsAndBounties,
+} from '../attributes/security/security-audits-bounties'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
@@ -193,8 +195,8 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							const auditedInLastYear = variantWallet.features.security.publicSecurityAudits.some(
-								audit => daysSince(audit.auditDate) <= 366,
+							const auditedInLastYear = isAuditedInLastYear(
+								variantWallet.features.security.publicSecurityAudits,
 							)
 
 							if (!auditedInLastYear) {
