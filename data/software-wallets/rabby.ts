@@ -422,7 +422,7 @@ export const rabby: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
-				drills: null,
+				drills: notSupported,
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: null,
