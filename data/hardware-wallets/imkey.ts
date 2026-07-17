@@ -10,7 +10,12 @@ import {
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -171,7 +176,7 @@ export const imkeyWallet: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				erc4361: null,
-				erc7730: { ...notSupported, ref: refTodo },
+				erc7730: notSupportedWithRef({ ref: refTodo }),
 				erc8213: null,
 			},
 			userSafety: null,

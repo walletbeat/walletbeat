@@ -40,7 +40,7 @@ import {
 import {
 	featureSupportedNoRef,
 	isSupported,
-	notSupported,
+	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
 import { refNotNecessary } from '@/schema/reference'
@@ -1876,7 +1876,9 @@ export const transactionLegibility: Attribute = {
 				hardwareMissingErc4361TransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: { ...notSupported, ref: refNotNecessary },
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {
@@ -1944,7 +1946,9 @@ export const transactionLegibility: Attribute = {
 				softwareMissingErc4361TransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: { ...notSupported, ref: refNotNecessary },
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {
@@ -2030,7 +2034,9 @@ export const transactionLegibility: Attribute = {
 					{
 						erc4361: null,
 						erc8213: null,
-						erc7730: { ...notSupported, ref: refNotNecessary },
+						erc7730: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						detailsDisplayed: displaysNoTransactionDetails,
 						dataExtraction: noDataExtraction,
 						ref: refNotNecessary,

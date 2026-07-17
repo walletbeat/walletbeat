@@ -239,7 +239,9 @@ describe('walletEipSupport', () => {
 				...unratedFeatures().security,
 				transactionLegibility: {
 					ref: { url: 'https://example.com/legibility' },
-					erc4361: { ...featureSupported, ref: { url: 'https://example.com/4361' } },
+					erc4361: supported({
+						ref: { url: 'https://example.com/4361' },
+					}),
 					erc8213: supported({
 						ref: { url: 'https://example.com/8213' },
 						calldataDisplay: {

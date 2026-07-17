@@ -20,7 +20,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
@@ -183,14 +183,13 @@ export const trezorWallet: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				erc4361: null,
-				erc7730: {
-					...notSupported,
+				erc7730: notSupportedWithRef({
 					ref: {
 						explanation:
 							"Independent video demonstration of Trezor's signing implementation on Safe.",
 						url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
 					},
-				},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,
