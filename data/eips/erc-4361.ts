@@ -1,8 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { walletTypes } from '@/schema/wallet-types'
 
 export const erc4361: Eip = {
 	friendlyName: 'Sign-In with Ethereum',
 	formalTitle: 'Sign-In with Ethereum',
+	appliesTo: walletTypes.set,
+	icon: 'ICON_LOG_IN',
 	number: '4361',
 	prefix: EipPrefix.ERC,
 	status: EipStatus.FINAL,

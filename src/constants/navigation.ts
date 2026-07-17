@@ -13,6 +13,7 @@ export type LucideNavigationIcon =
 	| 'ICON_GLOBE'
 	| 'ICON_HASH'
 	| 'ICON_LAYERS'
+	| 'ICON_LOG_IN'
 	| 'ICON_PLUG'
 	| 'ICON_RADAR'
 	| 'ICON_SIGNATURE'

@@ -15,6 +15,7 @@
 	import GlobeIcon from 'lucide-static/icons/globe.svg?raw'
 	import HashIcon from 'lucide-static/icons/hash.svg?raw'
 	import LayersIcon from 'lucide-static/icons/layers.svg?raw'
+	import LogInIcon from 'lucide-static/icons/log-in.svg?raw'
 	import PlugIcon from 'lucide-static/icons/plug.svg?raw'
 	import RadarIcon from 'lucide-static/icons/radar.svg?raw'
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
@@ -35,6 +36,7 @@
 		ICON_GLOBE: GlobeIcon,
 		ICON_HASH: HashIcon,
 		ICON_LAYERS: LayersIcon,
+		ICON_LOG_IN: LogInIcon,
 		ICON_PLUG: PlugIcon,
 		ICON_RADAR: RadarIcon,
 		ICON_SIGNATURE: SignatureIcon,
