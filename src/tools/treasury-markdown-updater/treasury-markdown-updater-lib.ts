@@ -719,7 +719,7 @@ async function populatePriceData(
 export function getChartColor(category: TreasuryCategory | 'Other'): string {
 	switch (category) {
 		case TreasuryCategory['expense:swag']:
-			return '#e76f51'
+			return '#e8835c'
 		case TreasuryCategory['expense:travel']:
 			return '#0077b6'
 		case TreasuryCategory['expense:wallet']:
@@ -737,7 +737,7 @@ export function getChartColor(category: TreasuryCategory | 'Other'): string {
 		case TreasuryCategory['services:email']:
 			return '#ff6d00'
 		case TreasuryCategory['services:storage']:
-			return '#ff6d00'
+			return '#ff8c00'
 		case TreasuryCategory['services:social_media']:
 			return '#80b918'
 		case TreasuryCategory.operational:
@@ -756,9 +756,9 @@ function formatUsd(value: number, showCurrency = false): string {
 	let result: string
 
 	if (value >= 1_000_000) {
-		result = `${(value / 1_000_000).toFixed(3)}M`
+		result = `${(value / 1_000_000).toFixed(1)}M`
 	} else if (value >= 1_000) {
-		result = `${(value / 1_000).toFixed(3)}k`
+		result = `${(value / 1_000).toFixed(1)}k`
 	} else {
 		result = `${value.toFixed(0)}`
 	}
@@ -896,8 +896,8 @@ export async function generateExpensesOverTimeChart(
 	const barGap = 18
 	const marginLeft = 65
 	const marginRight = 20
-	const marginTop = 20
-	const marginBottom = 50
+	const marginTop = 36
+	const marginBottom = 120
 
 	const width = marginLeft + chartData.length * (barWidth + barGap) - barGap + marginRight
 	const maxTotal = Math.max(...chartData.map(d => d.total), 1)
@@ -907,6 +907,13 @@ export async function generateExpensesOverTimeChart(
 	const chartHeight = 240
 	const height = marginTop + chartHeight + marginBottom
 
+	// Collect all categories (including those with zero total) for the legend
+	const legendCategories = sortedCategories.filter(category => {
+		return chartData.some(month => {
+			return month.segments.some(seg => seg.category === category)
+		})
+	})
+
 	// Y-axis ticks
 	const tickCount = 5
 	const ticks = Array.from({ length: tickCount + 1 }, (_, i) => (niceMax / tickCount) * i)
@@ -915,6 +922,7 @@ export async function generateExpensesOverTimeChart(
 
 	svgParts.push(
 		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Monthly expenses chart stacked by category">`,
+		"<rect width='100%' height='100%' fill='#fff'/>",
 	)
 
 	// Styles
@@ -975,6 +983,41 @@ export async function generateExpensesOverTimeChart(
 
 			cumulativeY -= segHeight
 		}
+
+		// Total label at top of bar
+		if (d.total > 0) {
+			svgParts.push(
+				`<text x="${labelX}" y="${cumulativeY - 5}" text-anchor="middle" font-size="10px" font-weight="600" fill="#374151">${formatUsd(d.total)}</text>`,
+			)
+		}
+	}
+
+	// Legend (below x-axis)
+	const legendYStart = marginTop + chartHeight + 36
+	const legendSwatchSize = 10
+	const legendSwatchGap = 8
+	const legendRowHeight = 18
+	const legendEntryMinWidth = 130
+	const legendMaxWidth = width - marginLeft - marginRight
+
+	// Compute number of columns that fit
+	const legendCols = Math.max(1, Math.floor(legendMaxWidth / legendEntryMinWidth))
+	const legendColWidth = Math.floor(legendMaxWidth / legendCols)
+
+	for (let idx = 0; idx < legendCategories.length; idx++) {
+		const category = legendCategories[idx]
+		const col = idx % legendCols
+		const row = Math.floor(idx / legendCols)
+
+		const lx = marginLeft + col * legendColWidth
+		const ly = legendYStart + row * legendRowHeight
+
+		svgParts.push(
+			`<rect x="${lx}" y="${ly - legendSwatchSize / 2}" width="${legendSwatchSize}" height="${legendSwatchSize}" fill="${getChartColor(category)}" rx="2" ry="2"/>`,
+		)
+		svgParts.push(
+			`<text x="${lx + legendSwatchSize + legendSwatchGap}" y="${ly}" class="pie-label" text-anchor="start">${escapeSvg(categoryLabel(category))}</text>`,
+		)
 	}
 
 	svgParts.push('</svg>')
@@ -1103,16 +1146,17 @@ export async function generateExpensesBreakdownChart(
 			: allSegments
 
 	// --- Generate SVG ---
-	const svgWidth = 600
-	const svgHeight = 400
-	const pieCenterX = 220
-	const pieCenterY = 200
-	const pieRadius = 160
+	const svgWidth = 690
+	const svgHeight = 344
+	const pieCenterX = 170
+	const pieCenterY = 190
+	const pieRadius = 140
 
 	const svgParts: string[] = []
 
 	svgParts.push(
 		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgWidth} ${svgHeight}" role="img" aria-label="Total expenses breakdown pie chart by category">`,
+		"<rect width='100%' height='100%' fill='#fff'/>",
 	)
 
 	// Styles
@@ -1121,7 +1165,7 @@ export async function generateExpensesBreakdownChart(
 		'  text { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; fill: #374151; }',
 		'  .pie-segment { cursor: pointer; }',
 		'  .pie-segment:hover { opacity: 0.8; }',
-		'  .pie-label { font-size: 10px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }',
+		'  .pie-label { font-size: 13px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }',
 		'  .pie-title { font-size: 16px; font-weight: 600; fill: #111827; text-anchor: middle; }',
 		'  .legend-item { cursor: pointer; }',
 		'  .legend-item:hover { opacity: 0.8; }',
@@ -1131,10 +1175,10 @@ export async function generateExpensesBreakdownChart(
 
 	// Title
 	svgParts.push(
-		`<text x="${pieCenterX}" y="${pieCenterY - pieRadius - 28}" class="pie-title">Total Expenses</text>`,
+		`<text x="${pieCenterX}" y="${pieCenterY - pieRadius - 24}" class="pie-title">Total Expenses</text>`,
 	)
 	svgParts.push(
-		`<text x="${pieCenterX}" y="${pieCenterY - pieRadius - 10}" font-size="12px" fill="#6b7280" text-anchor="middle">${formatUsd(totalUsd, true)}</text>`,
+		`<text x="${pieCenterX}" y="${pieCenterY - pieRadius - 8}" font-size="12px" fill="#6b7280" text-anchor="middle">${formatUsd(totalUsd, true)}</text>`,
 	)
 
 	// Draw pie slices
@@ -1188,34 +1232,33 @@ export async function generateExpensesBreakdownChart(
 		cumulativeAngle += sliceAngle
 	}
 
-	// Legend (right side, single column)
-	const legendX = 410
-	const legendYStart = 40
-	const legendRowHeight = 22
+	// Legend (right side, single line per entry: swatch, label, then percentage)
+	const legendX = 390
+	const legendYStart = 10
+	const legendSwatchWidth = 14
+	const legendSwatchHeight = 14
 	const labelPadding = 18
-	const percentagePadding = 8
-	const percentageRightX = 560
+	const percentageRightX = svgWidth - 14
+	const legendRowHeight = 20
 
 	for (let i = 0; i < segments.length; i++) {
 		const x = legendX
-		const y = legendYStart + i * legendRowHeight
+		const rowCenter = legendYStart + i * legendRowHeight + legendRowHeight / 2
 
 		const seg = segments[i]
 		const percentageLabel = `${seg.percentage.toFixed(1)}%`
 		const labelText = seg.label
-		const labelX = x + labelPadding
-		const percentageX = Math.max(
-			labelX + labelText.length * 6.5 + percentagePadding,
-			percentageRightX,
-		)
+		const labelX = x + legendSwatchWidth + labelPadding
 
 		svgParts.push('<g class="legend-item">')
 		svgParts.push(
-			`<rect x="${x}" y="${y - 10}" width="14" height="14" fill="${seg.color}" rx="2" ry="2"/>`,
+			`<rect x="${x}" y="${rowCenter - legendSwatchHeight / 2}" width="${legendSwatchWidth}" height="${legendSwatchHeight}" fill="${seg.color}" rx="2" ry="2"/>`,
 		)
-		svgParts.push(`<text x="${labelX}" y="${y}" class="legend-text">${escapeSvg(labelText)}</text>`)
 		svgParts.push(
-			`<text x="${percentageX}" y="${y}" class="legend-text" text-anchor="end" fill="#6b7280">${percentageLabel}</text>`,
+			`<text x="${labelX}" y="${rowCenter}" class="legend-text" dominant-baseline="central">${escapeSvg(labelText)}</text>`,
+		)
+		svgParts.push(
+			`<text x="${percentageRightX}" y="${rowCenter}" class="legend-text" text-anchor="end" fill="#6b7280" dominant-baseline="central">${percentageLabel}</text>`,
 		)
 		svgParts.push('</g>')
 	}
