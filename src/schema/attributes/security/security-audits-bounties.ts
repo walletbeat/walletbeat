@@ -241,7 +241,9 @@ function noBugBountyProgram(): BugBountyProgramSubResult {
 /**
  * Sub-result for wallets that implement a bug bounty program.
  */
-function evaluateBugBountyProgram(support: BugBountyProgramSupport): BugBountyProgramSubResult {
+export function evaluateBugBountyProgram(
+	support: BugBountyProgramSupport,
+): BugBountyProgramSubResult {
 	const rewardInfo = getRewardDescription(support)
 	const rewardDetailsInfo = getRewardDetailsDescription(support)
 	const coverageInfo =

@@ -1,4 +1,5 @@
 import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
+import { Rating } from '@/schema/attributes'
 import { sentence } from '@/types/content'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
@@ -13,8 +14,8 @@ import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import {
+	evaluateBugBountyProgram,
 	isAuditedInLastYear,
-	securityAuditsAndBounties,
 } from '../attributes/security/security-audits-bounties'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
@@ -572,11 +573,39 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBounties, {
-						allowPartial: false,
-						ifUnverifiable: 'THROW',
-						ifNoVariantInScope: null,
-					}),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							const bugBountyProgram = variantWallet.features.security.bugBountyProgram
+
+							if (bugBountyProgram === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!isSupported(bugBountyProgram)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence('{{WALLET_NAME}} does not have a bug bounty program.'),
+								}
+							}
+
+							if (evaluateBugBountyProgram(bugBountyProgram).rating !== Rating.PASS) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not have a sufficiently comprehensive bug bounty program.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} has a funded, comprehensive bug bounty program.',
+								),
+							}
+						},
+					),
 					displayName: 'Bug Bounty Program',
 				},
 				{
