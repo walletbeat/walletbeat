@@ -570,17 +570,13 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(
-						softwareWalletVariants,
-						securityAuditsAndBounties,
-						{
-							allowPartial: false,
-							ifUnverifiable: sentence(
-								"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
-							),
-							ifNoVariantInScope: null,
-						},
-					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBounties, {
+						allowPartial: false,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
 					displayName: 'Bug Bounty Program',
 				},
 				{
