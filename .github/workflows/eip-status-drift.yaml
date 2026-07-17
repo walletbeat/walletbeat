@@ -1,0 +1,30 @@
+name: EIP status drift
+
+on:
+  workflow_dispatch: {} # On demand
+  schedule: # On schedule
+    - cron: '0 8 * * 1' # Every Monday at 08:00 UTC
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  eip-status-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.0.9
+      - name: Install Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Report EIP status drift
+        run: ./deploy/eip-status/report-drift.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
