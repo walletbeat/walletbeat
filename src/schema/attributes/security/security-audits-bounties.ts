@@ -373,17 +373,13 @@ function combineEvaluation(
 	auditsPart: SecurityAuditsSubResult,
 	bugBountyPart: BugBountyProgramSubResult,
 ): Evaluation<SecurityAuditsMetadata> {
-	const rating =
-		compareExplicitRatings(auditsPart.rating, bugBountyPart.rating) <= 0
-			? auditsPart.rating
-			: bugBountyPart.rating
-
-	const { displayName, shortExplanation } = ((): Pick<
+	const { rating, displayName, shortExplanation } = ((): Pick<
 		SecurityAuditsSubResult,
-		'displayName' | 'shortExplanation'
+		'rating' | 'displayName' | 'shortExplanation'
 	> => {
 		if (auditsPart.rating === Rating.PASS && bugBountyPart.rating === Rating.PASS) {
 			return {
+				rating: Rating.PASS,
 				displayName: 'Recent security audit and active bug bounty program',
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} has undergone a recent security audit with all faults addressed, and maintains an active bug bounty program.',
@@ -391,7 +387,6 @@ function combineEvaluation(
 			}
 		}
 
-		// The headline reflects the sub-evaluation that drags the rating down.
 		return compareExplicitRatings(bugBountyPart.rating, auditsPart.rating) < 0
 			? bugBountyPart
 			: auditsPart
