@@ -34,7 +34,7 @@ Date	From	To	Amount	Purpose	ID
 2026-02-09	treasury	treasury	0	Approving 10,000 USDC for spending on Sablier	0xd68af308f487563bed39cad328779480f7084f7adf7f213500db96dcbbe6b5ab
 2026-02-09	treasury	mattmatt_sablier	0.000001 USDC [labor:dev]	Test top-up of Sablier stream	0x930381897bb10aee8712b7d49a11c8d3a7c95b3ec3968f726371b0ef89d434ec
 2026-02-09	treasury	mattmatt_sablier	1,999.999999 USDC [labor:dev]	Top-up of Sablier stream	0x4c2a2b7c3f415fa181f76399034705b7ddc3ed93a012b4792171efb0e33f818c
-2026-02-10	treasury	chainflip1	0.055 ETH [ignored:multi_tx_swap] + 0.00157093 BTC [multi_step_swap]	Chainflip swap to BTC https://scan.chainflip.io/swaps/1314403	0xa39a6666228ba3f3f023623fbd78487f0c054b70f879710d441a73d7225edfb7
+2026-02-10	treasury	chainflip1	0.055 ETH → 0.00157093 BTC	Chainflip swap to BTC https://scan.chainflip.io/swaps/1314403	0xa39a6666228ba3f3f023623fbd78487f0c054b70f879710d441a73d7225edfb7
 2026-02-10	chainflip1	proton1	0.00157093 BTC [services:email]	Payment for 2 years of Mail Plus for Walletbeat Proton Mail service	btc:d171832539dc34e86c29b9457249c96b98fdb8e5efbe00002a8f92073e7007ea
 2026-02-13	treasury	mattmatt_test1	0.05 ETH [labor:dev]	Wallet testing	0xdb3113117fd8c05be082110179634ecc1170350d12ed81d8924a3e435d4048f9
 2026-02-28	treasury	treasury	0	Add 0xMattmatt as signer	0xbb4098d18189dc2524653df23983617c80bba7c048d24a80c12a95c62172ad47
@@ -85,7 +85,7 @@ Date	From	To	Amount	Purpose	ID
 2026-07-06	treasury	thegeekygrower	1,000 USDC [labor:dev]	Payment for implementation of Orderflow Transparency attribute	0xe24178abd9e87a8f95f32c30119bac2b5d24543269e1916f786e00100e1f1a23
 2026-07-06	treasury	lucilajuliana.shefi.eth	1,500 USDC [labor:comms]	Compensation for social media	0x45cca27f75a540b905aa929463d5d45feee02473cf04a7795e65bc877cfadf19
 2026-07-06	treasury	ren2140	1,500 USDC [labor:data_entry]	Compensation for wallet data entry	0x7b96b2acc5a66eb507f38007c5dc001c4a367b00b677f8c4dc63f8a8c41c9c66
-2026-07-16	treasury	chainflip2	0.063 ETH [ignored:multi_tx_swap] + 0.00157093 BTC [multi_step_swap]	Chainflip swap to BTC https://scan.chainflip.io/swaps/1663183	0x0fc454c0fd1781e95d68de23ab17d9d9c9f1456cd13efb150f55abaffc54fd44
+2026-07-16	treasury	chainflip2	0.063 ETH → 0.00184883 BTC	Chainflip swap to BTC https://scan.chainflip.io/swaps/1663183	0x0fc454c0fd1781e95d68de23ab17d9d9c9f1456cd13efb150f55abaffc54fd44
 2026-07-16	chainflip2	proton2	0.00184883 BTC [services:storage]	Payment for 2 years of Proton Drive for Walletbeat	btc:7cb5aa40ae5ef45da6d159a5f39203dd0149659be26d1d68429d34e67ab386b3
 2026-07-16	treasury	treasury	0	Replace polymutex2 with ren2140 as signer	0x40854e56c62b3a9fcb131a49a0d5b523c7a22f3b2514c25b8532e39711336b85
 2026-07-16	treasury	treasury	0.260752232321898743 WETH → 500 USDC	CoW Swap from WETH to USDC	0x6baa3ebb8a194885856c073362fee8acad55e5c8b1028a27f8fd9b75b122fbcd
