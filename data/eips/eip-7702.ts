@@ -8,7 +8,7 @@ export const eip7702: Eip = {
 	icon: 'ICON_FILE_CODE',
 	number: '7702',
 	prefix: EipPrefix.EIP,
-	status: EipStatus.LAST_CALL,
+	status: EipStatus.FINAL,
 	summaryMarkdown: `
 		Smart contract accounts require their own Ethereum address by definition.
 		EIP-7702 builds on top of ERC-4337 by allowing non-smart-contract accounts

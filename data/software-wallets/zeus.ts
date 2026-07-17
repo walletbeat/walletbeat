@@ -260,12 +260,14 @@ export const zeus: SoftwareWallet = {
 							url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/utils/tx.rs#L241C1-L242C1',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: false,
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: supported({
@@ -276,8 +278,10 @@ export const zeus: SoftwareWallet = {
 						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
 					},
 				],
+				erc4361: null,
 				erc7730: null,
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: null,
 					messageSigningLegibility: {
 						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,

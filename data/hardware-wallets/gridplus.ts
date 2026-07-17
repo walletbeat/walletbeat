@@ -242,11 +242,6 @@ export const gridplusWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Independent video demonstration of GridPlus's clear signing implementation on Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
-					},
-					{
-						explanation:
 							"Independent video demonstration of GridPlus's transaction implementation on Safe.",
 						url: 'https://youtube.com/shorts/_s5PjZhgBig',
 					},
@@ -257,7 +252,13 @@ export const gridplusWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
+				erc4361: null,
 				erc7730: supported({
+					ref: {
+						explanation:
+							"Independent video demonstration of GridPlus's clear signing implementation on Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
+					},
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,

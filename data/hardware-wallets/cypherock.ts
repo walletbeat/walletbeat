@@ -18,7 +18,7 @@ import {
 	DataDisplayOptions,
 	DataExtraction,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -187,10 +187,6 @@ export const cypherockWallet: HardwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						explanation: "Independent video demonstration of Cypherock's signing implementation.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=534',
-					},
-					{
 						explanation:
 							"Independent video demonstration of Cypherock's transaction implementation.",
 						url: 'https://youtube.com/shorts/YG6lzwTUojE',
@@ -210,7 +206,13 @@ export const cypherockWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT, // contract address
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({
+					ref: {
+						explanation: "Independent video demonstration of Cypherock's signing implementation.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=534',
+					},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

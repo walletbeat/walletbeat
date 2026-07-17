@@ -18,7 +18,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -181,11 +181,6 @@ export const onekeyWallet: HardwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						explanation:
-							"Independent video demonstration of OneKey Pro's signing implementation with a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
-					},
-					{
 						explanation: "Independent video showing OneKey Pro's transaction details",
 						url: 'https://youtube.com/shorts/J_XG7cNOVhM',
 					},
@@ -200,7 +195,14 @@ export const onekeyWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_IN_UI,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Independent video demonstration of OneKey Pro's signing implementation with a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
+					},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

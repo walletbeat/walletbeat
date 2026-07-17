@@ -2430,30 +2430,29 @@ type PasskeyVerificationImplementation = WithRef<PasskeyVerificationSupport>
 
 ## `src/schema/features/security/scam-alerts.ts`
 
+### Interface: `ScamAlertLeaks`
+
+Fields shared by every scam-alert warning: does the lookup process leak identifying information about the user to an external service?
+
+- `leaksUserAddress` (`boolean`): Whether the lookup process leaks the user's Ethereum address to an external service.
+- `leaksUserIp` (`boolean`): Whether the lookup process leaks the user's IP address to an external service, as opposed to using an anonymizing proxy.
+
+---
+
 ### Type: `ScamUrlWarning`
 
 ```typescript
-type ScamUrlWarning = WithRef<{
-	/**
-	 * Whether the scam site lookup process leaks the visited URL to an
-	 * external service, as opposed to something like a partial hash match
-	 * like the Google Safe Browsing API for checking spam domains without
-	 * leaking the domains being visited to Google.
-	 */
-	leaksVisitedUrl: 'FULL_URL' | 'DOMAIN_ONLY' | 'PARTIAL_HASH_OF_DOMAIN' | 'NO'
-
-	/**
-	 * Whether the contract lookup process leaks the user's Ethereum address
-	 * to an external service.
-	 */
-	leaksUserAddress: boolean
-
-	/**
-	 * Whether the scam site lookup process leaks the user's IP to an external
-	 * service, as opposed to using an anonymizing proxy.
-	 */
-	leaksIp: boolean
-}>
+type ScamUrlWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Whether the scam site lookup process leaks the visited URL to an
+		 * external service, as opposed to something like a partial hash match
+		 * like the Google Safe Browsing API for checking spam domains without
+		 * leaking the domains being visited to Google.
+		 */
+		leaksVisitedUrl: 'FULL_URL' | 'DOMAIN_ONLY' | 'PARTIAL_HASH_OF_DOMAIN' | 'NO'
+	}
+>
 ```
 
 ---
@@ -2461,44 +2460,34 @@ type ScamUrlWarning = WithRef<{
 ### Type: `ContractTransactionWarning`
 
 ```typescript
-type ContractTransactionWarning = WithRef<{
-	/**
-	 * Does the wallet warn the user when they are interacting with a contract
-	 * they have not interacted with before?
-	 */
-	previousContractInteractionWarning: boolean
+type ContractTransactionWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Does the wallet warn the user when they are interacting with a contract
+		 * they have not interacted with before?
+		 */
+		previousContractInteractionWarning: boolean
 
-	/**
-	 * Does the wallet warn the user when they are interacting with a contract
-	 * that has only recently been deployed to the chain.
-	 */
-	recentContractWarning: boolean
+		/**
+		 * Does the wallet warn the user when they are interacting with a contract
+		 * that has only recently been deployed to the chain?
+		 */
+		recentContractWarning: boolean
 
-	/**
-	 * Does the wallet check a registry of known scam/non-scam contracts and
-	 * use it to warn the user?
-	 */
-	contractRegistry: boolean
+		/**
+		 * Does the wallet check a registry of known scam/non-scam contracts and
+		 * use it to warn the user?
+		 */
+		contractRegistry: boolean
 
-	/**
-	 * Whether the contract lookup process leaks the contract address to an
-	 * external service, as opposed to something like a partial match against
-	 * a static list.
-	 */
-	leaksContractAddress: boolean
-
-	/**
-	 * Whether the contract lookup process leaks the user's Ethereum address
-	 * to an external service.
-	 */
-	leaksUserAddress: boolean
-
-	/**
-	 * Whether the contract lookup process leaks the user's IP address to an
-	 * external service.
-	 */
-	leaksUserIp: boolean
-}>
+		/**
+		 * Whether the contract lookup process leaks the contract address to an
+		 * external service, as opposed to something like a partial match against
+		 * a static list.
+		 */
+		leaksContractAddress: boolean
+	}
+>
 ```
 
 ---
@@ -2506,37 +2495,56 @@ type ContractTransactionWarning = WithRef<{
 ### Type: `SendTransactionWarning`
 
 ```typescript
-type SendTransactionWarning = WithRef<{
-	/**
-	 * Does the wallet feature a user-editable whitelist, outside of which
-	 * the wallet warns when sending to other addresses?
-	 */
-	userWhitelist: boolean
+type SendTransactionWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Does the wallet feature a user-editable whitelist, outside of which
+		 * the wallet warns when sending to other addresses?
+		 */
+		userWhitelist: boolean
 
-	/**
-	 * Does the wallet warn the user when they are sending to an address they
-	 * have not sent funds to before?
-	 */
-	newRecipientWarning: boolean
+		/**
+		 * Does the wallet warn the user when they are sending to an address they
+		 * have not sent funds to before?
+		 */
+		newRecipientWarning: boolean
 
-	/**
-	 * Whether the lookup process leaks the recipient address to an external
-	 * service.
-	 */
-	leaksRecipient: boolean
+		/**
+		 * Does the wallet warn the user when they are sending to an address that
+		 * closely resembles, and may be a "poisoned" look-alike of, an address
+		 * already in their transaction history or whitelist?
+		 */
+		addressPoisoningDetection: boolean
 
-	/**
-	 * Whether the lookup process leaks the user's Ethereum address to an
-	 * external service.
-	 */
-	leaksUserAddress: boolean
+		/**
+		 * Whether the lookup process leaks the recipient address to an external
+		 * service.
+		 */
+		leaksRecipient: boolean
+	}
+>
+```
 
-	/**
-	 * Whether the lookup process leaks the user's IP address to an external
-	 * service.
-	 */
-	leaksUserIp: boolean
-}>
+---
+
+### Type: `UnlimitedApprovalWarning`
+
+```typescript
+type UnlimitedApprovalWarning = WithRef<
+	ScamAlertLeaks & {
+		/**
+		 * Does the wallet warn the user before a transaction or signature that
+		 * grants unlimited/infinite token allowance?
+		 */
+		warnsOnUnlimitedApproval: boolean
+
+		/**
+		 * Whether the spender/contract lookup process leaks the spender address
+		 * to an external service.
+		 */
+		leaksSpenderAddress: boolean
+	}
+>
 ```
 
 ---
@@ -2548,6 +2556,7 @@ Whether the wallet supports scam alerts.
 - `scamUrlWarning` (`Support<ScamUrlWarning>`): Does the wallet warn the user when visiting a known-scam site?
 - `contractTransactionWarning` (`Support<ContractTransactionWarning>`): Does the wallet warn the user before executing a contract transaction?
 - `sendTransactionWarning` (`Support<SendTransactionWarning>`): Does the wallet warn the user before executing a send transaction?
+- `unlimitedApprovalWarning` (`Support<UnlimitedApprovalWarning>`): Does the wallet warn the user before a transaction or signature that grants unlimited/infinite ERC-20 token allowance?
 
 ---
 
@@ -3315,7 +3324,8 @@ type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation |
 
 ### Interface: `BaseTransactionLegibilitySupport`
 
-- `erc8213` (`Support | null`)
+- `erc4361` (`WithRef<Support> | null`): ERC-4361 (Sign-In with Ethereum) support. Whether the wallet can clearly present Sign-In with Ethereum authentication requests to the user. The `ref` block should document ERC-4361 support specifically.
+- `erc8213` (`WithRef<Support> | null`): ERC-8123 (Wallet Signature and Calldata Digest Display) Whether the wallet follows the "Wallet Display Requirements" section of ERC-8123. The `ref` block should document ERC-8213 support specifically.
 
 ---
 
@@ -3323,8 +3333,8 @@ type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation |
 
 A record of transaction legibility support (both message and transaction)
 
-- `erc8213` (`Support<HardwareWalletErc8213> | null`)
-- `erc7730` (`Support<HardwareWalletErc7730> | null`)
+- `erc8213` (`WithRef<Support<HardwareWalletErc8213>> | null`)
+- `erc7730` (`WithRef<Support<HardwareWalletErc7730>> | null`)
 - `detailsDisplayed` (`DisplayedBasicTransactionDetails | null`): Does a wallet display transaction details clearly?
 - `dataExtraction` (`DataExtractionMethods | null`): Does a wallet allow for data extraction?
 
@@ -3356,8 +3366,8 @@ ERC-8213 (Transaction Legibility) support for software wallets. Tracks which cal
 
 A record of transaction legibility support (both message and transaction)
 
-- `erc8213` (`Support<SoftwareWalletErc8213> | null`)
-- `erc7730` (`Support<SoftwareWalletErc7730> | null`): ERC-7730 calldata decoding support per complex benchmark transaction.
+- `erc8213` (`WithRef<Support<SoftwareWalletErc8213>> | null`)
+- `erc7730` (`WithRef<Support<SoftwareWalletErc7730>> | null`): ERC-7730 calldata decoding support per complex benchmark transaction. The `ref` block should document ERC-7730 support specifically.
 - `transactionSimulations` (`Support<SoftwareTransactionSimulations> | null`): Per-benchmark simulation data: transaction outcomes for token and complex transactions, plus failure/nondeterminism detection for simulation-specific benchmarks.
 - `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Global basic transaction details display (gas, nonce, from, to, chain, value). Applied across all transaction types.
 

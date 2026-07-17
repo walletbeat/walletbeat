@@ -45,6 +45,7 @@
 	data {
 		&[value='UNRATED'] {
 			--accent: var(--rating-unrated);
+			--badge-backdropFilter: var(--rating-unrated-backdropFilter);
 		}
 	}
 </style>

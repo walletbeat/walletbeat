@@ -10,7 +10,7 @@ export const erc7828: Eip = {
 	icon: 'ICON_AT_SIGN',
 	number: '7828',
 	prefix: EipPrefix.ERC,
-	status: EipStatus.DRAFT,
+	status: EipStatus.REVIEW,
 	summaryMarkdown: `
 		Chain-specific address format that allows specifying both an
 		account and the chain on which that account intends to transact.

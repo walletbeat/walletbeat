@@ -777,18 +777,20 @@ export const ambire: SoftwareWallet = {
 							},
 						],
 					},
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: scamAlertsAndSendTxWarningRefs,
+					addressPoisoningDetection: true,
 					leaksRecipient: true,
 					leaksUserAddress: false,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
@@ -803,15 +805,23 @@ export const ambire: SoftwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						file: 'public/images/references/ambire/transaction_legibility_1.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_1.png',
 						label: 'Transaction legibility screenshot 1',
 					},
 					{
-						file: 'public/images/references/ambire/transaction_legibility_2.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_2.png',
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation: 'Ambire does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/ambire/screenshots/2026-07-13-ambire-erc4361-siwe.png',
+						label: 'Ambire sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -830,6 +840,7 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,

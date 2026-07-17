@@ -246,15 +246,6 @@ export const keycardShell: HardwareWallet = {
 							'Product page emphasizes human-readable transaction data and verifying tx data on-device display',
 						url: 'https://get.keycard.tech/pages/keycard-shell',
 					},
-					{
-						explanation: 'Blog post announces ETH ABI database updates for contract decoding',
-						url: 'https://keycard.tech/blog/a-shell-summer-btc-multisig-seedqr-stealth-passphrases-arrive-on-keycard-shell',
-					},
-					{
-						explanation:
-							'ETH ABI repository provides curated ABI database for Keycard Shell transaction decoding',
-						url: 'https://github.com/keycard-tech/eth-abi-repo',
-					},
 				],
 				// Data extraction: QR codes used for transaction data (ERC-4527); display visible to eyes
 				dataExtraction: {
@@ -270,7 +261,19 @@ export const keycardShell: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				erc4361: null,
 				erc7730: supported({
+					ref: [
+						{
+							explanation: 'Blog post announces ETH ABI database updates for contract decoding',
+							url: 'https://keycard.tech/blog/a-shell-summer-btc-multisig-seedqr-stealth-passphrases-arrive-on-keycard-shell',
+						},
+						{
+							explanation:
+								'ETH ABI repository provides curated ABI database for Keycard Shell transaction decoding',
+							url: 'https://github.com/keycard-tech/eth-abi-repo',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,

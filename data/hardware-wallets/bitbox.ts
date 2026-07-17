@@ -28,7 +28,7 @@ import {
 	DataDisplayOptions,
 	DataExtraction,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -219,12 +219,7 @@ export const bitboxWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation: 'Independent video demonstration of BitBox02 signing capabilities',
-						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
-					},
-				],
+				ref: refTodo,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -238,7 +233,13 @@ export const bitboxWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({
+					ref: {
+						explanation: 'Independent video demonstration of BitBox02 signing capabilities',
+						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
+					},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

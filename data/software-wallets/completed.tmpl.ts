@@ -63,6 +63,7 @@ import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
 	SendTransactionWarning,
+	UnlimitedApprovalWarning,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
@@ -645,17 +646,25 @@ export const completedTemplate: SoftwareWallet = {
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: refTodo,
+					addressPoisoningDetection: true,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: true,
 					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: supported<UnlimitedApprovalWarning>({
+					ref: refTodo,
+					leaksSpenderAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					warnsOnUnlimitedApproval: true,
 				}),
 			},
 			securityBestPractices: {
@@ -676,7 +685,11 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: supported({
+					ref: refTodo,
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -695,6 +708,7 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: displaysFullCallData,
 					messageSigningLegibility: {
 						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
