@@ -27,7 +27,9 @@
 
 	const flawStatuses = {
 		FIXED: {
-@/schema/attributes/security/security-audits-bounties
+			label: 'Fixed',
+			color: 'var(--rating-pass)',
+		},
 		NOT_FIXED: {
 			label: 'Not fixed',
 			color: 'var(--rating-fail)',
@@ -87,7 +89,7 @@
 	// Components
 	import Typography from '@/components/Typography.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
-	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bug-bounty'
+	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
 </script>
 
 {#if metadata.securityAudits.length === 0}
