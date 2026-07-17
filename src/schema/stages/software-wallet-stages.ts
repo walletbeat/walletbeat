@@ -572,9 +572,7 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAuditsAndBounties, {
 						allowPartial: false,
-						ifUnverifiable: sentence(
-							"{{WALLET_NAME}}'s bug bounty program cannot be publicly verified.",
-						),
+						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Bug Bounty Program',
