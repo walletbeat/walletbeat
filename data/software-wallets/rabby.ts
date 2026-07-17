@@ -913,7 +913,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The CI runs yarn install --immutable, which fails if package.json and yarn.lock are out of sync, ensuring dependencies are locked and reproducible.',
+								'The CI runs `yarn install --immutable`, which fails if package.json and yarn.lock are out of sync, ensuring dependencies are locked and reproducible.',
 							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml',
 						},
 					],
