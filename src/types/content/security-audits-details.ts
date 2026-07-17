@@ -1,5 +1,5 @@
 import type { EvaluationDetailProps } from '@/schema/attributes'
-import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bug-bounty'
+import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
 
 import { component, type Content } from '../content'
 

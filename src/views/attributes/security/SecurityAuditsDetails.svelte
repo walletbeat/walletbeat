@@ -27,9 +27,7 @@
 
 	const flawStatuses = {
 		FIXED: {
-			label: 'Fixed',
-			color: 'var(--rating-pass)',
-		},
+@/schema/attributes/security/security-audits-bounties
 		NOT_FIXED: {
 			label: 'Not fixed',
 			color: 'var(--rating-fail)',

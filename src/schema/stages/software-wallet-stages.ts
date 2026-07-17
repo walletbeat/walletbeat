@@ -13,7 +13,7 @@ import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
-import { securityAuditsAndBugBounties } from '../attributes/security/security-audits-bug-bounty'
+import { securityAuditsAndBounties } from '../attributes/security/security-audits-bounties'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
@@ -572,7 +572,7 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					),
 					evaluate: variantsMustPassAttribute(
 						softwareWalletVariants,
-						securityAuditsAndBugBounties,
+						securityAuditsAndBounties,
 						{
 							allowPartial: false,
 							ifUnverifiable: sentence(

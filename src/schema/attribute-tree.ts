@@ -16,8 +16,8 @@ const attributeGroupDefinitions = [
 		displayName: 'Security',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/security/security-audits-bug-bounty'))
-					.securityAuditsAndBugBounties,
+				attribute: (await import('@/schema/attributes/security/security-audits-bounties'))
+					.securityAuditsAndBounties,
 				weight: 1.0,
 			},
 			{
