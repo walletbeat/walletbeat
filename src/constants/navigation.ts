@@ -178,30 +178,6 @@ export const defaultNavigationItems = [
 			},
 		],
 	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary/',
-		icon: 'wallet_embedded',
-		children: [
-			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: 'ICON_CHART_PIE',
-				children: mapNonExemptAttributeGroupsInTree(
-					attributeTree,
-					representativeWalletForType(WalletType.EMBEDDED).overall,
-					(attrGroup, _evalGroup) => ({
-						id: `embedded-${attrGroup.id}`,
-						title: attrGroup.displayName,
-						icon: attrGroup.icon,
-						iconVariant: 'emoji' as const,
-						href: `/embedded/${attrGroup.id}/`,
-					}),
-				),
-			},
-		],
-	},
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,
