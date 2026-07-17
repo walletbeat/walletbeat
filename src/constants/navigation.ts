@@ -48,8 +48,7 @@ import { attributeTree } from '@/schema/attribute-tree'
 import { eipShortLabel } from '@/schema/eips'
 import { WalletType } from '@/schema/wallet-types'
 import { setContains } from '@/types/utils/non-empty'
-import { getEipTrackerUrl } from '@/utils/eip-url'
-import { getWalletUrl } from '@/utils/wallet-url'
+import { getEipTrackerUrl, getWalletUrl } from '@/utils/urls'
 
 /**
  * Navigation entries for the per-EIP adoption tracker pages, limited to the

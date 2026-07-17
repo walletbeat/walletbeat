@@ -95,7 +95,7 @@
 	// Functions
 	import { isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
-	import { getWalletUrl } from '@/utils/wallet-url'
+	import { getWalletUrl } from '@/utils/urls'
 
 
 	// Components

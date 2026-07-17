@@ -53,7 +53,7 @@
 	import { isSupported } from '@/schema/features/support'
 	import { refs } from '@/schema/reference'
 	import { variantLabel } from '@/schema/variants'
-	import { getWalletUrl } from '@/utils/wallet-url'
+	import { getWalletUrl } from '@/utils/urls'
 
 	const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
 		if (typeof support === 'string') {

@@ -3,7 +3,7 @@
 	import { EipPrefix, eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
-	import { getEipTrackerUrl } from '@/utils/eip-url'
+	import { getEipTrackerUrl } from '@/utils/urls'
 
 	type Props = {
 		eips: Eip[]

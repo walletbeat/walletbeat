@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { allRatedWallets } from '@/data/wallets'
 import { getStaticPaths as htmlMdGetStaticPaths } from '@/pages/[walletName]/index.html.md'
 import { getStaticPaths as jsonGetStaticPaths } from '@/pages/[walletName]/index.json'
-import { getWalletUrl } from '@/utils/wallet-url'
+import { getWalletUrl } from '@/utils/urls'
 
 /** Extract the `walletName` slug segment from a `/slug/` wallet URL. */
 const slugFromUrl = (url: string): string => url.replace(/^\/|\/$/g, '')

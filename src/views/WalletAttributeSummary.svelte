@@ -41,7 +41,7 @@
 	// Functions
 	import { variantToName } from '@/constants/variants'
 	import { slugifyCamelCase } from '@/types/utils/text'
-	import { getWalletUrl } from '@/utils/wallet-url'
+	import { getWalletUrl } from '@/utils/urls'
 
 
 	// Components
