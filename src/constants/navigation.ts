@@ -2,10 +2,22 @@
 import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon =
+	| 'ICON_AT_SIGN'
+	| 'ICON_BELL'
+	| 'ICON_BOOK_OPEN'
 	| 'ICON_CHART_BAR'
+	| 'ICON_EYE_OFF'
 	| 'ICON_FARCASTER'
+	| 'ICON_FILE_CODE'
 	| 'ICON_CHART_PIE'
+	| 'ICON_GLOBE'
+	| 'ICON_HASH'
+	| 'ICON_LAYERS'
+	| 'ICON_PLUG'
+	| 'ICON_RADAR'
+	| 'ICON_SIGNATURE'
 	| 'ICON_TWITTER'
+	| 'ICON_USER_COG'
 	| 'ICON_WALLET'
 
 export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
@@ -28,37 +40,29 @@ function walletImageIcon(id: string, ext: string): WalletImageNavigationIcon {
 
 // Constants
 import { eips } from '@/data/eips'
-import { hardwareWallets, ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedSoftwareWallets, softwareWallets } from '@/data/software-wallets'
+import { hardwareWallets } from '@/data/hardware-wallets'
+import { softwareWallets } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { attributeTree } from '@/schema/attribute-tree'
-import { ratedWalletEipSupport } from '@/schema/eip-support'
 import { eipShortLabel } from '@/schema/eips'
-import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
+import { setContains } from '@/types/utils/non-empty'
 import { getEipTrackerUrl } from '@/utils/eip-url'
 import { getWalletUrl } from '@/utils/wallet-url'
 
 /**
  * Navigation entries for the per-EIP adoption tracker pages, limited to the
- * EIPs that apply to at least one of the given wallets.
+ * EIPs that apply to the given wallet type.
  */
-function eipTrackerNavigationItems(
-	idPrefix: string,
-	wallets: Array<RatedWallet<string>>,
-): NavigationItem[] {
+function eipTrackerNavigationItems(idPrefix: string, walletType: WalletType): NavigationItem[] {
 	return Object.values(eips)
-		.filter(eip =>
-			wallets.some(
-				wallet => ratedWalletEipSupport(wallet, eip.number).overall !== 'NOT_APPLICABLE',
-			),
-		)
+		.filter(eip => setContains(eip.appliesTo, walletType))
 		.map(eip => ({
 			id: `${idPrefix}-eip-${eip.number}-tracker`,
 			title: `${eipShortLabel(eip)} Tracker`,
 			href: getEipTrackerUrl(eip),
-			icon: 'ICON_CHART_BAR' as const,
+			icon: eip.icon ?? ('ICON_CHART_BAR' as const),
 		}))
 }
 
@@ -164,7 +168,7 @@ export const defaultNavigationItems = [
 				id: 'software-eip-trackers',
 				title: 'EIP Trackers',
 				icon: 'ICON_CHART_BAR',
-				children: eipTrackerNavigationItems('software', Object.values(ratedSoftwareWallets)),
+				children: eipTrackerNavigationItems('software', WalletType.SOFTWARE),
 			},
 		],
 	},
@@ -207,7 +211,7 @@ export const defaultNavigationItems = [
 				id: 'hardware-eip-trackers',
 				title: 'EIP Trackers',
 				icon: 'ICON_CHART_BAR',
-				children: eipTrackerNavigationItems('hardware', Object.values(ratedHardwareWallets)),
+				children: eipTrackerNavigationItems('hardware', WalletType.HARDWARE),
 			},
 		],
 	},

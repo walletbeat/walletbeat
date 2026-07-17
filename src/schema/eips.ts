@@ -1,3 +1,8 @@
+import type { LucideNavigationIcon } from '@/constants/navigation'
+import type { NonEmptySet } from '@/types/utils/non-empty'
+
+import type { WalletType } from './wallet-types'
+
 /**
  * The set of all EIP numbers tracked by Walletbeat.
  */
@@ -51,6 +56,18 @@ export interface Eip {
 
 	/** EIP status as from the EIP repository. */
 	status: EipStatus
+
+	/**
+	 * The wallet types this EIP can apply to.
+	 * The EIP is treated as not applicable for wallets of any other type.
+	 */
+	appliesTo: NonEmptySet<WalletType>
+
+	/**
+	 * Navigation icon for this EIP.
+	 * Navigation entries fall back to a generic chart icon when unset.
+	 */
+	icon?: LucideNavigationIcon
 
 	/** EIP summary, as from the EIP repository with some minor tweaks if needed. */
 	summaryMarkdown: string

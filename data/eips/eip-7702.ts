@@ -1,8 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { walletTypes } from '@/schema/wallet-types'
 
 export const eip7702: Eip = {
 	friendlyName: 'Account Abstraction via smart contract authority delegation',
 	formalTitle: 'Set EOA account code',
+	appliesTo: walletTypes.set,
+	icon: 'ICON_FILE_CODE',
 	number: '7702',
 	prefix: EipPrefix.EIP,
 	status: EipStatus.LAST_CALL,

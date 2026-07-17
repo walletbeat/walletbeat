@@ -1,10 +1,13 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { walletTypes } from '@/schema/wallet-types'
 
 export const erc4337: Eip = {
 	// Yes this is not exactly what this ERC is implementing, but it is
 	// roughly what it unlocks.
 	friendlyName: 'Account Abstraction for smart contract wallets',
 	formalTitle: 'Account Abstraction Using Alt Mempool',
+	appliesTo: walletTypes.set,
+	icon: 'ICON_USER_COG',
 	number: '4337',
 	prefix: EipPrefix.ERC,
 	status: EipStatus.DRAFT,

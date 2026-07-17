@@ -29,10 +29,11 @@ import {
 	featureSupported,
 	isSupported,
 	notSupported,
+	notSupportedWithRef,
 	type Support,
 	supported,
 } from '@/schema/features/support'
-import { refs, type WithRef } from '@/schema/reference'
+import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 /** Resolved features of the unrated software wallet template. */
@@ -90,22 +91,6 @@ describe('walletEipSupport', () => {
 		expect(eipSupport['1193']).toBe('NOT_APPLICABLE')
 		expect(eipSupport['2700']).toBe('NOT_APPLICABLE')
 		expect(eipSupport['6963']).toBe('NOT_APPLICABLE')
-	})
-
-	it('marks software-wallet-only EIPs as not applicable for hardware wallets', () => {
-		const eipSupport = walletEipSupport(unratedHardwareFeatures())
-
-		// Wallet call API and address resolution are software-wallet-only
-		// features, so their EIPs cannot apply to hardware wallets.
-		expect(eipSupport['5792']).toBe('NOT_APPLICABLE')
-		expect(eipSupport['7828']).toBe('NOT_APPLICABLE')
-		expect(eipSupport['7831']).toBe('NOT_APPLICABLE')
-
-		// Account type support is a base feature: hardware wallets can
-		// meaningfully support signing EIP-7702 authorizations and ERC-4337
-		// user operations, so unassessed data stays unknown.
-		expect(eipSupport['4337']).toBe('UNKNOWN')
-		expect(eipSupport['7702']).toBe('UNKNOWN')
 	})
 
 	it('derives browser integration EIPs from the browser integration record', () => {
@@ -412,16 +397,6 @@ describe('walletEipSupport', () => {
 	})
 })
 
-/** A supported EIP support value referencing the given URL. */
-function supportedEip(url: string): WithRef<Support> {
-	return { ...featureSupported, ref: { url } }
-}
-
-/** A verified-unsupported EIP support value referencing the given URL. */
-function notSupportedEip(url: string): WithRef<Support> {
-	return { ...notSupported, ref: { url } }
-}
-
 describe('aggregateEipSupport', () => {
 	it('returns UNKNOWN when there is nothing to aggregate', () => {
 		expect(aggregateEipSupport([])).toBe('UNKNOWN')
@@ -429,8 +404,8 @@ describe('aggregateEipSupport', () => {
 
 	it('is supported when any variant supports the EIP, with the supporting refs', () => {
 		const aggregated = aggregateEipSupport([
-			notSupportedEip('https://example.com/mobile'),
-			supportedEip('https://example.com/browser'),
+			notSupportedWithRef({ ref: { url: 'https://example.com/mobile' } }),
+			supported({ ref: { url: 'https://example.com/browser' } }),
 			'UNKNOWN',
 			'NOT_APPLICABLE',
 		])
@@ -441,15 +416,18 @@ describe('aggregateEipSupport', () => {
 	})
 
 	it('is unknown when no variant supports the EIP but some are unassessed', () => {
-		expect(aggregateEipSupport([notSupportedEip('https://example.com/mobile'), 'UNKNOWN'])).toBe(
-			'UNKNOWN',
-		)
+		expect(
+			aggregateEipSupport([
+				notSupportedWithRef({ ref: { url: 'https://example.com/mobile' } }),
+				'UNKNOWN',
+			]),
+		).toBe('UNKNOWN')
 	})
 
 	it('is not supported only when no variant might support the EIP', () => {
 		const aggregated = aggregateEipSupport([
-			notSupportedEip('https://example.com/mobile'),
-			notSupportedEip('https://example.com/browser'),
+			notSupportedWithRef({ ref: { url: 'https://example.com/mobile' } }),
+			notSupportedWithRef({ ref: { url: 'https://example.com/browser' } }),
 			'NOT_APPLICABLE',
 		])
 

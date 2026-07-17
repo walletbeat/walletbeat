@@ -1,8 +1,13 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { WalletType } from '@/schema/wallet-types'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 export const erc7831: Eip = {
 	friendlyName: 'Multi-chain addresses',
 	formalTitle: 'Multi-Chain Addressing',
+	// Address resolution is a software wallet feature.
+	appliesTo: nonEmptySet(WalletType.SOFTWARE),
+	icon: 'ICON_GLOBE',
 	number: '7831',
 	prefix: EipPrefix.ERC,
 	status: EipStatus.DRAFT,
