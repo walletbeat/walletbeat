@@ -174,6 +174,8 @@ describe('cSpell', async () => {
 		const allowedUnusedWords: string[] = [
 			'rman', // Used in nickname "0xh3rman"
 			'xmattmatt', // Used in nickname "Mattmatt"
+			'Acid2', // Benchmark name; word extractor does not capture CamelCase+digits as single token
+			'Acid3', // Benchmark name; word extractor does not capture CamelCase+digits as single token
 			'BitBox02', // Product name; word extractor does not capture CamelCase+digits as single token
 			'Cure53', // Audit firm name; word extractor does not capture CamelCase+digits as single token
 			'Game7',
