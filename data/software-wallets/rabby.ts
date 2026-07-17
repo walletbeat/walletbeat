@@ -894,11 +894,21 @@ export const rabby: SoftwareWallet = {
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				artifactSigning: notSupported,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The CI runs yarn install --immutable, which fails if package.json and yarn.lock are out of sync, ensuring dependencies are locked and reproducible.',
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported({
+					ref: 'https://github.com/RabbyHub/Rabby/releases',
+				}),
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
