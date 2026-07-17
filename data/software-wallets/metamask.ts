@@ -45,7 +45,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -542,14 +547,13 @@ export const metamask: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				erc4361: {
-					...notSupported,
+				erc4361: notSupportedWithRef({
 					ref: {
 						explanation: 'MetaMask does not format SIWE requests for easy readability.',
 						file: 'public/references/wallets/metamask/screenshots/2026-07-13-metamask-erc4361-siwe.png',
 						label: 'MetaMask sign-in dialog for an ERC-4361 signature request',
 					},
-				},
+				}),
 				erc7730: supported({
 					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {

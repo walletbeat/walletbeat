@@ -813,14 +813,13 @@ export const ambire: SoftwareWallet = {
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
-				erc4361: {
-					...notSupported,
+				erc4361: notSupportedWithRef({
 					ref: {
 						explanation: 'Ambire does not format SIWE requests for easy readability.',
 						file: 'public/references/wallets/ambire/screenshots/2026-07-13-ambire-erc4361-siwe.png',
 						label: 'Ambire sign-in dialog for an ERC-4361 signature request',
 					},
-				},
+				}),
 				erc7730: supported({
 					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {

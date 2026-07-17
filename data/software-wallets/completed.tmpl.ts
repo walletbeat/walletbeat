@@ -685,7 +685,9 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				erc4361: { ...featureSupported, ref: refTodo },
+				erc4361: supported({
+					ref: refTodo,
+				}),
 				erc7730: supported({
 					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
