@@ -22,7 +22,6 @@ export enum TreasuryCategory {
 	'labor:comms' = 'labor:comms',
 	'labor:data_entry' = 'labor:data_entry',
 	'labor:dev' = 'labor:dev',
-	multi_step_swap = 'multi_step_swap',
 	operational = 'operational',
 	'services:email' = 'services:email',
 	'services:storage' = 'services:storage',
@@ -44,7 +43,6 @@ export const treasuryCategory = new Enum<TreasuryCategory>({
 	[TreasuryCategory['labor:comms']]: true,
 	[TreasuryCategory['labor:data_entry']]: true,
 	[TreasuryCategory['labor:dev']]: true,
-	[TreasuryCategory.multi_step_swap]: true,
 	[TreasuryCategory.operational]: true,
 	[TreasuryCategory['services:email']]: true,
 	[TreasuryCategory['services:storage']]: true,
@@ -250,8 +248,6 @@ export function categoryLabel(category: TreasuryCategory | 'Other'): string {
 			return 'Wallet data entry'
 		case TreasuryCategory['labor:dev']:
 			return 'Development'
-		case TreasuryCategory.multi_step_swap:
-			return 'Swap'
 		case TreasuryCategory.operational:
 			return 'Operations & fees'
 		case TreasuryCategory['services:email']:
@@ -301,8 +297,6 @@ export function includeInExpenseBreakdown(category: TreasuryCategory): boolean {
 		case TreasuryCategory.grant:
 			return false
 		case TreasuryCategory.swap:
-			return false
-		case TreasuryCategory.multi_step_swap:
 			return false
 		case TreasuryCategory['ignored:multi_tx_swap']:
 			return false
