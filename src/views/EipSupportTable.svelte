@@ -5,14 +5,12 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { Variant } from '@/schema/variants'
 
-	const EipSupportStatus = {
-		SUPPORTED: 'SUPPORTED',
-		NOT_SUPPORTED: 'NOT_SUPPORTED',
-		UNKNOWN: 'UNKNOWN',
-		NOT_APPLICABLE: 'NOT_APPLICABLE',
-	} as const
-
-	type EipSupportStatus = (typeof EipSupportStatus)[keyof typeof EipSupportStatus]
+	enum EipSupportStatus {
+		SUPPORTED = 'SUPPORTED',
+		NOT_SUPPORTED = 'NOT_SUPPORTED',
+		UNKNOWN = 'UNKNOWN',
+		NOT_APPLICABLE = 'NOT_APPLICABLE',
+	}
 
 	const eipSupportStatusSortPriority = {
 		[EipSupportStatus.SUPPORTED]: 0,
@@ -57,7 +55,7 @@
 
 	const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
 		if (typeof support === 'string') {
-			return support
+			return support === 'UNKNOWN' ? EipSupportStatus.UNKNOWN : EipSupportStatus.NOT_APPLICABLE
 		}
 
 		return isSupported(support) ? EipSupportStatus.SUPPORTED : EipSupportStatus.NOT_SUPPORTED
@@ -139,7 +137,7 @@
 				},
 			]}
 		>
-			{#snippet Cell({ row: wallet, column, value })}
+			{#snippet Cell({ row: wallet, column })}
 				{@const walletSupport = supportByWalletId.get(wallet.metadata.id)!}
 
 				{#if column.id === 'wallet'}
@@ -147,15 +145,12 @@
 						<span class="row-count" data-row="center"></span>
 
 						<img
-							src={`/images/wallets/${wallet.metadata.id}.svg`}
+							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
 							alt={wallet.metadata.displayName}
 							class="wallet-icon"
+							data-wallet-icon
 							width="36"
 							height="36"
-							onerror={event => {
-								if (event.currentTarget instanceof HTMLImageElement)
-									event.currentTarget.src = '/images/wallets/default.svg'
-							}}
 						/>
 
 						<div class="name">
@@ -179,9 +174,15 @@
 
 				{:else if column.id === 'variants'}
 					{@const perVariant = variantSupportList(walletSupport)}
+					{@const statuses = perVariant.map(({ support }) => eipSupportStatus(support))}
 
 					{#if perVariant.length <= 1}
 						<span class="muted-text">–</span>
+					{:else if statuses.every(status => status === statuses[0])}
+						<!-- All platforms share one status; the icon alone says it all. -->
+						<span class="support-status" data-support-status={statuses[0]}>
+							<span class="status-icon">{eipSupportStatusIcon[statuses[0]]}</span>
+						</span>
 					{:else}
 						<ul class="variant-list" data-list="unstyled gap-1">
 							{#each perVariant as { variant, support } (variant)}
@@ -221,9 +222,6 @@
 							{/each}
 						</ul>
 					{/if}
-
-				{:else}
-					{value}
 				{/if}
 			{/snippet}
 		</Table>
@@ -289,11 +287,8 @@
 		}
 
 		.wallet-icon {
-			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
 			width: 2.25em;
 			height: 2.25em;
-			object-fit: contain;
-			border-radius: 0.25em;
 		}
 
 		.name {
