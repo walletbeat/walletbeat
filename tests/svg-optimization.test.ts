@@ -211,8 +211,6 @@ const optimizedSvgHashes: Record<string, string> = {
 		'e351752dfb5f635f02b6fac153f8adbc9b292c7edde70b614d310496f0280428',
 	'resources/files/wbicons/self_sovereignty.svg':
 		'e2236a82ae8b231218dc84deef70e8ae58133f879e57987931c2d85ca9a4964a',
-	'resources/files/wbicons/source_visibility.svg':
-		'07f785dcbb8eda81a48e8480c7326939897b8f0e85dce7975133583fe1095d31',
 	'resources/files/wbicons/transaction_batching.svg':
 		'6a0e957bd7ea8e89c1aad266abbe6db54a7b930c074a47f459ee62f56d5a53d8',
 	'resources/files/wbicons/transaction_inclusion.svg':

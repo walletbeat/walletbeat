@@ -25,11 +25,11 @@ import { feeTransparency } from '../attributes/transparency/fee-transparency'
 import { funding } from '../attributes/transparency/funding'
 import { openSource } from '../attributes/transparency/open-source'
 import { releaseProcess } from '../attributes/transparency/release-process'
-import { sourceVisibility } from '../attributes/transparency/source-visibility'
 import { hardwareWalletType } from '../features/security/hardware-wallet-support'
 import { RpcEndpointConfiguration } from '../features/self-sovereignty/chain-configurability'
 import { SpendingApprovalsControl } from '../features/self-sovereignty/permissions-management'
 import { isSupported, notSupported } from '../features/support'
+import { isSourcePubliclyVisible } from '../features/transparency/license'
 import {
 	type StageCriterionEvaluation,
 	stageCriterionEvaluationPerVariant,
@@ -59,7 +59,28 @@ export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'The source code must be publicly available so that it can be reviewed by the public.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							const visible = isSourcePubliclyVisible(variantWallet.features.licensing)
+
+							if (visible === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!visible) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence("{{WALLET_NAME}}'s source code is not publicly available."),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence("{{WALLET_NAME}}'s source code is publicly available."),
+							}
+						},
+					),
 					displayName: 'Source Availability',
 				},
 			],

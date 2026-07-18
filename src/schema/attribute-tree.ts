@@ -164,11 +164,6 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 			{
-				attribute: (await import('@/schema/attributes/transparency/source-visibility.ts'))
-					.sourceVisibility,
-				weight: 1.0,
-			},
-			{
 				attribute: (await import('@/schema/attributes/transparency/funding.ts')).funding,
 				weight: 1.0,
 			},
