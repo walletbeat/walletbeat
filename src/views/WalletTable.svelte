@@ -847,6 +847,7 @@
 							<img
 								alt={displayName}
 								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+								data-wallet-icon
 								width="16"
 								height="16"
 							/>
@@ -1847,11 +1848,8 @@
 		}
 
 		img {
-			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
 			width: 2.25em;
 			height: 2.25em;
-			object-fit: contain;
-			border-radius: 0.25em;
 		}
 
 		.name-and-tags {

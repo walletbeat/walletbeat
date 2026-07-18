@@ -1080,6 +1080,21 @@ interface CssAttributes {
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`
 	 */
 	'data-tag'?: string | boolean
+
+	/**
+	 * ## [data-wallet-icon]
+	 *
+	 * Shared chrome for wallet logo images: contain fit, slight rounding, and a theme-aware halo (dark glow in light mode, light glow in dark mode) so logos stay legible on both backgrounds. Presence only (no tokens); size it at the usage site.
+	 *
+	 * ### Examples
+	 * ```html
+	 * <img data-wallet-icon src="/images/wallets/rabby.svg" alt="Rabby" width="36" height="36" />
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-wallet-icon]`
+	 */
+	'data-wallet-icon'?: string | boolean
 }
 
 declare namespace astroHTML.JSX {

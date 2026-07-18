@@ -205,6 +205,7 @@
 							src={`/images/wallets/${wallet.metadata.id}.svg`}
 							alt={wallet.metadata.displayName}
 							class="wallet-icon"
+							data-wallet-icon
 							onerror={event => {
 								if (event.currentTarget instanceof HTMLImageElement)
 									event.currentTarget.src = '/images/wallets/default.svg'
@@ -382,11 +383,8 @@
 		}
 
 		.wallet-icon {
-			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
 			width: 2.25em;
 			height: 2.25em;
-			object-fit: contain;
-			border-radius: 0.25em;
 		}
 
 		.name {

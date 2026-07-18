@@ -604,6 +604,10 @@
 					"description": "`[data-tag~=\"wallet-type\"]`"
 				}
 			]
+		},
+		{
+			"name": "data-wallet-icon",
+			"description": "## [data-wallet-icon]\n\nShared chrome for wallet logo images: contain fit, slight rounding, and a theme-aware halo (dark glow in light mode, light glow in dark mode) so logos stay legible on both backgrounds. Presence only (no tokens); size it at the usage site.\n\n### Examples\n```html\n<img data-wallet-icon src=\"/images/wallets/rabby.svg\" alt=\"Rabby\" width=\"36\" height=\"36\" />\n```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-wallet-icon]`"
 		}
 	]
 }
