@@ -452,8 +452,7 @@ export interface SimulatedNondeterministicTransaction {
  * All benchmark transactions for which simulation can track a transaction outcome.
  */
 export type TransactionSimulationsBenchmark =
-	| BasicBenchmarkTransactions
-	| ComplexBenchmarkTransactions
+	BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 
 /**
  * Per-benchmark-transaction simulation data for software wallets.
@@ -777,8 +776,7 @@ export const isFullBasicTransactionDetails = (
  */
 export function isHardwareTransactionLegibility(
 	transactionLegibility:
-		| HardwareTransactionLegibilityImplementation
-		| SoftwareTransactionLegibilityImplementation,
+		HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation,
 ): transactionLegibility is HardwareTransactionLegibilityImplementation {
 	// The `dataExtraction` field exists only on `HardwareTransactionLegibilityImplementation`,
 	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
@@ -799,8 +797,7 @@ export type SoftwareTransactionLegibilityImplementation =
  */
 export function transactionLegibilityErcRefs(
 	transactionLegibility:
-		| HardwareTransactionLegibilityImplementation
-		| SoftwareTransactionLegibilityImplementation,
+		HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation,
 ): FullyQualifiedReference[] {
 	return mergeRefs(
 		transactionLegibility.erc4361?.ref,

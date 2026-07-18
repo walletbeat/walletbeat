@@ -129,7 +129,8 @@ export type AppIsolation =
 	| typeof appConnectionNotSupported
 	| (BaseAppIsolation &
 			// Either `eth_accounts` or `wallet_connect` must be supported.
-			(| { ethAccounts: Supported<WithRef<ExposedAccountSet>> }
+			(
+				| { ethAccounts: Supported<WithRef<ExposedAccountSet>> }
 				| { erc7846WalletConnect: Supported<WithRef<ExposedAccountSet>> }
 			))
 
