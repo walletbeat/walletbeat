@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Types/constants
-	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
@@ -50,11 +49,13 @@
 		metadata,
 		auditedInLastYear,
 		hasUnaddressedFlaws,
+		bugBountyDetails,
 	}: {
 		wallet: RatedWallet
 		metadata: SecurityAuditsMetadata
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
+		bugBountyDetails?: string
 	} = $props()
 
 	const securityAudits = $derived(
@@ -88,6 +89,7 @@
 	// Components
 	import Typography from '@/components/Typography.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
+	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
 </script>
 
 {#if metadata.securityAudits.length === 0}
@@ -227,6 +229,20 @@
 				</section>
 			</details>
 		{/each}
+	</section>
+{/if}
+
+{#if bugBountyDetails}
+	<section data-column="gap-2">
+		<h4>Bug bounty program</h4>
+
+		<Typography
+			content={{
+				contentType: ContentType.MARKDOWN,
+				markdown: bugBountyDetails,
+			}}
+			strings={{ WALLET_NAME: wallet.metadata.displayName }}
+		/>
 	</section>
 {/if}
 

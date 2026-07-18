@@ -1,4 +1,5 @@
 import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
+import { Rating } from '@/schema/attributes'
 import { sentence } from '@/types/content'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
@@ -10,10 +11,12 @@ import { addressCorrelation } from '../attributes/privacy/address-correlation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import { bugBountyProgram } from '../attributes/security/bug-bounty-program'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
-import { securityAudits } from '../attributes/security/security-audits'
+import {
+	evaluateBugBountyProgram,
+	isAuditedInLastYear,
+} from '../attributes/security/security-audits-bounties'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
@@ -207,11 +210,34 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits, {
-						allowPartial: false,
-						ifUnverifiable: 'THROW',
-						ifNoVariantInScope: null,
-					}),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (variantWallet.features.security.publicSecurityAudits === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							const auditedInLastYear = isAuditedInLastYear(
+								variantWallet.features.security.publicSecurityAudits,
+							)
+
+							if (!auditedInLastYear) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} has not undergone a security audit within the last year.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} has undergone a security audit within the last year.',
+								),
+							}
+						},
+					),
 					displayName: 'Security Audits',
 				},
 				{
@@ -568,7 +594,39 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, bugBountyProgram),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							const bugBountyProgram = variantWallet.features.security.bugBountyProgram
+
+							if (bugBountyProgram === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!isSupported(bugBountyProgram)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence('{{WALLET_NAME}} does not have a bug bounty program.'),
+								}
+							}
+
+							if (evaluateBugBountyProgram(bugBountyProgram).rating !== Rating.PASS) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not have a sufficiently comprehensive bug bounty program.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} has a funded, comprehensive bug bounty program.',
+								),
+							}
+						},
+					),
 					displayName: 'Bug Bounty Program',
 				},
 				{
