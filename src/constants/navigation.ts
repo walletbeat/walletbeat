@@ -62,7 +62,7 @@ function eipTrackerNavigationItems(idPrefix: string, walletType: WalletType): Na
 			id: `${idPrefix}-eip-${eip.number}-tracker`,
 			title: `${eipShortLabel(eip)} Tracker`,
 			href: getEipTrackerUrl(eip),
-			icon: eip.icon ?? ('ICON_CHART_BAR' as const),
+			icon: eip.icon,
 		}))
 }
 

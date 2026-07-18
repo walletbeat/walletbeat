@@ -1,4 +1,5 @@
 import type { LucideNavigationIcon } from '@/constants/navigation'
+import type { WBIconID } from '@/styles/wbicons'
 import type { NonEmptySet } from '@/types/utils/non-empty'
 
 import type { WalletType } from './wallet-types'
@@ -65,11 +66,8 @@ export interface Eip {
 	 */
 	appliesTo: NonEmptySet<WalletType>
 
-	/**
-	 * Navigation icon for this EIP.
-	 * Navigation entries fall back to a generic chart icon when unset.
-	 */
-	icon?: LucideNavigationIcon
+	/** Navigation icon for this EIP. */
+	icon: LucideNavigationIcon | WBIconID
 
 	/** EIP summary, as from the EIP repository with some minor tweaks if needed. */
 	summaryMarkdown: string
