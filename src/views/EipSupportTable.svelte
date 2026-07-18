@@ -174,15 +174,9 @@
 
 				{:else if column.id === 'variants'}
 					{@const perVariant = variantSupportList(walletSupport)}
-					{@const statuses = perVariant.map(({ support }) => eipSupportStatus(support))}
 
 					{#if perVariant.length <= 1}
 						<span class="muted-text">–</span>
-					{:else if statuses.every(status => status === statuses[0])}
-						<!-- All platforms share one status; the icon alone says it all. -->
-						<span class="support-status" data-support-status={statuses[0]}>
-							<span class="status-icon">{eipSupportStatusIcon[statuses[0]]}</span>
-						</span>
 					{:else}
 						<ul class="variant-list" data-list="unstyled gap-1">
 							{#each perVariant as { variant, support } (variant)}
