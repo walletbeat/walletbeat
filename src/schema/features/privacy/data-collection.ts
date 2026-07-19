@@ -1149,9 +1149,7 @@ export type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
  * - {@link DataCollectionForFlow} — researched
  */
 export type DataCollectionForUserFlowOrUnsupported =
-	| DataCollectionForFlow
-	| null
-	| 'FLOW_NOT_SUPPORTED'
+	DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 /**
  * A collection of data that a wallet collects.

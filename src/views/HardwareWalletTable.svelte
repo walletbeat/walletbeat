@@ -18,11 +18,14 @@
 		tableId?: string
 		title?: string
 	} = $props()
+
+	const titleDisclaimer = 'Hardware wallets are in beta and our methodology is subject to change at any time.'
 </script>
 
 <WalletTable
 	{tableId}
 	{title}
+	{titleDisclaimer}
 	ladders={hardwareLadders}
 	{wallets}
 	attributeTree={hardwareWalletAttributeTree}

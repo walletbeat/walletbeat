@@ -186,9 +186,7 @@ interface EncodedResponsePayloadAbbreviated {
 }
 
 type EncodedResponsePayload =
-	| string
-	| EncodedResponsePayloadBase64
-	| EncodedResponsePayloadAbbreviated
+	string | EncodedResponsePayloadBase64 | EncodedResponsePayloadAbbreviated
 
 /**
  * How query params / cookies / headers are encoded.

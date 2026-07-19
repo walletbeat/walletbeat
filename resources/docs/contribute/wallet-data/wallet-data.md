@@ -191,9 +191,7 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 			websites: ['https://mylittlewallet.com'],
 		},
 	},
-	features: {
-		/* Do not touch this part yet; this comes in later steps. */
-	},
+	features: {/* Do not touch this part yet; this comes in later steps. */},
 	variants: {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
