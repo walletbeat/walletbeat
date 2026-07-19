@@ -191,7 +191,7 @@
 		},
 		{
 			"name": "data-icon",
-			"description": "## [data-icon]\n\nShared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control.\n\n### Tokens\n- shape: `circle`, `filled`\n- source: `wbicons`\n\n### CSS Variables\n- `--icon-content`\n- `--icon-size`\n- `--icon-navigation-borderColor`\n- `--icon-navigation-color`\n\n### Examples\n```html\n<span data-icon=\"&#x21b5;\"></span>\n<span data-icon=\"wbicons security\"></span>\n<button data-icon=\"circle\" type=\"button\"><svg aria-hidden=\"true\">...</svg></button>\n```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`",
+			"description": "## [data-icon]\n\nShared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.\n\n### Tokens\n- shape: `circle`, `filled`\n- source: `wbicons`\n- effect: `shadow`\n\n### CSS Variables\n- `--icon-content`\n- `--icon-size`\n- `--icon-navigation-borderColor`\n- `--icon-navigation-color`\n\n### Examples\n```html\n<span data-icon=\"&#x21b5;\"></span>\n<span data-icon=\"wbicons security\"></span>\n<button data-icon=\"circle\" type=\"button\"><svg aria-hidden=\"true\">...</svg></button>\n<span data-icon=\"shadow\"><img src=\"/images/wallets/rabby.svg\" alt=\"Rabby\" /></span>\n```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-icon]`",
 			"values": [
 				{
 					"name": "circle",
@@ -200,6 +200,10 @@
 				{
 					"name": "filled",
 					"description": "`[data-icon~=\"filled\"]`"
+				},
+				{
+					"name": "shadow",
+					"description": "`[data-icon~=\"shadow\"]`"
 				}
 			]
 		},
@@ -604,10 +608,6 @@
 					"description": "`[data-tag~=\"wallet-type\"]`"
 				}
 			]
-		},
-		{
-			"name": "data-wallet-icon",
-			"description": "## [data-wallet-icon]\n\nShared chrome for wallet logo images: contain fit, slight rounding, and a theme-aware halo (dark glow in light mode, light glow in dark mode) so logos stay legible on both backgrounds. Presence only (no tokens); size it at the usage site.\n\n### Examples\n```html\n<img data-wallet-icon src=\"/images/wallets/rabby.svg\" alt=\"Rabby\" width=\"36\" height=\"36\" />\n```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-wallet-icon]`"
 		}
 	]
 }

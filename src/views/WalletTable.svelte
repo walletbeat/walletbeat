@@ -844,13 +844,14 @@
 						<div class="wallet-info" data-row="start">
 							<span class="row-count" data-row="center"></span>
 
-							<img
-								alt={displayName}
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-								data-wallet-icon
-								width="16"
-								height="16"
-							/>
+							<span class="wallet-icon" data-icon="shadow">
+								<img
+									alt={displayName}
+									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+									width="16"
+									height="16"
+								/>
+							</span>
 
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
@@ -1847,9 +1848,8 @@
 			}
 		}
 
-		img {
-			width: 2.25em;
-			height: 2.25em;
+		.wallet-icon {
+			--icon-size: 2.25em;
 		}
 
 		.name-and-tags {

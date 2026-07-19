@@ -243,11 +243,12 @@ interface CssAttributes {
 	/**
 	 * ## [data-icon]
 	 *
-	 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control.
+	 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
 	 *
 	 * ### Tokens
 	 * - shape: `circle`, `filled`
 	 * - source: `wbicons`
+	 * - effect: `shadow`
 	 *
 	 * ### CSS Variables
 	 * - `--icon-content`
@@ -260,6 +261,7 @@ interface CssAttributes {
 	 * <span data-icon="&#x21b5;"></span>
 	 * <span data-icon="wbicons security"></span>
 	 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
+	 * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
 	 * ```
 	 *
 	 * ### Source
@@ -1080,21 +1082,6 @@ interface CssAttributes {
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`
 	 */
 	'data-tag'?: string | boolean
-
-	/**
-	 * ## [data-wallet-icon]
-	 *
-	 * Shared chrome for wallet logo images: contain fit, slight rounding, and a theme-aware halo (dark glow in light mode, light glow in dark mode) so logos stay legible on both backgrounds. Presence only (no tokens); size it at the usage site.
-	 *
-	 * ### Examples
-	 * ```html
-	 * <img data-wallet-icon src="/images/wallets/rabby.svg" alt="Rabby" width="36" height="36" />
-	 * ```
-	 *
-	 * ### Source
-	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-wallet-icon]`
-	 */
-	'data-wallet-icon'?: string | boolean
 }
 
 declare namespace astroHTML.JSX {

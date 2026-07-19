@@ -93,8 +93,8 @@ const embeddedWallets = Object.values(ratedEmbeddedWallets)
 					href={repositoryUrl}
 					target='_blank'
 					rel='noopener noreferrer'
-					class='github-link'
-					data-row='gap-2'><span set:html={GitHubIcon} />GitHub Repository</a
+					data-input
+					data-link='camouflaged'><span data-icon set:html={GitHubIcon} />GitHub Repository</a
 				>
 			</p>
 		</footer>
@@ -128,27 +128,6 @@ const embeddedWallets = Object.values(ratedEmbeddedWallets)
 		p {
 			color: var(--text-secondary);
 			font-size: 0.9rem;
-		}
-
-		.github-link {
-			margin-left: 0.5rem;
-			padding: 0.5rem 1rem;
-			background: var(--background-primary);
-			border: 1px solid var(--border-color);
-			border-radius: 0.375rem;
-			text-decoration: none;
-			color: var(--text-primary);
-
-			&:hover {
-				background: var(--background-secondary);
-				text-decoration: none;
-			}
-
-			span {
-				width: 1rem;
-				height: 1rem;
-				opacity: 0.8;
-			}
 		}
 	}
 </style>

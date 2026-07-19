@@ -144,14 +144,14 @@
 					<div class="wallet-info" data-row>
 						<span class="row-count" data-row="center"></span>
 
-						<img
-							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							alt={wallet.metadata.displayName}
-							class="wallet-icon"
-							data-wallet-icon
-							width="36"
-							height="36"
-						/>
+						<span class="wallet-icon" data-icon="shadow">
+							<img
+								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+								alt={wallet.metadata.displayName}
+								width="36"
+								height="36"
+							/>
+						</span>
 
 						<div class="name">
 							<h3>
@@ -281,8 +281,7 @@
 		}
 
 		.wallet-icon {
-			width: 2.25em;
-			height: 2.25em;
+			--icon-size: 2.25em;
 		}
 
 		.name {
