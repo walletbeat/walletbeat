@@ -15,8 +15,7 @@ export type BrowserIntegrationEip = '1193' | '2700' | '6963'
  * It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
  */
 export type WalletBrowserIntegration =
-	| 'NOT_A_BROWSER_WALLET'
-	| WithRef<Record<BrowserIntegrationEip, Support | null>>
+	'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>
 
 /**
  * Level of integration of a wallet within browsers, mobile phones, etc.

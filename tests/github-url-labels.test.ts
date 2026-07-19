@@ -132,7 +132,7 @@ describe('getUrlLabel for GitHub URLs', () => {
 		})
 
 		it('throws for unhandled repo page types', () => {
-			expect(() => getUrlLabel('https://github.com/org/repo/wiki')).toThrowError(
+			expect(() => getUrlLabel('https://github.com/org/repo/wiki')).toThrow(
 				/Unhandled GitHub URL path type "wiki"/,
 			)
 		})

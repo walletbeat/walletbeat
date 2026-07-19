@@ -16,7 +16,8 @@ const attributeGroupDefinitions = [
 		displayName: 'Security',
 		attributes: [
 			{
-				attribute: (await import('@/schema/attributes/security/security-audits.ts')).securityAudits,
+				attribute: (await import('@/schema/attributes/security/security-audits-bounties'))
+					.securityAuditsAndBounties,
 				weight: 1.0,
 			},
 			{
@@ -41,11 +42,6 @@ const attributeGroupDefinitions = [
 			{
 				attribute: (await import('@/schema/attributes/security/security-best-practices.ts'))
 					.securityBestPractices,
-				weight: 1.0,
-			},
-			{
-				attribute: (await import('@/schema/attributes/security/bug-bounty-program.ts'))
-					.bugBountyProgram,
 				weight: 1.0,
 			},
 			{
@@ -161,11 +157,6 @@ const attributeGroupDefinitions = [
 		attributes: [
 			{
 				attribute: (await import('@/schema/attributes/transparency/open-source.ts')).openSource,
-				weight: 1.0,
-			},
-			{
-				attribute: (await import('@/schema/attributes/transparency/source-visibility.ts'))
-					.sourceVisibility,
 				weight: 1.0,
 			},
 			{

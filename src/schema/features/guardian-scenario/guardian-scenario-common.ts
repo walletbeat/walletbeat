@@ -16,8 +16,7 @@ export const guardianScenarioType = new Enum<GuardianScenarioType>({
 })
 
 export type GuardianScenario<S extends GuardianScenarioType> = (
-	| GuardianScenarioDataLoss
-	| GuardianScenarioEntityTurnsEvil
+	GuardianScenarioDataLoss | GuardianScenarioEntityTurnsEvil
 ) & {
 	type: S
 }
@@ -32,8 +31,7 @@ export type AccountRecoveryOutcomeCannotBeRecovered = {
 }
 
 export type AccountRecoveryOutcome =
-	| AccountRecoveryOutcomeCanBeRecovered
-	| AccountRecoveryOutcomeCannotBeRecovered
+	AccountRecoveryOutcomeCanBeRecovered | AccountRecoveryOutcomeCannotBeRecovered
 
 export function isAccountRecoverable(
 	recoveryOutcome: AccountRecoveryOutcome,
@@ -51,8 +49,7 @@ export type AccountTakeOverOutcomeCanBeTakenOver = {
 }
 
 export type AccountTakeOverOutcome =
-	| AccountTakeOverOutcomeCannotBeTakenOver
-	| AccountTakeOverOutcomeCanBeTakenOver
+	AccountTakeOverOutcomeCannotBeTakenOver | AccountTakeOverOutcomeCanBeTakenOver
 
 export function isAccountTakeOverPossible(
 	takeOverOutcome: AccountTakeOverOutcome,

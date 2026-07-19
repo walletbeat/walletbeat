@@ -47,6 +47,12 @@ import {
 	GuardianPolicyType,
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramSupport,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
@@ -578,7 +584,26 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramSupport>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2024-01-01',
+				disclosure: supported({
+					numberOfDays: 90,
+				}),
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: 'https://example.com',
+				}),
+				platform: BugBountyPlatform.IMMUNEFI,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 100000,
+					minimum: 1000,
+				}),
+				upgradePathAvailable: true,
+			}),
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,

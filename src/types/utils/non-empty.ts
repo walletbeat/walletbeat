@@ -175,8 +175,7 @@ export function nonEmptyFirst<T>(
  * Concatenate a non-empty array and an array together.
  */
 export function nonEmptyConcat<T>([arr, rest]:
-	| [T[], NonEmptyArray<T>]
-	| [NonEmptyArray<T>, T[]]): NonEmptyArray<T> {
+	[T[], NonEmptyArray<T>] | [NonEmptyArray<T>, T[]]): NonEmptyArray<T> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know one of the two input arrays was non-empty.
 	return arr.concat(...rest) as NonEmptyArray<T>
 }

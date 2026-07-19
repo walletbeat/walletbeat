@@ -108,8 +108,7 @@ export function isCustomContent(content: unknown): content is CustomContent {
  * Typographic content that may be displayed on the UI.
  */
 export type TypographicContent<_Strings extends Strings = null> =
-	| TextContent<_Strings>
-	| MarkdownContent<_Strings>
+	TextContent<_Strings> | MarkdownContent<_Strings>
 
 /**
  * Represents any type of content that may be displayed on the UI.

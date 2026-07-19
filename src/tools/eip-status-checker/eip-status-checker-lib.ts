@@ -95,9 +95,7 @@ export interface EipCheckResultUnverifiable extends EipCheckResultBase {
 
 /** Result of checking a single EIP's status. */
 export type EipStatusCheckResult =
-	| EipCheckResultMatch
-	| EipCheckResultDrift
-	| EipCheckResultUnverifiable
+	EipCheckResultMatch | EipCheckResultDrift | EipCheckResultUnverifiable
 
 /** Aggregate report over every checked EIP. */
 export interface EipStatusReport {
@@ -442,19 +440,15 @@ export function reportToJson(report: EipStatusReport): string {
 				drift: report.drift.length,
 				unverifiable: report.unverifiable.length,
 			},
-			drift: report.drift.map(
-				(result): EipDriftJson => ({
-					eip: label(result),
-					mismatches: result.mismatches,
-					url: result.url,
-				}),
-			),
-			unverifiable: report.unverifiable.map(
-				(result): EipUnverifiableJson => ({
-					eip: label(result),
-					note: result.note,
-				}),
-			),
+			drift: report.drift.map((result): EipDriftJson => ({
+				eip: label(result),
+				mismatches: result.mismatches,
+				url: result.url,
+			})),
+			unverifiable: report.unverifiable.map((result): EipUnverifiableJson => ({
+				eip: label(result),
+				note: result.note,
+			})),
 		},
 		null,
 		2,

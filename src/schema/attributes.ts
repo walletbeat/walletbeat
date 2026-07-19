@@ -514,7 +514,7 @@ export function normalizeExampleRatings<_OutcomeMetadata extends OutcomeMetadata
 export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	/**
 	 * Unique ID representing the attribute in camelCase.
-	 * For example: "sourceVisibility".
+	 * For example: "openSource".
 	 */
 	id: string
 

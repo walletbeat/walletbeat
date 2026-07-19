@@ -32,6 +32,7 @@
 	let {
 		tableId,
 		title,
+		titleDisclaimer,
 		ladders,
 		wallets,
 		attributeTree,
@@ -39,6 +40,7 @@
 	}: {
 		tableId?: string,
 		title?: string
+		titleDisclaimer?: string
 		ladders?: Ladders<_AttributeGroupId>
 		wallets: RatedWallet<_AttributeGroupId>[]
 		attributeTree: AttributeTree<_AttributeGroupId>
@@ -396,7 +398,13 @@
 		data-row="wrap"
 	>
 		{#if title}
-			<h2>{title}</h2>
+			<div class="title-group" data-column="gap-1">
+				<h2>{title}</h2>
+
+				{#if titleDisclaimer}
+					<p class="title-disclaimer">{titleDisclaimer}</p>
+				{/if}
+			</div>
 		{/if}
 
 		<!-- Mobile-only filter UI -->
@@ -1822,6 +1830,11 @@
 				}
 			}
 		}
+	}
+
+	.title-disclaimer {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
 	}
 
 	.wallet-info {
