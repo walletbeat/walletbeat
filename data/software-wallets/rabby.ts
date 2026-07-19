@@ -739,7 +739,17 @@ export const rabby: SoftwareWallet = {
 			},
 			securityBestPractices: {
 				browser: {
-					ref: refTodo,
+					ref: [
+						{
+							label: `Vault encrypted via Metamask's browser-passworder, a standardized KDF.`,
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/src/background/utils/password.ts#L60-L98',
+						},
+						{
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/src/background/service/keyring/index.ts#L288-L290',
+							label:
+								'Rabby uses a seed phrase entropy from `crypto.getRandomValues` via @scure/bip39.',
+						},
+					],
 					browserExtensionHardening: parseBrowserExtensionManifest(rabbyRawExtManifest),
 					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
 					secureRng: SecureRngSource.OS_CSPRNG,
