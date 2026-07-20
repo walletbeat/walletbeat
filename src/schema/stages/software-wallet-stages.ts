@@ -6,11 +6,13 @@ import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 import { accountAbstraction } from '../attributes/ecosystem/account-abstraction'
 import { addressResolution } from '../attributes/ecosystem/address-resolution'
 import { browserIntegration } from '../attributes/ecosystem/browser-integration'
+import { hardwareWalletInteroperability } from '../attributes/ecosystem/hardware-wallet-interoperability'
 import { transactionBatching } from '../attributes/ecosystem/transaction-batching'
 import { addressCorrelation } from '../attributes/privacy/address-correlation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
+import { hasAccountRecovery, hasAccountRecoveryDrills } from '../attributes/security/account-recovery'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import {
@@ -22,6 +24,7 @@ import { transactionLegibility } from '../attributes/security/transaction-legibi
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
 import { accountUnruggability } from '../attributes/self-sovereignty/account-unruggability'
 import { chainVerification } from '../attributes/self-sovereignty/chain-verification'
+import { l1ProviderIndependence } from '../attributes/self-sovereignty/l1-provider-independence'
 import { permissionsManagement } from '../attributes/self-sovereignty/permissions-management'
 import { transactionInclusion } from '../attributes/self-sovereignty/transaction-inclusion'
 import { feeTransparency } from '../attributes/transparency/fee-transparency'
@@ -312,6 +315,52 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Standard Security Practices',
+				},
+				{
+					id: 'account_recovery_drills',
+					description: sentence(
+						'The wallet must periodically prompt users to verify that their account recovery methods are still accessible.',
+					),
+					rationale: sentence(`
+						Recovery methods can silently become inaccessible over time, for example a written-down seed phrase becoming unreadable or a guardian account getting abandoned. Periodic check-ups catch this while there is still time to fix it, rather than leaving the user to discover the problem only when they actually need to recover their account.
+					`),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (
+								variantWallet.features.security.accountRecovery === null ||
+								variantWallet.features.accountSupport === null
+							) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							const passes = hasAccountRecoveryDrills(
+								variantWallet.features.security.accountRecovery,
+								variantWallet.features.accountSupport,
+							)
+
+							if (passes === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!passes) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not run all recommended account recovery check-ups.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} periodically prompts users to verify their account recovery methods.',
+								),
+							}
+						},
+					),
+					displayName: 'Account Recovery Drills',
 				},
 			],
 		},
@@ -647,6 +696,44 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					displayName: 'Duress Resistance',
 				},
 				{
+					id: 'account_recovery',
+					description: sentence(
+						'The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios.',
+					),
+					rationale: sentence(`
+						Self-custody is only practical for everyday users if losing a
+						device, a guardian, or a single external provider does not mean
+						permanently losing access to one's account. Guardian-based
+						recovery provides this safety net without reintroducing a single
+						party that can take over the account.
+					`),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (variantWallet.features.security.accountRecovery === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!hasAccountRecovery(variantWallet.features.security.accountRecovery)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not let users recover their account in all likely catastrophic scenarios.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} lets users recover their account in all likely catastrophic scenarios.',
+								),
+							}
+						},
+					),
+					displayName: 'Account Recovery',
+				},
+				{
 					id: 'impact_mitigation',
 					description: sentence(
 						'The wallet must let users set self-imposed limits to mitigate damage from unauthorized access.',
@@ -780,6 +867,23 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					displayName: 'Chain Configurability',
 				},
 				{
+					id: 'full_l1_provider_independence',
+					description: sentence(
+						'The wallet must not critically depend on external providers to perform basic operations on Ethereum L1, even when the user configures their own self-hosted node.',
+					),
+					rationale: sentence(`
+						Merely letting the user point the wallet at a self-hosted node is
+						not enough if the wallet still contacts its default provider
+						before the user can configure it, or still relies on external
+						services for basic operations such as account creation, balance
+						lookups, or token transfers. True provider independence requires
+						that none of these critical paths depend on anything other than
+						the user's own node.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, l1ProviderIndependence),
+					displayName: 'L1 Provider Independence',
+				},
+				{
 					id: 'outstanding_approvals_full',
 					description: sentence(
 						'The wallet must let users inspect and revoke ERC-20, ERC-721, and ERC-1155 token approvals.',
@@ -891,6 +995,22 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionBatching),
 					displayName: 'Transaction Batching',
+				},
+				{
+					id: 'hardware_wallet_interoperability',
+					description: sentence(
+						'The wallet must directly support hardware wallets from at least three major manufacturers.',
+					),
+					rationale: sentence(`
+						Counting supported hardware wallet manufacturers alone is not sufficient: a wallet that only reaches most of them through WalletConnect still leaves users dependent on an intermediary and a separate external application.
+						True hardware wallet interoperability requires direct integration, which preserves a competitive, open hardware wallet market.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, hardwareWalletInteroperability, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Hardware Wallet Interoperability',
 				},
 			],
 		},
