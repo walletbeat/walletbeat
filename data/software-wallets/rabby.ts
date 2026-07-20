@@ -19,6 +19,11 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 import { WalletProfile } from '@/schema/features/profile'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
+	type BugBountyProgramImplementation,
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+} from '@/schema/features/security/bug-bounty-program'
+import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
@@ -88,7 +93,7 @@ export const rabby: SoftwareWallet = {
 		`),
 		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-06',
+		lastUpdated: '2026-07-20',
 		urls: {
 			docs: ['https://rabbykit.rabby.io/'],
 			extensions: [
@@ -425,7 +430,21 @@ export const rabby: SoftwareWallet = {
 				drills: notSupported,
 				guardianRecovery: notSupported,
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: 'https://bugrap.io/bounties/Rabby%20Wallet',
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2024-04-15',
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.BUGRAP,
+				rewards: supported({
+					currency: 'USDC',
+					maximum: 10000,
+					minimum: 0,
+				}),
+				upgradePathAvailable: true,
+			}),
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,
