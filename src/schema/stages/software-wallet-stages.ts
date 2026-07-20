@@ -909,13 +909,10 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 						'The wallet must not critically depend on external providers to perform basic operations on Ethereum L1, even when the user configures their own self-hosted node.',
 					),
 					rationale: sentence(`
-						Merely letting the user point the wallet at a self-hosted node is
-						not enough if the wallet still contacts its default provider
-						before the user can configure it, or still relies on external
-						services for basic operations such as account creation, balance
-						lookups, or token transfers. True provider independence requires
-						that none of these critical paths depend on anything other than
-						the user's own node.
+						Merely letting the user point the wallet at a self-hosted node is not enough if the
+						wallet still contacts its default provider before the user configures it, or relies on
+						external services for account creation, balance lookups, or transfers. True independence
+						requires all critical paths depend only on the user's own node.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, l1ProviderIndependence),
 					displayName: 'L1 Provider Independence',
@@ -991,7 +988,10 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 						'The wallet must transparently disclose how it monetizes or shares transaction data before it is included onchain.',
 					),
 					rationale: sentence(`
-						Wallet software may send transaction data to external services for broadcast, simulation, or orderflow auctioning (MEV) before a transaction is included onchain. Users cannot see this path as clearly as onchain execution unless the wallet discloses it, so wallets that auction orderflow by default must disclose this prominently and document their practices, while wallets that otherwise share pre-inclusion data must do so only through verifiably non-extractive endpoints.
+						Wallet software may send transaction data to external services for broadcast, simulation,
+						or orderflow auctioning before inclusion onchain, a path less visible than onchain execution.
+						Wallets that auction orderflow by default must disclose this prominently, and any pre-inclusion
+						data sharing must use verifiably non-extractive endpoints.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, orderflowTransparency, {
 						allowPartial: true,
