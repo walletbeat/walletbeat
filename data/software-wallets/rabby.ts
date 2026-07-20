@@ -735,7 +735,7 @@ export const rabby: SoftwareWallet = {
 					newRecipientWarning: false,
 					userWhitelist: true,
 				}),
-				unlimitedApprovalWarning: null,
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
