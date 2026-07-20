@@ -1,16 +1,18 @@
 <script lang="ts">
-	import type { Eip } from '@/schema/eips'
+	import type { Eip, EipNumber } from '@/schema/eips'
 	import { EipPrefix, eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
+	import { eips as eipsRecord } from '@/data/eips'
+	import { ratedSoftwareWallets } from '@/data/software-wallets'
+	import { isSupported } from '@/schema/features/support'
+	import { walletEipSupport } from '@/schema/eip-support'
+	import { getVariants } from '@/schema/variants'
+	import { getVariantResolvedWallet } from '@/schema/wallet'
+	import { setItems } from '@/types/utils/non-empty'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
 
-	type Props = {
-		eips: Eip[]
-	}
+	const eips: Eip[] = Object.values(eipsRecord)
 
-	let { eips }: Props = $props()
-
-	// Filter state
 	type FilterPrefix = EipPrefix | 'ALL'
 	let activeFilter = $state<FilterPrefix>('ALL')
 
@@ -21,74 +23,175 @@
 	]
 
 	const filtered = $derived(
-		activeFilter === 'ALL' ? eips : eips.filter((e) => e.prefix === activeFilter),
+		activeFilter === 'ALL' ? eips : eips.filter(eip => eip.prefix === activeFilter),
 	)
 
-	// Accordion open state per EIP
-	let openStates = $state<Record<string, boolean>>(
-		Object.fromEntries(eips.map((e) => [e.number, false])),
-	)
+	type SupportState = 'supported' | 'unsupported'
+
+	type WalletSupportEntry = {
+		id: string
+		displayName: string
+		iconExtension: 'png' | 'svg'
+		state: SupportState
+		walletUrl: string
+	}
+
+	/**
+	 * For a given EIP, determine each wallet's support state by consuming the
+	 * shared walletEipSupport() building block. Wallets for which the EIP is not
+	 * applicable or not yet assessed (across all variants) are omitted.
+	 */
+	function walletSupportForEip(eipNumber: EipNumber): WalletSupportEntry[] {
+		const results: WalletSupportEntry[] = []
+
+		for (const wallet of Object.values(ratedSoftwareWallets)) {
+			let anySupported = false
+			let anyAssessed = false
+
+			for (const variant of setItems(getVariants(wallet.variants))) {
+				const resolved = getVariantResolvedWallet(wallet, variant)
+
+				if (resolved === null) {
+					continue
+				}
+
+				const support = walletEipSupport(resolved.features)[eipNumber]
+
+				if (support === 'NOT_APPLICABLE' || support === 'UNKNOWN') {
+					continue
+				}
+
+				anyAssessed = true
+
+				if (isSupported(support)) {
+					anySupported = true
+				}
+			}
+
+			if (!anyAssessed) {
+				continue
+			}
+
+			results.push({
+				id: wallet.metadata.id,
+				displayName: wallet.metadata.displayName,
+				iconExtension: wallet.metadata.iconExtension,
+				state: anySupported ? 'supported' : 'unsupported',
+				walletUrl: `/${wallet.metadata.id}/`,
+			})
+		}
+
+		return results.sort((a, b) => {
+			if (a.state !== b.state) {
+				return a.state === 'supported' ? -1 : 1
+			}
+
+			return a.displayName.localeCompare(b.displayName)
+		})
+	}
 </script>
 
-<!-- Filter pills -->
-<nav class="filter-nav" aria-label="Filter EIPs">
-	{#each filters as f (f.value)}
+<div class="filters">
+	{#each filters as filter (filter.value)}
 		<button
 			class="filter-pill"
-			class:active={activeFilter === f.value}
-			onclick={() => (activeFilter = f.value)}
+			class:filter-pill--active={activeFilter === filter.value}
+			onclick={() => (activeFilter = filter.value)}
 		>
-			{f.label}
+			{filter.label}
 		</button>
 	{/each}
-	<span class="filter-count">{filtered.length} standard{filtered.length === 1 ? '' : 's'}</span>
-</nav>
+	<span class="filter-count">{filtered.length} standards</span>
+</div>
 
-<!-- EIP list -->
 <div class="eip-list">
 	{#each filtered as eip (eip.number)}
-		<div class="eip-item">
-			<details
-				bind:open={openStates[eip.number]}
-				data-card="secondary padding-0 radius-4"
-				class:open={openStates[eip.number]}
-			>
+		<div data-card='secondary padding-0 radius-4'>
+			<details>
 				<summary>
-					<div class="eip-row">
-						<span class="eip-label">{eipShortLabel(eip)}</span>
-						<span class="eip-name">{eip.friendlyName}</span>
-						<span class="eip-status" data-status={eip.status}>
-							{eipStatusLabel[eip.status]}
-						</span>
-					</div>
+					<span class="eip-summary">
+						<span class="eip-summary__label">{eipShortLabel(eip)}</span>
+						<span class="eip-summary__name">{eip.friendlyName}</span>
+					</span>
+					<span class="eip-status" data-status={eip.status}>{eipStatusLabel[eip.status]}</span>
+					<span class="eip-chevron" aria-hidden="true"></span>
 				</summary>
 
 				<div class="eip-detail">
 					<section class="eip-detail__section">
-						<h4>Summary</h4>
+						<h3>Summary</h3>
 						<Typography content={markdown(eip.summaryMarkdown)} />
 					</section>
 
 					<section class="eip-detail__section">
-						<h4>Why it matters for wallets</h4>
+						<h3>Why it matters for wallets</h3>
 						<Typography content={markdown(eip.whyItMattersMarkdown)} />
 					</section>
 
 					{#if eip.noteMarkdown}
 						<section class="eip-detail__section">
-							<h4>Notes</h4>
+							<h3>Notes</h3>
 							<Typography content={markdown(eip.noteMarkdown)} />
 						</section>
 					{/if}
 
-					<a
-						class="eip-detail__spec-link"
-						href={eipEthereumDotOrgUrl(eip)}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read full spec ↗
-					</a>
+					{#key eip.number}
+						{@const walletSupport = walletSupportForEip(eip.number)}
+						{@const supported = walletSupport.filter(w => w.state === 'supported')}
+						{@const unsupported = walletSupport.filter(w => w.state === 'unsupported')}
+
+						{#if walletSupport.length > 0}
+							<section class="eip-detail__section">
+								<h3>Wallet implementation</h3>
+
+								{#if supported.length > 0}
+									<div class="wallet-group">
+										<span class="wallet-group__label wallet-group__label--supported">Supports</span>
+										<div class="wallet-icons">
+											{#each supported as w (w.id)}
+												<a href={w.walletUrl} class="wallet-icon" title={w.displayName}>
+													<img src="/images/wallets/{w.id}.{w.iconExtension}" alt={w.displayName} />
+												</a>
+											{/each}
+										</div>
+									</div>
+								{/if}
+
+								{#if unsupported.length > 0}
+									<div class="wallet-group">
+										<span class="wallet-group__label wallet-group__label--unsupported">
+											Not supported
+										</span>
+										<div class="wallet-icons">
+											{#each unsupported as w (w.id)}
+												<a
+													href={w.walletUrl}
+													class="wallet-icon wallet-icon--fail"
+													title={w.displayName}
+												>
+													<img src="/images/wallets/{w.id}.{w.iconExtension}" alt={w.displayName} />
+												</a>
+											{/each}
+										</div>
+									</div>
+								{/if}
+							</section>
+						{/if}
+					{/key}
+
+					<div class="eip-detail__links">
+						<a class="eip-detail__page-link" href="/wallet-eips/{eip.number}/">
+							View wallet support →
+						</a>
+						<a
+							class="eip-detail__spec-link"
+							href={eipEthereumDotOrgUrl(eip)}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Read full spec ↗
+						</a>
+					</div>
 				</div>
 			</details>
 		</div>
@@ -100,37 +203,34 @@
 {/if}
 
 <style>
-	/* Filter nav  */
-	.filter-nav {
+	.filters {
 		display: flex;
 		align-items: center;
-		flex-wrap: wrap;
 		gap: 0.5rem;
 		margin-bottom: 1.5rem;
 	}
 
 	.filter-pill {
-		font-size: 0.82rem;
-		font-weight: 500;
-		padding: 0.35em 0.9em;
-		border: 1px solid var(--border);
+		font-size: 0.85rem;
+		font-weight: 600;
+		padding: 0.35rem 0.9rem;
 		border-radius: 99px;
+		border: 1px solid var(--border);
 		background: transparent;
 		color: var(--text-secondary);
 		cursor: pointer;
 		transition:
-			border-color 0.15s ease,
+			background 0.15s ease,
 			color 0.15s ease,
-			background 0.15s ease;
+			border-color 0.15s ease;
 
 		&:hover {
 			border-color: var(--accent);
-			color: var(--accent);
 		}
 
-		&.active {
+		&--active {
+			background: color-mix(in srgb, var(--accent) 15%, transparent);
 			border-color: var(--accent);
-			background: color-mix(in srgb, var(--accent) 12%, transparent);
 			color: var(--accent);
 		}
 	}
@@ -142,72 +242,48 @@
 		opacity: 0.6;
 	}
 
-	/* EIP list */
 	.eip-list {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 0.75rem;
 	}
 
-	.eip-item {
-		details {
-			overflow: hidden;
-			transition: border-color 0.15s ease;
-			border: 1px solid transparent;
-			padding: 0.875rem 1rem 0.875rem 1.5rem;
+	details {
+		summary {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			padding: 1rem 1.25rem;
+			cursor: pointer;
+			list-style: none;
+			user-select: none;
 
-			&.open {
-				border-color: var(--accent);
-				padding-bottom: 1.25rem;
-			}
-
-			summary {
-				list-style: none;
-				cursor: pointer;
-				padding: 0;
-				user-select: none;
-
-				&::-webkit-details-marker {
-					display: none;
-				}
-
-				&::after {
-					content: '›';
-					font-size: 1.1rem;
-					color: var(--text-secondary);
-					opacity: 0.5;
-					transition: transform 0.2s ease;
-					flex-shrink: 0;
-				}
-			}
-
-			&.open summary::after {
-				transform: rotate(90deg);
+			&::-webkit-details-marker {
+				display: none;
 			}
 		}
 	}
 
-	/* Row (summary line) */
-	.eip-row {
+	.eip-summary {
 		display: flex;
-		align-items: center;
-		gap: 1.5rem;
-		width: 100%;
+		align-items: baseline;
+		gap: 1rem;
+		flex: 1;
+		min-width: 0;
 	}
 
-	.eip-label {
+	.eip-summary__label {
 		font-family: var(--fontFamily-spMonorium);
-		font-size: 0.85rem;
 		font-weight: 600;
 		color: var(--accent);
-		min-width: 5.5rem;
-		flex-shrink: 0;
+		white-space: nowrap;
 	}
 
-	.eip-name {
-		flex: 1;
-		font-size: 0.95rem;
-		color: var(--text-primary);
+	.eip-summary__name {
+		font-size: 1.05rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.eip-status {
@@ -217,7 +293,7 @@
 		letter-spacing: 0.05em;
 		padding: 0.2em 0.6em;
 		border-radius: 99px;
-		flex-shrink: 0;
+		white-space: nowrap;
 
 		&[data-status='FINAL'] {
 			background: color-mix(in srgb, #4ade80 15%, transparent);
@@ -245,52 +321,127 @@
 		}
 	}
 
-	/* Expanded detail */
+	.eip-chevron {
+		width: 0.6rem;
+		height: 0.6rem;
+		border-right: 2px solid var(--text-secondary);
+		border-bottom: 2px solid var(--text-secondary);
+		transform: rotate(-45deg);
+		transition: transform 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	details[open] .eip-chevron {
+		transform: rotate(45deg);
+	}
+
 	.eip-detail {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid var(--border);
-		margin-top: 0.875rem;
+		gap: 1.5rem;
+		padding: 0 1.25rem 1.5rem;
 	}
 
 	.eip-detail__section {
-		h4 {
-			font-size: 0.75rem;
+		h3 {
+			font-size: 0.78rem;
 			font-weight: 700;
 			text-transform: uppercase;
-			letter-spacing: 0.07em;
+			letter-spacing: 0.06em;
 			color: var(--accent);
-			margin: 0 0 0.375rem;
+			margin: 0 0 0.5rem;
 		}
 
 		:global(p) {
 			margin: 0;
-			font-size: 0.9rem;
-			color: var(--text-secondary);
+			font-size: 0.92rem;
 			line-height: 1.65;
+			color: var(--text-secondary);
+		}
+	}
+
+	.wallet-group {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+
+		& + & {
+			margin-top: 0.75rem;
+		}
+	}
+
+	.wallet-group__label {
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		width: 6.5rem;
+		flex-shrink: 0;
+
+		&--supported {
+			color: #4ade80;
+		}
+
+		&--unsupported {
+			color: var(--text-secondary);
+			opacity: 0.6;
+		}
+	}
+
+	.wallet-icons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.wallet-icon {
+		display: block;
+		width: 1.9rem;
+		height: 1.9rem;
+
+		img {
+			width: 100%;
+			height: 100%;
+			border-radius: 0.4rem;
+		}
+
+		&--fail img {
+			filter: grayscale(100%);
+			opacity: 0.4;
+		}
+	}
+
+	.eip-detail__links {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		flex-wrap: wrap;
+	}
+
+	.eip-detail__page-link {
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--accent);
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
 		}
 	}
 
 	.eip-detail__spec-link {
-		align-self: flex-start;
 		font-size: 0.82rem;
 		color: var(--text-secondary);
 		text-decoration: none;
-		opacity: 0.7;
 
 		&:hover {
-			opacity: 1;
+			color: var(--accent);
 		}
 	}
 
-	/* Empty state */
 	.empty {
-		font-size: 0.9rem;
 		color: var(--text-secondary);
-		opacity: 0.6;
-		padding: 2rem 0;
 		text-align: center;
+		padding: 2rem;
 	}
 </style>
