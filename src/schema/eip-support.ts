@@ -121,7 +121,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}
 
 		if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc8213.ref)
 		}
 
 		const messageSigningLegibility = erc8213.messageSigningLegibility
@@ -134,7 +134,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 			Object.values(MessageSigningDetails).some(detail =>
 				displayEntryIsShown(messageSigningLegibility[detail]),
 			),
-			transactionLegibility.ref,
+			erc8213.ref,
 		)
 	},
 	'1193': features => browserIntegrationEipSupport(features, '1193'),
@@ -148,7 +148,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 			return 'UNKNOWN'
 		}
 
-		return eipSupport(isSupported(transactionLegibility.erc4361), transactionLegibility.ref)
+		return eipSupport(isSupported(transactionLegibility.erc4361), transactionLegibility.erc4361.ref)
 	},
 	// A wallet supports ERC-4337 if it supports raw ERC-4337 accounts, or if
 	// its EIP-7702 delegate contract is itself an ERC-4337 account (i.e. it
@@ -240,7 +240,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}
 
 		if (!isSupported<HardwareWalletErc7730 | SoftwareWalletErc7730>(erc7730)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc7730.ref)
 		}
 
 		const decoded = Object.values(ComplexBenchmarkTransactions).map((benchmark): boolean | null => {
@@ -258,14 +258,14 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		})
 
 		if (decoded.includes(false)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc7730.ref)
 		}
 
 		if (decoded.includes(null)) {
 			return 'UNKNOWN'
 		}
 
-		return eipSupport(true, transactionLegibility.ref)
+		return eipSupport(true, erc7730.ref)
 	},
 	'7828': features => addressResolutionEipSupport(features, 'erc7828'),
 	'7831': features => addressResolutionEipSupport(features, 'erc7831'),
@@ -286,7 +286,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}
 
 		if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc8213.ref)
 		}
 
 		const { calldataDisplay, messageSigningLegibility } = erc8213
@@ -304,7 +304,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 				(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]) &&
 					displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH])))
 
-		return eipSupport(calldataDigestShown || signatureDigestShown, transactionLegibility.ref)
+		return eipSupport(calldataDigestShown || signatureDigestShown, erc8213.ref)
 	},
 }
 

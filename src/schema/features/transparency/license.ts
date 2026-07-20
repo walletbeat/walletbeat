@@ -158,7 +158,8 @@ export type License = SourceAvailableLicense | SourceNotAvailableLicense
 /** A license and a reference. */
 export type LicenseWithRef = { license: License } &
 	// If a source-available license, a reference must be provided.
-	(| MustRef<{
+	(
+		| MustRef<{
 				license: SourceAvailableLicense
 		  }>
 		// The reference is not necessary for source-unavailable licenses.

@@ -36,7 +36,6 @@ export const wbIconEmojiSequences = {
 	security_audits: '📜',
 	security_best_practices: '📋',
 	self_sovereignty: '🏰',
-	source_visibility: '🔍',
 	transaction_batching: '🧺',
 	transaction_inclusion: '📡',
 	transaction_legibility: '🧾',

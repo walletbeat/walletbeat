@@ -514,6 +514,7 @@ To test:
 - `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
 - `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
+
   - SINGLE_SIGNER: only single-owner Safes are supported.
   - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
 
@@ -553,8 +554,8 @@ type DelegationHandling =
 	| (DelegationOffer &
 			(
 				| // Either the delegation is required at EOA creation and import time...
-				{ duringEOACreation: 'REQUIRED'; duringEOAImport: 'REQUIRED' }
-				// Or it is supported at transaction time.
+				  { duringEOACreation: 'REQUIRED'; duringEOAImport: 'REQUIRED' }
+				  // Or it is supported at transaction time.
 				| { duringFirst7702Operation: Supported<DelegationOffer['duringFirst7702Operation']> }
 			) & {
 				/** How is the fee for the initial EIP-7702 delegation paid? */
@@ -609,6 +610,7 @@ Specific details about a app connection method when supported
 
 - `supportedConnections` (`NonEmptySet<AppConnectionMethod | SoftwareWalletType>`): Which connection methods are supported (must have at least one). (e.g. A hardware wallet that supports both its own open-source app and MetaMask would list `VENDOR_OPEN_SOURCE_APP` and `METAMASK` here.)
 - `requiresManufacturerConsent` (`| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' } | MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER' }> | null`): Is manufacturer consent required to integrate any hardware wallet feature into a software wallet? If so, must provide reference.
+
   - `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware
     wallet without needing approval from the manufacturer.
   - `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can
@@ -646,8 +648,7 @@ Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo
 
 ```typescript
 type WalletBrowserIntegration =
-	| 'NOT_A_BROWSER_WALLET'
-	| WithRef<Record<BrowserIntegrationEip, Support | null>>
+	'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>
 ```
 
 ---
@@ -703,8 +704,7 @@ EIP-5792 Wallet Call API support.
 
 ```typescript
 type GuardianScenario<S extends GuardianScenarioType> = (
-	| GuardianScenarioDataLoss
-	| GuardianScenarioEntityTurnsEvil
+	GuardianScenarioDataLoss | GuardianScenarioEntityTurnsEvil
 ) & {
 	type: S
 }
@@ -729,8 +729,7 @@ type GuardianScenario<S extends GuardianScenarioType> = (
 
 ```typescript
 type AccountRecoveryOutcome =
-	| AccountRecoveryOutcomeCanBeRecovered
-	| AccountRecoveryOutcomeCannotBeRecovered
+	AccountRecoveryOutcomeCanBeRecovered | AccountRecoveryOutcomeCannotBeRecovered
 ```
 
 ---
@@ -752,8 +751,7 @@ type AccountRecoveryOutcome =
 
 ```typescript
 type AccountTakeOverOutcome =
-	| AccountTakeOverOutcomeCannotBeTakenOver
-	| AccountTakeOverOutcomeCanBeTakenOver
+	AccountTakeOverOutcomeCannotBeTakenOver | AccountTakeOverOutcomeCanBeTakenOver
 ```
 
 ---
@@ -884,7 +882,8 @@ type AppIsolation =
 	| typeof appConnectionNotSupported
 	| (BaseAppIsolation &
 			// Either `eth_accounts` or `wallet_connect` must be supported.
-			(| { ethAccounts: Supported<WithRef<ExposedAccountSet>> }
+			(
+				| { ethAccounts: Supported<WithRef<ExposedAccountSet>> }
 				| { erc7846WalletConnect: Supported<WithRef<ExposedAccountSet>> }
 			))
 ```
@@ -2828,7 +2827,7 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 
 ### Enum: `IosUsageDescription`
 
-iOS usage description keys declared in Info.plist (NS\*UsageDescription). Enum values match the plist key string exactly.
+iOS usage description keys declared in Info.plist (NS*UsageDescription). Enum values match the plist key string exactly.
 
 All keys seen in any wallet plist must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
 
@@ -2848,7 +2847,7 @@ All keys seen in any wallet plist must be listed here, including non-security-re
 Security-relevant fields from a mobile app's platform manifest. Values should be derived directly from the published app manifest. Not available for apps without a public source repository.
 
 - `android` (`| { usesPermissions: AndroidPermission[] } | 'NOT_AN_ANDROID_APP'`): Permissions declared in AndroidManifest.xml via `<uses-permission>`. Set to 'NOT_AN_ANDROID_APP' if the wallet has no Android variant.
-- `ios` (`| { usageDescriptions: IosUsageDescription[] } | 'NOT_AN_IOS_APP'`): Usage description keys declared in Info.plist (NS\*UsageDescription). Set to 'NOT_AN_IOS_APP' if the wallet has no iOS variant.
+- `ios` (`| { usageDescriptions: IosUsageDescription[] } | 'NOT_AN_IOS_APP'`): Usage description keys declared in Info.plist (NS*UsageDescription). Set to 'NOT_AN_IOS_APP' if the wallet has no iOS variant.
 
 ---
 
@@ -2881,7 +2880,7 @@ Security best-practices for the mobile app variant.
 
 Security best-practices data for a wallet, broken down by variant.
 
-- `browser` (`| WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and no data can be obtained at all.
+- `browser` (`WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. Set to 'SOURCE_NOT_AVAILABLE' if the wallet is closed-source and no data can be obtained at all.
 
   For closed-source wallets whose browser extension manifest is publicly available (e.g. via the Chrome Web Store), fill in actual manifest data and setting keyStorageMechanism / secureRng to KeyStorageMechanism.NOT_VERIFIABLE / SecureRngSource.NOT_VERIFIABLE
 
@@ -3324,8 +3323,8 @@ type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation |
 
 ### Interface: `BaseTransactionLegibilitySupport`
 
-- `erc4361` (`Support | null`): ERC-4361 (Sign-In with Ethereum) support. Whether the wallet can clearly present Sign-In with Ethereum authentication requests to the user.
-- `erc8213` (`Support | null`): ERC-8123 (Wallet Signature and Calldata Digest Display) Whether the wallet follows the "Wallet Display Requirements" section of ERC-8123.
+- `erc4361` (`WithRef<Support> | null`): ERC-4361 (Sign-In with Ethereum) support. Whether the wallet can clearly present Sign-In with Ethereum authentication requests to the user. The `ref` block should document ERC-4361 support specifically.
+- `erc8213` (`WithRef<Support> | null`): ERC-8123 (Wallet Signature and Calldata Digest Display) Whether the wallet follows the "Wallet Display Requirements" section of ERC-8123. The `ref` block should document ERC-8213 support specifically.
 
 ---
 
@@ -3333,8 +3332,8 @@ type HardwareWalletErc7730 = Record<ComplexBenchmarkTransactions, DataLocation |
 
 A record of transaction legibility support (both message and transaction)
 
-- `erc8213` (`Support<HardwareWalletErc8213> | null`)
-- `erc7730` (`Support<HardwareWalletErc7730> | null`)
+- `erc8213` (`WithRef<Support<HardwareWalletErc8213>> | null`)
+- `erc7730` (`WithRef<Support<HardwareWalletErc7730>> | null`)
 - `detailsDisplayed` (`DisplayedBasicTransactionDetails | null`): Does a wallet display transaction details clearly?
 - `dataExtraction` (`DataExtractionMethods | null`): Does a wallet allow for data extraction?
 
@@ -3366,8 +3365,8 @@ ERC-8213 (Transaction Legibility) support for software wallets. Tracks which cal
 
 A record of transaction legibility support (both message and transaction)
 
-- `erc8213` (`Support<SoftwareWalletErc8213> | null`)
-- `erc7730` (`Support<SoftwareWalletErc7730> | null`): ERC-7730 calldata decoding support per complex benchmark transaction.
+- `erc8213` (`WithRef<Support<SoftwareWalletErc8213>> | null`)
+- `erc7730` (`WithRef<Support<SoftwareWalletErc7730>> | null`): ERC-7730 calldata decoding support per complex benchmark transaction. The `ref` block should document ERC-7730 support specifically.
 - `transactionSimulations` (`Support<SoftwareTransactionSimulations> | null`): Per-benchmark simulation data: transaction outcomes for token and complex transactions, plus failure/nondeterminism detection for simulation-specific benchmarks.
 - `transactionDetailsDisplay` (`SoftwareTransactionDetailsDisplay | null`): Global basic transaction details display (gas, nonce, from, to, chain, value). Applied across all transaction types.
 
@@ -3653,6 +3652,7 @@ How much fee information is displayed by default and after an action.
   This field describes payment (whether the user pays nothing), while `byDefault` and `afterSingleAction` describe UI visibility. Orderflow prominence comparison uses the recorded display levels as-is; if no fee-related copy appears on the approval screen, set both levels to `NONE` even when the wallet fully sponsors fees.
 
 - `walletServiceFeeDisplayUnits` (`NonEmptySet<WalletServiceFeeDisplayUnit> | 'NOT_APPLICABLE' | null`): Which unit(s) the wallet service fee line item(s) are shown in, when a comprehensive breakdown is available. Meaningful when the flow includes a wallet-charged platform fee line item in the breakdown (e.g. built-in swap or cross-chain bridging).
+
   - A `NonEmptySet` of `WalletServiceFeeDisplayUnit` — every distinct unit
     shown on the wallet service fee line item(s) (e.g. a wallet showing
     both a percentage and its fiat equivalent would use both units here).
@@ -3753,7 +3753,8 @@ A license and a reference.
 ```typescript
 type LicenseWithRef = { license: License } &
 	// If a source-available license, a reference must be provided.
-	(| MustRef<{
+	(
+		| MustRef<{
 				license: SourceAvailableLicense
 		  }>
 		// The reference is not necessary for source-unavailable licenses.

@@ -3,7 +3,7 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import type { HardwareWallet } from '@/data/hardware-wallets'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { noDataExtraction } from '@/schema/features/security/transaction-legibility'
-import { notSupported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
@@ -83,7 +83,9 @@ export const fireflyWallet: HardwareWallet = {
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: null,
 				erc4361: null,
-				erc7730: notSupported,
+				erc7730: notSupportedWithRef({
+					ref: refTodo,
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

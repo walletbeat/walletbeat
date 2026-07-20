@@ -8,12 +8,21 @@ const GOVERNANCE_TREASURY_DIR = path.join(path.dirname(__dirname), 'governance',
 
 describe('treasury operations transparency', () => {
 	describe('markdown report', () => {
-		it('matches TSV contents', () => {
+		it('matches TSV contents', async () => {
 			try {
-				treasuryMarkdownUpdate({
+				await treasuryMarkdownUpdate({
 					addressesPath: path.join(GOVERNANCE_TREASURY_DIR, 'addresses.tsv'),
+					expensesOverTimePath: path.join(
+						GOVERNANCE_TREASURY_DIR,
+						'treasury-expenses-over-time.svg',
+					),
+					expensesBreakdownPath: path.join(
+						GOVERNANCE_TREASURY_DIR,
+						'treasury-expenses-breakdown.svg',
+					),
 					operationsPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-operations.tsv'),
 					outputPath: path.join(GOVERNANCE_TREASURY_DIR, 'treasury-transparency.md'),
+					priceDataPath: path.join(GOVERNANCE_TREASURY_DIR, 'price-data.tsv'),
 					quiet: true,
 					test: true,
 				})

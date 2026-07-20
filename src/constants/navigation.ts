@@ -2,11 +2,7 @@
 import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon =
-	| 'ICON_CHART_BAR'
-	| 'ICON_FARCASTER'
-	| 'ICON_CHART_PIE'
-	| 'ICON_TWITTER'
-	| 'ICON_WALLET'
+	'ICON_CHART_BAR' | 'ICON_FARCASTER' | 'ICON_CHART_PIE' | 'ICON_TWITTER' | 'ICON_WALLET'
 
 export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
 
@@ -175,30 +171,6 @@ export const defaultNavigationItems = [
 					href: getWalletUrl(wallet),
 					icon: walletImageIcon(wallet.metadata.id, wallet.metadata.iconExtension),
 				})),
-			},
-		],
-	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary/',
-		icon: 'wallet_embedded',
-		children: [
-			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: 'ICON_CHART_PIE',
-				children: mapNonExemptAttributeGroupsInTree(
-					attributeTree,
-					representativeWalletForType(WalletType.EMBEDDED).overall,
-					(attrGroup, _evalGroup) => ({
-						id: `embedded-${attrGroup.id}`,
-						title: attrGroup.displayName,
-						icon: attrGroup.icon,
-						iconVariant: 'emoji' as const,
-						href: `/embedded/${attrGroup.id}/`,
-					}),
-				),
 			},
 		],
 	},

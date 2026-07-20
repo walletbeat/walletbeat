@@ -734,15 +734,16 @@ export const rabby: SoftwareWallet = {
 			},
 			securityBestPractices: null,
 			transactionLegibility: {
-				ref: [
-					{
+				ref: refTodo,
+				erc4361: notSupportedWithRef({
+					ref: {
 						explanation: 'Rabby does not format SIWE requests for easy readability.',
 						file: 'public/references/wallets/rabby/screenshots/2026-07-13-rabby-erc4361-siwe.png',
 						label: 'Rabby sign-in dialog for an ERC-4361 signature request',
 					},
-				],
-				erc4361: notSupported,
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
@@ -761,6 +762,7 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,

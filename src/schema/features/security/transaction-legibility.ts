@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import { type FullyQualifiedReference, mergeRefs, type WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
 import type { Support } from '../support'
@@ -452,8 +452,7 @@ export interface SimulatedNondeterministicTransaction {
  * All benchmark transactions for which simulation can track a transaction outcome.
  */
 export type TransactionSimulationsBenchmark =
-	| BasicBenchmarkTransactions
-	| ComplexBenchmarkTransactions
+	BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 
 /**
  * Per-benchmark-transaction simulation data for software wallets.
@@ -637,23 +636,25 @@ export interface BaseTransactionLegibilitySupport {
 	 * ERC-4361 (Sign-In with Ethereum) support.
 	 * Whether the wallet can clearly present Sign-In with Ethereum
 	 * authentication requests to the user.
+	 * The `ref` block should document ERC-4361 support specifically.
 	 */
-	erc4361: Support | null
+	erc4361: WithRef<Support> | null
 
 	/**
 	 * ERC-8123 (Wallet Signature and Calldata Digest Display)
 	 * Whether the wallet follows the "Wallet Display Requirements"
 	 * section of ERC-8123.
+	 * The `ref` block should document ERC-8213 support specifically.
 	 */
-	erc8213: Support | null
+	erc8213: WithRef<Support> | null
 }
 
 /**
  * A record of transaction legibility support (both message and transaction)
  */
 export interface HardwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
-	erc8213: Support<HardwareWalletErc8213> | null
-	erc7730: Support<HardwareWalletErc7730> | null
+	erc8213: WithRef<Support<HardwareWalletErc8213>> | null
+	erc7730: WithRef<Support<HardwareWalletErc7730>> | null
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
@@ -724,12 +725,13 @@ export interface SoftwareWalletErc8213 {
  * A record of transaction legibility support (both message and transaction)
  */
 export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
-	erc8213: Support<SoftwareWalletErc8213> | null
+	erc8213: WithRef<Support<SoftwareWalletErc8213>> | null
 
 	/**
 	 * ERC-7730 calldata decoding support per complex benchmark transaction.
+	 * The `ref` block should document ERC-7730 support specifically.
 	 */
-	erc7730: Support<SoftwareWalletErc7730> | null
+	erc7730: WithRef<Support<SoftwareWalletErc7730>> | null
 
 	/**
 	 * Per-benchmark simulation data: transaction outcomes for token and complex transactions,
@@ -774,8 +776,7 @@ export const isFullBasicTransactionDetails = (
  */
 export function isHardwareTransactionLegibility(
 	transactionLegibility:
-		| HardwareTransactionLegibilityImplementation
-		| SoftwareTransactionLegibilityImplementation,
+		HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation,
 ): transactionLegibility is HardwareTransactionLegibilityImplementation {
 	// The `dataExtraction` field exists only on `HardwareTransactionLegibilityImplementation`,
 	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
@@ -787,3 +788,20 @@ export type HardwareTransactionLegibilityImplementation =
 	WithRef<HardwareTransactionLegibilitySupport>
 export type SoftwareTransactionLegibilityImplementation =
 	WithRef<SoftwareTransactionLegibilitySupport>
+
+/**
+ * The merged references of the per-ERC ref blocks of a transaction
+ * legibility record. The record's top-level `ref` documents the non-ERC
+ * fields (transaction details display, simulations, data extraction);
+ * each ERC block carries the references specific to that ERC.
+ */
+export function transactionLegibilityErcRefs(
+	transactionLegibility:
+		HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation,
+): FullyQualifiedReference[] {
+	return mergeRefs(
+		transactionLegibility.erc4361?.ref,
+		transactionLegibility.erc7730?.ref,
+		transactionLegibility.erc8213?.ref,
+	)
+}
