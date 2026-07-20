@@ -6,13 +6,18 @@ import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 import { accountAbstraction } from '../attributes/ecosystem/account-abstraction'
 import { addressResolution } from '../attributes/ecosystem/address-resolution'
 import { browserIntegration } from '../attributes/ecosystem/browser-integration'
+import { chainAbstraction } from '../attributes/ecosystem/chain-abstraction'
 import { hardwareWalletInteroperability } from '../attributes/ecosystem/hardware-wallet-interoperability'
 import { transactionBatching } from '../attributes/ecosystem/transaction-batching'
 import { addressCorrelation } from '../attributes/privacy/address-correlation'
+import { appIsolation } from '../attributes/privacy/app-isolation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import { hasAccountRecovery, hasAccountRecoveryDrills } from '../attributes/security/account-recovery'
+import {
+	hasAccountRecovery,
+	hasAccountRecoveryDrills,
+} from '../attributes/security/account-recovery'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import {
@@ -30,6 +35,7 @@ import { transactionInclusion } from '../attributes/self-sovereignty/transaction
 import { feeTransparency } from '../attributes/transparency/fee-transparency'
 import { funding } from '../attributes/transparency/funding'
 import { openSource } from '../attributes/transparency/open-source'
+import { orderflowTransparency } from '../attributes/transparency/orderflow-transparency'
 import { releaseProcess } from '../attributes/transparency/release-process'
 import { hardwareWalletType } from '../features/security/hardware-wallet-support'
 import { RpcEndpointConfiguration } from '../features/self-sovereignty/chain-configurability'
@@ -611,6 +617,21 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					}),
 					displayName: 'Browser Integration',
 				},
+				{
+					id: 'chain_abstraction',
+					description: sentence(
+						'The wallet must smooth out the complexities of dealing with multiple chains.',
+					),
+					rationale: sentence(`
+						A lot of Ethereum activity has moved onto rollups and Layer 2 chains, fragmenting token balances and account value across multiple chains. Wallets should abstract away this complexity, showing users their cross-chain balances and providing a built-in way to bridge assets between chains.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainAbstraction, {
+						allowPartial: true,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Chain Abstraction',
+				},
 			],
 		},
 	],
@@ -787,6 +808,22 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					}),
 					displayName: 'Full Wallet Address Privacy',
 				},
+				{
+					id: 'app_isolation',
+					description: sentence(
+						'The wallet must offer app-specific accounts by default when connecting to apps.',
+					),
+					rationale: sentence(`
+						Much like websites cannot query a browser's history from other websites by default, apps should not be able to correlate a user's activity across other apps by default.
+						Wallets must offer per-app accounts as the default behavior when connecting to apps, and remember the addresses last used for a given app.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, appIsolation, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'App Isolation',
+				},
 			],
 		},
 		{
@@ -948,6 +985,23 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					}),
 					displayName: 'Fee Transparency',
 				},
+				{
+					id: 'orderflow_transparency',
+					description: sentence(
+						'The wallet must transparently disclose how it monetizes or shares transaction data before it is included onchain.',
+					),
+					rationale: sentence(`
+						Wallet software may send transaction data to external services for broadcast, simulation, or orderflow auctioning (MEV) before a transaction is included onchain. Users cannot see this path as clearly as onchain execution unless the wallet discloses it, so wallets that auction orderflow by default must disclose this prominently and document their practices, while wallets that otherwise share pre-inclusion data must do so only through verifiably non-extractive endpoints.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, orderflowTransparency, {
+						allowPartial: true,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s orderflow transparency cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Orderflow Transparency',
+				},
 			],
 		},
 		{
@@ -1005,11 +1059,15 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 						Counting supported hardware wallet manufacturers alone is not sufficient: a wallet that only reaches most of them through WalletConnect still leaves users dependent on an intermediary and a separate external application.
 						True hardware wallet interoperability requires direct integration, which preserves a competitive, open hardware wallet market.
 					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, hardwareWalletInteroperability, {
-						allowPartial: false,
-						ifUnverifiable: 'THROW',
-						ifNoVariantInScope: null,
-					}),
+					evaluate: variantsMustPassAttribute(
+						softwareWalletVariants,
+						hardwareWalletInteroperability,
+						{
+							allowPartial: false,
+							ifUnverifiable: 'THROW',
+							ifNoVariantInScope: null,
+						},
+					),
 					displayName: 'Hardware Wallet Interoperability',
 				},
 			],
