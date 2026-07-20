@@ -62,9 +62,7 @@ export type AccountRecoveryMetadata = {
  * The guardian recovery scenarios (if any) in which the given guardian
  * policy leaves the user unable to recover their account.
  */
-function getNonRecoverableGuardianScenarios(
-	guardianPolicy: GuardianPolicy,
-): Array<
+function getNonRecoverableGuardianScenarios(guardianPolicy: GuardianPolicy): Array<
 	GuardianScenarioOutcome<GuardianScenarioType> & {
 		recovery: AccountRecoveryOutcomeCannotBeRecovered
 	}
