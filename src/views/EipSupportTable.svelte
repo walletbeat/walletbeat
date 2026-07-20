@@ -175,7 +175,7 @@
 				{:else if column.id === 'variants'}
 					{@const perVariant = variantSupportList(walletSupport)}
 
-					{#if perVariant.length <= 1}
+					{#if perVariant.length === 0}
 						<span class="muted-text">–</span>
 					{:else}
 						<ul class="variant-list" data-list="unstyled gap-1">
