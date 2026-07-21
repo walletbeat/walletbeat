@@ -250,49 +250,6 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					displayName: 'Security Audits',
 				},
 				{
-					id: 'hardware_wallet_subset',
-					description: sentence(
-						'The wallet must support hardware wallets from at least three manufacturers.',
-					),
-					rationale: sentence(`
-            By letting you offload your private key to a separate hardware
-            device, the wallet developer demonstrates that they are serious
-            about ensuring the security of your private key.
-          `),
-					evaluate: stageCriterionEvaluationPerVariant(
-						softwareWalletVariants,
-						(variantWallet): StageCriterionEvaluation => {
-							if (variantWallet.features.security.hardwareWalletSupport === null) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
-
-							const numSupportedWallets = Object.values(
-								hardwareWalletType.fullRecord(
-									variantWallet.features.security.hardwareWalletSupport.wallets,
-									notSupported,
-								),
-							).filter(isSupported).length
-
-							if (numSupportedWallets < 3) {
-								return {
-									rating: StageCriterionRating.FAIL,
-									explanation: sentence(
-										'{{WALLET_NAME}} supports fewer than three hardware wallet manufacturers.',
-									),
-								}
-							}
-
-							return {
-								rating: StageCriterionRating.PASS,
-								explanation: sentence(
-									'{{WALLET_NAME}} supports three or more hardware wallet manufacturers.',
-								),
-							}
-						},
-					),
-					displayName: 'Hardware Wallet Support',
-				},
-				{
 					id: 'scam_alerting',
 					description: sentence('The wallet must warn users about potential scams.'),
 					rationale: sentence(
