@@ -617,21 +617,6 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					}),
 					displayName: 'Browser Integration',
 				},
-				{
-					id: 'chain_abstraction',
-					description: sentence(
-						'The wallet must smooth out the complexities of dealing with multiple chains.',
-					),
-					rationale: sentence(`
-						A lot of Ethereum activity has moved onto rollups and Layer 2 chains, fragmenting token balances and account value across multiple chains. Wallets should abstract away this complexity, showing users their cross-chain balances and providing a built-in way to bridge assets between chains.
-					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainAbstraction, {
-						allowPartial: true,
-						ifUnverifiable: 'THROW',
-						ifNoVariantInScope: null,
-					}),
-					displayName: 'Chain Abstraction',
-				},
 			],
 		},
 	],
@@ -1010,6 +995,21 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 				'The wallet is aligned with advanced Ethereum ecosystem best practices for usability.',
 			),
 			criteria: [
+				{
+					id: 'chain_abstraction',
+					description: sentence(
+						'The wallet must smooth out the complexities of dealing with multiple chains.',
+					),
+					rationale: sentence(`
+						A lot of Ethereum activity has moved onto rollups and Layer 2 chains, fragmenting token balances and account value across multiple chains. Wallets should abstract away this complexity, showing users their cross-chain balances and providing a built-in way to bridge assets between chains.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainAbstraction, {
+						allowPartial: true,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Chain Abstraction',
+				},
 				{
 					id: 'chain_specific_address_resolution',
 					description: sentence(
