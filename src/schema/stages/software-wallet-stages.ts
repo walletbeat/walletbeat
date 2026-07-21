@@ -200,12 +200,11 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 					),
 					rationale: sentence(`
 						Recovery methods can silently become inaccessible over time, for
-						example a written-down seed phrase becoming unreadable. Periodic
-						check-ups catch this while there is still time to fix it, rather
-						than leaving the user to discover the problem only when they
-						actually need to recover their account. Wallets that implement
-						guardian-based recovery are held to a stronger recovery standard
-						at Stage 1 instead.
+						example a seed phrase becoming unreadable. Periodic check-ups
+						catch this early, rather than leaving users to discover the
+						problem only when they actually need to recover their account.
+						Wallets with guardian-based recovery are held to a stronger
+						standard at Stage 1 instead.
 					`),
 					evaluate: stageCriterionEvaluationPerVariant(
 						softwareWalletVariants,
@@ -362,15 +361,12 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 						'The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios, and must periodically prompt users to verify that their account recovery methods are still accessible.',
 					),
 					rationale: sentence(`
-						Self-custody is only practical for everyday users if losing a
-						device, a guardian, or a single external provider does not mean
-						permanently losing access to one's account. Guardian-based
-						recovery provides this safety net without reintroducing a single
-						party that can take over the account. Recovery methods can also
-						silently become inaccessible over time, for example a written-down
-						seed phrase becoming unreadable or a guardian account getting
-						abandoned, so periodic check-ups are needed to catch this while
-						there is still time to fix it.
+						Self-custody is only practical if losing a device, a guardian,
+						or a single external provider does not mean permanently losing
+						account access. Guardian-based recovery gives this safety net
+						without one party able to take it over. Recovery methods can
+						also silently fail over time, so periodic check-ups catch this
+						early.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountRecovery, {
 						allowPartial: false,
