@@ -22,6 +22,10 @@ import {
 	DataLocation,
 	displaysFullTransactionDetails,
 	displaysNoTransactionDetails,
+	erc7730HardwareWalletFullySupported,
+	erc7730SoftwareWalletFullySupported,
+	erc8213HardwareWalletFullySupported,
+	erc8213SoftwareWalletFullySupported,
 	type HardwareTransactionLegibilityImplementation,
 	type HardwareWalletErc8213,
 	isHardwareTransactionLegibility,
@@ -1432,52 +1436,11 @@ export const transactionLegibility: Attribute = {
 						erc4361: featureSupportedNoRef,
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.FORMATTED]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.CALLDATA_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.DOMAIN_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.MESSAGE_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.EIP712_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
+							...erc8213HardwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
+							...erc7730HardwareWalletFullySupported,
 						}),
 						detailsDisplayed: displaysFullTransactionDetails,
 						dataExtraction: {
@@ -1500,37 +1463,11 @@ export const transactionLegibility: Attribute = {
 						erc4361: featureSupportedNoRef,
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc8213SoftwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								{
-									decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								},
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc7730SoftwareWalletFullySupported,
 						}),
 						transactionSimulations: supported<SoftwareTransactionSimulations>({
 							[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
@@ -1969,52 +1906,11 @@ export const transactionLegibility: Attribute = {
 						}),
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.FORMATTED]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.CALLDATA_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.DOMAIN_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.MESSAGE_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.EIP712_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
+							...erc8213HardwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
+							...erc7730HardwareWalletFullySupported,
 						}),
 						detailsDisplayed: displaysFullTransactionDetails,
 						dataExtraction: {
@@ -2039,37 +1935,11 @@ export const transactionLegibility: Attribute = {
 						}),
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc8213SoftwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								{
-									decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								},
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc7730SoftwareWalletFullySupported,
 						}),
 						transactionSimulations: supported<SoftwareTransactionSimulations>({
 							[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
