@@ -17,12 +17,12 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
-	type BugBountyProgramImplementation,
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
