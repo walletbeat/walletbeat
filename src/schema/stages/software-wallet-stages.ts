@@ -14,10 +14,7 @@ import { appIsolation } from '../attributes/privacy/app-isolation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import {
-	hasAccountRecovery,
-	hasAccountRecoveryDrills,
-} from '../attributes/security/account-recovery'
+import { accountRecovery, hasAccountRecoveryDrills } from '../attributes/security/account-recovery'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import {
@@ -196,6 +193,67 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 					),
 					displayName: 'Basic Authentication',
 				},
+				{
+					id: 'account_recovery_drills_basic',
+					description: sentence(
+						'Unless the wallet implements guardian-based account recovery, it must periodically prompt users to verify they can still access their seed phrase or private key.',
+					),
+					rationale: sentence(`
+						Recovery methods can silently become inaccessible over time, for
+						example a written-down seed phrase becoming unreadable. Periodic
+						check-ups catch this while there is still time to fix it, rather
+						than leaving the user to discover the problem only when they
+						actually need to recover their account. Wallets that implement
+						guardian-based recovery are held to a stronger recovery standard
+						at Stage 1 instead.
+					`),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							if (
+								variantWallet.features.security.accountRecovery === null ||
+								variantWallet.features.accountSupport === null
+							) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (isSupported(variantWallet.features.security.accountRecovery.guardianRecovery)) {
+								return {
+									rating: StageCriterionRating.PASS,
+									explanation: sentence(
+										'{{WALLET_NAME}} implements guardian-based account recovery.',
+									),
+								}
+							}
+
+							const passes = hasAccountRecoveryDrills(
+								variantWallet.features.security.accountRecovery,
+								variantWallet.features.accountSupport,
+							)
+
+							if (passes === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!passes) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not periodically prompt users to verify their recovery material is still accessible.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} periodically prompts users to verify their recovery material is still accessible.',
+								),
+							}
+						},
+					),
+					displayName: 'Account Recovery Drills',
+				},
 			],
 		},
 	],
@@ -299,50 +357,27 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					displayName: 'Standard Security Practices',
 				},
 				{
-					id: 'account_recovery_drills',
+					id: 'account_recovery',
 					description: sentence(
-						'The wallet must periodically prompt users to verify that their account recovery methods are still accessible.',
+						'The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios, and must periodically prompt users to verify that their account recovery methods are still accessible.',
 					),
 					rationale: sentence(`
-						Recovery methods can silently become inaccessible over time, for example a written-down seed phrase becoming unreadable or a guardian account getting abandoned. Periodic check-ups catch this while there is still time to fix it, rather than leaving the user to discover the problem only when they actually need to recover their account.
+						Self-custody is only practical for everyday users if losing a
+						device, a guardian, or a single external provider does not mean
+						permanently losing access to one's account. Guardian-based
+						recovery provides this safety net without reintroducing a single
+						party that can take over the account. Recovery methods can also
+						silently become inaccessible over time, for example a written-down
+						seed phrase becoming unreadable or a guardian account getting
+						abandoned, so periodic check-ups are needed to catch this while
+						there is still time to fix it.
 					`),
-					evaluate: stageCriterionEvaluationPerVariant(
-						softwareWalletVariants,
-						(variantWallet): StageCriterionEvaluation => {
-							if (
-								variantWallet.features.security.accountRecovery === null ||
-								variantWallet.features.accountSupport === null
-							) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
-
-							const passes = hasAccountRecoveryDrills(
-								variantWallet.features.security.accountRecovery,
-								variantWallet.features.accountSupport,
-							)
-
-							if (passes === null) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
-
-							if (!passes) {
-								return {
-									rating: StageCriterionRating.FAIL,
-									explanation: sentence(
-										'{{WALLET_NAME}} does not run all recommended account recovery check-ups.',
-									),
-								}
-							}
-
-							return {
-								rating: StageCriterionRating.PASS,
-								explanation: sentence(
-									'{{WALLET_NAME}} periodically prompts users to verify their account recovery methods.',
-								),
-							}
-						},
-					),
-					displayName: 'Account Recovery Drills',
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountRecovery, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Account Recovery',
 				},
 			],
 		},
@@ -676,44 +711,6 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Duress Resistance',
-				},
-				{
-					id: 'account_recovery',
-					description: sentence(
-						'The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios.',
-					),
-					rationale: sentence(`
-						Self-custody is only practical for everyday users if losing a
-						device, a guardian, or a single external provider does not mean
-						permanently losing access to one's account. Guardian-based
-						recovery provides this safety net without reintroducing a single
-						party that can take over the account.
-					`),
-					evaluate: stageCriterionEvaluationPerVariant(
-						softwareWalletVariants,
-						(variantWallet): StageCriterionEvaluation => {
-							if (variantWallet.features.security.accountRecovery === null) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
-
-							if (!hasAccountRecovery(variantWallet.features.security.accountRecovery)) {
-								return {
-									rating: StageCriterionRating.FAIL,
-									explanation: sentence(
-										'{{WALLET_NAME}} does not let users recover their account in all likely catastrophic scenarios.',
-									),
-								}
-							}
-
-							return {
-								rating: StageCriterionRating.PASS,
-								explanation: sentence(
-									'{{WALLET_NAME}} lets users recover their account in all likely catastrophic scenarios.',
-								),
-							}
-						},
-					),
-					displayName: 'Account Recovery',
 				},
 				{
 					id: 'impact_mitigation',
