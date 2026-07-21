@@ -250,6 +250,26 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					displayName: 'Security Audits',
 				},
 				{
+					id: 'hardware_wallet_interoperability',
+					description: sentence(
+						'The wallet must directly support hardware wallets from at least three major manufacturers.',
+					),
+					rationale: sentence(`
+						Counting supported hardware wallet manufacturers alone is not sufficient: a wallet that only reaches most of them through WalletConnect still leaves users dependent on an intermediary and a separate external application.
+						True hardware wallet interoperability requires direct integration, which preserves a competitive, open hardware wallet market.
+					`),
+					evaluate: variantsMustPassAttribute(
+						softwareWalletVariants,
+						hardwareWalletInteroperability,
+						{
+							allowPartial: false,
+							ifUnverifiable: 'THROW',
+							ifNoVariantInScope: null,
+						},
+					),
+					displayName: 'Hardware Wallet Interoperability',
+				},
+				{
 					id: 'scam_alerting',
 					description: sentence('The wallet must warn users about potential scams.'),
 					rationale: sentence(
@@ -1006,26 +1026,6 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionBatching),
 					displayName: 'Transaction Batching',
-				},
-				{
-					id: 'hardware_wallet_interoperability',
-					description: sentence(
-						'The wallet must directly support hardware wallets from at least three major manufacturers.',
-					),
-					rationale: sentence(`
-						Counting supported hardware wallet manufacturers alone is not sufficient: a wallet that only reaches most of them through WalletConnect still leaves users dependent on an intermediary and a separate external application.
-						True hardware wallet interoperability requires direct integration, which preserves a competitive, open hardware wallet market.
-					`),
-					evaluate: variantsMustPassAttribute(
-						softwareWalletVariants,
-						hardwareWalletInteroperability,
-						{
-							allowPartial: false,
-							ifUnverifiable: 'THROW',
-							ifNoVariantInScope: null,
-						},
-					),
-					displayName: 'Hardware Wallet Interoperability',
 				},
 			],
 		},
