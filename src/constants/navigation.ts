@@ -2,7 +2,12 @@
 import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon =
-	'ICON_CHART_BAR' | 'ICON_FARCASTER' | 'ICON_CHART_PIE' | 'ICON_STAIRS' | 'ICON_TWITTER' | 'ICON_WALLET'
+	| 'ICON_CHART_BAR'
+	| 'ICON_FARCASTER'
+	| 'ICON_CHART_PIE'
+	| 'ICON_STAIRS'
+	| 'ICON_TWITTER'
+	| 'ICON_WALLET'
 
 export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
 
