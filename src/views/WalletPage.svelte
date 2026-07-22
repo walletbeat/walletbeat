@@ -809,23 +809,25 @@
 			aria-label="Attribute pie navigation"
 			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
-			<ScrollAngleSteps steps={pieRotationSteps}>
-				<NavigationItems
-					items={pieNavigationItems}
-					showSearch={false}
-					defaultOpen
-					ariaLabel="Attribute pie navigation"
-				>
-					{#snippet iconSnippet(item: NavigationItem)}
-						{#if item.icon}
-							<span
-								class="pie-navigation-icon"
-								data-icon="wbicons emoji {item.icon}"
-							></span>
-						{/if}
-					{/snippet}
-				</NavigationItems>
-			</ScrollAngleSteps>
+			<div class="pie-navigation-geometry">
+				<ScrollAngleSteps steps={pieRotationSteps}>
+					<NavigationItems
+						items={pieNavigationItems}
+						showSearch={false}
+						defaultOpen
+						ariaLabel="Attribute pie navigation"
+					>
+						{#snippet iconSnippet(item: NavigationItem)}
+							{#if item.icon}
+								<span
+									class="pie-navigation-icon"
+									data-icon="wbicons emoji {item.icon}"
+								></span>
+							{/if}
+						{/snippet}
+					</NavigationItems>
+				</ScrollAngleSteps>
+			</div>
 		</nav>
 
 		<header
@@ -2065,17 +2067,24 @@
 			position: sticky;
 			align-self: start;
 			flex-shrink: 0;
-			justify-self: center;
+			justify-self: stretch;
 			inset-block-start: 0;
-			inset-inline: auto;
-			inline-size: var(---pie-size);
+			inset-inline: 0;
+			inline-size: 100%;
 			block-size: var(---pie-size);
 			max-inline-size: none;
 			max-block-size: none;
 			pointer-events: none;
-			border-radius: 50%;
-			--sticky-backgroundColor: transparent;
+			border-radius: 0;
+			--sticky-backgroundColor: var(--background-secondary);
 			--sticky-backdropFilter: blur(1rem);
+
+			.pie-navigation-geometry {
+				position: relative;
+				inline-size: var(---pie-size);
+				block-size: var(---pie-size);
+				margin-inline: auto;
+			}
 
 			:global(.navigation-items) {
 				position: absolute;
@@ -2504,9 +2513,12 @@
 				---pie-target-angle: 0.5turn;
 
 				grid-area: Content;
-				justify-self: end;
+				justify-self: stretch;
 				inset-block-start: calc(var(--navigation-mobile-blockSize) + 0.125rem);
-				margin-inline-end: 1rem;
+
+				.pie-navigation-geometry {
+					margin-inline: auto 1rem;
+				}
 			}
 		}
 	}
