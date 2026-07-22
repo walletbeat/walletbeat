@@ -78,24 +78,24 @@
 	const transactionState = $state({
 		activeId: null as string | null,
 		isPending: false,
-		hashes: {},
-		batchIds: {},
+		hashes: {} as Record<string, `0x${string}`>,
+		batchIds: {} as Record<string, string>,
 		error: '',
 	})
 
 	const signatureState = $state({
 		activeId: null as string | null,
 		isPending: false,
-		results: {},
+		results: {} as Record<string, `0x${string}`>,
 		error: '',
 	})
 
 	// Step-based EIP testing state
 	const stepTestState = $state({
 		currentStepIndex: 0,
-		overallStatus: 'idle',
+		overallStatus: 'idle' as 'idle' | 'in_progress' | 'completed' | 'failed',
 		error: '',
-		stepResults: {},
+		stepResults: {} as Record<string, StepResult>,
 
 		// Step-specific data persisted across steps
 		discoveredProviders: [] as Array<DiscoveredProvider & { provider: unknown }>,
@@ -122,8 +122,8 @@
 	const scamAlertState = $state({
 		activeId: null as string | null,
 		isPending: false,
-		hashes: {},
-		signatures: {},
+		hashes: {} as Record<string, `0x${string}`>,
+		signatures: {} as Record<string, `0x${string}`>,
 		error: '',
 	})
 
