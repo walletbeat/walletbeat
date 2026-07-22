@@ -137,6 +137,8 @@ export enum ImpactCategory {
 	PHISHING_RELATED = 'PHISHING_RELATED',
 	/** Related to attacks and vulnerabilities on hardware (e.g. secure elements). */
 	HARDWARE_VULNERABILITY = 'HARDWARE_VULNERABILITY',
+	/** A malicious actor manages to become part of a wallet development entity. */
+	VENDOR_INFILTRATION = 'VENDOR_INFILTRATION',
 	/** Impact category not covered by other types */
 	OTHER = 'OTHER',
 }
@@ -162,6 +164,9 @@ export const impactCategories = {
 	},
 	[ImpactCategory.HARDWARE_VULNERABILITY]: {
 		label: 'Hardware Vulnerability',
+	},
+	[ImpactCategory.VENDOR_INFILTRATION]: {
+		label: 'Vendor Infiltration',
 	},
 	[ImpactCategory.OTHER]: {
 		label: 'Other',
