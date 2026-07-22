@@ -825,7 +825,7 @@
 		</nav>
 
 		<header
-			data-sticky="block-start backdrop-self backdrop-always"
+			data-sticky="block block-start backdrop-self backdrop-always"
 			data-row
 		>
 			<h2>Table of contents</h2>
