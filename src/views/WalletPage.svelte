@@ -825,7 +825,7 @@
 		</nav>
 
 		<header
-			data-sticky="block backdrop-self backdrop-always"
+			data-sticky="block-start backdrop-self backdrop-always"
 			data-row
 		>
 			<h2>Table of contents</h2>
@@ -1515,6 +1515,8 @@
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
 			> header {
+				--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
+
 				flex-shrink: 0;
 				block-size: var(--pageNavigation-header-blockSize);
 				box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
@@ -2053,11 +2055,7 @@
 			max-block-size: none;
 			pointer-events: none;
 			border-radius: 50%;
-			--sticky-backgroundColor: color-mix(
-				in oklch,
-				var(--background-primary) 72%,
-				transparent
-			);
+			--sticky-backgroundColor: transparent;
 			--sticky-backdropFilter: blur(1rem);
 
 			:global(.navigation-items) {
