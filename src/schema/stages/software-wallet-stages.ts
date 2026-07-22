@@ -14,7 +14,11 @@ import { appIsolation } from '../attributes/privacy/app-isolation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import { accountRecovery, hasAccountRecoveryDrills } from '../attributes/security/account-recovery'
+import {
+	accountRecovery,
+	hasAccountRecovery,
+	hasAccountRecoveryDrills,
+} from '../attributes/security/account-recovery'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import {
@@ -216,7 +220,7 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							if (isSupported(variantWallet.features.security.accountRecovery.guardianRecovery)) {
+							if (hasAccountRecovery(variantWallet.features.security.accountRecovery)) {
 								return {
 									rating: StageCriterionRating.PASS,
 									explanation: sentence(
