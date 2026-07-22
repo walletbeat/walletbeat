@@ -75,55 +75,90 @@
 		pendingTransaction: null as TestTransaction | null,
 	})
 
-	const transactionState = $state({
-		activeId: null as string | null,
+	const transactionState = $state<{
+		activeId: string | null
+		isPending: boolean
+		hashes: Record<string, `0x${string}`>
+		batchIds: Record<string, string>
+		error: string
+	}>({
+		activeId: null,
 		isPending: false,
-		hashes: {} as Record<string, `0x${string}`>,
-		batchIds: {} as Record<string, string>,
+		hashes: {},
+		batchIds: {},
 		error: '',
 	})
 
-	const signatureState = $state({
-		activeId: null as string | null,
+	const signatureState = $state<{
+		activeId: string | null
+		isPending: boolean
+		results: Record<string, `0x${string}`>
+		error: string
+	}>({
+		activeId: null,
 		isPending: false,
-		results: {} as Record<string, `0x${string}`>,
+		results: {},
 		error: '',
 	})
 
 	// Step-based EIP testing state
-	const stepTestState = $state({
+	const stepTestState = $state<{
+		currentStepIndex: number
+		overallStatus: 'idle' | 'in_progress' | 'completed' | 'failed'
+		error: string
+		stepResults: Record<string, StepResult>
+		discoveredProviders: Array<DiscoveredProvider & { provider: unknown }>
+		selectedProviderId: string | null
+		connectedAddress: string | null
+		chainId: number | null
+		batchId: string | null
+		earlyConnectEventFired: boolean
+		earlyConnectEventData: unknown
+		resultsModal: {
+			isOpen: boolean
+			overallPassed: boolean
+			hasPartialResults: boolean
+			stepResults: StepResult[]
+		}
+	}>({
 		currentStepIndex: 0,
-		overallStatus: 'idle' as 'idle' | 'in_progress' | 'completed' | 'failed',
+		overallStatus: 'idle',
 		error: '',
-		stepResults: {} as Record<string, StepResult>,
+		stepResults: {},
 
 		// Step-specific data persisted across steps
-		discoveredProviders: [] as Array<DiscoveredProvider & { provider: unknown }>,
-		selectedProviderId: null as string | null,
-		connectedAddress: null as string | null,
-		chainId: null as number | null,
-		batchId: null as string | null,
+		discoveredProviders: [],
+		selectedProviderId: null,
+		connectedAddress: null,
+		chainId: null,
+		batchId: null,
 
 		// Captured by a listener attached at provider-discovery time (page
 		// load), since 'connect' typically fires long before the user
 		// reaches step 2 and a step-scoped listener would miss it.
 		earlyConnectEventFired: false,
-		earlyConnectEventData: null as unknown,
+		earlyConnectEventData: null,
 
 		// Results modal
 		resultsModal: {
 			isOpen: false,
 			overallPassed: false,
 			hasPartialResults: false,
-			stepResults: [] as StepResult[],
+			stepResults: [],
 		},
 	})
 
-	const scamAlertState = $state({
-		activeId: null as string | null,
+	const scamAlertState = $state<{
+		activeId: string | null
+		isPending: boolean
+		hashes: Record<string, `0x${string}`>
+		signatures: Record<string, `0x${string}`>
+		error: string
+	}>({
+		activeId: null,
 		isPending: false,
-		hashes: {} as Record<string, `0x${string}`>,
-		signatures: {} as Record<string, `0x${string}`>,
+		hashes: {},
+		signatures: {},
 		error: '',
 	})
 
