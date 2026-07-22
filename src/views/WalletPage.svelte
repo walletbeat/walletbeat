@@ -805,27 +805,29 @@
 			aria-label="Attribute pie navigation"
 			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
-			<ScrollAngleSteps steps={pieRotationSteps}>
-				<NavigationItems
-					items={pieNavigationItems}
-					showSearch={false}
-					defaultOpen
-					ariaLabel="Attribute pie navigation"
-				>
-					{#snippet iconSnippet(item: NavigationItem)}
-						{#if item.icon}
-							<span
-								class="pie-navigation-icon"
-								data-icon="wbicons emoji {item.icon}"
-							></span>
-						{/if}
-					{/snippet}
-				</NavigationItems>
-			</ScrollAngleSteps>
+			<div class="pie-navigation-geometry">
+				<ScrollAngleSteps steps={pieRotationSteps}>
+					<NavigationItems
+						items={pieNavigationItems}
+						showSearch={false}
+						defaultOpen
+						ariaLabel="Attribute pie navigation"
+					>
+						{#snippet iconSnippet(item: NavigationItem)}
+							{#if item.icon}
+								<span
+									class="pie-navigation-icon"
+									data-icon="wbicons emoji {item.icon}"
+								></span>
+							{/if}
+						{/snippet}
+					</NavigationItems>
+				</ScrollAngleSteps>
+			</div>
 		</nav>
 
 		<header
-			data-sticky="block backdrop-self backdrop-always"
+			data-sticky="block block-start backdrop-self backdrop-always"
 			data-row
 		>
 			<h2>Table of contents</h2>
@@ -1515,6 +1517,8 @@
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
 			> header {
+				--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
+
 				flex-shrink: 0;
 				block-size: var(--pageNavigation-header-blockSize);
 				box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
@@ -2044,21 +2048,24 @@
 			position: sticky;
 			align-self: start;
 			flex-shrink: 0;
-			justify-self: center;
+			justify-self: stretch;
 			inset-block-start: 0;
-			inset-inline: auto;
-			inline-size: var(---pie-size);
-			block-size: var(---pie-size);
+			inset-inline: 0;
+			inline-size: 100%;
+			block-size: var(---pie-surface-size, var(---pie-size));
 			max-inline-size: none;
 			max-block-size: none;
 			pointer-events: none;
-			border-radius: 50%;
-			--sticky-backgroundColor: color-mix(
-				in oklch,
-				var(--background-primary) 72%,
-				transparent
-			);
+			border-radius: 0;
+			--sticky-backgroundColor: var(--background-secondary);
 			--sticky-backdropFilter: blur(1rem);
+
+			.pie-navigation-geometry {
+				position: relative;
+				inline-size: var(---pie-size);
+				block-size: var(---pie-size);
+				margin-inline: auto;
+			}
 
 			:global(.navigation-items) {
 				position: absolute;
@@ -2482,14 +2489,20 @@
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				---pie-size: 4.25rem;
-				---pie-scale: calc(4.25 / (var(---pie-diameter) / 16));
+				---pie-size: 6rem;
+				---pie-surface-size: 4.25rem;
+				---pie-scale: calc(6 / (var(---pie-diameter) / 16));
 				---pie-target-angle: 0.5turn;
 
 				grid-area: Content;
-				justify-self: end;
+				justify-self: stretch;
 				inset-block-start: calc(var(--navigation-mobile-blockSize) + 0.125rem);
-				margin-inline-end: 1rem;
+				overflow: clip;
+
+				.pie-navigation-geometry {
+					margin-inline: auto 1rem;
+					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
+				}
 			}
 		}
 	}
