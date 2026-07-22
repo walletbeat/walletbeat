@@ -728,9 +728,13 @@
 					data-row
 					data-scroll-item="inline-detached"
 				>
-					<a data-link="camouflaged" href="#stages">
-						<h2 id="stages">Stage Progress</h2>
-					</a>
+					<div class="heading-breadcrumb" data-row="start gap-0 wrap" data-row-item="flexible basis-2">
+						{@render walletBreadcrumbSnippet()}
+
+						<a data-link="camouflaged" href="#stages">
+							<h2 id="stages">Stage Progress</h2>
+						</a>
+					</div>
 				</header>
 
 				<div data-scroll-item="inline-detached padding-match-end" data-column>
@@ -860,6 +864,17 @@
 </div>
 
 
+{#snippet walletBreadcrumbSnippet()}
+	<span class="wallet-breadcrumb" aria-hidden="true">
+		<img
+			alt=""
+			src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+		/>
+		<span>{wallet.metadata.displayName}</span>
+	</span>
+{/snippet}
+
+
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
 	<WalletPageNavigationBadge
 		{item}
@@ -914,15 +929,19 @@
 				data-row
 				data-scroll-item="inline-detached"
 			>
-				<a
-					data-link="camouflaged"
-					href={`#${slugifyCamelCase(attrGroup.id)}`}
-					interestfor={slugifyCamelCase(attrGroup.id)}
-				>
-					<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
-						{attrGroup.displayName}
-					</h2>
-				</a>
+				<div class="heading-breadcrumb" data-row="start gap-0 wrap" data-row-item="flexible basis-2">
+					{@render walletBreadcrumbSnippet()}
+
+					<a
+						data-link="camouflaged"
+						href={`#${slugifyCamelCase(attrGroup.id)}`}
+						interestfor={slugifyCamelCase(attrGroup.id)}
+					>
+						<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
+							{attrGroup.displayName}
+						</h2>
+					</a>
+				</div>
 
 				{#if showScores}
 					<ScoreBadge {score} size="medium" />
@@ -2525,6 +2544,10 @@
 		display: none;
 	}
 
+	.wallet-breadcrumb {
+		display: none;
+	}
+
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		.container {
 			timeline-scope: --header-timeline;
@@ -2600,6 +2623,39 @@
 			}
 		}
 
+		.wallet-icon-layer {
+			display: none;
+		}
+
+		.wallet-breadcrumb {
+			display: inline-flex;
+			align-items: center;
+			flex: none;
+			gap: 0.5rem;
+			inline-size: max-content;
+			max-inline-size: 0;
+			min-inline-size: 0;
+			margin-inline-end: 0;
+			overflow: clip;
+			opacity: 0;
+			white-space: nowrap;
+
+			animation: WalletBreadcrumbAnimation var(--transition-easeInOutExpo) both;
+			animation-timeline: view(block);
+			animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
+
+			> img {
+				inline-size: 2.25rem;
+				block-size: 2.25rem;
+				flex: none;
+				filter: drop-shadow(0 0 0.5rem rgba(255, 255, 255, 0.1));
+			}
+		}
+
+		article a:has(> h2) {
+			animation-name: none;
+		}
+
 		@keyframes WalletIconAnimation {
 			from {
 				position: static;
@@ -2624,6 +2680,14 @@
 		@keyframes SectionHeadingAnimation {
 			to {
 				margin-left: calc(var(--wallet-icon-size) + 1.25rem);
+			}
+		}
+
+		@keyframes WalletBreadcrumbAnimation {
+			to {
+				max-inline-size: 100%;
+				margin-inline-end: 0.75rem;
+				opacity: 1;
 			}
 		}
 
@@ -2654,6 +2718,12 @@
 
 		.wallet-icon-layer {
 			display: none;
+		}
+
+		.wallet-breadcrumb {
+			max-inline-size: 100%;
+			margin-inline-end: 0.75rem;
+			opacity: 1;
 		}
 	}
 
@@ -2695,8 +2765,8 @@
 		> header {
 			padding-block: 1rem;
 
-			> a:is(:hover, :focus-visible, :interest-source),
-			.attribute-group:interest-target > & > a {
+			a:is(:hover, :focus-visible, :interest-source),
+			.attribute-group:interest-target > & a {
 				color: var(--accent);
 				text-decoration: none;
 			}
