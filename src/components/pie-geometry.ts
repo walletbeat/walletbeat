@@ -46,6 +46,7 @@ export type ComputedSlice = Slice & {
 		level: number
 		offset: number
 		labelSize: number
+		labelR: number
 	}
 	children?: ComputedSlice[]
 }
@@ -137,6 +138,21 @@ export const computePieSlices = ({
 			const startAngle = currentAngle
 			const endAngle = startAngle + totalAngle
 			const midAngle = startAngle + totalAngle / 2
+			const labelRadius = labelSize / 2
+			const minimumLabelR = Math.sqrt(
+				(outerR - labelRadius) * (innerR + labelRadius)
+			)
+			const halfAngle = Math.abs(totalAngle) * Math.PI / 360
+			const centroidLabelR = (
+				2 / 3
+				* ((outerR ** 3 - innerR ** 3) / (outerR ** 2 - innerR ** 2))
+				* (halfAngle === 0 ? 1 : Math.sin(halfAngle) / halfAngle)
+			)
+			const maximumLabelR = outerR - labelRadius
+			const labelR = Math.max(
+				minimumLabelR,
+				Math.min(centroidLabelR, maximumLabelR),
+			)
 
 			currentAngle = endAngle + (index < slices.length - 1 ? orientation * angleGap : 0)
 
@@ -153,6 +169,7 @@ export const computePieSlices = ({
 					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
 					labelSize: levelConfig.labelSize ?? labelSize,
+					labelR,
 				},
 				...children && {
 					children: compute({ slices: children, startAngle, endAngle }, level + 1),

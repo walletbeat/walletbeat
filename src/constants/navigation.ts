@@ -29,6 +29,7 @@ export type NavigationItem = {
 		outerCornerRadius: number
 		innerCornerRadius: number
 		labelSize: number
+		labelR: number
 	}
 	children?: NavigationItem[]
 }
