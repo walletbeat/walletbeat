@@ -225,16 +225,16 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 								}
 							}
 
-							const passes = hasAccountRecoveryDrills(
+							const hasDrills = hasAccountRecoveryDrills(
 								variantWallet.features.security.accountRecovery,
 								variantWallet.features.accountSupport,
 							)
 
-							if (passes === null) {
+							if (hasDrills === null) {
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							if (!passes) {
+							if (!hasDrills) {
 								return {
 									rating: StageCriterionRating.FAIL,
 									explanation: sentence(
