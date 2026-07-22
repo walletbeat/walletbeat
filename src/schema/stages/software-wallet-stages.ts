@@ -251,7 +251,7 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 							}
 						},
 					),
-					displayName: 'Account Recovery Drills',
+					displayName: 'Basic Account Recovery Assurance',
 				},
 			],
 		},
