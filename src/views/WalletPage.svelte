@@ -549,6 +549,21 @@
 	<article
 		data-column="gap-8"
 	>
+		<a
+			data-link="camouflaged"
+			class="wallet-name"
+			href="#top"
+		>
+			<h1 data-row="gap-2">
+				<img
+					class="wallet-icon"
+					alt={wallet.metadata.displayName}
+					src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+				/>
+				<span>{wallet.metadata.displayName}</span>
+			</h1>
+		</a>
+
 		<header
 			id="top"
 			data-column="gap-6"
@@ -556,21 +571,6 @@
 		>
 			<div data-row="wrap">
 				<div data-row="wrap">
-					<a
-						data-link="camouflaged"
-						class="wallet-name"
-						href="#top"
-					>
-						<h1 data-row="gap-2">
-							<img
-								class="wallet-icon"
-								alt={wallet.metadata.displayName}
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							/>
-							<span>{wallet.metadata.displayName}</span>
-						</h1>
-					</a>
-
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
 							bind:value={selectedVariant}
@@ -2540,6 +2540,41 @@
 		display: none;
 	}
 
+	article {
+		display: grid;
+		grid-template-columns: max-content minmax(0, 1fr);
+		gap: 2rem 0.75rem;
+
+		> :not(.wallet-name) {
+			grid-column: 1 / -1;
+		}
+
+		> .wallet-name,
+		> header#top {
+			grid-row: 1;
+		}
+
+		> .wallet-name {
+			z-index: 2;
+			grid-column: 1;
+			align-self: start;
+			inline-size: max-content;
+		}
+
+		> header#top {
+			display: grid;
+			grid-template-columns: subgrid;
+
+			> * {
+				grid-column: 1 / -1;
+			}
+
+			> :first-child {
+				grid-column: 2;
+			}
+		}
+	}
+
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		.container {
 			timeline-scope: --header-timeline;
@@ -2575,28 +2610,6 @@
 			> header#top {
 				view-timeline-name: --header-timeline;
 				view-timeline-axis: block;
-
-				.wallet-name {
-					position: static;
-
-					.wallet-icon {
-						position: sticky;
-						position: absolute;
-						top: 0;
-						z-index: 2;
-
-						transition-property: opacity;
-						opacity: 1;
-
-						animation: WalletIconAnimation var(--transition-easeOutExpo) both;
-						animation-timeline: --header-timeline;
-						animation-range: exit 0% exit 120%;
-					}
-
-					&:hover h1 img {
-						opacity: 0.75;
-					}
-				}
 			}
 
 			a:has(> h2) {
@@ -2612,27 +2625,6 @@
 					animation-timeline: --heading-timeline;
 					animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 				}
-			}
-		}
-
-		@keyframes WalletIconAnimation {
-			from {
-				position: static;
-				--wallet-icon-size: 3rem;
-			}
-			79% {
-				opacity: 1;
-				position: static;
-				scale: 1;
-			}
-			80% {
-				position: absolute;
-				top: -5rem;
-				scale: 0.25;
-			}
-			to {
-				top: 1rem;
-				--wallet-icon-size: 2.25rem;
 			}
 		}
 
@@ -2653,6 +2645,88 @@
 		}
 	}
 
+	@supports (
+		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+		(container-type: scroll-state) and
+		(position-anchor: --wallet-name) and
+		(position-visibility: anchors-visible) and
+		(inset-inline-start: anchor(--wallet-name end))
+	) {
+		article > .wallet-name {
+			anchor-name: --wallet-name;
+			position: sticky;
+			inset-block-start: var(---wallet-icon-sticky-block-start);
+			font-size: 2.25rem;
+
+			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
+			animation-timeline: --header-timeline;
+			animation-range: exit 0% exit 120%;
+
+			h1 {
+				font-size: inherit;
+			}
+		}
+
+		.wallet-icon-layer {
+			display: none;
+		}
+
+		article section:has(> header[data-sticky]) {
+			anchor-scope: --wallet-section-heading;
+		}
+
+		article section > header[data-sticky] {
+			anchor-name: --wallet-section-heading;
+			view-timeline-name: --wallet-section-heading-timeline;
+			view-timeline-axis: block;
+			min-block-size: 4.25rem;
+
+			> a:has(> h2) {
+				position: fixed;
+				position-anchor: --wallet-section-heading;
+				position-visibility: anchors-visible;
+				inset-block-start: calc(anchor(top) + 1rem);
+				inset-inline-start: anchor(start);
+				margin-inline-start: 0;
+
+				animation: AnchoredSectionHeadingAnimation var(--transition-easeInOutExpo) both;
+				animation-timeline: --wallet-section-heading-timeline;
+				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
+
+				&::before {
+					content: '› ';
+					opacity: 1;
+					animation: none;
+				}
+			}
+		}
+
+		@keyframes WalletNameAnimation {
+			from {
+				--wallet-icon-size: 3rem;
+			}
+			to {
+				--wallet-icon-size: 2.25rem;
+				font-size: 1.25rem;
+			}
+		}
+
+		@keyframes AnchoredSectionHeadingAnimation {
+			to {
+				inset-inline-start: anchor(--wallet-name end);
+				margin-inline-start: 0.75rem;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			article > .wallet-name {
+				--wallet-icon-size: 2.25rem;
+				font-size: 1.25rem;
+				animation: none;
+			}
+		}
+	}
+
 	@media (max-width: 1024px) {
 		.container {
 			---wallet-icon-sticky-block-start: calc(var(--navigation-mobile-blockSize) + 1rem);
@@ -2661,7 +2735,6 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.wallet-icon-layer,
-		article > header#top .wallet-icon,
 		article a:has(> h2),
 		article a:has(> h2)::before {
 			animation: none;
