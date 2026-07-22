@@ -14,11 +14,7 @@ import { appIsolation } from '../attributes/privacy/app-isolation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import {
-	accountRecovery,
-	hasAccountRecovery,
-	hasAccountRecoveryDrills,
-} from '../attributes/security/account-recovery'
+import { accountRecovery, hasAccountRecoveryDrills } from '../attributes/security/account-recovery'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
 import {
@@ -210,51 +206,58 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 						Wallets with guardian-based recovery are held to a stronger
 						standard at Stage 1 instead.
 					`),
-					evaluate: stageCriterionEvaluationPerVariant(
-						softwareWalletVariants,
-						(variantWallet): StageCriterionEvaluation => {
-							if (
-								variantWallet.features.security.accountRecovery === null ||
-								variantWallet.features.accountSupport === null
-							) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
+					evaluate: (wallet): StageCriterionEvaluation => {
+						const accountRecoveryEval = variantsMustPassAttribute(
+							softwareWalletVariants,
+							accountRecovery,
+							{
+								allowPartial: false,
+								ifUnverifiable: 'THROW',
+								ifNoVariantInScope: null,
+							},
+						)(wallet)
 
-							if (hasAccountRecovery(variantWallet.features.security.accountRecovery)) {
+						if (accountRecoveryEval.rating === StageCriterionRating.PASS) {
+							return accountRecoveryEval
+						}
+
+						return stageCriterionEvaluationPerVariant(
+							softwareWalletVariants,
+							(variantWallet): StageCriterionEvaluation => {
+								if (
+									variantWallet.features.security.accountRecovery === null ||
+									variantWallet.features.accountSupport === null
+								) {
+									return { rating: StageCriterionRating.UNRATED }
+								}
+
+								const hasDrills = hasAccountRecoveryDrills(
+									variantWallet.features.security.accountRecovery,
+									variantWallet.features.accountSupport,
+								)
+
+								if (hasDrills === null) {
+									return { rating: StageCriterionRating.UNRATED }
+								}
+
+								if (!hasDrills) {
+									return {
+										rating: StageCriterionRating.FAIL,
+										explanation: sentence(
+											'{{WALLET_NAME}} does not periodically prompt users to verify their recovery material is still accessible.',
+										),
+									}
+								}
+
 								return {
 									rating: StageCriterionRating.PASS,
 									explanation: sentence(
-										'{{WALLET_NAME}} implements guardian-based account recovery.',
+										'{{WALLET_NAME}} periodically prompts users to verify their recovery material is still accessible.',
 									),
 								}
-							}
-
-							const hasDrills = hasAccountRecoveryDrills(
-								variantWallet.features.security.accountRecovery,
-								variantWallet.features.accountSupport,
-							)
-
-							if (hasDrills === null) {
-								return { rating: StageCriterionRating.UNRATED }
-							}
-
-							if (!hasDrills) {
-								return {
-									rating: StageCriterionRating.FAIL,
-									explanation: sentence(
-										'{{WALLET_NAME}} does not periodically prompt users to verify their recovery material is still accessible.',
-									),
-								}
-							}
-
-							return {
-								rating: StageCriterionRating.PASS,
-								explanation: sentence(
-									'{{WALLET_NAME}} periodically prompts users to verify their recovery material is still accessible.',
-								),
-							}
-						},
-					),
+							},
+						)(wallet)
+					},
 					displayName: 'Basic Account Recovery Assurance',
 				},
 			],

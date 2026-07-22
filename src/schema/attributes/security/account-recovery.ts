@@ -82,18 +82,6 @@ function getNonRecoverableGuardianScenarios(guardianPolicy: GuardianPolicy): Arr
 	)
 }
 
-/**
- * Whether the wallet implements guardian-based account recovery that lets
- * the user recover their account in all likely catastrophic scenarios.
- */
-export function hasAccountRecovery(accountRecovery: AccountRecovery): boolean {
-	return (
-		isSupported(accountRecovery.guardianRecovery) &&
-		getNonRecoverableGuardianScenarios(accountRecovery.guardianRecovery.minimumGuardianPolicy)
-			.length === 0
-	)
-}
-
 function evaluateGuardianRecoveryPolicy(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	guardianPolicy: GuardianPolicy,
