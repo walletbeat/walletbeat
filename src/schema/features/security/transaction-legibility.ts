@@ -1,7 +1,7 @@
 import { type FullyQualifiedReference, mergeRefs, type WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
-import type { Support } from '../support'
+import { type Support } from '../support'
 
 /**
  * To test: initiate the relevant transaction type and observe the approval
@@ -769,6 +769,95 @@ export const isFullBasicTransactionDetails = (
 		details.chain === DataDisplayOptions.SHOWN_BY_DEFAULT &&
 		details.value === DataDisplayOptions.SHOWN_BY_DEFAULT
 	)
+}
+
+/**
+ * Shorthand for a hardware wallet that decodes every complex benchmark
+ * transaction on-device via ERC-7730.
+ */
+export const erc7730HardwareWalletFullySupported: HardwareWalletErc7730 = {
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+		DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+		DataLocation.ON_DEVICE,
+}
+
+/**
+ * Shorthand for a software wallet that decodes every complex benchmark
+ * transaction via ERC-7730.
+ */
+export const erc7730SoftwareWalletFullySupported: SoftwareWalletErc7730 = {
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: { decoded: DataDisplayOptions.SHOWN_BY_DEFAULT },
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: { decoded: DataDisplayOptions.SHOWN_BY_DEFAULT },
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+		decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+		decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+	[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+		decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+}
+
+/**
+ * Shorthand for a hardware wallet that shows every ERC-8213 calldata display
+ * option and message signing detail, all on-device.
+ */
+export const erc8213HardwareWalletFullySupported: HardwareWalletErc8213 = {
+	calldataDisplay: {
+		[CallDataDisplay.RAW_HEX]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[CallDataDisplay.FORMATTED]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[CallDataDisplay.CALLDATA_DIGEST]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+	},
+	messageSigningLegibility: {
+		[MessageSigningDetails.EIP712_STRUCT]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[MessageSigningDetails.DOMAIN_HASH]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[MessageSigningDetails.MESSAGE_HASH]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[MessageSigningDetails.EIP712_DIGEST]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+	},
+}
+
+/**
+ * Shorthand for a software wallet that shows every ERC-8213 calldata display
+ * option and message signing detail.
+ */
+export const erc8213SoftwareWalletFullySupported: SoftwareWalletErc8213 = {
+	calldataDisplay: displaysFullCallData,
+	messageSigningLegibility: {
+		[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+		[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+		[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+		[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
 }
 
 /**
