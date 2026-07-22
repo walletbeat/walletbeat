@@ -438,7 +438,6 @@
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
-	import NestedTimelineScopes from '@/components/NestedTimelineScopes.svelte'
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
@@ -545,10 +544,24 @@
 		/>
 	</div>
 
-	<NestedTimelineScopes timelines={pieRotationSteps.map(step => step.timeline)}>
 	<article
 		data-column="gap-8"
 	>
+		<a
+			data-link="camouflaged"
+			class="wallet-name"
+			href="#top"
+		>
+			<h1 data-row="gap-2">
+				<img
+					class="wallet-icon"
+					alt={wallet.metadata.displayName}
+					src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+				/>
+				<span>{wallet.metadata.displayName}</span>
+			</h1>
+		</a>
+
 		<header
 			id="top"
 			data-column="gap-6"
@@ -556,21 +569,6 @@
 		>
 			<div data-row="wrap">
 				<div data-row="wrap">
-					<a
-						data-link="camouflaged"
-						class="wallet-name"
-						href="#top"
-					>
-						<h1 data-row="gap-2">
-							<img
-								class="wallet-icon"
-								alt={wallet.metadata.displayName}
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							/>
-							<span>{wallet.metadata.displayName}</span>
-						</h1>
-					</a>
-
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
 							bind:value={selectedVariant}
@@ -857,8 +855,6 @@
 		</nav>
 
 	</aside>
-	</NestedTimelineScopes>
-
 </div>
 
 
@@ -1428,6 +1424,9 @@
 			var(--scrollItem-inlineDetached-paddingStart),
 			(100% - var(--scrollItem-inlineDetached-maxSize)) / 2
 		);
+		---wallet-name-sticky-icon-size: 2rem;
+		---wallet-name-sticky-font-size: 1.125rem;
+		---wallet-breadcrumb-gap: 1.5rem;
 		--border-radius-lg: 1rem;
 		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
@@ -1445,7 +1444,7 @@
 		display: grid;
 		grid-template:
 			'Content Nav'
-			/ minmax(max-content, 1fr) auto
+			/ minmax(0, 1fr) auto
 		;
 		@media (max-width: 1024px) {
 			&[data-sticky-container] {
@@ -1455,10 +1454,14 @@
 
 			grid-template:
 				'Nav Content'
-				/ auto minmax(max-content, 1fr)
+				/ auto minmax(0, 1fr)
 			;
 		}
 		@media (max-width: 864px) {
+			---wallet-name-sticky-icon-size: 2.4rem;
+			---wallet-name-sticky-font-size: 1.3rem;
+			---wallet-breadcrumb-gap: 1.25rem;
+
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 			}
@@ -1467,7 +1470,7 @@
 				[Nav-start]
 				'Content'
 				[Nav-end]
-				/ [Nav-start] minmax(max-content, 1fr) [Nav-end]
+				/ [Nav-start] minmax(0, 1fr) [Nav-end]
 			;
 		}
 
@@ -2540,9 +2543,46 @@
 		display: none;
 	}
 
+	article {
+		display: grid;
+		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+		gap: 2rem 0.75rem;
+		min-inline-size: 0;
+
+		> :not(.wallet-name) {
+			grid-column: 1 / -1;
+			min-inline-size: 0;
+		}
+
+		> .wallet-name,
+		> header#top {
+			grid-row: 1;
+		}
+
+		> .wallet-name {
+			z-index: 2;
+			grid-column: 1;
+			align-self: start;
+			inline-size: max-content;
+		}
+
+		> header#top {
+			display: grid;
+			grid-template-columns: subgrid;
+
+			> * {
+				grid-column: 1 / -1;
+			}
+
+			> :first-child {
+				grid-column: 2;
+			}
+		}
+	}
+
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		.container {
-			timeline-scope: --header-timeline;
+			timeline-scope: all;
 		}
 
 		.attribute-group,
@@ -2575,28 +2615,6 @@
 			> header#top {
 				view-timeline-name: --header-timeline;
 				view-timeline-axis: block;
-
-				.wallet-name {
-					position: static;
-
-					.wallet-icon {
-						position: sticky;
-						position: absolute;
-						top: 0;
-						z-index: 2;
-
-						transition-property: opacity;
-						opacity: 1;
-
-						animation: WalletIconAnimation var(--transition-easeOutExpo) both;
-						animation-timeline: --header-timeline;
-						animation-range: exit 0% exit 120%;
-					}
-
-					&:hover h1 img {
-						opacity: 0.75;
-					}
-				}
 			}
 
 			a:has(> h2) {
@@ -2612,27 +2630,6 @@
 					animation-timeline: --heading-timeline;
 					animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 				}
-			}
-		}
-
-		@keyframes WalletIconAnimation {
-			from {
-				position: static;
-				--wallet-icon-size: 3rem;
-			}
-			79% {
-				opacity: 1;
-				position: static;
-				scale: 1;
-			}
-			80% {
-				position: absolute;
-				top: -5rem;
-				scale: 0.25;
-			}
-			to {
-				top: 1rem;
-				--wallet-icon-size: 2.25rem;
 			}
 		}
 
@@ -2653,6 +2650,124 @@
 		}
 	}
 
+	@supports (
+		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+		(container-type: scroll-state) and
+		(position-anchor: --wallet-name) and
+		(position-visibility: anchors-visible) and
+		(inset-inline-start: anchor(--wallet-name end))
+	) {
+		article > .wallet-name {
+			anchor-name: --wallet-name;
+			font-size: 2.25rem;
+
+			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
+			animation-timeline: --header-timeline;
+			animation-range: exit 0% exit 120%;
+
+			h1 {
+				font-size: inherit;
+			}
+		}
+
+		.wallet-icon-layer {
+			display: none;
+		}
+
+		article section:has(> header[data-sticky]) {
+			anchor-scope: --wallet-section-heading;
+		}
+
+		article section > header[data-sticky] {
+			anchor-name: --wallet-section-heading;
+			view-timeline-name: --wallet-section-heading-timeline;
+			view-timeline-axis: block;
+
+			animation: AnchoredSectionHeaderAnimation step-start both;
+			animation-timeline: --wallet-section-heading-timeline;
+			animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
+
+			> a:has(> h2) {
+				animation: AnchoredSectionHeadingAnimation var(--transition-easeInOutExpo) both;
+				animation-timeline: --wallet-section-heading-timeline;
+				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
+
+				&::before {
+					content: '› ';
+					opacity: 1;
+					animation: none;
+				}
+			}
+		}
+
+		@keyframes AnchoredSectionHeaderAnimation {
+			from {
+				min-block-size: auto;
+			}
+			to {
+				min-block-size: 4.25rem;
+			}
+		}
+
+		@keyframes WalletNameAnimation {
+			from {
+				--wallet-icon-size: 3rem;
+				z-index: 2;
+				position: relative;
+				inset: auto;
+			}
+			0.001% {
+				z-index: 7;
+				position: sticky;
+				inset-block-start: var(---wallet-icon-sticky-block-start);
+			}
+			to {
+				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				z-index: 7;
+				position: sticky;
+				inset-block-start: var(---wallet-icon-sticky-block-start);
+				font-size: var(---wallet-name-sticky-font-size);
+			}
+		}
+
+		@keyframes AnchoredSectionHeadingAnimation {
+			from {
+				position: static;
+				position-anchor: auto;
+				position-visibility: always;
+				inset: auto;
+				margin-inline-start: 0;
+			}
+			0.001% {
+				position: fixed;
+				position-anchor: --wallet-section-heading;
+				position-visibility: anchors-visible;
+				inset-block-start: calc(anchor(top) + 1rem);
+				inset-inline-start: anchor(start);
+				margin-inline-start: 0;
+			}
+			to {
+				position: fixed;
+				position-anchor: --wallet-section-heading;
+				position-visibility: anchors-visible;
+				inset-block-start: calc(anchor(top) + 1rem);
+				inset-inline-start: anchor(--wallet-name end);
+				margin-inline-start: var(---wallet-breadcrumb-gap);
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			article > .wallet-name {
+				animation: none;
+			}
+
+			article section > header[data-sticky],
+			article section > header[data-sticky] > a:has(> h2) {
+				animation: none;
+			}
+		}
+	}
+
 	@media (max-width: 1024px) {
 		.container {
 			---wallet-icon-sticky-block-start: calc(var(--navigation-mobile-blockSize) + 1rem);
@@ -2661,7 +2776,6 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.wallet-icon-layer,
-		article > header#top .wallet-icon,
 		article a:has(> h2),
 		article a:has(> h2)::before {
 			animation: none;
@@ -2793,6 +2907,8 @@
 
 		> details {
 			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			min-inline-size: 0;
 			scroll-margin-top: 3.5rem;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 			transition:
@@ -2805,6 +2921,9 @@
 			}
 
 			> summary {
+				min-inline-size: 0;
+				max-inline-size: 100%;
+
 				> header {
 					flex-grow: 1;
 
@@ -2821,6 +2940,8 @@
 
 			> .attribute-content {
 				display: grid;
+				min-inline-size: 0;
+				max-inline-size: 100%;
 				gap: 1.5rem;
 			}
 
