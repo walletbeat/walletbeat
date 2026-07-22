@@ -862,6 +862,52 @@ interface CallsStatusResponse {
 	id?: unknown
 }
 
+const CALLS_STATUS_POLL_INTERVAL_MS = 2_000
+const CALLS_STATUS_POLL_TIMEOUT_MS = 60_000
+
+/**
+ * EIP-5792 v2.0.0 uses numeric status codes (100 = pending, >=200 = terminal).
+ * v1.0.0 used string statuses, where anything other than "PENDING" is terminal.
+ */
+function isTerminalCallsStatus(status: CallsStatusResponse['status']): boolean {
+	if (typeof status === 'number') {
+		return status >= 200
+	}
+
+	if (typeof status === 'string') {
+		return status.toUpperCase() !== 'PENDING'
+	}
+
+	return true
+}
+
+/**
+ * Poll wallet_getCallsStatus until the batch reaches a terminal status
+ * (confirmed or failed) or the timeout elapses. Bundles are frequently
+ * still pending immediately after wallet_sendCalls returns, and wallets
+ * commonly omit `atomic`/`receipts` until the batch is actually included.
+ */
+async function pollCallsStatus(
+	provider: Eip1193Provider,
+	batchId: string,
+): Promise<CallsStatusResponse> {
+	const deadline = Date.now() + CALLS_STATUS_POLL_TIMEOUT_MS
+
+	for (;;) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+		const status: CallsStatusResponse = (await provider.request({
+			method: 'wallet_getCallsStatus',
+			params: [batchId],
+		})) as CallsStatusResponse
+
+		if (isTerminalCallsStatus(status.status) || Date.now() >= deadline) {
+			return status
+		}
+
+		await new Promise(resolve => setTimeout(resolve, CALLS_STATUS_POLL_INTERVAL_MS))
+	}
+}
+
 /**
  * Step 6: Check Batch Status
  * Tests EIP-5792 wallet_getCallsStatus
@@ -895,11 +941,7 @@ export async function runStep6BatchStatus(
 	let receiptsDetail = ''
 
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-		const status = (await provider.request({
-			method: 'wallet_getCallsStatus',
-			params: [batchId],
-		})) as CallsStatusResponse
+		const status = await pollCallsStatus(provider, batchId)
 
 		statusPassed = true
 
