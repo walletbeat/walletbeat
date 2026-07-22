@@ -2071,7 +2071,7 @@
 			inset-block-start: 0;
 			inset-inline: 0;
 			inline-size: 100%;
-			block-size: var(---pie-size);
+			block-size: var(---pie-surface-size, var(---pie-size));
 			max-inline-size: none;
 			max-block-size: none;
 			pointer-events: none;
@@ -2508,16 +2508,19 @@
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				---pie-size: 4.25rem;
-				---pie-scale: calc(4.25 / (var(---pie-diameter) / 16));
+				---pie-size: 6rem;
+				---pie-surface-size: 4.25rem;
+				---pie-scale: calc(6 / (var(---pie-diameter) / 16));
 				---pie-target-angle: 0.5turn;
 
 				grid-area: Content;
 				justify-self: stretch;
 				inset-block-start: calc(var(--navigation-mobile-blockSize) + 0.125rem);
+				overflow: clip;
 
 				.pie-navigation-geometry {
 					margin-inline: auto 1rem;
+					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
 				}
 			}
 		}
