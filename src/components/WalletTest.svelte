@@ -104,6 +104,12 @@
 		chainId: null as number | null,
 		batchId: null as string | null,
 
+		// Captured by a listener attached at provider-discovery time (page
+		// load), since 'connect' typically fires long before the user
+		// reaches step 2 and a step-scoped listener would miss it.
+		earlyConnectEventFired: false,
+		earlyConnectEventData: null as unknown,
+
 		// Results modal
 		resultsModal: {
 			isOpen: false,
@@ -452,6 +458,28 @@ Issued At: ${new Date().toISOString()}`;
 		}
 	}
 
+	// Capture the 'connect' event as early as possible (at provider-discovery
+	// time, i.e. page load), since it typically fires long before the user
+	// reaches step 2 - a listener attached only when step 2 runs would miss it.
+	function attachEarlyConnectListener(provider: unknown) {
+		if (typeof provider !== 'object' || provider === null) return
+
+		const candidate = provider as { on?: (event: string, listener: (...args: unknown[]) => void) => unknown }
+
+		if (typeof candidate.on !== 'function') return
+
+		try {
+			candidate.on('connect', (info: unknown) => {
+				if (!stepTestState.earlyConnectEventFired) {
+					stepTestState.earlyConnectEventFired = true
+					stepTestState.earlyConnectEventData = info
+				}
+			})
+		} catch {
+			// Provider doesn't support event subscription
+		}
+	}
+
 	// EIP Support Testing
 	function discoverProviders() {
 		if (typeof window === 'undefined') return
@@ -474,11 +502,16 @@ Issued At: ${new Date().toISOString()}`;
 					rdns: info.rdns,
 					provider,
 				})
+				attachEarlyConnectListener(provider)
 			}
 		})
 
 		// Request providers to announce themselves
 		window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+		// Fallback: also listen on window.ethereum directly for wallets that
+		// don't implement EIP-6963 discovery.
+		attachEarlyConnectListener(getProvider())
 	}
 
 	// Step-based EIP testing functions
@@ -509,6 +542,10 @@ Issued At: ${new Date().toISOString()}`;
 			getChainId: () => stepTestState.chainId,
 			getBatchId: () => stepTestState.batchId,
 			getAccountAddress: () => account?.address,
+			getEarlyConnectEvent: () => ({
+				fired: stepTestState.earlyConnectEventFired,
+				data: stepTestState.earlyConnectEventData,
+			}),
 			setSelectedProviderId: (id: string) => { stepTestState.selectedProviderId = id },
 			setConnectedAddress: (address: string) => { stepTestState.connectedAddress = address },
 			setChainId: (chainId: number) => { stepTestState.chainId = chainId },
