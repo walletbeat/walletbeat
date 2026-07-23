@@ -1165,6 +1165,7 @@ ol {
  * - `--stickyBreadcrumb-position-insetBlockStart`
  * - `--stickyBreadcrumb-position-insetInlineStart`
  * - `--stickyBreadcrumb-item-insetBlockStart`
+ * - `--stickyBreadcrumb-item-blockSize`
  * - `--stickyBreadcrumb-itemAnchor`
  * - `--stickyBreadcrumb-parentAnchor`
  *
@@ -1243,6 +1244,7 @@ ol {
 				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
 			);
 			margin-inline-start: 0;
+			min-block-size: 0;
 		}
 		to {
 			position: fixed;
@@ -1252,6 +1254,7 @@ ol {
 				end
 			);
 			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
+			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
 		}
 	}
 
