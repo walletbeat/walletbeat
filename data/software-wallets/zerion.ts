@@ -38,7 +38,12 @@ import {
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -253,7 +258,13 @@ export const zerion: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				erc4361: null,
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation: 'Zerion does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/ambire/screenshots/2026-07-24-zerion-erc4361-siwe.png',
+						label: 'Zerion sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
 					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
