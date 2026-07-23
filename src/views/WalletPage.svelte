@@ -535,7 +535,10 @@
 	id="wallet-page"
 	class="container"
 	data-sticky-container
-	style:timeline-scope={pieRotationSteps.map(step => step.timeline).join(', ')}
+	style:timeline-scope={[
+		'--header-timeline',
+		...pieRotationSteps.map(step => step.timeline),
+	].join(', ')}
 	{@attach attachDetailsCommands}
 >
 	<div class="wallet-icon-layer" aria-hidden="true">
@@ -2560,6 +2563,7 @@
 		display: grid;
 		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 		gap: 2rem 0.75rem;
+		padding-block-start: 2rem;
 		min-inline-size: 0;
 
 		> :not(.wallet-name) {
@@ -2577,6 +2581,7 @@
 			grid-column: 1;
 			align-self: start;
 			inline-size: max-content;
+			margin-inline-start: var(--scrollItem-inlineDetached-paddingStart);
 		}
 
 		> header#top {
@@ -2590,6 +2595,12 @@
 			> :first-child {
 				grid-column: 2;
 			}
+		}
+	}
+
+	@media (max-width: 864px) {
+		article {
+			padding-block-start: calc(var(--navigation-mobile-blockSize) + 1rem);
 		}
 	}
 
