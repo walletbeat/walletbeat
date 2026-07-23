@@ -51,7 +51,11 @@ import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browse
 import { paragraph } from '@/types/content'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
-import type { ScamUrlWarning, SendTransactionWarning } from '@/schema/features/security/scam-alerts'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+	SendTransactionWarning,
+} from '@/schema/features/security/scam-alerts'
 
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -247,11 +251,25 @@ export const zerion: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
 			scamAlerts: {
-				contractTransactionWarning: notSupported,
+				contractTransactionWarning: supported<WithRef<ContractTransactionWarning>>({
+					ref: [
+						{
+							explanation:
+								'Zerion sends the transaction to their server, which simulates it and returns whether the contract address is a known app.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/wallet-simulate-transaction.ts#L46-L63',
+						},
+					],
+					contractRegistry: true,
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: false,
+					recentContractWarning: false,
+				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: [
 						{
-							label: 'Zerion sends the url domain to their server for security checks.',
+							explanation: 'Zerion sends the url domain to their server for security checks.',
 							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/security-check-url.ts#L19-L28',
 						},
 					],
