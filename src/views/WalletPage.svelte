@@ -535,6 +535,7 @@
 	id="wallet-page"
 	class="container"
 	data-sticky-container
+	style:timeline-scope={pieRotationSteps.map(step => step.timeline).join(', ')}
 	{@attach attachDetailsCommands}
 >
 	<div class="wallet-icon-layer" aria-hidden="true">
@@ -897,7 +898,10 @@
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
-		<hr />
+		<hr
+			class="attribute-group-timeline"
+			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
+		/>
 
 		<section
 			class="attribute-group"
@@ -905,7 +909,6 @@
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
-			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
 		>
 			<header
 				data-sticky="block backdrop-before backdrop-stuck"
@@ -2591,12 +2594,8 @@
 	}
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.container {
-			timeline-scope: all;
-		}
-
-		.attribute-group,
-		.attribute {
+		.attribute-group-timeline,
+		.attribute > details > summary {
 			view-timeline-name: var(---pie-timeline, none);
 			view-timeline-axis: block;
 		}

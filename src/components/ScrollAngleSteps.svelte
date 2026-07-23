@@ -43,7 +43,7 @@
 <style>
 	@property ---rotation-step {
 		syntax: "<angle>";
-		inherits: true;
+		inherits: false;
 		initial-value: 0deg;
 	}
 
@@ -67,7 +67,7 @@
 
 			animation: rotation-step 1ms linear both;
 			animation-timeline: var(---timeline);
-			animation-range: entry 80% entry 100%;
+			animation-range: cover 78% cover 85%;
 		}
 
 		.rotation-step-a {
