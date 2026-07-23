@@ -51,6 +51,7 @@ import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browse
 import { paragraph } from '@/types/content'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
+import type { ScamUrlWarning, SendTransactionWarning } from '@/schema/features/security/scam-alerts'
 
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -245,7 +246,36 @@ export const zerion: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: notSupported,
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							label: 'Zerion sends the url domain to their server for security checks.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/security-check-url.ts#L19-L28',
+						},
+					],
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					leaksVisitedUrl: 'DOMAIN_ONLY',
+				}),
+				sendTransactionWarning: supported<SendTransactionWarning>({
+					ref: [
+						{
+							label:
+								'Zerion simulates the transaction and returns any detected warnings before signing.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/wallet-simulate-transaction.ts#L46-L63',
+						},
+					],
+					addressPoisoningDetection: false,
+					leaksRecipient: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					newRecipientWarning: false,
+					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: notSupported,
+			},
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
