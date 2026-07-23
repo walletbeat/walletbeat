@@ -2446,10 +2446,6 @@
 				z-index: 1;
 			}
 
-			:global(.navigation-items a:target-current) {
-				---slice-scale: 1.075;
-			}
-
 			:global(.navigation-items a > span[data-row-item]) {
 				position: absolute;
 				inline-size: 1px;
@@ -2474,6 +2470,20 @@
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current) > .pie-navigation-icon) {
+				filter: none;
+			}
+		}
+
+		/*
+		 * Chromium currently fails to invalidate :target-current when it is
+		 * nested beneath the pie rule. Keep this state selector flat.
+		 */
+		:global(#wallet-page .pie-navigation .navigation-items a:target-current) {
+			---slice-scale: 1.075;
+			opacity: 1;
+			outline: none;
+
+			> .pie-navigation-icon {
 				filter: none;
 			}
 		}
