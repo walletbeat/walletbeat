@@ -1020,8 +1020,12 @@
 						style:--slice-labelR={sliceStyle?.labelR}
 					></span>
 
-					<div data-row-item="flexible basis-2" data-column="gap-2">
-						<div data-row="start gap-2 wrap">
+					<div
+						class="attribute-summary-layout"
+						data-row-item="flexible basis-2"
+						data-row="start gap-2 wrap"
+					>
+						<div class="attribute-heading" data-column="gap-2">
 							<a
 								data-link="camouflaged"
 								href={`#${slugifyCamelCase(attribute.id)}`}
@@ -1033,6 +1037,16 @@
 									{attribute.displayName}
 								</h3>
 							</a>
+
+							{#if attribute.question}
+								<div class="subsection-caption">
+									<Typography
+										content={attribute.question}
+										strings={{ WALLET_NAME: wallet.metadata.displayName }}
+									/>
+								</div>
+							{/if}
+						</div>
 
 							{#if showStage}
 								{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
@@ -1141,16 +1155,6 @@
 								data-badge="medium"
 								value={evalAttr.evaluation.outcome.rating}
 							>{evalAttr.evaluation.outcome.rating}</data>
-						</div>
-
-						{#if attribute.question}
-							<div class="subsection-caption">
-								<Typography
-									content={attribute.question}
-									strings={{ WALLET_NAME: wallet.metadata.displayName }}
-								/>
-							</div>
-						{/if}
 					</div>
 				</header>
 			</summary>
@@ -2974,12 +2978,21 @@
 				> header {
 					flex-grow: 1;
 
-					> div {
-						display: grid;
+					> .attribute-summary-layout {
+						min-inline-size: 0;
 						gap: 0.5rem;
 
-						h3 {
-							font-weight: 600;
+						> .attribute-heading {
+							flex: 1 1 16rem;
+							min-inline-size: 0;
+
+							h3 {
+								font-weight: 600;
+							}
+						}
+
+						> :not(.attribute-heading) {
+							flex: none;
 						}
 					}
 				}
