@@ -319,7 +319,7 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 						'The wallet must directly support hardware wallets from at least three major manufacturers.',
 					),
 					rationale: sentence(`
-						Direct integration with hardware wallets, rather than reliance on an intermediary and a separate external application, keeps users independent of any single go-between and preserves a competitive, open hardware wallet market.
+						Hardware wallets keep private keys isolated on dedicated, purpose-built devices, and direct support for multiple manufacturers ensures users are not locked into a single hardware vendor and can freely choose the device that best fits their security needs.
 					`),
 					evaluate: variantsMustPassAttribute(
 						softwareWalletVariants,
