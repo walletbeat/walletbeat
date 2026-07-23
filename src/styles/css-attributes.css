@@ -1142,6 +1142,126 @@ ol {
 }
 
 
+/**
+ * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
+ * resolves its configurable parent anchor: root → section → subsection. A `position` preserves the
+ * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
+ * remains visible.
+ *
+ * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
+ * every item remains in regular document flow.
+ *
+ * ### Tokens
+ * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
+ * - `scope`: visibility boundary for descendant items
+ * - `position`: regular-layout position anchor and view-timeline source
+ * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+ *
+ * ### CSS Variables
+ * - `--stickyBreadcrumb-animationRangeStart`
+ * - `--stickyBreadcrumb-animationRangeEnd`
+ * - `--stickyBreadcrumb-gap`
+ * - `--stickyBreadcrumb-position-minBlockSize`
+ * - `--stickyBreadcrumb-position-insetBlockStart`
+ * - `--stickyBreadcrumb-position-insetInlineStart`
+ * - `--stickyBreadcrumb-item-insetBlockStart`
+ * - `--stickyBreadcrumb-itemAnchor`
+ * - `--stickyBreadcrumb-parentAnchor`
+ *
+ * ### Example
+ * ```html
+ * <a data-sticky-breadcrumb="root item"><h1>Page</h1></a>
+ * <section data-sticky-breadcrumb="scope">
+ *   <header data-sticky-breadcrumb="position">
+ *     <a data-sticky-breadcrumb="item"><h2>Section</h2></a>
+ *   </header>
+ *   <section data-sticky-breadcrumb="scope">
+ *     <header data-sticky-breadcrumb="position">
+ *       <a data-sticky-breadcrumb="item"><h3>Subsection</h3></a>
+ *     </header>
+ *   </section>
+ * </section>
+ * ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
+ */
+@supports (
+	((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+	(container-type: scroll-state) and
+	(position-anchor: --sticky-breadcrumb-scope) and
+	(inset-inline-start: anchor(--sticky-breadcrumb-item end))
+) {
+	[data-sticky-breadcrumb~="scope"] {
+		anchor-scope:
+			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
+			--sticky-breadcrumb-position,
+			--sticky-breadcrumb-scope;
+		timeline-scope: --sticky-breadcrumb-timeline;
+
+		&::before {
+			content: '';
+			display: block;
+			position: sticky;
+			inset-block-start: var(--stickyBreadcrumb-item-insetBlockStart, 0px);
+			block-size: 1px;
+			margin-block-end: -1px;
+			anchor-name: --sticky-breadcrumb-scope;
+		}
+	}
+
+	[data-sticky-breadcrumb~="position"] {
+		anchor-name: --sticky-breadcrumb-position;
+		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
+		view-timeline-name: --sticky-breadcrumb-timeline;
+		view-timeline-axis: block;
+	}
+
+	[data-sticky-breadcrumb~="item"] {
+		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
+
+		&:not([data-sticky-breadcrumb~="root"]) {
+			position-anchor: --sticky-breadcrumb-scope;
+
+			animation: StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both;
+			animation-timeline: --sticky-breadcrumb-timeline;
+			animation-range:
+				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
+				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem));
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemAnimation {
+		from {
+			position: fixed;
+			inset-block-start: calc(
+				anchor(--sticky-breadcrumb-position top)
+				+ var(--stickyBreadcrumb-position-insetBlockStart, 0px)
+			);
+			inset-inline-start: calc(
+				anchor(--sticky-breadcrumb-position start)
+				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
+			);
+			margin-inline-start: 0;
+		}
+		to {
+			position: fixed;
+			inset-block-start: anchor(top);
+			inset-inline-start: anchor(
+				var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+				end
+			);
+			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[data-sticky-breadcrumb~="item"]:not([data-sticky-breadcrumb~="root"]) {
+			animation: none;
+		}
+	}
+}
+
 
 /**
  * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll

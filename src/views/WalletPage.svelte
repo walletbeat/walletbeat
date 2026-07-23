@@ -553,6 +553,7 @@
 	>
 		<a
 			data-link="camouflaged"
+			data-sticky-breadcrumb="root item"
 			class="wallet-name"
 			href="#top"
 		>
@@ -910,50 +911,55 @@
 			class="attribute-group"
 			id={slugifyCamelCase(attrGroup.id)}
 			aria-label={attrGroup.displayName}
+			data-sticky-breadcrumb="scope"
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
 		>
-			<header
-				data-sticky="block backdrop-before backdrop-stuck"
-				data-row
-				data-scroll-item="inline-detached"
-			>
-				<a
-					data-link="camouflaged"
-					href={`#${slugifyCamelCase(attrGroup.id)}`}
-					interestfor={slugifyCamelCase(attrGroup.id)}
-				>
-					<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
-						{attrGroup.displayName}
-					</h2>
-				</a>
-
-				{#if showScores}
-					<ScoreBadge {score} size="medium" />
-				{/if}
-			</header>
-
 			<div
+				class="attribute-group-stack"
 				data-scroll-item="inline-detached padding-match-end"
-				data-column
 			>
-				{#if attrGroup.perWalletQuestion}
-					<div class="section-caption">
-						<Typography
-							content={attrGroup.perWalletQuestion}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					</div>
-				{/if}
+				<header
+					data-sticky="block backdrop-before backdrop-stuck"
+					data-sticky-breadcrumb="position"
+					data-row
+					data-scroll-item="inline-detached"
+				>
+					<a
+						data-link="camouflaged"
+						data-sticky-breadcrumb="item"
+						href={`#${slugifyCamelCase(attrGroup.id)}`}
+						interestfor={slugifyCamelCase(attrGroup.id)}
+					>
+						<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
+							{attrGroup.displayName}
+						</h2>
+					</a>
 
-				<div class="attributes" data-column>
-					{#each attributes as { attribute, evalAttr }}
-						{@render attributeSnippet({
-							attrGroupId: attrGroup.id,
-							attribute,
-							evalAttr,
-						})}
-					{/each}
+					{#if showScores}
+						<ScoreBadge {score} size="medium" />
+					{/if}
+				</header>
+
+				<div data-column>
+					{#if attrGroup.perWalletQuestion}
+						<div class="section-caption">
+							<Typography
+								content={attrGroup.perWalletQuestion}
+								strings={{ WALLET_NAME: wallet.metadata.displayName }}
+							/>
+						</div>
+					{/if}
+
+					<div class="attributes" data-column>
+						{#each attributes as { attribute, evalAttr }}
+							{@render attributeSnippet({
+								attrGroupId: attrGroup.id,
+								attribute,
+								evalAttr,
+							})}
+						{/each}
+					</div>
 				</div>
 			</div>
 		</section>
@@ -994,6 +1000,7 @@
 		class="attribute"
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
+		data-sticky-breadcrumb="scope"
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
@@ -1025,18 +1032,27 @@
 						data-row-item="flexible basis-2"
 						data-row="start gap-2 wrap"
 					>
-						<div class="attribute-heading" data-column="gap-2">
-							<a
-								data-link="camouflaged"
-								href={`#${slugifyCamelCase(attribute.id)}`}
-								interestfor={slugifyCamelCase(attribute.id)}
+						<div
+							class="attribute-heading"
+							data-column="gap-2"
+						>
+							<div
+								class="attribute-heading-position"
+								data-sticky-breadcrumb="position"
 							>
-								<h3
-									title={formatAttributeTitleText(evalAttr)}
+								<a
+									data-link="camouflaged"
+									data-sticky-breadcrumb="item"
+									href={`#${slugifyCamelCase(attribute.id)}`}
+									interestfor={slugifyCamelCase(attribute.id)}
 								>
-									{attribute.displayName}
-								</h3>
-							</a>
+									<h3
+										title={formatAttributeTitleText(evalAttr)}
+									>
+										{attribute.displayName}
+									</h3>
+								</a>
+							</div>
 
 							{#if attribute.question}
 								<div class="subsection-caption">
@@ -2707,8 +2723,26 @@
 		(position-anchor: --wallet-name) and
 		(inset-inline-start: anchor(--wallet-name end))
 	) {
+		.container {
+			--stickyBreadcrumb-gap: var(---wallet-breadcrumb-gap);
+			--stickyBreadcrumb-item-insetBlockStart: var(---wallet-icon-sticky-block-start);
+		}
+
 		article > .wallet-name {
-			anchor-name: --wallet-name;
+			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-root;
+		}
+
+		.attribute-group {
+			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-group;
+			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-root;
+		}
+
+		.attribute {
+			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-attribute;
+			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
+		}
+
+		article > .wallet-name {
 			z-index: 7;
 			position: sticky;
 			inset-block-start: var(---wallet-icon-sticky-block-start);
@@ -2727,26 +2761,32 @@
 			display: none;
 		}
 
-		article section:has(> header[data-sticky]) {
-			anchor-scope: --wallet-section-heading;
-		}
+		.attribute-group-stack > header[data-sticky-breadcrumb~='position'] {
+			--stickyBreadcrumb-position-minBlockSize: 4.25rem;
+			--stickyBreadcrumb-position-insetBlockStart: 1rem;
+			--stickyBreadcrumb-position-insetInlineStart: var(--scrollItem-inlineDetached-paddingStart);
 
-		article section > header[data-sticky] {
-			anchor-name: --wallet-section-heading;
 			z-index: 4;
-			min-block-size: 4.25rem;
-			view-timeline-name: --wallet-section-heading-timeline;
-			view-timeline-axis: block;
 
-			> a:has(> h2) {
+			> [data-sticky-breadcrumb~='item'] {
 				z-index: 6;
 
-				animation: AnchoredSectionHeadingAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --wallet-section-heading-timeline;
-				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
+				&::before {
+					animation-timeline: --sticky-breadcrumb-timeline;
+					animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
+				}
+			}
+		}
+
+		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
+
+			> [data-sticky-breadcrumb~='item'] {
+				z-index: 5;
 
 				&::before {
-					animation-timeline: --wallet-section-heading-timeline;
+					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 				}
 			}
@@ -2763,33 +2803,8 @@
 			}
 		}
 
-		@keyframes AnchoredSectionHeadingAnimation {
-			from {
-				position: fixed;
-				position-anchor: --wallet-section-heading;
-				inset-block-start: calc(anchor(top) + 1rem);
-				inset-inline-start: calc(
-					anchor(start)
-					+ var(--scrollItem-inlineDetached-paddingStart)
-				);
-				margin-inline-start: 0;
-			}
-			to {
-				position: fixed;
-				position-anchor: --wallet-section-heading;
-				inset-block-start: calc(anchor(top) + 1rem);
-				inset-inline-start: anchor(--wallet-name end);
-				margin-inline-start: var(---wallet-breadcrumb-gap);
-			}
-		}
-
 		@media (prefers-reduced-motion: reduce) {
 			article > .wallet-name {
-				animation: none;
-			}
-
-			article section > header[data-sticky],
-			article section > header[data-sticky] > a:has(> h2) {
 				animation: none;
 			}
 		}
@@ -2848,7 +2863,7 @@
 	.attribute-group {
 		scroll-margin-top: 3.5rem;
 
-		> header {
+		> .attribute-group-stack > header {
 			padding-block: 1rem;
 
 			> a:is(:hover, :focus-visible, :interest-source),
