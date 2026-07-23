@@ -322,7 +322,7 @@ export const testSteps: TestStep[] = [
 						id: 'valid-receipts',
 						name: 'Valid receipts array',
 						description: 'Response includes receipts array with transaction receipt fields',
-						critical: false,
+						critical: true,
 					},
 					{
 						id: 'has-showCallsStatus',
