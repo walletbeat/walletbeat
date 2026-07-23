@@ -1447,10 +1447,15 @@
 	.container {
 		--wallet-icon-size: 3rem;
 		---wallet-icon-sticky-block-start: 1rem;
-		---wallet-icon-sticky-inline-start: max(
+		---wallet-content-inline-start: max(
 			var(--scrollItem-inlineDetached-paddingStart),
-			(100% - var(--scrollItem-inlineDetached-maxSize)) / 2
+			(
+				var(--sticky-sizeInline)
+				- var(--scrollItem-inlineDetached-maxSize)
+			)
+			/ 2
 		);
+		---wallet-icon-sticky-inline-start: var(---wallet-content-inline-start);
 		---wallet-name-sticky-icon-size: 2rem;
 		---wallet-name-sticky-font-size: 1.8rem;
 		---wallet-breadcrumb-gap: 1.5rem;
@@ -2656,7 +2661,7 @@
 			grid-column: 1;
 			align-self: start;
 			inline-size: max-content;
-			margin-inline-start: var(--scrollItem-inlineDetached-paddingStart);
+			margin-inline-start: var(---wallet-content-inline-start);
 		}
 
 		> header#top {
@@ -2792,7 +2797,14 @@
 		.attribute-group-stack > header[data-sticky-breadcrumb~='position'] {
 			--stickyBreadcrumb-position-minBlockSize: 4.25rem;
 			--stickyBreadcrumb-position-insetBlockStart: 1rem;
-			--stickyBreadcrumb-position-insetInlineStart: var(--scrollItem-inlineDetached-paddingStart);
+			--stickyBreadcrumb-position-insetInlineStart: max(
+				var(--scrollItem-inlineDetached-paddingStart),
+				(
+					anchor-size(--sticky-breadcrumb-position inline)
+					- var(--scrollItem-inlineDetached-maxSize)
+				)
+				/ 2
+			);
 
 			z-index: 4;
 
@@ -2808,6 +2820,7 @@
 
 		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
 			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
+			--stickyBreadcrumb-position-insetInlineStart: 0px;
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: 5;
@@ -2823,10 +2836,12 @@
 		@keyframes WalletNameAnimation {
 			from {
 				--wallet-icon-size: 3rem;
+				margin-inline-start: var(---wallet-content-inline-start);
 				font-size: 2.25rem;
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				margin-inline-start: var(--scrollItem-inlineDetached-paddingStart);
 				font-size: var(---wallet-name-sticky-font-size);
 			}
 		}
