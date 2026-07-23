@@ -736,7 +736,7 @@ export const ambire: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Ambire additionally supports the Keystone and Keycard air-gapped hardware wallets via QR-code signing (the UR protocol) through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone and Keycard.',
+							'Ambire additionally supports the Keystone and Keycard hardware wallets via QR-code signing through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone and Keycard.',
 						url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts',
 					},
 					{
