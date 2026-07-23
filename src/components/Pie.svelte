@@ -328,6 +328,10 @@
 			display: grid;
 			max-width: 100%;
 
+			> .slices {
+				contain: content;
+			}
+
 			.slice {
 				--slice-brightness: 1;
 				--slice-scale: 1;

@@ -1883,85 +1883,112 @@
 			---slice-inner-r: var(--slice-innerR);
 			---slice-outer-corner-radius: var(--slice-outerCornerRadius, calc(var(--slice-gap) / 2));
 			---slice-inner-corner-radius: var(--slice-innerCornerRadius, calc(var(--slice-gap) / 2));
+			---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
+			---slice-half-gap: calc(var(---slice-gap) / 2);
+			---slice-outer-corner-r: max(
+				0,
+				min(
+					var(---slice-outer-corner-radius),
+					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
+					calc(
+						(
+							sin(var(---slice-half-angle)) * var(---slice-outer-r)
+							- var(---slice-half-gap)
+						)
+						/ (1 + sin(var(---slice-half-angle)))
+					)
+				)
+			);
+			---slice-inner-corner-r: max(
+				0,
+				min(
+					var(---slice-inner-corner-radius),
+					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
+					calc(
+						(
+							sin(var(---slice-half-angle)) * var(---slice-inner-r)
+							- var(---slice-half-gap)
+						)
+						/ max(0.000001, 1 - sin(var(---slice-half-angle)))
+					)
+				)
+			);
+			---slice-outer-corner-offset: calc(var(---slice-half-gap) + var(---slice-outer-corner-r));
+			---slice-inner-corner-offset: calc(var(---slice-half-gap) + var(---slice-inner-corner-r));
+			---slice-outer-corner-center-r: calc(var(---slice-outer-r) - var(---slice-outer-corner-r));
+			---slice-inner-corner-center-r: calc(var(---slice-inner-r) + var(---slice-inner-corner-r));
+			---slice-outer-angle-inset: asin(var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r));
+			---slice-inner-angle-inset: asin(var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r));
+			---slice-outer-side-r: sqrt(pow(var(---slice-outer-corner-center-r), 2) - pow(var(---slice-outer-corner-offset), 2));
+			---slice-inner-side-r: sqrt(pow(var(---slice-inner-corner-center-r), 2) - pow(var(---slice-inner-corner-offset), 2));
+			---slice-angle-outer-start: calc(var(---slice-outer-angle-inset) - var(---slice-half-angle));
+			---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
+			---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
+			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
+			---slice-unit: calc(
+				var(--icon-size) * 0.55
+				/ var(--slice-labelSize)
+			);
+			---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
+			---slice-scaled-offset: calc(
+				var(--slice-offset)
+				* var(---slice-unit)
+			);
+			---slice-block-half: max(
+				calc(
+					sin(var(---slice-angle-outer-end))
+					* var(---slice-outer-r)
+				),
+				calc(
+					sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
+					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
+				),
+				calc(
+					sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
+					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
+				),
+				calc(
+					sin(var(---slice-angle-inner-end))
+					* var(---slice-inner-r)
+				)
+			);
 
 			position: relative;
 			isolation: isolate;
+			contain: content;
+			inline-size: calc(
+				(var(---slice-outer-r) - var(---slice-inner-r))
+				* var(---slice-unit)
+			);
+			block-size: calc(2 * var(---slice-block-half) * var(---slice-unit));
 			border: 0;
 			border-radius: 0;
 			background: transparent;
-			overflow: visible;
 
 			&::before {
-				position: relative;
+				position: absolute;
+				inset:
+					50% auto auto
+					calc(
+						(
+							var(---slice-outer-r) - var(--slice-labelR)
+						)
+						/ (
+							var(---slice-outer-r) - var(---slice-inner-r)
+						)
+						* 100%
+					);
 				z-index: 1;
 				font-size: calc(var(--icon-size) * 0.55);
+				translate: -50% -50%;
 			}
 
 			&::after {
 				content: '';
-				---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
-				---slice-half-gap: calc(var(---slice-gap) / 2);
-				---slice-outer-corner-r: max(
-					0,
-					min(
-						var(---slice-outer-corner-radius),
-						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-						calc(
-							(
-								sin(var(---slice-half-angle)) * var(---slice-outer-r)
-								- var(---slice-half-gap)
-							)
-							/ (1 + sin(var(---slice-half-angle)))
-						)
-					)
-				);
-				---slice-inner-corner-r: max(
-					0,
-					min(
-						var(---slice-inner-corner-radius),
-						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-						calc(
-							(
-								sin(var(---slice-half-angle)) * var(---slice-inner-r)
-								- var(---slice-half-gap)
-							)
-							/ max(0.000001, 1 - sin(var(---slice-half-angle)))
-						)
-					)
-				);
-				---slice-outer-corner-offset: calc(var(---slice-half-gap) + var(---slice-outer-corner-r));
-				---slice-inner-corner-offset: calc(var(---slice-half-gap) + var(---slice-inner-corner-r));
-				---slice-outer-corner-center-r: calc(var(---slice-outer-r) - var(---slice-outer-corner-r));
-				---slice-inner-corner-center-r: calc(var(---slice-inner-r) + var(---slice-inner-corner-r));
-				---slice-outer-angle-inset: asin(var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r));
-				---slice-inner-angle-inset: asin(var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r));
-				---slice-outer-side-r: sqrt(pow(var(---slice-outer-corner-center-r), 2) - pow(var(---slice-outer-corner-offset), 2));
-				---slice-inner-side-r: sqrt(pow(var(---slice-inner-corner-center-r), 2) - pow(var(---slice-inner-corner-offset), 2));
-				---slice-angle-outer-start: calc(var(---slice-outer-angle-inset) - var(---slice-half-angle));
-				---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
-				---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
-				---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-				---slice-unit: calc(
-					var(--icon-size) * 0.55
-					/ var(--slice-labelSize)
-				);
-				---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
-				---slice-scaled-label-r: calc(
-					var(--slice-labelR)
-					* var(---slice-unit)
-				);
-				---slice-scaled-offset: calc(
-					var(--slice-offset)
-					* var(---slice-unit)
-				);
 
 				display: block;
 				position: absolute;
-				inset-inline-start: calc(
-					50%
-					+ var(---slice-scaled-label-r)
-					- var(---slice-origin)
-				);
+				inset-inline-start: 0;
 				inset-block-start: calc(50% - var(---slice-origin));
 				inline-size: calc(2 * var(---slice-origin));
 				block-size: calc(2 * var(---slice-origin));
@@ -2081,6 +2108,7 @@
 				inset: 50% auto auto 50%;
 				inline-size: calc(var(---pie-diameter) * 1px);
 				block-size: calc(var(---pie-diameter) * 1px);
+				contain: content;
 				translate: -50% -50%;
 				scale: var(---pie-scale);
 				transform: rotate(var(---pie-rotate)) translateZ(0);
