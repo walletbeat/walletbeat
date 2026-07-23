@@ -2659,9 +2659,6 @@
 	) {
 		article > .wallet-name {
 			anchor-name: --wallet-name;
-			z-index: 7;
-			position: sticky;
-			inset-block-start: var(---wallet-icon-sticky-block-start);
 			font-size: 2.25rem;
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
@@ -2685,16 +2682,12 @@
 			anchor-name: --wallet-section-heading;
 			view-timeline-name: --wallet-section-heading-timeline;
 			view-timeline-axis: block;
-			min-block-size: 4.25rem;
+
+			animation: AnchoredSectionHeaderAnimation step-start both;
+			animation-timeline: --wallet-section-heading-timeline;
+			animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 
 			> a:has(> h2) {
-				position: fixed;
-				position-anchor: --wallet-section-heading;
-				position-visibility: anchors-visible;
-				inset-block-start: calc(anchor(top) + 1rem);
-				inset-inline-start: anchor(start);
-				margin-inline-start: 0;
-
 				animation: AnchoredSectionHeadingAnimation var(--transition-easeInOutExpo) both;
 				animation-timeline: --wallet-section-heading-timeline;
 				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
@@ -2707,18 +2700,57 @@
 			}
 		}
 
+		@keyframes AnchoredSectionHeaderAnimation {
+			from {
+				min-block-size: auto;
+			}
+			to {
+				min-block-size: 4.25rem;
+			}
+		}
+
 		@keyframes WalletNameAnimation {
 			from {
 				--wallet-icon-size: 3rem;
+				z-index: 2;
+				position: relative;
+				inset: auto;
+			}
+			0.001% {
+				z-index: 7;
+				position: sticky;
+				inset-block-start: var(---wallet-icon-sticky-block-start);
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				z-index: 7;
+				position: sticky;
+				inset-block-start: var(---wallet-icon-sticky-block-start);
 				font-size: var(---wallet-name-sticky-font-size);
 			}
 		}
 
 		@keyframes AnchoredSectionHeadingAnimation {
+			from {
+				position: static;
+				position-anchor: auto;
+				position-visibility: always;
+				inset: auto;
+				margin-inline-start: 0;
+			}
+			0.001% {
+				position: fixed;
+				position-anchor: --wallet-section-heading;
+				position-visibility: anchors-visible;
+				inset-block-start: calc(anchor(top) + 1rem);
+				inset-inline-start: anchor(start);
+				margin-inline-start: 0;
+			}
 			to {
+				position: fixed;
+				position-anchor: --wallet-section-heading;
+				position-visibility: anchors-visible;
+				inset-block-start: calc(anchor(top) + 1rem);
 				inset-inline-start: anchor(--wallet-name end);
 				margin-inline-start: var(---wallet-breadcrumb-gap);
 			}
@@ -2726,8 +2758,11 @@
 
 		@media (prefers-reduced-motion: reduce) {
 			article > .wallet-name {
-				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
-				font-size: var(---wallet-name-sticky-font-size);
+				animation: none;
+			}
+
+			article section > header[data-sticky],
+			article section > header[data-sticky] > a:has(> h2) {
 				animation: none;
 			}
 		}
