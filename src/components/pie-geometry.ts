@@ -32,6 +32,7 @@ export type LevelConfig = {
 	outerCornerRadius?: number
 	innerCornerRadius?: number
 	labelSize?: number
+	labelSizeScale?: number
 }
 
 export type ComputedSlice = Slice & {
@@ -46,6 +47,7 @@ export type ComputedSlice = Slice & {
 		level: number
 		offset: number
 		labelSize: number
+		labelSizeScale: number
 		labelR: number
 	}
 	children?: ComputedSlice[]
@@ -63,6 +65,7 @@ export const overallRatingPieLevels = (innerRadiusFraction = 0.15): LevelConfig[
 		offset: 3,
 		outerCornerRadius: 28,
 		innerCornerRadius: 16,
+		labelSizeScale: 1.25,
 	},
 	{
 		outerRadiusFraction: 0.45,
@@ -138,7 +141,9 @@ export const computePieSlices = ({
 			const startAngle = currentAngle
 			const endAngle = startAngle + totalAngle
 			const midAngle = startAngle + totalAngle / 2
-			const labelRadius = labelSize / 2
+			const labelSizeScale = levelConfig.labelSizeScale ?? 1
+			const effectiveLabelSize = (levelConfig.labelSize ?? labelSize) * labelSizeScale
+			const labelRadius = effectiveLabelSize / 2
 			const minimumLabelR = Math.sqrt(
 				(outerR - labelRadius) * (innerR + labelRadius)
 			)
@@ -168,7 +173,8 @@ export const computePieSlices = ({
 					level,
 					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
-					labelSize: levelConfig.labelSize ?? labelSize,
+					labelSize: effectiveLabelSize,
+					labelSizeScale,
 					labelR,
 				},
 				...children && {
