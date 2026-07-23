@@ -438,7 +438,6 @@
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
-	import NestedTimelineScopes from '@/components/NestedTimelineScopes.svelte'
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
@@ -545,7 +544,6 @@
 		/>
 	</div>
 
-	<NestedTimelineScopes timelines={pieRotationSteps.map(step => step.timeline)}>
 	<article
 		data-column="gap-8"
 	>
@@ -857,8 +855,6 @@
 		</nav>
 
 	</aside>
-	</NestedTimelineScopes>
-
 </div>
 
 
@@ -2577,7 +2573,7 @@
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		.container {
-			timeline-scope: --header-timeline;
+			timeline-scope: all;
 		}
 
 		.attribute-group,
