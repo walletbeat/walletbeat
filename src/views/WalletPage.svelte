@@ -1435,7 +1435,7 @@
 			(100% - var(--scrollItem-inlineDetached-maxSize)) / 2
 		);
 		---wallet-name-sticky-icon-size: 2rem;
-		---wallet-name-sticky-font-size: 1.125rem;
+		---wallet-name-sticky-font-size: 1.8rem;
 		---wallet-breadcrumb-gap: 1.5rem;
 		--border-radius-lg: 1rem;
 		--border-radius: 0.5rem;
@@ -1469,7 +1469,6 @@
 		}
 		@media (max-width: 864px) {
 			---wallet-name-sticky-icon-size: 2.4rem;
-			---wallet-name-sticky-font-size: 1.3rem;
 			---wallet-breadcrumb-gap: 1.25rem;
 
 			&[data-sticky-container] {
@@ -2710,6 +2709,9 @@
 	) {
 		article > .wallet-name {
 			anchor-name: --wallet-name;
+			z-index: 7;
+			position: sticky;
+			inset-block-start: var(---wallet-icon-sticky-block-start);
 			font-size: 2.25rem;
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
@@ -2732,12 +2734,9 @@
 		article section > header[data-sticky] {
 			anchor-name: --wallet-section-heading;
 			z-index: 4;
+			min-block-size: 4.25rem;
 			view-timeline-name: --wallet-section-heading-timeline;
 			view-timeline-axis: block;
-
-			animation: AnchoredSectionHeaderAnimation step-start both;
-			animation-timeline: --wallet-section-heading-timeline;
-			animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 
 			> a:has(> h2) {
 				z-index: 6;
@@ -2747,55 +2746,32 @@
 				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 
 				&::before {
-					content: '› ';
-					opacity: 1;
-					animation: none;
+					animation-timeline: --wallet-section-heading-timeline;
+					animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 				}
-			}
-		}
-
-		@keyframes AnchoredSectionHeaderAnimation {
-			from {
-				min-block-size: auto;
-			}
-			to {
-				min-block-size: 4.25rem;
 			}
 		}
 
 		@keyframes WalletNameAnimation {
 			from {
 				--wallet-icon-size: 3rem;
-				z-index: 2;
-				position: relative;
-				inset: auto;
-			}
-			0.001% {
-				z-index: 7;
-				position: sticky;
-				inset-block-start: var(---wallet-icon-sticky-block-start);
+				font-size: 2.25rem;
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
-				z-index: 7;
-				position: sticky;
-				inset-block-start: var(---wallet-icon-sticky-block-start);
 				font-size: var(---wallet-name-sticky-font-size);
 			}
 		}
 
 		@keyframes AnchoredSectionHeadingAnimation {
 			from {
-				position: static;
-				position-anchor: auto;
-				inset: auto;
-				margin-inline-start: 0;
-			}
-			0.001% {
 				position: fixed;
 				position-anchor: --wallet-section-heading;
 				inset-block-start: calc(anchor(top) + 1rem);
-				inset-inline-start: anchor(start);
+				inset-inline-start: calc(
+					anchor(start)
+					+ var(--scrollItem-inlineDetached-paddingStart)
+				);
 				margin-inline-start: 0;
 			}
 			to {
