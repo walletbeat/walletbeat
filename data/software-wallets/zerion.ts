@@ -20,6 +20,11 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+	SendTransactionWarning,
+} from '@/schema/features/security/scam-alerts'
 import {
 	KeyStorageMechanism,
 	SecureRngSource,
@@ -51,11 +56,6 @@ import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browse
 import { paragraph } from '@/types/content'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
-import type {
-	ContractTransactionWarning,
-	ScamUrlWarning,
-	SendTransactionWarning,
-} from '@/schema/features/security/scam-alerts'
 
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -280,8 +280,8 @@ export const zerion: SoftwareWallet = {
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: [
 						{
-							label: 'Zerion flags a recipient address as already in the address book when sending',
 							file: 'public/references/wallets/ambire/screenshots/2026-07-24-zerion-address-book.png',
+							label: 'Zerion flags a recipient address as already in the address book when sending',
 						},
 					],
 					addressPoisoningDetection: false,
