@@ -8,6 +8,7 @@
 	import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
 	import { FarcasterIcon } from '@/icons/farcaster'
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
+	import StairsIcon from 'lucide-static/icons/chart-no-axes-column-increasing.svg?raw'
 	import TwitterIcon from 'lucide-static/icons/twitter.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
@@ -15,6 +16,7 @@
 		ICON_CHART_BAR: ChartBarIcon,
 		ICON_CHART_PIE: ChartPieIcon,
 		ICON_FARCASTER: FarcasterIcon,
+		ICON_STAIRS: StairsIcon,
 		ICON_TWITTER: TwitterIcon,
 		ICON_WALLET: WalletIcon,
 	}

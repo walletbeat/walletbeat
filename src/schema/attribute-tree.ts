@@ -174,6 +174,11 @@ const attributeGroupDefinitions = [
 				weight: 1.0,
 			},
 			{
+				attribute: (await import('@/schema/attributes/transparency/orderflow-transparency.ts'))
+					.orderflowTransparency,
+				weight: 1.0,
+			},
+			{
 				attribute: (await import('@/schema/attributes/transparency/reputation.ts')).reputation,
 				weight: 1.0,
 			},

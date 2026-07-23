@@ -20,6 +20,7 @@ export enum HardwareWalletType {
 	TREZOR = 'TREZOR',
 	GRIDPLUS = 'GRIDPLUS',
 	KEYSTONE = 'KEYSTONE',
+	KEYCARD = 'KEYCARD',
 	KEEPKEY = 'KEEPKEY',
 	FIREFLY = 'FIREFLY',
 	ONEKEY = 'ONEKEY',
@@ -37,6 +38,7 @@ export const hardwareWalletType = new Enum<HardwareWalletType>({
 	[HardwareWalletType.TREZOR]: true,
 	[HardwareWalletType.GRIDPLUS]: true,
 	[HardwareWalletType.KEYSTONE]: true,
+	[HardwareWalletType.KEYCARD]: true,
 	[HardwareWalletType.KEEPKEY]: true,
 	[HardwareWalletType.FIREFLY]: true,
 	[HardwareWalletType.ONEKEY]: true,
@@ -65,6 +67,8 @@ export function hardwareWalletTypeToString(
 			return 'GridPlus'
 		case HardwareWalletType.KEYSTONE:
 			return 'Keystone'
+		case HardwareWalletType.KEYCARD:
+			return 'Keycard'
 		case HardwareWalletType.KEEPKEY:
 			return 'KeepKey'
 		case HardwareWalletType.ONEKEY:
