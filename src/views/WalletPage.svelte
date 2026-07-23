@@ -1886,6 +1886,7 @@
 
 			position: relative;
 			isolation: isolate;
+			contain: layout style;
 			border: 0;
 			border-radius: 0;
 			background: transparent;
@@ -2081,6 +2082,7 @@
 				inset: 50% auto auto 50%;
 				inline-size: calc(var(---pie-diameter) * 1px);
 				block-size: calc(var(---pie-diameter) * 1px);
+				contain: content;
 				translate: -50% -50%;
 				scale: var(---pie-scale);
 				transform: rotate(var(---pie-rotate)) translateZ(0);
