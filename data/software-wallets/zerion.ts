@@ -262,17 +262,16 @@ export const zerion: SoftwareWallet = {
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: [
 						{
-							label:
-								'Zerion simulates the transaction and returns any detected warnings before signing.',
-							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/wallet-simulate-transaction.ts#L46-L63',
+							label: 'Zerion flags a recipient address as already in the address book when sending',
+							file: 'public/references/wallets/ambire/screenshots/2026-07-24-zerion-address-book.png',
 						},
 					],
 					addressPoisoningDetection: false,
-					leaksRecipient: true,
-					leaksUserAddress: true,
-					leaksUserIp: true,
+					leaksRecipient: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
 					newRecipientWarning: false,
-					userWhitelist: false,
+					userWhitelist: true,
 				}),
 				unlimitedApprovalWarning: notSupported,
 			},
