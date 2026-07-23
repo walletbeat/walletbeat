@@ -1424,6 +1424,9 @@
 			var(--scrollItem-inlineDetached-paddingStart),
 			(100% - var(--scrollItem-inlineDetached-maxSize)) / 2
 		);
+		---wallet-name-sticky-icon-size: 2rem;
+		---wallet-name-sticky-font-size: 1.125rem;
+		---wallet-breadcrumb-gap: 1.5rem;
 		--border-radius-lg: 1rem;
 		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
@@ -1441,7 +1444,7 @@
 		display: grid;
 		grid-template:
 			'Content Nav'
-			/ minmax(max-content, 1fr) auto
+			/ minmax(0, 1fr) auto
 		;
 		@media (max-width: 1024px) {
 			&[data-sticky-container] {
@@ -1451,10 +1454,14 @@
 
 			grid-template:
 				'Nav Content'
-				/ auto minmax(max-content, 1fr)
+				/ auto minmax(0, 1fr)
 			;
 		}
 		@media (max-width: 864px) {
+			---wallet-name-sticky-icon-size: 2.4rem;
+			---wallet-name-sticky-font-size: 1.3rem;
+			---wallet-breadcrumb-gap: 1.25rem;
+
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 			}
@@ -1463,7 +1470,7 @@
 				[Nav-start]
 				'Content'
 				[Nav-end]
-				/ [Nav-start] minmax(max-content, 1fr) [Nav-end]
+				/ [Nav-start] minmax(0, 1fr) [Nav-end]
 			;
 		}
 
@@ -2538,11 +2545,13 @@
 
 	article {
 		display: grid;
-		grid-template-columns: max-content minmax(0, 1fr);
+		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 		gap: 2rem 0.75rem;
+		min-inline-size: 0;
 
 		> :not(.wallet-name) {
 			grid-column: 1 / -1;
+			min-inline-size: 0;
 		}
 
 		> .wallet-name,
@@ -2650,6 +2659,7 @@
 	) {
 		article > .wallet-name {
 			anchor-name: --wallet-name;
+			z-index: 7;
 			position: sticky;
 			inset-block-start: var(---wallet-icon-sticky-block-start);
 			font-size: 2.25rem;
@@ -2702,22 +2712,22 @@
 				--wallet-icon-size: 3rem;
 			}
 			to {
-				--wallet-icon-size: 2.25rem;
-				font-size: 1.25rem;
+				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				font-size: var(---wallet-name-sticky-font-size);
 			}
 		}
 
 		@keyframes AnchoredSectionHeadingAnimation {
 			to {
 				inset-inline-start: anchor(--wallet-name end);
-				margin-inline-start: 0.75rem;
+				margin-inline-start: var(---wallet-breadcrumb-gap);
 			}
 		}
 
 		@media (prefers-reduced-motion: reduce) {
 			article > .wallet-name {
-				--wallet-icon-size: 2.25rem;
-				font-size: 1.25rem;
+				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				font-size: var(---wallet-name-sticky-font-size);
 				animation: none;
 			}
 		}
@@ -2862,6 +2872,8 @@
 
 		> details {
 			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			min-inline-size: 0;
 			scroll-margin-top: 3.5rem;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 			transition:
@@ -2874,6 +2886,9 @@
 			}
 
 			> summary {
+				min-inline-size: 0;
+				max-inline-size: 100%;
+
 				> header {
 					flex-grow: 1;
 
@@ -2890,6 +2905,8 @@
 
 			> .attribute-content {
 				display: grid;
+				min-inline-size: 0;
+				max-inline-size: 100%;
 				gap: 1.5rem;
 			}
 
