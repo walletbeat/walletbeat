@@ -2664,7 +2664,6 @@
 		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
 		(container-type: scroll-state) and
 		(position-anchor: --wallet-name) and
-		(position-visibility: anchors-visible) and
 		(inset-inline-start: anchor(--wallet-name end))
 	) {
 		article > .wallet-name {
@@ -2690,6 +2689,7 @@
 
 		article section > header[data-sticky] {
 			anchor-name: --wallet-section-heading;
+			z-index: 4;
 			view-timeline-name: --wallet-section-heading-timeline;
 			view-timeline-axis: block;
 
@@ -2698,6 +2698,8 @@
 			animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 
 			> a:has(> h2) {
+				z-index: 6;
+
 				animation: AnchoredSectionHeadingAnimation var(--transition-easeInOutExpo) both;
 				animation-timeline: --wallet-section-heading-timeline;
 				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
@@ -2744,14 +2746,12 @@
 			from {
 				position: static;
 				position-anchor: auto;
-				position-visibility: always;
 				inset: auto;
 				margin-inline-start: 0;
 			}
 			0.001% {
 				position: fixed;
 				position-anchor: --wallet-section-heading;
-				position-visibility: anchors-visible;
 				inset-block-start: calc(anchor(top) + 1rem);
 				inset-inline-start: anchor(start);
 				margin-inline-start: 0;
@@ -2759,7 +2759,6 @@
 			to {
 				position: fixed;
 				position-anchor: --wallet-section-heading;
-				position-visibility: anchors-visible;
 				inset-block-start: calc(anchor(top) + 1rem);
 				inset-inline-start: anchor(--wallet-name end);
 				margin-inline-start: var(---wallet-breadcrumb-gap);
