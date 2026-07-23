@@ -736,8 +736,12 @@ export const ambire: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Ambire additionally supports the Keystone and Keycard air-gapped hardware wallets via QR-code signing (the UR protocol) through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone and Keycard.',
+							'Ambire additionally supports the Keystone, Keycard, and imToken QR signers via QR-code signing (the UR protocol) through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone, Keycard, and imToken.',
 						url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts',
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-07-22-ambire-qr-hardware-wallets.png',
+						label: 'Ambire "Connect QR wallet" flow listing Keystone, Keycard, and imToken',
 					},
 				],
 				wallets: {
@@ -754,6 +758,9 @@ export const ambire: SoftwareWallet = {
 						connectionTypes: [HardwareWalletConnection.QR],
 					}),
 					[HardwareWalletType.KEYCARD]: supported<SupportedHardwareWallet>({
+						connectionTypes: [HardwareWalletConnection.QR],
+					}),
+					[HardwareWalletType.IMTOKEN]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.QR],
 					}),
 				},

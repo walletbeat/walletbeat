@@ -26,6 +26,7 @@ export enum HardwareWalletType {
 	ONEKEY = 'ONEKEY',
 	BITBOX = 'BITBOX',
 	IMKEY = 'IMKEY',
+	IMTOKEN = 'IMTOKEN',
 	/** A hardware wallet not listed above. */
 	OTHER = 'OTHER',
 }
@@ -44,6 +45,7 @@ export const hardwareWalletType = new Enum<HardwareWalletType>({
 	[HardwareWalletType.ONEKEY]: true,
 	[HardwareWalletType.BITBOX]: true,
 	[HardwareWalletType.IMKEY]: true,
+	[HardwareWalletType.IMTOKEN]: true,
 	[HardwareWalletType.OTHER]: true,
 })
 
@@ -77,6 +79,8 @@ export function hardwareWalletTypeToString(
 			return 'Firefly'
 		case HardwareWalletType.IMKEY:
 			return 'imKey'
+		case HardwareWalletType.IMTOKEN:
+			return 'imToken'
 		case HardwareWalletType.OTHER:
 			if (ifOther === null) {
 				throw new Error('Unexpected "OTHER" hardware wallet type')
