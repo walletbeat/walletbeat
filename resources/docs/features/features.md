@@ -2286,6 +2286,7 @@ Types of hardware wallets that can be supported. To identify: check the wallet's
 - `TREZOR` = `'TREZOR'`
 - `GRIDPLUS` = `'GRIDPLUS'`
 - `KEYSTONE` = `'KEYSTONE'`
+- `KEYCARD` = `'KEYCARD'`
 - `KEEPKEY` = `'KEEPKEY'`
 - `FIREFLY` = `'FIREFLY'`
 - `ONEKEY` = `'ONEKEY'`
