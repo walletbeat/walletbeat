@@ -1636,6 +1636,12 @@
 		---anchor-button-size: 2.5rem;
 
 		scroll-marker-group: after;
+		timeline-scope: --wallet-page-exit;
+	}
+
+	#wallet-page {
+		view-timeline-name: --wallet-page-exit;
+		view-timeline-axis: block;
 	}
 
 	:global(#layout:has(#wallet-page))::scroll-marker-group {
@@ -1666,6 +1672,9 @@
 		box-shadow: 0 0 var(--separator-width) var(--border-color);
 		backdrop-filter: blur(1rem);
 		transition: scroll-snap-type 0s 500ms allow-discrete;
+		animation: keep-anchor-navigation-in-wallet linear both;
+		animation-timeline: --wallet-page-exit;
+		animation-range: exit 0% exit 100%;
 	}
 
 	:global(#layout:has(#wallet-page))::scroll-marker-group:is(
@@ -1724,6 +1733,9 @@
 		font-size: 1.25rem;
 		line-height: 1;
 		transition-property: scale, background-color, border-color, opacity;
+		animation: keep-anchor-navigation-in-wallet linear both;
+		animation-timeline: --wallet-page-exit;
+		animation-range: exit 0% exit 100%;
 		&:is(:hover, :focus-visible) {
 			background-color: var(--background-tertiary);
 			border-color: var(--text-secondary);
@@ -1780,6 +1792,12 @@
 		:global(#layout:has(#wallet-page))::scroll-button(block-start),
 		:global(#layout:has(#wallet-page))::scroll-button(block-end) {
 			content: none;
+		}
+	}
+
+	@keyframes keep-anchor-navigation-in-wallet {
+		to {
+			translate: 0 -100dvb;
 		}
 	}
 
