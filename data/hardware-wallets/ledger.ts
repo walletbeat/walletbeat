@@ -19,7 +19,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
@@ -184,20 +184,21 @@ export const ledgerWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation:
-							"Independent video demonstration of Ledger's signing implementation on a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
-					},
-				],
+				ref: refTodo,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({
+					ref: {
+						explanation:
+							"Independent video demonstration of Ledger's signing implementation on a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
+					},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

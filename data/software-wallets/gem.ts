@@ -6,7 +6,7 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -80,7 +80,6 @@ export const gemwallet: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
-			walletCall: null,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -169,12 +168,14 @@ export const gemwallet: SoftwareWallet = {
 							url: 'https://gemwallet.com',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: true,
 					userWhitelist: false,
 				}),
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: null,
@@ -196,11 +197,36 @@ export const gemwallet: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveFeesShownByDefault),
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: null,
+				}),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -211,6 +237,7 @@ export const gemwallet: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

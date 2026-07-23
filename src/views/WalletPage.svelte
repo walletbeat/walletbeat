@@ -37,6 +37,7 @@
 		variantToName,
 		variantToRunsOn,
 	} from '@/constants/variants'
+	import type { NavigationItem } from '@/constants/navigation'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import {
 		type AttributeGroup,
@@ -196,6 +197,43 @@
 		) satisfies EvaluationTree<_AttributeGroupId>
 	)
 
+	const tocNavigationItems = $derived.by<NavigationItem[]>(() => (
+		evalTree ?
+			Object.values(attributeTree)
+				.flatMap(attrGroup => {
+					const evalGroup = evalTree[attrGroup.id]
+
+					if (!evalGroup) return []
+
+					return [{
+						id: `toc-${attrGroup.id}`,
+						title: attrGroup.displayName,
+						icon: attrGroup.icon,
+						iconVariant: 'emoji' as const,
+						accentColor: scoreToColor(
+							calculateAttributeGroupScore(attrGroup, evalGroup)?.score ?? null,
+						),
+						href: `#${slugifyCamelCase(attrGroup.id)}`,
+						children: attrGroup.attributes.flatMap(({ attribute }) => {
+							const evalAttr = evalGroup[attribute.id]
+
+							if (!evalAttr || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) return []
+
+							return [{
+								id: `toc-${attrGroup.id}-${attribute.id}`,
+								title: attribute.displayName,
+								icon: attribute.icon,
+								iconVariant: 'emoji' as const,
+								accentColor: ratingToColor(evalAttr.evaluation.outcome.rating),
+								href: `#${slugifyCamelCase(attribute.id)}`,
+							}]
+						}),
+					}]
+				})
+		:
+			[]
+	))
+
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
@@ -251,6 +289,7 @@
 	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
+	import NavigationItems from '@/views/NavigationItems.svelte'
 </script>
 
 
@@ -343,23 +382,13 @@
 </svelte:head>
 
 
-<a href="#top" class="return-to-top">↑</a>
-
 <div
 	class="container"
 	data-sticky-container
 >
 	<article
-		data-scroll-container="block"
 		data-column="gap-8"
 	>
-		<div
-			data-sticky="block"
-			class="nav-title"
-		>
-			Table of contents
-		</div>
-
 		<header
 			id="top"
 			data-column="gap-6"
@@ -535,7 +564,7 @@
 
 			<section id="stages">
 				<header
-					data-sticky="block"
+					data-sticky="block backdrop-before backdrop-stuck"
 					data-row
 					data-scroll-item="inline-detached"
 				>
@@ -569,36 +598,41 @@
 		{/if}
 	</article>
 
-	<nav class="toc" aria-label="Table of contents">
-		{#each evalTree ? Object.entries(attributeTree) : [] as [attrGroupId, attrGroup]}
-			{@const evalGroup = evalTree?.[attrGroupId]}
-			{#if evalGroup}
-				{@const score = calculateAttributeGroupScore(attrGroup, evalGroup)}
-				{@const scoreColor = scoreToColor(score === null ? null : score.score)}
-				<a
-					class="toc-group"
-					href="#{slugifyCamelCase(attrGroup.id)}"
-					style:--accent={scoreColor}
-				>
-					<span class="toc-icon" data-icon="wbicons emoji {attrGroup.icon}"></span>
-					<span class="toc-label">{attrGroup.displayName}</span>
-				</a>
-				{#each attrGroup.attributes as { attribute }}
-					{@const evalAttr = evalGroup[attribute.id]}
-					{#if evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT}
-						<a
-							class="toc-attr"
-							href="#{slugifyCamelCase(attribute.id)}"
-							style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
-						>
-							<span class="toc-icon" data-icon="wbicons emoji {attribute.icon}"></span>
-							<span class="toc-label">{attribute.displayName}</span>
-						</a>
+	<aside
+		class="page-navigation"
+		data-scroll-container="block"
+		data-sticky-container
+		data-column="gap-0"
+	>
+		<header
+			data-sticky="block backdrop-self backdrop-always"
+			data-row
+		>
+			<h2>Table of contents</h2>
+		</header>
+
+		<nav
+			data-column
+			data-column-item="flexible"
+			data-sticky-container
+		>
+			<NavigationItems
+				items={tocNavigationItems}
+				showSearch={false}
+				defaultOpen
+				ariaLabel="Table of contents"
+			>
+				{#snippet iconSnippet(item: NavigationItem, depth: number)}
+					{#if item.icon}
+						<span
+							class="toc-icon"
+							data-icon="circle filled wbicons emoji {item.icon}"
+						></span>
 					{/if}
-				{/each}
-			{/if}
-		{/each}
-	</nav>
+				{/snippet}
+			</NavigationItems>
+		</nav>
+	</aside>
 </div>
 
 
@@ -637,7 +671,7 @@
 			style:--accent={scoreColor}
 		>
 			<header
-				data-sticky="block"
+				data-sticky="block backdrop-before backdrop-stuck"
 				data-row
 				data-scroll-item="inline-detached"
 			>
@@ -673,9 +707,14 @@
 					>
 						<div
 							class="attributes-pie"
-							data-icon="wbicons emoji {attrGroup.icon}"
 							data-row-item="wrap-center"
 						>
+							<span
+								class="attributes-pie-icon"
+								data-icon="wbicons emoji {attrGroup.icon}"
+								aria-hidden="true"
+							></span>
+
 							<Pie
 								title={formatAttributeGroupTitleText(attrGroup, score, showScores)}
 
@@ -821,7 +860,7 @@
 								<h3
 									title={formatAttributeTitleText(evalAttr)}
 								>
-									<span class="attribute-icon" data-icon="wbicons emoji {attribute.icon}"></span>
+									<span class="attribute-icon" data-icon="circle filled wbicons emoji {attribute.icon}"></span>
 									{attribute.displayName}
 								</h3>
 							</a>
@@ -1214,37 +1253,47 @@
 
 <style>
 	.container {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 54rem;
-			--scrollItem-inlineDetached-paddingStart: 2rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-paddingEnd: 2rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
 		--wallet-icon-size: 3rem;
 		--border-radius-lg: 1rem;
 		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
 		--nav-width: 20rem;
 
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 54rem;
+			--scrollItem-inlineDetached-paddingStart: 2rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-paddingEnd: 2rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+			--sticky-marginInlineEnd: var(--nav-width);
+		}
+
 		display: grid;
 		grid-template:
 			'Content Nav'
-			/ minmax(0, 1fr) auto
+			/ minmax(max-content, 1fr) auto
 		;
 		@media (max-width: 1024px) {
+			&[data-sticky-container] {
+				--sticky-marginInlineStart: var(--nav-width);
+				--sticky-marginInlineEnd: 0px;
+			}
+
 			grid-template:
 				'Nav Content'
-				/ auto minmax(0, 1fr)
+				/ auto minmax(max-content, 1fr)
 			;
 		}
 		@media (max-width: 864px) {
+			&[data-sticky-container] {
+				--sticky-marginInlineStart: 0px;
+			}
+
 			grid-template:
 				[Nav-start]
 				'Content'
 				[Nav-end]
-				/ [Nav-start] minmax(0, 1fr) [Nav-end]
+				/ [Nav-start] minmax(max-content, 1fr) [Nav-end]
 			;
 		}
 
@@ -1252,44 +1301,91 @@
 
 		position: relative;
 
-		&[data-sticky-container] {
-			--sticky-paddingInlineEnd: var(--nav-width);
-		}
-
 		article {
 			grid-area: Content;
 
-			max-height: 100dvh;
-			overflow: hidden auto;
-
 			scroll-padding-block-start: 5rem;
 			scroll-padding-block-end: 1rem;
-
-			display: grid;
-			padding-block-end: calc(var(--topbar-height, 6.8rem) + 2rem);
 		}
 
-		.toc {
+		.page-navigation {
+			/* Nested scroll root: don't inherit page content's TOC clearance as sticky insets. */
+			--sticky-marginInlineStart: 0px;
+			--sticky-marginInlineEnd: 0px;
+			--sticky-marginBlockStart: 0px;
+			--sticky-marginBlockEnd: 0px;
+			--sticky0-insetInlineStart: 0px;
+			--sticky0-insetInlineEnd: 0px;
+			--sticky0-insetBlockStart: 0px;
+			--sticky0-insetBlockEnd: 0px;
+			--sticky-insetInlineStart: 0px;
+			--sticky-insetInlineEnd: 0px;
+			--sticky-insetBlockStart: 0px;
+			--sticky-insetBlockEnd: 0px;
+
+			--pageNavigation-header-blockSize: 3.5rem;
+			--sticky-backgroundColor: var(--background-secondary);
+
 			grid-area: Nav;
 			z-index: 2;
 
-			box-sizing: border-box;
 			position: sticky;
 			top: 0;
 			align-self: start;
 			width: var(--nav-width);
-			max-height: 100dvh;
+			height: 100cqb;
 
-			overflow-y: auto;
 			scroll-behavior: smooth;
 
-			display: flex;
-			flex-direction: column;
-			padding: calc(2.5rem + 1rem) 0.75rem calc(var(--topbar-height, 6.8rem) + 1rem);
-			gap: 2px;
+			background-color: var(--background-secondary);
+			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
-			background: var(--background-secondary);
-			border-inline: 1px solid var(--border-color);
+			> header {
+				flex-shrink: 0;
+				block-size: var(--pageNavigation-header-blockSize);
+				box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
+				padding-inline: 1rem;
+
+				font-size: 0.875rem;
+				color: var(--text-secondary);
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				font-weight: 500;
+
+				h2 {
+					margin: 0;
+					font: inherit;
+					color: inherit;
+				}
+			}
+
+			> nav {
+				position: relative;
+				z-index: 0;
+				align-content: stretch;
+				min-block-size: max-content;
+				padding: 0.75rem;
+
+				&[data-sticky-container] {
+					--sticky-marginBlockStart: var(--pageNavigation-header-blockSize);
+					--sticky-paddingBlockStart: 0.75rem;
+					--sticky-paddingBlockEnd: 0.75rem;
+				}
+			}
+
+			:global(a) {
+				--icon-filter: brightness(0) opacity(0.35);
+
+				&:hover {
+					--icon-filter: none;
+				}
+			}
+
+			:global(.toc-icon[data-icon~='filled']::before) {
+				line-height: 1;
+				filter: var(--icon-filter);
+				transition-property: filter;
+			}
 
 			@media (max-width: 864px) {
 				top: calc(var(--navigation-mobile-blockSize) + 4rem);
@@ -1301,54 +1397,6 @@
 					translate: 0 0;
 				}
 			}
-		}
-
-		.toc-group,
-		.toc-attr {
-			--icon-filter: brightness(0) opacity(0.35);
-
-			display: flex;
-			align-items: center;
-			gap: 0.75em;
-			padding: 0.45rem 0.75rem;
-			border-radius: 0.375rem;
-			text-decoration: none;
-			color: inherit;
-			transition: background-color 0.15s, color 0.15s;
-
-			&:hover {
-				--icon-filter: none;
-
-				background-color: var(--background-primary);
-				color: var(--accent);
-			}
-
-			.toc-icon {
-				display: grid;
-				place-items: center;
-				width: 1em;
-				aspect-ratio: 1;
-				border-radius: 50%;
-				background-color: var(--accent);
-				font-size: 2.1em;
-			}
-
-			.toc-icon::before {
-				font-size: 0.5em;
-				line-height: 1;
-				filter: var(--icon-filter);
-				transition-property: filter;
-			}
-		}
-
-		.toc-group {
-			font-weight: 600;
-			font-size: 1.05em;
-		}
-
-		.toc-attr {
-			margin-left: 2rem;
-			font-size: 0.95em;
 		}
 	}
 
@@ -1443,41 +1491,6 @@
 				content: '› ';
 				opacity: 1;
 			}
-		}
-	}
-
-	.nav-title[data-sticky] {
-		z-index: 3;
-		position: absolute;
-		left: auto;
-		right: 0;
-
-		@media (max-width: 1024px) {
-			right: auto;
-			left: 0;
-		}
-
-		@media (max-width: 864px) {
-			transition-property: translate;
-			translate: -100% 0;
-		}
-
-		bottom: auto;
-		padding: 1rem;
-		width: calc(var(--nav-width) - 1px);
-
-		border-bottom: 1px solid var(--border-color);
-
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		font-weight: 500;
-
-		pointer-events: none;
-
-		@supports not (scroll-marker-group: before) {
-			display: none;
 		}
 	}
 
@@ -1585,7 +1598,7 @@
 			font-size: 2.5em;
 		}
 
-		> .attributes-pie::before {
+		> .attributes-pie > .attributes-pie-icon {
 			display: none;
 		}
 
@@ -1679,7 +1692,7 @@
 			;
 			animation-timeline: --AttributesViewTimeline;
 
-			&::before {
+			> .attributes-pie-icon {
 				position: absolute;
 				inset: 0;
 				display: grid;
@@ -1717,38 +1730,38 @@
 			from {
 				--isTransformed: 1;
 				--pie-slice-highlightIndex: 0;
-				--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount));
+				--pie-rotate: 0turn;
 			}
 			to {
 				--isTransformed: 1;
 				--pie-slice-highlightIndex: var(--attributesCount);
-				--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount) + 1turn);
+				--pie-rotate: 1turn;
 			}
-			exit 100% {
+			100% {
 				--isTransformed: 0;
 				--pie-rotate: 1turn;
 			}
 		}
 
 		@keyframes AttributesPieTransformAnimation {
-			entry 40% {
+			0% {
 				--isTranslated: 0;
 				--translate: 0px 0px;
 			}
-			entry 55% {
+			15% {
 				--isTranslated: 1;
 				--translate: calc(-50% - 1rem) calc(50vh - 50%);
 			}
 
-			exit 47.5% {
+			72.5% {
 				--translate: calc(-50% - 1rem) calc(50vh - 50%);
 				--scale: 1;
 				--opacity: 1;
 			}
-			exit 75% {
+			87.5% {
 				--opacity: 0;
 			}
-			exit 100% {
+			100% {
 				--scale: 0;
 				--translate: 0 0;
 			}
@@ -1787,16 +1800,9 @@
 			}
 
 			.attribute-icon {
-				display: grid;
-				place-items: center;
-				width: 1em;
-				aspect-ratio: 1;
-				border-radius: 50%;
-				background-color: var(--accent);
-				font-size: 2.2em;
+				--icon-size: 2.2em;
 
 				&::before {
-					font-size: 0.5em;
 					line-height: 1;
 					filter: var(--icon-filter);
 					transition-property: filter;
@@ -1877,29 +1883,6 @@
 			.impact {
 				color: var(--text-secondary);
 			}
-		}
-	}
-
-	.return-to-top {
-		z-index: 1;
-		position: fixed;
-		bottom: 2rem;
-		right: 2rem;
-
-		display: grid;
-		place-items: center;
-		width: 3rem;
-		height: 3rem;
-
-		background-color: var(--accent);
-		color: #ffffff;
-		border-radius: 50%;
-		text-decoration: none;
-
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-		&:hover {
-			filter: brightness(1.1);
 		}
 	}
 

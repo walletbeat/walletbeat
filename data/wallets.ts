@@ -64,6 +64,11 @@ export const allRatedWalletsBySlug: Record<string, RatedWallet<string>> = Object
 	Object.values(allRatedWallets).map(wallet => [wallet.metadata.id, wallet]),
 )
 
+/** Check if a string is a valid wallet slug (metadata.id). */
+export function isValidWalletSlug(slug: string): slug is keyof typeof allRatedWalletsBySlug {
+	return Object.prototype.hasOwnProperty.call(allRatedWalletsBySlug, slug)
+}
+
 /**
  * Given a specific wallet type, return a RatedWallet of that type.
  */

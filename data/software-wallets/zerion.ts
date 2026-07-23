@@ -129,7 +129,6 @@ export const zerion: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -173,6 +172,7 @@ export const zerion: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: null,
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
@@ -253,7 +253,9 @@ export const zerion: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -272,6 +274,7 @@ export const zerion: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -351,6 +354,7 @@ export const zerion: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
 				dependencyLocking: supported({
@@ -371,6 +375,7 @@ export const zerion: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

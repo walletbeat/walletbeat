@@ -8,7 +8,6 @@ import Layout from '../layouts/Layout.astro'
 // Components
 import Navigation from '@/views/Navigation.astro'
 import SoftwareWalletTable from '@/views/SoftwareWalletTable.svelte'
-import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 ---
 
 <Layout
@@ -16,10 +15,10 @@ import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 		title: 'Walletbeat - Who watches the wallets?',
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column='gap-6'>
-		<header data-sticky='inline'>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-6'>
+		<header data-scroll-item='inline-detached padding-match-start padding-match-end'>
 			<h1>Who watches the wallets?</h1>
 
 			<p>
@@ -44,32 +43,74 @@ import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 		</header>
 
 		<SoftwareWalletTable client:visible title='Software Wallets' />
-
-		<HardwareWalletTable client:visible title='Hardware Wallets' />
 	</main>
 </Layout>
 
 <style>
-	main {
-		> header {
-			&::before {
-				content: '';
-			}
+	:global(#content),
+	main[data-sticky-container] {
+		--scrollItem-inlineDetached-maxSize: 60.5rem;
+		--scrollItem-inlineDetached-paddingStart: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 4rem;
+		--scrollItem-inlineDetached-paddingEnd: clamp(
+			1.5rem,
+			0.04 * var(--scrollContainer-sizeInline),
+			3rem
+		);
+	}
 
-			padding: clamp(0.75rem, 0.04 * var(--scrollContainer-sizeInline), 4rem)
-				clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
+	main {
+		padding-block-end: 3rem;
+
+		> header {
+			--hero-backgroundColor: light-dark(#f8e6ff, #3f165e);
+			--hero-glowColor: light-dark(#f0c6ff, var(--hero-backgroundColor));
+			--hero-highlightColor: light-dark(#d62f88, #ff4fb8);
+			--hero-rimColor: light-dark(#ffffff, #f8edff);
+			--hero-textColor: light-dark(#2d123d, #f5f2f7);
+			--hero-textSecondaryColor: color-mix(in oklch, var(--hero-textColor) 78%, transparent);
+
+			padding-block-end: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 8rem);
 
 			text-shadow:
-				0 0 1em var(--background-primary),
-				0 0 2em var(--background-primary),
-				0 0 3em var(--background-primary);
+				0 0 1em var(--hero-glowColor),
+				0 0 2em var(--hero-glowColor),
+				0 0 3em var(--hero-glowColor);
+
+			background:
+				linear-gradient(
+					to right,
+					color-mix(in oklch, var(--hero-backgroundColor) 100%, transparent) 34cqi,
+					color-mix(in oklch, var(--hero-backgroundColor) 80%, transparent) 72cqi,
+					color-mix(in oklch, var(--hero-backgroundColor) 34%, transparent)
+				),
+				radial-gradient(
+					circle at 90% 12%,
+					color-mix(in oklch, var(--hero-rimColor) 34%, transparent) 0,
+					transparent 21cqi
+				),
+				radial-gradient(
+					circle at 82% 88%,
+					color-mix(in oklch, var(--hero-highlightColor) 24%, transparent) 0,
+					transparent 26cqi
+				),
+				var(--hero-backgroundColor);
+
+			> * {
+				position: relative;
+				z-index: 1;
+			}
 
 			h1 {
 				font-family: var(--fontFamily-spMonorium);
 				font-size: clamp(1.75em, 0.04 * var(--scrollContainer-sizeInline), 3.5em);
 				font-weight: 800;
 				margin: 0 0 1rem 0;
-				color: var(--text-primary);
+				color: var(--hero-textColor);
 				line-height: 1.1;
 			}
 
@@ -78,9 +119,13 @@ import HardwareWalletTable from '@/views/HardwareWalletTable.svelte'
 				line-height: 1.6;
 				margin: 0;
 				text-wrap: balance;
-				max-width: 420px;
+				max-width: 72.5%;
 				margin-bottom: 1em;
-				color: var(--text-secondary);
+				color: var(--hero-textSecondaryColor);
+			}
+
+			a {
+				color: currentColor;
 			}
 		}
 	}

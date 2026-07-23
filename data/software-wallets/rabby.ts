@@ -8,6 +8,7 @@ import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -16,6 +17,11 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+} from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
@@ -28,6 +34,10 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
 import {
 	BasicBenchmarkTransactions,
 	CallDataDisplay,
@@ -53,8 +63,8 @@ import {
 	supported,
 } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
 	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
@@ -63,13 +73,15 @@ import {
 } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
-
+import rabbyRawExtManifest from './manifests/rabby/acmacodkjbdgmoleebolmdjonilkdbch.manifest.json'
 export const rabby: SoftwareWallet = {
 	metadata: {
 		id: 'rabby',
@@ -81,7 +93,7 @@ export const rabby: SoftwareWallet = {
 		`),
 		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-06',
+		lastUpdated: '2026-07-20',
 		urls: {
 			docs: ['https://rabbykit.rabby.io/'],
 			extensions: [
@@ -148,6 +160,7 @@ export const rabby: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.NONE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -200,9 +213,6 @@ export const rabby: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupportedWithRef({
-				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
-			}),
 		},
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
@@ -354,6 +364,7 @@ export const rabby: SoftwareWallet = {
 									},
 								},
 								purposes: [DataCollectionPurpose.SCAM_DETECTION],
+								role: EntityRole.OPERATOR,
 							},
 						],
 					},
@@ -396,6 +407,7 @@ export const rabby: SoftwareWallet = {
 									DataCollectionPurpose.TRANSACTION_BROADCAST,
 									DataCollectionPurpose.TRANSACTION_SIMULATION,
 								],
+								role: EntityRole.OPERATOR,
 							},
 						],
 					},
@@ -415,9 +427,24 @@ export const rabby: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: notSupported,
 				guardianRecovery: notSupported,
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: 'https://bugrap.io/bounties/Rabby%20Wallet',
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2024-04-15',
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.BUGRAP,
+				rewards: supported({
+					currency: 'USDC',
+					maximum: 10000,
+					minimum: 0,
+				}),
+				upgradePathAvailable: true,
+			}),
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,
@@ -567,6 +594,9 @@ export const rabby: SoftwareWallet = {
 					variantsScope: { [Variant.DESKTOP]: true },
 				},
 				{
+					// The upstream repository really names this file
+					// "Least Authority - Debank Rabby Walle Audit Report.pdf";
+					// the missing "t" is Rabby's, not ours. Do not "fix" the URL.
 					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
 					auditDate: '2024-10-18',
 					auditor: leastAuthority,
@@ -702,8 +732,8 @@ export const rabby: SoftwareWallet = {
 							url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 						},
 					],
-					leaksIp: true,
 					leaksUserAddress: true,
+					leaksUserIp: true,
 					leaksVisitedUrl: 'DOMAIN_ONLY',
 				}),
 				sendTransactionWarning: supported({
@@ -717,17 +747,46 @@ export const rabby: SoftwareWallet = {
 							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/send.ts#L113-L132',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: false,
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: [
+						{
+							label: "Vault encrypted via MetaMask's browser-passworder, a standardized KDF.",
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/src/background/utils/password.ts#L60-L98',
+						},
+						{
+							label:
+								'Rabby uses a seed phrase entropy from `crypto.getRandomValues` via `@scure/bip39`.',
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/src/background/service/keyring/index.ts#L288-L290',
+						},
+					],
+					browserExtensionHardening: parseBrowserExtensionManifest(rabbyRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'NOT_A_MOBILE_APP',
+			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation: 'Rabby does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/rabby/screenshots/2026-07-13-rabby-erc4361-siwe.png',
+						label: 'Rabby sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
@@ -746,6 +805,7 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
@@ -851,31 +911,54 @@ export const rabby: SoftwareWallet = {
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 				}),
 				erc20L1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
 				ethL1Transfer: supported({
 					ref: refTodo,
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 					byDefault: FeeDisplayLevel.NONE,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
 				}),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
+				artifactSigning: notSupported,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The CI runs `yarn install --immutable`, which fails if package.json and yarn.lock are out of sync, ensuring dependencies are locked and reproducible.',
+							url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported({
+					ref: 'https://github.com/RabbyHub/Rabby/releases',
+				}),
+				hermeticBuilds: notSupported,
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupportedWithRef({
+			ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,

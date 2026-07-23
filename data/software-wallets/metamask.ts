@@ -45,11 +45,13 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
-	FeeDisplayLevel,
-} from '@/schema/features/transparency/fee-display'
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -153,6 +155,7 @@ export const metamask: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -231,10 +234,6 @@ export const metamask: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
@@ -315,6 +314,7 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: null,
 				guardianRecovery: supported({
 					ref: [
 						{
@@ -377,7 +377,7 @@ export const metamask: SoftwareWallet = {
 					type: LegalProtectionType.SAFE_HARBOR,
 					ref: {
 						explanation:
-							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here..',
+							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here.',
 						url: 'https://hackerone.com/metamask/safe_harbor',
 					},
 				}),
@@ -504,8 +504,8 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/eth-phishing-detect',
 						},
 					],
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported({
@@ -515,13 +515,20 @@ export const metamask: SoftwareWallet = {
 								'MetaMask provides address labeling and warns about address poisoning attacks using local address book and transaction history. For enhanced security validation, MetaMask may use Consensys services which share recipient and user addresses along with IP addresses. Users can disable external services to prevent this data sharing.',
 							url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
 						},
+						{
+							explanation:
+								'Metamask provides address poisoning alerts live on Metamask and Extension across all networks',
+							url: 'https://x.com/MetaMask/status/2067299428680265791',
+						},
 					],
+					addressPoisoningDetection: true,
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: true,
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
@@ -540,7 +547,15 @@ export const metamask: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation: 'MetaMask does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/metamask/screenshots/2026-07-13-metamask-erc4361-siwe.png',
+						label: 'MetaMask sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
 					},
@@ -559,6 +574,7 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -640,11 +656,36 @@ export const metamask: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveFeesShownByDefault),
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: null,
+				}),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -655,6 +696,10 @@ export const metamask: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	overrides: {
 		attributes: {

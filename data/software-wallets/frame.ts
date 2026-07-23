@@ -73,7 +73,6 @@ export const frame: SoftwareWallet = {
 				'2700': null,
 				'6963': null,
 			},
-			walletCall: null,
 		},
 		licensing: null,
 		monetization: {
@@ -143,6 +142,7 @@ export const frame: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: null,
 				transactionDetailsDisplay: null,
@@ -174,6 +174,7 @@ export const frame: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -184,6 +185,7 @@ export const frame: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.BROWSER]: true,

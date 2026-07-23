@@ -89,8 +89,7 @@ export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
  */
 export function pickWorstRating<_OutcomeMetadata extends OutcomeMetadata>(
 	evaluations:
-		| AtLeastOneVariant<Evaluation<_OutcomeMetadata>>
-		| NonEmptyArray<Evaluation<_OutcomeMetadata>>,
+		AtLeastOneVariant<Evaluation<_OutcomeMetadata>> | NonEmptyArray<Evaluation<_OutcomeMetadata>>,
 ): Evaluation<_OutcomeMetadata> {
 	let worst: Evaluation<_OutcomeMetadata> | null = null
 	const evaluationsArray =

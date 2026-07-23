@@ -239,9 +239,7 @@ export class WalletCaptureAnnotations {
 			const methodOpt = expectOptionalString(obj.method, `${matcherAt}.method`)
 
 			const purposes = (():
-				| NonEmptyArray<DataCollectionPurpose>
-				| 'NOT_WALLET_INITIATED'
-				| undefined => {
+				NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | undefined => {
 				if (obj.purposes === undefined) {
 					return undefined
 				}

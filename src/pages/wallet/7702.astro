@@ -20,10 +20,10 @@ import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 			'Which wallets implement EIP-7702? Track the adoption of EIP-7702 across the Ethereum wallet ecosystem.',
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column='gap-8'>
-		<header data-sticky='inline' data-scroll-item='inline-detached padding-match-start'>
+	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
 			<Typography
 				content={markdown(`
 					# EIP-7702 Adoption Tracker

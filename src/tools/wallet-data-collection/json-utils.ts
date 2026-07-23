@@ -50,7 +50,25 @@ export function expectBoolean(v: unknown, at: string): boolean {
 	return v
 }
 
-/** Returns whether two strings are JSON-equivalent. */
+/** Returns whether two strings are JSON-equivalent (order-independent). */
 export function isSameJson(obj1: string, obj2: string): boolean {
-	return JSON.stringify(JSON.parse(obj1)) === JSON.stringify(JSON.parse(obj2))
+	return stableJSONStringify(JSON.parse(obj1)) === stableJSONStringify(JSON.parse(obj2))
+}
+
+export function stableJSONStringify(v: unknown): string {
+	if (v === null || typeof v !== 'object') {
+		return JSON.stringify(v)
+	}
+
+	if (Array.isArray(v)) {
+		const items = v.map(item => stableJSONStringify(item)).sort()
+
+		return `[${items.join(',')}]`
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we checked it was an object and not an array.
+	const obj = v as Record<string, unknown>
+	const keys = Object.keys(obj).sort()
+
+	return `{${keys.map(k => `${JSON.stringify(k)}:${stableJSONStringify(obj[k])}`).join(',')}}`
 }

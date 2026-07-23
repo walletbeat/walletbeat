@@ -7,6 +7,32 @@ import type {
 	WalletDeveloper,
 } from '@/schema/entity'
 
+export const exampleOrderflowAuctioneer: CorporateEntity & TransactionBroadcastProvider = {
+	id: 'exampleOrderflowAuctioneer',
+	name: 'Example Orderflow Auctioneer',
+	legalName: { name: 'Example Orderflow Auctioneer Inc', soundsDifferent: false },
+	type: {
+		chainDataProvider: false,
+		corporate: true,
+		dataBroker: false,
+		exchange: false,
+		infrastructureProvider: false,
+		offchainDataProvider: false,
+		securityAuditor: false,
+		transactionBroadcastProvider: true,
+		walletDeveloper: false,
+	},
+	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+	icon: 'NO_ICON',
+	jurisdiction: 'Atlantis',
+	linkedin: { type: 'NO_LINKEDIN_URL' },
+	privacyPolicy: 'https://example.com/privacy',
+	repoUrl: 'https://github.com/example-orderflow-auctioneer',
+	twitter: { type: 'NO_TWITTER_URL' },
+	url: 'https://example.com/orderflow-auctioneer',
+}
+
 export const exampleNodeCompany: CorporateEntity &
 	ChainDataProvider &
 	TransactionBroadcastProvider = {
@@ -18,6 +44,7 @@ export const exampleNodeCompany: CorporateEntity &
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: true,
@@ -43,6 +70,7 @@ export const exampleSecurityAuditor: CorporateEntity & SecurityAuditor = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: true,
 		transactionBroadcastProvider: false,
@@ -68,6 +96,7 @@ export const exampleCex: CorporateEntity & Exchange = {
 		corporate: true,
 		dataBroker: false,
 		exchange: true,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,
@@ -93,6 +122,7 @@ export const exampleWalletDevelopmentCompany: CorporateEntity & WalletDeveloper 
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

@@ -28,7 +28,7 @@ interface DelegationOffer {
 				/**
 				 * Is the delegation step done as a standalone step before other operations?
 				 * (i.e. The wallet shows a "Set up your smart account" screen and waits for it to confirm
-				 * on-chain before proceeding with the user's original transaction.)
+				 * onchain before proceeding with the user's original transaction.)
 				 */
 				type: 'STANDALONE_UPFRONT_DELEGATION'
 		  }
@@ -60,8 +60,8 @@ export type DelegationHandling =
 	| (DelegationOffer &
 			(
 				| // Either the delegation is required at EOA creation and import time...
-				{ duringEOACreation: 'REQUIRED'; duringEOAImport: 'REQUIRED' }
-				// Or it is supported at transaction time.
+				  { duringEOACreation: 'REQUIRED'; duringEOAImport: 'REQUIRED' }
+				  // Or it is supported at transaction time.
 				| { duringFirst7702Operation: Supported<DelegationOffer['duringFirst7702Operation']> }
 			) & {
 				/** How is the fee for the initial EIP-7702 delegation paid? */

@@ -1,0 +1,48 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+import WalletEipList from '@/components/WalletEipList.svelte'
+import { eips } from 'data/eips'
+---
+
+<Layout
+	metadata={{
+		title: 'Wallet EIPs - Walletbeat',
+		description:
+			'A reference of Ethereum Improvement Proposals (EIPs and ERCs) tracked by Walletbeat — with plain-English explanations of why each one matters for wallets.',
+	}}
+>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>Wallet EIPs</h1>
+				<p>Ethereum standards tracked by Walletbeat and why they matter for wallets.</p>
+			</hgroup>
+		</header>
+
+		<div data-scroll-item='inline-detached padding-match-end'>
+			<WalletEipList eips={Object.values(eips)} client:visible />
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 58rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+
+		hgroup p {
+			font-size: 1.1rem;
+			color: var(--text-secondary);
+			opacity: 0.75;
+		}
+	}
+</style>

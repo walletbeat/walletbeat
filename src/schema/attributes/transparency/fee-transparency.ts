@@ -9,10 +9,17 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
-import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	type BasicOperationFees,
+	compareFeeDisplay,
+	type FeeDisplay,
+	FeeDisplayLevel,
+	hasRelativeWalletServiceFeeUnit,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import { type NonEmptyArray, nonEmptyMap, nonEmptySet } from '@/types/utils/non-empty'
 import { markdownListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
@@ -152,87 +159,10 @@ function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
 	)
 }
 
-function validateFeeDisplay(feeDisplay: FeeDisplay) {
-	if (
-		(feeDisplay.byDefault === FeeDisplayLevel.AGGREGATED ||
-			feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE) &&
-		feeDisplay.afterSingleAction === FeeDisplayLevel.NONE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have afterSingleAction=NONE if the default behavior is not NONE',
-		)
-	}
-
-	if (
-		feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE &&
-		feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE
-	) {
-		throw new Error(
-			'Invalid fee display: Cannot have byDefault=COMPREHENSIVE if the afterSingleAction behavior is not also comprehensive',
-		)
-	}
-}
-
-/**
- * Returns;
- *   * 1 if feeDisplay1 is better
- *   * 0 if feeDisplay1 and feeDisplay2 are completely equal
- *   * -1 if feeDisplay2 is better
- */
-function compareFeeDisplay(feeDisplay1: FeeDisplay, feeDisplay2: FeeDisplay): -1 | 0 | 1 {
-	validateFeeDisplay(feeDisplay1)
-	validateFeeDisplay(feeDisplay2)
-
-	if (
-		feeDisplay1.byDefault === feeDisplay2.byDefault &&
-		feeDisplay1.afterSingleAction === feeDisplay2.afterSingleAction &&
-		feeDisplay1.fullySponsored === feeDisplay2.fullySponsored
-	) {
-		return 0
-	}
-
-	if (feeDisplay1.fullySponsored !== feeDisplay2.fullySponsored) {
-		return feeDisplay1.fullySponsored ? 1 : -1
-	}
-
-	const compareFeeDisplayLevel = (
-		displayLevel1: FeeDisplayLevel,
-		displayLevel2: FeeDisplayLevel,
-	): -1 | 0 | 1 => {
-		if (displayLevel1 === FeeDisplayLevel.COMPREHENSIVE) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.COMPREHENSIVE) {
-			return -1
-		}
-
-		if (displayLevel1 === FeeDisplayLevel.AGGREGATED) {
-			return 1
-		}
-
-		if (displayLevel2 === FeeDisplayLevel.AGGREGATED) {
-			return -1
-		}
-
-		throw new Error('Unreachable')
-	}
-
-	if (feeDisplay1.byDefault !== feeDisplay2.byDefault) {
-		return compareFeeDisplayLevel(feeDisplay1.byDefault, feeDisplay2.byDefault)
-	}
-
-	if (feeDisplay1.afterSingleAction !== feeDisplay2.afterSingleAction) {
-		return compareFeeDisplayLevel(feeDisplay1.afterSingleAction, feeDisplay2.afterSingleAction)
-	}
-
-	throw new Error('Unreachable')
-}
-
 /**
  * How a wallet handles the worst type of fees it does handle.
  */
-type WorstFeeDisplay = {
+export type WorstFeeDisplay = {
 	/** The way the wallet displays fees. */
 	feeDisplay: FeeDisplay
 
@@ -291,6 +221,21 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	}
 
 	return worstFeeTypes
+}
+
+/** Worst-case fee display among basic operation fees only. */
+export function worstOperationFeeDisplay(operationFees: BasicOperationFees): FeeDisplay | null {
+	return (
+		computeWorstFees({
+			[FeeType.ETH_L1_TRANSFER]: operationFees.ethL1Transfer,
+			[FeeType.ERC20_L1_TRANSFER]: operationFees.erc20L1Transfer,
+			[FeeType.BUILT_IN_ERC20_SWAP]: operationFees.builtInErc20Swap,
+			[FeeType.UNISWAP_USDC_TO_ETHER_SWAP]: operationFees.uniswapUSDCToEtherSwap,
+			[FeeType.CROSS_CHAIN_BRIDGING]: null,
+			[FeeType.TORNADO_CASH_NOVA_RELAYER]: null,
+			[FeeType.STEALTH_ADDRESS_SENDING]: null,
+		})?.feeDisplay ?? null
+	)
 }
 
 export type FeeTransparencyMetadata = {
@@ -442,6 +387,46 @@ function evaluateWorstFeeDisplay(
 		throw new Error('Logic error')
 	}
 
+	// Reached only when the worst case is COMPREHENSIVE and the wallet
+	// service fee display units are still unresearched. FAIL/PARTIAL paths
+	// above already fired if applicable.
+	if (worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits === null) {
+		return unrated(ctx, { worstFeeDisplay })
+	}
+
+	if (
+		worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits !== 'NOT_APPLICABLE' &&
+		!hasRelativeWalletServiceFeeUnit(worstFeeDisplay.feeDisplay.walletServiceFeeDisplayUnits)
+	) {
+		return ctx.build({
+			outcome: {
+				id: 'comprehensive_fees_non_relative_units',
+				displayName: 'Non-relative wallet service fee units',
+				rating: Rating.PARTIAL,
+				shortExplanation: sentence(`
+					{{WALLET_NAME}} does not show some wallet service fees as a percentage or basis points.
+				`),
+				metadata: { worstFeeDisplay },
+			},
+			details: markdown(`
+				{{WALLET_NAME}} shows a complete fee breakdown for ${worstFeeTypesMarkdown(`
+				`)}
+				However, some wallet service fees are not shown as a percentage or basis points,
+				making it harder to compare the effective rate across wallets and order sizes.
+			`),
+			howToImprove: markdown(`
+				{{WALLET_NAME}} should display wallet service fees (platform fees on
+				built-in swap and bridging flows) as a percentage or basis points when
+				showing a comprehensive fee breakdown.
+			`),
+			impact: markdown(`
+				Absolute fee amounts obscure the effective rate on order-size-sensitive wallet
+				service fees, making it harder for users to compare costs across wallets and
+				transaction sizes.
+			`),
+		})
+	}
+
 	return ctx.build({
 		outcome: {
 			id: 'comprehensive_fees',
@@ -483,15 +468,24 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 		transaction purposes to users.
 
 		A wallet receives a passing rating if it provides comprehensive fee information,
-		including detailed breakdowns of network fees, clear disclosure of any additional
-		wallet fees. Fees may be aggregated down to one number, but a breakdown must be
-		available to the user within a single click.
+		including detailed breakdowns of network fees and clear disclosure of any additional
+		wallet fees. Fees may be aggregated down to one number. A breakdown must be
+		available to the user within a single click. For built-in swap and cross-chain
+		bridging flows, wallet service fees must be shown as a percentage or basis points
+		when a comprehensive breakdown is available. Wallet service fees are
+		platform fees charged by the wallet itself.
 
 		A wallet receives a partial rating if it provides an aggregate fee but does not
-		let the user get a detailed breakdown.
+		let the user get a detailed breakdown. It also receives a partial rating if it
+		shows a comprehensive breakdown on built-in swap or bridging flows. In that case,
+		wallet service fees must be shown as a percentage or basis points. Absolute units
+		(e.g. flat dollar or token amounts) are not sufficient.
 
 		A wallet fails this attribute if it provides minimal or no fee information before
 		transaction confirmation.
+
+		Chain execution fees (gas, priority fees, L1 data costs) and external protocol
+		fees are not subject to the wallet service fee unit rule.
 
 		Various transaction types are tested: Ether and ERC-20 transfers on L1, built-in
 		swaps or bridging transactions, DeFi transactions, private transactions if
@@ -511,6 +505,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 						byDefault: FeeDisplayLevel.NONE,
 						afterSingleAction: FeeDisplayLevel.NONE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 					},
 					feeTypes: [FeeType.ETH_L1_TRANSFER],
 					isUniform: true,
@@ -518,24 +513,46 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 				},
 			),
 		),
-		partial: exampleRating(
-			paragraph(
-				'The wallet shows an aggregate transaction fee by default, but does not provide a full breakdown.',
-			),
-			evaluateWorstFeeDisplay(
-				EvaluationContext.forTest(() => feeTransparency),
-				{
-					feeDisplay: {
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						afterSingleAction: FeeDisplayLevel.AGGREGATED,
-						fullySponsored: false,
+		partial: [
+			exampleRating(
+				paragraph(
+					'The wallet shows an aggregate transaction fee by default, but does not provide a full breakdown.',
+				),
+				evaluateWorstFeeDisplay(
+					EvaluationContext.forTest(() => feeTransparency),
+					{
+						feeDisplay: {
+							byDefault: FeeDisplayLevel.AGGREGATED,
+							afterSingleAction: FeeDisplayLevel.AGGREGATED,
+							fullySponsored: false,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
+						},
+						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						isUniform: true,
+						references: [],
 					},
-					feeTypes: [FeeType.ETH_L1_TRANSFER],
-					isUniform: true,
-					references: [],
-				},
+				),
 			),
-		),
+			exampleRating(
+				paragraph(
+					'The wallet shows a comprehensive fee breakdown, but displays wallet service fees in absolute units (e.g. a flat dollar amount) rather than as a percentage or basis points.',
+				),
+				evaluateWorstFeeDisplay(
+					EvaluationContext.forTest(() => feeTransparency),
+					{
+						feeDisplay: {
+							byDefault: FeeDisplayLevel.COMPREHENSIVE,
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+							walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.FIAT),
+						},
+						feeTypes: [FeeType.BUILT_IN_ERC20_SWAP],
+						isUniform: true,
+						references: [],
+					},
+				),
+			),
+		],
 		pass: [
 			exampleRating(
 				paragraph(
@@ -548,6 +565,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 							byDefault: FeeDisplayLevel.COMPREHENSIVE,
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							fullySponsored: false,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 						},
 						feeTypes: [FeeType.ETH_L1_TRANSFER],
 						isUniform: true,
@@ -566,8 +584,31 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							fullySponsored: false,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE',
 						},
 						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						isUniform: true,
+						references: [],
+					},
+				),
+			),
+			exampleRating(
+				paragraph(
+					'The wallet shows a comprehensive fee breakdown for its built-in swap feature, displaying the wallet service fee as both a percentage and its flat dollar equivalent.',
+				),
+				evaluateWorstFeeDisplay(
+					EvaluationContext.forTest(() => feeTransparency),
+					{
+						feeDisplay: {
+							byDefault: FeeDisplayLevel.COMPREHENSIVE,
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+							walletServiceFeeDisplayUnits: nonEmptySet(
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+								WalletServiceFeeDisplayUnit.FIAT,
+							),
+						},
+						feeTypes: [FeeType.BUILT_IN_ERC20_SWAP],
 						isUniform: true,
 						references: [],
 					},
@@ -580,6 +621,7 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 	): Evaluation<FeeTransparencyMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable in UI.
 		const feeTransparencyData: FeeTransparency = extractFeeTransparency(ctx.features)
+
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)
 
 		if (worstFeeDisplay === null) {

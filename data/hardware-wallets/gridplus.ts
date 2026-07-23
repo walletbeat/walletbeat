@@ -118,12 +118,12 @@ export const gridplusWallet: HardwareWallet = {
 		monetization: {
 			ref: [
 				{
-					explanation: 'Grid+ is the first internally incubated venture to spin out of ConsenSys.',
+					explanation: 'Grid+ is the first internally incubated venture to spin out of Consensys.',
 					url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
 				},
 				{
 					explanation:
-						'GridPlus VC funding includes Bankless Ventures, ConsenSys Mesh, Allatus Ventures, Dlab, and Game7.',
+						'GridPlus VC funding includes Bankless Ventures, Consensys Mesh, Allatus Ventures, Dlab, and Game7.',
 					url: 'https://pitchbook.com/profiles/company/184644-55',
 				},
 			],
@@ -176,6 +176,7 @@ export const gridplusWallet: HardwareWallet = {
 			// This does not qualify as guardian-based recovery under Walletbeat's schema,
 			// but it does mitigate seed phrase loss for users.
 			accountRecovery: {
+				drills: null,
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
@@ -241,11 +242,6 @@ export const gridplusWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Independent video demonstration of GridPlus's clear signing implementation on Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
-					},
-					{
-						explanation:
 							"Independent video demonstration of GridPlus's transaction implementation on Safe.",
 						url: 'https://youtube.com/shorts/_s5PjZhgBig',
 					},
@@ -256,7 +252,13 @@ export const gridplusWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
+				erc4361: null,
 				erc7730: supported({
+					ref: {
+						explanation:
+							"Independent video demonstration of GridPlus's clear signing implementation on Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
+					},
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,

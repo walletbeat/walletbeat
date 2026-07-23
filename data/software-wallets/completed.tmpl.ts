@@ -7,15 +7,17 @@
  * Use this as a reference when filling in real wallet data to understand what
  * "best-in-class" looks like for each field.
  *
- * NOTE: All `ref` fields use `refTodo` as a placeholder. Real wallet submissions
- * must replace each `refTodo` with a URL or reference pointing to the source
- * of the claim (source code, documentation, or audit report).
+ * NOTE: Most `ref` fields use `refTodo` as a placeholder. `MustRef` fields (e.g.
+ * enclave audit refs, orderflow practices page) use example URLs instead. Real
+ * wallet submissions must replace placeholders with URLs pointing to the source
+ * of each claim (source code, documentation, or audit report).
  */
 
 import { exampleContributor } from '@/data/contributors/example'
 import {
 	exampleCex,
 	exampleNodeCompany,
+	exampleOrderflowAuctioneer,
 	exampleSecurityAuditor,
 	exampleWalletDevelopmentCompany,
 } from '@/data/entities/example'
@@ -27,6 +29,7 @@ import {
 	CollectionPolicy,
 	DataCollectionPurpose,
 	type Endpoint,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -38,7 +41,18 @@ import {
 	StealthAddressUnlabeledBehavior,
 } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
+import {
+	type AccountRecoveryDrill,
+	AccountRecoveryDrillType,
+	GuardianPolicyType,
+	GuardianType,
+} from '@/schema/features/security/account-recovery'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramSupport,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
@@ -55,6 +69,7 @@ import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
 	SendTransactionWarning,
+	UnlimitedApprovalWarning,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
@@ -83,14 +98,22 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
-	comprehensiveFeesShownByDefault,
+	FeeDisplayLevel,
 	fullySponsoredFees,
+	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import {
+	OnchainVerificationDocumentation,
+	OrderflowDisclosureLevel,
+	type OrderflowPracticesPageContents,
+} from '@/schema/features/transparency/orderflow'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
-import { type References, refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 /**
  * Fictitious data leak references for the completed template.
@@ -101,6 +124,12 @@ const dataLeakReferences: Record<string, References> = {
 		{
 			explanation: 'Used as a bundler for ERC-4337 user operations.',
 			url: 'https://example.com/bundler',
+		},
+	],
+	orderflowAuctioneer: [
+		{
+			explanation: 'Receives mempool transactions for orderflow auctioning by default.',
+			url: 'https://example.com/orderflow-auctioneer',
 		},
 	],
 	staticContent: [
@@ -146,7 +175,9 @@ const sealedEnclaveEndpoint: Endpoint = {
 		clientVerification: {
 			type: 'VERIFIED',
 			ref: 'https://example.com',
+			verificationCodeAudit: { ref: 'https://example.com' },
 		},
+		independentCodeAudit: { ref: 'https://example.com' },
 		reproducibleBuilds: true,
 		sourceAvailable: true,
 	},
@@ -250,7 +281,13 @@ export const completedTemplate: SoftwareWallet = {
 			bridging: {
 				builtInBridging: supported({
 					ref: refTodo,
-					feesLargerThan1bps: comprehensiveFeesShownByDefault,
+					feesLargerThan1bps: {
+						ref: [],
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
 					risksExplained: 'VISIBLE_BY_DEFAULT',
 				}),
 				suggestedBridging: supported({
@@ -311,10 +348,6 @@ export const completedTemplate: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -381,6 +414,18 @@ export const completedTemplate: SoftwareWallet = {
 				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
+							ref: dataLeakReferences.orderflowAuctioneer,
+							byEntity: exampleOrderflowAuctioneer,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.NEVER,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.NEVER,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+							},
+							purposes: [DataCollectionPurpose.ORDERFLOW_AUCTION],
+							role: EntityRole.OPERATOR,
+						},
+						{
 							ref: dataLeakReferences.walletBackend,
 							byEntity: exampleWalletDevelopmentCompany,
 							dataCollection: {
@@ -396,6 +441,7 @@ export const completedTemplate: SoftwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.TRANSACTION_BROADCAST,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: dataLeakReferences.bundler,
@@ -410,6 +456,7 @@ export const completedTemplate: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -423,6 +470,7 @@ export const completedTemplate: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -439,6 +487,7 @@ export const completedTemplate: SoftwareWallet = {
 								DataCollectionPurpose.UPDATE_CHECKING,
 								DataCollectionPurpose.STATIC_ASSETS,
 							],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -486,6 +535,25 @@ export const completedTemplate: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: supported({
+					entries: [
+						{
+							type: AccountRecoveryDrillType.PRIVATE_KEY_QUIZ,
+							ref: refTodo,
+							reminderEveryNDays: 90,
+						},
+						{
+							type: AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+							ref: refTodo,
+							reminderEveryNDays: 90,
+						},
+						{
+							type: AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK,
+							ref: refTodo,
+							reminderEveryNDays: 90,
+						},
+					] satisfies NonEmptyArray<WithRef<AccountRecoveryDrill>>,
+				}),
 				guardianRecovery: supported({
 					ref: refTodo,
 					minimumGuardianPolicy: {
@@ -516,7 +584,26 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramSupport>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2024-01-01',
+				disclosure: supported({
+					numberOfDays: 90,
+				}),
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: 'https://example.com',
+				}),
+				platform: BugBountyPlatform.IMMUNEFI,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 100000,
+					minimum: 1000,
+				}),
+				upgradePathAvailable: true,
+			}),
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,
@@ -584,17 +671,25 @@ export const completedTemplate: SoftwareWallet = {
 				}),
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: refTodo,
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: refTodo,
+					addressPoisoningDetection: true,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: true,
 					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: supported<UnlimitedApprovalWarning>({
+					ref: refTodo,
+					leaksSpenderAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					warnsOnUnlimitedApproval: true,
 				}),
 			},
 			securityBestPractices: {
@@ -615,7 +710,11 @@ export const completedTemplate: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: supported({
+					ref: refTodo,
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -634,6 +733,7 @@ export const completedTemplate: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: displaysFullCallData,
 					messageSigningLegibility: {
 						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -715,10 +815,52 @@ export const completedTemplate: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveFeesShownByDefault),
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+				}),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+			},
+			orderflowPractices: {
+				disclosure: {
+					ref: refTodo,
+					afterSingleAction: OrderflowDisclosureLevel.COMPREHENSIVE,
+					byDefault: OrderflowDisclosureLevel.COMPREHENSIVE,
+				},
+				practicesPage: supported({
+					ref: 'https://example.com/orderflow-practices',
+					contents: {
+						documentsHowToChangeDefaults: true,
+						explainsDefaultOrderflowAuctioning: true,
+						listsEntitiesAndWhatTheyDo: true,
+						onchainVerification: OnchainVerificationDocumentation.METHOD_DOCUMENTED_AND_EFFECTIVE,
+						pageLastUpdated: '2026-02-27',
+					},
+				} satisfies MustRef<{ contents: OrderflowPracticesPageContents }>),
+				userCanRemoveAuctioning: supported({ ref: refTodo }),
 			},
 			releaseTransparency: {
 				artifactSigning: supported<ArtifactSigningDetails>({
@@ -741,6 +883,10 @@ export const completedTemplate: SoftwareWallet = {
 				reproducibleBuilds: supported({ ref: refTodo }),
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.BROWSER]: true,

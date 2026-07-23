@@ -32,6 +32,7 @@
 	let {
 		tableId,
 		title,
+		titleDisclaimer,
 		ladders,
 		wallets,
 		attributeTree,
@@ -39,6 +40,7 @@
 	}: {
 		tableId?: string,
 		title?: string
+		titleDisclaimer?: string
 		ladders?: Ladders<_AttributeGroupId>
 		wallets: RatedWallet<_AttributeGroupId>[]
 		attributeTree: AttributeTree<_AttributeGroupId>
@@ -392,12 +394,17 @@
 	data-column="gap-6"
 >
 	<header
-		data-sticky="inline"
 		data-scroll-item="inline-detached padding-match-start"
 		data-row="wrap"
 	>
 		{#if title}
-			<h2>{title}</h2>
+			<div class="title-group" data-column="gap-1">
+				<h2>{title}</h2>
+
+				{#if titleDisclaimer}
+					<p class="title-disclaimer">{titleDisclaimer}</p>
+				{/if}
+			</div>
 		{/if}
 
 		<!-- Mobile-only filter UI -->
@@ -437,7 +444,7 @@
 									aria-label={variantToName(variant, true)}
 									onclick={() => toggleFilterById?.(filterId)}
 								>
-									<span data-wbicon data-icon={variantWbIconIds[variant]}></span>
+									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
 								<span class="filter-circle-label">{variantToName(variant, false)}</span>
 							</div>
@@ -459,7 +466,7 @@
 								aria-label={label}
 								onclick={() => toggleFilterById?.(id)}
 							>
-								<span data-wbicon data-icon="account_type"></span>
+								<span data-icon="wbicons account_type"></span>
 							</button>
 							<span class="filter-circle-label">{label}</span>
 						</div>
@@ -470,7 +477,6 @@
 
 		<div
 			class="filters"
-			data-scroll-item="inline-detached"
 			data-scroll-container="inline"
 		>
 			<div
@@ -780,7 +786,7 @@
 
 				{#if column.id === 'stage'}
 					{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-					
+
 					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
 						<small>N/A</small>
 					{:else}
@@ -1324,7 +1330,7 @@
 										{wallet}
 										{score}
 										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
-										{isInTooltip}	
+										{isInTooltip}
 									/>
 								{/if}
 							{/snippet}
@@ -1491,7 +1497,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon" data-wbicon data-icon={attrGroup.icon}></span>
+										<span class="pie-center-icon" data-icon="wbicons {attrGroup.icon}"></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}
@@ -1663,7 +1669,7 @@
 									aria-pressed={variant === selectedVariant}
 									onclick={() => toggleFilterById?.(`variant-${variant}`, true)}
 								>
-									<span data-wbicon data-icon={variantWbIconIds[variant]}></span>
+									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
 							{/each}
 						</div>
@@ -1683,7 +1689,7 @@
 								class="mobile-attr-circle"
 								style:--attr-color={groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)'}
 							>
-								<span data-wbicon data-icon={attrGroup.icon}></span>
+								<span data-icon="wbicons {attrGroup.icon}"></span>
 							</div>
 							<span class="mobile-attr-label">{attrGroup.displayName}</span>
 						</a>
@@ -1824,6 +1830,11 @@
 				}
 			}
 		}
+	}
+
+	.title-disclaimer {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
 	}
 
 	.wallet-info {
@@ -1976,7 +1987,7 @@
 		display: none;
 	}
 
-	@media (max-width: 768px) {
+	@media (max-width: 1024px) {
 		/* Show mobile filters, hide desktop filter strip */
 		.mobile-filters {
 			display: flex;
@@ -1988,15 +1999,12 @@
 			display: none;
 		}
 
-		/* Make header stack vertically on mobile */
-		:global(section[data-sticky-container]) header[data-sticky="inline"] {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
-		/* Hide desktop table — !important beats [data-scroll-item] global display:grid */
-		:global(.desktop-table-container) {
-			display: none !important;
+		:global(
+			[data-scroll-container]
+				[data-sticky-container]
+				.desktop-table-container[data-scroll-item][data-scroll-item~="inline-attached"]
+		) {
+			display: none;
 		}
 
 		.mobile-wallet-list {
@@ -2058,9 +2066,8 @@
 		cursor: pointer;
 		transition-property: background-color, border-color, color;
 
-		[data-wbicon] {
+		[data-icon~="wbicons"] {
 			font-size: 1.5rem;
-			line-height: 1;
 		}
 
 		&.active {
@@ -2172,9 +2179,8 @@
 		padding: 0;
 		transition-property: color;
 
-		[data-wbicon] {
+		[data-icon~="wbicons"] {
 			font-size: 1.25rem;
-			line-height: 1;
 		}
 
 		&.active {
@@ -2219,9 +2225,8 @@
 		justify-content: center;
 		flex-shrink: 0;
 
-		[data-wbicon] {
+		[data-icon~="wbicons"] {
 			font-size: 1.4rem;
-			line-height: 1;
 		}
 	}
 

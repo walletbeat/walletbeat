@@ -6,6 +6,7 @@ export type EipNumber =
 	| '1193'
 	| '2700'
 	| '4337'
+	| '4361'
 	| '5564'
 	| '5792'
 	| '6963'
@@ -20,6 +21,7 @@ export type EipNumber =
  */
 export enum EipStatus {
 	DRAFT = 'DRAFT',
+	REVIEW = 'REVIEW',
 	FINAL = 'FINAL',
 	LIVING = 'LIVING',
 	LAST_CALL = 'LAST_CALL',
@@ -95,4 +97,13 @@ export function eipMarkdownLink(eip: Eip): string {
 /** Return a markdown link and a title for an EIP. */
 export function eipMarkdownLinkAndTitle(eip: Eip): string {
 	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
+}
+
+/** Return a human-readable label for an EIP status. */
+export const eipStatusLabel: Record<EipStatus, string> = {
+	[EipStatus.FINAL]: 'Final',
+	[EipStatus.DRAFT]: 'Draft',
+	[EipStatus.REVIEW]: 'Review',
+	[EipStatus.LIVING]: 'Living',
+	[EipStatus.LAST_CALL]: 'Last Call',
 }

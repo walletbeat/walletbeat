@@ -9,6 +9,7 @@ export const firefly: CorporateEntity & WalletDeveloper = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,
@@ -17,7 +18,9 @@ export const firefly: CorporateEntity & WalletDeveloper = {
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	farcaster: 'https://warpcast.com/firefly',
 	icon: {
-		extension: 'svg',
+		extension: 'jpg',
+		height: 400,
+		width: 400,
 	},
 	jurisdiction: { type: 'UNKNOWN' },
 	linkedin: { type: 'NO_LINKEDIN_URL' },

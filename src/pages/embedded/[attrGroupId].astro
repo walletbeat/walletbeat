@@ -43,9 +43,15 @@ import EmbeddedWalletTable from '@/views/EmbeddedWalletTable.svelte'
 		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container>
 		<EmbeddedWalletTable client:visible title='Embedded Wallets' />
 	</main>
 </Layout>
+
+<style>
+	main {
+		padding-block-end: 3rem;
+	}
+</style>

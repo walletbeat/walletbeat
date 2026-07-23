@@ -331,7 +331,10 @@
 					"domain": "android.clients.google.com",
 					"path": "/checkin",
 					"sessionTime": 1000044774,
-					"content": "\u0010\u0000\u001a*1-da39a3ee5e6b4b0d3255bfef95601890afd80709\"\u0018`\u0003j\u0014\b\u0003\u0012\u000e145.0.7632.109\u0018\u0005i\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000p\u0003°\u0001\u0000"
+					"content": {
+						"type": "base64",
+						"base64": "EAAaKjEtZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOSIYYANqFAgDEg4xNDUuMC43NjMyLjEwORgFaQAAAAAAAAAAcAPCsAEA"
+					}
 				},
 				{
 					"domain": "android.clients.google.com",
@@ -24970,7 +24973,7 @@
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
-					"path": "/images/wallets/firefly.svg",
+					"path": "/images/wallets/firefly.jpg",
 					"sessionTime": 8000027013,
 					"refererDomain": "beta.walletbeat.eth.limo",
 					"oddHeaders": {
@@ -26939,7 +26942,7 @@
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
-					"path": "/images/wallets/firefly.svg",
+					"path": "/images/wallets/firefly.jpg",
 					"sessionTime": 9000014547,
 					"refererDomain": "beta.walletbeat.eth.limo",
 					"oddHeaders": {

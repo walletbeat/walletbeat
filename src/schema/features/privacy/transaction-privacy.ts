@@ -355,7 +355,8 @@ type PrivacyPoolsCapabilities = PrivacyPoolsCapabilitiesBase &
 	// At least Ether or USDC must be supported.
 	({ etherL1Pool: Supported } | { usdcL1Pool: Supported }) &
 	// At least one form of withdrawal must be supported.
-	(| { withdrawalWithRelayer: Supported<PrivacyPoolsWithdrawalWithRelayer> }
+	(
+		| { withdrawalWithRelayer: Supported<PrivacyPoolsWithdrawalWithRelayer> }
 		| { withdrawalWithoutRelayer: Supported }
 	)
 
@@ -476,7 +477,7 @@ export type RailgunSupport = WithRef<{
 
 	/**
 	 * Does the wallet warn users about correlation risks when shielding tokens?
-	 * Shielding transactions are public on-chain and can be analyzed to link
+	 * Shielding transactions are public onchain and can be analyzed to link
 	 * a user's 0x address to their 0zk address through amount, timing, and token
 	 * type correlation. Similar to how Privacy Pools tracks deposit correlation risks.
 	 */

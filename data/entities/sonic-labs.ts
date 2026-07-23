@@ -9,6 +9,7 @@ export const sonicLabs: CorporateEntity & ChainDataProvider = {
 		corporate: true,
 		dataBroker: false,
 		exchange: false,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

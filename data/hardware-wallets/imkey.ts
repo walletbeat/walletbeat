@@ -10,13 +10,19 @@ import {
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
 
@@ -80,7 +86,7 @@ export const imkeyWallet: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'imKey Pro is a one-time hardware purchase with no subscription or custodial service fees. Transactions incur only standard on-chain gas fees.',
+						'imKey Pro is a one-time hardware purchase with no subscription or custodial service fees. Transactions incur only standard onchain gas fees.',
 					url: 'https://imkey.im/products/imkey-pro-crypto-hardware-wallet',
 				},
 			],
@@ -169,7 +175,8 @@ export const imkeyWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({ ref: refTodo }),
 				erc8213: null,
 			},
 			userSafety: null,
@@ -188,8 +195,20 @@ export const imkeyWallet: HardwareWallet = {
 			maintenance: null,
 			operationFees: {
 				builtInErc20Swap: notSupported,
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 				uniswapUSDCToEtherSwap: notSupported,
 			},
 			releaseTransparency: {

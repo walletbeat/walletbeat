@@ -455,7 +455,7 @@
 			{/each}
 		</colgroup>
 
-		<thead data-sticky="block">
+		<thead data-sticky="block backdrop-before backdrop-stuck">
 			{@render headerRows(table.columns, 0)}
 
 			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
@@ -503,7 +503,7 @@
 					data-header-level={level}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
-					data-sticky={column.isSticky ? 'inline' : undefined}
+					data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
 					data-column-align={column.align ? column.align.toLowerCase() : undefined}
 					data-expandable={isExpandable ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
@@ -527,7 +527,7 @@
 						<div data-sticky-container>
 							{#if isSortable}
 								<label class="sort-label" data-pressable="to-containing">
-									<span data-sticky="backdrop-none">
+									<span data-sticky="backdrop-before backdrop-stuck">
 										{@render HeaderTitle()}
 
 										<button
@@ -542,7 +542,7 @@
 									</span>
 								</label>
 							{:else}
-								<span data-sticky>
+								<span data-sticky="backdrop-before backdrop-stuck">
 									{@render HeaderTitle()}
 								</span>
 							{/if}
@@ -552,7 +552,7 @@
 							<button
 								type="button"
 								class="expansion-button"
-								data-sticky
+								data-sticky="backdrop-before backdrop-stuck"
 								onclick={() => {
 									table.toggleIsColumnExpanded(column.id)
 								}}
@@ -610,7 +610,7 @@
 							colspan={columnSpan}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
-							data-sticky={column.isSticky ? 'inline' : undefined}
+							data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
 							data-column-align={column.align ? column.align.toLowerCase() : undefined}
 							style:--table-cell-verticalAlign={
 								cellVerticalAlign?.({

@@ -54,7 +54,7 @@ export type AddressResolutionData =
 			 * This is generally not visible in the UI — check the wallet's source code
 			 * or privacy/security documentation to determine the correct value.
 			 *   - `VERIFIABLE`: the wallet cross-checks the offchain result against
-			 *     on-chain data or uses a light client to verify it.
+			 *     onchain data or uses a light client to verify it.
 			 *   - `NOT_VERIFIABLE`: the wallet trusts the offchain provider's response as-is.
 			 */
 			offchainDataVerifiability: 'VERIFIABLE' | 'NOT_VERIFIABLE'

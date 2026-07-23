@@ -83,6 +83,7 @@ export const bitget: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.AGGREGATED,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -113,7 +114,6 @@ export const bitget: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -157,6 +157,7 @@ export const bitget: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: null,
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
@@ -202,12 +203,15 @@ export const bitget: SoftwareWallet = {
 				contractTransactionWarning: notSupported,
 				scamUrlWarning: notSupported,
 				sendTransactionWarning: notSupported,
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -231,6 +235,7 @@ export const bitget: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -241,6 +246,7 @@ export const bitget: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

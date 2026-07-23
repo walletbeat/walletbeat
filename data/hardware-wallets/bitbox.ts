@@ -11,6 +11,7 @@ import {
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
@@ -27,7 +28,7 @@ import {
 	DataDisplayOptions,
 	DataExtraction,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -51,7 +52,7 @@ export const bitboxWallet: HardwareWallet = {
 				url: 'https://bitbox.swiss/bitbox02/',
 			},
 		],
-		iconExtension: 'png',
+		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
 		urls: {
 			docs: ['https://bitbox.swiss/dev/'],
@@ -136,6 +137,7 @@ export const bitboxWallet: HardwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -156,6 +158,7 @@ export const bitboxWallet: HardwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.ASSET_METADATA,
 							],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -216,12 +219,7 @@ export const bitboxWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation: 'Independent video demonstration of BitBox02 signing capabilities',
-						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
-					},
-				],
+				ref: refTodo,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -235,7 +233,13 @@ export const bitboxWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({
+					ref: {
+						explanation: 'Independent video demonstration of BitBox02 signing capabilities',
+						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
+					},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

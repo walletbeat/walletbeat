@@ -54,7 +54,7 @@ The following flows are defined:
 - `SEND_ETHER`: Recorded when sending Ether to another wallet. Requires `--wallet-addresses` to be set to the account address(es) that you will send **from** and send **to**.
 - `SEND_USDC`: Same as `SEND_ETHER`, but send USDC instead of Ether.
 - `NATIVE_SWAP`: Perform a swap using the wallet's built-in swap feature. Requires `--wallet-addresses` to be set to the account address doing the swapping.
-- `APP_CONNECTION`: Connect and sign in to Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
+- `APP_CONNECTION`: Connect and sign into Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
 - `MAKE_TRANSACTION`: Make transactions using Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the transactions.
 
 #### `delete-capture` subcommand
@@ -87,14 +87,29 @@ Mark a flow as not being supported by the wallet, which means capturing its netw
 #### `mark-domain` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-domain --domain='<domain>' --entity='<entity ID>'
+$ pnpm wallet-data-collection <global flags> mark-domain --domain='<domain>' --entity='<entity ID>' [--intermediaries='<entity ID>,...']
 ```
 
-Mark a domain name and all its subdomains as belonging to the given entity ID.
+Mark a domain name and all its subdomains as operated by the given entity ID.
 Note that domain assignments are **not** wallet-specific, and will not need to be redone in future network captures.
 Domains for requests that were not actually initiated by the wallet (e.g. browser/OS built-in analytics) should **still** be marked,
 as this will help mark them appropriately for other wallets' captures. Such requests can be marked as not-wallet-initiated
 using request matchers (see `explain-request` below).
+
+If the domain is fronted by TLS-terminating infrastructure (e.g. a CDN), the data sent to it is also seen by
+that infrastructure entity without it being the intended recipient. Record this with `--intermediaries='<entity ID>,...'`.
+Since CDN fronting is often per-hostname, record intermediaries on the exact hostname observed to be fronted,
+not on the apex domain; the most specific matching entry takes precedence when resolving.
+
+#### `mark-domain-update` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> mark-domain-update --domain='<domain>' [--set-operator='<entity ID>'] [--set-intermediaries='<entity ID>,...'] [--add-intermediaries='<entity ID>,...'] [--remove-intermediaries='<entity ID>,...']
+```
+
+Update an existing domain mapping, e.g. when an intermediary is discovered later.
+`--set-intermediaries` replaces the whole intermediary list and cannot be combined with
+`--add-intermediaries` or `--remove-intermediaries`.
 
 #### `explain-request` subcommand
 
@@ -117,6 +132,7 @@ Requests can be assigned to the following purposes:
 - `UPDATE_CHECKING`: Checking for updates to the wallet.
 - `CHAIN_DATA_LOOKUP`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST`: Broadcasting transactions for inclusion.
+- `ORDERFLOW_AUCTION`: Auctioning orderflow (MEV) from pre-inclusion transaction data. Requires qualified `MEMPOOL_TRANSACTIONS` of `BY_DEFAULT` or `ALWAYS` on the same entity row.
 - `TRANSACTION_SIMULATION`: Simulating transaction outcome.
 - `SWAP_QUOTE`: Getting a quote for a swap operation.
 - `SCAM_DETECTION`: Checking for scams.
@@ -130,13 +146,27 @@ Requests can be assigned to the following purposes:
 
 Purposes are case-insensitive on the command line.
 
+#### `review-strings` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> review-strings
+```
+
+Review high-entropy strings from network capture to flag the user data they are carrying.
+
+This is useful to avoid repetitive flagging of user data during the `review-requests` phase.
+By going through these strings contained in network requests, things like tracking cookies, EOA addresses, wallet-connect domains, etc. can be tagged as corresponding to one or more pieces of user-identifying information (or simply as `TRACKING_IDENTIFIER` when repeated across requests).
+The benefit of doing so is that requests containing these strings will be automatically identified as carrying this user information without having to repeat yourself.
+
+Alternatively, you can use the `mark-string` subcommand to mark a given string as carrying a given piece of user information. `review-strings` is just a pretty UI over it.
+
 #### `mark-string` subcommand
 
 ```
 $ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
-Mark a string as conveying the given data type. The string will be classified and stored in the capture file's user data store.
+Mark a string as conveying the given datatype. This is the same operation as the one `review-strings` does, but with a more machine-friendly interface. The string will be classified and stored in the capture file's user data store.
 
 Marking a string as carrying user data has the following effect:
 
@@ -183,9 +213,12 @@ After a request is manually reviewed, it will never be prompted for in future ex
 - Record a network capture with `--flow=ONBOARDING_NEW`.
 - Start the browser with `mitmproxy` and create two new wallet addresses.
 - Stop the browser, end the capture.
-- Create a new browser profile, install the wallet again (do not go through user onboarding). Stop the browser.
-- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses you had created.
+- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to two addresses you have pre-seeded with Ether and USDC.
 - Start the browser and import the two wallet addresses you had created (e.g. by using the same seed phrase).
+  - If you cannot import these two addresses in the wallet after a user account was already created in `ONBOARDING_NEW`:
+    - Stop there, reinstall the wallet from scratch.
+    - Record a capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses are about to import (pre-seeded with Ether and USDC) and the two you had created during `ONBOARDING_NEW`.
+    - Go through the wallet's account import or account recovery flow, and import the two addresses you have pre-seeded with Ether and USDC. Do _not_ import the two addresses from the `ONBOARDING_NEW` float.
 - Stop the browser, end the capture.
 - For each remaining flow (`SEND_ETHER`, `SEND_USDC`, `NATIVE_SWAP`, `APP_CONNECTION`, `MAKE_TRANSACTION`):
   - If the wallet does not support this flow, run the `mark-flow-unsupported` subcommand to tag it as such. Otherwise:
@@ -195,7 +228,7 @@ After a request is manually reviewed, it will never be prompted for in future ex
 - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
   - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
   - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
-  - Run the `mark-string` subcommand to classify personal data strings and automatically associate requests to the data they send.
+  - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send.
   - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
   - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
 - Once the `check` subcommand is successful, you are done!

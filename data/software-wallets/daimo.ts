@@ -7,6 +7,7 @@ import { appConnectionNotSupported } from '@/schema/features/privacy/app-isolati
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -112,6 +113,7 @@ export const daimo: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -144,7 +146,6 @@ export const daimo: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -223,6 +224,7 @@ export const daimo: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -240,6 +242,7 @@ export const daimo: SoftwareWallet = {
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -257,6 +260,7 @@ export const daimo: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING],
+							role: EntityRole.OPERATOR,
 						},
 					],
 					publishedOnchain: {
@@ -291,6 +295,7 @@ export const daimo: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -317,6 +322,7 @@ export const daimo: SoftwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.ACCOUNT_SIGNUP,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: {
@@ -337,6 +343,7 @@ export const daimo: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.ANALYTICS],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: [
@@ -355,6 +362,7 @@ export const daimo: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -423,12 +431,14 @@ export const daimo: SoftwareWallet = {
 							url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/apps/daimo-mobile/src/view/screen/send/SendTransferScreen.tsx#L234-L238',
 						},
 					],
+					addressPoisoningDetection: false,
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					newRecipientWarning: true,
 					userWhitelist: false,
 				}),
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: null,
@@ -452,6 +462,7 @@ export const daimo: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -462,6 +473,7 @@ export const daimo: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: notSupported,
 	},
 	overrides: {
 		attributes: {

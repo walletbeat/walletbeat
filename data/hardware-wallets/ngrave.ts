@@ -17,7 +17,7 @@ import {
 	DataDisplayOptions,
 	noDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
-import { notSupported, supported } from '@/schema/features/support'
+import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -41,7 +41,7 @@ export const ngrave: HardwareWallet = {
 				url: 'https://ngrave.io/zero',
 			},
 		],
-		iconExtension: 'png',
+		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
 		urls: {
 			socials: {
@@ -150,12 +150,7 @@ export const ngrave: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
-				ref: [
-					{
-						explanation: 'Independent video demonstration of NGRAVE Zero signing issues',
-						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
-					},
-				],
+				ref: refTodo,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: {
 					chain: DataDisplayOptions.NOT_IN_UI,
@@ -165,7 +160,13 @@ export const ngrave: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				erc7730: notSupported,
+				erc4361: null,
+				erc7730: notSupportedWithRef({
+					ref: {
+						explanation: 'Independent video demonstration of NGRAVE Zero signing issues',
+						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
+					},
+				}),
 				erc8213: null,
 			},
 			userSafety: null,

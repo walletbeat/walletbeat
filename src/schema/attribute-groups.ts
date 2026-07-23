@@ -157,7 +157,9 @@ export function aggregateAttributes<_AttributeGroupId extends string>(
 type EvaluatedGroupFromAttributeGroup<AttrGroup extends AttributeGroup<string>> =
 	AttrGroup extends AttributeGroup<infer _AttributeGroupId>
 		? {
-				[AttributeWithWeight in AttrGroup['attributes'][number] as AttributeWithWeight['attribute']['id']]: EvaluatedAttribute<
+				[
+					AttributeWithWeight in AttrGroup['attributes'][number] as AttributeWithWeight['attribute']['id']
+				]: EvaluatedAttribute<
 					AttributeWithWeight['attribute'] extends Attribute<infer _OutcomeMetadata>
 						? _OutcomeMetadata
 						: never
@@ -295,7 +297,7 @@ export function calculateAttributeGroupScore<
 
 			return { score, weight }
 		})
-		.filter((s): s is WeightedScore => s !== null)
+		.filter((s): s is WeightedScore => s.score !== null)
 
 	if (isNonEmptyArray(subScores)) {
 		let hasUnratedComponent = false

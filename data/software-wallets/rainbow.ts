@@ -54,13 +54,18 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	type FeeDisplay,
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
 import rainbowIosParsed from './manifests/rainbow/ios.parsed.json'
@@ -144,23 +149,41 @@ export const rainbow: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: {
-			// Chain abstraction was evaluated on the mobile app only; the browser
-			// extension has not been tested for it yet.
 			[Variant.BROWSER]: {
 				bridging: {
 					builtInBridging: supported({
 						ref: [
 							{
 								explanation:
-									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default (and "Hold to Bridge" is available there), so the fee shown by default is aggregated. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
+									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default, and "Hold to Bridge" is available there. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
 								lastRetrieved: '2026-06-26',
 								url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
+							},
+							{
+								explanation:
+									'The Rainbow browser extension "Review & Bridge" panel, reached by clicking "Review" (one action) on a USDC cross-chain bridge, itemizes the fee breakdown. It lists the minimum received, the bridging provider (Relay), and an "Included Rainbow fee" shown as a token amount (0.000586 USDC), alongside the estimated network fee.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review.png',
+								label:
+									'Rainbow browser extension bridge Review panel itemizing the "Included Rainbow fee" (0.000586 USDC) alongside the network fee',
+								lastRetrieved: '2026-07-03',
+							},
+							{
+								explanation:
+									'Clicking the info icon on the "Included Rainbow fee" line in the browser extension bridge Review surfaces a "Rainbow Fee" note stating "Rainbow takes a 0.25% fee from bridges."',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-rainbow-fee.png',
+								label:
+									'Rainbow browser extension "Rainbow Fee" note disclosing the bridge fee as 0.25%',
+								lastRetrieved: '2026-07-03',
 							},
 						],
 						feesLargerThan1bps: {
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							fullySponsored: false,
+							walletServiceFeeDisplayUnits: nonEmptySet(
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+							),
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -210,7 +233,7 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default (and "Hold to Bridge" is available there), so the fee shown by default is aggregated. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
+									'Rainbow has a built-in cross-chain bridge/swap feature. On the amount-entry screen only a gas estimate is shown by default, and "Hold to Bridge" is available there. Tapping "Review" (a single action) reveals the itemized breakdown: destination network, minimum received, the "Included Rainbow Fee", and max slippage as separate line items. The UI does not, however, explain the trust assumptions or risks of bridging across chains (no warning about external bridge providers, L2 risk, or possible loss of funds), and the Rainbow support documentation likewise omits these.',
 								lastRetrieved: '2026-06-17',
 								url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
 							},
@@ -224,17 +247,29 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'Rainbow mobile app bridge "Review" screen (reached by tapping "Review", one action): fees are itemized as the destination network, minimum received, "Included Rainbow Fee", and max slippage, with no warning explaining bridge trust assumptions or cross-chain risk.',
+									'Rainbow mobile app bridge "Review" screen, reached by tapping "Review" (one action). Fees are itemized as separate line items: destination network, minimum received, the "Included Rainbow Fee", and max slippage. The "Included Rainbow Fee" is shown as a token amount (e.g. 0.00125 USDC). There is no warning explaining bridge trust assumptions or cross-chain risk.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-review-fees.jpg',
 								label:
 									'Rainbow mobile app screenshot of the bridge Review screen with itemized fees',
 								lastRetrieved: '2026-06-17',
+							},
+							{
+								explanation:
+									'On mobile, a tap on the "Included Rainbow Fee" line of the bridge Review screen (a second tap, after Review) is required to reveal the fee as a percentage: "Included Rainbow Fee 0.25%".',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-04-chain-abstraction-mobile-bridge-percentage-fee.png',
+								label:
+									'Rainbow iOS bridge Review showing the Included Rainbow Fee as 0.25% after tapping the fee line',
+								lastRetrieved: '2026-07-04',
 							},
 						],
 						feesLargerThan1bps: {
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 							byDefault: FeeDisplayLevel.AGGREGATED,
 							fullySponsored: false,
+							walletServiceFeeDisplayUnits: nonEmptySet(
+								WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+								WalletServiceFeeDisplayUnit.PERCENTAGE,
+							),
 						},
 						risksExplained: 'NOT_IN_UI',
 					}),
@@ -332,7 +367,6 @@ export const rainbow: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -365,19 +399,24 @@ export const rainbow: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Rainbow token has ~180M circulating of 1B total supply (~18% float) as of April 2026.',
+						'Rainbow token has ~180 million tokens circulating of 1 billion total supply (~18% float) as of April 2026.',
 					url: 'https://www.coingecko.com/en/coins/rainbow-3',
+				},
+				{
+					explanation:
+						'Rainbow sold RNBW tokens to the public on CoinList (11-18 December 2025): 30 million tokens (3% of supply) at $0.10, followed by an open Uniswap continuous auction at the 5 February 2026 TGE.',
+					url: 'https://coinlist.co/rainbow',
 				},
 			],
 			revenueBreakdownIsPublic: true,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
+				donations: false, // Rainbow's public investor page enumerates its funding sources; it does not solicit user donations
+				ecosystemGrants: false, // Rainbow's public investor page enumerates its funding sources; no ecosystem/foundation grants are listed
 				governanceTokenLowFloat: true, // ~180M circulating of 1B total supply (~18% float) per CoinGecko as of 2026 04 24
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: true, // Questionnaire: fees on perpetual futures and prediction markets are not explicitly displayed
-				publicOffering: null,
-				selfFunded: null,
+				publicOffering: true, // Public RNBW sale on CoinList (Dec 2025, 3% of supply at $0.10) plus a public Uniswap continuous auction at the Feb 2026 TGE
+				selfFunded: false, // VC-backed ($19.5M across seed + Series A) and token-funded, not developer self-funded
 				transparentConvenienceFees: true, // Questionnaire: swap review sheet shows fees
 				ventureCapital: true, // $18M Series A led by Seven Seven Six, $1.5M seed including Y Combinator
 			},
@@ -418,7 +457,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The mobile app collects product usage analytics via RudderStack; analytics default to enabled and are disabled only when the `doNotTrack` device flag is set.',
+								'The mobile app collects product usage analytics via RudderStack; analytics are active by default and become disabled only when the `doNotTrack` device flag is set.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
 						},
 						{
@@ -508,7 +547,7 @@ export const rainbow: SoftwareWallet = {
 					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
 						ref: {
 							explanation:
-								'After connecting the Rainbow browser extension to an app with one account, disconnecting, switching the active account in the wallet, and reconnecting to the same app, the connection dialog defaults to the now-active account rather than the previously-connected one. Rainbow does not remember the per-app last-connected address.',
+								'When reconnecting to the same app after disconnecting and switching the active account in the wallet, the connection dialog defaults to the now-active account rather than the previously-connected one. Rainbow does not remember the per-app last-connected address.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-defaults-to-active-account.png',
 							label:
 								'Rainbow browser extension reconnect dialog defaulting to the active account, not the previously-connected one',
@@ -535,7 +574,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen rather than connecting the app with the new account, so a fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
+									'The expanded account picker inside the connection sheet does include an "+ Add" button that can create a new wallet. However, creating one leaves the connection flow and returns to the wallet home screen. A fresh address cannot be created and used as part of the app connection flow; the connection can only be completed by selecting an existing account.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet-add-account.jpg',
 								label:
 									'Rainbow mobile connection sheet account picker expanded, showing the "+ Add" option among existing accounts',
@@ -586,7 +625,7 @@ export const rainbow: SoftwareWallet = {
 									'Rainbow mobile after switching the active account in-wallet (from "Test" to "Test 2"): the already-connected test page\'s "Connected as" indicator updates on its own to the newly-active account, without reconnecting.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-after-account-switch.png',
 								label:
-									'Walletbeat test page in the Rainbow mobile in-app browser, connected account following an in-wallet active-account switch',
+									"Walletbeat test page in the Rainbow mobile in-app browser, connected account following the wallet's active account switch",
 								lastRetrieved: '2026-06-19',
 							},
 						],
@@ -598,7 +637,7 @@ export const rainbow: SoftwareWallet = {
 					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
 						ref: {
 							explanation:
-								'After connecting the Rainbow mobile app to an app with one account, disconnecting, switching the active account in the wallet, and reconnecting to the same app, the connection sheet defaults to the now-active account rather than the previously-connected one. Rainbow mobile does not remember the per-app last-connected address.',
+								'When reconnecting to the same app after disconnecting and switching the active account in the wallet, the connection sheet defaults to the now-active account rather than the previously-connected one. Rainbow mobile does not remember the per-app last-connected address.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet.png',
 							label:
 								'Rainbow mobile connection sheet defaulting to the active account rather than a remembered per-app address',
@@ -620,6 +659,7 @@ export const rainbow: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: null,
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				// Rainbow supports cloud backup (iCloud/Google Drive) but not guardian-based recovery.
 				guardianRecovery: supported({
@@ -721,7 +761,9 @@ export const rainbow: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
@@ -740,6 +782,7 @@ export const rainbow: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -821,17 +864,137 @@ export const rainbow: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				// Source: Rainbow team responses via Walletbeat questionnaire
-				builtInErc20Swap: supported({
-					ref: refTodo,
+				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
+				// Corrects an earlier questionnaire-sourced NONE: the default swap
+				// screen already shows a network fee (so byDefault is AGGREGATED, not
+				// NONE), and tapping "Review" (one action) reveals a comprehensive
+				// breakdown including an itemized "Included Rainbow Fee" line, shown as
+				// a token amount (ETH); tapping that fee line (mobile) or its info icon
+				// (browser) reveals the rate as a percentage (0.85%), so the unit set
+				// is {TOKEN_AMOUNT, PERCENTAGE}.
+				builtInErc20Swap: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'By default the Rainbow built-in swap screen shows the exchange rate and a single network-fee estimate (e.g. "$0.07"), but does not itemize the Rainbow service fee.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-default.png',
+							label:
+								'Rainbow iOS built-in swap screen showing a network-fee estimate by default, with the Rainbow service fee not itemized',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'Tapping "Review" (a single action) reveals an itemized breakdown: network, minimum received, the "Included Rainbow Fee" shown as a token amount (0.00000262 ETH), max slippage, and the estimated network fee.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-review.png',
+							label:
+								'Rainbow iOS built-in swap Review panel itemizing the "Included Rainbow Fee" (in ETH) alongside network fee, minimum received, and max slippage',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'On mobile, a tap on the "Included Rainbow Fee" line of the swap Review screen (a second tap, after Review) is required to reveal the fee as a percentage: "Included Rainbow Fee 0.85%".',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-04-operation-fees-mobile-swap-percentage-fee.png',
+							label:
+								'Rainbow iOS swap Review showing the Included Rainbow Fee as 0.85% after tapping the fee line',
+							lastRetrieved: '2026-07-04',
+						},
+						{
+							explanation:
+								'On the browser extension, clicking the info icon on the swap Rainbow fee surfaces a "Rainbow Fee" note: "Rainbow takes a 0.85% fee from swaps."',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-04-operation-fees-browser-swap-percentage-fee.png',
+							label:
+								'Rainbow browser extension "Rainbow Fee" note disclosing the swap fee as 0.85%',
+							lastRetrieved: '2026-07-04',
+						},
+					],
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.NONE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
 					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(
+						WalletServiceFeeDisplayUnit.TOKEN_AMOUNT,
+						WalletServiceFeeDisplayUnit.PERCENTAGE,
+					),
 				}),
-				erc20L1Transfer: null,
-				ethL1Transfer: null,
-				uniswapUSDCToEtherSwap: null,
+				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
+				// For all three flows below, the transaction screen shows a single
+				// aggregate "Estimated fee" figure by default, and one tap on the gas
+				// control opens a sheet itemizing base fee / miner tip / max
+				// transaction fee. None of these flows carry a Rainbow platform fee,
+				// so walletServiceFeeDisplayUnits is NOT_APPLICABLE.
+				erc20L1Transfer: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'By default the USDC (ERC-20) L1 send screen shows only a single aggregate "Estimated fee" figure with no itemized breakdown.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-erc20-l1-send-screen.png',
+							label:
+								'Rainbow iOS USDC (ERC-20) send screen showing a single aggregate "Estimated fee" figure by default, with no itemized breakdown',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ERC-20 transfer, so this network-fee breakdown is the complete breakdown. The same sheet is reachable from every transaction type tested.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
+							label:
+								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
+							lastRetrieved: '2026-07-03',
+						},
+					],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'By default the ETH L1 send screen shows only a single aggregate "Estimated fee" figure with no itemized breakdown. The fee shown by default is therefore aggregated.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-eth-l1-send-screen.png',
+							label:
+								'Rainbow iOS ETH send screen showing a single aggregate "Estimated fee" figure by default, with no itemized breakdown',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. No wallet platform fee applies to a plain ETH transfer, so this network-fee breakdown is the complete breakdown. The same sheet is reachable from every transaction type tested.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
+							label:
+								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
+							lastRetrieved: '2026-07-03',
+						},
+					],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported<WithRef<FeeDisplay>>({
+					ref: [
+						{
+							explanation:
+								'For a USDC-to-ETH swap initiated through the Uniswap frontend (app.uniswap.org), the Rainbow approval popup shows a single aggregate "Estimated fee" by default, alongside the simulated result. The Uniswap protocol fee is reflected in the simulated receive amount, not itemized separately.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-swap.png',
+							label:
+								'Rainbow iOS transaction approval for a USDC-to-ETH swap initiated on app.uniswap.org, with transaction details expanded; the fee is the single aggregate "Estimated fee"',
+							lastRetrieved: '2026-07-03',
+						},
+						{
+							explanation:
+								'One tap on the gas control opens this sheet itemizing current base fee, max base fee, miner tip, and max transaction fee. This is a swap through an external app, so no Rainbow platform fee applies. The same sheet is reachable from every transaction type tested.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png',
+							label:
+								'Rainbow iOS gas-fee options sheet (one tap from the transaction screen) itemizing current base fee, max base fee, miner tip, and max transaction fee',
+							lastRetrieved: '2026-07-03',
+						},
+					],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
 				dependencyLocking: supported({
@@ -908,6 +1071,7 @@ export const rainbow: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

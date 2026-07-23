@@ -116,7 +116,6 @@
 	data-column="gap-6"
 >
 	<header
-		data-sticky="inline"
 		data-row="wrap"
 		data-scroll-item='inline-detached padding-match-start'
 	>

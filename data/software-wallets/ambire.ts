@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
@@ -10,6 +11,7 @@ import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	PersonalInfo,
 	RegularEndpoint,
@@ -63,12 +65,16 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
+import {
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
@@ -207,9 +213,9 @@ export const ambire: SoftwareWallet = {
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
 			`),
-		contributors: [jiojosbg, nconsigny, mattmatt, polymutex],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-01-29',
+		lastUpdated: '2026-07-22',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -294,7 +300,13 @@ export const ambire: SoftwareWallet = {
 						explanation: 'All fees are displayed when agreeing to the bridge',
 						url: 'https://www.ambire.com/',
 					},
-					feesLargerThan1bps: comprehensiveFeesShownByDefault,
+					feesLargerThan1bps: {
+						ref: [],
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
 					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
@@ -383,10 +395,6 @@ export const ambire: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -462,6 +470,7 @@ export const ambire: SoftwareWallet = {
 								endpoint: RegularEndpoint,
 							},
 							purposes: [DataCollectionPurpose.ASSET_METADATA],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -481,6 +490,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -494,6 +504,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -507,6 +518,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
@@ -527,6 +539,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -540,6 +553,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: refTodo,
@@ -553,6 +567,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
@@ -576,6 +591,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -600,6 +616,7 @@ export const ambire: SoftwareWallet = {
 								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
 								DataCollectionPurpose.TRANSACTION_BROADCAST,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: dataLeakReferences.pimlico,
@@ -614,6 +631,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 						{
 							ref: dataLeakReferences.biconomy,
@@ -628,6 +646,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -644,6 +663,7 @@ export const ambire: SoftwareWallet = {
 								DataCollectionPurpose.UPDATE_CHECKING,
 								DataCollectionPurpose.STATIC_ASSETS,
 							],
+							role: EntityRole.OPERATOR,
 						},
 						// ENS resolution when the user opens the wallet
 						{
@@ -658,6 +678,7 @@ export const ambire: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -674,6 +695,7 @@ export const ambire: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
+				drills: notSupported,
 				// Supported in v1 but not v2.
 				guardianRecovery: notSupported,
 			},
@@ -706,11 +728,22 @@ export const ambire: SoftwareWallet = {
 				duressMode: notSupported,
 			},
 			hardwareWalletSupport: {
-				ref: {
-					explanation:
-						'You can natively sign transactions with Ledger, Trezor, or GridPlus Lattice1 in Ambire.',
-					url: 'https://www.ambire.com/',
-				},
+				ref: [
+					{
+						explanation:
+							'You can natively sign transactions with Ledger, Trezor, or GridPlus Lattice1 in Ambire.',
+						url: 'https://www.ambire.com/',
+					},
+					{
+						explanation:
+							'Ambire additionally supports the Keystone and Keycard hardware wallets via QR-code signing through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone and Keycard.',
+						url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts',
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-07-22-ambire-qr-hardware-wallets.png',
+						label: 'Ambire "Connect QR wallet" flow, showing Keystone and Keycard',
+					},
+				],
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
@@ -721,7 +754,12 @@ export const ambire: SoftwareWallet = {
 					[HardwareWalletType.GRIDPLUS]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
 					}),
-					[HardwareWalletType.KEYSTONE]: notSupported,
+					[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+						connectionTypes: [HardwareWalletConnection.QR],
+					}),
+					[HardwareWalletType.KEYCARD]: supported<SupportedHardwareWallet>({
+						connectionTypes: [HardwareWalletConnection.QR],
+					}),
 				},
 			},
 			keysHandling: {
@@ -756,18 +794,20 @@ export const ambire: SoftwareWallet = {
 							},
 						],
 					},
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: scamAlertsAndSendTxWarningRefs,
+					addressPoisoningDetection: true,
 					leaksRecipient: true,
 					leaksUserAddress: false,
 					leaksUserIp: true,
 					newRecipientWarning: true,
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
+				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
 				browser: {
@@ -782,15 +822,23 @@ export const ambire: SoftwareWallet = {
 			transactionLegibility: {
 				ref: [
 					{
-						file: 'public/images/references/ambire/transaction_legibility_1.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_1.png',
 						label: 'Transaction legibility screenshot 1',
 					},
 					{
-						file: 'public/images/references/ambire/transaction_legibility_2.png',
+						file: 'public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_2.png',
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation: 'Ambire does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/ambire/screenshots/2026-07-13-ambire-erc4361-siwe.png',
+						label: 'Ambire sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -809,6 +857,7 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
@@ -888,11 +937,36 @@ export const ambire: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				builtInErc20Swap: supported(comprehensiveFeesShownByDefault),
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
-				uniswapUSDCToEtherSwap: supported(comprehensiveFeesShownByDefault),
+				builtInErc20Swap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+				}),
+				erc20L1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				ethL1Transfer: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
+				uniswapUSDCToEtherSwap: supported({
+					ref: [],
+					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					fullySponsored: false,
+					walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+				}),
 			},
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: notSupported,
 				dependencyLocking: supported({
@@ -940,6 +1014,10 @@ export const ambire: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.BROWSER]: true,

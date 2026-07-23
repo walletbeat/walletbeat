@@ -100,10 +100,6 @@ export const nufi: SoftwareWallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
-			walletCall: supported({
-				ref: refTodo,
-				atomicMultiTransactions: featureSupported,
-			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -190,6 +186,7 @@ export const nufi: SoftwareWallet = {
 				// 	to: DataDisplayOptions.SHOWN_OPTIONALLY,
 				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// },
+				erc4361: null,
 				erc7730: null,
 				erc8213: null,
 				transactionDetailsDisplay: null,
@@ -213,6 +210,7 @@ export const nufi: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -223,6 +221,10 @@ export const nufi: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: featureSupported,
+		}),
 	},
 	variants: {
 		[Variant.BROWSER]: true,

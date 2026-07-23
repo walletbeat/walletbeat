@@ -125,7 +125,7 @@ export const ratingIcons = {
 } as const
 
 /**
- * Convert a rating to the icon displayed on the slice tooltip.
+ * Convert a rating to a human-readable text.
  */
 export function ratingToText(rating: Rating): string {
 	switch (rating) {
@@ -514,7 +514,7 @@ export function normalizeExampleRatings<_OutcomeMetadata extends OutcomeMetadata
 export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	/**
 	 * Unique ID representing the attribute in camelCase.
-	 * For example: "sourceVisibility".
+	 * For example: "openSource".
 	 */
 	id: string
 
@@ -699,11 +699,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 		attribute: Attribute<_OutcomeMetadata>,
 		features: ResolvedFeatures,
 	): EvaluationContext<_OutcomeMetadata> {
-		const ctx = new EvaluationContext<_OutcomeMetadata>(() => attribute, features, false)
-
-		ctx.isForTest = true
-
-		return ctx
+		return new EvaluationContext<_OutcomeMetadata>(() => attribute, features, false)
 	}
 
 	private constructor(

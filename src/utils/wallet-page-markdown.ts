@@ -8,6 +8,7 @@ import {
 import { Rating, ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
+import { gitCommitRefPinRegExp } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import {
 	type RatedWallet,
@@ -302,7 +303,15 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 										? ''
 										: `${collapseToSingleLine(ref.explanation)} Source: `
 
-								parts.push(`- ${prefix}[${labeledUrl.label}](${labeledUrl.url})`)
+								// Escape square brackets (e.g. in filename-derived labels)
+								// so they cannot parse as nested/reference-style links, and
+								// render commit-hash pins in GitHub-like labels (`foo.ts
+								// L1-2 @abcdef1`) as the code they are.
+								const label = labeledUrl.label
+									.replace(/[[\]]/g, String.raw`\$&`)
+									.replace(gitCommitRefPinRegExp, '`$&`')
+
+								parts.push(`- ${prefix}[${label}](${labeledUrl.url})`)
 							}
 						}
 

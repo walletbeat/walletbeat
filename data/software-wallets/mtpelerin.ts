@@ -78,7 +78,6 @@ export const mtpelerin: SoftwareWallet = {
 				'2700': null,
 				'6963': null,
 			},
-			walletCall: null,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -175,6 +174,7 @@ export const mtpelerin: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -185,6 +185,7 @@ export const mtpelerin: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

@@ -9,6 +9,7 @@ export const binance: CorporateEntity & Exchange = {
 		corporate: true,
 		dataBroker: false,
 		exchange: true,
+		infrastructureProvider: false,
 		offchainDataProvider: false,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,

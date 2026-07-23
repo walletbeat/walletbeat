@@ -1,26 +1,24 @@
 ---
 // Types/constants
-import { allRatedWallets, assertValidWalletName } from '@/data/wallets'
+import { allRatedWalletsBySlug, isValidWalletSlug } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
-
-// Functions
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Routes
 export const prerender = true
 
-export const getStaticPaths = () => [
-	...nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({
-		params: { walletName },
-	})),
-]
+export const getStaticPaths = () =>
+	Object.values(allRatedWalletsBySlug).map(wallet => ({
+		params: { walletName: wallet.metadata.id },
+	}))
 
 const { walletName } = Astro.params
 
-assertValidWalletName(walletName)
+if (walletName === undefined || !isValidWalletSlug(walletName)) {
+	throw new Error(`invalid wallet slug "${walletName}"`)
+}
 
 // Data
-const wallet = allRatedWallets[walletName]
+const wallet = allRatedWalletsBySlug[walletName]
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
@@ -46,9 +44,9 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
 	}}
 >
-	<Navigation navigationItems={defaultNavigationItems} />
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-column-item='flexible' data-sticky-container>
 		<WalletPageContext walletId={wallet.metadata.id} client:idle />
 	</main>
 </Layout>

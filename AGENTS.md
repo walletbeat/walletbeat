@@ -31,7 +31,7 @@ pnpm lint         # Auto-fix syntax and lint issues
 ### Data processing pipeline
 
 1. **Wallet Data** (`/data/[wallet-type]/`): Raw wallet metadata and feature data
-2. **Features** (`src/schema/features/`): Objective, factual data about wallet capabilities. Read `resources/docs/features.md` if you need to understand wallet feature types.
+2. **Features** (`src/schema/features/`): Objective, factual data about wallet capabilities. Read `resources/docs/features/features.md` if you need to understand wallet feature types.
 3. **Attributes** (`src/schema/attributes/`): Evaluation logic that transforms features into ratings
 4. **Attribute Groups** (`src/schema/attribute-groups.ts`): Logical groupings of related attributes
 
@@ -59,7 +59,7 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 - Wallet feature data must be objective and unopinionated.
 - Attributes evaluate only feature data, no other inputs.
 - Some feature blobs allow per-field unknowns while `/data` is incomplete. For those, keep the exported feature type as the complete shape `F`, put `Nullable<F>` only on the `WalletBaseFeatures` field, and let `ResolvedFeatures` expose either a full `F` or `null`. In `resolveFeatures`, wrap these entries with `nullable()` so any remaining `null` property makes the whole resolved feature `null`; for `Support`-wrapped blobs, put `Nullable` inside the supported payload and resolve with `nullable<Support<ResolvedShape>>(...)`. See `.cursor/rules/50-wallet-schema.mdc` for the full pattern.
-- Read `resources/docs/features.md` if you need to understand wallet feature types.
+- Read `resources/docs/features/features.md` if you need to understand wallet feature types.
 
 ### Code quality
 
@@ -68,6 +68,10 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 - Fix prettier issues with `pnpm lint`
 - Never use `eslint-disable` or `as any` workarounds
 - Add spelling exceptions to `.cspell.json` only for valid terms
+
+### Commit signing
+
+CI requires every commit to be GPG/SSH-signed. The `check:signed-commit` check verifies the HEAD commit has a `gpgsig` field. Ensure your git configuration includes `commit.gpgsign true` with a valid signing key before pushing.
 
 ### CSS rules and system
 

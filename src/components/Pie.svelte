@@ -1,11 +1,13 @@
 <script module lang="ts">
+	import type { WBIconID } from '@/styles/wbicons'
+
 	// Types/constants
 	export type Slice = {
 		id: string
 		color: string
 		weight: number
 		arcLabel: string
-		arcIconId?: string
+		arcIconId?: WBIconID
 		titleText: string
 		href?: string
 		gradient?: {
@@ -55,6 +57,7 @@
 
 <script lang="ts">
 	// Types
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -68,6 +71,7 @@
 
 		// View options
 		layout = PieLayout.HalfTop,
+		centerFirstSlice = true,
 		padding = 0,
 		radius = 47,
 		labelSize = radius / 4,
@@ -113,6 +117,7 @@
 
 		// View options
 		layout?: (typeof PieLayout)[keyof typeof PieLayout]
+		centerFirstSlice?: boolean
 		radius?: number
 		padding?: number
 		labelSize?: number
@@ -148,7 +153,11 @@
 			}))
 			.filter(({ weight }) => weight > 0)
 
-		if (colorWeights.length <= 1) return colorWeights[0]?.color ?? slice.color
+		if (colorWeights.length <= 1) {
+			const color = colorWeights[0]?.color ?? slice.color
+
+			return color === slice.gradient.transparentStopColor ? 'var(--rating-unrated)' : color
+		}
 
 		const areaRadiusStops = slice.gradient.areaRadiusStops
 		const totalWeight = colorWeights.reduce((sum, entry) => sum + entry.weight, 0)
@@ -192,18 +201,26 @@
 				[],
 			)
 
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), ${slice.color}`
+		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), var(--rating-unrated)`
 	}
+
+	const sliceBackdropFilter = (slice: ComputedSlice) => (
+		slice.gradient || slice.color === 'var(--rating-unrated)'
+			? 'var(--rating-unrated-backdropFilter)'
+			: 'none'
+	)
 
 	const computeSlices = (
 		{
 			slices,
 			startAngle,
 			endAngle,
+			firstSliceMidAngle,
 		}: {
 			slices: Slice[]
 			startAngle: number
 			endAngle: number
+			firstSliceMidAngle?: number
 		},
 		cy = 0,
 		level = 0,
@@ -227,8 +244,10 @@
 		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - orientation * totalGapAngle
 
 		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
+		const computedFirstSliceMidAngle = effectiveStartAngle + effectiveTotalAngle * ((slices[0]?.weight ?? 0) / (totalWeight || 1)) / 2
+		const angleOffset = (firstSliceMidAngle ?? computedFirstSliceMidAngle) - computedFirstSliceMidAngle
 
-		let currentAngle = effectiveStartAngle
+		let currentAngle = effectiveStartAngle + angleOffset
 
 		return slices.map(({ children, ...slice }, i) => {
 			const totalAngle = effectiveTotalAngle * (slice.weight / totalWeight)
@@ -275,6 +294,7 @@
 		computeSlices(
 			{
 				slices,
+				firstSliceMidAngle: centerFirstSlice ? 0 : undefined,
 				...(
 					layout === PieLayout.FullLeft ?
 						{
@@ -286,7 +306,7 @@
 							startAngle: 360 - getLevelConfig(0).angleGap / 2,
 							endAngle: 0 + getLevelConfig(0).angleGap / 2,
 						}
-					: // layout === PieLayout.HalfTop ?
+					: // layout === PieLayout.HalfTop
 						{
 							startAngle: -90,
 							endAngle: 90,
@@ -354,6 +374,7 @@
 
 		style:--slice-color={slice.color}
 		style:--slice-fill={sliceFill(slice)}
+		style:--slice-backdropFilter={sliceBackdropFilter(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
 
 		data-slice-id={slice.id}
@@ -363,7 +384,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-icon="wbicons emoji {slice.arcIconId}"></span>
+				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
@@ -438,8 +459,11 @@
 			--center-label-baseline: central;
 		}
 
+		overflow: clip;
+
 		display: grid;
 		justify-content: center;
+
 		transform: translateZ(0);
 		will-change: transform;
 		backface-visibility: hidden;
@@ -578,6 +602,7 @@
 					--slice-outerStartY: calc(var(--pie-originY) - cos(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
 
 					background: var(--slice-fill);
+					backdrop-filter: var(--slice-backdropFilter, none);
 
 					clip-path: shape(
 						from

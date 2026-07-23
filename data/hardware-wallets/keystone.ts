@@ -142,7 +142,7 @@ export const keystoneWallet: HardwareWallet = {
 				{
 					ref: [
 						{
-							explanation: 'Keystone 3 Pro security audit by Keylabs',
+							explanation: 'Keystone 3 Pro security audit by KeyLabs',
 							url: 'https://github.com/keylabsio/audits/blob/24e10a7404106494f66c5ebcf49b8fa4eaaa2d3c/2023-11-keystone3.pdf',
 						},
 					],
@@ -170,7 +170,7 @@ export const keystoneWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Keystone 3 incorporates a PCI-grade anti-tampering feature, with an intricate ‘security house’ of circuitry encompassing the core IC and SE chips.',
+							'Keystone 3 incorporates a PCI-grade anti-tampering feature, with an intricate ‘security house’ of circuitry encompassing the core IC and Secure Element chips.',
 						url: 'https://blog.keyst.one/secure-elements-the-bedrock-of-hardware-wallet-security-1dd8cbdef461',
 					},
 				],
@@ -181,11 +181,6 @@ export const keystoneWallet: HardwareWallet = {
 			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: [
-					{
-						explanation:
-							"Independent video demonstration of Keystone's signing implementation on a Safe.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=759',
-					},
 					{
 						explanation:
 							"Independent video demonstration of Keystone's transaction implementation on a Safe.",
@@ -201,7 +196,13 @@ export const keystoneWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
+				erc4361: null,
 				erc7730: supported({
+					ref: {
+						explanation:
+							"Independent video demonstration of Keystone's signing implementation on a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=759',
+					},
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.NOT_PROVIDED,

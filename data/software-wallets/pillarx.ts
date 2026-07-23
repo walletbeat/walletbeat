@@ -72,7 +72,6 @@ export const pillarx: SoftwareWallet = {
 				'2700': notSupported,
 				'6963': notSupported,
 			},
-			walletCall: null,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -154,6 +153,7 @@ export const pillarx: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: null,
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -164,6 +164,7 @@ export const pillarx: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

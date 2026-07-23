@@ -6,6 +6,7 @@ import type { AddressResolutionData } from '@/schema/features/privacy/address-re
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
+	EntityRole,
 	MultiAddressPolicy,
 	RegularEndpoint,
 	UserFlow,
@@ -111,6 +112,7 @@ export const imtoken: SoftwareWallet = {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
+						walletServiceFeeDisplayUnits: null,
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -136,7 +138,6 @@ export const imtoken: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
-			walletCall: null,
 		},
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
@@ -221,6 +222,7 @@ export const imtoken: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.CHAIN_DATA_LOOKUP],
+							role: EntityRole.OPERATOR,
 						},
 					],
 				},
@@ -330,11 +332,12 @@ export const imtoken: SoftwareWallet = {
 							url: 'https://support.token.im/hc/en-us/articles/21850966355737-Revamped-imToken-signature-for-safer-and-more-intuitive-transactions',
 						},
 					],
-					leaksIp: false,
 					leaksUserAddress: false,
+					leaksUserIp: false,
 					leaksVisitedUrl: 'NO',
 				}),
 				sendTransactionWarning: notSupported,
+				unlimitedApprovalWarning: null,
 			},
 			securityBestPractices: null,
 			transactionLegibility: null,
@@ -360,10 +363,11 @@ export const imtoken: SoftwareWallet = {
 			operationFees: null,
 			/* TODO: Fill in; partial data: {
 				builtInErc20Swap: null,
-				erc20L1Transfer: supported(comprehensiveFeesShownByDefault),
-				ethL1Transfer: supported(comprehensiveFeesShownByDefault),
+				erc20L1Transfer: supported(comprehensiveGasOrExternalFees),
+				ethL1Transfer: supported(comprehensiveGasOrExternalFees),
 				uniswapUSDCToEtherSwap: null,
 			},*/
+			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
 				dependencyLocking: null,
@@ -374,6 +378,7 @@ export const imtoken: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
+		walletCall: null,
 	},
 	variants: {
 		[Variant.MOBILE]: true,

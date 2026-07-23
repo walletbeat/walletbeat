@@ -1,3 +1,8 @@
+---
+title: 'Walletbeat wallet testing: `mitmproxy` setup'
+description: 'A guide explaining how to set up `mitmproxy`, a critical step to testing wallets on their data collection practices.'
+---
+
 # `mitmproxy` guide
 
 _This guide describes how to set up [`mitmproxy`](https://mitmproxy.org) to inspect the network traffic that a wallet generates._
@@ -34,19 +39,19 @@ In order to eliminate noise from the network capture you are about to do, it is 
 As the name implies, `mitmproxy` is a proxy. This means it intercepts requests and forwards them onto their initially-intended destination.
 Putting `mitmproxy` in a place where it _can_ intercept requests from a wallet is a 2-step process:
 
-#### Step 3.a: Set up proxy settings
+#### Step 3.1: Set up proxy settings
 
 You will need to configure your browser or mobile device to use `mitmproxy` as a proxy. This is browser-dependent (or device-dependent); what's not device dependent is the `mitmproxy` proxy settings: the IP is `127.0.0.1` and the port number is `8080`.
 
 - **For browser extension wallet testing**: Set your browser's proxy settings. This is usually located in the settings. If using a dedicated `chromium` profile from earlier, you can also specify it on the command line: `chromium --user-data-dir=/tmp/walletbeat-test-browser --proxy-server=http://127.0.0.1:8080`
-- **For mobile app wallet testing**: Go to the the Android Studio's settings for the emulated device (**not** the "Settings" app inside the emulated device itself), and you can set device-wide proxy configuration here:
+- **For mobile app wallet testing**: Go to the Android Studio's settings for the emulated device (**not** the "Settings" app inside the emulated device itself), and you can set device-wide proxy configuration here:
 
 ![](./android-studio-1.png)
 ![](./android-studio-2.png)
 
 Unlike the above screenshot, you will want `127.0.0.1` as "Host name", and `8080` as port.
 
-#### Step 3.b: Install the `mitmproxy` certificate
+#### Step 3.2: Install the `mitmproxy` certificate
 
 Because `mitmproxy` needs to intercept authenticated HTTPS connections, it needs to use a certificate that your browser or mobile device will initially be very suspicious of. HTTPS is _designed_ to prevent request interception, which is why you will see lots of scary warnings in the process of adding a trusted certificate. Nonetheless, this is required for `mitmproxy` to be able to intercept authenticated requests and show their contents.
 
@@ -110,3 +115,14 @@ export const someWallet: SoftwareWallet = {
 ```
 
 Once this is done, run the unit tests (`pnpm vitest`) to verify the integrity of the data. If everything passes, you are done! 🫡
+
+## Orderflow auctioning (`ORDERFLOW_AUCTION`)
+
+Use the `ORDERFLOW_AUCTION` data-collection purpose when an entity receives **pre-inclusion** transaction data (`MEMPOOL_TRANSACTIONS` with `BY_DEFAULT` or `ALWAYS`) **to auction orderflow** (MEV), as distinct from:
+
+- `TRANSACTION_BROADCAST` — plain broadcast or private-mempool routing without auctioning
+- `TRANSACTION_SIMULATION` — simulation / preview only
+
+**Validation:** A row must not list `ORDERFLOW_AUCTION` unless qualified `MEMPOOL_TRANSACTIONS` on that same row is `BY_DEFAULT` or `ALWAYS`. `OPT_IN` / `PROMPTED` mempool collection may coexist with `ORDERFLOW_AUCTION` on the row (optional auctioning).
+
+**Endpoint:** When documenting default or always mempool collection, record an `endpoint` on the row (`RegularEndpoint` at minimum if only the host is known; complete `SECURE_ENCLAVE` details when researched). Rows with default/always mempool collection but no `endpoint` leave orderflow ratings **UNRATED** until finished.

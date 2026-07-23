@@ -1,7 +1,7 @@
-import type { WithRef } from '@/schema/reference'
+import { type FullyQualifiedReference, mergeRefs, type WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
-import type { Support } from '../support'
+import { type Support } from '../support'
 
 /**
  * To test: initiate the relevant transaction type and observe the approval
@@ -452,8 +452,7 @@ export interface SimulatedNondeterministicTransaction {
  * All benchmark transactions for which simulation can track a transaction outcome.
  */
 export type TransactionSimulationsBenchmark =
-	| BasicBenchmarkTransactions
-	| ComplexBenchmarkTransactions
+	BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 
 /**
  * Per-benchmark-transaction simulation data for software wallets.
@@ -633,15 +632,29 @@ type DisplayCapability = {
 }
 
 export interface BaseTransactionLegibilitySupport {
-	erc8213: Support | null
+	/**
+	 * ERC-4361 (Sign-In with Ethereum) support.
+	 * Whether the wallet can clearly present Sign-In with Ethereum
+	 * authentication requests to the user.
+	 * The `ref` block should document ERC-4361 support specifically.
+	 */
+	erc4361: WithRef<Support> | null
+
+	/**
+	 * ERC-8123 (Wallet Signature and Calldata Digest Display)
+	 * Whether the wallet follows the "Wallet Display Requirements"
+	 * section of ERC-8123.
+	 * The `ref` block should document ERC-8213 support specifically.
+	 */
+	erc8213: WithRef<Support> | null
 }
 
 /**
  * A record of transaction legibility support (both message and transaction)
  */
 export interface HardwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
-	erc8213: Support<HardwareWalletErc8213> | null
-	erc7730: Support<HardwareWalletErc7730> | null
+	erc8213: WithRef<Support<HardwareWalletErc8213>> | null
+	erc7730: WithRef<Support<HardwareWalletErc7730>> | null
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
@@ -712,12 +725,13 @@ export interface SoftwareWalletErc8213 {
  * A record of transaction legibility support (both message and transaction)
  */
 export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLegibilitySupport {
-	erc8213: Support<SoftwareWalletErc8213> | null
+	erc8213: WithRef<Support<SoftwareWalletErc8213>> | null
 
 	/**
 	 * ERC-7730 calldata decoding support per complex benchmark transaction.
+	 * The `ref` block should document ERC-7730 support specifically.
 	 */
-	erc7730: Support<SoftwareWalletErc7730> | null
+	erc7730: WithRef<Support<SoftwareWalletErc7730>> | null
 
 	/**
 	 * Per-benchmark simulation data: transaction outcomes for token and complex transactions,
@@ -735,6 +749,15 @@ export interface SoftwareTransactionLegibilitySupport extends BaseTransactionLeg
 export const isShown = (field: DataDisplayOptions): boolean =>
 	field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
 
+/**
+ * Whether a display entry is shown to the user.
+ * Handles both the software wallet shape (a bare `DataDisplayOptions`) and
+ * the hardware wallet shape (a `DisplayCapability` object).
+ */
+export function displayEntryIsShown(entry: DataDisplayOptions | DisplayCapability): boolean {
+	return isShown(typeof entry === 'object' ? entry.display : entry)
+}
+
 export const isFullBasicTransactionDetails = (
 	details: DisplayedBasicTransactionDetails,
 ): boolean => {
@@ -749,12 +772,100 @@ export const isFullBasicTransactionDetails = (
 }
 
 /**
+ * Shorthand for a hardware wallet that decodes every complex benchmark
+ * transaction on-device via ERC-7730.
+ */
+export const erc7730HardwareWalletFullySupported: HardwareWalletErc7730 = {
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+		DataLocation.ON_DEVICE,
+	[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+		DataLocation.ON_DEVICE,
+}
+
+/**
+ * Shorthand for a software wallet that decodes every complex benchmark
+ * transaction via ERC-7730.
+ */
+export const erc7730SoftwareWalletFullySupported: SoftwareWalletErc7730 = {
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: { decoded: DataDisplayOptions.SHOWN_BY_DEFAULT },
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: { decoded: DataDisplayOptions.SHOWN_BY_DEFAULT },
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+		decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+		decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+	[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+		decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+}
+
+/**
+ * Shorthand for a hardware wallet that shows every ERC-8213 calldata display
+ * option and message signing detail, all on-device.
+ */
+export const erc8213HardwareWalletFullySupported: HardwareWalletErc8213 = {
+	calldataDisplay: {
+		[CallDataDisplay.RAW_HEX]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[CallDataDisplay.FORMATTED]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[CallDataDisplay.CALLDATA_DIGEST]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+	},
+	messageSigningLegibility: {
+		[MessageSigningDetails.EIP712_STRUCT]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[MessageSigningDetails.DOMAIN_HASH]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[MessageSigningDetails.MESSAGE_HASH]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+		[MessageSigningDetails.EIP712_DIGEST]: {
+			display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+			location: DataLocation.ON_DEVICE,
+		},
+	},
+}
+
+/**
+ * Shorthand for a software wallet that shows every ERC-8213 calldata display
+ * option and message signing detail.
+ */
+export const erc8213SoftwareWalletFullySupported: SoftwareWalletErc8213 = {
+	calldataDisplay: displaysFullCallData,
+	messageSigningLegibility: {
+		[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+		[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+		[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+		[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	},
+}
+
+/**
  * Type predicate for `HardwareTransactionLegibilityImplementation`.
  */
 export function isHardwareTransactionLegibility(
 	transactionLegibility:
-		| HardwareTransactionLegibilityImplementation
-		| SoftwareTransactionLegibilityImplementation,
+		HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation,
 ): transactionLegibility is HardwareTransactionLegibilityImplementation {
 	// The `dataExtraction` field exists only on `HardwareTransactionLegibilityImplementation`,
 	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
@@ -766,3 +877,20 @@ export type HardwareTransactionLegibilityImplementation =
 	WithRef<HardwareTransactionLegibilitySupport>
 export type SoftwareTransactionLegibilityImplementation =
 	WithRef<SoftwareTransactionLegibilitySupport>
+
+/**
+ * The merged references of the per-ERC ref blocks of a transaction
+ * legibility record. The record's top-level `ref` documents the non-ERC
+ * fields (transaction details display, simulations, data extraction);
+ * each ERC block carries the references specific to that ERC.
+ */
+export function transactionLegibilityErcRefs(
+	transactionLegibility:
+		HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation,
+): FullyQualifiedReference[] {
+	return mergeRefs(
+		transactionLegibility.erc4361?.ref,
+		transactionLegibility.erc7730?.ref,
+		transactionLegibility.erc8213?.ref,
+	)
+}
