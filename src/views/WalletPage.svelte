@@ -1024,6 +1024,7 @@
 						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
 						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
 						style:--slice-labelSize={sliceStyle?.labelSize}
+						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
 						style:--slice-labelR={sliceStyle?.labelR}
 					></span>
 
@@ -1945,7 +1946,7 @@
 			---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
 			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
 			---slice-unit: calc(
-				var(--icon-size) * 0.55
+				var(--icon-size) * 0.55 * var(--slice-labelSizeScale, 1)
 				/ var(--slice-labelSize)
 			);
 			---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
@@ -1998,7 +1999,10 @@
 						* 100%
 					);
 				z-index: 1;
-				font-size: calc(var(--icon-size) * 0.55);
+				font-size: calc(
+					var(--icon-size) * 0.55
+					* var(--slice-labelSizeScale, 1)
+				);
 				translate: -50% -50%;
 			}
 
@@ -2205,8 +2209,11 @@
 				--slice-gap: 4;
 				--slice-outerCornerRadius: 28;
 				--slice-innerCornerRadius: 16;
-				--slice-labelSize: 20;
-				---slice-label-offset: calc(var(---slice-label-r) * 1px);
+				--slice-labelSize: 25;
+				--slice-labelSizeScale: 1.25;
+				---slice-label-offset: calc(
+					(var(---slice-label-r) + var(---slice-offset)) * 1px
+				);
 			}
 
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
@@ -2228,14 +2235,17 @@
 				--slice-outerCornerRadius: 8;
 				--slice-innerCornerRadius: 8;
 				--slice-labelSize: 9;
-				---slice-label-offset: calc(var(---slice-label-r) * 1px);
+				--slice-labelSizeScale: 1;
+				---slice-label-offset: calc(
+					(var(---slice-label-r) + var(---slice-offset)) * 1px
+				);
 				--slice-arcSize: small;
 			}
 
 			/* Firefox lacks typed length division/multiplication outside shape(). */
 			@supports not (top: calc(sibling-index() * 1px)) {
 				:global(.navigation-items summary > a) {
-					---slice-label-offset: 39.4201px;
+					---slice-label-offset: 55.313px;
 				}
 
 				:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {

@@ -1689,6 +1689,7 @@
 								offset: 4,
 								outerCornerRadius: 35,
 								innerCornerRadius: 20,
+								labelSizeScale: 1.25,
 							},
 							{
 								outerRadiusFraction: 0.45,
