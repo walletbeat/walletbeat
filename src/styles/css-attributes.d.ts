@@ -960,6 +960,54 @@ interface CssAttributes {
 	'data-sticky'?: string | boolean
 
 	/**
+	 * ## [data-sticky-breadcrumb]
+	 *
+	 * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
+	 * resolves its configurable parent anchor: root → section → subsection. A `position` preserves the
+	 * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
+	 * remains visible.
+	 *
+	 * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
+	 * every item remains in regular document flow.
+	 *
+	 * ### Tokens
+	 * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
+	 * - `scope`: visibility boundary for descendant items
+	 * - `position`: regular-layout position anchor and view-timeline source
+	 * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+	 *
+	 * ### CSS Variables
+	 * - `--stickyBreadcrumb-animationRangeStart`
+	 * - `--stickyBreadcrumb-animationRangeEnd`
+	 * - `--stickyBreadcrumb-gap`
+	 * - `--stickyBreadcrumb-position-minBlockSize`
+	 * - `--stickyBreadcrumb-position-insetBlockStart`
+	 * - `--stickyBreadcrumb-position-insetInlineStart`
+	 * - `--stickyBreadcrumb-item-insetBlockStart`
+	 * - `--stickyBreadcrumb-itemAnchor`
+	 * - `--stickyBreadcrumb-parentAnchor`
+	 *
+	 * ### Example
+	 * ```html
+	 * <a data-sticky-breadcrumb="root item"><h1>Page</h1></a>
+	 * <section data-sticky-breadcrumb="scope">
+	 *   <header data-sticky-breadcrumb="position">
+	 *     <a data-sticky-breadcrumb="item"><h2>Section</h2></a>
+	 *   </header>
+	 *   <section data-sticky-breadcrumb="scope">
+	 *     <header data-sticky-breadcrumb="position">
+	 *       <a data-sticky-breadcrumb="item"><h3>Subsection</h3></a>
+	 *     </header>
+	 *   </section>
+	 * </section>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
+	 */
+	'data-sticky-breadcrumb'?: string | boolean
+
+	/**
 	 * ## [data-sticky-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
