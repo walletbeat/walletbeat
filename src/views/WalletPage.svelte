@@ -1970,8 +1970,13 @@
 				inset:
 					50% auto auto
 					calc(
-						(var(---slice-outer-r) - var(--slice-labelR))
-						* var(---slice-unit)
+						(
+							var(---slice-outer-r) - var(--slice-labelR)
+						)
+						/ (
+							var(---slice-outer-r) - var(---slice-inner-r)
+						)
+						* 100%
 					);
 				z-index: 1;
 				font-size: calc(var(--icon-size) * 0.55);
