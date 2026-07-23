@@ -535,6 +535,10 @@
 	id="wallet-page"
 	class="container"
 	data-sticky-container
+	style:timeline-scope={[
+		'--header-timeline',
+		...pieRotationSteps.map(step => step.timeline),
+	].join(', ')}
 	{@attach attachDetailsCommands}
 >
 	<div class="wallet-icon-layer" aria-hidden="true">
@@ -897,7 +901,10 @@
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
-		<hr />
+		<hr
+			class="attribute-group-timeline"
+			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
+		/>
 
 		<section
 			class="attribute-group"
@@ -905,7 +912,6 @@
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
-			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
 		>
 			<header
 				data-sticky="block backdrop-before backdrop-stuck"
@@ -2446,10 +2452,6 @@
 				z-index: 1;
 			}
 
-			:global(.navigation-items a:target-current) {
-				---slice-scale: 1.075;
-			}
-
 			:global(.navigation-items a > span[data-row-item]) {
 				position: absolute;
 				inline-size: 1px;
@@ -2474,6 +2476,20 @@
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current) > .pie-navigation-icon) {
+				filter: none;
+			}
+		}
+
+		/*
+		 * Chromium currently fails to invalidate :target-current when it is
+		 * nested beneath the pie rule. Keep this state selector flat.
+		 */
+		:global(#wallet-page .pie-navigation .navigation-items a:target-current) {
+			---slice-scale: 1.075;
+			opacity: 1;
+			outline: none;
+
+			> .pie-navigation-icon {
 				filter: none;
 			}
 		}
@@ -2547,6 +2563,7 @@
 		display: grid;
 		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 		gap: 2rem 0.75rem;
+		padding-block-start: 2rem;
 		min-inline-size: 0;
 
 		> :not(.wallet-name) {
@@ -2564,6 +2581,7 @@
 			grid-column: 1;
 			align-self: start;
 			inline-size: max-content;
+			margin-inline-start: var(--scrollItem-inlineDetached-paddingStart);
 		}
 
 		> header#top {
@@ -2580,13 +2598,15 @@
 		}
 	}
 
-	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.container {
-			timeline-scope: all;
+	@media (max-width: 864px) {
+		article {
+			padding-block-start: calc(var(--navigation-mobile-blockSize) + 1rem);
 		}
+	}
 
-		.attribute-group,
-		.attribute {
+	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+		.attribute-group-timeline,
+		.attribute > details > summary {
 			view-timeline-name: var(---pie-timeline, none);
 			view-timeline-axis: block;
 		}
@@ -2654,7 +2674,6 @@
 		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
 		(container-type: scroll-state) and
 		(position-anchor: --wallet-name) and
-		(position-visibility: anchors-visible) and
 		(inset-inline-start: anchor(--wallet-name end))
 	) {
 		article > .wallet-name {
@@ -2680,6 +2699,7 @@
 
 		article section > header[data-sticky] {
 			anchor-name: --wallet-section-heading;
+			z-index: 4;
 			view-timeline-name: --wallet-section-heading-timeline;
 			view-timeline-axis: block;
 
@@ -2688,6 +2708,8 @@
 			animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
 
 			> a:has(> h2) {
+				z-index: 6;
+
 				animation: AnchoredSectionHeadingAnimation var(--transition-easeInOutExpo) both;
 				animation-timeline: --wallet-section-heading-timeline;
 				animation-range: entry calc(100vh - 6rem) entry calc(100vh - 3rem);
@@ -2734,14 +2756,12 @@
 			from {
 				position: static;
 				position-anchor: auto;
-				position-visibility: always;
 				inset: auto;
 				margin-inline-start: 0;
 			}
 			0.001% {
 				position: fixed;
 				position-anchor: --wallet-section-heading;
-				position-visibility: anchors-visible;
 				inset-block-start: calc(anchor(top) + 1rem);
 				inset-inline-start: anchor(start);
 				margin-inline-start: 0;
@@ -2749,7 +2769,6 @@
 			to {
 				position: fixed;
 				position-anchor: --wallet-section-heading;
-				position-visibility: anchors-visible;
 				inset-block-start: calc(anchor(top) + 1rem);
 				inset-inline-start: anchor(--wallet-name end);
 				margin-inline-start: var(---wallet-breadcrumb-gap);
