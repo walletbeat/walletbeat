@@ -2912,9 +2912,52 @@
 			animation-timeline: --header-timeline;
 			animation-range: exit 0% exit 120%;
 
+			&::after {
+				content: '';
+				z-index: -1;
+				pointer-events: none;
+
+				position: fixed;
+				inset-block-start: var(---wallet-page-block-offset);
+				inset-inline-start: 0;
+				inline-size: calc(100vi - var(---wallet-page-navigation-inline-size));
+				block-size: calc(
+					(2 * var(---wallet-sticky-content-inset))
+					+ var(---wallet-breadcrumb-block-size)
+				);
+
+				background-color: light-dark(#F8EDFF, #130a2b3c);
+				backdrop-filter: blur(20px);
+				opacity: 0;
+
+				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
+				animation-timeline: --header-timeline;
+				animation-range: exit 0% exit 120%;
+
+				@media (max-width: 1024px) {
+					inset-inline-start: var(---wallet-page-navigation-inline-size);
+				}
+
+				@media (max-width: 864px) {
+					inset-inline-start: 0;
+					inline-size: 100vi;
+				}
+
+				@media (prefers-reduced-transparency: reduce) {
+					backdrop-filter: none;
+				}
+			}
+
 			h1 {
 				font-size: inherit;
 			}
+		}
+
+		:is(
+			#stages > header,
+			.attribute-group-stack > header
+		)[data-sticky]::before {
+			content: none;
 		}
 
 		.wallet-icon-layer {
@@ -3054,9 +3097,26 @@
 			}
 		}
 
+		@keyframes WalletBreadcrumbSurfaceAnimation {
+			to {
+				opacity: 1;
+			}
+		}
+
 		@media (prefers-reduced-motion: reduce) {
 			article > .wallet-name {
 				animation: none;
+
+				&::after {
+					animation: none;
+				}
+			}
+
+			:is(
+				#stages > header,
+				.attribute-group-stack > header
+			)[data-sticky]::before {
+				content: '';
 			}
 		}
 	}
