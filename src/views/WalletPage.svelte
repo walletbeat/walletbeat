@@ -3121,6 +3121,7 @@
 				inline-size: var(---wallet-breadcrumb-heading-icon-size);
 				block-size: var(---wallet-breadcrumb-heading-icon-size);
 				font-size: var(---wallet-breadcrumb-heading-icon-size);
+				filter: none;
 				translate: none;
 			}
 		}
