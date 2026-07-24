@@ -69,15 +69,6 @@
 		securityAudits[0]
 	)
 
-	const anyAuditHasUnfixedFlaws = $derived(
-		securityAudits
-			.some(audit => (
-				Array.isArray(audit.unpatchedFlaws)
-				&& audit.unpatchedFlaws
-					.some((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED')
-			))
-	)
-
 
 	// Functions
 	import { securityAuditId, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
@@ -108,20 +99,14 @@
 	/>
 
 	<section data-column="gap-2">
-		{#each securityAudits as audit, index (securityAuditId(audit))}
-			{@const isMostRecent = index === 0}
+		{#each securityAudits as audit (securityAuditId(audit))}
 			{@const hasUnfixedFlaws = Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.some((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED')}
 			{@const flawGroups = Array.isArray(audit.unpatchedFlaws) ? Map.groupBy(audit.unpatchedFlaws, (flaw: UnpatchedSecurityFlaw) => flaw.severityAtAuditPublication) : null}
 			{@const hasFlaws = flawGroups && flawGroups.size > 0}
 
 			<details
 				data-card="secondary"
-				open={
-					anyAuditHasUnfixedFlaws ?
-						hasUnfixedFlaws
-					:
-						isMostRecent
-				}
+				open
 			>
 				<summary>
 					<header data-row="wrap wrap-first-last">
