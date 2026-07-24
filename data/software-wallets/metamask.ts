@@ -48,7 +48,6 @@ import {
 import {
 	featureSupported,
 	notSupported,
-	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
@@ -550,7 +549,7 @@ export const metamask: SoftwareWallet = {
 				erc4361: supported({
 					ref: {
 						explanation: 'MetaMask formats SIWE requests for easy readability.',
-						file: 'public/references/wallets/metamask/screenshots/2026-07-25-metamask-erc4361-siwe.png',
+						file: 'public/references/wallets/metamask/screenshots/2026-07-24-metamask-erc4361-siwe.png',
 						label: 'MetaMask sign-in dialog for an ERC-4361 signature request',
 					},
 				}),
