@@ -1509,6 +1509,10 @@
 		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
 		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
 		---wallet-breadcrumb-layer-root: 20;
+		---wallet-breadcrumb-layer-surface: calc(
+			var(---wallet-breadcrumb-layer-root)
+			- 2
+		);
 		---wallet-breadcrumb-layer-group: 21;
 		---wallet-breadcrumb-layer-attribute: 22;
 		---wallet-attribute-heading-font-size: 1.17em;
@@ -1544,8 +1548,11 @@
 			;
 		}
 		@media (max-width: 864px) {
-			---wallet-name-sticky-icon-size: 2.4rem;
-			---wallet-breadcrumb-gap: 1.25rem;
+			---wallet-name-sticky-icon-size: 2rem;
+			---wallet-name-sticky-font-size: 1.5rem;
+			---wallet-breadcrumb-gap: 0.5rem;
+			---wallet-breadcrumb-heading-icon-size: 1.25rem;
+			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
 
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
@@ -2704,7 +2711,7 @@
 				---pie-surface-size: 4.25rem;
 				---pie-target-angle: 0.5turn;
 
-				z-index: 10;
+				z-index: calc(var(---wallet-breadcrumb-layer-surface) + 0.5);
 				grid-area: Content;
 				justify-self: end;
 				inset-block-start: calc(var(---wallet-page-block-offset) + 0.125rem);
@@ -2876,7 +2883,7 @@
 		article > .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
 			position: sticky;
-			inset-block-start: 0;
+			inset-block-start: var(---wallet-icon-sticky-block-start);
 			font-size: 2.25rem;
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
@@ -2884,7 +2891,15 @@
 			animation-range: exit 0% exit 120%;
 
 			h1 {
+				z-index: 1;
+				position: relative;
 				font-size: inherit;
+			}
+		}
+
+		@container scroll-state(scrollable: top) {
+			.wallet-icon-layer {
+				opacity: 1;
 			}
 		}
 
@@ -2892,28 +2907,40 @@
 			#stages > header,
 			.attribute-group-stack > header
 		)[data-sticky] {
-			background-color: var(---wallet-breadcrumb-surface-background);
-			box-shadow:
-				0 0 0 100vi
-				var(---wallet-breadcrumb-surface-background);
-			clip-path: inset(
-				0 -100vi
-					calc(
-						100%
-						- (
-							(2 * var(---wallet-sticky-content-inset))
-							+ var(---wallet-breadcrumb-block-size)
-						)
-					)
-			);
+			--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
 
 			&::before {
-				content: none;
+				inset: 0;
+				block-size: calc(
+					2 * var(---wallet-sticky-content-inset)
+					+ var(---wallet-breadcrumb-block-size)
+				);
+				border-radius: 0;
 			}
 		}
 
 		.wallet-icon-layer {
-			display: none;
+			display: block;
+			z-index: var(---wallet-breadcrumb-layer-surface);
+			grid-area: Content;
+			position: sticky;
+			inset-block-start: var(---wallet-page-block-offset);
+			align-self: start;
+			block-size: calc(
+				2 * var(---wallet-sticky-content-inset)
+				+ var(---wallet-breadcrumb-block-size)
+			);
+			background-color: var(---wallet-breadcrumb-surface-background);
+			opacity: 0;
+			pointer-events: none;
+
+			> img {
+				display: none;
+			}
+		}
+
+		.attribute-group-stack {
+			z-index: calc(var(---wallet-breadcrumb-layer-root) - 1);
 		}
 
 		#stages > header[data-sticky-breadcrumb~='position'] {
@@ -3152,7 +3179,6 @@
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
-				inset-block-start: var(---wallet-icon-sticky-block-start);
 				margin-inline-start: var(---wallet-content-inline-start);
 				font-size: var(---wallet-name-sticky-font-size);
 			}
