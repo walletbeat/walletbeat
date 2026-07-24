@@ -1719,6 +1719,10 @@
 		animation: keep-anchor-navigation-in-wallet linear both;
 		animation-timeline: --wallet-page-exit;
 		animation-range: exit 0% exit 100%;
+
+		@media (prefers-reduced-transparency: reduce) {
+			backdrop-filter: none;
+		}
 	}
 
 	:global(#layout:has(#wallet-page))::scroll-marker-group:is(
@@ -1875,6 +1879,10 @@
 		box-shadow: 0 0 var(--separator-width) var(--border-color);
 		backdrop-filter: blur(1rem);
 		pointer-events: auto;
+
+		@media (prefers-reduced-transparency: reduce) {
+			backdrop-filter: none;
+		}
 
 		> li {
 			display: contents;
