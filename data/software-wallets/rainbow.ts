@@ -761,7 +761,14 @@ export const rainbow: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				erc4361: null,
+				erc4361: notSupportedWithRef({
+					ref: [
+						{
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-24-browser-siwe.png',
+							label: 'Rainbow browser extension not supporting SIWE',
+						},
+					],
+				}),
 				erc7730: supported({
 					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
