@@ -781,7 +781,7 @@ export const rabby: SoftwareWallet = {
 				erc4361: notSupportedWithRef({
 					ref: {
 						explanation: 'Rabby does not format SIWE requests for easy readability.',
-						file: 'public/references/wallets/rabby/screenshots/2026-07-13-rabby-erc4361-siwe.png',
+						file: 'public/references/wallets/rabby/screenshots/2026-07-24-rabby-erc4361-siwe.png',
 						label: 'Rabby sign-in dialog for an ERC-4361 signature request',
 					},
 				}),
