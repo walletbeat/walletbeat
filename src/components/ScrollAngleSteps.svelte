@@ -13,99 +13,64 @@
 		steps: ScrollAngleStep[]
 		children: Snippet
 	} = $props()
+
+	const animationNames = $derived(steps.map(() => 'WalletPieRotationStep').join(', '))
+	const animationTimelines = $derived(steps.map(step => step.timeline).join(', '))
+	const animationTimingFunctions = $derived(
+		steps.map(step => `linear(0, ${step.delta})`).join(', ')
+	)
 </script>
 
 
-{#snippet rotationStep(index: number)}
-	{#if index < steps.length}
-		<div
-			class:rotation-step-a={index % 2 === 0}
-			class:rotation-step-b={index % 2 === 1}
-			style:---timeline={steps[index].timeline}
-			style:---rotation-delta={`${steps[index].delta}deg`}
-		>
-			{@render rotationStep(index + 1)}
-		</div>
-	{:else}
-		<div
-			class:rotation-result-a={steps.length % 2 === 0}
-			class:rotation-result-b={steps.length % 2 === 1}
-		>
-			{@render children()}
-		</div>
-	{/if}
-{/snippet}
-
-
-{@render rotationStep(0)}
+<div
+	class="rotation-result"
+	style:animation-name={animationNames}
+	style:animation-timeline={animationTimelines}
+	style:animation-timing-function={animationTimingFunctions}
+>
+	{@render children()}
+</div>
 
 
 <style>
-	@property ---rotation-step {
-		syntax: "<angle>";
-		inherits: false;
-		initial-value: 0deg;
-	}
-
-	@property ---rotation-a {
+	@property ---pie-start-angle {
 		syntax: "<angle>";
 		inherits: true;
 		initial-value: 0deg;
 	}
 
-	@property ---rotation-b {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 0deg;
+	.rotation-result {
+		display: contents;
 	}
 
-	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.rotation-step-a,
-		.rotation-step-b {
-			inline-size: 100%;
-			block-size: 100%;
-
-			animation: rotation-step 1ms linear both;
-			animation-timeline: var(---timeline);
+	@supports (
+		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+		(animation-composition: accumulate)
+	) {
+		.rotation-result {
+			animation-duration: 1ms;
+			animation-fill-mode: both;
+			animation-composition: accumulate;
 			animation-range: cover 78% cover 85%;
 		}
 
-		.rotation-step-a {
-			---rotation-a: calc(
-				var(---rotation-b)
-				+ var(---rotation-step)
-			);
-		}
-
-		.rotation-step-b {
-			---rotation-b: calc(
-				var(---rotation-a)
-				+ var(---rotation-step)
-			);
-		}
-
-		.rotation-result-a {
-			---pie-start-angle: var(---rotation-b);
-		}
-
-		.rotation-result-b {
-			---pie-start-angle: var(---rotation-a);
-		}
-
-		@keyframes rotation-step {
+		@keyframes -global-WalletPieRotationStep {
 			from {
-				---rotation-step: 0deg;
+				---pie-start-angle: 0deg;
 			}
 
 			to {
-				---rotation-step: var(---rotation-delta);
+				/*
+				 * Each animation's linear() easing scales this unit angle by
+				 * its configured step delta before native composition sums it.
+				 */
+				---pie-start-angle: 1deg;
 			}
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.rotation-step-a,
-		.rotation-step-b {
+		.rotation-result {
 			animation: none;
 		}
 	}
