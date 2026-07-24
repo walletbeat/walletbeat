@@ -121,11 +121,6 @@
 	}
 
 	function attachDetailsCommands(root: HTMLElement) {
-		queueMicrotask(() => {
-			for (const detail of root.querySelectorAll<HTMLDetailsElement>(':scope > article details'))
-				detail.open = true
-		})
-
 		const detailsForCommand = (command: string) => {
 			if (command === '--toggle-page-details')
 				return root.querySelectorAll<HTMLDetailsElement>(':scope > article details')
