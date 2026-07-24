@@ -794,6 +794,10 @@ summary {
 	border: 1px solid var(--badge-borderColor);
 	backdrop-filter: var(--badge-backdropFilter);
 
+	@media (prefers-reduced-transparency: reduce) {
+		backdrop-filter: none;
+	}
+
 	color: var(--badge-textColor);
 	font-weight: 600;
 	line-height: 1;
@@ -1673,6 +1677,10 @@ ol {
 				&[data-sticky~="backdrop-before"]::before,
 				&[data-sticky~="backdrop-after"]::after {
 					transition-property: background-color, backdrop-filter;
+
+					@media (prefers-reduced-transparency: reduce) {
+						backdrop-filter: none;
+					}
 				}
 
 				&[data-sticky~="backdrop-before"]::before,
