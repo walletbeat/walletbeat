@@ -965,11 +965,6 @@
 									href={`#${slugifyCamelCase(attrGroup.id)}`}
 									interestfor={slugifyCamelCase(attrGroup.id)}
 								>
-									<span
-										class="breadcrumb-icon"
-										data-icon="wbicons emoji {attrGroup.icon}"
-										aria-hidden="true"
-									></span>
 									<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 										{attrGroup.displayName}
 									</h2>
@@ -1089,11 +1084,6 @@
 									href={`#${slugifyCamelCase(attribute.id)}`}
 									interestfor={slugifyCamelCase(attribute.id)}
 								>
-									<span
-										class="breadcrumb-icon"
-										data-icon="wbicons emoji {attribute.icon}"
-										aria-hidden="true"
-									></span>
 									<h3
 										title={formatAttributeTitleText(evalAttr)}
 									>
@@ -3018,7 +3008,6 @@
 		}
 
 		.attribute-group-stack > header {
-			> .attribute-group-icon,
 			.section-caption,
 			.section-controls {
 				animation: AttributeGroupHeadingCompanionAnimation var(--transition-easeInOutExpo) both;
@@ -3043,6 +3032,14 @@
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: 9;
 
+				h3 {
+					animation: BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
+					animation-timeline: --sticky-breadcrumb-timeline;
+					animation-range:
+						var(---wallet-breadcrumb-animation-range-start)
+						var(---wallet-breadcrumb-animation-range-end);
+				}
+
 				&::before {
 					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
 					animation-timeline: --sticky-breadcrumb-timeline;
@@ -3053,33 +3050,109 @@
 			}
 		}
 
-		:is(
-			.attribute-group-heading-position,
-			.attribute-heading-position
-		)[data-sticky-breadcrumb~='position'] > [data-sticky-breadcrumb~='item'] > .breadcrumb-icon {
-			animation: BreadcrumbHeadingIconAnimation var(--transition-easeInOutExpo) both;
-			animation-timeline: --sticky-breadcrumb-timeline;
-			animation-range:
-				var(---wallet-breadcrumb-animation-range-start)
-				var(---wallet-breadcrumb-animation-range-end);
+		:is(.attribute-group-icon, .attribute-icon) {
+			z-index: 8;
+			anchor-name: --breadcrumb-slice-icon-position;
+			anchor-scope: --breadcrumb-slice-icon-position;
+			contain: style;
+
+			&::before {
+				animation: BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both;
+				animation-timeline: --sticky-breadcrumb-timeline;
+				animation-range:
+					var(---wallet-breadcrumb-animation-range-start)
+					var(---wallet-breadcrumb-animation-range-end);
+			}
+
+			&::after {
+				animation: BreadcrumbSliceShapeAnimation var(--transition-easeInOutExpo) both;
+				animation-timeline: --sticky-breadcrumb-timeline;
+				animation-range:
+					var(---wallet-breadcrumb-animation-range-start)
+					var(---wallet-breadcrumb-animation-range-end);
+			}
 		}
 
-		@keyframes BreadcrumbHeadingIconAnimation {
+		@keyframes BreadcrumbSliceIconAnimation {
 			from {
-				inline-size: 0;
-				margin-inline-end: 0;
-				opacity: 0;
+				position: fixed;
+				position-anchor: --breadcrumb-slice-icon-position;
+				inset-block-start: calc(
+					anchor(--breadcrumb-slice-icon-position top)
+					+ (
+						var(---slice-block-half)
+						* var(---slice-unit)
+					)
+					- (
+						var(--icon-size)
+						* 0.55
+						* var(--slice-labelSizeScale, 1)
+						/ 2
+					)
+				);
+				inset-inline-start: calc(
+					anchor(--breadcrumb-slice-icon-position start)
+					+ (
+						(
+							var(---slice-outer-r)
+							- var(--slice-labelR)
+						)
+						* var(---slice-unit)
+					)
+					- (
+						var(--icon-size)
+						* 0.55
+						* var(--slice-labelSizeScale, 1)
+						/ 2
+					)
+				);
+				translate: none;
 			}
 			to {
-				inline-size: var(---wallet-breadcrumb-heading-icon-size);
-				margin-inline-end: var(---wallet-breadcrumb-heading-icon-gap);
-				opacity: 1;
+				position: fixed;
+				position-anchor: --sticky-breadcrumb-scope;
+				inset-block-start: calc(
+					anchor(--sticky-breadcrumb-scope top)
+					+ (
+						var(---wallet-breadcrumb-block-size)
+						- var(---wallet-breadcrumb-heading-icon-size)
+					)
+					/ 2
+				);
+				inset-inline-start: calc(
+					anchor(
+						var(--stickyBreadcrumb-parentAnchor)
+						end
+					)
+					+ var(---wallet-breadcrumb-gap)
+				);
+				font-size: var(---wallet-breadcrumb-heading-icon-size);
+				translate: none;
+			}
+		}
+
+		@keyframes BreadcrumbSliceShapeAnimation {
+			to {
+				opacity: 0;
+			}
+		}
+
+		@keyframes BreadcrumbHeadingIconSpaceAnimation {
+			to {
+				margin-inline-start: calc(
+					var(---wallet-breadcrumb-heading-icon-size)
+					+ var(---wallet-breadcrumb-heading-icon-gap)
+				);
 			}
 		}
 
 		@keyframes AttributeGroupBreadcrumbHeadingAnimation {
 			to {
 				font-size: var(---wallet-attribute-heading-font-size);
+				margin-inline-start: calc(
+					var(---wallet-breadcrumb-heading-icon-size)
+					+ var(---wallet-breadcrumb-heading-icon-gap)
+				);
 			}
 		}
 
@@ -3136,24 +3209,6 @@
 	.wallet-name {
 		h1 {
 			font-size: 2.25rem;
-		}
-	}
-
-	.breadcrumb-icon {
-		display: inline-flex;
-		flex: none;
-		justify-content: center;
-		align-items: center;
-		box-sizing: content-box;
-		inline-size: 0;
-		block-size: var(---wallet-breadcrumb-heading-icon-size);
-		margin-inline-end: 0;
-		overflow: clip;
-		opacity: 0;
-
-		&::before {
-			font-size: var(---wallet-breadcrumb-heading-icon-size);
-			line-height: 1;
 		}
 	}
 
