@@ -139,14 +139,14 @@ interface CssAttributes {
 	 *   ```html
 	 *   <details>
 	 *     <summary>More</summary>
-	 *     <p>Hidden body.</p>
+	 *     <div><p>Hidden body.</p></div>
 	 *   </details>
 	 *   ```
 	 * - `[data-collapsible]` + `[data-card]` padding split between summary and body:
 	 *   ```html
 	 *   <details data-card="padding-6">
 	 *     <summary data-row="wrap wrap-first-last">Title row</summary>
-	 *     <p>Body</p>
+	 *     <div><p>Body</p></div>
 	 *   </details>
 	 *   ```
 	 *
@@ -340,7 +340,6 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
@@ -364,7 +363,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -414,7 +413,6 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
@@ -438,7 +436,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -488,7 +486,6 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
@@ -512,7 +509,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -984,6 +981,8 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-position-insetBlockStart`
 	 * - `--stickyBreadcrumb-position-insetInlineStart`
 	 * - `--stickyBreadcrumb-item-insetBlockStart`
+	 * - `--stickyBreadcrumb-item-blockSize`
+	 * - `--stickyBreadcrumb-trackBlockEnd`
 	 * - `--stickyBreadcrumb-itemAnchor`
 	 * - `--stickyBreadcrumb-parentAnchor`
 	 *
