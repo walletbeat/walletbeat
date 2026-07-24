@@ -1661,6 +1661,8 @@
 
 			@media (max-width: 864px) {
 				display: contents;
+				z-index: auto;
+				position: static;
 				background: none;
 				box-shadow: none;
 
@@ -2708,13 +2710,19 @@
 				---pie-surface-size: 4.25rem;
 				---pie-target-angle: 0.5turn;
 
+				z-index: 10;
 				grid-area: Content;
-				justify-self: stretch;
+				justify-self: end;
 				inset-block-start: calc(var(---wallet-page-block-offset) + 0.125rem);
-				overflow: clip;
+				inset-inline: auto 0;
+				inline-size: var(---pie-size);
+
+				&::before {
+					content: none;
+				}
 
 				.pie-navigation-geometry {
-					margin-inline: auto 1rem;
+					margin: 0;
 					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
 				}
 			}
