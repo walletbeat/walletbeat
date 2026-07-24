@@ -3095,8 +3095,9 @@
 			}
 			to {
 				position: fixed;
+				position-anchor: --sticky-breadcrumb-scope;
 				inset-block-start: calc(
-					var(---wallet-icon-sticky-block-start)
+					anchor(--sticky-breadcrumb-scope top)
 					+ (
 						var(---wallet-breadcrumb-block-size)
 						- var(---wallet-breadcrumb-heading-icon-size)
