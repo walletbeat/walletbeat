@@ -2753,40 +2753,17 @@
 	}
 
 	article {
-		display: grid;
-		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
-		gap: 2rem 0.75rem;
 		min-inline-size: 0;
-
-		> :not(.wallet-name) {
-			grid-column: 1 / -1;
-			min-inline-size: 0;
-		}
-
-		> .wallet-name,
-		> header#top {
-			grid-row: 1;
-		}
 
 		> .wallet-name {
 			z-index: 2;
-			grid-column: 1;
 			align-self: start;
 			inline-size: max-content;
 			margin-inline-start: var(---wallet-content-inline-start);
 		}
 
 		> header#top {
-			display: grid;
-			grid-template-columns: subgrid;
-
-			> * {
-				grid-column: 1 / -1;
-			}
-
-			> :first-child {
-				grid-column: 2;
-			}
+			min-inline-size: 0;
 		}
 	}
 
