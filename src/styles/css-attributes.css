@@ -1166,6 +1166,7 @@ ol {
  * - `--stickyBreadcrumb-position-insetInlineStart`
  * - `--stickyBreadcrumb-item-insetBlockStart`
  * - `--stickyBreadcrumb-item-blockSize`
+ * - `--stickyBreadcrumb-trackBlockEnd`
  * - `--stickyBreadcrumb-itemAnchor`
  * - `--stickyBreadcrumb-parentAnchor`
  *
@@ -1198,7 +1199,11 @@ ol {
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
 			--sticky-breadcrumb-position,
 			--sticky-breadcrumb-scope;
-		timeline-scope: --sticky-breadcrumb-timeline;
+		timeline-scope:
+			--sticky-breadcrumb-timeline,
+			--sticky-breadcrumb-scope-timeline;
+		view-timeline-name: --sticky-breadcrumb-scope-timeline;
+		view-timeline-axis: block;
 
 		&::before {
 			content: '';
@@ -1223,12 +1228,22 @@ ol {
 
 		&:not([data-sticky-breadcrumb~="root"]) {
 			position-anchor: --sticky-breadcrumb-scope;
+			position-visibility: anchors-visible;
 
-			animation: StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both;
-			animation-timeline: --sticky-breadcrumb-timeline;
+			animation:
+				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
+				StickyBreadcrumbItemVisibility 1ms steps(1, start) both;
+			animation-timeline:
+				--sticky-breadcrumb-timeline,
+				--sticky-breadcrumb-scope-timeline;
 			animation-range:
 				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
-				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem));
+				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
+				exit-crossing calc(
+					100%
+					- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+				)
+				exit-crossing 100%;
 		}
 	}
 
@@ -1255,6 +1270,15 @@ ol {
 			);
 			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
 			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemVisibility {
+		from {
+			visibility: visible;
+		}
+		to {
+			visibility: hidden;
 		}
 	}
 

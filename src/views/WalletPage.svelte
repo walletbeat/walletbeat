@@ -2809,6 +2809,10 @@
 			--stickyBreadcrumb-gap: var(---wallet-breadcrumb-gap);
 			--stickyBreadcrumb-item-insetBlockStart: var(---wallet-icon-sticky-block-start);
 			--stickyBreadcrumb-item-blockSize: var(---wallet-breadcrumb-block-size);
+			--stickyBreadcrumb-trackBlockEnd: calc(
+				var(---wallet-icon-sticky-block-start)
+				+ var(---wallet-breadcrumb-block-size)
+			);
 			--stickyBreadcrumb-animationRangeStart: var(---wallet-breadcrumb-animation-range-start);
 			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
 		}
