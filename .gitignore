@@ -59,5 +59,11 @@ deploy/dev/dev-server.log
 deploy/dev/dev-server.pid
 deploy/dev/dev-server.url
 
+# Local browser verification artifacts
+.playwright-cli/
+
+# Local package store
+.pnpm-store/
+
 # Ruff cache
 .ruff_cache
