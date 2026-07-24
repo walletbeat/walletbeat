@@ -82,7 +82,7 @@ export const overallRatingPieLevels = (innerRadiusFraction = 0.15): LevelConfig[
 
 export const overallRatingPieMaxRadius = Math.max(
 	...overallRatingPieLevels().map(
-		level => overallRatingPieRadius * level.outerRadiusFraction + (level.offset ?? 0)
+		level => overallRatingPieRadius * level.outerRadiusFraction + (level.offset ?? 0),
 	),
 )
 
@@ -125,15 +125,22 @@ export const computePieSlices = ({
 		const anglePadding = levelConfig.anglePadding ?? 0
 		const angleGap = levelConfig.angleGap ?? 0
 		const totalGapAngle = angleGap * Math.max(slices.length - 1, 0)
-		const angleInsetFromParentGap = parentLevelConfig ?
-			(Math.asin((levelConfig.gap / 2) / outerR) - Math.asin((parentLevelConfig.gap / 2) / outerR)) * 180 / Math.PI
+		const angleInsetFromParentGap = parentLevelConfig
+			? ((Math.asin(levelConfig.gap / 2 / outerR) - Math.asin(parentLevelConfig.gap / 2 / outerR)) *
+					180) /
+				Math.PI
 			: 0
-		const effectiveStartAngle = startAngle + orientation * (anglePadding / 2 + angleInsetFromParentGap)
+		const effectiveStartAngle =
+			startAngle + orientation * (anglePadding / 2 + angleInsetFromParentGap)
 		const effectiveEndAngle = endAngle - orientation * (anglePadding / 2 + angleInsetFromParentGap)
-		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - orientation * totalGapAngle
+		const effectiveTotalAngle =
+			effectiveEndAngle - effectiveStartAngle - orientation * totalGapAngle
 		const totalWeight = slices.reduce((sum, slice) => sum + slice.weight, 0)
-		const computedFirstSliceMidAngle = effectiveStartAngle + effectiveTotalAngle * ((slices[0]?.weight ?? 0) / (totalWeight || 1)) / 2
-		const angleOffset = (firstSliceMidAngle ?? computedFirstSliceMidAngle) - computedFirstSliceMidAngle
+		const computedFirstSliceMidAngle =
+			effectiveStartAngle +
+			(effectiveTotalAngle * ((slices[0]?.weight ?? 0) / (totalWeight || 1))) / 2
+		const angleOffset =
+			(firstSliceMidAngle ?? computedFirstSliceMidAngle) - computedFirstSliceMidAngle
 		let currentAngle = effectiveStartAngle + angleOffset
 
 		return slices.map(({ children, ...slice }, index) => {
@@ -144,20 +151,14 @@ export const computePieSlices = ({
 			const labelSizeScale = levelConfig.labelSizeScale ?? 1
 			const effectiveLabelSize = (levelConfig.labelSize ?? labelSize) * labelSizeScale
 			const labelRadius = effectiveLabelSize / 2
-			const minimumLabelR = Math.sqrt(
-				(outerR - labelRadius) * (innerR + labelRadius)
-			)
-			const halfAngle = Math.abs(totalAngle) * Math.PI / 360
-			const centroidLabelR = (
-				2 / 3
-				* ((outerR ** 3 - innerR ** 3) / (outerR ** 2 - innerR ** 2))
-				* (halfAngle === 0 ? 1 : Math.sin(halfAngle) / halfAngle)
-			)
+			const minimumLabelR = Math.sqrt((outerR - labelRadius) * (innerR + labelRadius))
+			const halfAngle = (Math.abs(totalAngle) * Math.PI) / 360
+			const centroidLabelR =
+				(2 / 3) *
+				((outerR ** 3 - innerR ** 3) / (outerR ** 2 - innerR ** 2)) *
+				(halfAngle === 0 ? 1 : Math.sin(halfAngle) / halfAngle)
 			const maximumLabelR = outerR - labelRadius
-			const labelR = Math.max(
-				minimumLabelR,
-				Math.min(centroidLabelR, maximumLabelR),
-			)
+			const labelR = Math.max(minimumLabelR, Math.min(centroidLabelR, maximumLabelR))
 
 			currentAngle = endAngle + (index < slices.length - 1 ? orientation * angleGap : 0)
 
@@ -177,9 +178,9 @@ export const computePieSlices = ({
 					labelSizeScale,
 					labelR,
 				},
-				...children && {
+				...(children && {
 					children: compute({ slices: children, startAngle, endAngle }, level + 1),
-				},
+				}),
 			}
 		})
 	}
@@ -189,10 +190,10 @@ export const computePieSlices = ({
 	return compute({
 		slices,
 		firstSliceMidAngle: centerFirstSlice ? 0 : undefined,
-		...(layout === PieLayout.FullLeft ?
-			{ startAngle: -90 + level0AngleGap / 2, endAngle: 270 - level0AngleGap / 2 }
-			: layout === PieLayout.FullTop ?
-				{ startAngle: 360 - level0AngleGap / 2, endAngle: level0AngleGap / 2 }
+		...(layout === PieLayout.FullLeft
+			? { startAngle: -90 + level0AngleGap / 2, endAngle: 270 - level0AngleGap / 2 }
+			: layout === PieLayout.FullTop
+				? { startAngle: 360 - level0AngleGap / 2, endAngle: level0AngleGap / 2 }
 				: { startAngle: -90, endAngle: 90 }),
 	})
 }
