@@ -2766,7 +2766,6 @@
 		display: grid;
 		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 		gap: 2rem 0.75rem;
-		padding-block-start: 2rem;
 		min-inline-size: 0;
 
 		> :not(.wallet-name) {
@@ -2798,15 +2797,6 @@
 			> :first-child {
 				grid-column: 2;
 			}
-		}
-	}
-
-	@media (max-width: 864px) {
-		article {
-			padding-block-start: calc(
-				var(---wallet-page-block-offset)
-				+ var(---wallet-sticky-content-inset)
-			);
 		}
 	}
 
