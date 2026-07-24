@@ -832,8 +832,8 @@ export const ambire: SoftwareWallet = {
 				],
 				erc4361: notSupportedWithRef({
 					ref: {
-						explanation: 'Ambire does not format SIWE requests for easy readability.',
-						file: 'public/references/wallets/ambire/screenshots/2026-07-13-ambire-erc4361-siwe.png',
+						explanation: 'Ambire formats SIWE requests for easy readability.',
+						file: 'public/references/wallets/ambire/screenshots/2026-07-24-ambire-erc4361-siwe.png',
 						label: 'Ambire sign-in dialog for an ERC-4361 signature request',
 					},
 				}),
