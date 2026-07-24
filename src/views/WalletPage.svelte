@@ -3159,7 +3159,7 @@
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
 				inset-block-start: var(---wallet-icon-sticky-block-start);
-				margin-inline-start: var(--scrollItem-inlineDetached-paddingStart);
+				margin-inline-start: var(---wallet-content-inline-start);
 				font-size: var(---wallet-name-sticky-font-size);
 			}
 		}
