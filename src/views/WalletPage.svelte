@@ -2857,7 +2857,7 @@
 		article > .wallet-name {
 			z-index: 7;
 			position: sticky;
-			inset-block-start: var(---wallet-icon-sticky-block-start);
+			inset-block-start: 0;
 			font-size: 2.25rem;
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
@@ -2925,6 +2925,7 @@
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				inset-block-start: var(---wallet-icon-sticky-block-start);
 				margin-inline-start: var(--scrollItem-inlineDetached-paddingStart);
 				font-size: var(---wallet-name-sticky-font-size);
 			}
