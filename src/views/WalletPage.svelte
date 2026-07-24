@@ -965,6 +965,11 @@
 									href={`#${slugifyCamelCase(attrGroup.id)}`}
 									interestfor={slugifyCamelCase(attrGroup.id)}
 								>
+									<span
+										class="breadcrumb-icon"
+										data-icon="wbicons emoji {attrGroup.icon}"
+										aria-hidden="true"
+									></span>
 									<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 										{attrGroup.displayName}
 									</h2>
@@ -1084,6 +1089,11 @@
 									href={`#${slugifyCamelCase(attribute.id)}`}
 									interestfor={slugifyCamelCase(attribute.id)}
 								>
+									<span
+										class="breadcrumb-icon"
+										data-icon="wbicons emoji {attribute.icon}"
+										aria-hidden="true"
+									></span>
 									<h3
 										title={formatAttributeTitleText(evalAttr)}
 									>
@@ -1505,6 +1515,9 @@
 			* 1.6
 		);
 		---wallet-breadcrumb-gap: 1.5rem;
+		---wallet-breadcrumb-heading-icon-size: 1.5rem;
+		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
+		---wallet-attribute-heading-font-size: 1.17em;
 		---wallet-breadcrumb-animation-range-start: entry calc(100dvb - 6rem);
 		---wallet-breadcrumb-animation-range-end: entry calc(100dvb - 3rem);
 		--border-radius-lg: 1rem;
@@ -2942,7 +2955,16 @@
 			--stickyBreadcrumb-position-insetInlineStart: 0px;
 
 			> [data-sticky-breadcrumb~='item'] {
-				z-index: 6;
+				z-index: 8;
+				position-visibility: always;
+
+				h2 {
+					animation: AttributeGroupBreadcrumbHeadingAnimation var(--transition-easeInOutExpo) both;
+					animation-timeline: --sticky-breadcrumb-timeline;
+					animation-range:
+						var(---wallet-breadcrumb-animation-range-start)
+						var(---wallet-breadcrumb-animation-range-end);
+				}
 
 				&::before {
 					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
@@ -2954,12 +2976,31 @@
 			}
 		}
 
+		.attribute-group-stack > header {
+			> .attribute-group-icon,
+			.section-caption,
+			.section-controls {
+				animation: AttributeGroupHeadingCompanionAnimation var(--transition-easeInOutExpo) both;
+				animation-timeline: --sticky-breadcrumb-timeline;
+				animation-range:
+					var(---wallet-breadcrumb-animation-range-start)
+					var(---wallet-breadcrumb-animation-range-end);
+			}
+		}
+
+		@keyframes AttributeGroupHeadingCompanionAnimation {
+			to {
+				visibility: hidden;
+				opacity: 0;
+			}
+		}
+
 		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
 			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
 			--stickyBreadcrumb-position-insetInlineStart: 0px;
 
 			> [data-sticky-breadcrumb~='item'] {
-				z-index: 5;
+				z-index: 9;
 
 				&::before {
 					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
@@ -2968,6 +3009,36 @@
 						var(---wallet-breadcrumb-animation-range-start)
 						var(---wallet-breadcrumb-animation-range-end);
 				}
+			}
+		}
+
+		:is(
+			.attribute-group-heading-position,
+			.attribute-heading-position
+		)[data-sticky-breadcrumb~='position'] > [data-sticky-breadcrumb~='item'] > .breadcrumb-icon {
+			animation: BreadcrumbHeadingIconAnimation var(--transition-easeInOutExpo) both;
+			animation-timeline: --sticky-breadcrumb-timeline;
+			animation-range:
+				var(---wallet-breadcrumb-animation-range-start)
+				var(---wallet-breadcrumb-animation-range-end);
+		}
+
+		@keyframes BreadcrumbHeadingIconAnimation {
+			from {
+				inline-size: 0;
+				margin-inline-end: 0;
+				opacity: 0;
+			}
+			to {
+				inline-size: var(---wallet-breadcrumb-heading-icon-size);
+				margin-inline-end: var(---wallet-breadcrumb-heading-icon-gap);
+				opacity: 1;
+			}
+		}
+
+		@keyframes AttributeGroupBreadcrumbHeadingAnimation {
+			to {
+				font-size: var(---wallet-attribute-heading-font-size);
 			}
 		}
 
@@ -3007,6 +3078,24 @@
 	.wallet-name {
 		h1 {
 			font-size: 2.25rem;
+		}
+	}
+
+	.breadcrumb-icon {
+		display: inline-flex;
+		flex: none;
+		justify-content: center;
+		align-items: center;
+		box-sizing: content-box;
+		inline-size: 0;
+		block-size: var(---wallet-breadcrumb-heading-icon-size);
+		margin-inline-end: 0;
+		overflow: clip;
+		opacity: 0;
+
+		&::before {
+			font-size: var(---wallet-breadcrumb-heading-icon-size);
+			line-height: 1;
 		}
 	}
 
@@ -3189,6 +3278,7 @@
 							min-inline-size: 0;
 
 							h3 {
+								font-size: var(---wallet-attribute-heading-font-size);
 								font-weight: 600;
 							}
 						}

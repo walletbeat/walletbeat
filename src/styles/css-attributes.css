@@ -1267,7 +1267,7 @@ ol {
 		}
 		to {
 			position: fixed;
-			inset-block-start: anchor(top);
+			inset-block-start: anchor(--sticky-breadcrumb-scope top);
 			inset-inline-start: anchor(
 				var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
 				end
