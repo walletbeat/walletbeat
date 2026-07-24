@@ -374,6 +374,11 @@
 			))
 		)
 	)
+	const attributeGroupSliceStyles = $derived(
+		new Map(
+			pieNavigationItems.map(group => [group.href, group.sliceStyle] as const)
+		)
+	)
 
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
@@ -901,6 +906,7 @@
 		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
+		{@const sliceStyle = attributeGroupSliceStyles.get(`#${slugifyCamelCase(attrGroup.id)}`)}
 
 		<hr
 			class="attribute-group-timeline"
@@ -921,36 +927,67 @@
 			>
 				<header
 					data-sticky="block backdrop-before backdrop-stuck"
-					data-sticky-breadcrumb="position"
-					data-row
+					data-row="start gap-3"
 					data-scroll-item="inline-detached"
 				>
-					<a
-						data-link="camouflaged"
-						data-sticky-breadcrumb="item"
-						href={`#${slugifyCamelCase(attrGroup.id)}`}
-						interestfor={slugifyCamelCase(attrGroup.id)}
-					>
-						<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
-							{attrGroup.displayName}
-						</h2>
-					</a>
+					<span
+						class="attribute-group-icon"
+						data-icon="wbicons emoji {attrGroup.icon}"
+						style:--slice-totalAngle={sliceStyle?.totalAngle}
+						style:--slice-midAngle={sliceStyle?.midAngle}
+						style:--slice-offset={sliceStyle?.offset}
+						style:--slice-gap={sliceStyle?.gap}
+						style:--slice-outerR={sliceStyle?.outerR}
+						style:--slice-innerR={sliceStyle?.innerR}
+						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
+						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
+						style:--slice-labelSize={sliceStyle?.labelSize}
+						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
+						style:--slice-labelR={sliceStyle?.labelR}
+					></span>
 
-					{#if showScores}
-						<ScoreBadge {score} size="medium" />
-					{/if}
+					<div
+						class="attribute-group-summary-layout"
+						data-row-item="flexible basis-2"
+						data-row="start gap-2 wrap"
+					>
+						<div
+							class="attribute-group-heading"
+							data-column="gap-2"
+						>
+							<div
+								class="attribute-group-heading-position"
+								data-sticky-breadcrumb="position"
+							>
+								<a
+									data-link="camouflaged"
+									data-sticky-breadcrumb="item"
+									href={`#${slugifyCamelCase(attrGroup.id)}`}
+									interestfor={slugifyCamelCase(attrGroup.id)}
+								>
+									<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
+										{attrGroup.displayName}
+									</h2>
+								</a>
+							</div>
+
+							{#if attrGroup.perWalletQuestion}
+								<div class="section-caption">
+									<Typography
+										content={attrGroup.perWalletQuestion}
+										strings={{ WALLET_NAME: wallet.metadata.displayName }}
+									/>
+								</div>
+							{/if}
+						</div>
+
+						{#if showScores}
+							<ScoreBadge {score} size="medium" />
+						{/if}
+					</div>
 				</header>
 
 				<div data-column>
-					{#if attrGroup.perWalletQuestion}
-						<div class="section-caption">
-							<Typography
-								content={attrGroup.perWalletQuestion}
-								strings={{ WALLET_NAME: wallet.metadata.displayName }}
-							/>
-						</div>
-					{/if}
-
 					<div class="attributes" data-column>
 						{#each attributes as { attribute, evalAttr }}
 							{@render attributeSnippet({
@@ -1966,7 +2003,7 @@
 	}
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
-		:is(.toc-icon, .attribute-icon) {
+		:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
 			---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
 			---slice-gap: var(--slice-gap);
 			---slice-outer-r: var(--slice-outerR);
@@ -2873,7 +2910,7 @@
 			display: none;
 		}
 
-		:is(#stages, .attribute-group-stack) > header[data-sticky-breadcrumb~='position'] {
+		#stages > header[data-sticky-breadcrumb~='position'] {
 			--stickyBreadcrumb-position-minBlockSize: 4.25rem;
 			--stickyBreadcrumb-position-insetBlockStart: 1rem;
 			--stickyBreadcrumb-position-insetInlineStart: max(
@@ -2886,6 +2923,23 @@
 			);
 
 			z-index: 4;
+
+			> [data-sticky-breadcrumb~='item'] {
+				z-index: 6;
+
+				&::before {
+					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+					animation-timeline: --sticky-breadcrumb-timeline;
+					animation-range:
+						var(---wallet-breadcrumb-animation-range-start)
+						var(---wallet-breadcrumb-animation-range-end);
+				}
+			}
+		}
+
+		.attribute-group-heading-position[data-sticky-breadcrumb~='position'] {
+			--stickyBreadcrumb-position-minBlockSize: 2.875rem;
+			--stickyBreadcrumb-position-insetInlineStart: 0px;
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: 6;
@@ -2986,12 +3040,44 @@
 		scroll-margin-top: 3.5rem;
 
 		> .attribute-group-stack > header {
+			--icon-filter: brightness(0) opacity(0.35);
+			min-inline-size: 0;
 			padding-block: 1rem;
 
-			> a:is(:hover, :focus-visible, :interest-source),
-			.attribute-group:interest-target > & > a {
+			&:has(a:is(:hover, :focus-visible, :interest-source)),
+			.attribute-group:interest-target > & {
+				--icon-filter: none;
+			}
+
+			.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source),
+			.attribute-group:interest-target > & .attribute-group-summary-layout a {
 				color: var(--accent);
 				text-decoration: none;
+			}
+
+			> .attribute-group-icon {
+				--icon-size: 4.125em;
+				flex: none;
+
+				&::before {
+					line-height: 1;
+					filter: var(--icon-filter);
+					transition-property: filter;
+				}
+			}
+
+			> .attribute-group-summary-layout {
+				min-inline-size: 0;
+				gap: 0.5rem;
+
+				> .attribute-group-heading {
+					flex: 1 1 16rem;
+					min-inline-size: 0;
+				}
+
+				> :not(.attribute-group-heading) {
+					flex: none;
+				}
 			}
 
 			&[data-sticky]::before {
@@ -3032,6 +3118,12 @@
 		.section-caption {
 			opacity: 0.8;
 			font-style: italic;
+			color: var(--text-secondary);
+			text-wrap: pretty;
+
+			:global(p) {
+				margin: 0;
+			}
 		}
 	}
 
