@@ -1507,6 +1507,10 @@
 		---wallet-breadcrumb-gap: 1.5rem;
 		---wallet-breadcrumb-heading-icon-size: 1.5rem;
 		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
+		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
+		---wallet-breadcrumb-layer-root: 20;
+		---wallet-breadcrumb-layer-group: 21;
+		---wallet-breadcrumb-layer-attribute: 22;
 		---wallet-attribute-heading-font-size: 1.17em;
 		---wallet-breadcrumb-animation-range-start: entry calc(100dvb - 6rem);
 		---wallet-breadcrumb-animation-range-end: entry calc(100dvb - 3rem);
@@ -2870,7 +2874,7 @@
 		}
 
 		article > .wallet-name {
-			z-index: 7;
+			z-index: var(---wallet-breadcrumb-layer-root);
 			position: sticky;
 			inset-block-start: 0;
 			font-size: 2.25rem;
@@ -2878,42 +2882,6 @@
 			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
 			animation-timeline: --header-timeline;
 			animation-range: exit 0% exit 120%;
-
-			&::after {
-				content: '';
-				z-index: -1;
-				pointer-events: none;
-
-				position: fixed;
-				inset-block-start: var(---wallet-page-block-offset);
-				inset-inline-start: 0;
-				inline-size: calc(100vi - var(---wallet-page-navigation-inline-size));
-				block-size: calc(
-					(2 * var(---wallet-sticky-content-inset))
-					+ var(---wallet-breadcrumb-block-size)
-				);
-
-				background-color: light-dark(#F8EDFF, #130a2b3c);
-				backdrop-filter: blur(20px);
-				opacity: 0;
-
-				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
-				animation-timeline: --header-timeline;
-				animation-range: exit 0% exit 120%;
-
-				@media (max-width: 1024px) {
-					inset-inline-start: var(---wallet-page-navigation-inline-size);
-				}
-
-				@media (max-width: 864px) {
-					inset-inline-start: 0;
-					inline-size: 100vi;
-				}
-
-				@media (prefers-reduced-transparency: reduce) {
-					backdrop-filter: none;
-				}
-			}
 
 			h1 {
 				font-size: inherit;
@@ -2923,8 +2891,25 @@
 		:is(
 			#stages > header,
 			.attribute-group-stack > header
-		)[data-sticky]::before {
-			content: none;
+		)[data-sticky] {
+			background-color: var(---wallet-breadcrumb-surface-background);
+			box-shadow:
+				0 0 0 100vi
+				var(---wallet-breadcrumb-surface-background);
+			clip-path: inset(
+				0 -100vi
+					calc(
+						100%
+						- (
+							(2 * var(---wallet-sticky-content-inset))
+							+ var(---wallet-breadcrumb-block-size)
+						)
+					)
+			);
+
+			&::before {
+				content: none;
+			}
 		}
 
 		.wallet-icon-layer {
@@ -2943,10 +2928,10 @@
 				/ 2
 			);
 
-			z-index: 4;
+			z-index: var(---wallet-breadcrumb-layer-group);
 
 			> [data-sticky-breadcrumb~='item'] {
-				z-index: 6;
+				z-index: var(---wallet-breadcrumb-layer-group);
 
 				&::before {
 					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
@@ -2963,7 +2948,7 @@
 			--stickyBreadcrumb-position-insetInlineStart: 0px;
 
 			> [data-sticky-breadcrumb~='item'] {
-				z-index: 8;
+				z-index: var(---wallet-breadcrumb-layer-group);
 				position-visibility: always;
 
 				h2 {
@@ -3007,7 +2992,7 @@
 			--stickyBreadcrumb-position-insetInlineStart: 0px;
 
 			> [data-sticky-breadcrumb~='item'] {
-				z-index: 9;
+				z-index: var(---wallet-breadcrumb-layer-attribute);
 
 				h3 {
 					animation: BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
@@ -3037,12 +3022,12 @@
 				)
 			);
 
-			z-index: 8;
 			anchor-name: --breadcrumb-slice-icon-position;
 			anchor-scope: --breadcrumb-slice-icon-position;
 			contain: style;
 
 			&::before {
+				z-index: inherit;
 				display: inline-grid;
 				place-items: center;
 				line-height: 1;
@@ -3061,6 +3046,14 @@
 					var(---wallet-breadcrumb-animation-range-start)
 					var(---wallet-breadcrumb-animation-range-end);
 			}
+		}
+
+		.attribute-group-icon {
+			z-index: var(---wallet-breadcrumb-layer-group);
+		}
+
+		.attribute-icon {
+			z-index: var(---wallet-breadcrumb-layer-attribute);
 		}
 
 		@keyframes BreadcrumbSliceIconAnimation {
@@ -3102,9 +3095,8 @@
 			}
 			to {
 				position: fixed;
-				position-anchor: --sticky-breadcrumb-scope;
 				inset-block-start: calc(
-					anchor(--sticky-breadcrumb-scope top)
+					var(---wallet-icon-sticky-block-start)
 					+ (
 						var(---wallet-breadcrumb-block-size)
 						- var(---wallet-breadcrumb-heading-icon-size)
@@ -3165,19 +3157,9 @@
 			}
 		}
 
-		@keyframes WalletBreadcrumbSurfaceAnimation {
-			to {
-				opacity: 1;
-			}
-		}
-
 		@media (prefers-reduced-motion: reduce) {
 			article > .wallet-name {
 				animation: none;
-
-				&::after {
-					animation: none;
-				}
 			}
 
 			:is(
