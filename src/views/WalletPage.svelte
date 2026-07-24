@@ -2928,7 +2928,7 @@
 				/ 2
 			);
 
-			z-index: var(---wallet-breadcrumb-layer-group);
+			z-index: calc(var(---wallet-breadcrumb-layer-root) - 1);
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-group);
