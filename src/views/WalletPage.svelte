@@ -2024,11 +2024,28 @@
 				var(--slice-offset)
 				* var(---slice-unit)
 			);
+			---slice-outer-arc-block-half: calc(
+				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
+				* var(---slice-outer-r)
+			);
+			---slice-inner-arc-block-half: calc(
+				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
+				* var(---slice-inner-r)
+			);
+			---slice-outer-corner-arc-block-half: calc(
+				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
+				* var(---slice-outer-corner-center-r)
+				+ var(---slice-outer-corner-r)
+			);
+			---slice-inner-corner-arc-block-half: calc(
+				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
+				* var(---slice-inner-corner-center-r)
+				+ var(---slice-inner-corner-r)
+			);
 			---slice-block-half: max(
-				calc(
-					sin(var(---slice-angle-outer-end))
-					* var(---slice-outer-r)
-				),
+				0,
+				var(---slice-outer-arc-block-half),
+				var(---slice-outer-corner-arc-block-half),
 				calc(
 					sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
 					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
@@ -2037,10 +2054,8 @@
 					sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
 					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
 				),
-				calc(
-					sin(var(---slice-angle-inner-end))
-					* var(---slice-inner-r)
-				)
+				var(---slice-inner-corner-arc-block-half),
+				var(---slice-inner-arc-block-half)
 			);
 
 			position: relative;
