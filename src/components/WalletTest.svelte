@@ -216,7 +216,7 @@
 			const address = account?.address || '0x0000000000000000000000000000000000000000';
 			const baseUrl = getBaseUrl()
 
-			siweSig.message = `${baseUrl}/ wants you to sign in with your Ethereum account:
+			siweSig.message = `${baseUrl} wants you to sign in with your Ethereum account:
 ${address}
 
 Sign in to authenticate your wallet. This is a test SIWE message.
