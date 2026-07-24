@@ -2876,6 +2876,7 @@
 				z-index: 6;
 
 				&::before {
+					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
 					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
