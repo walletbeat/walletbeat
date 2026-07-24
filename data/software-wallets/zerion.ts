@@ -269,7 +269,7 @@ export const zerion: SoftwareWallet = {
 				scamUrlWarning: supported<ScamUrlWarning>({
 					ref: [
 						{
-							explanation: 'Zerion sends the url domain to their server for security checks.',
+							explanation: 'Zerion sends the URL domain to their server for security checks.',
 							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/security-check-url.ts#L19-L28',
 						},
 					],
