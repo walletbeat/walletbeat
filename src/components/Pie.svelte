@@ -8,10 +8,10 @@
 	// Types
 	import {
 		computePieSlices,
-		PieLayout,
+		PieLayout as PieLayoutValue,
 		type ComputedSlice,
-		type LevelConfig,
-		type Slice,
+		type LevelConfig as PieLevelConfig,
+		type Slice as PieSlice,
 	} from './pie-geometry'
 	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
@@ -26,7 +26,7 @@
 		centerLabel,
 
 		// View options
-		layout = PieLayout.HalfTop,
+		layout = PieLayoutValue.HalfTop,
 		centerFirstSlice = true,
 		padding = 0,
 		radius = 47,
@@ -68,16 +68,16 @@
 		...restProps
 	}: HTMLAttributes<HTMLDivElement> & {
 		// Content
-		slices: Slice[]
+		slices: PieSlice[]
 		centerLabel?: string
 
 		// View options
-		layout?: (typeof PieLayout)[keyof typeof PieLayout]
+		layout?: (typeof PieLayoutValue)[keyof typeof PieLayoutValue]
 		centerFirstSlice?: boolean
 		radius?: number
 		padding?: number
 		labelSize?: number
-		levels?: LevelConfig[]
+		levels?: PieLevelConfig[]
 
 		// State
 		highlightedSliceId?: string | null
@@ -175,7 +175,7 @@
 		const maxRadius = radius * maxRadiusMultiplier + maxOffset
 
 		const width = padding * 2 + maxRadius * 2
-		const height = padding * 2 + maxRadius * (layout === PieLayout.HalfTop ? 1 : 2)
+		const height = padding * 2 + maxRadius * (layout === PieLayoutValue.HalfTop ? 1 : 2)
 		const viewBoxX = -(padding + maxRadius)
 		const viewBoxY = -(padding + maxRadius)
 
