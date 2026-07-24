@@ -280,7 +280,7 @@ export const zerion: SoftwareWallet = {
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: [
 						{
-							file: 'public/references/wallets/ambire/screenshots/2026-07-24-zerion-address-book.png',
+							file: 'public/references/wallets/zerion/screenshots/2026-07-24-zerion-address-book.png',
 							label: 'Zerion flags a recipient address as already in the address book when sending',
 						},
 					],
@@ -308,7 +308,7 @@ export const zerion: SoftwareWallet = {
 				erc4361: notSupportedWithRef({
 					ref: {
 						explanation: 'Zerion does not format SIWE requests for easy readability.',
-						file: 'public/references/wallets/ambire/screenshots/2026-07-24-zerion-erc4361-siwe.png',
+						file: 'public/references/wallets/zerion/screenshots/2026-07-24-zerion-erc4361-siwe.png',
 						label: 'Zerion sign-in dialog for an ERC-4361 signature request',
 					},
 				}),
