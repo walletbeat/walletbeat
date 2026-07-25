@@ -830,7 +830,7 @@ export const ambire: SoftwareWallet = {
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
-				erc4361: notSupportedWithRef({
+				erc4361: supported({
 					ref: {
 						explanation: 'Ambire formats SIWE requests for easy readability.',
 						file: 'public/references/wallets/ambire/screenshots/2026-07-24-ambire-erc4361-siwe.png',
