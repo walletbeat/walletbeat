@@ -736,10 +736,9 @@ export const rainbow: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
-			// Mobile only. The browser extension is left unrated rather than assumed
-			// to behave the same way. The leak fields come from the app's network
-			// traffic, captured through a local proxy to see which service performs
-			// each lookup.
+			// Mobile only. The leak fields come from the app's network traffic,
+			// captured through a local proxy to see which service performs each
+			// lookup.
 			//
 			// The "no warning" results below come from tests that cannot demonstrate
 			// the behavior they target. The scam-address test sends to the zero
