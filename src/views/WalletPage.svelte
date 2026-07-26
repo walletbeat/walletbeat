@@ -1037,7 +1037,6 @@
 		class="attribute"
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
-		data-sticky-breadcrumb="scope"
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
@@ -1046,6 +1045,7 @@
 			open
 			data-card="radius-8 padding-6 border-accent"
 			data-column="gap-0"
+			data-sticky-breadcrumb="scope"
 		>
 			<summary data-row>
 				<header data-row="start gap-3">
@@ -3025,6 +3025,36 @@
 						var(---wallet-breadcrumb-animation-range-start)
 						var(---wallet-breadcrumb-animation-range-end);
 				}
+			}
+		}
+
+		.attribute > details {
+			&[open] > summary > header {
+				animation: AttributeBreadcrumbOutAnimation linear both;
+				animation-timeline: --sticky-breadcrumb-scope-timeline;
+				animation-range:
+					exit-crossing calc(
+						100%
+							- var(--stickyBreadcrumb-trackBlockEnd)
+					)
+					exit-crossing 100%;
+			}
+
+			&:not([open]) {
+				.attribute-heading-position > [data-sticky-breadcrumb~='item'],
+				.attribute-heading-position > [data-sticky-breadcrumb~='item']::before,
+				.attribute-heading-position h3,
+				.attribute-icon::before,
+				.attribute-icon::after {
+					animation: none;
+				}
+			}
+		}
+
+		@keyframes AttributeBreadcrumbOutAnimation {
+			to {
+				visibility: hidden;
+				opacity: 0;
 			}
 		}
 

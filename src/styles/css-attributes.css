@@ -1236,7 +1236,7 @@ ol {
 
 			animation:
 				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
-				StickyBreadcrumbItemVisibility 1ms steps(1, start) both;
+				StickyBreadcrumbItemVisibility 1ms steps(1, end) both;
 			animation-timeline:
 				--sticky-breadcrumb-timeline,
 				--sticky-breadcrumb-scope-timeline;
