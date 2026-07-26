@@ -553,6 +553,7 @@
 	>
 		<header
 			id="top"
+			data-column="gap-8"
 		>
 			<a
 				data-link="camouflaged"
@@ -2782,10 +2783,6 @@
 	article {
 		min-inline-size: 0;
 
-		> header#top {
-			display: contents;
-		}
-
 		> header#top > .wallet-name {
 			z-index: 2;
 			align-self: start;
@@ -2826,11 +2823,6 @@
 		}
 
 		article {
-			> header#top > .wallet-header-content {
-				view-timeline-name: --header-timeline;
-				view-timeline-axis: block;
-			}
-
 			a:has(> h2):not([data-sticky-breadcrumb~='item']) {
 				view-timeline-name: --heading-timeline;
 				view-timeline-axis: block;
@@ -2902,11 +2894,12 @@
 
 		article > header#top > .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
-			position: sticky;
-			inset-block-start: 0;
 			font-size: 2.25rem;
+			view-timeline-name: --header-timeline;
+			view-timeline-axis: block;
+			view-timeline-inset: var(---wallet-page-block-offset) 0px;
 
-			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
+			animation: WalletNameAnimation var(--transition-easeOutExpo) forwards;
 			animation-timeline: --header-timeline;
 			animation-range: exit 0% exit 120%;
 
@@ -3261,13 +3254,24 @@
 		@keyframes WalletNameAnimation {
 			from {
 				--wallet-icon-size: 3rem;
-				margin-inline-start: var(---wallet-content-inline-start);
+				position: fixed;
+				inset-block-start: var(---wallet-page-block-offset);
+				inset-inline-start: calc(
+					var(--sticky-insetInlineStart)
+						+ var(---wallet-content-inline-start)
+				);
+				margin-inline-start: 0;
 				font-size: 2.25rem;
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				position: fixed;
 				inset-block-start: var(---wallet-icon-sticky-block-start);
-				margin-inline-start: var(---wallet-content-inline-start);
+				inset-inline-start: calc(
+					var(--sticky-insetInlineStart)
+						+ var(---wallet-content-inline-start)
+				);
+				margin-inline-start: 0;
 				font-size: var(---wallet-breadcrumb-root-font-size);
 			}
 		}
