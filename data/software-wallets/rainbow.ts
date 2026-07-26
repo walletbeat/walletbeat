@@ -807,6 +807,10 @@ export const rainbow: SoftwareWallet = {
 						leaksUserIp: true,
 						leaksVisitedUrl: 'DOMAIN_ONLY',
 					}),
+					// The look-alike test sent to one address, then to a second sharing
+					// its first four and last four characters, so the two are
+					// indistinguishable wherever an address is shown truncated.
+					//
 					// Rainbow's own send screen does note whether a recipient is new, in
 					// a slot that reads "First time send" or a count of previous sends.
 					// It is a history note rather than a caution, in plain text with no
