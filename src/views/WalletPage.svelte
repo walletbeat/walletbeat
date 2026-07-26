@@ -3461,12 +3461,6 @@
 				}
 			}
 
-			&[data-sticky]::before {
-				content: '';
-				inset: -0.5rem -6rem;
-				mask-image: linear-gradient(to top, transparent, white 0.5rem);
-			}
-
 			h2 {
 				font-size: 1.8rem;
 				font-weight: 700;
@@ -3548,11 +3542,6 @@
 			min-inline-size: 0;
 			scroll-margin-top: 3.5rem;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-			transition: box-shadow 0.2s ease;
-
-			&:hover {
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-			}
 
 			> summary {
 				min-inline-size: 0;
