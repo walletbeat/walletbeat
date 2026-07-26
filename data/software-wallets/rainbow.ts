@@ -807,9 +807,10 @@ export const rainbow: SoftwareWallet = {
 						leaksUserIp: true,
 						leaksVisitedUrl: 'DOMAIN_ONLY',
 					}),
-					// The look-alike test sent to one address, then to a second sharing
-					// its first four and last four characters, so the two are
-					// indistinguishable wherever an address is shown truncated.
+					// Look-alike recipients were tested by sending to one address, then
+					// to a second sharing its first four and last four characters, so
+					// that the two are indistinguishable wherever an address appears
+					// truncated. The second send drew no warning.
 					//
 					// Rainbow's own send screen does note whether a recipient is new, in
 					// a slot that reads "First time send" or a count of previous sends.
@@ -819,24 +820,14 @@ export const rainbow: SoftwareWallet = {
 					// Ambire's address book is treated: saving a recipient is possible,
 					// but recipients you have not saved draw no warning.
 					sendTransactionWarning: notSupportedWithRef({
-						ref: [
-							{
-								explanation:
-									'Rainbow does not warn you about who you are sending funds to, even when the request comes from an app it has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet, moments after warning about that same app at the connection screen.',
-								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png',
-								label:
-									'Rainbow mobile transaction request from a flagged app, sending 0.0001 ETH to the burn address with no warning shown.',
-								lastRetrieved: '2026-07-26',
-							},
-							{
-								explanation:
-									'Rainbow does not flag look-alike addresses, the kind used in address poisoning scams. Sending to an address that matched the first four and last four characters of one already in the account history drew no warning. The send screen notes a recipient you have not sent to before, but states it plainly rather than cautioning you, and offers to save the address as a contact.',
-								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-lookalike-recipient-no-warning.png',
-								label:
-									'Rainbow mobile send screen for an address resembling an earlier recipient, showing a plain "First time send" note and no warning.',
-								lastRetrieved: '2026-07-26',
-							},
-						],
+						ref: {
+							explanation:
+								'Rainbow does not warn you about who you are sending funds to, even when the request comes from an app it has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet, moments after warning about that same app at the connection screen.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png',
+							label:
+								'Rainbow mobile transaction request from a flagged app, sending 0.0001 ETH to the burn address with no warning shown.',
+							lastRetrieved: '2026-07-26',
+						},
 					}),
 					unlimitedApprovalWarning: notSupportedWithRef({
 						ref: {
