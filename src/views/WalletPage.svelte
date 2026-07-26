@@ -1102,7 +1102,15 @@
 							{/if}
 						</div>
 
-							{#if showStage}
+						<div
+							class="attribute-summary-companions-position"
+							data-row-item="wrap-end"
+						>
+							<div
+								class="attribute-summary-companions"
+								data-row="gap-2 wrap"
+							>
+								{#if showStage}
 								{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
 
 								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
@@ -1163,9 +1171,9 @@
 										</a>
 									{/if}
 								{/if}
-							{/if}
+								{/if}
 
-							{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
+								{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
 								<div
 									class="variant-indicator"
 									data-badge="small"
@@ -1183,9 +1191,9 @@
 										</span>
 									{/each}
 								</div>
-							{/if}
+								{/if}
 
-							{#if true}
+								{#if true}
 								{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 								{#if verifiability === Verifiability.UNVERIFIABLE}
 									<data
@@ -1202,13 +1210,14 @@
 										style:--accent="var(--accent-color)"
 									>Unverifiable but audited</data>
 								{/if}
-							{/if}
+								{/if}
 
-							<data
-								data-row-item="wrap-end"
-								data-badge="medium"
-								value={evalAttr.evaluation.outcome.rating}
-							>{evalAttr.evaluation.outcome.rating}</data>
+								<data
+									data-badge="medium"
+									value={evalAttr.evaluation.outcome.rating}
+								>{evalAttr.evaluation.outcome.rating}</data>
+							</div>
+						</div>
 					</div>
 				</header>
 			</summary>
@@ -3038,6 +3047,15 @@
 		}
 
 		.attribute > details {
+			.attribute-summary-companions-position {
+				anchor-name: --sticky-breadcrumb-extra-position;
+				inline-size: max-content;
+
+				> .attribute-summary-companions {
+					z-index: var(---wallet-breadcrumb-layer-attribute);
+				}
+			}
+
 			&[open] > summary > header {
 				animation: AttributeBreadcrumbOutAnimation linear both;
 				animation-timeline: --sticky-breadcrumb-scope-timeline;
@@ -3049,14 +3067,49 @@
 					exit-crossing 100%;
 			}
 
+			&[open] .attribute-summary-companions {
+				animation: AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) both;
+				animation-timeline: --sticky-breadcrumb-timeline;
+				animation-range:
+					var(---wallet-breadcrumb-animation-range-start)
+					var(---wallet-breadcrumb-animation-range-end);
+			}
+
 			&:not([open]) {
 				.attribute-heading-position > [data-sticky-breadcrumb~='item'],
 				.attribute-heading-position > [data-sticky-breadcrumb~='item']::before,
 				.attribute-heading-position h3,
+				.attribute-summary-companions,
 				.attribute-icon::before,
 				.attribute-icon::after {
 					animation: none;
 				}
+			}
+		}
+
+		@keyframes AttributeBreadcrumbCompanionsAnimation {
+			from {
+				position: fixed;
+				position-anchor: --sticky-breadcrumb-extra-position;
+				inset-block-start: anchor(--sticky-breadcrumb-extra-position top);
+				inset-inline: anchor(--sticky-breadcrumb-extra-position start) auto;
+				translate: none;
+			}
+			to {
+				position: fixed;
+				position-anchor: none;
+				inset-block-start: calc(
+					var(---wallet-icon-sticky-block-start)
+						+ var(---wallet-breadcrumb-block-size)
+						/ 2
+				);
+				inset-inline:
+					auto
+					calc(
+						var(--sticky-marginInlineEnd)
+							+ var(---wallet-content-inline-start)
+					);
+				translate: 0 -50%;
 			}
 		}
 
