@@ -811,7 +811,7 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning, and there is no address list you can maintain to mark which recipients you trust. Rainbow also does not flag look-alike addresses, the kind used in address poisoning scams.',
+									'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning, and there is no address list you can maintain to mark which recipients you trust.',
 								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-known-scam-send-no-warning.png',
 								label:
 									"Rainbow mobile transaction request sending 0.0001 ETH to the scam address on Walletbeat's test page, shown as an ordinary transfer with no warning",
