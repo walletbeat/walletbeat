@@ -2758,66 +2758,17 @@
 	}
 
 	article {
-		display: grid;
-		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
-		gap: 2rem 0.75rem;
-		padding-block-start: 2rem;
 		min-inline-size: 0;
-
-		> :not(.wallet-name) {
-			grid-column: 1 / -1;
-			min-inline-size: 0;
-		}
-
-		> .wallet-name,
-		> header#top {
-			grid-row: 1;
-		}
 
 		> .wallet-name {
 			z-index: 2;
-			grid-column: 1;
 			align-self: start;
 			inline-size: max-content;
 			margin-inline-start: var(---wallet-content-inline-start);
 		}
 
 		> header#top {
-			display: grid;
-			grid-template-columns: subgrid;
 			min-inline-size: 0;
-
-			> * {
-				grid-column: 1 / -1;
-			}
-
-			> :first-child {
-				grid-column: 2;
-			}
-		}
-	}
-
-	@media (max-width: 864px) {
-		article {
-			padding-block-start: calc(
-				var(---wallet-page-block-offset)
-					+ var(---wallet-sticky-content-inset)
-			);
-		}
-	}
-
-	@media (max-width: 480px) {
-		article {
-			grid-template-columns: minmax(0, 1fr);
-
-			> .wallet-name,
-			> header#top {
-				grid-row: auto;
-			}
-
-			> header#top > :first-child {
-				grid-column: 1;
-			}
 		}
 	}
 
