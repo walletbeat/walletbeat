@@ -2906,6 +2906,7 @@
 				content: '';
 				z-index: -1;
 				pointer-events: none;
+				anchor-name: --wallet-breadcrumb-surface;
 
 				position: fixed;
 				inset-block-start: var(---wallet-page-block-offset);
@@ -3068,7 +3069,7 @@
 			}
 
 			&[open] .attribute-summary-companions {
-				animation: AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) both;
+				animation: AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) forwards;
 				animation-timeline: --sticky-breadcrumb-timeline;
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
@@ -3097,16 +3098,12 @@
 			}
 			to {
 				position: fixed;
-				position-anchor: none;
-				inset-block-start: calc(
-					var(---wallet-icon-sticky-block-start)
-						+ var(---wallet-breadcrumb-block-size)
-						/ 2
-				);
+				position-anchor: --wallet-breadcrumb-surface;
+				inset-block-start: anchor(--wallet-breadcrumb-surface center);
 				inset-inline:
 					auto
 					calc(
-						var(--sticky-marginInlineEnd)
+						anchor(--wallet-breadcrumb-surface end)
 							+ var(---wallet-content-inline-start)
 					);
 				translate: 0 -50%;
