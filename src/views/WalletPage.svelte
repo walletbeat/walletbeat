@@ -554,6 +554,7 @@
 		<header
 			id="top"
 			data-column="gap-8"
+			data-scroll-item="inline-detached padding-match-start"
 		>
 			<a
 				data-link="camouflaged"
@@ -1498,6 +1499,7 @@
 	.container {
 		--wallet-icon-size: 3rem;
 		---wallet-content-inline-padding: 2rem;
+		---wallet-content-block-start: 2rem;
 		---wallet-sticky-content-inset: 1rem;
 		---wallet-icon-sticky-block-start: calc(
 			var(---wallet-page-block-offset)
@@ -1537,6 +1539,7 @@
 		---wallet-attribute-heading-font-size: 1.17em;
 		---wallet-breadcrumb-animation-range-start: entry calc(100dvb - 6rem);
 		---wallet-breadcrumb-animation-range-end: entry calc(100dvb - 3rem);
+		---wallet-name-animation-distance: 7.5rem;
 		--border-radius-lg: 1rem;
 		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
@@ -1716,6 +1719,12 @@
 	}
 
 	:global(#layout:has(#wallet-page)) {
+		/*
+		 * A perspective establishes a containing block for fixed descendants.
+		 * Breadcrumbs must remain fixed to this scroll container, not its moving
+		 * contents.
+		 */
+		--scrollContainer-perspective: none;
 		---wallet-page-navigation-inline-size-rem: 20;
 		---wallet-page-navigation-inline-size: calc(
 			var(---wallet-page-navigation-inline-size-rem)
@@ -2783,11 +2792,16 @@
 	article {
 		min-inline-size: 0;
 
+		> header#top {
+			z-index: var(---wallet-breadcrumb-layer-root);
+			view-timeline-name: --header-timeline;
+			view-timeline-axis: block;
+		}
+
 		> header#top > .wallet-name {
 			z-index: 2;
 			align-self: start;
 			inline-size: max-content;
-			margin-inline-start: var(---wallet-content-inline-start);
 		}
 
 		> header#top > .wallet-header-content {
@@ -2895,13 +2909,15 @@
 		article > header#top > .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
 			font-size: 2.25rem;
-			view-timeline-name: --header-timeline;
-			view-timeline-axis: block;
-			view-timeline-inset: var(---wallet-page-block-offset) 0px;
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) forwards;
 			animation-timeline: --header-timeline;
-			animation-range: exit 0% exit 120%;
+			animation-range:
+				exit-crossing var(---wallet-content-block-start)
+				exit-crossing calc(
+					var(---wallet-content-block-start)
+					+ var(---wallet-name-animation-distance)
+				);
 
 			&::after {
 				content: '';
@@ -2927,7 +2943,12 @@
 
 				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
 				animation-timeline: --header-timeline;
-				animation-range: exit 0% exit 120%;
+				animation-range:
+					exit-crossing var(---wallet-content-block-start)
+					exit-crossing calc(
+						var(---wallet-content-block-start)
+						+ var(---wallet-name-animation-distance)
+					);
 
 				@media (max-width: 1024px) {
 					inset-inline-start: var(---wallet-page-navigation-inline-size);
