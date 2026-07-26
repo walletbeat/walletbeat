@@ -2933,6 +2933,45 @@
 			animation-timeline: --header-timeline;
 			animation-range: exit 0% exit 120%;
 
+			&::after {
+				content: '';
+				z-index: -1;
+				pointer-events: none;
+
+				position: fixed;
+				inset-block-start: var(---wallet-page-block-offset);
+				inset-inline-start: 0;
+				inline-size: calc(
+					100vi
+					- var(---wallet-page-navigation-inline-size)
+				);
+				block-size: calc(
+					2 * var(---wallet-sticky-content-inset)
+					+ var(---wallet-breadcrumb-block-size)
+				);
+
+				background-color: var(---wallet-breadcrumb-surface-background);
+				backdrop-filter: blur(20px);
+				opacity: 0;
+
+				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
+				animation-timeline: --header-timeline;
+				animation-range: exit 0% exit 120%;
+
+				@media (max-width: 1024px) {
+					inset-inline-start: var(---wallet-page-navigation-inline-size);
+				}
+
+				@media (max-width: 864px) {
+					inset-inline-start: 0;
+					inline-size: 100vi;
+				}
+
+				@media (prefers-reduced-transparency: reduce) {
+					backdrop-filter: none;
+				}
+			}
+
 			h1 {
 				font-size: inherit;
 			}
@@ -2941,25 +2980,8 @@
 		:is(
 			#stages > header,
 			.attribute-group-stack > header
-		)[data-sticky] {
-			background-color: var(---wallet-breadcrumb-surface-background);
-			box-shadow:
-				0 0 0 100vi
-				var(---wallet-breadcrumb-surface-background);
-			clip-path: inset(
-				0 -100vi
-					calc(
-						100%
-						- (
-							(2 * var(---wallet-sticky-content-inset))
-							+ var(---wallet-breadcrumb-block-size)
-						)
-					)
-			);
-
-			&::before {
-				content: none;
-			}
+		)[data-sticky]::before {
+			content: none;
 		}
 
 		.wallet-icon-layer {
@@ -3205,6 +3227,12 @@
 				inset-block-start: var(---wallet-icon-sticky-block-start);
 				margin-inline-start: var(---wallet-content-inline-start);
 				font-size: var(---wallet-name-sticky-font-size);
+			}
+		}
+
+		@keyframes WalletBreadcrumbSurfaceAnimation {
+			to {
+				opacity: 1;
 			}
 		}
 
