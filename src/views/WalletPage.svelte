@@ -551,27 +551,30 @@
 	<article
 		data-column="gap-8"
 	>
-		<a
-			data-link="camouflaged"
-			data-sticky-breadcrumb="root item"
-			class="wallet-name"
-			href="#top"
-		>
-			<h1 data-row="gap-2">
-				<img
-					class="wallet-icon"
-					alt={wallet.metadata.displayName}
-					src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-				/>
-				<span>{wallet.metadata.displayName}</span>
-			</h1>
-		</a>
-
 		<header
 			id="top"
-			data-column="gap-6"
-			data-scroll-item="inline-detached padding-match-start"
 		>
+			<a
+				data-link="camouflaged"
+				data-sticky-breadcrumb="root item"
+				class="wallet-name"
+				href="#top"
+			>
+				<h1 data-row="gap-2">
+					<img
+						class="wallet-icon"
+						alt={wallet.metadata.displayName}
+						src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+					/>
+					<span>{wallet.metadata.displayName}</span>
+				</h1>
+			</a>
+
+			<div
+				class="wallet-header-content"
+				data-column="gap-6"
+				data-scroll-item="inline-detached padding-match-start"
+			>
 			<div data-row="wrap">
 				<div data-row="wrap">
 					{#if Object.keys(wallet.variants).length > 1}
@@ -713,6 +716,7 @@
 					{/if}
 				</div>
 			</section>
+			</div>
 		</header>
 
 		{#if walletNews.length > 0 && !newsIsVeryStale}
@@ -2778,14 +2782,18 @@
 	article {
 		min-inline-size: 0;
 
-		> .wallet-name {
+		> header#top {
+			display: contents;
+		}
+
+		> header#top > .wallet-name {
 			z-index: 2;
 			align-self: start;
 			inline-size: max-content;
 			margin-inline-start: var(---wallet-content-inline-start);
 		}
 
-		> header#top {
+		> header#top > .wallet-header-content {
 			min-inline-size: 0;
 		}
 	}
@@ -2818,7 +2826,7 @@
 		}
 
 		article {
-			> header#top {
+			> header#top > .wallet-header-content {
 				view-timeline-name: --header-timeline;
 				view-timeline-axis: block;
 			}
@@ -2878,7 +2886,7 @@
 			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
 		}
 
-		article > .wallet-name {
+		article > header#top > .wallet-name {
 			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-root;
 		}
 
@@ -2892,7 +2900,7 @@
 			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
 		}
 
-		article > .wallet-name {
+		article > header#top > .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
 			position: sticky;
 			inset-block-start: 0;
@@ -3271,7 +3279,7 @@
 		}
 
 		@media (prefers-reduced-motion: reduce) {
-			article > .wallet-name {
+			article > header#top > .wallet-name {
 				animation: none;
 			}
 		}
