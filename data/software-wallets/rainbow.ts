@@ -807,10 +807,14 @@ export const rainbow: SoftwareWallet = {
 						leaksUserIp: true,
 						leaksVisitedUrl: 'DOMAIN_ONLY',
 					}),
+					// Rainbow does have a contacts list, and saved contacts surface as
+					// suggestions while sending. It is not a whitelist in the sense this
+					// field means, because Rainbow never warns about a recipient that is
+					// absent from it. Same reading as Ambire's address book.
 					sendTransactionWarning: notSupportedWithRef({
 						ref: {
 							explanation:
-								'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning, and there is no address list you can maintain to mark which recipients you trust. This holds even when the request comes from an app Rainbow has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet, moments after warning about that same app at the connection screen.',
+								'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning. You can save addresses as contacts, and they are offered as suggestions while sending, but sending to an address you never saved is not treated any differently. This holds even when the request comes from an app Rainbow has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet, moments after warning about that same app at the connection screen.',
 							file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png',
 							label:
 								'Rainbow mobile transaction request from a flagged app, sending 0.0001 ETH to the burn address with no warning shown.',
