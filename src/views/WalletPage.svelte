@@ -2735,7 +2735,7 @@
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				---pie-size-rem: 6;
+				---pie-size-rem: 8;
 				---pie-size: calc(var(---pie-size-rem) * 1rem);
 				---pie-surface-size: 4.25rem;
 				---pie-target-angle: 0.5turn;
