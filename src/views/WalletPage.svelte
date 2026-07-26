@@ -727,7 +727,7 @@
 
 			<section id="stages" data-sticky-breadcrumb="scope">
 				<header
-					data-sticky="block backdrop-before backdrop-stuck"
+					data-sticky="block backdrop-none"
 					data-sticky-breadcrumb="position"
 					data-row
 					data-scroll-item="inline-detached"
@@ -926,7 +926,7 @@
 				data-scroll-item="inline-detached padding-match-end"
 			>
 				<header
-					data-sticky="block backdrop-before backdrop-stuck"
+					data-sticky="block backdrop-none"
 					data-row="start gap-3"
 					data-scroll-item="inline-detached"
 				>
@@ -2928,13 +2928,6 @@
 			}
 		}
 
-		:is(
-			#stages > header,
-			.attribute-group-stack > header
-		)[data-sticky]::before {
-			content: none;
-		}
-
 		.wallet-icon-layer {
 			display: none;
 		}
@@ -3190,13 +3183,6 @@
 		@media (prefers-reduced-motion: reduce) {
 			article > .wallet-name {
 				animation: none;
-			}
-
-			:is(
-				#stages > header,
-				.attribute-group-stack > header
-			)[data-sticky]::before {
-				content: '';
 			}
 		}
 	}
