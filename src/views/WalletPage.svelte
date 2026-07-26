@@ -1500,8 +1500,17 @@
 		---wallet-icon-sticky-inline-start: var(---wallet-content-inline-start);
 		---wallet-name-sticky-icon-size: 2rem;
 		---wallet-name-sticky-font-size: 1.8rem;
+		---wallet-breadcrumb-root-font-size: var(---wallet-name-sticky-font-size);
+		---wallet-breadcrumb-attribute-font-size: 1.17rem;
+		---wallet-breadcrumb-group-font-size: calc(
+			(
+				var(---wallet-breadcrumb-root-font-size)
+				+ var(---wallet-breadcrumb-attribute-font-size)
+			)
+			/ 2
+		);
 		---wallet-breadcrumb-block-size: calc(
-			var(---wallet-name-sticky-font-size)
+			var(---wallet-breadcrumb-root-font-size)
 			* 1.6
 		);
 		---wallet-breadcrumb-gap: 1.5rem;
@@ -3173,6 +3182,7 @@
 
 		@keyframes BreadcrumbHeadingIconSpaceAnimation {
 			to {
+				font-size: var(---wallet-breadcrumb-attribute-font-size);
 				margin-inline-start: calc(
 					var(---wallet-breadcrumb-heading-icon-size)
 					+ var(---wallet-breadcrumb-heading-icon-gap)
@@ -3182,7 +3192,7 @@
 
 		@keyframes AttributeGroupBreadcrumbHeadingAnimation {
 			to {
-				font-size: var(---wallet-attribute-heading-font-size);
+				font-size: var(---wallet-breadcrumb-group-font-size);
 				margin-inline-start: calc(
 					var(---wallet-breadcrumb-heading-icon-size)
 					+ var(---wallet-breadcrumb-heading-icon-gap)
@@ -3200,7 +3210,7 @@
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
 				inset-block-start: var(---wallet-icon-sticky-block-start);
 				margin-inline-start: var(---wallet-content-inline-start);
-				font-size: var(---wallet-name-sticky-font-size);
+				font-size: var(---wallet-breadcrumb-root-font-size);
 			}
 		}
 
