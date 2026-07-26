@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import { alphabet } from '@/data/entities/alphabet'
 import { apple } from '@/data/entities/apple'
 import { rainbow as rainbowEntity } from '@/data/entities/rainbow'
@@ -27,6 +28,10 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+} from '@/schema/features/security/scam-alerts'
 import {
 	KeyStorageMechanism,
 	SecureRngSource,
@@ -79,9 +84,9 @@ export const rainbow: SoftwareWallet = {
 		blurb: paragraph(`
 			Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
-		contributors: [polymutex, mattmatt],
+		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-11',
+		lastUpdated: '2026-07-26',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -731,7 +736,118 @@ export const rainbow: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
-			scamAlerts: null, // Rainbow uses Blockaid per questionnaire, but full details on all sub-fields pending follow-up
+			// Mobile only. The browser extension is left unrated rather than assumed
+			// to behave the same way. The leak fields come from the app's network
+			// traffic, captured through a local proxy to see which service performs
+			// each lookup.
+			//
+			// The "no warning" results below come from tests that cannot demonstrate
+			// the behavior they target. The scam-address test sends to the zero
+			// address, which no registry flags. Both contract tests point at the
+			// same call to Walletbeat's own test contract, which is verified and has
+			// been onchain since March 2026, so it is neither flagged nor recently
+			// deployed. Revisit once the tests use targets that are genuinely
+			// flagged and genuinely new.
+			scamAlerts: {
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					contractTransactionWarning: supported<WithRef<ContractTransactionWarning>>({
+						ref: [
+							{
+								explanation:
+									'Rainbow checks transactions for scams using Blockaid. Every request is compared against a database of known scams and malicious contracts, and Rainbow shows a warning when a request is flagged.',
+								lastRetrieved: '2026-07-26',
+								url: 'https://www.blockaid.io/blog/rainbow-wallet-mobile-app-and-browser-extension-powered-by-blockaid',
+							},
+							{
+								explanation:
+									'Before you can confirm a transaction, Rainbow sends it to its own servers to be simulated and scanned. That request includes your account address, the contract you are interacting with, the transaction data, and the website that requested it. The servers return a risk verdict and a link to the full scan report.',
+								lastRetrieved: '2026-07-26',
+								url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/graphql/queries/metadata.graphql#L168',
+							},
+							{
+								explanation:
+									"Rainbow doesn't warn you about a contract if it was deployed recently or if you've never interacted with it before.",
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-18-scam-alerts-recent-deploy-contract-no-warning.png',
+								label:
+									"Rainbow mobile transaction request for Walletbeat's test contract with no risk warning.",
+								lastRetrieved: '2026-07-18',
+							},
+							{
+								explanation:
+									'When a request does come back flagged, Rainbow heads the sheet "Suspicious Transaction" in red and tells you that signing could result in losing access to everything in your wallet.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-suspicious-transaction-warning.png',
+								label:
+									'Rainbow mobile signature request from a flagged app, showing a "Suspicious Transaction" warning above an unlimited USDC approval.',
+								lastRetrieved: '2026-07-26',
+							},
+						],
+						contractRegistry: true,
+						leaksContractAddress: true,
+						leaksUserAddress: true,
+						leaksUserIp: true,
+						previousContractInteractionWarning: false,
+						recentContractWarning: false,
+					}),
+					scamUrlWarning: supported<ScamUrlWarning>({
+						ref: [
+							{
+								explanation:
+									"When a website asks to connect, Rainbow checks that site's reputation against its own servers. The check sends the site's domain name and nothing else. It does not send your wallet address, and it does not send the individual pages you visit on that site.",
+								lastRetrieved: '2026-07-26',
+								url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/graphql/queries/metadata.graphql#L98',
+							},
+							{
+								explanation:
+									'If that check flags the site as a scam, Rainbow shows the site\'s address in red with a warning symbol, and adds an alert titled "This app is likely malicious" telling you that signing could cost you your assets. The same connection screen is used for WalletConnect and for sites opened in Rainbow\'s built-in browser.',
+								lastRetrieved: '2026-07-26',
+								url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/screens/WalletConnectApprovalSheet.tsx#L181',
+							},
+							{
+								explanation:
+									'Connecting to an app that Rainbow flags shows this warning in practice. The app\'s address appears in red beside a warning symbol, above an alert reading "This app is likely malicious".',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-malicious-dapp-connect-warning.png',
+								label:
+									'Rainbow mobile connection screen for a flagged app, showing its address in red and an alert reading "This app is likely malicious".',
+								lastRetrieved: '2026-07-26',
+							},
+						],
+						leaksUserAddress: false,
+						leaksUserIp: true,
+						leaksVisitedUrl: 'DOMAIN_ONLY',
+					}),
+					sendTransactionWarning: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning, and there is no address list you can maintain to mark which recipients you trust. Rainbow also does not flag look-alike addresses, the kind used in address poisoning scams.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-known-scam-send-no-warning.png',
+								label:
+									"Rainbow mobile transaction request sending 0.0001 ETH to the scam address on Walletbeat's test page, shown as an ordinary transfer with no warning",
+								lastRetrieved: '2026-07-26',
+							},
+							{
+								explanation:
+									'This holds even when the request comes from an app Rainbow has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet with no warning, moments after warning about the same app at the connection screen.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png',
+								label:
+									'Rainbow mobile transaction request from a flagged app, sending 0.0001 ETH to the burn address with no warning shown.',
+								lastRetrieved: '2026-07-26',
+							},
+						],
+					}),
+					unlimitedApprovalWarning: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Rainbow shows you that an approval is unlimited, but does not warn you about it. It warns when the request itself is assessed as malicious, such as a permit granting an allowance to a known bad address. An unlimited approval that is not otherwise flagged is presented plainly as "Approve Unlimited USDC", with no cautionary color, icon, or wording. The size of the allowance is never itself the trigger.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-18-scam-alerts-unlimited-approval-neutral-label.png',
+							label:
+								'Rainbow mobile approval request showing "Approve Unlimited USDC" in ordinary styling, with no risk warning',
+							lastRetrieved: '2026-07-18',
+						},
+					}),
+				},
+			},
 			securityBestPractices: {
 				browser: {
 					ref: [
@@ -871,7 +987,7 @@ export const rainbow: SoftwareWallet = {
 		},
 		transparency: {
 			operationFees: {
-				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
+				// Source: testing in the Rainbow iOS app (2026-07-03).
 				// Corrects an earlier questionnaire-sourced NONE: the default swap
 				// screen already shows a network fee (so byDefault is AGGREGATED, not
 				// NONE), and tapping "Review" (one action) reveals a comprehensive
@@ -922,7 +1038,7 @@ export const rainbow: SoftwareWallet = {
 						WalletServiceFeeDisplayUnit.PERCENTAGE,
 					),
 				}),
-				// Source: first-hand testing in the Rainbow iOS app (2026-07-03).
+				// Source: testing in the Rainbow iOS app (2026-07-03).
 				// For all three flows below, the transaction screen shows a single
 				// aggregate "Estimated fee" figure by default, and one tap on the gas
 				// control opens a sheet itemizing base fee / miner tip / max
