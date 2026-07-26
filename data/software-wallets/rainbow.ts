@@ -739,14 +739,6 @@ export const rainbow: SoftwareWallet = {
 			// Mobile only. The leak fields come from the app's network traffic,
 			// captured through a local proxy to see which service performs each
 			// lookup.
-			//
-			// The "no warning" results below come from tests that cannot demonstrate
-			// the behavior they target. The scam-address test sends to the zero
-			// address, which no registry flags. Both contract tests point at the
-			// same call to Walletbeat's own test contract, which is verified and has
-			// been onchain since March 2026, so it is neither flagged nor recently
-			// deployed. Revisit once the tests use targets that are genuinely
-			// flagged and genuinely new.
 			scamAlerts: {
 				[Variant.BROWSER]: null,
 				[Variant.MOBILE]: {
