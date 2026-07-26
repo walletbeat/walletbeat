@@ -808,24 +808,14 @@ export const rainbow: SoftwareWallet = {
 						leaksVisitedUrl: 'DOMAIN_ONLY',
 					}),
 					sendTransactionWarning: notSupportedWithRef({
-						ref: [
-							{
-								explanation:
-									'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning, and there is no address list you can maintain to mark which recipients you trust.',
-								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-known-scam-send-no-warning.png',
-								label:
-									"Rainbow mobile transaction request sending 0.0001 ETH to the scam address on Walletbeat's test page, shown as an ordinary transfer with no warning",
-								lastRetrieved: '2026-07-26',
-							},
-							{
-								explanation:
-									'This holds even when the request comes from an app Rainbow has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet with no warning, moments after warning about the same app at the connection screen.',
-								file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png',
-								label:
-									'Rainbow mobile transaction request from a flagged app, sending 0.0001 ETH to the burn address with no warning shown.',
-								lastRetrieved: '2026-07-26',
-							},
-						],
+						ref: {
+							explanation:
+								'Rainbow does not warn you about who you are sending funds to. Sending to an address for the first time produces no warning, and there is no address list you can maintain to mark which recipients you trust. This holds even when the request comes from an app Rainbow has already flagged as malicious. Asked to send funds to the burn address by such an app, Rainbow showed an ordinary transfer sheet, moments after warning about that same app at the connection screen.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png',
+							label:
+								'Rainbow mobile transaction request from a flagged app, sending 0.0001 ETH to the burn address with no warning shown.',
+							lastRetrieved: '2026-07-26',
+						},
 					}),
 					unlimitedApprovalWarning: notSupportedWithRef({
 						ref: {
