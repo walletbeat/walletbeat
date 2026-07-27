@@ -784,7 +784,7 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									"When a website asks to connect, Rainbow checks that site's reputation against its own servers. The check sends the site's domain name and nothing else. It does not send your wallet address, and it does not send the individual pages you visit on that site.",
+									"When a website asks to connect, Rainbow checks that site's reputation against its own servers. Browsing in Rainbow's own browser reduces the site to its domain before the check is sent, so the individual pages you visit on that site are not disclosed. Your wallet address is never part of the check.",
 								lastRetrieved: '2026-07-26',
 								url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/graphql/queries/metadata.graphql#L98',
 							},
