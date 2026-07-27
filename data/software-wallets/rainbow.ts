@@ -807,18 +807,9 @@ export const rainbow: SoftwareWallet = {
 						leaksUserIp: true,
 						leaksVisitedUrl: 'DOMAIN_ONLY',
 					}),
-					// Look-alike recipients were tested by sending to one address, then
-					// to a second sharing its first four and last four characters, so
-					// that the two are indistinguishable wherever an address appears
-					// truncated. The second send drew no warning.
-					//
-					// Rainbow's own send screen does note whether a recipient is new, in
-					// a slot that reads "First time send" or a count of previous sends.
-					// It is a history note rather than a caution, in plain text with no
-					// icon or color, unlike the red treatment Rainbow gives a request it
-					// considers malicious. Contacts are read the same way, matching how
-					// Ambire's address book is treated: saving a recipient is possible,
-					// but recipients you have not saved draw no warning.
+					// The send screen notes whether a recipient is new, in a slot reading
+					// "First time send" or a count of previous sends. That is a history
+					// note, not a caution.
 					sendTransactionWarning: notSupportedWithRef({
 						ref: [
 							{
