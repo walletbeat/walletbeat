@@ -994,7 +994,7 @@
 				</header>
 
 				<div data-column>
-					<div class="attributes" data-column>
+					<div class="attributes" data-column="gap-5">
 						{#each attributes as { attribute, evalAttr }}
 							{@render attributeSnippet({
 								attrGroupId: attrGroup.id,
@@ -1352,7 +1352,7 @@
 				</div>
 			{/if}
 
-			<div class="attribute-accordions" data-column>
+			<div class="attribute-accordions" data-column="gap-3">
 				<details open data-card="padding-5 secondary radius-4" data-column="gap-0">
 					<summary>
 						<h4>
@@ -3492,7 +3492,6 @@
 
 		.section-caption {
 			opacity: 0.8;
-			font-style: italic;
 			color: var(--text-secondary);
 			text-wrap: pretty;
 

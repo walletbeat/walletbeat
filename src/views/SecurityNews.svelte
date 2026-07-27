@@ -66,7 +66,7 @@
 		</summary>
 
 
-		<div class="attribute-accordions news-items" data-column>
+		<div class="attribute-accordions news-items" data-column="gap-3">
 			{#each news as newsItem (newsItem.title)}
 				{@const statusInfo = incidentStatuses[newsItem.status]}
 				{@const severityInfo = severities[newsItem.severity]}
