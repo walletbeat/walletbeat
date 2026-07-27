@@ -784,9 +784,15 @@ export const rainbow: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									"When a website asks to connect, Rainbow checks that site's reputation against its own servers. Browsing in Rainbow's own browser reduces the site to its domain before the check is sent, so the individual pages you visit on that site are not disclosed. Your wallet address is never part of the check.",
+									"When a website asks to connect, Rainbow checks that site's reputation against its own servers. The check carries the site's address and a short name for it. Your wallet address is not part of it.",
 								lastRetrieved: '2026-07-26',
 								url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/graphql/queries/metadata.graphql#L98',
+							},
+							{
+								explanation:
+									"Rainbow's own browser reduces a site to its domain before that check is sent, both when a site asks to connect and when it makes any later request. The individual pages you visit on the site are not disclosed.",
+								lastRetrieved: '2026-07-26',
+								url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/features/dapp-browser/services/handleProviderRequest.ts#L116-L139',
 							},
 							{
 								explanation:
