@@ -807,9 +807,10 @@ export const rainbow: SoftwareWallet = {
 						leaksUserIp: true,
 						leaksVisitedUrl: 'DOMAIN_ONLY',
 					}),
-					// The send screen notes whether a recipient is new, in a slot reading
-					// "First time send" or a count of previous sends. That is a history
-					// note, not a caution.
+					// Look-alike recipients were tested by sending to one address, then
+					// to a second sharing its first four and last four characters, so
+					// that the two are indistinguishable wherever an address appears
+					// truncated. The second send drew no warning.
 					sendTransactionWarning: notSupportedWithRef({
 						ref: [
 							{
