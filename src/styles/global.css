@@ -241,14 +241,3 @@ h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
 }
-
-@keyframes WalletPageIconLayerAnimation {
-	from,
-	79% {
-		opacity: 0;
-	}
-	80%,
-	to {
-		opacity: 1;
-	}
-}

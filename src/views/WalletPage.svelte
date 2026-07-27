@@ -541,44 +541,32 @@
 	].join(', ')}
 	{@attach attachDetailsCommands}
 >
-	<div class="wallet-icon-layer" aria-hidden="true">
-		<img
-			alt=""
-			src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-		/>
-	</div>
-
 	<article
 		data-column="gap-8"
 	>
 		<header
 			id="top"
-			data-column="gap-8"
+			data-column="gap-6"
 			data-scroll-item="inline-detached padding-match-start"
 		>
-			<a
-				data-link="camouflaged"
-				data-sticky-breadcrumb="root item"
-				class="wallet-name"
-				href="#top"
-			>
-				<h1 data-row="gap-2">
-					<img
-						class="wallet-icon"
-						alt={wallet.metadata.displayName}
-						src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-					/>
-					<span>{wallet.metadata.displayName}</span>
-				</h1>
-			</a>
-
-			<div
-				class="wallet-header-content"
-				data-column="gap-6"
-				data-scroll-item="inline-detached padding-match-start"
-			>
 			<div data-row="wrap">
-				<div data-row="wrap">
+				<div class="wallet-title-row" data-row="wrap">
+					<a
+						data-link="camouflaged"
+						data-sticky-breadcrumb="root item"
+						class="wallet-name"
+						href="#top"
+					>
+						<h1 data-row="gap-2">
+							<img
+								class="wallet-icon"
+								alt={wallet.metadata.displayName}
+								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+							/>
+							<span>{wallet.metadata.displayName}</span>
+						</h1>
+					</a>
+
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
 							bind:value={selectedVariant}
@@ -718,7 +706,6 @@
 					{/if}
 				</div>
 			</section>
-			</div>
 		</header>
 
 		{#if walletNews.length > 0 && !newsIsVeryStale}
@@ -1515,6 +1502,8 @@
 		---wallet-icon-sticky-inline-start: var(---wallet-content-inline-start);
 		---wallet-name-sticky-icon-size: 2rem;
 		---wallet-name-sticky-font-size: 1.8rem;
+		---wallet-name-flow-font-size: 2.25rem;
+		---wallet-line-height: 1.6;
 		---wallet-breadcrumb-root-font-size: var(---wallet-name-sticky-font-size);
 		---wallet-breadcrumb-attribute-font-size: 1.17rem;
 		---wallet-breadcrumb-group-font-size: calc(
@@ -1606,7 +1595,7 @@
 			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
 		}
 
-		line-height: 1.6;
+		line-height: var(---wallet-line-height);
 
 		position: relative;
 
@@ -2886,10 +2875,6 @@
 		initial-value: 0;
 	}
 
-	.wallet-icon-layer {
-		display: none;
-	}
-
 	article {
 		min-inline-size: 0;
 
@@ -2899,14 +2884,21 @@
 			view-timeline-axis: block;
 		}
 
-		> header#top > .wallet-name {
+		.wallet-name {
 			z-index: 2;
 			align-self: start;
 			inline-size: max-content;
 		}
 
-		> header#top > .wallet-header-content {
-			min-inline-size: 0;
+		.wallet-title-row {
+			anchor-name: --wallet-title-flow-position;
+			min-block-size: max(
+				var(--wallet-icon-size),
+				calc(
+					var(---wallet-name-flow-font-size)
+					* var(---wallet-line-height)
+				)
+			);
 		}
 	}
 
@@ -2915,26 +2907,6 @@
 		.attribute > details > summary {
 			view-timeline-name: var(---pie-timeline, none);
 			view-timeline-axis: block;
-		}
-
-		.wallet-icon-layer {
-			display: block;
-			z-index: 2;
-			grid-area: Content;
-			pointer-events: none;
-
-			animation: WalletPageIconLayerAnimation linear both;
-			animation-timeline: --header-timeline;
-			animation-range: exit 0% exit 120%;
-
-			> img {
-				display: block;
-				position: sticky;
-				inset-block-start: var(---wallet-icon-sticky-block-start);
-				inline-size: 2.25rem;
-				block-size: 2.25rem;
-				margin-inline-start: var(---wallet-icon-sticky-inline-start);
-			}
 		}
 
 		article {
@@ -2993,7 +2965,7 @@
 			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
 		}
 
-		article > header#top > .wallet-name {
+		article > header#top .wallet-name {
 			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-root;
 		}
 
@@ -3007,9 +2979,9 @@
 			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
 		}
 
-		article > header#top > .wallet-name {
+		article > header#top .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
-			font-size: 2.25rem;
+			font-size: var(---wallet-name-flow-font-size);
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) forwards;
 			animation-timeline: --header-timeline;
@@ -3068,10 +3040,6 @@
 			h1 {
 				font-size: inherit;
 			}
-		}
-
-		.wallet-icon-layer {
-			display: none;
 		}
 
 		#stages > header[data-sticky-breadcrumb~='position'] {
@@ -3421,13 +3389,10 @@
 			from {
 				--wallet-icon-size: 3rem;
 				position: fixed;
-				inset-block-start: var(---wallet-page-block-offset);
-				inset-inline-start: calc(
-					var(--sticky-insetInlineStart)
-						+ var(---wallet-content-inline-start)
-				);
+				inset-block-start: anchor(--wallet-title-flow-position top);
+				inset-inline-start: anchor(--wallet-title-flow-position start);
 				margin-inline-start: 0;
-				font-size: 2.25rem;
+				font-size: var(---wallet-name-flow-font-size);
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
@@ -3463,7 +3428,7 @@
 				);
 			}
 
-			article > header#top > .wallet-name::after {
+			article > header#top .wallet-name::after {
 				block-size: calc(
 					2 * var(---wallet-sticky-content-inset)
 					+ 2 * var(---wallet-breadcrumb-block-size)
@@ -3490,27 +3455,22 @@
 		}
 
 		@media (prefers-reduced-motion: reduce) {
-			article > header#top > .wallet-name {
+			article > header#top .wallet-name {
 				animation: none;
 			}
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.wallet-icon-layer,
 		article a:has(> h2),
 		article a:has(> h2)::before {
 			animation: none;
-		}
-
-		.wallet-icon-layer {
-			display: none;
 		}
 	}
 
 	.wallet-name {
 		h1 {
-			font-size: 2.25rem;
+			font-size: var(---wallet-name-flow-font-size);
 		}
 	}
 
