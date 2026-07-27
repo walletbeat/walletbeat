@@ -46,7 +46,10 @@ import {
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
+import {
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
@@ -57,6 +60,7 @@ import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { mdParagraph, paragraph } from '@/types/content'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
@@ -141,16 +145,25 @@ export const metamask: SoftwareWallet = {
 		chainAbstraction: {
 			bridging: {
 				builtInBridging: supported({
-					ref: {
-						explanation:
-							'MetaMask has a built-in bridge feature that allows users to bridge assets between chains.',
-						url: 'https://support.metamask.io/more-web3/learn/field-guide-to-bridges/',
-					},
+					ref: [
+						{
+							explanation:
+								'MetaMask has a built-in bridge feature that allows users to bridge assets between chains.',
+							url: 'https://support.metamask.io/more-web3/learn/field-guide-to-bridges/',
+						},
+						{
+							explanation:
+								"MetaMask's Bridge feature uses the same swap engine as its built-in Swap feature, which discloses a 0.875% MetaMask fee as a percentage via the Rate info tooltip, revealed by hovering over the info icon.",
+							file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
+							label:
+								'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
+						},
+					],
 					feesLargerThan1bps: {
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
-						walletServiceFeeDisplayUnits: null,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 					},
 					risksExplained: 'NOT_IN_UI',
 				}),
@@ -652,11 +665,19 @@ export const metamask: SoftwareWallet = {
 		transparency: {
 			operationFees: {
 				builtInErc20Swap: supported({
-					ref: [],
+					ref: [
+						{
+							explanation:
+								'MetaMask discloses its built-in swap fee (0.875%) as a percentage inside the Rate info tooltip, revealed by hovering over the info icon; the network fee is shown by default but the wallet fee is not.',
+							file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
+							label:
+								'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
+						},
+					],
 					afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-					byDefault: FeeDisplayLevel.COMPREHENSIVE,
+					byDefault: FeeDisplayLevel.AGGREGATED,
 					fullySponsored: false,
-					walletServiceFeeDisplayUnits: null,
+					walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
 				}),
 				erc20L1Transfer: supported({
 					ref: [],
