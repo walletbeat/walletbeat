@@ -36,9 +36,10 @@ jobs:
           - name: Commit signature
             command: pnpm run check:signed-commit
           - name: Wallet metadata freshness
-            command: pnpm run check:wallet-metadata-update
-            # Diffs against the PR base ref, so it needs full history and only
-            # makes sense on pull_request events.
+            # `actions/checkout` creates no `origin/<branch>` tracking ref, so the
+            # base has to be named by SHA. At fetch-depth 0 the base commit is in
+            # the fetched history, so it resolves locally.
+            command: pnpm run check:wallet-metadata-update -- --base ${{ github.event.pull_request.base.sha }}
             fetchDepth: 0
             pullRequestOnly: true
     steps:
