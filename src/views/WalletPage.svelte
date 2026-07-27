@@ -3183,7 +3183,6 @@
 			.attribute-summary-companions-position {
 				anchor-name: --sticky-breadcrumb-extra-position;
 				inline-size: max-content;
-				min-inline-size: 11rem;
 
 				> .attribute-summary-companions {
 					z-index: var(---wallet-breadcrumb-layer-attribute);
