@@ -2328,6 +2328,7 @@
 				inline-size: var(---pie-size);
 				block-size: var(---pie-size);
 				margin-inline: auto;
+				contain: strict;
 			}
 
 			:global(.navigation-items) {
@@ -2335,7 +2336,7 @@
 				inset: 50% auto auto 50%;
 				inline-size: calc(var(---pie-diameter) * 1px);
 				block-size: calc(var(---pie-diameter) * 1px);
-				contain: content;
+				contain: strict;
 				translate: -50% -50%;
 				scale: var(---pie-scale);
 				transform: rotate(var(---pie-rotate)) translateZ(0);
@@ -3676,6 +3677,7 @@
 			min-inline-size: 0;
 			scroll-margin-top: 3.5rem;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+			contain: style;
 
 			> summary {
 				min-inline-size: 0;

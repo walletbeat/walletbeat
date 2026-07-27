@@ -41,6 +41,7 @@
 
 	.rotation-result {
 		display: contents;
+		contain: style;
 	}
 
 	@supports (
