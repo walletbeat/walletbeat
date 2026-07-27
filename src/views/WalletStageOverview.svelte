@@ -132,14 +132,18 @@
 								</data>
 							</a>
 
-							<h3 data-row-item="flexible basis-3">
-								<strong>{s.name}</strong>:
+							<div
+								class="stage-summary-copy"
+								data-column="gap-1"
+								data-row-item="flexible basis-3"
+							>
+								<h3><strong>{s.name}</strong></h3>
 								{#if isTypographicContent(s.description)}
 									<Typography content={s.description} />
 								{:else}
-									{s.id}
+									<p>{s.id}</p>
 								{/if}
-							</h3>
+							</div>
 
 							<div
 								data-row-item="wrap-end"
