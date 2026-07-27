@@ -35,18 +35,9 @@ jobs:
             command: pnpm run check:build:post:quiet
           - name: Commit signature
             command: pnpm run check:signed-commit
-          - name: Wallet metadata freshness
-            # `actions/checkout` creates no `origin/<branch>` tracking ref, so the
-            # base has to be named by SHA. At fetch-depth 0 the base commit is in
-            # the fetched history, so it resolves locally.
-            command: pnpm run check:wallet-metadata-update -- --base ${{ github.event.pull_request.base.sha }}
-            fetchDepth: 0
-            pullRequestOnly: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
-        with:
-          fetch-depth: ${{ matrix.fetchDepth || 1 }}
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js
@@ -57,5 +48,31 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: ${{ matrix.name }}
-        if: matrix.pullRequestOnly != true || github.event_name == 'pull_request'
         run: ${{ matrix.command }}
+
+  # Kept out of the `check` matrix above: this is the only check that needs full
+  # history, and a matrix-driven `fetch-depth` cannot express 0 (every
+  # `x && 0 || 1` form collapses to 1, because 0 is falsy in GHA expressions).
+  wallet-metadata:
+    name: Wallet metadata freshness
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+        with:
+          # Needed so the base commit is present to diff against.
+          fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.0.9
+      - name: Install Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Wallet metadata freshness
+        # `actions/checkout` fetches only the PR merge ref, so no `origin/<branch>`
+        # tracking ref exists; name the base by SHA instead.
+        run: pnpm run check:wallet-metadata-update -- --base ${{ github.event.pull_request.base.sha }}
