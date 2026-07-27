@@ -1040,7 +1040,7 @@
 			data-sticky-breadcrumb="scope"
 		>
 			<summary data-row>
-				<header data-row="start gap-3">
+				<header data-row-item="flexible" data-row="start gap-3">
 					<span
 						class="attribute-icon"
 						data-icon="wbicons emoji {attribute.icon}"
@@ -3644,8 +3644,6 @@
 				max-inline-size: 100%;
 
 				> header {
-					flex-grow: 1;
-
 					> .attribute-summary-layout {
 						min-inline-size: 0;
 						gap: 0.5rem;
