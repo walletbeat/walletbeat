@@ -932,7 +932,6 @@
 				data-scroll-item="inline-detached padding-match-end"
 			>
 				<header
-					data-sticky="block backdrop-none"
 					data-row="start gap-3"
 					data-scroll-item="inline-detached"
 				>
@@ -1532,6 +1531,21 @@
 		---wallet-breadcrumb-gap: 1.5rem;
 		---wallet-breadcrumb-heading-icon-size: 1.5rem;
 		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
+		---wallet-breadcrumb-icon-block-start: calc(
+			anchor(--sticky-breadcrumb-scope top)
+			+ (
+				var(---wallet-breadcrumb-block-size)
+				- var(---wallet-breadcrumb-heading-icon-size)
+			)
+			/ 2
+		);
+		---wallet-breadcrumb-icon-inline-start: calc(
+			anchor(var(--stickyBreadcrumb-parentAnchor) end)
+			+ var(---wallet-breadcrumb-gap)
+		);
+		---wallet-breadcrumb-companion-block-start: anchor(
+			--wallet-breadcrumb-surface center
+		);
 		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
 		---wallet-breadcrumb-layer-root: 20;
 		---wallet-breadcrumb-layer-group: 21;
@@ -1572,6 +1586,7 @@
 		@media (max-width: 864px) {
 			---wallet-name-sticky-icon-size: 2.4rem;
 			---wallet-breadcrumb-gap: 1.25rem;
+			---wallet-breadcrumb-mobile-row-gap: 0.25rem;
 
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
@@ -1583,6 +1598,12 @@
 				[Nav-end]
 				/ [Nav-start] minmax(0, 1fr) [Nav-end]
 			;
+		}
+		@media (min-width: 865px) and (max-width: 1280px) {
+			---wallet-breadcrumb-root-font-size: 1.5rem;
+			---wallet-breadcrumb-gap: 0.75rem;
+			---wallet-breadcrumb-heading-icon-size: 1.25rem;
+			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
 		}
 
 		line-height: 1.6;
@@ -1626,6 +1647,10 @@
 			block-size: calc(100cqb - var(---wallet-page-block-offset));
 
 			scroll-behavior: smooth;
+			scroll-padding-block-start: calc(
+				var(--sticky0-insetBlockStart)
+				+ var(--pageNavigation-header-blockSize)
+			);
 
 			background-color: var(--background-secondary);
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
@@ -1759,6 +1784,18 @@
 		@media (max-width: 1024px) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 		}
+	}
+
+	/*
+	 * The mobile navigation depth effect normally promotes `#content` with an
+	 * identity transform. That makes it the containing block for fixed
+	 * descendants, so fixed anchor-positioned breadcrumbs move with this scroll
+	 * root instead of the viewport. WalletPage's scroll-driven breadcrumbs need
+	 * the viewport containing block at every breakpoint.
+	 */
+	:global(#layout:has(#wallet-page) > #content) {
+		transform: none;
+		transform-style: flat;
 	}
 
 	#wallet-page {
@@ -3110,24 +3147,65 @@
 		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
 			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
 			--stickyBreadcrumb-position-insetInlineStart: 0px;
+			--stickyBreadcrumb-item-insetInlineEnd: calc(
+				anchor(--wallet-breadcrumb-surface end)
+					+ var(---wallet-content-inline-start)
+					+ anchor-size(--sticky-breadcrumb-extra-position inline)
+					+ var(---wallet-breadcrumb-gap)
+			);
+
+			@media (max-width: 864px) {
+				--stickyBreadcrumb-item-blockOffset: calc(
+					var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
+				--stickyBreadcrumb-item-insetInlineStart: calc(
+					anchor(--wallet-breadcrumb-surface start)
+					+ var(---wallet-content-inline-start)
+				);
+				--stickyBreadcrumb-gap: 0px;
+			}
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-attribute);
+				min-inline-size: 0;
 
 				h3 {
-					animation: BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
-					animation-timeline: --sticky-breadcrumb-timeline;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+
+					animation:
+						BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both,
+						AttributeBreadcrumbOutAnimation linear both;
+					animation-timeline:
+						--sticky-breadcrumb-timeline,
+						--sticky-breadcrumb-scope-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
+						var(---wallet-breadcrumb-animation-range-end),
+						exit-crossing calc(
+							100%
+								- var(--stickyBreadcrumb-trackBlockEnd)
+						)
+						exit-crossing 100%;
 				}
 
 				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
-					animation-timeline: --sticky-breadcrumb-timeline;
+					animation:
+						SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards,
+						AttributeBreadcrumbOutAnimation linear both;
+					animation-timeline:
+						--sticky-breadcrumb-timeline,
+						--sticky-breadcrumb-scope-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
+						var(---wallet-breadcrumb-animation-range-end),
+						exit-crossing calc(
+							100%
+								- var(--stickyBreadcrumb-trackBlockEnd)
+						)
+						exit-crossing 100%;
 				}
 			}
 		}
@@ -3136,16 +3214,23 @@
 			.attribute-summary-companions-position {
 				anchor-name: --sticky-breadcrumb-extra-position;
 				inline-size: max-content;
+				min-inline-size: 11rem;
 
 				> .attribute-summary-companions {
 					z-index: var(---wallet-breadcrumb-layer-attribute);
 				}
 			}
 
-			&[open] > summary > header {
-				animation: AttributeBreadcrumbOutAnimation linear both;
-				animation-timeline: --sticky-breadcrumb-scope-timeline;
+			&[open] .attribute-summary-companions {
+				animation:
+					AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) forwards,
+					AttributeBreadcrumbOutAnimation linear both;
+				animation-timeline:
+					--sticky-breadcrumb-timeline,
+					--sticky-breadcrumb-scope-timeline;
 				animation-range:
+					var(---wallet-breadcrumb-animation-range-start)
+					var(---wallet-breadcrumb-animation-range-end),
 					exit-crossing calc(
 						100%
 							- var(--stickyBreadcrumb-trackBlockEnd)
@@ -3153,19 +3238,12 @@
 					exit-crossing 100%;
 			}
 
-			&[open] .attribute-summary-companions {
-				animation: AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) forwards;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-			}
-
 			&:not([open]) {
 				.attribute-heading-position > [data-sticky-breadcrumb~='item'],
 				.attribute-heading-position > [data-sticky-breadcrumb~='item']::before,
 				.attribute-heading-position h3,
 				.attribute-summary-companions,
+				.attribute-icon,
 				.attribute-icon::before,
 				.attribute-icon::after {
 					animation: none;
@@ -3184,7 +3262,7 @@
 			to {
 				position: fixed;
 				position-anchor: --wallet-breadcrumb-surface;
-				inset-block-start: anchor(--wallet-breadcrumb-surface center);
+				inset-block-start: var(---wallet-breadcrumb-companion-block-start);
 				inset-inline:
 					auto
 					calc(
@@ -3240,10 +3318,26 @@
 
 		.attribute-group-icon {
 			z-index: var(---wallet-breadcrumb-layer-group);
+			---wallet-breadcrumb-icon-inline-start: calc(
+				anchor(--wallet-breadcrumb-root end)
+				+ var(---wallet-breadcrumb-gap)
+			);
 		}
 
 		.attribute-icon {
 			z-index: var(---wallet-breadcrumb-layer-attribute);
+			---wallet-breadcrumb-icon-inline-start: calc(
+				anchor(--wallet-breadcrumb-group end)
+				+ var(---wallet-breadcrumb-gap)
+			);
+			animation: AttributeBreadcrumbOutAnimation linear both;
+			animation-timeline: --sticky-breadcrumb-scope-timeline;
+			animation-range:
+				exit-crossing calc(
+					100%
+						- var(--stickyBreadcrumb-trackBlockEnd)
+				)
+				exit-crossing 100%;
 		}
 
 		@keyframes BreadcrumbSliceIconAnimation {
@@ -3286,21 +3380,8 @@
 			to {
 				position: fixed;
 				position-anchor: --sticky-breadcrumb-scope;
-				inset-block-start: calc(
-					anchor(--sticky-breadcrumb-scope top)
-					+ (
-						var(---wallet-breadcrumb-block-size)
-						- var(---wallet-breadcrumb-heading-icon-size)
-					)
-					/ 2
-				);
-				inset-inline-start: calc(
-					anchor(
-						var(--stickyBreadcrumb-parentAnchor)
-						end
-					)
-					+ var(---wallet-breadcrumb-gap)
-				);
+				inset-block-start: var(---wallet-breadcrumb-icon-block-start);
+				inset-inline-start: var(---wallet-breadcrumb-icon-inline-start);
 				inline-size: var(---wallet-breadcrumb-heading-icon-size);
 				block-size: var(---wallet-breadcrumb-heading-icon-size);
 				font-size: var(---wallet-breadcrumb-heading-icon-size);
@@ -3366,6 +3447,47 @@
 			}
 		}
 
+		@media (max-width: 864px) {
+			.container {
+				--stickyBreadcrumb-trackBlockEnd: calc(
+					var(---wallet-icon-sticky-block-start)
+					+ 2 * var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
+				---wallet-breadcrumb-companion-block-start: calc(
+					anchor(--wallet-breadcrumb-surface top)
+					+ var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+					+ var(---wallet-breadcrumb-block-size) / 2
+				);
+			}
+
+			article > header#top > .wallet-name::after {
+				block-size: calc(
+					2 * var(---wallet-sticky-content-inset)
+					+ 2 * var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
+			}
+
+			.attribute-icon {
+				---wallet-breadcrumb-icon-block-start: calc(
+					anchor(--sticky-breadcrumb-scope top)
+					+ var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+					+ (
+						var(---wallet-breadcrumb-block-size)
+						- var(---wallet-breadcrumb-heading-icon-size)
+					)
+					/ 2
+				);
+				---wallet-breadcrumb-icon-inline-start: calc(
+					anchor(--wallet-breadcrumb-surface start)
+					+ var(---wallet-content-inline-start)
+				);
+			}
+		}
+
 		@media (prefers-reduced-motion: reduce) {
 			article > header#top > .wallet-name {
 				animation: none;
@@ -3420,8 +3542,21 @@
 	.attribute-group {
 		scroll-margin-top: 3.5rem;
 
-		> .attribute-group-stack > header {
+		> .attribute-group-stack[data-scroll-item] {
+			/*
+			 * `inline-detached` uses sticky positioning for horizontal
+			 * alignment by default. This wrapper scrolls normally so its
+			 * fixed breadcrumb descendants can participate in the page-level
+			 * root/group/attribute stacking order.
+			 */
+			position: relative;
+			inset-inline: auto;
+		}
+
+		> .attribute-group-stack[data-scroll-item] > header[data-scroll-item] {
 			--icon-filter: brightness(0) opacity(0.35);
+			position: relative;
+			inset-inline: auto;
 			min-inline-size: 0;
 			padding-block: 1rem;
 

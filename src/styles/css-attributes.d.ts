@@ -981,6 +981,9 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-position-insetBlockStart`
 	 * - `--stickyBreadcrumb-position-insetInlineStart`
 	 * - `--stickyBreadcrumb-item-insetBlockStart`
+	 * - `--stickyBreadcrumb-item-blockOffset`
+	 * - `--stickyBreadcrumb-item-insetInlineStart`
+	 * - `--stickyBreadcrumb-item-insetInlineEnd`
 	 * - `--stickyBreadcrumb-item-blockSize`
 	 * - `--stickyBreadcrumb-trackBlockEnd`
 	 * - `--stickyBreadcrumb-itemAnchor`

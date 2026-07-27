@@ -1169,6 +1169,9 @@ ol {
  * - `--stickyBreadcrumb-position-insetBlockStart`
  * - `--stickyBreadcrumb-position-insetInlineStart`
  * - `--stickyBreadcrumb-item-insetBlockStart`
+ * - `--stickyBreadcrumb-item-blockOffset`
+ * - `--stickyBreadcrumb-item-insetInlineStart`
+ * - `--stickyBreadcrumb-item-insetInlineEnd`
  * - `--stickyBreadcrumb-item-blockSize`
  * - `--stickyBreadcrumb-trackBlockEnd`
  * - `--stickyBreadcrumb-itemAnchor`
@@ -1268,11 +1271,18 @@ ol {
 		}
 		to {
 			position: fixed;
-			inset-block-start: anchor(--sticky-breadcrumb-scope top);
-			inset-inline-start: anchor(
-				var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
-				end
+			inset-block-start: calc(
+				anchor(--sticky-breadcrumb-scope top)
+					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
 			);
+			inset-inline-start: var(
+				--stickyBreadcrumb-item-insetInlineStart,
+				anchor(
+					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+						end
+				)
+			);
+			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
 			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
 			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
 		}
