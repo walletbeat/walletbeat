@@ -1317,6 +1317,10 @@ ol {
  * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
  * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
  *
+ * ### CSS Variables
+ * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+ * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
+ *
  * ### Examples
  * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
  *   ```html
@@ -1343,6 +1347,22 @@ ol {
 	--scrollContainer-sizeBlock: 100cqb;
 	--scrollContainer-sizeInline: 100cqi;
 	--scrollContainer-perspective: 900px;
+	--scrollContainer-scrollPaddingBlockStart: calc(
+		var(--sticky0-insetBlockStart)
+		+ var(--sticky0-paddingBlockStart)
+	);
+	--scrollContainer-scrollPaddingBlockEnd: calc(
+		var(--sticky0-insetBlockEnd)
+		+ var(--sticky0-paddingBlockEnd)
+	);
+	--scrollContainer-scrollPaddingInlineStart: calc(
+		var(--sticky0-insetInlineStart)
+		+ var(--sticky0-paddingInlineStart)
+	);
+	--scrollContainer-scrollPaddingInlineEnd: calc(
+		var(--sticky0-insetInlineEnd)
+		+ var(--sticky0-paddingInlineEnd)
+	);
 
 	/* Rules */
 	overscroll-behavior: none;
@@ -1350,6 +1370,29 @@ ol {
 	scrollbar-width: none;
 	touch-action: pan-x pan-y;
 	perspective: var(--scrollContainer-perspective);
+	scroll-padding-block:
+		var(--scrollContainer-scrollPaddingBlockStart)
+		var(--scrollContainer-scrollPaddingBlockEnd);
+	scroll-padding-inline:
+		var(--scrollContainer-scrollPaddingInlineStart)
+		var(--scrollContainer-scrollPaddingInlineEnd);
+
+	/*
+	 * Chromium can omit scroll-padding when a fragment target's snap area is
+	 * larger than its scrollport. Mirror the same clearance on the active
+	 * target, scoped to its nearest scroll container, so native anchor
+	 * navigation remains unobscured for both small and oversized targets.
+	 */
+	@scope (&) to ([data-scroll-container]) {
+		:target {
+			scroll-margin-block:
+				var(--scrollContainer-scrollPaddingBlockStart)
+				var(--scrollContainer-scrollPaddingBlockEnd);
+			scroll-margin-inline:
+				var(--scrollContainer-scrollPaddingInlineStart)
+				var(--scrollContainer-scrollPaddingInlineEnd);
+		}
+	}
 
 	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
 		container-type: size;

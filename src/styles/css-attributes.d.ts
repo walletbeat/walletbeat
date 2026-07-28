@@ -697,6 +697,10 @@ interface CssAttributes {
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
+	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
 	 *   ```html
@@ -756,6 +760,10 @@ interface CssAttributes {
 	 * - scroll container: `block`, `inline`
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
 	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
@@ -874,6 +882,10 @@ interface CssAttributes {
 	 * - scroll container: `block`, `inline`
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
 	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
@@ -1022,6 +1034,10 @@ interface CssAttributes {
 	 * - scroll container: `block`, `inline`
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
 	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
