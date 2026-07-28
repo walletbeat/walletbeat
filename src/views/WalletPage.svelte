@@ -1214,7 +1214,7 @@
 					</div>
 				</header>
 			</summary>
-			<div class="attribute-content">
+			<div class="attribute-content" data-column="gap-6">
 
 			<ul
 				class="attribute-rating-details"
@@ -1341,7 +1341,7 @@
 
 			<div class="attribute-accordions" data-column="gap-3">
 				<details open data-card="padding-5 secondary radius-4" data-column="gap-0" data-sticky-container>
-					<summary data-sticky="block-start backdrop-self backdrop-always">
+					<summary data-sticky="block block-start backdrop-self backdrop-always">
 						<h4>
 							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
 						</h4>
@@ -1359,7 +1359,7 @@
 				</details>
 
 				<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
-					<summary data-sticky="block-start backdrop-self backdrop-always">
+					<summary data-sticky="block block-start backdrop-self backdrop-always">
 						<h4>
 							{getHowIsEvaluatedHeading(attribute)}
 						</h4>
@@ -1452,7 +1452,7 @@
 
 				{#if howToImprove}
 					<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
-						<summary data-sticky="block-start backdrop-self backdrop-always">
+						<summary data-sticky="block block-start backdrop-self backdrop-always">
 							<h4>
 								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
 							</h4>
@@ -3717,10 +3717,8 @@
 			}
 
 			> .attribute-content {
-				display: grid;
 				min-inline-size: 0;
 				max-inline-size: 100%;
-				gap: 1.5rem;
 			}
 
 			.subsection-caption {
