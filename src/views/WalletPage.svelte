@@ -919,7 +919,7 @@
 				data-scroll-item="inline-detached padding-match-end"
 			>
 				<header
-					data-row="start gap-3"
+					data-row="start gap-4"
 					data-scroll-item="inline-detached"
 				>
 					<span
@@ -945,7 +945,7 @@
 					>
 						<div
 							class="attribute-group-heading"
-							data-column="gap-2"
+							data-column="gap-1"
 						>
 							<div
 								class="attribute-group-heading-position"
