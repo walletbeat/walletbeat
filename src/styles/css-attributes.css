@@ -1174,6 +1174,7 @@ ol {
  * - `--stickyBreadcrumb-item-insetInlineEnd`
  * - `--stickyBreadcrumb-item-blockSize`
  * - `--stickyBreadcrumb-trackBlockEnd`
+ * - `--stickyBreadcrumb-exitAnimationDistance`
  * - `--stickyBreadcrumb-itemAnchor`
  * - `--stickyBreadcrumb-parentAnchor`
  *
@@ -1202,6 +1203,21 @@ ol {
 	(inset-inline-start: anchor(--sticky-breadcrumb-item end))
 ) {
 	[data-sticky-breadcrumb~="scope"] {
+		---stickyBreadcrumb-exitAnimationRangeStart: exit-crossing
+			calc(
+				100%
+				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+				- var(
+					--stickyBreadcrumb-exitAnimationDistance,
+					var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+				)
+			);
+		---stickyBreadcrumb-exitAnimationRangeEnd: exit-crossing
+			calc(
+				100%
+				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+			);
+
 		anchor-scope:
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
 			--sticky-breadcrumb-position,
@@ -1212,6 +1228,7 @@ ol {
 			--sticky-breadcrumb-scope-timeline;
 		view-timeline-name: --sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
+		view-timeline-inset: 0;
 
 		&::before {
 			content: '';
@@ -1229,6 +1246,7 @@ ol {
 		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
 		view-timeline-name: --sticky-breadcrumb-timeline;
 		view-timeline-axis: block;
+		view-timeline-inset: 0;
 	}
 
 	[data-sticky-breadcrumb~="item"] {
@@ -1240,18 +1258,19 @@ ol {
 
 			animation:
 				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
+				StickyBreadcrumbItemExitAnimation linear both,
 				StickyBreadcrumbItemVisibility 1ms steps(1, end) both;
 			animation-timeline:
 				--sticky-breadcrumb-timeline,
+				--sticky-breadcrumb-scope-timeline,
 				--sticky-breadcrumb-scope-timeline;
 			animation-range:
 				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
 				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
-				exit-crossing calc(
-					100%
-					- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-				)
-				exit-crossing 100%;
+				var(---stickyBreadcrumb-exitAnimationRangeStart)
+				var(---stickyBreadcrumb-exitAnimationRangeEnd),
+				var(---stickyBreadcrumb-exitAnimationRangeStart)
+				var(---stickyBreadcrumb-exitAnimationRangeEnd);
 		}
 	}
 
@@ -1294,6 +1313,12 @@ ol {
 		}
 		to {
 			visibility: hidden;
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemExitAnimation {
+		to {
+			opacity: 0;
 		}
 	}
 

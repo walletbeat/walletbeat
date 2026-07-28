@@ -998,6 +998,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-item-insetInlineEnd`
 	 * - `--stickyBreadcrumb-item-blockSize`
 	 * - `--stickyBreadcrumb-trackBlockEnd`
+	 * - `--stickyBreadcrumb-exitAnimationDistance`
 	 * - `--stickyBreadcrumb-itemAnchor`
 	 * - `--stickyBreadcrumb-parentAnchor`
 	 *
