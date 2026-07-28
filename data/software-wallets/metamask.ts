@@ -725,7 +725,7 @@ export const metamask: SoftwareWallet = {
 						{
 							explanation:
 								'The repo pins a `yarn.lock` lockfile committed alongside `package.json`.',
-							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#L2',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json',
 						},
 						{
 							explanation: 'CI lints the lockfile and checks yarn resolutions on every run.',
