@@ -1795,6 +1795,16 @@
 		transform-style: flat;
 	}
 
+	/*
+	 * Keep the independently animated background from competing with the
+	 * anchor-positioned scroll animations for main-thread style updates.
+	 * The blobs remain rendered; only their decorative ambient motion pauses
+	 * while WalletPage is mounted.
+	 */
+	:global(body:has(#wallet-page) .background-blob *) {
+		animation-play-state: paused;
+	}
+
 	#wallet-page {
 		view-timeline-name: --wallet-page-exit;
 		view-timeline-axis: block;
