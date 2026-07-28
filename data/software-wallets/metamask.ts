@@ -45,7 +45,7 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { featureSupported, notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import {
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
@@ -322,7 +322,14 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
-				drills: null,
+				drills: notSupportedWithRef({
+					ref: [
+						{
+							explanation: `MetaMask reminds users to backup their recovery phrase but only if they haven't had their recovery phrase backed up in the first place. Once the user confirms backup, the reminder is permanently dismissed.`,
+							url: 'https://github.com/MetaMask/metamask-extension/blob/9c8c6bcb8b5b48718018b6e2c800d0e05c5d30a9/ui/components/app/recovery-phrase-reminder/recovery-phrase-reminder-container.tsx#L24-L26'
+						}
+					]
+				}),
 				guardianRecovery: supported({
 					ref: [
 						{
