@@ -1064,6 +1064,7 @@
 					>
 						<div
 							class="attribute-heading"
+							data-row-item="flexible"
 							data-column="gap-2"
 						>
 							<div
@@ -3648,7 +3649,6 @@
 						gap: 0.5rem;
 
 						> .attribute-heading {
-							flex: 1 1 16rem;
 							min-inline-size: 0;
 
 							h3 {
