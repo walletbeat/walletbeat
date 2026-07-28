@@ -1340,8 +1340,8 @@
 			{/if}
 
 			<div class="attribute-accordions" data-column="gap-3">
-				<details open data-card="padding-5 secondary radius-4" data-column="gap-0">
-					<summary>
+				<details open data-card="padding-5 secondary radius-4" data-column="gap-0" data-sticky-container>
+					<summary data-sticky="block-start backdrop-self backdrop-always">
 						<h4>
 							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
 						</h4>
@@ -1358,8 +1358,8 @@
 					</section>
 				</details>
 
-				<details open data-card="secondary padding-5 radius-4" data-column="gap-0">
-					<summary>
+				<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
+					<summary data-sticky="block-start backdrop-self backdrop-always">
 						<h4>
 							{getHowIsEvaluatedHeading(attribute)}
 						</h4>
@@ -1451,8 +1451,8 @@
 				</details>
 
 				{#if howToImprove}
-					<details open data-card="secondary padding-5 radius-4" data-column="gap-0">
-						<summary>
+					<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
+						<summary data-sticky="block-start backdrop-self backdrop-always">
 							<h4>
 								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
 							</h4>
@@ -3769,10 +3769,21 @@
 	}
 
 	.attribute-accordions {
+		---attribute-accordion-sticky-inset: calc(
+			var(---wallet-page-block-offset)
+			+ var(---wallet-sticky-content-inset)
+			+ var(---wallet-breadcrumb-block-size)
+			+ var(---wallet-breadcrumb-surface-fade)
+		);
+
 		details {
-			overflow: hidden;
+			--sticky-marginBlockStart: var(---attribute-accordion-sticky-inset);
+
+			overflow: visible;
 
 			summary {
+				--sticky-backgroundColor: var(--background-secondary);
+
 				h4 {
 					max-width: 60ch;
 					word-wrap: break-word;
