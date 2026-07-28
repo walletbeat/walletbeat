@@ -352,6 +352,22 @@ export async function grammarLintMessages(
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'lockdown',
 	)
 
+	// Ignore the "dApp" site convention lint when it's immediately followed by a source-file
+	// extension, e.g. the upstream filename `dapp.ts` inside an auto-generated GitHub blob
+	// label such as "dapp.ts"
+	lints = lints.filter(lint => {
+		if (
+			lint.lint_kind_pretty() !== 'Site convention' ||
+			lint.get_problem_text().toLowerCase() !== 'dapp'
+		) {
+			return true
+		}
+
+		const after = trimmedText.slice(lint.span().end, lint.span().end + 10)
+
+		return !/^\.[a-z]{1,10}\b/.test(after)
+	})
+
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
 		lint =>
