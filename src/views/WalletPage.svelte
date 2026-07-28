@@ -1537,6 +1537,7 @@
 			--wallet-breadcrumb-surface center
 		);
 		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
+		---wallet-breadcrumb-surface-fade: 0.5rem;
 		---wallet-breadcrumb-layer-root: 20;
 		---wallet-breadcrumb-layer-group: 21;
 		---wallet-breadcrumb-layer-attribute: 22;
@@ -3006,7 +3007,10 @@
 				anchor-name: --wallet-breadcrumb-surface;
 
 				position: fixed;
-				inset-block-start: var(---wallet-page-block-offset);
+				inset-block-start: calc(
+					var(---wallet-page-block-offset)
+					- var(---wallet-breadcrumb-surface-fade)
+				);
 				inset-inline-start: 0;
 				inline-size: calc(
 					100vi
@@ -3015,10 +3019,21 @@
 				block-size: calc(
 					2 * var(---wallet-sticky-content-inset)
 					+ var(---wallet-breadcrumb-block-size)
+					+ 2 * var(---wallet-breadcrumb-surface-fade)
 				);
 
 				background-color: var(---wallet-breadcrumb-surface-background);
 				backdrop-filter: blur(20px);
+				-webkit-mask-image: linear-gradient(
+					to top,
+					transparent,
+					white var(---wallet-breadcrumb-surface-fade)
+				);
+				mask-image: linear-gradient(
+					to top,
+					transparent,
+					white var(---wallet-breadcrumb-surface-fade)
+				);
 				opacity: 0;
 
 				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
@@ -3439,6 +3454,7 @@
 					2 * var(---wallet-sticky-content-inset)
 					+ 2 * var(---wallet-breadcrumb-block-size)
 					+ var(---wallet-breadcrumb-mobile-row-gap)
+					+ 2 * var(---wallet-breadcrumb-surface-fade)
 				);
 			}
 
