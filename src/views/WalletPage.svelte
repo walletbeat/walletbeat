@@ -2993,6 +2993,7 @@
 			--stickyBreadcrumb-trackBlockEnd: calc(
 				var(---wallet-icon-sticky-block-start)
 				+ var(---wallet-breadcrumb-block-size)
+				+ var(---wallet-breadcrumb-surface-fade)
 			);
 			--stickyBreadcrumb-animationRangeStart: var(---wallet-breadcrumb-animation-range-start);
 			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
@@ -3192,36 +3193,20 @@
 					white-space: nowrap;
 
 					animation:
-						BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both,
-						AttributeBreadcrumbOutAnimation linear both;
-					animation-timeline:
-						--sticky-breadcrumb-timeline,
-						--sticky-breadcrumb-scope-timeline;
+						BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
+					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end),
-						exit-crossing calc(
-							100%
-								- var(--stickyBreadcrumb-trackBlockEnd)
-						)
-						exit-crossing 100%;
+						var(---wallet-breadcrumb-animation-range-end);
 				}
 
 				&::before {
 					animation:
-						SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards,
-						AttributeBreadcrumbOutAnimation linear both;
-					animation-timeline:
-						--sticky-breadcrumb-timeline,
-						--sticky-breadcrumb-scope-timeline;
+						SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end),
-						exit-crossing calc(
-							100%
-								- var(--stickyBreadcrumb-trackBlockEnd)
-						)
-						exit-crossing 100%;
+						var(---wallet-breadcrumb-animation-range-end);
 				}
 			}
 		}
@@ -3246,11 +3231,8 @@
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
 					var(---wallet-breadcrumb-animation-range-end),
-					exit-crossing calc(
-						100%
-							- var(--stickyBreadcrumb-trackBlockEnd)
-					)
-					exit-crossing 100%;
+					var(---stickyBreadcrumb-exitAnimationRangeStart)
+					var(---stickyBreadcrumb-exitAnimationRangeEnd);
 			}
 
 			&:not([open]) {
@@ -3348,11 +3330,8 @@
 			animation: AttributeBreadcrumbOutAnimation linear both;
 			animation-timeline: --sticky-breadcrumb-scope-timeline;
 			animation-range:
-				exit-crossing calc(
-					100%
-						- var(--stickyBreadcrumb-trackBlockEnd)
-				)
-				exit-crossing 100%;
+				var(---stickyBreadcrumb-exitAnimationRangeStart)
+				var(---stickyBreadcrumb-exitAnimationRangeEnd);
 		}
 
 		@keyframes BreadcrumbSliceIconAnimation {
@@ -3465,6 +3444,7 @@
 					var(---wallet-icon-sticky-block-start)
 					+ 2 * var(---wallet-breadcrumb-block-size)
 					+ var(---wallet-breadcrumb-mobile-row-gap)
+					+ var(---wallet-breadcrumb-surface-fade)
 				);
 				---wallet-breadcrumb-companion-block-start: calc(
 					anchor(--wallet-breadcrumb-surface top)
