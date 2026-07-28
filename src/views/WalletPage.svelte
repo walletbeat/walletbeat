@@ -1487,7 +1487,6 @@
 		--wallet-icon-size: 3rem;
 		---wallet-content-inline-padding: 2rem;
 		---wallet-content-block-start: 2rem;
-		---wallet-sticky-content-inset: 1rem;
 		---wallet-icon-sticky-block-start: calc(
 			var(---wallet-page-block-offset)
 			+ var(---wallet-sticky-content-inset)
@@ -1505,7 +1504,6 @@
 		---wallet-name-sticky-font-size: 1.8rem;
 		---wallet-name-flow-font-size: 2.25rem;
 		---wallet-line-height: 1.6;
-		---wallet-breadcrumb-root-font-size: var(---wallet-name-sticky-font-size);
 		---wallet-breadcrumb-attribute-font-size: 1.17rem;
 		---wallet-breadcrumb-group-font-size: calc(
 			(
@@ -1513,10 +1511,6 @@
 				+ var(---wallet-breadcrumb-attribute-font-size)
 			)
 			/ 2
-		);
-		---wallet-breadcrumb-block-size: calc(
-			var(---wallet-breadcrumb-root-font-size)
-			* 1.6
 		);
 		---wallet-breadcrumb-gap: 1.5rem;
 		---wallet-breadcrumb-heading-icon-size: 1.5rem;
@@ -1537,7 +1531,6 @@
 			--wallet-breadcrumb-surface center
 		);
 		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
-		---wallet-breadcrumb-surface-fade: 0.5rem;
 		---wallet-breadcrumb-layer-root: 20;
 		---wallet-breadcrumb-layer-group: 21;
 		---wallet-breadcrumb-layer-attribute: 22;
@@ -1577,8 +1570,6 @@
 		@media (max-width: 864px) {
 			---wallet-name-sticky-icon-size: 2.4rem;
 			---wallet-breadcrumb-gap: 1.25rem;
-			---wallet-breadcrumb-mobile-row-gap: 0.25rem;
-
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
 			}
@@ -1591,7 +1582,6 @@
 			;
 		}
 		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-breadcrumb-root-font-size: 1.5rem;
 			---wallet-breadcrumb-gap: 0.75rem;
 			---wallet-breadcrumb-heading-icon-size: 1.25rem;
 			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
@@ -1604,9 +1594,6 @@
 		article {
 			grid-area: Content;
 			position: relative;
-
-			scroll-padding-block-start: 5rem;
-			scroll-padding-block-end: 1rem;
 		}
 
 		.page-navigation {
@@ -1615,6 +1602,7 @@
 			--sticky-marginInlineEnd: 0px;
 			--sticky-marginBlockStart: 0px;
 			--sticky-marginBlockEnd: 0px;
+			--sticky-paddingBlockStart: var(--pageNavigation-header-blockSize);
 			--sticky0-insetInlineStart: 0px;
 			--sticky0-insetInlineEnd: 0px;
 			--sticky0-insetBlockStart: 0px;
@@ -1638,11 +1626,6 @@
 			block-size: calc(100cqb - var(---wallet-page-block-offset));
 
 			scroll-behavior: smooth;
-			scroll-padding-block-start: calc(
-				var(--sticky0-insetBlockStart)
-				+ var(--pageNavigation-header-blockSize)
-			);
-
 			background-color: var(--background-secondary);
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
@@ -1676,7 +1659,7 @@
 				padding-block-end: var(---anchor-controls-reserved-block-size);
 
 				&[data-sticky-container] {
-					--sticky-marginBlockStart: var(--pageNavigation-header-blockSize);
+					--sticky-marginBlockStart: 0px;
 					--sticky-paddingBlockStart: 0.75rem;
 					--sticky-paddingBlockEnd: 0.75rem;
 				}
@@ -1748,6 +1731,23 @@
 			* 1rem
 		);
 		---wallet-page-block-offset: 0px;
+		---wallet-sticky-content-inset: 1rem;
+		---wallet-breadcrumb-root-font-size: 1.8rem;
+		---wallet-breadcrumb-block-size: calc(
+			var(---wallet-breadcrumb-root-font-size)
+			* 1.6
+		);
+		---wallet-breadcrumb-mobile-row-gap: 0.25rem;
+		---wallet-breadcrumb-surface-fade: 0.5rem;
+		/* Keep targeted content visibly separated from the soft backdrop edge. */
+		---wallet-anchor-scroll-gap: 1rem;
+		--scrollContainer-scrollPaddingBlockStart: calc(
+			var(---wallet-page-block-offset)
+			+ var(---wallet-sticky-content-inset)
+			+ var(---wallet-breadcrumb-block-size)
+			+ var(---wallet-breadcrumb-surface-fade)
+			+ var(---wallet-anchor-scroll-gap)
+		);
 		---anchor-button-size: 2.5rem;
 		---anchor-control-inset: 0.75rem;
 		---anchor-control-gap: 0.75rem;
@@ -1780,6 +1780,21 @@
 
 		@media (max-width: 1024px) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
+		}
+
+		@media (min-width: 865px) and (max-width: 1280px) {
+			---wallet-breadcrumb-root-font-size: 1.5rem;
+		}
+
+		@media (max-width: 864px) {
+			--scrollContainer-scrollPaddingBlockStart: calc(
+				var(---wallet-page-block-offset)
+				+ var(---wallet-sticky-content-inset)
+				+ 2 * var(---wallet-breadcrumb-block-size)
+				+ var(---wallet-breadcrumb-mobile-row-gap)
+				+ var(---wallet-breadcrumb-surface-fade)
+				+ var(---wallet-anchor-scroll-gap)
+			);
 		}
 	}
 
@@ -3533,8 +3548,6 @@
 	}
 
 	.attribute-group {
-		scroll-margin-top: 3.5rem;
-
 		> .attribute-group-stack[data-scroll-item] {
 			/*
 			 * `inline-detached` uses sticky positioning for horizontal
@@ -3667,7 +3680,6 @@
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 			min-inline-size: 0;
-			scroll-margin-top: 3.5rem;
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 			contain: style;
 

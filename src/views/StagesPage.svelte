@@ -137,8 +137,6 @@
 		article {
 			max-height: 100dvh;
 			overflow: auto;
-			scroll-padding-block-start: 5rem;
-			scroll-padding-block-end: 1rem;
 			padding-block-end: 4rem;
 			display: grid;
 		}
