@@ -20,6 +20,7 @@
 	import RadarIcon from 'lucide-static/icons/radar.svg?raw'
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
 	import SignatureIcon from 'lucide-static/icons/signature.svg?raw'
+	import StairsIcon from 'lucide-static/icons/chart-no-axes-column-increasing.svg?raw'
 	import TwitterIcon from 'lucide-static/icons/twitter.svg?raw'
 	import UserCogIcon from 'lucide-static/icons/user-cog.svg?raw'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
@@ -40,6 +41,7 @@
 		ICON_PLUG: PlugIcon,
 		ICON_RADAR: RadarIcon,
 		ICON_SIGNATURE: SignatureIcon,
+		ICON_STAIRS: StairsIcon,
 		ICON_TWITTER: TwitterIcon,
 		ICON_USER_COG: UserCogIcon,
 		ICON_WALLET: WalletIcon,

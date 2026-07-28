@@ -20,6 +20,11 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+	SendTransactionWarning,
+} from '@/schema/features/security/scam-alerts'
 import {
 	KeyStorageMechanism,
 	SecureRngSource,
@@ -38,7 +43,12 @@ import {
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -240,7 +250,49 @@ export const zerion: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [],
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: supported<WithRef<ContractTransactionWarning>>({
+					ref: [
+						{
+							explanation:
+								'Zerion sends the transaction to their server, which simulates it and returns whether the contract address is a known app.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/wallet-simulate-transaction.ts#L46-L63',
+						},
+					],
+					contractRegistry: true,
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: false,
+					recentContractWarning: false,
+				}),
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							explanation: 'Zerion sends the URL domain to their server for security checks.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/security-check-url.ts#L19-L28',
+						},
+					],
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					leaksVisitedUrl: 'DOMAIN_ONLY',
+				}),
+				sendTransactionWarning: supported<SendTransactionWarning>({
+					ref: [
+						{
+							file: 'public/references/wallets/zerion/screenshots/2026-07-24-zerion-address-book.png',
+							label: 'Zerion flags a recipient address as already in the address book when sending',
+						},
+					],
+					addressPoisoningDetection: false,
+					leaksRecipient: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					newRecipientWarning: false,
+					userWhitelist: true,
+				}),
+				unlimitedApprovalWarning: notSupported,
+			},
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
@@ -253,7 +305,13 @@ export const zerion: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				erc4361: null,
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation: 'Zerion does not format SIWE requests for easy readability.',
+						file: 'public/references/wallets/zerion/screenshots/2026-07-24-zerion-erc4361-siwe.png',
+						label: 'Zerion sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
 					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {

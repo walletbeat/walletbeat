@@ -17,6 +17,7 @@ export type LucideNavigationIcon =
 	| 'ICON_PLUG'
 	| 'ICON_RADAR'
 	| 'ICON_SIGNATURE'
+	| 'ICON_STAIRS'
 	| 'ICON_TWITTER'
 	| 'ICON_USER_COG'
 	| 'ICON_WALLET'
@@ -124,6 +125,13 @@ export const navigationWalletEips = {
 	href: '/wallet-eips/',
 } as const satisfies NavigationItem
 
+export const navigationStages = {
+	id: 'stages',
+	icon: 'ICON_STAIRS',
+	title: 'Stages',
+	href: '/stages/',
+} as const satisfies NavigationItem
+
 export const topbarNavigationItems = [
 	navigationAbout,
 	navigationFaq,
@@ -217,30 +225,7 @@ export const defaultNavigationItems = [
 			},
 		],
 	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary/',
-		icon: 'wallet_embedded',
-		children: [
-			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: 'ICON_CHART_PIE',
-				children: mapNonExemptAttributeGroupsInTree(
-					attributeTree,
-					representativeWalletForType(WalletType.EMBEDDED).overall,
-					(attrGroup, _evalGroup) => ({
-						id: `embedded-${attrGroup.id}`,
-						title: attrGroup.displayName,
-						icon: attrGroup.icon,
-						iconVariant: 'emoji' as const,
-						href: `/embedded/${attrGroup.id}/`,
-					}),
-				),
-			},
-		],
-	},
+	navigationStages,
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,

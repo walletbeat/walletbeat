@@ -60,8 +60,8 @@ export type DelegationHandling =
 	| (DelegationOffer &
 			(
 				| // Either the delegation is required at EOA creation and import time...
-				{ duringEOACreation: 'REQUIRED'; duringEOAImport: 'REQUIRED' }
-				// Or it is supported at transaction time.
+				  { duringEOACreation: 'REQUIRED'; duringEOAImport: 'REQUIRED' }
+				  // Or it is supported at transaction time.
 				| { duringFirst7702Operation: Supported<DelegationOffer['duringFirst7702Operation']> }
 			) & {
 				/** How is the fee for the initial EIP-7702 delegation paid? */

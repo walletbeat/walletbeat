@@ -22,6 +22,10 @@ import {
 	DataLocation,
 	displaysFullTransactionDetails,
 	displaysNoTransactionDetails,
+	erc7730HardwareWalletFullySupported,
+	erc7730SoftwareWalletFullySupported,
+	erc8213HardwareWalletFullySupported,
+	erc8213SoftwareWalletFullySupported,
 	type HardwareTransactionLegibilityImplementation,
 	type HardwareWalletErc8213,
 	isHardwareTransactionLegibility,
@@ -1422,23 +1426,21 @@ export const transactionLegibility: Attribute = {
 		pass: [
 			exampleRating(
 				paragraph(`
-					The hardware wallet implements full transaction legibility, displaying all
-					transaction details on the hardware device screen for verification before signing.
+					The hardware wallet implements full transaction legibility: all transaction
+					details and complex nested calldata are decoded on the hardware device screen,
+					and both the calldata digest and EIP-712 digest (ERC-8213) are shown on-device.
 				`),
-				hardwareFullTransactionLegibility(
+				evaluateHardwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
 						erc4361: featureSupportedNoRef,
-						erc8213: null,
+						erc8213: supported({
+							ref: refNotNecessary,
+							...erc8213HardwareWalletFullySupported,
+						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
+							...erc7730HardwareWalletFullySupported,
 						}),
 						detailsDisplayed: displaysFullTransactionDetails,
 						dataExtraction: {
@@ -1452,101 +1454,20 @@ export const transactionLegibility: Attribute = {
 			),
 			exampleRating(
 				paragraph(`
-					The hardware wallet implements full transaction legibility with complete ERC-8213
-					compliance: calldata digest and EIP-712 digest are both shown on-device.
-				`),
-				hardwareFullTransactionLegibility(
-					EvaluationContext.forTest(() => transactionLegibility),
-					{
-						erc4361: featureSupportedNoRef,
-						erc8213: supported({
-							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.FORMATTED]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.CALLDATA_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.DOMAIN_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.MESSAGE_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.EIP712_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
-						}),
-						erc7730: null,
-						detailsDisplayed: null,
-						dataExtraction: null,
-						ref: refNotNecessary,
-					},
-				),
-			),
-			exampleRating(
-				paragraph(`
 					The software wallet implements full transaction legibility, displaying all
 					transaction details on the wallet screen/window for verification before signing.
 				`),
-				softwareFullTransactionLegibility(
+				evaluateSoftwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
 						erc4361: featureSupportedNoRef,
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc8213SoftwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								{
-									decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								},
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc7730SoftwareWalletFullySupported,
 						}),
 						transactionSimulations: supported<SoftwareTransactionSimulations>({
 							[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
@@ -1595,12 +1516,60 @@ export const transactionLegibility: Attribute = {
 					The hardware wallet implements partial transaction legibility, where most but not all transaction
 					details are displayed on the hardware device screen.
 				`),
-				hardwarePartialTransactionLegibility(
+				evaluateHardwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
-						erc8213: null,
-						erc7730: null,
+						erc4361: featureSupportedNoRef,
+						erc8213: supported({
+							ref: refNotNecessary,
+							calldataDisplay: {
+								[CallDataDisplay.RAW_HEX]: {
+									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
+									location: DataLocation.ON_DEVICE,
+								},
+								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[CallDataDisplay.FORMATTED]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[CallDataDisplay.CALLDATA_DIGEST]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+							},
+							messageSigningLegibility: {
+								[MessageSigningDetails.EIP712_STRUCT]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[MessageSigningDetails.DOMAIN_HASH]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[MessageSigningDetails.MESSAGE_HASH]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[MessageSigningDetails.EIP712_DIGEST]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+							},
+						}),
+						erc7730: supported({
+							ref: refNotNecessary,
+							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
+							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]:
+								DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								DataLocation.NOT_PROVIDED,
+						}),
 						detailsDisplayed: {
 							gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							nonce: DataDisplayOptions.NOT_IN_UI,
@@ -1609,7 +1578,11 @@ export const transactionLegibility: Attribute = {
 							chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 							value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						},
-						dataExtraction: null,
+						dataExtraction: {
+							[DataExtraction.EYES]: true,
+							[DataExtraction.QRCODE]: false,
+							[DataExtraction.HASHES]: false,
+						},
 						ref: refNotNecessary,
 					},
 				),
@@ -1619,11 +1592,49 @@ export const transactionLegibility: Attribute = {
 					The hardware wallet decodes a basic contract interaction on-device but lacks
 					support for complex nested transactions, and data extraction is visual-only.
 				`),
-				hardwareBasicTransactionLegibility(
+				evaluateHardwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
-						erc8213: null,
+						erc4361: featureSupportedNoRef,
+						erc8213: supported({
+							ref: refNotNecessary,
+							calldataDisplay: {
+								[CallDataDisplay.RAW_HEX]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[CallDataDisplay.FORMATTED]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[CallDataDisplay.CALLDATA_DIGEST]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+							},
+							messageSigningLegibility: {
+								[MessageSigningDetails.EIP712_STRUCT]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[MessageSigningDetails.DOMAIN_HASH]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[MessageSigningDetails.MESSAGE_HASH]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+								[MessageSigningDetails.EIP712_DIGEST]: {
+									display: DataDisplayOptions.NOT_IN_UI,
+									location: DataLocation.NOT_PROVIDED,
+								},
+							},
+						}),
 						erc7730: supported({
 							ref: refNotNecessary,
 							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
@@ -1651,10 +1662,10 @@ export const transactionLegibility: Attribute = {
 					message signing, but the calldata digest is only available off-device via the companion app,
 					and complex nested transactions are not decoded.
 				`),
-				hardwareBasicTransactionLegibility(
+				evaluateHardwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
+						erc4361: featureSupportedNoRef,
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {
@@ -1694,9 +1705,23 @@ export const transactionLegibility: Attribute = {
 								},
 							},
 						}),
-						erc7730: null,
-						detailsDisplayed: null,
-						dataExtraction: null,
+						erc7730: supported({
+							ref: refNotNecessary,
+							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]:
+								DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								DataLocation.NOT_PROVIDED,
+							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+								DataLocation.NOT_PROVIDED,
+						}),
+						detailsDisplayed: displaysFullTransactionDetails,
+						dataExtraction: {
+							[DataExtraction.EYES]: true,
+							[DataExtraction.QRCODE]: false,
+							[DataExtraction.HASHES]: false,
+						},
 						ref: refNotNecessary,
 					},
 				),
@@ -1706,10 +1731,10 @@ export const transactionLegibility: Attribute = {
 					The software wallet implements partial transaction legibility: basic fields are shown
 					but some are missing (gas, nonce, chain), and not all transaction outcomes are explained.
 				`),
-				softwarePartialTransactionLegibility(
+				evaluateSoftwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
+						erc4361: featureSupportedNoRef,
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {
@@ -1790,10 +1815,10 @@ export const transactionLegibility: Attribute = {
 					but does not show the calldata digest required for full ERC-8213 compliance,
 					and not all transaction outcomes are explained.
 				`),
-				softwarePartialTransactionLegibility(
+				evaluateSoftwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
+						erc4361: featureSupportedNoRef,
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {
@@ -1873,7 +1898,7 @@ export const transactionLegibility: Attribute = {
 					The hardware wallet has full transaction legibility other than ERC-4361
 					(Sign-In with Ethereum) support.
 				`),
-				hardwareMissingErc4361TransactionLegibility(
+				evaluateHardwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
 						erc4361: notSupportedWithRef({
@@ -1881,52 +1906,11 @@ export const transactionLegibility: Attribute = {
 						}),
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.FORMATTED]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[CallDataDisplay.CALLDATA_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.DOMAIN_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.MESSAGE_HASH]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-								[MessageSigningDetails.EIP712_DIGEST]: {
-									display: DataDisplayOptions.SHOWN_BY_DEFAULT,
-									location: DataLocation.ON_DEVICE,
-								},
-							},
+							...erc8213HardwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								DataLocation.ON_DEVICE,
+							...erc7730HardwareWalletFullySupported,
 						}),
 						detailsDisplayed: displaysFullTransactionDetails,
 						dataExtraction: {
@@ -1943,7 +1927,7 @@ export const transactionLegibility: Attribute = {
 					The software wallet has full transaction legibility other than ERC-4361
 					(Sign-In with Ethereum) support.
 				`),
-				softwareMissingErc4361TransactionLegibility(
+				evaluateSoftwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
 						erc4361: notSupportedWithRef({
@@ -1951,37 +1935,11 @@ export const transactionLegibility: Attribute = {
 						}),
 						erc8213: supported({
 							ref: refNotNecessary,
-							calldataDisplay: {
-								[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.FORMATTED]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							messageSigningLegibility: {
-								[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc8213SoftwareWalletFullySupported,
 						}),
 						erc7730: supported({
 							ref: refNotNecessary,
-							[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
-							[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-								{
-									decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-								},
-							[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
-								decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							},
+							...erc7730SoftwareWalletFullySupported,
 						}),
 						transactionSimulations: supported<SoftwareTransactionSimulations>({
 							[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
@@ -2029,11 +1987,15 @@ export const transactionLegibility: Attribute = {
 				paragraph(`
 					The hardware wallet does not implement effective transaction legibility on the device itself.
 				`),
-				hardwareNoTransactionLegibility(
+				evaluateHardwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
-						erc8213: null,
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
+						erc8213: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc7730: notSupportedWithRef({
 							ref: refNotNecessary,
 						}),
@@ -2047,10 +2009,12 @@ export const transactionLegibility: Attribute = {
 				paragraph(`
 					The software wallet does not implement effective transaction legibility.
 				`),
-				softwareNoTransactionLegibility(
+				evaluateSoftwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {
@@ -2130,10 +2094,12 @@ export const transactionLegibility: Attribute = {
 					The software wallet claims ERC-8213 support but does not show raw hex calldata,
 					failing the basic transparency requirement.
 				`),
-				softwareNoTransactionLegibility(
+				evaluateSoftwareWalletTransactionLegibility(
 					EvaluationContext.forTest(() => transactionLegibility),
 					{
-						erc4361: null,
+						erc4361: notSupportedWithRef({
+							ref: refNotNecessary,
+						}),
 						erc8213: supported({
 							ref: refNotNecessary,
 							calldataDisplay: {

@@ -5,7 +5,7 @@ description: 'Overview of Walletbeat treasury addresses and their operational hi
 
 # Walletbeat Treasury Transparency Report
 
-_Latest operation: 2026-07-16_
+_Latest operation: 2026-07-27_
 
 This document tracks known treasury addresses and their operational history.
 
@@ -141,6 +141,7 @@ A history of transfers, grants, and treasury operations.
 | 2026-07-16 | [`chainflip2`](https://eth.blockscout.com/address/0x53DF77e44a66212E7BC674354c7ED0bCA1871918)                | [`proton2`](https://mempool.space/address/bc1qkzrh837ypwnkkwmtdws9wf42js8hgr6us436u6)                        | `0.00184883 BTC [Online storage]`                                       | Payment for 2 years of Proton Drive for Walletbeat                                                                                                         | [`7cb5aa40ae...`](https://mempool.space/tx/7cb5aa40ae5ef45da6d159a5f39203dd0149659be26d1d68429d34e67ab386b3)        |
 | 2026-07-16 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | `(zero)`                                                                | Replace polymutex2 with ren2140 as signer                                                                                                                  | [`0x40854e56...`](https://eth.blockscout.com/tx/0x40854e56c62b3a9fcb131a49a0d5b523c7a22f3b2514c25b8532e39711336b85) |
 | 2026-07-16 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | `0.26075223232189876 WETH → 500 USDC`                                   | CoW Swap from WETH to USDC                                                                                                                                 | [`0x6baa3ebb...`](https://eth.blockscout.com/tx/0x6baa3ebb8a194885856c073362fee8acad55e5c8b1028a27f8fd9b75b122fbcd) |
+| 2026-07-27 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | `3.6019332285775207 WETH → 7000 USDC`                                   | CoW Swap from WETH to USDC                                                                                                                                 | [`0x0c84d5c0...`](https://eth.blockscout.com/tx/0x0c84d5c05fbb52dd100c819d132b84c552209a804e1fcd06bc08c81fe63f8a98) |
 
 ---
 

@@ -386,8 +386,7 @@ export type GuardianPolicyKOfNWithTimelocks = GuardianPolicyBase & {
 
 /** A single specific configuration of guardians. */
 export type GuardianPolicy =
-	| GuardianPolicySecretSplitAcrossGuardians
-	| GuardianPolicyKOfNWithTimelocks
+	GuardianPolicySecretSplitAcrossGuardians | GuardianPolicyKOfNWithTimelocks
 
 export function guardianPolicyMarkdown(guardianPolicy: GuardianPolicy): string {
 	switch (guardianPolicy.type) {

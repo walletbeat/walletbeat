@@ -355,7 +355,8 @@ type PrivacyPoolsCapabilities = PrivacyPoolsCapabilitiesBase &
 	// At least Ether or USDC must be supported.
 	({ etherL1Pool: Supported } | { usdcL1Pool: Supported }) &
 	// At least one form of withdrawal must be supported.
-	(| { withdrawalWithRelayer: Supported<PrivacyPoolsWithdrawalWithRelayer> }
+	(
+		| { withdrawalWithRelayer: Supported<PrivacyPoolsWithdrawalWithRelayer> }
 		| { withdrawalWithoutRelayer: Supported }
 	)
 
