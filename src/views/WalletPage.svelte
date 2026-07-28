@@ -1537,6 +1537,7 @@
 		---wallet-breadcrumb-companion-block-start: anchor(
 			--wallet-breadcrumb-surface center
 		);
+		---wallet-breadcrumb-companion-inline-end-clearance: 0px;
 		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
 		---wallet-breadcrumb-layer-root: 20;
 		---wallet-breadcrumb-layer-group: 21;
@@ -1575,6 +1576,12 @@
 			;
 		}
 		@media (max-width: 864px) {
+			---wallet-mobile-pie-size-rem: 8;
+			---wallet-mobile-pie-size: calc(
+				var(---wallet-mobile-pie-size-rem)
+				* 1rem
+			);
+			---wallet-breadcrumb-companion-inline-end-clearance: var(---wallet-mobile-pie-size);
 			---wallet-name-sticky-icon-size: 2.4rem;
 			---wallet-breadcrumb-gap: 1.25rem;
 			&[data-sticky-container] {
@@ -2459,7 +2466,7 @@
 				--slice-labelSize: 25;
 				--slice-labelSizeScale: 1.25;
 				---slice-label-offset: calc(
-					(var(---slice-label-r) + var(---slice-offset)) * 1px
+					var(---slice-label-r) * 1px
 				);
 			}
 
@@ -2484,7 +2491,7 @@
 				--slice-labelSize: 9;
 				--slice-labelSizeScale: 1;
 				---slice-label-offset: calc(
-					(var(---slice-label-r) + var(---slice-offset)) * 1px
+					var(---slice-label-r) * 1px
 				);
 				--slice-arcSize: small;
 			}
@@ -2492,11 +2499,11 @@
 			/* Firefox lacks typed length division/multiplication outside shape(). */
 			@supports not (top: calc(sibling-index() * 1px)) {
 				:global(.navigation-items summary > a) {
-					---slice-label-offset: 55.313px;
+					---slice-label-offset: 52.313px;
 				}
 
 				:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-					---slice-label-offset: 90.99px;
+					---slice-label-offset: 10.99px;
 				}
 			}
 
@@ -2815,12 +2822,12 @@
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				---pie-size-rem: 8;
-				---pie-size: calc(var(---pie-size-rem) * 1rem);
+				---pie-size-rem: var(---wallet-mobile-pie-size-rem);
+				---pie-size: var(---wallet-mobile-pie-size);
 				---pie-surface-size: 4.25rem;
 				---pie-target-angle: 0.5turn;
 
-				z-index: 10;
+				z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
 				grid-area: Content;
 				justify-self: end;
 				inset-block-start: calc(var(---wallet-page-block-offset) + 0.125rem);
@@ -3299,6 +3306,7 @@
 					calc(
 						anchor(--wallet-breadcrumb-surface end)
 							+ var(---wallet-content-inline-start)
+							+ var(---wallet-breadcrumb-companion-inline-end-clearance)
 					);
 				translate: 0 -50%;
 			}
