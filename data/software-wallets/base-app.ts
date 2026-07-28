@@ -21,7 +21,10 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+} from '@/schema/features/security/scam-alerts'
 import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
@@ -399,7 +402,19 @@ export const baseApp: SoftwareWallet = {
 					previousContractInteractionWarning: false,
 					recentContractWarning: true,
 				}),
-				scamUrlWarning: null,
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							explanation:
+								'Base App v30.1.0 issues a `useBlocklistQueryQuery` query to `graphql-base.coinbase.com` on every in-app-browser navigation. The request carries the full visited URL, including path and query string (e.g. `{"domain":"https://example.com/path?leaktest=..."}`), plus a second lookup of the bare origin. Coinbase additionally documents that Base App warns users before they proceed to a flagged site.',
+							lastRetrieved: '2026-06-29',
+							url: 'https://help.coinbase.com/en/wallet/security/avoiding-crypto-scams',
+						},
+					],
+					leaksIp: true,
+					leaksUserAddress: false,
+					leaksVisitedUrl: 'FULL_URL',
+				}),
 				sendTransactionWarning: notSupported,
 				unlimitedApprovalWarning: null,
 			},
