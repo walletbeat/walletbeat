@@ -1,0 +1,63 @@
+---
+import { eips } from '@/data/eips'
+import { eipShortLabel } from '@/schema/eips'
+import { defaultNavigationItems } from '@/constants/navigation'
+
+// Routes
+export const prerender = true
+
+export const getStaticPaths = () =>
+	Object.values(eips).map(eip => ({
+		params: { eipNumber: eip.number },
+	}))
+
+const { eipNumber } = Astro.params
+
+const eip = Object.values(eips).find(e => e.number === eipNumber)
+
+if (eip === undefined) {
+	throw new Error(`Invalid EIP number: ${eipNumber}`)
+}
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import WalletEipDetail from '@/components/WalletEipDetail.svelte'
+---
+
+<Layout
+	metadata={{
+		title: `${eipShortLabel(eip)}: ${eip.friendlyName} - Walletbeat`,
+		description: `Which wallets implement ${eipShortLabel(eip)} (${eip.friendlyName})? See wallet support for this Ethereum standard on Walletbeat.`,
+		keywordsBefore: [
+			eip.number,
+			eipShortLabel(eip),
+			eip.friendlyName,
+			eip.formalTitle,
+			'EIP',
+			'ERC',
+			'wallet',
+		],
+		keywordsAfter: ['support', 'implementation', 'Ethereum', 'standard'],
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column='gap-8'>
+		<div data-scroll-item='inline-detached padding-match-start padding-match-end'>
+			<WalletEipDetail eipNumber={eip.number} client:visible />
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 58rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+	}
+</style>
