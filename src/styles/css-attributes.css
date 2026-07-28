@@ -1377,23 +1377,6 @@ ol {
 		var(--scrollContainer-scrollPaddingInlineStart)
 		var(--scrollContainer-scrollPaddingInlineEnd);
 
-	/*
-	 * Chromium can omit scroll-padding when a fragment target's snap area is
-	 * larger than its scrollport. Mirror the same clearance on the active
-	 * target, scoped to its nearest scroll container, so native anchor
-	 * navigation remains unobscured for both small and oversized targets.
-	 */
-	@scope (&) to ([data-scroll-container]) {
-		:target {
-			scroll-margin-block:
-				var(--scrollContainer-scrollPaddingBlockStart)
-				var(--scrollContainer-scrollPaddingBlockEnd);
-			scroll-margin-inline:
-				var(--scrollContainer-scrollPaddingInlineStart)
-				var(--scrollContainer-scrollPaddingInlineEnd);
-		}
-	}
-
 	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
 		container-type: size;
 		container-type: scroll-state size;
