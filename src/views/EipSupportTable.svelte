@@ -5,11 +5,11 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { Variant } from '@/schema/variants'
 
-	enum EipSupportStatus {
-		SUPPORTED = 'SUPPORTED',
-		NOT_SUPPORTED = 'NOT_SUPPORTED',
-		UNKNOWN = 'UNKNOWN',
-		NOT_APPLICABLE = 'NOT_APPLICABLE',
+	const EipSupportStatus = {
+		SUPPORTED: 'SUPPORTED' as const,
+		NOT_SUPPORTED: 'NOT_SUPPORTED' as const,
+		UNKNOWN: 'UNKNOWN' as const,
+		NOT_APPLICABLE: 'NOT_APPLICABLE' as const,
 	}
 
 	const eipSupportStatusSortPriority = {
@@ -32,6 +32,8 @@
 		[EipSupportStatus.UNKNOWN]: '?',
 		[EipSupportStatus.NOT_APPLICABLE]: '–',
 	} as const
+
+	type EipSupportStatus = (typeof EipSupportStatus)[keyof typeof EipSupportStatus]
 
 
 	// Props
