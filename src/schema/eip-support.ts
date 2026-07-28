@@ -314,11 +314,11 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 
 /**
  * Determine a wallet's implementation status for a single EIP, based on its
- * resolved features. EIPs that do not apply to the wallet's type (as declared
+ * resolved features. EIPs that do not apply to the wallet's variant (as declared
  * by the EIP's `appliesTo` field) are not applicable regardless of features.
  */
 function resolveEipSupport(eipNumber: EipNumber, features: ResolvedFeatures): EipSupport {
-	if (!setContains(eips[eipNumber].appliesTo, features.type)) {
+	if (!setContains(eips[eipNumber].appliesTo, features.variant)) {
 		return 'NOT_APPLICABLE'
 	}
 

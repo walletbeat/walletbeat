@@ -1,12 +1,12 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
-import { WalletType } from '@/schema/wallet-types'
+import { Variant } from '@/schema/variants'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 export const eip2700: Eip = {
 	friendlyName: 'JavaScript Provider Events',
 	formalTitle: 'JavaScript Provider Event Emitter',
-	// Browser providers are only implemented by software wallets.
-	appliesTo: nonEmptySet(WalletType.SOFTWARE),
+	// Browser providers are only implemented by browser extension wallets.
+	appliesTo: nonEmptySet(Variant.BROWSER),
 	icon: 'ICON_BELL',
 	number: '2700',
 	prefix: EipPrefix.EIP,

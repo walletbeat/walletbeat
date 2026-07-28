@@ -39,9 +39,9 @@ import {
 	type WalletStage,
 } from '../stages'
 import { Variant } from '../variants'
-import { WalletType, walletTypeToVariants } from '../wallet-types'
+import { allVariantsForWalletType, WalletType } from '../wallet-types'
 
-export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
+export const softwareWalletVariants = allVariantsForWalletType(WalletType.SOFTWARE)
 
 export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-0',

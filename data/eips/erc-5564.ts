@@ -1,10 +1,10 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
-import { walletTypes } from '@/schema/wallet-types'
+import { variantEnum } from '@/schema/variants'
 
 export const erc5564: Eip = {
 	friendlyName: 'Stealth Addresses',
 	formalTitle: 'Stealth Addresses',
-	appliesTo: walletTypes.set,
+	appliesTo: variantEnum.set,
 	icon: 'ICON_EYE_OFF',
 	number: '5564',
 	prefix: EipPrefix.ERC,

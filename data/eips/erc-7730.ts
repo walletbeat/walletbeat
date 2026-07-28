@@ -1,10 +1,10 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
-import { walletTypes } from '@/schema/wallet-types'
+import { variantEnum } from '@/schema/variants'
 
 export const erc7730: Eip = {
 	friendlyName: 'Clear Signing Format',
 	formalTitle: 'Clear Signing Format',
-	appliesTo: walletTypes.set,
+	appliesTo: variantEnum.set,
 	icon: 'ICON_BOOK_OPEN',
 	number: '7730',
 	prefix: EipPrefix.ERC,

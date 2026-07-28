@@ -47,8 +47,8 @@ import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { attributeTree } from '@/schema/attribute-tree'
 import { eipShortLabel } from '@/schema/eips'
-import { WalletType } from '@/schema/wallet-types'
-import { setContains } from '@/types/utils/non-empty'
+import { allVariantsForWalletType, WalletType } from '@/schema/wallet-types'
+import { setItems } from '@/types/utils/non-empty'
 import { getEipTrackerUrl, getWalletUrl } from '@/utils/urls'
 
 /**
@@ -56,8 +56,10 @@ import { getEipTrackerUrl, getWalletUrl } from '@/utils/urls'
  * EIPs that apply to the given wallet type.
  */
 function eipTrackerNavigationItems(idPrefix: string, walletType: WalletType): NavigationItem[] {
+	const variantsForType = allVariantsForWalletType(walletType)
+
 	return Object.values(eips)
-		.filter(eip => setContains(eip.appliesTo, walletType))
+		.filter(eip => setItems(eip.appliesTo).some(v => variantsForType[v]))
 		.map(eip => ({
 			id: `${idPrefix}-eip-${eip.number}-tracker`,
 			title: `${eipShortLabel(eip)} Tracker`,

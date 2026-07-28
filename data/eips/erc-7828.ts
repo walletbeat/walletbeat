@@ -1,12 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
-import { WalletType } from '@/schema/wallet-types'
-import { nonEmptySet } from '@/types/utils/non-empty'
+import { allVariantsForWalletType, WalletType } from '@/schema/wallet-types'
 
 export const erc7828: Eip = {
 	friendlyName: 'Chain-specific addresses using ENS',
 	formalTitle: 'Chain-specific addresses using ENS',
 	// Address resolution is a software wallet feature.
-	appliesTo: nonEmptySet(WalletType.SOFTWARE),
+	appliesTo: allVariantsForWalletType(WalletType.SOFTWARE),
 	icon: 'ICON_AT_SIGN',
 	number: '7828',
 	prefix: EipPrefix.ERC,

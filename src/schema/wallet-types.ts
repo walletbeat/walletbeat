@@ -86,17 +86,6 @@ export function isWalletType(str: string): str is WalletType {
 }
 
 /**
- * Given a wallet type, return the set of variants it may have.
- * A wallet of the given type must have at least one variant from the
- * returned set.
- */
-export function walletTypeToVariants(walletType: WalletType): NonEmptySet<Variant> {
-	return nonEmptySetFromArray(
-		nonEmptyFilter(variantEnum.items, variant => variantToWalletType(variant) === walletType),
-	)
-}
-
-/**
  * Given a wallet variant, return the type that the wallet is expected to
  * have if it implements that variant.
  */
@@ -113,6 +102,15 @@ export function variantToWalletType(variant: Variant): WalletType {
 		case Variant.HARDWARE:
 			return WalletType.HARDWARE
 	}
+}
+
+/**
+ * Given a wallet type, return the set of all variants that belong to that type.
+ */
+export function allVariantsForWalletType(walletType: WalletType): NonEmptySet<Variant> {
+	return nonEmptySetFromArray(
+		nonEmptyFilter(variantEnum.items, variant => variantToWalletType(variant) === walletType),
+	)
 }
 
 /**

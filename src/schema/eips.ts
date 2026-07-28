@@ -1,8 +1,7 @@
 import type { LucideNavigationIcon } from '@/constants/navigation'
 import type { WBIconID } from '@/styles/wbicons'
-import type { NonEmptySet } from '@/types/utils/non-empty'
 
-import type { WalletType } from './wallet-types'
+import type { AtLeastOneTrueVariant } from './variants'
 
 /**
  * The set of all EIP numbers tracked by Walletbeat.
@@ -61,10 +60,10 @@ export interface Eip {
 	status: EipStatus
 
 	/**
-	 * The wallet types this EIP can apply to.
-	 * The EIP is treated as not applicable for wallets of any other type.
+	 * The wallet variants this EIP can apply to.
+	 * The EIP is treated as not applicable for wallets of any other variant.
 	 */
-	appliesTo: NonEmptySet<WalletType>
+	appliesTo: AtLeastOneTrueVariant
 
 	/** Navigation icon for this EIP. */
 	icon: LucideNavigationIcon | WBIconID
