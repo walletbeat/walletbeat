@@ -2098,6 +2098,12 @@
 		initial-value: 0turn;
 	}
 
+	@property ---slice-scale {
+		syntax: "<number>";
+		inherits: true;
+		initial-value: 1;
+	}
+
 	.pie-navigation {
 		display: none;
 	}
@@ -2722,7 +2728,7 @@
 						of calc(var(---slice-outer-corner-r) * var(---slice-unit, 1px)) cw small,
 					close
 				);
-				transition-property: opacity, transform;
+				transition-property: opacity, ---slice-scale;
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)),
@@ -2759,7 +2765,7 @@
 					contrast(0.5) brightness(3) opacity(0.7)
 						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
 				);
-				transition-property: rotate, filter;
+				transition-property: filter;
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current) > .pie-navigation-icon) {
