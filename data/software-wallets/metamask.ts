@@ -757,23 +757,30 @@ export const metamask: SoftwareWallet = {
 				repositoryChangeControls: {
 					ref: [
 						{
-							label: 'MetaMask/metamask-extension GitHub ruleset #833719',
+							explanation:
+								'Ruleset on the default branch requiring PR review before merge and blocking force pushes.',
+							label: 'Default Branch - Require Pull Request, Restrict Force Push',
 							url: 'https://github.com/MetaMask/metamask-extension/rules/833719',
 						},
 						{
-							label: 'MetaMask/metamask-extension GitHub ruleset #11609401',
+							explanation:
+								'Ruleset requiring changes to main to pass through a merge queue with required status checks.',
+							label: 'Merge Queue Main',
 							url: 'https://github.com/MetaMask/metamask-extension/rules/11609401',
 						},
 						{
-							label: 'MetaMask/metamask-extension GitHub ruleset #895542',
+							explanation: 'Ruleset blocking updates/deletion of tags, keeping them immutable.',
+							label: 'Tag Ruleset - Block Updating Tags',
 							url: 'https://github.com/MetaMask/metamask-extension/rules/895542',
 						},
 						{
-							label: 'MetaMask/metamask-extension GitHub ruleset #4683630',
+							explanation: 'Ruleset blocking deletion of release-candidate branches.',
+							label: 'Release Candidate (Restrict Deletions)',
 							url: 'https://github.com/MetaMask/metamask-extension/rules/4683630',
 						},
 						{
-							label: 'MetaMask/metamask-extension GitHub ruleset #18725950',
+							explanation: 'Ruleset blocking force pushes to release-candidate branches.',
+							label: 'Release Candidate (Restrict Force Push)',
 							url: 'https://github.com/MetaMask/metamask-extension/rules/18725950',
 						},
 					],
