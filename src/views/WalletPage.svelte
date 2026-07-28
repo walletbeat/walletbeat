@@ -1776,6 +1776,7 @@
 		);
 
 		scroll-marker-group: after;
+		scroll-snap-type: block proximity;
 		timeline-scope: --wallet-page-exit;
 
 		@media (max-width: 1024px) {
@@ -1796,6 +1797,10 @@
 				+ var(---wallet-anchor-scroll-gap)
 			);
 		}
+	}
+
+	:global(#wallet-page [id]) {
+		scroll-snap-align: start;
 	}
 
 	/*
