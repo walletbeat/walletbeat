@@ -89,3 +89,4 @@ Date	From	To	Amount	Purpose	ID
 2026-07-16	chainflip2	proton2	0.00184883 BTC [services:storage]	Payment for 2 years of Proton Drive for Walletbeat	btc:7cb5aa40ae5ef45da6d159a5f39203dd0149659be26d1d68429d34e67ab386b3
 2026-07-16	treasury	treasury	0	Replace polymutex2 with ren2140 as signer	0x40854e56c62b3a9fcb131a49a0d5b523c7a22f3b2514c25b8532e39711336b85
 2026-07-16	treasury	treasury	0.260752232321898743 WETH → 500 USDC	CoW Swap from WETH to USDC	0x6baa3ebb8a194885856c073362fee8acad55e5c8b1028a27f8fd9b75b122fbcd
+2026-07-27	treasury	treasury	3.601933228577520569 WETH → 7000 USDC	CoW Swap from WETH to USDC	0x0c84d5c05fbb52dd100c819d132b84c552209a804e1fcd06bc08c81fe63f8a98
