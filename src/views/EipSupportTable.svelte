@@ -67,7 +67,24 @@
 		Object.values(Variant).flatMap(variant => {
 			const support = walletSupport.perVariant[variant]
 
-			return support === undefined ? [] : [{ variant, support }]
+			if (support === undefined) return []
+
+			if (eipSupportStatus(support) === EipSupportStatus.NOT_APPLICABLE) return []
+
+			return [{ variant, support }]
+		})
+
+	const nonApplicableVariantList = (
+		walletSupport: RatedWalletEipSupport,
+	): Variant[] =>
+		Object.values(Variant).flatMap(variant => {
+			const support = walletSupport.perVariant[variant]
+
+			if (support === undefined) return []
+
+			if (eipSupportStatus(support) === EipSupportStatus.NOT_APPLICABLE) return [variant]
+
+			return []
 		})
 
 
@@ -76,6 +93,24 @@
 		new Map(
 			wallets.map(wallet => [wallet.metadata.id, ratedWalletEipSupport(wallet, eip.number)])
 		)
+	)
+
+	const getWalletSupport = (walletId: string): RatedWalletEipSupport => {
+		const support = supportByWalletId.get(walletId)
+
+		if (support === undefined) {
+			throw new Error(`Missing EIP support for wallet "${walletId}"`)
+		}
+
+		return support
+	}
+
+	const applicableWallets = $derived(
+		wallets.filter(wallet => {
+			const walletSupport = getWalletSupport(wallet.metadata.id)
+
+			return eipSupportStatus(walletSupport.overall) !== EipSupportStatus.NOT_APPLICABLE
+		})
 	)
 
 
@@ -101,7 +136,7 @@
 
 	<div data-scroll-item="inline-attached underflow-center overflow-start">
 		<Table
-			rows={wallets}
+			rows={applicableWallets}
 			rowId={wallet => wallet.metadata.id}
 
 			columns={[
@@ -117,7 +152,7 @@
 				{
 					id: 'status',
 					name: 'Support',
-					value: wallet => eipSupportStatusSortPriority[eipSupportStatus(supportByWalletId.get(wallet.metadata.id)!.overall)],
+					value: wallet => eipSupportStatusSortPriority[eipSupportStatus(getWalletSupport(wallet.metadata.id).overall)],
 					sort: {
 						isDefault: true,
 						defaultDirection: SortDirection.Ascending,
@@ -126,7 +161,7 @@
 				{
 					id: 'variants',
 					name: 'Platforms',
-					value: wallet => Object.values(supportByWalletId.get(wallet.metadata.id)!.perVariant)
+					value: wallet => Object.values(getWalletSupport(wallet.metadata.id).perVariant)
 						.filter(support => eipSupportStatus(support) === EipSupportStatus.SUPPORTED)
 						.length,
 				},
@@ -138,7 +173,7 @@
 			]}
 		>
 			{#snippet Cell({ row: wallet, column })}
-				{@const walletSupport = supportByWalletId.get(wallet.metadata.id)!}
+				{@const walletSupport = getWalletSupport(wallet.metadata.id)}
 
 				{#if column.id === 'wallet'}
 					<div class="wallet-info" data-row>
@@ -174,8 +209,9 @@
 
 				{:else if column.id === 'variants'}
 					{@const perVariant = variantSupportList(walletSupport)}
+					{@const notApplicable = nonApplicableVariantList(walletSupport)}
 
-					{#if perVariant.length === 0}
+					{#if perVariant.length === 0 && notApplicable.length === 0}
 						<span class="muted-text">–</span>
 					{:else}
 						<ul class="variant-list" data-list="unstyled gap-1">
@@ -187,6 +223,16 @@
 									{variantLabel(variant)}
 								</li>
 							{/each}
+
+							{#if notApplicable.length > 0}
+								<li class="muted-text">
+									{#if notApplicable.length === 1}
+										(EIP doesn't apply to {variantLabel(notApplicable[0]).toLowerCase()} version)
+									{:else}
+										(EIP doesn't apply to other wallet versions)
+									{/if}
+								</li>
+							{/if}
 						</ul>
 					{/if}
 
