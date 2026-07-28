@@ -1672,6 +1672,7 @@
 				align-content: stretch;
 				min-block-size: max-content;
 				padding: 0.75rem;
+				padding-block-end: var(---anchor-controls-reserved-block-size);
 
 				&[data-sticky-container] {
 					--sticky-marginBlockStart: var(--pageNavigation-header-blockSize);
@@ -1753,6 +1754,11 @@
 		---anchor-marker-block-size: calc(
 			var(---anchor-button-size)
 			+ 2 * var(---anchor-marker-padding)
+		);
+		---anchor-controls-reserved-block-size: calc(
+			var(---anchor-control-inset)
+			+ var(---anchor-marker-block-size)
+			+ var(---anchor-control-gap)
 		);
 		---anchor-control-track-inset: calc(
 			var(---anchor-control-inset)
