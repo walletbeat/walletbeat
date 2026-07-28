@@ -717,7 +717,7 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/upload-extension-to-cws.yml#L53,L340-L353',
 						},
 					],
-					publication: 'GITHUB_RELEASE',
+					publication: 'SIGSTORE_REKOR',
 					signer: 'BUILD_INFRA_IDENTITY',
 				}),
 				dependencyLocking: supported({
