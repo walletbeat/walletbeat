@@ -409,6 +409,10 @@ span svg {
 	display: flex;
 	flex-direction: column;
 
+	> * {
+		min-inline-size: 0;
+	}
+
 	&[data-row] {
 		flex-direction: row;
 	}
@@ -540,6 +544,10 @@ summary {
 	justify-content: space-between;
 	align-items: center;
 	gap: 1em;
+
+	> * {
+		min-inline-size: 0;
+	}
 
 	&[data-row~="wrap"],
 	&:where(summary) {

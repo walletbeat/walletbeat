@@ -3743,11 +3743,6 @@
 				}
 			}
 
-			> .attribute-content {
-				min-inline-size: 0;
-				max-inline-size: 100%;
-			}
-
 			.subsection-caption {
 				opacity: 0.8;
 				color: var(--text-secondary);
