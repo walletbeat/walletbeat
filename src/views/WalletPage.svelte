@@ -3230,7 +3230,7 @@
 			&[open] .attribute-summary-companions {
 				animation:
 					AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) forwards,
-					AttributeBreadcrumbOutAnimation linear both;
+					AttributeBreadcrumbCompanionsOutAnimation linear forwards;
 				animation-timeline:
 					--sticky-breadcrumb-timeline,
 					--sticky-breadcrumb-scope-timeline;
@@ -3273,6 +3273,23 @@
 							+ var(---wallet-content-inline-start)
 					);
 				translate: 0 -50%;
+			}
+		}
+
+		@keyframes AttributeBreadcrumbCompanionsOutAnimation {
+			from {
+				visibility: visible;
+				position: fixed;
+				opacity: 1;
+			}
+			99.999% {
+				position: fixed;
+			}
+			to {
+				visibility: hidden;
+				position: static;
+				opacity: 0;
+				translate: none;
 			}
 		}
 
