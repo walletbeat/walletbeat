@@ -550,7 +550,11 @@
 			data-scroll-item="inline-detached padding-match-start"
 		>
 			<div data-row="wrap">
-				<div class="wallet-title-row" data-row="wrap">
+				<div
+					class="wallet-title-row"
+					data-row="wrap"
+					data-wallet-name={wallet.metadata.displayName}
+				>
 					<a
 						data-link="camouflaged"
 						data-sticky-breadcrumb="root item"
@@ -603,6 +607,7 @@
 				</div>
 
 				<div
+					class="wallet-summary-badges"
 					data-row-item="wrap-end"
 					data-row="gap-2"
 				>
@@ -1502,7 +1507,9 @@
 		---wallet-icon-sticky-inline-start: var(---wallet-content-inline-start);
 		---wallet-name-sticky-icon-size: 2rem;
 		---wallet-name-sticky-font-size: 1.8rem;
+		---wallet-name-flow-icon-size: 3rem;
 		---wallet-name-flow-font-size: 2.25rem;
+		---wallet-name-flow-gap: 0.5em;
 		---wallet-line-height: 1.6;
 		---wallet-breadcrumb-attribute-font-size: 1.17rem;
 		---wallet-breadcrumb-group-font-size: calc(
@@ -1725,6 +1732,8 @@
 		 * contents.
 		 */
 		--scrollContainer-perspective: none;
+		scroll-timeline-name: --wallet-page-scroll-timeline;
+		scroll-timeline-axis: block;
 		---wallet-page-navigation-inline-size-rem: 20;
 		---wallet-page-navigation-inline-size: calc(
 			var(---wallet-page-navigation-inline-size-rem)
@@ -2919,6 +2928,12 @@
 		initial-value: 0;
 	}
 
+	@property --wallet-breadcrumb-surface-opacity {
+		syntax: "<number>";
+		inherits: true;
+		initial-value: 0;
+	}
+
 	article {
 		min-inline-size: 0;
 
@@ -2943,6 +2958,13 @@
 					* var(---wallet-line-height)
 				)
 			);
+		}
+
+		@media (max-width: 864px) {
+			.wallet-summary-badges {
+				flex-basis: 100%;
+				justify-content: end;
+			}
 		}
 	}
 
@@ -3014,6 +3036,21 @@
 			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-root;
 		}
 
+		article > header#top .wallet-title-row::after {
+			content: attr(data-wallet-name) / '';
+			order: -1;
+			flex: none;
+			padding-inline-start: calc(
+				var(---wallet-name-flow-icon-size)
+				+ var(---wallet-name-flow-gap)
+			);
+
+			visibility: hidden;
+			font-size: var(---wallet-name-flow-font-size);
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
 		:is(#stages, .attribute-group) {
 			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-group;
 			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-root;
@@ -3028,14 +3065,9 @@
 			z-index: var(---wallet-breadcrumb-layer-root);
 			font-size: var(---wallet-name-flow-font-size);
 
-			animation: WalletNameAnimation var(--transition-easeOutExpo) forwards;
-			animation-timeline: --header-timeline;
-			animation-range:
-				exit-crossing var(---wallet-content-block-start)
-				exit-crossing calc(
-					var(---wallet-content-block-start)
-					+ var(---wallet-name-animation-distance)
-				);
+			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
+			animation-timeline: --wallet-page-scroll-timeline;
+			animation-range: 0px var(---wallet-name-animation-distance);
 
 			&::after {
 				content: '';
@@ -3071,16 +3103,7 @@
 					transparent,
 					white var(---wallet-breadcrumb-surface-fade)
 				);
-				opacity: 0;
-
-				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
-				animation-timeline: --header-timeline;
-				animation-range:
-					exit-crossing var(---wallet-content-block-start)
-					exit-crossing calc(
-						var(---wallet-content-block-start)
-						+ var(---wallet-name-animation-distance)
-					);
+				opacity: var(--wallet-breadcrumb-surface-opacity);
 
 				@media (max-width: 1024px) {
 					inset-inline-start: var(---wallet-page-navigation-inline-size);
@@ -3440,7 +3463,8 @@
 
 		@keyframes WalletNameAnimation {
 			from {
-				--wallet-icon-size: 3rem;
+				--wallet-icon-size: var(---wallet-name-flow-icon-size);
+				--wallet-breadcrumb-surface-opacity: 0;
 				position: fixed;
 				inset-block-start: anchor(--wallet-title-flow-position top);
 				inset-inline-start: anchor(--wallet-title-flow-position start);
@@ -3449,6 +3473,7 @@
 			}
 			to {
 				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
+				--wallet-breadcrumb-surface-opacity: 1;
 				position: fixed;
 				inset-block-start: var(---wallet-icon-sticky-block-start);
 				inset-inline-start: calc(
@@ -3457,12 +3482,6 @@
 				);
 				margin-inline-start: 0;
 				font-size: var(---wallet-breadcrumb-root-font-size);
-			}
-		}
-
-		@keyframes WalletBreadcrumbSurfaceAnimation {
-			to {
-				opacity: 1;
 			}
 		}
 
