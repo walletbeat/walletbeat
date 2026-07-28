@@ -797,7 +797,8 @@ export const rainbow: SoftwareWallet = {
 					sendTransactionWarning: notSupported,
 					unlimitedApprovalWarning: notSupportedWithRef({
 						ref: {
-							explanation: `The extension shows that an approval is unlimited, but does not warn about it.`,
+							explanation:
+								'The extension shows that an approval is unlimited, but does not warn about it.',
 							lastRetrieved: '2026-07-28',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/Simulation.tsx#L111-L213',
 						},
