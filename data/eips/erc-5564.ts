@@ -1,8 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { variantEnum } from '@/schema/variants'
 
 export const erc5564: Eip = {
 	friendlyName: 'Stealth Addresses',
 	formalTitle: 'Stealth Addresses',
+	appliesTo: variantEnum.set,
+	icon: 'ICON_EYE_OFF',
 	number: '5564',
 	prefix: EipPrefix.ERC,
 	status: EipStatus.FINAL,

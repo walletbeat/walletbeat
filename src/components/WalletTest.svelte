@@ -75,46 +75,87 @@
 		pendingTransaction: null as TestTransaction | null,
 	})
 
-	const transactionState = $state({
-		activeId: null as string | null,
+	const transactionState = $state<{
+		activeId: string | null
+		isPending: boolean
+		hashes: Record<string, `0x${string}`>
+		batchIds: Record<string, string>
+		error: string
+	}>({
+		activeId: null,
 		isPending: false,
 		hashes: {},
 		batchIds: {},
 		error: '',
 	})
 
-	const signatureState = $state({
-		activeId: null as string | null,
+	const signatureState = $state<{
+		activeId: string | null
+		isPending: boolean
+		results: Record<string, `0x${string}`>
+		error: string
+	}>({
+		activeId: null,
 		isPending: false,
 		results: {},
 		error: '',
 	})
 
 	// Step-based EIP testing state
-	const stepTestState = $state({
+	const stepTestState = $state<{
+		currentStepIndex: number
+		overallStatus: 'idle' | 'in_progress' | 'completed' | 'failed'
+		error: string
+		stepResults: Record<string, StepResult>
+		discoveredProviders: Array<DiscoveredProvider & { provider: unknown }>
+		selectedProviderId: string | null
+		connectedAddress: string | null
+		chainId: number | null
+		batchId: string | null
+		earlyConnectEventFired: boolean
+		earlyConnectEventData: unknown
+		resultsModal: {
+			isOpen: boolean
+			overallPassed: boolean
+			hasPartialResults: boolean
+			stepResults: StepResult[]
+		}
+	}>({
 		currentStepIndex: 0,
 		overallStatus: 'idle',
 		error: '',
 		stepResults: {},
 
 		// Step-specific data persisted across steps
-		discoveredProviders: [] as Array<DiscoveredProvider & { provider: unknown }>,
-		selectedProviderId: null as string | null,
-		connectedAddress: null as string | null,
-		chainId: null as number | null,
-		batchId: null as string | null,
+		discoveredProviders: [],
+		selectedProviderId: null,
+		connectedAddress: null,
+		chainId: null,
+		batchId: null,
+
+		// Captured by a listener attached at provider-discovery time (page
+		// load), since 'connect' typically fires long before the user
+		// reaches step 2 and a step-scoped listener would miss it.
+		earlyConnectEventFired: false,
+		earlyConnectEventData: null,
 
 		// Results modal
 		resultsModal: {
 			isOpen: false,
 			overallPassed: false,
 			hasPartialResults: false,
-			stepResults: [] as StepResult[],
+			stepResults: [],
 		},
 	})
 
-	const scamAlertState = $state({
-		activeId: null as string | null,
+	const scamAlertState = $state<{
+		activeId: string | null
+		isPending: boolean
+		hashes: Record<string, `0x${string}`>
+		signatures: Record<string, `0x${string}`>
+		error: string
+	}>({
+		activeId: null,
 		isPending: false,
 		hashes: {},
 		signatures: {},
@@ -175,7 +216,7 @@
 			const address = account?.address || '0x0000000000000000000000000000000000000000';
 			const baseUrl = getBaseUrl()
 
-			siweSig.message = `${baseUrl}/ wants you to sign in with your Ethereum account:
+			siweSig.message = `${baseUrl} wants you to sign in with your Ethereum account:
 ${address}
 
 Sign in to authenticate your wallet. This is a test SIWE message.
@@ -452,6 +493,28 @@ Issued At: ${new Date().toISOString()}`;
 		}
 	}
 
+	// Capture the 'connect' event as early as possible (at provider-discovery
+	// time, i.e. page load), since it typically fires long before the user
+	// reaches step 2 - a listener attached only when step 2 runs would miss it.
+	function attachEarlyConnectListener(provider: unknown) {
+		if (typeof provider !== 'object' || provider === null) return
+
+		const candidate = provider as { on?: (event: string, listener: (...args: unknown[]) => void) => unknown }
+
+		if (typeof candidate.on !== 'function') return
+
+		try {
+			candidate.on('connect', (info: unknown) => {
+				if (!stepTestState.earlyConnectEventFired) {
+					stepTestState.earlyConnectEventFired = true
+					stepTestState.earlyConnectEventData = info
+				}
+			})
+		} catch {
+			// Provider doesn't support event subscription
+		}
+	}
+
 	// EIP Support Testing
 	function discoverProviders() {
 		if (typeof window === 'undefined') return
@@ -474,11 +537,16 @@ Issued At: ${new Date().toISOString()}`;
 					rdns: info.rdns,
 					provider,
 				})
+				attachEarlyConnectListener(provider)
 			}
 		})
 
 		// Request providers to announce themselves
 		window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+		// Fallback: also listen on window.ethereum directly for wallets that
+		// don't implement EIP-6963 discovery.
+		attachEarlyConnectListener(getProvider())
 	}
 
 	// Step-based EIP testing functions
@@ -509,6 +577,10 @@ Issued At: ${new Date().toISOString()}`;
 			getChainId: () => stepTestState.chainId,
 			getBatchId: () => stepTestState.batchId,
 			getAccountAddress: () => account?.address,
+			getEarlyConnectEvent: () => ({
+				fired: stepTestState.earlyConnectEventFired,
+				data: stepTestState.earlyConnectEventData,
+			}),
 			setSelectedProviderId: (id: string) => { stepTestState.selectedProviderId = id },
 			setConnectedAddress: (address: string) => { stepTestState.connectedAddress = address },
 			setChainId: (chainId: number) => { stepTestState.chainId = chainId },

@@ -21,6 +21,10 @@ export interface EIPTestContext {
 	getChainId: () => number | null
 	getBatchId: () => string | null
 	getAccountAddress: () => string | undefined
+	// Connect event captured by a listener attached at provider-discovery time
+	// (page load), since the 'connect' event usually fires long before the
+	// user reaches step 2 and a step-scoped listener would miss it.
+	getEarlyConnectEvent: () => { fired: boolean; data: unknown }
 
 	// State setters
 	setSelectedProviderId: (id: string) => void
@@ -281,12 +285,16 @@ export async function runStep2Connect(step: TestStep, ctx: EIPTestContext): Prom
 		passed: typeof provider.removeListener === 'function',
 	})
 
-	// Set up connect event listener BEFORE requesting accounts
-	let connectEventFired = false
-	let connectEventData: unknown = null
+	// Set up a step-scoped connect listener too, in case the provider only
+	// connects once account access is granted (deferred connection). The
+	// primary source of truth is the early listener attached at
+	// provider-discovery time (page load), since 'connect' usually fires
+	// long before the user reaches this step.
+	let lateConnectEventFired = false
+	let lateConnectEventData: unknown = null
 	const connectListener = (info: unknown) => {
-		connectEventFired = true
-		connectEventData = info
+		lateConnectEventFired = true
+		lateConnectEventData = info
 	}
 
 	// Set up disconnect event listener to verify subscription works
@@ -344,6 +352,14 @@ export async function runStep2Connect(step: TestStep, ctx: EIPTestContext): Prom
 		passed: connectPassed,
 		detail: connectDetail,
 	})
+
+	// Prefer the early-captured event (attached at provider-discovery time,
+	// i.e. page load) since 'connect' usually fires long before this step
+	// runs; fall back to whatever this step's own listener caught in case the
+	// provider connects lazily, on account authorization.
+	const earlyConnectEvent = ctx.getEarlyConnectEvent()
+	const connectEventFired = earlyConnectEvent.fired || lateConnectEventFired
+	const connectEventData = earlyConnectEvent.fired ? earlyConnectEvent.data : lateConnectEventData
 
 	// Check if connect event actually fired (EIP-1193 MUST emit when connected)
 	let connectEventDetail: string
@@ -862,6 +878,52 @@ interface CallsStatusResponse {
 	id?: unknown
 }
 
+const CALLS_STATUS_POLL_INTERVAL_MS = 2_000
+const CALLS_STATUS_POLL_TIMEOUT_MS = 60_000
+
+/**
+ * EIP-5792 v2.0.0 uses numeric status codes (100 = pending, >=200 = terminal).
+ * v1.0.0 used string statuses, where anything other than "PENDING" is terminal.
+ */
+function isTerminalCallsStatus(status: CallsStatusResponse['status']): boolean {
+	if (typeof status === 'number') {
+		return status >= 200
+	}
+
+	if (typeof status === 'string') {
+		return status.toUpperCase() !== 'PENDING'
+	}
+
+	return true
+}
+
+/**
+ * Poll wallet_getCallsStatus until the batch reaches a terminal status
+ * (confirmed or failed) or the timeout elapses. Bundles are frequently
+ * still pending immediately after wallet_sendCalls returns, and wallets
+ * commonly omit `atomic`/`receipts` until the batch is actually included.
+ */
+async function pollCallsStatus(
+	provider: Eip1193Provider,
+	batchId: string,
+): Promise<CallsStatusResponse> {
+	const deadline = Date.now() + CALLS_STATUS_POLL_TIMEOUT_MS
+
+	for (;;) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+		const status: CallsStatusResponse = (await provider.request({
+			method: 'wallet_getCallsStatus',
+			params: [batchId],
+		})) as CallsStatusResponse
+
+		if (isTerminalCallsStatus(status.status) || Date.now() >= deadline) {
+			return status
+		}
+
+		await new Promise(resolve => setTimeout(resolve, CALLS_STATUS_POLL_INTERVAL_MS))
+	}
+}
+
 /**
  * Step 6: Check Batch Status
  * Tests EIP-5792 wallet_getCallsStatus
@@ -895,11 +957,7 @@ export async function runStep6BatchStatus(
 	let receiptsDetail = ''
 
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-		const status = (await provider.request({
-			method: 'wallet_getCallsStatus',
-			params: [batchId],
-		})) as CallsStatusResponse
+		const status = await pollCallsStatus(provider, batchId)
 
 		statusPassed = true
 

@@ -6,7 +6,7 @@
 	import { AccountType } from '@/schema/features/account-support'
 	import type { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
-	import { getWalletUrl } from '@/utils/wallet-url'
+	import { getWalletUrl } from '@/utils/urls'
 	import { Rating } from '@/schema/attributes'
 
 	const WalletTypeFor7702 = {
@@ -201,15 +201,16 @@
 					<div class="wallet-info" data-row>
 						<span class="row-count" data-row="center"></span>
 
-						<img
-							src={`/images/wallets/${wallet.metadata.id}.svg`}
-							alt={wallet.metadata.displayName}
-							class="wallet-icon"
-							onerror={event => {
-								if (event.currentTarget instanceof HTMLImageElement)
-									event.currentTarget.src = '/images/wallets/default.svg'
-							}}
-						/>
+						<span class="wallet-icon" data-icon="shadow">
+							<img
+								src={`/images/wallets/${wallet.metadata.id}.svg`}
+								alt={wallet.metadata.displayName}
+								onerror={event => {
+									if (event.currentTarget instanceof HTMLImageElement)
+										event.currentTarget.src = '/images/wallets/default.svg'
+								}}
+							/>
+						</span>
 
 						<div class="name">
 							<h3>
@@ -382,11 +383,7 @@
 		}
 
 		.wallet-icon {
-			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
-			width: 2.25em;
-			height: 2.25em;
-			object-fit: contain;
-			border-radius: 0.25em;
+			--icon-size: 2.25em;
 		}
 
 		.name {

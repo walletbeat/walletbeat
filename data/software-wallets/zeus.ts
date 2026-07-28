@@ -278,8 +278,10 @@ export const zeus: SoftwareWallet = {
 						url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
 					},
 				],
+				erc4361: null,
 				erc7730: null,
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: null,
 					messageSigningLegibility: {
 						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,

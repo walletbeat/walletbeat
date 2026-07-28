@@ -1,8 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { variantEnum } from '@/schema/variants'
 
 export const eip7702: Eip = {
 	friendlyName: 'Account Abstraction via smart contract authority delegation',
 	formalTitle: 'Set EOA account code',
+	appliesTo: variantEnum.set,
+	icon: 'ICON_FILE_CODE',
 	number: '7702',
 	prefix: EipPrefix.EIP,
 	status: EipStatus.FINAL,

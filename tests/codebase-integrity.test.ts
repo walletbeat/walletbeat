@@ -514,6 +514,7 @@ describe('codebase integrity', () => {
 		const PATH_COMPONENT_WHITELIST = new Set<string>([
 			'eternalsafe.Containerfile',
 			'[attrGroupId].astro',
+			'[eip].astro',
 			'[walletName]',
 		])
 

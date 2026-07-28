@@ -1,35 +1,44 @@
 import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
+import { Rating } from '@/schema/attributes'
 import { sentence } from '@/types/content'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
 import { accountAbstraction } from '../attributes/ecosystem/account-abstraction'
 import { addressResolution } from '../attributes/ecosystem/address-resolution'
 import { browserIntegration } from '../attributes/ecosystem/browser-integration'
+import { chainAbstraction } from '../attributes/ecosystem/chain-abstraction'
+import { hardwareWalletInteroperability } from '../attributes/ecosystem/hardware-wallet-interoperability'
 import { transactionBatching } from '../attributes/ecosystem/transaction-batching'
 import { addressCorrelation } from '../attributes/privacy/address-correlation'
+import { appIsolation } from '../attributes/privacy/app-isolation'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privacyHygiene } from '../attributes/privacy/privacy-hygiene'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
-import { bugBountyProgram } from '../attributes/security/bug-bounty-program'
+import { accountRecovery, hasAccountRecoveryDrills } from '../attributes/security/account-recovery'
 import { duressResistance } from '../attributes/security/duress-resistance'
 import { scamPrevention } from '../attributes/security/scam-prevention'
-import { securityAudits } from '../attributes/security/security-audits'
+import {
+	evaluateBugBountyProgram,
+	isAuditedInLastYear,
+} from '../attributes/security/security-audits-bounties'
 import { securityBestPractices } from '../attributes/security/security-best-practices'
 import { transactionLegibility } from '../attributes/security/transaction-legibility'
 import { accountPortability } from '../attributes/self-sovereignty/account-portability'
 import { accountUnruggability } from '../attributes/self-sovereignty/account-unruggability'
 import { chainVerification } from '../attributes/self-sovereignty/chain-verification'
+import { l1ProviderIndependence } from '../attributes/self-sovereignty/l1-provider-independence'
 import { permissionsManagement } from '../attributes/self-sovereignty/permissions-management'
 import { transactionInclusion } from '../attributes/self-sovereignty/transaction-inclusion'
 import { feeTransparency } from '../attributes/transparency/fee-transparency'
 import { funding } from '../attributes/transparency/funding'
 import { openSource } from '../attributes/transparency/open-source'
+import { orderflowTransparency } from '../attributes/transparency/orderflow-transparency'
 import { releaseProcess } from '../attributes/transparency/release-process'
-import { sourceVisibility } from '../attributes/transparency/source-visibility'
 import { hardwareWalletType } from '../features/security/hardware-wallet-support'
 import { RpcEndpointConfiguration } from '../features/self-sovereignty/chain-configurability'
 import { SpendingApprovalsControl } from '../features/self-sovereignty/permissions-management'
 import { isSupported, notSupported } from '../features/support'
+import { isSourcePubliclyVisible } from '../features/transparency/license'
 import {
 	type StageCriterionEvaluation,
 	stageCriterionEvaluationPerVariant,
@@ -39,9 +48,9 @@ import {
 	type WalletStage,
 } from '../stages'
 import { Variant } from '../variants'
-import { WalletType, walletTypeToVariants } from '../wallet-types'
+import { allVariantsForWalletType, WalletType } from '../wallet-types'
 
-export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
+export const softwareWalletVariants = allVariantsForWalletType(WalletType.SOFTWARE)
 
 export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-0',
@@ -59,7 +68,28 @@ export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'The source code must be publicly available so that it can be reviewed by the public.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							const visible = isSourcePubliclyVisible(variantWallet.features.licensing)
+
+							if (visible === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!visible) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence("{{WALLET_NAME}}'s source code is not publicly available."),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence("{{WALLET_NAME}}'s source code is publicly available."),
+							}
+						},
+					),
 					displayName: 'Source Availability',
 				},
 			],
@@ -163,6 +193,73 @@ export const softwareWalletStageZeroFive: WalletStage<SoftwareAttributeGroupId> 
 					),
 					displayName: 'Basic Authentication',
 				},
+				{
+					id: 'account_recovery_drills_basic',
+					description: sentence(
+						'Unless the wallet implements guardian-based account recovery, it must periodically prompt users to verify they can still access their seed phrase or private key.',
+					),
+					rationale: sentence(`
+						Recovery methods can silently become inaccessible over time, for
+						example a seed phrase becoming unreadable. Periodic check-ups
+						catch this early, rather than leaving users to discover the
+						problem only when they actually need to recover their account.
+						Wallets with guardian-based recovery are held to a stronger
+						standard at Stage 1 instead.
+					`),
+					evaluate: (wallet): StageCriterionEvaluation => {
+						const accountRecoveryEval = variantsMustPassAttribute(
+							softwareWalletVariants,
+							accountRecovery,
+							{
+								allowPartial: false,
+								ifUnverifiable: 'THROW',
+								ifNoVariantInScope: null,
+							},
+						)(wallet)
+
+						if (accountRecoveryEval.rating === StageCriterionRating.PASS) {
+							return accountRecoveryEval
+						}
+
+						return stageCriterionEvaluationPerVariant(
+							softwareWalletVariants,
+							(variantWallet): StageCriterionEvaluation => {
+								if (
+									variantWallet.features.security.accountRecovery === null ||
+									variantWallet.features.accountSupport === null
+								) {
+									return { rating: StageCriterionRating.UNRATED }
+								}
+
+								const hasDrills = hasAccountRecoveryDrills(
+									variantWallet.features.security.accountRecovery,
+									variantWallet.features.accountSupport,
+								)
+
+								if (hasDrills === null) {
+									return { rating: StageCriterionRating.UNRATED }
+								}
+
+								if (!hasDrills) {
+									return {
+										rating: StageCriterionRating.FAIL,
+										explanation: sentence(
+											'{{WALLET_NAME}} does not periodically prompt users to verify their recovery material is still accessible.',
+										),
+									}
+								}
+
+								return {
+									rating: StageCriterionRating.PASS,
+									explanation: sentence(
+										'{{WALLET_NAME}} periodically prompts users to verify their recovery material is still accessible.',
+									),
+								}
+							},
+						)(wallet)
+					},
+					displayName: 'Basic Account Recovery Assurance',
+				},
 			],
 		},
 	],
@@ -186,42 +283,22 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits, {
-						allowPartial: false,
-						ifUnverifiable: 'THROW',
-						ifNoVariantInScope: null,
-					}),
-					displayName: 'Security Audits',
-				},
-				{
-					id: 'hardware_wallet_subset',
-					description: sentence(
-						'The wallet must support hardware wallets from at least three manufacturers.',
-					),
-					rationale: sentence(`
-            By letting you offload your private key to a separate hardware
-            device, the wallet developer demonstrates that they are serious
-            about ensuring the security of your private key.
-          `),
 					evaluate: stageCriterionEvaluationPerVariant(
 						softwareWalletVariants,
 						(variantWallet): StageCriterionEvaluation => {
-							if (variantWallet.features.security.hardwareWalletSupport === null) {
+							if (variantWallet.features.security.publicSecurityAudits === null) {
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							const numSupportedWallets = Object.values(
-								hardwareWalletType.fullRecord(
-									variantWallet.features.security.hardwareWalletSupport.wallets,
-									notSupported,
-								),
-							).filter(isSupported).length
+							const auditedInLastYear = isAuditedInLastYear(
+								variantWallet.features.security.publicSecurityAudits,
+							)
 
-							if (numSupportedWallets < 3) {
+							if (!auditedInLastYear) {
 								return {
 									rating: StageCriterionRating.FAIL,
 									explanation: sentence(
-										'{{WALLET_NAME}} supports fewer than three hardware wallet manufacturers.',
+										'{{WALLET_NAME}} has not undergone a security audit within the last year.',
 									),
 								}
 							}
@@ -229,12 +306,31 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 							return {
 								rating: StageCriterionRating.PASS,
 								explanation: sentence(
-									'{{WALLET_NAME}} supports three or more hardware wallet manufacturers.',
+									'{{WALLET_NAME}} has undergone a security audit within the last year.',
 								),
 							}
 						},
 					),
-					displayName: 'Hardware Wallet Support',
+					displayName: 'Security Audits',
+				},
+				{
+					id: 'hardware_wallet_interoperability',
+					description: sentence(
+						'The wallet must directly support hardware wallets from at least three major manufacturers.',
+					),
+					rationale: sentence(`
+						Hardware wallets keep private keys isolated on dedicated, purpose-built devices, and direct support for multiple manufacturers ensures users are not locked into a single hardware vendor and can freely choose the device that best fits their security needs.
+					`),
+					evaluate: variantsMustPassAttribute(
+						softwareWalletVariants,
+						hardwareWalletInteroperability,
+						{
+							allowPartial: false,
+							ifUnverifiable: 'THROW',
+							ifNoVariantInScope: null,
+						},
+					),
+					displayName: 'Hardware Wallet Interoperability',
 				},
 				{
 					id: 'scam_alerting',
@@ -265,6 +361,26 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Standard Security Practices',
+				},
+				{
+					id: 'account_recovery',
+					description: sentence(
+						'The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios, and must periodically prompt users to verify that their account recovery methods are still accessible.',
+					),
+					rationale: sentence(`
+						Self-custody is only practical if losing a device, a guardian,
+						or a single external provider does not mean permanently losing
+						account access. Guardian-based recovery gives this safety net
+						without one party able to take it over. Recovery methods can
+						also silently fail over time, so periodic check-ups catch this
+						early.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountRecovery, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Account Recovery',
 				},
 			],
 		},
@@ -547,7 +663,39 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					rationale: sentence(
 						'This aligns incentives for security exploits to be reported to the wallet developer, rather than exploited.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, bugBountyProgram),
+					evaluate: stageCriterionEvaluationPerVariant(
+						softwareWalletVariants,
+						(variantWallet): StageCriterionEvaluation => {
+							const bugBountyProgram = variantWallet.features.security.bugBountyProgram
+
+							if (bugBountyProgram === null) {
+								return { rating: StageCriterionRating.UNRATED }
+							}
+
+							if (!isSupported(bugBountyProgram)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence('{{WALLET_NAME}} does not have a bug bounty program.'),
+								}
+							}
+
+							if (evaluateBugBountyProgram(bugBountyProgram).rating !== Rating.PASS) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not have a sufficiently comprehensive bug bounty program.',
+									),
+								}
+							}
+
+							return {
+								rating: StageCriterionRating.PASS,
+								explanation: sentence(
+									'{{WALLET_NAME}} has a funded, comprehensive bug bounty program.',
+								),
+							}
+						},
+					),
 					displayName: 'Bug Bounty Program',
 				},
 				{
@@ -620,6 +768,22 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Full Wallet Address Privacy',
+				},
+				{
+					id: 'app_isolation',
+					description: sentence(
+						'The wallet must offer app-specific accounts by default when connecting to apps.',
+					),
+					rationale: sentence(`
+						Much like websites cannot query a browser's history from other websites by default, apps should not be able to correlate a user's activity across other apps by default.
+						Wallets must offer per-app accounts as the default behavior when connecting to apps, and remember the addresses last used for a given app.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, appIsolation, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'App Isolation',
 				},
 			],
 		},
@@ -701,6 +865,20 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					displayName: 'Chain Configurability',
 				},
 				{
+					id: 'full_l1_provider_independence',
+					description: sentence(
+						'The wallet must not critically depend on external providers to perform basic operations on Ethereum L1, even when the user configures their own self-hosted node.',
+					),
+					rationale: sentence(`
+						Merely letting the user point the wallet at a self-hosted node is not enough if the
+						wallet still contacts its default provider before the user configures it, or relies on
+						external services for account creation, balance lookups, or transfers. True independence
+						requires all critical paths depend only on the user's own node.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, l1ProviderIndependence),
+					displayName: 'L1 Provider Independence',
+				},
+				{
 					id: 'outstanding_approvals_full',
 					description: sentence(
 						'The wallet must let users inspect and revoke ERC-20, ERC-721, and ERC-1155 token approvals.',
@@ -765,6 +943,26 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 					}),
 					displayName: 'Fee Transparency',
 				},
+				{
+					id: 'orderflow_transparency',
+					description: sentence(
+						'The wallet must transparently disclose how it monetizes or shares transaction data before it is included onchain.',
+					),
+					rationale: sentence(`
+						Wallet software may send transaction data to external services for broadcast, simulation,
+						or orderflow auctioning before inclusion onchain, a path less visible than onchain execution.
+						Wallets that auction orderflow by default must disclose this prominently, and any pre-inclusion
+						data sharing must use verifiably non-extractive endpoints.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, orderflowTransparency, {
+						allowPartial: true,
+						ifUnverifiable: sentence(
+							"{{WALLET_NAME}}'s orderflow transparency cannot be publicly verified.",
+						),
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Orderflow Transparency',
+				},
 			],
 		},
 		{
@@ -773,6 +971,21 @@ const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 				'The wallet is aligned with advanced Ethereum ecosystem best practices for usability.',
 			),
 			criteria: [
+				{
+					id: 'chain_abstraction',
+					description: sentence(
+						'The wallet must smooth out the complexities of dealing with multiple chains.',
+					),
+					rationale: sentence(`
+						A lot of Ethereum activity has moved onto rollups and Layer 2 chains, fragmenting token balances and account value across multiple chains. Wallets should abstract away this complexity, showing users their cross-chain balances and providing a built-in way to bridge assets between chains.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainAbstraction, {
+						allowPartial: true,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
+					displayName: 'Chain Abstraction',
+				},
 				{
 					id: 'chain_specific_address_resolution',
 					description: sentence(

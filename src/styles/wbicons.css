@@ -1,4 +1,4 @@
-[data-icon~="wbicons"] {
+[data-icon~='wbicons'] {
 	font-family: var(--fontFamily-wbicons);
 	font-style: normal;
 	-webkit-font-smoothing: subpixel-antialiased;
@@ -9,215 +9,211 @@
 		font-size: var(--icon-size, 1em);
 	}
 
-	&[data-icon~="circle"]::before {
+	&[data-icon~='circle']::before {
 		font-size: calc(var(--icon-size, 2rem) * 0.55);
 	}
 
-	&[data-icon~="emoji"] {
+	&[data-icon~='emoji'] {
 		font-family: var(--fontFamily-emoji);
 	}
 
-	&[data-icon~="about"] {
-		--icon-content: "ℹ️";
+	&[data-icon~='about'] {
+		--icon-content: 'ℹ️';
 	}
 
-	&[data-icon~="account_abstraction"] {
-		--icon-content: "👤";
+	&[data-icon~='account_abstraction'] {
+		--icon-content: '👤';
 	}
 
-	&[data-icon~="account_portability"] {
-		--icon-content: "🧳";
+	&[data-icon~='account_portability'] {
+		--icon-content: '🧳';
 	}
 
-	&[data-icon~="account_recovery"] {
-		--icon-content: "🛟";
+	&[data-icon~='account_recovery'] {
+		--icon-content: '🛟';
 	}
 
-	&[data-icon~="account_type"] {
-		--icon-content: "🪪";
+	&[data-icon~='account_type'] {
+		--icon-content: '🪪';
 	}
 
-	&[data-icon~="account_unruggability"] {
-		--icon-content: "🪚";
+	&[data-icon~='account_unruggability'] {
+		--icon-content: '🪚';
 	}
 
-	&[data-icon~="address_resolution"] {
-		--icon-content: "📇";
+	&[data-icon~='address_resolution'] {
+		--icon-content: '📇';
 	}
 
-	&[data-icon~="app_isolation"] {
-		--icon-content: "🏝️";
+	&[data-icon~='app_isolation'] {
+		--icon-content: '🏝️';
 	}
 
-	&[data-icon~="browser_integration"] {
-		--icon-content: "🌐";
+	&[data-icon~='browser_integration'] {
+		--icon-content: '🌐';
 	}
 
-	&[data-icon~="chain_abstraction"] {
-		--icon-content: "🌉";
+	&[data-icon~='chain_abstraction'] {
+		--icon-content: '🌉';
 	}
 
-	&[data-icon~="chain_verification"] {
-		--icon-content: "⚓";
+	&[data-icon~='chain_verification'] {
+		--icon-content: '⚓';
 	}
 
-	&[data-icon~="discuss"] {
-		--icon-content: "💬";
+	&[data-icon~='discuss'] {
+		--icon-content: '💬';
 	}
 
-	&[data-icon~="duress_resistance"] {
-		--icon-content: "🔧";
+	&[data-icon~='duress_resistance'] {
+		--icon-content: '🔧';
 	}
 
-	&[data-icon~="ecosystem"] {
-		--icon-content: "🌳";
+	&[data-icon~='ecosystem'] {
+		--icon-content: '🌳';
 	}
 
-	&[data-icon~="faq"] {
-		--icon-content: "❓";
+	&[data-icon~='faq'] {
+		--icon-content: '❓';
 	}
 
-	&[data-icon~="fee_transparency"] {
-		--icon-content: "💸";
+	&[data-icon~='fee_transparency'] {
+		--icon-content: '💸';
 	}
 
-	&[data-icon~="free_and_open_source_license"] {
-		--icon-content: "❤️";
+	&[data-icon~='free_and_open_source_license'] {
+		--icon-content: '❤️';
 	}
 
-	&[data-icon~="funding_transparency"] {
-		--icon-content: "💰";
+	&[data-icon~='funding_transparency'] {
+		--icon-content: '💰';
 	}
 
-	&[data-icon~="hardware_wallet_interoperability"] {
-		--icon-content: "🧱";
+	&[data-icon~='hardware_wallet_interoperability'] {
+		--icon-content: '🧱';
 	}
 
-	&[data-icon~="hardware_wallet_support"] {
-		--icon-content: "🗝️";
+	&[data-icon~='hardware_wallet_support'] {
+		--icon-content: '🗝️';
 	}
 
-	&[data-icon~="l1_provider_independence"] {
-		--icon-content: "🏠";
+	&[data-icon~='l1_provider_independence'] {
+		--icon-content: '🏠';
 	}
 
-	&[data-icon~="multi_address_privacy"] {
-		--icon-content: "🖇️";
+	&[data-icon~='multi_address_privacy'] {
+		--icon-content: '🖇️';
 	}
 
-	&[data-icon~="newsletter"] {
-		--icon-content: "📰";
+	&[data-icon~='newsletter'] {
+		--icon-content: '📰';
 	}
 
-	&[data-icon~="orderflow_transparency"] {
-		--icon-content: "🔀";
+	&[data-icon~='orderflow_transparency'] {
+		--icon-content: '🔀';
 	}
 
-	&[data-icon~="passkey_verification"] {
-		--icon-content: "🫆";
+	&[data-icon~='passkey_verification'] {
+		--icon-content: '🫆';
 	}
 
-	&[data-icon~="permissions_management"] {
-		--icon-content: "🔑";
+	&[data-icon~='permissions_management'] {
+		--icon-content: '🔑';
 	}
 
-	&[data-icon~="privacy"] {
-		--icon-content: "😎";
+	&[data-icon~='privacy'] {
+		--icon-content: '😎';
 	}
 
-	&[data-icon~="privacy_hygiene"] {
-		--icon-content: "🧼";
+	&[data-icon~='privacy_hygiene'] {
+		--icon-content: '🧼';
 	}
 
-	&[data-icon~="private_token_transfers"] {
-		--icon-content: "📨";
+	&[data-icon~='private_token_transfers'] {
+		--icon-content: '📨';
 	}
 
-	&[data-icon~="question_mark"] {
-		--icon-content: "❔";
+	&[data-icon~='question_mark'] {
+		--icon-content: '❔';
 	}
 
-	&[data-icon~="release_process_transparency"] {
-		--icon-content: "📦";
+	&[data-icon~='release_process_transparency'] {
+		--icon-content: '📦';
 	}
 
-	&[data-icon~="repository"] {
-		--icon-content: "🐱";
+	&[data-icon~='repository'] {
+		--icon-content: '🐱';
 	}
 
-	&[data-icon~="scam_prevention"] {
-		--icon-content: "🚨";
+	&[data-icon~='scam_prevention'] {
+		--icon-content: '🚨';
 	}
 
-	&[data-icon~="security"] {
-		--icon-content: "🔒";
+	&[data-icon~='security'] {
+		--icon-content: '🔒';
 	}
 
-	&[data-icon~="security_audits"] {
-		--icon-content: "📜";
+	&[data-icon~='security_audits'] {
+		--icon-content: '📜';
 	}
 
-	&[data-icon~="security_best_practices"] {
-		--icon-content: "📋";
+	&[data-icon~='security_best_practices'] {
+		--icon-content: '📋';
 	}
 
-	&[data-icon~="self_sovereignty"] {
-		--icon-content: "🏰";
+	&[data-icon~='self_sovereignty'] {
+		--icon-content: '🏰';
 	}
 
-	&[data-icon~="source_visibility"] {
-		--icon-content: "🔍";
+	&[data-icon~='transaction_batching'] {
+		--icon-content: '🧺';
 	}
 
-	&[data-icon~="transaction_batching"] {
-		--icon-content: "🧺";
+	&[data-icon~='transaction_inclusion'] {
+		--icon-content: '📡';
 	}
 
-	&[data-icon~="transaction_inclusion"] {
-		--icon-content: "📡";
+	&[data-icon~='transaction_legibility'] {
+		--icon-content: '🧾';
 	}
 
-	&[data-icon~="transaction_legibility"] {
-		--icon-content: "🧾";
+	&[data-icon~='transparency'] {
+		--icon-content: '🕵️';
 	}
 
-	&[data-icon~="transparency"] {
-		--icon-content: "🕵️";
+	&[data-icon~='user_privacy'] {
+		--icon-content: '🕶️';
 	}
 
-	&[data-icon~="user_privacy"] {
-		--icon-content: "🕶️";
+	&[data-icon~='wallet_address_privacy'] {
+		--icon-content: '🔗';
 	}
 
-	&[data-icon~="wallet_address_privacy"] {
-		--icon-content: "🔗";
+	&[data-icon~='wallet_browser'] {
+		--icon-content: '🧩';
 	}
 
-	&[data-icon~="wallet_browser"] {
-		--icon-content: "🧩";
+	&[data-icon~='wallet_desktop'] {
+		--icon-content: '🖥️';
 	}
 
-	&[data-icon~="wallet_desktop"] {
-		--icon-content: "🖥️";
+	&[data-icon~='wallet_embedded'] {
+		--icon-content: '🧬';
 	}
 
-	&[data-icon~="wallet_embedded"] {
-		--icon-content: "🧬";
+	&[data-icon~='wallet_hardware'] {
+		--icon-content: '📟';
 	}
 
-	&[data-icon~="wallet_hardware"] {
-		--icon-content: "📟";
+	&[data-icon~='wallet_mobile'] {
+		--icon-content: '📱';
 	}
 
-	&[data-icon~="wallet_mobile"] {
-		--icon-content: "📱";
+	&[data-icon~='wallet_software'] {
+		--icon-content: '💻';
 	}
 
-	&[data-icon~="wallet_software"] {
-		--icon-content: "💻";
-	}
-
-	&[data-icon~="wallet_test"] {
-		--icon-content: "🧪";
+	&[data-icon~='wallet_test'] {
+		--icon-content: '🧪';
 	}
 }

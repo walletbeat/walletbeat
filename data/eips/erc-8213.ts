@@ -1,8 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { variantEnum } from '@/schema/variants'
 
 export const erc8213: Eip = {
 	friendlyName: 'Wallet signature & calldata digest display',
 	formalTitle: 'Wallet Signature and Calldata Digest Display',
+	appliesTo: variantEnum.set,
+	icon: 'ICON_HASH',
 	number: '8213',
 	prefix: EipPrefix.ERC,
 	status: EipStatus.DRAFT,

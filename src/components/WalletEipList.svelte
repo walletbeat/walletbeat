@@ -3,6 +3,7 @@
 	import { EipPrefix, eipEthereumDotOrgUrl, eipShortLabel, eipStatusLabel } from '@/schema/eips'
 	import Typography from '@/components/Typography.svelte'
 	import { markdown } from '@/types/content'
+	import { getEipTrackerUrl } from '@/utils/urls'
 
 	type Props = {
 		eips: Eip[]
@@ -81,14 +82,20 @@
 						</section>
 					{/if}
 
-					<a
-						class="eip-detail__spec-link"
-						href={eipEthereumDotOrgUrl(eip)}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read full spec ↗
-					</a>
+					<div class="eip-detail__links">
+						<a class="eip-detail__spec-link" href={getEipTrackerUrl(eip)}>
+							Wallet support tracker →
+						</a>
+
+						<a
+							class="eip-detail__spec-link"
+							href={eipEthereumDotOrgUrl(eip)}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Read full spec ↗
+						</a>
+					</div>
 				</div>
 			</details>
 		</div>
@@ -267,6 +274,11 @@
 			color: var(--text-secondary);
 			line-height: 1.65;
 		}
+	}
+
+	.eip-detail__links {
+		display: flex;
+		gap: 1.25rem;
 	}
 
 	.eip-detail__spec-link {

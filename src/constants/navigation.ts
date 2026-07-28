@@ -2,10 +2,24 @@
 import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon =
+	| 'ICON_AT_SIGN'
+	| 'ICON_BELL'
+	| 'ICON_BOOK_OPEN'
 	| 'ICON_CHART_BAR'
+	| 'ICON_EYE_OFF'
 	| 'ICON_FARCASTER'
+	| 'ICON_FILE_CODE'
 	| 'ICON_CHART_PIE'
+	| 'ICON_GLOBE'
+	| 'ICON_HASH'
+	| 'ICON_LAYERS'
+	| 'ICON_LOG_IN'
+	| 'ICON_PLUG'
+	| 'ICON_RADAR'
+	| 'ICON_SIGNATURE'
+	| 'ICON_STAIRS'
 	| 'ICON_TWITTER'
+	| 'ICON_USER_COG'
 	| 'ICON_WALLET'
 
 export type WalletImageNavigationIcon = `ICON_WALLET_IMG:${string}`
@@ -40,13 +54,33 @@ function walletImageIcon(id: string, ext: string): WalletImageNavigationIcon {
 }
 
 // Constants
+import { eips } from '@/data/eips'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { attributeTree } from '@/schema/attribute-tree'
-import { WalletType } from '@/schema/wallet-types'
-import { getWalletUrl } from '@/utils/wallet-url'
+import { eipShortLabel } from '@/schema/eips'
+import { allVariantsForWalletType, WalletType } from '@/schema/wallet-types'
+import { setItems } from '@/types/utils/non-empty'
+import { getEipTrackerUrl, getWalletUrl } from '@/utils/urls'
+
+/**
+ * Navigation entries for the per-EIP adoption tracker pages, limited to the
+ * EIPs that apply to the given wallet type.
+ */
+function eipTrackerNavigationItems(idPrefix: string, walletType: WalletType): NavigationItem[] {
+	const variantsForType = allVariantsForWalletType(walletType)
+
+	return Object.values(eips)
+		.filter(eip => setItems(eip.appliesTo).some(v => variantsForType[v]))
+		.map(eip => ({
+			id: `${idPrefix}-eip-${eip.number}-tracker`,
+			title: `${eipShortLabel(eip)} Tracker`,
+			href: getEipTrackerUrl(eip),
+			icon: eip.icon,
+		}))
+}
 
 export const navigationFaq = {
 	id: 'faq',
@@ -104,6 +138,13 @@ export const navigationWalletEips = {
 	href: '/wallet-eips/',
 } as const satisfies NavigationItem
 
+export const navigationStages = {
+	id: 'stages',
+	icon: 'ICON_STAIRS',
+	title: 'Stages',
+	href: '/stages/',
+} as const satisfies NavigationItem
+
 export const topbarNavigationItems = [
 	navigationAbout,
 	navigationFaq,
@@ -147,10 +188,10 @@ export const defaultNavigationItems = [
 				})),
 			},
 			{
-				id: 'eip-7702-tracker',
-				title: 'EIP-7702 Tracker',
-				href: '/wallet/7702/',
+				id: 'software-eip-trackers',
+				title: 'EIP Trackers',
 				icon: 'ICON_CHART_BAR',
+				children: eipTrackerNavigationItems('software', WalletType.SOFTWARE),
 			},
 		],
 	},
@@ -189,32 +230,15 @@ export const defaultNavigationItems = [
 					icon: walletImageIcon(wallet.metadata.id, wallet.metadata.iconExtension),
 				})),
 			},
-		],
-	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary/',
-		icon: 'wallet_embedded',
-		children: [
 			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: 'ICON_CHART_PIE',
-				children: mapNonExemptAttributeGroupsInTree(
-					attributeTree,
-					representativeWalletForType(WalletType.EMBEDDED).overall,
-					(attrGroup, _evalGroup) => ({
-						id: `embedded-${attrGroup.id}`,
-						title: attrGroup.displayName,
-						icon: attrGroup.icon,
-						iconVariant: 'emoji' as const,
-						href: `/embedded/${attrGroup.id}/`,
-					}),
-				),
+				id: 'hardware-eip-trackers',
+				title: 'EIP Trackers',
+				icon: 'ICON_CHART_BAR',
+				children: eipTrackerNavigationItems('hardware', WalletType.HARDWARE),
 			},
 		],
 	},
+	navigationStages,
 	navigationNews,
 	navigationWalletEips,
 	navigationTesting,

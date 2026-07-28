@@ -1,8 +1,11 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { variantEnum } from '@/schema/variants'
 
 export const eip712: Eip = {
 	friendlyName: 'Typed structured data signing',
 	formalTitle: 'Typed structured data hashing and signing',
+	appliesTo: variantEnum.set,
+	icon: 'ICON_SIGNATURE',
 	number: '712',
 	prefix: EipPrefix.EIP,
 	status: EipStatus.FINAL,

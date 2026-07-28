@@ -1,3 +1,8 @@
+import type { LucideNavigationIcon } from '@/constants/navigation'
+import type { WBIconID } from '@/styles/wbicons'
+
+import type { AtLeastOneTrueVariant } from './variants'
+
 /**
  * The set of all EIP numbers tracked by Walletbeat.
  */
@@ -6,6 +11,7 @@ export type EipNumber =
 	| '1193'
 	| '2700'
 	| '4337'
+	| '4361'
 	| '5564'
 	| '5792'
 	| '6963'
@@ -52,6 +58,15 @@ export interface Eip {
 
 	/** EIP status as from the EIP repository. */
 	status: EipStatus
+
+	/**
+	 * The wallet variants this EIP can apply to.
+	 * The EIP is treated as not applicable for wallets of any other variant.
+	 */
+	appliesTo: AtLeastOneTrueVariant
+
+	/** Navigation icon for this EIP. */
+	icon: LucideNavigationIcon | WBIconID
 
 	/** EIP summary, as from the EIP repository with some minor tweaks if needed. */
 	summaryMarkdown: string

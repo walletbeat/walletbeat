@@ -17,8 +17,8 @@ import {
 import { ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { getWalletStageAndLadder } from '@/utils/stage'
+import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
-import { getWalletUrl } from '@/utils/wallet-url'
 
 import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'

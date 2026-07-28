@@ -58,6 +58,30 @@ export type AccountRecoveryMetadata = {
 	} | null
 }
 
+/**
+ * The guardian recovery scenarios (if any) in which the given guardian
+ * policy leaves the user unable to recover their account.
+ */
+function getNonRecoverableGuardianScenarios(guardianPolicy: GuardianPolicy): Array<
+	GuardianScenarioOutcome<GuardianScenarioType> & {
+		recovery: AccountRecoveryOutcomeCannotBeRecovered
+	}
+> {
+	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
+
+	if (!isNonEmptyArray(outcomes)) {
+		throw new Error('Got no scenarios for given guardian policy.')
+	}
+
+	return outcomes.filter(
+		(
+			outcome,
+		): outcome is GuardianScenarioOutcome<GuardianScenarioType> & {
+			recovery: AccountRecoveryOutcomeCannotBeRecovered
+		} => !isAccountRecoverable(outcome.recovery),
+	)
+}
+
 function evaluateGuardianRecoveryPolicy(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	guardianPolicy: GuardianPolicy,
@@ -68,13 +92,7 @@ function evaluateGuardianRecoveryPolicy(
 		throw new Error('Got no scenarios for given guardian policy.')
 	}
 
-	const nonRecoverableOutcomes = outcomes.filter(
-		(
-			outcome,
-		): outcome is GuardianScenarioOutcome<GuardianScenarioType> & {
-			recovery: AccountRecoveryOutcomeCannotBeRecovered
-		} => !isAccountRecoverable(outcome.recovery),
-	)
+	const nonRecoverableOutcomes = getNonRecoverableGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(nonRecoverableOutcomes)) {
 		return ctx.build({
@@ -154,14 +172,50 @@ function drillsHowToImprove(missing: NonEmptyArray<AccountRecoveryDrillType>) {
 	`)
 }
 
+/**
+ * Which of the recommended drill types are not configured by the wallet.
+ */
+function getMissingDrillTypes(
+	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }>,
+	recommendedDrillTypes: AccountRecoveryDrillType[],
+): AccountRecoveryDrillType[] {
+	if (!isSupported(drills)) {
+		return recommendedDrillTypes
+	}
+
+	const configuredDrillTypes = new Set(drills.entries.map(drill => drill.type))
+
+	return recommendedDrillTypes.filter(type => !configuredDrillTypes.has(type))
+}
+
+/**
+ * Whether the wallet periodically drills the user on all recovery material
+ * relevant to their account support. Returns `null` if this cannot be
+ * determined because drills have not been rated yet.
+ */
+export function hasAccountRecoveryDrills(
+	accountRecovery: AccountRecovery,
+	accountSupport: AccountSupport,
+): boolean | null {
+	if (accountRecovery.drills === null) {
+		return null
+	}
+
+	const recommendedDrillTypes = getRecommendedDrillTypes(
+		accountSupport,
+		isSupported(accountRecovery.guardianRecovery),
+	)
+
+	return getMissingDrillTypes(accountRecovery.drills, recommendedDrillTypes).length === 0
+}
+
 function evaluateAccountRecoveryDrills(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }>,
 	recommendedDrillTypes: AccountRecoveryDrillType[],
 ): Evaluation<AccountRecoveryMetadata> {
 	if (isSupported(drills)) {
-		const configuredDrillTypes = new Set(drills.entries.map(drill => drill.type))
-		const missing = recommendedDrillTypes.filter(type => !configuredDrillTypes.has(type))
+		const missing = getMissingDrillTypes(drills, recommendedDrillTypes)
 		const configured = drills.entries.map(({ type, reminderEveryNDays }) => ({
 			type,
 			reminderEveryNDays,

@@ -452,13 +452,13 @@ _Author: @hesterbruikman · Date: 2026-02-05T18:30:14Z_
 
 > **Basic authentication** >> would propose a minor but IMO important edit for nuance to distinguish app unlock from tx signing
 >
-> - Criteria: Wallets must require some form of ~unlocking~ authentication and authorization, such as a password, biometrics, etc., along with manual lock and automated inactivity lock features.
+> - Criteria: Wallets must require some form of ~~unlocking~~ authentication and authorization, such as a password, biometrics, etc., along with manual lock and automated inactivity lock features.
 >
 > **Hardware Wallet support** >> I'd propose to prioritize portability over hardware wallet support for level 1. Purely from a security perspective hardware wallet support adds composability, but doesn't strengthen the wallet itself.
 >
 > **Scam alerting**
 >
-> - Warning about ~too-high~ unlimited ERC-20 approvals >> too high is arbitrary
+> - Warning about ~~too-high~~ unlimited ERC-20 approvals >> too high is arbitrary
 > - Chain verification: This appears in Level 3, I’d add a stage here that precedes light client integration: Warnings when interacting with unknown remote RPCs that can lie about the state of the blockchain Wallets should verify against public registries like chainid.network
 >
 > ### **Security Level 2: "Secure the wallet"**

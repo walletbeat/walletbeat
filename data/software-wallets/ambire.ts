@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
@@ -212,9 +213,9 @@ export const ambire: SoftwareWallet = {
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
 			`),
-		contributors: [jiojosbg, nconsigny, mattmatt, polymutex],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-01-29',
+		lastUpdated: '2026-07-22',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -727,11 +728,22 @@ export const ambire: SoftwareWallet = {
 				duressMode: notSupported,
 			},
 			hardwareWalletSupport: {
-				ref: {
-					explanation:
-						'You can natively sign transactions with Ledger, Trezor, or GridPlus Lattice1 in Ambire.',
-					url: 'https://www.ambire.com/',
-				},
+				ref: [
+					{
+						explanation:
+							'You can natively sign transactions with Ledger, Trezor, or GridPlus Lattice1 in Ambire.',
+						url: 'https://www.ambire.com/',
+					},
+					{
+						explanation:
+							'Ambire additionally supports the Keystone and Keycard hardware wallets via QR-code signing through its "Connect QR wallet" flow. The wallet\'s QR hardware-wallet registry lists Keystone and Keycard.',
+						url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts',
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-07-22-ambire-qr-hardware-wallets.png',
+						label: 'Ambire "Connect QR wallet" flow, showing Keystone and Keycard',
+					},
+				],
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
@@ -742,7 +754,12 @@ export const ambire: SoftwareWallet = {
 					[HardwareWalletType.GRIDPLUS]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
 					}),
-					[HardwareWalletType.KEYSTONE]: notSupported,
+					[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+						connectionTypes: [HardwareWalletConnection.QR],
+					}),
+					[HardwareWalletType.KEYCARD]: supported<SupportedHardwareWallet>({
+						connectionTypes: [HardwareWalletConnection.QR],
+					}),
 				},
 			},
 			keysHandling: {
@@ -813,7 +830,15 @@ export const ambire: SoftwareWallet = {
 						label: 'Transaction legibility screenshot 2',
 					},
 				],
+				erc4361: supported({
+					ref: {
+						explanation: 'Ambire formats SIWE requests for easy readability.',
+						file: 'public/references/wallets/ambire/screenshots/2026-07-24-ambire-erc4361-siwe.png',
+						label: 'Ambire sign-in dialog for an ERC-4361 signature request',
+					},
+				}),
 				erc7730: supported({
+					ref: refTodo,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -832,6 +857,7 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
+					ref: refTodo,
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,

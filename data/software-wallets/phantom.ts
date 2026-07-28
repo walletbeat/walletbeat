@@ -145,6 +145,7 @@ export const phantom: SoftwareWallet = {
 			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
+				erc4361: null,
 				erc7730: null,
 				erc8213: null,
 				transactionDetailsDisplay: {

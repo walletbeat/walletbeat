@@ -32,7 +32,7 @@ import {
 	computeCountsAndStatus,
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
-import { getWalletUrl } from '@/utils/wallet-url'
+import { getWalletUrl } from '@/utils/urls'
 
 /**
  * Return the wallet blurb as a single collapsed line, suitable for use

@@ -1,3 +1,5 @@
+import { eips } from '@/data/eips'
+import { setContains, setItems } from '@/types/utils/non-empty'
 import { remap } from '@/types/utils/remap'
 
 import type { EipNumber } from './eips'
@@ -18,6 +20,8 @@ import {
 } from './features/security/transaction-legibility'
 import { featureSupported, isSupported, notSupported, type Support } from './features/support'
 import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
+import { getVariants, type Variant } from './variants'
+import { getVariantResolvedWallet, type RatedWallet } from './wallet'
 
 /**
  * Whether a wallet implements a specific EIP.
@@ -121,7 +125,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}
 
 		if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc8213.ref)
 		}
 
 		const messageSigningLegibility = erc8213.messageSigningLegibility
@@ -134,11 +138,22 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 			Object.values(MessageSigningDetails).some(detail =>
 				displayEntryIsShown(messageSigningLegibility[detail]),
 			),
-			transactionLegibility.ref,
+			erc8213.ref,
 		)
 	},
 	'1193': features => browserIntegrationEipSupport(features, '1193'),
 	'2700': features => browserIntegrationEipSupport(features, '2700'),
+	// A wallet supports ERC-4361 if the transaction legibility record explicitly
+	// tracks Sign-In with Ethereum support.
+	'4361': features => {
+		const transactionLegibility = features.security.transactionLegibility
+
+		if (transactionLegibility === null || transactionLegibility.erc4361 === null) {
+			return 'UNKNOWN'
+		}
+
+		return eipSupport(isSupported(transactionLegibility.erc4361), transactionLegibility.erc4361.ref)
+	},
 	// A wallet supports ERC-4337 if it supports raw ERC-4337 accounts, or if
 	// its EIP-7702 delegate contract is itself an ERC-4337 account (i.e. it
 	// implements `validateUserOp`). EIP-7702 alone does not imply ERC-4337:
@@ -229,7 +244,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}
 
 		if (!isSupported<HardwareWalletErc7730 | SoftwareWalletErc7730>(erc7730)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc7730.ref)
 		}
 
 		const decoded = Object.values(ComplexBenchmarkTransactions).map((benchmark): boolean | null => {
@@ -247,14 +262,14 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		})
 
 		if (decoded.includes(false)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc7730.ref)
 		}
 
 		if (decoded.includes(null)) {
 			return 'UNKNOWN'
 		}
 
-		return eipSupport(true, transactionLegibility.ref)
+		return eipSupport(true, erc7730.ref)
 	},
 	'7828': features => addressResolutionEipSupport(features, 'erc7828'),
 	'7831': features => addressResolutionEipSupport(features, 'erc7831'),
@@ -275,7 +290,7 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 		}
 
 		if (!isSupported<HardwareWalletErc8213 | SoftwareWalletErc8213>(erc8213)) {
-			return eipSupport(false, transactionLegibility.ref)
+			return eipSupport(false, erc8213.ref)
 		}
 
 		const { calldataDisplay, messageSigningLegibility } = erc8213
@@ -293,8 +308,21 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
 				(displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]) &&
 					displayEntryIsShown(messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH])))
 
-		return eipSupport(calldataDigestShown || signatureDigestShown, transactionLegibility.ref)
+		return eipSupport(calldataDigestShown || signatureDigestShown, erc8213.ref)
 	},
+}
+
+/**
+ * Determine a wallet's implementation status for a single EIP, based on its
+ * resolved features. EIPs that do not apply to the wallet's variant (as declared
+ * by the EIP's `appliesTo` field) are not applicable regardless of features.
+ */
+function resolveEipSupport(eipNumber: EipNumber, features: ResolvedFeatures): EipSupport {
+	if (!setContains(eips[eipNumber].appliesTo, features.variant)) {
+		return 'NOT_APPLICABLE'
+	}
+
+	return eipSupportResolvers[eipNumber](features)
 }
 
 /**
@@ -303,8 +331,68 @@ const eipSupportResolvers: Record<EipNumber, (features: ResolvedFeatures) => Eip
  * support (EIP directory pages, per-EIP wallet support trackers, etc.).
  */
 export function walletEipSupport(features: ResolvedFeatures): WalletEipSupport {
-	return remap(
-		eipSupportResolvers,
-		(_: EipNumber, resolve: (features: ResolvedFeatures) => EipSupport) => resolve(features),
+	return remap(eipSupportResolvers, (eipNumber: EipNumber) =>
+		resolveEipSupport(eipNumber, features),
 	)
+}
+
+/** A rated wallet's support for a single EIP. */
+export interface RatedWalletEipSupport {
+	/** Support aggregated across all of the wallet's variants. */
+	overall: EipSupport
+
+	/** Support for each variant the wallet exists in. */
+	perVariant: Partial<Record<Variant, EipSupport>>
+}
+
+/**
+ * Aggregate EIP support values across a wallet's variants.
+ * The wallet supports the EIP if any variant supports it, and verifiably does
+ * not support it only if no variant might (i.e. none is unknown). The EIP is
+ * not applicable to the wallet only if it applies to no variant at all.
+ */
+export function aggregateEipSupport(supports: EipSupport[]): EipSupport {
+	const assessed = supports.filter(support => typeof support !== 'string')
+	const supporting = assessed.filter(support => isSupported(support))
+
+	if (supporting.length > 0) {
+		return eipSupport(true, ...supporting.map(support => support.ref))
+	}
+
+	if (supports.includes('UNKNOWN') || supports.length === 0) {
+		return 'UNKNOWN'
+	}
+
+	if (assessed.length > 0) {
+		return eipSupport(false, ...assessed.map(support => support.ref))
+	}
+
+	return 'NOT_APPLICABLE'
+}
+
+/**
+ * Determine a rated wallet's support for a single EIP, per variant and
+ * aggregated across all variants.
+ */
+export function ratedWalletEipSupport<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): RatedWalletEipSupport {
+	const perVariant: Partial<Record<Variant, EipSupport>> = {}
+	const variantSupports: EipSupport[] = []
+
+	for (const variant of setItems(getVariants(wallet.variants))) {
+		const resolvedWallet = getVariantResolvedWallet(wallet, variant)
+
+		if (resolvedWallet === null) {
+			continue
+		}
+
+		const support = resolveEipSupport(eipNumber, resolvedWallet.features)
+
+		perVariant[variant] = support
+		variantSupports.push(support)
+	}
+
+	return { overall: aggregateEipSupport(variantSupports), perVariant }
 }

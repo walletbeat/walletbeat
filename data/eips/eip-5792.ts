@@ -1,8 +1,12 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { allVariantsForWalletType, WalletType } from '@/schema/wallet-types'
 
 export const eip5792: Eip = {
 	friendlyName: 'Wallet Call API',
 	formalTitle: 'Wallet Call API',
+	// The wallet call API is a software wallet feature.
+	appliesTo: allVariantsForWalletType(WalletType.SOFTWARE),
+	icon: 'ICON_LAYERS',
 	number: '5792',
 	prefix: EipPrefix.EIP,
 	status: EipStatus.FINAL,

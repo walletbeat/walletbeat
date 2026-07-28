@@ -1,8 +1,13 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { Variant } from '@/schema/variants'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 export const eip1193: Eip = {
 	friendlyName: 'JavaScript Provider API',
 	formalTitle: 'Ethereum Provider JavaScript API',
+	// Browser providers are only implemented by browser extension wallets.
+	appliesTo: nonEmptySet(Variant.BROWSER),
+	icon: 'ICON_PLUG',
 	noteMarkdown: `
 		EIP-1193 has largely been superseded by EIP-6963, which provides better
 		support for the case where the user has installed multiple Ethereum

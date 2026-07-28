@@ -32,6 +32,7 @@
 	let {
 		tableId,
 		title,
+		titleDisclaimer,
 		ladders,
 		wallets,
 		attributeTree,
@@ -39,6 +40,7 @@
 	}: {
 		tableId?: string,
 		title?: string
+		titleDisclaimer?: string
 		ladders?: Ladders<_AttributeGroupId>
 		wallets: RatedWallet<_AttributeGroupId>[]
 		attributeTree: AttributeTree<_AttributeGroupId>
@@ -238,7 +240,7 @@
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
-	import { getWalletUrl } from '@/utils/wallet-url'
+	import { getWalletUrl } from '@/utils/urls'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
@@ -403,7 +405,13 @@
 		data-row="wrap"
 	>
 		{#if title}
-			<h2>{title}</h2>
+			<div class="title-group" data-column="gap-1">
+				<h2>{title}</h2>
+
+				{#if titleDisclaimer}
+					<p class="title-disclaimer">{titleDisclaimer}</p>
+				{/if}
+			</div>
 		{/if}
 
 		<!-- Mobile-only filter UI -->
@@ -851,12 +859,14 @@
 						<div class="wallet-info" data-row="start">
 							<span class="row-count" data-row="center"></span>
 
-							<img
-								alt={displayName}
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-								width="16"
-								height="16"
-							/>
+							<span class="wallet-icon" data-icon="shadow">
+								<img
+									alt={displayName}
+									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+									width="16"
+									height="16"
+								/>
+							</span>
 
 							<div class="name-and-tags" data-column="gap-2">
 								<div class="name" data-column="gap-1">
@@ -1817,6 +1827,11 @@
 		}
 	}
 
+	.title-disclaimer {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+	}
+
 	.wallet-info {
 		block-size: 5rem;
 
@@ -1839,12 +1854,8 @@
 			}
 		}
 
-		img {
-			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
-			width: 2.25em;
-			height: 2.25em;
-			object-fit: contain;
-			border-radius: 0.25em;
+		.wallet-icon {
+			--icon-size: 2.25em;
 		}
 
 		.name-and-tags {

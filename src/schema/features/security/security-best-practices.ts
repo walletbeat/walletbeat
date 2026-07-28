@@ -472,9 +472,7 @@ export interface SecurityBestPracticesData {
 	 * KeyStorageMechanism.NOT_VERIFIABLE / SecureRngSource.NOT_VERIFIABLE
 	 */
 	browser:
-		| WithRef<BrowserSecurityBestPractices>
-		| 'NOT_A_BROWSER_EXTENSION'
-		| 'SOURCE_NOT_AVAILABLE'
+		WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION' | 'SOURCE_NOT_AVAILABLE'
 
 	/**
 	 * Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent.

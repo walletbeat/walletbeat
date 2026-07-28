@@ -25,10 +25,7 @@ export type ArtifactSignerType = 'DEVELOPER_KEY' | 'BUILD_INFRA_IDENTITY' | 'BOT
 
 /** Where signatures or attestations for release artifacts are published. */
 export type SignaturePublicationType =
-	| 'GITHUB_RELEASE'
-	| 'SIGSTORE_REKOR'
-	| 'ONCHAIN'
-	| 'OTHER_PUBLIC'
+	'GITHUB_RELEASE' | 'SIGSTORE_REKOR' | 'ONCHAIN' | 'OTHER_PUBLIC'
 
 /** Signer and publication metadata for artifact signing (without reference). */
 export type ArtifactSigningPayload = {
