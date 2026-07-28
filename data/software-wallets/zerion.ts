@@ -182,7 +182,15 @@ export const zerion: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
-				drills: null,
+				drills: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'Zerion only warns about backing up the recovery phrase if it has never been backed up (`lastBackedUp == null`). Once the backup is confirmed `lastBackedUp` is set and never reset, so the reminder never reappears.',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/components/BackupInfoNote/BackupInfoNote.tsx#L12-L18',
+						},
+					],
+				}),
 				guardianRecovery: notSupported,
 			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
