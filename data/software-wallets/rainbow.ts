@@ -667,9 +667,10 @@ export const rainbow: SoftwareWallet = {
 				// Rainbow prompts about backups, but never on a schedule, so none of these
 				// prompts is a drill. The three surfaces that look like one:
 				// the seed quiz runs only from onboarding or when the user opens it in
-				// settings; the extension's backup reminder fires at most once and only
-				// for a wallet that is not backed up yet; and mobile's "Authentication
-				// Needed" screen is a keychain integrity check that fires when the device
+				// settings; the extension's backup reminder recurs, but only for a wallet
+				// that is not backed up yet, and it asks the user to make a backup rather
+				// than to prove they still hold one; and mobile's "Authentication Needed"
+				// screen is a keychain integrity check that fires when the device
 				// identifier changes (reinstall or new phone), not a test of the user's
 				// recovery material.
 				drills: notSupportedWithRef({
@@ -682,9 +683,15 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'The extension reminds the user to back up only while a wallet has no backup yet, and it sets a flag as soon as it has done so. There is no timer and no way to clear the flag, so the reminder does not repeat and a backed-up wallet never sees it.',
+								'The extension only reminds the user to back up while a wallet has no backup yet, and it asks the user to make one rather than to show they still hold it. Nothing puts the reminder on a schedule, and it stops once the wallet is backed up.',
 							lastRetrieved: '2026-07-29',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/hooks/useWalletBackups.ts#L49-L68',
+						},
+						{
+							explanation:
+								'Dismissing that reminder hides it for the moment, but the dismissal is not saved, so the reminder comes back the next time the extension is opened.',
+							lastRetrieved: '2026-07-29',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/state/walletBackups/index.ts#L8-L19',
 						},
 						{
 							explanation:
