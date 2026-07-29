@@ -4,7 +4,7 @@ Quoting https://x.com/ethereumfndn/status/2066568147230961679
 It's been almost a month since clear signing has launched and here's the list of software wallets that have adopted the ERC:
 
 - Ambire
-- Walletchan
+- WalletChan
 
 End of list.
 
