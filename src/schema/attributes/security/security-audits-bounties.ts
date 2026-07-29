@@ -28,7 +28,7 @@ import { markdown, mdSentence, paragraph, type Sentence, sentence } from '@/type
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { daysSince } from '@/types/date'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptySet, setItems } from '@/types/utils/non-empty'
-import { commaListFormat } from '@/types/utils/text'
+import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
 
@@ -399,10 +399,9 @@ function combineEvaluation(
 			: auditsPart
 	})()
 
-	const howToImproveParts = [
-		auditsPart.howToImproveMarkdown,
-		bugBountyPart.howToImproveMarkdown,
-	].filter((part): part is string => part !== null)
+	const howToImproveParts = [auditsPart.howToImproveMarkdown, bugBountyPart.howToImproveMarkdown]
+		.filter((part): part is string => part !== null)
+		.map(trimWhitespacePrefix)
 
 	return ctx.build({
 		outcome: {
