@@ -1596,7 +1596,7 @@
 			;
 		}
 		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-breadcrumb-gap: 0.75rem;
+			---wallet-breadcrumb-gap: 1rem;
 			---wallet-breadcrumb-heading-icon-size: 1.25rem;
 			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
 		}
@@ -1643,6 +1643,17 @@
 			background-color: var(--background-secondary);
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
+			&::after {
+				content: '';
+				z-index: 3;
+				position: sticky;
+				inset-block-end: 0;
+				flex: 0 0 var(---anchor-controls-reserved-block-size);
+				margin-block-start: auto;
+				background-color: var(--background-secondary);
+				box-shadow: 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
+			}
+
 			> header {
 				--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
 
@@ -1670,7 +1681,6 @@
 				align-content: stretch;
 				min-block-size: max-content;
 				padding: 0.75rem;
-				padding-block-end: var(---anchor-controls-reserved-block-size);
 
 				&[data-sticky-container] {
 					--sticky-marginBlockStart: 0px;
@@ -1709,6 +1719,10 @@
 					translate: -100% 0;
 					transition: translate 0.3s var(--ease-out-expo);
 					background-color: var(--background-secondary);
+				}
+
+				&::after {
+					content: none;
 				}
 
 				> header {
@@ -1800,6 +1814,7 @@
 		}
 
 		@media (min-width: 865px) and (max-width: 1280px) {
+			---wallet-page-navigation-inline-size-rem: 16;
 			---wallet-breadcrumb-root-font-size: 1.5rem;
 		}
 
@@ -3210,6 +3225,7 @@
 					+ var(---wallet-content-inline-start)
 					+ anchor-size(--sticky-breadcrumb-extra-position inline)
 					+ var(---wallet-breadcrumb-gap)
+					+ var(---wallet-breadcrumb-companion-inline-end-clearance)
 			);
 
 			@media (max-width: 864px) {
