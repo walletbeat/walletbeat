@@ -81,6 +81,7 @@
 	import Typography from '@/components/Typography.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
+	import { trimWhitespacePrefix } from '@/types/utils/text'
 </script>
 
 {#if metadata.securityAudits.length === 0}
@@ -224,7 +225,7 @@
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: bugBountyDetails,
+				markdown: trimWhitespacePrefix(bugBountyDetails),
 			}}
 			strings={{ WALLET_NAME: wallet.metadata.displayName }}
 		/>
