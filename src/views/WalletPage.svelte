@@ -2434,6 +2434,7 @@
 			}
 
 			:global(.navigation-items menu::before),
+			:global(.navigation-items summary::before),
 			:global(.navigation-items summary::after),
 			:global(.navigation-items summary::marker) {
 				display: none;
