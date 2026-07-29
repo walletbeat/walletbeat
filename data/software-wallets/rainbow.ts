@@ -664,7 +664,36 @@ export const rainbow: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
-				drills: null,
+				// Rainbow prompts about backups, but never on a schedule, so none of these
+				// prompts is a drill. The three surfaces that look like one:
+				// the seed quiz runs only from onboarding or when the user opens it in
+				// settings; the extension's backup reminder fires at most once and only
+				// for a wallet that is not backed up yet; and mobile's "Authentication
+				// Needed" screen is a keychain integrity check that fires when the device
+				// identifier changes (reinstall or new phone), not a test of the user's
+				// recovery material.
+				drills: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								"The extension's seed phrase quiz records where it was started from, and the only two options are onboarding and the settings menu. Nothing schedules it, so the wallet never asks a user to re-verify a phrase they have already confirmed.",
+							lastRetrieved: '2026-07-29',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/analytics/event.ts#L1177-L1192',
+						},
+						{
+							explanation:
+								'The extension reminds the user to back up only while a wallet has no backup yet, and it sets a flag as soon as it has done so. There is no timer and no way to clear the flag, so the reminder does not repeat and a backed-up wallet never sees it.',
+							lastRetrieved: '2026-07-29',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/hooks/useWalletBackups.ts#L49-L68',
+						},
+						{
+							explanation:
+								'On mobile, the closest thing to a periodic check compares a stored device identifier against the current one and only interrupts the user when it has changed, which happens on a reinstall or a new phone. It verifies that the keychain still holds matching private keys rather than asking the user to produce their recovery phrase.',
+							lastRetrieved: '2026-07-29',
+							url: 'https://github.com/rainbow-me/rainbow/blob/84494d81757fb9e745ee592b067bb617a9f2074b/src/features/backup/backup.ts#L698-L712',
+						},
+					],
+				}),
 				// Source: Rainbow team responses via Walletbeat questionnaire
 				// Rainbow supports cloud backup (iCloud/Google Drive) but not guardian-based recovery.
 				guardianRecovery: supported({
