@@ -55,6 +55,7 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
+import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -703,12 +704,92 @@ export const metamask: SoftwareWallet = {
 			},
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
-				hermeticBuilds: null,
-				repositoryChangeControls: null,
+				artifactSigning: supported<ArtifactSigningDetails>({
+					ref: [
+						{
+							explanation:
+								'The release workflow attests build provenance for each artifact via `actions/attest-build-provenance`.',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/publish-release-from-release-head.yml#L138-L260',
+						},
+						{
+							explanation:
+								'Before upload to the Chrome Web Store, the attestation is verified with `gh attestation verify` against the publishing workflow and release-branch source ref.',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/upload-extension-to-cws.yml#L53,L340-L353',
+						},
+					],
+					publication: 'SIGSTORE_REKOR',
+					signer: 'BUILD_INFRA_IDENTITY',
+				}),
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The repo pins a `yarn.lock` lockfile committed alongside `package.json`.',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json',
+						},
+						{
+							explanation: 'CI lints the lockfile and checks yarn resolutions on every run.',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/repository-health-checks.yml#L37-L47',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: supported({
+					ref: [
+						{
+							explanation:
+								'CI runs `yarn audit` against a baseline artifact on every PR/push/cron, failing PRs on new production moderate+ advisories.',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/repository-health-checks.yml#L63-L132',
+						},
+						{
+							explanation: 'A dedicated static security code scanner runs on push and PR.',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml',
+						},
+					],
+				}),
+				hasPublicChangelog: supported({
+					ref: {
+						explanation:
+							'The repo maintains a publicly accessible `CHANGELOG.md`, validated by CI on every run.',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md',
+					},
+				}),
+				hermeticBuilds: notSupported,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'Ruleset on the default branch requiring PR review before merge and blocking force pushes.',
+							label: 'Default Branch - Require Pull Request, Restrict Force Push',
+							url: 'https://github.com/MetaMask/metamask-extension/rules/833719',
+						},
+						{
+							explanation:
+								'Ruleset requiring changes to main to pass through a merge queue with required status checks.',
+							label: 'Merge Queue Main',
+							url: 'https://github.com/MetaMask/metamask-extension/rules/11609401',
+						},
+						{
+							explanation: 'Ruleset blocking updates/deletion of tags, keeping them immutable.',
+							label: 'Tag Ruleset - Block Updating Tags',
+							url: 'https://github.com/MetaMask/metamask-extension/rules/895542',
+						},
+						{
+							explanation: 'Ruleset blocking deletion of release-candidate branches.',
+							label: 'Release Candidate (Restrict Deletions)',
+							url: 'https://github.com/MetaMask/metamask-extension/rules/4683630',
+						},
+						{
+							explanation: 'Ruleset blocking force pushes to release-candidate branches.',
+							label: 'Release Candidate (Restrict Force Push)',
+							url: 'https://github.com/MetaMask/metamask-extension/rules/18725950',
+						},
+					],
+					branchDeletionBlocked: true,
+					forcePushBlocked: true,
+					requiredChecks: true,
+					requiredReview: true,
+					tagsImmutable: true,
+				},
 				reproducibleBuilds: null,
 			},
 		},
