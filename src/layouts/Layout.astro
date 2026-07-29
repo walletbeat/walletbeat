@@ -38,9 +38,8 @@ import Footer from '@/views/Footer.astro'
 		<Metadata {metadata} />
 
 		<Font cssVariable='--fontFamily-spaceGrotesk' preload />
-		<Font cssVariable='--fontFamily-spMonorium' preload />
 		<Font cssVariable='--fontFamily-wbicons' preload />
-		<Font cssVariable='--fontFamily-avenir' />
+		<Font cssVariable='--fontFamily-avenir' preload />
 
 		<ClientRouter />
 		<script is:inline>
@@ -132,7 +131,7 @@ import Footer from '@/views/Footer.astro'
 		@media (min-width: 1025px) {
 			grid-template:
 				'Nav Content' minmax(0, 1fr)
-				/ var(--navigation-desktop-inlineSize) minmax(max-content, 1fr);
+				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
 
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: var(--separator-width);

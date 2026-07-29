@@ -59,6 +59,7 @@
 		ariaLabel = 'Navigation',
 		defaultOpen = false,
 		iconSnippet,
+		afterLabelSnippet,
 		showSearch = true,
 	}: {
 		items: NavigationItem[]
@@ -67,6 +68,7 @@
 		ariaLabel?: string
 		defaultOpen?: boolean
 		iconSnippet?: Snippet<[NavigationItem, number]>
+		afterLabelSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
 	} = $props()
 
@@ -272,17 +274,44 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
+			{...item.href.startsWith('#') && {
+				interestfor: item.href.slice(1),
+			}}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
+			style:--slice-totalAngle={item.sliceStyle?.totalAngle}
+			style:--slice-midAngle={item.sliceStyle?.midAngle}
+			style:--slice-offset={item.sliceStyle?.offset}
+			style:--slice-gap={item.sliceStyle?.gap}
+			style:--slice-outerR={item.sliceStyle?.outerR}
+			style:--slice-innerR={item.sliceStyle?.innerR}
+			style:--slice-outerCornerRadius={item.sliceStyle?.outerCornerRadius}
+			style:--slice-innerCornerRadius={item.sliceStyle?.innerCornerRadius}
+			style:--slice-labelSize={item.sliceStyle?.labelSize}
+			style:--slice-labelSizeScale={item.sliceStyle?.labelSizeScale}
+			style:--slice-labelR={item.sliceStyle?.labelR}
+			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
 			{@render navigationIcon(item, depth)}
 
 			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+
+			{#if afterLabelSnippet}
+				<span class="navigation-item-after" data-row="gap-1">
+					{@render afterLabelSnippet(item, depth)}
+				</span>
+			{/if}
 		</a>
 	{:else}
 		{@render navigationIcon(item, depth)}
 
 		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+
+		{#if afterLabelSnippet}
+			<span class="navigation-item-after" data-row="gap-1">
+				{@render afterLabelSnippet(item, depth)}
+			</span>
+		{/if}
 	{/if}
 {/snippet}
 
@@ -415,6 +444,11 @@
 				}
 			}
 
+			.navigation-item-after {
+				flex: none;
+				margin-inline-start: auto;
+			}
+
 			li > details > summary,
 			li > a {
 				--icon-size: var(--navIcon-size);
@@ -424,7 +458,8 @@
 
 				&:hover,
 				&:focus-visible,
-				&:focus-within {
+				&:focus-within,
+				&:interest-source {
 					---backgroundColor: var(--navItem-hover-backgroundColor);
 					---color: var(--accent);
 				}

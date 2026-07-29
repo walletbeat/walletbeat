@@ -115,7 +115,7 @@
 	scroll-behavior: smooth;
 	overflow: hidden;
 
-	font-family: var(--fontFamily-spaceGrotesk), 'Noto Color Emoji';
+	font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
 	font-size: min(3.2vw, 16px);
 
 	color-scheme: light dark;
@@ -226,15 +226,18 @@ h2,
 h3,
 h4,
 h5,
-h6 {
-	text-box: trim-both auto;
-	text-wrap: balance;
+h6,
+[data-badge],
+.navigation-items {
+	font-family: var(--fontFamily-spaceGrotesk), 'Noto Color Emoji';
 }
 
+h1,
+h2,
 h3,
 h4,
 h5,
-h6,
-p {
-	font-family: var(--fontFamily-avenir);
+h6 {
+	text-box: trim-both auto;
+	text-wrap: balance;
 }

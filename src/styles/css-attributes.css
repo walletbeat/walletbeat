@@ -409,6 +409,10 @@ span svg {
 	display: flex;
 	flex-direction: column;
 
+	> * {
+		min-inline-size: 0;
+	}
+
 	&[data-row] {
 		flex-direction: row;
 	}
@@ -540,6 +544,10 @@ summary {
 	justify-content: space-between;
 	align-items: center;
 	gap: 1em;
+
+	> * {
+		min-inline-size: 0;
+	}
 
 	&[data-row~="wrap"],
 	&:where(summary) {
@@ -807,6 +815,10 @@ summary {
 	border: 1px solid var(--badge-borderColor);
 	backdrop-filter: var(--badge-backdropFilter);
 
+	@media (prefers-reduced-transparency: reduce) {
+		backdrop-filter: none;
+	}
+
 	color: var(--badge-textColor);
 	font-weight: 600;
 	line-height: 1;
@@ -977,7 +989,6 @@ summary {
  * ### CSS Variables
  * - `--list-markerGap`
  * - `--list-gap`
- * - `--list-marker-content`
  * - `--list-marker-inlineSize`
  *
  * ### Examples
@@ -1005,7 +1016,6 @@ ol {
 	/* Inputs */
 	--list-markerGap: 0.66em;
 	--list-gap: 0.5lh;
-	--list-marker-content: attr(data-list-item-marker);
 	--list-marker-inlineSize: 1.15em;
 
 	/* Rules */
@@ -1056,7 +1066,7 @@ ol {
 	}
 
 	/**
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -1124,7 +1134,7 @@ ol {
 			font-size: 1em;
 		}
 		&[data-list-item-marker]::marker {
-			content: var(--list-marker-content);
+			content: attr(data-list-item-marker);
 			font-size: 0.875em;
 		}
 
@@ -1144,7 +1154,7 @@ ol {
 				text-align: center;
 			}
 			&[data-list-item-marker]::before {
-				content: var(--list-marker-content);
+				content: attr(data-list-item-marker);
 			}
 		/* } */
 
@@ -1156,6 +1166,189 @@ ol {
 	}
 }
 
+
+/**
+ * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
+ * resolves its configurable parent anchor: root → section → subsection. A `position` preserves the
+ * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
+ * remains visible.
+ *
+ * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
+ * every item remains in regular document flow.
+ *
+ * ### Tokens
+ * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
+ * - `scope`: visibility boundary for descendant items
+ * - `position`: regular-layout position anchor and view-timeline source
+ * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+ *
+ * ### CSS Variables
+ * - `--stickyBreadcrumb-animationRangeStart`
+ * - `--stickyBreadcrumb-animationRangeEnd`
+ * - `--stickyBreadcrumb-gap`
+ * - `--stickyBreadcrumb-position-minBlockSize`
+ * - `--stickyBreadcrumb-position-insetBlockStart`
+ * - `--stickyBreadcrumb-position-insetInlineStart`
+ * - `--stickyBreadcrumb-item-insetBlockStart`
+ * - `--stickyBreadcrumb-item-blockOffset`
+ * - `--stickyBreadcrumb-item-insetInlineStart`
+ * - `--stickyBreadcrumb-item-insetInlineEnd`
+ * - `--stickyBreadcrumb-item-blockSize`
+ * - `--stickyBreadcrumb-trackBlockEnd`
+ * - `--stickyBreadcrumb-exitAnimationDistance`
+ * - `--stickyBreadcrumb-itemAnchor`
+ * - `--stickyBreadcrumb-parentAnchor`
+ *
+ * ### Example
+ * ```html
+ * <a data-sticky-breadcrumb="root item"><h1>Page</h1></a>
+ * <section data-sticky-breadcrumb="scope">
+ *   <header data-sticky-breadcrumb="position">
+ *     <a data-sticky-breadcrumb="item"><h2>Section</h2></a>
+ *   </header>
+ *   <section data-sticky-breadcrumb="scope">
+ *     <header data-sticky-breadcrumb="position">
+ *       <a data-sticky-breadcrumb="item"><h3>Subsection</h3></a>
+ *     </header>
+ *   </section>
+ * </section>
+ * ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
+ */
+@supports (
+	((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+	(container-type: scroll-state) and
+	(position-anchor: --sticky-breadcrumb-scope) and
+	(inset-inline-start: anchor(--sticky-breadcrumb-item end))
+) {
+	[data-sticky-breadcrumb~="scope"] {
+		---stickyBreadcrumb-exitAnimationRangeStart: exit-crossing
+			calc(
+				100%
+				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+				- var(
+					--stickyBreadcrumb-exitAnimationDistance,
+					var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+				)
+			);
+		---stickyBreadcrumb-exitAnimationRangeEnd: exit-crossing
+			calc(
+				100%
+				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+			);
+
+		anchor-scope:
+			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
+			--sticky-breadcrumb-position,
+			--sticky-breadcrumb-scope,
+			--sticky-breadcrumb-extra-position;
+		timeline-scope:
+			--sticky-breadcrumb-timeline,
+			--sticky-breadcrumb-scope-timeline;
+		view-timeline-name: --sticky-breadcrumb-scope-timeline;
+		view-timeline-axis: block;
+		view-timeline-inset: 0;
+
+		&::before {
+			content: '';
+			display: block;
+			position: sticky;
+			inset-block-start: var(--stickyBreadcrumb-item-insetBlockStart, 0px);
+			block-size: 1px;
+			margin-block-end: -1px;
+			anchor-name: --sticky-breadcrumb-scope;
+		}
+	}
+
+	[data-sticky-breadcrumb~="position"] {
+		anchor-name: --sticky-breadcrumb-position;
+		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
+		view-timeline-name: --sticky-breadcrumb-timeline;
+		view-timeline-axis: block;
+		view-timeline-inset: 0;
+	}
+
+	[data-sticky-breadcrumb~="item"] {
+		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
+
+		&:not([data-sticky-breadcrumb~="root"]) {
+			position-anchor: --sticky-breadcrumb-scope;
+			position-visibility: anchors-visible;
+
+			animation:
+				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
+				StickyBreadcrumbItemExitAnimation linear both,
+				StickyBreadcrumbItemVisibility 1ms steps(1, end) both;
+			animation-timeline:
+				--sticky-breadcrumb-timeline,
+				--sticky-breadcrumb-scope-timeline,
+				--sticky-breadcrumb-scope-timeline;
+			animation-range:
+				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
+				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
+				var(---stickyBreadcrumb-exitAnimationRangeStart)
+				var(---stickyBreadcrumb-exitAnimationRangeEnd),
+				var(---stickyBreadcrumb-exitAnimationRangeStart)
+				var(---stickyBreadcrumb-exitAnimationRangeEnd);
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemAnimation {
+		from {
+			position: fixed;
+			inset-block-start: calc(
+				anchor(--sticky-breadcrumb-position top)
+				+ var(--stickyBreadcrumb-position-insetBlockStart, 0px)
+			);
+			inset-inline-start: calc(
+				anchor(--sticky-breadcrumb-position start)
+				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
+			);
+			margin-inline-start: 0;
+			min-block-size: 0;
+		}
+		to {
+			position: fixed;
+			inset-block-start: calc(
+				anchor(--sticky-breadcrumb-scope top)
+					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+			);
+			inset-inline-start: var(
+				--stickyBreadcrumb-item-insetInlineStart,
+				anchor(
+					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+						end
+				)
+			);
+			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
+			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
+			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemVisibility {
+		from {
+			visibility: visible;
+		}
+		to {
+			visibility: hidden;
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemExitAnimation {
+		to {
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[data-sticky-breadcrumb~="item"]:not([data-sticky-breadcrumb~="root"]) {
+			animation: none;
+		}
+	}
+}
 
 
 /**
@@ -1169,6 +1362,10 @@ ol {
  * - scroll container: `block`, `inline`
  * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
  * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+ *
+ * ### CSS Variables
+ * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+ * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
  *
  * ### Examples
  * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
@@ -1196,6 +1393,22 @@ ol {
 	--scrollContainer-sizeBlock: 100cqb;
 	--scrollContainer-sizeInline: 100cqi;
 	--scrollContainer-perspective: 900px;
+	--scrollContainer-scrollPaddingBlockStart: calc(
+		var(--sticky0-insetBlockStart)
+		+ var(--sticky0-paddingBlockStart)
+	);
+	--scrollContainer-scrollPaddingBlockEnd: calc(
+		var(--sticky0-insetBlockEnd)
+		+ var(--sticky0-paddingBlockEnd)
+	);
+	--scrollContainer-scrollPaddingInlineStart: calc(
+		var(--sticky0-insetInlineStart)
+		+ var(--sticky0-paddingInlineStart)
+	);
+	--scrollContainer-scrollPaddingInlineEnd: calc(
+		var(--sticky0-insetInlineEnd)
+		+ var(--sticky0-paddingInlineEnd)
+	);
 
 	/* Rules */
 	overscroll-behavior: none;
@@ -1203,6 +1416,12 @@ ol {
 	scrollbar-width: none;
 	touch-action: pan-x pan-y;
 	perspective: var(--scrollContainer-perspective);
+	scroll-padding-block:
+		var(--scrollContainer-scrollPaddingBlockStart)
+		var(--scrollContainer-scrollPaddingBlockEnd);
+	scroll-padding-inline:
+		var(--scrollContainer-scrollPaddingInlineStart)
+		var(--scrollContainer-scrollPaddingInlineEnd);
 
 	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
 		container-type: size;
@@ -1541,6 +1760,10 @@ ol {
 				&[data-sticky~="backdrop-before"]::before,
 				&[data-sticky~="backdrop-after"]::after {
 					transition-property: background-color, backdrop-filter;
+
+					@media (prefers-reduced-transparency: reduce) {
+						backdrop-filter: none;
+					}
 				}
 
 				&[data-sticky~="backdrop-before"]::before,
@@ -1680,14 +1903,14 @@ ol {
  *   ```html
  *   <details>
  *     <summary>More</summary>
- *     <p>Hidden body.</p>
+ *     <div><p>Hidden body.</p></div>
  *   </details>
  *   ```
  * - `[data-collapsible]` + `[data-card]` padding split between summary and body:
  *   ```html
  *   <details data-card="padding-6">
  *     <summary data-row="wrap wrap-first-last">Title row</summary>
- *     <p>Body</p>
+ *     <div><p>Body</p></div>
  *   </details>
  *   ```
  *
@@ -1778,9 +2001,10 @@ details {
 			padding: var(--card-padding);
 		}
 
+		&:has(> summary + :not(:last-child))::details-content,
 		> summary + :last-child {
 			padding: var(--card-padding);
-			padding-top: 0;
+			padding-block-start: 0;
 		}
 	}
 }

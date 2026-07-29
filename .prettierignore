@@ -1,4 +1,6 @@
 *.css
+.playwright-cli/
+.pnpm-store/
 data/*-wallets/collection/*
 pnpm-lock.yaml
 resources/files/

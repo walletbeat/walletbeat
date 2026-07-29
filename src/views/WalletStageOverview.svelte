@@ -76,15 +76,6 @@
 			ladderDefinition.stages.findIndex(ladderStage => ladderStage.id === stage.id)
 	)
 
-	const defaultOpenStageIndex = $derived(
-		!ladderDefinition ?
-			null
-		: currentStageIndex === null ?
-			0
-		:
-			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
-	)
-
 	const stageEvaluatableWallet = $derived.by(() => {
 		const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
 
@@ -118,11 +109,9 @@
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
 				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
-				{@const isDefaultOpen = defaultOpenStageIndex === stageIndex}
-
 				<details
 					id={s.id}
-					open={isDefaultOpen}
+					open
 					data-card="radius-8 padding-6 {isCurrent ? 'border-accent' : ''}"
 					data-column="gap-0"
 					style:--accent={stageToColor(stageIndex, ladderDefinition?.stages.length ?? 3)}
@@ -143,23 +132,27 @@
 								</data>
 							</a>
 
-							<h3 data-row-item="flexible basis-3">
-								<strong>{s.name}</strong>:
+							<div
+								class="stage-summary-copy"
+								data-column="gap-1"
+								data-row-item="flexible basis-3"
+							>
+								<h3><strong>{s.name}</strong></h3>
 								{#if isTypographicContent(s.description)}
 									<Typography content={s.description} />
 								{:else}
-									{s.id}
+									<p>{s.id}</p>
 								{/if}
-							</h3>
+							</div>
 
 							<div
 								data-row-item="wrap-end"
 								data-row="gap-2"
 							>
-							<span>{passedCount}/{totalCount}</span>
-							<data value={stageRating} title={stageStatuses[stageRating].label}>
-								{stageStatuses[stageRating].icon}
-							</data>
+									<span>{passedCount}/{totalCount}</span>
+									<data value={stageRating} title={stageStatuses[stageRating].label}>
+										{stageStatuses[stageRating].icon}
+									</data>
 							</div>
 						</div>
 					</summary>
@@ -181,6 +174,7 @@
 									)}
 
 									<details
+										open
 										data-card="padding-5 secondary radius-4"
 										style:--accent={stageStatuses[groupRating].color}
 									>

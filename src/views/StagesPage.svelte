@@ -133,20 +133,16 @@
 		}
 
 		line-height: 1.6;
-		font-family: var(--fontFamily-avenir);
 
 		article {
 			max-height: 100dvh;
 			overflow: auto;
-			scroll-padding-block-start: 5rem;
-			scroll-padding-block-end: 1rem;
 			padding-block-end: 4rem;
 			display: grid;
 		}
 	}
 
 	h1 {
-		font-family: var(--fontFamily-avenir);
 		font-size: 2rem;
 	}
 

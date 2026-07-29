@@ -1,62 +1,18 @@
 <script module lang="ts">
-	import type { WBIconID } from '@/styles/wbicons'
-
-	// Types/constants
-	export type Slice = {
-		id: string
-		color: string
-		weight: number
-		arcLabel: string
-		arcIconId?: WBIconID
-		titleText: string
-		href?: string
-		gradient?: {
-			areaRadiusStops?: number[]
-			colors: string[]
-			transparentStopColor?: string
-		}
-		children?: Slice[]
-	}
-
-	export const PieLayout = {
-		HalfTop: 'TopHalf',
-		FullLeft: 'FullLeft',
-		FullTop: 'FullTop',
-	}
-
-	export type LevelConfig = {
-		outerRadiusFraction: number
-		innerRadiusFraction: number
-		offset?: number
-		gap: number
-		anglePadding?: number
-		angleGap?: number
-		outerCornerRadius?: number
-		innerCornerRadius?: number
-		labelSize?: number
-	}
-
-	// (Internal)
-	type ComputedSlice = Slice & {
-		computed: {
-			totalAngle: number
-			midAngle: number
-			outerR: number
-			innerR: number
-			outerCornerRadius: number
-			innerCornerRadius: number
-			gap: number
-			level: number
-			offset: number
-			labelSize: number
-		}
-		children?: ComputedSlice[]
-	}
+	export { PieLayout } from './pie-geometry'
+	export type { LevelConfig, Slice } from './pie-geometry'
 </script>
 
 
 <script lang="ts">
 	// Types
+	import {
+		computePieSlices,
+		PieLayout as PieLayoutValue,
+		type ComputedSlice,
+		type LevelConfig as PieLevelConfig,
+		type Slice as PieSlice,
+	} from './pie-geometry'
 	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
@@ -70,7 +26,7 @@
 		centerLabel,
 
 		// View options
-		layout = PieLayout.HalfTop,
+		layout = PieLayoutValue.HalfTop,
 		centerFirstSlice = true,
 		padding = 0,
 		radius = 47,
@@ -112,16 +68,16 @@
 		...restProps
 	}: HTMLAttributes<HTMLDivElement> & {
 		// Content
-		slices: Slice[]
+		slices: PieSlice[]
 		centerLabel?: string
 
 		// View options
-		layout?: (typeof PieLayout)[keyof typeof PieLayout]
+		layout?: (typeof PieLayoutValue)[keyof typeof PieLayoutValue]
 		centerFirstSlice?: boolean
 		radius?: number
 		padding?: number
 		labelSize?: number
-		levels?: LevelConfig[]
+		levels?: PieLevelConfig[]
 
 		// State
 		highlightedSliceId?: string | null
@@ -139,8 +95,6 @@
 
 
 	// Functions
-	const getLevelConfig = (level: number) => levels[Math.min(level, levels.length - 1)]
-
 	const sliceFill = (slice: ComputedSlice) => {
 		if (!slice.children?.length || !slice.gradient) return slice.color
 
@@ -210,110 +164,9 @@
 			: 'none'
 	)
 
-	const computeSlices = (
-		{
-			slices,
-			startAngle,
-			endAngle,
-			firstSliceMidAngle,
-		}: {
-			slices: Slice[]
-			startAngle: number
-			endAngle: number
-			firstSliceMidAngle?: number
-		},
-		cy = 0,
-		level = 0,
-	): ComputedSlice[] => {
-		const levelConfig = getLevelConfig(level)
-		const parentLevelConfig = getLevelConfig(level - 1)
-
-		const outerR = radius * levelConfig.outerRadiusFraction
-		const innerR = radius * levelConfig.innerRadiusFraction
-
-		const orientation = Math.sign(endAngle - startAngle)
-
-		const anglePadding = levelConfig.anglePadding ?? 0
-		const angleGap = levelConfig.angleGap ?? 0
-		const totalGapAngle = angleGap * Math.max(slices.length - 1, 0)
-
-		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerR) - Math.asin((parentLevelConfig.gap / 2) / outerR)) * 180 / Math.PI : 0
-
-		const effectiveStartAngle = startAngle + orientation * (anglePadding / 2 + angleInsetFromParentGap)
-		const effectiveEndAngle = endAngle - orientation * (anglePadding / 2 + angleInsetFromParentGap)
-		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - orientation * totalGapAngle
-
-		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
-		const computedFirstSliceMidAngle = effectiveStartAngle + effectiveTotalAngle * ((slices[0]?.weight ?? 0) / (totalWeight || 1)) / 2
-		const angleOffset = (firstSliceMidAngle ?? computedFirstSliceMidAngle) - computedFirstSliceMidAngle
-
-		let currentAngle = effectiveStartAngle + angleOffset
-
-		return slices.map(({ children, ...slice }, i) => {
-			const totalAngle = effectiveTotalAngle * (slice.weight / totalWeight)
-			const startAngle = currentAngle
-			const endAngle = currentAngle + totalAngle
-			const midAngle = startAngle + totalAngle / 2
-
-			currentAngle = endAngle + (i < slices.length - 1 ? orientation * angleGap : 0)
-
-			return {
-				...slice,
-				computed: {
-					totalAngle,
-					midAngle,
-					outerR,
-					innerR,
-					outerCornerRadius: levelConfig.outerCornerRadius ?? levelConfig.gap / 2,
-					innerCornerRadius: levelConfig.innerCornerRadius ?? levelConfig.gap / 2,
-					level,
-					offset: levelConfig.offset ?? 0,
-					gap: levelConfig.gap,
-					labelSize: levelConfig.labelSize ?? labelSize,
-				},
-				...children && {
-					children: (
-						computeSlices(
-							{
-								slices: children,
-								startAngle,
-								endAngle,
-							},
-							cy,
-							level + 1,
-						)
-					),
-				},
-			}
-		})
-	}
-
-
 	// State
 	const computedSlices = $derived(
-		computeSlices(
-			{
-				slices,
-				firstSliceMidAngle: centerFirstSlice ? 0 : undefined,
-				...(
-					layout === PieLayout.FullLeft ?
-						{
-							startAngle: -90 + getLevelConfig(0).angleGap / 2,
-							endAngle: 270 - getLevelConfig(0).angleGap / 2,
-						}
-					: layout === PieLayout.FullTop ?
-						{
-							startAngle: 360 - getLevelConfig(0).angleGap / 2,
-							endAngle: 0 + getLevelConfig(0).angleGap / 2,
-						}
-					: // layout === PieLayout.HalfTop
-						{
-							startAngle: -90,
-							endAngle: 90,
-						}
-				),
-			},
-		),
+		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
 
 	const pieMetrics = $derived.by(() => {
@@ -322,7 +175,7 @@
 		const maxRadius = radius * maxRadiusMultiplier + maxOffset
 
 		const width = padding * 2 + maxRadius * 2
-		const height = padding * 2 + maxRadius * (layout === PieLayout.HalfTop ? 1 : 2)
+		const height = padding * 2 + maxRadius * (layout === PieLayoutValue.HalfTop ? 1 : 2)
 		const viewBoxX = -(padding + maxRadius)
 		const viewBoxY = -(padding + maxRadius)
 
@@ -376,6 +229,7 @@
 		style:--slice-fill={sliceFill(slice)}
 		style:--slice-backdropFilter={sliceBackdropFilter(slice)}
 		style:--slice-labelSize={slice.computed.labelSize}
+		style:--slice-labelR={slice.computed.labelR}
 
 		data-slice-id={slice.id}
 		class:highlighted={highlightedSliceId === slice.id}
@@ -464,9 +318,6 @@
 		display: grid;
 		justify-content: center;
 
-		transform: translateZ(0);
-		will-change: transform;
-		backface-visibility: hidden;
 		transition-duration: 0.4s;
 
 		.pie {
@@ -476,6 +327,10 @@
 			position: relative;
 			display: grid;
 			max-width: 100%;
+
+			> .slices {
+				contain: content;
+			}
 
 			.slice {
 				--slice-brightness: 1;
@@ -516,40 +371,6 @@
 				}
 
 				.slice-shape {
-					--slice-labelRadius: calc(var(--pie-labelSize) / 2);
-					--slice-labelR: clamp(
-						/* Geometric mean of the inner and outer radii (with label radius carved out) */
-						pow(
-							(
-								(var(--slice-outerR) - var(--slice-labelRadius))
-								* (var(--slice-innerR) + var(--slice-labelRadius))
-							),
-							0.5
-						),
-
-						/* Centroid of the trimmed annular sector (with inner radius adjusted by label radius) */
-						(
-							2 / 3
-							* (
-								(
-									pow(var(--slice-outerR), 3)
-									- pow(var(--slice-innerR), 3)
-								)
-								/ (
-									pow(var(--slice-outerR), 2)
-									- pow(var(--slice-innerR), 2)
-								)
-							)
-							* (
-								sin(abs(var(--slice-totalAngle)) * 1deg / 2)
-								/ (abs(var(--slice-totalAngle)) * pi/180 / 2)
-							)
-						),
-
-						/* Outer radius minus label radius */
-						var(--slice-outerR) - var(--slice-labelRadius)
-					);
-
 					--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
 					--slice-halfGap: calc(var(--slice-gap) / 2);
 					--slice-outerCornerR: max(
@@ -603,6 +424,10 @@
 
 					background: var(--slice-fill);
 					backdrop-filter: var(--slice-backdropFilter, none);
+
+					@media (prefers-reduced-transparency: reduce) {
+						backdrop-filter: none;
+					}
 
 					clip-path: shape(
 						from
@@ -701,7 +526,6 @@
 
 					opacity: var(--slice-opacity);
 
-					will-change: transform;
 					transition-property:
 						clip-path,
 						transform,

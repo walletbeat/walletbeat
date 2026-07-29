@@ -788,7 +788,6 @@
 									display: inline-block;
 
 									font-size: var(--column-sortIndicator-fontSize);
-									font-family: system-ui;
 
 									transform: var(--column-sortIndicator-transform);
 

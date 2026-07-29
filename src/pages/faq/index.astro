@@ -277,7 +277,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
 			{
 				frequentlyAskedQuestions.map(entry => (
-					<details id={entry.anchor}>
+					<details id={entry.anchor} data-card='padding-5'>
 						<summary>
 							<h4>{entry.question}</h4>
 						</summary>
@@ -304,10 +304,6 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		line-height: 1.4;
 	}
 
-	h1 {
-		font-family: var(--fontFamily-spMonorium);
-	}
-
 	hgroup p {
 		color: var(--text-secondary);
 		font-size: 1rem;
@@ -316,7 +312,6 @@ import { defaultNavigationItems } from '@/constants/navigation'
 	details {
 		border: var(--separator-width) solid var(--border-color);
 		border-radius: 0.5rem;
-		padding: 1.25rem 1.5rem;
 
 		summary {
 			cursor: pointer;
@@ -358,7 +353,6 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		> div {
 			margin-block-start: 1rem;
 			line-height: 1.8;
-			font-family: var(--fontFamily-avenir);
 		}
 
 		div :global(ul) {

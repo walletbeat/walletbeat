@@ -139,14 +139,14 @@ interface CssAttributes {
 	 *   ```html
 	 *   <details>
 	 *     <summary>More</summary>
-	 *     <p>Hidden body.</p>
+	 *     <div><p>Hidden body.</p></div>
 	 *   </details>
 	 *   ```
 	 * - `[data-collapsible]` + `[data-card]` padding split between summary and body:
 	 *   ```html
 	 *   <details data-card="padding-6">
 	 *     <summary data-row="wrap wrap-first-last">Title row</summary>
-	 *     <p>Body</p>
+	 *     <div><p>Body</p></div>
 	 *   </details>
 	 *   ```
 	 *
@@ -342,7 +342,6 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
@@ -366,7 +365,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -416,7 +415,6 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
@@ -440,7 +438,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -490,7 +488,6 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--list-markerGap`
 	 * - `--list-gap`
-	 * - `--list-marker-content`
 	 * - `--list-marker-inlineSize`
 	 *
 	 * ### Examples
@@ -514,7 +511,7 @@ interface CssAttributes {
 	 *
 	 * ---
 	 *
-	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text; use `--list-marker-content` when a caller needs mapped icon content.
+	 * List row: per-item vertical rhythm (`[data-list-item]` gap tokens), marker column (`::before` / `[data-list-item-marker]`), and padding that pairs with `[data-list]` / `[data-card]` list padding. `[data-list-item-marker]` renders literal marker text.
 	 *
 	 * ### Placement
 	 * - Direct child of `[data-list]`, `ul`, or `ol` — use native `<li>` or `[data-list-item]` for the same rules.
@@ -702,6 +699,10 @@ interface CssAttributes {
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
+	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
 	 *   ```html
@@ -761,6 +762,10 @@ interface CssAttributes {
 	 * - scroll container: `block`, `inline`
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
 	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
@@ -880,6 +885,10 @@ interface CssAttributes {
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
 	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
+	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):
 	 *   ```html
@@ -962,6 +971,60 @@ interface CssAttributes {
 	'data-sticky'?: string | boolean
 
 	/**
+	 * ## [data-sticky-breadcrumb]
+	 *
+	 * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
+	 * resolves its configurable parent anchor: root → section → subsection. A `position` preserves the
+	 * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
+	 * remains visible.
+	 *
+	 * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
+	 * every item remains in regular document flow.
+	 *
+	 * ### Tokens
+	 * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
+	 * - `scope`: visibility boundary for descendant items
+	 * - `position`: regular-layout position anchor and view-timeline source
+	 * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+	 *
+	 * ### CSS Variables
+	 * - `--stickyBreadcrumb-animationRangeStart`
+	 * - `--stickyBreadcrumb-animationRangeEnd`
+	 * - `--stickyBreadcrumb-gap`
+	 * - `--stickyBreadcrumb-position-minBlockSize`
+	 * - `--stickyBreadcrumb-position-insetBlockStart`
+	 * - `--stickyBreadcrumb-position-insetInlineStart`
+	 * - `--stickyBreadcrumb-item-insetBlockStart`
+	 * - `--stickyBreadcrumb-item-blockOffset`
+	 * - `--stickyBreadcrumb-item-insetInlineStart`
+	 * - `--stickyBreadcrumb-item-insetInlineEnd`
+	 * - `--stickyBreadcrumb-item-blockSize`
+	 * - `--stickyBreadcrumb-trackBlockEnd`
+	 * - `--stickyBreadcrumb-exitAnimationDistance`
+	 * - `--stickyBreadcrumb-itemAnchor`
+	 * - `--stickyBreadcrumb-parentAnchor`
+	 *
+	 * ### Example
+	 * ```html
+	 * <a data-sticky-breadcrumb="root item"><h1>Page</h1></a>
+	 * <section data-sticky-breadcrumb="scope">
+	 *   <header data-sticky-breadcrumb="position">
+	 *     <a data-sticky-breadcrumb="item"><h2>Section</h2></a>
+	 *   </header>
+	 *   <section data-sticky-breadcrumb="scope">
+	 *     <header data-sticky-breadcrumb="position">
+	 *       <a data-sticky-breadcrumb="item"><h3>Subsection</h3></a>
+	 *     </header>
+	 *   </section>
+	 * </section>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
+	 */
+	'data-sticky-breadcrumb'?: string | boolean
+
+	/**
 	 * ## [data-sticky-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
@@ -974,6 +1037,10 @@ interface CssAttributes {
 	 * - scroll container: `block`, `inline`
 	 * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `background`, `background-always`, `backdrop-self`, `backdrop-before`, `backdrop-after`, `backdrop-stuck`, `backdrop-always`, `backdrop-none`
 	 * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+	 *
+	 * ### CSS Variables
+	 * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
+	 * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
 	 *
 	 * ### Examples
 	 * - Default (both axes scrollable; omit `block` / `inline` when this matches your layout):

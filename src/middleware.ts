@@ -151,6 +151,13 @@ export function shouldShield(pathName: string): boolean | null {
  * dealing with unicode.
  */
 export const onRequest = defineMiddleware(async (context, next) => {
+	// Development resources are served by Vite and have no stable build-time
+	// integrity hash. The shield integration is disabled in astro.config.mjs
+	// for the same reason, so keep its middleware out of the dev request path.
+	if (import.meta.env.DEV) {
+		return next()
+	}
+
 	const shouldBeShielded = shouldShield(context.url.pathname)
 
 	if (shouldBeShielded === null) {

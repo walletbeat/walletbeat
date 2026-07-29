@@ -51,7 +51,7 @@
 		<div class="eip-item">
 			<details
 				bind:open={openStates[eip.number]}
-				data-card="secondary padding-0 radius-4"
+				data-card="secondary padding-4 radius-4"
 				class:open={openStates[eip.number]}
 			>
 				<summary>
@@ -161,17 +161,14 @@
 			overflow: hidden;
 			transition: border-color 0.15s ease;
 			border: 1px solid transparent;
-			padding: 0.875rem 1rem 0.875rem 1.5rem;
 
 			&.open {
 				border-color: var(--accent);
-				padding-bottom: 1.25rem;
 			}
 
 			summary {
 				list-style: none;
 				cursor: pointer;
-				padding: 0;
 				user-select: none;
 
 				&::-webkit-details-marker {
@@ -203,7 +200,6 @@
 	}
 
 	.eip-label {
-		font-family: var(--fontFamily-spMonorium);
 		font-size: 0.85rem;
 		font-weight: 600;
 		color: var(--accent);

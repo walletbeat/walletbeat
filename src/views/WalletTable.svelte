@@ -350,7 +350,14 @@
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
-	import Pie, { PieLayout, type Slice } from '@/components/Pie.svelte'
+	import Pie from '@/components/Pie.svelte'
+	import {
+		overallRatingPieLevels,
+		overallRatingPiePadding,
+		overallRatingPieRadius,
+		PieLayout,
+		type Slice,
+	} from '@/components/pie-geometry'
 	import Select from '@/components/Select.svelte'
 	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
@@ -1126,35 +1133,14 @@
 							) : null}
 							<Pie
 								layout={PieLayout.FullTop}
-								padding={8}
-								radius={80}
-								levels={[
-									{
-										outerRadiusFraction: 1,
-										innerRadiusFraction: (
+								padding={overallRatingPiePadding}
+								radius={overallRatingPieRadius}
+								levels={overallRatingPieLevels(
 											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage || summaryVisualization === SummaryVisualization.Icon) ?
 												0.15
 											:
 												0.1
-										),
-										gap: 4,
-										angleGap: 5,
-										offset: 3,
-										outerCornerRadius: 28,
-										innerCornerRadius: 16,
-									},
-									{
-										outerRadiusFraction: 0.45,
-										innerRadiusFraction: 0.1,
-										gap: 0,
-										anglePadding: -20,
-										angleGap: -30,
-										offset: 80,
-										outerCornerRadius: 8,
-										innerCornerRadius: 8,
-										labelSize: 9,
-									}
-								]}
+								)}
 
 								slices={
 									displayedAttributeGroups.map(attrGroup => {
@@ -1713,6 +1699,7 @@
 								offset: 4,
 								outerCornerRadius: 35,
 								innerCornerRadius: 20,
+								labelSizeScale: 1.25,
 							},
 							{
 								outerRadiusFraction: 0.45,
@@ -1819,15 +1806,21 @@
 					summary {
 						box-sizing: content-box;
 						margin: calc(-1 * var(--table-cell-padding));
-						padding: var(--table-cell-padding);
 
-						transition-property: opacity, scale, min-block-size, padding-block-end;
+						transition-property: opacity, scale, min-block-size;
 						min-block-size: var(--walletTable-rowClosed-blockSize);
+
+						> * {
+							padding: var(--table-cell-padding);
+						}
 					}
 
 					&:open summary {
 						min-block-size: 5rem;
-						padding-block-end: 0.25rem;
+
+						> * {
+							padding-block-end: 0.25rem;
+						}
 					}
 				}
 			}

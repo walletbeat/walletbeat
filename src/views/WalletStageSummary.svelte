@@ -137,7 +137,7 @@
 		</header>
 	{:else if displayStage}
 		<header data-column="gap-2">
-			<h3 data-row="gap-2 start">
+			<h3>
 				<a
 					data-link="camouflaged"
 					href={getWalletUrl(wallet, { attributeAnchor: displayStage.id })}
@@ -145,15 +145,17 @@
 					<WalletStageBadge
 						stage={displayStage}
 						ladderEvaluation={ladderEvaluation}
-						size="large"
+						 size="large"
 					/>
 				</a>
+			</h3>
+			<p>
 				{#if isTypographicContent(displayStage.description)}
 					<Typography content={displayStage.description} />
 				{:else}
 					{displayStage.id}
 				{/if}
-			</h3>
+			</p>
 		</header>
 	{/if}
 
