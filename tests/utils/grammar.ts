@@ -2,6 +2,7 @@ import * as harper from 'harper.js'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
+import { gitCommitRefPinRegExp } from '@/schema/url'
 import { getCSpellPatterns, getCSpellWords } from '@/tests/utils/cspell'
 import {
 	ContentType,
@@ -147,6 +148,24 @@ function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
 	return start >= urlStart && start < urlEnd
 }
 
+/**
+ * Check if a given position falls inside a standalone URL (e.g. `https://example.com/path`).
+ */
+function isInsideUrl(text: string, start: number): boolean {
+	const urlRegex = /\bhttps?:\/\/[^\s,)'"\]]+/gi
+
+	for (const match of text.matchAll(urlRegex)) {
+		const urlStart = match.index ?? 0
+		const urlEnd = urlStart + match[0].length
+
+		if (start >= urlStart && start < urlEnd) {
+			return true
+		}
+	}
+
+	return false
+}
+
 function getRegexpLinter({
 	name,
 	regExp,
@@ -169,6 +188,10 @@ function getRegexpLinter({
 						const start = match.index ?? 0
 
 						if (isInsideMarkdownLinkUrl(text, start)) {
+							continue
+						}
+
+						if (isInsideUrl(text, start)) {
 							continue
 						}
 
@@ -236,6 +259,55 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 ]
 
 /**
+ * Return all character ranges in `text` that belong to auto-generated
+ * GitHub labels (e.g. "dapp.ts L48-65 @5caa9e2").
+ *
+ * These labels are produced by `getGitHubUrlLabel()` in `src/schema/url.ts`
+ * and contain filenames, line ranges, commit hashes, etc. that come from
+ * the referenced repository's source, not from Walletbeat's own text.
+ */
+function collectGitHubLabelRanges(text: string): { start: number; end: number }[] {
+	const ranges: { start: number; end: number }[] = []
+
+	// First, find all commit hash pins to anchor which parts of the text
+	// are part of GitHub labels.
+	const hashSpans: { start: number; end: number }[] = []
+
+	for (const m of text.matchAll(gitCommitRefPinRegExp)) {
+		hashSpans.push({ start: m.index ?? 0, end: (m.index ?? 0) + m[0].length })
+	}
+
+	// For each hash pin, expand backward to cover the full label:
+	// filename, optional line range ("L123-456"), spaces.
+	for (const hash of hashSpans) {
+		const labelEnd = hash.end
+
+		// Walk backward from the hash to find the start of the label.
+		// Include filename chars, line ranges, spaces, trailing slashes (tree labels),
+		// and slashes in org/repo paths.
+		let pos = hash.start - 1
+
+		while (pos >= 0) {
+			const ch = text[pos]
+			// Filename chars: alphanumeric, dot, hyphen, underscore
+			// Line-range chars: "L" followed by digits/dashes
+			// Path separators and trailing slashes
+			// Spaces between parts
+
+			if (/[\w.\-\s]/.test(ch)) {
+				pos--
+			} else {
+				break
+			}
+		}
+
+		ranges.push({ start: pos + 1, end: labelEnd })
+	}
+
+	return ranges
+}
+
+/**
  * Return all character ranges in `text` matched by any active cspell pattern.
  */
 function collectCspellPatternRanges(text: string): { start: number; end: number }[] {
@@ -297,6 +369,8 @@ export async function grammarLintMessages(
 
 	// Precompute ranges covered by cspell "patterns" so we can suppress lints inside them.
 	const cspellRanges = collectCspellPatternRanges(trimmedText)
+	// Same for GitHub labels
+	const githubLabelRanges = collectGitHubLabelRanges(trimmedText)
 
 	let lints: Lint[] = []
 
@@ -309,8 +383,11 @@ export async function grammarLintMessages(
 	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
 	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
 
-	// Ignore lints that fall inside text matched by a cspell pattern (hex addresses, CIDs, …).
+	// Ignore lints that fall inside text that is part of an ignored text range.
 	lints = lints.filter(lint => !overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges))
+	lints = lints.filter(
+		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
+	)
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(

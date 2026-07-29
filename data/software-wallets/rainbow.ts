@@ -740,7 +740,70 @@ export const rainbow: SoftwareWallet = {
 			// captured through a local proxy to see which service performs each
 			// lookup.
 			scamAlerts: {
-				[Variant.BROWSER]: null,
+				[Variant.BROWSER]: {
+					contractTransactionWarning: supported<WithRef<ContractTransactionWarning>>({
+						ref: [
+							{
+								explanation:
+									'Rainbow checks transactions for scams using Blockaid. Every request is compared against a database of known scams and malicious contracts, and Rainbow shows a warning when a request is flagged.',
+								lastRetrieved: '2026-07-28',
+								url: 'https://www.blockaid.io/blog/rainbow-wallet-mobile-app-and-browser-extension-powered-by-blockaid',
+							},
+							{
+								explanation:
+									'Before you can confirm a transaction or signature, the extension sends it to its own servers to be simulated and scanned. That request includes the account address, the contract being interacted with, the transaction data, and the URL of the page that requested it. The servers return a risk verdict, a human-readable description, and the simulated balance changes.',
+								lastRetrieved: '2026-07-28',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/graphql/queries/metadata.graphql#L149-L205',
+							},
+							{
+								explanation:
+									'The extension asks its own server for a scan verdict on every transaction and signature request, and the scan result also carries contract metadata such as whether its source code is verified and when it was created.',
+								lastRetrieved: '2026-07-28',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/SendTransaction/SendTransactionsInfo.tsx#L206-L281',
+							},
+						],
+						contractRegistry: true,
+						leaksContractAddress: true,
+						leaksUserAddress: true,
+						leaksUserIp: true,
+						previousContractInteractionWarning: false,
+						recentContractWarning: false,
+					}),
+					scamUrlWarning: supported<ScamUrlWarning>({
+						ref: [
+							{
+								explanation:
+									"When a website asks to connect, the extension checks that site's reputation against its own servers. The check carries the page's URL and a short name for the app. The wallet address is not part of it.",
+								lastRetrieved: '2026-07-28',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/graphql/queries/metadata.graphql#L106-L120',
+							},
+							{
+								explanation:
+									'The extension does not reduce a site to its domain before sending this check. The full page URL from the browser tab, including path and query string, is sent both for the connect-time reputation check and as the domain parameter on every later transaction/signature scan.',
+								lastRetrieved: '2026-07-28',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/resources/metadata/dapp.ts#L48-L65',
+							},
+							{
+								explanation:
+									'If the check flags the site as a scam, the extension shows the app\'s host in red with a shield-warning badge next to it. It also adds a card titled "This app is likely malicious," telling the user that signing could cost them their assets.',
+								lastRetrieved: '2026-07-28',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/RequestAccounts/RequestAccountsInfo.tsx#L20-L69',
+							},
+						],
+						leaksUserAddress: false,
+						leaksUserIp: true,
+						leaksVisitedUrl: 'FULL_URL',
+					}),
+					sendTransactionWarning: notSupported,
+					unlimitedApprovalWarning: notSupportedWithRef({
+						ref: {
+							explanation:
+								'The extension shows that an approval is unlimited, but does not warn about it.',
+							lastRetrieved: '2026-07-28',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/Simulation.tsx#L111-L213',
+						},
+					}),
+				},
 				[Variant.MOBILE]: {
 					contractTransactionWarning: supported<WithRef<ContractTransactionWarning>>({
 						ref: [
