@@ -3083,6 +3083,22 @@
 			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
 		}
 
+		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
+			&::before {
+				position: absolute;
+				inset-block-start: 0;
+				inset-inline-start: calc(-1 * var(--stickyBreadcrumb-gap));
+				display: grid;
+				place-items: center;
+				inline-size: var(--stickyBreadcrumb-gap);
+				block-size: var(--stickyBreadcrumb-item-blockSize);
+				margin: 0;
+				line-height: 1;
+				text-box: trim-both cap alphabetic;
+				pointer-events: none;
+			}
+		}
+
 		article > header#top .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
 			font-size: var(---wallet-name-flow-font-size);
@@ -3816,6 +3832,14 @@
 			+ var(---wallet-breadcrumb-block-size)
 			+ var(---wallet-breadcrumb-surface-fade)
 		);
+		@media (min-width: 865px) {
+			---attribute-accordion-sticky-inset: calc(
+				var(---wallet-page-block-offset)
+				+ 2 * var(---wallet-sticky-content-inset)
+				+ var(---wallet-breadcrumb-block-size)
+				+ var(---wallet-breadcrumb-surface-fade)
+			);
+		}
 
 		details {
 			--sticky-marginBlockStart: var(---attribute-accordion-sticky-inset);
