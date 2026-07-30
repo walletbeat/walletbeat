@@ -1,6 +1,6 @@
 ---
 title: 'Walletbeat impact log'
-description: "A lot of actions that wallets have taken as a result of Walletbeat's actions or existence."
+description: "A log of actions that wallets have taken as a result of Walletbeat's actions or existence."
 ---
 
 - **2025-12**: Walletbeat publishes the L1 Provider Independence Test: https://x.com/walletbeat/status/2002818293741301777
