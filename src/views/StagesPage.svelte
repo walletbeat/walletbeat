@@ -29,7 +29,7 @@
 			</p>
 		</header>
 
-		{#each softwareWalletLadder.stages as stage, index}
+		{#each softwareWalletLadder.stages as stage, index (stage.id)}
 			{@const stageColor = stageToColor(index, softwareWalletLadder.stages.length)}
 
 			<section id={stage.id}>
@@ -66,8 +66,9 @@
 						</p>
 					{/if}
 
-					{#each stage.criteriaGroups as criteriaGroup}
+					{#each stage.criteriaGroups as criteriaGroup (criteriaGroup.id)}
 						<details
+							open
 							data-card="padding-5 radius-4"
 						>
 							<summary>
@@ -90,7 +91,7 @@
 									data-card="padding-4"
 									data-list="gap-4"
 								>
-									{#each criteriaGroup.criteria as criterion}
+									{#each criteriaGroup.criteria as criterion (criterion.id)}
 										<li>
 											<div data-column="gap-1">
 												<strong>{criterion.displayName}</strong>
