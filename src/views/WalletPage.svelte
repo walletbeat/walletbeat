@@ -431,8 +431,6 @@
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
 	import WalletPageNavigationBadge from '@/views/WalletPageNavigationBadge.svelte'
 	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
-	import WalletStageSummary from '@/views/WalletStageSummary.svelte'
-	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
@@ -615,17 +613,11 @@
 						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
 						{#if stage !== null && ladderEvaluation !== null}
-							<Tooltip buttonTriggerPlacement="behind">
-								<WalletStageBadge
-									{stage}
-									{ladderEvaluation}
-									size="large"
-								/>
-
-								{#snippet TooltipContent()}
-									<WalletStageSummary {wallet} {ladders} {stage} {ladderEvaluation} />
-								{/snippet}
-							</Tooltip>
+							<WalletStageBadge
+								{stage}
+								{ladderEvaluation}
+								size="large"
+							/>
 						{/if}
 					{/if}
 
@@ -1126,35 +1118,7 @@
 									{@const stageNumber = stageNumbers[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
 
-									{#if stage && ladderEvaluation}
-										<Tooltip
-											buttonTriggerPlacement="behind"
-											style="--accent: var(--accent-color)"
-										>
-											<a
-												href={`#${stage.id}`}
-												data-link="camouflaged"
-												title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
-											>
-												<div
-													data-badge="small"
-													style:--accent="var(--accent-color)"
-												>
-													<small>Stage {stageNumbers.join(', ')}</small>
-												</div>
-											</a>
-
-											{#snippet TooltipContent()}
-												<WalletStageSummary
-													{wallet}
-													{ladders}
-													stage={stage}
-													{ladderEvaluation}
-													showNextStageCriteria={false}
-												/>
-											{/snippet}
-										</Tooltip>
-									{:else if stage}
+									{#if stage}
 										<a
 											href={`#${stage.id}`}
 											data-link="camouflaged"
