@@ -52,7 +52,6 @@
 		type AttributeGroup,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
-		formatAttributeGroupTitleText,
 	} from '@/schema/attribute-groups'
 	import { toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
@@ -407,10 +406,6 @@
 	const overallScore = $derived(
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
-
-
-	// Functions
-	import { formatAttributeTitleText } from '@/schema/attributes'
 
 
 	// Components
@@ -954,7 +949,7 @@
 									href={`#${slugifyCamelCase(attrGroup.id)}`}
 									interestfor={slugifyCamelCase(attrGroup.id)}
 								>
-									<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
+									<h2>
 										{attrGroup.displayName}
 									</h2>
 								</a>
@@ -1074,9 +1069,7 @@
 									href={`#${slugifyCamelCase(attribute.id)}`}
 									interestfor={slugifyCamelCase(attribute.id)}
 								>
-									<h3
-										title={formatAttributeTitleText(evalAttr)}
-									>
+									<h3>
 										{attribute.displayName}
 									</h3>
 								</a>

@@ -970,23 +970,3 @@ export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = null>(
 		sampleEvaluations,
 	}
 }
-
-/**
- * Format title text for an attribute pie slice.
- * @param attribute The evaluated attribute to format.
- * @param suffix Optional suffix to append to the title.
- * @returns Formatted title text in the format: "(icon) title [(eval icon) EVAL OUTCOME]\n\n(displayName)"
- */
-export const formatAttributeTitleText = (
-	attribute: EvaluatedAttribute<OutcomeMetadata>,
-	suffix?: string,
-) =>
-	`${attribute.evaluation.outcome.icon ?? attribute.attribute.icon} ${
-		attribute.attribute.displayName
-	}${suffix ?? ''} [${ratingIcons[attribute.evaluation.outcome.rating]} ${
-		attribute.evaluation.outcome.rating
-	}]${
-		![Rating.EXEMPT, Rating.UNRATED].includes(attribute.evaluation.outcome.rating)
-			? `\n\n${attribute.evaluation.outcome.displayName}`
-			: ''
-	}`

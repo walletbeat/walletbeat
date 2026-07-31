@@ -40,12 +40,10 @@
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
-	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/urls'
 
 
 	// Components
-	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 	import Typography from '../components/Typography.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
@@ -153,15 +151,6 @@
 			{/if}
 		{/if}
 	</p>
-
-	<div>
-		<a
-			href={getWalletUrl(wallet, { variant, attributeAnchor: slugifyCamelCase(attribute.attribute.id) })}
-		>
-			<span>{@html InfoIcon}</span>
-			Learn more
-		</a>
-	</div>
 </div>
 
 

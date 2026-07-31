@@ -234,8 +234,8 @@
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
-	import { calculateAttributeGroupScore, calculateOverallScore, formatAttributeGroupTitleText } from '@/schema/attribute-groups'
-	import { evaluatedAttributesEntries, ratingToColor, formatAttributeTitleText } from '@/schema/attributes'
+	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
+	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
@@ -800,40 +800,29 @@
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
 
-						<Tooltip>
-							<div
-								role="button"
-								tabindex="0"
-								aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-								onclick={event => {
-									event.preventDefault()
-									event.stopPropagation()
-									toggleAttributeFilterById?.(stageFilterId)
-								}}
-								onkeydown={event => {
-									if (event.key !== 'Enter' && event.key !== ' ') return
+						<div
+							role="button"
+							tabindex="0"
+							aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
+							onclick={event => {
+								event.preventDefault()
+								event.stopPropagation()
+								toggleAttributeFilterById?.(stageFilterId)
+							}}
+							onkeydown={event => {
+								if (event.key !== 'Enter' && event.key !== ' ') return
 
-									event.preventDefault()
-									event.stopPropagation()
-									toggleAttributeFilterById?.(stageFilterId)
-								}}
-							>
-								<WalletStageBadge
-									{stage}
-									{ladderEvaluation}
-									size="medium"
-								/>
-							</div>
-
-							{#snippet TooltipContent()}
-								<WalletStageSummary
-									{wallet}
-									{ladders}
-									{stage}
-									{ladderEvaluation}
-								/>
-							{/snippet}
-						</Tooltip>
+								event.preventDefault()
+								event.stopPropagation()
+								toggleAttributeFilterById?.(stageFilterId)
+							}}
+						>
+							<WalletStageBadge
+								{stage}
+								{ladderEvaluation}
+								size="medium"
+							/>
+						</div>
 					{/if}
 				{:else if column.id === 'displayName'}
 					{@const displayName = value}
@@ -938,13 +927,11 @@
 															label: `#${erc4337.number}`,
 															filterId: 'accountType-erc4337',
 															type: 'eip',
-															eipTooltipContent: erc4337,
 														},
 														AccountType.eip7702 in accountTypes && {
 															label: `#${eip7702.number}`,
 															filterId: 'accountType-eip7702',
 															type: 'eip',
-															eipTooltipContent: eip7702,
 														},
 														AccountType.safe in accountTypes && {
 															label: 'Safe',
@@ -963,49 +950,16 @@
 										]
 											.filter(Boolean)
 									) as tag (tag.label)}
-										{#if tag.eipTooltipContent}
-											<Tooltip
-												placement="inline-end"
-											>
-												<div
-													data-tag={tag.type}
-													role="button"
-													tabindex="0"
-													aria-label="Filter by {tag.label}"
-													onclick={event => {
-														event.stopPropagation()
-														toggleFilterById!(tag.filterId)
-													}}
-													onkeydown={event => {
-														if (event.key !== 'Enter' && event.key !== ' ') return
-
-														event.stopPropagation()
-														toggleFilterById!(tag.filterId)
-													}}
-												>
-													{tag.label}
-												</div>
-
-												{#snippet TooltipContent()}
-													<div class="eip-tooltip-content">
-														<EipDetails
-															eip={tag.eipTooltipContent}
-														/>
-													</div>
-												{/snippet}
-											</Tooltip>
-										{:else}
-											<button
-												data-tag={tag.type}
-												aria-label="Filter by {tag.label}"
-												onclick={event => {
-													event.stopPropagation()
-													toggleFilterById!(tag.filterId)
-												}}
-											>
-												{tag.label}
-											</button>
-										{/if}
+										<button
+											data-tag={tag.type}
+											aria-label="Filter by {tag.label}"
+											onclick={event => {
+												event.stopPropagation()
+												toggleFilterById!(tag.filterId)
+											}}
+										>
+											{tag.label}
+										</button>
 									{/each}
 								</div>
 							</div>
@@ -1157,11 +1111,6 @@
 												:
 													'var(--rating-unrated)'
 											),
-											titleText: formatAttributeGroupTitleText(
-												attrGroup,
-												groupScore,
-												summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
-											),
 											gradient: attributeGroupFlowerGradient,
 											weight: 1,
 											...evalGroup && {
@@ -1187,7 +1136,6 @@
 															),
 															arcLabel: '',
 															arcIconId: attribute.attribute.icon,
-															titleText: formatAttributeTitleText(attribute),
 															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 																opacity: 0.33,
 															},
@@ -1366,14 +1314,6 @@
 							}
 						>
 							<Pie
-								title={
-									formatAttributeGroupTitleText(
-										attrGroup,
-										groupScore,
-										summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
-									)
-								}
-
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1430,7 +1370,6 @@
 												),
 												arcLabel: '',
 												arcIconId: attribute.attribute.icon,
-												titleText: formatAttributeTitleText(attribute, tooltipSuffix),
 												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 													opacity: 0.33,
 												},
@@ -1553,8 +1492,6 @@
 							}
 						>
 							<Pie
-								title={formatAttributeTitleText(attribute)}
-
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
@@ -1593,7 +1530,6 @@
 												weight: 1,
 												arcLabel: '',
 												arcIconId: attribute.icon,
-												titleText: formatAttributeTitleText(attribute),
 											}
 										]
 									:
@@ -1722,7 +1658,6 @@
 									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
 									arcIconId: attrGroup.icon,
 									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
-									titleText: formatAttributeGroupTitleText(attrGroup, groupScore, false),
 									gradient: attributeGroupFlowerGradient,
 									weight: 1,
 									...evalGroup && {
@@ -1742,7 +1677,6 @@
 													),
 													arcLabel: '',
 													arcIconId: attribute.attribute.icon,
-													titleText: formatAttributeTitleText(attribute),
 													...attribute.evaluation.outcome.rating === Rating.EXEMPT && { opacity: 0.33 },
 												}))
 										),
