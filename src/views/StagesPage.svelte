@@ -1,9 +1,8 @@
 <script lang="ts">
 	// Types/constants
 	import { softwareWalletLadder } from '@/schema/stages/software-wallet-stages'
-	import { stageToColor } from '@/utils/colors'
 	import { isTypographicContent } from '@/types/content'
-
+	import { stageToColor } from '@/utils/colors'
 	// Components
 	import Typography from '@/components/Typography.svelte'
 </script>
@@ -34,7 +33,7 @@
 
 			<section id={stage.id}>
 				<header
-					data-sticky="block"
+					data-sticky="block backdrop-before backdrop-stuck"
 					data-row
 					data-scroll-item="inline-detached"
 				>
@@ -152,7 +151,11 @@
 	}
 
 	section > header {
+		--sticky-backgroundColor: var(--background-primary);
+		--sticky-backdropFilter: none;
+
 		margin-bottom: 1.25rem;
+		padding-block: 0.75rem;
 	}
 
 	.subtitle {
