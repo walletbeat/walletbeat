@@ -1,8 +1,11 @@
 <script lang="ts">
 	// Types/constants
 	import { softwareWalletLadder } from '@/schema/stages/software-wallet-stages'
+	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { isTypographicContent } from '@/types/content'
 	import { stageToColor } from '@/utils/colors'
+	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
+
 	// Components
 	import Typography from '@/components/Typography.svelte'
 </script>
@@ -87,11 +90,17 @@
 
 							<div>
 								<ul
+									class="criteria-list"
 									data-card="padding-4"
 									data-list="gap-4"
 								>
 									{#each criteriaGroup.criteria as criterion (criterion.id)}
-										<li>
+										{@const attributeId = getCriterionAttributeId(criterion)}
+										{@const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null}
+
+										<li
+											data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
+										>
 											<div data-column="gap-1">
 												<strong>{criterion.displayName}</strong>
 
@@ -181,6 +190,10 @@
 	.criterion-rationale {
 		color: var(--text-secondary);
 		font-size: 0.85em;
+	}
+
+	.criteria-list {
+		--list-marker-fontFamily: var(--fontFamily-wbicons);
 	}
 
 	details {
