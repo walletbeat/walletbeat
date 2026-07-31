@@ -57,6 +57,7 @@
 		"@wagmi/core": "^3.5.5",
 		"astro": "^7.0.6",
 		"autoprefixer": "^10.5.2",
+		"bits-ui": "^2.18.1",
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.6",
 		"eslint-plugin-unused-imports": "^4.4.1",
