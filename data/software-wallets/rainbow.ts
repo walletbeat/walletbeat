@@ -86,7 +86,7 @@ export const rainbow: SoftwareWallet = {
 		`),
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-07-26',
+		lastUpdated: '2026-08-01',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -956,6 +956,18 @@ export const rainbow: SoftwareWallet = {
 								'The browser extension encrypts its keychain "vault" with a user-chosen password using `@metamask/browser-passworder` (PBKDF2, 600k iterations) before persisting it. The decrypted keychains live in memory only while unlocked.',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/132521f80261f1c4473c33965ee27976d8506630/src/core/keychain/KeychainManager.ts',
 						},
+						{
+							explanation:
+								"When creating a new browser-extension wallet, Rainbow generates a 12-word BIP-39 recovery phrase on the user's device with `@scure/bip39`.",
+							label: 'Rainbow browser-extension recovery-phrase generation',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L136-L150',
+						},
+						{
+							explanation:
+								'The `@noble/hashes` random-byte implementation used by `@scure/bip39` calls the browser-provided `crypto.getRandomValues` CSPRNG and throws instead of producing bytes if no secure provider is available.',
+							label: 'Rainbow browser-extension CSPRNG provider',
+							url: 'https://github.com/paulmillr/noble-hashes/blob/32f700f38ec49d7e6b2ab687904d6b2d7d60d80a/src/utils.ts#L385-L394',
+						},
 					],
 					browserExtensionHardening: parseBrowserExtensionManifest(rainbowRawExtManifest),
 					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
@@ -968,6 +980,24 @@ export const rainbow: SoftwareWallet = {
 							explanation:
 								'The mobile app stores the seed phrase in `react-native-keychain`, gated by biometrics or device passcode (iOS `USER_PRESENCE`, Android `BIOMETRY_CURRENT_SET_OR_DEVICE_PASSCODE`) wrapped by an RSA key held in OS keystore. The secret cannot be extracted by other software.',
 							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/features/local-auth/keychain.ts',
+						},
+						{
+							explanation:
+								"When creating a new mobile wallet, Rainbow generates a 12-word BIP-39 recovery phrase on the user's device with `bip39`.",
+							label: 'Rainbow mobile recovery-phrase generation',
+							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L638-L657',
+						},
+						{
+							explanation:
+								"In production, the random-values provider used by Rainbow's mobile app obtains random bytes from Java `SecureRandom` on Android.",
+							label: 'Rainbow mobile Android CSPRNG provider',
+							url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/android/src/main/java/org/linusu/RNGetRandomValuesModule.java#L25-L34',
+						},
+						{
+							explanation:
+								"In production, the random-values provider used by Rainbow's mobile app obtains random bytes from Security.framework `SecRandomCopyBytes` on iOS and fails if that OS call is unsuccessful.",
+							label: 'Rainbow mobile iOS CSPRNG provider',
+							url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/ios/RNGetRandomValues.m#L12-L20',
 						},
 					],
 					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
