@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { loadConfig, optimize } from 'svgo'
 
+import { assertCalendarDate, type CalendarDate } from '@/types/date'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
 
@@ -72,7 +73,7 @@ interface AddressRow {
 }
 
 interface OperationRow {
-	Date: string
+	Date: CalendarDate
 	From: string
 	To: string
 	Amount: string
@@ -323,6 +324,26 @@ function formatAmountForTable(parsed: ParsedAmount): string {
 }
 
 /**
+ * Returns an italicized Markdown note describing a payment that is spread back
+ * as backpay, or an empty string when the payment is not spread back.
+ */
+function spreadBackNote(parsed: ParsedAmount): string {
+	if (parsed.type !== 'expense') {
+		return ''
+	}
+
+	const spreadBack = parsed.assets.find(asset => asset.spreadBack !== undefined)?.spreadBack
+
+	if (!spreadBack) {
+		return ''
+	}
+
+	const unitLabel = spreadBack.unit === 'mo' ? 'months' : 'days'
+
+	return `_(Backpay covering the past ${spreadBack.value} ${unitLabel})_`
+}
+
+/**
  * Generates the Operations Markdown Table
  */
 function generateOperationsTable(operations: OperationRow[], addresses: AddressRow[]): string {
@@ -348,13 +369,15 @@ function generateOperationsTable(operations: OperationRow[], addresses: AddressR
 
 		const parsedAmount = parseAmounts(operation.Amount)
 		const formattedAmount = formatAmountForTable(parsedAmount)
+		const backpayNote = spreadBackNote(parsedAmount)
+		const purpose = backpayNote ? `${operation.Purpose} ${backpayNote}` : operation.Purpose
 
 		return [
 			escapeMd(operation.Date),
 			`${markdownAddressLink(getAddressRowByName(operation.From, addresses), operation.From, true)}`,
 			`${markdownAddressLink(getAddressRowByName(operation.To, addresses), operation.To, true)}`,
 			`\`${escapeMd(formattedAmount)}\``,
-			escapeMd(operation.Purpose),
+			escapeMd(purpose),
 			txLink,
 		]
 	})
@@ -364,11 +387,21 @@ function generateOperationsTable(operations: OperationRow[], addresses: AddressR
 
 // --- Price Data ---
 
+/** Describes how a payment should be spread back as backpay over prior months/days. */
+interface SpreadBack {
+	/** Number of months (each treated as 30 days) or days to spread across. */
+	value: number
+	/** Unit of the spread-back window: months ('mo') or days ('d'). */
+	unit: 'mo' | 'd'
+}
+
 /** A parsed monetary amount: a numeric value, its asset symbol, and a required category. */
 interface AssetAmount {
 	value: number
 	asset: string
 	category: TreasuryCategory
+	/** When set, this payment is treated as backpay spread over a prior window. */
+	spreadBack?: SpreadBack
 }
 
 /** A parsed swap: input and output asset amounts, both categorized as "swap". */
@@ -477,7 +510,9 @@ function parseSimpleAmount(text: string, category: TreasuryCategory): AssetAmoun
  */
 function parseSimpleAmountWithCategory(text: string): AssetAmount {
 	const trimmed = text.trim()
-	const match = trimmed.match(/^([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)\s+\[([a-z][a-z0-9_:~-]*)\]$/)
+	const match = trimmed.match(
+		/^([\d,]+(?:\.\d+)?)\s+([A-Z][a-zA-Z]*)\s+\[([a-z][a-z0-9_:~-]*)(?:,(\d+)(mo|d))?\]$/,
+	)
 
 	if (!match) {
 		throw new Error(`Cannot parse amount with category: "${text}"`)
@@ -485,10 +520,20 @@ function parseSimpleAmountWithCategory(text: string): AssetAmount {
 
 	const category = treasuryCategory.assert(match[3])
 
+	let spreadBack: SpreadBack | undefined
+
+	if (match[4]) {
+		spreadBack = {
+			value: parseInt(match[4], 10),
+			unit: match[5] === 'd' ? 'd' : 'mo',
+		}
+	}
+
 	return {
 		value: parseFloat(match[1].replace(/,/g, '')),
 		asset: match[2],
 		category,
+		...(spreadBack ? { spreadBack } : {}),
 	}
 }
 
@@ -556,7 +601,7 @@ function readPriceData(filePath: string): Map<string, PriceDataRow> {
 		})
 
 		const priceRow = {
-			Date: row['Date'],
+			Date: assertCalendarDate(row['Date']),
 			Asset: row['Asset'],
 			Value: row['Value'],
 			Denomination: row['Denomination'],
@@ -604,7 +649,9 @@ function checkPriceDataCompleteness(
 	const missing: string[] = []
 	const extra: string[] = []
 
-	for (const [date, assets] of needed) {
+	for (const [dateStr, assets] of needed) {
+		const date = assertCalendarDate(dateStr)
+
 		for (const asset of assets) {
 			const key = priceKey(date, asset)
 
@@ -652,10 +699,12 @@ async function populatePriceData(
 	const existing = readPriceData(priceDataPath)
 
 	// Collect missing (date, asset) pairs
-	const missing: [string, string][] = []
+	const missing: [CalendarDate, string][] = []
 	const extra: string[] = []
 
-	for (const [date, assets] of needed) {
+	for (const [dateStr, assets] of needed) {
+		const date = assertCalendarDate(dateStr)
+
 		for (const asset of assets) {
 			const key = priceKey(date, asset)
 
@@ -790,6 +839,60 @@ function collectMonths(fromDate: string, toDate: string): string[] {
 	return months
 }
 
+/** Converts a YYYY-MM-DD date string to an integer day count (UTC). */
+function dateToDayCount(dateStr: CalendarDate): number {
+	const [year, month, day] = dateStr.split('-').map(Number)
+
+	return Date.UTC(year, month - 1, day) / 86_400_000
+}
+
+/** Converts an integer day count back to a YYYY-MM-DD date string (UTC). */
+function dayCountToDate(dayCount: number): CalendarDate {
+	const date = new Date(dayCount * 86_400_000)
+	const year = date.getUTCFullYear()
+	const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+	const day = String(date.getUTCDate()).padStart(2, '0')
+
+	return assertCalendarDate(`${year}-${month}-${day}`)
+}
+
+/** Returns the number of days in a spread-back window (months count as 30 days). */
+function spreadTotalDays(spreadBack: SpreadBack): number {
+	return spreadBack.unit === 'mo' ? spreadBack.value * 30 : spreadBack.value
+}
+
+/**
+ * Distribute a payment across the calendar months it covers as backpay.
+ *
+ * A payment on date D with a spread-back window of `totalDays` days is treated
+ * as earned uniformly over the `totalDays` days immediately preceding D
+ * (exclusive of D). Returns a Map of year-month → USD amount.
+ */
+function spreadPaymentByMonth(
+	date: CalendarDate,
+	usdTotal: number,
+	totalDays: number,
+): Map<string, number> {
+	const endDay = dateToDayCount(date)
+	const startDay = endDay - totalDays
+	const daysPerMonth = new Map<string, number>()
+
+	for (let day = startDay; day < endDay; day++) {
+		const month = dayCountToDate(day).substring(0, 7)
+
+		daysPerMonth.set(month, (daysPerMonth.get(month) ?? 0) + 1)
+	}
+
+	const dailyUsd = usdTotal / totalDays
+	const byMonth = new Map<string, number>()
+
+	for (const [month, days] of daysPerMonth) {
+		byMonth.set(month, days * dailyUsd)
+	}
+
+	return byMonth
+}
+
 interface ExpenseChartSegment {
 	category: TreasuryCategory | 'Other'
 	usd: number
@@ -826,15 +929,7 @@ export async function generateExpensesOverTimeChart(
 			continue
 		}
 
-		const yearMonth = op.Date.substring(0, 7)
-
-		if (!aggregated.has(yearMonth)) {
-			aggregated.set(yearMonth, new Map<TreasuryCategory, number>())
-		}
-
-		const monthData = aggregated.get(yearMonth)!
-
-		for (const { value, asset, category } of parsed.assets) {
+		for (const { value, asset, category, spreadBack } of parsed.assets) {
 			if (!includeInExpenseBreakdown(category)) {
 				continue
 			}
@@ -848,9 +943,23 @@ export async function generateExpensesOverTimeChart(
 			}
 
 			const price = parseFloat(priceRow.Value)
-			const usd = value * price
+			const usdTotal = value * price
 
-			monthData.set(category, (monthData.get(category) ?? 0) + usd)
+			// Spread-back payments are earned uniformly over a prior window instead
+			// of appearing as a single spike in the month they were paid.
+			const contributions: [string, number][] = spreadBack
+				? [...spreadPaymentByMonth(op.Date, usdTotal, spreadTotalDays(spreadBack))]
+				: [[op.Date.substring(0, 7), usdTotal]]
+
+			for (const [yearMonth, usd] of contributions) {
+				if (!aggregated.has(yearMonth)) {
+					aggregated.set(yearMonth, new Map<TreasuryCategory, number>())
+				}
+
+				const monthData = aggregated.get(yearMonth)!
+
+				monthData.set(category, (monthData.get(category) ?? 0) + usd)
+			}
 		}
 	}
 
@@ -1059,7 +1168,7 @@ function aggregateExpensesByCategory(
 			}
 
 			const normalized = normalizeAsset(asset)
-			const priceKeyStr = priceKey(op.Date, normalized)
+			const priceKeyStr = priceKey(assertCalendarDate(op.Date), normalized)
 			const priceRow = priceData.get(priceKeyStr)
 
 			if (!priceRow) {

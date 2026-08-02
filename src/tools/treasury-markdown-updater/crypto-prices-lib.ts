@@ -1,7 +1,9 @@
 // --- Types ---
 
+import { assertCalendarDate, type CalendarDate, calendarParts } from '@/types/date'
+
 export interface PriceDataRow {
-	Date: string
+	Date: CalendarDate
 	Asset: string
 	Value: string
 	Denomination: string
@@ -44,21 +46,20 @@ export function normalizeAsset(asset: string): string {
 }
 
 /** Format a YYYY-MM-DD date as dd-mm-yyyy for CoinGecko history endpoint. */
-function formatDateForCoinGecko(date: string): string {
-	// date is expected YYYY-MM-DD
-	const [year, month, day] = date.split('-')
+function formatDateForCoinGecko(date: CalendarDate): string {
+	const parts = calendarParts(date)
 
-	return `${day}-${month}-${year}`
+	return `${parts.day}-${parts.month}-${parts.year}`
 }
 
 /** Key used to index price entries: "YYYY-MM-DD|ASSET" */
-export function priceKey(date: string, asset: string): string {
+export function priceKey(date: CalendarDate, asset: string): string {
 	return `${date}|${asset}`
 }
 
 // --- Fetching ---
 
-async function fetchHistoricalPrice(asset: string, date: string): Promise<number> {
+async function fetchHistoricalPrice(asset: string, date: CalendarDate): Promise<number> {
 	const coinId = COINGECKO_IDS[asset]
 
 	if (!coinId) {
@@ -137,7 +138,7 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3): Promi
  * For stablecoins, synthesizes a value of 1.00.
  * Returns PriceDataRow[] with one entry per pair.
  */
-export async function fetchPrices(pairs: [string, string][]): Promise<PriceDataRow[]> {
+export async function fetchPrices(pairs: [CalendarDate, string][]): Promise<PriceDataRow[]> {
 	const today = new Date().toISOString().slice(0, 10)
 	const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
 	const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
@@ -146,7 +147,12 @@ export async function fetchPrices(pairs: [string, string][]): Promise<PriceDataR
 
 	for (const [date, asset] of pairs) {
 		if (STABLECOINS.has(asset)) {
-			results.push({ Date: date, Asset: asset, Value: '1.00', Denomination: 'USD' })
+			results.push({
+				Date: assertCalendarDate(date),
+				Asset: asset,
+				Value: '1.00',
+				Denomination: 'USD',
+			})
 			continue
 		}
 
@@ -160,7 +166,7 @@ export async function fetchPrices(pairs: [string, string][]): Promise<PriceDataR
 
 		// Round to 2 decimal places for display
 		results.push({
-			Date: date,
+			Date: assertCalendarDate(date),
 			Asset: asset,
 			Value: price.toFixed(2),
 			Denomination: 'USD',
