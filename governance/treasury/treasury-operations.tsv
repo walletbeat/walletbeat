@@ -90,3 +90,9 @@ Date	From	To	Amount	Purpose	ID
 2026-07-16	treasury	treasury	0	Replace polymutex2 with ren2140 as signer	0x40854e56c62b3a9fcb131a49a0d5b523c7a22f3b2514c25b8532e39711336b85
 2026-07-16	treasury	treasury	0.260752232321898743 WETH → 500 USDC	CoW Swap from WETH to USDC	0x6baa3ebb8a194885856c073362fee8acad55e5c8b1028a27f8fd9b75b122fbcd
 2026-07-27	treasury	treasury	3.601933228577520569 WETH → 7000 USDC	CoW Swap from WETH to USDC	0x0c84d5c05fbb52dd100c819d132b84c552209a804e1fcd06bc08c81fe63f8a98
+2026-08-01	treasury	treasury	12 ETH → 12 WETH	Wrapping Ether to WETH	0x66f19d98e413beaa5758e77265af8b7a58c9e369b2d81b14b58e4db0c483490e
+2026-08-01	treasury	treasury	0	CoW Swap order creation	0x56f2723364971dab1e726ce74ce5cbfa319ff88a0ef1bbfffe285f52dab0f465
+2026-08-01	treasury	treasury	6.812043767888325202 WETH → 12500 USDC	Swap on CoW swap	0x829a2a07ef1d30ce247ae57371c37e606e4d3adf4d939ff29c5f91c934b240cd
+2026-08-01	treasury	teresa5	2075 USDC [labor:branding]	Payment for Walletbeat branding services	0xd917693cefaeab671f2d3d1df276e660a369e11e73146bf112301fc7a5f04237
+2026-08-01	treasury	ren2140	1000 USDC [labor:data_entry]	Compensation for wallet data entry	0x3f260b73cda41951e716113fcfe95a55653d2e725433fbfc7d836da477474937
+2026-08-01	treasury	mattmatt_sablier	6000 USDC [labor:dev]	Top-up of Sablier stream	0xc32ea4038a7562f141eef4cf0ccc20f9e1c9a579b80520c9cc8bb5596451525f
