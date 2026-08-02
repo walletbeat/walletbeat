@@ -1,7 +1,21 @@
 import { greekfetacheese } from '@/data/contributors/greekfetacheese'
+import { across } from '@/data/entities/across'
+import { github } from '@/data/entities/github'
+import { pimlico } from '@/data/entities/pimlico'
+import { userEnabledRpcEndpoints } from '@/data/entities/user-enabled-rpc'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
+import {
+	CollectionPolicy,
+	DataCollectionPurpose,
+	EntityRole,
+	MultiAddressPolicy,
+	PersonalInfo,
+	RegularEndpoint,
+	UserFlow,
+	WalletInfo,
+} from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -12,7 +26,10 @@ import {
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -25,9 +42,10 @@ import {
 } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { paragraph } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 export const zeus: SoftwareWallet = {
 	metadata: {
@@ -39,7 +57,7 @@ export const zeus: SoftwareWallet = {
 		`),
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
-		lastUpdated: '2026-01-12',
+		lastUpdated: '2026-08-02',
 		urls: {
 			docs: ['https://github.com/greekfetacheese/zeus'],
 			repositories: ['https://github.com/greekfetacheese/zeus'],
@@ -84,17 +102,17 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Zeus has a built-in interface which uses the Across protocol to bridge ETH between chains.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/7bd2a133344bfa5b52dfe0df6e8864839cbbaee9/src/gui/ui/dapps/across.rs',
+								'Zeus has a built-in Across bridge UI. It shows a risk warning by default that bridging is powered by the third-party Across Protocol, and before the user clicks Bridge it breaks fees into Network, Bridge, and Total amounts.',
+							url: 'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/across.rs',
 						},
 					],
 					feesLargerThan1bps: {
-						afterSingleAction: FeeDisplayLevel.AGGREGATED,
-						byDefault: FeeDisplayLevel.AGGREGATED,
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
 						walletServiceFeeDisplayUnits: null,
 					},
-					risksExplained: 'NOT_IN_UI',
+					risksExplained: 'VISIBLE_BY_DEFAULT',
 				}),
 				suggestedBridging: notSupported,
 			},
@@ -114,24 +132,29 @@ export const zeus: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: supported({
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
 			ref: [
 				{
 					explanation:
-						"Zeus uses public RPC endpoints by default but allows users to provide custom endpoints and disable or delete what they don't want.",
-					url: 'https://github.com/greekfetacheese/zeus#features',
+						'Zeus ships with a list of default public RPC endpoints, but they are disabled by default so no RPC requests are made until the user enables a default endpoint or adds their own. Users can enable, disable, or remove defaults and use custom RPCs. The UI warns when a chain has no enabled or working RPC and links to Network Settings.',
+					url: [
+						'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/core/context/client.rs',
+						'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/panels/top_panel.rs',
+						'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
+					] as NonEmptyArray<string>,
 				},
 			],
 			customChainRpcEndpoint: supported({
 				ref: [
 					{
-						explanation: 'Users can use their own RPC endpoints.',
-						url: 'https://github.com/greekfetacheese/zeus#features',
+						explanation:
+							'Users can add their own RPC endpoints, enable or disable defaults, and remove default RPCs they do not want.',
+						url: 'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
 					},
 				],
 			}),
 			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
 				withNoConnectivityExceptL1RPCEndpoint: {
 					accountCreation: featureSupported,
 					accountImport: featureSupported,
@@ -141,7 +164,7 @@ export const zeus: SoftwareWallet = {
 				},
 			}),
 			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
 			}),
 		}),
 		ecosystem: {
@@ -180,8 +203,9 @@ export const zeus: SoftwareWallet = {
 		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				// No telemetry / crash reporting endpoints in Zeus.
+				crashReports: notSupported,
+				usage: notSupported,
 			},
 			appIsolation: {
 				[Variant.DESKTOP]: {
@@ -199,14 +223,195 @@ export const zeus: SoftwareWallet = {
 					useAppSpecificLastConnectedAddresses: notSupported,
 				},
 			},
-			dataCollection: null,
+			// External traffic is limited to user-enabled RPCs, optional bridge/bundler
+			// APIs, and optional circuit artifact downloads for Railgun.
+			dataCollection: {
+				[UserFlow.INSTALL]: {
+					// Desktop portable binary.
+					collected: [],
+				},
+				[UserFlow.ONBOARDING_NEW]: {
+					// Local username/password HD derivation, no account signup service.
+					collected: [],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.ONBOARDING_IMPORT]: {
+					collected: [],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.SEND_ETHER]: {
+					// Sends use whatever RPC endpoints the user enabled (see UNCLASSIFIED).
+					collected: [],
+				},
+				[UserFlow.SEND_USDC]: {
+					collected: [],
+				},
+				[UserFlow.NATIVE_SWAP]: {
+					// Uniswap routing/simulation is local (revm), chain I/O is via user RPCs.
+					collected: [],
+				},
+				[UserFlow.MAKE_TRANSACTION]: {
+					collected: [
+						{
+							ref: [
+								{
+									explanation:
+										'Built-in Across bridge quotes fees from the Across suggested-fees API. Default URL is https://app.across.to/api/suggested-fees with use_api enabled by default, the user can change the API URL or disable the API in Across settings. The bridge deposit itself is submitted via the user-configured RPC.',
+									url: [
+										'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/across.rs',
+									] as NonEmptyArray<string>,
+								},
+							],
+							byEntity: across,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								// Quote requests include chain/token/amount/recipient parameters needed for suggested fees.
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.SWAP_QUOTE],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: [
+								{
+									explanation:
+										'Railgun unshield defaults to a private broadcast path via the public Pimlico bundler URL (https://public.pimlico.io/v2/{chainId}/rpc). The user can point the bundler URL at a self-hosted Alto or use emergency self-broadcast.',
+									url: [
+										'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/unshield.rs',
+										'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/src/gui/ui/dapps/railgun/shield.rs',
+									] as NonEmptyArray<string>,
+								},
+							],
+							byEntity: pimlico,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+				[UserFlow.APP_CONNECTION]: {
+					// Wallet-connector talks to the local Zeus process.
+					collected: [],
+				},
+				[UserFlow.UNCLASSIFIED]: {
+					collected: [
+						{
+							ref: [
+								{
+									explanation:
+										'Zeus ships default third-party public RPC endpoints disabled by default and lets the user add custom RPC URLs, no chain traffic happens until at least one endpoint is enabled. Once an endpoint is enabled (required for normal chain use), that operator learns IP and usual RPC contents. Critically for multi-address privacy: background ETH balance refresh loads all configured wallet addresses and batches them in a single StateView getETHBalance call (via batch::get_eth_balances), so one request can contain many addresses at once. ERC-20 balance refresh is per-owner, but the ETH multi-wallet batch is enough to correlate addresses. The default host list can change between releases, this row covers any user-enabled default or custom RPC rather than naming individual providers. Users who only ever talk to their own node avoid third-party correlation.',
+									url: [
+										'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/core/context/client.rs',
+										'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
+										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/src/core/context/balance_manager.rs',
+										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/crates/zeus-eth/src/utils/batch.rs',
+									] as NonEmptyArray<string>,
+								},
+							],
+							byEntity: userEnabledRpcEndpoints,
+							dataCollection: {
+								// Defaults ship disabled (user must enable an endpoint first). Policy is
+								// BY_DEFAULT for the enabled-RPC operating mode: once any endpoint is on,
+								// chain/balance/broadcast traffic happens automatically without a separate
+								// privacy opt-in. Multi-address scorer only considers rows where
+								// ACCOUNT_ADDRESS is collected by default, OPT_IN would incorrectly hide
+								// the StateView multi-wallet ETH batch and yield a false PASS.
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								},
+							},
+							purposes: [
+								DataCollectionPurpose.CHAIN_DATA_LOOKUP,
+								DataCollectionPurpose.TRANSACTION_BROADCAST,
+								DataCollectionPurpose.GAS_QUOTE,
+								DataCollectionPurpose.TOKEN_PRICE_LOOKUP,
+							],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: [
+								{
+									explanation:
+										'Missing Railgun proving-circuit artifacts beyond the embedded hot-set are downloaded from the privacy-protocol-artifacts GitHub raw host during optional prefetch/use. Some common circuits are embedded in the binary and need no download.',
+									url: [
+										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/crates/zeus-railgun/src/circuit/remote_artifact_loader.rs',
+										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/src/utils/state.rs',
+									] as NonEmptyArray<string>,
+								},
+							],
+							byEntity: github,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+							},
+							purposes: [DataCollectionPurpose.STATIC_ASSETS],
+							role: EntityRole.OPERATOR,
+						},
+					],
+				},
+			},
+			// No published privacy policy page for the wallet itself.
 			privacyPolicy: null,
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
 				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
-				[PrivateTransferTechnology.RAILGUN]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: supported({
+					ref: [
+						{
+							explanation:
+								'Zeus has a fully native Railgun integration: local proving, local note decryption/merkle handling, and UTXO sync over the user-enabled RPC (RpcSyncer). A Subsquid syncer exists in the codebase but is not used by default and cannot be enabled from the UI. Users can shield ERC-20s, unshield ERC-20s, send private transfers to 0zk addresses, and merge notes. Unshield defaults to a privacy paymaster / bundler path (public Pimlico URL by default, user-customizable); optional self-broadcast is available for emergency withdrawals and is labeled as breaking anonymity. Private transfers and note merges are submitted from the user wallet.',
+							url: [
+								'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/readme.md',
+								'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/src/gui/ui/dapps/railgun/shield.rs',
+								'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/unshield.rs',
+								'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/transfer.rs',
+								'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/tx/events.rs',
+							] as NonEmptyArray<string>,
+						},
+					],
+					broadcasterBasedTransactionSubmission: supported({
+						broadcasterFee: {
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							// Confirmation UI shows separate Protocol fee and Broadcaster fee line items (token + USD).
+							byDefault: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+							walletServiceFeeDisplayUnits: 'NOT_APPLICABLE' as const,
+						},
+						// Default bundler is HTTPS public.pimlico.io
+						broadcasterLearnsUserIpAddress: true,
+						customizableBroadcaster: featureSupported,
+					}),
+					crossContractCalls: notSupported,
+					// Unshield defaults to private broadcast (paymaster/bundler), self-broadcast is opt-in.
+					defaultTransactionSubmissionType: 'BROADCASTER',
+					merkleTreeSync: 'ON_USER_DEVICE',
+					privateTransfers: featureSupported,
+					selfRelayedTransactionSubmission: featureSupported,
+					warnAboutShieldingCorrelation: notSupported,
+					warnAboutSuccessiveOperations: notSupported,
+					warnAboutUnshieldingDestinationCorrelation: notSupported,
+					warnAboutViewingKeySharing: notSupported,
+				}),
 			},
 		},
 		profile: WalletProfile.GENERIC,
