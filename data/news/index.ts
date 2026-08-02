@@ -11,6 +11,7 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
 	(await import('./2026-05-20-bankrbot-hack')).default,
 	(await import('./2026-06-03-tropic01-secure-element-fault-injection')).default,
 	(await import('./2026-07-17-consensys-metamask-north-korean-hacker')).default,
+	(await import('./2026-07-30-coldcard-mk3-seed-generation')).default,
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
 /**
