@@ -96,3 +96,4 @@ Date	From	To	Amount	Purpose	ID
 2026-08-01	treasury	teresa5	2075 USDC [labor:branding]	Payment for Walletbeat branding services	0xd917693cefaeab671f2d3d1df276e660a369e11e73146bf112301fc7a5f04237
 2026-08-01	treasury	ren2140	1000 USDC [labor:data_entry]	Compensation for wallet data entry	0x3f260b73cda41951e716113fcfe95a55653d2e725433fbfc7d836da477474937
 2026-08-01	treasury	mattmatt_sablier	6000 USDC [labor:dev]	Top-up of Sablier stream	0xc32ea4038a7562f141eef4cf0ccc20f9e1c9a579b80520c9cc8bb5596451525f
+2026-08-01	treasury	darrylyeo	6300 USDC [labor:dev,3mo]	Payment for UI refresh	0xd2fa8193a668653c9e81e75d70cd4bd9c2147fffbb269022dc3101c460c3223f
