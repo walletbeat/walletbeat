@@ -1,4 +1,3 @@
-import chalk from 'chalk'
 import { spawn } from 'child_process'
 import fs from 'fs'
 import path from 'path'
@@ -33,7 +32,7 @@ import {
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { type Variant, variantEnum } from '@/schema/variants'
-import { WalletType, walletTypes } from '@/schema/wallet-types'
+import { variantToWalletType, WalletType, walletTypes } from '@/schema/wallet-types'
 import { getErrorMessage } from '@/types/errors'
 import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
 import {
@@ -47,7 +46,10 @@ import {
 } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
 
+import { type ChalkLike, getChalk as _getChalk } from './chalk-like'
+import { classifyStringHeuristically } from './string-classification-heuristics'
 import {
+	domainMatches,
 	type SaveOptions,
 	WalletCaptureAnnotations,
 	WalletRequestMatcher,
@@ -69,6 +71,14 @@ import {
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+export { type ChalkLike, noopChalk } from './chalk-like'
+
+export function getChalk(opts: GlobalOptions): ChalkLike {
+	return _getChalk(
+		opts.actor === DataCollectionActor.CI || opts.actor === DataCollectionActor.HUMAN,
+	)
+}
 
 export function flowInstructions(flow: RecordedFlow): string {
 	switch (flow) {
@@ -120,10 +130,10 @@ export function getNextFlow(flow: RecordedFlow): RecordedFlow | 'DONE' {
 // Option Interfaces
 // ============================================================================
 
-type Option<O> = (x: unknown) => O
+type Option<O> = (x: string | null) => O
 
 function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2> {
-	return (x: unknown): O1 | O2 => {
+	return (x: string | null): O1 | O2 => {
 		try {
 			return opt1(x)
 		} catch (e1) {
@@ -136,13 +146,9 @@ function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2
 	}
 }
 
-function stringOption(x: unknown): string {
-	if (x === undefined) {
+function stringOption(x: string | null): string {
+	if (x === null) {
 		throw new Error('flag not specified')
-	}
-
-	if (typeof x !== 'string') {
-		throw new Error(`not a string (got ${typeof x})`)
 	}
 
 	return x
@@ -153,7 +159,7 @@ function typedStringOption<T extends string>(
 	predicate: (s: string) => s is T,
 	helpText: string,
 ): Option<T> {
-	return (x: unknown): T => {
+	return (x: string | null): T => {
 		const s = stringOption(x)
 
 		if (!predicate(s)) {
@@ -166,13 +172,9 @@ function typedStringOption<T extends string>(
 	}
 }
 
-function stringListOption(x: unknown): NonEmptyArray<string> {
-	if (x === undefined) {
+function stringListOption(x: string | null): NonEmptyArray<string> {
+	if (x === null) {
 		throw new Error('flag not specified')
-	}
-
-	if (typeof x !== 'string') {
-		throw new Error(`not a string (got ${typeof x})`)
 	}
 
 	const split = x
@@ -187,7 +189,7 @@ function stringListOption(x: unknown): NonEmptyArray<string> {
 	return split
 }
 
-function walletAddressesSet(x: unknown): NonEmptySet<Erc55Address> {
+function walletAddressesSet(x: string | null): NonEmptySet<Erc55Address> {
 	const set = nonEmptySetFromArray(nonEmptyMap(stringListOption(x), ethereumErc55Address))
 
 	if (setItems(set).length < 4) {
@@ -199,13 +201,9 @@ function walletAddressesSet(x: unknown): NonEmptySet<Erc55Address> {
 	return set
 }
 
-function booleanOption(x: unknown): boolean {
-	if (x === undefined) {
+function booleanOption(x: string | null): boolean {
+	if (x === null) {
 		throw new Error('flag not specified')
-	}
-
-	if (typeof x !== 'string') {
-		throw new Error(`not a string (got ${typeof x})`)
 	}
 
 	const lower = x.toLowerCase()
@@ -217,16 +215,12 @@ function booleanOption(x: unknown): boolean {
 	return lower == 'true' || lower === 'yes'
 }
 
-function numberOption(x: unknown): number {
-	if (x === undefined) {
+function numberOption(x: string | null): number {
+	if (x === null) {
 		throw new Error('flag not specified')
 	}
 
-	if (typeof x === 'number') {
-		return x
-	}
-
-	if (typeof x === 'string' && x.trim() !== '') {
+	if (x.trim() !== '') {
 		const n = Number(x)
 
 		if (Number.isFinite(n)) {
@@ -238,13 +232,9 @@ function numberOption(x: unknown): number {
 }
 
 function enumOption<E extends string>(e: Enum<E>): Option<E> {
-	return (x: unknown): E => {
-		if (x === undefined) {
+	return (x: string | null): E => {
+		if (x === null) {
 			throw new Error('flag not specified')
-		}
-
-		if (typeof x !== 'string') {
-			throw new Error(`not a string (got ${typeof x})`)
 		}
 
 		if (!e.is(x)) {
@@ -262,13 +252,9 @@ function enumOption<E extends string>(e: Enum<E>): Option<E> {
 }
 
 function enumSetOption<E extends string>(e: Enum<E>): Option<NonEmptySet<E>> {
-	return (x: unknown): NonEmptySet<E> => {
-		if (x === undefined) {
+	return (x: string | null): NonEmptySet<E> => {
+		if (x === null) {
 			throw new Error('flag not specified')
-		}
-
-		if (typeof x !== 'string') {
-			throw new Error(`not a string (got ${typeof x})`)
 		}
 
 		const items: E[] = []
@@ -303,13 +289,50 @@ function enumSetOption<E extends string>(e: Enum<E>): Option<NonEmptySet<E>> {
 }
 
 function optionalOption<O>(nonOptional: Option<O>): Option<O | null> {
-	return (x: unknown): O | null => {
-		if (x === undefined || x === null) {
+	return (x: string | null): O | null => {
+		if (x === null) {
 			return null
 		}
 
 		return nonOptional(x)
 	}
+}
+
+function camelToKebab(name: string): string {
+	return name.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`)
+}
+
+/**
+ * Re-parse `process.argv` to recover the raw string that was passed for the
+ * option flag `--name`. This is necessary because `cac` coerces option values
+ * that look like JS literals (e.g. full-length hex addresses like `0xabc...`)
+ * into numbers, losing the original string. Returns `undefined` when the flag
+ * is not present on the command line.
+ */
+function rawArgvOption(name: string): string | undefined {
+	const spellings = [name, camelToKebab(name)]
+
+	for (const spelling of spellings) {
+		const dash = `--${spelling}`
+
+		for (const arg of process.argv) {
+			if (arg.startsWith(`${dash}=`)) {
+				return arg.slice(dash.length + 1)
+			}
+		}
+
+		for (let i = 0; i < process.argv.length - 1; i++) {
+			if (process.argv[i] === dash) {
+				const next = process.argv[i + 1]
+
+				if (!next.startsWith('-')) {
+					return next
+				}
+			}
+		}
+	}
+
+	return undefined
 }
 
 class Options<T extends object> {
@@ -360,7 +383,12 @@ class Options<T extends object> {
 			}
 
 			try {
-				const processed = option((x as Partial<T>)[fieldName])
+				const raw = rawArgvOption(fieldName.toString())
+				const cacValue = (x as Partial<T>)[fieldName]
+				const input: string | null =
+					raw !== undefined ? raw : cacValue === undefined ? null : String(cacValue)
+
+				const processed = option(input)
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
@@ -373,20 +401,29 @@ class Options<T extends object> {
 	}
 }
 
+export enum DataCollectionActor {
+	HUMAN = 'HUMAN',
+	AGENT = 'AGENT',
+	CI = 'CI',
+}
+
+export const dataCollectionActor = new Enum<DataCollectionActor>({
+	[DataCollectionActor.HUMAN]: true,
+	[DataCollectionActor.AGENT]: true,
+	[DataCollectionActor.CI]: true,
+})
+
 export interface GlobalOptions {
 	id: WalletName
 	variant: Variant
 	type: WalletType
+	actor: DataCollectionActor
 }
 
 export const globalOptions = new Options<GlobalOptions>({
-	id: (x: unknown): WalletName => {
-		if (x === undefined) {
+	id: (x: string | null): WalletName => {
+		if (x === null) {
 			throw new Error('must specify wallet ID')
-		}
-
-		if (typeof x !== 'string') {
-			throw new Error(`not a string (got ${typeof x})`)
 		}
 
 		if (x === '') {
@@ -401,6 +438,27 @@ export const globalOptions = new Options<GlobalOptions>({
 	},
 	variant: enumOption(variantEnum),
 	type: enumOption(walletTypes),
+	actor: (x: string | null): DataCollectionActor => {
+		const enumVal = enumOption(dataCollectionActor)(x)
+
+		if (enumVal === DataCollectionActor.HUMAN && !process.stdin.isTTY) {
+			throw new Error(
+				'You are not a human. You should be using the `pnpm wallet-data-collection:agent` command. Do not cheat.',
+			)
+		}
+
+		if (
+			process.env.WALLETBEAT_ENV !== undefined &&
+			dataCollectionActor.is(process.env.WALLETBEAT_ENV) &&
+			process.env.WALLETBEAT_ENV !== enumVal
+		) {
+			throw new Error(
+				'Incoherent --actor setting. If you are an agent, You should be using the `pnpm wallet-data-collection:agent` command. Do not cheat.',
+			)
+		}
+
+		return enumVal
+	},
 })
 
 export function getSaveOptions(opts: GlobalOptions): SaveOptions {
@@ -411,8 +469,47 @@ export function getSaveOptions(opts: GlobalOptions): SaveOptions {
 	}
 }
 
+/**
+ * The `wallet-data-collection:agent` and `wallet-data-collection:ci` pnpm scripts set
+ * `WALLETBEAT_ENV` to `AGENT` / `CI`. Mirror that suffix in generated command prefixes so
+ * an agent or CI runner sees commands matching the variant they are actually using.
+ */
+export function actorEnvSuffixFromEnv(): string {
+	const env = process.env.WALLETBEAT_ENV
+
+	if (env === DataCollectionActor.AGENT || env === DataCollectionActor.CI) {
+		return `:${env.toLowerCase()}`
+	}
+
+	return ''
+}
+
+/**
+ * Crude pass over the process arguments to see whether `--actor HUMAN|AGENT|CI` was
+ * explicitly set on the command line, and reflect it in the prefix if so.
+ */
+export function actorFlagFromArgv(): string {
+	const argv = process.argv
+
+	for (let i = 0; i < argv.length; i++) {
+		const arg = argv[i]
+
+		if (arg === '--actor' && i + 1 < argv.length) {
+			return ` --actor ${argv[i + 1]}`
+		}
+
+		const match = /^--actor=(.+)$/.exec(arg)
+
+		if (match) {
+			return ` --actor ${match[1]}`
+		}
+	}
+
+	return ''
+}
+
 export function getCommandPrefix(opts: GlobalOptions): string {
-	return `pnpm wallet-data-collection --id=${opts.id} --variant=${opts.variant}${opts.type === WalletType.SOFTWARE ? '' : ` --type=${opts.type}`}`
+	return `pnpm wallet-data-collection${actorEnvSuffixFromEnv()}${actorFlagFromArgv()} --id=${opts.id} --variant=${opts.variant}${opts.type === WalletType.SOFTWARE ? '' : ` --type=${opts.type}`}`
 }
 
 export interface CaptureOptions extends GlobalOptions {
@@ -476,7 +573,7 @@ const entityIdOption = typedStringOption(
 	'ensure the entity is registered in `/data/entities.ts` → `allEntities`',
 )
 
-function entityIdListOption(x: unknown): NonEmptyArray<EntityId> {
+function entityIdListOption(x: string | null): NonEmptyArray<EntityId> {
 	return nonEmptyMap(stringListOption(x), entityIdOption)
 }
 
@@ -553,6 +650,88 @@ const checkFormat = new Enum<CheckFormat>({
 	[CheckFormat.SUMMARY]: true,
 	[CheckFormat.FULL]: true,
 })
+
+export interface ReviewStringsOptions extends GlobalOptions {
+	limit: number
+}
+
+export const reviewStringsOptions = new Options<ReviewStringsOptions>(
+	{
+		limit: (x: string | null): number => {
+			if (x === null) {
+				return 10
+			}
+
+			const n = numberOption(x)
+
+			if (n < 1 || !Number.isInteger(n)) {
+				throw new Error('must be an integer >= 1')
+			}
+
+			return n
+		},
+	},
+	globalOptions,
+)
+
+export interface SearchOptions extends GlobalOptions {
+	string: string | null
+	domain: string | null
+	path: string | null
+	pathRegexp: string | null
+	reviewed: 'true' | 'false' | 'any'
+	limit: number
+	offset: number
+}
+
+const reviewedOption = typedStringOption(
+	'reviewed filter',
+	(s: string): s is 'true' | 'false' | 'any' => s === 'true' || s === 'false' || s === 'any',
+	'',
+)
+
+export const searchOptions = new Options<SearchOptions>(
+	{
+		string: optionalOption(stringOption),
+		domain: optionalOption(stringOption),
+		path: optionalOption(stringOption),
+		pathRegexp: optionalOption(stringOption),
+		reviewed: (x: string | null): 'true' | 'false' | 'any' => {
+			if (x === null) {
+				return 'any'
+			}
+
+			return reviewedOption(x)
+		},
+		limit: (x: string | null): number => {
+			if (x === null) {
+				return 10
+			}
+
+			const n = numberOption(x)
+
+			if (n < 1 || !Number.isInteger(n)) {
+				throw new Error('must be an integer >= 1')
+			}
+
+			return n
+		},
+		offset: (x: string | null): number => {
+			if (x === null) {
+				return 0
+			}
+
+			const n = numberOption(x)
+
+			if (n < 0 || !Number.isInteger(n)) {
+				throw new Error('must be an integer >= 0')
+			}
+
+			return n
+		},
+	},
+	globalOptions,
+)
 
 export interface CheckOptions extends GlobalOptions {
 	format: CheckFormat | null
@@ -801,7 +980,20 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 
 export async function handleCheck(opts: CheckOptions): Promise<number> {
 	const capture = await openCaptureFile(opts)
-	const issues = await capture.check()
+	const issues = await capture.check({
+		reviewType: opts.actor === DataCollectionActor.AGENT ? 'MUST_MAKE_REVIEWABLE' : 'MUST_REVIEW',
+	})
+	const showFormatFull = opts.actor !== DataCollectionActor.AGENT
+
+	if (
+		opts.actor === DataCollectionActor.AGENT &&
+		opts.format === CheckFormat.FULL &&
+		issues.length > 10
+	) {
+		log(
+			'REMINDER: As an agent, you do not need to solve every issue at once. You only need to make *some* amount of forward progress. Tackle one issue at a time.',
+		)
+	}
 
 	if (issues.length == 0) {
 		log('✅ No issues found! Wallet capture process complete. Well done.')
@@ -838,7 +1030,9 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 		numSectionsLogged++
 
 		if (isSummary && numSectionsLogged > 3) {
-			log('  (Elided until the above issues are addressed first; use --format=FULL to show all)')
+			log(
+				`  (Elided until the above issues are addressed first${showFormatFull ? '; use --format=FULL to show all)' : ''}`,
+			)
 			continue
 		}
 
@@ -849,7 +1043,7 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 
 			if (isSummary && issuesLogged > 5) {
 				log(
-					'  > (Other issues elided until the above issues are addressed first; use --format=FULL to show all)',
+					`  > (Other issues elided until the above issues are addressed first${showFormatFull ? '; use --format=FULL to show all)' : ''}`,
 				)
 				break
 			}
@@ -1155,6 +1349,7 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 
 	if (opts.data === 'BENIGN') {
 		capture.addBenignString(opts.string, opts.global !== null && opts.global)
+		await capture.save(getSaveOptions(opts))
 		log(
 			`✅ Marked string "${opts.string}" as benign${opts.global !== null && opts.global ? ' globally' : ''}.`,
 		)
@@ -1172,6 +1367,166 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 	log(`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}.`)
 }
 
+export async function handleSearch(opts: SearchOptions): Promise<void> {
+	if (opts.string === null && opts.domain === null) {
+		throw new Error('Must specify at least one of --string or --domain')
+	}
+
+	if (opts.pathRegexp !== null) {
+		try {
+			new RegExp(opts.pathRegexp)
+		} catch {
+			throw new Error(`Invalid --path-regexp: '${opts.pathRegexp}'`)
+		}
+	}
+
+	const capture = await openCaptureFile(opts)
+	const chalk = getChalk(opts)
+
+	// Collect all requests across all flows
+	const allRequests: WalletRequest[] = []
+
+	for (const f of recordedFlow.items) {
+		const flow = capture.getFlow(f)
+
+		if (flow === null || flow === 'NOT_SUPPORTED') {
+			continue
+		}
+
+		for (const req of flow.requests) {
+			allRequests.push(req)
+		}
+	}
+
+	// Sort by session time for consistent ordering
+	allRequests.sort((a, b) => a.sessionTime.toNumber() - b.sessionTime.toNumber())
+
+	// Filter
+	const pathRegExp = opts.pathRegexp !== null ? new RegExp(opts.pathRegexp) : null
+
+	const matchesFlags = await Promise.all(
+		allRequests.map(async request => {
+			// Domain filter
+			if (opts.domain !== null && !domainMatches(opts.domain, request.domain)) {
+				return false
+			}
+
+			// Path filter
+			if (opts.path !== null && request.path !== opts.path) {
+				return false
+			}
+
+			// Path regexp filter
+			if (pathRegExp !== null && !pathRegExp.test(request.path)) {
+				return false
+			}
+
+			// String filter
+			if (opts.string !== null && !(await request.containsString(opts.string))) {
+				return false
+			}
+
+			// Reviewed filter
+			if (opts.reviewed !== 'any') {
+				const isReviewed = request.review.isManuallyReviewed()
+				const wantReviewed = opts.reviewed === 'true'
+
+				if (isReviewed !== wantReviewed) {
+					return false
+				}
+			}
+
+			return true
+		}),
+	)
+
+	const matches = allRequests.filter((_, i) => matchesFlags[i])
+
+	const totalCount = matches.length
+	const paged = matches.slice(opts.offset, opts.offset + opts.limit)
+
+	// Gather strings only when --string is specified (expensive)
+	let captureStrings: WalletDataStrings | null = null
+
+	if (opts.string !== null) {
+		captureStrings = await capture.gatherStrings()
+	}
+
+	// Build highlight function
+	let agentHighlighted = false
+	const needle = opts.string ?? opts.domain
+	const highlight: ((s: string) => string) | null = (() => {
+		if (needle === null) {
+			return null
+		}
+
+		if (opts.actor === DataCollectionActor.AGENT) {
+			return (s: string): string => {
+				if (!s.includes(needle)) {
+					return s
+				}
+
+				const returned = s.split(needle).join('𜱭𜱭𜱭' + needle + '𜱫𜱫𜱫')
+
+				agentHighlighted = agentHighlighted || returned !== s
+
+				return returned
+			}
+		}
+
+		return (s: string): string => {
+			if (!s.includes(needle)) {
+				return s
+			}
+
+			return s.split(needle).join(chalk.bgRed.whiteBright.bold(needle))
+		}
+	})()
+
+	// Print header
+	log('')
+
+	if (opts.actor === DataCollectionActor.AGENT) {
+		if (totalCount > opts.offset + opts.limit) {
+			log(chalk.bold('Found additional matching requests beyond the current `--offset`.'))
+		}
+	} else {
+		log(chalk.bold(`Found ${totalCount} matching request(s)`))
+	}
+
+	if (totalCount > 0) {
+		log(chalk.gray(`(showing ${paged.length} at offset ${opts.offset})`))
+	}
+
+	log('')
+
+	for (const request of paged) {
+		displayRequestInfo(request, {
+			captureStrings,
+			isBenignString: (s: string) => capture.isBenignString(s),
+			highlight,
+			headerPrefix: null,
+			chalk,
+		})
+
+		log('')
+	}
+
+	if (needle !== null && agentHighlighted) {
+		log(`Instances of '${needle}' were highlighted as '𜱭𜱭𜱭${needle}𜱫𜱫𜱫' above.`)
+	}
+
+	// Print footer if there are more results
+	if (opts.offset + opts.limit < totalCount) {
+		log(
+			chalk.gray(
+				`Use --offset=${opts.offset + opts.limit} to see more results (${totalCount - opts.offset - opts.limit} remaining).`,
+			),
+		)
+		log('')
+	}
+}
+
 function displayRequestInfo(
 	request: WalletRequest,
 	options: {
@@ -1179,8 +1534,11 @@ function displayRequestInfo(
 		isBenignString: ((str: string) => boolean) | null
 		highlight: ((s: string) => string) | null
 		headerPrefix: string | null
+		chalk: ChalkLike
 	},
 ): void {
+	const chalk = options.chalk
+
 	function formatStr(str: string): string {
 		if (options.highlight !== null) {
 			const highlighted = options.highlight(str)
@@ -1281,36 +1639,64 @@ function displayRequestInfo(
 	}
 }
 
-export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
-	let capture = await openCaptureFile(opts)
+export async function handleReviewStrings(opts: ReviewStringsOptions): Promise<void> {
+	if (opts.actor === DataCollectionActor.AGENT) {
+		await handleReviewStringsAgent(opts)
 
-	let walletDataStrings = await capture.gatherStrings()
-	let allStrings = walletDataStrings.strings()
-	const isWorthReviewing = (str: WalletDataString): boolean => {
-		if (capture.isBenignString(str.str.str)) {
-			return false
-		}
-
-		return str.str.pieces.size === 0
+		return
 	}
-	let firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
-	let userStopped = false
-	const highlightStr = chalk.bgRed.whiteBright.bold
 
-	while (firstUnreviewedStringIndex !== -1 && !userStopped) {
-		// Process the highest-score string first
-		const strEntry = allStrings[firstUnreviewedStringIndex]
-		const strValue = strEntry.str
+	await handleReviewStringsInteractive({
+		id: opts.id,
+		variant: opts.variant,
+		type: opts.type,
+		actor: opts.actor,
+	})
+}
 
-		// Display the string and its occurrences
-		log('\n' + chalk.bgBlue.gray('='.repeat(80)))
-		const headerLineLen = `String ${firstUnreviewedStringIndex + 1} of ${allStrings.length}`.length
+async function prioritizedReviewableStrings(
+	capture: WalletCaptureFile,
+	allStringsFn: (walletDataStrings: WalletDataStrings) => ReadonlyArray<WalletDataString>,
+): Promise<{
+	walletDataStrings: WalletDataStrings
+	prioritizedStrings: ReadonlyArray<WalletDataString>
+}> {
+	const walletDataStrings = await capture.gatherStrings()
+	const allStrings = allStringsFn(walletDataStrings)
+	const worthReviewingStrings = allStrings.filter(s => s.isWorthReviewingWithin(walletDataStrings))
+	const smallestSet = walletDataStrings
+		.smallestSetUnblockingOneRequestReview()
+		.filter(s => worthReviewingStrings.some(s2 => s2.str.str === s.str.str))
+	let prioritizedStrings = worthReviewingStrings
 
-		log(
-			chalk.bgBlue(
-				`${chalk.whiteBright('String ')}${chalk.yellowBright((firstUnreviewedStringIndex + 1).toString())}${chalk.whiteBright(' of ')}${chalk.yellowBright(allStrings.length.toString())}${chalk.whiteBright(' '.repeat(80 - headerLineLen))}`,
+	if (smallestSet.length > 0) {
+		prioritizedStrings = smallestSet.concat(
+			prioritizedStrings.filter(s1 =>
+				smallestSet.every((s2: WalletDataString) => s1.str.str !== s2.str.str),
 			),
 		)
+	}
+
+	return { walletDataStrings, prioritizedStrings }
+}
+
+async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void> {
+	let capture = await openCaptureFile(opts)
+
+	let { walletDataStrings, prioritizedStrings } = await prioritizedReviewableStrings(
+		capture,
+		walletDataStrings => walletDataStrings.strings(),
+	)
+	let userStopped = false
+	const chalk = getChalk(opts)
+
+	const highlightStr = chalk.bgRed.whiteBright.bold
+
+	while (prioritizedStrings.length > 0 && !userStopped) {
+		const strEntry = prioritizedStrings[0]
+		const strValue = strEntry.str
+
+		log('\n' + chalk.bgBlue.gray('='.repeat(80)))
 		log(chalk.bgBlue.gray('='.repeat(80)))
 		function header(header: string): string {
 			return ' '.repeat(16 - header.length) + chalk.bold(header) + chalk.gray(':') + ' '
@@ -1346,6 +1732,7 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 			},
 			isBenignString: (s: string) => capture.isBenignString(s),
 			headerPrefix: ' '.repeat(4),
+			chalk: chalk,
 		})
 
 		// Build prompt choices
@@ -1528,9 +1915,12 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 
 		// Refresh strings:
 		capture = await openCaptureFile(opts)
-		walletDataStrings = await capture.gatherStrings()
-		allStrings = walletDataStrings.strings()
-		firstUnreviewedStringIndex = allStrings.findIndex(isWorthReviewing)
+		const reprioritized = await prioritizedReviewableStrings(capture, walletDataStrings =>
+			walletDataStrings.strings(),
+		)
+
+		walletDataStrings = reprioritized.walletDataStrings
+		prioritizedStrings = reprioritized.prioritizedStrings
 	}
 
 	if (!userStopped) {
@@ -1541,7 +1931,174 @@ export async function handleReviewStrings(opts: GlobalOptions): Promise<void> {
 	}
 }
 
+// ============================================================================
+// review-strings agent mode
+// ============================================================================
+
+async function handleReviewStringsAgent(opts: ReviewStringsOptions): Promise<void> {
+	const capture = await openCaptureFile(opts)
+	const { walletDataStrings, prioritizedStrings } = await prioritizedReviewableStrings(
+		capture,
+		walletDataStrings => walletDataStrings.highestFrequencyFirstStrings(),
+	)
+
+	if (prioritizedStrings.length === 0) {
+		log('')
+		log('All strings have been classified. Run `check` to verify.')
+		log('')
+
+		return
+	}
+
+	const limit = Math.min(32, Math.min(opts.limit, prioritizedStrings.length))
+
+	if (limit < opts.limit && limit < prioritizedStrings.length) {
+		log(
+			`(Truncated to ${limit} strings. As an agent, you need to tackle strings in small chunks, so trying to increase the limit further is non-productive.)`,
+		)
+	}
+
+	const toShow = prioritizedStrings.slice(0, limit)
+	const remaining = prioritizedStrings.length - limit
+	const cmdPrefix = getCommandPrefix(opts)
+
+	log('')
+	log('='.repeat(68))
+
+	if (prioritizedStrings.length > limit) {
+		log(`Showing top ${limit} strings needing classification`)
+	} else {
+		log(`Strings needing classification: ${prioritizedStrings.length}`)
+	}
+
+	log('='.repeat(68))
+
+	for (const strEntry of toShow) {
+		const strValue = strEntry.str
+		const suggestions = classifyStringHeuristically(strEntry)
+
+		log('')
+		log('-'.repeat(68))
+		log(`  String   : ${strValue.str}`)
+		log(`  Entropy  : ${strEntry.score.toFixed(2)}`)
+		log(
+			`  Tagged   : ${
+				strValue.pieces.size === 0 ? '(none)' : Array.from(strValue.pieces).join(', ')
+			}`,
+		)
+		const numOccurrences = strEntry.getTotalOccurrences()
+
+		if (numOccurrences === 1) {
+			log('  Shows up in a single request:')
+		} else {
+			log(`  Shows up in ${numOccurrences} requests:`)
+
+			for (const [roughKey, count] of Array.from(strEntry.getRoughOccurrences()).toSorted(
+				(a, b) => b[1] - a[1],
+			)) {
+				const seenText = count === 1 ? '' : ` (seen ${count} times)`
+
+				log(`    - ${roughKey}${seenText}`)
+			}
+
+			log(`  Sample Request (string highlighted as \`𜱭𜱭𜱭${strValue.str}𜱫𜱫𜱫\`):`)
+		}
+
+		displayRequestInfo(strEntry.firstOrigin.request, {
+			captureStrings: walletDataStrings,
+			highlight: (s: string): string => {
+				if (!s.includes(strValue.str)) {
+					return s
+				}
+
+				return s.split(strValue.str).join('𜱭𜱭𜱭' + strValue.str + '𜱫𜱫𜱫')
+			},
+			isBenignString: (s: string) => capture.isBenignString(s),
+			headerPrefix: ' '.repeat(4),
+			chalk: getChalk(opts),
+		})
+
+		log('')
+		log('  Suggested commands to deal with this string:')
+
+		const escaped = strValue.str.replace(/'/g, "'\"'\"'")
+
+		if (numOccurrences > 1) {
+			log('    # Search for more requests carrying this same string to get more context:')
+			log(`    $ ${cmdPrefix} search --string='${escaped}'`)
+			log('')
+		}
+
+		let hasBenignSuggestion = false
+
+		for (const [info, reason] of suggestions) {
+			if (info === 'BENIGN') {
+				hasBenignSuggestion = true
+				log(`    # Mark as not carrying any user-identifying information nor tracking (${reason}):`)
+				log(`    $ ${cmdPrefix} mark-string --string='${escaped}' --data='BENIGN'`)
+				log('')
+				log(`    # Mark as not carrying any user-identifying information nor tracking (${reason});`)
+				log(
+					'    # use `--global=true` if this string is likely benign regardless of where it shows up,',
+				)
+				log(
+					'    # such as common English words or typical JSON dictionary key names or URL parameter names:',
+				)
+				log(`    $ ${cmdPrefix} mark-string --string='${escaped}' --data='BENIGN' --global=true`)
+				log('')
+			} else {
+				log(`    # Mark as carrying ${info} (${reason}):`)
+				log(`    $ ${cmdPrefix} mark-string --string='${escaped}' --data='${info}'`)
+			}
+
+			log('')
+		}
+
+		if (!hasBenignSuggestion) {
+			log('    # Mark as not carrying any user-identifying information nor tracking:')
+			log(`    $ ${cmdPrefix} mark-string --string='${escaped}' --data='BENIGN'`)
+			log('')
+			log('    # Mark as not carrying any user-identifying information nor tracking:')
+			log(
+				'    # use `--global=true` if this string is likely benign regardless of where it shows up,',
+			)
+			log(
+				'    # such as common English words or typical JSON dictionary key names or URL parameter names:',
+			)
+			log(`    $ ${cmdPrefix} mark-string --string='${escaped}' --data='BENIGN' --global=true`)
+			log('')
+		}
+
+		log(
+			'  All valid --data values (you can specify multiple ones by concatenating them with commas, other than BENIGN which is mutually exclusive with everything else):',
+		)
+		log(`    ${userInfoEnums.items.join(', ')}, BENIGN`)
+	}
+
+	log('')
+	log('='.repeat(68))
+
+	if (remaining > 0) {
+		log(
+			'More strings remain unclassified, and will be shown only after some of the above strings are classified.',
+		)
+		log(
+			`After marking one or more strings, re-run the \`${cmdPrefix} review-strings\` command to see the next batch, or run \`${cmdPrefix} check\` to verify progress.`,
+		)
+	} else {
+		log(`All strings shown. After classification, run \`${cmdPrefix} check\` to verify.`)
+	}
+
+	log('='.repeat(68))
+	log('')
+}
+
 export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
+	if (opts.actor !== DataCollectionActor.HUMAN) {
+		throw new Error('This command can only be executed by humans')
+	}
+
+	const chalk = getChalk(opts)
 	const capture = await openCaptureFile(opts)
 	const allStrings = await capture.gatherStrings()
 
@@ -1597,6 +2154,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				isBenignString: (s: string) => capture.isBenignString(s),
 				highlight: null,
 				headerPrefix: null,
+				chalk: chalk,
 			})
 
 			// Get matcher if any
@@ -1872,6 +2430,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				isBenignString: (s: string) => capture.isBenignString(s),
 				highlight: null,
 				headerPrefix: null,
+				chalk: chalk,
 			})
 
 			log('\n   Purposes:')
@@ -2063,5 +2622,183 @@ export async function handleLintFix(): Promise<void> {
 				}
 			}
 		}
+	}
+}
+
+export async function handleListWallets(opts: GlobalOptions): Promise<void> {
+	const chalk = getChalk(opts)
+	const repoRoot = repoDir()
+
+	// Collect capture status per wallet per variant
+	const captureStatus = new Map<
+		WalletName,
+		Map<Variant, { exists: boolean; complete: boolean | null }>
+	>()
+
+	for (const [walletId, wallet] of Object.entries(allWallets)) {
+		const name = walletId
+		const variants = new Map<Variant, { exists: boolean; complete: boolean | null }>()
+
+		for (const variant of variantEnum.items) {
+			if (!wallet.variants[variant]) {
+				continue
+			}
+
+			const walletType = variantToWalletType(variant)
+			const typeDir = walletType.toLowerCase() + '-wallets'
+			const captureFilePath = path.join(
+				repoRoot,
+				'data',
+				typeDir,
+				'collection',
+				walletId.toLowerCase(),
+				`${walletId.toLowerCase()}.${variant.toLowerCase()}.capture.json`,
+			)
+
+			const exists = fs.existsSync(captureFilePath)
+			let complete: boolean | null = null
+
+			if (exists) {
+				// Check if capture is complete by loading and checking
+				const annotationsPath = path.join(
+					repoRoot,
+					'data',
+					typeDir,
+					'collection',
+					walletId.toLowerCase(),
+					`${walletId.toLowerCase()}.annotations.json`,
+				)
+				const globalAnnotations = globalAnnotationsPath()
+
+				try {
+					const annotations = WalletCaptureAnnotations.fromFile(
+						walletId,
+						path.isAbsolute(annotationsPath)
+							? annotationsPath
+							: path.join(repoRoot, annotationsPath),
+						path.isAbsolute(globalAnnotations)
+							? globalAnnotations
+							: path.join(repoRoot, globalAnnotations),
+					)
+					const captureFile = await WalletCaptureFile.fromFile(
+						{
+							walletId: name,
+							walletType,
+							walletVariant: variant,
+						},
+						captureFilePath,
+						annotations,
+					)
+					const issues = await captureFile.check({ reviewType: 'MUST_REVIEW' })
+
+					complete = issues.length === 0
+				} catch {
+					// If we can't load the file, just mark it as existing
+					complete = null
+				}
+			}
+
+			variants.set(variant, { exists, complete })
+		}
+
+		if (variants.size > 0) {
+			captureStatus.set(name, variants)
+		}
+	}
+
+	function statusSymbol({
+		exists,
+		complete,
+	}: {
+		exists: boolean
+		complete: boolean | null
+	}): string {
+		if (!exists) {
+			return chalk.gray('no capture')
+		}
+
+		if (complete === true) {
+			return chalk.green('complete')
+		}
+
+		if (complete === false) {
+			return chalk.yellow('in progress')
+		}
+
+		return chalk.gray('uncertain')
+	}
+
+	function stripAnsi(s: string): string {
+		// eslint-disable-next-line no-control-regex -- Match ANSI escape codes
+		return s.replace(/\x1b\[[0-9;]*m/g, '')
+	}
+
+	// Compute column widths (strip ANSI for accurate width calculation)
+	const walletIdWidth = Math.max(
+		'WALLET'.length,
+		...Array.from(captureStatus.keys()).map(w => w.length),
+	)
+	const variantStatusEntries = Array.from(captureStatus.entries()).map(([, variants]) =>
+		Array.from(variants.entries())
+			.toSorted((a, b) => variantEnum.items.indexOf(a[0]) - variantEnum.items.indexOf(b[0]))
+			.map(([variant, status]) => `${variant}: ${statusSymbol(status)}`)
+			.join(', '),
+	)
+	const variantStatusWidth = Math.max(
+		'VARIANTS'.length,
+		...variantStatusEntries.map(v => stripAnsi(v).length),
+	)
+
+	function padRight(s: string, width: number): string {
+		const visibleLen = stripAnsi(s).length
+
+		return s + ' '.repeat(width - visibleLen)
+	}
+
+	log('')
+	log(
+		chalk.bold(padRight('WALLET', walletIdWidth)) +
+			' | ' +
+			chalk.bold(padRight('VARIANTS', variantStatusWidth)),
+	)
+	log(chalk.gray('-'.repeat(walletIdWidth + variantStatusWidth + 3)))
+
+	for (const [walletId, variants] of Array.from(captureStatus.entries()).toSorted()) {
+		const variantStatus = Array.from(variants.entries())
+			.toSorted((a, b) => variantEnum.items.indexOf(a[0]) - variantEnum.items.indexOf(b[0]))
+			.map(([variant, status]) => `${variant}: ${statusSymbol(status)}`)
+			.join(', ')
+
+		log(padRight(walletId, walletIdWidth) + ' | ' + padRight(variantStatus, variantStatusWidth))
+	}
+
+	log('')
+}
+
+/**
+ * List all known wallet IDs and the set of variants they are defined for.
+ * Output is a non-colorized table with a header and one row per wallet.
+ */
+export function handleListWalletIds(): void {
+	const rows = Object.entries(allWallets)
+		.map(([walletId, wallet]) => {
+			const variants = setItems(wallet.variants)
+				.toSorted((a, b) => variantEnum.items.indexOf(a) - variantEnum.items.indexOf(b))
+				.join(', ')
+
+			return { walletId, variants }
+		})
+		.toSorted((a, b) => a.walletId.localeCompare(b.walletId))
+
+	const idWidth = Math.max('WALLET ID'.length, ...rows.map(r => r.walletId.length))
+	const variantsWidth = Math.max('VARIANTS'.length, ...rows.map(r => r.variants.length))
+
+	const padRight = (s: string, width: number): string => s + ' '.repeat(width - s.length)
+
+	log(padRight('WALLET ID', idWidth) + ' | ' + padRight('VARIANTS', variantsWidth))
+	log('-'.repeat(idWidth + variantsWidth + 3))
+
+	for (const row of rows) {
+		log(padRight(row.walletId, idWidth) + ' | ' + padRight(row.variants, variantsWidth))
 	}
 }
