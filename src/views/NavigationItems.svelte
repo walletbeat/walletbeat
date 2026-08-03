@@ -21,8 +21,8 @@
 	import SearchIcon from 'lucide-static/icons/search.svg?raw'
 	import SignatureIcon from 'lucide-static/icons/signature.svg?raw'
 	import StairsIcon from 'lucide-static/icons/chart-no-axes-column-increasing.svg?raw'
-	import TwitterIcon from 'lucide-static/icons/twitter.svg?raw'
 	import UserCogIcon from 'lucide-static/icons/user-cog.svg?raw'
+	import { XIcon } from '@/icons/x'
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 	const LUCIDE_ICONS: Record<LucideNavigationIcon, string> = {
@@ -42,7 +42,7 @@
 		ICON_RADAR: RadarIcon,
 		ICON_SIGNATURE: SignatureIcon,
 		ICON_STAIRS: StairsIcon,
-		ICON_TWITTER: TwitterIcon,
+		ICON_TWITTER: XIcon,
 		ICON_USER_COG: UserCogIcon,
 		ICON_WALLET: WalletIcon,
 	}

@@ -43,8 +43,10 @@
 		"helios": "deploy/helios/helios.sh",
 		"helios:wrap": "deploy/helios/helios-wrap.sh",
 		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts",
-		"wallet-data-collection": "tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
-		"wallet-data-collection:lint-fix": "pnpm run wallet-data-collection lint-fix"
+		"wallet-data-collection": "cross-env WALLETBEAT_ENV=HUMAN tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
+		"wallet-data-collection:agent": "cross-env WALLETBEAT_ENV=AGENT tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
+		"wallet-data-collection:ci": "cross-env WALLETBEAT_ENV=CI tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
+		"wallet-data-collection:lint-fix": "pnpm run wallet-data-collection:ci lint-fix"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.3",

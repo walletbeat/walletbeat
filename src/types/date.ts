@@ -13,6 +13,32 @@ type Century = '20' | '21' // We're good from 2000 to 2199.
 /** A valid date in YYYY-MM-DD format. */
 export type CalendarDate = `${Century}${Digit}${Digit}-${MonthAndDay}`
 
+const CALENDAR_DATE_PATTERN = /^(20|21)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
+
+/** Check whether a string is a valid CalendarDate. */
+function isCalendarDate(date: string): date is CalendarDate {
+	if (!CALENDAR_DATE_PATTERN.test(date)) {
+		return false
+	}
+
+	const [year, month, day] = date.split('-').map(part => +part)
+	const parsed = new Date(Date.UTC(year, month - 1, day))
+	const isRealDate =
+		parsed.getUTCFullYear() === year &&
+		parsed.getUTCMonth() === month - 1 &&
+		parsed.getUTCDate() === day
+
+	return isRealDate
+}
+
+export function assertCalendarDate(date: string): CalendarDate {
+	if (!isCalendarDate(date)) {
+		throw new Error(`Invalid calendar date: ${date}`)
+	}
+
+	return date
+}
+
 /** The components of a calendar date in YYYY-MM-DD format. */
 export interface CalendarDateParts {
 	year: number

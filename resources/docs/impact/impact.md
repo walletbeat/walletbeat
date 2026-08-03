@@ -10,3 +10,4 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
 - **2026-07**: Walletbeat contributor 0xMattmatt shows how multiple wallets handle a malicious Ethereum transaction that caused a user to lose ~300k USD: https://x.com/0xMattmatt/status/2081106605463289971
   - **Reaction**: Ambire fixes this in their next release: https://x.com/borislavItskovv/status/2081582575790006360
   - **Reaction**: WalletChan fixes this in their next release: https://x.com/walletbeat/status/2082293464071373094
+  - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention: https://x.com/ambire/status/2082816470560747558
