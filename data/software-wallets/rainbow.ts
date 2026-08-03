@@ -86,7 +86,7 @@ export const rainbow: SoftwareWallet = {
 		`),
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-01',
+		lastUpdated: '2026-08-02',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -958,15 +958,30 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"When creating a new browser-extension wallet, Rainbow generates a 12-word BIP-39 recovery phrase on the user's device with `@scure/bip39`.",
-							label: 'Rainbow browser-extension recovery-phrase generation',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L136-L150',
-						},
-						{
-							explanation:
-								'The `@noble/hashes` random-byte implementation used by `@scure/bip39` calls the browser-provided `crypto.getRandomValues` CSPRNG and throws instead of producing bytes if no secure provider is available.',
-							label: 'Rainbow browser-extension CSPRNG provider',
-							url: 'https://github.com/paulmillr/noble-hashes/blob/32f700f38ec49d7e6b2ab687904d6b2d7d60d80a/src/utils.ts#L385-L394',
+								"When creating a new browser-extension wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `@scure/bip39`, at the library's default 128-bit entropy (12 words). `@scure/bip39` draws that entropy from `@noble/hashes`, whose `randomBytes` calls the browser-provided `crypto.getRandomValues` and throws rather than returning bytes if no secure provider is available. The extension pins `@scure/bip39` 1.6.0, which requires `@noble/hashes` `~1.8.0`; its lockfile resolves that to 1.8.0.",
+							lastRetrieved: '2026-08-02',
+							url: [
+								{
+									label: 'Recovery-phrase generation',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L149',
+								},
+								{
+									label: '`@scure/bip39` import',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L4-L5',
+								},
+								{
+									label: '`@scure/bip39` 1.6.0 dependency pin',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/package.json#L122',
+								},
+								{
+									label: '`@noble/hashes` 1.8.0 lockfile resolution',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/yarn.lock#L4136-L4139',
+								},
+								{
+									label: '`@noble/hashes` 1.8.0 `randomBytes`',
+									url: 'https://github.com/paulmillr/noble-hashes/blob/32f700f38ec49d7e6b2ab687904d6b2d7d60d80a/src/utils.ts#L385-L395',
+								},
+							],
 						},
 					],
 					browserExtensionHardening: parseBrowserExtensionManifest(rainbowRawExtManifest),
@@ -983,21 +998,50 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"When creating a new mobile wallet, Rainbow generates a 12-word BIP-39 recovery phrase on the user's device with `bip39`.",
-							label: 'Rainbow mobile recovery-phrase generation',
-							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L638-L657',
-						},
-						{
-							explanation:
-								"In production, the random-values provider used by Rainbow's mobile app obtains random bytes from Java `SecureRandom` on Android.",
-							label: 'Rainbow mobile Android CSPRNG provider',
-							url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/android/src/main/java/org/linusu/RNGetRandomValuesModule.java#L25-L34',
-						},
-						{
-							explanation:
-								"In production, the random-values provider used by Rainbow's mobile app obtains random bytes from Security.framework `SecRandomCopyBytes` on iOS and fails if that OS call is unsuccessful.",
-							label: 'Rainbow mobile iOS CSPRNG provider',
-							url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/ios/RNGetRandomValues.m#L12-L20',
+								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, whose browser and React Native build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup; it returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
+							lastRetrieved: '2026-08-02',
+							url: [
+								{
+									label: 'Recovery-phrase generation',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L656',
+								},
+								{
+									label: '`bip39` import',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L11',
+								},
+								{
+									label: '`bip39` 3.0.2 dependency pin',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/package.json#L241',
+								},
+								{
+									label: '`randombytes` 2.1.0 lockfile resolution',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/yarn.lock#L21931-L21933',
+								},
+								{
+									label: '`randombytes` 2.1.0 requires `crypto.getRandomValues`',
+									url: 'https://github.com/crypto-browserify/randombytes/blob/f18ded32b209f0d4c637608a11ae042ae96b4c2e/browser.js#L11-L22',
+								},
+								{
+									label: '`react-native-get-random-values` 1.5.0 dependency pin',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/package.json#L319',
+								},
+								{
+									label: 'App shim imports the random-values polyfill',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/shim.js#L1',
+								},
+								{
+									label: 'App entry point loads the shim',
+									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/index.js#L31',
+								},
+								{
+									label: 'Android: Java `SecureRandom`',
+									url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/android/src/main/java/org/linusu/RNGetRandomValuesModule.java#L27-L35',
+								},
+								{
+									label: 'iOS: `SecRandomCopyBytes`',
+									url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/ios/RNGetRandomValues.m#L11-L18',
+								},
+							],
 						},
 					],
 					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
