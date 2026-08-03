@@ -1,0 +1,19 @@
+{
+	"matchers": [
+		{
+			"domain": "www.google-analytics.com",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"path": "/g/collect"
+		},
+		{
+			"domain": "o331974.ingest.sentry.io",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"path": "/api/4504012577112064/envelope/"
+		}
+	],
+	"benignStrings": []
+}
