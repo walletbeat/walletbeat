@@ -13,7 +13,193 @@
 				"ANALYTICS"
 			],
 			"path": "/api/4504012577112064/envelope/"
+		},
+		{
+			"domain": "rainbowjiumask.dataplane.rudderstack.com",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"path": "/v1/batch"
+		},
+		{
+			"domain": "firebaseinstallations.googleapis.com",
+			"purposes": [
+				"ANALYTICS"
+			],
+			"path": "/v1/projects/rainbow-me/installations"
+		},
+		{
+			"domain": "metadata.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/graph"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"TRANSACTION_BROADCAST"
+			],
+			"method": "eth_sendRawTransaction"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_call"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_chainId"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_blockNumber"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_estimateGas"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_getBlockByNumber"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_getTransactionCount"
+		},
+		{
+			"domain": "rpc.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"method": "eth_getCode"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"ASSET_METADATA"
+			],
+			"path": "/v1/assets/GetAssetUpdates"
+		},
+		{
+			"domain": "addys.p.rainbow.me",
+			"purposes": [
+				"ASSET_METADATA"
+			],
+			"path": "/v3/summary"
+		},
+		{
+			"domain": "safebrowsing.googleapis.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/transactions/ListTransactions"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/wallets/delegation/WalletStatus"
+		},
+		{
+			"domain": "rainbow.imgix.net",
+			"purposes": [
+				"STATIC_ASSETS"
+			]
+		},
+		{
+			"domain": "metadata.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/meteorology/v1/gas/*"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/transactions/GetTransactionByHash"
+		},
+		{
+			"domain": "rainbowme-res.cloudinary.com",
+			"purposes": [
+				"STATIC_ASSETS"
+			]
+		},
+		{
+			"domain": "mobile.events.data.microsoft.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "platform.p.rainbow.me",
+			"purposes": [
+				"CHAIN_DATA_LOOKUP"
+			],
+			"path": "/v1/wallets/delegation/NetworkStatus"
+		},
+		{
+			"domain": "token-search.rainbow.me",
+			"purposes": [
+				"ASSET_METADATA"
+			]
+		},
+		{
+			"domain": "swap.p.rainbow.me",
+			"purposes": [
+				"SWAP_QUOTE"
+			],
+			"path": "/v1/slippage"
+		},
+		{
+			"domain": "swap.p.rainbow.me",
+			"purposes": [
+				"SWAP_QUOTE"
+			],
+			"path": "/v1/quote"
 		}
 	],
-	"benignStrings": []
+	"benignStrings": [
+		"0x067b3daa152600182fb340a7418c3167d51856dcb18a9c42e1d3f6483b98748a",
+		"0x4cd00e387622c35bddb9b4c962c136462338bc31",
+		"13r3r3r3n5l1",
+		"1710x1112",
+		"2026-07-31T15:48:34.078Z",
+		"2026-07-31T15:49:09.447Z",
+		"2026-07-31T16:06:06.234Z",
+		"2026-07-31T16:09:10.993Z",
+		"48af2f1d696141cca1045e07b2d035b4",
+		"AAgAAAQ",
+		"AgAAAAQ",
+		"Basic MmRZYTB5U05VV0w2WXdoVFZKQU42VGlwWlkyOg",
+		"Chromium;153.0.7984.0|Not_A%20Brand;8.0.0.0",
+		"G111",
+		"MTc3OTc4MTQ2NS05NzQ1LTM",
+		"MTc3OTg0MjMwOS05NzQ1LTQ",
+		"chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/703.js",
+		"chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/popup.html",
+		"noapi"
+	]
 }

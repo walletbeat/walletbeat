@@ -73,7 +73,11 @@ function optionalGlobMatches(pattern: string | null, value: string): boolean {
 	return globToRegExp(pattern).test(value)
 }
 
-const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [/^chrome-extension:\/\/\w+$/]
+const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [
+	/^chrome-extension:\/\/\w+$/,
+	// ISO-8601 timestamps (e.g. event/request timestamps) are not user-identifying on their own.
+	/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/,
+]
 
 export interface SaveOptions {
 	/** Verify existing file contents instead of saving. */
