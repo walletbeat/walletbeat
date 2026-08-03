@@ -998,7 +998,7 @@ export const rainbow: SoftwareWallet = {
 						},
 						{
 							explanation:
-								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, whose browser and React Native build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup; it returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
+								"When creating a new mobile wallet, Rainbow generates a BIP-39 recovery phrase on the user's device using `bip39` 3.0.2, at the library's default 128-bit entropy (12 words). `bip39` draws entropy from `randombytes` 2.1.0, which the React Native bundler resolves to its browser build under the default `react-native, browser, main` field precedence; that build calls `global.crypto.getRandomValues` and refuses to produce bytes if no secure provider is present. Rainbow installs that provider by importing `react-native-get-random-values` 1.5.0 from the app shim loaded at startup; it returns bytes from Java `SecureRandom` on Android and `SecRandomCopyBytes` on iOS, throwing if the iOS call fails.",
 							lastRetrieved: '2026-08-02',
 							url: [
 								{
