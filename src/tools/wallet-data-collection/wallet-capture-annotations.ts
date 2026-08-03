@@ -8,6 +8,7 @@ import {
 	dataCollectionPurpose,
 } from '@/schema/features/privacy/data-collection'
 import { type AtLeastOneTrueVariant, Variant, variantEnum } from '@/schema/variants'
+import { isInVocabulary } from '@/tests/utils/grammar'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -57,7 +58,7 @@ function globToRegExp(glob: string): RegExp {
  *     matcher=infura.io matches infura.io and foo.infura.io
  * Matching is case-insensitive.
  */
-function domainMatches(matcherDomain: string, requestDomain: string): boolean {
+export function domainMatches(matcherDomain: string, requestDomain: string): boolean {
 	const m = matcherDomain.trim().toLowerCase()
 	const r = requestDomain.trim().toLowerCase()
 
@@ -358,6 +359,10 @@ export class WalletCaptureAnnotations {
 	}
 
 	public addBenignString(str: string, global: boolean) {
+		if (this.isBenign(str)) {
+			throw new Error(`string '${str}' is already considered benign`)
+		}
+
 		;(global ? this.globalBenignStrings : this.benignStrings).add(str)
 	}
 
@@ -366,6 +371,10 @@ export class WalletCaptureAnnotations {
 			if (benignRegexp.test(str)) {
 				return true
 			}
+		}
+
+		if (isInVocabulary(str)) {
+			return true
 		}
 
 		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)

@@ -201,4 +201,8 @@ export class StringEntropy {
 	public encode(): `v1:${StringEntropyCharset}:${string}` {
 		return `v1:${this.charset}:${this.entropy.toFixed(20)}`
 	}
+
+	public likelyIdentifying(): boolean {
+		return this.entropy > 32 // Experimentally derived
+	}
 }
