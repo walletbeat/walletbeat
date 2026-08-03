@@ -977,10 +977,6 @@ export const rainbow: SoftwareWallet = {
 									label: '`@noble/hashes` 1.8.0 lockfile resolution',
 									url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/yarn.lock#L4136-L4139',
 								},
-								{
-									label: '`@noble/hashes` 1.8.0 `randomBytes`',
-									url: 'https://github.com/paulmillr/noble-hashes/blob/32f700f38ec49d7e6b2ab687904d6b2d7d60d80a/src/utils.ts#L385-L395',
-								},
 							],
 						},
 					],
@@ -1018,10 +1014,6 @@ export const rainbow: SoftwareWallet = {
 									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/yarn.lock#L21931-L21933',
 								},
 								{
-									label: '`randombytes` 2.1.0 requires `crypto.getRandomValues`',
-									url: 'https://github.com/crypto-browserify/randombytes/blob/f18ded32b209f0d4c637608a11ae042ae96b4c2e/browser.js#L11-L22',
-								},
-								{
 									label: '`react-native-get-random-values` 1.5.0 dependency pin',
 									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/package.json#L319',
 								},
@@ -1032,14 +1024,6 @@ export const rainbow: SoftwareWallet = {
 								{
 									label: 'App entry point loads the shim',
 									url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/index.js#L31',
-								},
-								{
-									label: 'Android: Java `SecureRandom`',
-									url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/android/src/main/java/org/linusu/RNGetRandomValuesModule.java#L27-L35',
-								},
-								{
-									label: 'iOS: `SecRandomCopyBytes`',
-									url: 'https://github.com/LinusU/react-native-get-random-values/blob/1bb6c57a29bf197aebd31b1327d7bba58ab296fe/ios/RNGetRandomValues.m#L11-L18',
 								},
 							],
 						},
