@@ -17,8 +17,12 @@ import { trimWhitespacePrefix } from '@/types/utils/text'
 
 import { recordedFlow } from './wallet-capture-file'
 import {
+	actorEnvSuffixFromEnv,
+	actorFlagFromArgv,
 	captureOptions,
 	checkOptions,
+	DataCollectionActor,
+	dataCollectionActor,
 	deleteCaptureOptions,
 	explainRequestOptions,
 	globalOptions,
@@ -27,23 +31,39 @@ import {
 	handleDeleteCapture,
 	handleExplainRequest,
 	handleLintFix,
+	handleListWalletIds,
 	handleMarkDomain,
 	handleMarkDomainUpdate,
 	handleMarkFlowUnsupported,
 	handleMarkString,
 	handleReviewRequests,
 	handleReviewStrings,
+	handleSearch,
 	markDomainOptions,
 	markDomainUpdateOptions,
 	markFlowUnsupportedOptions,
 	markStringOptions,
+	reviewStringsOptions,
+	searchOptions,
 } from './wallet-data-collection-lib'
 
 // ============================================================================
 // CLI Definition
 // ============================================================================
 
-const cli = cac('wallet-data-collection')
+const cli = cac(`pnpm wallet-data-collection${actorEnvSuffixFromEnv()}`)
+
+function getCommand(
+	args: string,
+	opts: { walletIdFlags: boolean } = { walletIdFlags: true },
+): string {
+	// Do a crude pass over the process arguments and extract `--actor HUMAN|AGENT|CI` from it,
+	// and the WALLETBEAT_ENV_VAR, then make these two vars depend on it:
+	const actorEnvSuffix = actorEnvSuffixFromEnv()
+	const maybeActorFlag = actorFlagFromArgv()
+
+	return `  $ pnpm wallet-data-collection${actorEnvSuffix}${maybeActorFlag}${opts.walletIdFlags ? " --id='metamask' --variant='BROWSER'" : ''} ${args}`
+}
 
 // Global options
 cli
@@ -52,6 +72,19 @@ cli
 	.option('--type <type>', `Type of wallet: ${walletTypes.items.join(', ')}`, {
 		default: WalletType.SOFTWARE,
 	})
+	.option('--actor <HUMAN|AGENT|CI>', 'Who is using the tool. Set to AGENT if you are an agent.', {
+		default: ((): DataCollectionActor => {
+			if (dataCollectionActor.is(process.env.WALLETBEAT_ENV)) {
+				return process.env.WALLETBEAT_ENV
+			}
+
+			if (!process.stdin.isTTY) {
+				return DataCollectionActor.AGENT
+			}
+
+			return DataCollectionActor.HUMAN
+		})(),
+	})
 
 // capture subcommand
 cli
@@ -59,12 +92,8 @@ cli
 	.option('--flow <flow>', `Flow to capture: ${recordedFlow.items.join(', ')}`)
 	.option('--wallet-addresses <addresses>', 'Wallet addresses being used (comma-separated)')
 	.option('--port <port>', 'mitmproxy port', { default: 8080 })
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' capture --flow='IDLE_PRE_INSTALL'",
-	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' capture --flow='SEND_ETHER' --wallet-addresses='0x123...,0x456...'",
-	)
+	.example(getCommand("capture --flow='IDLE_PRE_INSTALL'"))
+	.example(getCommand("capture --flow='SEND_ETHER' --wallet-addresses='0x123...,0x456...'"))
 	.action(async options => {
 		await handleCapture(captureOptions.process(options))
 	})
@@ -73,9 +102,7 @@ cli
 cli
 	.command('delete-capture', 'Delete network traffic from a specific session')
 	.option('--session <session ID>', 'session ID')
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' delete-capture --session=42",
-	)
+	.example(getCommand('delete-capture --session=42'))
 	.action(async options => {
 		await handleDeleteCapture(deleteCaptureOptions.process(options))
 	})
@@ -87,9 +114,7 @@ cli
 		'--format <SUMMARY|FULL>',
 		'Whether to show a full dump of all missing information (--format=FULL) or just a summary (--format=SUMMARY).',
 	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' check [--format=SUMMARY|FULL]",
-	)
+	.example(getCommand('check [--format=SUMMARY|FULL]'))
 	.action(async options => {
 		await handleCheck(checkOptions.process(options))
 	})
@@ -98,9 +123,7 @@ cli
 cli
 	.command('mark-flow-unsupported', 'Mark a flow as not supported by the wallet')
 	.option('--flow <flow>', `Flow to mark as unsupported: ${recordedFlow.items.join(', ')}`)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-flow-unsupported --flow='NATIVE_SWAP'",
-	)
+	.example(getCommand("mark-flow-unsupported --flow='NATIVE_SWAP'"))
 	.action(async options => {
 		await handleMarkFlowUnsupported(markFlowUnsupportedOptions.process(options))
 	})
@@ -121,18 +144,17 @@ cli
 		'Comma-separated list of entities that see the data in transit without being its intended recipient (e.g. TLS-terminating CDNs).',
 	)
 	.usage(
-		'mark-domain --domain=<domain-pattern> --entity=<entity-id> [--intermediaries=<entity-id>,...]' +
+		'mark-domain --domain=<domain-pattern> --entity=<entity-id> [--intermediaries=<entity-id>,...]\n\n' +
 			trimWhitespacePrefix(`
-
 				Entities must be defined in the codebase first.
 				Known entity IDs: ${Object.keys(allEntities).toSorted().join(', ')}
 	`),
 	)
+	.example(getCommand("mark-domain --domain='infura.io' --entity='consensys'"))
 	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain --domain='infura.io' --entity='consensys'",
-	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain --domain='graphql-base.coinbase.com' --entity='coinbase' --intermediaries='cloudflare'",
+		getCommand(
+			"mark-domain --domain='graphql-base.coinbase.com' --entity='coinbase' --intermediaries='cloudflare'",
+		),
 	)
 	.action(async options => {
 		await handleMarkDomain(markDomainOptions.process(options))
@@ -156,15 +178,16 @@ cli
 		'Remove the given comma-separated entities from the intermediary list.',
 	)
 	.usage(
-		'mark-domain-update --domain=<domain-pattern> [--set-operator=<entity-id>] [--set-intermediaries=<entity-id>,...|--add-intermediaries=<entity-id>,...|--remove-intermediaries=<entity-id>,...]' +
+		'mark-domain-update --domain=<domain-pattern> [--set-operator=<entity-id>] [--set-intermediaries=<entity-id>,...|--add-intermediaries=<entity-id>,...|--remove-intermediaries=<entity-id>,...]\n\n' +
 			trimWhitespacePrefix(`
-
 				Entities must be defined in the codebase first.
 				Known entity IDs: ${Object.keys(allEntities).toSorted().join(', ')}
 	`),
 	)
 	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-domain-update --domain='graphql-base.coinbase.com' --add-intermediaries='cloudflare'",
+		getCommand(
+			"mark-domain-update --domain='graphql-base.coinbase.com' --add-intermediaries='cloudflare'",
+		),
 	)
 	.action(async options => {
 		await handleMarkDomainUpdate(markDomainUpdateOptions.process(options))
@@ -177,7 +200,7 @@ cli
 		'Mark requests matching selectors as being done for specific purposes',
 	)
 	.usage(
-		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--policy=<collection_policy>] [--force=true]" +
+		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--policy=<collection_policy>] [--force=true]\n\n" +
 			trimWhitespacePrefix(`
 				Mark requests matching selectors as being done for specific purposes.
 				Use \`--purposes=NOT_WALLET_INITIATED\` if these requests were not initiated by the wallet,
@@ -207,16 +230,20 @@ cli
 	)
 	.option('--force <true|false>', 'Add this request matcher even if capture is not complete.')
 	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='infura.io' --method='eth_getBalance' --purposes='CHAIN_DATA_LOOKUP'",
+		getCommand(
+			"explain-request --domain='infura.io' --method='eth_getBalance' --purposes='CHAIN_DATA_LOOKUP'",
+		),
+	)
+	.example(getCommand("explain-request --domain='analytics.example.com' --purposes='ANALYTICS'"))
+	.example(
+		getCommand(
+			"explain-request --domain='api.example.com' --path='/v1/swap/*' --purposes='SWAP_QUOTE,TRANSACTION_SIMULATION'",
+		),
 	)
 	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='analytics.example.com' --purposes='ANALYTICS'",
-	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='api.example.com' --path='/v1/swap/*' --purposes='SWAP_QUOTE,TRANSACTION_SIMULATION'",
-	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='builtin-spyware-reporting.chrome.google.com' --purposes='NOT_WALLET_INITIATED'",
+		getCommand(
+			"explain-request --domain='builtin-spyware-reporting.chrome.google.com' --purposes='NOT_WALLET_INITIATED'",
+		),
 	)
 	.action(async options => {
 		await handleExplainRequest(explainRequestOptions.process(options))
@@ -226,9 +253,8 @@ cli
 cli
 	.command('mark-string', 'Mark a string as conveying user data.')
 	.usage(
-		'mark-string --string=<string> --data=<data-type>|BENIGN' +
+		'mark-string --string=<string> --data=<data-type>|BENIGN\n\n' +
 			trimWhitespacePrefix(`
-
 				Mark a string as conveying one or more pieces of user data.
 				Valid user data types: ${userInfoEnums.items.join(', ')}
 			`),
@@ -242,54 +268,86 @@ cli
 		'--global <true|false>',
 		'For benign strings, mark as benign globally for all captures (true), or only in this capture file (false).',
 	)
+	.example(getCommand("mark-string --string='GA1.1.1294582759' --data='TRACKING_IDENTIFIER'"))
+	.example(getCommand("mark-string --string='0x1234...' --data='ACCOUNT_ADDRESS'"))
 	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='GA1.1.1294582759' --data='TRACKING_IDENTIFIER'",
+		getCommand(
+			"mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'",
+		),
 	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='0x1234...' --data='ACCOUNT_ADDRESS'",
-	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'",
-	)
-	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='BraveBrowser' --data='BENIGN' --global=true",
-	)
+	.example(getCommand("mark-string --string='BraveBrowser' --data='BENIGN' --global=true"))
 	.action(async options => {
 		await handleMarkString(markStringOptions.process(options))
 	})
 
-// mark-string subcommand
+// search subcommand
+cli
+	.command('search', 'Search for requests matching the given criteria')
+	.usage(
+		'search [--string=<text>] [--domain=<domain>] [--path=<path>] [--path-regexp=<regex>] [--reviewed=<true|false|any>] [--limit=<number>] [--offset=<number>]\n\n' +
+			trimWhitespacePrefix(`
+				Search for requests matching the given criteria.
+				At least one of --string or --domain must be specified.
+				Results are ordered by capture session and time.
+			`),
+	)
+	.option('--string <text>', 'Search this substring across any part of the request.')
+	.option(
+		'--domain <domain>',
+		'Match this domain or any subdomain of it (e.g., infura.io matches api.infura.io).',
+	)
+	.option('--path <path>', 'Exact path match.')
+	.option('--path-regexp <regex>', 'Regex path match.')
+	.option('--reviewed <true|false|any>', 'Filter by manual review status (default: any).')
+	.option('--limit <number>', 'Maximum number of results to show (default: 10, must be >= 1).')
+	.option('--offset <number>', 'Pagination offset (default: 0).')
+	.example(getCommand("search --string='eth_accounts'"))
+	.example(getCommand("search --domain='infura.io'"))
+	.example(
+		getCommand("search --domain='infura.io' --path-regexp='/v3/.*' --reviewed=false --limit=20"),
+	)
+	.action(async options => {
+		await handleSearch(searchOptions.process(options))
+	})
+
+// review-strings subcommand
 cli
 	.command(
 		'review-strings',
 		'Review high-entropy strings from network capture to flag the user data they are carrying.',
 	)
 	.usage(
-		'review-strings' +
+		'review-strings [--limit=<number>]\n\n' +
 			trimWhitespacePrefix(`
-
 				Interactively review unclassified strings from network capture.
 			`),
 	)
-	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
-	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
-	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-strings")
+	.option('--limit <number>', 'Maximum number of strings to review (default: 10, must be >= 1).')
+	.example(getCommand('review-strings'))
+	.example(getCommand('review-strings --limit=5'))
 	.action(async options => {
-		await handleReviewStrings(globalOptions.process(options))
+		await handleReviewStrings(reviewStringsOptions.process(options))
 	})
 
 cli
 	.command('review-requests', 'Interactively review requests')
-	.example("  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' review-requests")
+	.example(getCommand('review-requests'))
 	.action(async options => {
 		await handleReviewRequests(globalOptions.process(options))
 	})
 
 cli
 	.command('lint-fix', 'Fix lint issues in wallet data collection files')
-	.example('  $ pnpm wallet-data-collection lint-fix')
+	.example(getCommand('lint-fix', { walletIdFlags: false }))
 	.action(async () => {
 		await handleLintFix()
+	})
+
+cli
+	.command('list-wallet-ids', 'List all known wallet IDs and their defined variants')
+	.example(getCommand('list-wallet-ids', { walletIdFlags: false }))
+	.action(() => {
+		handleListWalletIds()
 	})
 
 // Help and version

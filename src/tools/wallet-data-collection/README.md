@@ -20,7 +20,7 @@ The tool helps you walk through these steps.
 At a high level, all commands look like this:
 
 ```
-$ pnpm wallet-data-collection --id='<wallet_id>' --variant='<wallet_variant>' <subcommand> [subcommand-specific flags...]
+$ pnpm wallet-data-collection[:agent] --id='<wallet_id>' --variant='<wallet_variant>' <subcommand> [subcommand-specific flags...]
 ```
 
 ### Global flags:
@@ -70,7 +70,7 @@ Session numbers are printed in the output of the `capture` subcommand.
 #### `check` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> check
+$ pnpm wallet-data-collection[:agent] <global flags> check
 ```
 
 Examine the capture file and flag any missing information that needs further triaging, including directions on how to address them.
@@ -87,7 +87,7 @@ Mark a flow as not being supported by the wallet, which means capturing its netw
 #### `mark-domain` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-domain --domain='<domain>' --entity='<entity ID>' [--intermediaries='<entity ID>,...']
+$ pnpm wallet-data-collection[:agent] <global flags> mark-domain --domain='<domain>' --entity='<entity ID>' [--intermediaries='<entity ID>,...']
 ```
 
 Mark a domain name and all its subdomains as operated by the given entity ID.
@@ -104,7 +104,7 @@ not on the apex domain; the most specific matching entry takes precedence when r
 #### `mark-domain-update` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-domain-update --domain='<domain>' [--set-operator='<entity ID>'] [--set-intermediaries='<entity ID>,...'] [--add-intermediaries='<entity ID>,...'] [--remove-intermediaries='<entity ID>,...']
+$ pnpm wallet-data-collection[:agent] <global flags> mark-domain-update --domain='<domain>' [--set-operator='<entity ID>'] [--set-intermediaries='<entity ID>,...'] [--add-intermediaries='<entity ID>,...'] [--remove-intermediaries='<entity ID>,...']
 ```
 
 Update an existing domain mapping, e.g. when an intermediary is discovered later.
@@ -114,7 +114,7 @@ Update an existing domain mapping, e.g. when an intermediary is discovered later
 #### `explain-request` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>'
+$ pnpm wallet-data-collection[:agent] <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>'
 ```
 
 Mark requests matching the given `selectors` as being done for purposes `purpose1`, `purpose2`, ...
@@ -149,7 +149,7 @@ Purposes are case-insensitive on the command line.
 #### `review-strings` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> review-strings
+$ pnpm wallet-data-collection[:agent] <global flags> review-strings
 ```
 
 Review high-entropy strings from network capture to flag the user data they are carrying.
@@ -163,7 +163,7 @@ Alternatively, you can use the `mark-string` subcommand to mark a given string a
 #### `mark-string` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
+$ pnpm wallet-data-collection[:agent] <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
 Mark a string as conveying the given datatype. This is the same operation as the one `review-strings` does, but with a more machine-friendly interface. The string will be classified and stored in the capture file's user data store.
@@ -176,19 +176,19 @@ Marking a string as carrying user data has the following effect:
 
 ```
 # Mark a cookie as a tracking identifier:
-$ pnpm wallet-data-collection <global flags> mark-string --string='GA1.1.1294582759.1067224611' --data='TRACKING_IDENTIFIER'
+$ pnpm wallet-data-collection[:agent] <global flags> mark-string --string='GA1.1.1294582759.1067224611' --data='TRACKING_IDENTIFIER'
 
 # Mark a wallet address as such:
-$ pnpm wallet-data-collection <global flags> mark-string --string='0x1234678...' --data='ACCOUNT_ADDRESS'
+$ pnpm wallet-data-collection[:agent] <global flags> mark-string --string='0x1234678...' --data='ACCOUNT_ADDRESS'
 
 # Mark your X.com and Farcaster account name as such:
-$ pnpm wallet-data-collection <global flags> mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'
+$ pnpm wallet-data-collection[:agent] <global flags> mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'
 ```
 
 #### `review-requests` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> review-requests
+$ pnpm wallet-data-collection[:agent] <global flags> review-requests
 ```
 
 Interactively go through requests to manually define their purpose and/or carried data.
@@ -203,32 +203,36 @@ After a request is manually reviewed, it will never be prompted for in future ex
 
 ## Workflow
 
-- Start by creating a browser profile and setting up `mitmproxy`.
-- Record a network capture with `--flow=IDLE_PRE_INSTALL`.
-- Start the browser and simply leave it open for a few minutes.
-- Stop the browser, end the capture.
-- Record a network capture with `--flow=INSTALL`.
-- Start the browser, install the wallet. Do not go through onboarding.
-- Stop the browser, and the capture.
-- Record a network capture with `--flow=ONBOARDING_NEW`.
-- Start the browser with `mitmproxy` and create two new wallet addresses.
-- Stop the browser, end the capture.
-- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to two addresses you have pre-seeded with Ether and USDC.
-- Start the browser and import the two wallet addresses you had created (e.g. by using the same seed phrase).
-  - If you cannot import these two addresses in the wallet after a user account was already created in `ONBOARDING_NEW`:
-    - Stop there, reinstall the wallet from scratch.
-    - Record a capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses are about to import (pre-seeded with Ether and USDC) and the two you had created during `ONBOARDING_NEW`.
-    - Go through the wallet's account import or account recovery flow, and import the two addresses you have pre-seeded with Ether and USDC. Do _not_ import the two addresses from the `ONBOARDING_NEW` float.
-- Stop the browser, end the capture.
-- For each remaining flow (`SEND_ETHER`, `SEND_USDC`, `NATIVE_SWAP`, `APP_CONNECTION`, `MAKE_TRANSACTION`):
-  - If the wallet does not support this flow, run the `mark-flow-unsupported` subcommand to tag it as such. Otherwise:
-  - Record a network capture with `--flow=<flow>`, with `--wallet-addresses` set to the two addresses you have set up in the wallet already.
-  - Start the browser and perform the UX flow.
+- Human:
+  - Start by creating a browser profile and setting up `mitmproxy`.
+  - Record a network capture with `--flow=IDLE_PRE_INSTALL`.
+  - Start the browser and simply leave it open for a few minutes.
   - Stop the browser, end the capture.
-- Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
-  - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
-  - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
-  - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send.
-  - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
-  - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
-- Once the `check` subcommand is successful, you are done!
+  - Record a network capture with `--flow=INSTALL`.
+  - Start the browser, install the wallet. Do not go through onboarding.
+  - Stop the browser, and the capture.
+  - Record a network capture with `--flow=ONBOARDING_NEW`.
+  - Start the browser with `mitmproxy` and create two new wallet addresses.
+  - Stop the browser, end the capture.
+  - Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to two addresses you have pre-seeded with Ether and USDC.
+  - Start the browser and import the two wallet addresses you had created (e.g. by using the same seed phrase).
+    - If you cannot import these two addresses in the wallet after a user account was already created in `ONBOARDING_NEW`:
+      - Stop there, reinstall the wallet from scratch.
+      - Record a capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses are about to import (pre-seeded with Ether and USDC) and the two you had created during `ONBOARDING_NEW`.
+      - Go through the wallet's account import or account recovery flow, and import the two addresses you have pre-seeded with Ether and USDC. Do _not_ import the two addresses from the `ONBOARDING_NEW` float.
+  - Stop the browser, end the capture.
+  - For each remaining flow (`SEND_ETHER`, `SEND_USDC`, `NATIVE_SWAP`, `APP_CONNECTION`, `MAKE_TRANSACTION`):
+    - If the wallet does not support this flow, run the `mark-flow-unsupported` subcommand to tag it as such. Otherwise:
+    - Record a network capture with `--flow=<flow>`, with `--wallet-addresses` set to the two addresses you have set up in the wallet already.
+    - Start the browser and perform the UX flow.
+    - Stop the browser, end the capture.
+- Agent:
+  - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
+    - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
+    - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
+    - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send. If you are not sure, pause and ask your human operator for assistance.
+    - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
+    - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
+  - Once the `check` subcommand is successful, you are done!
+- Human:
+  - Run the `check` subcommand as well. This will contain more tasks for you to do that the automated version of this subcommand did not cover. Your time to shine is now. You will likely need to run the `review-strings` and `review-requests` subcommands until they are happy.

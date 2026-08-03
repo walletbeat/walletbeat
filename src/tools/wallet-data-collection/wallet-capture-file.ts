@@ -812,10 +812,12 @@ function parseWalletDataFlow(v: unknown, at: string): EncodedWalletDataFlow {
  */
 export class UserDataString {
 	public readonly str: string
+	public readonly length: number
 	public readonly pieces: ReadonlySet<UserInfo>
 
 	constructor(str: string, pieces: Iterable<UserInfo>) {
 		this.str = str
+		this.length = str.length
 		this.pieces = new Set(pieces)
 
 		if (str === '' && this.pieces.size > 0) {
@@ -925,7 +927,7 @@ export class UserDataStringStore {
 
 // ============  WalletDataString  ============
 
-enum WalletStringOccurrenceType {
+export enum WalletStringOccurrenceType {
 	HEADER = 'HEADER',
 	TRAILER = 'TRAILER',
 	QUERY = 'QUERY',
@@ -935,7 +937,7 @@ enum WalletStringOccurrenceType {
 	RESPONSE_PAYLOAD = 'RESPONSE_PAYLOAD',
 }
 
-const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
+export const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
 	[WalletStringOccurrenceType.HEADER]: true,
 	[WalletStringOccurrenceType.TRAILER]: true,
 	[WalletStringOccurrenceType.QUERY]: true,
@@ -944,6 +946,25 @@ const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
 	[WalletStringOccurrenceType.RESPONSE_HEADER]: true,
 	[WalletStringOccurrenceType.RESPONSE_PAYLOAD]: true,
 })
+
+export function walletStringOccurrenceTypeName(type: WalletStringOccurrenceType): string {
+	switch (type) {
+		case WalletStringOccurrenceType.HEADER:
+			return 'header'
+		case WalletStringOccurrenceType.TRAILER:
+			return 'trailer'
+		case WalletStringOccurrenceType.QUERY:
+			return 'query'
+		case WalletStringOccurrenceType.COOKIE:
+			return 'cookie'
+		case WalletStringOccurrenceType.PAYLOAD:
+			return 'payload'
+		case WalletStringOccurrenceType.RESPONSE_HEADER:
+			return 'response header'
+		case WalletStringOccurrenceType.RESPONSE_PAYLOAD:
+			return 'response payload'
+	}
+}
 
 export type WalletDataStringBreadcrumb =
 	| {
@@ -1029,6 +1050,64 @@ export class WalletDataStringBreadcrumbs {
 	}
 	public add(breadcrumb: WalletDataStringBreadcrumb): WalletDataStringBreadcrumbs {
 		return new WalletDataStringBreadcrumbs(nonEmptyConcat([this.breadcrumbs, [breadcrumb]]))
+	}
+
+	public containsType(type: WalletStringOccurrenceType): boolean {
+		return this.breadcrumbs.some(x => x.type === type)
+	}
+
+	/**
+	 * If this breadcrumb sequence originates from a key/value dict entry (a
+	 * cookie, header, trailer, query parameter, or response header), returns
+	 * which dict field it belongs to, along with the occurrence type. Returns
+	 * `null` when the string is not a direct field of such a dict (e.g. it was
+	 * extracted from a JSON payload).
+	 */
+	public getDictField(): {
+		occurrence: WalletStringOccurrenceType
+		key: string
+		branch: 'KEY' | 'VALUE'
+	} | null {
+		const first = this.breadcrumbs[0]
+
+		if (!walletStringOccurrenceType.is(first.type)) {
+			return null
+		}
+
+		const second = this.breadcrumbs[1]
+
+		if (second.type !== 'MULTI_KEY' && second.type !== 'KEY') {
+			return null
+		}
+
+		return { occurrence: first.type, key: second.key, branch: second.branch }
+	}
+
+	/**
+	 * Like {@link getDictField}, but also finds fields nested inside (ND)JSON
+	 * or otherwise decoded payload content, by searching past the structural
+	 * breadcrumbs (e.g. `NDJSON_DECODE`, `INDEX`, `JSON_DECODE`) that separate
+	 * the occurrence type from the key. Returns the first key/value field found
+	 * in the chain, or `null` when there is none.
+	 */
+	public findField(): {
+		occurrence: WalletStringOccurrenceType
+		key: string
+		branch: 'KEY' | 'VALUE'
+	} | null {
+		const occurrence = this.breadcrumbs[0]
+
+		if (!walletStringOccurrenceType.is(occurrence.type)) {
+			return null
+		}
+
+		for (const crumb of this.breadcrumbs.slice(1)) {
+			if (crumb.type === 'KEY' || crumb.type === 'MULTI_KEY') {
+				return { occurrence: occurrence.type, key: crumb.key, branch: crumb.branch }
+			}
+		}
+
+		return null
 	}
 
 	/**
@@ -1430,14 +1509,16 @@ export class WalletDataString {
 	}
 
 	public str: UserDataString
+	public readonly length: number
+	public readonly entropy: StringEntropy
 	private readonly _firstOrigin: WalletDataStringOrigin
 	private readonly origins: Map<string, WalletDataStringOrigin>
 	private readonly occurrencesByRoughKey: Map<string, number>
-	private readonly entropy: StringEntropy
 	private _score: number | null = null
 
 	private constructor(str: UserDataString, firstOrigin: WalletDataStringOrigin) {
 		this.str = str
+		this.length = str.length
 		this.origins = new Map()
 		this.occurrencesByRoughKey = new Map()
 		this._firstOrigin = firstOrigin
@@ -1464,6 +1545,13 @@ export class WalletDataString {
 	 */
 	public getRoughOccurrences(): ReadonlyMap<string, number> {
 		return this.occurrencesByRoughKey
+	}
+
+	/**
+	 * @returns Total number of occurrences of this string.
+	 */
+	public getTotalOccurrences(): number {
+		return this.origins.size
 	}
 
 	public addOccurrencesFrom(other: WalletDataString) {
@@ -1515,13 +1603,26 @@ export class WalletDataString {
 
 		return this._score
 	}
+
+	public isWorthReviewingWithin(strings: WalletDataStrings): boolean {
+		if (strings.captureFile.isBenignString(this.str.str)) {
+			return false
+		}
+
+		if (this.str.pieces.size > 0) {
+			return false
+		}
+
+		return true
+	}
 }
 
 export class WalletDataStrings {
-	private captureFile: WalletCaptureFile
+	public readonly captureFile: WalletCaptureFile
 	private _strings: Map<string, WalletDataString> = new Map()
 	private _highestScoreFirstStrings: WalletDataString[] | null = null
 	private _longestFirstStrings: WalletDataString[] | null = null
+	private _highestFrequencyFirstStrings: WalletDataString[] | null = null
 
 	constructor(captureFile: WalletCaptureFile) {
 		this.captureFile = captureFile
@@ -1550,12 +1651,16 @@ export class WalletDataStrings {
 
 		this._highestScoreFirstStrings = null
 		this._longestFirstStrings = null
+		this._highestFrequencyFirstStrings = null
 	}
 
 	public get size(): number {
 		return this._strings.size
 	}
 
+	/**
+	 * @returns The set of strings, ordered by highest entropy score first. Useful for humans.
+	 */
 	public strings(): ReadonlyArray<WalletDataString> {
 		if (this._highestScoreFirstStrings === null) {
 			this._highestScoreFirstStrings = Array.from(this._strings.values()).sort((a, b) =>
@@ -1570,6 +1675,9 @@ export class WalletDataStrings {
 		return this._strings.get(str)
 	}
 
+	/**
+	 * @returns The set of strings, ordered by longest string first. Useful for string matching.
+	 */
 	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
 		if (this._longestFirstStrings === null) {
 			this._longestFirstStrings = Array.from(this._strings.values())
@@ -1578,6 +1686,114 @@ export class WalletDataStrings {
 		}
 
 		return this._longestFirstStrings
+	}
+
+	/**
+	 * @returns The set of strings, ordered by most-common first. Useful for agents.
+	 */
+	public highestFrequencyFirstStrings(): ReadonlyArray<WalletDataString> {
+		if (this._highestFrequencyFirstStrings === null) {
+			this._highestFrequencyFirstStrings = Array.from(this._strings.values()).sort(
+				(a, b) => b.getTotalOccurrences() - a.getTotalOccurrences(),
+			)
+		}
+
+		return this._highestFrequencyFirstStrings
+	}
+
+	/**
+	 * Computes and returns the smallest set of unclassified (not classified as
+	 * BENIGN or carrying user info) strings that, if all classified, would
+	 * unblock one currently-unreviewable `WalletRequest`.
+	 * If multiple such sets of that size exist, the set that unblocks the most
+	 * `WalletRequest`s at once is returned.
+	 * If multiple such sets of that size exist which unblock the same number of
+	 * `WalletRequest`s at once, the one with the highest total entropy score
+	 * wins.
+	 * Within the returned set, strings are ordered highest-score first.
+	 */
+	public smallestSetUnblockingOneRequestReview(): ReadonlyArray<WalletDataString> {
+		// For each currently-unreviewable request, collect the set of unclassified
+		// strings blocking it. A request is unreviewable when it contains at least
+		// one string that is neither BENIGN nor carrying user info.
+		const blockingByRequest: Map<WalletRequest, Set<WalletDataString>> = new Map()
+
+		for (const s of this.strings()) {
+			// Only unclassified strings block review.
+			if (!s.isWorthReviewingWithin(this)) {
+				continue
+			}
+
+			for (const origin of s.getOrigins().values()) {
+				const req = origin.request
+				const matcher = this.captureFile.findMatcherForReq(req)
+
+				if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
+					continue
+				}
+
+				let blocking = blockingByRequest.get(req)
+
+				if (blocking === undefined) {
+					blocking = new Set()
+					blockingByRequest.set(req, blocking)
+				}
+
+				blocking.add(s)
+			}
+		}
+
+		const candidateSets = Array.from(blockingByRequest.values())
+
+		if (candidateSets.length === 0) {
+			return []
+		}
+
+		const isSubset = (a: Set<WalletDataString>, b: Set<WalletDataString>): boolean => {
+			for (const x of a) {
+				if (!b.has(x)) {
+					return false
+				}
+			}
+
+			return true
+		}
+
+		const unblocksCount = (set: Set<WalletDataString>): number => {
+			let count = 0
+
+			for (const other of blockingByRequest.values()) {
+				if (isSubset(other, set)) {
+					count++
+				}
+			}
+
+			return count
+		}
+
+		const totalScore = (set: Set<WalletDataString>): number => {
+			let total = 0
+
+			for (const s of set) {
+				total += s.score
+			}
+
+			return total
+		}
+
+		// Smallest set that unblocks one request wins.
+		const minSize = Math.min(...candidateSets.map(set => set.size))
+		const minimal = candidateSets.filter(set => set.size === minSize)
+
+		// Among minimal sets, prefer the one unblocking the most requests at once.
+		const maxUnblocks = Math.max(...minimal.map(unblocksCount))
+		const mostUnblocking = minimal.filter(set => unblocksCount(set) === maxUnblocks)
+
+		// Among those, prefer the one with the highest total entropy score.
+		const winner = mostUnblocking.reduce((a, b) => (totalScore(b) > totalScore(a) ? b : a))
+
+		// Return the winning strings, ordered highest-score first.
+		return Array.from(winner).sort((a, b) => WalletDataString.highestScoreFirst(a, b))
 	}
 }
 
@@ -1983,6 +2199,39 @@ export class WalletRequest {
 		)
 	}
 
+	/**
+	 * Returns true if `needle` appears in any string field of this request.
+	 */
+	public async containsString(needle: string): Promise<boolean> {
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		for (const s of reqStrings.strings()) {
+			if (s.str.str.includes(needle)) {
+				return true
+			}
+		}
+
+		if (this.domain.includes(needle)) {
+			return true
+		}
+
+		if (this.path.includes(needle)) {
+			return true
+		}
+
+		if (this.refererDomain !== null && this.refererDomain.includes(needle)) {
+			return true
+		}
+
+		if (this.jsonRpcMethods.some(m => m.includes(needle))) {
+			return true
+		}
+
+		return false
+	}
+
 	public get key(): string {
 		return this._key
 	}
@@ -2142,6 +2391,24 @@ export class WalletRequest {
 			}
 		}
 	}
+
+	/**
+	 * Returns true if this `WalletRequest` is ready for review, i.e. ALL strings
+	 * within it are marked as BENIGN or user-data-carrying in `wholeCaptureStrings`.
+	 */
+	public async isReadyForReview(wholeCaptureStrings: WalletDataStrings): Promise<boolean> {
+		const thisRequestStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(thisRequestStrings)
+
+		for (const s of thisRequestStrings.strings()) {
+			if (s.isWorthReviewingWithin(wholeCaptureStrings)) {
+				return false
+			}
+		}
+
+		return true
+	}
 }
 
 export class WalletCaptureFlow {
@@ -2208,6 +2475,19 @@ export class WalletCaptureFlow {
 		}
 
 		return issues
+	}
+
+	public async unreviewableRequests(strings: WalletDataStrings): Promise<WalletRequest[]> {
+		const filtered = this._requests.filter(req => {
+			const matcher = this.file.findMatcherForReq(req)
+
+			return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
+		})
+		const keepIndexes = await Promise.all(
+			filtered.map(async req => await req.isReadyForReview(strings)),
+		)
+
+		return filtered.filter((_, i) => keepIndexes[i])
 	}
 
 	public unreviewedRequests(): WalletRequestReview[] {
@@ -2753,7 +3033,9 @@ export class WalletCaptureFile {
 		}
 	}
 
-	public async check(): Promise<WalletCaptureIssue[]> {
+	public async check(checkOpts: {
+		reviewType: 'MUST_MAKE_REVIEWABLE' | 'MUST_REVIEW'
+	}): Promise<WalletCaptureIssue[]> {
 		if (recordedFlow.items.map(this.getFlow.bind(this)).every(v => v === null)) {
 			return [
 				new WalletCaptureIssue({
@@ -2769,8 +3051,10 @@ export class WalletCaptureFile {
 			]
 		}
 
+		const strings = await this.gatherStrings()
 		const issues: WalletCaptureIssue[] = []
 		let numUnreviewedRequests = 0
+		let numUnreviewableRequests = 0
 		const allDomains = new Set<string>()
 
 		for (const f of recordedFlow.items) {
@@ -2809,6 +3093,7 @@ export class WalletCaptureFile {
 			for (const issue of flow.check()) {
 				issues.push(issue.prependSection(`Flow ${f}`))
 			}
+			numUnreviewableRequests += (await flow.unreviewableRequests(strings)).length
 			numUnreviewedRequests += flow.unreviewedRequests().length
 		}
 
@@ -2850,20 +3135,38 @@ export class WalletCaptureFile {
 			}
 		}
 
-		if (!hasUnassociatedDomain && numUnreviewedRequests > 0) {
+		if (checkOpts.reviewType === 'MUST_REVIEW') {
+			if (!hasUnassociatedDomain && numUnreviewedRequests > 0) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Requests review'],
+						issue: `There are ${numUnreviewedRequests} unreviewed requests.`,
+						suggestions: [
+							{
+								suggestion:
+									'Tag high-entropy strings as benign, tracking identifiers, or user information (makes `review-requests` less tedious)',
+								subcommand: 'review-strings',
+							},
+							{
+								suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers or `review-strings` before doing so)' : ''}`,
+								subcommand: 'review-requests',
+							},
+						],
+					}),
+				)
+			}
+		}
+
+		if (numUnreviewableRequests > 0) {
 			issues.push(
 				new WalletCaptureIssue({
-					section: ['Requests review'],
-					issue: `There are ${numUnreviewedRequests} unreviewed requests.`,
+					section: ['Requests reviewability'],
+					issue: `There are ${numUnreviewableRequests} unreviewable requests.`,
 					suggestions: [
 						{
 							suggestion:
-								'Tag high-entropy strings as benign, tracking identifiers, or user information (makes `review-requests` less tedious)',
+								'Tag high-entropy strings as benign, tracking identifiers, or user information',
 							subcommand: 'review-strings',
-						},
-						{
-							suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers or `review-strings` before doing so)' : ''}`,
-							subcommand: 'review-requests',
 						},
 					],
 				}),

@@ -19,19 +19,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Check – Astro
+          - name: 'Check: Astro'
             command: pnpm run check:astro
-          - name: Test – Vitest
+          - name: 'Test: Vitest'
             command: pnpm run check:vitest
-          - name: Lint – ESLint
+          - name: 'Lint: ESLint'
             command: pnpm run check:lint
-          - name: Format – Prettier
+          - name: 'Format: Prettier'
             command: pnpm run check:syntax
-          - name: Spell check – CSpell
+          - name: 'Spell check: CSpell'
             command: pnpm run check:spelling:quiet
           - name: Other checks
             command: pnpm run check:misc
-          - name: Build – Astro
+          - name: 'Build: Astro'
             command: pnpm run check:build:post:quiet
           - name: Commit signature
             command: pnpm run check:signed-commit
@@ -49,3 +49,5 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: ${{ matrix.name }}
         run: ${{ matrix.command }}
+        env:
+          WALLETBEAT_ENV: CI
