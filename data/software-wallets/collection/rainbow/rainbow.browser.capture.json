@@ -2912,7 +2912,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				}
 			]
 		},
@@ -2936,7 +2940,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "7dV-PFRaSb3-pr4yS8RhSjpsnJJNZR2BEaZtPR2l-3B7o6kE7yPkFg=="
 					},
-					"responsePayload": "{\"data\":{\"reverseResolveENSProfile\":null}}"
+					"responsePayload": "{\"data\":{\"reverseResolveENSProfile\":null}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -2958,7 +2966,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "w9t2m7XUC2V7BQUcOOSI-ZZTNoSnUCSBb3MDyHqQuwq9vjndjz2Lmw=="
 					},
-					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:48:23.812992684Z\",\"responseTime\":\"2026-07-31T15:48:24.230119675Z\",\"requestId\":\"dc3586a0-0593-4c84-9957-57f10ff5100c\",\"currency\":\"USD\",\"success\":true}}"
+					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:48:23.812992684Z\",\"responseTime\":\"2026-07-31T15:48:24.230119675Z\",\"requestId\":\"dc3586a0-0593-4c84-9957-57f10ff5100c\",\"currency\":\"USD\",\"success\":true}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -2969,7 +2981,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dbf403d0ba3e6-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -2983,7 +2999,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -2997,7 +3017,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3011,7 +3035,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3025,7 +3053,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3041,6 +3073,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3057,6 +3093,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3098,6 +3138,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3114,6 +3158,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3128,7 +3176,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3142,7 +3194,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3158,6 +3214,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3172,7 +3232,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3188,6 +3252,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3202,7 +3270,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "android.clients.google.com",
@@ -3271,6 +3343,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3287,6 +3363,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3301,7 +3381,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3315,7 +3399,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -3337,7 +3425,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "jSSbmdfAk7wqfpTlXKXcUO13Foe7hcpX0MLdQCrSfj0dUtc9NJuz1w=="
 					},
-					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:49:24.567628801Z\",\"responseTime\":\"2026-07-31T15:49:25.129891150Z\",\"requestId\":\"a673ecf4-7ee2-40a6-b637-91452eb3042d\",\"currency\":\"USD\",\"success\":true}}"
+					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:49:24.567628801Z\",\"responseTime\":\"2026-07-31T15:49:25.129891150Z\",\"requestId\":\"a673ecf4-7ee2-40a6-b637-91452eb3042d\",\"currency\":\"USD\",\"success\":true}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3353,6 +3445,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3367,7 +3463,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
