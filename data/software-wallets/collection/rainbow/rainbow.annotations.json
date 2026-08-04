@@ -182,8 +182,13 @@
 		}
 	],
 	"benignStrings": [
+		"/#/home",
+		"/#/swap",
 		"0x067b3daa152600182fb340a7418c3167d51856dcb18a9c42e1d3f6483b98748a",
 		"0x4cd00e387622c35bddb9b4c962c136462338bc31",
+		"0x71452ca6c221a6a2520a51813d3b6613d7fe1b3c31527a79001e238c6f481309",
+		"0xb7d6ca640000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000003c00000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000014782d62617463682d676174657761793a74727565000000000000000000000000",
+		"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9",
 		"13r3r3r3n5l1",
 		"1710x1112",
 		"2026-07-31T15:48:34.078Z",
@@ -195,11 +200,22 @@
 		"AgAAAAQ",
 		"Basic MmRZYTB5U05VV0w2WXdoVFZKQU42VGlwWlkyOg",
 		"Chromium;153.0.7984.0|Not_A%20Brand;8.0.0.0",
+		"G-YT3SXRJEC6",
 		"G111",
 		"MTc3OTc4MTQ2NS05NzQ1LTM",
 		"MTc3OTg0MjMwOS05NzQ1LTQ",
+		"POST https://rpc.rainbow.me/v1/1/B9kBlwE2Hpw0COb7pWj6rpnk69fqSGGRc3fQ5nZ2LzeFS1G2VRxBQilZWbxAZkXI",
 		"chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/703.js",
 		"chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/popup.html",
-		"noapi"
+		"div._28iyjl0 > div._28iyjl0._28iyjl89._28iyjl8c._28iyjl6m._28iyjl9w._28iyjl8v",
+		"div._28iyjl0._28iyjl1e4._28iyjl1e6._28iyjl1e3._28iyjl1e1._28iyjl1cq.qwcid0",
+		"https://addys.p.rainbow.me/v3/summary",
+		"https://token-search.rainbow.me/v3/discovery/1",
+		"https://token-search.rainbow.me/v3/discovery/324",
+		"includeTestnets",
+		"noapi",
+		"{ Q0: token( address: \"0x0000000000000000000000000000000000000000\" chainID: 1 currency: \"USD\" ) { colors { primary fallback shadow } decimals iconUrl name networks symbol price { value relativeChange24h } } }",
+		"{ Q0: token( address: \"0x0000000000000000000000000000000000000000\" chainID: 324 currency: \"USD\" ) { colors { primary fallback shadow } decimals iconUrl name networks symbol price { value relativeChange24h } } }",
+		"{ Q0: token( address: \"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\" chainID: 1 currency: \"USD\" ) { colors { primary fallback shadow } decimals iconUrl name networks symbol price { value relativeChange24h } } }"
 	]
 }
