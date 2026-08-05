@@ -3720,6 +3720,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3734,7 +3738,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3754,7 +3762,11 @@
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					},
-					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}"
+					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3770,6 +3782,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3786,6 +3802,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3800,7 +3820,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3816,6 +3840,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
 					}
 				},
 				{
@@ -3832,6 +3860,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
 					}
 				},
 				{
@@ -3852,7 +3884,11 @@
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					},
-					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}"
+					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3868,6 +3904,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3884,6 +3924,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3898,7 +3942,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3912,7 +3960,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3928,6 +3980,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
 					}
 				},
 				{
@@ -3944,6 +4000,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3972,6 +4032,10 @@
 							"0x4403908d9052bcd1a0d818a766d9168b549c9921",
 							"0xce4234a06dd0f213c01940115b6b83007abe1674"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3992,7 +4056,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "4DSU0JYpjD7NHCvr0i3UK9MYBvWhTCn-5FEPTZ6jvEd1BExoMf2i1Q=="
 					},
-					"responsePayload": "{\"data\":{\"reverseResolveENSProfile\":null}}"
+					"responsePayload": "{\"data\":{\"reverseResolveENSProfile\":null}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4003,7 +4071,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dcf788bd5fe8c-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":48,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":48,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -4049,6 +4121,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4078,6 +4154,10 @@
 							"0x4403908d9052bcd1a0d818a766d9168b549c9921",
 							"0xce4234a06dd0f213c01940115b6b83007abe1674"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4098,7 +4178,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "B9543GprXVzNHYfQ-xBIe2zNKA3zl9eF6_gzNBZuusQmaS__eOP7Fw=="
 					},
-					"responsePayload": "{\"result\":{\"1\":{\"chainId\":\"1\",\"delegationStatus\":\"DELEGATION_STATUS_THIRD_PARTY_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_UPGRADE_AVAILABLE\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"10\":{\"chainId\":\"10\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"100\":{\"chainId\":\"100\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"130\":{\"chainId\":\"130\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"137\":{\"chainId\":\"137\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"42161\":{\"chainId\":\"42161\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"4663\":{\"chainId\":\"4663\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"56\":{\"chainId\":\"56\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"57073\":{\"chainId\":\"57073\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"747474\":{\"chainId\":\"747474\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"80094\":{\"chainId\":\"80094\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"8453\":{\"chainId\":\"8453\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}}}}"
+					"responsePayload": "{\"result\":{\"1\":{\"chainId\":\"1\",\"delegationStatus\":\"DELEGATION_STATUS_THIRD_PARTY_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_UPGRADE_AVAILABLE\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"10\":{\"chainId\":\"10\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"100\":{\"chainId\":\"100\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"130\":{\"chainId\":\"130\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"137\":{\"chainId\":\"137\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"42161\":{\"chainId\":\"42161\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"4663\":{\"chainId\":\"4663\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"56\":{\"chainId\":\"56\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"57073\":{\"chainId\":\"57073\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"747474\":{\"chainId\":\"747474\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"80094\":{\"chainId\":\"80094\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"8453\":{\"chainId\":\"8453\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}}}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -4173,6 +4257,10 @@
 							"0xedb22965d0dd7fe8fe4dae8e89f1d958d6b2f0a4",
 							"0xf28e08eb463e48eb070bad47c1f97a98c1f09da9b60056578652d316ff2d5d1f"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4184,7 +4272,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dcf791a8bfede-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":8,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":8,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4195,7 +4287,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dcf792b54fd26-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":49,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":49,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4206,7 +4302,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dcf792bbef88e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":50,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":50,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4217,7 +4317,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dcf7928171d5a-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":51,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":51,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4231,7 +4335,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4245,7 +4353,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4259,7 +4371,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4273,7 +4389,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4287,7 +4407,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4301,7 +4425,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -4347,6 +4475,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4361,7 +4493,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbow.imgix.net",
@@ -4387,6 +4523,10 @@
 						"suffix": "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'abef7ead0e446d006ea95c308f26898c6fbe3e866fa49c0e2e5f0143a8987117\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'33b58dc3b17cbc4ef8adde63ab75a668aad27955e2e580a9e83798c66de763d0\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\'952572ae6fcd1e9adbb469d960ca9b818296881bfe0526a9816a360b430995b4\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\', \\\\\\\\\\'sha256\\\\\\\\\\': \\\\\\\\\\'c5f179f395b9cb8cd4fba024fc5f7c806a4365f6a6acb928824d642cb2165adf\\\\\\\\\\', \\\\\\\\\\'format\\\\\\\\\\': \\\\\\\\\\'unknown\\\\\\\\\\'}\\', \\'sha256\\': \\'e5daa8f2220d08dc9d6d72acfbed6204273e060e4facab6b5198d40d3d5289aa\\', \\'format\\': \\'unknown\\'}\", \\'sha256\\': \\'ddfcd8971897a71255ca38c82181c5fc9464b0c2c1f24d9aa680d6e2a1d0437d\\', \\'format\\': \\'unknown\\'}', 'sha256': '0194b926c2541ae449a2fef3b809999e59965e1489612eabaa8504f557408efc', 'format': 'unknown'}",
 						"sha256": "1164afac1ed7a76548e19b1d81a6b9198d239d3fe79777ac97b6e8cfc1e8c3a4",
 						"format": "unknown"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4413,6 +4553,10 @@
 						"suffix": "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'8d5fc2506acbf6e9db8e09237fcc90a3e34c0c5443960f97932288efc29d23c5\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'726591740b26b75de121b73b12f01d8ea9ad2cca6553d72fa46cb76967ac2568\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\'7933771ada9336f98bf8fb945e85778a3e8594a49255af6a36a1365ea8ed04d3\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\', \\\\\\\\\\'sha256\\\\\\\\\\': \\\\\\\\\\'bc51a0a7100c52ba2ff0d541a6c463f938f2479461d89cedae49de07a8e298a3\\\\\\\\\\', \\\\\\\\\\'format\\\\\\\\\\': \\\\\\\\\\'unknown\\\\\\\\\\'}\\', \\'sha256\\': \\'f46b8d60932096465d907b8016c60a30936ce06114dc0ba12662ca76164cb596\\', \\'format\\': \\'unknown\\'}\", \\'sha256\\': \\'11d6f06c50cc8923f5ff387c3e22f32da17e5182a207718f22a871c34b53f491\\', \\'format\\': \\'unknown\\'}', 'sha256': 'd3a33bcac3b058cb5751d85fe7d5de7eacf598475f68d02f460bc20fe9f1bfa7', 'format': 'unknown'}",
 						"sha256": "f2bb6856afce6bed66b30cc49e485b808f4ed878b0a56a7391f33e90b9e708ef",
 						"format": "unknown"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4439,6 +4583,10 @@
 						"suffix": "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'72db28425bf812f972a3ff690b963084f16071095a6028f2d8350c7104380982\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'deead964f0be9ae1adc39d3c78f6ee9b68060e5691d5fbb6959daa6fac0e1d25\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\'03174b512e0561158543a865bc6ab1301da318ed08ac6476704eb230d1ecc0e5\\\\\\\\\\\\\\\\\\\\\\\\\\', \\\\\\\\\\\\\\\\\\\\\\\\\\'format\\\\\\\\\\\\\\\\\\\\\\\\\\': \\\\\\\\\\\\\\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\\\\\\\\\\\\\'}\\\\\\\\\\', \\\\\\\\\\'sha256\\\\\\\\\\': \\\\\\\\\\'b5b13c21756079a6fc2bdb89467d8c46ef9f9cc482144bd3d7a19c0badbe9a51\\\\\\\\\\', \\\\\\\\\\'format\\\\\\\\\\': \\\\\\\\\\'unknown\\\\\\\\\\'}\\', \\'sha256\\': \\'9223925cfe66e5b156df260df561d1ecfcdc73792884f94f1cf1e296fe017d2f\\', \\'format\\': \\'unknown\\'}\", \\'sha256\\': \\'a13410d95655725e8136d5d3acd4e9e8eab57525307141a811742fecd8f3ec96\\', \\'format\\': \\'unknown\\'}', 'sha256': '95395adce64e158320dba0904044d796d637f981d2fc2cdbe0dc4f1c27886a24', 'format': 'unknown'}",
 						"sha256": "3843bc8b0d01d4f3b6e44e62613946418cee1e8aad72d4dc2743cee70854ba5e",
 						"format": "unknown"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4459,7 +4607,11 @@
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					},
-					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}"
+					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -4479,7 +4631,11 @@
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					},
-					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}"
+					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -4499,7 +4655,11 @@
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					},
-					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}"
+					"responsePayload": "{\"id\":\"ae4c5fec5bca41228342e73b42f813f5\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				}
 			]
 		},
@@ -4605,6 +4765,10 @@
 							"0xedbbae25e687f4bb73417ce6df06e9ef19f1b0a4",
 							"0xfca035ef568239c8b0c20605f8580384756316bb3cbf66dbd5d65571d3038ed6"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4651,6 +4815,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4667,6 +4835,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4678,7 +4850,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd56cc8fbd47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":7,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":7,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -4694,6 +4870,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4705,7 +4885,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd56d5d368958-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":8,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":8,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4716,7 +4900,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd56d5f2e4067-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":9,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":9,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4727,7 +4915,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd56e2ad161aa-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":10,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":10,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4738,7 +4930,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd56eba5640a4-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":11,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":11,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4752,7 +4948,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4766,7 +4966,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -4780,7 +4984,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4791,7 +4999,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd57338a8d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":12,\"error\":{\"code\":3,\"message\":\"execution reverted\",\"data\":\"0x77209fe80000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c2a307863653432333461303664643046323133433031393430313135623662383330303741626531363734000000000000000000000000000000000000000000\"}}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":12,\"error\":{\"code\":3,\"message\":\"execution reverted\",\"data\":\"0x77209fe80000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c2a307863653432333461303664643046323133433031393430313135623662383330303741626531363734000000000000000000000000000000000000000000\"}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -4837,6 +5049,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -4848,7 +5064,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd584daa8d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "metadata.p.rainbow.me",
@@ -4860,7 +5080,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "OL1TpMTIr_vI2UWX9lOI4xjg6qLomkecWbuX48rxxZBV17i9qgNOIQ=="
 					},
-					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390052,\"provider\":\"rpc\"}}"
+					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390052,\"provider\":\"rpc\"}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4871,7 +5095,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd587c98840a4-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4882,7 +5110,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd589eaba40a4-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b6ff\",\"id\":43}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b6ff\",\"id\":43}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4893,7 +5125,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd58a9883d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b6ff\",\"id\":43}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b6ff\",\"id\":43}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4904,7 +5140,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd592ae77d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "metadata.p.rainbow.me",
@@ -4916,7 +5156,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "OrWfKxGppjlO8z5VO_x5U_oytJyaSn48Pykcf7gdTPy4mXal67Mh-A=="
 					},
-					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390054,\"provider\":\"rpc\"}}"
+					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390054,\"provider\":\"rpc\"}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4927,7 +5171,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5945c77d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b6ff\",\"id\":43}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b6ff\",\"id\":43}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "metadata.p.rainbow.me",
@@ -4939,7 +5187,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "3KxI4BzXSGjBNv7Ar8YUEvcag9c_eLFQfh3WGvhGXgW8Gjdb-7M78A=="
 					},
-					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390056,\"provider\":\"rpc\"}}"
+					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390056,\"provider\":\"rpc\"}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4950,7 +5202,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5ae58fad47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4961,7 +5217,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5b04fb8d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":{\"baseFeePerGas\":\"0x2b275d0\",\"difficulty\":\"0x0\",\"extraData\":\"0x\",\"gasLimit\":\"0x4000000000000\",\"gasUsed\":\"0x385d7\",\"hash\":\"0xdad0f539324d67a0739681757bf28691f044d1598833b3ada1cf07a86dc80ff3\",\"l1BatchNumber\":null,\"l1BatchTimestamp\":null,\"logsBloom\":\"0x000000000004000000001000000000000000000000000000020040000000000000000200000000000020000000200000000000000000000000000000000000000000000000000400000000080000000800000000100000200000000100000a0000000000020000000000000000000800000000000000000000000010000000000000000000000080000004000000000000000000000000000000000000000000000000000001100000100000000010000000000002000000000000000000000000000002008020000000000000000000400000000000040000000000000020000000000000000040000020000000020000000000000000020000000000001000\",\"miner\":\"0x0000000000000000000000000000000000000000\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"nonce\":\"0x0000000000000000\",\"number\":\"0x441536a\",\"parentHash\":\"0x0f0f4de7c00cc4763bcdecbe829ca322e3e6d41d20ffd34af73f2fa2d2cdc857\",\"receiptsRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"sealFields\":[],\"sha3Uncles\":\"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\"size\":\"0x0\",\"stateRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"timestamp\":\"0x6a6cc75b\",\"totalDifficulty\":\"0x0\",\"transactions\":[\"0xa50800d4cd5b2a6a02545781f496cfb3e2f33dea02aecd4db6bfb1a7feb5b827\"],\"transactionsRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"uncles\":[]},\"id\":43}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":{\"baseFeePerGas\":\"0x2b275d0\",\"difficulty\":\"0x0\",\"extraData\":\"0x\",\"gasLimit\":\"0x4000000000000\",\"gasUsed\":\"0x385d7\",\"hash\":\"0xdad0f539324d67a0739681757bf28691f044d1598833b3ada1cf07a86dc80ff3\",\"l1BatchNumber\":null,\"l1BatchTimestamp\":null,\"logsBloom\":\"0x000000000004000000001000000000000000000000000000020040000000000000000200000000000020000000200000000000000000000000000000000000000000000000000400000000080000000800000000100000200000000100000a0000000000020000000000000000000800000000000000000000000010000000000000000000000080000004000000000000000000000000000000000000000000000000000001100000100000000010000000000002000000000000000000000000000002008020000000000000000000400000000000040000000000000020000000000000000040000020000000020000000000000000020000000000001000\",\"miner\":\"0x0000000000000000000000000000000000000000\",\"mixHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"nonce\":\"0x0000000000000000\",\"number\":\"0x441536a\",\"parentHash\":\"0x0f0f4de7c00cc4763bcdecbe829ca322e3e6d41d20ffd34af73f2fa2d2cdc857\",\"receiptsRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"sealFields\":[],\"sha3Uncles\":\"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\"size\":\"0x0\",\"stateRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"timestamp\":\"0x6a6cc75b\",\"totalDifficulty\":\"0x0\",\"transactions\":[\"0xa50800d4cd5b2a6a02545781f496cfb3e2f33dea02aecd4db6bfb1a7feb5b827\"],\"transactionsRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"uncles\":[]},\"id\":43}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "metadata.p.rainbow.me",
@@ -4973,7 +5233,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "sjHzX59CQe5dG0KxEmz6KaUhhHpv6BCfC1oqeh_vaRPZLqbHsrJwtQ=="
 					},
-					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390058,\"provider\":\"rpc\"}}"
+					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390058,\"provider\":\"rpc\"}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4984,7 +5248,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5b20e5ed47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":44}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":44}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -4995,7 +5263,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5b46ea2d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x\",\"id\":45}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x\",\"id\":45}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5006,7 +5278,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5b6aed5d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":46}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":46}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5017,7 +5293,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5b89d72d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b67f\",\"id\":47}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x2b67f\",\"id\":47}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5028,7 +5308,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5bb3ef3d47e-SIN"
 					},
-					"responsePayload": "[{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}]"
+					"responsePayload": "[{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}]",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5042,7 +5326,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5bd2e71d47e-SIN"
 					},
-					"responsePayload": "[{\"jsonrpc\":\"2.0\",\"result\":\"0x1\",\"id\":43},{\"jsonrpc\":\"2.0\",\"result\":\"0x1\",\"id\":44}]"
+					"responsePayload": "[{\"jsonrpc\":\"2.0\",\"result\":\"0x1\",\"id\":43},{\"jsonrpc\":\"2.0\",\"result\":\"0x1\",\"id\":44}]",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "metadata.p.rainbow.me",
@@ -5054,7 +5342,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "kjEUD3lCT1lW0psFuvns0LMh0SY82TEMYw4-ObfvuQwFN9RBpurGSg=="
 					},
-					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390060,\"provider\":\"rpc\"}}"
+					"responsePayload": "{\"data\":{\"currentBaseFee\":\"45250000\",\"baseFeeSuggestion\":\"54271961\",\"baseFeeTrend\":0,\"blocksToConfirmationByBaseFee\":{\"120\":\"22853756\",\"240\":\"18409971\",\"4\":\"43719081\",\"40\":\"28370178\",\"8\":\"35218150\"},\"blocksToConfirmationByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"confirmationTimeByPriorityFee\":{\"1\":\"103\",\"2\":\"103\",\"3\":\"100\",\"4\":\"100\"},\"maxPriorityFeeSuggestions\":{\"fast\":\"104\",\"lowest\":\"100\",\"normal\":\"100\",\"urgent\":\"104\"},\"secondsPerNewBlock\":0.425},\"meta\":{\"feeType\":\"eip1559\",\"blockNumber\":71390060,\"provider\":\"rpc\"}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5065,7 +5357,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5bf0e85d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":42}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5076,7 +5372,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5c0fe0ed47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":43}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":43}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5087,7 +5387,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5c2ed37d47e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x441536d\",\"id\":44}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x441536d\",\"id\":44}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5098,7 +5402,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5c2efa640a4-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":45}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0x144\",\"id\":45}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5109,7 +5417,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5c508f540a4-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"id\":46}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"result\":\"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"id\":46}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -5125,6 +5437,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5141,6 +5457,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5155,7 +5475,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -5169,7 +5493,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -5215,6 +5543,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5229,6 +5561,10 @@
 					},
 					"oddHeaders": {
 						"Authorization": "Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5240,7 +5576,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd5c7ca8140a4-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":13,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":13,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -39771,7 +40111,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "qggK1q0y8Qa9VuFjNENOjBt-yArI2VLS1bMnjNBFCh6EQIHlPEI_6g=="
 					},
-					"responsePayload": "{\"data\":{\"dApp\":null}}"
+					"responsePayload": "{\"data\":{\"dApp\":null}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "metadata.p.rainbow.me",
@@ -39791,7 +40135,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P1",
 						"X-Amz-Cf-Id": "xtslmi8nZBCjjtgfCzaaTU2FIL31jcAoFcj1yK5FzhYdIKSEJYiEYw=="
 					},
-					"responsePayload": "{\"data\":{\"dApp\":{\"name\":\"\",\"status\":\"UNVERIFIED\",\"colors\":{\"primary\":\"\",\"fallback\":\"\",\"shadow\":\"\"},\"iconURL\":\"\",\"url\":\"https://beta.walletbeat.eth.limo/\",\"description\":\"\",\"shortName\":\"\"}}}"
+					"responsePayload": "{\"data\":{\"dApp\":{\"name\":\"\",\"status\":\"UNVERIFIED\",\"colors\":{\"primary\":\"\",\"fallback\":\"\",\"shadow\":\"\"},\"iconURL\":\"\",\"url\":\"https://beta.walletbeat.eth.limo/\",\"description\":\"\",\"shortName\":\"\"}}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "addys.p.rainbow.me",
@@ -39820,6 +40168,10 @@
 							"0x4403908d9052bcd1a0d818a766d9168b549c9921",
 							"0xce4234a06dd0f213c01940115b6b83007abe1674"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -39866,6 +40218,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -39882,6 +40238,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -39893,7 +40253,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23ddd2f4c38fe1d-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":0,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":0,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -39907,6 +40271,10 @@
 					},
 					"oddHeaders": {
 						"Authorization": "Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -39927,7 +40295,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "qN1cHjxjtC3fCEBPhkBwvlIDCa9SZLAfpriUcgLbjDLshfmqauqD3g=="
 					},
-					"responsePayload": "{\"result\":{\"1\":{\"chainId\":\"1\",\"delegationStatus\":\"DELEGATION_STATUS_THIRD_PARTY_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_UPGRADE_AVAILABLE\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"10\":{\"chainId\":\"10\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"100\":{\"chainId\":\"100\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"130\":{\"chainId\":\"130\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"137\":{\"chainId\":\"137\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"42161\":{\"chainId\":\"42161\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"4663\":{\"chainId\":\"4663\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"56\":{\"chainId\":\"56\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"57073\":{\"chainId\":\"57073\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"747474\":{\"chainId\":\"747474\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"80094\":{\"chainId\":\"80094\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"8453\":{\"chainId\":\"8453\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}}}}"
+					"responsePayload": "{\"result\":{\"1\":{\"chainId\":\"1\",\"delegationStatus\":\"DELEGATION_STATUS_THIRD_PARTY_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_UPGRADE_AVAILABLE\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"10\":{\"chainId\":\"10\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"100\":{\"chainId\":\"100\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"130\":{\"chainId\":\"130\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"137\":{\"chainId\":\"137\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"42161\":{\"chainId\":\"42161\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"4663\":{\"chainId\":\"4663\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"56\":{\"chainId\":\"56\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"57073\":{\"chainId\":\"57073\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"747474\":{\"chainId\":\"747474\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"80094\":{\"chainId\":\"80094\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"8453\":{\"chainId\":\"8453\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}}}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -39943,6 +40315,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -39959,6 +40335,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -39970,7 +40350,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23ddd302d2eeb9e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -39981,7 +40365,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23ddd310f31fd74-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -39992,7 +40380,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23ddd310e57fd2d-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -40003,7 +40395,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23ddd311a09fe86-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":4,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":4,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -40014,7 +40410,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23ddd3118cbce39-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":5,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":5,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -40028,7 +40428,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -40074,6 +40478,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -40088,7 +40496,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -40102,7 +40514,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -40116,7 +40532,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -40132,6 +40552,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				}
 			]

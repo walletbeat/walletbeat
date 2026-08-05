@@ -1527,6 +1527,24 @@ export async function handleSearch(opts: SearchOptions): Promise<void> {
 	}
 }
 
+function looksBinary(str: string): boolean {
+	// Scan the whole string, not just a prefix: multi-part payloads (e.g. Sentry envelopes)
+	// can have many KB of clean JSON text followed by a raw binary tail (e.g. replay_recording),
+	// which a prefix-only sample would miss entirely.
+	let suspiciousCount = 0
+
+	for (let i = 0; i < str.length; i++) {
+		const code = str.charCodeAt(i)
+
+		// Replacement character (failed UTF-8 decode) or control chars other than tab/newline/CR.
+		if (code === 0xfffd || (code < 0x20 && code !== 0x09 && code !== 0x0a && code !== 0x0d)) {
+			suspiciousCount++
+		}
+	}
+
+	return str.length > 0 && suspiciousCount / str.length > 0.01
+}
+
 function displayRequestInfo(
 	request: WalletRequest,
 	options: {
@@ -1611,7 +1629,13 @@ function displayRequestInfo(
 	}
 
 	if (request.content !== null && request.content.trim() !== '') {
-		log(`${header('Content')}${formatStr(request.content.toString())}`)
+		const content = request.content.toString()
+
+		if (looksBinary(content)) {
+			log(`${header('Content')}${fadedOut(`[binary payload, ${content.length} bytes, not displayed]`)}`)
+		} else {
+			log(`${header('Content')}${formatStr(content)}`)
+		}
 	}
 
 	if (Object.keys(request.cookies).length > 0) {
