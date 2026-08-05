@@ -1,0 +1,31 @@
+Devcon 8 Proposal
+
+Session title: Setting the bar on Ethereum wallets
+
+Session type: Workshop (50 minutes)
+
+Track: Security
+
+Abstract: 
+A hands-on workshop that breaks down what makes an Ethereum wallet “good”, and how standards shape interoperability across the ecosystem.
+Participants will evaluate real wallets across key categories including transaction simulations, signatures, scam alerts, and EIP support: highlighting how these features impact UX.
+We will also dive into recent EIPs like EIP-7730 (structured data signing) and EIP-8213 (calldata digest), and how they aim to improve wallet UX, safety, and standardization.
+
+Additional Speakers: Polymutex / Matt
+
+Tags: Wallets, UX, Security
+
+The session assumes: No prior knowledge
+
+How does your session relate to CROPS?:  
+Ethereum is CROPS: Censorship-Resistant, Open, Private, and Secure. Walletbeat ensures users actually harness these values.
+The Ethereum ecosystem has gone to painstaking lengths to ensure Ethereum-the-protocol embodies these values. However, this only matters if users actually get to harness these values.
+For that to happen, every layer of the stack needs to be crafted with them in mind. Other layers are well-served by our peers at L2BEAT, Anticapture, DeFiScan, and others.
+Walletbeat focuses on the last-mile wallet layer of the stack: users' gateway to Ethereum.
+We ensure Ethereum values make it all the way to users.
+
+Resources: https://youtu.be/zOL73Ll_6N0?si=fJpo6VgDt86fKjYl
+
+Notes: We gave this workshop only once before, during Dappcon 2026, so we want to spread this knowledge with a wider audience.
+
+Status: Submitted https://cfp.devcon.org/devcon8/talk/review/9R8SRN7RZASWJCNVJUV9MPF9NVVRYPST
