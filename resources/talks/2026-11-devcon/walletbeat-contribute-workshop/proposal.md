@@ -1,6 +1,6 @@
 # Contributing verified wallet data to Walletbeat
 
-- **Session title**: Walletbeat Agentic Data Entry Workshop
+- **Session title**: Help watch the wallets: Building the CROPS-legible dataset
 - **Session type**: Workshop (50 minutes)
 - **Track**: Users, Builders, and Agents
 - **Abstract**:
