@@ -9,7 +9,7 @@
 
 - **Description**:
   _A clear and detailed description helps the review team assess how well your proposal fits the Devcon agenda and directly affects your chances of acceptance. Focus on what knowledge, insight, or findings you're sharing and why it's relevant now. Submissions that are vague, read as a project pitch, or cover ground that has been widely presented before are less likely to be accepted. Please write between 300 and 1000 characters._
-  Walletbeat is an open source database that grades wallets based on CROPS values. Anyone in the Ethereum community can contribute data to Walletbeat to help users understand how CROPS maps to wallets. This workshop will demonstrate how frictionless it is to start researching, gathering and verifying evidence with an agentic workflow and a human in the loop, no coding skills required. You should leave this workshop with the confidence to begin contributing data to Walletbeat and open your first PR.
+  Walletbeat is an open source database that grades wallets based on CROPS values. Anyone in the Ethereum community can contribute data to Walletbeat to help users understand how CROPS maps to wallets. You will learn how to gather evidence using the proper references (e.g. screenshots, direct links, etc.), verify the evidence is correct, and contribute the data to our repo using an agentic workflow with a human in the loop. No coding skills required. You should leave this workshop with the confidence to begin contributing data to Walletbeat and open your first PR.
 
 - **Additional speaker**: N/A
 - **Tags**: Wallets, Open Source, Security, AI
