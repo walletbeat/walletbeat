@@ -2,13 +2,13 @@ What happened with @ColdCardWallet, and how could they have prevented it?
 
 ## What happened?
 
-During a 2021 code migration, seed generation accidentally started using MicroPython's software pseudo-random number generator (PRNG) instead of COLDCARD's intended hardware true random number generator (TRNG).
+During a 2021 code migration, seed generation accidentally started using MicroPython's software pseudo-random number generator (PRNG) instead of COLDCARD's intended hardware random number generator (RNG).
 
 ### What does this mean?
 
 In simple terms, COLDCARD intended to use a hardware source of randomness to generate seed phrases with enough entropy that brute-forcing them would be computationally infeasible.
 
-But after the migration, the seed-generation path was calling the wrong RNG implementation and not the intended hardware TRNG.
+But after the migration, the seed-generation path was calling the wrong RNG implementation and not the intended hardware RNG.
 
 That turned what should have been a computationally infeasible seed search into a potentially practical brute-force attack.
 
