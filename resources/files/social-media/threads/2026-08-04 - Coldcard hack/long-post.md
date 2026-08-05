@@ -32,7 +32,7 @@ Wallets are high-stakes software where vulnerabilities can directly put user fun
 
 We also push that wallets should maintain an active bug bounty program. Audits are periodic and don't guarantee vulnerability-free software, while bug bounties continuously incentivize security researchers and white-hat hackers to responsibly find and disclose vulnerabilities before they can be exploited by bad actors.
 
-![FOSS](./foss.png)
+![Security audits and Bug bounty](./security.png)
 
 ### Free and Open Source Software (FOSS)
 
@@ -40,7 +40,7 @@ While COLDCARD's firmware source code is publicly available, it is source-availa
 
 For wallet security, this helps create a culture where independent researchers can inspect implementations, build security tooling around them, publish improvements, and contribute their findings back to the ecosystem.
 
-![Security audits and Bug bounty](./security.png)
+![FOSS](./foss.png)
 
 ## Conclusion
 
