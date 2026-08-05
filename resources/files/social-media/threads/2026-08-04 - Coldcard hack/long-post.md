@@ -36,6 +36,12 @@ Wallets are high-stakes software where vulnerabilities can directly put user fun
 
 We also push that wallets should maintain an active bug bounty program. Audits are periodic and don't guarantee vulnerability-free software, while bug bounties continuously incentivize security researchers and white-hat hackers to responsibly find and disclose vulnerabilities before they can be exploited by bad actors.
 
+### Multiple Sources of Entropy
+
+COLDCARD supports adding entropy through dice rolls, but this is optional and requires user interaction. Seed generation should automatically and correctly mix multiple independent entropy sources to maintain stronger security and reduce reliance on any single source of randomness.
+
+This provides another layer of defense when generating one of the most security-critical pieces of information in a wallet: the user's seed.
+
 ## Conclusion
 
 Wallets are one of the most critical layers of the crypto ecosystem. They hold the keys to our assets and are where we authorize transactions. While insecure RNG was the direct technical failure in this case, wallet teams should meet a high bar for security and adopt practice to ensure that users funds are safe.
