@@ -32,7 +32,7 @@
 - **Bluesky profile**: N/A
 - **Farcaster profile**: @REN2140.eth
 - **Personal website, GitHub, or other relevant link**: N/A
-- **What is your Telegram handle?** @Ren2140
-- **Do you have a public Ethereum address or ENS you want to share?** N/A
+- **What is your Telegram handle?** @REN2140
+- **Do you have a public Ethereum address or ENS you want to share?** No
 - **Would you like to MC at Devcon?** No
 - **Do you have accessibility requirements or do you require assistance?** No
