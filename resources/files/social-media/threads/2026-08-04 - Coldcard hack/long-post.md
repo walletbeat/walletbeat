@@ -18,11 +18,15 @@ At Walletbeat, we look beyond what the **vulnerability** was and ask what wallet
 
 The direct technical failure here was insecure seed generation. But wallet security goes beyond preventing this specific bug.
 
+![FOSS](./foss.png)
+
 ### Free and Open Source Software (FOSS)
 
 While COLDCARD's firmware source code is publicly available, it is source-available rather than FOSS. Its license includes the Commons Clause, which restricts the right to sell the software. FOSS isn't just about being able to read the code. It gives the broader ecosystem the freedom to use, study, modify, redistribute, and build upon it.
 
 For wallet security, this helps create a culture where independent researchers can inspect implementations, build security tooling around them, publish improvements, and contribute their findings back to the ecosystem.
+
+![Security audits and Bug bounty](./security.png)
 
 ### Security Audits
 
