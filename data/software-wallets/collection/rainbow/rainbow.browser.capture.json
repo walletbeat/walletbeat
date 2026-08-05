@@ -3489,7 +3489,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "l7M91DmNsDbKKin3-11oCazHSt8vG-oxX7T6NZc94Pm5PnIgr2lj1A=="
 					},
-					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:49:28.644274201Z\",\"responseTime\":\"2026-07-31T15:49:29.182331303Z\",\"requestId\":\"7a6a4a38-9ce8-4e32-84fe-ccbd02412ba8\",\"currency\":\"USD\",\"success\":true}}"
+					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:49:28.644274201Z\",\"responseTime\":\"2026-07-31T15:49:29.182331303Z\",\"requestId\":\"7a6a4a38-9ce8-4e32-84fe-ccbd02412ba8\",\"currency\":\"USD\",\"success\":true}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -3500,7 +3504,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dc0d54dc3a3e6-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":0,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":0,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3514,7 +3522,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -3528,7 +3540,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -3551,7 +3567,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "1S-GffYqeXZEhsFEXCWeObZs3pTHCnbnaNM-RwfqpH1DS3Az61IGjg=="
 					},
-					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:49:28.700716340Z\",\"responseTime\":\"2026-07-31T15:49:29.163191588Z\",\"requestId\":\"fef73976-4325-47ce-8e8d-ee922457748f\",\"currency\":\"USD\",\"success\":true},\"pagination\":{}}"
+					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T15:49:28.700716340Z\",\"responseTime\":\"2026-07-31T15:49:29.163191588Z\",\"requestId\":\"fef73976-4325-47ce-8e8d-ee922457748f\",\"currency\":\"USD\",\"success\":true},\"pagination\":{}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -3571,7 +3591,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "fXo6yI2nlYtvG108UzrsoEwybJPKTbpkyTkZAnED-3vkkIfdwCWqAQ=="
 					},
-					"responsePayload": "{\"result\":{\"1\":{\"chainId\":\"1\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"10\":{\"chainId\":\"10\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"100\":{\"chainId\":\"100\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"130\":{\"chainId\":\"130\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"137\":{\"chainId\":\"137\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"42161\":{\"chainId\":\"42161\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"4663\":{\"chainId\":\"4663\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"56\":{\"chainId\":\"56\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"57073\":{\"chainId\":\"57073\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"747474\":{\"chainId\":\"747474\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"80094\":{\"chainId\":\"80094\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"8453\":{\"chainId\":\"8453\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}}}}"
+					"responsePayload": "{\"result\":{\"1\":{\"chainId\":\"1\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"10\":{\"chainId\":\"10\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"100\":{\"chainId\":\"100\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"130\":{\"chainId\":\"130\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"137\":{\"chainId\":\"137\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"42161\":{\"chainId\":\"42161\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"4663\":{\"chainId\":\"4663\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"56\":{\"chainId\":\"56\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"57073\":{\"chainId\":\"57073\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"747474\":{\"chainId\":\"747474\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"80094\":{\"chainId\":\"80094\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}},\"8453\":{\"chainId\":\"8453\",\"delegationStatus\":\"DELEGATION_STATUS_NOT_DELEGATED\",\"updates\":{\"reason\":\"UPDATE_REASON_RAINBOW_ONBOARDING\",\"latest\":{\"address\":\"0x612373d7003d694220f7800eeaf8e3924c0951d3\",\"name\":\"Rainbow Calibur\"}}}}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -3582,7 +3606,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dc0d5d85f6b99-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "addys.p.rainbow.me",
@@ -3609,6 +3637,10 @@
 						"ethereum": [
 							"0xad315911768bf30f8f82c9570481b857595cbc4f"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -3623,7 +3655,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -3640,7 +3676,11 @@
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					},
-					"responsePayload": "{\"id\":\"337c2eab75e443b9bf015754c6e685ff\"}"
+					"responsePayload": "{\"id\":\"337c2eab75e443b9bf015754c6e685ff\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				}
 			]
 		},
@@ -3660,6 +3700,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
