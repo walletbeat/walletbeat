@@ -1,6 +1,6 @@
-# Wallets and software supply chain security
+# Solving CROPS' last-mile problem
 
-- **Session title**: Walletbeat: Let's solve CROPS' last-mile problem
+- **Session title**: Solving CROPS' last-mile problem
 - **Session type**: Talk (20 minutes + 5 minutes for Q&A)
 - **Track**: Futures Worth Building
 - **Abstract**:
@@ -12,10 +12,11 @@
   Ethereum is built around a clear set of CROPS values. Users experience Ethereum through wallets, yet most wallets today don't live up to these very values.
   Walletbeat aims to be an L2BEAT-like public good for wallets: an open framework that evaluates Ethereum wallets through CROPS values.
   This talk walks through:
+  - Why CROPS faces a last-mile problem (at the access layer)
   - How CROPS maps to wallets
   - What the current wallet landscape looks like
   - What obstacles exist for wallets to fully embody Ethereum values
-  - How Walletbeat fits in solving the last-mile problem
+  - How "dashboard organizations" like Walletbeat fit in solving the last-mile problem
     We'll cover where the Ethereum wallet ecosystem is making progress, where it's stuck, and what meaningful CROPS alignment actually looks like in practice for modern wallets.
 
 - **Additional speaker**: 0xMattmatt

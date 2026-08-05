@@ -5,7 +5,7 @@
 - **Track**: Open & Verifiable Stack
 - **Abstract**:
   _Keep it to 1–2 sentences: what the talk is about and what people will walk away with. Please write between 100 and 500 characters._
-  Learn about existing measures for software supply chain integrity (Sigstore, SLSA, TUF), their underlying concepts (lockfiles, reproducible builds, hermetic builds, attestations, SBOMs), and how to implement these processes in your wallet's software development process.
+  Learn about existing measures for software supply chain integrity (Sigstore, SLSA, TUF), their underlying concepts (lockfiles, reproducible builds, hermetic builds, attestations, SBOMs), why they are important, and how to implement these processes in your wallet's software development process.
 
 - **Description**:
   _A clear and detailed description helps the review team assess how well your proposal fits the Devcon agenda and directly affects your chances of acceptance. Focus on what knowledge, insight, or findings you're sharing and why it's relevant now. Submissions that are vague, read as a project pitch, or cover ground that has been widely presented before are less likely to be accepted. Please write between 300 and 1000 characters._
