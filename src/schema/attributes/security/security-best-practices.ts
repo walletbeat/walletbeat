@@ -429,6 +429,8 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.WEB_NAVIGATION]: Rating.PASS,
 	// Read-only access to HTTP/S request metadata, used to detect and warn about insecure RPC connections.
 	[BrowserExtensionPermission.WEB_REQUEST]: Rating.PASS,
+	// Creates and manages browser windows, used to open the transaction approval popup.
+	[BrowserExtensionPermission.WINDOWS]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Exposes the user's physical location, not required for any wallet function and enables persistent user tracking.

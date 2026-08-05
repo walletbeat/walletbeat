@@ -198,6 +198,9 @@ export enum BrowserExtensionPermission {
 
 	/** Block or modify HTTP/S requests synchronously. */
 	WEB_REQUEST_BLOCKING = 'webRequestBlocking',
+
+	/** Create, move, resize, and close browser windows. */
+	WINDOWS = 'windows',
 }
 
 /**
