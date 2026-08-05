@@ -18,15 +18,11 @@ At Walletbeat, we look beyond what the **vulnerability** was and ask what wallet
 
 The direct technical failure here was insecure seed generation. But wallet security goes beyond preventing this specific bug.
 
-![FOSS](./foss.png)
+### Multiple Sources of Entropy
 
-### Free and Open Source Software (FOSS)
+COLDCARD supports adding entropy through dice rolls, but this is optional and requires user interaction. Seed generation should automatically and correctly mix multiple independent entropy sources to maintain stronger security and reduce reliance on any single source of randomness.
 
-While COLDCARD's firmware source code is publicly available, it is source-available rather than FOSS. Its license includes the Commons Clause, which restricts the right to sell the software. FOSS isn't just about being able to read the code. It gives the broader ecosystem the freedom to use, study, modify, redistribute, and build upon it.
-
-For wallet security, this helps create a culture where independent researchers can inspect implementations, build security tooling around them, publish improvements, and contribute their findings back to the ecosystem.
-
-![Security audits and Bug bounty](./security.png)
+This provides another layer of defense when generating one of the most security-critical pieces of information in a wallet: the user's seed.
 
 ### Security Audits
 
@@ -36,11 +32,15 @@ Wallets are high-stakes software where vulnerabilities can directly put user fun
 
 We also push that wallets should maintain an active bug bounty program. Audits are periodic and don't guarantee vulnerability-free software, while bug bounties continuously incentivize security researchers and white-hat hackers to responsibly find and disclose vulnerabilities before they can be exploited by bad actors.
 
-### Multiple Sources of Entropy
+![FOSS](./foss.png)
 
-COLDCARD supports adding entropy through dice rolls, but this is optional and requires user interaction. Seed generation should automatically and correctly mix multiple independent entropy sources to maintain stronger security and reduce reliance on any single source of randomness.
+### Free and Open Source Software (FOSS)
 
-This provides another layer of defense when generating one of the most security-critical pieces of information in a wallet: the user's seed.
+While COLDCARD's firmware source code is publicly available, it is source-available rather than FOSS. Its license includes the Commons Clause, which restricts the right to sell the software. FOSS isn't just about being able to read the code. It gives the broader ecosystem the freedom to use, study, modify, redistribute, and build upon it.
+
+For wallet security, this helps create a culture where independent researchers can inspect implementations, build security tooling around them, publish improvements, and contribute their findings back to the ecosystem.
+
+![Security audits and Bug bounty](./security.png)
 
 ## Conclusion
 
