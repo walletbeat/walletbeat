@@ -23,8 +23,7 @@
 - **60-second introduction video** (Optional): N/A
 - **Is your talk not in English?**: English
 - **Notes**:
-  This is the practical "how you can help" companion to the "Solving CROPS' last-mile problem" proposal, which deliberately does not cover that question.
-  The agentic workflow is demonstrated from the stage rather than run by participants on their own machines, so no setup or laptop is required to follow along.
+  This is the practical "how you can help" companion to the "Solving CROPS' last-mile problem" proposal.
 
 - **What projects or organization are you affiliated with?** Walletbeat
 - **When and at which event did you last speak?** N/A
