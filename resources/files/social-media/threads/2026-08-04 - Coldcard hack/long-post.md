@@ -1,8 +1,8 @@
-What happened with @ColdCardWallet and how they could've prevented it?
+What happened with @ColdCardWallet, and how could they have prevented it?
 
 ## What happened?
 
-During a 2021 code migration, seed generation accidentally started using MicroPython's software PRNG instead of COLDCARD's intended hardware true random number generator (TRNG).
+During a 2021 code migration, seed generation accidentally started using MicroPython's software pseudo-random number generator (PRNG) instead of COLDCARD's intended hardware true random number generator (TRNG).
 
 ### What does this mean?
 
@@ -38,4 +38,4 @@ Wallets are one of the most critical layers of the crypto ecosystem. They hold t
 
 Incidents like this are difficult for the ecosystem, especially for those affected. But we're optimistic that learning from these failures and raising the bar for wallet security will make crypto wallets better over time.
 
-*Note: Walletbeat currently focuses on evaluating Ethereum software wallets and does not yet rate hardware wallets. But we care about the broader crypto ecosystem and recognize the impact this vulnerability has had on affected users.*
+*Note: Walletbeat currently focuses on evaluating Ethereum software wallets and does not yet rate hardware wallets. But we care about the broader crypto ecosystem and recognize the impact this vulnerability has had on affected users. Secure RNG sourcing is already relevant to how we evaluate software wallets, and this incident reinforces that randomness and entropy sourcing should remain an important part of how Walletbeat evaluates wallet security.*
