@@ -5594,7 +5594,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -5609,6 +5613,10 @@
 					},
 					"oddHeaders": {
 						"Authorization": "Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5638,6 +5646,10 @@
 							"0x4403908d9052bcd1a0d818a766d9168b549c9921",
 							"0xce4234a06dd0f213c01940115b6b83007abe1674"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5652,7 +5664,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -5675,7 +5691,11 @@
 						"X-Amz-Cf-Pop": "MNL51-P2",
 						"X-Amz-Cf-Id": "av0gA58R-gihxVX833ciTrbuE8QYpm7wG5bCB9engNlN9aVgiQwCVg=="
 					},
-					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T16:03:48.596629504Z\",\"responseTime\":\"2026-07-31T16:03:48.646590588Z\",\"requestId\":\"b6ee9c27-1174-4493-8993-709d1295f484\",\"currency\":\"USD\",\"success\":true},\"result\":{\"id\":\"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"type\":\"trade\",\"chainId\":\"324\",\"network\":\"zksync-era\",\"blockNumber\":\"71390062\",\"minedAt\":\"2026-07-31T16:03:45Z\",\"status\":\"confirmed\",\"hash\":\"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"direction\":\"out\",\"addressFrom\":\"0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9\",\"addressTo\":\"0xce4234a06dd0f213c01940115b6b83007abe1674\",\"nonce\":\"1\",\"changes\":[{\"asset\":{\"decimals\":18,\"iconUrl\":\"https://rainbowme-res.cloudinary.com/image/upload/v1668565116/assets/ethereum/eth.png\",\"name\":\"Ethereum\",\"network\":\"zksync-era\",\"chainId\":\"324\",\"price\":{\"value\":\"1858.8604468\",\"changedAt\":\"2026-07-31T16:03:00Z\",\"relativeChange24h\":\"0\"},\"symbol\":\"ETH\",\"type\":\"native\",\"colors\":{\"primary\":\"#B6B1B6\"}},\"direction\":\"out\",\"addressFrom\":\"0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9\",\"addressTo\":\"0x0000000000000000000000000000000000008001\",\"price\":\"1858.8604468\",\"quantity\":\"3930234000000\",\"value\":\"3930234000000\"},{\"asset\":{\"decimals\":18,\"iconUrl\":\"https://rainbowme-res.cloudinary.com/image/upload/v1668565116/assets/ethereum/eth.png\",\"name\":\"Ethereum\",\"network\":\"zksync-era\",\"chainId\":\"324\",\"price\":{\"value\":\"1858.8604468\",\"changedAt\":\"2026-07-31T16:03:00Z\",\"relativeChange24h\":\"0\"},\"symbol\":\"ETH\",\"type\":\"native\",\"colors\":{\"primary\":\"#B6B1B6\"}},\"direction\":\"out\",\"addressFrom\":\"0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9\",\"addressTo\":\"0xce4234a06dd0f213c01940115b6b83007abe1674\",\"price\":\"1858.8604468\",\"quantity\":\"100000000\",\"value\":\"100000000\"}],\"fee\":{\"value\":\"3930234000000\",\"price\":\"1858.8604468\"},\"meta\":{\"explorerLabel\":\"ZKsync\",\"explorerUrl\":\"https://explorer.zksync.io/tx/0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"type\":\"swap\"}}}"
+					"responsePayload": "{\"metadata\":{\"requestTime\":\"2026-07-31T16:03:48.596629504Z\",\"responseTime\":\"2026-07-31T16:03:48.646590588Z\",\"requestId\":\"b6ee9c27-1174-4493-8993-709d1295f484\",\"currency\":\"USD\",\"success\":true},\"result\":{\"id\":\"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"type\":\"trade\",\"chainId\":\"324\",\"network\":\"zksync-era\",\"blockNumber\":\"71390062\",\"minedAt\":\"2026-07-31T16:03:45Z\",\"status\":\"confirmed\",\"hash\":\"0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"direction\":\"out\",\"addressFrom\":\"0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9\",\"addressTo\":\"0xce4234a06dd0f213c01940115b6b83007abe1674\",\"nonce\":\"1\",\"changes\":[{\"asset\":{\"decimals\":18,\"iconUrl\":\"https://rainbowme-res.cloudinary.com/image/upload/v1668565116/assets/ethereum/eth.png\",\"name\":\"Ethereum\",\"network\":\"zksync-era\",\"chainId\":\"324\",\"price\":{\"value\":\"1858.8604468\",\"changedAt\":\"2026-07-31T16:03:00Z\",\"relativeChange24h\":\"0\"},\"symbol\":\"ETH\",\"type\":\"native\",\"colors\":{\"primary\":\"#B6B1B6\"}},\"direction\":\"out\",\"addressFrom\":\"0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9\",\"addressTo\":\"0x0000000000000000000000000000000000008001\",\"price\":\"1858.8604468\",\"quantity\":\"3930234000000\",\"value\":\"3930234000000\"},{\"asset\":{\"decimals\":18,\"iconUrl\":\"https://rainbowme-res.cloudinary.com/image/upload/v1668565116/assets/ethereum/eth.png\",\"name\":\"Ethereum\",\"network\":\"zksync-era\",\"chainId\":\"324\",\"price\":{\"value\":\"1858.8604468\",\"changedAt\":\"2026-07-31T16:03:00Z\",\"relativeChange24h\":\"0\"},\"symbol\":\"ETH\",\"type\":\"native\",\"colors\":{\"primary\":\"#B6B1B6\"}},\"direction\":\"out\",\"addressFrom\":\"0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9\",\"addressTo\":\"0xce4234a06dd0f213c01940115b6b83007abe1674\",\"price\":\"1858.8604468\",\"quantity\":\"100000000\",\"value\":\"100000000\"}],\"fee\":{\"value\":\"3930234000000\",\"price\":\"1858.8604468\"},\"meta\":{\"explorerLabel\":\"ZKsync\",\"explorerUrl\":\"https://explorer.zksync.io/tx/0xe34965f0c8553c2320d51a0c3d313f652fa5d255d82bf512e7b93c2106adeff9\",\"type\":\"swap\"}}}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "platform.p.rainbow.me",
@@ -5721,6 +5741,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5734,6 +5758,10 @@
 					},
 					"oddHeaders": {
 						"Authorization": "Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5780,6 +5808,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5796,6 +5828,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5810,6 +5846,10 @@
 					},
 					"oddHeaders": {
 						"Authorization": "Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5825,6 +5865,10 @@
 					},
 					"oddHeaders": {
 						"Authorization": "Bearer NqULJDbyCkEWLRD4Hyp9nJdfJprHmBjtos33qWCVEW9cHxNHnPg6fws6o4tjxJMe"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5854,6 +5898,10 @@
 							"0x4403908d9052bcd1a0d818a766d9168b549c9921",
 							"0xce4234a06dd0f213c01940115b6b83007abe1674"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5870,6 +5918,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -5881,7 +5933,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd7c16e13f8ea-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":38,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":38,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5892,7 +5948,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd7c1fcc43df3-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":39,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":39,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5903,7 +5963,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd7c1f860fd2d-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":40,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":40,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -5914,7 +5978,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd7c20d7efd3e-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":41,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":41,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -5928,7 +5996,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -5942,7 +6014,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -5956,7 +6032,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				}
 			]
 		},
@@ -6006,6 +6086,10 @@
 							"0xaf88d065e77c8cc2239327c5edb3a432268e5831",
 							"0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 						]
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -6022,6 +6106,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -6033,7 +6121,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd8dae9c2d261-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":42,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":42,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "o331974.ingest.sentry.io",
@@ -6049,6 +6141,10 @@
 						"access-control-expose-headers": "x-sentry-error,x-sentry-rate-limits,retry-after",
 						"via": "1.1 google",
 						"Alt-Svc": "h3=\":443\"; ma=2592000"
+					},
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
 					}
 				},
 				{
@@ -6060,7 +6156,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd8db7af08bc9-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":43,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":43,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -6071,7 +6171,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd8db8a8f87c3-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":44,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":44,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -6082,7 +6186,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd8dc2c2dfd33-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":45,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":45,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rpc.rainbow.me",
@@ -6093,7 +6201,11 @@
 					"responseOddHeaders": {
 						"CF-RAY": "a23dd8dc9f6ad261-SIN"
 					},
-					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":46,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}"
+					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":46,\"result\":\"0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a7d635c8de9a58a228aa69353a1699c7cc240dcf0000000000000000000000000000000000000000000000000000000000000000\"}",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -6107,7 +6219,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "BY_DEFAULT"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
@@ -6121,7 +6237,11 @@
 						"Access-Control-Allow-Credentials": "true",
 						"X-Robots-Tag": "noindex, nofollow"
 					},
-					"responsePayload": "ok"
+					"responsePayload": "ok",
+					"review": {
+						"manuallyReviewed": true,
+						"collectionPolicy": "ALWAYS"
+					}
 				},
 				{
 					"domain": "rainbowjiumask.dataplane.rudderstack.com",
