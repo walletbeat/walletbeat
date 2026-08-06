@@ -1,0 +1,10 @@
+{
+	"identity": {
+		"walletId": "rainbow",
+		"walletType": "SOFTWARE",
+		"walletVariant": "MOBILE"
+	},
+	"flows": {},
+	"userData": [],
+	"sessions": 0
+}
