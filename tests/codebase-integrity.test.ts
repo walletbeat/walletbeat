@@ -258,6 +258,7 @@ describe('codebase integrity', () => {
 			'→',
 			'←',
 			'↗',
+			'⇒',
 			'☠',
 			'…',
 			'✓',
