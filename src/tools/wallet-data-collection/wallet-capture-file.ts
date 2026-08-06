@@ -91,7 +91,8 @@ interface EncodedWalletDataFlow {
  * Encoded representation of a UserDataString: raw string with optional piece classification.
  */
 interface EncodedUserDataString {
-	str: string
+	str?: string
+	strBase64?: string
 	piece?: UserInfo
 	pieces?: UserInfo[]
 }
@@ -837,12 +838,27 @@ export class UserDataString {
 			pieces.push(...userInfoEnums.assertArray(record.pieces))
 		}
 
-		return new UserDataString(expectString(record.str, `${at}.str`), assertNonEmptyArray(pieces))
+		let str: string
+
+		if (record.strBase64 !== undefined) {
+			const b64 = expectString(record.strBase64, `${at}.strBase64`)
+			const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4)
+
+			str = new TextDecoder('utf-8').decode(Uint8Array.from(atob(padded), c => c.charCodeAt(0)))
+		} else {
+			str = expectString(record.str, `${at}.str`)
+		}
+
+		return new UserDataString(str, assertNonEmptyArray(pieces))
 	}
 
 	public encode(): EncodedUserDataString {
 		const sortedPieces = [...this.pieces].sort(compareUserInfo)
-		const result: EncodedUserDataString = { str: this.str }
+		const bytes = new TextEncoder().encode(this.str)
+		const isAscii = bytes.every(b => b < 128)
+		const result: EncodedUserDataString = isAscii
+			? { str: this.str }
+			: { strBase64: btoa(String.fromCharCode(...bytes)).replace(/=+$/, '') }
 
 		if (sortedPieces.length === 1) {
 			result.piece = sortedPieces[0]
@@ -2483,11 +2499,11 @@ export class WalletCaptureFlow {
 
 			return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
 		})
-		const keepIndexes = await Promise.all(
+		const readyIndexes = await Promise.all(
 			filtered.map(async req => await req.isReadyForReview(strings)),
 		)
 
-		return filtered.filter((_, i) => keepIndexes[i])
+		return filtered.filter((_, i) => !readyIndexes[i])
 	}
 
 	public unreviewedRequests(): WalletRequestReview[] {
