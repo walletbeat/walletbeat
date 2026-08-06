@@ -69,12 +69,16 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { parseDataCollection } from '@/tools/wallet-data-collection/parse-data-collection'
 import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
+import rainbowDataCollectionRaw from './collection/rainbow/rainbow.dataCollection.generated.json'
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
 import rainbowIosParsed from './manifests/rainbow/ios.parsed.json'
 import rainbowRawExtManifest from './manifests/rainbow/opfgelmcmbiajamepnmloijbpoleiama.manifest.json'
+
+const rainbowDataCollection = parseDataCollection(rainbowDataCollectionRaw)
 
 export const rainbow: SoftwareWallet = {
 	metadata: {
@@ -651,7 +655,7 @@ export const rainbow: SoftwareWallet = {
 					}),
 				},
 			},
-			dataCollection: null,
+			dataCollection: rainbowDataCollection,
 			privacyPolicy: 'https://rainbow.me/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
