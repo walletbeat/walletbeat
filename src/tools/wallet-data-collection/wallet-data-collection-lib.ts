@@ -768,7 +768,7 @@ function globalAnnotationsPath(): string {
 	return 'data/collection/global.annotations.json'
 }
 
-async function openCaptureFile(options: GlobalOptions): Promise<WalletCaptureFile> {
+export async function openCaptureFile(options: GlobalOptions): Promise<WalletCaptureFile> {
 	const annotations = WalletCaptureAnnotations.fromFile(
 		options.id,
 		annotationsPath(options),
@@ -1527,6 +1527,24 @@ export async function handleSearch(opts: SearchOptions): Promise<void> {
 	}
 }
 
+function looksBinary(str: string): boolean {
+	// Scan the whole string, not just a prefix: multi-part payloads (e.g. Sentry envelopes)
+	// can have many KB of clean JSON text followed by a raw binary tail (e.g. replay_recording),
+	// which a prefix-only sample would miss entirely.
+	let suspiciousCount = 0
+
+	for (let i = 0; i < str.length; i++) {
+		const code = str.charCodeAt(i)
+
+		// Replacement character (failed UTF-8 decode) or control chars other than tab/newline/CR.
+		if (code === 0xfffd || (code < 0x20 && code !== 0x09 && code !== 0x0a && code !== 0x0d)) {
+			suspiciousCount++
+		}
+	}
+
+	return str.length > 0 && suspiciousCount / str.length > 0.01
+}
+
 function displayRequestInfo(
 	request: WalletRequest,
 	options: {
@@ -1611,7 +1629,15 @@ function displayRequestInfo(
 	}
 
 	if (request.content !== null && request.content.trim() !== '') {
-		log(`${header('Content')}${formatStr(request.content.toString())}`)
+		const content = request.content.toString()
+
+		if (looksBinary(content)) {
+			log(
+				`${header('Content')}${fadedOut(`[binary payload, ${content.length} bytes, not displayed]`)}`,
+			)
+		} else {
+			log(`${header('Content')}${formatStr(content)}`)
+		}
 	}
 
 	if (Object.keys(request.cookies).length > 0) {
@@ -1695,13 +1721,17 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 	while (prioritizedStrings.length > 0 && !userStopped) {
 		const strEntry = prioritizedStrings[0]
 		const strValue = strEntry.str
+		const strIsBinary = looksBinary(strValue.str)
+		const displayStr = strIsBinary
+			? `[binary payload, ${strValue.str.length} bytes, not displayed]`
+			: strValue.str
 
 		log('\n' + chalk.bgBlue.gray('='.repeat(80)))
 		log(chalk.bgBlue.gray('='.repeat(80)))
 		function header(header: string): string {
 			return ' '.repeat(16 - header.length) + chalk.bold(header) + chalk.gray(':') + ' '
 		}
-		log(`${header('String')}${highlightStr(strValue.str)}`)
+		log(`${header('String')}${strIsBinary ? displayStr : highlightStr(strValue.str)}`)
 
 		if (strValue.pieces.size > 0) {
 			log(`${header('Info')}${Array.from(strValue.pieces).toSorted().join(', ')}`)
@@ -1713,7 +1743,9 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 		for (const [roughKey, count] of Array.from(strEntry.getRoughOccurrences()).toSorted(
 			(a, b) => b[1] - a[1],
 		)) {
-			const highlightedKey = roughKey.split(strValue.str).join(highlightStr(strValue.str))
+			const highlightedKey = strIsBinary
+				? roughKey
+				: roughKey.split(strValue.str).join(highlightStr(strValue.str))
 
 			log(
 				`       ${chalk.gray('-')} ${highlightedKey}${count === 1 ? '' : ` ${chalk.gray('(')}seen ${chalk.bold(count.toString())} times${chalk.gray(')')}`}`,
@@ -1724,7 +1756,7 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 		displayRequestInfo(strEntry.firstOrigin.request, {
 			captureStrings: walletDataStrings,
 			highlight: (s: string): string => {
-				if (!s.includes(strValue.str)) {
+				if (strIsBinary || !s.includes(strValue.str)) {
 					return s
 				}
 
@@ -1867,7 +1899,7 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 				if (specialOption === '__GLOBAL_BENIGN__') {
 					capture.addBenignString(strValue.str, true)
 					await capture.save(getSaveOptions(opts))
-					log(`✅ Marked string "${strValue.str}" as globally benign.`)
+					log(`✅ Marked string "${displayStr}" as globally benign.`)
 					confirmed = true
 					continue
 				}
@@ -1875,7 +1907,7 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 				if (specialOption === '__BENIGN__') {
 					capture.addBenignString(strValue.str, false)
 					await capture.save(getSaveOptions(opts))
-					log(`✅ Marked string "${strValue.str}" as benign.`)
+					log(`✅ Marked string "${displayStr}" as benign.`)
 					confirmed = true
 					continue
 				}
@@ -1907,9 +1939,7 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 
 			capture.userData.add(merged)
 			await capture.save(getSaveOptions(opts))
-			log(
-				`✅ Marked string "${strValue.str}" as ${Array.from(merged.pieces).toSorted().join(', ')}.`,
-			)
+			log(`✅ Marked string "${displayStr}" as ${Array.from(merged.pieces).toSorted().join(', ')}.`)
 			confirmed = true
 		}
 
@@ -1976,10 +2006,14 @@ async function handleReviewStringsAgent(opts: ReviewStringsOptions): Promise<voi
 	for (const strEntry of toShow) {
 		const strValue = strEntry.str
 		const suggestions = classifyStringHeuristically(strEntry)
+		const strIsBinary = looksBinary(strValue.str)
+		const displayStr = strIsBinary
+			? `[binary payload, ${strValue.str.length} bytes, not displayed]`
+			: strValue.str
 
 		log('')
 		log('-'.repeat(68))
-		log(`  String   : ${strValue.str}`)
+		log(`  String   : ${displayStr}`)
 		log(`  Entropy  : ${strEntry.score.toFixed(2)}`)
 		log(
 			`  Tagged   : ${
@@ -2001,7 +2035,7 @@ async function handleReviewStringsAgent(opts: ReviewStringsOptions): Promise<voi
 				log(`    - ${roughKey}${seenText}`)
 			}
 
-			log(`  Sample Request (string highlighted as \`𜱭𜱭𜱭${strValue.str}𜱫𜱫𜱫\`):`)
+			log(`  Sample Request (string highlighted as \`𜱭𜱭𜱭${displayStr}𜱫𜱫𜱫\`):`)
 		}
 
 		displayRequestInfo(strEntry.firstOrigin.request, {
@@ -2019,6 +2053,13 @@ async function handleReviewStringsAgent(opts: ReviewStringsOptions): Promise<voi
 		})
 
 		log('')
+
+		if (strIsBinary) {
+			log('  This string looks like binary data, so no shell commands are suggested for it.')
+			log('')
+			continue
+		}
+
 		log('  Suggested commands to deal with this string:')
 
 		const escaped = strValue.str.replace(/'/g, "'\"'\"'")
