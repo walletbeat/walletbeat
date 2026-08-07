@@ -2483,11 +2483,11 @@ export class WalletCaptureFlow {
 
 			return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
 		})
-		const keepIndexes = await Promise.all(
+		const readyIndexes = await Promise.all(
 			filtered.map(async req => await req.isReadyForReview(strings)),
 		)
 
-		return filtered.filter((_, i) => keepIndexes[i])
+		return filtered.filter((_, i) => !readyIndexes[i])
 	}
 
 	public unreviewedRequests(): WalletRequestReview[] {
