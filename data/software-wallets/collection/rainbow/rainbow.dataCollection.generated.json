@@ -1,0 +1,1538 @@
+{
+	"BROWSER": {
+		"walletId": "rainbow",
+		"INSTALL": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "alphabet",
+						"name": "Alphabet",
+						"legalName": {
+							"name": "Alphabet Inc",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/alphabet",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "United States",
+						"linkedin": "https://www.linkedin.com/company/alphabet-inc",
+						"privacyPolicy": "https://policies.google.com/privacy",
+						"repoUrl": "https://github.com/google",
+						"twitter": "https://x.com/alphabetlnc",
+						"url": "https://abc.xyz/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"BROWSING_HISTORY_URLS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"CHAIN_DATA_LOOKUP"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			]
+		},
+		"ONBOARDING_NEW": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS",
+						"USER_ACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"CHAIN_DATA_LOOKUP",
+						"ASSET_METADATA"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"PSEUDONYM": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			],
+			"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
+		},
+		"ONBOARDING_IMPORT": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"USER_ACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT",
+						"ACCOUNT_ADDRESS": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"ASSET_METADATA",
+						"CHAIN_DATA_LOOKUP"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "imgix",
+						"name": "imgix",
+						"legalName": {
+							"name": "Zebrafish Labs, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": true,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/imgix",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Mateo, California, United States",
+						"linkedin": "https://linkedin.com/company/imgix",
+						"privacyPolicy": "https://www.imgix.com/privacy",
+						"repoUrl": "https://github.com/imgix",
+						"twitter": "https://x.com/imgix",
+						"url": "https://www.imgix.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"STATIC_ASSETS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			],
+			"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
+		},
+		"SEND_ETHER": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS",
+						"USER_ACTIONS": "ALWAYS",
+						"MEMPOOL_TRANSACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"CHAIN_DATA_LOOKUP",
+						"ASSET_METADATA",
+						"TRANSACTION_BROADCAST"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			]
+		},
+		"SEND_USDC": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS",
+						"USER_ACTIONS": "ALWAYS",
+						"MEMPOOL_TRANSACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"ASSET_METADATA",
+						"CHAIN_DATA_LOOKUP",
+						"TRANSACTION_BROADCAST"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "cloudinary",
+						"name": "Cloudinary",
+						"legalName": {
+							"name": "Cloudinary Ltd.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": true,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/cloudinary",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "Santa Clara, California, United States",
+						"linkedin": "https://linkedin.com/company/cloudinary",
+						"privacyPolicy": "https://cloudinary.com/privacy",
+						"repoUrl": "https://github.com/cloudinary",
+						"twitter": "https://x.com/cloudinary",
+						"url": "https://cloudinary.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"STATIC_ASSETS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "imgix",
+						"name": "imgix",
+						"legalName": {
+							"name": "Zebrafish Labs, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": true,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/imgix",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Mateo, California, United States",
+						"linkedin": "https://linkedin.com/company/imgix",
+						"privacyPolicy": "https://www.imgix.com/privacy",
+						"repoUrl": "https://github.com/imgix",
+						"twitter": "https://x.com/imgix",
+						"url": "https://www.imgix.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"STATIC_ASSETS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			]
+		},
+		"NATIVE_SWAP": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS",
+						"MEMPOOL_TRANSACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"ASSET_METADATA",
+						"CHAIN_DATA_LOOKUP",
+						"SWAP_QUOTE",
+						"TRANSACTION_BROADCAST"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"PSEUDONYM": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS",
+						"USER_ACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "imgix",
+						"name": "imgix",
+						"legalName": {
+							"name": "Zebrafish Labs, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": true,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/imgix",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Mateo, California, United States",
+						"linkedin": "https://linkedin.com/company/imgix",
+						"privacyPolicy": "https://www.imgix.com/privacy",
+						"repoUrl": "https://github.com/imgix",
+						"twitter": "https://x.com/imgix",
+						"url": "https://www.imgix.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"STATIC_ASSETS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "cloudinary",
+						"name": "Cloudinary",
+						"legalName": {
+							"name": "Cloudinary Ltd.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": true,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/cloudinary",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "Santa Clara, California, United States",
+						"linkedin": "https://linkedin.com/company/cloudinary",
+						"privacyPolicy": "https://cloudinary.com/privacy",
+						"repoUrl": "https://github.com/cloudinary",
+						"twitter": "https://x.com/cloudinary",
+						"url": "https://cloudinary.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"STATIC_ASSETS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			]
+		},
+		"MAKE_TRANSACTION": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS",
+						"MEMPOOL_TRANSACTIONS": "ALWAYS"
+					},
+					"purposes": [
+						"ASSET_METADATA",
+						"CHAIN_DATA_LOOKUP",
+						"TRANSACTION_BROADCAST"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"PSEUDONYM": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "imgix",
+						"name": "imgix",
+						"legalName": {
+							"name": "Zebrafish Labs, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": true,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/imgix",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Mateo, California, United States",
+						"linkedin": "https://linkedin.com/company/imgix",
+						"privacyPolicy": "https://www.imgix.com/privacy",
+						"repoUrl": "https://github.com/imgix",
+						"twitter": "https://x.com/imgix",
+						"url": "https://www.imgix.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"STATIC_ASSETS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			]
+		},
+		"APP_CONNECTION": {
+			"collected": [
+				{
+					"byEntity": {
+						"id": "rainbow",
+						"name": "Rainbow",
+						"legalName": {
+							"name": "Rainbow Studio, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": false,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": true
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rainbow-ddab",
+						"farcaster": "https://farcaster.xyz/rainbow",
+						"icon": {
+							"extension": "png",
+							"height": 1024,
+							"width": 1024
+						},
+						"jurisdiction": "New York, United States",
+						"linkedin": "https://linkedin.com/company/rainbow-wallet",
+						"privacyPolicy": "https://rainbow.me/privacy",
+						"repoUrl": "https://github.com/rainbow-me",
+						"twitter": "https://x.com/rainbowdotme",
+						"url": "https://rainbow.me"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS",
+						"ACCOUNT_ADDRESS": "ALWAYS"
+					},
+					"purposes": [
+						"CHAIN_DATA_LOOKUP",
+						"ASSET_METADATA"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "sentry",
+						"name": "Sentry",
+						"legalName": {
+							"name": "Functional Software, Inc.",
+							"soundsDifferent": true
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/sentry",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": {
+							"extension": "svg"
+						},
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/getsentry",
+						"privacyPolicy": "https://sentry.io/privacy/",
+						"repoUrl": "https://github.com/getsentry",
+						"twitter": "https://x.com/sentry",
+						"url": "https://sentry.io/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "ALWAYS",
+						"TRACKING_IDENTIFIER": "ALWAYS"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				},
+				{
+					"byEntity": {
+						"id": "rudderstack",
+						"name": "RudderStack",
+						"legalName": {
+							"name": "RudderStack, Inc.",
+							"soundsDifferent": false
+						},
+						"type": {
+							"chainDataProvider": false,
+							"corporate": true,
+							"dataBroker": false,
+							"exchange": false,
+							"infrastructureProvider": false,
+							"offchainDataProvider": true,
+							"securityAuditor": false,
+							"transactionBroadcastProvider": false,
+							"walletDeveloper": false
+						},
+						"crunchbase": "https://www.crunchbase.com/organization/rudderstack",
+						"farcaster": {
+							"type": "NO_FARCASTER_PROFILE"
+						},
+						"icon": "NO_ICON",
+						"jurisdiction": "San Francisco, California, United States",
+						"linkedin": "https://linkedin.com/company/rudderstack",
+						"privacyPolicy": "https://www.rudderstack.com/legal/privacy-policy/",
+						"repoUrl": "https://github.com/rudderlabs",
+						"twitter": "https://x.com/rudderstack",
+						"url": "https://www.rudderstack.com/"
+					},
+					"role": "OPERATOR",
+					"dataCollection": {
+						"endpoint": {
+							"type": "REGULAR"
+						},
+						"IP_ADDRESS": "BY_DEFAULT",
+						"PSEUDONYM": "BY_DEFAULT",
+						"TRACKING_IDENTIFIER": "BY_DEFAULT"
+					},
+					"purposes": [
+						"ANALYTICS"
+					],
+					"ref": {
+						"refNotNecessary": true
+					}
+				}
+			]
+		}
+	},
+	"MOBILE": null
+}
