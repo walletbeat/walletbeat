@@ -335,3 +335,96 @@ export function classifyStringHeuristically(
 
 	return new Map(Array.from(best, ([info, { reason }]) => [info, reason]))
 }
+
+/**
+ * Returns whether `str` is non-UTF8, i.e. whether it cannot be losslessly
+ * represented as valid UTF-8 text (e.g. it contains lone surrogates or other
+ * malformed byte sequences). Such strings must be stored as base64 rather than
+ * as a plain JSON string.
+ */
+export function looksBinary(str: string): boolean {
+	const bytes = new TextEncoder().encode(str)
+
+	try {
+		const roundTripped = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+
+		return roundTripped !== str
+	} catch {
+		return true
+	}
+}
+
+export interface BinaryAwareChunk {
+	kind: 'printable' | 'binary'
+	text: string
+}
+
+/**
+ * Chunks a (possibly binary) string into interleaved runs of >=8 valid UTF-8
+ * code points ("printable" chunks) and everything else (lone surrogates and
+ * shorter printable runs, which are meant to be shown as escaped bytes). Runs
+ * of valid UTF-8 with fewer than 8 characters are merged into the surrounding
+ * binary chunk so that only longer printable subsequences are shown as
+ * readable text.
+ */
+export function chunkBinaryAwareString(str: string): BinaryAwareChunk[] {
+	const runs: BinaryAwareChunk[] = []
+	let i = 0
+
+	while (i < str.length) {
+		const code = str.charCodeAt(i)
+		let kind: BinaryAwareChunk['kind']
+		let advance: number
+
+		if (
+			code >= 0xd800 &&
+			code <= 0xdbff &&
+			i + 1 < str.length &&
+			str.charCodeAt(i + 1) >= 0xdc00 &&
+			str.charCodeAt(i + 1) <= 0xdfff
+		) {
+			kind = 'printable'
+			advance = 2
+		} else if (code >= 0xd800 && code <= 0xdfff) {
+			kind = 'binary'
+			advance = 1
+		} else {
+			kind = 'printable'
+			advance = 1
+		}
+
+		const last = runs[runs.length - 1]
+
+		if (last !== undefined && last.kind === kind) {
+			last.text += str.slice(i, i + advance)
+		} else {
+			runs.push({ kind, text: str.slice(i, i + advance) })
+		}
+
+		i += advance
+	}
+
+	// Merge short printable runs (<8 code points) into the surrounding binary
+	// chunk so only runs of >=8 UTF-8 characters are shown as readable text.
+	const chunks: BinaryAwareChunk[] = []
+	let pendingBinary = ''
+
+	for (const run of runs) {
+		if (run.kind === 'printable' && Array.from(run.text).length >= 8) {
+			if (pendingBinary !== '') {
+				chunks.push({ kind: 'binary', text: pendingBinary })
+				pendingBinary = ''
+			}
+
+			chunks.push(run)
+		} else {
+			pendingBinary += run.text
+		}
+	}
+
+	if (pendingBinary !== '') {
+		chunks.push({ kind: 'binary', text: pendingBinary })
+	}
+
+	return chunks
+}

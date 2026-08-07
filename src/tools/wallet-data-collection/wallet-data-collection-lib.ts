@@ -25,6 +25,7 @@ import {
 	DataCollectionPurpose,
 	dataCollectionPurpose,
 	dataCollectionPurposeToText,
+	PersonalInfo,
 	UserFlow,
 	type UserInfo,
 	userInfoEnums,
@@ -36,8 +37,10 @@ import { variantToWalletType, WalletType, walletTypes } from '@/schema/wallet-ty
 import { getErrorMessage } from '@/types/errors'
 import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
 import {
+	assertNonEmptyArray,
 	isNonEmptyArray,
 	type NonEmptyArray,
+	nonEmptyDedup,
 	nonEmptyMap,
 	type NonEmptySet,
 	nonEmptySetFromArray,
@@ -47,7 +50,11 @@ import {
 import { Enum } from '@/utils/enum'
 
 import { type ChalkLike, getChalk as _getChalk } from './chalk-like'
-import { classifyStringHeuristically } from './string-classification-heuristics'
+import {
+	chunkBinaryAwareString,
+	classifyStringHeuristically,
+	looksBinary,
+} from './string-classification-heuristics'
 import {
 	domainMatches,
 	type SaveOptions,
@@ -55,6 +62,8 @@ import {
 	WalletRequestMatcher,
 } from './wallet-capture-annotations'
 import {
+	CaptureInfo,
+	CaptureInfoTransaction,
 	flowsNotRequiringWalletAddress,
 	type RecordedFlow,
 	recordedFlow,
@@ -875,7 +884,9 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 		const captureFile = await openCaptureFile(opts)
 
 		for (const walletAddr of setItems(opts.walletAddresses)) {
-			captureFile.userData.add(new UserDataString(walletAddr, [WalletInfo.ACCOUNT_ADDRESS]))
+			captureFile.userData.add(
+				new UserDataString(walletAddr, [WalletInfo.ACCOUNT_ADDRESS], 'MANUAL'),
+			)
 		}
 		await captureFile.save(getSaveOptions(opts))
 	}
@@ -982,6 +993,7 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 	const capture = await openCaptureFile(opts)
 	const issues = await capture.check({
 		reviewType: opts.actor === DataCollectionActor.AGENT ? 'MUST_MAKE_REVIEWABLE' : 'MUST_REVIEW',
+		isAgent: opts.actor === DataCollectionActor.AGENT,
 	})
 	const showFormatFull = opts.actor !== DataCollectionActor.AGENT
 
@@ -1361,7 +1373,37 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 		throw new Error('Cannot use --global option for non-BENIGN strings')
 	}
 
-	capture.userData.add(new UserDataString(opts.string, setItems(opts.data)))
+	const newInfos = setItems(opts.data)
+	const existing = capture.userData.get(opts.string)
+
+	if (existing !== undefined) {
+		const toAdd = newInfos.filter(info => !existing.pieces.has(info))
+
+		if (toAdd.length === 0) {
+			const tagged =
+				existing.pieces.size > 0
+					? [...existing.pieces].map(info => userInfoName(info).long).join(', ')
+					: 'nothing'
+
+			log(`ℹ️ String "${opts.string}" is already tagged as ${tagged}; nothing to add.`)
+
+			return
+		}
+
+		if (
+			!toAdd.every(info => info === PersonalInfo.TRACKING_IDENTIFIER) &&
+			opts.actor === DataCollectionActor.AGENT
+		) {
+			log(
+				'⚠️ Only humans have the ability to tag strings as anything other than TRACKING_IDENTIFIER. ' +
+					`If you believe this string is ${toAdd.map(info => userInfoName(info).long).join(', ')}, stop and ask your human operator what to do.`,
+			)
+
+			return
+		}
+	}
+
+	capture.userData.add(new UserDataString(opts.string, newInfos, 'MANUAL'))
 
 	await capture.save(getSaveOptions(opts))
 	log(`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}.`)
@@ -1540,6 +1582,50 @@ function displayRequestInfo(
 	const chalk = options.chalk
 
 	function formatStr(str: string): string {
+		if (looksBinary(str)) {
+			const bytesToHexEscaped = (bytes: Uint8Array): string => {
+				let out = ''
+
+				for (const byte of bytes) {
+					out += `\\x${byte.toString(16).padStart(2, '0')}`
+				}
+
+				return out
+			}
+
+			const formatByteCount = (byteCount: number): string => {
+				const units = ['B', 'KiB', 'MiB', 'GiB'] as const
+				let value = byteCount
+				let unitIndex = 0
+
+				while (value >= 1024 && unitIndex < units.length - 1) {
+					value /= 1024
+					unitIndex++
+				}
+
+				return `${Number.isInteger(value) ? String(value) : value.toFixed(2)} ${units[unitIndex]}`
+			}
+
+			const formatBinaryChunk = (text: string): string => {
+				const bytes = new TextEncoder().encode(text)
+				const escaped = bytesToHexEscaped(bytes)
+
+				if (bytes.length <= 72) {
+					return `【${escaped}】`
+				}
+
+				const hidden = bytes.length - 32
+
+				return `【${bytesToHexEscaped(bytes.slice(0, 16))}… +${formatByteCount(hidden)} …${bytesToHexEscaped(bytes.slice(-16))}】`
+			}
+
+			return chunkBinaryAwareString(str)
+				.map(chunk =>
+					chunk.kind === 'printable' ? formatStr(chunk.text) : formatBinaryChunk(chunk.text),
+				)
+				.join('')
+		}
+
 		if (options.highlight !== null) {
 			const highlighted = options.highlight(str)
 
@@ -1697,7 +1783,6 @@ async function handleReviewStringsInteractive(opts: GlobalOptions): Promise<void
 		const strValue = strEntry.str
 
 		log('\n' + chalk.bgBlue.gray('='.repeat(80)))
-		log(chalk.bgBlue.gray('='.repeat(80)))
 		function header(header: string): string {
 			return ' '.repeat(16 - header.length) + chalk.bold(header) + chalk.gray(':') + ' '
 		}
@@ -2689,7 +2774,7 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 						captureFilePath,
 						annotations,
 					)
-					const issues = await captureFile.check({ reviewType: 'MUST_REVIEW' })
+					const issues = await captureFile.check({ reviewType: 'MUST_REVIEW', isAgent: false })
 
 					complete = issues.length === 0
 				} catch {
@@ -2800,5 +2885,525 @@ export function handleListWalletIds(): void {
 
 	for (const row of rows) {
 		log(padRight(row.walletId, idWidth) + ' | ' + padRight(row.variants, variantsWidth))
+	}
+}
+
+// ============================================================================
+// capture-info subcommand
+// ============================================================================
+
+/** USDC (native) token contract address on Ethereum. */
+const USDC_ETHEREUM_ADDRESS: Erc55Address = ethereumErc55Address(
+	'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+)
+
+/** Thrown when the user aborts an interactive capture-info prompt. */
+class CaptureInfoCancelled extends Error {}
+
+const TX_HASH_PATTERN = /^0x[0-9a-fA-F]{64}$/
+
+const MONTHS: Record<string, number> = {
+	jan: 0,
+	feb: 1,
+	mar: 2,
+	apr: 3,
+	may: 4,
+	jun: 5,
+	jul: 6,
+	aug: 7,
+	sep: 8,
+	oct: 9,
+	nov: 10,
+	dec: 11,
+}
+
+/**
+ * Parse the timezone offset (in minutes, positive east of UTC) from an
+ * Etherscan-style suffix such as `+UTC`, `UTC`, `UTC-08`, `UTC+05:30`, or a
+ * bare `+08:00` / `-08`. Returns `null` if unrecognized.
+ */
+function parseTimezoneOffsetMinutes(tz: string): number | null {
+	if (tz === '' || tz === 'UTC' || tz === '+UTC') {
+		return 0
+	}
+
+	const utcOffset = /^UTC([+-])(\d{1,2})(?::(\d{2}))?$/.exec(tz)
+
+	if (utcOffset !== null) {
+		const sign = utcOffset[1] === '-' ? -1 : 1
+		const hours = parseInt(utcOffset[2], 10)
+		const minutes = utcOffset[3] === undefined ? 0 : parseInt(utcOffset[3], 10)
+
+		return sign * (hours * 60 + minutes)
+	}
+
+	const bareOffset = /^([+-])(\d{1,2})(?::(\d{2}))?$/.exec(tz)
+
+	if (bareOffset !== null) {
+		const sign = bareOffset[1] === '-' ? -1 : 1
+		const hours = parseInt(bareOffset[2], 10)
+		const minutes = bareOffset[3] === undefined ? 0 : parseInt(bareOffset[3], 10)
+
+		return sign * (hours * 60 + minutes)
+	}
+
+	return null
+}
+
+/**
+ * Parse a timestamp in any of the formats Etherscan shows, returning the unix
+ * timestamp (seconds, UTC), or `null` if the input is not recognized:
+ *
+ * - `1671864611` (unix seconds)
+ * - `Dec-24-2022 06:50:11 AM +UTC`
+ * - `Dec-23-2022 10:50:11 PM UTC-08` (any UTC offset)
+ */
+function parseEtherscanTimestamp(input: string): number | null {
+	const s = input.trim()
+
+	// Unix seconds (optionally with a fractional part).
+	if (/^\d+(\.\d+)?$/.test(s)) {
+		const n = parseFloat(s)
+
+		if (!Number.isFinite(n)) {
+			return null
+		}
+
+		return Math.round(n)
+	}
+
+	const m =
+		/^([A-Za-z]{3})-(\d{1,2})-(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?(?:\s*(.+))?$/.exec(s)
+
+	if (m === null) {
+		return null
+	}
+
+	const month = MONTHS[m[1].toLowerCase()]
+
+	if (month === undefined) {
+		return null
+	}
+
+	const day = parseInt(m[2], 10)
+	const year = parseInt(m[3], 10)
+	let hour = parseInt(m[4], 10)
+	const minute = parseInt(m[5], 10)
+	const second = parseInt(m[6], 10)
+	const meridiem = m[7]
+
+	if (meridiem !== undefined) {
+		const upper = meridiem.toUpperCase()
+
+		if (upper === 'AM') {
+			if (hour === 12) {
+				hour = 0
+			}
+		} else if (upper === 'PM') {
+			if (hour !== 12) {
+				hour += 12
+			}
+		} else {
+			return null
+		}
+	}
+
+	if (hour > 23 || minute > 59 || second > 60 || day < 1 || day > 31) {
+		return null
+	}
+
+	const tz = m[8] === undefined ? '' : m[8].trim()
+	const offsetMinutes = parseTimezoneOffsetMinutes(tz)
+
+	if (offsetMinutes === null) {
+		return null
+	}
+
+	// The clock shown is in timezone `UTC+offset`, so UTC = local − offset.
+	const utcMs = Date.UTC(year, month, day, hour, minute, second) - offsetMinutes * 60_000
+
+	if (Number.isNaN(utcMs)) {
+		return null
+	}
+
+	return Math.round(utcMs / 1000)
+}
+
+function splitList(input: string): string[] {
+	return input
+		.split(/[\s,]+/)
+		.map(v => v.trim())
+		.filter(v => v !== '')
+}
+
+/**
+ * Recover the wallet addresses that were previously passed to `capture`
+ * subcommands, which were tagged with the `ACCOUNT_ADDRESS` piece in the
+ * capture file's user data store. Used as the default for the wallet-address
+ * question.
+ */
+function defaultWalletAddresses(capture: WalletCaptureFile): Erc55Address[] {
+	const addresses = new Set<Erc55Address>()
+
+	for (const encoded of capture.userData.toJSON()) {
+		const pieces = encoded.piece !== undefined ? [encoded.piece] : (encoded.pieces ?? [])
+
+		if (pieces.includes(WalletInfo.ACCOUNT_ADDRESS)) {
+			if (typeof encoded.str !== 'string') {
+				throw new Error(`non-string Ethereum address: ${JSON.stringify(encoded)}`)
+			}
+
+			try {
+				addresses.add(ethereumErc55Address(encoded.str))
+			} catch (e) {
+				throw new Error(`invalid Ethereum address: ${encoded.str}: ${getErrorMessage(e)}`, {
+					cause: e,
+				})
+			}
+		}
+	}
+
+	return Array.from(addresses)
+}
+
+/** Whether the string is a syntactically valid domain name (≥2 labels). */
+function isValidDomainName(domain: string): boolean {
+	if (domain.length === 0 || domain.length > 253) {
+		return false
+	}
+
+	if (domain.includes('://') || domain.includes('/') || domain.includes('?')) {
+		return false
+	}
+
+	const labels = domain.toLowerCase().split('.')
+
+	if (labels.length < 2) {
+		return false
+	}
+
+	return labels.every(
+		label =>
+			label.length >= 1 && label.length <= 63 && /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(label),
+	)
+}
+
+/** Whether the capture contains at least one request to the given domain. */
+function captureHasDomain(capture: WalletCaptureFile, domain: string): boolean {
+	for (const f of recordedFlow.items) {
+		const flow = capture.getFlow(f)
+
+		if (flow === null || flow === 'NOT_SUPPORTED') {
+			continue
+		}
+
+		for (const req of flow.requests) {
+			if (domainMatches(domain, req.domain)) {
+				return true
+			}
+
+			if (req.refererDomain !== null && domainMatches(domain, req.refererDomain)) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+async function promptWalletAddresses(
+	capture: WalletCaptureFile,
+	defaults: CaptureInfo | null,
+): Promise<NonEmptyArray<Erc55Address>> {
+	const initial = (
+		defaults !== null ? defaults.walletAddresses : defaultWalletAddresses(capture)
+	).join(', ')
+
+	while (true) {
+		const response = await prompts({
+			type: 'text',
+			name: 'value',
+			message: 'Which wallet addresses did you use during this capture run? (comma-separated)',
+			initial,
+		})
+
+		if (response.value === undefined) {
+			throw new CaptureInfoCancelled()
+		}
+
+		const split = splitList(String(response.value))
+
+		if (split.length === 0) {
+			log('⚠️  Please provide at least one wallet address.')
+			continue
+		}
+
+		try {
+			const addresses = nonEmptyMap(assertNonEmptyArray(split), a => ethereumErc55Address(a))
+
+			if (addresses.some(a => a === USDC_ETHEREUM_ADDRESS)) {
+				log(
+					'⚠️  The USDC token contract address is not a wallet address. Please provide the wallet addresses you used.',
+				)
+				continue
+			}
+
+			return nonEmptyDedup(addresses)
+		} catch (e) {
+			log(`⚠️  ${getErrorMessage(e)} Try again.`)
+		}
+	}
+}
+
+async function promptConnectedApps(
+	capture: WalletCaptureFile,
+	defaults: CaptureInfo | null,
+): Promise<NonEmptyArray<string>> {
+	const initial = defaults !== null ? defaults.connectedApps.join(', ') : ''
+
+	while (true) {
+		const response = await prompts({
+			type: 'text',
+			name: 'value',
+			message:
+				'Which websites/apps did you connect your wallet to? (comma-separated domain names, e.g. app.uniswap.org)',
+			initial,
+		})
+
+		if (response.value === undefined) {
+			throw new CaptureInfoCancelled()
+		}
+
+		const split = splitList(String(response.value))
+
+		if (split.length === 0) {
+			log('⚠️  Please provide at least one domain name.')
+			continue
+		}
+
+		const domains = assertNonEmptyArray(split)
+		const invalid = domains.filter(domain => !isValidDomainName(domain))
+
+		if (invalid.length > 0) {
+			log(`⚠️  Not valid domain names: ${invalid.join(', ')} Try again.`)
+			continue
+		}
+
+		const missing = domains.filter(domain => !captureHasDomain(capture, domain))
+
+		if (missing.length > 0) {
+			log(
+				`⚠️  No requests to these domains were found in the capture (check for typos): ${missing.join(', ')}`,
+			)
+			continue
+		}
+
+		return nonEmptyDedup(domains, (a, b) => a.toLowerCase() === b.toLowerCase())
+	}
+}
+
+async function promptSwapTokenAddresses(
+	defaults: CaptureInfo | null,
+): Promise<NonEmptyArray<Erc55Address>> {
+	const initial = (
+		defaults !== null && defaults.swapTokenAddresses.length > 0
+			? defaults.swapTokenAddresses
+			: [USDC_ETHEREUM_ADDRESS]
+	).join(', ')
+
+	while (true) {
+		const response = await prompts({
+			type: 'text',
+			name: 'value',
+			message:
+				'Which token addresses did you use to swap? (comma-separated; defaults to USDC on Ethereum)',
+			initial,
+		})
+
+		if (response.value === undefined) {
+			throw new CaptureInfoCancelled()
+		}
+
+		const split = splitList(String(response.value))
+
+		if (split.length === 0) {
+			log('⚠️  Please provide at least one token address.')
+			continue
+		}
+
+		try {
+			return nonEmptyDedup(nonEmptyMap(assertNonEmptyArray(split), a => ethereumErc55Address(a)))
+		} catch (e) {
+			log(`⚠️  ${getErrorMessage(e)} Try again.`)
+		}
+	}
+}
+
+async function promptTransactionHashes(
+	defaults: CaptureInfo | null,
+): Promise<NonEmptyArray<string>> {
+	const initial =
+		defaults !== null && defaults.transactions.length > 0
+			? defaults.transactions.map(tx => tx.txHash).join(', ')
+			: ''
+
+	while (true) {
+		const response = await prompts({
+			type: 'text',
+			name: 'value',
+			message:
+				'Which transaction IDs (0x...) did you submit as part of this? (comma- or newline-separated)',
+			initial,
+		})
+
+		if (response.value === undefined) {
+			throw new CaptureInfoCancelled()
+		}
+
+		const split = splitList(String(response.value))
+
+		if (split.length === 0) {
+			log('⚠️  Please provide at least one transaction ID.')
+			continue
+		}
+
+		const hashes = assertNonEmptyArray(split)
+		const invalid = hashes.filter(hash => !TX_HASH_PATTERN.test(hash))
+
+		if (invalid.length > 0) {
+			log(`⚠️  Invalid transaction IDs (must be 0x + 64 hex chars): ${invalid.join(', ')}`)
+			continue
+		}
+
+		return nonEmptyDedup(hashes)
+	}
+}
+
+async function promptTransactionTimestamp(txHash: string): Promise<number> {
+	const link = `https://etherscan.io/tx/${txHash}`
+
+	while (true) {
+		log(`\nOpen this link to find the timestamp of this transaction:\n  ${link}`)
+
+		const response = await prompts({
+			type: 'text',
+			name: 'value',
+			message:
+				'When did this transaction land on-chain? (e.g. "Dec-24-2022 06:50:11 AM +UTC", "Dec-23-2022 10:50:11 PM UTC-08", or unix seconds)',
+			initial: '',
+		})
+
+		if (response.value === undefined) {
+			throw new CaptureInfoCancelled()
+		}
+
+		const timestamp = parseEtherscanTimestamp(String(response.value))
+
+		if (timestamp === null) {
+			log(
+				'⚠️  Could not parse that timestamp. Accepts formats like "Dec-24-2022 06:50:11 AM +UTC", "Dec-23-2022 10:50:11 PM UTC-08", or unix seconds. Try again.',
+			)
+			continue
+		}
+
+		if (timestamp > Date.now() / 1000) {
+			log('⚠️  That timestamp is in the future. Try again.')
+			continue
+		}
+
+		return timestamp
+	}
+}
+
+async function collectCaptureInfo(
+	capture: WalletCaptureFile,
+	defaults: CaptureInfo | null,
+): Promise<CaptureInfo> {
+	const walletAddresses = await promptWalletAddresses(capture, defaults)
+	const connectedApps = await promptConnectedApps(capture, defaults)
+	const swapTokenAddresses = await promptSwapTokenAddresses(defaults)
+	const txHashes = await promptTransactionHashes(defaults)
+	const transactions: CaptureInfoTransaction[] = []
+
+	for (const txHash of txHashes) {
+		const timestamp = await promptTransactionTimestamp(txHash)
+
+		transactions.push(new CaptureInfoTransaction(txHash, timestamp))
+	}
+
+	return new CaptureInfo(walletAddresses, connectedApps, swapTokenAddresses, transactions)
+}
+
+/**
+ * Interactively collect high-level capture metadata (capture info) after all
+ * network captures have been performed, and store it in the capture file.
+ * Running again with existing entries lets the user edit a past response or
+ * append a new one.
+ */
+export async function handleCaptureInfo(opts: GlobalOptions): Promise<void> {
+	if (opts.actor !== DataCollectionActor.HUMAN) {
+		throw new Error('This command can only be executed by humans')
+	}
+
+	const capture = await openCaptureFile(opts)
+	const existing = capture.getCaptureInfo()
+
+	try {
+		if (existing.length === 0) {
+			const info = await collectCaptureInfo(capture, null)
+
+			capture.setCaptureInfo([info])
+			await capture.save(getSaveOptions(opts))
+			log('✅ Capture info recorded.')
+
+			return
+		}
+
+		const choices: prompts.PromptObject<'value'>['choices'] = existing.map((info, i) => ({
+			title: `Edit entry #${i + 1}: ${info.connectedApps.join(', ')} (${info.transactions.length} transaction${info.transactions.length === 1 ? '' : 's'})`,
+			value: i,
+		}))
+
+		choices.push({ title: 'Append a new capture-info entry', value: 'NEW' })
+
+		const response = await prompts({
+			type: 'select',
+			name: 'value',
+			message: 'You already have capture info recorded. What would you like to do?',
+			choices,
+		})
+
+		if (response.value === undefined) {
+			log('\nCapture info cancelled.')
+
+			return
+		}
+
+		if (response.value === 'NEW') {
+			const info = await collectCaptureInfo(capture, null)
+
+			capture.setCaptureInfo([...existing, info])
+		} else {
+			if (typeof response.value !== 'number') {
+				throw new CaptureInfoCancelled()
+			}
+
+			const info = await collectCaptureInfo(capture, existing[response.value])
+			const newList = [...existing]
+
+			newList[response.value] = info
+			capture.setCaptureInfo(newList)
+		}
+
+		await capture.save(getSaveOptions(opts))
+		log('✅ Capture info saved.')
+	} catch (e) {
+		if (e instanceof CaptureInfoCancelled) {
+			log('\nCapture info cancelled. No changes saved.')
+
+			return
+		}
+
+		throw e
 	}
 }

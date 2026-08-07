@@ -67,6 +67,22 @@ Delete all data from a single capture session.
 Use this if you made a mistake during a network capture.
 Session numbers are printed in the output of the `capture` subcommand.
 
+#### `capture-info` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> capture-info
+```
+
+After you have captured (or marked as not supported) **all** flows, run this to record
+high-level metadata about your capture session. It asks for the wallet addresses you used,
+the websites/apps you connected to, and the token addresses you swapped with (defaulting
+to USDC on Ethereum). It also asks for the onchain timestamps of the transactions you
+submitted. This is a human-only command; agents and CI skip it. The `check` subcommand
+will flag a missing capture info for you to address.
+
+If capture info has already been recorded, running this again lets you either edit a past entry
+or append a new one.
+
 #### `check` subcommand
 
 ```
@@ -226,6 +242,7 @@ After a request is manually reviewed, it will never be prompted for in future ex
     - Record a network capture with `--flow=<flow>`, with `--wallet-addresses` set to the two addresses you have set up in the wallet already.
     - Start the browser and perform the UX flow.
     - Stop the browser, end the capture.
+  - Once you have captured (or marked as unsupported) all flows, run the `capture-info` subcommand to record the wallet addresses, apps, token addresses, and transaction timestamps you used during the capture session.
 - Agent:
   - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
     - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
