@@ -27,6 +27,7 @@ import {
 	explainRequestOptions,
 	globalOptions,
 	handleCapture,
+	handleCaptureInfo,
 	handleCheck,
 	handleDeleteCapture,
 	handleExplainRequest,
@@ -117,6 +118,17 @@ cli
 	.example(getCommand('check [--format=SUMMARY|FULL]'))
 	.action(async options => {
 		await handleCheck(checkOptions.process(options))
+	})
+
+// capture-info subcommand
+cli
+	.command(
+		'capture-info',
+		'Record high-level capture metadata (wallet addresses, apps, tokens, transactions) after all captures',
+	)
+	.example(getCommand('capture-info'))
+	.action(async options => {
+		await handleCaptureInfo(globalOptions.process(options))
 	})
 
 // mark-flow-unsupported subcommand

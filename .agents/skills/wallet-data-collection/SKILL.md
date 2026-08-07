@@ -17,5 +17,7 @@ If you do not know these pieces of information, ask the user about it. Once you 
 
 If you feel overwhelmed by the sheer amount of tasks in front of you as reported by `check`, do not panic. Your task is simply to make _some_ progress at all. Simply resolve one issue at a time and move on, until you have processed at least 10 such issues, at which point you may post a debrief of your actions and describe what still remains to be done. Do not classify things in bulk.
 
+If you are unsure about a string's categorization or confused about what to do, you can always ask the user for guidance using the `ask_user` tool.
+
 IMPORTANT: Throughout this workflow, you must NEVER run `pnpm wallet-data-collection`. Always run `pnpm wallet-data-collection:agent` instead.
 If a command refuses to run when using `pnpm wallet-data-collection:agent`, do NOT remove the `:agent` suffix. Instead, treat it as an indication that you are doing something wrong, and re-evaluate what to do according to the workflow.

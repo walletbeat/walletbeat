@@ -24,6 +24,7 @@ import {
 	type UserInfo,
 	userInfoEnums,
 	validateDataCollectionByEntityRow,
+	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type Variant, variantEnum } from '@/schema/variants'
@@ -41,6 +42,7 @@ import {
 	nonEmptySet,
 	setItems,
 } from '@/types/utils/non-empty'
+import { assertStringHasPrefix } from '@/types/utils/text'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
 
 import {
@@ -52,6 +54,7 @@ import {
 	isSameJson,
 	stableJSONStringify,
 } from './json-utils'
+import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {
 	type SaveOptions,
@@ -89,10 +92,10 @@ interface EncodedWalletDataFlow {
 
 /**
  * Encoded representation of a UserDataString: raw string with optional piece classification.
+ * The `str` field is a plain string for valid UTF-8 text, or a base64 wrapper for binary data.
  */
 interface EncodedUserDataString {
-	str?: string
-	strBase64?: string
+	str: string | { type: 'base64'; base64: string }
 	piece?: UserInfo
 	pieces?: UserInfo[]
 }
@@ -208,11 +211,34 @@ interface EncodedWalletCaptureFlow {
 	requests: EncodedWalletDataRequest[]
 }
 
+/**
+ * Encoded representation of a single transaction recorded in capture info.
+ */
+interface EncodedCaptureInfoTransaction {
+	/** Transaction hash: `0x` + 64 hex characters. */
+	txHash: `0x${string}`
+	/** Unix timestamp (seconds, UTC) at which the transaction landed on-chain. */
+	timestamp: number
+}
+
+/**
+ * Encoded representation of a single capture-info entry: the answers a human
+ * provided, after capturing, to the capture-info questions (wallet addresses
+ * used, apps connected to, tokens swapped, and submitted transactions).
+ */
+interface EncodedCaptureInfo {
+	walletAddresses: NonEmptyArray<Erc55Address>
+	connectedApps: NonEmptyArray<string>
+	swapTokenAddresses: Erc55Address[]
+	transactions: EncodedCaptureInfoTransaction[]
+}
+
 interface EncodedWalletCaptureFile {
 	identity: WalletCaptureFileIdentity
 	flows: Record<string, EncodedWalletCaptureFlow | 'NOT_SUPPORTED'>
 	userData: EncodedUserDataStringStore
 	sessions: number
+	captureInfo?: NonEmptyArray<EncodedCaptureInfo>
 }
 
 function parseEncodedWalletRequestReview(v: unknown, at: string): EncodedWalletRequestReview {
@@ -443,6 +469,28 @@ function _decodeBase64ToBytes(b64: string): Uint8Array {
 	}
 
 	return bytes
+}
+
+/**
+ * Decode the `str` field of an `EncodedUserDataString`: a plain string for
+ * valid UTF-8 text, or a `{ type: 'base64', base64 }` wrapper for binary data.
+ */
+function decodeUserDataStringStr(v: unknown, at: string): string {
+	if (typeof v === 'string') {
+		return v
+	}
+
+	const record = expectRecord(v, at)
+
+	if (record.type !== 'base64') {
+		throw new Error(`Expected 'base64' at ${at}.type, got ${String(record.type)}`)
+	}
+
+	if (typeof record.base64 !== 'string') {
+		throw new Error(`Expected string at ${at}.base64`)
+	}
+
+	return new TextDecoder('utf-8').decode(_decodeBase64ToBytes(record.base64))
 }
 
 function _validateResponsePayloadEncoding(
@@ -815,11 +863,17 @@ export class UserDataString {
 	public readonly str: string
 	public readonly length: number
 	public readonly pieces: ReadonlySet<UserInfo>
+	public readonly source: 'CAPTURE_INFO' | 'MANUAL' | 'EPHEMERAL'
 
-	constructor(str: string, pieces: Iterable<UserInfo>) {
+	constructor(
+		str: string,
+		pieces: Iterable<UserInfo>,
+		source: 'CAPTURE_INFO' | 'MANUAL' | 'EPHEMERAL',
+	) {
 		this.str = str
 		this.length = str.length
 		this.pieces = new Set(pieces)
+		this.source = source
 
 		if (str === '' && this.pieces.size > 0) {
 			throw new Error('Cannot create a user-data-carrying UserDataString with an empty string')
@@ -838,27 +892,30 @@ export class UserDataString {
 			pieces.push(...userInfoEnums.assertArray(record.pieces))
 		}
 
-		let str: string
-
-		if (record.strBase64 !== undefined) {
-			const b64 = expectString(record.strBase64, `${at}.strBase64`)
-			const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4)
-
-			str = new TextDecoder('utf-8').decode(Uint8Array.from(atob(padded), c => c.charCodeAt(0)))
-		} else {
-			str = expectString(record.str, `${at}.str`)
-		}
-
-		return new UserDataString(str, assertNonEmptyArray(pieces))
+		return new UserDataString(
+			decodeUserDataStringStr(record.str, `${at}.str`),
+			assertNonEmptyArray(pieces),
+			'MANUAL',
+		)
 	}
 
 	public encode(): EncodedUserDataString {
+		if (this.source !== 'MANUAL') {
+			throw new Error(
+				`Cannot encode non-manual UserDataString ${this.str} (source: ${this.source})`,
+			)
+		}
+
 		const sortedPieces = [...this.pieces].sort(compareUserInfo)
-		const bytes = new TextEncoder().encode(this.str)
-		const isAscii = bytes.every(b => b < 128)
-		const result: EncodedUserDataString = isAscii
-			? { str: this.str }
-			: { strBase64: btoa(String.fromCharCode(...bytes)).replace(/=+$/, '') }
+		const str: string | { type: 'base64'; base64: string } = looksBinary(this.str)
+			? (() => {
+					const bytes = new TextEncoder().encode(this.str)
+					const b64 = btoa(String.fromCharCode(...bytes)).replace(/=+$/, '')
+
+					return { type: 'base64' as const, base64: b64 }
+				})()
+			: this.str
+		const result: EncodedUserDataString = { str }
 
 		if (sortedPieces.length === 1) {
 			result.piece = sortedPieces[0]
@@ -894,7 +951,7 @@ export class UserDataString {
 			newSet.add(info)
 		}
 
-		return new UserDataString(this.str, newSet)
+		return new UserDataString(this.str, newSet, 'MANUAL')
 	}
 }
 
@@ -936,8 +993,121 @@ export class UserDataStringStore {
 
 	public toJSON(): EncodedUserDataStringStore {
 		return Array.from(this._index.values())
+			.filter(s => s.source === 'MANUAL')
 			.sort((a, b) => a.str.localeCompare(b.str))
 			.map(item => item.encode())
+	}
+
+	public addCaptureInfo(captureInfo: CaptureInfo) {
+		for (const address of captureInfo.walletAddresses) {
+			this.add(new UserDataString(address, [WalletInfo.ACCOUNT_ADDRESS], 'CAPTURE_INFO'))
+		}
+
+		for (const app of captureInfo.connectedApps) {
+			this.add(new UserDataString(app, [WalletInfo.WALLET_CONNECTED_DOMAINS], 'CAPTURE_INFO'))
+		}
+
+		for (const address of captureInfo.swapTokenAddresses) {
+			this.add(new UserDataString(address, [WalletInfo.ASSETS], 'CAPTURE_INFO'))
+		}
+
+		for (const tx of captureInfo.transactions) {
+			this.add(new UserDataString(tx.txHash, [WalletInfo.MEMPOOL_TRANSACTIONS], 'CAPTURE_INFO'))
+		}
+	}
+}
+
+// ============  CaptureInfo  ============
+
+/**
+ * A single transaction submitted as part of a capture run, together with the
+ * on-chain timestamp at which it landed.
+ */
+export class CaptureInfoTransaction {
+	public readonly txHash: `0x${string}`
+	public readonly timestamp: number
+
+	constructor(txHash: string, timestamp: number) {
+		if (!/^0x[0-9a-fA-F]{64}$/.test(txHash)) {
+			throw new Error(`Invalid transaction hash: "${txHash}" (must be 0x + 64 hex chars)`)
+		}
+
+		if (!Number.isFinite(timestamp) || timestamp <= 0) {
+			throw new Error(`Invalid transaction timestamp: ${timestamp}`)
+		}
+
+		this.txHash = assertStringHasPrefix(txHash, '0x')
+		this.timestamp = timestamp
+	}
+
+	public static fromEncoded(data: unknown, at: string): CaptureInfoTransaction {
+		const obj = expectRecord(data, at)
+
+		return new CaptureInfoTransaction(
+			expectString(obj.txHash, `${at}.txHash`),
+			expectNumber(obj.timestamp, `${at}.timestamp`),
+		)
+	}
+
+	public toJSON(): EncodedCaptureInfoTransaction {
+		return {
+			txHash: this.txHash,
+			timestamp: this.timestamp,
+		}
+	}
+}
+
+/**
+ * The answers a human provided to the capture-info questions for a single
+ * capture run: wallet addresses used, apps connected to, tokens swapped, and
+ * the submitted transactions with their on-chain timestamps.
+ */
+export class CaptureInfo {
+	public readonly walletAddresses: NonEmptyArray<Erc55Address>
+	public readonly connectedApps: NonEmptyArray<string>
+	public readonly swapTokenAddresses: Erc55Address[]
+	public readonly transactions: CaptureInfoTransaction[]
+
+	constructor(
+		walletAddresses: NonEmptyArray<Erc55Address>,
+		connectedApps: NonEmptyArray<string>,
+		swapTokenAddresses: Erc55Address[],
+		transactions: CaptureInfoTransaction[],
+	) {
+		this.walletAddresses = walletAddresses
+		this.connectedApps = connectedApps
+		this.swapTokenAddresses = swapTokenAddresses
+		this.transactions = transactions
+	}
+
+	public static fromEncoded(data: unknown, at: string): CaptureInfo {
+		const obj = expectRecord(data, at)
+		const addressesRaw = expectArray(obj.walletAddresses, `${at}.walletAddresses`)
+		const appsRaw = expectArray(obj.connectedApps, `${at}.connectedApps`)
+		const swapRaw = expectArray(obj.swapTokenAddresses, `${at}.swapTokenAddresses`)
+		const txRaw = expectArray(obj.transactions, `${at}.transactions`)
+
+		return new CaptureInfo(
+			assertNonEmptyArray(
+				addressesRaw.map((v, i) =>
+					ethereumErc55Address(expectString(v, `${at}.walletAddresses[${i}]`)),
+				),
+			),
+			assertNonEmptyArray(appsRaw.map((v, i) => expectString(v, `${at}.connectedApps[${i}]`))),
+			swapRaw.map((v, i) =>
+				ethereumErc55Address(expectString(v, `${at}.swapTokenAddresses[${i}]`)),
+			),
+			txRaw.map((v, i) => CaptureInfoTransaction.fromEncoded(v, `${at}.transactions[${i}]`)),
+		)
+	}
+
+	public toJSON(): EncodedCaptureInfo {
+		return {
+			walletAddresses: this.walletAddresses,
+			connectedApps: this.connectedApps,
+			swapTokenAddresses: this.swapTokenAddresses,
+			transactions: this.transactions.map(tx => tx.toJSON()),
+		}
 	}
 }
 
@@ -1266,7 +1436,7 @@ export class WalletDataString {
 		}
 
 		// Fallback: treat the entire string as a single WalletDataString
-		return [new WalletDataString(new UserDataString(str, new Set()), origin)]
+		return [new WalletDataString(new UserDataString(str, new Set(), 'EPHEMERAL'), origin)]
 	}
 
 	private static async _tryParseAsQueryString(
@@ -2499,11 +2669,11 @@ export class WalletCaptureFlow {
 
 			return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
 		})
-		const readyIndexes = await Promise.all(
-			filtered.map(async req => await req.isReadyForReview(strings)),
+		const keepIndexes = await Promise.all(
+			filtered.map(async req => !(await req.isReadyForReview(strings))),
 		)
 
-		return filtered.filter((_, i) => !readyIndexes[i])
+		return filtered.filter((_, i) => keepIndexes[i])
 	}
 
 	public unreviewedRequests(): WalletRequestReview[] {
@@ -2575,6 +2745,7 @@ export class WalletCaptureFile {
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
+	private captureInfo: CaptureInfo[]
 
 	public static async fromFile(
 		identity: WalletCaptureFileIdentity | null,
@@ -2707,6 +2878,18 @@ export class WalletCaptureFile {
 
 		this.flows = captureFlows
 		this.sessions = root.sessions === undefined ? 0 : expectNumber(root.sessions, '$.sessions')
+		this.captureInfo =
+			root.captureInfo === undefined
+				? []
+				: assertNonEmptyArray(
+						expectArray(root.captureInfo, '$.captureInfo').map((v, i) =>
+							CaptureInfo.fromEncoded(v, `$.captureInfo[${i}]`),
+						),
+					)
+
+		for (const info of this.captureInfo) {
+			this.userData.addCaptureInfo(info)
+		}
 	}
 
 	private toJSON(): EncodedWalletCaptureFile {
@@ -2726,14 +2909,15 @@ export class WalletCaptureFile {
 			}
 		}
 
-		const out: EncodedWalletCaptureFile = {
+		return {
 			identity: this.identity,
 			flows: flowsOut,
 			userData: this.userData.toJSON(),
 			sessions: this.sessions,
+			...(this.captureInfo.length > 0
+				? { captureInfo: assertNonEmptyArray(this.captureInfo.map(info => info.toJSON())) }
+				: {}),
 		}
-
-		return out
 	}
 
 	/**
@@ -3015,6 +3199,16 @@ export class WalletCaptureFile {
 		return this.flows[flow] ?? null
 	}
 
+	/** Returns the list of capture-info entries recorded so far (possibly empty). */
+	public getCaptureInfo(): CaptureInfo[] {
+		return this.captureInfo
+	}
+
+	/** Replaces the full list of capture-info entries. */
+	public setCaptureInfo(captureInfo: CaptureInfo[]): void {
+		this.captureInfo = captureInfo
+	}
+
 	public getSessions(): Set<number> {
 		const sessions = new Set<number>()
 
@@ -3051,6 +3245,12 @@ export class WalletCaptureFile {
 
 	public async check(checkOpts: {
 		reviewType: 'MUST_MAKE_REVIEWABLE' | 'MUST_REVIEW'
+		/**
+		 * Whether the command is being run by an automated agent (AGENT mode).
+		 * Human and CI mode run the same checks; the capture-info check only
+		 * applies to those non-agent runs.
+		 */
+		isAgent: boolean
 	}): Promise<WalletCaptureIssue[]> {
 		if (recordedFlow.items.map(this.getFlow.bind(this)).every(v => v === null)) {
 			return [
@@ -3072,11 +3272,13 @@ export class WalletCaptureFile {
 		let numUnreviewedRequests = 0
 		let numUnreviewableRequests = 0
 		const allDomains = new Set<string>()
+		let hasFlowWithoutData = false
 
 		for (const f of recordedFlow.items) {
 			const flow = this.getFlow(f)
 
 			if (flow === null) {
+				hasFlowWithoutData = true
 				issues.push(
 					new WalletCaptureIssue({
 						section: ['Capture flows'],
@@ -3111,6 +3313,40 @@ export class WalletCaptureFile {
 			}
 			numUnreviewableRequests += (await flow.unreviewableRequests(strings)).length
 			numUnreviewedRequests += flow.unreviewedRequests().length
+		}
+
+		if (!hasFlowWithoutData && this.captureInfo.length === 0) {
+			if (checkOpts.isAgent) {
+				// Abort here, need human immediately regardless of further issues.
+				return [
+					new WalletCaptureIssue({
+						section: ['Capture info'],
+						issue:
+							'No capture info recorded for this wallet. A human needs to provide this information.',
+						suggestions: [
+							{
+								suggestion:
+									'Ask your human operator to run the following command to record the wallet addresses, apps, tokens, and transactions used during the capture session',
+								subcommand: 'capture-info',
+							},
+						],
+					}),
+				]
+			}
+
+			issues.push(
+				new WalletCaptureIssue({
+					section: ['Capture info'],
+					issue: 'No capture info recorded for this wallet.',
+					suggestions: [
+						{
+							suggestion:
+								'Record the wallet addresses, apps, tokens, and transactions used during this capture session',
+							subcommand: 'capture-info',
+						},
+					],
+				}),
+			)
 		}
 
 		// Deduplicate domains: keep only "most parental" domains
