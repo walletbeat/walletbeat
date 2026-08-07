@@ -46,7 +46,8 @@
 		"wallet-data-collection": "cross-env WALLETBEAT_ENV=HUMAN tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
 		"wallet-data-collection:agent": "cross-env WALLETBEAT_ENV=AGENT tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
 		"wallet-data-collection:ci": "cross-env WALLETBEAT_ENV=CI tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
-		"wallet-data-collection:lint-fix": "pnpm run wallet-data-collection:ci lint-fix"
+		"wallet-data-collection:lint-fix": "pnpm run wallet-data-collection:ci lint-fix",
+		"wallet-data-collection:generate": "tsx src/tools/wallet-data-collection/generate-data-collection.ts"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.3",
