@@ -779,7 +779,6 @@ function globalAnnotationsPath(): string {
 
 async function openCaptureFile(options: GlobalOptions): Promise<WalletCaptureFile> {
 	const annotations = WalletCaptureAnnotations.fromFile(
-		options.id,
 		annotationsPath(options),
 		globalAnnotationsPath(),
 	)
@@ -994,6 +993,7 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 	const issues = await capture.check({
 		reviewType: opts.actor === DataCollectionActor.AGENT ? 'MUST_MAKE_REVIEWABLE' : 'MUST_REVIEW',
 		isAgent: opts.actor === DataCollectionActor.AGENT,
+		walletVariants: getSaveOptions(opts).walletVariants,
 	})
 	const showFormatFull = opts.actor !== DataCollectionActor.AGENT
 
@@ -1080,7 +1080,6 @@ export async function handleCheck(opts: CheckOptions): Promise<number> {
 		}
 		log('')
 	}
-	await Promise.resolve()
 
 	return issues.length
 }
@@ -2670,7 +2669,6 @@ export async function handleLintFix(): Promise<void> {
 			}
 
 			const annotations = WalletCaptureAnnotations.fromFile(
-				walletId,
 				annotationsPath,
 				globalAnnotationsPath(),
 			)
@@ -2765,7 +2763,6 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 
 				try {
 					const annotations = WalletCaptureAnnotations.fromFile(
-						walletId,
 						path.isAbsolute(annotationsPath)
 							? annotationsPath
 							: path.join(repoRoot, annotationsPath),
@@ -2782,7 +2779,11 @@ export async function handleListWallets(opts: GlobalOptions): Promise<void> {
 						captureFilePath,
 						annotations,
 					)
-					const issues = await captureFile.check({ reviewType: 'MUST_REVIEW', isAgent: false })
+					const issues = await captureFile.check({
+						reviewType: 'MUST_REVIEW',
+						isAgent: false,
+						walletVariants: getSaveOptions(opts).walletVariants,
+					})
 
 					complete = issues.length === 0
 				} catch {

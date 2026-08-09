@@ -99,16 +99,26 @@ Yes, this is tiresome work. It can be the toughest part of the wallet rating pro
 
 Once the `pnpm wallet-data-collection` capture and annotation process is complete, you can now hook up the data it has produced to Walletbeat's data about the wallet you just rated.
 
+First, automatically generate the JSON and TypeScript files in a format that Walletbeat's wallet object understands. This will process your capture data into a condensed `DataCollection` object that aggregates all the data collection practices of the wallet. Example:
+
+```shell
+$ pnpm wallet-data-collection lint-fix
+✅ Linted: data/software-wallets/collection/rabby/rabby.browser.datacollection.json
+✅ Linted: data/software-wallets/collection/rabby/rabby.datacollection.ts
+```
+
+Now you can add the default export from `<wallet_id>.datacollection.ts` as an import in the wallet data object:
+
 ```typescript
 // Add this import:
-import walletDataCollection from '@/data/software-wallets/collection/<wallet_id>/wallet-data-collection.ts'
+import someWalletDataCollection from '@/data/software-wallets/collection/<wallet_id>/<wallet_id>.datacollection.ts'
 
 export const someWallet: SoftwareWallet = {
 	features: {
 		// [...]
 		privacy: {
 			// Set this field to the data you just imported:
-			dataCollection: walletDataCollection,
+			dataCollection: someWalletDataCollection,
 		},
 	},
 }
