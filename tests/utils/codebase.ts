@@ -28,7 +28,7 @@ export const commonExclusions: PathPredicate[] = [
 ]
 
 /** Escape special regex characters in a string. */
-function escapeRegExp(str: string): string {
+export function escapeRegExp(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
