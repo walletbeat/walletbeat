@@ -562,6 +562,7 @@
 
 					{#if Object.keys(wallet.variants).length > 1}
 						<Select
+							data-scripting="required"
 							bind:value={selectedVariant}
 							options={[
 								{
@@ -584,6 +585,7 @@
 						{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
 						{#if brandModels.length > 1}
 							<Select
+								data-scripting="required"
 								bind:value={selectedModel}
 								options={[
 									{ value: undefined, label: 'All models' },
