@@ -2,11 +2,20 @@ import { ackee } from '@/data/entities/ackee'
 import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
+import { chainidNetwork } from '@/data/entities/chainidNetwork'
 import { citrea } from '@/data/entities/citrea'
 import { cloudflare } from '@/data/entities/cloudflare'
+import { consensys } from '@/data/entities/consensys'
+import { contentful } from '@/data/entities/contentful'
 import { deBank } from '@/data/entities/debank'
+import { fastly } from '@/data/entities/fastly'
+import { fourByteDirectory } from '@/data/entities/fourByteDirectory'
+import { github } from '@/data/entities/github'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
+import { megaeth } from '@/data/entities/megaeth'
+import { merkl } from '@/data/entities/merkl'
 import { monad } from '@/data/entities/monad'
+import { quicknode } from '@/data/entities/quicknode'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
 import { walletbeat } from '@/data/entities/walletbeat'
@@ -21,11 +30,20 @@ export const allEntities = {
 	alphabet,
 	ambire: ambireEntity,
 	apple,
+	chainidNetwork,
 	citrea,
 	cloudflare,
+	consensys,
+	contentful,
 	debank: deBank,
+	fastly,
+	fourByteDirectory,
+	github,
 	hyperFoundation,
+	megaeth,
+	merkl,
 	monad,
+	quicknode,
 	sentry,
 	sonicLabs,
 	walletbeat,
