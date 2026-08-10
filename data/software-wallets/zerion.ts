@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -63,9 +64,9 @@ export const zerion: SoftwareWallet = {
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		blurb: paragraph(''),
-		contributors: [lucemans, mattmatt],
+		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2025-04-22',
+		lastUpdated: '2026-08-10',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -437,7 +438,27 @@ export const zerion: SoftwareWallet = {
 					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
 				}),
 				hermeticBuilds: notSupported,
-				repositoryChangeControls: null,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'The only ruleset on the extension repository, "main protection", is active on the default branch and contains three rules: `deletion`, `non_fast_forward`, and `pull_request`. Blocking deletion and non-fast-forward pushes covers branch deletion and force-push respectively.',
+							label: 'main protection',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/rules/12153885',
+						},
+						{
+							explanation:
+								'The `pull_request` rule in the same ruleset sets `required_approving_review_count` to 0, so a pull request is required but may be merged without any approving review. No `required_status_checks` rule is present, and no ruleset targets tags.',
+							label: 'Ruleset definition (GitHub API)',
+							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets/12153885',
+						},
+					],
+					branchDeletionBlocked: true,
+					forcePushBlocked: true,
+					requiredChecks: false,
+					requiredReview: false,
+					tagsImmutable: false,
+				},
 				reproducibleBuilds: null,
 			},
 		},
