@@ -111,7 +111,6 @@
 				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
 				<details
 					id={s.id}
-					open
 					data-card="radius-8 padding-6 {isCurrent ? 'border-accent' : ''}"
 					data-column="gap-0"
 					style:--accent={stageToColor(stageIndex, ladderDefinition?.stages.length ?? 3)}
@@ -174,7 +173,6 @@
 									)}
 
 									<details
-										open
 										data-card="padding-5 secondary radius-4"
 										style:--accent={stageStatuses[groupRating].color}
 									>
