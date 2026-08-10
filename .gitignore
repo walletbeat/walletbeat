@@ -60,10 +60,13 @@ deploy/dev/dev-server.pid
 deploy/dev/dev-server.url
 
 # Local browser verification artifacts
-.playwright-cli/
+.playwright-cli
 
 # Local package store
-.pnpm-store/
+.pnpm-store
 
 # Ruff cache
 .ruff_cache
+
+# Browser verification matrix output
+screenshots/wallet-page-matrix/

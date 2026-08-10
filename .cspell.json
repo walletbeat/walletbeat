@@ -300,6 +300,7 @@
 		"L2s",
 		"Lattice1",
 		"LGPLv3",
+		"libexec",
 		"LiFi",
 		"linkability",
 		"linkable",
@@ -365,6 +366,7 @@
 		"ncsgy",
 		"Neocypherpunk",
 		"nethermind",
+		"networkidle",
 		"NFT",
 		"NFTs",
 		"nftstorage",
@@ -645,7 +647,8 @@
 		"resources/contracts/cache/**",
 		"resources/contracts/lib/**",
 		"resources/contracts/out/**",
-		"resources/contracts/images/**"
+		"resources/contracts/images/**",
+		"screenshots/wallet-page-matrix/**"
 	],
 	"patterns": [
 		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
