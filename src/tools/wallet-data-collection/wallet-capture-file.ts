@@ -2648,7 +2648,43 @@ export class WalletCaptureFlow {
 		const issues: WalletCaptureIssue[] = []
 
 		for (const req of this._requests) {
-			if (this.file.findMatcherForReq(req) === null) {
+			if (this.file.findMatcherForReq(req) !== null) {
+				continue
+			}
+
+			if (this.flow === RecordedOnlyFlow.IDLE_PRE_INSTALL) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Request annotations'],
+						issue: `Request ${req.toString()} does not have any assigned purpose. Since this request was made pre-wallet-install, it should be matched with \`--purposes=NOT_WALLET_INITIATED\`.`,
+						suggestions: [
+							{
+								suggestion: 'Declare the purpose of this request as `NOT_WALLET_INITIATED`.',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=NOT_WALLET_INITIATED`,
+							},
+						],
+					}),
+				)
+			} else if (this.flow === UserFlow.INSTALL) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Request annotations'],
+						issue: `Request ${req.toString()} does not have any assigned purpose.`,
+						suggestions: [
+							{
+								suggestion:
+									'Declare the purpose of this request as `NOT_WALLET_INITIATED` if the request was made before the wallet was actually installed (e.g. Chrome Web Store, Android Play Store, iOS App Store requests).',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=NOT_WALLET_INITIATED`,
+							},
+							{
+								suggestion:
+									'Declare the purpose and collection policy of this request, if the request was made by the wallet after it was installed.',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,... --policy=collection_policy`,
+							},
+						],
+					}),
+				)
+			} else {
 				issues.push(
 					new WalletCaptureIssue({
 						section: ['Request annotations'],
@@ -2656,7 +2692,7 @@ export class WalletCaptureFlow {
 						suggestions: [
 							{
 								suggestion: 'Declare the purpose of this request.',
-								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} '--purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED'`,
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED --policy=collection_policy`,
 							},
 						],
 					}),
@@ -3711,6 +3747,16 @@ export class WalletCaptureFile {
 			for (const req of flow.requests) {
 				if (matcher.matches(req)) {
 					matched.push(req)
+
+					if (
+						flow.flow === RecordedOnlyFlow.IDLE_PRE_INSTALL &&
+						matcher.purposes !== 'NOT_WALLET_INITIATED'
+					) {
+						throw new Error(
+							`Matcher ${matcher.toString()} matches request ${req.toString()} which occurred during the IDLE_PRE_INSTALL flow, which means it cannot have been made by the wallet. Either use --purposes=NOT_WALLET_INITIATED if the request was not initiated by the wallet, or adjust the matcher to be more selective.`,
+						)
+					}
+
 					const existingMatcher = this.annotations.matches(req)
 
 					if (existingMatcher !== null) {

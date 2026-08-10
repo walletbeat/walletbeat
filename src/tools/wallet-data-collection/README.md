@@ -130,10 +130,10 @@ Update an existing domain mapping, e.g. when an intermediary is discovered later
 #### `explain-request` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>'
+$ pnpm wallet-data-collection[:agent] <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>' --policy='<collection_policy>'
 ```
 
-Mark requests matching the given `selectors` as being done for purposes `purpose1`, `purpose2`, ...
+Mark requests matching the given `selectors` as being done for certain purposes (`purpose1`, `purpose2`), and with a given policy (`collection_policy`).
 
 ##### Selectors
 
@@ -161,6 +161,16 @@ Requests can be assigned to the following purposes:
 - `NOT_WALLET_INITIATED`: Requests not actually initiated by the wallet (e.g. browser/OS built-in analytics).
 
 Purposes are case-insensitive on the command line.
+
+##### Collection policy
+
+Requests can also be assigned to a collection policy, i.e. whether the wallet makes this request with or without the user's consent.
+Valid policy options are:
+
+- `OPT_IN`: The wallet only makes this request if the user has actively configured the wallet to do so, and this configuration wasn't part of the regular wallet onboarding flow.
+- `PROMPTED`: The wallet only makes this request after asking the user whether they are OK with this request being made, e.g. opt-in analytics during the onboarding flow.
+- `BY_DEFAULT`: The wallet makes this request by default. The user may configure the wallet to avoid this request being made, but this option isn't presented to the user by default.
+- `ALWAYS`: The wallet makes this request, and there is nothing the user can do about it.
 
 #### `review-strings` subcommand
 
@@ -246,7 +256,8 @@ After a request is manually reviewed, it will never be prompted for in future ex
 - Agent:
   - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
     - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
-    - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
+    - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes and collection policies. If unsure about the collection policy, ask the human user about it.
+      - Hint: All requests during the `IDLE_PRE_INSTALL` are obviously `NOT_WALLET_INITIATED`, so you should create matchers that cover them; this will quiesce similar requests in other flows that we want to ignore since they're not the wallet's doing. Additionally, most of the requests in `INSTALL` are also likely `NOT_WALLET_INITIATED`, as the capture covers the requests needed to download and install the wallet before any of the wallet's code runs. For example, this includes requests to the Chrome Web Store, the Android Play Store, etc. which are not the wallet's doing.
     - Run the `review-strings` and/or `mark-string` subcommands to classify personal data strings and automatically associate requests to the data they send. If you are not sure, pause and ask your human operator for assistance.
     - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
     - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
