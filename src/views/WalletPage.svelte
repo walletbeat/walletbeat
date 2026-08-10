@@ -352,20 +352,28 @@
 			),
 		}))
 	)
+	/*
+	 * A single element must accumulate every data-dependent view timeline so
+	 * both slice levels share one exact start angle. CSS cannot read the
+	 * current descendant's inline geometry back into an ancestor, making these
+	 * three parallel lists the irreducible bridge from Pie's computed angles.
+	 */
+	const pieRotationAnimationNames = $derived(
+		pieRotationSteps.map(() => 'WalletPieRotationStep').join(', ')
+	)
+	const pieRotationAnimationTimelines = $derived(
+		pieRotationSteps.map(step => step.timeline).join(', ')
+	)
+	const pieRotationAnimationTimingFunctions = $derived(
+		pieRotationSteps.map(step => `linear(0, ${step.delta})`).join(', ')
+	)
 	const pieTimelineByHref = $derived(
 		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
 	)
 
-	const attributeSliceStyles = $derived(
+	const sliceStylesByHref = $derived(
 		new Map(
-			pieNavigationItems.flatMap(group => (
-				group.children?.map(attribute => [attribute.href, attribute.sliceStyle] as const) ?? []
-			))
-		)
-	)
-	const attributeGroupSliceStyles = $derived(
-		new Map(
-			pieNavigationItems.map(group => [group.href, group.sliceStyle] as const)
+			pieRotationItems.map(item => [item.href, item.sliceStyle] as const)
 		)
 	)
 
@@ -405,6 +413,7 @@
 	// Components
 	import { Github, Globe } from 'lucide-static'
 	import ListCollapseIcon from 'lucide-static/icons/list-collapse.svg?raw'
+	import MenuIcon from 'lucide-static/icons/menu.svg?raw'
 	import Rows3Icon from 'lucide-static/icons/rows-3.svg?raw'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
@@ -427,7 +436,6 @@
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
-	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
 
@@ -791,7 +799,9 @@
 	</article>
 
 	<aside
+		id="wallet-page-navigation"
 		class="page-navigation"
+		popover="auto"
 		data-scroll-container="block"
 		data-sticky-container
 		data-column="gap-0"
@@ -799,28 +809,53 @@
 		<nav
 			class="pie-navigation"
 			data-sticky="block-start backdrop-before backdrop-always"
+			data-row="start gap-2"
 			aria-label="Attribute pie navigation"
-			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
+			style:---initial-slice-mid-angle={`${pieInitialSliceMidAngle}deg`}
+			style:--pie-padding={overallRatingPiePadding}
+			style:--pie-maxR={overallRatingPieMaxRadius}
 		>
-			<div class="pie-navigation-geometry">
-				<ScrollAngleSteps steps={pieRotationSteps}>
-					<NavigationItems
-						items={pieNavigationItems}
-						showSearch={false}
-						defaultOpen
-						ariaLabel="Attribute pie navigation"
-					>
-						{#snippet iconSnippet(item: NavigationItem)}
-							{#if item.icon}
-								<span
-									class="pie-navigation-icon"
-									data-icon="wbicons emoji {item.icon}"
-								></span>
-							{/if}
-						{/snippet}
-					</NavigationItems>
-				</ScrollAngleSteps>
+			<div
+				class="pie-navigation-geometry"
+				data-row-item="wrap-end"
+				style:animation-name={pieRotationAnimationNames}
+				style:animation-timeline={pieRotationAnimationTimelines}
+				style:animation-timing-function={pieRotationAnimationTimingFunctions}
+			>
+				<NavigationItems
+					items={pieNavigationItems}
+					showSearch={false}
+					enableSticky={false}
+					defaultOpen
+					ariaLabel="Attribute pie navigation"
+				>
+					{#snippet iconSnippet(item: NavigationItem)}
+						{#if item.icon}
+							<span
+								class="pie-navigation-icon"
+								data-icon="wbicons emoji {item.icon}"
+							></span>
+						{/if}
+					{/snippet}
+				</NavigationItems>
 			</div>
+
+			<menu
+				class="page-navigation-trailing-controls"
+				data-row="gap-2"
+			>
+				<li>
+					<button
+						type="button"
+						data-icon="circle"
+						popovertarget="wallet-page-navigation"
+						aria-label="Table of contents"
+						title="Table of contents"
+					>
+						<span>{@html MenuIcon}</span>
+					</button>
+				</li>
+			</menu>
 		</nav>
 
 		<header
@@ -892,19 +927,21 @@
 		}))}
 
 	{#if attributes.length > 0}
-		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
+		{@const id = slugifyCamelCase(attrGroup.id)}
+		{@const href = `#${id}`}
+		{@const score = calculateAttributeGroupScore(attrGroup, evalGroup)}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
-		{@const sliceStyle = attributeGroupSliceStyles.get(`#${slugifyCamelCase(attrGroup.id)}`)}
+		{@const sliceStyle = sliceStylesByHref.get(href)}
 
 		<hr
 			class="attribute-group-timeline"
-			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
+			style:---pie-timeline={pieTimelineByHref.get(href)}
 		/>
 
 		<section
 			class="attribute-group"
-			id={slugifyCamelCase(attrGroup.id)}
+			{id}
 			aria-label={attrGroup.displayName}
 			data-sticky-breadcrumb="scope"
 			data-score={scoreLevel}
@@ -913,27 +950,23 @@
 			<div
 				class="attribute-group-stack"
 				data-scroll-item="inline-detached padding-match-end"
+				style:--slice-totalAngle={sliceStyle?.totalAngle}
+				style:--slice-midAngle={sliceStyle?.midAngle}
+				style:--slice-offset={sliceStyle?.offset}
+				style:--slice-gap={sliceStyle?.gap}
+				style:--slice-outerR={sliceStyle?.outerR}
+				style:--slice-innerR={sliceStyle?.innerR}
+				style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
+				style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
+				style:--slice-labelSize={sliceStyle?.labelSize}
+				style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
+				style:--slice-labelR={sliceStyle?.labelR}
 			>
 				<header
+					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-row="start gap-4"
 					data-scroll-item="inline-detached"
 				>
-					<span
-						class="attribute-group-icon"
-						data-icon="wbicons emoji {attrGroup.icon}"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
-					></span>
-
 					<div
 						class="attribute-group-summary-layout"
 						data-row-item="flexible basis-2"
@@ -950,8 +983,8 @@
 								<a
 									data-link="camouflaged"
 									data-sticky-breadcrumb="item"
-									href={`#${slugifyCamelCase(attrGroup.id)}`}
-									interestfor={slugifyCamelCase(attrGroup.id)}
+									{href}
+									interestfor={id}
 								>
 									<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 										{attrGroup.displayName}
@@ -973,6 +1006,13 @@
 							<ScoreBadge {score} size="medium" />
 						{/if}
 					</div>
+
+					<span
+						class="attribute-group-icon"
+						data-icon="wbicons emoji {attrGroup.icon}"
+					>
+						<span class="breadcrumb-slice-shape-layer" aria-hidden="true"></span>
+					</span>
 				</header>
 
 				<div data-column>
@@ -1002,7 +1042,10 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
-	{@const sliceStyle = attributeSliceStyles.get(`#${slugifyCamelCase(attribute.id)}`)}
+	{@const id = slugifyCamelCase(attribute.id)}
+	{@const href = `#${id}`}
+	{@const sliceStyle = sliceStylesByHref.get(href)}
+	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
@@ -1023,10 +1066,10 @@
 
 	<section
 		class="attribute"
-		id={slugifyCamelCase(attribute.id)}
+		{id}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
-		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
+		style:---pie-timeline={pieTimelineByHref.get(href)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
 		<details
@@ -1037,22 +1080,6 @@
 		>
 			<summary data-row>
 				<header data-row-item="flexible" data-row="start gap-3">
-					<span
-						class="attribute-icon"
-						data-icon="wbicons emoji {attribute.icon}"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
-					></span>
-
 					<div
 						class="attribute-summary-layout"
 						data-row-item="flexible basis-2"
@@ -1070,8 +1097,8 @@
 								<a
 									data-link="camouflaged"
 									data-sticky-breadcrumb="item"
-									href={`#${slugifyCamelCase(attribute.id)}`}
-									interestfor={slugifyCamelCase(attribute.id)}
+									{href}
+									interestfor={id}
 								>
 									<h3
 										title={formatAttributeTitleText(evalAttr)}
@@ -1182,8 +1209,6 @@
 								</div>
 								{/if}
 
-								{#if true}
-								{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 								{#if verifiability === Verifiability.UNVERIFIABLE}
 									<data
 										data-row-item="wrap-end"
@@ -1199,7 +1224,6 @@
 										style:--accent="var(--accent-color)"
 									>Unverifiable but audited</data>
 								{/if}
-								{/if}
 
 								<data
 									data-badge="medium"
@@ -1208,6 +1232,24 @@
 							</div>
 						</div>
 					</div>
+
+					<span
+						class="attribute-icon"
+						data-icon="wbicons emoji {attribute.icon}"
+						style:--slice-totalAngle={sliceStyle?.totalAngle}
+						style:--slice-midAngle={sliceStyle?.midAngle}
+						style:--slice-offset={sliceStyle?.offset}
+						style:--slice-gap={sliceStyle?.gap}
+						style:--slice-outerR={sliceStyle?.outerR}
+						style:--slice-innerR={sliceStyle?.innerR}
+						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
+						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
+						style:--slice-labelSize={sliceStyle?.labelSize}
+						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
+						style:--slice-labelR={sliceStyle?.labelR}
+					>
+						<span class="breadcrumb-slice-shape-layer" aria-hidden="true"></span>
+					</span>
 				</header>
 			</summary>
 			<div class="attribute-content" data-column="gap-6">
@@ -1341,14 +1383,7 @@
 					data-card="padding-5 secondary radius-4"
 					data-column="gap-0"
 					data-sticky-container
-					data-sticky-breadcrumb="scope mobile"
 				>
-					<span
-						class="detail-breadcrumb-position"
-						data-sticky-breadcrumb="position mobile"
-						aria-hidden="true"
-					></span>
-
 					<summary
 						data-sticky="block block-start backdrop-self backdrop-always"
 					>
@@ -1373,14 +1408,7 @@
 					data-card="secondary padding-5 radius-4"
 					data-column="gap-0"
 					data-sticky-container
-					data-sticky-breadcrumb="scope mobile"
 				>
-					<span
-						class="detail-breadcrumb-position"
-						data-sticky-breadcrumb="position mobile"
-						aria-hidden="true"
-					></span>
-
 					<summary
 						data-sticky="block block-start backdrop-self backdrop-always"
 					>
@@ -1524,7 +1552,6 @@
 	.container {
 		--wallet-icon-size: 3rem;
 		---wallet-content-inline-padding: 2rem;
-		---wallet-content-block-start: 2rem;
 		---wallet-icon-sticky-block-start: calc(
 			var(---wallet-page-block-offset)
 			+ var(---wallet-sticky-content-inset)
@@ -1537,9 +1564,7 @@
 			)
 			/ 2
 		);
-		---wallet-icon-sticky-inline-start: var(---wallet-content-inline-start);
 		---wallet-name-sticky-icon-size: 2rem;
-		---wallet-name-sticky-font-size: 1.8rem;
 		---wallet-name-flow-icon-size: 3rem;
 		---wallet-name-flow-font-size: 2.25rem;
 		---wallet-name-flow-gap: 0.5em;
@@ -1567,18 +1592,46 @@
 			anchor(var(--stickyBreadcrumb-parentAnchor) end)
 			+ var(---wallet-breadcrumb-gap)
 		);
-		---wallet-breadcrumb-companion-block-start: anchor(
-			--wallet-breadcrumb-surface center
+		---wallet-breadcrumb-companion-block-start: calc(
+			var(---wallet-icon-sticky-block-start)
+			+ var(---wallet-breadcrumb-block-size) / 2
 		);
 		---wallet-breadcrumb-companion-inline-end-clearance: 0px;
-		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
-		---wallet-breadcrumb-layer-root: 20;
-		---wallet-breadcrumb-layer-group: 21;
-		---wallet-breadcrumb-layer-attribute: 22;
+		---wallet-breadcrumb-companion-slot-inline-size: 6rem;
+		---wallet-breadcrumb-companion-gap: 0.5rem;
+		---wallet-breadcrumb-surface-inline-end-clearance: var(
+			---wallet-page-navigation-inline-size
+		);
+		---wallet-breadcrumb-attribute-inline-end: calc(
+			var(---wallet-content-inline-start)
+			+ var(---wallet-breadcrumb-surface-inline-end-clearance)
+			+ var(---wallet-breadcrumb-companion-inline-end-clearance)
+			+ var(---wallet-breadcrumb-companion-slot-inline-size)
+			+ var(---wallet-breadcrumb-companion-gap)
+		);
+		---wallet-breadcrumb-row-max-inline-size: calc(
+			100vi
+			- var(--sticky-insetInlineStart)
+			- var(---wallet-content-inline-start)
+			- var(---wallet-breadcrumb-inline-end)
+		);
+		---wallet-breadcrumb-attribute-max-inline-size: calc(
+			100vi
+			- var(--sticky-insetInlineStart)
+			- var(---wallet-content-inline-start)
+			- var(---wallet-breadcrumb-attribute-inline-end)
+		);
 		---wallet-attribute-heading-font-size: 1.17em;
-		---wallet-breadcrumb-animation-range-start: entry calc(100dvb - 6rem);
-		---wallet-breadcrumb-animation-range-end: entry calc(100dvb - 3rem);
+		---wallet-breadcrumb-animation-range-start: exit-crossing 0%;
+		---wallet-breadcrumb-animation-range-end: exit-crossing 100%;
 		---wallet-name-animation-distance: 7.5rem;
+		---wallet-group-header-padding-block: 0px;
+		---wallet-group-icon-size: 2rem;
+		---wallet-group-slice-block-size: var(---wallet-group-icon-size);
+		---wallet-group-heading-font-size: var(---wallet-breadcrumb-group-font-size);
+		---wallet-group-heading-direction: row;
+		---wallet-group-heading-align: baseline;
+		---wallet-group-caption-white-space: nowrap;
 		--border-radius-lg: 1rem;
 		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
@@ -1598,27 +1651,38 @@
 			/ minmax(0, 1fr) auto
 		;
 		@media (max-width: 1024px) {
-			&[data-sticky-container] {
-				--sticky-marginInlineStart: var(---wallet-page-navigation-inline-size);
-				--sticky-marginInlineEnd: 0px;
-			}
-
-			grid-template:
-				'Nav Content'
-				/ auto minmax(0, 1fr)
-			;
-		}
-		@media (max-width: 864px) {
 			---wallet-mobile-pie-size-rem: 8;
 			---wallet-mobile-pie-size: calc(
 				var(---wallet-mobile-pie-size-rem)
 				* 1rem
 			);
-			---wallet-breadcrumb-companion-inline-end-clearance: var(---wallet-mobile-pie-size);
+			---wallet-page-navigation-toolbar-gap: var(--navigation-mobile-gap);
+			---wallet-page-navigation-toolbar-inline-padding: 0.5rem;
+			---wallet-page-navigation-toolbar-inline-size: calc(
+				var(---wallet-mobile-pie-size)
+					+ var(--navigation-mobile-controlSize)
+					+ var(---wallet-page-navigation-toolbar-gap)
+					+ var(---wallet-page-navigation-toolbar-inline-padding)
+			);
+			---wallet-breadcrumb-inline-end: calc(
+				var(---wallet-page-navigation-toolbar-inline-size)
+				+ var(---wallet-page-navigation-toolbar-gap)
+			);
+			---wallet-breadcrumb-companion-inline-end-clearance: var(
+				---wallet-page-navigation-toolbar-inline-size
+			);
+			---wallet-breadcrumb-surface-inline-end-clearance: 0px;
 			---wallet-name-sticky-icon-size: 2.4rem;
 			---wallet-breadcrumb-gap: 1.25rem;
+
+			@media (max-width: 480px) {
+				/* ScoreBadge's longest compact state fits this intrinsic lane. */
+				---wallet-breadcrumb-companion-slot-inline-size: 3.25rem;
+			}
+
 			&[data-sticky-container] {
 				--sticky-marginInlineStart: 0px;
+				--sticky-marginInlineEnd: 0px;
 			}
 
 			grid-template:
@@ -1736,44 +1800,67 @@
 				transition-property: filter;
 			}
 
-			@media (max-width: 864px) {
-				display: contents;
-				z-index: auto;
-				position: static;
-				background: none;
+			@media (max-width: 1024px) {
+				z-index: var(---wallet-breadcrumb-layer-root);
+				position: fixed;
+				inset:
+					var(---wallet-page-block-offset)
+					0
+					0;
+				inline-size: 100%;
+				block-size: calc(100dvb - var(---wallet-page-block-offset));
+				margin: 0;
+				padding: 0;
+				display: flex;
+				background-color: transparent;
 				box-shadow: none;
+				clip-path: inset(
+					calc(-1 * var(---wallet-page-block-offset)) 0
+					calc(100% - var(---wallet-mobile-pie-size))
+					0
+				);
+				transition-property: clip-path, display, overlay;
+				transition-behavior: allow-discrete;
 
 				> header,
 				> nav:not(.pie-navigation) {
-					z-index: 6;
-					position: fixed;
-					inset-inline: 0 auto;
-					inline-size: var(---wallet-page-navigation-inline-size);
-					translate: -100% 0;
-					transition: translate 0.3s var(--ease-out-expo);
-					background-color: var(--background-secondary);
-				}
-
-				&::after {
-					content: none;
+					z-index: 0;
+					position: relative;
+					inset: auto;
+					inline-size: 100%;
+					translate: none;
+					background-color: var(---wallet-breadcrumb-surface-background);
 				}
 
 				> header {
-					inset-block: calc(var(---wallet-page-block-offset) + 4rem) auto;
+					flex: 0 0 var(--pageNavigation-header-blockSize);
 				}
 
 				> nav:not(.pie-navigation) {
-					inset-block:
-						calc(var(---wallet-page-block-offset) + 4rem + var(--pageNavigation-header-blockSize))
-						0;
-					overflow-y: auto;
+					flex: 1 0 auto;
 					min-block-size: 0;
-					box-shadow: 0 0 var(--separator-width) var(--border-color);
+					box-shadow: none;
 				}
 
-				&:focus-within > header,
-				&:focus-within > nav:not(.pie-navigation) {
-					translate: 0 0;
+				&:not(:popover-open) > header,
+				&:not(:popover-open) > nav:not(.pie-navigation),
+				&:not(:popover-open)::after {
+					display: none;
+					interactivity: inert;
+					pointer-events: none;
+				}
+
+				&:popover-open {
+					clip-path: inset(0);
+					background-color: var(---wallet-breadcrumb-surface-background);
+
+					@starting-style {
+						clip-path: inset(
+							calc(-1 * var(---wallet-page-block-offset)) 0
+							calc(100% - var(---wallet-mobile-pie-size))
+							0
+						);
+					}
 				}
 			}
 		}
@@ -1794,6 +1881,11 @@
 			* 1rem
 		);
 		---wallet-page-block-offset: 0px;
+		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
+		---wallet-breadcrumb-layer-root: 20;
+		---wallet-breadcrumb-layer-group: 21;
+		---wallet-breadcrumb-layer-attribute: 22;
+		---wallet-breadcrumb-layer-detail: 23;
 		---wallet-sticky-content-inset: 1rem;
 		---wallet-breadcrumb-root-font-size: 1.8rem;
 		---wallet-breadcrumb-block-size: calc(
@@ -1802,14 +1894,15 @@
 		);
 		---wallet-breadcrumb-mobile-row-gap: 0.25rem;
 		---wallet-breadcrumb-surface-fade: 0.5rem;
-		/* Keep targeted content visibly separated from the soft backdrop edge. */
-		---wallet-anchor-scroll-gap: 1rem;
+		/*
+		 * Scroll padding / sticky h4 sit flush under crumb text.
+		 * `--stickyBreadcrumb-trackBlockEnd` still includes the surface fade for
+		 * breadcrumb exit ranges; hash targets and accordion stickies omit it.
+		 */
 		--scrollContainer-scrollPaddingBlockStart: calc(
 			var(---wallet-page-block-offset)
 			+ var(---wallet-sticky-content-inset)
 			+ var(---wallet-breadcrumb-block-size)
-			+ var(---wallet-breadcrumb-surface-fade)
-			+ var(---wallet-anchor-scroll-gap)
 		);
 		---anchor-button-size: 2.5rem;
 		---anchor-control-inset: 0.75rem;
@@ -1851,15 +1944,26 @@
 			---wallet-breadcrumb-root-font-size: 1.5rem;
 		}
 
-		@media (max-width: 864px) {
+		@media (max-width: 1024px) {
+			---wallet-breadcrumb-root-font-size: 1.25rem;
+			/*
+			 * The root crumb shares the layout navigation row. Count only the
+			 * group/attribute rows below it when deriving the sticky surface and
+			 * scroll padding; narrow attribute titles may consume one extra row.
+			 */
+			---wallet-breadcrumb-row-count: 2;
 			--scrollContainer-scrollPaddingBlockStart: calc(
 				var(---wallet-page-block-offset)
 				+ var(---wallet-sticky-content-inset)
-				+ 2 * var(---wallet-breadcrumb-block-size)
-				+ var(---wallet-breadcrumb-mobile-row-gap)
-				+ var(---wallet-breadcrumb-surface-fade)
-				+ var(---wallet-anchor-scroll-gap)
+				+ var(---wallet-breadcrumb-row-count)
+					* var(---wallet-breadcrumb-block-size)
+				+ (var(---wallet-breadcrumb-row-count) - 1)
+					* var(---wallet-breadcrumb-mobile-row-gap)
 			);
+
+			@media (max-width: 480px) {
+				---wallet-breadcrumb-row-count: 3;
+			}
 		}
 	}
 
@@ -1877,6 +1981,28 @@
 	:global(#layout:has(#wallet-page) > #content) {
 		transform: none;
 		transform-style: flat;
+	}
+
+	@supports (
+		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+		(container-type: scroll-state) and
+		(position-anchor: --wallet-name) and
+		(inset-inline-start: anchor(--wallet-name end))
+	) {
+		@media (max-width: 1024px) {
+			:global(#layout:has(#wallet-page) > #nav:not(:popover-open)) {
+				z-index: calc(var(---wallet-breadcrumb-layer-root) + 1);
+				--sticky-backgroundColor: transparent;
+				background-color: transparent;
+				backdrop-filter: none;
+			}
+
+			:global(#layout:has(#wallet-page) > #nav:not(:popover-open) > header) {
+				--sticky-backgroundColor: transparent;
+				background-color: transparent;
+				backdrop-filter: none;
+			}
+		}
 	}
 
 	/*
@@ -2038,7 +2164,7 @@
 		}
 	}
 
-	@media (max-width: 864px) {
+	@media (max-width: 1024px) {
 		:global(#layout:has(#wallet-page)) {
 			scroll-marker-group: none;
 		}
@@ -2107,64 +2233,10 @@
 
 	}
 
-	@property ---pie-rotate {
+	@property ---pie-start-angle {
 		syntax: "<angle>";
 		inherits: true;
-		initial-value: 0turn;
-	}
-
-	@property ---group-index {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---group-count {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---group-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 1turn;
-	}
-
-	@property ---group-start-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 0turn;
-	}
-
-	@property ---attribute-index {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---attribute-count {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---attribute-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 1turn;
-	}
-
-	@property ---slice-total-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 1turn;
-	}
-
-	@property ---slice-mid-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 0turn;
+		initial-value: 0deg;
 	}
 
 	@property ---slice-scale {
@@ -2173,13 +2245,35 @@
 		initial-value: 1;
 	}
 
+	@keyframes -global-WalletPieRotationStep {
+		from {
+			---pie-start-angle: 0deg;
+		}
+
+		to {
+			/*
+			 * Each animation's linear() easing scales this unit angle by its
+			 * configured delta before native composition sums every step.
+			 */
+			---pie-start-angle: 1deg;
+		}
+	}
+
 	.pie-navigation {
 		display: none;
 	}
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
-		:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
+		:is(
+			.toc-icon,
+			.attribute-group-stack,
+			.attribute-group-icon,
+			.attribute-icon,
+			:global(.pie-navigation .navigation-items summary > a),
+			:global(.pie-navigation .navigation-items menu[data-navigation-depth='1'] > li > a)
+		) {
 			---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
+			---slice-offset: var(--slice-offset);
 			---slice-gap: var(--slice-gap);
 			---slice-outer-r: var(--slice-outerR);
 			---slice-inner-r: var(--slice-innerR);
@@ -2227,6 +2321,119 @@
 			---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
 			---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
 			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
+			---slice-unit: 1px;
+			---slice-arc-size: var(--slice-arcSize, small);
+			---slice-clip-origin-x: var(---slice-origin);
+			---slice-clip-origin-y: var(---slice-origin);
+			---slice-outer-start-x: calc(
+				var(---slice-clip-origin-x)
+				+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
+			);
+			---slice-outer-start-y: calc(
+				var(---slice-clip-origin-y)
+				- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
+			);
+			---slice-clip-path: shape(
+				from var(---slice-outer-start-x) var(---slice-outer-start-y),
+				arc to
+					calc(
+						var(---slice-clip-origin-x)
+						+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
+					)
+					of calc(var(---slice-outer-r) * var(---slice-unit)) cw var(---slice-arc-size),
+				arc to
+					calc(
+						var(---slice-clip-origin-x)
+						+ (
+							sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
+							- cos(var(---slice-half-angle)) * var(---slice-half-gap)
+						) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- (
+							cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
+							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
+						) * var(---slice-unit)
+					)
+					of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
+				line to
+					calc(
+						var(---slice-clip-origin-x)
+						+ (
+							sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
+							- cos(var(---slice-half-angle)) * var(---slice-half-gap)
+						) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- (
+							cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
+							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
+						) * var(---slice-unit)
+					),
+				arc to
+					calc(
+						var(---slice-clip-origin-x)
+						+ sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit)
+					)
+					of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
+				arc to
+					calc(
+						var(---slice-clip-origin-x)
+						+ sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit)
+					)
+					of calc(var(---slice-inner-r) * var(---slice-unit)) ccw var(---slice-arc-size),
+				arc to
+					calc(
+						var(---slice-clip-origin-x)
+						+ (
+							cos(var(---slice-half-angle)) * var(---slice-half-gap)
+							- sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
+						) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- (
+							cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
+							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
+						) * var(---slice-unit)
+					)
+					of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
+				line to
+					calc(
+						var(---slice-clip-origin-x)
+						+ (
+							cos(var(---slice-half-angle)) * var(---slice-half-gap)
+							- sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
+						) * var(---slice-unit)
+					)
+					calc(
+						var(---slice-clip-origin-y)
+						- (
+							cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
+							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
+						) * var(---slice-unit)
+					),
+				arc to var(---slice-outer-start-x) var(---slice-outer-start-y)
+					of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
+				close
+			);
+		}
+
+		:is(.toc-icon, .attribute-group-stack, .attribute-group-icon, .attribute-icon) {
 			---slice-unit: calc(
 				var(--icon-size) * 0.55 * var(--slice-labelSizeScale, 1)
 				/ var(--slice-labelSize)
@@ -2269,7 +2476,15 @@
 				var(---slice-inner-corner-arc-block-half),
 				var(---slice-inner-arc-block-half)
 			);
+		}
 
+		.attribute-group-stack {
+			---wallet-group-slice-block-size: calc(
+				2 * var(---slice-block-half) * var(---slice-unit)
+			);
+		}
+
+		:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
 			position: relative;
 			isolation: isolate;
 			contain: content;
@@ -2303,7 +2518,19 @@
 				translate: -50% -50%;
 			}
 
-			&::after {
+			> .breadcrumb-slice-shape-layer {
+				/*
+				 * Keep the trigonometric clip path static. The lightweight wrapper owns
+				 * scroll-driven opacity so the shape math is not invalidated per frame.
+				 */
+				position: absolute;
+				inset: 0;
+				z-index: 0;
+				pointer-events: none;
+			}
+
+			&:is(.toc-icon)::after,
+			> .breadcrumb-slice-shape-layer::after {
 				content: '';
 
 				display: block;
@@ -2313,54 +2540,7 @@
 				inline-size: calc(2 * var(---slice-origin));
 				block-size: calc(2 * var(---slice-origin));
 				background: var(--accent, var(--background-tertiary));
-				clip-path: shape(
-					from
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-						),
-					arc to
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						of calc(var(---slice-outer-r) * var(---slice-unit)) cw small,
-					arc to
-						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-outer-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-					line to
-						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-inner-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
-						of calc(var(---slice-inner-r) * var(---slice-unit)) ccw small,
-					arc to
-						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-inner-side-r)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-					line to
-						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-outer-side-r)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-					close
-				);
+				clip-path: var(---slice-clip-path);
 				pointer-events: none;
 				transform-origin:
 					var(---slice-origin)
@@ -2395,10 +2575,7 @@
 			---pie-target-angle: 0.625turn;
 			---pie-rotate: calc(
 				var(---pie-target-angle)
-				- var(
-					---initial-slice-mid-angle,
-					calc(0.5turn / var(---group-count))
-				)
+				- var(---initial-slice-mid-angle, 0deg)
 			);
 			--sticky-insetBlockStart: 0px;
 
@@ -2426,6 +2603,28 @@
 				block-size: var(---pie-size);
 				margin-inline: auto;
 				contain: strict;
+			}
+
+			.page-navigation-trailing-controls {
+				display: none;
+			}
+
+			@supports (
+				((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+				(animation-composition: accumulate)
+			) {
+				.pie-navigation-geometry {
+					animation-duration: 1ms;
+					animation-fill-mode: both;
+					animation-composition: accumulate;
+					animation-range: cover 78% cover 85%;
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.pie-navigation-geometry {
+					animation: none;
+				}
 			}
 
 			:global(.navigation-items) {
@@ -2472,217 +2671,26 @@
 			:global(.navigation-items summary::marker) {
 				display: none;
 				content: none;
-			}
-
-			:global(.navigation-items menu[data-navigation-depth='0'] > li) {
-				---group-angle: calc(1turn / var(---group-count));
-				---group-start-angle: calc(
-					(var(---group-index) - 1) * var(---group-angle)
-				);
-			}
-
-			:global(.navigation-items menu[data-navigation-depth='1'] > li) {
-				---attribute-angle: calc(
-					var(---group-angle) / var(---attribute-count)
-				);
-			}
-
-			@supports (top: calc(sibling-index() * 1px)) {
-				:global(.navigation-items menu[data-navigation-depth='0'] > li) {
-					---group-index: sibling-index();
-					---group-count: sibling-count();
-				}
-
-				:global(.navigation-items menu[data-navigation-depth='1'] > li) {
-					---attribute-index: sibling-index();
-					---attribute-count: sibling-count();
-				}
+				background: none;
 			}
 
 			:global(.navigation-items summary) {
 				display: contents;
-			}
-
-			:global(.navigation-items summary > a) {
-				--slice-totalAngle: calc((1turn - 5deg * var(---group-count)) / var(---group-count));
-				--slice-midAngle: calc((1 - var(---group-index)) * 1turn / var(---group-count));
-				--slice-offset: 3;
-				--slice-outerR: 80;
-				--slice-innerR: 12;
-				--slice-gap: 4;
-				--slice-outerCornerRadius: 28;
-				--slice-innerCornerRadius: 16;
-				--slice-labelSize: 25;
-				--slice-labelSizeScale: 1.25;
-				---slice-label-offset: calc(
-					var(---slice-label-r) * 1px
-				);
-			}
-
-			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				--slice-totalAngle: var(---attribute-angle);
-				--slice-midAngle: calc(
-					var(
-						---attribute-start-angle,
-						calc(
-							var(---group-start-angle)
-							+ (var(---attribute-index) - 1) * var(---attribute-angle)
-						)
-					)
-					+ var(---attribute-angle) / 2
-				);
-				--slice-offset: 80;
-				--slice-outerR: 36;
-				--slice-innerR: 8;
-				--slice-gap: 0;
-				--slice-outerCornerRadius: 8;
-				--slice-innerCornerRadius: 8;
-				--slice-labelSize: 9;
-				--slice-labelSizeScale: 1;
-				---slice-label-offset: calc(
-					var(---slice-label-r) * 1px
-				);
-				--slice-arcSize: small;
-			}
-
-			/* Firefox lacks typed length division/multiplication outside shape(). */
-			@supports not (top: calc(sibling-index() * 1px)) {
-				:global(.navigation-items summary > a) {
-					---slice-label-offset: 52.313px;
-				}
-
-				:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-					---slice-label-offset: 10.99px;
-				}
+				---backgroundColor: transparent;
+				background: none;
 			}
 
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
 				---slice-mid-angle: calc(
 					var(--slice-midAngle) * 1deg
 					+ var(---pie-start-angle, 0deg)
 				);
-				---slice-offset: var(--slice-offset);
-				---slice-gap: var(--slice-gap);
-				---slice-outer-r: var(--slice-outerR);
-				---slice-inner-r: var(--slice-innerR);
-				---slice-outer-corner-radius: var(--slice-outerCornerRadius);
-				---slice-inner-corner-radius: var(--slice-innerCornerRadius);
 				---slice-label-size: var(--slice-labelSize);
-				---slice-arc-size: var(--slice-arcSize, small);
 				---slice-scale: 1;
-				---slice-label-radius: calc(var(---slice-label-size) / 2);
-				---slice-label-r: clamp(
-					pow(
-						(
-							(var(---slice-outer-r) - var(---slice-label-radius))
-							* (var(---slice-inner-r) + var(---slice-label-radius))
-						),
-						0.5
-					),
-					(
-						2 / 3
-						* (
-							(
-								pow(var(---slice-outer-r), 3)
-								- pow(var(---slice-inner-r), 3)
-							)
-							/ (
-								pow(var(---slice-outer-r), 2)
-								- pow(var(---slice-inner-r), 2)
-							)
-						)
-						* (
-							sin(abs(var(---slice-total-angle)) / 2)
-							/ (abs(var(---slice-total-angle)) / 2rad)
-						)
-					),
-					var(---slice-outer-r) - var(---slice-label-radius)
-				);
-
-				---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
-				---slice-half-gap: calc(var(---slice-gap) / 2);
-				---slice-outer-corner-r: max(
-					0,
-					min(
-						var(---slice-outer-corner-radius),
-						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-						max(
-							0,
-							(
-								(
-									sin(var(---slice-half-angle)) * var(---slice-outer-r)
-									- var(---slice-half-gap)
-								)
-								/ (1 + sin(var(---slice-half-angle)))
-							)
-						)
-					)
-				);
-				---slice-inner-corner-r: max(
-					0,
-					min(
-						var(---slice-inner-corner-radius),
-						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-						max(
-							0,
-							(
-								(
-									sin(var(---slice-half-angle)) * var(---slice-inner-r)
-									- var(---slice-half-gap)
-								)
-								/ max(0.000001, 1 - sin(var(---slice-half-angle)))
-							)
-						)
-					)
-				);
-				---slice-outer-corner-offset: calc(
-					var(---slice-half-gap) + var(---slice-outer-corner-r)
-				);
-				---slice-inner-corner-offset: calc(
-					var(---slice-half-gap) + var(---slice-inner-corner-r)
-				);
-				---slice-outer-corner-center-r: calc(
-					var(---slice-outer-r) - var(---slice-outer-corner-r)
-				);
-				---slice-inner-corner-center-r: calc(
-					var(---slice-inner-r) + var(---slice-inner-corner-r)
-				);
-				---slice-outer-angle-inset: asin(
-					var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r)
-				);
-				---slice-inner-angle-inset: asin(
-					var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r)
-				);
-				---slice-outer-side-r: sqrt(
-					pow(var(---slice-outer-corner-center-r), 2)
-					- pow(var(---slice-outer-corner-offset), 2)
-				);
-				---slice-inner-side-r: sqrt(
-					pow(var(---slice-inner-corner-center-r), 2)
-					- pow(var(---slice-inner-corner-offset), 2)
-				);
-				---slice-angle-outer-start: calc(
-					var(---slice-outer-angle-inset) - var(---slice-half-angle)
-				);
-				---slice-angle-outer-end: calc(
-					var(---slice-half-angle) - var(---slice-outer-angle-inset)
-				);
-				---slice-angle-inner-end: calc(
-					var(---slice-half-angle) - var(---slice-inner-angle-inset)
-				);
-				---slice-angle-inner-start: calc(
-					var(---slice-inner-angle-inset) - var(---slice-half-angle)
-				);
-				---slice-outer-start-x: calc(
-					var(---pie-origin-x)
-					+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-				);
-				---slice-outer-start-y: calc(
-					var(---pie-origin-y)
-					- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-				);
+				---slice-label-offset: calc(var(--slice-labelR) * 1px);
+				---slice-clip-origin-x: var(---pie-origin-x);
+				---slice-clip-origin-y: var(---pie-origin-y);
 
 				display: block;
 				position: absolute;
@@ -2700,104 +2708,7 @@
 					rotate(var(---slice-mid-angle))
 					scale(var(---slice-scale))
 					translateY(calc(var(---slice-offset) * -1px));
-				clip-path: shape(
-					from var(---slice-outer-start-x) var(---slice-outer-start-y),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-outer-r) * var(---slice-unit, 1px)) cw var(---slice-arc-size, small),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-								- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit, 1px)) cw small,
-					line to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-								- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit, 1px)) cw small,
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-inner-r) * var(---slice-unit, 1px)) ccw var(---slice-arc-size, small),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								cos(var(---slice-half-angle)) * var(---slice-half-gap)
-								- sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit, 1px)) cw small,
-					line to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								cos(var(---slice-half-angle)) * var(---slice-half-gap)
-								- sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						),
-					arc to var(---slice-outer-start-x) var(---slice-outer-start-y)
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit, 1px)) cw small,
-					close
-				);
+				clip-path: var(---slice-clip-path);
 				transition-property: opacity, ---slice-scale;
 			}
 
@@ -2810,6 +2721,15 @@
 
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
 				z-index: 1;
+				opacity: 0.08;
+				pointer-events: none;
+			}
+
+			:global(.navigation-items details:is(:hover, :focus-within) menu[data-navigation-depth='1'] > li > a),
+			:global(.navigation-items details:has(> summary > a:is(:interest-source, :target-current)) menu[data-navigation-depth='1'] > li > a),
+			:global(.navigation-items details:has(> menu a:is(:interest-source, :target-current)) menu[data-navigation-depth='1'] > li > a) {
+				opacity: 0.62;
+				pointer-events: auto;
 			}
 
 			:global(.navigation-items a > span[data-row-item]) {
@@ -2863,7 +2783,7 @@
 			}
 		}
 
-		@media (max-width: 864px) {
+		@media (max-width: 1024px) {
 			.container .page-navigation {
 				padding-block-start: 0;
 				--sticky0-insetBlockStart: 0px;
@@ -2876,26 +2796,49 @@
 				---pie-surface-size: 4.25rem;
 				---pie-target-angle: 0.5turn;
 
-				z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
-				grid-area: Content;
-				justify-self: end;
-				inset-block-start: calc(var(---wallet-page-block-offset) + 0.125rem);
+				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 1);
+				flex: 0 0 var(---wallet-mobile-pie-size);
+				inset-block-start: 0;
 				inset-inline: auto 0;
-				inline-size: var(---pie-size);
+				inline-size: 100%;
+				block-size: var(---wallet-mobile-pie-size);
+				display: flex;
+				align-items: center;
+				gap: var(---wallet-page-navigation-toolbar-gap);
+				padding-inline-end: var(---wallet-page-navigation-toolbar-inline-padding);
+
+				.pie-navigation-geometry {
+					margin-inline: auto 0;
+					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
+				}
+
+				.page-navigation-trailing-controls {
+					--icon-size: var(--navigation-mobile-controlSize);
+
+					display: flex;
+					margin: 0;
+					padding: 0;
+					list-style: none;
+					pointer-events: auto;
+
+					> li {
+						display: contents;
+					}
+				}
 
 				&::before {
 					content: none;
-				}
-
-				.pie-navigation-geometry {
-					margin: 0;
-					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
 				}
 			}
 		}
 	}
 
-	a:has(> :is(h1, h2, h3)) {
+	/*
+	 * Permalink affordance for in-flow heading links. Sticky breadcrumb items
+	 * own `::before` for the `›` marker; the hash styles must not win on
+	 * specificity and skew marker size/box geometry.
+	 */
+	a:has(> :is(h1, h2, h3)):not([data-sticky-breadcrumb]) {
 		display: flex;
 		align-items: center;
 
@@ -2918,14 +2861,20 @@
 		}
 	}
 
+	.attribute-group:interest-target > .attribute-group-stack > header,
+	.attribute:interest-target > details > summary > header {
+		--icon-filter: none;
+	}
+
 	/*
-	 * Interest invokers expose state on their target, but not on the target's
-	 * other invokers. CSS cannot compare arbitrary attribute values, so these
-	 * target ↔ href pairs are the irreducible CSS-only bridge between both
-	 * NavigationItems trees and the matching in-page link.
+	 * Native interest state lands on the shared in-page target. These static
+	 * target/href pairs let every matching invoker reuse that state without
+	 * runtime style construction; CSS cannot otherwise compare two attribute
+	 * values. Keep this list aligned with the schema's stable anchor ids.
 	 */
+	.container:has(#stages:interest-target) :global(:is(a[href='#stages'], summary:has(> a[href='#stages']))),
 	.container:has(#security:interest-target) :global(:is(a[href='#security'], summary:has(> a[href='#security']))),
-	.container:has(#security-audits:interest-target) :global(:is(a[href='#security-audits'], summary:has(> a[href='#security-audits']))),
+	.container:has(#security-audits-and-bounties:interest-target) :global(:is(a[href='#security-audits-and-bounties'], summary:has(> a[href='#security-audits-and-bounties']))),
 	.container:has(#scam-prevention:interest-target) :global(:is(a[href='#scam-prevention'], summary:has(> a[href='#scam-prevention']))),
 	.container:has(#chain-verification:interest-target) :global(:is(a[href='#chain-verification'], summary:has(> a[href='#chain-verification']))),
 	.container:has(#transaction-legibility:interest-target) :global(:is(a[href='#transaction-legibility'], summary:has(> a[href='#transaction-legibility']))),
@@ -2978,18 +2927,6 @@
 		text-decoration: none;
 	}
 
-	@property --wallet-icon-size {
-		syntax: "<length>";
-		inherits: true;
-		initial-value: 0;
-	}
-
-	@property --wallet-breadcrumb-surface-opacity {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 0;
-	}
-
 	article {
 		min-inline-size: 0;
 
@@ -3016,10 +2953,11 @@
 			);
 		}
 
-		@media (max-width: 864px) {
+		@media (max-width: 1024px) {
 			.wallet-summary-badges {
 				flex-basis: 100%;
 				justify-content: end;
+				padding-inline-end: var(---wallet-breadcrumb-companion-inline-end-clearance);
 			}
 		}
 	}
@@ -3063,7 +3001,6 @@
 				opacity: 0;
 			}
 			to {
-				content: '› ';
 				opacity: 1;
 			}
 		}
@@ -3086,6 +3023,52 @@
 			);
 			--stickyBreadcrumb-animationRangeStart: var(---wallet-breadcrumb-animation-range-start);
 			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
+		}
+
+		@media (prefers-reduced-motion: no-preference) {
+			.container {
+				---wallet-group-header-padding-block: 1rem;
+				---wallet-group-icon-size: 4.125em;
+				---wallet-group-heading-font-size: 1.8rem;
+				---wallet-group-heading-direction: column;
+				---wallet-group-heading-align: stretch;
+				---wallet-group-caption-white-space: normal;
+			}
+
+			.attribute-group-stack {
+				/* Fixed/anchored crumbs replace the baseline sticky group row. */
+				---wallet-group-sticky-block-end-override: var(--scrollContainer-scrollPaddingBlockStart);
+			}
+
+			#stages > header[data-sticky] {
+				inset-block: auto;
+				max-block-size: none;
+				container-type: normal;
+
+				&::before {
+					content: none;
+				}
+			}
+
+			.attribute-group > .attribute-group-stack[data-scroll-item] {
+				position: relative;
+				inset-inline: auto;
+			}
+
+			.attribute-group
+				> .attribute-group-stack[data-scroll-item]
+				> header[data-scroll-item][data-sticky] {
+				z-index: var(---wallet-breadcrumb-layer-group);
+				position: relative;
+				inset: auto;
+				max-block-size: none;
+				container-type: normal;
+
+				&::before {
+					content: none;
+				}
+			}
+
 		}
 
 		article > header#top .wallet-name {
@@ -3118,23 +3101,44 @@
 		}
 
 		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
+			display: flex;
+			align-items: safe center;
+
+			> :is(h2, h3, h4) {
+				flex: 1 1 auto;
+				min-inline-size: 0;
+			}
+
 			&::before {
+				/* Sticky trail marker; must not inherit permalink hash styles. */
+				content: '›';
 				position: absolute;
 				inset-block-start: 0;
-				inset-inline-start: calc(-1 * var(--stickyBreadcrumb-gap));
-				display: grid;
-				place-items: center;
+				inset-inline-start: calc(
+					-1 * var(--stickyBreadcrumb-gap)
+					- 0.25em
+				);
+				display: flex;
+				align-items: center;
+				justify-content: center;
 				inline-size: var(--stickyBreadcrumb-gap);
+				min-inline-size: var(--stickyBreadcrumb-gap);
 				block-size: var(--stickyBreadcrumb-item-blockSize);
+				padding: 0;
 				margin: 0;
+				font-size: 1em;
 				line-height: 1;
 				text-box: trim-both cap alphabetic;
+				overflow: clip;
 				pointer-events: none;
+				opacity: 0;
 			}
 		}
 
 		article > header#top .wallet-name {
 			z-index: var(---wallet-breadcrumb-layer-root);
+			position: fixed;
+			margin-inline-start: 0;
 			font-size: var(---wallet-name-flow-font-size);
 
 			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
@@ -3152,9 +3156,10 @@
 					var(---wallet-page-block-offset)
 					- var(---wallet-breadcrumb-surface-fade)
 				);
-				inset-inline-start: 0;
+				inset-inline-start: var(--sticky-insetInlineStart);
 				inline-size: calc(
 					100vi
+					- var(--sticky-insetInlineStart)
 					- var(---wallet-page-navigation-inline-size)
 				);
 				block-size: calc(
@@ -3175,13 +3180,13 @@
 					transparent,
 					white var(---wallet-breadcrumb-surface-fade)
 				);
-				opacity: var(--wallet-breadcrumb-surface-opacity);
+				opacity: 0;
+				will-change: opacity;
+				animation: WalletBreadcrumbSurfaceAnimation var(--transition-easeOutExpo) both;
+				animation-timeline: --wallet-page-scroll-timeline;
+				animation-range: 0px var(---wallet-name-animation-distance);
 
 				@media (max-width: 1024px) {
-					inset-inline-start: var(---wallet-page-navigation-inline-size);
-				}
-
-				@media (max-width: 864px) {
 					inset-inline-start: 0;
 					inline-size: 100vi;
 				}
@@ -3194,6 +3199,12 @@
 			h1 {
 				font-size: inherit;
 			}
+		}
+
+		article > header#top .wallet-icon {
+			animation: WalletIconAnimation var(--transition-easeOutExpo) both;
+			animation-timeline: --wallet-page-scroll-timeline;
+			animation-range: 0px var(---wallet-name-animation-distance);
 		}
 
 		#stages > header[data-sticky-breadcrumb~='position'] {
@@ -3249,55 +3260,77 @@
 			}
 		}
 
-		.attribute-group-stack > header {
-			.section-caption,
-			.section-controls {
-				animation: AttributeGroupHeadingCompanionAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-			}
-		}
-
-		@keyframes AttributeGroupHeadingCompanionAnimation {
-			to {
-				visibility: hidden;
-				opacity: 0;
-			}
+		.attribute-group-stack > header .section-caption {
+			animation: StickyBreadcrumbItemExitAnimation var(--transition-easeInOutExpo) both;
+			animation-timeline: --sticky-breadcrumb-timeline;
+			animation-range:
+				var(---wallet-breadcrumb-animation-range-start)
+				var(---wallet-breadcrumb-animation-range-end);
 		}
 
 		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+			/*
+			 * Reserve end space matching where sticky badges are parked
+			 * (surface end + content inset + pie clearance) plus a badge slot.
+			 * `anchor-size` / edge-anchoring against the fixed badges is unreliable
+			 * while they animate (`translate`, fixed containing block).
+			 */
 			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
 			--stickyBreadcrumb-position-insetInlineStart: 0px;
-			--stickyBreadcrumb-item-insetInlineEnd: calc(
-				anchor(--wallet-breadcrumb-surface end)
-					+ var(---wallet-content-inline-start)
-					+ anchor-size(--sticky-breadcrumb-extra-position inline)
-					+ var(---wallet-breadcrumb-gap)
-					+ var(---wallet-breadcrumb-companion-inline-end-clearance)
+			--stickyBreadcrumb-item-insetInlineEnd: var(
+				---wallet-breadcrumb-attribute-inline-end
 			);
+			--stickyBreadcrumb-item-inlineSize: max-content;
+			--stickyBreadcrumb-item-positionTryFallbacks:
+				--sticky-breadcrumb-next-row,
+				--sticky-breadcrumb-constrained-row;
+			--stickyBreadcrumb-item-nextRowInsetInlineStart: calc(
+				anchor(--wallet-breadcrumb-surface start)
+				+ var(---wallet-content-inline-start)
+			);
+			--stickyBreadcrumb-item-nextRowInsetInlineEnd: var(
+				--stickyBreadcrumb-item-insetInlineEnd
+			);
+			--stickyBreadcrumb-item-rowGap: var(---wallet-breadcrumb-mobile-row-gap);
 
-			@media (max-width: 864px) {
-				--stickyBreadcrumb-item-blockOffset: calc(
-					var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-				);
-				--stickyBreadcrumb-item-insetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-					+ var(---wallet-content-inline-start)
-				);
-				--stickyBreadcrumb-gap: 0px;
+			@media (max-width: 1024px) {
+				--stickyBreadcrumb-item-blockOffset: 0px;
+			}
+
+			@media (max-width: 480px) {
+				--stickyBreadcrumb-item-positionTryFallbacks: none;
+
+				> [data-sticky-breadcrumb~='item'] {
+					inset-block-start: calc(
+						anchor(--wallet-breadcrumb-group bottom)
+						+ var(---wallet-breadcrumb-mobile-row-gap)
+					);
+					inset-inline-start: calc(
+						anchor(--wallet-breadcrumb-surface start)
+						+ var(---wallet-content-inline-start)
+					);
+					margin-inline-start: 0;
+				}
 			}
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-attribute);
 				min-inline-size: 0;
+				max-inline-size: var(
+					---wallet-breadcrumb-attribute-max-inline-size
+				);
 
 				h3 {
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
+
+					@media (max-width: 480px) {
+						overflow: visible;
+						text-overflow: clip;
+						text-wrap: balance;
+						white-space: normal;
+					}
 
 					animation:
 						BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
@@ -3318,12 +3351,71 @@
 			}
 		}
 
+		.attribute-accordions details {
+			@media (max-width: 1024px) {
+				> summary[data-sticky] {
+					z-index: var(---wallet-breadcrumb-layer-detail);
+					--sticky-backdropFilter: none;
+
+					@container scroll-state(stuck: block-start) {
+						> h4[data-sticky-breadcrumb~='item'] {
+							padding-inline-start: 1rem;
+						}
+
+						> h4[data-sticky-breadcrumb~='item']::before {
+							opacity: 1;
+						}
+					}
+				}
+
+				> summary > h4[data-sticky-breadcrumb~='item'] {
+					z-index: var(---wallet-breadcrumb-layer-detail);
+					position: relative;
+					position-anchor: auto;
+					inset: auto;
+					inline-size: auto;
+					min-inline-size: 0;
+					max-inline-size: none;
+					min-block-size: 0;
+					margin-inline-start: 0;
+					position-try-fallbacks: none;
+					font-size: 1rem;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					animation: none;
+
+					&::before {
+						inset-inline-start: 0;
+						inline-size: 0.75rem;
+						min-inline-size: 0.75rem;
+					}
+				}
+			}
+		}
+
 		.attribute > details {
+			---attribute-summary-gap: 0.5rem;
+
+			.attribute-summary-layout {
+				anchor-name: --sticky-breadcrumb-summary-layout;
+			}
+
+			.attribute-heading {
+				anchor-name: --sticky-breadcrumb-heading-track;
+			}
+
 			.attribute-summary-companions-position {
 				anchor-name: --sticky-breadcrumb-extra-position;
 				inline-size: max-content;
 
 				> .attribute-summary-companions {
+					/*
+					 * Keep an anchor on the badges themselves: once they go
+					 * `position: fixed` the position wrapper collapses to 0 and
+					 * must not be the source of reserved heading end-space.
+					 */
+					anchor-name: --sticky-breadcrumb-companions;
 					z-index: var(---wallet-breadcrumb-layer-attribute);
 				}
 			}
@@ -3349,7 +3441,7 @@
 				.attribute-summary-companions,
 				.attribute-icon,
 				.attribute-icon::before,
-				.attribute-icon::after {
+				.attribute-icon > .breadcrumb-slice-shape-layer {
 					animation: none;
 				}
 			}
@@ -3359,13 +3451,14 @@
 			from {
 				position: fixed;
 				position-anchor: --sticky-breadcrumb-extra-position;
-				inset-block-start: anchor(--sticky-breadcrumb-extra-position top);
+				inset-block-start: anchor(center);
 				inset-inline: anchor(--sticky-breadcrumb-extra-position start) auto;
-				translate: none;
+				max-inline-size: none;
+				translate: 0 -50%;
 			}
 			to {
 				position: fixed;
-				position-anchor: --wallet-breadcrumb-surface;
+				position-anchor: auto;
 				inset-block-start: var(---wallet-breadcrumb-companion-block-start);
 				inset-inline:
 					auto
@@ -3374,6 +3467,7 @@
 							+ var(---wallet-content-inline-start)
 							+ var(---wallet-breadcrumb-companion-inline-end-clearance)
 					);
+				max-inline-size: var(---wallet-breadcrumb-companion-slot-inline-size);
 				translate: 0 -50%;
 			}
 		}
@@ -3395,13 +3489,6 @@
 			}
 		}
 
-		@keyframes AttributeBreadcrumbOutAnimation {
-			to {
-				visibility: hidden;
-				opacity: 0;
-			}
-		}
-
 		:is(.attribute-group-icon, .attribute-icon) {
 			---breadcrumb-slice-label-size: calc(
 				anchor-size(--breadcrumb-slice-icon-position inline)
@@ -3420,16 +3507,32 @@
 				z-index: inherit;
 				display: inline-grid;
 				place-items: center;
+				position: fixed;
+				position-anchor: --sticky-breadcrumb-scope;
+				inset-block-start: var(---wallet-breadcrumb-icon-block-start);
+				inset-inline-start: var(---wallet-breadcrumb-icon-inline-start);
+				inline-size: var(---wallet-breadcrumb-heading-icon-size);
+				block-size: var(---wallet-breadcrumb-heading-icon-size);
+				font-size: var(---wallet-breadcrumb-heading-icon-size);
 				line-height: 1;
+				filter: none;
+				translate: none;
 
-				animation: BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
+				/* One animated box owns both handoff and scope exit. */
+				animation:
+					BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both,
+					StickyBreadcrumbItemExitAnimation linear both;
+				animation-timeline:
+					--sticky-breadcrumb-timeline,
+					--sticky-breadcrumb-scope-timeline;
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
+						var(---wallet-breadcrumb-animation-range-end),
+					var(---stickyBreadcrumb-exitAnimationRangeStart)
+						var(---stickyBreadcrumb-exitAnimationRangeEnd);
 			}
 
-			&::after {
+			> .breadcrumb-slice-shape-layer {
 				animation: BreadcrumbSliceShapeAnimation var(--transition-easeInOutExpo) both;
 				animation-timeline: --sticky-breadcrumb-timeline;
 				animation-range:
@@ -3448,19 +3551,44 @@
 
 		.attribute-icon {
 			z-index: var(---wallet-breadcrumb-layer-attribute);
-			---wallet-breadcrumb-icon-inline-start: calc(
-				anchor(--wallet-breadcrumb-group end)
-				+ var(---wallet-breadcrumb-gap)
+			/*
+			 * Follow the attribute crumb after native position-try resolves its
+			 * row. The heading reserves this icon's inline space itself.
+			 */
+			---wallet-breadcrumb-icon-block-start: calc(
+				anchor(--wallet-breadcrumb-attribute center)
+				- var(---wallet-breadcrumb-heading-icon-size) / 2
 			);
-			animation: AttributeBreadcrumbOutAnimation linear both;
-			animation-timeline: --sticky-breadcrumb-scope-timeline;
-			animation-range:
-				var(---stickyBreadcrumb-exitAnimationRangeStart)
-				var(---stickyBreadcrumb-exitAnimationRangeEnd);
+			---wallet-breadcrumb-icon-inline-start: anchor(
+				--wallet-breadcrumb-attribute start
+			);
 		}
 
 		@keyframes BreadcrumbSliceIconAnimation {
-			from {
+			0% {
+				position: absolute;
+				position-anchor: auto;
+				inset-block-start: calc(
+					50%
+					- var(---breadcrumb-slice-label-size) / 2
+				);
+				inset-inline-start: calc(
+					100%
+					* (
+						var(---slice-outer-r)
+						- var(--slice-labelR)
+					)
+					/ (
+						var(---slice-outer-r)
+						- var(---slice-inner-r)
+					)
+					- var(---breadcrumb-slice-label-size) / 2
+				);
+				inline-size: var(---breadcrumb-slice-label-size);
+				block-size: var(---breadcrumb-slice-label-size);
+				translate: none;
+			}
+			0.01% {
 				position: fixed;
 				position-anchor: --breadcrumb-slice-icon-position;
 				inset-block-start: calc(
@@ -3498,14 +3626,7 @@
 			}
 			to {
 				position: fixed;
-				position-anchor: --sticky-breadcrumb-scope;
-				inset-block-start: var(---wallet-breadcrumb-icon-block-start);
-				inset-inline-start: var(---wallet-breadcrumb-icon-inline-start);
-				inline-size: var(---wallet-breadcrumb-heading-icon-size);
-				block-size: var(---wallet-breadcrumb-heading-icon-size);
-				font-size: var(---wallet-breadcrumb-heading-icon-size);
 				filter: none;
-				translate: none;
 			}
 		}
 
@@ -3537,41 +3658,65 @@
 
 		@keyframes WalletNameAnimation {
 			from {
-				--wallet-icon-size: var(---wallet-name-flow-icon-size);
-				--wallet-breadcrumb-surface-opacity: 0;
-				position: fixed;
 				inset-block-start: anchor(--wallet-title-flow-position top);
 				inset-inline-start: anchor(--wallet-title-flow-position start);
-				margin-inline-start: 0;
 				font-size: var(---wallet-name-flow-font-size);
 			}
 			to {
-				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
-				--wallet-breadcrumb-surface-opacity: 1;
-				position: fixed;
 				inset-block-start: var(---wallet-icon-sticky-block-start);
 				inset-inline-start: calc(
 					var(--sticky-insetInlineStart)
 						+ var(---wallet-content-inline-start)
 				);
-				margin-inline-start: 0;
 				font-size: var(---wallet-breadcrumb-root-font-size);
 			}
 		}
 
-		@media (max-width: 864px) {
+		@keyframes WalletNameMobileAnimation {
+			from {
+				inset-block-start: anchor(--wallet-title-flow-position top);
+				inset-inline-start: anchor(--wallet-title-flow-position start);
+				font-size: var(---wallet-name-flow-font-size);
+			}
+			to {
+				inset-block-start: anchor(--layout-site-logo top);
+				inset-inline-start: calc(
+					anchor(--layout-site-logo end)
+					+ var(--navigation-mobile-gap)
+				);
+				font-size: var(---wallet-breadcrumb-root-font-size);
+			}
+		}
+
+		@keyframes WalletIconAnimation {
+			from {
+				inline-size: var(---wallet-name-flow-icon-size);
+				block-size: var(---wallet-name-flow-icon-size);
+			}
+			to {
+				inline-size: var(---wallet-name-sticky-icon-size);
+				block-size: var(---wallet-name-sticky-icon-size);
+			}
+		}
+
+		@keyframes WalletBreadcrumbSurfaceAnimation {
+			to {
+				opacity: 1;
+			}
+		}
+
+		@media (min-width: 1025px) and (max-width: 1399px) {
 			.container {
+				---wallet-breadcrumb-companion-block-start: calc(
+					var(---wallet-icon-sticky-block-start)
+					+ 1.5 * var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
 				--stickyBreadcrumb-trackBlockEnd: calc(
 					var(---wallet-icon-sticky-block-start)
 					+ 2 * var(---wallet-breadcrumb-block-size)
 					+ var(---wallet-breadcrumb-mobile-row-gap)
 					+ var(---wallet-breadcrumb-surface-fade)
-				);
-				---wallet-breadcrumb-companion-block-start: calc(
-					anchor(--wallet-breadcrumb-surface top)
-					+ var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-					+ var(---wallet-breadcrumb-block-size) / 2
 				);
 			}
 
@@ -3584,26 +3729,170 @@
 				);
 			}
 
-			.attribute-icon {
-				---wallet-breadcrumb-icon-block-start: calc(
-					anchor(--sticky-breadcrumb-scope top)
-					+ var(---wallet-breadcrumb-block-size)
+			:global(#layout:has(#wallet-page)) {
+				--scrollContainer-scrollPaddingBlockStart: calc(
+					var(---wallet-page-block-offset)
+					+ var(---wallet-sticky-content-inset)
+					+ 2 * var(---wallet-breadcrumb-block-size)
 					+ var(---wallet-breadcrumb-mobile-row-gap)
-					+ (
-						var(---wallet-breadcrumb-block-size)
-						- var(---wallet-breadcrumb-heading-icon-size)
-					)
-					/ 2
-				);
-				---wallet-breadcrumb-icon-inline-start: calc(
-					anchor(--wallet-breadcrumb-surface start)
-					+ var(---wallet-content-inline-start)
 				);
 			}
 		}
 
+		@media (max-width: 1024px) {
+			article > header#top .wallet-name::before {
+				content: '';
+				z-index: -1;
+				position: fixed;
+				inset: 0 0 auto;
+				block-size: var(--navigation-mobile-blockSize);
+				background-color: var(---wallet-breadcrumb-surface-background);
+				box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
+				backdrop-filter: blur(20px);
+				pointer-events: none;
+
+				@media (prefers-reduced-transparency: reduce) {
+					backdrop-filter: none;
+				}
+			}
+
+			.container {
+				---wallet-breadcrumb-companion-block-start: calc(
+					var(---wallet-page-block-offset)
+					+ 2 * var(---wallet-breadcrumb-block-size)
+					+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
+				--stickyBreadcrumb-trackBlockEnd: calc(
+					var(---wallet-icon-sticky-block-start)
+					+ var(---wallet-breadcrumb-row-count)
+						* var(---wallet-breadcrumb-block-size)
+					+ (var(---wallet-breadcrumb-row-count) - 1)
+						* var(---wallet-breadcrumb-mobile-row-gap)
+					+ var(---wallet-breadcrumb-surface-fade)
+				);
+			}
+
+			@media (max-width: 480px) {
+				.container {
+					---wallet-breadcrumb-companion-block-start: calc(
+						var(---wallet-page-block-offset)
+						+ var(---wallet-breadcrumb-block-size)
+						+ var(---wallet-breadcrumb-mobile-row-gap)
+					);
+				}
+			}
+
+			article > header#top .wallet-name::after {
+				block-size: calc(
+					2 * var(---wallet-sticky-content-inset)
+					+ var(---wallet-breadcrumb-row-count)
+						* var(---wallet-breadcrumb-block-size)
+					+ (var(---wallet-breadcrumb-row-count) - 1)
+						* var(---wallet-breadcrumb-mobile-row-gap)
+					+ 2 * var(---wallet-breadcrumb-surface-fade)
+				);
+			}
+
+			article > header#top .wallet-name {
+				max-inline-size: calc(
+					100vi
+					- anchor(--layout-site-logo end)
+					- var(--navigation-mobile-gap)
+					- var(--navigation-mobile-trailingClearance)
+				);
+				animation-name: WalletNameMobileAnimation;
+
+				h1 > span {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+
+			:is(
+				#stages > header[data-sticky-breadcrumb~='position'],
+				.attribute-group-heading-position[data-sticky-breadcrumb~='position']
+			) {
+				--stickyBreadcrumb-item-insetInlineStart: anchor(--wallet-breadcrumb-root end);
+				--stickyBreadcrumb-item-insetInlineEnd: var(---wallet-breadcrumb-inline-end);
+				--stickyBreadcrumb-item-inlineSize: max-content;
+				--stickyBreadcrumb-item-translate: none;
+				--stickyBreadcrumb-item-justifySelf: safe center;
+				--stickyBreadcrumb-item-positionTryFallbacks:
+					--sticky-breadcrumb-next-row,
+					--sticky-breadcrumb-constrained-row;
+				--stickyBreadcrumb-item-nextRowInsetInlineStart: calc(
+					anchor(--wallet-breadcrumb-surface start)
+					+ var(---wallet-content-inline-start)
+				);
+				--stickyBreadcrumb-item-nextRowInsetInlineEnd: var(
+					---wallet-breadcrumb-inline-end
+				);
+				--stickyBreadcrumb-item-nextRowJustifySelf: safe center;
+				--stickyBreadcrumb-item-rowGap: var(---wallet-breadcrumb-mobile-row-gap);
+				--stickyBreadcrumb-gap: var(---wallet-breadcrumb-heading-icon-gap);
+
+				> [data-sticky-breadcrumb~='item'] {
+					max-inline-size: var(---wallet-breadcrumb-row-max-inline-size);
+					inset-block-start: max(
+						anchor(--sticky-breadcrumb-position top),
+						var(---wallet-icon-sticky-block-start)
+					);
+					h2 {
+						flex: 0 1 auto;
+						min-inline-size: 0;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+
+					&::before {
+						content: '›';
+					}
+				}
+			}
+
+			.attribute-group-icon {
+				---wallet-breadcrumb-icon-block-start: calc(
+					anchor(--wallet-breadcrumb-group center)
+					- var(---wallet-breadcrumb-heading-icon-size) / 2
+				);
+				---wallet-breadcrumb-icon-inline-start: anchor(
+					--wallet-breadcrumb-group start
+				);
+			}
+
+		}
+
 		@media (prefers-reduced-motion: reduce) {
 			article > header#top .wallet-name {
+				position: static;
+			}
+
+			article > header#top .wallet-title-row::after {
+				content: none;
+			}
+
+			.attribute-summary-companions {
+				position: static;
+				translate: none;
+			}
+
+			:is(.attribute-group-icon, .attribute-icon)::before {
+				position: absolute;
+				translate: -50% -50%;
+			}
+
+			article > header#top :is(.wallet-name, .wallet-icon),
+			article > header#top .wallet-name::after,
+			[data-sticky-breadcrumb~='item']::before,
+			.attribute-group-heading-position h2,
+			.section-caption,
+			.attribute-heading-position h3,
+			.attribute-summary-companions,
+			.attribute-group-icon::before,
+			.attribute-icon::before,
+			.breadcrumb-slice-shape-layer {
 				animation: none;
 			}
 		}
@@ -3636,50 +3925,50 @@
 		color: var(--accent);
 	}
 
-	#news {
-		> header {
-			padding-block: 1.2rem;
-		}
-	}
-
 	#stages {
 		> header {
 			padding-block: 1.2rem;
 		}
 	}
 
+	:is(
+		#stages > header,
+		.attribute-group > .attribute-group-stack > header
+	)[data-sticky]::before {
+		inset-block: -0.5rem;
+		inset-inline: 0;
+		-webkit-mask-image: linear-gradient(to top, transparent, white 0.5rem);
+		mask-image: linear-gradient(to top, transparent, white 0.5rem);
+	}
+
 	.attribute-group {
 		> .attribute-group-stack[data-scroll-item] {
-			/*
-			 * `inline-detached` uses sticky positioning for horizontal
-			 * alignment by default. This wrapper scrolls normally so its
-			 * fixed breadcrumb descendants can participate in the page-level
-			 * root/group/attribute stacking order.
-			 */
-			position: relative;
-			inset-inline: auto;
+			--icon-size: var(---wallet-group-icon-size);
+			---wallet-group-sticky-block-end: var(
+				---wallet-group-sticky-block-end-override,
+				calc(
+					var(---wallet-page-block-offset)
+					+ var(---wallet-group-slice-block-size)
+				)
+			);
 		}
 
 		> .attribute-group-stack[data-scroll-item] > header[data-scroll-item] {
 			--icon-filter: brightness(0) opacity(0.35);
-			position: relative;
-			inset-inline: auto;
 			min-inline-size: 0;
-			padding-block: 1rem;
+			padding-block: var(---wallet-group-header-padding-block);
 
-			&:has(a:is(:hover, :focus-visible, :interest-source)),
-			.attribute-group:interest-target > & {
+			&:has(a:is(:hover, :focus-visible, :interest-source)) {
 				--icon-filter: none;
 			}
 
-			.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source),
-			.attribute-group:interest-target > & .attribute-group-summary-layout a {
+			.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source) {
 				color: var(--accent);
 				text-decoration: none;
 			}
 
 			> .attribute-group-icon {
-				--icon-size: 4.125em;
+				order: -1;
 				flex: none;
 
 				&::before {
@@ -3696,6 +3985,10 @@
 				> .attribute-group-heading {
 					flex: 1 1 16rem;
 					min-inline-size: 0;
+					flex-direction: var(---wallet-group-heading-direction);
+					align-items: var(---wallet-group-heading-align);
+					column-gap: 0.5rem;
+					row-gap: 0.25rem;
 				}
 
 				> :not(.attribute-group-heading) {
@@ -3704,41 +3997,25 @@
 			}
 
 			h2 {
-				font-size: 1.8rem;
+				font-size: var(---wallet-group-heading-font-size);
 				font-weight: 700;
 			}
 
-			.section-controls {
-				display: flex;
-				align-items: center;
-				gap: 1rem;
-
-				.section-score {
-					display: flex;
-					align-items: center;
-					gap: 0.25rem;
-					padding: 0.5rem 1.15rem;
-					border-radius: var(--border-radius);
-					font-weight: 500;
-					color: white;
-					font-size: 0.9rem;
-					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-					background-color: var(--accent, transparent);
-
-					.unrated-hint {
-						cursor: help;
-					}
-				}
-			}
 		}
 
 		.section-caption {
+			min-inline-size: 0;
+			overflow: hidden;
 			opacity: 0.8;
 			color: var(--text-secondary);
+			text-overflow: ellipsis;
 			text-wrap: pretty;
+			white-space: var(---wallet-group-caption-white-space);
 
 			:global(p) {
 				margin: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		}
 	}
@@ -3750,13 +4027,11 @@
 			--icon-filter: brightness(0) opacity(0.35);
 			min-inline-size: 0;
 
-			&:has(a:is(:hover, :focus-visible, :interest-source)),
-			.attribute:interest-target & {
+			&:has(a:is(:hover, :focus-visible, :interest-source)) {
 				--icon-filter: none;
 			}
 
-			a:is(:hover, :focus-visible, :interest-source),
-			.attribute:interest-target & a:has(h3) {
+			a:is(:hover, :focus-visible, :interest-source) {
 				color: var(--accent);
 				text-decoration: none;
 			}
@@ -3767,6 +4042,7 @@
 
 			.attribute-icon {
 				--icon-size: 3.3em;
+				order: -1;
 				flex: none;
 
 				&::before {
@@ -3791,7 +4067,7 @@
 				> header {
 					> .attribute-summary-layout {
 						min-inline-size: 0;
-						gap: 0.5rem;
+						gap: var(---attribute-summary-gap);
 
 						> .attribute-heading {
 							min-inline-size: 0;
@@ -3848,10 +4124,6 @@
 		}
 	}
 
-	.not-implemented {
-		opacity: 0.7;
-	}
-
 	.attribute-rating-methodology {
 		h5 {
 			font-size: 1rem;
@@ -3860,23 +4132,17 @@
 	}
 
 	.attribute-accordions {
-		---attribute-accordion-sticky-inset: calc(
-			var(---wallet-page-block-offset)
-			+ var(---wallet-sticky-content-inset)
-			+ var(---wallet-breadcrumb-block-size)
-			+ var(---wallet-breadcrumb-surface-fade)
-		);
-		@media (min-width: 865px) {
-			---attribute-accordion-sticky-inset: calc(
-				var(---wallet-page-block-offset)
-				+ 2 * var(---wallet-sticky-content-inset)
-				+ var(---wallet-breadcrumb-block-size)
-				+ var(---wallet-breadcrumb-surface-fade)
-			);
-		}
-
 		details {
-			--sticky-marginBlockStart: var(---attribute-accordion-sticky-inset);
+			/*
+			 * Accordion sticky containers nest at sticky-level 4 under
+			 * #layout → #content → main → #wallet-page. The baseline group
+			 * heading is a real sticky row, so derive the next inset from its
+			 * mathematically exact slice bounding box.
+			 */
+			--sticky-marginBlockStart: calc(
+				var(---wallet-group-sticky-block-end)
+				- var(--sticky3-insetBlockStart, 0px)
+			);
 
 			overflow: visible;
 
@@ -3898,6 +4164,187 @@
 					overflow-wrap: break-word;
 				}
 			}
+		}
+	}
+
+	/*
+	 * Browsers without the complete anchor/scroll-state breadcrumb stack keep
+	 * real sticky headings. Use the same compact endpoint as the animated path:
+	 * the existing icon remains, its slice and the subtitle recede, and H3 owns
+	 * the next sticky layer. The expanded clip only cuts content crossing the
+	 * sticky top edge; it deliberately preserves vertical sticky translation and
+	 * paint extending through the inline and block-end edges.
+	 */
+	@supports not (
+		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+		(container-type: scroll-state) and
+		(position-anchor: --wallet-name) and
+		(inset-inline-start: anchor(--wallet-name end))
+	) {
+		.container {
+			---wallet-fallback-group-sticky-block-size: max(
+				calc(var(---wallet-breadcrumb-group-font-size) * 1.3 + 1rem),
+				calc(var(---wallet-breadcrumb-heading-icon-size) + 1rem)
+			);
+			---wallet-fallback-attribute-sticky-block-size: max(
+				calc(var(---wallet-breadcrumb-attribute-font-size) * 1.3 + 1rem),
+				calc(var(---wallet-breadcrumb-heading-icon-size) + 1rem)
+			);
+		}
+
+		#stages > header[data-sticky],
+		.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-sticky] {
+			--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
+
+			box-sizing: border-box;
+			block-size: var(---wallet-fallback-group-sticky-block-size);
+			padding-block: 0.5rem;
+			justify-content: center;
+			clip-path: inset(0 -100vmax -100vmax);
+		}
+
+		.attribute-group > .attribute-group-stack[data-scroll-item] {
+			---wallet-group-sticky-block-end-override: calc(
+				var(---wallet-page-block-offset)
+				+ var(---wallet-fallback-group-sticky-block-size)
+			);
+
+			> header[data-sticky] > .attribute-group-summary-layout {
+				flex: 0 1 auto;
+				inline-size: auto;
+
+				> .attribute-group-heading {
+					flex-basis: auto;
+				}
+			}
+		}
+
+		#stages > header [data-sticky-breadcrumb~='item'],
+		.attribute-group-heading-position [data-sticky-breadcrumb~='item'],
+		.attribute-heading-position [data-sticky-breadcrumb~='item'] {
+			position: relative;
+			display: flex;
+			align-items: center;
+
+			&::before {
+				content: '›';
+				position: absolute;
+				inset-block-start: 50%;
+				inset-inline-start: calc(
+					-1.75em
+					- var(---wallet-breadcrumb-heading-icon-size)
+					- var(---wallet-breadcrumb-heading-icon-gap)
+				);
+				inline-size: 1em;
+				block-size: 1lh;
+				padding: 0;
+				margin: 0;
+				display: grid;
+				place-items: center;
+				translate: 0 -50%;
+				opacity: 1;
+				pointer-events: none;
+			}
+		}
+
+		#stages > header [data-sticky-breadcrumb~='item'] {
+			gap: 0.5em;
+
+			&::before {
+				position: static;
+				inset: auto;
+				flex: none;
+				translate: none;
+			}
+		}
+
+		:is(.attribute-group-icon, .attribute-icon) {
+			inline-size: var(---wallet-breadcrumb-heading-icon-size);
+			block-size: var(---wallet-breadcrumb-heading-icon-size);
+
+			&::before {
+				inset: 50% auto auto 50%;
+				inline-size: var(---wallet-breadcrumb-heading-icon-size);
+				block-size: var(---wallet-breadcrumb-heading-icon-size);
+				font-size: var(---wallet-breadcrumb-heading-icon-size);
+				display: grid;
+				place-items: center;
+				translate: -50% -50%;
+				filter: none;
+			}
+
+			> .breadcrumb-slice-shape-layer {
+				opacity: 0;
+			}
+		}
+
+		.attribute-group .section-caption,
+		.attribute > details .subsection-caption {
+			visibility: hidden;
+			flex-basis: 0;
+			inline-size: 0;
+			block-size: 0;
+			opacity: 0;
+		}
+
+		.attribute-group-heading-position h2 {
+			font-size: var(---wallet-breadcrumb-group-font-size);
+		}
+
+		#stages > header h2 {
+			font-size: var(---wallet-breadcrumb-group-font-size);
+		}
+
+		.attribute > details > summary {
+			--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
+
+			z-index: var(---wallet-breadcrumb-layer-attribute);
+			position: sticky;
+			inset-block-start: var(---wallet-group-sticky-block-end);
+			box-sizing: border-box;
+			min-block-size: var(---wallet-fallback-attribute-sticky-block-size);
+			padding-block: 0.5rem;
+			clip-path: inset(0 -100vmax -100vmax);
+			background-color: var(--sticky-backgroundColor);
+			backdrop-filter: blur(20px);
+
+			@media (prefers-reduced-transparency: reduce) {
+				backdrop-filter: none;
+			}
+
+			.attribute-summary-layout {
+				flex-wrap: nowrap;
+			}
+
+			.attribute-heading-position h3 {
+				font-size: var(---wallet-breadcrumb-attribute-font-size);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
+
+		@media (min-width: 865px) {
+			.attribute > details > summary > header {
+				justify-content: center;
+
+				> .attribute-summary-layout {
+					flex: 0 1 auto;
+					inline-size: auto;
+
+					> .attribute-heading {
+						flex: 0 1 auto;
+					}
+				}
+			}
+		}
+
+		.attribute-accordions details {
+			--sticky-marginBlockStart: calc(
+				var(---wallet-group-sticky-block-end)
+				+ var(---wallet-fallback-attribute-sticky-block-size)
+				- var(--sticky3-insetBlockStart, 0px)
+			);
 		}
 	}
 </style>
