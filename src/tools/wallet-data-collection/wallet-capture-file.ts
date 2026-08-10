@@ -56,7 +56,6 @@ import {
 	isSameJson,
 	stableJSONStringify,
 } from './json-utils'
-import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {
 	type SaveOptions,
@@ -471,6 +470,21 @@ function _decodeBase64ToBytes(b64: string): Uint8Array {
 	}
 
 	return bytes
+}
+
+/**
+ * Encode a string as plain ASCII text, or as a `{ type: 'base64', base64 }`
+ * wrapper if it contains any non-ASCII byte. The capture file format requires
+ * all JSON output to be ASCII-only.
+ */
+function _encodeAsciiSafe(str: string): string | { type: 'base64'; base64: string } {
+	const bytes = new TextEncoder().encode(str)
+
+	if (bytes.every(b => b < 128)) {
+		return str
+	}
+
+	return { type: 'base64' as const, base64: btoa(String.fromCharCode(...bytes)).replace(/=+$/, '') }
 }
 
 /**
@@ -909,14 +923,7 @@ export class UserDataString {
 		}
 
 		const sortedPieces = [...this.pieces].sort(compareUserInfo)
-		const str: string | { type: 'base64'; base64: string } = looksBinary(this.str)
-			? (() => {
-					const bytes = new TextEncoder().encode(this.str)
-					const b64 = btoa(String.fromCharCode(...bytes)).replace(/=+$/, '')
-
-					return { type: 'base64' as const, base64: b64 }
-				})()
-			: this.str
+		const str = _encodeAsciiSafe(this.str)
 		const result: EncodedUserDataString = { str }
 
 		if (sortedPieces.length === 1) {
@@ -2304,22 +2311,7 @@ export class WalletRequest {
 
 		const responsePayloadEncoded = this._responsePayloadEncoded
 
-		const contentEncoded =
-			this.content === null
-				? undefined
-				: (() => {
-						const bytes = new TextEncoder().encode(this.content)
-
-						const isAscii = bytes.every(b => b < 128)
-
-						if (isAscii) {
-							return this.content
-						}
-
-						const b64 = btoa(String.fromCharCode(...bytes)).replace(/=+$/, '')
-
-						return { type: 'base64' as const, base64: b64 }
-					})()
+		const contentEncoded = this.content === null ? undefined : _encodeAsciiSafe(this.content)
 
 		return {
 			domain: this.domain,
