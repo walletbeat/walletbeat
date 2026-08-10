@@ -197,20 +197,26 @@
 		class="slice"
 		title={slice.titleText}
 
-		role="button"
-		tabindex="0"
+		role={slice.href ? 'link' : 'button'}
+		tabindex={slice.href ? undefined : '0'}
 		aria-label={slice.titleText}
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
 		onblur={() => { onSliceBlur?.(slice.id) }}
 		onclick={(event: MouseEvent) => {
+			if (!onSliceClick) return
+
 			event.stopPropagation()
-			onSliceClick?.(slice.id)
+			onSliceClick(slice.id)
 		}}
 		onkeydown={(event: KeyboardEvent) => {
-			if (event.code === 'Enter' || event.code === 'Space')
-				onSliceClick?.(slice.id)
+			if (slice.href || !onSliceClick) return
+
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault()
+				onSliceClick(slice.id)
+			}
 		}}
 
 		style:--slice-midAngle={slice.computed.midAngle}
@@ -236,6 +242,12 @@
 		<div
 			class="slice-shape"
 		>
+			{#if !slice.href && onSliceClick}
+				<noscript><span class="accessible-label">{slice.titleText}</span></noscript>
+			{:else if !slice.href}
+				<span class="accessible-label">{slice.titleText}</span>
+			{/if}
+
 			{#if slice.arcIconId}
 				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
 			{:else}
@@ -341,11 +353,8 @@
 
 				display: grid;
 
-				pointer-events: none;
-
-				> * {
-					pointer-events: auto;
-				}
+				pointer-events: auto;
+				cursor: pointer;
 
 				&:hover,
 				&:focus-within,
@@ -370,6 +379,8 @@
 				}
 
 				.slice-shape {
+					position: relative;
+
 					--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
 					--slice-halfGap: calc(var(--slice-gap) / 2);
 					--slice-outerCornerR: max(
@@ -551,6 +562,18 @@
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
 						transition-property: translate, rotate, filter;
 					}
+				}
+
+				.accessible-label {
+					position: absolute;
+					inline-size: 1px;
+					block-size: 1px;
+					padding: 0;
+					margin: -1px;
+					overflow: hidden;
+					clip-path: inset(50%);
+					white-space: nowrap;
+					border: 0;
 				}
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
