@@ -1,0 +1,26 @@
+{
+	"INSTALL": {
+		"collected": []
+	},
+	"ONBOARDING_NEW": {
+		"collected": [],
+		"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
+	},
+	"ONBOARDING_IMPORT": {
+		"collected": [],
+		"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
+	},
+	"SEND_ETHER": {
+		"collected": []
+	},
+	"SEND_USDC": {
+		"collected": []
+	},
+	"NATIVE_SWAP": null,
+	"MAKE_TRANSACTION": {
+		"collected": []
+	},
+	"APP_CONNECTION": {
+		"collected": []
+	}
+}
