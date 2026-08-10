@@ -82,11 +82,6 @@
 	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
 	// Functions
-	const hasCurrentPage = (item: NavigationItem) => (
-		currentHref === item.href
-		|| (item.children?.some(hasCurrentPage) ?? false)
-	)
-
 	const fuzzyMatch = (text: string, query: string): [number, number][] | undefined => {
 		const ranges: [number, number][] = []
 		let textIndex = 0
@@ -244,7 +239,7 @@
 				() => (
 					effectiveSearchValue
 						? matchesSearch(item, effectiveSearchValue)
-						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item)))
+						: (isOpen.get(item) ?? defaultOpen)
 				),
 				(_: boolean) => {
 					if (!effectiveSearchValue && _ !== undefined)
