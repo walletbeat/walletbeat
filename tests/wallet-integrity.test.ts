@@ -175,7 +175,6 @@ describe('wallets', () => {
 						'global.annotations.json',
 					)
 					const annotations = WalletCaptureAnnotations.fromFile(
-						walletId,
 						annotationsPath,
 						globalAnnotationsPath,
 					)
@@ -190,6 +189,7 @@ describe('wallets', () => {
 						/* const issues = */ await captureFileObj.check({
 							reviewType: 'MUST_REVIEW',
 							isAgent: false,
+							walletVariants: wallet.variants,
 						})
 
 						/*

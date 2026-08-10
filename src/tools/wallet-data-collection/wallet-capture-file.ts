@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { format, resolveConfig } from 'prettier'
 
 import { assertValidEntityId } from '@/data/entities'
 import { entitiesForDomain } from '@/data/entities/domains/entity-domains'
@@ -27,8 +28,9 @@ import {
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
-import { type Variant, variantEnum } from '@/schema/variants'
+import { type AtLeastOneTrueVariant, Variant, variantEnum } from '@/schema/variants'
 import { type WalletType, walletTypes } from '@/schema/wallet-types'
+import { escapeRegExp } from '@/tests/utils/codebase'
 import { isInVocabulary, isLikelyEnglish } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
 import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
@@ -1600,16 +1602,18 @@ export class WalletDataString {
 		if (typeof value === 'string') {
 			results.push(...(await WalletDataString.createMany(strings, value, origin)))
 		} else if (Array.isArray(value)) {
-			await Promise.all(
-				value.map(async (val, i) => {
-					results.push(
-						...(await WalletDataString._extractJsonStrings(
-							strings,
-							val,
-							origin.add({ type: 'INDEX', index: i }),
-						)),
+			results.push(
+				...(
+					await Promise.all(
+						value.map((val, i) =>
+							WalletDataString._extractJsonStrings(
+								strings,
+								val,
+								origin.add({ type: 'INDEX', index: i }),
+							),
+						),
 					)
-				}),
+				).flat(),
 			)
 		} else if (typeof value === 'object') {
 			for (const key of Object.keys(value).sort()) {
@@ -2644,7 +2648,43 @@ export class WalletCaptureFlow {
 		const issues: WalletCaptureIssue[] = []
 
 		for (const req of this._requests) {
-			if (this.file.findMatcherForReq(req) === null) {
+			if (this.file.findMatcherForReq(req) !== null) {
+				continue
+			}
+
+			if (this.flow === RecordedOnlyFlow.IDLE_PRE_INSTALL) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Request annotations'],
+						issue: `Request ${req.toString()} does not have any assigned purpose. Since this request was made pre-wallet-install, it should be matched with \`--purposes=NOT_WALLET_INITIATED\`.`,
+						suggestions: [
+							{
+								suggestion: 'Declare the purpose of this request as `NOT_WALLET_INITIATED`.',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=NOT_WALLET_INITIATED`,
+							},
+						],
+					}),
+				)
+			} else if (this.flow === UserFlow.INSTALL) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Request annotations'],
+						issue: `Request ${req.toString()} does not have any assigned purpose.`,
+						suggestions: [
+							{
+								suggestion:
+									'Declare the purpose of this request as `NOT_WALLET_INITIATED` if the request was made before the wallet was actually installed (e.g. Chrome Web Store, Android Play Store, iOS App Store requests).',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=NOT_WALLET_INITIATED`,
+							},
+							{
+								suggestion:
+									'Declare the purpose and collection policy of this request, if the request was made by the wallet after it was installed.',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,... --policy=collection_policy`,
+							},
+						],
+					}),
+				)
+			} else {
 				issues.push(
 					new WalletCaptureIssue({
 						section: ['Request annotations'],
@@ -2652,7 +2692,7 @@ export class WalletCaptureFlow {
 						suggestions: [
 							{
 								suggestion: 'Declare the purpose of this request.',
-								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} '--purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED'`,
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED --policy=collection_policy`,
 							},
 						],
 					}),
@@ -2727,7 +2767,7 @@ export class WalletCaptureIssue {
 export interface AutoGenerationOptions {
 	/**
 	 * Whether to strictly verify the generated data.
-	 * Set to `true` in tests; omit in feature data files.
+	 * Set to `true` in tests.
 	 */
 	strict?: boolean
 }
@@ -2770,7 +2810,14 @@ export class WalletCaptureFile {
 			throw new Error('Cannot create a new WalletCaptureFile without providing wallet identity')
 		}
 
-		const parsed: unknown = JSON.parse(text)
+		let parsed: unknown
+
+		try {
+			parsed = JSON.parse(text) as unknown
+		} catch (e) {
+			throw new Error(`Invalid JSON in capture file ${path}: ${getErrorMessage(e)}`, { cause: e })
+		}
+
 		const captureFile = new WalletCaptureFile(identity, path, parsed, annotations)
 
 		if (wasNew) {
@@ -2922,7 +2969,7 @@ export class WalletCaptureFile {
 
 	/**
 	 * Convert to `DataCollection`.
-	 * If `strict` is true, generate errors as we go.
+	 * If `options.strict` is true, generate errors as we go.
 	 * Otherwise, all errors are silenced. Useful for being able to include
 	 * partial data into wallet feature data without breakage. Unit tests
 	 * should check in strict mode.
@@ -3188,11 +3235,173 @@ export class WalletCaptureFile {
 		return changed
 	}
 
+	private async saveDataCollectionJson(opts: SaveOptions): Promise<string[]> {
+		if (this.path === null) {
+			throw new Error('WalletCaptureFile was constructed without a path; cannot save.')
+		}
+
+		const jsonPath = path.join(
+			path.dirname(this.path),
+			`${this.identity.walletId}.${this.identity.walletVariant.toLowerCase()}.datacollection.autogenerated.json`,
+		)
+		let dataCollection: DataCollection | null = null
+
+		try {
+			dataCollection = await this.toDataCollection({
+				strict: false,
+			})
+			// eslint-disable-next-line unused-imports/no-unused-vars
+		} catch (_) {
+			// Ignored; the file must be deleted if it exists though (see below).
+		}
+
+		if (dataCollection === null) {
+			if (fs.existsSync(jsonPath)) {
+				if (opts.verifyExisting) {
+					throw new Error(`File not in sync: ${jsonPath}`)
+				}
+
+				await fs.promises.rm(jsonPath)
+
+				return [jsonPath]
+			}
+
+			return []
+		}
+
+		const content = JSON.stringify(dataCollection, null, '\t') + '\n'
+		let needsWrite = true
+
+		if (fs.existsSync(jsonPath)) {
+			const existingContent = fs.readFileSync(jsonPath, 'utf8')
+
+			if (isSameJson(existingContent, content)) {
+				needsWrite = false
+			}
+		}
+
+		const changed: string[] = []
+
+		if (opts.verifyExisting) {
+			if (needsWrite) {
+				throw new Error(`File not in sync: ${jsonPath}`)
+			}
+		} else if (needsWrite) {
+			const tmpPath = `${jsonPath}.tmp`
+
+			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
+			await fs.promises.writeFile(tmpPath, content, 'utf8')
+			await fs.promises.rename(tmpPath, jsonPath)
+			changed.push(jsonPath)
+		}
+
+		return changed
+	}
+
+	private async saveDataCollectionAggregationLib(opts: SaveOptions): Promise<string[]> {
+		if (this.path === null) {
+			throw new Error('WalletCaptureFile was constructed without a path; cannot save.')
+		}
+
+		const aggregationLibPath = path.join(
+			path.dirname(this.path),
+			`${this.identity.walletId}.datacollection.autogenerated.ts`,
+		)
+
+		// Determine the set of variants that have a sibling `*.datacollection.autogenerated.json`
+		// file written by `saveDataCollectionJson`.
+		const dir = path.dirname(this.path)
+		const variants: Variant[] = []
+
+		for (const filename of fs.readdirSync(dir)) {
+			const datacollectionMatch = filename.match(
+				new RegExp(
+					`^${escapeRegExp(this.identity.walletId)}\\.(.*?)\\.datacollection\\.autogenerated\\.json$`,
+				),
+			)
+
+			if (datacollectionMatch === null) {
+				continue
+			}
+
+			const variantName = datacollectionMatch[1]
+			const variantKey = variantName.toUpperCase()
+
+			if (!variantEnum.is(variantKey)) {
+				throw new Error(`Unknown variant "${variantName}" in file ${filename}`)
+			}
+
+			if (!variants.includes(variantKey)) {
+				variants.push(variantKey)
+			}
+		}
+
+		variants.sort((a, b) => a.localeCompare(b))
+
+		const wantLines: string[] = [
+			"import { capturedWalletDataCollection } from '@/tools/wallet-data-collection/data-collection-for-wallet-lib.ts'",
+			'',
+		]
+
+		for (const variant of variants) {
+			wantLines.push(
+				`import ${variant.toLowerCase()}Data from './${this.identity.walletId}.${variant.toLowerCase()}.datacollection.autogenerated.json'`,
+			)
+		}
+		const dataCollectionVarName = `${this.identity.walletId}DataCollection`
+
+		wantLines.push('')
+		wantLines.push(
+			`const ${dataCollectionVarName} = capturedWalletDataCollection([${variants.map(variant => `${variant.toLowerCase()}Data`).join(', ')}])`,
+		)
+		wantLines.push('')
+		wantLines.push(`export default ${dataCollectionVarName}`)
+		const prettierConfig = await resolveConfig(aggregationLibPath)
+
+		const wantTypescript = await format(wantLines.join('\n'), {
+			...prettierConfig,
+			parser: 'typescript',
+		})
+
+		// Check if the existing file is in sync.
+		let needsWrite = true
+
+		if (fs.existsSync(aggregationLibPath)) {
+			const existingContent = fs.readFileSync(aggregationLibPath, 'utf8')
+
+			if (existingContent === wantTypescript) {
+				needsWrite = false
+			}
+		}
+
+		const changed: string[] = []
+
+		if (opts.verifyExisting) {
+			if (needsWrite) {
+				throw new Error(`File not in sync: ${aggregationLibPath}`)
+			}
+		} else if (needsWrite) {
+			const tmpPath = `${aggregationLibPath}.tmp`
+
+			await fs.promises.mkdir(dir, { recursive: true })
+			await fs.promises.writeFile(tmpPath, wantTypescript, 'utf8')
+			await fs.promises.rename(tmpPath, aggregationLibPath)
+			changed.push(aggregationLibPath)
+		}
+
+		return changed
+	}
+
 	public async save(opts: SaveOptions): Promise<string[]> {
 		const changed = await this.saveCaptureFileOnly(opts.verifyExisting)
 		const annotationsChanged = await this.annotations.save(opts)
+		const dataCollectionJsonChanged = await this.saveDataCollectionJson(opts)
+		const dataCollectionAggregationLibChanged = await this.saveDataCollectionAggregationLib(opts)
 
-		return changed.concat(...annotationsChanged)
+		return changed
+			.concat(...annotationsChanged)
+			.concat(...dataCollectionJsonChanged)
+			.concat(...dataCollectionAggregationLibChanged)
 	}
 
 	public getFlow(flow: RecordedFlow): WalletCaptureFlow | 'NOT_SUPPORTED' | null {
@@ -3251,6 +3460,10 @@ export class WalletCaptureFile {
 		 * applies to those non-agent runs.
 		 */
 		isAgent: boolean
+		/**
+		 * Set of wallet variants.
+		 */
+		walletVariants: AtLeastOneTrueVariant
 	}): Promise<WalletCaptureIssue[]> {
 		if (recordedFlow.items.map(this.getFlow.bind(this)).every(v => v === null)) {
 			return [
@@ -3447,6 +3660,30 @@ export class WalletCaptureFile {
 			}
 		}
 
+		if (issues.length === 0) {
+			// Check if all auxiliary files are in sync.
+			try {
+				await this.save({
+					verifyExisting: true,
+					walletId: this.identity.walletId,
+					walletVariants: checkOpts.walletVariants,
+				})
+			} catch (e) {
+				return [
+					new WalletCaptureIssue({
+						section: ['Lint'],
+						issue: `Checked-in repository files are not in sync: ${getErrorMessage(e)}`,
+						suggestions: [
+							{
+								suggestion: 'Run the `lint-fix` subcommand.',
+								subcommand: 'lint-fix',
+							},
+						],
+					}),
+				]
+			}
+		}
+
 		return issues
 	}
 
@@ -3510,6 +3747,16 @@ export class WalletCaptureFile {
 			for (const req of flow.requests) {
 				if (matcher.matches(req)) {
 					matched.push(req)
+
+					if (
+						flow.flow === RecordedOnlyFlow.IDLE_PRE_INSTALL &&
+						matcher.purposes !== 'NOT_WALLET_INITIATED'
+					) {
+						throw new Error(
+							`Matcher ${matcher.toString()} matches request ${req.toString()} which occurred during the IDLE_PRE_INSTALL flow, which means it cannot have been made by the wallet. Either use --purposes=NOT_WALLET_INITIATED if the request was not initiated by the wallet, or adjust the matcher to be more selective.`,
+						)
+					}
+
 					const existingMatcher = this.annotations.matches(req)
 
 					if (existingMatcher !== null) {
