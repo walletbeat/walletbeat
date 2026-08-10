@@ -1194,14 +1194,18 @@ ol {
  * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
  * remains visible.
  *
- * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
- * every item remains in regular document flow.
+ * This is a progressive enhancement. Without the complete recursive-positioning capability set,
+ * every item remains in regular document flow. Scroll-state support is also a compatibility guard:
+ * current WebKit advertises the anchor/timeline syntax but incorrectly applies fixed-position
+ * keyframes before their view-animation range. Keep independent timeline-only effects in their own
+ * feature query so they remain available there.
  *
  * ### Tokens
  * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
  * - `scope`: visibility boundary for descendant items
  * - `position`: regular-layout position anchor and view-timeline source
  * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+ * - `mobile`: enable the paired role only through the layout mobile breakpoint
  *
  * ### CSS Variables
  * - `--stickyBreadcrumb-animationRangeStart`
@@ -1215,6 +1219,15 @@ ol {
  * - `--stickyBreadcrumb-item-insetInlineStart`
  * - `--stickyBreadcrumb-item-insetInlineEnd`
  * - `--stickyBreadcrumb-item-blockSize`
+ * - `--stickyBreadcrumb-item-inlineSize`
+ * - `--stickyBreadcrumb-item-translate`
+ * - `--stickyBreadcrumb-item-justifySelf`
+ * - `--stickyBreadcrumb-item-positionTryFallbacks`
+ * - `--stickyBreadcrumb-item-nextRowInsetBlockStart`
+ * - `--stickyBreadcrumb-item-nextRowInsetInlineStart`
+ * - `--stickyBreadcrumb-item-nextRowInsetInlineEnd`
+ * - `--stickyBreadcrumb-item-nextRowJustifySelf`
+ * - `--stickyBreadcrumb-item-rowGap`
  * - `--stickyBreadcrumb-trackBlockEnd`
  * - `--stickyBreadcrumb-exitAnimationDistance`
  * - `--stickyBreadcrumb-itemAnchor`
@@ -1244,6 +1257,46 @@ ol {
 	(position-anchor: --sticky-breadcrumb-scope) and
 	(inset-inline-start: anchor(--sticky-breadcrumb-item end))
 ) {
+	@position-try --sticky-breadcrumb-next-row {
+		inset-block-start: var(
+			--stickyBreadcrumb-item-nextRowInsetBlockStart,
+			calc(
+				anchor(bottom)
+				+ var(--stickyBreadcrumb-item-rowGap, 0.25rem)
+			)
+		);
+		inset-inline-start: var(
+			--stickyBreadcrumb-item-nextRowInsetInlineStart,
+			anchor(start)
+		);
+		inset-inline-end: var(--stickyBreadcrumb-item-nextRowInsetInlineEnd, auto);
+		inline-size: max-content;
+		min-inline-size: 0;
+		max-inline-size: none;
+		margin-inline-start: 0;
+		justify-self: var(--stickyBreadcrumb-item-nextRowJustifySelf, start);
+	}
+
+	@position-try --sticky-breadcrumb-constrained-row {
+		inset-block-start: var(
+			--stickyBreadcrumb-item-nextRowInsetBlockStart,
+			calc(
+				anchor(bottom)
+				+ var(--stickyBreadcrumb-item-rowGap, 0.25rem)
+			)
+		);
+		inset-inline-start: var(
+			--stickyBreadcrumb-item-nextRowInsetInlineStart,
+			anchor(start)
+		);
+		inset-inline-end: var(--stickyBreadcrumb-item-nextRowInsetInlineEnd, auto);
+		inline-size: auto;
+		min-inline-size: 0;
+		max-inline-size: none;
+		margin-inline-start: 0;
+		justify-self: var(--stickyBreadcrumb-item-nextRowJustifySelf, start);
+	}
+
 	[data-sticky-breadcrumb~="scope"] {
 		---stickyBreadcrumb-exitAnimationRangeStart: exit-crossing
 			calc(
@@ -1264,7 +1317,10 @@ ol {
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
 			--sticky-breadcrumb-position,
 			--sticky-breadcrumb-scope,
-			--sticky-breadcrumb-extra-position;
+			--sticky-breadcrumb-extra-position,
+			--sticky-breadcrumb-summary-layout,
+			--sticky-breadcrumb-heading-track,
+			--sticky-breadcrumb-companions;
 		timeline-scope:
 			--sticky-breadcrumb-timeline,
 			--sticky-breadcrumb-scope-timeline;
@@ -1288,53 +1344,30 @@ ol {
 		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
 		view-timeline-name: --sticky-breadcrumb-timeline;
 		view-timeline-axis: block;
-		view-timeline-inset: 0;
+		view-timeline-inset:
+			calc(
+				var(--stickyBreadcrumb-item-insetBlockStart, 0px)
+				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+			)
+			0;
 	}
 
 	[data-sticky-breadcrumb~="item"] {
 		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
 
 		&:not([data-sticky-breadcrumb~="root"]) {
-			position-anchor: --sticky-breadcrumb-scope;
-			position-visibility: anchors-visible;
-
-			animation:
-				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
-				StickyBreadcrumbItemExitAnimation linear both,
-				StickyBreadcrumbItemVisibility 1ms steps(1, end) both;
-			animation-timeline:
-				--sticky-breadcrumb-timeline,
-				--sticky-breadcrumb-scope-timeline,
-				--sticky-breadcrumb-scope-timeline;
-			animation-range:
-				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
-				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
-				var(---stickyBreadcrumb-exitAnimationRangeStart)
-				var(---stickyBreadcrumb-exitAnimationRangeEnd),
-				var(---stickyBreadcrumb-exitAnimationRangeStart)
-				var(---stickyBreadcrumb-exitAnimationRangeEnd);
-		}
-	}
-
-	@keyframes StickyBreadcrumbItemAnimation {
-		from {
 			position: fixed;
-			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-position top)
-				+ var(--stickyBreadcrumb-position-insetBlockStart, 0px)
+			position-anchor: var(
+				--stickyBreadcrumb-parentAnchor,
+				--sticky-breadcrumb-scope
 			);
-			inset-inline-start: calc(
-				anchor(--sticky-breadcrumb-position start)
-				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
-			);
-			margin-inline-start: 0;
-			min-block-size: 0;
-		}
-		to {
-			position: fixed;
+			position-visibility: always;
 			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-scope top)
-					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+				anchor(
+					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+					top
+				)
+				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
 			);
 			inset-inline-start: var(
 				--stickyBreadcrumb-item-insetInlineStart,
@@ -1346,26 +1379,104 @@ ol {
 			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
 			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
 			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+			display: flex;
+			align-items: safe center;
+			inline-size: var(--stickyBreadcrumb-item-inlineSize, auto);
+			justify-self: var(--stickyBreadcrumb-item-justifySelf, auto);
+			position-try-fallbacks: var(
+				--stickyBreadcrumb-item-positionTryFallbacks,
+				none
+			);
+
+			animation:
+				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
+				StickyBreadcrumbItemExitAnimation linear both;
+			animation-timeline:
+				--sticky-breadcrumb-timeline,
+				--sticky-breadcrumb-scope-timeline;
+			animation-range:
+				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
+				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
+				var(---stickyBreadcrumb-exitAnimationRangeStart)
+				var(---stickyBreadcrumb-exitAnimationRangeEnd);
 		}
 	}
 
-	@keyframes StickyBreadcrumbItemVisibility {
-		from {
-			visibility: visible;
+	@keyframes StickyBreadcrumbItemAnimation {
+		0% {
+			position: relative;
+			inset: auto;
+			translate: none;
+			margin-inline-start: 0;
+			min-block-size: 0;
+		}
+		0.01% {
+			position: fixed;
+			inset-block-start: calc(
+				anchor(--sticky-breadcrumb-position top)
+				+ var(--stickyBreadcrumb-position-insetBlockStart, 0px)
+			);
+			inset-inline-start: calc(
+				anchor(--sticky-breadcrumb-position start)
+				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
+			);
+			inset-inline-end: auto;
+			translate: none;
+			margin-inline-start: 0;
+			min-block-size: 0;
 		}
 		to {
-			visibility: hidden;
+			position: fixed;
+			translate: var(--stickyBreadcrumb-item-translate, none);
 		}
 	}
 
 	@keyframes StickyBreadcrumbItemExitAnimation {
+		from,
+		99.999% {
+			visibility: visible;
+		}
+
 		to {
 			opacity: 0;
+			visibility: hidden;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		[data-sticky-breadcrumb~="item"]:not([data-sticky-breadcrumb~="root"]) {
+			position: static;
+			position-anchor: auto;
+			inset: auto;
+			inline-size: auto;
+			min-block-size: 0;
+			margin-inline-start: 0;
+			position-try-fallbacks: none;
+			animation: none;
+		}
+	}
+
+	@media (min-width: 1025px) {
+		[data-sticky-breadcrumb~="scope"][data-sticky-breadcrumb~="mobile"] {
+			anchor-scope: none;
+			timeline-scope: none;
+			view-timeline-name: none;
+
+			&::before {
+				content: none;
+			}
+		}
+
+		[data-sticky-breadcrumb~="position"][data-sticky-breadcrumb~="mobile"] {
+			anchor-name: none;
+			min-block-size: auto;
+			view-timeline-name: none;
+		}
+
+		[data-sticky-breadcrumb~="item"][data-sticky-breadcrumb~="mobile"] {
+			anchor-name: none;
+			position: static;
+			inline-size: auto;
 			animation: none;
 		}
 	}

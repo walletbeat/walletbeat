@@ -996,14 +996,18 @@ interface CssAttributes {
 	 * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
 	 * remains visible.
 	 *
-	 * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
-	 * every item remains in regular document flow.
+	 * This is a progressive enhancement. Without the complete recursive-positioning capability set,
+	 * every item remains in regular document flow. Scroll-state support is also a compatibility guard:
+	 * current WebKit advertises the anchor/timeline syntax but incorrectly applies fixed-position
+	 * keyframes before their view-animation range. Keep independent timeline-only effects in their own
+	 * feature query so they remain available there.
 	 *
 	 * ### Tokens
 	 * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
 	 * - `scope`: visibility boundary for descendant items
 	 * - `position`: regular-layout position anchor and view-timeline source
 	 * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+	 * - `mobile`: enable the paired role only through the layout mobile breakpoint
 	 *
 	 * ### CSS Variables
 	 * - `--stickyBreadcrumb-animationRangeStart`
@@ -1017,6 +1021,15 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-item-insetInlineStart`
 	 * - `--stickyBreadcrumb-item-insetInlineEnd`
 	 * - `--stickyBreadcrumb-item-blockSize`
+	 * - `--stickyBreadcrumb-item-inlineSize`
+	 * - `--stickyBreadcrumb-item-translate`
+	 * - `--stickyBreadcrumb-item-justifySelf`
+	 * - `--stickyBreadcrumb-item-positionTryFallbacks`
+	 * - `--stickyBreadcrumb-item-nextRowInsetBlockStart`
+	 * - `--stickyBreadcrumb-item-nextRowInsetInlineStart`
+	 * - `--stickyBreadcrumb-item-nextRowInsetInlineEnd`
+	 * - `--stickyBreadcrumb-item-nextRowJustifySelf`
+	 * - `--stickyBreadcrumb-item-rowGap`
 	 * - `--stickyBreadcrumb-trackBlockEnd`
 	 * - `--stickyBreadcrumb-exitAnimationDistance`
 	 * - `--stickyBreadcrumb-itemAnchor`
