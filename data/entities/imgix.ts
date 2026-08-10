@@ -18,7 +18,7 @@ export const imgix: CorporateEntity & InfrastructureProvider = {
 	crunchbase: 'https://www.crunchbase.com/organization/imgix',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: 'NO_ICON',
-	jurisdiction: 'San Mateo, California, United States',
+	jurisdiction: 'California, United States',
 	linkedin: 'https://linkedin.com/company/imgix',
 	privacyPolicy: 'https://www.imgix.com/privacy',
 	repoUrl: 'https://github.com/imgix',
