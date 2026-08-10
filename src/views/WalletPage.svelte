@@ -120,12 +120,12 @@
 			containingDetails.open = true
 	}
 
-	function attachDetailsCommands(root: HTMLElement) {
-		const detailsForCommand = (command: string) => {
-			if (command === '--toggle-page-details')
+	function attachDetailsControls(root: HTMLElement) {
+		const detailsForScope = (scope: string) => {
+			if (scope === 'page')
 				return root.querySelectorAll<HTMLDetailsElement>(':scope > article details')
 
-			if (command !== '--toggle-group-details') return []
+			if (scope !== 'group') return []
 
 			const currentLink = globalThis.CSS.supports('selector(:target-current)')
 				? root.querySelector<HTMLAnchorElement>(
@@ -145,40 +145,29 @@
 			return currentGroup?.querySelectorAll<HTMLDetailsElement>('details') ?? []
 		}
 
-		const runCommand = (command?: string) => {
-			if (!command) return
+		const toggleDetails = (scope?: string) => {
+			if (!scope) return
 
-			const details = Array.from(detailsForCommand(command))
+			const details = Array.from(detailsForScope(scope))
 			const open = details.some(detail => !detail.open)
 
 			for (const detail of details)
 				detail.open = open
 		}
 
-		const handleCommand = (event: Event) => {
-			runCommand((event as Event & { command?: string }).command)
-		}
-
-		root.addEventListener('command', handleCommand)
-
 		const handleClick = (event: MouseEvent) => {
 			const button = event.target instanceof Element
-				? event.target.closest<HTMLButtonElement>('button[commandfor="wallet-page"]')
+				? event.target.closest<HTMLButtonElement>('button[data-details-scope]')
 				: null
 
 			if (!button) return
 
-			/* An invoker cannot reliably target its own ancestor. Keep the native
-			 * command markup as the baseline and own this irreducible case. */
-			event.preventDefault()
-			runCommand(button.getAttribute('command') ?? undefined)
+			toggleDetails(button.dataset.detailsScope)
 		}
 
 		root.addEventListener('click', handleClick)
 
 		return () => {
-			root.removeEventListener('command', handleCommand)
-
 			root.removeEventListener('click', handleClick)
 		}
 	}
@@ -539,7 +528,7 @@
 		'--header-timeline',
 		...pieRotationSteps.map(step => step.timeline),
 	].join(', ')}
-	{@attach attachDetailsCommands}
+	{@attach attachDetailsControls}
 >
 	<article
 		data-column="gap-8"
@@ -766,6 +755,7 @@
 		<div class="details-controls-layer" data-sticky-container>
 			<menu
 				class="details-controls"
+				data-scripting="required"
 				data-sticky="block-start backdrop-before backdrop-stuck"
 				data-row="gap-2"
 				aria-label="Expand or collapse rating details"
@@ -774,8 +764,7 @@
 					<button
 						type="button"
 						data-icon="circle"
-						commandfor="wallet-page"
-						command="--toggle-group-details"
+						data-details-scope="group"
 						aria-label="Expand or collapse details in the current attribute group"
 						title="Toggle current group details"
 					>
@@ -787,8 +776,7 @@
 					<button
 						type="button"
 						data-icon="circle"
-						commandfor="wallet-page"
-						command="--toggle-page-details"
+						data-details-scope="page"
 						aria-label="Expand or collapse all details on this page"
 						title="Toggle all page details"
 					>
