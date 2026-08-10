@@ -727,7 +727,7 @@
 			<NavigationItems
 				items={pieNavigationItems}
 				showSearch={false}
-				defaultOpen
+				defaultOpen={false}
 				ariaLabel="Table of contents"
 				afterLabelSnippet={navigationBadgeSnippet}
 			>
@@ -919,7 +919,6 @@
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
 		<details
-			open
 			data-card="radius-8 padding-6 border-accent"
 			data-column="gap-0"
 			data-sticky-breadcrumb="scope"
@@ -1195,7 +1194,7 @@
 			{/if}
 
 			<div class="attribute-accordions" data-column="gap-3">
-				<details open data-card="padding-5 secondary radius-4" data-column="gap-0" data-sticky-container>
+				<details data-card="padding-5 secondary radius-4" data-column="gap-0" data-sticky-container>
 					<summary data-sticky="block block-start backdrop-self backdrop-always">
 						<h4>
 							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
@@ -1213,7 +1212,7 @@
 					</section>
 				</details>
 
-				<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
+				<details data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
 					<summary data-sticky="block block-start backdrop-self backdrop-always">
 						<h4>
 							{getHowIsEvaluatedHeading(attribute)}
@@ -1306,7 +1305,7 @@
 				</details>
 
 				{#if howToImprove}
-					<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
+					<details data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
 						<summary data-sticky="block block-start backdrop-self backdrop-always">
 							<h4>
 								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
