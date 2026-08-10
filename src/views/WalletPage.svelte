@@ -716,7 +716,7 @@
 
 			<section id="stages" data-sticky-breadcrumb="scope">
 				<header
-					data-sticky="block backdrop-none"
+					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-sticky-breadcrumb="position"
 					data-row
 					data-scroll-item="inline-detached"
@@ -725,8 +725,9 @@
 						data-link="camouflaged"
 						data-sticky-breadcrumb="item"
 						href="#stages"
+						interestfor="stages"
 					>
-						<h2 id="stages">Stage Progress</h2>
+						<h2>Stage Progress</h2>
 					</a>
 				</header>
 
