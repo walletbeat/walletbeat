@@ -26,6 +26,12 @@ import WalletTest from '../../components/WalletTest.svelte'
 		</header>
 
 		<WalletTest client:load />
+
+		<noscript>
+			<section data-scroll-item='inline-detached padding-match-start'>
+				<p>The wallet interaction playground requires JavaScript.</p>
+			</section>
+		</noscript>
 	</main>
 </Layout>
 

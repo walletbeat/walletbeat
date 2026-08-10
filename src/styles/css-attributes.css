@@ -6,6 +6,27 @@
 
 
 /**
+ * Hides controls whose behavior requires ongoing JavaScript execution when scripting is unavailable. The control remains in normal flow while scripting is enabled, including before framework hydration.
+ *
+ * ### Tokens
+ * - `required`.
+ *
+ * ### Examples
+ * ```html
+ * <button data-scripting="required" type="button">Apply client-side filter</button>
+ * ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-scripting]`
+ */
+@media (scripting: none), (scripting: initial-only) {
+	[data-scripting~="required"] {
+		display: none !important;
+	}
+}
+
+
+/**
  * Shared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.
  *
  * ### Tokens

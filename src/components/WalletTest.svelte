@@ -703,6 +703,7 @@ Issued At: ${new Date().toISOString()}`;
 
 <section
 	class="wallet-test"
+	data-scripting="required"
 	data-scroll-item="inline-detached padding-match-start"
 	data-column="gap-6"
 >

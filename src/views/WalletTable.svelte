@@ -415,7 +415,7 @@
 		{/if}
 
 		<!-- Mobile-only filter UI -->
-		<div class="mobile-filters">
+		<div class="mobile-filters" data-scripting="required">
 			<div class="mobile-filter-row">
 				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0}
 					<div class="mobile-filter-group">
@@ -484,6 +484,7 @@
 
 		<div
 			class="filters"
+			data-scripting="required"
 			data-scroll-container="inline"
 		>
 			<div
@@ -800,6 +801,7 @@
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
 
+						<span data-scripting="required">
 						<Tooltip>
 							<div
 								role="button"
@@ -834,6 +836,14 @@
 								/>
 							{/snippet}
 						</Tooltip>
+						</span>
+						<noscript>
+							<WalletStageBadge
+								{stage}
+								{ladderEvaluation}
+								size="medium"
+							/>
+						</noscript>
 					{/if}
 				{:else if column.id === 'displayName'}
 					{@const displayName = value}
@@ -963,8 +973,9 @@
 										]
 											.filter(Boolean)
 									) as tag (tag.label)}
-										{#if tag.eipTooltipContent}
-											<Tooltip
+									{#if tag.eipTooltipContent}
+										<span data-scripting="required">
+										<Tooltip
 												placement="inline-end"
 											>
 												<div
@@ -993,18 +1004,22 @@
 														/>
 													</div>
 												{/snippet}
-											</Tooltip>
-										{:else}
-											<button
+										</Tooltip>
+										</span>
+										<noscript><span data-tag={tag.type}>{tag.label}</span></noscript>
+									{:else}
+										<button
+											data-scripting="required"
 												data-tag={tag.type}
 												aria-label="Filter by {tag.label}"
 												onclick={event => {
 													event.stopPropagation()
 													toggleFilterById!(tag.filterId)
 												}}
-											>
-												{tag.label}
-											</button>
+										>
+											{tag.label}
+										</button>
+										<noscript><span data-tag={tag.type}>{tag.label}</span></noscript>
 										{/if}
 									{/each}
 								</div>
@@ -1014,6 +1029,7 @@
 								<div class="variants" data-row="gap-1">
 									{#each supportedVariants as variant}
 										<button
+											data-scripting="required"
 											data-selected={variant === selectedVariant ? '' : undefined}
 											aria-label={`Select ${variants[variant].label} variant`}
 											aria-pressed={variant === selectedVariant}
@@ -1030,6 +1046,11 @@
 												{@html variants[variant].icon}
 											</span>
 										</button>
+										<noscript>
+											<span class="icon" title={variants[variant].label}>
+												{@html variants[variant].icon}
+											</span>
+										</noscript>
 									{/each}
 								</div>
 							{/if}
@@ -1651,6 +1672,7 @@
 						<div class="mobile-card-variants">
 							{#each cardSupportedVariants as variant}
 								<button
+									data-scripting="required"
 									class="mobile-variant-btn"
 									class:active={variant === selectedVariant}
 									aria-label={variantToName(variant, true)}
@@ -1659,6 +1681,14 @@
 								>
 									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
 								</button>
+								<noscript>
+									<span
+										class="mobile-variant-btn"
+										title={variantToName(variant, true)}
+									>
+										<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
+									</span>
+								</noscript>
 							{/each}
 						</div>
 					</div>

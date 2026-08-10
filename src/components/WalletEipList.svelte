@@ -32,7 +32,7 @@
 </script>
 
 <!-- Filter pills -->
-<nav class="filter-nav" aria-label="Filter EIPs">
+<nav class="filter-nav" aria-label="Filter EIPs" data-scripting="required">
 	{#each filters as f (f.value)}
 		<button
 			class="filter-pill"

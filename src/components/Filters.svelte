@@ -160,6 +160,7 @@
 
 <form
 	class="menu"
+	data-scripting="required"
 	data-card="padding-5 radius-4"
 	data-row="gap-6 wrap"
 	{...restProps}

@@ -42,6 +42,13 @@ import Footer from '@/views/Footer.astro'
 		<Font cssVariable='--fontFamily-avenir' preload />
 
 		<ClientRouter />
+		<noscript>
+			<style is:global>
+				[data-scripting~='required'] {
+					display: none !important;
+				}
+			</style>
+		</noscript>
 		<script is:inline>
 			// `color-scheme` override
 			const colorScheme = localStorage.getItem('theme')

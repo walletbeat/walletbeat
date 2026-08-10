@@ -686,6 +686,24 @@ interface CssAttributes {
 	'data-safari'?: string | boolean
 
 	/**
+	 * ## [data-scripting]
+	 *
+	 * Hides controls whose behavior requires ongoing JavaScript execution when scripting is unavailable. The control remains in normal flow while scripting is enabled, including before framework hydration.
+	 *
+	 * ### Tokens
+	 * - `required`.
+	 *
+	 * ### Examples
+	 * ```html
+	 * <button data-scripting="required" type="button">Apply client-side filter</button>
+	 * ```
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-scripting]`
+	 */
+	'data-scripting'?: string | boolean
+
+	/**
 	 * ## [data-scroll-container]
 	 *
 	 * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll

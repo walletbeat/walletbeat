@@ -85,7 +85,7 @@
 	)
 
 	let filteredWallets: typeof softwareWallets[number][] = $state(
-		[]
+		softwareWallets
 	)
 
 
@@ -227,47 +227,54 @@
 					{@const typeFor7702 = getWalletTypeFor7702(wallet)}
 
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
-						<Tooltip
-							placement="inline-end"
-						>
-							<button
-								data-tag="eip"
-								aria-label="Filter by EIP-7702"
-								onclick={event => {
-									event.stopPropagation()
-									toggleFilterById!('accountType-eip7702')
-								}}
-							>
-								EIP-7702
-							</button>
-
-							{#snippet TooltipContent()}
-								<EipDetails eip={eip7702} />
-							{/snippet}
-						</Tooltip>
-					{:else}
-						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
+						<span data-scripting="required">
 							<Tooltip
 								placement="inline-end"
 							>
 								<button
 									data-tag="eip"
-									aria-label="Filter by ERC-4337"
+									aria-label="Filter by EIP-7702"
 									onclick={event => {
 										event.stopPropagation()
-										toggleFilterById!('accountType-erc4337')
+										toggleFilterById!('accountType-eip7702')
 									}}
 								>
-									ERC-4337
+									EIP-7702
 								</button>
 
 								{#snippet TooltipContent()}
-									<EipDetails eip={erc4337} />
+									<EipDetails eip={eip7702} />
 								{/snippet}
 							</Tooltip>
+						</span>
+						<noscript><span data-tag="eip">EIP-7702</span></noscript>
+					{:else}
+						{#if typeFor7702 === WalletTypeFor7702.EIP4337}
+							<span data-scripting="required">
+								<Tooltip
+									placement="inline-end"
+								>
+									<button
+										data-tag="eip"
+										aria-label="Filter by ERC-4337"
+										onclick={event => {
+											event.stopPropagation()
+											toggleFilterById!('accountType-erc4337')
+										}}
+									>
+										ERC-4337
+									</button>
+
+									{#snippet TooltipContent()}
+										<EipDetails eip={erc4337} />
+									{/snippet}
+								</Tooltip>
+							</span>
+							<noscript><span data-tag="eip">ERC-4337</span></noscript>
 						{:else}
 							{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
 								<button
+									data-scripting="required"
 									data-tag="eoa"
 									aria-label="Filter by EOA"
 									onclick={event => {
@@ -277,6 +284,7 @@
 								>
 									EOA
 								</button>
+								<noscript><span data-tag="eoa">EOA</span></noscript>
 							{/if}
 						{/if}
 

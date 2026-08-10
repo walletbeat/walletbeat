@@ -532,6 +532,7 @@
 
 										<button
 											type="button"
+											data-scripting="required"
 											aria-label={`Sort by ${column.name}`}
 											class="sort-button"
 											onclick={() => {
@@ -551,6 +552,7 @@
 						{#if isExpandable}
 							<button
 								type="button"
+								data-scripting="required"
 								class="expansion-button"
 								data-sticky="backdrop-before backdrop-stuck"
 								onclick={() => {
