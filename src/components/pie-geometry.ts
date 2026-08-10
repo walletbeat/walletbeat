@@ -80,10 +80,12 @@ export const overallRatingPieLevels = (innerRadiusFraction = 0.15): LevelConfig[
 	},
 ]
 
-export const overallRatingPieMaxRadius = Math.max(
-	...overallRatingPieLevels().map(
-		level => overallRatingPieRadius * level.outerRadiusFraction + (level.offset ?? 0),
-	),
+export const computePieMaxRadius = (radius: number, levels: LevelConfig[]) =>
+	Math.max(...levels.map(level => radius * level.outerRadiusFraction + (level.offset ?? 0)))
+
+export const overallRatingPieMaxRadius = computePieMaxRadius(
+	overallRatingPieRadius,
+	overallRatingPieLevels(),
 )
 
 export const computePieSlices = ({

@@ -7,6 +7,7 @@
 <script lang="ts">
 	// Types
 	import {
+		computePieMaxRadius,
 		computePieSlices,
 		PieLayout as PieLayoutValue,
 		type ComputedSlice,
@@ -170,9 +171,7 @@
 	)
 
 	const pieMetrics = $derived.by(() => {
-		const maxRadiusMultiplier = Math.max(...levels.map(level => level.outerRadiusFraction))
-		const maxOffset = Math.max(...levels.map(level => (level.offset ?? 0) * (level.outerRadiusFraction ?? 1)))
-		const maxRadius = radius * maxRadiusMultiplier + maxOffset
+		const maxRadius = computePieMaxRadius(radius, levels)
 
 		const width = padding * 2 + maxRadius * 2
 		const height = padding * 2 + maxRadius * (layout === PieLayoutValue.HalfTop ? 1 : 2)
