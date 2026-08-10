@@ -1,0 +1,80 @@
+{
+	"INSTALL": {
+		"collected": [
+			{
+				"byEntity": {
+					"id": "debank",
+					"name": "DeBank",
+					"legalName": {
+						"name": "DeBank Global PTE Ltd",
+						"soundsDifferent": false
+					},
+					"type": {
+						"chainDataProvider": true,
+						"corporate": true,
+						"dataBroker": false,
+						"exchange": false,
+						"infrastructureProvider": false,
+						"offchainDataProvider": false,
+						"securityAuditor": false,
+						"transactionBroadcastProvider": true,
+						"walletDeveloper": true
+					},
+					"crunchbase": "https://www.crunchbase.com/organization/debank",
+					"farcaster": "https://warpcast.com/debankdefi",
+					"icon": {
+						"extension": "svg"
+					},
+					"jurisdiction": "Singapore",
+					"linkedin": {
+						"type": "NO_LINKEDIN_URL"
+					},
+					"privacyPolicy": "https://rabby.io/docs/privacy/",
+					"repoUrl": "https://github.com/DeBankDeFi",
+					"twitter": "https://x.com/DebankDeFi",
+					"url": "https://debank.com/"
+				},
+				"role": "OPERATOR",
+				"dataCollection": {
+					"endpoint": {
+						"type": "REGULAR"
+					},
+					"IP_ADDRESS": "ALWAYS"
+				},
+				"purposes": [
+					"STATIC_ASSETS",
+					"CHAIN_DATA_LOOKUP",
+					"SWAP_QUOTE",
+					"UPDATE_CHECKING",
+					"ANALYTICS"
+				],
+				"ref": {
+					"refNotNecessary": true
+				}
+			}
+		]
+	},
+	"ONBOARDING_NEW": {
+		"collected": [],
+		"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
+	},
+	"ONBOARDING_IMPORT": {
+		"collected": [],
+		"publishedOnchain": "NO_DATA_PUBLISHED_ONCHAIN"
+	},
+	"SEND_ETHER": {
+		"collected": []
+	},
+	"SEND_USDC": {
+		"collected": []
+	},
+	"NATIVE_SWAP": {
+		"collected": []
+	},
+	"MAKE_TRANSACTION": {
+		"collected": []
+	},
+	"APP_CONNECTION": {
+		"collected": []
+	}
+}

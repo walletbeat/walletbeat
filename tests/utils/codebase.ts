@@ -25,6 +25,10 @@ export const commonExclusions: PathPredicate[] = [
 
 	// Helios binary checkpoint file.
 	'deploy/helios/data/checkpoint',
+
+	// Generated wallet data-collection files; not hand-authored, may contain raw captured payloads.
+	/^data\/software-wallets\/collection\/.*\.(annotations|capture)\.json$/,
+	/^data\/software-wallets\/collection\/.*\.dataCollection\.generated\.json$/,
 ]
 
 /** Escape special regex characters in a string. */
