@@ -118,6 +118,12 @@ import Footer from '@/views/Footer.astro'
 		/* Constants */
 		--navigation-desktop-inlineSize: 20rem;
 		--navigation-mobile-blockSize: 4.16rem;
+		--navigation-mobile-controlSize: 2.5rem;
+		--navigation-mobile-gap: 0.5rem;
+		--navigation-mobile-inlinePadding: 1rem;
+		--navigation-mobile-trailingClearance: calc(
+			var(--navigation-mobile-inlinePadding) + var(--navigation-mobile-controlSize)
+		);
 
 		/* Rules */
 		inline-size: 100%;

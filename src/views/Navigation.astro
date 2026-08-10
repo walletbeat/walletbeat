@@ -46,22 +46,37 @@ const secondaryNavigationItems = [
 	data-scroll-container
 	data-sticky-container
 >
-	<header data-sticky='backdrop-self backdrop-always' data-row>
+	<header data-sticky='backdrop-self backdrop-always' data-row='start gap-2'>
+		<menu class='navigation-leading-controls' data-row='gap-2'>
+			<li>
+				<button
+					type='button'
+					id='menu-toggle'
+					data-icon='circle'
+					popovertarget='nav'
+					aria-label='Site navigation'
+					title='Site navigation'
+				>
+					<span set:html={LuMenu} />
+				</button>
+			</li>
+		</menu>
+
 		<a href='/' class='logo'>
 			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
 		</a>
 
-		<menu data-row='gap-2'>
+		<menu class='navigation-trailing-controls' data-row='gap-2' data-row-item='wrap-end'>
 			<li>
-				<button type='button' id='theme-toggle' data-icon='circle' data-stack>
+				<button
+					type='button'
+					id='theme-toggle'
+					data-icon='circle'
+					data-stack
+					data-scripting='required'
+				>
 					<span set:html={LuSun} />
 					<span set:html={LuMoon} />
-				</button>
-			</li>
-
-			<li>
-				<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav'>
-					<span set:html={LuMenu} />
 				</button>
 			</li>
 		</menu>
@@ -167,7 +182,7 @@ const secondaryNavigationItems = [
 	}
 
 	@media (min-width: 1025px) {
-		nav:not(:popover-open) li:has(#menu-toggle) {
+		.navigation-leading-controls {
 			display: none;
 		}
 	}
@@ -189,6 +204,10 @@ const secondaryNavigationItems = [
 			block-size: 100dvh;
 			height: 100dvh;
 			transform-style: preserve-3d;
+
+			> header .logo {
+				anchor-name: --layout-site-logo;
+			}
 
 			#nav-menu {
 				.navigation-note {

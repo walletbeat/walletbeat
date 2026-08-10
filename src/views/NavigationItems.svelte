@@ -61,6 +61,7 @@
 		iconSnippet,
 		afterLabelSnippet,
 		showSearch = true,
+		enableSticky = true,
 	}: {
 		items: NavigationItem[]
 		groups?: NavigationGroup[]
@@ -70,6 +71,11 @@
 		iconSnippet?: Snippet<[NavigationItem, number]>
 		afterLabelSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
+		/*
+		 * Pie flower specialization: sticky summary backdrops survive
+		 * `display: contents` and paint a full circular nav-item disc.
+		 */
+		enableSticky?: boolean
 	} = $props()
 
 	let navigationGroups = $derived(groups ?? [{ items }])
@@ -144,10 +150,11 @@
 	data-column="gap-3"
 	data-column-item="flexible"
 	aria-label={ariaLabel}
-	data-sticky-container
+	data-sticky-container={enableSticky ? true : undefined}
 >
 	{#if showSearch}
 		<search
+			data-scripting="required"
 			data-sticky="block backdrop-before backdrop-stuck"
 		>
 			<label data-row="gap-0">
@@ -215,7 +222,7 @@
 
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
-	{@const ownsStickyStep = depth > 0 || hasNestedNavigation(items)}
+	{@const ownsStickyStep = enableSticky && (depth > 0 || hasNestedNavigation(items))}
 	<menu
 		data-navigation-depth={depth}
 		data-sticky-container={ownsStickyStep ? true : undefined}
@@ -253,7 +260,7 @@
 			}
 		>
 			<summary
-				data-sticky="block backdrop-before backdrop-stuck"
+				data-sticky={enableSticky ? 'block backdrop-before backdrop-stuck' : undefined}
 				data-row="gap-2"
 			>
 				{@render linkable(item, depth)}
@@ -292,26 +299,23 @@
 			style:--slice-labelR={item.sliceStyle?.labelR}
 			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
-			{@render navigationIcon(item, depth)}
-
-			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
-
-			{#if afterLabelSnippet}
-				<span class="navigation-item-after" data-row="gap-1">
-					{@render afterLabelSnippet(item, depth)}
-				</span>
-			{/if}
+			{@render navigationItemContent(item, depth)}
 		</a>
 	{:else}
-		{@render navigationIcon(item, depth)}
+		{@render navigationItemContent(item, depth)}
+	{/if}
+{/snippet}
 
-		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 
-		{#if afterLabelSnippet}
-			<span class="navigation-item-after" data-row="gap-1">
-				{@render afterLabelSnippet(item, depth)}
-			</span>
-		{/if}
+{#snippet navigationItemContent(item: NavigationItem, depth = 0)}
+	{@render navigationIcon(item, depth)}
+
+	<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+
+	{#if afterLabelSnippet}
+		<span class="navigation-item-after" data-row="gap-1">
+			{@render afterLabelSnippet(item, depth)}
+		</span>
 	{/if}
 {/snippet}
 
