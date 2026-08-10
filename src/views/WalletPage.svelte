@@ -119,69 +119,6 @@
 			containingDetails.open = true
 	}
 
-	function attachDetailsCommands(root: HTMLElement) {
-		const detailsForCommand = (command: string) => {
-			if (command === '--toggle-page-details')
-				return root.querySelectorAll<HTMLDetailsElement>(':scope > article details')
-
-			if (command !== '--toggle-group-details') return []
-
-			const currentLink = globalThis.CSS.supports('selector(:target-current)')
-				? root.querySelector<HTMLAnchorElement>(
-					'.page-navigation a:target-current[href^="#"]'
-				)
-				: null
-			const currentId = currentLink?.hash
-				? decodeURIComponent(currentLink.hash.slice(1))
-				: decodeURIComponent(globalThis.location.hash.slice(1))
-			const currentGroup = (
-				currentId
-					? globalThis.document.getElementById(currentId)?.closest('.attribute-group')
-					: null
-				?? root.querySelector('.attribute-group')
-			)
-
-			return currentGroup?.querySelectorAll<HTMLDetailsElement>('details') ?? []
-		}
-
-		const runCommand = (command?: string) => {
-			if (!command) return
-
-			const details = Array.from(detailsForCommand(command))
-			const open = details.some(detail => !detail.open)
-
-			for (const detail of details)
-				detail.open = open
-		}
-
-		const handleCommand = (event: Event) => {
-			runCommand((event as Event & { command?: string }).command)
-		}
-
-		root.addEventListener('command', handleCommand)
-
-		const handleClick = (event: MouseEvent) => {
-			const button = event.target instanceof Element
-				? event.target.closest<HTMLButtonElement>('button[commandfor="wallet-page"]')
-				: null
-
-			if (!button) return
-
-			/* An invoker cannot reliably target its own ancestor. Keep the native
-			 * command markup as the baseline and own this irreducible case. */
-			event.preventDefault()
-			runCommand(button.getAttribute('command') ?? undefined)
-		}
-
-		root.addEventListener('click', handleClick)
-
-		return () => {
-			root.removeEventListener('command', handleCommand)
-
-			root.removeEventListener('click', handleClick)
-		}
-	}
-
 	$effect(() => {
 		openHashDetails()
 		globalThis.addEventListener('hashchange', openHashDetails)
@@ -410,8 +347,6 @@
 
 	// Components
 	import { Github, Globe } from 'lucide-static'
-	import ListCollapseIcon from 'lucide-static/icons/list-collapse.svg?raw'
-	import Rows3Icon from 'lucide-static/icons/rows-3.svg?raw'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -532,7 +467,6 @@
 		'--header-timeline',
 		...pieRotationSteps.map(step => step.timeline),
 	].join(', ')}
-	{@attach attachDetailsCommands}
 >
 	<article
 		data-column="gap-8"
@@ -750,40 +684,6 @@
 			</div>
 		{/if}
 
-		<div class="details-controls-layer" data-sticky-container>
-			<menu
-				class="details-controls"
-				data-sticky="block-start backdrop-before backdrop-stuck"
-				data-row="gap-2"
-				aria-label="Expand or collapse rating details"
-			>
-				<li>
-					<button
-						type="button"
-						data-icon="circle"
-						commandfor="wallet-page"
-						command="--toggle-group-details"
-						aria-label="Expand or collapse details in the current attribute group"
-						title="Toggle current group details"
-					>
-						<span>{@html ListCollapseIcon}</span>
-					</button>
-				</li>
-
-				<li>
-					<button
-						type="button"
-						data-icon="circle"
-						commandfor="wallet-page"
-						command="--toggle-page-details"
-						aria-label="Expand or collapse all details on this page"
-						title="Toggle all page details"
-					>
-						<span>{@html Rows3Icon}</span>
-					</button>
-				</li>
-			</menu>
-		</div>
 	</article>
 
 	<aside
@@ -1600,17 +1500,6 @@
 			background-color: var(--background-secondary);
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
-			&::after {
-				content: '';
-				z-index: 3;
-				position: sticky;
-				inset-block-end: 0;
-				flex: 0 0 var(---anchor-controls-reserved-block-size);
-				margin-block-start: auto;
-				background-color: var(--background-secondary);
-				box-shadow: 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
-			}
-
 			> header {
 				--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
 
@@ -1735,36 +1624,8 @@
 			+ var(---wallet-breadcrumb-surface-fade)
 			+ var(---wallet-anchor-scroll-gap)
 		);
-		---anchor-button-size: 2.5rem;
-		---anchor-control-inset: 0.75rem;
-		---anchor-control-gap: 0.75rem;
-		---anchor-marker-padding: 0.5rem;
-		---anchor-marker-block-size: calc(
-			var(---anchor-button-size)
-			+ 2 * var(---anchor-marker-padding)
-		);
-		---anchor-controls-reserved-block-size: calc(
-			var(---anchor-control-inset)
-			+ var(---anchor-marker-block-size)
-			+ var(---anchor-control-gap)
-		);
-		---anchor-control-track-inset: calc(
-			var(---anchor-control-inset)
-			+ var(---anchor-button-size)
-			+ var(---anchor-control-gap)
-		);
-		---anchor-button-block-inset: calc(
-			var(---anchor-control-inset)
-			+ (
-				var(---anchor-marker-block-size)
-				- var(---anchor-button-size)
-			)
-			/ 2
-		);
 
-		scroll-marker-group: after;
 		scroll-snap-type: block proximity;
-		timeline-scope: --wallet-page-exit;
 
 		@media (max-width: 1024px) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
@@ -1811,224 +1672,6 @@
 	 */
 	:global(body:has(#wallet-page) .background-blob *) {
 		animation-play-state: paused;
-	}
-
-	#wallet-page {
-		view-timeline-name: --wallet-page-exit;
-		view-timeline-axis: block;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-marker-group {
-		z-index: 4;
-		position: fixed;
-		inset-block: auto var(---anchor-control-inset);
-		inset-inline: auto var(---anchor-control-track-inset);
-		box-sizing: border-box;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		inline-size: calc(
-			var(---wallet-page-navigation-inline-size)
-			- 2 * var(---anchor-control-track-inset)
-		);
-		block-size: var(---anchor-marker-block-size);
-		padding: var(---anchor-marker-padding);
-		overflow-x: auto;
-		overflow-y: clip;
-		scroll-snap-type: inline mandatory;
-		scrollbar-width: none;
-		border-radius: 100vmax;
-		background-color: color-mix(
-			in oklch,
-			var(--background-primary) 82%,
-			transparent
-		);
-		box-shadow: 0 0 var(--separator-width) var(--border-color);
-		backdrop-filter: blur(1rem);
-		transition: scroll-snap-type 0s 500ms allow-discrete;
-		animation: keep-anchor-navigation-in-wallet linear both;
-		animation-timeline: --wallet-page-exit;
-		animation-range: exit 0% exit 100%;
-
-		@media (prefers-reduced-transparency: reduce) {
-			backdrop-filter: none;
-		}
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-marker-group:is(
-		:hover,
-		:focus-within,
-		:active
-	) {
-		scroll-snap-type: none;
-		transition-delay: 0s;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-marker-group::-webkit-scrollbar {
-		display: none;
-	}
-
-	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker {
-		content: '' / attr(aria-label);
-		flex: 0 0 auto;
-		box-sizing: border-box;
-		inline-size: var(---anchor-button-size);
-		block-size: var(---anchor-button-size);
-		border: var(--separator-width) solid var(--border-color);
-		border-radius: 50%;
-		background-color: var(--background-secondary);
-		transition-property: scale, background-color, border-color;
-	}
-
-	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker:target-current {
-		scroll-snap-align: center;
-	}
-
-	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker:is(
-		:hover,
-		:focus-visible,
-		:target-current
-	) {
-		background-color: var(--background-tertiary);
-		border-color: var(--text-secondary);
-		scale: 1.08;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-start),
-	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-		z-index: 5;
-		position: fixed;
-		inset-block: auto var(---anchor-button-block-inset);
-		box-sizing: border-box;
-		inline-size: var(---anchor-button-size);
-		block-size: var(---anchor-button-size);
-		padding: 0;
-		border: var(--separator-width) solid var(--border-color);
-		border-radius: 50%;
-		background-color: var(--background-secondary);
-		color: var(--text-primary);
-		font: inherit;
-		font-size: 1.25rem;
-		line-height: 1;
-		transition-property: scale, background-color, border-color, opacity;
-		animation: keep-anchor-navigation-in-wallet linear both;
-		animation-timeline: --wallet-page-exit;
-		animation-range: exit 0% exit 100%;
-		&:is(:hover, :focus-visible) {
-			background-color: var(--background-tertiary);
-			border-color: var(--text-secondary);
-			scale: 1.05;
-		}
-
-		&:disabled {
-			opacity: 0.38;
-		}
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-start) {
-		inset-inline: auto calc(
-			var(---wallet-page-navigation-inline-size)
-			- var(---anchor-button-size)
-			- var(---anchor-control-inset)
-		);
-		content: '↑' / 'Scroll toward the previous rating section';
-
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-		inset-inline: auto var(---anchor-control-inset);
-		content: '↓' / 'Scroll toward the next rating section';
-
-	}
-
-	@media (max-width: 1024px) {
-		:global(#layout:has(#wallet-page))::scroll-marker-group {
-			inset-inline: var(---anchor-control-track-inset) auto;
-
-		}
-
-		:global(#layout:has(#wallet-page))::scroll-button(block-start) {
-			inset-inline: var(---anchor-control-inset) auto;
-
-		}
-
-		:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-			inset-inline: calc(
-				var(---wallet-page-navigation-inline-size)
-				- var(---anchor-button-size)
-				- var(---anchor-control-inset)
-			) auto;
-
-		}
-	}
-
-	@media (max-width: 864px) {
-		:global(#layout:has(#wallet-page)) {
-			scroll-marker-group: none;
-		}
-
-		:global(#layout:has(#wallet-page))::scroll-button(block-start),
-		:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-			content: none;
-		}
-	}
-
-	@keyframes keep-anchor-navigation-in-wallet {
-		to {
-			translate: 0 -100dvb;
-		}
-	}
-
-	.details-controls-layer {
-		position: absolute;
-		inset: 0;
-		z-index: 4;
-		pointer-events: none;
-	}
-
-	.details-controls {
-		--icon-size: 2.75rem;
-		--icon-navigation-borderColor: var(--border-color);
-		--icon-navigation-color: var(--text-primary);
-		--sticky-insetBlockStart: calc(100dvb - 4.75rem);
-		--sticky-insetInlineEnd: 1rem;
-
-		position: sticky;
-		inset-inline: auto 1rem;
-		inline-size: max-content;
-		margin: 0;
-		margin-inline-start: auto;
-		padding: 0.5rem;
-		border-radius: 100vmax;
-		list-style: none;
-		background-color: color-mix(
-			in oklch,
-			var(--background-primary) 82%,
-			transparent
-		);
-		box-shadow: 0 0 var(--separator-width) var(--border-color);
-		backdrop-filter: blur(1rem);
-		pointer-events: auto;
-
-		@media (prefers-reduced-transparency: reduce) {
-			backdrop-filter: none;
-		}
-
-		> li {
-			display: contents;
-		}
-
-		button {
-			background-color: var(--background-secondary);
-			transition-property: color, background-color, border-color, scale;
-
-			&:is(:hover, :focus-visible) {
-				background-color: var(--background-tertiary);
-				border-color: var(--text-secondary);
-				scale: 1.05;
-			}
-		}
-
 	}
 
 	@property ---pie-rotate {
