@@ -2049,24 +2049,6 @@
 					}
 				},
 				{
-					"domain": "gae2-spclient.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events",
-					"sessionTime": 1000005724,
-					"content": "{\"suppress_persist\":false,\"events\":[{\"sequence_id\":\"LTE4OTgwOTgzNDk=\",\"sequence_number\":11589,\"event_name\":\"EventSenderStats2NonAuth\",\"fragments\":{\"context_sdk\":{\"version_name\":\"5.1.0-LS\",\"type\":\"javascript\"},\"context_time\":{\"timestamp\":1786381652479},\"context_application_desktop\":{\"version_code\":129500453,\"version_string\":\"1.2.95.453\"},\"context_client_id\":{\"value\":\"ZbcIBz/ASA6pKgdyM8qHvQ==\"},\"context_installation_id\":{\"value\":\"9SvJ5OZhRQOsAe6FEtfcTw==\"},\"context_device_desktop\":{\"device_id\":\"56C68A44-AA80-56BE-8343-32466FCD1B5A\",\"device_manufacturer\":\"Apple Inc.\",\"device_model\":\"Mac15,12\",\"os_version\":\"26.4.1\",\"platform_type\":\"osx\"},\"message\":{\"sequence_ids\":[\"LTE4OTgwOTgzNDk=\",\"LTIwMTYyMzU4Njg=\"],\"event_names\":[\"EventSenderStats2NonAuth\",\"StriderSetup\",\"UbiProd1Impression\",\"DefaultConfigurationApplied\",\"WwwExperiments\",\"KmPageView\",\"WindowSize\",\"ConnectDevicePickerClosed\",\"ConfigurationApplied\",\"UbiProd1Interaction\",\"AdEvent\",\"TimeMeasurement\",\"UbiExpr2PageView\",\"UbiProd1ImpressionSegment\",\"MinimumLyricsCharactersSeen\"],\"loss_stats_num_entries_per_sequence_id\":[1,14],\"loss_stats_event_name_index\":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],\"loss_stats_storage_sizes\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"loss_stats_sequence_number_mins\":[11589,8,15265,7,2995,371,255,15,252,414,276,1018,1284,16983,11],\"loss_stats_sequence_number_nexts\":[11589,8,15265,7,2995,371,255,15,252,414,276,1018,1284,16983,11],\"drop_list_num_entries_per_sequence_id\":[0,1],\"drop_list_event_name_index\":[13],\"drop_list_counts_unreported\":[0],\"drop_list_counts_total\":[273]}}}]}",
-					"refererDomain": "xpui.app.spotify.com",
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g=",
-						"Referer": "https://xpui.app.spotify.com/"
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					},
-					"responsePayload": "{\"errors\":[]}"
-				},
-				{
 					"domain": "apis.google.com",
 					"path": "/_/scs/abc-static/_/js/k=gapi.lb.en.9vdPKhB0RUg.O/m=googleapis_proxy/rt=j/sv=1/d=1/ed=1/rs=AHpOoo97anj7zZ432JcN58tqJJp_A6WeOw/cb=gapi.loaded_0",
 					"sessionTime": 1000005730,
@@ -3135,24 +3117,6 @@
 		},
 		"ONBOARDING_NEW": {
 			"requests": [
-				{
-					"domain": "spclient.wg.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events/",
-					"sessionTime": 3000004181,
-					"content": {
-						"type": "base64",
-						"base64": "CsKZBBIYRXZlbnRTZW5kZXJDYW5hcnlOb25BdXRoGhYKB21lc3NhZ2USC0oJaGVhcnRiZWF0GicKEWNvbnRleHRfY2xpZW50X2lkEhIKEGXCtwgHP8OASA7CqSoHcjPDisKHwr0aLQoXY29udGV4dF9pbnN0YWxsYXRpb25faWQSEgoQw7Urw4nDpMOmYUUDwqwBw67ChRLDl8OcTxpCChtjb250ZXh0X2FwcGxpY2F0aW9uX2Rlc2t0b3ASIwoKMS4yLjk1LjQ1MxDCpcKKw6A9GhDCqUprwqNbw6fCjkjCqsOIGcKJw6F9w6XDsBpjChZjb250ZXh0X2RldmljZV9kZXNrdG9wEkkKA29zeBIKQXBwbGUgSW5jLhoITWFjMTUsMTIiJDU2QzY4QTQ0LUFBODAtNTZCRS04MzQzLTMyNDY2RkNEMUI1QSoGMjYuNC4xGhcKDGNvbnRleHRfdGltZRIHCMOewqTCmsOlw74zGiMKF2NvbnRleHRfbW9ub3RvbmljX2Nsb2NrEggIw6cCEMO4w6nCgQoadQoLY29udGV4dF9zZGsSZgpfMC45LjQtcmwtZXNzb3B0LWxvZ2luc2VuZC1vbmxpbmVzZW5kLWJjZHNlbmQtaGVhcnRiZWF0MzAwLjBzLzMwLjBzLW1vZGVybi1wYXlsb2FkMTI1a0ItYmF0Y2gxMDASA2NwcBobChljb250ZXh0X2NsaWVudF9jb250ZXh0X2lkIhBjMsOmw6PCiSRPwq/Cp8K+Lh8cREzDhSgQ"
-					},
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g="
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					}
-				},
 				{
 					"domain": "price.api.cx.metamask.io",
 					"path": "/v1/supportedVsCurrencies",
@@ -31294,46 +31258,6 @@
 					"responsePayload": "{\"count\":0,\"balances\":[],\"unprocessedNetworks\":[]}"
 				},
 				{
-					"domain": "spclient.wg.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events/",
-					"sessionTime": 4000001174,
-					"content": {
-						"type": "base64",
-						"base64": "CsKZBBIYRXZlbnRTZW5kZXJDYW5hcnlOb25BdXRoGhYKB21lc3NhZ2USC0oJaGVhcnRiZWF0GicKEWNvbnRleHRfY2xpZW50X2lkEhIKEGXCtwgHP8OASA7CqSoHcjPDisKHwr0aLQoXY29udGV4dF9pbnN0YWxsYXRpb25faWQSEgoQw7Urw4nDpMOmYUUDwqwBw67ChRLDl8OcTxpCChtjb250ZXh0X2FwcGxpY2F0aW9uX2Rlc2t0b3ASIwoKMS4yLjk1LjQ1MxDCpcKKw6A9GhDCqUprwqNbw6fCjkjCqsOIGcKJw6F9w6XDsBpjChZjb250ZXh0X2RldmljZV9kZXNrdG9wEkkKA29zeBIKQXBwbGUgSW5jLhoITWFjMTUsMTIiJDU2QzY4QTQ0LUFBODAtNTZCRS04MzQzLTMyNDY2RkNEMUI1QSoGMjYuNC4xGhcKDGNvbnRleHRfdGltZRIHCMKTwrXCucOlw74zGiMKF2NvbnRleHRfbW9ub3RvbmljX2Nsb2NrEggIw6cCEMKqw7rCoAoadQoLY29udGV4dF9zZGsSZgpfMC45LjQtcmwtZXNzb3B0LWxvZ2luc2VuZC1vbmxpbmVzZW5kLWJjZHNlbmQtaGVhcnRiZWF0MzAwLjBzLzMwLjBzLW1vZGVybi1wYXlsb2FkMTI1a0ItYmF0Y2gxMDASA2NwcBobChljb250ZXh0X2NsaWVudF9jb250ZXh0X2lkIhBjMsOmw6PCiSRPwq/Cp8K+Lh8cREzDhSgY"
-					},
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g="
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					}
-				},
-				{
-					"domain": "spclient.wg.spotify.com",
-					"path": "/gabo-receiver-service/v3/events/",
-					"sessionTime": 4000001616,
-					"content": {
-						"type": "base64",
-						"base64": "CsOeBBIYRXZlbnRTZW5kZXJTdGF0czJOb25BdXRoGlsKB21lc3NhZ2USUAoUejTClsODDj/DjyXDkFhfMMOvP8OfRljDpSLDoRIST2ZmbGluZVBydW5lUmVwb3J0GAEgACgAMMK1GTjCtRl4AMKAAcK0GcKIAQDCkAEAwpgBwrQZwqABAMKoAcK1GcKwAQAaJwoRY29udGV4dF9jbGllbnRfaWQSEgoQZcK3CAc/w4BIDsKpKgdyM8OKwofCvRotChdjb250ZXh0X2luc3RhbGxhdGlvbl9pZBISChDDtSvDicOkw6ZhRQPCrAHDrsKFEsOXw5xPGkIKG2NvbnRleHRfYXBwbGljYXRpb25fZGVza3RvcBIjCgoxLjIuOTUuNDUzEMKlworDoD0aEMKpSmvCo1vDp8KOSMKqw4gZwonDoX3DpcOwGmMKFmNvbnRleHRfZGV2aWNlX2Rlc2t0b3ASSQoDb3N4EgpBcHBsZSBJbmMuGghNYWMxNSwxMiIkNTZDNjhBNDQtQUE4MC01NkJFLTgzNDMtMzI0NjZGQ0QxQjVBKgYyNi40LjEaFwoMY29udGV4dF90aW1lEgcIwrPCucK5w6XDvjMaIwoXY29udGV4dF9tb25vdG9uaWNfY2xvY2sSCAjDpwIQw4rDvsKgChp1Cgtjb250ZXh0X3NkaxJmCl8wLjkuNC1ybC1lc3NvcHQtbG9naW5zZW5kLW9ubGluZXNlbmQtYmNkc2VuZC1oZWFydGJlYXQzMDAuMHMvMzAuMHMtbW9kZXJuLXBheWxvYWQxMjVrQi1iYXRjaDEwMBIDY3BwGhsKGWNvbnRleHRfY2xpZW50X2NvbnRleHRfaWQiEGHCrsKuwq7DrcO+RjnCrwjDoyDCiMO4wrXDuCgQCsKrBRIZUGVuZGluZ0V2ZW50c1N0YXRzTm9uQXV0aBrCpgEKB21lc3NhZ2USwpoBChRSYXdDb3JlU3RyZWFtU2VnbWVudAoNUmF3Q29yZVN0cmVhbQoWQm9vbWJveFBsYXliYWNrU2Vzc2lvbhDCtA0Qw6gIEMKIDxjCtA0Yw6gIGMKJDyAAIAAgATDCsw0ww6cIMMKIDzgAOAA4AEAAQABAAEjCsw1Iw6cISMKID1AAUABQAFgAWABYAGAAYABgAGgAaABoAHAAcABwAHjCsw14w6cIeMKHDxonChFjb250ZXh0X2NsaWVudF9pZBISChBlwrcIBz/DgEgOwqkqB3Izw4rCh8K9Gi0KF2NvbnRleHRfaW5zdGFsbGF0aW9uX2lkEhIKEMO1K8OJw6TDpmFFA8KsAcOuwoUSw5fDnE8aQgobY29udGV4dF9hcHBsaWNhdGlvbl9kZXNrdG9wEiMKCjEuMi45NS40NTMQwqXCisOgPRoQwqlKa8KjW8Onwo5IwqrDiBnCicOhfcOlw7AaYwoWY29udGV4dF9kZXZpY2VfZGVza3RvcBJJCgNvc3gSCkFwcGxlIEluYy4aCE1hYzE1LDEyIiQ1NkM2OEE0NC1BQTgwLTU2QkUtODM0My0zMjQ2NkZDRDFCNUEqBjI2LjQuMRoXCgxjb250ZXh0X3RpbWUSBwjCs8O7wrHDpcO+MxojChdjb250ZXh0X21vbm90b25pY19jbG9jaxIICMOnAhDDisOAwpkKGnUKC2NvbnRleHRfc2RrEmYKXzAuOS40LXJsLWVzc29wdC1sb2dpbnNlbmQtb25saW5lc2VuZC1iY2RzZW5kLWhlYXJ0YmVhdDMwMC4wcy8zMC4wcy1tb2Rlcm4tcGF5bG9hZDEyNWtCLWJhdGNoMTAwEgNjcHAaGwoZY29udGV4dF9jbGllbnRfY29udGV4dF9pZCIQYcKuwq7CrsOtw75GOcKvCMOjIMKIw7jCtcO4KA8"
-					},
-					"oddHeaders": {
-						"App-Platform": "OSX_ARM64",
-						"Authorization": "Bearer BQD23RMxW50IFDkcqXbXGYpH7lnP7uj1skqmO_oUCAJojiGcGVpLqNiOm7aZ6mIEVw-KpvK4-DYBalafWwEEXED43A_MpD71QnVwf17t4NQpeWYwSRmAaapr8Edw92Dnwakq56MRoc_xcJMkcjg92xbJq7XfCxFkHoVqSjAC2ePnaKSdCSe-DFh2r5DsjdbsrBassrWUiFSCQmF0oj8IGfCoLZveCPIOAQp5MwiXNMlrlauc3B9OAmpgO7OZeu9_EmVI9v48FjseVMLEIW-4M2Kjcv5enZlHD1YKn-21NxANakhaR97rBgcCwogLFb_UuirOnxD_ZT2Hwdl6y2W_TIKUogWjD6hzbrRZPtReVHW_BHkoScO6g55PwD4aax-rGZ4i8oiqvGEySy74hQe3hbTXVGjfTA04DivKSsK2bhsQN8JTkuFZy24g6655GYUSEf6ozjPsJKeFBKyxdoRCd8bsWUJeAB85NpqvUCWqcfVUgNCy_0f8Gw",
-						"Spotify-App-Version": "129500453",
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g="
-					},
-					"responseOddHeaders": {
-						"server-timing": "edge;dur=15",
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					}
-				},
-				{
 					"domain": "gateway.api.cx.metamask.io",
 					"path": "/v1",
 					"sessionTime": 4000007046,
@@ -36035,24 +35959,6 @@
 					}
 				},
 				{
-					"domain": "gae2-spclient.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events",
-					"sessionTime": 4000096498,
-					"content": "{\"suppress_persist\":false,\"events\":[{\"sequence_id\":\"LTE4OTgwOTgzNDk=\",\"sequence_number\":11593,\"event_name\":\"EventSenderStats2NonAuth\",\"fragments\":{\"context_sdk\":{\"version_name\":\"5.1.0-LS\",\"type\":\"javascript\"},\"context_time\":{\"timestamp\":1786382372484},\"context_application_desktop\":{\"version_code\":129500453,\"version_string\":\"1.2.95.453\"},\"context_client_id\":{\"value\":\"ZbcIBz/ASA6pKgdyM8qHvQ==\"},\"context_installation_id\":{\"value\":\"9SvJ5OZhRQOsAe6FEtfcTw==\"},\"context_device_desktop\":{\"device_id\":\"56C68A44-AA80-56BE-8343-32466FCD1B5A\",\"device_manufacturer\":\"Apple Inc.\",\"device_model\":\"Mac15,12\",\"os_version\":\"26.4.1\",\"platform_type\":\"osx\"},\"message\":{\"sequence_ids\":[\"LTE4OTgwOTgzNDk=\",\"LTIwMTYyMzU4Njg=\"],\"event_names\":[\"EventSenderStats2NonAuth\",\"StriderSetup\",\"UbiProd1Impression\",\"DefaultConfigurationApplied\",\"WwwExperiments\",\"KmPageView\",\"WindowSize\",\"ConnectDevicePickerClosed\",\"ConfigurationApplied\",\"UbiProd1Interaction\",\"AdEvent\",\"TimeMeasurement\",\"UbiExpr2PageView\",\"UbiProd1ImpressionSegment\",\"MinimumLyricsCharactersSeen\"],\"loss_stats_num_entries_per_sequence_id\":[1,14],\"loss_stats_event_name_index\":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],\"loss_stats_storage_sizes\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"loss_stats_sequence_number_mins\":[11593,8,15265,7,2995,371,255,15,252,414,276,1018,1284,16983,11],\"loss_stats_sequence_number_nexts\":[11593,8,15265,7,2995,371,255,15,252,414,276,1018,1284,16983,11],\"drop_list_num_entries_per_sequence_id\":[0,1],\"drop_list_event_name_index\":[13],\"drop_list_counts_unreported\":[0],\"drop_list_counts_total\":[273]}}}]}",
-					"refererDomain": "xpui.app.spotify.com",
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g=",
-						"Referer": "https://xpui.app.spotify.com/"
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					},
-					"responsePayload": "{\"errors\":[]}"
-				},
-				{
 					"domain": "api.merkl.xyz",
 					"path": "/v4/users/0x41c36c21b31c67e1c645cee831dd5e4bfbf0cbc9/rewards",
 					"sessionTime": 5000000763,
@@ -36468,24 +36374,6 @@
 						"suffix": "ozCisKKworCj0IzRyXDmF7CtcK7wqvDmyw2AxsfH8O/wqrCqsKuw6bDvMO5w7NLWAc7w6rCn8OOw6c9w64uwpLCpVsTScK5wrAAwpIQeMOVwqpVwpM9A8KndMOYZwkJCT9Xw5XDhcK8wpfCmMO4w5N+w5Yiwr/CoMOqw6LDosOiVcOQw55RBcOWGMK1wrfCt1/DtcOLb8OBw4UiwpHDhMOewq1CK8KtGnR2w5jCihHDssKPeyHDl0MedcKxwroJwppRwpwxAkgrHcOyw7PDs38vHsK+woU8w4fCj8Kfw7xYwpUXwpbClsKWw7YvYhfDhcKvcmjDpz83XgNeCTVbXsOtw6fChw9Pw6bCo8O0wqjCgMKoOMOWGsKTRMOaamxjw7bChMOxRTXCiMKkTcOywoYXwrbDsRfCpwFNwqw6wrDCvcOnw4XCi1fCnmXCk1vCuMKdwpTDn2jCncKXwoskUcKiwqrCu8KXwpTClMKUB8KFw5IhwoDDhAw/T8K+MsKQw7jCgMOINUoEOsOdJ3fDtsO0w7TCnsOjLMKvw5s9MCbCmcONScOgEsKSXcK1F8Ocw5TDlMK0woEPAxRbw41Aw7FeCsKmwr7DnnQsIyPDo8OlwrjCuMK4KcKYw7gTwqFERiHDm8Olw6p0wroHwpYvW8O+RG5+w747DsK7wr3ClMKXDCgwwo81GcOwwrgpwo7DkDk5OcKTwqPCoWfDpQPCs8Kbwo8PQmJ2wrRKwofCtMKXH2DClMOTCw/CulYPwo9vw5hGLCkpwpkdTT0qS2LCi8OFcsOKwpvCm0vCpFo8I8OYXSrCmsO5wqLCmnPDsm4AecO5w7LDpcOXwqNxXMODwpLCuMK7wrvDuz3DnsOiw7LCq3wRwrtXGMOnLUbDqmnDhMKxTsOiAMOJw4vDiwlPUVHDkcOjasOXwr1DwpLDuMOQwqFDD8Ohw7HCm8KJX8O2wo3CuH0/w4DDssKqw7HDlsOyNsKcw5PDqTzDjW8uwq7CjXbCj8KSb3lNZmbDplPCmMOAwqUCwr9hw4AEZMKYFgpFwqhVQyrCt8K2w77DnjHDoUp/wqrCo8Kjw7PDtMKHHybDnT8WfcO6wr51ZcKxwrHCsT/DncK7d8Ovax0dHcKfwpvCjMKmwrI6Y10VwonCgcKGEiEFeVrCsUTCsFRUVFTDl8OVwpkuwrbCtMK0bMOZwrp1w6vCs8O8PsOPfm05w6bDvcKLAGg3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUBPDvh8Pwrtxw6rDtsOQwrknAAAAAElFTkTCrkJgwoI\\\\\\\\\\\\\\', \\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\': \\\\\\\\\\\\\\'8589545437fe07296d90378ff3b53be512d4585c958383df2effe65b8bb5c552\\\\\\\\\\\\\\', \\\\\\\\\\\\\\'format\\\\\\\\\\\\\\': \\\\\\\\\\\\\\'query\\\\\\\\\\\\\\', \\\\\\\\\\\\\\'uniqueKeys\\\\\\\\\\\\\\': []}\", \\\\\\\\\\\\\\'sha256\\\\\\\\\\\\\\': \\\\\\\\\\\\\\'ef66be4067eaece931cd784d70e705a0cffb7d0e1533098495ca38765be43aac\\\\\\\\\\\\\\', \\\\\\\\\\\\\\'format\\\\\\\\\\\\\\': \\\\\\\\\\\\\\'unknown\\\\\\\\\\\\\\'}\\\\\\', \\\\\\'sha256\\\\\\': \\\\\\'f9d39bfce096f218196b26e1563e925f1c24a305099cae2a34ea896151b248f7\\\\\\', \\\\\\'format\\\\\\': \\\\\\'unknown\\\\\\'}\\', \\'sha256\\': \\'f08f155bd164a2a4540e4a5b98739b6f885ff0e81773ce666af33f5b775b36b0\\', \\'format\\': \\'unknown\\'}', 'sha256': '48dc3081266ae10394d8c69cee275cf69aaca94c893502b372630d21a237b274', 'format': 'unknown'}",
 						"sha256": "eade10419fd17dca65253071ccfef98bc8bead6b1f9386fb2dcedffbda7b9585",
 						"format": "unknown"
-					}
-				},
-				{
-					"domain": "spclient.wg.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events/",
-					"sessionTime": 6000017983,
-					"content": {
-						"type": "base64",
-						"base64": "CsKZBBIYRXZlbnRTZW5kZXJDYW5hcnlOb25BdXRoGhYKB21lc3NhZ2USC0oJaGVhcnRiZWF0GicKEWNvbnRleHRfY2xpZW50X2lkEhIKEGXCtwgHP8OASA7CqSoHcjPDisKHwr0aLQoXY29udGV4dF9pbnN0YWxsYXRpb25faWQSEgoQw7Urw4nDpMOmYUUDwqwBw67ChRLDl8OcTxpCChtjb250ZXh0X2FwcGxpY2F0aW9uX2Rlc2t0b3ASIwoKMS4yLjk1LjQ1MxDCpcKKw6A9GhDCqUprwqNbw6fCjkjCqsOIGcKJw6F9w6XDsBpjChZjb250ZXh0X2RldmljZV9kZXNrdG9wEkkKA29zeBIKQXBwbGUgSW5jLhoITWFjMTUsMTIiJDU2QzY4QTQ0LUFBODAtNTZCRS04MzQzLTMyNDY2RkNEMUI1QSoGMjYuNC4xGhcKDGNvbnRleHRfdGltZRIHCMKhw4fDjcOlw74zGiMKF2NvbnRleHRfbW9ub3RvbmljX2Nsb2NrEggIw6cCEMK2wozCtQoadQoLY29udGV4dF9zZGsSZgpfMC45LjQtcmwtZXNzb3B0LWxvZ2luc2VuZC1vbmxpbmVzZW5kLWJjZHNlbmQtaGVhcnRiZWF0MzAwLjBzLzMwLjBzLW1vZGVybi1wYXlsb2FkMTI1a0ItYmF0Y2gxMDASA2NwcBobChljb250ZXh0X2NsaWVudF9jb250ZXh0X2lkIhBjMsOmw6PCiSRPwq/Cp8K+Lh8cREzDhSgZ"
-					},
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g="
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
 					}
 				},
 				{
@@ -44511,34 +44399,6 @@
 					"responsePayload": "{\"subscriptions\":[],\"trialedProducts\":[]}"
 				},
 				{
-					"domain": "gae2-spclient.spotify.com",
-					"path": "/quicksilver/v2/triggers",
-					"sessionTime": 8000027767,
-					"query": {
-						"trig_type": [
-							"URI",
-							"CLIENT_EVENT"
-						],
-						"ctv_type": "web-modal"
-					},
-					"refererDomain": "xpui.app.spotify.com",
-					"oddHeaders": {
-						"app-platform": "WebPlayer",
-						"authorization": "Bearer BQD23RMxW50IFDkcqXbXGYpH7lnP7uj1skqmO_oUCAJojiGcGVpLqNiOm7aZ6mIEVw-KpvK4-DYBalafWwEEXED43A_MpD71QnVwf17t4NQpeWYwSRmAaapr8Edw92Dnwakq56MRoc_xcJMkcjg92xbJq7XfCxFkHoVqSjAC2ePnaKSdCSe-DFh2r5DsjdbsrBassrWUiFSCQmF0oj8IGfCoLZveCPIOAQp5MwiXNMlrlauc3B9OAmpgO7OZeu9_EmVI9v48FjseVMLEIW-4M2Kjcv5enZlHD1YKn-21NxANakhaR97rBgcCwogLFb_UuirOnxD_ZT2Hwdl6y2W_TIKUogWjD6hzbrRZPtReVHW_BHkoScO6g55PwD4aax-rGZ4i8oiqvGEySy74hQe3hbTXVGjfTA04DivKSsK2bhsQN8JTkuFZy24g6655GYUSEf6ozjPsJKeFBKyxdoRCd8bsWUJeAB85NpqvUCWqcfVUgNCy_0f8Gw",
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g=",
-						"x-client-id": "65b708073fc0480ea92a077233ca87bd",
-						"Referer": "https://xpui.app.spotify.com/"
-					},
-					"responseOddHeaders": {
-						"server-timing": "edge;dur=1",
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					},
-					"responsePayload": "[{\"type\":\"URI\",\"pattern\":\"spotify:home\",\"format\":\"web-modal\",\"cache\":false},{\"type\":\"URI\",\"pattern\":\"spotify:artist:?\",\"format\":\"web-modal\",\"cache\":false},{\"type\":\"URI\",\"pattern\":\"spotify:collections\",\"format\":\"web-modal\",\"cache\":false},{\"type\":\"URI\",\"pattern\":\"spotify:album:?\",\"format\":\"web-modal\",\"cache\":false},{\"type\":\"CLIENT_EVENT\",\"pattern\":\"app:update:eol\",\"format\":\"web-modal\",\"cache\":false}]"
-				},
-				{
 					"domain": "mainnet.infura.io",
 					"path": "/v3/b6bf7d3508c941499b10025c0776eaf8",
 					"sessionTime": 8000027785,
@@ -45428,24 +45288,6 @@
 						"CF-RAY": "a290b38caa8c44b7-SIN"
 					},
 					"responsePayload": "{\"uuid\":\"5ec69f46-f550-42bc-889c-406388d237ce\"}"
-				},
-				{
-					"domain": "gae2-spclient.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events",
-					"sessionTime": 8000030381,
-					"content": "{\"suppress_persist\":false,\"events\":[{\"sequence_id\":\"LTE4OTgwOTgzNDk=\",\"sequence_number\":11595,\"event_name\":\"EventSenderStats2NonAuth\",\"fragments\":{\"context_sdk\":{\"version_name\":\"5.1.0-LS\",\"type\":\"javascript\"},\"context_time\":{\"timestamp\":1786382742500},\"context_application_desktop\":{\"version_code\":129500453,\"version_string\":\"1.2.95.453\"},\"context_client_id\":{\"value\":\"ZbcIBz/ASA6pKgdyM8qHvQ==\"},\"context_installation_id\":{\"value\":\"9SvJ5OZhRQOsAe6FEtfcTw==\"},\"context_device_desktop\":{\"device_id\":\"56C68A44-AA80-56BE-8343-32466FCD1B5A\",\"device_manufacturer\":\"Apple Inc.\",\"device_model\":\"Mac15,12\",\"os_version\":\"26.4.1\",\"platform_type\":\"osx\"},\"message\":{\"sequence_ids\":[\"LTE4OTgwOTgzNDk=\",\"LTIwMTYyMzU4Njg=\"],\"event_names\":[\"EventSenderStats2NonAuth\",\"StriderSetup\",\"UbiProd1Impression\",\"DefaultConfigurationApplied\",\"WwwExperiments\",\"KmPageView\",\"WindowSize\",\"ConnectDevicePickerClosed\",\"ConfigurationApplied\",\"UbiProd1Interaction\",\"AdEvent\",\"TimeMeasurement\",\"UbiExpr2PageView\",\"UbiProd1ImpressionSegment\",\"MinimumLyricsCharactersSeen\"],\"loss_stats_num_entries_per_sequence_id\":[1,14],\"loss_stats_event_name_index\":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],\"loss_stats_storage_sizes\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"loss_stats_sequence_number_mins\":[11595,8,15265,7,2995,371,255,15,252,414,276,1018,1284,16983,11],\"loss_stats_sequence_number_nexts\":[11595,8,15265,7,2995,371,255,15,252,414,276,1018,1284,16983,11],\"drop_list_num_entries_per_sequence_id\":[0,1],\"drop_list_event_name_index\":[13],\"drop_list_counts_unreported\":[0],\"drop_list_counts_total\":[273]}}}]}",
-					"refererDomain": "xpui.app.spotify.com",
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g=",
-						"Referer": "https://xpui.app.spotify.com/"
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					},
-					"responsePayload": "{\"errors\":[]}"
 				},
 				{
 					"domain": "base-mainnet.infura.io",
@@ -48507,28 +48349,6 @@
 						"X-Trace-Id": "669ac3351df7113abfaf82e35754850f"
 					},
 					"responsePayload": "{\"jsonrpc\":\"2.0\",\"id\":\"81-_usCrNUAe4G6RF44ov\",\"result\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}"
-				},
-				{
-					"domain": "spclient.wg.spotify.com",
-					"path": "/gabo-receiver-service/v3/events/",
-					"sessionTime": 9000009607,
-					"content": {
-						"type": "base64",
-						"base64": "CsKrBRIZUGVuZGluZ0V2ZW50c1N0YXRzTm9uQXV0aBrCpgEKB21lc3NhZ2USwpoBChRSYXdDb3JlU3RyZWFtU2VnbWVudAoNUmF3Q29yZVN0cmVhbQoWQm9vbWJveFBsYXliYWNrU2Vzc2lvbhDCtA0Qw6gIEMKIDxjCtA0Yw6gIGMKJDyAAIAAgATDCsw0ww6cIMMKIDzgAOAA4AEAAQABAAEjCsw1Iw6cISMKID1AAUABQAFgAWABYAGAAYABgAGgAaABoAHAAcABwAHjCsw14w6cIeMKHDxonChFjb250ZXh0X2NsaWVudF9pZBISChBlwrcIBz/DgEgOwqkqB3Izw4rCh8K9Gi0KF2NvbnRleHRfaW5zdGFsbGF0aW9uX2lkEhIKEMO1K8OJw6TDpmFFA8KsAcOuwoUSw5fDnE8aQgobY29udGV4dF9hcHBsaWNhdGlvbl9kZXNrdG9wEiMKCjEuMi45NS40NTMQwqXCisOgPRoQwqlKa8KjW8Onwo5IwqrDiBnCicOhfcOlw7AaYwoWY29udGV4dF9kZXZpY2VfZGVza3RvcBJJCgNvc3gSCkFwcGxlIEluYy4aCE1hYzE1LDEyIiQ1NkM2OEE0NC1BQTgwLTU2QkUtODM0My0zMjQ2NkZDRDFCNUEqBjI2LjQuMRoXCgxjb250ZXh0X3RpbWUSBwjCk8OLw5bDpcO+MxojChdjb250ZXh0X21vbm90b25pY19jbG9jaxIICMOnAhDCisKQwr4KGnUKC2NvbnRleHRfc2RrEmYKXzAuOS40LXJsLWVzc29wdC1sb2dpbnNlbmQtb25saW5lc2VuZC1iY2RzZW5kLWhlYXJ0YmVhdDMwMC4wcy8zMC4wcy1tb2Rlcm4tcGF5bG9hZDEyNWtCLWJhdGNoMTAwEgNjcHAaGwoZY29udGV4dF9jbGllbnRfY29udGV4dF9pZCIQYcKuwq7CrsOtw75GOcKvCMOjIMKIw7jCtcO4KBE"
-					},
-					"oddHeaders": {
-						"App-Platform": "OSX_ARM64",
-						"Authorization": "Bearer BQD23RMxW50IFDkcqXbXGYpH7lnP7uj1skqmO_oUCAJojiGcGVpLqNiOm7aZ6mIEVw-KpvK4-DYBalafWwEEXED43A_MpD71QnVwf17t4NQpeWYwSRmAaapr8Edw92Dnwakq56MRoc_xcJMkcjg92xbJq7XfCxFkHoVqSjAC2ePnaKSdCSe-DFh2r5DsjdbsrBassrWUiFSCQmF0oj8IGfCoLZveCPIOAQp5MwiXNMlrlauc3B9OAmpgO7OZeu9_EmVI9v48FjseVMLEIW-4M2Kjcv5enZlHD1YKn-21NxANakhaR97rBgcCwogLFb_UuirOnxD_ZT2Hwdl6y2W_TIKUogWjD6hzbrRZPtReVHW_BHkoScO6g55PwD4aax-rGZ4i8oiqvGEySy74hQe3hbTXVGjfTA04DivKSsK2bhsQN8JTkuFZy24g6655GYUSEf6ozjPsJKeFBKyxdoRCd8bsWUJeAB85NpqvUCWqcfVUgNCy_0f8Gw",
-						"Spotify-App-Version": "129500453",
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g="
-					},
-					"responseOddHeaders": {
-						"server-timing": "edge;dur=6",
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000"
-					}
 				},
 				{
 					"domain": "cdn.contentful.com",
@@ -53738,24 +53558,6 @@
 						"x-permitted-cross-domain-policies": "none"
 					},
 					"responsePayload": "{\"statusCode\":409,\"message\":\"Transaction not yet indexed on chain; please retry in a few seconds (chain: 1, tx: 0xdb45f280fe4bf50233ca67b26a7cd7090a0e04e1a2071c760003da076cdf422c)\",\"type\":\"TRANSACTION_NOT_INDEXED\"}"
-				},
-				{
-					"domain": "spclient.wg.spotify.com",
-					"path": "/gabo-receiver-service/public/v3/events/",
-					"sessionTime": 11000027302,
-					"content": {
-						"type": "base64",
-						"base64": "CsKZBBIYRXZlbnRTZW5kZXJDYW5hcnlOb25BdXRoGhYKB21lc3NhZ2USC0oJaGVhcnRiZWF0GicKEWNvbnRleHRfY2xpZW50X2lkEhIKEGXCtwgHP8OASA7CqSoHcjPDisKHwr0aLQoXY29udGV4dF9pbnN0YWxsYXRpb25faWQSEgoQw7Urw4nDpMOmYUUDwqwBw67ChRLDl8OcTxpCChtjb250ZXh0X2FwcGxpY2F0aW9uX2Rlc2t0b3ASIwoKMS4yLjk1LjQ1MxDCpcKKw6A9GhDCqUprwqNbw6fCjkjCqsOIGcKJw6F9w6XDsBpjChZjb250ZXh0X2RldmljZV9kZXNrdG9wEkkKA29zeBIKQXBwbGUgSW5jLhoITWFjMTUsMTIiJDU2QzY4QTQ0LUFBODAtNTZCRS04MzQzLTMyNDY2RkNEMUI1QSoGMjYuNC4xGhcKDGNvbnRleHRfdGltZRIHCMK8wq7DpcOlw74zGiMKF2NvbnRleHRfbW9ub3RvbmljX2Nsb2NrEggIw6cCEMKlw7PDjAoadQoLY29udGV4dF9zZGsSZgpfMC45LjQtcmwtZXNzb3B0LWxvZ2luc2VuZC1vbmxpbmVzZW5kLWJjZHNlbmQtaGVhcnRiZWF0MzAwLjBzLzMwLjBzLW1vZGVybi1wYXlsb2FkMTI1a0ItYmF0Y2gxMDASA2NwcBobChljb250ZXh0X2NsaWVudF9jb250ZXh0X2lkIhBjMsOmw6PCiSRPwq/Cp8K+Lh8cREzDhSgd"
-					},
-					"oddHeaders": {
-						"client-token": "AAFkJCYjpGg/jG+nCTnAqCXvsWNG77SebKaFqUjbdSPWLMrJuzgeodP7VwEADL5l1icQigwGphGZG06fQWT/MIvJCFmwK08Sfgjc4Z7Ai+5glapCdc52mmqpNGJK1IW39STJC5mWeb3uTPRGj2zpKODLlvZusAn3ZCt4xb79qW4udufBKmbJhMDJBfwao1dTa9X+5oauYVzR6mnwHGaAyhSEsfEa3GlXsPjnawz3McPVvDrT4T403CY2cAHtvkvk3uzXCmSVZZZIzWU5HavqCWasqzjrYc1CFJuWHGVnLlzUzZWun8Rw0mwWLSiuhh6H/QId/rY77AHs+CSgfIsUxnDEHzUvPgQ/z2AMEQsslJI7McjDJIRyLJHk82g="
-					},
-					"responseOddHeaders": {
-						"alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
-						"access-control-allow-credentials": "true",
-						"via": "HTTP/2 edgeproxy, 1.1 google",
-						"Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
-					}
 				},
 				{
 					"domain": "tx-sentinel-ethereum-mainnet.api.cx.metamask.io",
