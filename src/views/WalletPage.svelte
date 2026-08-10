@@ -1336,9 +1336,23 @@
 			{/if}
 
 			<div class="attribute-accordions" data-column="gap-3">
-				<details open data-card="padding-5 secondary radius-4" data-column="gap-0" data-sticky-container>
-					<summary data-sticky="block block-start backdrop-self backdrop-always">
-						<h4>
+				<details
+					open
+					data-card="padding-5 secondary radius-4"
+					data-column="gap-0"
+					data-sticky-container
+					data-sticky-breadcrumb="scope mobile"
+				>
+					<span
+						class="detail-breadcrumb-position"
+						data-sticky-breadcrumb="position mobile"
+						aria-hidden="true"
+					></span>
+
+					<summary
+						data-sticky="block block-start backdrop-self backdrop-always"
+					>
+						<h4 data-sticky-breadcrumb="item mobile">
 							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
 						</h4>
 					</summary>
@@ -1354,9 +1368,23 @@
 					</section>
 				</details>
 
-				<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
-					<summary data-sticky="block block-start backdrop-self backdrop-always">
-						<h4>
+				<details
+					open
+					data-card="secondary padding-5 radius-4"
+					data-column="gap-0"
+					data-sticky-container
+					data-sticky-breadcrumb="scope mobile"
+				>
+					<span
+						class="detail-breadcrumb-position"
+						data-sticky-breadcrumb="position mobile"
+						aria-hidden="true"
+					></span>
+
+					<summary
+						data-sticky="block block-start backdrop-self backdrop-always"
+					>
+						<h4 data-sticky-breadcrumb="item mobile">
 							{getHowIsEvaluatedHeading(attribute)}
 						</h4>
 					</summary>
@@ -1447,9 +1475,23 @@
 				</details>
 
 				{#if howToImprove}
-					<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
-						<summary data-sticky="block block-start backdrop-self backdrop-always">
-							<h4>
+					<details
+						open
+						data-card="secondary padding-5 radius-4"
+						data-column="gap-0"
+						data-sticky-container
+						data-sticky-breadcrumb="scope mobile"
+					>
+						<span
+							class="detail-breadcrumb-position"
+							data-sticky-breadcrumb="position mobile"
+							aria-hidden="true"
+						></span>
+
+						<summary
+							data-sticky="block block-start backdrop-self backdrop-always"
+						>
+							<h4 data-sticky-breadcrumb="item mobile">
 								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
 							</h4>
 						</summary>
