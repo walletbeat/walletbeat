@@ -442,15 +442,20 @@ export const zerion: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The only ruleset on the extension repository, "main protection", is active on the default branch and contains three rules: `deletion`, `non_fast_forward`, and `pull_request`. Blocking deletion and non-fast-forward pushes covers branch deletion and force-push respectively.',
+								'This active default-branch ruleset blocks deletion and non-fast-forward pushes.',
 							label: 'main protection',
 							url: 'https://github.com/zeriontech/zerion-wallet-extension/rules/12153885',
 						},
 						{
 							explanation:
-								'The `pull_request` rule in the same ruleset sets `required_approving_review_count` to 0, so a pull request is required but may be merged without any approving review. No `required_status_checks` rule is present, and no ruleset targets tags.',
-							label: 'Ruleset definition (GitHub API)',
+								'Pull requests require zero approvals, and no status checks are configured.',
+							label: 'Ruleset definition',
 							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets/12153885',
+						},
+						{
+							explanation: 'This is the only ruleset on the repository, so none targets tags.',
+							label: 'Repository ruleset list',
+							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets',
 						},
 					],
 					branchDeletionBlocked: true,
