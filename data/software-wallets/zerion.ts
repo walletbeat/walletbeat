@@ -1,5 +1,6 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -63,9 +64,9 @@ export const zerion: SoftwareWallet = {
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		blurb: paragraph(''),
-		contributors: [lucemans, mattmatt],
+		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2025-04-22',
+		lastUpdated: '2026-08-10',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -437,7 +438,32 @@ export const zerion: SoftwareWallet = {
 					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
 				}),
 				hermeticBuilds: notSupported,
-				repositoryChangeControls: null,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation:
+								'The default-branch ruleset blocks deletion and non-fast-forward pushes.',
+							label: 'main protection',
+							url: 'https://github.com/zeriontech/zerion-wallet-extension/rules/12153885',
+						},
+						{
+							explanation:
+								'Pull requests require zero approvals, and no status checks are configured.',
+							label: 'Ruleset definition',
+							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets/12153885',
+						},
+						{
+							explanation: 'The repository has one ruleset and it targets branches, not tags.',
+							label: 'Repository ruleset list',
+							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets',
+						},
+					],
+					branchDeletionBlocked: true,
+					forcePushBlocked: true,
+					requiredChecks: false,
+					requiredReview: false,
+					tagsImmutable: false,
+				},
 				reproducibleBuilds: null,
 			},
 		},
