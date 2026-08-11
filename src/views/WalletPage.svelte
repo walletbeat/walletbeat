@@ -934,10 +934,7 @@
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 		{@const sliceStyle = sliceStylesByHref.get(href)}
 
-		<hr
-			class="attribute-group-timeline"
-			style:---pie-timeline={pieTimelineByHref.get(href)}
-		/>
+		<hr />
 
 		<section
 			class="attribute-group"
@@ -979,6 +976,7 @@
 							<div
 								class="attribute-group-heading-position"
 								data-sticky-breadcrumb="position"
+								style:---pie-timeline={pieTimelineByHref.get(href)}
 							>
 								<a
 									data-link="camouflaged"
@@ -1069,7 +1067,6 @@
 		{id}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
-		style:---pie-timeline={pieTimelineByHref.get(href)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
 		<details
@@ -1093,6 +1090,7 @@
 							<div
 								class="attribute-heading-position"
 								data-sticky-breadcrumb="position"
+								style:---pie-timeline={pieTimelineByHref.get(href)}
 							>
 								<a
 									data-link="camouflaged"
@@ -1651,7 +1649,12 @@
 			/ minmax(0, 1fr) auto
 		;
 		@media (max-width: 1024px) {
-			---wallet-breadcrumb-animation-range-end: exit-crossing 25%;
+			/*
+			 * Complete the handoff over the heading's full exit crossing. A 25%
+			 * range reduced the transition to roughly 10px and made its threshold
+			 * appear to change with short versus tall viewports.
+			 */
+			---wallet-breadcrumb-animation-range-end: exit-crossing 100%;
 			---wallet-mobile-pie-size-rem: 8;
 			---wallet-mobile-pie-size: calc(
 				var(---wallet-mobile-pie-size-rem)
@@ -2627,13 +2630,13 @@
 
 			@supports (
 				((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
-				(animation-composition: accumulate)
+					(animation-composition: accumulate)
 			) {
 				.pie-navigation-geometry {
 					animation-duration: 1ms;
 					animation-fill-mode: both;
 					animation-composition: accumulate;
-					animation-range: cover 78% cover 85%;
+					animation-range: exit-crossing 0% exit-crossing 100%;
 				}
 			}
 
@@ -2979,10 +2982,13 @@
 	}
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.attribute-group-timeline,
-		.attribute > details > summary {
-			view-timeline-name: var(---pie-timeline, none);
+		:is(.attribute-group-heading-position, .attribute-heading-position) {
+			/* One heading box publishes the synchronized breadcrumb and pie tracks. */
+			view-timeline-name:
+				--sticky-breadcrumb-timeline,
+				var(---pie-timeline, none);
 			view-timeline-axis: block;
+			view-timeline-inset: var(--stickyBreadcrumb-item-insetBlockStart, 0px) 0;
 		}
 
 		article {
@@ -2990,14 +2996,14 @@
 				view-timeline-name: --heading-timeline;
 				view-timeline-axis: block;
 
-				animation: SectionHeadingAnimation var(--transition-easeInOutExpo) both;
+				animation: SectionHeadingAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 				animation-timeline: view();
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
 					var(---wallet-breadcrumb-animation-range-end);
 
 				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+					animation: SectionHeadingArrowAnimation var(--stickyBreadcrumb-animationTimingFunction) forwards;
 					animation-timeline: --heading-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
@@ -3039,6 +3045,8 @@
 			);
 			--stickyBreadcrumb-animationRangeStart: var(---wallet-breadcrumb-animation-range-start);
 			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
+			/* Scroll position already supplies progression; easing only adds perceived lag. */
+			--stickyBreadcrumb-animationTimingFunction: linear;
 		}
 
 		@media (prefers-reduced-motion: no-preference) {
@@ -3240,7 +3248,7 @@
 				z-index: var(---wallet-breadcrumb-layer-group);
 
 				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+					animation: SectionHeadingArrowAnimation var(--stickyBreadcrumb-animationTimingFunction) forwards;
 					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
@@ -3258,7 +3266,7 @@
 				position-visibility: always;
 
 				h2 {
-					animation: AttributeGroupBreadcrumbHeadingAnimation var(--transition-easeInOutExpo) both;
+					animation: AttributeGroupBreadcrumbHeadingAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
@@ -3266,7 +3274,7 @@
 				}
 
 				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+					animation: SectionHeadingArrowAnimation var(--stickyBreadcrumb-animationTimingFunction) forwards;
 					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
@@ -3276,7 +3284,7 @@
 		}
 
 		.attribute-group-stack > header .section-caption {
-			animation: StickyBreadcrumbItemExitAnimation var(--transition-easeInOutExpo) both;
+			animation: StickyBreadcrumbItemExitAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 			animation-timeline: --sticky-breadcrumb-timeline;
 			animation-range:
 				var(---wallet-breadcrumb-animation-range-start)
@@ -3347,7 +3355,7 @@
 					}
 
 					animation:
-						BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
+						BreadcrumbHeadingIconSpaceAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
@@ -3356,7 +3364,7 @@
 
 				&::before {
 					animation:
-						SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
+						SectionHeadingArrowAnimation var(--stickyBreadcrumb-animationTimingFunction) forwards;
 					animation-timeline: --sticky-breadcrumb-timeline;
 					animation-range:
 						var(---wallet-breadcrumb-animation-range-start)
@@ -3436,7 +3444,7 @@
 
 			&[open] .attribute-summary-companions {
 				animation:
-					AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) forwards,
+					AttributeBreadcrumbCompanionsAnimation var(--stickyBreadcrumb-animationTimingFunction) forwards,
 					AttributeBreadcrumbCompanionsOutAnimation linear forwards;
 				animation-timeline:
 					--sticky-breadcrumb-timeline,
@@ -3534,7 +3542,7 @@
 
 				/* One animated box owns both handoff and scope exit. */
 				animation:
-					BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both,
+					BreadcrumbSliceIconAnimation var(--stickyBreadcrumb-animationTimingFunction) both,
 					StickyBreadcrumbItemExitAnimation linear both;
 				animation-timeline:
 					--sticky-breadcrumb-timeline,
@@ -3547,7 +3555,7 @@
 			}
 
 			> .breadcrumb-slice-shape-layer {
-				animation: BreadcrumbSliceShapeAnimation var(--transition-easeInOutExpo) both;
+				animation: BreadcrumbSliceShapeAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 				animation-timeline: --sticky-breadcrumb-timeline;
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
@@ -3827,14 +3835,21 @@
 				#stages > header[data-sticky-breadcrumb~='position'],
 				.attribute-group-heading-position[data-sticky-breadcrumb~='position']
 			) {
-				--stickyBreadcrumb-item-insetInlineStart: anchor(--wallet-breadcrumb-root end);
+				/*
+				 * The root occupies the layout-navigation row at this breakpoint, so
+				 * the group begins a new breadcrumb chain on the content row. Ground
+				 * that row in the shared content inset instead of centering it in the
+				 * space after an unrelated root anchor.
+				 */
+				--stickyBreadcrumb-item-insetInlineStart: calc(
+					anchor(--wallet-breadcrumb-surface start)
+					+ var(---wallet-content-inline-start)
+				);
 				--stickyBreadcrumb-item-insetInlineEnd: var(---wallet-breadcrumb-inline-end);
 				--stickyBreadcrumb-item-inlineSize: max-content;
 				--stickyBreadcrumb-item-translate: none;
-				--stickyBreadcrumb-item-justifySelf: safe center;
-				--stickyBreadcrumb-item-positionTryFallbacks:
-					--sticky-breadcrumb-next-row,
-					--sticky-breadcrumb-constrained-row;
+				--stickyBreadcrumb-item-justifySelf: start;
+				--stickyBreadcrumb-item-positionTryFallbacks: --sticky-breadcrumb-constrained-row;
 				--stickyBreadcrumb-item-nextRowInsetInlineStart: calc(
 					anchor(--wallet-breadcrumb-surface start)
 					+ var(---wallet-content-inline-start)
@@ -3842,7 +3857,7 @@
 				--stickyBreadcrumb-item-nextRowInsetInlineEnd: var(
 					---wallet-breadcrumb-inline-end
 				);
-				--stickyBreadcrumb-item-nextRowJustifySelf: safe center;
+				--stickyBreadcrumb-item-nextRowJustifySelf: start;
 				--stickyBreadcrumb-item-rowGap: var(---wallet-breadcrumb-mobile-row-gap);
 				> [data-sticky-breadcrumb~='item'] {
 					max-inline-size: var(---wallet-breadcrumb-row-max-inline-size);
