@@ -144,6 +144,26 @@ def looks_binary(s: str) -> bool:
     return decoded != s
 
 
+def _decode_raw_text(content: bytes | None) -> str | bytes | None:
+    """Decode raw (already transport-decompressed) bytes as strict UTF-8 text.
+
+    We deliberately avoid mitmproxy's `Message.get_text()`/`.text`, which falls
+    back to a permissive single-byte decode whenever it can't confidently
+    identify a text encoding for the content. That fallback never raises, so
+    genuinely binary bodies (e.g. Sentry Session Replay attachments, images)
+    get silently turned into "valid" but meaningless mojibake text, which then
+    gets persisted to the capture file and displayed verbatim during string
+    review. Returning the raw bytes instead lets callers treat non-UTF-8
+    content as opaque binary data rather than mis-decoded text.
+    """
+    if content is None:
+        return None
+    try:
+        return content.decode("utf-8")
+    except UnicodeDecodeError:
+        return content
+
+
 def _replace_lone_surrogates(s: str) -> str:
     """Replace lone surrogates with U+FFFD, matching the Web TextEncoder behavior."""
     out: list[str] = []
@@ -558,11 +578,6 @@ def _encode_response_payload(text: str | None) -> str | dict | None:
 class WalletRequest:
     @classmethod
     def decode(cls, data: dict):
-        def _decode_if_set(k):
-            if k not in data:
-                return None
-            return str(data[k])
-
         def _decode_content(k):
             if k not in data:
                 return None
@@ -570,7 +585,11 @@ class WalletRequest:
             if isinstance(val, dict) and val.get("type") == "base64":
                 b64 = val["base64"]
                 padded = b64 + "=" * ((4 - len(b64) % 4) % 4)
-                return base64.b64decode(padded).decode("utf-8")
+                raw = base64.b64decode(padded)
+                try:
+                    return raw.decode("utf-8")
+                except UnicodeDecodeError:
+                    return raw
             return str(val)
 
         def _decode_str_multidict(k):
@@ -603,7 +622,14 @@ class WalletRequest:
             review=data.get("review"),
             response_status=data.get("responseStatus"),
             response_headers=_decode_str_multidict("responseOddHeaders") or None,
-            response_payload=_decode_if_set("responsePayload"),
+            # Pass the already-encoded value through untouched (rather than
+            # decoding it back into text and re-encoding on save). Round-
+            # tripping it through `_encode_response_payload` was corrupting
+            # repeatedly-fetched assets by re-abbreviating an already-
+            # abbreviated payload every time the file was reloaded and saved,
+            # nesting deeper each time. `set_response_data` below is the only
+            # place a *fresh* payload should come from.
+            response_payload_encoded=data.get("responsePayload"),
         )
 
     @classmethod
@@ -615,10 +641,11 @@ class WalletRequest:
         # attributing a request to an entity. `pretty_*` yields the real hostname.
         url = urllib.parse.urlparse(req.pretty_url)
         json_rpc_method: tuple[str, ...] = ()
-        text = req.get_text()
-        if text is not None and text == "":
-            text = None
-        if text is not None:
+        content = _decode_raw_text(req.content)
+        if isinstance(content, str) and content == "":
+            content = None
+        if isinstance(content, str):
+            text = content
             try:
                 payload = json.loads(text)
                 if not isinstance(payload, list):
@@ -641,7 +668,7 @@ class WalletRequest:
             path=url.path,
             query=_multidict_to_dict_of_tuples(req.query),
             json_rpc_method=json_rpc_method,
-            content=text,
+            content=content,
             cookies=_multidict_to_dict_of_tuples(req.cookies),
             referer_domain=referer_domain,
             odd_headers=_multidict_to_dict_of_tuples(
@@ -662,7 +689,7 @@ class WalletRequest:
         path: str,
         query: dict[str, tuple[str, ...]],
         json_rpc_method: tuple[str, ...],
-        content: str | None,
+        content: str | bytes | None,
         cookies: dict[str, tuple[str, ...]],
         referer_domain: str | None,
         odd_headers: dict[str, tuple[str, ...]],
@@ -671,7 +698,7 @@ class WalletRequest:
         review: object | None,
         response_status: int | None = None,
         response_headers: dict[str, tuple[str, ...]] | None = None,
-        response_payload: str | None = None,
+        response_payload_encoded: str | dict | None = None,
     ):
         self._domain = domain
         self._path = path
@@ -688,7 +715,11 @@ class WalletRequest:
         self._response_headers: dict[str, tuple[str, ...]] = (
             response_headers if response_headers is not None else {}
         )
-        self._response_payload: str | None = response_payload
+        # The already-encoded payload as loaded from a previous capture file,
+        # passed through untouched unless a fresh response arrives this
+        # session (see `set_response_data` / `encode`).
+        self._response_payload_encoded: str | dict | None = response_payload_encoded
+        self._response_payload_fresh: str | None = None
 
     @classmethod
     def set_response_data(
@@ -701,8 +732,11 @@ class WalletRequest:
         wallet_request._response_headers = _multidict_to_dict_of_tuples(
             resp.headers, filter_fn=lambda k: not is_benign_response_header(k)
         )
-        text = resp.get_text()
-        wallet_request._response_payload = text
+        content = _decode_raw_text(resp.content)
+        # Binary responses (images, etc.) aren't useful as `responsePayload`
+        # (it's only used for purpose/format classification of text bodies),
+        # and mis-decoding them as text is exactly the bug we're avoiding.
+        wallet_request._response_payload_fresh = content if isinstance(content, str) else None
 
     def __str__(self):
         def _maybe_multidict(name: str, md: dict[str, tuple[str, ...]]) -> str:
@@ -723,15 +757,18 @@ class WalletRequest:
         referer_domain = (
             "" if self._referer_domain is None else f" referer={self._referer_domain}"
         )
-        content = "" if self._content is None else f" content={self._content}"
+        content = "" if self._content is None else f" content={self._content!r}"
         response_status = (
             "" if self._response_status is None else f" status={self._response_status}"
         )
-        response_payload = (
-            ""
-            if self._response_payload is None or len(self._response_payload) == 0
-            else f" resp=[{len(self._response_payload)!s} bytes]"
-        )
+        payload_len = 0
+        if self._response_payload_fresh is not None:
+            payload_len = len(self._response_payload_fresh)
+        elif isinstance(self._response_payload_encoded, str):
+            payload_len = len(self._response_payload_encoded)
+        elif isinstance(self._response_payload_encoded, dict):
+            payload_len = self._response_payload_encoded.get("length", 0)
+        response_payload = "" if payload_len == 0 else f" resp=[{payload_len!s} bytes]"
         return (
             f"{self._domain}: {self._path}"
             f"{_maybe_multidict('query', self._query)}"
@@ -771,7 +808,10 @@ class WalletRequest:
             data["jsonRpcMethod"] = list(self._json_rpc_method)
 
         if self._content is not None:
-            if self._content.isascii():
+            if isinstance(self._content, bytes):
+                b64 = base64.b64encode(self._content).decode("ascii").rstrip("=")
+                data["content"] = {"type": "base64", "base64": b64}
+            elif self._content.isascii():
                 data["content"] = self._content
             else:
                 b64 = (
@@ -794,7 +834,15 @@ class WalletRequest:
 
         _encode_multidict("responseOddHeaders", self._response_headers)
 
-        payload_data = _encode_response_payload(self._response_payload)
+        # Only re-derive the encoded payload when a fresh response was
+        # actually captured this session; otherwise pass through whatever was
+        # already stored so repeated save/reload cycles can't nest an
+        # abbreviated payload inside itself.
+        payload_data = (
+            _encode_response_payload(self._response_payload_fresh)
+            if self._response_payload_fresh is not None
+            else self._response_payload_encoded
+        )
         if payload_data is not None:
             data["responsePayload"] = payload_data
 
