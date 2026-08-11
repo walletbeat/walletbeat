@@ -22,7 +22,6 @@ import { notSupported, notSupportedWithRef, supported } from '@/schema/features/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { slowMist } from '../entities/slowmist'
 
@@ -31,9 +30,6 @@ export const onekeyWallet: HardwareWallet = {
 		id: 'onekey',
 		displayName: 'OneKey Pro',
 		tableName: 'OneKey Pro',
-		blurb: paragraph(`
-			OneKey Pro is a hardware wallet with excellent haptic feedback, air gap mode, and EAL6+ secure element.
-		`),
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

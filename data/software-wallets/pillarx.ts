@@ -7,7 +7,6 @@ import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { iamkio } from '../contributors/iamkio'
 import { kernal7702Contract } from '../wallet-contracts/kernal-7702'
@@ -17,9 +16,6 @@ export const pillarx: SoftwareWallet = {
 		id: 'pillarx',
 		displayName: 'PillarX',
 		tableName: 'PillarX',
-		blurb: paragraph(
-			'PillarX is a web3 wallet that allows you to manage your digital assets and interact with the blockchain.',
-		),
 		contributors: [iamkio],
 		iconExtension: 'svg',
 		lastUpdated: '2025-12-16',

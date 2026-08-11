@@ -23,15 +23,10 @@ import { notSupported, notSupportedWithRef, supported } from '@/schema/features/
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
 export const ledgerWalletMetadata: WalletMetadata = {
 	id: 'ledger',
 	displayName: 'Ledger Wallet',
 	tableName: 'Ledger',
-	blurb: paragraph(`
-			Ledger Wallet is a self-custodial wallet built by Ledger. It
-			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
-		`),
 	contributors: [nconsigny, patrickalphac, mattmatt],
 	hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 	hardwareWalletModels: [

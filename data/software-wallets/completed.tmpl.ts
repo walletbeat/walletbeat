@@ -111,7 +111,6 @@ import {
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
 import { type MustRef, type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
@@ -206,11 +205,6 @@ export const completedTemplate: SoftwareWallet = {
 		id: 'completed',
 		displayName: 'Completed wallet template',
 		tableName: 'Completed',
-		blurb: paragraph(`
-			This is a fictitious wallet with all of its rated fields set to PASS values.
-			It is meant to serve as a reference for contributors to understand what
-			best-in-class implementation looks like for each walletbeat attribute.
-		`),
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2026-02-27',

@@ -69,7 +69,6 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
-import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
@@ -81,9 +80,6 @@ export const rainbow: SoftwareWallet = {
 		id: 'rainbow',
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
-		blurb: paragraph(`
-			Rainbow Extension. Built for speed. Built for power. Built for You.
-		`),
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-02',

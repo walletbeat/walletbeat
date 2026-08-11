@@ -27,7 +27,7 @@ Before doing anything else:
    - Hardware: `data/hardware-wallets/[wallet-name].ts`
    - Embedded: `data/embedded-wallets/[wallet-name].ts`
    - If the file **already exists**, let the contributor know and suggest using `/wallet-update` instead to populate feature data.
-4. Ask the contributor for their preferred display name or nickname, then immediately check whether a file for them already exists in `data/contributors/`. Also ask for the wallet's one-sentence blurb — this is the only piece of content only they can provide. If they need a new contributor file, also ask for their affiliation (company / role, if any) and a URL to their profile (GitHub, Twitter, etc.).
+4. Ask the contributor for their preferred display name or nickname, then immediately check whether a file for them already exists in `data/contributors/`. If they need a new contributor file, also ask for their affiliation (company / role, if any) and a URL to their profile (GitHub, Twitter, etc.).
 5. Read the following files in parallel:
    - The matching template for the wallet type:
      - Software: `data/software-wallets/unrated.tmpl.ts`
@@ -136,7 +136,6 @@ Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallet
 - `id`: Camel case wallet name (e.g., `'rainbow'`) — must match the icon filename
 - `displayName`: The wallet's official display name
 - `tableName`: Short name for table display (often same as `displayName`)
-- `blurb`: Use the blurb collected in step 4, wrapped in `paragraph(\`...\`)`
 - Rename the exported constant from `unratedTemplate` / `unratedHardwareTemplate` / `unratedEmbeddedTemplate` to the camel case wallet name (e.g., `rainbow`, `ledgerNano`, `privySdk`).
 - `contributors`: `[yourContributorConstant]`
 - `iconExtension`: `'svg'` (or `'png'` if no SVG available)
