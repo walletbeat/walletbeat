@@ -10,22 +10,13 @@ import { toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
 import { gitCommitRefPinRegExp } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
-import {
-	type RatedWallet,
-	type ResolvedWallet,
-	VariantSpecificity,
-	type WalletMetadata,
-} from '@/schema/wallet'
+import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
-import {
-	collapseToSingleLine,
-	markdownBlockquote,
-	normalizeMarkdownBlankLines,
-} from '@/utils/markdown-utils'
+import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import {
 	allCriteriaInStage,
@@ -33,18 +24,6 @@ import {
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
 import { getWalletUrl } from '@/utils/urls'
-
-/**
- * Return the wallet blurb as a single collapsed line, suitable for use
- * as a short description in the /llms.txt index.
- */
-export function walletBlurbText(wallet: { metadata: WalletMetadata }): string {
-	return collapseToSingleLine(
-		renderTypographicContentToString(wallet.metadata.blurb, {
-			WALLET_NAME: wallet.metadata.displayName,
-		}),
-	)
-}
 
 /**
  * Generate a clean markdown page for a wallet, following the llms.txt convention
@@ -79,10 +58,6 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 
 	const headerLines: string[] = [
 		`# ${walletName} — Walletbeat Review`,
-		'',
-		...markdownBlockquote(
-			renderTypographicContentToString(metadata.blurb, { WALLET_NAME: walletName }),
-		),
 		'',
 		`Last updated: ${metadata.lastUpdated}`,
 		`Walletbeat page: ${siteUrl}${getWalletUrl(wallet)}`,

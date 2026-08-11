@@ -18,7 +18,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 
@@ -27,9 +26,6 @@ export const okx: SoftwareWallet = {
 		id: 'okx',
 		displayName: 'OKX Wallet',
 		tableName: 'OKX',
-		blurb: paragraph(`
-OKX Wallet is a universal crypto wallet available on multiple platforms, including app, web, and extension
-		`),
 		contributors: [mattmatt],
 		iconExtension: 'png',
 		lastUpdated: '2026-01-28',

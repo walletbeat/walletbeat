@@ -10,18 +10,12 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const gemwallet: SoftwareWallet = {
 	metadata: {
 		id: 'gemwallet',
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
-		blurb: paragraph(`
-			Gem Wallet is a fully open source multichain mobile wallet with transparent
-			revenue reporting. Built for iOS and Android with a focus on security and
-			user sovereignty.
-		`),
 		contributors: [h3rman],
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-14',

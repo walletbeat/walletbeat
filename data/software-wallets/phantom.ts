@@ -15,17 +15,11 @@ import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 export const phantom: SoftwareWallet = {
 	metadata: {
 		id: 'phantom',
 		displayName: 'Phantom',
 		tableName: 'Phantom',
-		blurb: paragraph(`
-			Phantom is a user-friendly Ethereum and Solana wallet. It focuses
-			on ease of use, easy swapping of tokens and NFTs, and integration
-			with popular DeFi and NFT exchange protocols within the wallet.
-		`),
 		contributors: [nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',

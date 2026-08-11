@@ -14,7 +14,6 @@ import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
-import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 import { RatedWalletExportValidator } from './utils/assert-valid-json'
 
@@ -45,7 +44,7 @@ describe('ratedWalletJsonExport', () => {
 
 				expect(payload.walletId).toBe(wallet.metadata.id)
 				expect(payload.displayName).toBe(wallet.metadata.displayName)
-				expect(payload.description).toBe(walletBlurbText(wallet))
+				expect(payload.description).toBe(`${wallet.metadata.displayName} Ethereum wallet`)
 				expect(payload.lastUpdated).toBe(wallet.metadata.lastUpdated)
 				expect(payload.types.sort()).toEqual(setItems(wallet.types).sort())
 				expect(payload.stage).toBe(stageToExportString(stage))

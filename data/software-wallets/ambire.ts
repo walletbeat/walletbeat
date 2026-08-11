@@ -73,7 +73,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { ambireEntity } from '../entities/ambire'
@@ -209,10 +208,6 @@ export const ambire: SoftwareWallet = {
 		id: 'ambire',
 		displayName: 'Ambire',
 		tableName: 'Ambire',
-		blurb: paragraph(`
-			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
-			improving security and user experience.
-			`),
 		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-07-22',

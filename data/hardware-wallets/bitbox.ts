@@ -32,16 +32,12 @@ import { notSupported, notSupportedWithRef, supported } from '@/schema/features/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const bitboxWallet: HardwareWallet = {
 	metadata: {
 		id: 'bitbox',
 		displayName: 'BitBox',
 		tableName: 'BitBox',
-		blurb: paragraph(`
-			BitBox02 is a hardware wallet with fully open-source firmware and a unique secure chip architecture that doesn't require trusting closed-source code.
-		`),
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

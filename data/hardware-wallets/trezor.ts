@@ -23,17 +23,12 @@ import {
 import { notSupported, notSupportedWithRef, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const trezorWallet: HardwareWallet = {
 	metadata: {
 		id: 'trezor',
 		displayName: 'Trezor Wallet',
 		tableName: 'Trezor',
-		blurb: paragraph(`
-			Trezor Wallet is a self-custodial hardware wallet built by SatoshiLabs. It
-			provides secure storage for cryptocurrencies with an easy-to-use interface.
-		`),
 		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

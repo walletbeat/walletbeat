@@ -26,20 +26,12 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const keycardShell: HardwareWallet = {
 	metadata: {
 		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
-		blurb: paragraph(`
-			Keycard Shell is a modular, fully open-source, air-gapped hardware wallet that signs
-			via QR codes (ERC-4527). It has a built-in keypad, display, and camera, optional USB
-			(can be turned off), and uses removable Keycards for secure key storage and backups.
-			Keycard is a BIP-32 HD wallet running on JavaCard with EAL6+ secure element. Supports
-			BIP-39 and SLIP-39 seed phrases.
-		`),
 		contributors: [phift, mmlado],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

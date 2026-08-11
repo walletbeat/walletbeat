@@ -49,7 +49,7 @@
 		},
 		"description": {
 			"type": "string",
-			"description": "Short wallet description (rendered blurb)."
+			"description": "Short wallet description for JSON-LD (e.g. \"MetaMask Ethereum wallet\")."
 		},
 		"lastUpdated": {
 			"type": "string",

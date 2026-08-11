@@ -10,18 +10,12 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const unratedHardwareTemplate: HardwareWallet = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated hardware wallet template',
 		tableName: 'Unrated',
-		blurb: paragraph(`
-			This is a fictitious hardware wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
-		`),
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',
