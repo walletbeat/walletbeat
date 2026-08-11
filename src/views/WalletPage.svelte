@@ -60,6 +60,7 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
+	import { getWalletExternalLinks } from '@/utils/wallet-external-links'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
@@ -86,7 +87,6 @@
 
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
-	import { isLabeledUrl } from '@/schema/url'
 	import { IncidentStatus } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
 	import { getNewsForWallet } from '@/data/news'
@@ -407,9 +407,10 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
+	const externalLinks = $derived(getWalletExternalLinks(wallet))
+
 
 	// Components
-	import { Github, Globe } from 'lucide-static'
 	import ListCollapseIcon from 'lucide-static/icons/list-collapse.svg?raw'
 	import Rows3Icon from 'lucide-static/icons/rows-3.svg?raw'
 	import Select from '@/components/Select.svelte'
@@ -604,6 +605,27 @@
 					data-row-item="wrap-end"
 					data-row="gap-2"
 				>
+					{#if externalLinks.length > 0}
+						<details class="wallet-links">
+							<summary data-badge="medium">
+								Links
+							</summary>
+							<ul>
+								{#each externalLinks as link (link.url)}
+									<li>
+										<a
+											href={link.url}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{link.label}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</details>
+					{/if}
+
 					{#if showStage}
 						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
@@ -633,30 +655,6 @@
 							strings={{ WALLET_NAME: wallet.metadata.displayName }}
 						/>
 					</p>
-
-					<nav data-row="gap-2 start wrap">
-						<a
-							href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-							data-badge="medium"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{@html Globe}
-							Website
-						</a>
-
-						{#if wallet.metadata.urls?.repository}
-							<a
-								href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
-								data-badge="medium"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{@html Github}
-								Source Code
-							</a>
-						{/if}
-					</nav>
 				</div>
 
 				<div
@@ -3554,6 +3552,65 @@
 
 	.wallet-overview {
 		font-size: 0.9rem;
+	}
+
+	.wallet-links {
+		position: relative;
+		width: fit-content;
+
+		&::details-content {
+			display: contents;
+			height: auto;
+			opacity: 1;
+			filter: none;
+			transform: none;
+			content-visibility: visible;
+		}
+
+		&:not([open])::details-content {
+			content-visibility: hidden;
+		}
+
+		&:not([open]) > ul {
+			display: none;
+		}
+
+		> summary {
+			cursor: pointer;
+			user-select: none;
+		}
+
+		> ul {
+			position: absolute;
+			z-index: 20;
+			inset-block-start: calc(100% + 0.35rem);
+			inset-inline-end: 0;
+			min-inline-size: max(14rem, 100%);
+			max-inline-size: min(22rem, 80vw);
+			max-block-size: min(24rem, 60vh);
+			overflow: auto;
+			margin: 0;
+			padding: 0.35rem;
+			list-style: none;
+			background-color: var(--background-primary);
+			border: 1px solid var(--border-color);
+			border-radius: 0.5rem;
+			box-shadow: 0 0.5rem 1.25rem light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.45));
+		}
+
+		a {
+			display: block;
+			padding: 0.55rem 0.7rem;
+			border-radius: 0.35rem;
+			color: var(--text-primary);
+			font-weight: 500;
+			text-decoration: none;
+
+			&:hover {
+				background-color: var(--background-secondary);
+				text-decoration: none;
+			}
+		}
 	}
 
 	.platforms-label {
