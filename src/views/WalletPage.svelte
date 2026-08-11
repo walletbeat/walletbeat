@@ -1651,6 +1651,7 @@
 			/ minmax(0, 1fr) auto
 		;
 		@media (max-width: 1024px) {
+			---wallet-breadcrumb-animation-range-end: exit-crossing 25%;
 			---wallet-mobile-pie-size-rem: 8;
 			---wallet-mobile-pie-size: calc(
 				var(---wallet-mobile-pie-size-rem)
@@ -1678,6 +1679,28 @@
 			@media (max-width: 480px) {
 				/* ScoreBadge's longest compact state fits this intrinsic lane. */
 				---wallet-breadcrumb-companion-slot-inline-size: 3.25rem;
+				/*
+				 * The root occupies the layout-navigation row. The group consumes one
+				 * breadcrumb line and the balanced attribute title at most two; place
+				 * native sticky detail summaries immediately after that rendered stack
+				 * instead of reserving another hypothetical full row plus content inset.
+				 */
+				---wallet-breadcrumb-attribute-line-block-size: calc(
+					var(---wallet-breadcrumb-attribute-font-size) * 1.4
+				);
+				---wallet-name-mobile-block-start: calc(
+					(
+						var(--navigation-mobile-blockSize)
+						- var(---wallet-name-sticky-icon-size)
+					) / 2
+				);
+				---wallet-sticky-stack-block-end: calc(
+					var(---wallet-name-mobile-block-start)
+					+ var(---wallet-name-sticky-icon-size)
+					+ var(---wallet-breadcrumb-block-size)
+					+ 2 * var(---wallet-breadcrumb-attribute-line-block-size)
+					+ 3 * var(---wallet-breadcrumb-mobile-row-gap)
+				);
 			}
 
 			&[data-sticky-container] {
@@ -1814,13 +1837,7 @@
 				display: flex;
 				background-color: transparent;
 				box-shadow: none;
-				clip-path: inset(
-					calc(-1 * var(---wallet-page-block-offset)) 0
-					calc(100% - var(---wallet-mobile-pie-size))
-					0
-				);
-				transition-property: clip-path, display, overlay;
-				transition-behavior: allow-discrete;
+				pointer-events: none;
 
 				> header,
 				> nav:not(.pie-navigation) {
@@ -1843,24 +1860,19 @@
 				}
 
 				&:not(:popover-open) > header,
-				&:not(:popover-open) > nav:not(.pie-navigation),
-				&:not(:popover-open)::after {
+				&:not(:popover-open) > nav:not(.pie-navigation) {
 					display: none;
 					interactivity: inert;
 					pointer-events: none;
 				}
 
 				&:popover-open {
-					clip-path: inset(0);
 					background-color: var(---wallet-breadcrumb-surface-background);
+					pointer-events: auto;
+				}
 
-					@starting-style {
-						clip-path: inset(
-							calc(-1 * var(---wallet-page-block-offset)) 0
-							calc(100% - var(---wallet-mobile-pie-size))
-							0
-						);
-					}
+				> .pie-navigation {
+					pointer-events: none;
 				}
 			}
 		}
@@ -1899,11 +1911,12 @@
 		 * `--stickyBreadcrumb-trackBlockEnd` still includes the surface fade for
 		 * breadcrumb exit ranges; hash targets and accordion stickies omit it.
 		 */
-		--scrollContainer-scrollPaddingBlockStart: calc(
+		---wallet-sticky-stack-block-end: calc(
 			var(---wallet-page-block-offset)
 			+ var(---wallet-sticky-content-inset)
 			+ var(---wallet-breadcrumb-block-size)
 		);
+		--scrollContainer-scrollPaddingBlockStart: var(---wallet-sticky-stack-block-end);
 		---anchor-button-size: 2.5rem;
 		---anchor-control-inset: 0.75rem;
 		---anchor-control-gap: 0.75rem;
@@ -1947,12 +1960,13 @@
 		@media (max-width: 1024px) {
 			---wallet-breadcrumb-root-font-size: 1.25rem;
 			/*
-			 * The root crumb shares the layout navigation row. Count only the
-			 * group/attribute rows below it when deriving the sticky surface and
-			 * scroll padding; narrow attribute titles may consume one extra row.
+			 * The root crumb shares the layout navigation row. Count group and
+			 * attribute rows only for the complete sticky surface; narrow attribute
+			 * titles may consume one extra row. A target does not reserve its own row
+			 * in scroll padding before it becomes sticky.
 			 */
 			---wallet-breadcrumb-row-count: 2;
-			--scrollContainer-scrollPaddingBlockStart: calc(
+			---wallet-sticky-stack-block-end: calc(
 				var(---wallet-page-block-offset)
 				+ var(---wallet-sticky-content-inset)
 				+ var(---wallet-breadcrumb-row-count)
@@ -1960,6 +1974,8 @@
 				+ (var(---wallet-breadcrumb-row-count) - 1)
 					* var(---wallet-breadcrumb-mobile-row-gap)
 			);
+			/* The target supplies the next row; do not reserve it before it sticks. */
+			--scrollContainer-scrollPaddingBlockStart: var(---wallet-page-block-offset);
 
 			@media (max-width: 480px) {
 				---wallet-breadcrumb-row-count: 3;
@@ -3037,7 +3053,7 @@
 
 			.attribute-group-stack {
 				/* Fixed/anchored crumbs replace the baseline sticky group row. */
-				---wallet-group-sticky-block-end-override: var(--scrollContainer-scrollPaddingBlockStart);
+				---wallet-group-sticky-block-end-override: var(---wallet-sticky-stack-block-end);
 			}
 
 			#stages > header[data-sticky] {
@@ -3116,7 +3132,6 @@
 				inset-block-start: 0;
 				inset-inline-start: calc(
 					-1 * var(--stickyBreadcrumb-gap)
-					- 0.25em
 				);
 				display: flex;
 				align-items: center;
@@ -3309,7 +3324,6 @@
 						anchor(--wallet-breadcrumb-surface start)
 						+ var(---wallet-content-inline-start)
 					);
-					margin-inline-start: 0;
 				}
 			}
 
@@ -3626,6 +3640,9 @@
 			}
 			to {
 				position: fixed;
+				inline-size: var(---wallet-breadcrumb-heading-icon-size);
+				block-size: var(---wallet-breadcrumb-heading-icon-size);
+				font-size: var(---wallet-breadcrumb-heading-icon-size);
 				filter: none;
 			}
 		}
@@ -3730,7 +3747,7 @@
 			}
 
 			:global(#layout:has(#wallet-page)) {
-				--scrollContainer-scrollPaddingBlockStart: calc(
+				---wallet-sticky-stack-block-end: calc(
 					var(---wallet-page-block-offset)
 					+ var(---wallet-sticky-content-inset)
 					+ 2 * var(---wallet-breadcrumb-block-size)
@@ -3784,11 +3801,8 @@
 
 			article > header#top .wallet-name::after {
 				block-size: calc(
-					2 * var(---wallet-sticky-content-inset)
-					+ var(---wallet-breadcrumb-row-count)
-						* var(---wallet-breadcrumb-block-size)
-					+ (var(---wallet-breadcrumb-row-count) - 1)
-						* var(---wallet-breadcrumb-mobile-row-gap)
+					var(---wallet-sticky-stack-block-end)
+					- var(---wallet-page-block-offset)
 					+ 2 * var(---wallet-breadcrumb-surface-fade)
 				);
 			}
@@ -3830,8 +3844,6 @@
 				);
 				--stickyBreadcrumb-item-nextRowJustifySelf: safe center;
 				--stickyBreadcrumb-item-rowGap: var(---wallet-breadcrumb-mobile-row-gap);
-				--stickyBreadcrumb-gap: var(---wallet-breadcrumb-heading-icon-gap);
-
 				> [data-sticky-breadcrumb~='item'] {
 					max-inline-size: var(---wallet-breadcrumb-row-max-inline-size);
 					inset-block-start: max(
@@ -3860,6 +3872,22 @@
 				---wallet-breadcrumb-icon-inline-start: anchor(
 					--wallet-breadcrumb-group start
 				);
+			}
+
+			.attribute-icon {
+				---wallet-breadcrumb-icon-block-start: calc(
+					var(---wallet-breadcrumb-companion-block-start)
+					- var(---wallet-breadcrumb-heading-icon-size) / 2
+				);
+				---wallet-breadcrumb-icon-inline-start: calc(
+					var(---wallet-content-inline-start)
+					+ var(---wallet-breadcrumb-gap)
+				);
+
+				&::before {
+					/* Every geometry anchor is explicit; avoid retained default-anchor scroll offset. */
+					position-anchor: auto !important;
+				}
 			}
 
 		}
@@ -4169,11 +4197,11 @@
 
 	/*
 	 * Browsers without the complete anchor/scroll-state breadcrumb stack keep
-	 * real sticky headings. Use the same compact endpoint as the animated path:
-	 * the existing icon remains, its slice and the subtitle recede, and H3 owns
-	 * the next sticky layer. The expanded clip only cuts content crossing the
-	 * sticky top edge; it deliberately preserves vertical sticky translation and
-	 * paint extending through the inline and block-end edges.
+	 * real sticky attribute headings. Use the same compact endpoint as the
+	 * animated path: the existing icon remains, its slice and the subtitle
+	 * recede, and H3 owns the next sticky layer. Stage Progress remains in its
+	 * native flow presentation because these engines cannot detect the exact
+	 * moment a sticky item becomes stuck.
 	 */
 	@supports not (
 		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
@@ -4182,25 +4210,44 @@
 		(inset-inline-start: anchor(--wallet-name end))
 	) {
 		.container {
+			---wallet-fallback-sticky-padding-block: 0.5rem;
 			---wallet-fallback-group-sticky-block-size: max(
-				calc(var(---wallet-breadcrumb-group-font-size) * 1.3 + 1rem),
-				calc(var(---wallet-breadcrumb-heading-icon-size) + 1rem)
+				calc(
+					var(---wallet-breadcrumb-group-font-size)
+						* var(---wallet-line-height)
+						+ 2 * var(---wallet-fallback-sticky-padding-block)
+				),
+				calc(
+					var(---wallet-breadcrumb-heading-icon-size)
+						+ 2 * var(---wallet-fallback-sticky-padding-block)
+				)
 			);
 			---wallet-fallback-attribute-sticky-block-size: max(
-				calc(var(---wallet-breadcrumb-attribute-font-size) * 1.3 + 1rem),
-				calc(var(---wallet-breadcrumb-heading-icon-size) + 1rem)
+				calc(
+					var(---wallet-breadcrumb-attribute-font-size)
+						* var(---wallet-line-height)
+						+ 2 * var(---wallet-fallback-sticky-padding-block)
+				),
+				calc(
+					var(---wallet-breadcrumb-heading-icon-size)
+						+ 2 * var(---wallet-fallback-sticky-padding-block)
+				)
 			);
 		}
 
-		#stages > header[data-sticky],
+		:global(#layout:has(#wallet-page)) {
+			/* Native sticky rows are the targets; prospective rows add no inset. */
+			--scrollContainer-scrollPaddingBlockStart: var(---wallet-page-block-offset);
+		}
+
 		.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-sticky] {
 			--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
 
+			z-index: calc(var(---wallet-breadcrumb-layer-detail) + 2);
 			box-sizing: border-box;
-			block-size: var(---wallet-fallback-group-sticky-block-size);
-			padding-block: 0.5rem;
+			min-block-size: var(---wallet-fallback-group-sticky-block-size);
+			padding-block: var(---wallet-fallback-sticky-padding-block);
 			justify-content: center;
-			clip-path: inset(0 -100vmax -100vmax);
 		}
 
 		.attribute-group > .attribute-group-stack[data-scroll-item] {
@@ -4219,7 +4266,6 @@
 			}
 		}
 
-		#stages > header [data-sticky-breadcrumb~='item'],
 		.attribute-group-heading-position [data-sticky-breadcrumb~='item'],
 		.attribute-heading-position [data-sticky-breadcrumb~='item'] {
 			position: relative;
@@ -4247,18 +4293,9 @@
 			}
 		}
 
-		#stages > header [data-sticky-breadcrumb~='item'] {
-			gap: 0.5em;
-
-			&::before {
-				position: static;
-				inset: auto;
-				flex: none;
-				translate: none;
-			}
-		}
-
 		:is(.attribute-group-icon, .attribute-icon) {
+			--icon-filter: none;
+
 			inline-size: var(---wallet-breadcrumb-heading-icon-size);
 			block-size: var(---wallet-breadcrumb-heading-icon-size);
 
@@ -4287,24 +4324,24 @@
 			opacity: 0;
 		}
 
-		.attribute-group-heading-position h2 {
-			font-size: var(---wallet-breadcrumb-group-font-size);
+		.attribute > details > summary .attribute-heading {
+			/* A zero-sized hidden caption must not leave its row gap behind. */
+			gap: 0;
 		}
 
-		#stages > header h2 {
+		.attribute-group-heading-position h2 {
 			font-size: var(---wallet-breadcrumb-group-font-size);
 		}
 
 		.attribute > details > summary {
 			--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
 
-			z-index: var(---wallet-breadcrumb-layer-attribute);
+			z-index: calc(var(---wallet-breadcrumb-layer-detail) + 3);
 			position: sticky;
 			inset-block-start: var(---wallet-group-sticky-block-end);
 			box-sizing: border-box;
 			min-block-size: var(---wallet-fallback-attribute-sticky-block-size);
-			padding-block: 0.5rem;
-			clip-path: inset(0 -100vmax -100vmax);
+			padding-block: var(---wallet-fallback-sticky-padding-block);
 			background-color: var(--sticky-backgroundColor);
 			backdrop-filter: blur(20px);
 
