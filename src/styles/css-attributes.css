@@ -1273,7 +1273,6 @@ ol {
 		inline-size: max-content;
 		min-inline-size: 0;
 		max-inline-size: none;
-		margin-inline-start: 0;
 		justify-self: var(--stickyBreadcrumb-item-nextRowJustifySelf, start);
 	}
 
@@ -1293,7 +1292,6 @@ ol {
 		inline-size: auto;
 		min-inline-size: 0;
 		max-inline-size: none;
-		margin-inline-start: 0;
 		justify-self: var(--stickyBreadcrumb-item-nextRowJustifySelf, start);
 	}
 
@@ -1301,17 +1299,12 @@ ol {
 		---stickyBreadcrumb-exitAnimationRangeStart: exit-crossing
 			calc(
 				100%
-				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-				- var(
-					--stickyBreadcrumb-exitAnimationDistance,
-					var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-				)
+					- var(
+						--stickyBreadcrumb-exitAnimationDistance,
+						var(--stickyBreadcrumb-trackBlockEnd, 1lh)
+					)
 			);
-		---stickyBreadcrumb-exitAnimationRangeEnd: exit-crossing
-			calc(
-				100%
-				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-			);
+		---stickyBreadcrumb-exitAnimationRangeEnd: exit-crossing 100%;
 
 		anchor-scope:
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
@@ -1326,7 +1319,8 @@ ol {
 			--sticky-breadcrumb-scope-timeline;
 		view-timeline-name: --sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
-		view-timeline-inset: 0;
+		/* The scope exits the sticky inset viewport, not the global viewport. */
+		view-timeline-inset: var(--stickyBreadcrumb-trackBlockEnd, 0px) 0;
 
 		&::before {
 			content: '';
