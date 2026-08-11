@@ -442,7 +442,7 @@ export const zerion: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'This active default-branch ruleset blocks deletion and non-fast-forward pushes.',
+								'The default-branch ruleset blocks deletion and non-fast-forward pushes.',
 							label: 'main protection',
 							url: 'https://github.com/zeriontech/zerion-wallet-extension/rules/12153885',
 						},
@@ -453,7 +453,7 @@ export const zerion: SoftwareWallet = {
 							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets/12153885',
 						},
 						{
-							explanation: 'This is the only ruleset on the repository, so none targets tags.',
+							explanation: 'The repository has one ruleset and it targets branches, not tags.',
 							label: 'Repository ruleset list',
 							url: 'https://api.github.com/repos/zeriontech/zerion-wallet-extension/rulesets',
 						},
