@@ -20,7 +20,7 @@ export const rudderstack: CorporateEntity & OffchainDataProvider = {
 	icon: 'NO_ICON',
 	jurisdiction: 'San Francisco, California, United States',
 	linkedin: 'https://linkedin.com/company/rudderstack',
-	privacyPolicy: 'https://www.rudderstack.com/legal/privacy-policy/',
+	privacyPolicy: 'https://www.rudderstack.com/privacy-policy/',
 	repoUrl: 'https://github.com/rudderlabs',
 	twitter: 'https://x.com/rudderstack',
 	url: 'https://www.rudderstack.com/',
