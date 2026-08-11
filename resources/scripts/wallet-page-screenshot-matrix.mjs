@@ -3,6 +3,8 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+// cspell:ignore domcontentloaded
+
 const playwrightCorePath =
 	process.env.PLAYWRIGHT_CORE_PATH ??
 	path.join(
@@ -17,6 +19,7 @@ const widths = process.env.WALLETBEAT_MATRIX_WIDTHS?.split(',').map(Number) ?? [
 	390, 864, 865, 1024, 1025, 1280, 1281, 1440,
 ]
 const height = Number(process.env.WALLETBEAT_MATRIX_HEIGHT ?? 900)
+const settleMs = Number(process.env.WALLETBEAT_MATRIX_SETTLE_MS ?? 3_000)
 const states = [
 	{ id: 'top', target: '#top' },
 	{ id: 'group', target: '#security' },
@@ -47,8 +50,19 @@ for (const engineName of engineNames) {
 			reducedMotion: 'no-preference',
 		})
 
-		await page.goto(baseUrl, { waitUntil: 'networkidle', timeout: 120_000 })
-		await page.waitForSelector('#top', { state: 'attached', timeout: 60_000 })
+		await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 120_000 })
+		await page.waitForFunction(() => document.querySelector('#top') !== null, undefined, {
+			timeout: 60_000,
+		})
+		await page.evaluate(() => document.fonts.ready)
+		await page.waitForFunction(
+			() =>
+				[...document.querySelectorAll('astro-island')]
+					.filter(island => island.getAttribute('component-url')?.includes('NavigationItems'))
+					.every(island => !island.hasAttribute('ssr')),
+			undefined,
+			{ timeout: 60_000 },
+		)
 
 		for (const state of states) {
 			await page.evaluate(async ({ target, offset = 0 }) => {
@@ -76,7 +90,40 @@ for (const engineName of engineNames) {
 				await new Promise(requestAnimationFrame)
 				scrollContainer.scrollTop += offset
 			}, state)
-			await page.waitForTimeout(900)
+			await page.evaluate(async target => {
+				const scrollContainer = document.querySelector('#layout')
+				const targetElement = target ? document.querySelector(target) : null
+				let previous
+				let stableFrameCount = 0
+
+				for (let frame = 0; frame < 120 && stableFrameCount < 5; frame += 1) {
+					await new Promise(requestAnimationFrame)
+					const targetRect = targetElement?.getBoundingClientRect()
+					const current = [
+						scrollContainer?.scrollTop ?? 0,
+						scrollContainer?.scrollHeight ?? 0,
+						targetRect?.top ?? 0,
+						targetRect?.bottom ?? 0,
+					]
+
+					stableFrameCount = previous?.every(
+						(value, index) => Math.abs(value - current[index]) < 0.1,
+					)
+						? stableFrameCount + 1
+						: 0
+					previous = current
+				}
+			}, state.target)
+			await page.evaluate(async () => {
+				await new Promise(resolve =>
+					'requestIdleCallback' in window
+						? window.requestIdleCallback(resolve, { timeout: 3_000 })
+						: resolve(),
+				)
+				await new Promise(requestAnimationFrame)
+				await new Promise(requestAnimationFrame)
+			})
+			await page.waitForTimeout(settleMs)
 
 			const filename = `${engineName}__${width}x${height}__${state.id}.png`
 
