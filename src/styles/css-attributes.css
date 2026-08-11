@@ -1210,6 +1210,7 @@ ol {
  * ### CSS Variables
  * - `--stickyBreadcrumb-animationRangeStart`
  * - `--stickyBreadcrumb-animationRangeEnd`
+ * - `--stickyBreadcrumb-animationTimingFunction`
  * - `--stickyBreadcrumb-gap`
  * - `--stickyBreadcrumb-position-minBlockSize`
  * - `--stickyBreadcrumb-position-insetBlockStart`
@@ -1383,7 +1384,12 @@ ol {
 			);
 
 			animation:
-				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
+				StickyBreadcrumbItemAnimation
+					var(
+						--stickyBreadcrumb-animationTimingFunction,
+						var(--transition-easeInOutExpo)
+					)
+					both,
 				StickyBreadcrumbItemExitAnimation linear both;
 			animation-timeline:
 				--sticky-breadcrumb-timeline,
