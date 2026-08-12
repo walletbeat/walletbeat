@@ -1412,9 +1412,11 @@ ol {
 		}
 		0.01% {
 			position: fixed;
+			/* Enter at the resolved sticky lane; never pass through the
+			 * position anchor's transient pre-handoff coordinate. */
 			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-position top)
-				+ var(--stickyBreadcrumb-position-insetBlockStart, 0px)
+				var(--stickyBreadcrumb-item-insetBlockStart, 0px)
+				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
 			);
 			inset-inline-start: calc(
 				anchor(--sticky-breadcrumb-position start)
