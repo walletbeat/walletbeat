@@ -31,6 +31,9 @@ export default defineConfig({
 		build: {
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
+			// Preserve scroll-timeline properties for engines that do not yet
+			// accept animation timelines inside the animation shorthand.
+			cssMinify: 'esbuild',
 		},
 	},
 	fonts: [
