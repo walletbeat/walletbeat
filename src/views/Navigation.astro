@@ -75,13 +75,6 @@ const secondaryNavigationItems = [
 			groups={[{ items: navigationItems }, { items: secondaryNavigationItems }]}
 			currentHref={currentHref}
 		/>
-
-		<footer data-card data-sticky='backdrop-self backdrop-always' data-sticky-container>
-			<p>
-				Wallets listed on Walletbeat do not represent endorsements and are for informational
-				purposes only.
-			</p>
-		</footer>
 	</div>
 </nav>
 
@@ -132,8 +125,6 @@ const secondaryNavigationItems = [
 		}
 
 		#nav-menu {
-			--navigation-footer-sidestepBlock: 1rem;
-
 			position: relative;
 			z-index: 0;
 			align-content: stretch;
@@ -143,25 +134,9 @@ const secondaryNavigationItems = [
 			&[data-sticky-container] {
 				--sticky-marginBlockStart: var(--navigation-mobile-blockSize);
 				--sticky-paddingBlockStart: 1rem;
-				--sticky-paddingBlockEnd: var(--navigation-footer-sidestepBlock);
+				--sticky-paddingBlockEnd: 1rem;
 				--sticky-paddingInlineStart: 0.75rem;
 				--sticky-paddingInlineEnd: 0.75rem;
-			}
-
-			footer {
-				&[data-card] {
-					--card-backgroundColor: color-mix(
-						in oklch,
-						var(--background-secondary) 82%,
-						var(--accent)
-					);
-
-					p {
-						line-height: 1.4;
-						font-size: 0.875rem;
-						color: var(--text-secondary);
-					}
-				}
 			}
 		}
 	}
@@ -195,10 +170,6 @@ const secondaryNavigationItems = [
 					display: block;
 					order: 3;
 					margin-block-start: 1rem;
-				}
-
-				> footer {
-					display: none;
 				}
 			}
 
