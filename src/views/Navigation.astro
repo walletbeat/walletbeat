@@ -11,12 +11,14 @@ import NavigationItems from './NavigationItems.svelte'
 import LuMenu from 'lucide-static/icons/menu.svg?raw'
 import LuMoon from 'lucide-static/icons/moon.svg?raw'
 import LuSun from 'lucide-static/icons/sun.svg?raw'
+import LuTableOfContents from 'lucide-static/icons/table-of-contents.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
+	contextNavigationTarget?: string
 }
 
-const { navigationItems } = Astro.props
+const { navigationItems, contextNavigationTarget } = Astro.props
 const currentHref = Astro.url.pathname
 const secondaryNavigationItems = [
 	navigationAbout,
@@ -62,10 +64,6 @@ const secondaryNavigationItems = [
 			</li>
 		</menu>
 
-		<a href='/' class='logo'>
-			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
-		</a>
-
 		<menu class='navigation-trailing-controls' data-row='gap-2' data-row-item='wrap-end'>
 			<li>
 				<button
@@ -80,6 +78,24 @@ const secondaryNavigationItems = [
 				</button>
 			</li>
 		</menu>
+
+		{
+			contextNavigationTarget && (
+				<menu class='navigation-context-controls' data-row='gap-2' data-row-item='wrap-end'>
+					<li>
+						<button
+							type='button'
+							data-icon='circle'
+							popovertarget={contextNavigationTarget}
+							aria-label='Table of contents'
+							title='Table of contents'
+						>
+							<span set:html={LuTableOfContents} />
+						</button>
+					</li>
+				</menu>
+			)
+		}
 	</header>
 
 	<div id='nav-menu' data-column data-column-item='flexible' data-sticky-container>
@@ -113,16 +129,6 @@ const secondaryNavigationItems = [
 			block-size: var(--navigation-mobile-blockSize);
 			box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
 			padding: 1rem;
-
-			.logo {
-				display: flex;
-				text-decoration: none;
-
-				img {
-					display: block;
-					height: 2.35rem;
-				}
-			}
 
 			menu {
 				li {
@@ -182,7 +188,7 @@ const secondaryNavigationItems = [
 	}
 
 	@media (min-width: 1025px) {
-		.navigation-leading-controls {
+		:is(.navigation-leading-controls, .navigation-context-controls) {
 			display: none;
 		}
 	}
@@ -204,10 +210,6 @@ const secondaryNavigationItems = [
 			block-size: 100dvh;
 			height: 100dvh;
 			transform-style: preserve-3d;
-
-			> header .logo {
-				anchor-name: --layout-site-logo;
-			}
 
 			#nav-menu {
 				.navigation-note {

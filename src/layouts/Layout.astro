@@ -109,6 +109,11 @@ import Footer from '@/views/Footer.astro'
 				<slot />
 				<Footer />
 			</div>
+			<div class='logo-position-area'>
+				<a href='/' class='logo'>
+					<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
+				</a>
+			</div>
 		</div>
 	</body>
 </html>
@@ -119,8 +124,15 @@ import Footer from '@/views/Footer.astro'
 		--navigation-desktop-inlineSize: 20rem;
 		--navigation-mobile-blockSize: 4.16rem;
 		--navigation-mobile-controlSize: 2.5rem;
+		--navigation-mobile-controlIconSize: calc(var(--navigation-mobile-controlSize) * 0.55);
 		--navigation-mobile-gap: 0.5rem;
 		--navigation-mobile-inlinePadding: 1rem;
+		--navigation-mobile-controlLane: calc(
+			var(--navigation-mobile-inlinePadding) + var(--navigation-mobile-controlSize) +
+				var(--navigation-mobile-controlSize) + var(--navigation-mobile-gap)
+		);
+		--navigation-logo-blockSize: 2.35rem;
+		--navigation-logo-inlineSize: calc(var(--navigation-logo-blockSize) * 516.23 / 126.12);
 		--navigation-mobile-trailingClearance: calc(
 			var(--navigation-mobile-inlinePadding) + var(--navigation-mobile-controlSize)
 		);
@@ -175,6 +187,38 @@ import Footer from '@/views/Footer.astro'
 			&:not(:focus-visible) {
 				opacity: 0;
 				translate: -50% -150%;
+			}
+		}
+
+		> .logo-position-area {
+			z-index: 4;
+			position: fixed;
+			inset: 0;
+			block-size: var(--navigation-mobile-blockSize);
+			pointer-events: none;
+
+			> .logo {
+				position: absolute;
+				inset-block-start: 1rem;
+				inset-inline-start: calc(var(--navigation-desktop-inlineSize) / 2);
+				display: flex;
+				translate: -50% 0;
+				text-decoration: none;
+				pointer-events: auto;
+
+				img {
+					display: block;
+					height: var(--navigation-logo-blockSize);
+				}
+			}
+
+			@media (max-width: 1024px) {
+				inset-inline: var(--navigation-mobile-controlLane);
+
+				> .logo {
+					anchor-name: --layout-site-logo;
+					inset-inline-start: 50%;
+				}
 			}
 		}
 
