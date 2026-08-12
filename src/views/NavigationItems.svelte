@@ -71,10 +71,7 @@
 		iconSnippet?: Snippet<[NavigationItem, number]>
 		afterLabelSnippet?: Snippet<[NavigationItem, number]>
 		showSearch?: boolean
-		/*
-		 * Pie flower specialization: sticky summary backdrops survive
-		 * `display: contents` and paint a full circular nav-item disc.
-		 */
+		/** Whether nested navigation headings participate in the sticky stack. */
 		enableSticky?: boolean
 	} = $props()
 
@@ -468,22 +465,13 @@
 					---color: var(--accent);
 				}
 
-				&:is(a):is(
-					[aria-current='page'],
-					:target-current
-				),
+				&:is(a):is([aria-current='page'], :target-current),
 				&:is(summary):is(
 					:has(
-						a:is(
-							[aria-current='page'],
-							:target-current
-						)
+						a[aria-current='page']
 					),
 					:not(details:open > &):has(
-						~ menu a:is(
-							[aria-current='page'],
-							:target-current
-						)
+						~ menu a[aria-current='page']
 					)
 				) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
