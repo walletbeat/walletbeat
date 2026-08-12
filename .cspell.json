@@ -461,6 +461,7 @@
 		"resolvers",
 		"RetroPGF",
 		"reviewable",
+		"revm",
 		"RF",
 		"riscv",
 		"rman",

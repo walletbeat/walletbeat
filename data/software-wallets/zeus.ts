@@ -102,7 +102,15 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Zeus has a built-in Across bridge UI. It shows a risk warning by default that bridging is powered by the third-party Across Protocol, and before the user clicks Bridge it breaks fees into Network, Bridge, and Total amounts.',
+								'Zeus has a built-in Across bridge UI. By default it shows an amber risk warning that bridge functionality is powered by the third-party Across Protocol and that the user should understand the risks. Before the user can bridge, the same screen itemizes fees as Network, Bridge, and Total amounts.',
+							file: 'public/references/wallets/zeus/screenshots/2026-08-12-chain-abstraction-bridge-ui.png',
+							label:
+								'Zeus desktop Bridge UI showing the Across Protocol risk warning by default and Network / Bridge / Total fee breakdown',
+							lastRetrieved: '2026-08-12',
+						},
+						{
+							explanation:
+								'Zeus implements the built-in Across bridge UI in across.rs (risk banner and Network / Bridge / Total fee lines).',
 							url: 'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/across.rs',
 						},
 					],
