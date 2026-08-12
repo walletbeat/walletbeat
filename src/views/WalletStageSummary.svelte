@@ -10,7 +10,6 @@
 		type WalletLadderEvaluation,
 		type WalletStage,
 	} from '@/schema/stages'
-	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/urls'
@@ -187,45 +186,36 @@
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
 					{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
+					{@const criterionRatingMeta = stageCriterionRatings[evaluation.rating]}
 
 					<li
-						data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
+						data-list-item-marker={criterionRatingMeta.icon}
 						data-stage-criterion-rating={evaluation.rating}
-						style:--accent={stageCriterionRatings[evaluation.rating].color}
+						style:--accent={criterionRatingMeta.color}
+						title={criterionRatingMeta.label}
 					>
-						<span data-row="start gap-2">
-							<span data-row-item="flexible">
-								{#if attributeName}
-									{#if attributeLink}
-										<a href={attributeLink} title={attributeName}>
-											<strong>{attributeName}</strong>
-										</a>:
-									{:else}
-										<strong>{attributeName}</strong>:
-									{/if}
-									<span>
-										{#if isTypographicContent(criterion.description)}
-											<Typography content={criterion.description} />
-										{:else}
-											{criterion.id}
-										{/if}
-									</span>
+						{#if attributeName}
+							{#if attributeLink}
+								<a href={attributeLink} title={attributeName}>
+									<strong>{attributeName}</strong>
+								</a>:
+							{:else}
+								<strong>{attributeName}</strong>:
+							{/if}
+							<span>
+								{#if isTypographicContent(criterion.description)}
+									<Typography content={criterion.description} />
 								{:else}
-									{#if isTypographicContent(criterion.description)}
-										<Typography content={criterion.description} />
-									{:else}
-										{criterion.id}
-									{/if}
+									{criterion.id}
 								{/if}
 							</span>
-
-							<data
-								value={evaluation.rating}
-								title={stageCriterionRatings[evaluation.rating].label}
-							>
-								{stageCriterionRatings[evaluation.rating].icon}
-							</data>
-						</span>
+						{:else}
+							{#if isTypographicContent(criterion.description)}
+								<Typography content={criterion.description} />
+							{:else}
+								{criterion.id}
+							{/if}
+						{/if}
 					</li>
 				{/each}
 			</ul>
@@ -243,7 +233,7 @@
 		text-align: start;
 	}
 
-	li > span > span:last-child {
+	li > span {
 		color: var(--text-secondary);
 	}
 
