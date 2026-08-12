@@ -74,8 +74,8 @@ const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [
 	/^chrome-extension:\/\/\w+$/,
 	// ISO-8601 timestamps (e.g. event/request timestamps) are not user-identifying on their own.
 	/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/,
-	// Two-letter strings
-	/^[a-zA-Z]{2}$/,
+	// Strings of one or two word characters (letters, digits, underscore)
+	/^\w{1,2}$/,
 ]
 
 export interface SaveOptions {
