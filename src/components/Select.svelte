@@ -87,7 +87,7 @@
 							{/if}
 						{/if}
 					</span>
-					{option.label}
+					<span class="select-label">{option.label}</span>
 				{/snippet}
 			{/if}
 		</option>
@@ -162,7 +162,7 @@
 					font-weight: bold;
 				}
 
-				img, svg {
+				img, :global(svg) {
 					height: 1em;
 					vertical-align: middle;
 				}
