@@ -38,4 +38,4 @@ Wallets should take an active role in detecting and preventing scams.
 
 ---
 
-Check out walletbeat here [link]
+Check out Walletbeat here [link]
