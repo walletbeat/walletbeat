@@ -1,0 +1,2285 @@
+import { type CalendarDate } from '@/types/date'
+
+export interface KnownValidUrl {
+	url: string
+	urlHash: string
+	retrieved: CalendarDate
+}
+
+/**
+ * URLs that should be skipped during validation checks.
+ * These URLs would always return an error response, so we skip them to avoid failing the test.
+ */
+export const URLS_TO_SKIP = [
+	'docs.phantom.com',
+	'developers.zerion.io',
+	'help.ambire.com/hc/en-us',
+	'nufi.gitbook.io/',
+	'linkedin.com',
+	'facebook.com',
+	'instagram.com',
+	'reddit.com',
+	'tiktok.com',
+	'web3.bitget.com',
+	'gridplus.io',
+	'coinbase.com',
+	'sec.gov',
+	'defillama.com',
+	'defillama.com',
+	'coingecko.com',
+	'api.github.com',
+]
+
+/**
+ * This list exists to prevent hallucinated URLs from creeping into the codebase.
+ * It exists because this problem has happened.
+ * URLs must be retrieved successfully at least once, then added to this list to avoid
+ * having to re-fetch them on every run of the URL check test.
+ *
+ * Run `pnpm validate-urls` to update this list automatically. The script only adds
+ * URLs that it has actually retrieved, so the anti-hallucination guarantee is
+ * preserved. Some websites block automated requests (Cloudflare challenges, 403s);
+ * if the script reports such a URL, open it in a browser yourself and, if it loads
+ * correctly, add its entry here manually.
+ *
+ * Coding agents: Do **NOT** edit this list by hand!
+ * Manual entries are for humans to add only.
+ * If you wish to update this list, run `pnpm validate-urls` or ask your operator.
+ */
+export const knownValidUrls: KnownValidUrl[] = [
+	{
+		url: 'https://www.ambire.com/',
+		urlHash: '9056590b5e73b6970259bcd861a1a4f25904444a',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
+		urlHash: 'f1819791d1bcb34e4b3bd8e7f8c84f05bbfe8362',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/contract/nameRegistry.ts#L183-L197',
+		urlHash: 'c5e42c214b1b6300f16fcf410093de8d62b18233',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/viemClient.ts#L35-L50',
+		urlHash: '1dd9648f73ee8fe161637e32754ba0e8d77ec366',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://elytro.com',
+		urlHash: '2e213bd9d3d9bfa33c76e72424f12fe449b7659c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/Elytro-eth/soul-wallet-contract',
+		urlHash: 'ce277d3d0abb029b3a19965f7393d28e37ffc110',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://family.co',
+		urlHash: '312d2833bbee6edd4987c61dd266d324c38cbf33',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://frame.sh',
+		urlHash: 'eceb723c41dea2999054d18a5d9b07b8921e79e6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://gemwallet.com',
+		urlHash: '30b962c6f41cda4b6fbe8e800e15ac88190ea74f',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://metamask.io',
+		urlHash: 'ddd617777dd14c4d772ef645dce14808cc020d71',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://support.metamask.io/more-web3/learn/field-guide-to-bridges/',
+		urlHash: 'f0a2d00d2047598d581d19f3637e04a3060e81b3',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://support.metamask.io/manage-crypto/tokens/how-to-view-your-token-balance-across-multiple-networks/',
+		urlHash: '85292c97cef9e0ae82f5538ba4f79d1f9fb90e49',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/MetaMask/core/tree/main/packages',
+		urlHash: 'b10087f4a0f6d32253b4b485abce382722d27342',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://assets.ctfassets.net/clixtyxoaeas/21m4LE3WLYbgWjc33aDcp2/8252073e115688b1dc1500a9c2d33fe4/metamask-delegator-framework-audit-2024-10.pdf',
+		urlHash: '13e8d550931291ff8617aefc577777e71592f627',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://assets.ctfassets.net/clixtyxoaeas/4sNMB55kkGw6BtAiIn08mm/f1f4a78d3901dd03848d070e15a1ff12/pentest-report_metamask-signing-snap.pdf',
+		urlHash: '6e3c1ded5545f10407784398daffe66a592989e2',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.mtpelerin.com/',
+		urlHash: 'e2a5275410aa4af87e3d3ef4f121c3f0d9451f9c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
+		urlHash: '93fe25d48aa026197acb65b8837a477ba68557f7',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://nu.fi',
+		urlHash: '768b9a33d06b0ab33c87a8e88628feaa592d090b',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://support.nu.fi/support/solutions/articles/80001178239',
+		urlHash: 'e3cf55040413a724e090fe4bb617e141fe5bcdd6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://rabby.io',
+		urlHash: 'bdf2dfd8e68f5d193a5546174446edda6e7b25ee',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+		urlHash: 'ae5b23948f69b87f8ed38e206000c64e09415cc8',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://rainbow.me',
+		urlHash: 'd644f5e836c2c0e63f2f18a4526eded90d13e236',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://safe.global',
+		urlHash: 'b04af73888fa32372bee2405ef919f410547a1d6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/f918ceb9b561dd3a27af96903071cd56c1fb5ddd/apps/web/src/services/safe-wallet-provider/index.ts#L184',
+		urlHash: '7da7c72ae031938d7512ec3567cee253bbac10cb',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://bitbox.swiss/',
+		urlHash: 'f0ea281aae5ae6f15d55bb3dee437b78d37fad9d',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://firefly.city/',
+		urlHash: '4b5374e0b40b8c99c67b3ad24f7ef156820208db',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.ledger.com/',
+		urlHash: '6eaef16400d9a1725ac38426ab0ff8411bbfa607',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://onekey.so/',
+		urlHash: '3c9a3345f1ad10e65043374746a3a4e43e2d8502',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://trezor.io/',
+		urlHash: '693376b03a7fe431819b4693b56b7deb9f52721b',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://ngrave.io/',
+		urlHash: 'fc6972f7c67bd094040a6289154a1e0073848855',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://blog.ambire.com/eip-7702-wallet/',
+		urlHash: '8c8ea02e6d6ce85d1fb135536cc0d00ccd8fdce6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://zerion.io',
+		urlHash: '3dbaa0aff3a17de107b4ede050772af955291068',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.cypherock.com',
+		urlHash: 'd5f6869ac8c564c2268d996f4df5a6c9f17852c3',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.ambire.com',
+		urlHash: '3b41a43a21f4d0d1209715d7203802b68e96a03d',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://daimo.com',
+		urlHash: '3cb9fb7a3fad5bbf0581a3f54ffb923384fc3dbc',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://token.im',
+		urlHash: '0ce4a9de92e7c615f36655ca206617c3d2a5127a',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://imkey.im/',
+		urlHash: 'a48c5da2453ffb4f5e7ba1f3f9c46bd30e1de5b9',
+		retrieved: '2025-11-05',
+	},
+	{
+		url: 'https://keyst.one/',
+		urlHash: '17e49d498d1f04f47a7c79dd02974ffd60183efc',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://phantom.com',
+		urlHash: '2ade81c184f3fece1b40ece8632d63685e923be6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension',
+		urlHash: 'fb3693c39d0e16fcecd756fe9bdcd6512e4a0dbe',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo',
+		urlHash: 'c1deb6057590ad95d6c38cd5a9df85d1ba7f2eb5',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/Elytro-eth',
+		urlHash: '2bd7c8c2bea748f5e90302b997431291f67e8666',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/gemwalletcom/gem-ios',
+		urlHash: '20ef1311fce88a839d49b4da560ece38514ed097',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/consenlabs/token-core-monorepo',
+		urlHash: '24c27cb0b84e4936627f8b5550764f28a3e69949',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension',
+		urlHash: 'efffdfe52d6431678ef0bb885e7f2bbe3c36021e',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/mtpelerin',
+		urlHash: '52cec4b8cefdda81f4321fe8abbe886bba90dd27',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/nufi-official/nufi',
+		urlHash: '1c627e48c21b66b3217b60b7ca64bd16d79506ca',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby',
+		urlHash: 'c6157bc0c8cd5286a4684049fd6b83c0cd6fe57f',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension',
+		urlHash: 'f92eadbe22abf8ad0124476f62e80a1c29637a5f',
+		retrieved: '2026-04-25',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow',
+		urlHash: 'f02fdbb37a245bcc077f7eef8d0b1a17cd91d28b',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/safe-fndn',
+		urlHash: '4623aeac8399d1112a4f85eae525881390810d6d',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/BitBoxSwiss/bitbox02-firmware',
+		urlHash: 'd3a746d513e09077799d9b884c1cd9858e299836',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/Cypherock',
+		urlHash: '4f3f89eea1f6e237f87c2d28a9d8b8fa6d13b944',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/GridPlus',
+		urlHash: 'f2e9ad66a296755d8c55885381031d8cb9fae930',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/consenlabs/imkey-core',
+		urlHash: 'bab751b002caab589b2cbe5344e067667d484eab',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/KeystoneHQ',
+		urlHash: '4d2a88c5addf046b5384a8ab144a4c05ce973686',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/LedgerHQ/',
+		urlHash: 'fe86af9feb4bf26014d59cdc6110f95615298437',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/OneKeyHQ',
+		urlHash: '4b3df49df953e02de65257636fa32f640bf7fab2',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/trezor/trezor-suite',
+		urlHash: '68f7e9858a3ae6e5abcd3aa229eb1f39e92a41bd',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://bitbox.swiss/dev/',
+		urlHash: 'b4f94a40360751f24aca2f8a53ad29bca1702e8e',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://docs.cypherock.com/',
+		urlHash: 'dcc46d653bb007b2d8c5d19a370fa4b655a75bcb',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://support.keyst.one/',
+		urlHash: '22b43ad06c2e7bce190b83158055f30bcf2f6a8d',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://developers.ledger.com/',
+		urlHash: 'aee76f91795e4822e68fd390ed195ed85cd23996',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://developer.onekey.so/',
+		urlHash: '4bfb28a04b4f00411c4f9f21419a4fa87c8a17fe',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://trezor.io/learn',
+		urlHash: 'ece6156a9e5fb17b96b488ee95850ac3089abe39',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/BitBoxSwiss',
+		urlHash: '91c72481edcabf1553ad58e67fd05da2fec16a27',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/@bitboxswiss',
+		urlHash: 'f3a0e03a260098953a460d19395b9694e7f2d427',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://t.me/cypherock',
+		urlHash: 'b5f6cdc01cfdc207ba952304c48871f0b8b13d9a',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/CypherockWallet',
+		urlHash: '9002d8da1e73708d4d674f7096a7a75f3561925a',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://discord.com/invite/gridplus',
+		urlHash: '721caded54e216ddf169dde8a66ced15753015b9',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/gridplus/',
+		urlHash: '2c0ebdda1894e8d285abac96cf269abe853b552d',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://farcaster.xyz/keystonewallet',
+		urlHash: 'c0b381af10b3ec40fa34fcf7a9d720e4cb5133ad',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://t.me/KeystoneWallet',
+		urlHash: 'c88ecd88c690e8202de8bf73efc8f7b8d031c6dc',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/KeystoneWallet',
+		urlHash: '68b066f60ed46a29d0d73c12b0a8059720a167a8',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/channel/UCaReIdawwYPPcyWGoNunF7g',
+		urlHash: '3558c0fec7ba4e6f8067d772694b16813a9f0aad',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/Ledger',
+		urlHash: '768d245facd22619dec680687f01eff336ed0b47',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://discord.com/invite/gapxmWEBNJ',
+		urlHash: '529970c1e8efa911b8c88160278d25e158d44e8a',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/ngrave_official',
+		urlHash: 'c60578dd7cc59f374556fd2f69faac632da43363',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/OneKeyHQ',
+		urlHash: '46326dbf5b61b98b8839ccc384b6d0a3420fbfe5',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/trezor',
+		urlHash: '9ed6792bcfa02411b582ff840bd860044c4b8093',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/@TrezorWallet',
+		urlHash: '4df76409512b9f9f52f2dfb9efc14081a9ef0729',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/watch?v=R0g35dKjRtI',
+		urlHash: '18accfdc98d7db3fe8da0d329de0fc07f01d0288',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://guide.keyst.one/docs/keystone',
+		urlHash: 'f9bec99a37876566243f6ee49468e3aeca9e7e64',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://support.ledger.com/article/360018444599-zd',
+		urlHash: '8549635465c6f706108cbca9f14cbef16295ea71',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+		urlHash: '1f6bf49de87f6fcdbce0d353fc7ef8681c212685',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
+		urlHash: '826047213cd41016cbcd483f67ee42961129f5a1',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://pillarx.app',
+		urlHash: 'b24441fce1ec129e0c6385e34abdfe8d7b871818',
+		retrieved: '2025-12-17',
+	},
+	{
+		url: 'https://pillarx.app/login',
+		urlHash: 'e1c183c8cb53133e9544eca41f8893500a686961',
+		retrieved: '2025-12-17',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/ambire-web3-wallet/ehgjhhccekdedpbkifaojjaefeohnoea',
+		urlHash: 'fcb8ae1a4993828173beb661943cc2d18378f8df',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://discord.com/invite/ambire',
+		urlHash: '798bc72bdc77d29dc047b3647ffe2bdc49508e0d',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://t.me/AmbireOfficial',
+		urlHash: 'b3374fcb92da0bca2a0004b9fed9542ad57b2e9a',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/ambire',
+		urlHash: '0121d068421dbe1eb821ee7617fc91b0c5647d0c',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://www.youtube.com/@AmbireTech',
+		urlHash: 'dc8e7917ea7e30a63432c2a63d7824b6416ea858',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://t.me/+l9coqJq9QHgyYjI1',
+		urlHash: 'f0765beb9f478e627b20c1d629e99e9a4fd617e8',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/Elytro_eth',
+		urlHash: '3a4317cc57bede6517bc9937e5afe1eddfd502a9',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://docs.frame.sh/',
+		urlHash: 'a1a8024b6a045bc19c6a2c185a3f50ab4ebff235',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://github.com/floating/frame',
+		urlHash: '08c2a73da8f0204aff551c7ccb6faab99567a9ff',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://discord.com/invite/rr4Yr3JkPq',
+		urlHash: '393f9368aba3db455522d7042ec1535dc9035204',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/0xFrame',
+		urlHash: '1cda6ba54424937a43a3c33fd6a9a206ccf073c6',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://docs.metamask.io/',
+		urlHash: '063384e5aa34896e0eb6a3ea2e4ba308200eb066',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+		urlHash: '77c689503658e09fe775dbcde519ff3302c2475b',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://farcaster.xyz/metamask',
+		urlHash: '83f57de599f487f0b15333fb3d40c43e8835b1b4',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/MetaMask',
+		urlHash: 'e832939187065fe667525b07376f25e69d47064f',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/phantom',
+		urlHash: '3695a86104a927c02aa37c0c11b12a2274ef5bfc',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://www.youtube.com/@phantom-wallet',
+		urlHash: '38f6317c854a910c86e21e3a3847f7d267161114',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://rabbykit.rabby.io/',
+		urlHash: 'decdb1be0f7fe86f7807b21aeb9998aa5e870164',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
+		urlHash: 'f8c4af09f64e100ad15071307d4ef3e0ebaf676d',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://discord.com/invite/seFBCWmUre',
+		urlHash: '639cfdb85dc5094c5974e292fc6d8dbe091c120f',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/Rabby_io',
+		urlHash: 'aec4ebbd1f47b1decacdbb4dc3f90ff1da1a5878',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://rainbowkit.com/',
+		urlHash: 'bab45e31f0639cd803f5ea156dd0df90746f9418',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://farcaster.xyz/rainbow',
+		urlHash: '84f55618238013489f20a8ed62e9326e888f509f',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/rainbowdotme',
+		urlHash: 'a5df2785570542a819ca55d26816f5480cc2ca1e',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension',
+		urlHash: '625bbfdaa489e178a87e61a4eecba29cee2cde8a',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://farcaster.xyz/zerion.eth',
+		urlHash: 'a10efd64786aa9c8bb2ba2c1afaa63789969bf74',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/zerion',
+		urlHash: '29f2107818187fad134fad9a57879af673589146',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://keycard.tech/',
+		urlHash: '32dc30e035528956c74636e1d5d3f8fb0b361257',
+		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://shell.keycard.tech/',
+		urlHash: '038c9089c6734df2c266b69a545e2340aaff9679',
+		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://keycard.tech/start/shell',
+		urlHash: '8c781c8f948d32fcc0a24bfc54ea7729b2265d8c',
+		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://github.com/keycard-tech/keycard-shell',
+		urlHash: 'd210d4cdc0bd75611c2d8f1da33d4fcff8628c80',
+		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://github.com/keycard-tech/status-keycard',
+		urlHash: '6adbdbcc11f3049cc70df872ee50fac0b5035a07',
+		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://keycard.tech/en/developers/overview',
+		urlHash: '0b3be0a3fb51551da19902877ddc31390423b983',
+		retrieved: '2025-12-27',
+	},
+	{
+		url: 'https://github.com/keycard-tech/eth-abi-repo',
+		urlHash: 'f56660626b1a09693dfde026d828092fd493dcff',
+		retrieved: '2025-12-27',
+	},
+	{
+		url: 'https://x.com/Keycard_',
+		urlHash: '7038cc6b902e6bf7c713e07414e344857aa1b8bd',
+		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://paydocs.daimo.com/',
+		urlHash: '61c87268f1fc9bce27f1e9154054ae8c71bdda2b',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://farcaster.xyz/daimo-pay',
+		urlHash: 'f081dba41dcf3d3b1e4341672b92160350bc9708',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://x.com/daimopay',
+		urlHash: 'ec5585796102df3b3a0a6a8bc10b999b0ab73771',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://family.co/docs',
+		urlHash: '90f9f6f88f9e8d09d7b04d2795d75ce37a075850',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://x.com/family',
+		urlHash: 'ee74600b82d67efcb57a1ec9db6b86150cba3dca',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://docs.gemwallet.com/',
+		urlHash: '29744c6bdbcbe6a30d7b5ce9e45978f77c73f2a2',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://discord.com/invite/4jpxtwT8r6',
+		urlHash: 'a5bace08f5feb783f1775a2191dd77e890013a44',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://t.me/gemwallet',
+		urlHash: '873b50b9387307280c16c405e61381d9d319bc5d',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://x.com/gemwallet',
+		urlHash: '56fa69943cc6d852480a4bf6a50584a82d73212d',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://www.youtube.com/@gemwallet',
+		urlHash: '369cd41255fd28ac8c7ca2a521ec56e37dac5bf4',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://docs.token.im/',
+		urlHash: '0746eaee6defc62e3fb9aa2d654d025dcfd6cd3b',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://discord.com/invite/imToken',
+		urlHash: '710069b164290b32e37f324f1666b427bfbaf5dd',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://x.com/imTokenOfficial',
+		urlHash: '5e6f6e5064d8f057c7848dd5a7fd47f0bc7d99f3',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://discord.com/invite/WErDKTvMr7',
+		urlHash: '4ae6066bc25aa3989a3847ce6431b119b57c2306',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://x.com/mtpelerin',
+		urlHash: 'f2370a402d2700ec01b1ccdd807e5c027af06a67',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://www.youtube.com/@mtpelerin',
+		urlHash: 'c2801fdd40afe1e6c8d49cbb565499da89aa9a8a',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://discord.com/invite/jSyVPAXw3w',
+		urlHash: 'db805c6f23e06f492cf24e789a55916ec7b36ae0',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://x.com/nufiwallet',
+		urlHash: '32937e1e99a11905fbcab06924e6a19fb4602627',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://docs.safe.global/',
+		urlHash: '7b3f7d52c78b53db3a0f2bf40e37cdbe7dd81c12',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://developers.ledger.com/docs/clear-signing/for-wallets',
+		urlHash: '71ba731db6934452b33327999ee3e1cd7dff7a68',
+		retrieved: '2025-12-20',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus',
+		urlHash: 'eedecf715cc2b3c6dfba8e22a9413f580e33ffb0',
+		retrieved: '2026-01-12',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/bitget-wallet-crypto-web3/jiidiaalihmmhddjgbnbgdfflelocpak',
+		urlHash: 'cb1bf5f6779c772436e55f9add6d764a456fbc59',
+		retrieved: '2026-01-21',
+	},
+	{
+		url: 'https://x.com/BitgetWallet',
+		urlHash: 'b2be6e82fcd37824d1f497679611ff4a9618ff44',
+		retrieved: '2026-01-21',
+	},
+	{
+		url: 'https://web3.okx.com/',
+		urlHash: 'f5c6347af281999467371460243da89157ce815c',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+		urlHash: '417cf3d5b9346c976bdb24828c6a932fd9729428',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://x.com/wallet',
+		urlHash: '9fd8107761754e932d217c8cba525769b5a2ac42',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://hackerone.com/metamask/safe_harbor',
+		urlHash: '22fefabd03259db123b5217a9deae2e6c9fb2eaa',
+		retrieved: '2026-02-24',
+	},
+	{
+		url: 'https://x.com/ambire/status/2016861388103373134',
+		urlHash: '73cfe3038a20a4cc97667482d356dba98879ac3e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://li.quest',
+		urlHash: '31e2ecd6d4d933ad817ecffadae0793f1b35bb37',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/portfolio.ts#L146-L150',
+		urlHash: '3a0c952c5d99055265135613588a7e3b841f4910',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/batcher.ts#L143',
+		urlHash: '271fd557e5a42c78b9b214e73b9166d99ba9b19c',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com',
+		urlHash: '84b7e44aa54d002eac8d00f5bfa9cc93410f2a48',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://blog.ambire.com/ambire-x-immunefy-bug-bounty-audit-our-code-and-earn-rewards/',
+		urlHash: '94ba5cbef9f4559eaca92fe07eef65de29b51d13',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/389365fa505b4a32ac378bdf64d59752160ae8eb/src/services/validations/validate.ts#L122-L133',
+		urlHash: '48eacef13b9471eb01cf900dfe95c5b3914433a5',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://bugrap.io/bounties/Bitget%20Wallet%20(Formerly%20BitKeep)',
+		urlHash: '9910cbc809ad68a148148e10adb4283d1463eb04',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/packages/daimo-api/src/network/viemClient.ts#L128',
+		urlHash: '16bfb188f957d798ba2a456fa0b178c5a559a4bf',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://blog.ethereum.org/2024/02/20/esp-allocation-q423',
+		urlHash: '390f0919fb427ccb53e55992a7e5e7cd2ad7c12e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://vote.optimism.io/retropgf/3/application/0x118a000851cf4c736497bab89993418517ac7cd9c8ede074aff408a8e0f84060',
+		urlHash: '38cfa7c028b952e4de7b317fcf53078d8315d76b',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/binanceClient.ts#L132',
+		urlHash: 'b3141696ca64d9fe9228329cedb044193e03e17c',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/apps/daimo-mobile/src/view/sheet/FarcasterBottomSheet.tsx#L141-L148',
+		urlHash: 'af92475391d2c13b009e64e01c86c30e609fcc04',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/bundlerClient.ts#L131-L133',
+		urlHash: '8bfc3d5c1e18710345835766de13f044c0307033',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/server/telemetry.ts#L101-L111',
+		urlHash: '961d1d63cda7d6a12e610796608467c39d8a6c13',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/072e57d700ba8d2e932165a12c2741c31938f1c2/packages/daimo-api/src/api/getExchangeRates.ts',
+		urlHash: '9b40a75b50116f407ff43662d22eb1f7f796880c',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/.env.example#L6',
+		urlHash: '173d4e603a6629f15cdc8b2244009d3b29a0f104',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/apps/daimo-mobile/src/view/screen/send/SendTransferScreen.tsx#L234-L238',
+		urlHash: 'a310b3557d4889586133389b1f8aba8294372711',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://bugrap.io/bounties/imToken%20Wallet',
+		urlHash: '982b83ec0e99e47306a968d7a4d714a82ddd97f1',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://cure53.de/pentest-report_imtoken.pdf',
+		urlHash: '67c8070e19e5c0cd501dc00cb4433fcf5b31487a',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/more-web3/learn/sending-or-receiving-a-transaction-with-ens/',
+		urlHash: 'd893cf252a3f0f2b9505471ccf98a80b1399003d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',
+		urlHash: '9a4ef3cfe1b036f33d53d1518357e3675fcfc4d3',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/hc/en-us/articles/360015489471',
+		urlHash: '2eba31cdfe0200571401eecf46699938414ef764',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://consensys.io/blog/consensys-raises-450m-series-d-funding',
+		urlHash: '6ecbf27bcbb89587abb66b6e81d087612120996b',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/configure/wallet/social-login',
+		urlHash: 'fb9894e3fea8ab9232a87816cf8237e6fc3aff1c',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://metamask.io/security/metamask-security-program',
+		urlHash: '112787f9f585315686ab1140e93ed661363a0d4d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/more-web3/wallets/hardware-wallet-hub/',
+		urlHash: 'e9c2d3ba304d3309f9164ccd9a4362be18625c34',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/MetaMask/eth-phishing-detect',
+		urlHash: 'c1944faa74c7f0bd4e564730d10a87eacb19ffdb',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/configure/privacy/how-to-adjust-metamask-privacy-settings/',
+		urlHash: 'f9fddf8707330b597de6378eb1ee0a931caa2c5b',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://immunefi.com/bug-bounty/mtpelerin/information/',
+		urlHash: '04f8d40391ebe721c9daa63b53921e892d12dbe5',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://hackerone.com/okg?type=team',
+		urlHash: 'ba1b5aae0ecee5f0b2cf1ff21b380ff5fe47cfd0',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/5f2b84491b6af881ab4ef41f7627d5e068d10652/src/ui/views/ImportWatchAddress.tsx#L170',
+		urlHash: 'deededf1e387e65792541e7d520edb4d299d6013',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile',
+		urlHash: '2888d02eb26291b8a642989ab448337567f8d430',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
+		urlHash: '73862c7a8d789066c6c2c1b08449763be5f9c930',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/permit.ts#L42-L70',
+		urlHash: '79dc283dd769806dd88050e46d27b7e21fea0ecf',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/tokenApprove.ts#L73-L92',
+		urlHash: 'aba17f35882c8207cdd73c09251af5edd01d2ee9',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/connect.ts#L5-L73',
+		urlHash: 'c52e805dcc6e442c0774fac6bc929cc245683a49',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/send.ts#L25-L44',
+		urlHash: '0b668fabdb6737ff0ce26fe0648bebab012cc379',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/send.ts#L113-L132',
+		urlHash: '44ddebd45ba8f86c91fc686c544e5b4b0b786d9a',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/safe-global/safe-wallet-monorepo',
+		urlHash: '0d77fb94839e0e003123241231cb81f050420446',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://gov.optimism.io/t/draft-gf-phase-1-proposal-old-template-safe/3400',
+		urlHash: '8556a71be49c877b2c33956591e6d071c2a5126d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://safefoundation.org/blog/safedao-community-aligned-fees-introduction',
+		urlHash: 'c04094636c1caa75514df868bf8e2e557dbc079d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://safefoundation.org/blog/safe-tokenomics',
+		urlHash: '335cfc6e4a8a1bdf5e7160d69c4c300da129a208',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/safe-fndn/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
+		urlHash: '5c9a861a542bbae113deebe39dc11095027eef70',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.ledger.com/zerion',
+		urlHash: 'd4bd733dd72122c4130350c49d3232b185c76f0b',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
+		urlHash: '8e67e6ec2e1f2a8ac8f1c619f90c284ea83eb980',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus#features',
+		urlHash: 'd6374b8907729edafada870d81823c7c350d3fe0',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus/blob/8d51c76d1c6ccce5a4a845c34429a4f89ff9cdae/src/server.rs#L371',
+		urlHash: '5a9ac6ed2321d0be998f70e295c89a7d57cb1090',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus#how-the-wallet-recovery-works',
+		urlHash: '2ca09ed57f45b4041b280ec2ea7818d401e3da55',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
+		urlHash: 'f00acef6ae0c668d46df9d353411251ed520d634',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://bitbox.swiss/policies/privacy-policy/',
+		urlHash: 'bb247ff2b21c09fe8e6ddfa5ff977fb63e87dd2d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://bitbox.swiss/bug-bounty-program/',
+		urlHash: '2b6a6c0c3dd741590c91c424b1242a3f48ef13a6',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://entrackr.com/2022/12/hardware-wallet-startup-cypherock-raises-1-mn/',
+		urlHash: '34b89e02f5b12f0c8691cfa8b355cbf861121679',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.cypherock.com/bug-bounty',
+		urlHash: '6d67014dd8b42c76cf1931b1a8851afa35bafc52',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.cypherock.com/keylabs.pdf',
+		urlHash: 'e678331f3bb5a9f5c9e2a6ec26f1526183291739',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://docs.cypherock.com/security-overview/introduction',
+		urlHash: '189319fdea5ab3352dae389d3eee900d574d8698',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.prnewswire.com/news-releases/gridplus-sets-a-new-standard-for-blockchain-security-with-the-release-of-the-enterprise-grade-lattice1-wireless-hardware-wallet-301186849.html',
+		urlHash: '6af1a91973f9601305e3ef23402a564c524dc1e9',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://eips.ethereum.org/EIPS/eip-4527',
+		urlHash: 'b851fade855aa347bbbc6ef1166db7a42b29d2dc',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://blog.keyst.one/secure-elements-the-bedrock-of-hardware-wallet-security-1dd8cbdef461',
+		urlHash: '7d92bfba0262298f7b566f8cdc96ced45c74c55e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.ledger.com/academy/security/the-secure-element-whistanding-security-attacks',
+		urlHash: '6a5065e46b56ccc05b6593cfc31ae74a5b01ceba',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://ngrave.io/en/crypto-hardware-wallet-ngrave-raises-6m-seed-round',
+		urlHash: '171865b99ba01c42ab720637bdf87f917613ca98',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://ngrave.io/en/bug-bounty-program',
+		urlHash: '5547d94d0967370492af1c91b28f3f50c9bd9a44',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://ngrave.io/en/zero',
+		urlHash: '8ca6403573c262e3f271432a097698c4364f89c8',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
+		urlHash: '2ce6e3a219dad3ebab2c01ef0896fa47e46b6783',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://walletscrutiny.com/hardware/onekey.pro/',
+		urlHash: '7ddba77289b9a0299585124d3138143fabb0a796',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://bugrap.io/bounties/OneKey',
+		urlHash: '70fc1b3a7180b7c396072d1c2eef0bd67324bc37',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://trezor.io/other/partner-portal/for-developers/bug-bounty-program',
+		urlHash: 'ab9ae677919eabcda01ddb017dcc1b1ffe5f950c',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://invictus.ambire.com',
+		urlHash: '17b99560f16751649f2b5958ec1b6cceefd07c80',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://investors.rainbow.me/',
+		urlHash: 'cb7977990dbe6a97892e6325c864f11b9a952fa4',
+		retrieved: '2026-04-25',
+	},
+	{
+		url: 'https://cena.ambire.com',
+		urlHash: '3bf3200cca5e942710969aadad18f354e3eaad10',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://relayer.ambire.com',
+		urlHash: '5ea6c9f8ff1691c35e60da3e2820390946be48b3',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://nftcdn.ambire.com',
+		urlHash: '689132297983810966badd66ca4bb9c3e4d2ef6a',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://api.pimlico.io',
+		urlHash: '9ee78adaa8d4b36edead2bb4a16568e805c8a483',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://bundler.biconomy.io',
+		urlHash: '113483f5246a91c8d9a24ba11a2d07d862baf343',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://raw.githubusercontent.com',
+		urlHash: '6145de4cdf4eb4ce8c699b5657de5d2e33746da9',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.crunchbase.com/funding_round/daimo-seed--8722ae6a',
+		urlHash: '6b46f851c19deb02ba75f5ac7ce394178958d6c6',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://dune.com/gemwallet/gem-wallet',
+		urlHash: '5c1ecf81b46a4310b2a2b516e5cfa2b7895e770a',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.token.im/hc/articles/360039928813',
+		urlHash: 'd752184b3226352b53d1c57b624f43dd6bea6fc6',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.token.im/hc/en-us/articles/4404355206553-How-to-use-cBridge-with-imToken',
+		urlHash: '96b7397d12e644c14748eb39827c2880b99e9336',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.token.im/hc/en-us/articles/900005414706-imToken-Announces-US-30-million-Series-B-Investment',
+		urlHash: 'b8165717ba0498849fe424b915fd6480b9437452',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://token.im/tos-en.html',
+		urlHash: '4b72e23e091500329d1aca5e565a9e3d679fddc1',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.token.im/hc/en-us/articles/25985632007193-imToken-and-Hardware-Wallets-Uncompromised-Protection-Unparalleled-Convenience',
+		urlHash: 'ea97d10cc8139de2933f34b12221c6ad2b1ddc5a',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.token.im/hc/en-us/articles/21850966355737-Revamped-imToken-signature-for-safer-and-more-intuitive-transactions',
+		urlHash: 'c77576067314f864df45a47f586b3d16113b1375',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://metamask.io/news/latest/metamask-security-alerts-by-blockaid-the-new-normal-for-a-safer-transaction/',
+		urlHash: 'da3bbd0111fb785911f2fb5430c6164ff3454f25',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
+		urlHash: 'e82b2dead80ec08db3ced77a72847928821c7869',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.crunchbase.com/funding_round/debank-series-a--65945a04',
+		urlHash: '6f07759f0165e38739d40c4614a16d49820cf80d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.crunchbase.com/funding_round/debank-series-b--44225a21',
+		urlHash: '2a4c9fde483e016a52a74ca3118850d060557860',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://rabby.io/download',
+		urlHash: '7e2310746884123bceff49b41dd9e4998d8feb7e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://forum.safe.global/t/safedao-community-updates/4213',
+		urlHash: '92b554da810d8f0066989594e8bad14488e3f8dd',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/-m1jcBFS0dc?t=300',
+		urlHash: '32771e8dbdd5bf5e7860c3eaae3cda9f94c507b5',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/9YmPWxAvKYY?t=534',
+		urlHash: '20a5a109282b920920bdf947fbbe9e5286582dda',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtube.com/shorts/YG6lzwTUojE',
+		urlHash: 'f7cf6557141b90ed8d2eb0974649a873f11d5747',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
+		urlHash: '547eedd1810099b1becf0232e17f336ad2443a7b',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
+		urlHash: 'b2c25b6f781bb3c7c3c90ff7c8a1a9320008485c',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtube.com/shorts/_s5PjZhgBig',
+		urlHash: '1fa7e839c4acef25974ef03cee4b47ddf803f8a8',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://imkey.im/products/imkey-pro-crypto-hardware-wallet',
+		urlHash: '5829fd9696d60ab3cbcf7697a080b9af428b07ac',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://imkey.im/pages/integrated-wallets',
+		urlHash: '95da1f32d742eb49fb34e071f7837126e32c02fd',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://learn.imkey.im/hc/en-001/articles/35683788822937',
+		urlHash: '671bf1641b054867b927a3651560329d9994f93e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://keycard.tech/blog/announcing-keycard-shell',
+		urlHash: '93a3c3b6ca475bf21a6c1319df5f0e655905634f',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://keycard.tech/wallets',
+		urlHash: '323e686c271186192f7d2d801c0fada229f38d0b',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://get.keycard.tech/pages/keycard-shell',
+		urlHash: 'b3201002041a53a1b6a7a3cd9b8e0e5c44a48cd0',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://keycard.tech/developers/apdu/exportkey',
+		urlHash: 'e36343b4e7a110650cee513434837847b2007997',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://keycard.tech/blog/a-shell-summer-btc-multisig-seedqr-stealth-passphrases-arrive-on-keycard-shell',
+		urlHash: 'fa0684b2c3a3d4d8cc9a5ae98ba373513de3baa3',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://keyst.one/bug-bounty-program',
+		urlHash: 'b74ed892983abcc41018752cb0784c05159d5358',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/9YmPWxAvKYY?t=759',
+		urlHash: '0e0c3c3de8a49e9a320cbcd7c004853691cd9100',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtube.com/shorts/Ly9lo4g5NpA',
+		urlHash: 'ece1a00162b0eb495b6d34bd27b92cdc8ca42b22',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://donjon.ledger.com/bounty',
+		urlHash: 'c3f77a97de787cadb9d1b3727c566b80dc52d12d',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
+		urlHash: '53f6f372471d7f2299f756c295e8b0dfb3519f12',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/-m1jcBFS0dc?t=701',
+		urlHash: 'c24318f554f354fd43c7e27a7a63e2f051c10b85',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://developer.onekey.so/connect-to-software/using-walletconnect',
+		urlHash: 'e8e50fafffbc0ef9a7508d8cdae60e58faebccc7',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://onekey.so/blog/updates/onekey-secures-series-b-funding/',
+		urlHash: '2ffaa55d1acd83a0c7656e4f3a109058fb27d17e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://onekey.so/products/onekey-classic-1s-hardware-wallet/',
+		urlHash: '25a029eee905cf378e2fa77e498e54956ec06863',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
+		urlHash: 'bc9229a540bb86f497f411246da7ec26af3dbb54',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtube.com/shorts/J_XG7cNOVhM',
+		urlHash: '588f650183a7f4ce435e01079ef89a929244510e',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://trezor.io/trezor-safe-3',
+		urlHash: 'c1bdd7dff110cb7978e87f9c39f95a83d6bd27c1',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
+		urlHash: '05af4180fc2ff13c19f7815a6d2f8f9ba8de9ad9',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://youtube.com/shorts/4LayLrSuHNg',
+		urlHash: '41c82105039fafb0cedd243ffc9140446921f900',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://support.metamask.io/configure/wallet/how-to-turn-on-security-alerts',
+		urlHash: 'adb2e6bac218dfa0bafb81ead608dab751f6c003',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://www.businesswire.com/news/home/20210609005985/en/Ledger-completes-a-%24380-million-Series-C-fundraising-valuing-the-company-at-more-than-%241.5-billion-to-strengthen-its-position-as-the-leading-secure-gateway-to-digital-assets',
+		urlHash: '51248182cd2888bd0982b46b288742f3b649ebdd',
+		retrieved: '2026-03-08',
+	},
+	{
+		url: 'https://pitchbook.com/profiles/company/184644-55',
+		urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
+		retrieved: '2026-03-14',
+	},
+	{
+		url: 'https://docs.base.org/get-started/base',
+		urlHash: '81a4a84e30d05861b1624b1db0d00d53c940f3f1',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet',
+		urlHash: 'bc3738927c2f5aa60b5815802d8011fdf7ffb3fa',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/base/account-sdk',
+		urlHash: 'f43270328de1d0f2cc596d9680f994c5fd396ba8',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://discord.com/invite/buildonbase',
+		urlHash: 'e4e34d04b084b64f573c559eabe6f5c78bf9a480',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://hackerone.com/coinbase?type=team',
+		urlHash: 'a592f1a22c5c28338d345d29591d4c48ccb25f26',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://x.com/baseapp',
+		urlHash: 'a39919c5d5cc7eccb1da78806beb96ebffa3e2d3',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://farcaster.xyz/baseapp.base.eth',
+		urlHash: 'cc08ee93913fafa6cd1f796c8143244dc8cd27ea',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://base.app/',
+		urlHash: 'a8eaf246359dc850b9d97536ced50a7e577898b3',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://blog.ambire.com/ambire-supports-safe-accounts/',
+		urlHash: 'c89f9bd364380a9ffd5ff2e7f453e0220296d1d9',
+		retrieved: '2026-03-27',
+	},
+	{
+		url: 'https://wallet.uniswap.org/',
+		urlHash: '53c26e1f58ef41abe6e2eb4eb95ddc1bbbba7629',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://docs.uniswap.org/',
+		urlHash: 'a3e405706ac38b59e5c1bb138162c977405124c4',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://github.com/Uniswap',
+		urlHash: '046a7fce9ef8ea6ac8c0d5854f920cb6639afa45',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
+		urlHash: '97d54b721f1af8144f69b9e89abfd76d8243a5a2',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://discord.com/invite/uniswap',
+		urlHash: 'f9dc5c01d6d7dd0a07ab46833c0ae1e3c1ac259a',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://farcaster.xyz/uniswap',
+		urlHash: 'c8299cb24ebec66fffacb45145fc7439e60b4f03',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://x.com/Uniswap',
+		urlHash: '236d460e150a8fff554beddcc672387e11669452',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
+		urlHash: 'f3ee58ccad5b73604401c32f5ce451e773809784',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+		urlHash: '1eb054801b62cdf521f2a266ea9336ff6072cab3',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+		urlHash: 'fef14a0fce263eab6abdcf946c39d3e496bff766',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/zerion-wallet-crypto-defi/klghhnkeealcohjjanjjdaeeggmfmlpl',
+		urlHash: 'f4db2da787034114958427804936711fd439e152',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
+		urlHash: 'da0b34b74deeac2a56309905cb86da9028010e11',
+		retrieved: '2026-03-31',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
+		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
+		retrieved: '2026-03-31',
+	},
+	{
+		url: 'https://techcrunch.com/2022/02/15/web3-mobile-wallet-startup-rainbow-raises-18m-series-a-from-alexis-ohanians-fund/',
+		urlHash: '090640f8b142069bbcef4cd144b5533a862c2600',
+		retrieved: '2026-04-26',
+	},
+	{
+		url: 'https://rainbow.me/support/app/restore-from-a-backup',
+		urlHash: 'd69769c0a41f388feadaa319c9137f54e039d90a',
+		retrieved: '2026-04-27',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/0e74e323e06e6ba30192dcaa93ffb536db9a2156/contracts/AmbireAccount7702.sol',
+		urlHash: 'ea4ded798c88fe910641f6a1c011f7df6227751d',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/4cce586884a8224a8ea2a696150207ad37680dc9/contracts/AmbireAccount.sol',
+		urlHash: '57d336ea60f2f1505a18cda02e9a054124f4e46c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/851dc597dbe02143876ccc9f013d25cce9b20a51/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+		urlHash: '9f2914938e1deb0427039a16d11782e8a1ff8f95',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/22678d08810b6f28fa55886c4214d3bc54260d1f/src/consts/networks.ts',
+		urlHash: '904fe3bf6ea3cdc1d0a9daf683ff82d0e98618f4',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/e3a749a1cb2e4bf098b18e547b363a1931a81d29/src/services/ensDomains/ensDomains.ts',
+		urlHash: 'a309f80f3ffb5261f36c6d67fc544bcd6ae5c4ff',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/362e2dc1e2e769d23f5de1717b66ff295c8e91bc/src/libs/portfolio/getOnchainBalances.ts',
+		urlHash: 'a5fe081d833ab1f181c03745966ecd44367a1578',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/104b0a29114a2133c19dcb833c7425de096fbb92/src/web/extension-services/background/background.ts',
+		urlHash: 'a52f887c478cdf142987c2d5deff5523141227ac',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/82c86aa342b85ece2afbe3689a5b52be9c6e1ff9/LICENSE',
+		urlHash: '85cf1937413652d10bfd2549823981e5a26f92fb',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/5942801f127d41d25170ef079e94aa64eb606210/src/common/config/analytics/CrashAnalytics.web.ts',
+		urlHash: '004b3bdb4fd4cd317415419485cd8574a6332f86',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/b4e45b584754694555d433a52e8aab8f4e0ac539/src/common/modules/settings/components/General/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+		urlHash: 'd6431e5e34c7fd41b76090cab2abcac9140b630e',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/2a5bfb52fc07d6ab23a30aed001cade45dde6824/src/common/modules/hardware-wallets/qr/wallets/index.ts',
+		urlHash: 'e985c48ca9f45c77808fe36049fabc8dbbef3dd8',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/4be3dfec816cdd11039c1d260943a1a98affdc92/audits/Pashov-Ambire-third-security-review.md',
+		urlHash: 'e1661818fa0bf5615f3ebf2ba4427c97cc6d449e',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/2bf3233cd22c28eca7f87a6ef997325936ca3214/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		urlHash: '5a3e2f5a3ac19aa21b4c316b9c63f3b1b35607f4',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/2216ea165a56b01ccb76ab2895fa1295577af10e/src/controllers/phishing/phishing.ts',
+		urlHash: '1e839937e9e4b48890f3563bca3792895f6b2e52',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/package.json',
+		urlHash: 'e0569dfeff9c2593ced12f1084822f440cafee73',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extensions.yml',
+		urlHash: '04a1c6fd54c786ae87887588d9f6ae11aba3ce30',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/releases',
+		urlHash: '849318a4369731fddf595512cceb2687a1c2b87f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-android.yml',
+		urlHash: '8cc861094e61ad72a9930fca1689ce7fac3e6934',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/_build-ios.yml',
+		urlHash: 'bc8008c46a0cf7533236f98ea5e4dd75eda6e26f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/19c22dbba374dc12730f1f40e3fce33e71ad2f90/.github/workflows/build-extension-gecko.yml',
+		urlHash: '9ab6fba98d37d5aa0e12de62c6eac3fa46ae71ff',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/base/eip-7702-proxy/blob/429ba3c76186a72949235e23cc84267bf456b48a/src/EIP7702Proxy.sol',
+		urlHash: 'ba60f0067a8e39cd408f3c9429e686cffbec8ba0',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://blog.base.dev/securing-eip-7702-upgrades',
+		urlHash: '45578e8572e30bafcac119896f8776c0dad71c4b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet/blob/9edcf7f174c3ebef100a4400e6a17c746ea521a4/src/CoinbaseSmartWallet.sol',
+		urlHash: '68783ca350a8c20e4e31f467573f8ee603830923',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://docs.base.org/base-account/overview/what-is-base-account',
+		urlHash: '25d7ef1a8275877572f93e26ddb8bc10986c2f07',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/src/CoinbaseSmartWallet.sol',
+		urlHash: '917cf7f643fb0ec6b10c3683d994328bbf6dde6c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-December-2023.pdf',
+		urlHash: '8bf48094016c6c6ddf63e9a4104d7711c1fca5fa',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Certora-February-2024.pdf',
+		urlHash: '9eec18ee2e3196a95c234fb7eed5a2c17396cfa1',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://code4rena.com/reports/2024-03-coinbase',
+		urlHash: 'f31da788a707435172b89faae98b70c90c92ecdf',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet/blob/0fe87f18488fa89b792896d79de3200242778a68/audits/Cantina-April-2024.pdf',
+		urlHash: '8eaba3a5ea421a00595fbf9c2ca8013fc9ed4322',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/base/account-sdk/blob/24ab30c1a42a66bde605a43b1a60045b2fd19fec/packages/account-sdk/src/store/chain-clients/utils.ts',
+		urlHash: '9152212b9a9cba73d61c3f6334f1f4eff55f71c7',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://docs.base.org/base-account/improve-ux/batch-transactions',
+		urlHash: '1a644d77289e138fe4c0f1c50e0b7ea74ab5b917',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/base/account-sdk/blob/8b1c268d5c99023d78092518506a9507da4c1c6c/packages/account-sdk/src/core/rpc/wallet_sendCalls.ts',
+		urlHash: '34a806206be3190861e48b945a64ee991e10161b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://etherscan.io/tx/0x5d7d80b72125903d6d4df9c7af1b98a3a9b23c0719549ee4b915c1659de8ebda',
+		urlHash: '04f2f665dff20360294873b9603b507192aa1a8c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/01e18724ff6c1ac77727a14e64ec0f72749f54d5/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
+		urlHash: 'ef7d52ce45eb793b82d199e75a5625a249223a59',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/226ed1a1f5087a39ce87e6be17a66c1ce1189e9d/LICENSE',
+		urlHash: '7b2ac046dc415730ec7f82537bd0e703ee393867',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/daimo-eth/p256-verifier/blob/402e7b4ec4b91f941529f43f9270a8727f647c98/src/P256Verifier.sol',
+		urlHash: 'f8cf5e961aeb7e46fb7b6d763a525484a43e6b75',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/0a31a01bf47dcf339db57df4891db23ba914f1ba/audits/2023-10-veridise-daimo.pdf',
+		urlHash: '94e5185032ff214e74f3f6e5d4c2c0b2df637bf3',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/gemwalletcom/gem-ios/blob/ef264f54eacacacba837735ac6ed605c9512f84a/LICENSE',
+		urlHash: 'a416db0a12a8ec3cc152e2e58472723ce3675304',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/consenlabs/token-core-monorepo/blob/9798639887b0496b562490952d8f1585047a749e/LICENSE',
+		urlHash: '16ea36bcac493f2ede6f5959255bd0311be9d95f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/c83a307e909b1f767531162a8e30043254d0e9b7/LICENSE',
+		urlHash: 'e07cbbfdda698b5b9e038781bb57044ecc547344',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-mobile/blob/d502f24bb850d279709081c2667adb53a1eff20f/LICENSE',
+		urlHash: 'c035bf95b60e66bd474014545aa237724d1e1c22',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/9c8c6bcb8b5b48718018b6e2c800d0e05c5d30a9/ui/components/app/recovery-phrase-reminder/recovery-phrase-reminder-container.tsx#L24-L26',
+		urlHash: 'feed25aa098fb1f0d9c0130a86da20477af5bc2b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+		urlHash: 'e9bf48d93daf8757620550840d34b3056bd83030',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/1c439c5aecc7176328c87fa424455b2beb35acf3/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+		urlHash: 'd9fe81722074beb7c8e501f77b96b1a7d662c12f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://x.com/MetaMask/status/2067299428680265791',
+		urlHash: '4e03f6b7ee3f9e113bfa47a56629d0fbbf376eec',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/publish-release-from-release-head.yml#L138-L260',
+		urlHash: '78feb04c815af49cd46d8eaafe759893bd389773',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/upload-extension-to-cws.yml#L53,L340-L353',
+		urlHash: '77e375733e80246cb09abbaaa193ebb9f3fe7819',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json',
+		urlHash: 'dea579f6c10de0bd73aa99bb44bd4150d1b47e9f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/repository-health-checks.yml#L37-L47',
+		urlHash: 'e2324a027b5c0d33d9f24b60fcc8118df733572f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/repository-health-checks.yml#L63-L132',
+		urlHash: 'd68534eb1d442fbfb218b105989bbd2f6e1aae0c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/.github/workflows/security-code-scanner.yml',
+		urlHash: '5329d6e32c8cf39eb498dc001e35b769e00ffdb3',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/CHANGELOG.md',
+		urlHash: '5b0abf06bfdf6fb8c656c27411371b0c1c336645',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/rules/833719',
+		urlHash: 'ab8b5808fc9561285ddecd866c896838f13ab1b4',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/rules/11609401',
+		urlHash: 'f532f79136f8bff669b4ee29f0f3ffe305144e50',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/rules/895542',
+		urlHash: '5f069e5e7d6843fbc04182e09ba1673c71f25345',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/rules/4683630',
+		urlHash: 'e6885d620ba5fe6cbd36d99408b14c1fa5b1b8fc',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/rules/18725950',
+		urlHash: 'b268c7d4dea7b965a028725b53a18f123ed7470a',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/pillarwallet/x/blob/43b3392ad3379a04bbe64318143f1df1d5208c70/LICENSE',
+		urlHash: '2406638ff24489cc36e0563adc1886e7d88c47ae',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/163a6cce4e12b1403b31a99da88bd417029a9973/src/background/utils/buildinProvider.ts',
+		urlHash: '8cb47380f27630711fc5b1a28812fb491b591ccb',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/2194a1c8a4ec199e7b6fe0fa1dee5cd1997fcb1c/LICENSE',
+		urlHash: '1d4bb3cb9192c3f58f0c5c714e7fe342bbdf8198',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/LICENSE',
+		urlHash: '58896ad0f1c5e6f0f54795a8f98173f7f06b2c8d',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://bugrap.io/bounties/Rabby%20Wallet',
+		urlHash: '362cbd7a16cdceef8708a2d96973b97b6754a957',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+		urlHash: '32e445e31a760cd20de6eb2d0ae0d2aa1e7e629f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
+		urlHash: 'bc949e9f367d60c1a04df229c9fe8b80dda1a2d1',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
+		urlHash: '673a68573d090ee125022755573f53d43662af4d',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/RabbyDesktop/blob/39b04238052ba559ccae1c962cbafcfb3286ca4c/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
+		urlHash: '0a4842b0262f31c72992d02a4d56c31ff0048e08',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+		urlHash: 'f8d44f53a7cbc3064fec6106a41790b4635a1f7b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+		urlHash: 'c13fcf04deebe90e8bfc0a9843596830fa2c3490',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile/blob/4c463a3fcac064228151a0f65a5af43218db53b2/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+		urlHash: 'b04047d49900586ad03f8d5ca2c13277593334c4',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
+		urlHash: '726be04ed138f26adfe05a67667c9a63f7f154b7',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
+		urlHash: 'af2275135b35a93301e751ddf765c18ba42b5b12',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/src/background/utils/password.ts#L60-L98',
+		urlHash: '5c64eeccda05a247a3f77973cdc37cc55011971c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/src/background/service/keyring/index.ts#L288-L290',
+		urlHash: 'f64d4903f64eaf65a2a0e745de2e56f0449c3dc6',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/896107ac9ab167b561f7cb116945abe43a63fc62/.github/workflows/build.yml',
+		urlHash: '93317ec45e84095e954ff95b01b61be31916cbc7',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/releases',
+		urlHash: '8445281c46507f211f1e34955ba0edeeed570560',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
+		urlHash: '227fe17dd3356637cefddc447c570fbcfad2b048',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/ios/Rainbow/Info.plist',
+		urlHash: '1701f93942da9a9edfeef673a753821c23f35ad2',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Uniswap/calibur',
+		urlHash: '2f526c51f0382da1a0e7f7d5bfae135b36f0408b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://x.com/rainbowdotme/status/2026753700216127820',
+		urlHash: 'f5d6b7cd74f1b8074fced45f0b7a083daf064da8',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/a6caacc07ddad0d40554d647dc4414945c9ebb81/src/features/delegation/willDelegate.ts',
+		urlHash: '2d6da348ad2d024841388e14c9e8e87bd6ff5381',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://rainbow.me/support/app/bridge-and-swap-tokens',
+		urlHash: 'db968749393c06252a412af9eb0725409c717c3f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://rainbow.me/support/app/supported-networks',
+		urlHash: 'e810e78acf0769d882a66a4ee8b05c405158d967',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/c26561eefb4251146db71e5b39f6f0b7233fa647/LICENSE',
+		urlHash: '1050de2bd78604d8ee344b011443c2ed922b9be2',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://coinlist.co/rainbow',
+		urlHash: 'a7bbd0029a120e195d5669f25bd967d6161cf037',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/903d96e1075054ede51a721f5430b09c530fedf9/src/logger/sentry.ts',
+		urlHash: '60d452f7783f7d7f9a07bb043964ac3702d233ec',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/bcaa23256cdab40bea73a5bf89a232d8f13f9ac0/src/screens/SettingsSheet/components/PrivacySection.tsx',
+		urlHash: 'f20efc75e675227ed8b66d8cc994d3706263fb2f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/566dbc30d057e007a6f05ca2694cc600683e4ae8/src/core/sentry/index.ts',
+		urlHash: '6add12a79bf82c2a93fc7911dfd25422e9b988d8',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/fa6b1e08a12d964cc82f61ff657ec586dd5086e5/src/analytics/index.ts',
+		urlHash: '205a3a71c3eaf28b616290bf48398fd50b2ca4d4',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/b5da91cd683f1b9cdd2eb4a43b3b8314986cf1af/src/analytics/index.ts',
+		urlHash: '854c7666cc1666a19bc542acc895aeeb32035b71',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/analytics/event.ts#L1177-L1192',
+		urlHash: '2d0ff2b2fdb26e582c15eef61b742828d976680f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/hooks/useWalletBackups.ts#L49-L68',
+		urlHash: '33a277e1c35b3fce4a91f1b5839b54a89c220df1',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/state/walletBackups/index.ts#L8-L19',
+		urlHash: '8c98bad4d8bfad8a196bef4d2f640cedcb88412e',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/84494d81757fb9e745ee592b067bb617a9f2074b/src/features/backup/backup.ts#L698-L712',
+		urlHash: '496c7975a4b3d4cc756c966184f26f530617ec80',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://www.blockaid.io/blog/rainbow-wallet-mobile-app-and-browser-extension-powered-by-blockaid',
+		urlHash: 'd7f15bc27e16a6513cfd3c2e8ffba9f06bc710e5',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/graphql/queries/metadata.graphql#L149-L205',
+		urlHash: '99a17d2e531a7c29d11f2e3f844b50fe3006e672',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/SendTransaction/SendTransactionsInfo.tsx#L206-L281',
+		urlHash: '9b1c4e863bae0539250635b80349ddf145e5f8ab',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/graphql/queries/metadata.graphql#L106-L120',
+		urlHash: '74fbc071b55de0826e554a2c06d29f17ac726e49',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/resources/metadata/dapp.ts#L48-L65',
+		urlHash: 'c3ef4fdb001eb4ead11d22a740c7d5ad47ac2223',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/RequestAccounts/RequestAccountsInfo.tsx#L20-L69',
+		urlHash: 'cb9141a71b80e14cba03aec030218c28f6e4ca1f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/messages/Simulation.tsx#L111-L213',
+		urlHash: 'b58982752843f221ad7b85fffec370a20e0b9a20',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/graphql/queries/metadata.graphql#L168',
+		urlHash: 'fd23b6a249c4721cf6595e6d8224c138970a6421',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/graphql/queries/metadata.graphql#L98',
+		urlHash: '64f0d3b90940d610be7b5ceb5521605ad600dd33',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/features/dapp-browser/services/handleProviderRequest.ts#L116-L139',
+		urlHash: '5fada7e0a6d854e5773c6b3410cb1d5f5a9b6b0c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/a37815f49d1a08fa3eab1be820691c8a57a44e27/src/screens/WalletConnectApprovalSheet.tsx#L181',
+		urlHash: '2de7b1eade94a57092d485eb77aa3777373d8877',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/132521f80261f1c4473c33965ee27976d8506630/src/core/keychain/KeychainManager.ts',
+		urlHash: 'a8ee7381491278721aff262423b063707c74f6b9',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L149',
+		urlHash: 'fff1ce0fe3c89752fcc7ba30ab2999757d7e55d8',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L4-L5',
+		urlHash: '26fbe057d2c8a3ed9a61bfd7dd7238acf0c4fa88',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/package.json#L122',
+		urlHash: '58b90c1548bbe948522b1608c473ab0142d008cc',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/yarn.lock#L4136-L4139',
+		urlHash: 'e6bc067abf089fbab65a570bc37f54285866ee07',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/features/local-auth/keychain.ts',
+		urlHash: '9e64af4fc612fa8f66d6af27a3dd87dd87466e67',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L656',
+		urlHash: '862d3bf2ee8fd478b3743479c02fecf5cffe3560',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L11',
+		urlHash: '73c72bfa5316ddbccf4e392ffa2ab02692c81aec',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/package.json#L241',
+		urlHash: '6851bd12d706c432e17ab31f9b4f44ac54a01d0c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/yarn.lock#L21931-L21933',
+		urlHash: '6721174b4bd46590eaf6f1db5776a334d6c0f873',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/package.json#L319',
+		urlHash: '2f3fdd8b43e08ec20cb72a07ea36a488b5a240da',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/shim.js#L1',
+		urlHash: '5bb853bd92d96444c6331efdc66da4eab181918f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/index.js#L31',
+		urlHash: '53f2922677f597864c1e850d683107fc7ee63aaf',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
+		urlHash: 'd1ba3049a23865db7d4509b7d768a4efb910481f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/d79896d683cfa0ef8a8a6133057c4060acdbe63c/.github/workflows/android-play-store.yml',
+		urlHash: '01957e78793c9d526cd1c59c88896e4ae638fafe',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/4782c0a9010ea5783761144fb46ef0b55f4cc572/.github/actions/ios-build/action.yaml',
+		urlHash: 'fb1d42998780fbc3e5cb0103b707b14c814a4cba',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/blob/c203ae4e9cb48627310f37ebbab05dbb43211286/.github/workflows/unit-test.yml',
+		urlHash: 'dcafd9454594b0bea11bb59e65bcb02e195b9a4e',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/browser-extension/releases',
+		urlHash: '4df6429eb64b9091c00f78abd8885b3256fa708e',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow/releases',
+		urlHash: 'ebd468d5172dce03bf2928d7000638a0a4bb41ae',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/safe-fndn/safe-modules/blob/1e57772571fc72471b7bc3203fde9b1799fb87d4/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
+		urlHash: 'd5012b8e4dd384ecfbfea9faebf24ea9d7b1ecb1',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+		urlHash: '47d37e8930552c9d6ef14f0a49d8bcb8f74e6d55',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/safe-fndn/safe-smart-account/blob/a0f4c3691fc4385ceb09785b0c0b76f5a2d09c20/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+		urlHash: '6c51d921f7dea8802fbe85a353c9b324f47cc60c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Uniswap/interface/blob/64ff3de5ac6c4840ca6b32947b3529aea49930cc/apps/mobile/LICENSE',
+		urlHash: '6ac0c01d640ae1f428dbbb49514220bb917c6a65',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://techcrunch.com/2022/10/13/uniswap-labs-raises-165-million-in-new-funding/',
+		urlHash: '23ae6ec55e419939adbef15cac68334d706d4e56',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://cantina.xyz/bounties/f9df94db-c7b1-434b-bb06-d1360abdd1be',
+		urlHash: 'ad5234d3f2a749ff68602d9af4176968284636b5',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+		urlHash: '55c74574eb7696a70c8d7de5305bc1a4db7b2a95',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/components/BackupInfoNote/BackupInfoNote.tsx#L12-L18',
+		urlHash: 'aae5e7490d333b07805ca874e924c8921e82801c',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/wallet-simulate-transaction.ts#L46-L63',
+		urlHash: '370a680e21bc8cd99371d1145eff2e7419c8af28',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/zerion-api/requests/security-check-url.ts#L19-L28',
+		urlHash: '4923611506f3434abe4082d06faebaceb9ca8921',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/76c2f4384d345fe6790121055b1afb603a02d1ae/package-lock.json',
+		urlHash: '81e62672e26e3a85cafd5efb9d75e32f292889eb',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/releases',
+		urlHash: 'e9e356705fb0357a4481a609126c85d7127b7a3b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension/rules/12153885',
+		urlHash: '251326309a3c41cb4b58de5026ef29da5dad2c68',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus/blob/7bd2a133344bfa5b52dfe0df6e8864839cbbaee9/src/gui/ui/dapps/across.rs',
+		urlHash: '6d1c24e5c63ce3b23679a459ec7d85156cec0619',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus/blob/e2f12ad22ae24845f8f9bee1f0187be0a5bd07c8/LICENSE-MIT',
+		urlHash: '00413d64bf8d180aac4ef90ada9dc07e6e9322a4',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/gui/ui/tx_window.rs#L246C1-L247C1',
+		urlHash: '920b9ff241792bdccdfade4aa1bf6a8801658a3b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/utils/tx.rs#L241C1-L242C1',
+		urlHash: 'd2acb7759db5e6afc8be7ce8c0cd92d2a608c467',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/core/tx_analysis.rs',
+		urlHash: '36edb201f899b2acf17183bcebe6ded6a56aab8f',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/3542eeae9f4455bec107fe0f02230453719706a6/LICENSE.md',
+		urlHash: '0aa691ff2788fa13980b01697e4b5ec03e83fc66',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/keycard-tech/keycard-shell/blob/48020c66841b795b4766e358f4b108a33654a347/LICENSE',
+		urlHash: 'bde3c38d51d292d599776a71224e8dda8f7b7887',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8149990d5bef3c86355b3e60281427c90d/app/keycard/keycard.c#L240',
+		urlHash: '871eaf52b807a602e9eace4be0da22e07fbbea50',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8149990d5bef3c86355b3e60281427c90d/app/ui/english.c#L140',
+		urlHash: '226b1c5ce0a98818725ba0fac0d6ce5b1243dbfa',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/keylabsio/audits/blob/24e10a7404106494f66c5ebcf49b8fa4eaaa2d3c/2023-11-keystone3.pdf',
+		urlHash: '7f131a77321a81ec479711b399ddd679b0f644bd',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/slowmist/Knowledge-Base/blob/bbf894fc9c42d1e9af7b2690f54fc94c7d0fc299/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
+		urlHash: '83452663211ba04cedc46593fd74711be4f6871a',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/slowmist/Knowledge-Base/blob/49f4b9fce925d988b7d291bb0b97d0b6aac5f44f/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
+		urlHash: '4c113ed14d5f390d54abed081e9f468e7130c1d8',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://docs.keycard.tech/en/help/about-your-keycard-pin-and-duress-pin',
+		urlHash: 'b1bd7446ea0f44475aa37d10bb8893a980982ed2',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://immunefi.com/bug-bounty/zerion/information/',
+		urlHash: '723a86666673447a39b71228a2c4355e9d4c0112',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/2686012c743f222b61b19b9435016117d59b7d5e/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
+		urlHash: 'f82d4976eff28421dead657431d3f9488293a74b',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://apps.apple.com/us/app/base-app-built-to-trade/id1278383455',
+		urlHash: '82cf596b186ea3d80b60f3dceb86f569281a28c8',
+		retrieved: '2026-08-13',
+	},
+	{
+		url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/contracts/libraries/WebAuthn.sol',
+		urlHash: 'f2bce4d31798dc0bd7589d97fad59fdc16f393b2',
+		retrieved: '2026-08-13',
+	},
+]
