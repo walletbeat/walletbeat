@@ -152,7 +152,7 @@ export const keycardShell: HardwareWallet = {
 				basicUnlock: {
 					ref: [
 						'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8149990d5bef3c86355b3e60281427c90d/app/keycard/keycard.c#L240',
-						'https://docs.keycard.tech/duress_pin',
+						'https://docs.keycard.tech/en/help/about-your-keycard-pin-and-duress-pin',
 					],
 					mechanisms: {
 						[BasicUnlockMechanism.PIN]: true,
@@ -164,7 +164,7 @@ export const keycardShell: HardwareWallet = {
 				duressMode: supported({
 					ref: [
 						'https://github.com/keycard-tech/keycard-shell/blob/b25a5f8149990d5bef3c86355b3e60281427c90d/app/ui/english.c#L140',
-						'https://docs.keycard.tech/duress_pin',
+						'https://docs.keycard.tech/en/help/about-your-keycard-pin-and-duress-pin',
 					],
 					actions: {
 						[DuressAction.DECOY_WALLET]: true,

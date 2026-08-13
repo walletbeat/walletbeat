@@ -227,7 +227,7 @@ export const baseApp: SoftwareWallet = {
 						{
 							explanation:
 								'Apple App Store privacy label declares "Diagnostics: Crash Data" and performance metrics are collected.',
-							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
+							url: 'https://apps.apple.com/us/app/base-app-built-to-trade/id1278383455',
 						},
 						{
 							explanation:
@@ -243,7 +243,7 @@ export const baseApp: SoftwareWallet = {
 						{
 							explanation:
 								'Apple App Store privacy label declares Product Interaction (usage data) is collected and linked to identity. It states that it is used for external advertising, developer advertising/marketing, and analytics. The in-app "Personalized Advertising" toggle (defaulted on) reduces sharing, but does not stop the underlying analytics collection.',
-							url: 'https://apps.apple.com/us/app/base-formerly-coinbase-wallet/id1278383455',
+							url: 'https://apps.apple.com/us/app/base-app-built-to-trade/id1278383455',
 						},
 						{
 							explanation:
