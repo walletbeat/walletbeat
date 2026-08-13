@@ -44,7 +44,6 @@ describe('ratedWalletJsonExport', () => {
 
 				expect(payload.walletId).toBe(wallet.metadata.id)
 				expect(payload.displayName).toBe(wallet.metadata.displayName)
-				expect(payload.description).toBe(`${wallet.metadata.displayName} Ethereum wallet`)
 				expect(payload.lastUpdated).toBe(wallet.metadata.lastUpdated)
 				expect(payload.types.sort()).toEqual(setItems(wallet.types).sort())
 				expect(payload.stage).toBe(stageToExportString(stage))

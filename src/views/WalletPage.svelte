@@ -494,7 +494,6 @@
 			about: {
 				'@type': 'SoftwareApplication',
 				name: wallet.metadata.displayName,
-				description: `${wallet.metadata.displayName} Ethereum wallet`,
 				url: (
 					typeof wallet.metadata.url === 'string' ?
 						wallet.metadata.url

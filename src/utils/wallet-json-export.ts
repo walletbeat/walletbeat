@@ -145,7 +145,6 @@ export interface RatedWalletJsonExport {
 	variants: Variant[]
 	walletId: string
 	displayName: string
-	description: string
 	lastUpdated: string
 	stage: string | null
 	stageBreakdown: StageBreakdownItemJsonExport[] | null
@@ -375,7 +374,6 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 		types: setItems(wallet.types),
 		variants: setItems(getVariants(wallet.variants)),
 		displayName: metadata.displayName,
-		description: `${metadata.displayName} Ethereum wallet`,
 		lastUpdated: metadata.lastUpdated,
 		stage: stageExport,
 		stageBreakdown,

@@ -9,7 +9,6 @@
 		"overall",
 		"perVariant",
 		"displayName",
-		"description",
 		"lastUpdated",
 		"stage",
 		"stageBreakdown"
@@ -46,10 +45,6 @@
 			"type": "string",
 			"minLength": 1,
 			"description": "Human-readable wallet name."
-		},
-		"description": {
-			"type": "string",
-			"description": "Short wallet description for JSON-LD (e.g. \"MetaMask Ethereum wallet\")."
 		},
 		"lastUpdated": {
 			"type": "string",
