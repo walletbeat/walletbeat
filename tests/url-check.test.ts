@@ -83,7 +83,7 @@ async function checkValidUrl(url: Url): Promise<void> {
 		})
 
 		// Without an explicit socket timeout, a host that accepts the connection but
-		// never responds would hang until vitest's testTimeout. 
+		// never responds would hang until vitest's testTimeout.
 		// Fail fast instead, like `pnpm validate-urls` does.
 		req.setTimeout(15000)
 		req.on('timeout', () => {

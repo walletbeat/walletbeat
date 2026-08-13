@@ -39,7 +39,7 @@
 		"dev:background:restart": "deploy/dev/background-dev.sh --restart",
 		"lint": "pnpm run check:syntax --write && pnpm run check:lint --fix && pnpm run check:spelling:reorder",
 		"preview": "pnpm run astro preview",
-		"fix": "pnpm run lint && pnpm run check:treasury:markdown && pnpm run wallet-data-collection lint-fix && pnpm run check:features:markdown && pnpm run generate:css-attributes && pnpm run generate:wbicons",
+		"fix": "pnpm run lint && pnpm run check:treasury:markdown && pnpm run wallet-data-collection lint-fix && pnpm run check:features:markdown && pnpm run generate:css-attributes && pnpm run generate:wbicons && pnpm validate-urls",
 		"helios": "deploy/helios/helios.sh",
 		"helios:wrap": "deploy/helios/helios-wrap.sh",
 		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts",
