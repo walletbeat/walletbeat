@@ -194,8 +194,8 @@
 		"eslintcache",
 		"etc",
 		"eternalsafe",
-		"ETH",
 		"eth",
+		"ETH",
 		"EthCC",
 		"Ethereans",
 		"Etherscan",
@@ -232,6 +232,7 @@
 		"gatekeeping",
 		"gemwallet",
 		"geolocation",
+		"getETHBalance",
 		"Geth",
 		"gitbook",
 		"Gitcoin",
@@ -444,6 +445,7 @@
 		"postcapitalism",
 		"PR",
 		"preconfigured",
+		"prefetch",
 		"pressable",
 		"PRNG",
 		"prodversion",
@@ -480,6 +482,7 @@
 		"resolvers",
 		"RetroPGF",
 		"reviewable",
+		"revm",
 		"RF",
 		"riscv",
 		"rman",
@@ -491,6 +494,8 @@
 		"rollups",
 		"Rotki",
 		"roundtrip",
+		"rpc",
+		"RpcSyncer",
 		"RPGF",
 		"RRGGBB",
 		"RRGGBBAA",
@@ -540,17 +545,20 @@
 		"stablecoin",
 		"stablecoins",
 		"starkware",
+		"StateView",
 		"Stax",
-		"Stańczak",
+		"Sta\u0144czak",
 		"Storacha",
 		"subcolumns",
 		"subcriteria",
 		"subresource",
+		"Subsquid",
 		"substeps",
 		"subtable",
 		"SV",
 		"svgs",
 		"svgtofont",
+		"syncer",
 		"takeoverable",
 		"Tangem",
 		"tantodefi",
@@ -595,6 +603,7 @@
 		"unreviewed",
 		"unruggability",
 		"unruggable",
+		"unshield",
 		"unshielding",
 		"unverifiability",
 		"upconvert",
@@ -652,6 +661,7 @@
 		"Zerion",
 		"zeriontech",
 		"Zirkus",
+		"zk",
 		"ZKID",
 		"ZKSync"
 	],
@@ -676,24 +686,54 @@
 		"resources/contracts/images/**"
 	],
 	"patterns": [
-		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
-		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
+		{
+			"name": "Bitcoin addresses",
+			"pattern": "/\\bbtc:[0-9a-z]+/g"
+		},
+		{
+			"name": "CIDv1",
+			"pattern": "/\\bbafy\\w+/g"
+		},
 		{
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
-		{ "name": "Git commit ref pins", "pattern": "/@(?:[0-9a-f]{40}|[0-9a-f]{7})\\b/g" },
-		{ "name": "Git short commit hashes", "pattern": "/\\b[0-9a-f]{8}\\b/g" },
-		{ "name": "GitHub line anchors", "pattern": "/\\bL\\d+(?:-\\d+)?\\b/g" },
-		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" },
-		{ "name": "Million-dollar and billion-dollar amounts", "pattern": "/\\$[.0-9a]+[BM]/g" },
+		{
+			"name": "Git commit ref pins",
+			"pattern": "/@(?:[0-9a-f]{40}|[0-9a-f]{7})\\b/g"
+		},
+		{
+			"name": "Git short commit hashes",
+			"pattern": "/\\b[0-9a-f]{8}\\b/g"
+		},
+		{
+			"name": "GitHub line anchors",
+			"pattern": "/\\bL\\d+(?:-\\d+)?\\b/g"
+		},
+		{
+			"name": "Hexadecimal addresses",
+			"pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi"
+		},
+		{
+			"name": "Million-dollar and billion-dollar amounts",
+			"pattern": "/\\$[.0-9a]+[BM]/g"
+		},
 		{
 			"name": "Rabby Walle audit PDF filename",
 			"pattern": "/Debank Rabby Walle Audit Report\\.pdf/g"
 		},
-		{ "name": "Seven Seven Six", "pattern": "/Seven Seven Six/g" },
-		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" },
-		{ "name": "Version numbers", "pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g" }
+		{
+			"name": "Seven Seven Six",
+			"pattern": "/Seven Seven Six/g"
+		},
+		{
+			"name": "svgicons2svgfont",
+			"pattern": "/svgicons2svgfont/g"
+		},
+		{
+			"name": "Version numbers",
+			"pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g"
+		}
 	],
 	"ignoreRegExpList": [
 		"Bitcoin addresses",
