@@ -1568,8 +1568,6 @@ ol {
 		overflow-y: auto;
 	}
 	&[data-scroll-container~="inline"] {
-		container-type: block-size;
-		container-type: scroll-state block-size;
 		min-inline-size: 0;
 		max-inline-size: 100%;
 		overflow-x: auto;
