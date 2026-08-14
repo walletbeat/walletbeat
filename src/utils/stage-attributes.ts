@@ -165,7 +165,7 @@ export const getCriterionAttributeId = <_AttributeGroupId extends string>(
  * Get all criteria that reference a specific attribute across all ladders.
  * @param attribute The attribute to find criteria for
  * @param wallet The wallet to find criteria for
- * @returns An array of objects containing ladder type, stage number, and criterion
+ * @returns An array of objects containing ladder type, stage, its index, and criterion
  */
 export function getAttributeCriteriaForWallet<
 	_AttributeGroupId extends string,
@@ -189,7 +189,7 @@ export function getAttributeCriteriaForWallet<
 		.flatMap(({ ladderType, stage, stageIndex }) =>
 			allCriteriaInStage(stage)
 				.filter(criterion => getCriterionAttributeId(criterion) === attribute.id)
-				.map(criterion => ({ ladderType, stageNumber: stageIndex, criterion })),
+				.map(criterion => ({ ladderType, stage, stageIndex, criterion })),
 		)
 }
 
@@ -205,10 +205,10 @@ function toStageEvaluatable<_AttributeGroupId extends string>(
 }
 
 /**
- * Find which stage numbers (0-indexed) an attribute is used in for a given wallet,
- * restricted to stages where the wallet passes the criterion for that attribute.
- * Returns only the highest stage passed per ladder (e.g. "Stage 2" not "Stage 1, 2"
- * when the wallet passes both).
+ * Find the highest stage in each applicable ladder for which a wallet passes
+ * this attribute's criterion.
+ * Return stage objects rather than array indexes: ladder labels are not
+ * necessarily integer indexes (for example, index 1 is "Stage 0.5").
  */
 export function getAttributeStagesForWallet<
 	_AttributeGroupId extends string,
@@ -217,26 +217,22 @@ export function getAttributeStagesForWallet<
 	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: RatedWallet<_AttributeGroupId>,
-): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
+): Array<{ ladderType: WalletLadderType; stage: WalletStage<_AttributeGroupId> }> {
 	const stageEvaluatable = toStageEvaluatable(wallet)
 	const criteria = getAttributeCriteriaForWallet(ladders, attribute, wallet)
 	const stagesPassed = criteria
 		.filter(
 			({ criterion }) => criterion.evaluate(stageEvaluatable).rating === StageCriterionRating.PASS,
 		)
-		.map(({ ladderType, stageNumber }) => ({ ladderType, stageIndex: stageNumber }))
+		.map(({ ladderType, stage, stageIndex }) => ({ ladderType, stage, stageIndex }))
 
 	const uniqueLadderTypes = Array.from(new Set(stagesPassed.map(({ ladderType }) => ladderType)))
 
 	return uniqueLadderTypes.map(ladderType => {
-		const indices = stagesPassed
+		const { stage } = stagesPassed
 			.filter(({ ladderType: type }) => type === ladderType)
-			.map(({ stageIndex }) => stageIndex)
-		const maxStageIndex = Math.max(...indices)
+			.reduce((highest, current) => (current.stageIndex > highest.stageIndex ? current : highest))
 
-		return {
-			ladderType,
-			stageNumbers: [maxStageIndex],
-		}
+		return { ladderType, stage }
 	})
 }

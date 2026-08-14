@@ -68,18 +68,11 @@
 		ladders && getAttributeStagesForWallet(ladders, attribute.attribute, wallet)
 	)
 
-	const relevantStages = $derived(
+	const relevantStage = $derived(
 		ladderType && ladderEvaluation &&
 			attributeStages
 				?.find(stage => stage.ladderType === ladderType)
-				?.stageNumbers
-		||
-			[]
-	)
-
-	const firstStage = $derived(
-		relevantStages.length > 0 &&
-			ladderEvaluation?.ladder.stages[relevantStages[0]]
+				?.stage
 		||
 			undefined
 	)
@@ -99,18 +92,18 @@
 		</h4>
 
 		<div data-row="gap-2">
-			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
+			{#if relevantStage && ladderEvaluation}
 				<Tooltip buttonTriggerPlacement="behind">
 					<a
-						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
+						href={getWalletUrl(wallet, { variant, attributeAnchor: relevantStage.id })}
 						data-link="camouflaged"
-						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+						title={`This attribute is required for ${relevantStage.label}`}
 					>
 						<div
 							data-badge="small"
 							style:--accent="var(--accent-color)"
 						>
-							<small>Stage {relevantStages.join(', ')}</small>
+							<small>{relevantStage.label}</small>
 						</div>
 					</a>
 
@@ -118,7 +111,7 @@
 						<WalletStageSummary
 							{wallet}
 							{ladders}
-							stage={firstStage}
+							stage={relevantStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}
 						/>

@@ -851,10 +851,7 @@
 		{depth}
 		{attributeTree}
 		{evalTree}
-		{ladders}
-		{wallet}
 		{showScores}
-		{showStage}
 	/>
 {/snippet}
 
@@ -1001,6 +998,14 @@
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
 	{@const howToImprove = override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove}
+	{@const stageContext = showStage ? getWalletStageAndLadder(wallet) : null}
+	{@const relevantStage = (
+		stageContext?.ladderType
+			? getAttributeStagesForWallet(ladders, attribute, wallet)
+				.find(({ ladderType }) => ladderType === stageContext.ladderType)
+				?.stage
+			: undefined
+	)}
 
 	{@const variantSpecificCaption = (() => {
 		const thisVariantSpecificity = relevantVariants.length === 0 ? VariantSpecificity.ALL_SAME : relevantVariants.length === 1 ? VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT : VariantSpecificity.NOT_UNIVERSAL
@@ -1054,12 +1059,24 @@
 									<h3
 										title={formatAttributeTitleText(evalAttr)}
 									>
+									data-row="start gap-2"
 										{attribute.displayName}
 									</h3>
 								</a>
 							</div>
 
 							{#if attribute.question}
+
+									{#if relevantStage}
+										<span
+											class="attribute-stage-badge"
+											data-badge="small"
+											style:--accent="var(--accent-color)"
+											title={`This attribute is required for ${relevantStage.label}`}
+										>
+											<small>{relevantStage.label}</small>
+										</span>
+									{/if}
 								<div class="subsection-caption">
 									<Typography
 										content={attribute.question}
@@ -1077,69 +1094,6 @@
 								class="attribute-summary-companions"
 								data-row="gap-2 wrap"
 							>
-								{#if showStage}
-								{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
-
-								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
-
-								{@const stageNumbers = (
-									ladderType &&
-										attributeStages
-											.find(stage => stage.ladderType === ladderType)
-											?.stageNumbers
-									||
-										[]
-								)}
-
-								{#if stageNumbers.length > 0}
-									{@const stageNumber = stageNumbers[0]}
-									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
-
-									{#if stage && ladderEvaluation}
-										<Tooltip
-											buttonTriggerPlacement="behind"
-											style="--accent: var(--accent-color)"
-										>
-											<a
-												href={`#${stage.id}`}
-												data-link="camouflaged"
-												title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
-											>
-												<div
-													data-badge="small"
-													style:--accent="var(--accent-color)"
-												>
-													<small>Stage {stageNumbers.join(', ')}</small>
-												</div>
-											</a>
-
-											{#snippet TooltipContent()}
-												<WalletStageSummary
-													{wallet}
-													{ladders}
-													stage={stage}
-													{ladderEvaluation}
-													showNextStageCriteria={false}
-												/>
-											{/snippet}
-										</Tooltip>
-									{:else if stage}
-										<a
-											href={`#${stage.id}`}
-											data-link="camouflaged"
-											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
-										>
-											<div
-												data-badge="small"
-												style:--accent="var(--accent-color)"
-											>
-												<small>Stage {stageNumbers.join(', ')}</small>
-											</div>
-										</a>
-									{/if}
-								{/if}
-								{/if}
-
 								{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
 								<div
 									class="variant-indicator"
