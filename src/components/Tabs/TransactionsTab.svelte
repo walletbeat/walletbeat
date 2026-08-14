@@ -3,6 +3,7 @@
 
 	let {
 		selectedTx,
+		isCustom = false,
 		transactionState,
 		account,
 		onSendTransaction,
@@ -10,6 +11,7 @@
 		formatValue,
 	}: {
 		selectedTx: TestTransaction | undefined
+		isCustom?: boolean
 		transactionState: {
 			activeId: string | null
 			isPending: boolean
@@ -21,14 +23,151 @@
 		formatValue: (value: string, type: string) => string
 	} = $props()
 
+	const customTxId = 'custom-tx'
+
+	let customAddress = $state('')
+	let customCalldata = $state('')
+	let customAddressError = $state('')
+	let customCalldataError = $state('')
+
 	const isActive = $derived(
-		selectedTx && transactionState.activeId === selectedTx.id
+		isCustom
+			? transactionState.activeId === customTxId
+			: selectedTx && transactionState.activeId === selectedTx.id
 	)
 	const isPending = $derived(transactionState.isPending && isActive)
-	const txHash = $derived(selectedTx ? transactionState.hashes[selectedTx.id] : undefined)
+	const txHash = $derived(
+		isCustom
+			? transactionState.hashes[customTxId]
+			: selectedTx
+				? transactionState.hashes[selectedTx.id]
+				: undefined
+	)
+
+	function isValidAddress(addr: string): addr is `0x${string}` {
+		return /^0x[0-9a-fA-F]{40}$/.test(addr)
+	}
+
+	function isValidCalldata(data: string): data is `0x${string}` {
+		return /^0x([0-9a-fA-F]{2})*$/.test(data)
+	}
+
+	function sendCustomTransaction() {
+		customAddressError = ''
+		customCalldataError = ''
+
+		const address = customAddress.trim()
+		const calldata = customCalldata.trim()
+
+		if (!isValidAddress(address)) {
+			customAddressError = 'Enter a valid Ethereum address (0x…)'
+
+			return
+		}
+
+		if (!isValidCalldata(calldata)) {
+			customCalldataError = 'Enter 0x-prefixed hex calldata with an even number of hex characters'
+
+			return
+		}
+
+		onSendTransaction({
+			id: customTxId,
+			name: 'Custom Transaction',
+			function: 'custom',
+			parameters: [],
+			calldata,
+			contractAddress: address,
+		})
+	}
 </script>
 
-{#if selectedTx}
+{#if isCustom}
+	<div class="detail-card" data-card="radius-8 padding-5">
+		<header data-row="gap-2 start wrap">
+			<div data-column="gap-1">
+				<h3>Custom Transaction</h3>
+				<p class="body-text">
+					Send your own transaction by providing a contract address and calldata.
+				</p>
+			</div>
+			{#if txHash}
+				<button
+					type="button"
+					class="explorer-link"
+					onclick={() => onOpenInExplorer(txHash)}
+					title="View on Etherscan"
+				>
+					↗
+				</button>
+			{/if}
+		</header>
+
+		<div data-column="gap-4">
+			<div class="detail-section">
+				<label class="detail-label" for="custom-tx-address">📍 Contract Address:</label>
+				<input
+					id="custom-tx-address"
+					type="text"
+					class="address-input"
+					class:error={!!customAddressError}
+					placeholder="0x…"
+					bind:value={customAddress}
+					oninput={() => { customAddressError = ''; }}
+				/>
+				{#if customAddressError}
+					<span class="address-error">{customAddressError}</span>
+				{/if}
+			</div>
+
+			<div class="detail-section">
+				<label class="detail-label" for="custom-tx-calldata">📦 Calldata:</label>
+				<textarea
+					id="custom-tx-calldata"
+					class="address-input calldata-input"
+					class:error={!!customCalldataError}
+					placeholder="0x…"
+					rows="4"
+					bind:value={customCalldata}
+					oninput={() => { customCalldataError = ''; }}
+				></textarea>
+				{#if customCalldataError}
+					<span class="address-error">{customCalldataError}</span>
+				{/if}
+			</div>
+
+			<div class="warning-box">
+				<p class="warning-text">
+					<strong>⚠️ WARNING:</strong> This page is for testing only. Do NOT send real transactions.
+				</p>
+			</div>
+
+			<button
+				type="button"
+				data-pressable
+				onclick={sendCustomTransaction}
+				disabled={!account?.address || isPending}
+			>
+				{#if isPending}
+					Preparing…
+				{:else if txHash}
+					Transaction Sent ✓
+				{:else}
+					Send Transaction (Testing Only)
+				{/if}
+			</button>
+
+			{#if txHash}
+				<div class="result-box">
+					<span class="result-label">Transaction Hash:</span>
+					<button type="button" class="result-link" onclick={() => onOpenInExplorer(txHash)}>
+						{txHash.slice(0, 10)}…{txHash.slice(-8)} ↗
+					</button>
+				</div>
+			{/if}
+		</div>
+	</div>
+{:else if selectedTx}
 	<div class="detail-card" data-card="radius-8 padding-5">
 		<header data-row="gap-2 start wrap">
 			<div data-column="gap-1">
@@ -241,6 +380,40 @@
 
 	.detail-code.calldata {
 		font-size: 0.75rem;
+	}
+
+	.address-input {
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+			monospace;
+		font-size: 0.85rem;
+		background-color: var(--background-secondary);
+		color: var(--text-primary);
+		border: 1px solid var(--background-secondary);
+		border-radius: 0.5rem;
+		padding: 0.75rem;
+		width: 100%;
+		box-sizing: border-box;
+		outline: none;
+		transition: border-color 0.15s;
+	}
+
+	.address-input:focus {
+		border-color: var(--accent);
+	}
+
+	.address-input.error {
+		border-color: var(--rating-fail);
+	}
+
+	.calldata-input {
+		font-size: 0.75rem;
+		resize: vertical;
+		word-break: break-all;
+	}
+
+	.address-error {
+		font-size: 0.8rem;
+		color: var(--rating-fail);
 	}
 
 	.parameters-list {
