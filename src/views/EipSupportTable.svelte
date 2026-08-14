@@ -1,16 +1,7 @@
-<script lang="ts" generics="AttributeGroupId extends string">
+<script lang="ts">
 	// Types/constants
-	import type { Eip } from '@/schema/eips'
-	import type { EipSupport, RatedWalletEipSupport } from '@/schema/eip-support'
-	import type { RatedWallet } from '@/schema/wallet'
+	import { type EipSupportRow, EipSupportStatus } from '@/schema/eip-support-row'
 	import { Variant } from '@/schema/variants'
-
-	const EipSupportStatus = {
-		SUPPORTED: 'SUPPORTED' as const,
-		NOT_SUPPORTED: 'NOT_SUPPORTED' as const,
-		UNKNOWN: 'UNKNOWN' as const,
-		NOT_APPLICABLE: 'NOT_APPLICABLE' as const,
-	}
 
 	const eipSupportStatusSortPriority = {
 		[EipSupportStatus.SUPPORTED]: 0,
@@ -33,93 +24,37 @@
 		[EipSupportStatus.NOT_APPLICABLE]: '–',
 	} as const
 
-	type EipSupportStatus = (typeof EipSupportStatus)[keyof typeof EipSupportStatus]
-
 
 	// Props
 	let {
 		title,
-		eip,
-		wallets,
+		rows,
 	}: {
 		title?: string
-		eip: Eip
-		wallets: Array<RatedWallet<AttributeGroupId>>
+		rows: EipSupportRow[]
 	} = $props()
 
 
 	// Functions
-	import { ratedWalletEipSupport } from '@/schema/eip-support'
-	import { isSupported } from '@/schema/features/support'
-	import { refs } from '@/schema/reference'
 	import { variantLabel } from '@/schema/variants'
-	import { getWalletUrl } from '@/utils/urls'
-
-	const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
-		if (typeof support === 'string') {
-			return support === 'UNKNOWN' ? EipSupportStatus.UNKNOWN : EipSupportStatus.NOT_APPLICABLE
-		}
-
-		return isSupported(support) ? EipSupportStatus.SUPPORTED : EipSupportStatus.NOT_SUPPORTED
-	}
 
 	const variantSupportList = (
-		walletSupport: RatedWalletEipSupport,
-	): Array<{ variant: Variant; support: EipSupport }> =>
-		Object.values(Variant).flatMap(variant => {
-			const support = walletSupport.perVariant[variant]
-
-			if (support === undefined) return []
-
-			if (eipSupportStatus(support) === EipSupportStatus.NOT_APPLICABLE) return []
-
-			return [{ variant, support }]
-		})
+		row: EipSupportRow,
+	): Array<{ variant: Variant; status: EipSupportStatus }> =>
+		row.variants.filter(({ status }) => status !== EipSupportStatus.NOT_APPLICABLE)
 
 	const nonApplicableVariantList = (
-		walletSupport: RatedWalletEipSupport,
+		row: EipSupportRow,
 	): Variant[] =>
-		Object.values(Variant).flatMap(variant => {
-			const support = walletSupport.perVariant[variant]
-
-			if (support === undefined) return []
-
-			if (eipSupportStatus(support) === EipSupportStatus.NOT_APPLICABLE) return [variant]
-
-			return []
-		})
-
-
-	// State
-	const supportByWalletId = $derived(
-		new Map(
-			wallets.map(wallet => [wallet.metadata.id, ratedWalletEipSupport(wallet, eip.number)])
-		)
-	)
-
-	const getWalletSupport = (walletId: string): RatedWalletEipSupport => {
-		const support = supportByWalletId.get(walletId)
-
-		if (support === undefined) {
-			throw new Error(`Missing EIP support for wallet "${walletId}"`)
-		}
-
-		return support
-	}
-
-	const applicableWallets = $derived(
-		wallets.filter(wallet => {
-			const walletSupport = getWalletSupport(wallet.metadata.id)
-
-			return eipSupportStatus(walletSupport.overall) !== EipSupportStatus.NOT_APPLICABLE
-		})
-	)
+		row.variants
+			.filter(({ status }) => status === EipSupportStatus.NOT_APPLICABLE)
+			.map(({ variant }) => variant)
 
 
 	// Components
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 
-	import Table, { SortDirection } from '@/components/Table.svelte'
+	import Table, { type Column, SortDirection } from '@/components/Table.svelte'
 </script>
 
 
@@ -138,14 +73,14 @@
 
 	<div data-scroll-item="inline-attached underflow-center overflow-start">
 		<Table
-			rows={applicableWallets}
-			rowId={wallet => wallet.metadata.id}
+			rows={rows}
+			rowId={(row: EipSupportRow) => row.id}
 
 			columns={[
 				{
 					id: 'wallet',
 					name: 'Wallet',
-					value: wallet => wallet.metadata.displayName,
+					value: (row: EipSupportRow) => row.displayName,
 					isSticky: true,
 					sort: {
 						defaultDirection: SortDirection.Ascending,
@@ -154,7 +89,7 @@
 				{
 					id: 'status',
 					name: 'Support',
-					value: wallet => eipSupportStatusSortPriority[eipSupportStatus(getWalletSupport(wallet.metadata.id).overall)],
+					value: (row: EipSupportRow) => eipSupportStatusSortPriority[row.overall],
 					sort: {
 						isDefault: true,
 						defaultDirection: SortDirection.Ascending,
@@ -163,8 +98,8 @@
 				{
 					id: 'variants',
 					name: 'Platforms',
-					value: wallet => Object.values(getWalletSupport(wallet.metadata.id).perVariant)
-						.filter(support => eipSupportStatus(support) === EipSupportStatus.SUPPORTED)
+					value: (row: EipSupportRow) => row.variants
+						.filter(({ status }) => status === EipSupportStatus.SUPPORTED)
 						.length,
 				},
 				{
@@ -174,17 +109,15 @@
 				},
 			]}
 		>
-			{#snippet Cell({ row: wallet, column })}
-				{@const walletSupport = getWalletSupport(wallet.metadata.id)}
-
+			{#snippet Cell({ row, column }: { row: EipSupportRow; column: Column<EipSupportRow> })}
 				{#if column.id === 'wallet'}
 					<div class="wallet-info" data-row>
 						<span class="row-count" data-row="center"></span>
 
 						<span class="wallet-icon" data-icon="shadow">
 							<img
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-								alt={wallet.metadata.displayName}
+								src={`/images/wallets/${row.id}.${row.iconExtension}`}
+								alt={row.displayName}
 								width="36"
 								height="36"
 							/>
@@ -193,33 +126,29 @@
 						<div class="name">
 							<h3>
 								<a
-									href={getWalletUrl(wallet)}
+									href={row.url}
 								>
-									{wallet.metadata.displayName}
+									{row.displayName}
 								</a>
 							</h3>
 						</div>
 					</div>
 
 				{:else if column.id === 'status'}
-					{@const status = eipSupportStatus(walletSupport.overall)}
-
-					<span class="support-status" data-support-status={status}>
-						<span class="status-icon">{eipSupportStatusIcon[status]}</span>
-						<span class="status-label">{eipSupportStatusLabel[status]}</span>
+					<span class="support-status" data-support-status={row.overall}>
+						<span class="status-icon">{eipSupportStatusIcon[row.overall]}</span>
+						<span class="status-label">{eipSupportStatusLabel[row.overall]}</span>
 					</span>
 
 				{:else if column.id === 'variants'}
-					{@const perVariant = variantSupportList(walletSupport)}
-					{@const notApplicable = nonApplicableVariantList(walletSupport)}
+					{@const perVariant = variantSupportList(row)}
+					{@const notApplicable = nonApplicableVariantList(row)}
 
 					{#if perVariant.length === 0 && notApplicable.length === 0}
 						<span class="muted-text">–</span>
 					{:else}
 						<ul class="variant-list" data-list="unstyled gap-1">
-							{#each perVariant as { variant, support } (variant)}
-								{@const status = eipSupportStatus(support)}
-
+							{#each perVariant as { variant, status } (variant)}
 								<li data-variant-status={status}>
 									<span class="status-icon">{eipSupportStatusIcon[status]}</span>
 									{variantLabel(variant)}
@@ -239,17 +168,11 @@
 					{/if}
 
 				{:else if column.id === 'sources'}
-					{@const sourceUrls =
-						typeof walletSupport.overall === 'string'
-							? []
-							: refs(walletSupport.overall).flatMap(ref => ref.urls)
-					}
-
-					{#if sourceUrls.length === 0}
+					{#if row.sourceUrls.length === 0}
 						<span class="muted-text">–</span>
 					{:else}
 						<ul class="source-list" data-list="unstyled gap-1">
-							{#each sourceUrls as url (url.url)}
+							{#each row.sourceUrls as url (url.url)}
 								<li>
 									<a
 										href={url.url}
