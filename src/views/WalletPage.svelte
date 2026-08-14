@@ -429,7 +429,6 @@
 	import { Github, Globe } from 'lucide-static'
 	import Layers3Icon from 'lucide-static/icons/layers-3.svg?raw'
 	import ListCollapseIcon from 'lucide-static/icons/list-collapse.svg?raw'
-	import Rows3Icon from 'lucide-static/icons/rows-3.svg?raw'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -823,27 +822,21 @@
 				aria-label="Expand or collapse rating details"
 			>
 				<li>
-					<button
-						type="button"
-						data-icon="circle"
-						data-details-scope="group"
-						aria-label="Expand or collapse details in the current attribute group"
-						title="Toggle current group details"
+					<Tooltip
+						placement="block-start"
+						buttonProps={{
+							'data-icon': 'circle',
+							'data-details-scope': 'group',
+							'aria-label': 'Expand or collapse all details in the current section',
+						}}
 					>
 						<span>{@html ListCollapseIcon}</span>
-					</button>
-				</li>
 
-				<li>
-					<button
-						type="button"
-						data-icon="circle"
-						data-details-scope="page"
-						aria-label="Expand or collapse all details on this page"
-						title="Toggle all page details"
-					>
-						<span>{@html Rows3Icon}</span>
-					</button>
+
+						{#snippet TooltipContent()}
+							Toggle all details in the current section
+						{/snippet}
+					</Tooltip>
 				</li>
 			</menu>
 		</div>

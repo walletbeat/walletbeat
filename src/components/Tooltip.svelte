@@ -22,7 +22,7 @@
 
 <script lang="ts">
 	// Types/constants
-	import type { HTMLAttributes } from 'svelte/elements'
+	import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
 
 
@@ -43,6 +43,7 @@
 		TooltipContent,
 		hideDelay = 200,
 		isEnabled = true,
+		buttonProps,
 		children,
 		...restProps
 	}: HTMLAttributes<HTMLDivElement> & {
@@ -55,6 +56,7 @@
 		hideDelay?: number
 		TooltipContent?: Snippet
 		isEnabled?: boolean
+		buttonProps?: HTMLButtonAttributes
 		children?: Snippet
 	} = $props()
 
@@ -191,6 +193,7 @@
 			<button
 				type="button"
 				{title}
+				{...buttonProps}
 				data-tooltip-trigger
 				style:anchor-name={anchorName}
 				popovertarget={popoverId}
@@ -208,6 +211,7 @@
 	{:else if buttonTriggerPlacement === 'around'}
 		<button
 			type="button"
+			{...buttonProps}
 			data-tooltip-trigger
 			style:anchor-name={anchorName}
 			popovertarget={popoverId}
@@ -277,7 +281,7 @@
 
 		&:not(:popover-open) {
 			display: none;
-			content-visibility: none;
+			content-visibility: hidden;
 			pointer-events: none;
 
 			opacity: 0;
