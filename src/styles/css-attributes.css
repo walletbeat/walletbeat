@@ -1208,8 +1208,7 @@ ol {
  * - `mobile`: enable the paired role only through the layout mobile breakpoint
  *
  * ### CSS Variables
- * - `--stickyBreadcrumb-animationRangeStart`
- * - `--stickyBreadcrumb-animationRangeEnd`
+ * - `--stickyBreadcrumb-animationRange`
  * - `--stickyBreadcrumb-animationTimingFunction`
  * - `--stickyBreadcrumb-gap`
  * - `--stickyBreadcrumb-position-minBlockSize`
@@ -1275,6 +1274,7 @@ ol {
 		min-inline-size: 0;
 		max-inline-size: none;
 		justify-self: var(--stickyBreadcrumb-item-nextRowJustifySelf, start);
+		margin-inline-start: 0;
 	}
 
 	@position-try --sticky-breadcrumb-constrained-row {
@@ -1294,6 +1294,7 @@ ol {
 		min-inline-size: 0;
 		max-inline-size: none;
 		justify-self: var(--stickyBreadcrumb-item-nextRowJustifySelf, start);
+		margin-inline-start: 0;
 	}
 
 	[data-sticky-breadcrumb~="scope"] {
@@ -1309,15 +1310,10 @@ ol {
 
 		anchor-scope:
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
-			--sticky-breadcrumb-position,
 			--sticky-breadcrumb-scope,
 			--sticky-breadcrumb-extra-position,
-			--sticky-breadcrumb-summary-layout,
-			--sticky-breadcrumb-heading-track,
-			--sticky-breadcrumb-companions;
-		timeline-scope:
-			--sticky-breadcrumb-timeline,
-			--sticky-breadcrumb-scope-timeline;
+			var(--stickyBreadcrumb-iconAnchor, --sticky-breadcrumb-extra-position);
+		timeline-scope: --sticky-breadcrumb-scope-timeline;
 		view-timeline-name: --sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
 		/* The scope exits the sticky inset viewport, not the global viewport. */
@@ -1351,29 +1347,19 @@ ol {
 		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
 
 		&:not([data-sticky-breadcrumb~="root"]) {
+			--stickyBreadcrumb-exitTranslate: 0 -100vb;
+
 			position: fixed;
-			position-anchor: var(
-				--stickyBreadcrumb-parentAnchor,
-				--sticky-breadcrumb-scope
-			);
+			position-anchor: --sticky-breadcrumb-position;
 			position-visibility: always;
-			inset-block-start: calc(
-				anchor(
-					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
-					top
-				)
-				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
-			);
-			inset-inline-start: var(
-				--stickyBreadcrumb-item-insetInlineStart,
-				anchor(
-					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
-						end
-				)
+			inset-block-start: anchor(top);
+			inset-inline-start: calc(
+				anchor(start)
+					+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
 			);
 			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
-			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
-			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+			margin-inline-start: 0;
+			min-block-size: 0;
 			display: flex;
 			align-items: safe center;
 			inline-size: var(--stickyBreadcrumb-item-inlineSize, auto);
@@ -1395,41 +1381,74 @@ ol {
 				--sticky-breadcrumb-timeline,
 				--sticky-breadcrumb-scope-timeline;
 			animation-range:
-				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
-				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
+				var(
+					--stickyBreadcrumb-animationRange,
+					entry calc(100vh - 6rem) entry calc(100vh - 3rem)
+				),
 				var(---stickyBreadcrumb-exitAnimationRangeStart)
 				var(---stickyBreadcrumb-exitAnimationRangeEnd);
+			animation-composition: replace, add;
 		}
 	}
 
 	@keyframes StickyBreadcrumbItemAnimation {
-		0% {
-			position: relative;
-			inset: auto;
-			translate: none;
-			margin-inline-start: 0;
-			min-block-size: 0;
-		}
-		0.01% {
+		/* Repeated named anchors settle just after ownership changes in Chromium.
+		 * Keep that 50–95% interval transparent, then reveal the resolved pad. */
+		from,
+		49.999% {
 			position: fixed;
-			/* Enter at the resolved sticky lane; never pass through the
-			 * position anchor's transient pre-handoff coordinate. */
-			inset-block-start: calc(
-				var(--stickyBreadcrumb-item-insetBlockStart, 0px)
-				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
-			);
+			position-anchor: --sticky-breadcrumb-position;
+			inset-block-start: anchor(top);
 			inset-inline-start: calc(
-				anchor(--sticky-breadcrumb-position start)
-				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
+				anchor(start)
+					+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
 			);
-			inset-inline-end: auto;
+			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
 			translate: none;
 			margin-inline-start: 0;
 			min-block-size: 0;
 		}
+		from {
+			opacity: 1;
+		}
+		49.999%,
+		95% {
+			opacity: 0;
+		}
+		50%,
 		to {
 			position: fixed;
+			position-anchor: var(
+				--stickyBreadcrumb-item-targetAnchor,
+				var(
+					--stickyBreadcrumb-parentAnchor,
+					--sticky-breadcrumb-scope
+				)
+			);
+			inset-block-start: var(
+				--stickyBreadcrumb-item-targetInsetBlockStart,
+				calc(
+					anchor(
+						var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+						top
+					)
+					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+				)
+			);
+			inset-inline-start: var(
+				--stickyBreadcrumb-item-insetInlineStart,
+				anchor(
+					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+						end
+				)
+			);
+			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
 			translate: var(--stickyBreadcrumb-item-translate, none);
+			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
+			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+		}
+		to {
+			opacity: 1;
 		}
 	}
 
@@ -1437,11 +1456,12 @@ ol {
 		from,
 		99.999% {
 			visibility: visible;
+			translate: none;
 		}
 
 		to {
-			opacity: 0;
 			visibility: hidden;
+			translate: var(--stickyBreadcrumb-exitTranslate, none);
 		}
 	}
 
