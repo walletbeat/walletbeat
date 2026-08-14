@@ -24,20 +24,12 @@ import {
 } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const imkeyWallet: HardwareWallet = {
 	metadata: {
 		id: 'imkey',
 		displayName: 'imKey',
 		tableName: 'imKey',
-		blurb: paragraph(`
-			Incubated by imToken, imKey is a reliable digital wallet that supports access to 50+ major networks
-			(including Bitcoin, Ethereum, and Tron). Built with an EAL6+ certified secure chip, imKey ensures
-			private keys are generated, stored, and used entirely within the device for maximum protection.
-			Seamlessly integrated with imToken on mobile and compatible with the Rabby browser extension on PC,
-			imKey enables users to manage assets, interact with apps, and perform transactions with enhanced security and flexibility.
-		`),
 		contributors: [mako],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

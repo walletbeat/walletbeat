@@ -22,7 +22,6 @@ import { notSupported, notSupportedWithRef, supported } from '@/schema/features/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { keylabs } from '../entities/keylabs'
 
@@ -31,9 +30,6 @@ export const cypherockWallet: HardwareWallet = {
 		id: 'cypherock',
 		displayName: 'Cypherock Wallet',
 		tableName: 'Cypherock',
-		blurb: paragraph(`
-			The Cypherock has a secure element (EAL6+ rated) and uses a unique card-tapping system for transaction authorization.
-		`),
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

@@ -27,16 +27,12 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const zeus: SoftwareWallet = {
 	metadata: {
 		id: 'zeus',
 		displayName: 'Zeus',
 		tableName: 'Zeus',
-		blurb: paragraph(`
-			Zeus is a truly seedless and decentralized self-custodial Ethereum wallet.
-		`),
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-12',

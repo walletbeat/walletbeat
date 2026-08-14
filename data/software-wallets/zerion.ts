@@ -54,7 +54,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import { paragraph } from '@/types/content'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 
@@ -63,7 +62,6 @@ export const zerion: SoftwareWallet = {
 		id: 'zerion',
 		displayName: 'Zerion',
 		tableName: 'Zerion',
-		blurb: paragraph(''),
 		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-10',

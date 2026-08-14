@@ -494,17 +494,6 @@
 			about: {
 				'@type': 'SoftwareApplication',
 				name: wallet.metadata.displayName,
-				description: renderStrings(
-					(
-						wallet.metadata.blurb.contentType === ContentType.TEXT ?
-							wallet.metadata.blurb.text
-						:
-							wallet.metadata.displayName + ' wallet'
-					),
-					{
-						WALLET_NAME: wallet.metadata.displayName
-					},
-				),
 				url: (
 					typeof wallet.metadata.url === 'string' ?
 						wallet.metadata.url
@@ -626,38 +615,29 @@
 				class="wallet-overview"
 				data-column="gap-6"
 			>
-				<div data-row="wrap">
-					<p data-row-item="flexible basis-3">
-						<Typography
-							content={wallet.metadata.blurb}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					</p>
+				<nav data-row="gap-2 start wrap">
+					<a
+						href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
+						data-badge="medium"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{@html Globe}
+						Website
+					</a>
 
-					<nav data-row="gap-2 start wrap">
+					{#if wallet.metadata.urls?.repository}
 						<a
-							href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
+							href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
 							data-badge="medium"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{@html Globe}
-							Website
+							{@html Github}
+							Source Code
 						</a>
-
-						{#if wallet.metadata.urls?.repository}
-							<a
-								href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
-								data-badge="medium"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{@html Github}
-								Source Code
-							</a>
-						{/if}
-					</nav>
-				</div>
+					{/if}
+				</nav>
 
 				<div
 					class="wallet-platforms"

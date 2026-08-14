@@ -7,14 +7,12 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const family: SoftwareWallet = {
 	metadata: {
 		id: 'family',
 		displayName: 'Family',
 		tableName: 'Family',
-		blurb: paragraph(''),
 		contributors: [lucemans],
 		iconExtension: 'png',
 		lastUpdated: '2025-04-22',

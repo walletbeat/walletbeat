@@ -21,7 +21,6 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 
@@ -30,9 +29,6 @@ export const bitget: SoftwareWallet = {
 		id: 'bitget',
 		displayName: 'Bitget Wallet',
 		tableName: 'Bitget',
-		blurb: paragraph(`
-			Bitget Wallet is a leading multi-chain decentralized wallet that is committed to providing a wide range of asset management and DeFi services for its users.
-		`),
 		contributors: [mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-17',
