@@ -64,6 +64,10 @@ const secondaryNavigationItems = [
 			</li>
 		</menu>
 
+		<a href='/' class='logo'>
+			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
+		</a>
+
 		<menu class='navigation-trailing-controls' data-row='gap-2' data-row-item='wrap-end'>
 			<li>
 				<button
@@ -191,9 +195,25 @@ const secondaryNavigationItems = [
 		:is(.navigation-leading-controls, .navigation-context-controls) {
 			display: none;
 		}
+
+		nav > header .logo {
+			display: flex;
+			align-items: center;
+			align-self: stretch;
+			text-decoration: none;
+
+			img {
+				display: block;
+				block-size: var(--navigation-logo-blockSize);
+			}
+		}
 	}
 
 	@media (max-width: 1024px) {
+		nav > header .logo {
+			display: none;
+		}
+
 		#nav {
 			--navigation-menu-maskFade: 9rem;
 
