@@ -353,7 +353,6 @@
 
 		--nav-submenu-gap: 0.33rem;
 		--nav-search-blockSize: 0rem;
-
 		&:has(> search) {
 			--nav-search-blockSize: 3rem;
 		}
@@ -424,7 +423,10 @@
 			}
 			&[data-navigation-depth='2'] {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+				grid-template-columns: var(
+					--navigation-items-level-2-grid-columns,
+					repeat(auto-fit, minmax(min(100%, 11rem), 1fr))
+				);
 
 				&[data-sticky-container] {
 					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
