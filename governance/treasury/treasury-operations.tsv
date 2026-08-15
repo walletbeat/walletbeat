@@ -97,8 +97,8 @@ Date	From	To	Amount	Purpose	ID
 2026-08-01	treasury	ren2140	1000 USDC [labor:data_entry]	Compensation for wallet data entry	0x3f260b73cda41951e716113fcfe95a55653d2e725433fbfc7d836da477474937
 2026-08-01	treasury	mattmatt_sablier	6000 USDC [labor:dev]	Top-up of Sablier stream	0xc32ea4038a7562f141eef4cf0ccc20f9e1c9a579b80520c9cc8bb5596451525f
 2026-08-01	treasury	darrylyeo	6300 USDC [labor:dev,3mo]	Payment for UI refresh	0xd2fa8193a668653c9e81e75d70cd4bd9c2147fffbb269022dc3101c460c3223f
-2026-08-16	treasury	4everland_eoa	0.025 ETH [seeding]	Seeding for 4everland EOA	0xe5bc4f12096f69a8dc7b2f768698951659d788931b24cac31211a882fac2c038
+2026-08-16	treasury	4everland_eoa	0.025 ETH [test]	Seeding for 4everland EOA	0xe5bc4f12096f69a8dc7b2f768698951659d788931b24cac31211a882fac2c038
 2026-08-16	4everland_eoa	4everland	1 USDC [hosting-infra]	Initialize 4everland account	0x1408ad4de08f3a54a5f2d1f85c51050fb8f229c2b4107575d4c230f6c1704f0b
-2026-08-16	4everland_eoa	4everland	10 USDC [hosting-infra]	Deposit funds	0x1408ad4de08f3a54a5f2d1f85c51050fb8f229c2b4107575d4c230f6c1704f0b
+2026-08-16	4everland_eoa	4everland	10 USDC [hosting-infra]	Deposit funds	0x66d16c7ee83233724de52dee6893d60e5c6ed4c9ea90990fe1c087114b01a9a9
 2026-08-16	treasury	lucilajuliana.shefi.eth	1075 USDC [labor:comms] + 1075 USDC [labor:dev]	Payment for Lucila: Comms, UI/UX	0xadcb7062aec75b020561479d1a20afc95f593862ccf04dbd9ddb1395e972911f
-2026-08-16	treasury	treasury	2.75 WETH → 5.17K USDC	Swap WETH to USDC on CoW swap	0xa5f7364f672e102ba8f4cf5f0ab532f392ecd941df266e7560a0f0e2e0c506ed
+2026-08-16	treasury	treasury	2.75 WETH → 5170 USDC	Swap WETH to USDC on CoW swap	0xa5f7364f672e102ba8f4cf5f0ab532f392ecd941df266e7560a0f0e2e0c506ed
