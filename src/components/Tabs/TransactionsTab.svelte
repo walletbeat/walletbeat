@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { isErc55Address } from '@/types/utils/ethereum-address'
 	import type { TestTransaction } from '../../constants/test-transactions-signatures'
 
 	let {
@@ -44,10 +45,6 @@
 				: undefined
 	)
 
-	function isValidAddress(addr: string): addr is `0x${string}` {
-		return /^0x[0-9a-fA-F]{40}$/.test(addr)
-	}
-
 	function isValidCalldata(data: string): data is `0x${string}` {
 		return /^0x([0-9a-fA-F]{2})*$/.test(data)
 	}
@@ -59,7 +56,7 @@
 		const address = customAddress.trim()
 		const calldata = customCalldata.trim()
 
-		if (!isValidAddress(address)) {
+		if (!isErc55Address(address)) {
 			customAddressError = 'Enter a valid Ethereum address (0x…)'
 
 			return
