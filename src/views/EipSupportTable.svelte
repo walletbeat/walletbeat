@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import { type EipSupportRow, EipSupportStatus } from '@/schema/eip-support-row'
+	import { type EipSupportRow, EipSupportStatus } from '@/schema/eip-support'
 	import { Variant } from '@/schema/variants'
 
 	const eipSupportStatusSortPriority = {

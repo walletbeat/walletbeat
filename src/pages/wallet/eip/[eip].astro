@@ -6,8 +6,12 @@ import { eips } from '@/data/eips'
 import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
-import { ratedWalletEipSupport } from '@/schema/eip-support'
-import { type EipSupportRow, EipSupportStatus, eipSupportStatus } from '@/schema/eip-support-row'
+import {
+	ratedWalletEipSupport,
+	type EipSupportRow,
+	EipSupportStatus,
+	eipSupportStatus,
+} from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
 import { refs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -33,12 +37,7 @@ type Props = { eip: Eip }
 
 const { eip } = Astro.props
 
-/**
- * Precompute the slim table rows at build time. `EipSupportTable` is a
- * hydrated island, and Astro serializes all of its props into the page HTML —
- * passing full `RatedWallet` objects would inline tens of megabytes of data.
- * Wallets the EIP does not apply to are filtered out here.
- */
+/** Precompute the EIP support table rows at build time. */
 function eipSupportRows(wallets: Array<RatedWallet<string>>): EipSupportRow[] {
 	return wallets.flatMap(wallet => {
 		const support = ratedWalletEipSupport(wallet, eip.number)
