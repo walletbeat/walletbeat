@@ -63,6 +63,15 @@ Every entry needs a `ref` (`WithRef<WalletSecurityNews>`) pointing at the primar
 - **Prefer the official announcement / incident report** from the wallet developer or the affected party (e.g. a `blog` post, a security advisory).
 - The `ref.label` should be a human-readable description of the link (e.g. the article's title), and `ref.url` the direct URL.
 - Add secondary refs (news coverage, affected-company advisories) only if they add meaningful detail.
+- To cite **more than one** source, make `ref` an array of labeled ref objects (each with `label` + `url`). E.g. a blog post plus the vendor's announcement on X:
+
+  ```ts
+  ref: [
+    { label: 'Trezor blog: Recent customer data exposed in shipping provider incident', url: 'https://trezor.io/blog/news/...' },
+    { label: 'Trezor on X: Customer data exposure incident', url: 'https://x.com/Trezor/status/...' },
+  ],
+  ```
+
 - `refTodo` / `refNotNecessary` are **not** appropriate here — the news entry should always cite the incident source.
 
 ---
@@ -91,6 +100,12 @@ In `data/news/index.ts`, add a dynamic import for the new file inside the `allWa
 ### 3. Add spelling exceptions (only if needed)
 
 If the source introduces proper nouns the project dictionary does not know (e.g. a vendor or tool name such as `Metabase`), add the word to the `words` array in `.cspell.json`, keeping it alphabetically sorted. Only add valid proper nouns — never add typos or arbitrary words.
+
+Two gotchas when adding a word:
+
+- **Add it in its canonical capitalization.** Because `cSpell` matches `words` case-insensitively, one entry (`ShipMonk`) also covers the lowercased slug in the filename / index import (`shipmonk`) — don't add both spellings. Enter the word in its **correct capitalization** (the proper-noun form), not lowercase. Harper (the grammar linter, see `tests/utils/grammar.ts`) builds its vocabulary from the `words` list in `.cspell.json`. A capitalized entry is recognized as a proper noun, and Harper automatically adds its possessive `'s` form — so you don't need to add `ShipMonk's`. A lowercase entry would not be recognized as a proper noun.
+  - Edge case: a brand spelled with a leading lowercase letter (e.g. `imToken`) trips Harper's Capitalization lint (it would force `ImToken`). Such words must also be added to `PROPER_NOUNS_LOWERCASE_FIRST` in `tests/utils/grammar.ts` — a code edit outside this skill's file permissions.
+- **Exact sort order.** The `cSpell` test sorts by `toLowerCase()` (`tests/cspell.test.ts`), so ordering can differ from a naive case-sensitive sort — e.g. `ShipMonk` (`ship...`) sorts _after_ `shefi` and _before_ `sidepanel`, not right after `Shamir`. If the order is wrong, `pnpm check:vitest` fails with a message naming the two words that are out of order; move it accordingly.
 
 ---
 
