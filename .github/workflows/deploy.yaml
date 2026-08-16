@@ -101,3 +101,32 @@ jobs:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
           SKIP_HELIOS: 'false'
+  unpin-old-ipfs-pins:
+    name: Unpin old IPFS pins
+    runs-on: ubuntu-latest
+    needs:
+      - update-ens
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+        with:
+          fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.0.9
+      - name: Install Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Download dist
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: dist
+          path: dist
+      - name: Unpin old IPFS CIDs
+        run: ./deploy/unpin-old-ipfs-cids.sh
+        env:
+          DEPLOY_DIRECTORY: dist
+          OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
