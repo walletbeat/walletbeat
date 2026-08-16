@@ -2,12 +2,70 @@
 
 # Build wrapper script that may re-execute the actual build process if some
 # steps need that, such as SRI build hashes which turn the build into
-# a 2-pass process.
+# a 2-pass process. Also features optional bwrap-based sandboxing.
 
 set -euo pipefail
 
+# Optional sandboxing via bubblewrap. This is essential to keep the build
+# deterministic, as Astro otherwise computes its resource hashes
+# (the `astro-island uid`s) based on the absolute path of where the files
+# are in the filesystem. By running in a sandbox, we can change the
+# perceived path of these files and avoid this non-determinism.
+if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
+	if command -v bwrap >/dev/null 2>&1; then
+		tmpfs_arg=()
+		if [[ "${WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY:-}" == "true" ]]; then
+			# Enforce that deps must be installed from scratch in the sandbox by
+			# mounting a tmpfs on top of `node_modules`:
+			tmpfs_arg=(--tmpfs /tmp/wb-build/node_modules)
+		fi
+		if [[ "${WALLETBEAT_ENV:-}" == "CI" ]]; then
+			sudo sysctl -w kernel.unprivileged_userns_clone=1 &>/dev/null || true
+			sudo sysctl -w user.max_user_namespaces=4096 &>/dev/null || true
+			sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 &>/dev/null || true
+		fi
+		exec bwrap \
+			--unshare-user \
+			--unshare-ipc \
+			--unshare-pid \
+			--unshare-uts \
+			--ro-bind / / \
+			--bind /tmp /tmp \
+			--bind "${HOME:-/tmp}" "${HOME:-/tmp}" \
+			--bind "$PWD" /tmp/wb-build \
+			"${tmpfs_arg[@]}" \
+			--dev /dev \
+			--proc /proc \
+			--chdir /tmp/wb-build \
+			--setenv CI true \
+			--setenv WALLETBEAT_RUNNING_IN_SANDBOX true \
+			-- bash "$0" "$@"
+	fi
+	if [[ "${WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY:-}" == "true" ]]; then
+		echo "bwrap is required to sandbox the build (WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY=true), but bwrap is not installed." >&2
+		exit 1
+	fi
+	if [[ "${WALLETBEAT_BUILD_MUST_BE_SANDBOXED:-}" == "true" ]]; then
+		echo "bwrap is required to sandbox the build (WALLETBEAT_BUILD_MUST_BE_SANDBOXED=true), but bwrap is not installed." >&2
+		exit 1
+	fi
+	if [[ "${WALLETBEAT_ENV:-}" == "CI" ]]; then
+		echo "bwrap is required to sandbox the build (WALLETBEAT_ENV=CI), but bwrap is not installed." >&2
+		exit 1
+	fi
+	# Otherwise, run build unsandboxed anyway.
+	if [[ "${WALLETBEAT_BUILD_TEST:-}" == true ]]; then
+		echo 'bwrap is not available; build will be non-deterministic.' >&2
+	fi
+fi
+
 if [[ -n "${WALLETBEAT_BUILD_DO_NOT_RECURSE:-}" ]]; then
 	exec pnpm astro build
+fi
+
+# Ensure dependencies are installed before building.
+if [[ ! -d node_modules ]] || [[ -z "$(ls -A node_modules 2>/dev/null)" ]]; then
+	pnpm install --frozen-lockfile
 fi
 
 attempts_left=5
@@ -49,7 +107,7 @@ while IFS= read -r line; do
 done < <(do_build)
 
 if [[ -n "$need_rebuild" ]]; then
-	export WALLETBEAT_BUILD_ATTEMPTS_LEFT="$(( $((attempts_left)) - 1 ))"
+	export WALLETBEAT_BUILD_ATTEMPTS_LEFT="$(($((attempts_left)) - 1))"
 	if [[ "$attempts_left" -le 1 ]]; then
 		echo "> Need to rebuild (${need_rebuild}) but ran out of rebuild attempts. Build failed." >&2
 		exit 1

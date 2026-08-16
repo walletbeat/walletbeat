@@ -17,7 +17,7 @@ log() {
 }
 
 log "> Building..."
-pnpm run build || exit 1
+WALLETBEAT_BUILD_TEST=true pnpm run build || exit 1
 
 if [[ ! -d "$DIST_DIR" ]]; then
 	echo "Build did not produce expected directory at '${DIST_DIR}'." >&2
