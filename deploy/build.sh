@@ -31,8 +31,13 @@ do_build() {
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true script -q -e -f -c 'pnpm astro build' /dev/null 2>&1 | tee /dev/tty | sed -r "s/\x1B\[[0-9;]*[A-Za-z]//g"
 	elif has_tty; then
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/tty
-	else
+	elif [[ -w /dev/stderr ]]; then
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/stderr
+	else
+		while IFS= read -r line; do
+			echo "$line"
+			echo "$line" >&2
+		done < <(WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1)
 	fi
 }
 
