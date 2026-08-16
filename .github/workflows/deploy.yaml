@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
+        with:
+          fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js

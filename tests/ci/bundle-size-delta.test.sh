@@ -23,6 +23,10 @@ set -euo pipefail
 # Known reference branches, in priority order.
 REFERENCES=('beta' 'main')
 
+log() {
+	echo "[Bundle size]" "$@" >&2
+}
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 CURRENT_HEAD="$(git -C "$ROOT" rev-parse HEAD)"
@@ -58,7 +62,7 @@ find_reference_commit() {
 }
 
 if ! REFERENCE_HEAD="$(find_reference_commit)"; then
-	echo "dist-size: no reference branch (${REFERENCES[*]}) is an ancestor of HEAD; passing vacuously." >&2
+	log "No reference branch (${REFERENCES[*]}) is an ancestor of HEAD; passing vacuously."
 	exit 0
 fi
 
@@ -79,18 +83,18 @@ measure_revision() {
 	local dir="$WORKTREE_ROOT/$name"
 
 	if ! git -C "$ROOT" worktree add --force "$dir" "$rev" >/dev/null 2>&1; then
-		echo "dist-size: could not create worktree at $rev ($name)." >&2
+		log "Could not create worktree at $rev ($name)."
 		return 1
 	fi
 
 	(
 		cd "$dir" || exit 1
 		if ! pnpm install --frozen-lockfile >/dev/null 2>&1; then
-			echo "dist-size: \`pnpm install\` failed for $name." >&2
+			log "\`pnpm install\` failed for $name."
 			exit 1
 		fi
 		if ! pnpm build >/dev/null 2>&1; then
-			echo "dist-size: \`pnpm build\` failed for $name." >&2
+			log "\`pnpm build\` failed for $name."
 			exit 1
 		fi
 	)
@@ -100,26 +104,26 @@ measure_revision() {
 	fi
 
 	if [[ ! -d "$dir/dist" ]]; then
-		echo "dist-size: no \`dist\` directory produced for $name." >&2
+		log "No \`dist\` directory produced for $name."
 		return 1
 	fi
 	du -sb "$dir/dist" | awk '{print $1}'
 }
 
-echo "Building reference ($REFERENCE_HEAD)..." >&2
+log "Building reference ($REFERENCE_HEAD)..."
 if ! REFERENCE_SIZE="$(measure_revision "$REFERENCE_HEAD" "reference")"; then
-	echo "dist-size: reference build failed; passing vacuously." >&2
+	log "Reference build failed; passing vacuously."
 	exit 0
 fi
 
-echo "Building current ($CURRENT_HEAD)..." >&2
+log "Building current ($CURRENT_HEAD)..."
 if ! CURRENT_SIZE="$(measure_revision "$CURRENT_HEAD" "current")"; then
-	echo "dist-size: current build failed; passing vacuously." >&2
+	log "Current build failed; passing vacuously."
 	exit 0
 fi
 
-echo "Reference dist size: $REFERENCE_SIZE bytes" >&2
-echo "Current dist size: $CURRENT_SIZE bytes" >&2
+log "Reference bundle size: $REFERENCE_SIZE bytes"
+log "Current bundle size: $CURRENT_SIZE bytes"
 
 awk -v cur="$CURRENT_SIZE" -v ref="$REFERENCE_SIZE" 'BEGIN {
 	increase = (cur - ref) / ref;
