@@ -16,12 +16,6 @@ log() {
 	fi
 }
 
-is_text_file() {
-	local f="$1"
-	# A file is text if its contents are valid UTF-8.
-	iconv -f UTF-8 -t UTF-8 "$f" >/dev/null 2>&1
-}
-
 is_known_too_large() {
 	local f="$1"
 	local rel="${f#"$DIST_DIR"/}"
@@ -40,10 +34,6 @@ while IFS= read -r f; do
 		continue
 	fi
 	rel="${f#"$DIST_DIR"/}"
-	if ! is_text_file "$f"; then
-		log "  > File: $f (binary, skipping)"
-		continue
-	fi
 	size="$(stat -c '%s' "$f")"
 	if is_known_too_large "$f"; then
 		if ((size <= MAX_BYTES)); then
