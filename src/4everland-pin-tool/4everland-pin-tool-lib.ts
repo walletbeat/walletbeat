@@ -108,6 +108,41 @@ function isPinResults(value: unknown): value is PinResults {
 }
 
 /**
+ * Check the current status of every pin matching the given CID pinned under
+ * the account identified by the given access token.
+ *
+ * A CID may have been pinned more than once, in which case multiple pin
+ * records (one per pin request) are returned. Matching is done against the
+ * API's `GET /pins?cid=<cid>` filter rather than a single `requestid`.
+ *
+ * @returns Every pin record matching `cid`, oldest first. Empty when the CID
+ *   is not pinned under the account.
+ * @throws if the request fails or the API returns a non-2xx response.
+ */
+export async function getPinStatus(token: string, cid: string): Promise<EverlandPin[]> {
+	const query = new URLSearchParams({ limit: String(PAGE_LIMIT), cid })
+	const url = `${API_BASE_URL}/pins?${query.toString()}`
+
+	const response = await fetch(url, {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+
+	if (!response.ok) {
+		const body = await response.text()
+
+		throw new Error(`4EVERLAND /pins request for ${cid} failed (${response.status}): ${body}`)
+	}
+
+	const data = (await response.json()) as unknown
+
+	if (!isPinResults(data)) {
+		throw new Error('Unexpected response from the 4EVERLAND /pins endpoint.')
+	}
+
+	return data.results.sort((a, b) => Date.parse(a.created) - Date.parse(b.created))
+}
+
+/**
  * List the CIDs of every pin matching the given statuses pinned under the
  * account identified by the given access token.
  *

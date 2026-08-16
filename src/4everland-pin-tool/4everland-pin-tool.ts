@@ -4,6 +4,7 @@ import { getErrorMessage } from '@/types/errors'
 import { Enum } from '@/utils/enum'
 
 import {
+	getPinStatus,
 	listPinnedCIDs,
 	type PinnedCID,
 	type PinStatus,
@@ -172,6 +173,27 @@ cli
 
 			for (const pin of arranged) {
 				process.stdout.write(`${pin.cid}\n`)
+			}
+		} catch (error) {
+			process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
+			process.exit(1)
+		}
+	})
+
+cli
+	.command('check-pin-status <cid>', 'Check the pin status of a CID')
+	.action(async (cid: string) => {
+		try {
+			const token = process.env.ACCESS_TOKEN_4EVERLAND
+
+			if (token === undefined || token === '') {
+				throw new Error('The ACCESS_TOKEN_4EVERLAND environment variable is required.')
+			}
+
+			const pins = await getPinStatus(token, cid)
+
+			for (const pin of pins) {
+				process.stdout.write(`${pin.requestid}\t${pin.status}\t${pin.created}\n`)
 			}
 		} catch (error) {
 			process.stderr.write(`Error: ${getErrorMessage(error)}\n`)

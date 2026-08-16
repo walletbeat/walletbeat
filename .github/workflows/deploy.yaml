@@ -66,12 +66,20 @@ jobs:
         with:
           name: dist
           path: dist
+      - name: Check if website bundle contents have changed
+        id: check-existing-pin
+        run: ./deploy/check-existing-pin.sh
+        env:
+          DEPLOY_DIRECTORY: dist
+          ACCESS_TOKEN_4EVERLAND: ${{ secrets.BETA_WALLBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
       - name: Deploy on IPFS
+        if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/deploy-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
       - name: Pin on 4EVERLAND
+        if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/pin-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
