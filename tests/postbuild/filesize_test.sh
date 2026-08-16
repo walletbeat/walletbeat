@@ -8,7 +8,6 @@ MAX_BYTES=$((4 * 1024 * 1024))
 # Text files that are intentionally larger than MAX_BYTES and so are tolerated.
 # Paths are relative to DIST_DIR.
 KNOWN_TOO_LARGE=(
-	'wallet/7702/index.html'
 )
 
 log() {
