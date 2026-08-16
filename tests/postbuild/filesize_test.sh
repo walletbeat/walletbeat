@@ -46,12 +46,18 @@ while IFS= read -r f; do
 		continue
 	fi
 	size="$(stat -c '%s' "$f")"
-	if ((size <= MAX_BYTES)); then
-		log "  > File: $f (${size} bytes, OK)"
+	if is_known_too_large "$f"; then
+		if ((size <= MAX_BYTES)); then
+			# The file is no longer oversized, so its KNOWN_TOO_LARGE entry is stale.
+			echo "  > File: ${rel} is ${size} bytes, which is within the ${MAX_BYTES}-byte limit; remove it from the KNOWN_TOO_LARGE list in tests/postbuild/filesize_test.sh." >&2
+			success=false
+		else
+			log "  > File: $f (${size} bytes, known too large, tolerated)"
+		fi
 		continue
 	fi
-	if is_known_too_large "$f"; then
-		log "  > File: $f (${size} bytes, known too large, tolerated)"
+	if ((size <= MAX_BYTES)); then
+		log "  > File: $f (${size} bytes, OK)"
 		continue
 	fi
 	echo "  > File: ${rel} is ${size} bytes, which exceeds the ${MAX_BYTES}-byte (4 MiB) limit for text files." >&2
