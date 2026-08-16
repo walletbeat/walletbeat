@@ -4,6 +4,7 @@ set -euo pipefail
 
 TESTS=(
 	postbuild/links_test.sh
+	postbuild/filesize_test.sh
 )
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export REPO_DIR="$(dirname "$SCRIPT_DIR")"
@@ -25,11 +26,11 @@ fi
 
 success=true
 for test in "${TESTS[@]}"; do
-	log "> Running post-build test: ${test}..."
-	if "${SCRIPT_DIR}/${test}" ; then
-	  log "  > PASS: ${test}" >&2
+	log "> Running post-build test: $(basename "$test")..."
+	if "${SCRIPT_DIR}/${test}"; then
+		log "  > PASS: $(basename "$test")" >&2
 	else
-	  echo "  > FAIL: ${test}" >&2
+		echo "  > FAIL: $(basename "$test")" >&2
 		success=false
 	fi
 done
