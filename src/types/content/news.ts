@@ -50,13 +50,51 @@ export const incidentStatuses = {
  * Category of security-related news event
  */
 export enum NewsType {
-	/** Exploit or attack resulting in theft of cryptocurrency or wallet funds */
+	/**
+	 * Exploit or attack resulting in theft of cryptocurrency or wallet funds.
+	 * Severity:
+	 *   - Low: Total loss limited to under 10,000 USD in aggregate.
+	 *   - Medium: Total loss limited to under 1,000,000 USD in aggregate.
+	 *   - High: Total loss limited to under 10,000,000 USD in aggregate.
+	 *   - Critical: Anything higher.
+	 */
 	HACK = 'HACK',
-	/** Unauthorized exposure of user personal information (not funds) */
+
+	/**
+	 * Unauthorized exposure of user personal information (not funds).
+	 *
+	 * Severity:
+	 *   - Low: Breach of information unrelated to customers or wallet users, e.g. company employee information.
+	 *   - Medium: Breach of customer/user information limited to name and/or email address.
+	 *   - High: Breach of customer/user information including phone number, home address, payment information,
+	 *           IP addresses, public Ethereum addresses.
+	 *           Also includes leakage of customer support chat messages as they typically contain such information.
+	 *   - Critical: Breach of user private key material, even if partial (e.g. for MPC wallets).
+	 */
 	DATA_BREACH = 'DATA_BREACH',
-	/** Discovered security flaw or weakness (may or may not be exploited) */
+
+	/**
+	 * Discovered security flaw or weakness (may or may not be exploited).
+	 *
+	 * Severity:
+	 *   - Low: Vulnerability with no loss of user funds and no impact on user security or privacy,
+	 *          e.g. an exploit by which web apps can remotely cause a wallet user's browser to crash.
+	 *   - Medium: Vulnerability with no loss of user funds but has impact on user security or privacy,
+	 *             e.g. an exploit that allows web apps to read the user's Ethereum address or other
+	 *             information prior to the user consenting it to do so.
+	 *   - High: Any vulnerability that allows irrevocable loss of user funds for a subset of wallet users.
+	 *   - Critical: Any vulnerability that allows irrevocable loss of user funds for all wallet users.
+	 *               Also includes any vulnerability that can be escalated into such loss,
+	 *               e.g. a remote code execution exploit that allows an attacker to obtain users' private key.
+	 */
 	VULNERABILITY = 'VULNERABILITY',
-	/** General security event not covered by other categories */
+
+	/**
+	 * General security event not covered by other categories.
+	 *
+	 * Severity rating is determined on a case-by-case basis, in line with the
+	 * rough thresholds described in other security event types.
+	 */
 	INCIDENT = 'INCIDENT',
 }
 
@@ -81,7 +119,8 @@ export const newsTypes = {
 >
 
 /**
- * Severity level of a security incident
+ * Severity level of a security incident.
+ * Its meaning depends on the NewsType; see above.
  */
 export enum Severity {
 	/** Critical severity - immediate action required, significant impact */
