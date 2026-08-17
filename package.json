@@ -71,6 +71,7 @@
 		"micromark": "^4.0.2",
 		"postcss": "^8.5.25",
 		"svelte": "5.56.8",
+		"turndown": "^7.2.4",
 		"typescript-eslint": "^8.65.0",
 		"wagmi": "3.7.5"
 	},
@@ -80,6 +81,7 @@
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
 		"@types/prompts": "^2.4.9",
+		"@types/turndown": "^5.0.6",
 		"@xmldom/xmldom": "^0.9.10",
 		"ajv": "^8.20.0",
 		"cac": "^7.0.0",
