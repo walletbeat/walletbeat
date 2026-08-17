@@ -89,6 +89,19 @@ export function securityAuditsDetailsContent(
 </div>
 ```
 
+- Edit `src/utils/custom-content-markdown.ts` to add a `case` for your component. This is what renders it into the LLM-friendly `index.html.md` version of each wallet page, following the [llms.txt](https://llmstxt.org/) convention. The `assertNever` in the `default` case makes this a compile error until you do it. Pass the same props as the `WalletPage.svelte` dispatch above:
+
+```typescript
+case 'SecurityAuditsDetails':
+	return renderComponentToMarkdown(SecurityAuditsDetails, {
+		...componentAndProps.componentProps,
+		wallet,
+		metadata: narrowMetadata(outcome),
+	})
+```
+
+Your component is server-rendered and its HTML is converted to Markdown, so it needs no Markdown-specific code of its own. Two conventions are applied for you: any `ReferenceLinks` it renders are stripped, because the Markdown page emits the attribute's references itself; and its headings are demoted one level so that they nest under the attribute's own heading.
+
 - Finally, in your attribute's `Evaluation`s, use the `<YourAttributeId>DetailsContent(...)` function in the `details` field, passing in any fields you added in `<YourAttributeId>DetailsProps`. Example for the security audits case:
 
 ```typescript
