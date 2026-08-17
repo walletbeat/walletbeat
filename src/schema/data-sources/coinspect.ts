@@ -1,14 +1,31 @@
 import type { WalletName } from '@/data/wallets'
 import { Variant } from '@/schema/variants'
+import { Enum } from '@/utils/enum'
 
-/** How each Coinspect `platform` string resolves to a Walletbeat `Variant`. */
-export const COINSPECT_PLATFORM_TO_VARIANT = {
-	Browser: Variant.BROWSER,
-	Android: Variant.MOBILE,
-	Ios: Variant.MOBILE,
-} as const satisfies Record<string, Variant>
+/** Platforms that appear in Coinspect report `platform` strings. */
+export enum CoinspectPlatform {
+	BROWSER = 'Browser',
+	ANDROID = 'Android',
+	IOS = 'Ios',
+}
 
-export type CoinspectPlatform = keyof typeof COINSPECT_PLATFORM_TO_VARIANT
+export const coinspectPlatformEnum = new Enum<CoinspectPlatform>({
+	[CoinspectPlatform.BROWSER]: true,
+	[CoinspectPlatform.ANDROID]: true,
+	[CoinspectPlatform.IOS]: true,
+})
+
+/** How each Coinspect platform resolves to a Walletbeat `Variant`. */
+export function coinspectPlatformToVariant(coinspectPlatform: CoinspectPlatform): Variant {
+	switch (coinspectPlatform) {
+		case CoinspectPlatform.BROWSER:
+			return Variant.BROWSER
+		case CoinspectPlatform.ANDROID:
+			return Variant.MOBILE
+		case CoinspectPlatform.IOS:
+			return Variant.MOBILE
+	}
+}
 
 export enum CoinspectUnmappedReason {
 	/** The wallet exists on Coinspect but Walletbeat does not track it yet. */

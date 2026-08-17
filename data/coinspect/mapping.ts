@@ -1,4 +1,8 @@
-import { type CoinspectMapping, CoinspectUnmappedReason } from '@/schema/data-sources/coinspect'
+import {
+	type CoinspectMapping,
+	CoinspectPlatform,
+	CoinspectUnmappedReason,
+} from '@/schema/data-sources/coinspect'
 
 /** Keyed by Coinspect `walletMakerUID`. */
 export const coinspectMapping = {
@@ -6,7 +10,7 @@ export const coinspectMapping = {
 	'alpha-wallet': { reason: CoinspectUnmappedReason.NOT_IN_WALLETBEAT, walletbeatId: null },
 	ambire: {
 		// Walletbeat currently rates Ambire's browser extension only.
-		skipPlatforms: ['Android'],
+		skipPlatforms: [CoinspectPlatform.ANDROID],
 		walletbeatId: 'ambire',
 	},
 	binance: { reason: CoinspectUnmappedReason.NOT_IN_WALLETBEAT, walletbeatId: null },
@@ -19,7 +23,7 @@ export const coinspectMapping = {
 	// 'coinbase-wallet' rebranded to Base App — https://base.app/
 	'coinbase-wallet': {
 		// Base App is mobile-only in Walletbeat; Coinspect still ships a Browser report.
-		skipPlatforms: ['Browser'],
+		skipPlatforms: [CoinspectPlatform.BROWSER],
 		walletbeatId: 'baseApp',
 	},
 	'ctrl-wallet': { reason: CoinspectUnmappedReason.NOT_IN_WALLETBEAT, walletbeatId: null },
