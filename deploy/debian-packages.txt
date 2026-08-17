@@ -1,0 +1,3 @@
+bubblewrap
+curl
+uidmap

@@ -21,16 +21,12 @@ import { notSupported, notSupportedWithRef, supported } from '@/schema/features/
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const ngrave: HardwareWallet = {
 	metadata: {
 		id: 'ngrave',
 		displayName: 'NGRAVE Zero',
 		tableName: 'NGRAVE',
-		blurb: paragraph(`
-			NGRAVE Zero is a hardware wallet with EAL7+ secure element, biometric authentication, and QR code scanning capabilities. However, it fails to properly display transaction and message data for verification.
-		`),
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

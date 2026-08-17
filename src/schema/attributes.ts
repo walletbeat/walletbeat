@@ -6,7 +6,7 @@ import {
 	type NonEmptyRecord,
 } from '@/types/utils/non-empty'
 
-/** Strings for content that may use {{WALLET_NAME}} only (e.g. details, blurb). */
+/** Strings for content that may use {{WALLET_NAME}} only (e.g. details). */
 export type WalletNameStrings = null | { WALLET_NAME: string }
 
 /** Strings for content that may use {{WALLET_NAME}} and/or pseudonym placeholders. */

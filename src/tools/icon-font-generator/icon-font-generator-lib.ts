@@ -3,6 +3,7 @@ import { existsSync, promises as fs, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { format, resolveConfig } from 'prettier'
+import sax from 'sax'
 import { type Config, loadConfig, optimize } from 'svgo'
 import svgtofont from 'svgtofont'
 import ttf2eot from 'ttf2eot'
@@ -10,6 +11,8 @@ import ttf2woff from 'ttf2woff'
 import ttf2woff2 from 'ttf2woff2'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
+
+import { removeCSSOutline } from './svg-stroke-removal'
 
 // Color attributes that can appear on SVG elements
 const SVG_COLOR_ATTRIBUTES = ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color']
@@ -213,7 +216,8 @@ export type IconUnicodeSequences = Readonly<Record<string, string>>
 
 export const iconFontStartCharCode = 0xea01
 export const maxIconFontChars = 255
-const iconFontGeneratorVersion = 'emoji-unicode-sequence-cmap14-v1'
+const iconFontGeneratorVersion = 'emoji-unicode-sequence-cmap14-v2'
+const saxMaxBufferLengthCap = 1024 * 1024 * 1024
 
 const svgToFontOptions = {
 	startUnicode: iconFontStartCharCode,
@@ -244,7 +248,7 @@ export const repeatedIconFontUnicodeSequences = (iconUnicodeSequences: IconUnico
 	)
 
 const iconFontCSSRuleForIcon = (key: string, iconContent: string) =>
-	[`&[data-icon~="${key}"] {`, `\t--icon-content: "${iconContent}";`, '}'].join('\n')
+	[`&[data-icon~='${key}'] {`, `\t--icon-content: '${iconContent}';`, '}'].join('\n')
 
 export const generatedIconFontTypescript = (
 	fontTypeName: string,
@@ -583,7 +587,7 @@ const fontWithEmojiVariationSequences = (
 
 export const generatedIconFontCSS = (fontName: string, cssRules: readonly string[]) => {
 	return [
-		'[data-icon~="wbicons"] {',
+		`[data-icon~='${fontName}'] {`,
 		`\tfont-family: var(--fontFamily-${fontName});`,
 		'\tfont-style: normal;',
 		'\t-webkit-font-smoothing: subpixel-antialiased;',
@@ -594,11 +598,11 @@ export const generatedIconFontCSS = (fontName: string, cssRules: readonly string
 		'\t\tfont-size: var(--icon-size, 1em);',
 		'\t}',
 		'',
-		'\t&[data-icon~="circle"]::before {',
+		"\t&[data-icon~='circle']::before {",
 		'\t\tfont-size: calc(var(--icon-size, 2rem) * 0.55);',
 		'\t}',
 		'',
-		'\t&[data-icon~="emoji"] {',
+		"\t&[data-icon~='emoji'] {",
 		'\t\tfont-family: var(--fontFamily-emoji);',
 		'\t}',
 		'',
@@ -828,17 +832,46 @@ export class SVGFont {
 			}
 		}
 
-		const result = await svgtofont({
-			src: this.svgIconsDir,
-			dist: this.fontOutputDir,
-			fontName: this.fontName,
-			excludeFormat: ['symbol.svg'],
-			css: false,
-			...svgToFontOptions,
-			getIconUnicode: (name, unicode, startUnicode) => {
-				return [iconUnicodeSequences?.[name] ?? unicode, startUnicode]
-			},
-		})
+		const stagingDir = path.join(this.svgIconsDir, 'staging.tmp')
+
+		await fs.mkdir(stagingDir, { recursive: true })
+
+		let result: Awaited<ReturnType<typeof svgtofont>>
+
+		try {
+			// Remove CSS outlines as `svgtofont` does not respect them.
+			const svgEntries = (await fs.readdir(this.svgIconsDir)).filter(entry =>
+				entry.endsWith('.svg'),
+			)
+
+			let largestStagedSvgSize = 0
+
+			for (const entry of svgEntries) {
+				const stagedSvg = removeCSSOutline(
+					await fs.readFile(path.join(this.svgIconsDir, entry), 'utf-8'),
+				)
+
+				largestStagedSvgSize = Math.max(largestStagedSvgSize, stagedSvg.length)
+				await fs.writeFile(path.join(stagingDir, entry), stagedSvg)
+			}
+
+			// Needed to deal with long paths.
+			sax.MAX_BUFFER_LENGTH = Math.min(largestStagedSvgSize * 2, saxMaxBufferLengthCap)
+
+			result = await svgtofont({
+				src: stagingDir,
+				dist: this.fontOutputDir,
+				fontName: this.fontName,
+				excludeFormat: ['symbol.svg'],
+				css: false,
+				...svgToFontOptions,
+				getIconUnicode: (name, unicode, startUnicode) => {
+					return [iconUnicodeSequences?.[name] ?? unicode, startUnicode]
+				},
+			})
+		} finally {
+			await fs.rm(stagingDir, { recursive: true, force: true })
+		}
 
 		if (iconUnicodeSequences !== null) {
 			const ttfPath = path.join(this.fontOutputDir, `${this.fontName}.ttf`)

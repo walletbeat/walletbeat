@@ -21,6 +21,7 @@
 		ZERO_ADDRESS,
 	} from '../../constants/test-contracts'
 	import { assertTransactionId } from '@/types/utils/ethereum-types'
+	import { isErc55Address } from '@/types/utils/ethereum-address'
 
 	let {
 		activeSubTab,
@@ -42,9 +43,6 @@
 	}
 	function safeUint(stringValue: string, fallback = 0n): bigint {
 		try { return BigInt(stringValue) } catch { return fallback }
-	}
-	function isValidAddress(address: string): address is `0x${string}` {
-		return /^0x[0-9a-fA-F]{40}$/.test(address)
 	}
 
 	// Editable params for transfer
@@ -74,7 +72,7 @@
 		if (activeSubTab === 'erc20-transfer') {
 			erc20ToError = ''
 
-			if (!isValidAddress(erc20To)) {
+			if (!isErc55Address(erc20To)) {
 				erc20ToError = 'Enter a valid Ethereum address (0x…)'
 
 				return
@@ -82,7 +80,7 @@
 		} else if (activeSubTab === 'erc721-transfer') {
 			erc721ToError = ''
 
-			if (!isValidAddress(erc721To)) {
+			if (!isErc55Address(erc721To)) {
 				erc721ToError = 'Enter a valid Ethereum address (0x…)'
 
 				return
@@ -90,7 +88,7 @@
 		} else if (activeSubTab === 'erc1155-transfer') {
 			erc1155ToError = ''
 
-			if (!isValidAddress(erc1155To)) {
+			if (!isErc55Address(erc1155To)) {
 				erc1155ToError = 'Enter a valid Ethereum address (0x…)'
 
 				return

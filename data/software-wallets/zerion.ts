@@ -54,7 +54,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import { paragraph } from '@/types/content'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 
@@ -63,7 +62,6 @@ export const zerion: SoftwareWallet = {
 		id: 'zerion',
 		displayName: 'Zerion',
 		tableName: 'Zerion',
-		blurb: paragraph(''),
 		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-10',
@@ -149,18 +147,71 @@ export const zerion: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Zerion announced a $2M seed round led by Placeholder in December 2019.',
+					label: 'Zerion raises $2M to fuel next phase of DeFi',
+					url: 'https://zerion.io/blog/zerion-raises-2m-to-fuel-next-phase-of-defi/',
+				},
+				{
+					explanation: 'Zerion announced an $8.2M Series A led by Mosaic Ventures in July 2021.',
+					label: 'Zerion raises $8.2M from Mosaic Ventures',
+					url: 'https://zerion.io/blog/zerion-raises-8-2m-from-mosaic-ventures-to-take-defi-mainstream/',
+				},
+				{
+					explanation:
+						'Zerion announced a $12.3M Series B led by Wintermute Ventures in October 2022.',
+					label: 'Zerion closes $12M Series B',
+					url: 'https://www.prnewswire.com/news-releases/zerion-closes-12m-series-b-fundraise-led-by-wintermute-ventures-301646731.html',
+				},
+				{
+					explanation:
+						'Zerion charges a 0.67% service fee on swaps and bridges. Premium subscribers pay 0.25% and Gold DNA holders are exempt.',
+					label: 'Understanding fees on Zerion',
+					url: 'https://help.zerion.io/en/articles/4813752-understanding-fees-on-zerion',
+				},
+				{
+					explanation:
+						'In the browser extension, the swap quote shows the service fee as a labeled "Zerion Fee" row, with a tooltip and a link explaining it.',
+					label: 'Swap quote fee row',
+					url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/SwapForm2/QuoteDetails/QuoteDetails.tsx#L68-L110',
+				},
+				{
+					explanation:
+						'In the mobile app, the swap screen states the fee rate underneath the quote without requiring any interaction.',
+					file: 'public/references/wallets/zerion/screenshots/2026-08-12-zerion-swap-fee-disclosure.png',
+					label: 'Mobile swap screen showing the service fee',
+				},
+				{
+					explanation:
+						'For perpetuals, the fee rate shown to the user separates the fee taken by Zerion from the fee taken by the Hyperliquid venue.',
+					label: 'Perpetuals fee breakdown',
+					url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/modules/hyperliquid/fees/calculateFeeRate.ts#L28-L46',
+				},
+				{
+					explanation:
+						'The mobile perpetuals fee breakdown lists the Zerion fee and the provider fee as separate line items.',
+					file: 'public/references/wallets/zerion/screenshots/2026-08-12-zerion-perps-fee-breakdown.png',
+					label: 'Mobile perpetuals fee breakdown',
+				},
+				{
+					explanation:
+						'Zerion DNA is a membership NFT granting fee discounts and Premium access. It carries no governance rights, and Zerion has no governance token.',
+					label: 'The next evolution of Zerion Genesis',
+					url: 'https://zerion.io/blog/genesis-meets-dna/',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				donations: false, // No donation mechanism in the app or on the website; funding is equity and fee revenue
+				ecosystemGrants: false, // Zerion's three funding announcements enumerate its sources; no ecosystem or foundation grant is listed
+				governanceTokenLowFloat: false, // No governance token: DNA is a membership NFT, and the ZERO Network L2 has no token
+				governanceTokenMostlyDistributed: false, // No governance token
+				hiddenConvenienceFees: false, // The swap and bridge fee is documented and shown in-app, and the perpetuals fee separates Zerion's share from the venue's
+				publicOffering: false, // No token sale or public equity offering; every round was private
+				selfFunded: false, // Venture-backed from the 2019 seed round onward
+				transparentConvenienceFees: true, // 0.67% service fee on swaps and bridges, documented publicly and shown in the swap quote details panel
+				ventureCapital: true, // $22.5M across seed, Series A and Series B
 			},
 		},
 		multiAddress: null,

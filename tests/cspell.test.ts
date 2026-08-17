@@ -181,6 +181,7 @@ describe('cSpell', async () => {
 			'Game7',
 			'Lattice1', // Product name; word extractor does not capture CamelCase+digits as single token
 			'LGPLv3', // License name; word extractor does not capture mixed case+digits as single token
+			'everland',
 		]
 
 		cSpellWords.map(word => {

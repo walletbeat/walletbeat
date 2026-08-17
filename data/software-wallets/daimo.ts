@@ -31,7 +31,7 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { mdParagraph, paragraph } from '@/types/content'
+import { mdParagraph } from '@/types/content'
 
 import { binance } from '../entities/binance'
 import { daimoInc } from '../entities/daimo'
@@ -46,11 +46,6 @@ export const daimo: SoftwareWallet = {
 		id: 'daimo',
 		displayName: 'Daimo',
 		tableName: 'Daimo',
-		blurb: paragraph(`
-			Daimo aims to replicate a Venmo-like experience onchain.
-			It focuses on cheap stablecoin payments and fast onramp and
-			offramp of USD / USDC with minimal fees.
-		`),
 		contributors: [polymutex, nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',

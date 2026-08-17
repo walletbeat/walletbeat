@@ -65,7 +65,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
-import { mdParagraph, paragraph } from '@/types/content'
+import { mdParagraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { alphabet } from '../entities/alphabet'
@@ -84,11 +84,6 @@ export const metamask: SoftwareWallet = {
 		id: 'metamask',
 		displayName: 'MetaMask',
 		tableName: 'MetaMask',
-		blurb: paragraph(`
-			MetaMask is a popular multichain wallet created by Consensys and that has
-			been around for a long time. It is a jack-of-all-trades wallet that can
-			be extended through MetaMask Snaps.
-		`),
 		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-05-06',
