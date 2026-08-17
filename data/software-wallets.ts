@@ -16,6 +16,7 @@ import { gemwallet } from './software-wallets/gem'
 import { imtoken } from './software-wallets/imtoken'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
+import { multisig } from './software-wallets/multisig'
 import { nufi } from './software-wallets/nufi'
 import { okx } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
@@ -75,6 +76,7 @@ export const softwareWallets = {
 	imtoken,
 	metamask,
 	mtpelerin,
+	multisig,
 	nufi,
 	okx,
 	phantom,

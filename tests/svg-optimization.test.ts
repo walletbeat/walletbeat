@@ -96,6 +96,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'3a2f209f512556215cd7050d37be54d0cf6f79880064b8d242a683ded7465ab1',
 	'public/images/wallets/mtpelerin.svg':
 		'd735241b9540a7f293c482da53ec8ee35542a67455d122d3e758a87b97d08ccd',
+	'public/images/wallets/multisig.svg':
+		'839a0cffebd0416c5abb0584ccb5a915e0d97d370eae78ed189784b0f90315ff',
 	'public/images/wallets/ngrave.svg':
 		'17e61fa51fc10b58056e789b042befc9a70f7a06c16c49bcc90732837b2e7a30',
 	'public/images/wallets/nufi.svg':
