@@ -79,7 +79,7 @@ jobs:
         run: ./deploy/check-existing-pin.sh
         env:
           DEPLOY_DIRECTORY: dist
-          ACCESS_TOKEN_4EVERLAND: ${{ secrets.BETA_WALLBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
+          ACCESS_TOKEN_4EVERLAND: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
       - name: Deploy on IPFS
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
         run: ./deploy/deploy-omnipin.sh
