@@ -1,5 +1,5 @@
 import { createHash } from 'crypto'
-import { readFile, writeFile } from 'fs/promises'
+import { writeFile } from 'fs/promises'
 import { request } from 'https'
 import pLimit from 'p-limit'
 import path from 'path'
@@ -13,7 +13,7 @@ import { today } from '@/types/date'
 
 /**
  * Validates all reference URLs found in wallet data and updates the
- * known-valid URL list in tests/utils/known-urls.ts:
+ * known-valid URL list in tests/utils/known-urls.json:
  *
  * - URLs already in the list are not re-fetched.
  * - New URLs are fetched once (plain node.js request, no browser spoofing);
@@ -23,11 +23,10 @@ import { today } from '@/types/date'
  * URLs that fail to fetch are reported for manual verification: many websites
  * block automated requests (Cloudflare challenges, 403s), which does not mean
  * the link is dead. Open such URLs in a browser and, if they load correctly,
- * add the printed entry to `knownValidUrls` by hand.
+ * add the printed entry to the list by hand.
  */
 
-const KNOWN_URLS_FILE = path.join(getRepositoryRoot(), 'tests', 'utils', 'known-urls.ts')
-const ARRAY_ANCHOR = 'export const knownValidUrls: KnownValidUrl[] = ['
+const KNOWN_URLS_FILE = path.join(getRepositoryRoot(), 'tests', 'utils', 'known-urls.json')
 const FETCH_TIMEOUT_MS = 15000
 const FETCH_CONCURRENCY = 4
 
@@ -155,25 +154,12 @@ async function fetchUrl(href: string): Promise<FetchOutcome> {
 }
 
 function serializeEntry(entry: KnownValidUrl): string {
-	return `\t{\n\t\turl: '${entry.url}',\n\t\turlHash: '${entry.urlHash}',\n\t\tretrieved: '${entry.retrieved}',\n\t},`
+	return JSON.stringify(entry, null, '\t')
 }
 
-/** Rewrite the `knownValidUrls` array in tests/utils/known-urls.ts with the given entries. */
+/** Rewrite tests/utils/known-urls.json with the given entries. */
 async function rewriteKnownUrls(entries: KnownValidUrl[]): Promise<void> {
-	const contents = await readFile(KNOWN_URLS_FILE, 'utf-8')
-	const anchorIndex = contents.indexOf(ARRAY_ANCHOR)
-
-	if (anchorIndex === -1) {
-		throw new Error(`Could not find \`${ARRAY_ANCHOR}\` in ${KNOWN_URLS_FILE}`)
-	}
-
-	const header = contents.slice(0, anchorIndex + ARRAY_ANCHOR.length)
-
-	await writeFile(
-		KNOWN_URLS_FILE,
-		`${header}\n${entries.map(serializeEntry).join('\n')}\n]\n`,
-		'utf-8',
-	)
+	await writeFile(KNOWN_URLS_FILE, `${JSON.stringify(entries, null, '\t')}\n`, 'utf-8')
 }
 
 async function main(): Promise<void> {
@@ -238,7 +224,7 @@ async function main(): Promise<void> {
 		}
 
 		process.stdout.write(
-			`Updated tests/utils/known-urls.ts: ${added.length.toString()} added, ${stale.length.toString()} removed.\n`,
+			`Updated tests/utils/known-urls.json: ${added.length.toString()} added, ${stale.length.toString()} removed.\n`,
 		)
 	}
 
@@ -247,13 +233,13 @@ async function main(): Promise<void> {
 			`\n${failed.length.toString()} URL(s) could not be validated automatically.\n` +
 				'This is often bot protection (e.g. a Cloudflare challenge or 403) rather than a dead link.\n' +
 				'Please check each URL below in your browser. If it loads correctly, add its entry to\n' +
-				'`knownValidUrls` in tests/utils/known-urls.ts manually. If it does not, fix or remove the\n' +
+				'tests/utils/known-urls.json manually. If it does not, fix or remove the\n' +
 				'URL from the wallet data.\n\n',
 		)
 
 		for (const failure of failed) {
 			process.stderr.write(
-				`- ${failure.entry.url}\n  (${failure.outcome.detail})\n${serializeEntry(failure.entry).replace(/^\t/gm, '')}\n`,
+				`- ${failure.entry.url}\n  (${failure.outcome.detail})\n${serializeEntry(failure.entry)}\n`,
 			)
 		}
 
