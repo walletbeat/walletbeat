@@ -8,7 +8,7 @@ import { getUrl, labeledUrl, type Url } from '@/schema/url'
 import { type KnownValidUrl, knownValidUrls, URLS_TO_SKIP } from '@/tests/utils/known-urls'
 import { today } from '@/types/date'
 
-const newValidUrls: string[] = []
+const newValidUrls: KnownValidUrl[] = []
 
 const verifiedUrls: KnownValidUrl[] = []
 
@@ -42,7 +42,7 @@ async function checkValidUrl(url: Url): Promise<void> {
 		})
 	}
 
-	if (newValidUrls.some(newValidUrl => href === newValidUrl)) {
+	if (newValidUrls.some(newValidUrl => href === newValidUrl.url)) {
 		expect(true).toBeDefined()
 
 		return new Promise(resolve => {
@@ -99,9 +99,7 @@ async function checkValidUrl(url: Url): Promise<void> {
 	expect(failure).toSatisfy(f => f === null, failure ?? '')
 
 	if (failure === null) {
-		newValidUrls.push(
-			`\t{\n\t\turl: '${href}',\n\t\turlHash: '${digest}',\n\t\tretrieved: '${today()}',\n\t},`,
-		)
+		newValidUrls.push({ url: href, urlHash: digest, retrieved: today() })
 	}
 }
 
@@ -210,8 +208,8 @@ describe('already-known valid URLs set', () => {
 			(newValidUrls.length === 1
 				? 'A new valid URL was detected, and needs to be added to the known-valid URL list to avoid re-fetching it on every run.'
 				: 'New valid URLs were detected, and need to be added to the known-valid URL list to avoid re-fetching them on every run.') +
-				'\n\nRun `pnpm validate-urls` to add them automatically, or add the following to `knownValidUrls` in tests/utils/known-urls.ts:\n\n' +
-				newValidUrls.join('\n'),
+				'\n\nRun `pnpm validate-urls` to add them automatically, or add the following to tests/utils/known-urls.json:\n\n' +
+				newValidUrls.map(newValidUrl => JSON.stringify(newValidUrl, null, '\t')).join('\n'),
 		)
 	})
 	it('has no extraneous entries', () => {
@@ -220,7 +218,7 @@ describe('already-known valid URLs set', () => {
 				knownValidUrls.every(knownValidUrl =>
 					verifiedUrls.some(verifiedUrl => knownValidUrl.urlHash === verifiedUrl.urlHash),
 				),
-			'URLs were removed; run `pnpm validate-urls` or remove them from the set of known-valid URLs in tests/utils/known-urls.ts as well:\n\n' +
+			'URLs were removed; run `pnpm validate-urls` or remove them from tests/utils/known-urls.json as well:\n\n' +
 				knownValidUrls
 					.filter(knownValidUrl =>
 						verifiedUrls.every(verifiedUrl => knownValidUrl.urlHash !== verifiedUrl.urlHash),
