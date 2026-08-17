@@ -30,3 +30,9 @@ description: "A log of positive social media mentions as a result of Walletbeat'
 - https://x.com/Hiraweb3/status/2079953097892237425
 - https://x.com/web3privacy/status/2079190143152291997
 - https://x.com/apoorveth/status/2087916066995343681
+- https://x.com/RailgunIntern/status/2063256494213062702
+- https://x.com/walletbeat/status/2059702873970098649
+- https://x.com/walletbeat/status/2059466776535068933
+- https://x.com/walletbeat/status/2059014754870444174
+- https://x.com/walletbeat/status/2048786657063628824
+- https://x.com/theZeugh/status/2048769781516406985
