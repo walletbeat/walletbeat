@@ -129,6 +129,9 @@ importers:
       omnipin:
         specifier: ^3.1.1
         version: 3.1.1
+      ox:
+        specifier: ^0.12.4
+        version: 0.12.4(typescript@6.0.3)(zod@4.4.3)
       p-limit:
         specifier: ^7.3.1
         version: 7.3.1

@@ -47,6 +47,7 @@
 		"helios:wrap": "deploy/helios/helios-wrap.sh",
 		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts",
 		"deploy:4everland-pin-tool": "tsx src/4everland-pin-tool/4everland-pin-tool.ts",
+		"deploy:ens-content-hash-check": "tsx src/tools/ens-content-hash-checker/ens-content-hash-checker.ts",
 		"wallet-data-collection": "cross-env WALLETBEAT_ENV=HUMAN tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
 		"wallet-data-collection:agent": "cross-env WALLETBEAT_ENV=AGENT tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
 		"wallet-data-collection:ci": "cross-env WALLETBEAT_ENV=CI tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts"
@@ -94,6 +95,7 @@
 		"globals": "^17.8.0",
 		"harper.js": "^0.61.0",
 		"omnipin": "^3.1.1",
+		"ox": "^0.12.4",
 		"p-limit": "^7.3.1",
 		"pnpm": "11.19.0",
 		"prettier": "^3.9.6",
