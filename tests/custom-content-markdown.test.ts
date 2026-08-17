@@ -270,17 +270,17 @@ describe('renderCustomContentToMarkdown', () => {
 			expect(renderFirstInstanceOf('SecurityAuditsDetails')).toMatchInlineSnapshot(`
 				"Ambire / securityAuditsAndBounties
 
-				**Ambire** was last audited on February 19, 2025, which was over a year ago.
+				**Ambire** was last audited on February 20, 2025, which was over a year ago.
 
 				##### Audit by [Hunter Security](https://www.huntersec.co/)
 
-				February 19, 2025
+				February 20, 2025
 
 				No security flaws of severity level medium or higher were found.
 
 				##### Audit by [Pashov Audit Group](https://www.pashov.net/)
 
-				January 25, 2024
+				January 26, 2024
 
 				All security flaws of severity level medium or higher were addressed.
 

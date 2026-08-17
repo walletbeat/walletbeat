@@ -2,6 +2,7 @@
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
+	import { calendarDateToDate } from '@/types/date'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 
 	const securityFlawSeverities = {
@@ -62,7 +63,7 @@
 		metadata
 			.securityAudits
 			.toSorted((a, b) => (
-				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()
+				calendarDateToDate(b.auditDate).getTime() - calendarDateToDate(a.auditDate).getTime()
 			))
 	)
 
@@ -96,7 +97,7 @@
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
-			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
+			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(calendarDateToDate(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
@@ -165,7 +166,7 @@
 							{
 								Intl.DateTimeFormat(undefined, { dateStyle: 'long' })
 									.format(
-										new Date(audit.auditDate),
+										calendarDateToDate(audit.auditDate),
 									)
 							}
 						</time>
