@@ -102,7 +102,7 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Zeus has a built-in Across bridge UI. By default it shows an amber risk warning that bridge functionality is powered by the third-party Across Protocol and that the user should understand the risks. Before the user can bridge, the same screen itemizes fees as Network, Bridge, and Total amounts.',
+								'Zeus has a built-in Across bridge UI. By default it shows an amber risk warning that bridge functionality is powered by Across Protocol, an independent provider, and that the user should understand the risks. Before the user can bridge, the same screen itemizes fees as Network, Bridge, and Total amounts.',
 							file: 'public/references/wallets/zeus/screenshots/2026-08-12-chain-abstraction-bridge-ui.png',
 							label:
 								'Zeus desktop Bridge UI showing the Across Protocol risk warning by default and Network / Bridge / Total fee breakdown',
@@ -319,7 +319,7 @@ export const zeus: SoftwareWallet = {
 							ref: [
 								{
 									explanation:
-										'Zeus ships default third-party public RPC endpoints disabled by default and lets the user add custom RPC URLs, no chain traffic happens until at least one endpoint is enabled. Once an endpoint is enabled (required for normal chain use), that operator learns IP and usual RPC contents. Critically for multi-address privacy: background ETH balance refresh loads all configured wallet addresses and batches them in a single StateView getETHBalance call (via batch::get_eth_balances), so one request can contain many addresses at once. ERC-20 balance refresh is per-owner, but the ETH multi-wallet batch is enough to correlate addresses. The default host list can change between releases, this row covers any user-enabled default or custom RPC rather than naming individual providers. Users who only ever talk to their own node avoid third-party correlation.',
+										'Zeus ships default external public RPC endpoints disabled by default and lets the user add custom RPC URLs, no chain traffic happens until at least one endpoint is enabled. Once an endpoint is enabled (required for normal chain use), that operator learns IP and usual RPC contents. Critically for multi-address privacy: background ETH balance refresh loads all configured wallet addresses and batches them in a single StateView getETHBalance call (via batch::get_eth_balances), so one request can contain many addresses at once. ERC-20 balance refresh is per-owner, but the ETH multi-wallet batch is enough to correlate addresses. The default host list can change between releases, this row covers any user-enabled default or custom RPC rather than naming individual providers. Users who only ever talk to their own node avoid external-provider correlation.',
 									url: [
 										'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/core/context/client.rs',
 										'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
