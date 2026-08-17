@@ -29,3 +29,4 @@ description: "A log of positive social media mentions as a result of Walletbeat'
 - https://x.com/alexanderchopan/status/2081896550633193867
 - https://x.com/Hiraweb3/status/2079953097892237425
 - https://x.com/web3privacy/status/2079190143152291997
+- https://x.com/apoorveth/status/2087916066995343681
