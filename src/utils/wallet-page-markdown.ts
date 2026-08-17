@@ -15,6 +15,7 @@ import { isTypographicContent, renderTypographicContentToString } from '@/types/
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
+import { NO_MARKDOWN_DETAILS, renderCustomContentToMarkdown } from '@/utils/custom-content-markdown'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
@@ -232,12 +233,25 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 
 				parts.push(shortExpl, '')
 
-				const details = normalizeMarkdownBlankLines(
-					renderContentToText(evaluation.details, evalStrings, {
-						fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
-						trim: true,
-					}),
-				)
+				const qualifiedRefs =
+					evaluation.references === undefined ? [] : toFullyQualified(evaluation.references)
+
+				// Detail components are server-rendered to Markdown; anything
+				// else is typographic content. A component may also opt out of
+				// Markdown entirely, in which case no details are emitted.
+				const customDetails = renderCustomContentToMarkdown(evaluation.details, {
+					wallet,
+					outcome: evaluation.outcome,
+					references: qualifiedRefs,
+				})
+				const details =
+					customDetails === null
+						? normalizeMarkdownBlankLines(
+								renderContentToText(evaluation.details, evalStrings, { trim: true }),
+							)
+						: customDetails === NO_MARKDOWN_DETAILS
+							? ''
+							: customDetails
 
 				if (details.trim() !== '') {
 					parts.push(details, '')
@@ -265,33 +279,29 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 					}
 				}
 
-				if (evaluation.references !== undefined && evaluation.references.length > 0) {
-					const qualifiedRefs = toFullyQualified(evaluation.references)
+				if (qualifiedRefs.length > 0) {
+					parts.push('#### References', '')
 
-					if (qualifiedRefs.length > 0) {
-						parts.push('#### References', '')
+					for (const ref of qualifiedRefs) {
+						for (const labeledUrl of ref.urls) {
+							const prefix =
+								ref.explanation === undefined
+									? ''
+									: `${collapseToSingleLine(ref.explanation)} Source: `
 
-						for (const ref of qualifiedRefs) {
-							for (const labeledUrl of ref.urls) {
-								const prefix =
-									ref.explanation === undefined
-										? ''
-										: `${collapseToSingleLine(ref.explanation)} Source: `
+							// Escape square brackets (e.g. in filename-derived labels)
+							// so they cannot parse as nested/reference-style links, and
+							// render commit-hash pins in GitHub-like labels (`foo.ts
+							// L1-2 @abcdef1`) as the code they are.
+							const label = labeledUrl.label
+								.replace(/[[\]]/g, String.raw`\$&`)
+								.replace(gitCommitRefPinRegExp, '`$&`')
 
-								// Escape square brackets (e.g. in filename-derived labels)
-								// so they cannot parse as nested/reference-style links, and
-								// render commit-hash pins in GitHub-like labels (`foo.ts
-								// L1-2 @abcdef1`) as the code they are.
-								const label = labeledUrl.label
-									.replace(/[[\]]/g, String.raw`\$&`)
-									.replace(gitCommitRefPinRegExp, '`$&`')
-
-								parts.push(`- ${prefix}[${label}](${labeledUrl.url})`)
-							}
+							parts.push(`- ${prefix}[${label}](${labeledUrl.url})`)
 						}
-
-						parts.push('')
 					}
+
+					parts.push('')
 				}
 
 				return parts
