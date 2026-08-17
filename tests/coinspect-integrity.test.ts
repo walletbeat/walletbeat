@@ -4,19 +4,15 @@ import { coinspectMapping } from '@/data/coinspect/mapping'
 import reportsSnapshot from '@/data/coinspect/reports-snapshot.json'
 import { allWallets, isValidWalletName } from '@/data/wallets'
 import {
-	COINSPECT_PLATFORM_TO_VARIANT,
 	type CoinspectMapping,
-	type CoinspectPlatform,
+	coinspectPlatformEnum,
+	coinspectPlatformToVariant,
 	CoinspectUnmappedReason,
 } from '@/schema/data-sources/coinspect'
 import { variantLabel } from '@/schema/variants'
 
 const unmappedReasons = new Set<string>(Object.values(CoinspectUnmappedReason))
 const mappingByWalletMakerId: Readonly<Record<string, CoinspectMapping>> = coinspectMapping
-
-function isCoinspectPlatform(platform: string): platform is CoinspectPlatform {
-	return Object.prototype.hasOwnProperty.call(COINSPECT_PLATFORM_TO_VARIANT, platform)
-}
 
 describe('coinspect mapping', () => {
 	for (const entry of reportsSnapshot) {
@@ -31,16 +27,15 @@ describe('coinspect mapping', () => {
 			})
 
 			it('uses a known Coinspect platform', () => {
-				expect(
-					isCoinspectPlatform(platform),
-					`add "${platform}" to COINSPECT_PLATFORM_TO_VARIANT`,
-				).toBe(true)
+				expect(coinspectPlatformEnum.is(platform), `add "${platform}" to CoinspectPlatform`).toBe(
+					true,
+				)
 			})
 
 			it('maps to a Walletbeat variant the target wallet has', () => {
 				const mapping = mappingByWalletMakerId[walletMakerUID]
 
-				if (mapping === undefined || !isCoinspectPlatform(platform)) {
+				if (mapping === undefined || !coinspectPlatformEnum.is(platform)) {
 					return
 				}
 
@@ -54,7 +49,7 @@ describe('coinspect mapping', () => {
 					return
 				}
 
-				const variant = COINSPECT_PLATFORM_TO_VARIANT[platform]
+				const variant = coinspectPlatformToVariant(platform)
 				const wallet = allWallets[mapping.walletbeatId]
 
 				expect(
