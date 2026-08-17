@@ -107,6 +107,7 @@
 		"citrea",
 		"clineignore",
 		"cmap",
+		"Code4rena",
 		"codegen",
 		"coinbase",
 		"Coinkite",
@@ -275,6 +276,7 @@
 		"IHDR",
 		"ilyavna",
 		"imkey",
+		"Immunefi",
 		"imToken",
 		"inkscape",
 		"inpage",
@@ -692,6 +694,10 @@
 	],
 	"patterns": [
 		{ "name": "4everland", "pattern": "/\\b4everland\\b/gi" },
+		{
+			"name": "Audit finding titles",
+			"pattern": "/\\b[A-Z]{2,5}-\\d{2}-\\d{3} WP\\d(?:-WP\\d)?: [^\\n]*/g"
+		},
 		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
 		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
 		{
@@ -713,6 +719,7 @@
 	],
 	"ignoreRegExpList": [
 		"4everland",
+		"Audit finding titles",
 		"Bitcoin addresses",
 		"CIDv1",
 		"Chrome extension IDs",

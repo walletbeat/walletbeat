@@ -49,7 +49,7 @@
 			contentType: ContentType.MARKDOWN,
 			markdown: trimWhitespacePrefix(`
 				{{WALLET_NAME}} implements a Guardian-based account recovery feature which
-				${failedOutcomes.length === 0 ? 'passes all of the tested scenarios' : successfulOutcomes.length === 0 ? 'does not pass any of the tested scenarios' : 'does not pass all of the tested scenarios'}
+				${failedOutcomes.length === 0 ? 'passes all the tested scenarios' : successfulOutcomes.length === 0 ? 'does not pass any of the tested scenarios' : 'does not pass all the tested scenarios'}
 				when it comes to anti-ruggability.
 			`),
 		}}

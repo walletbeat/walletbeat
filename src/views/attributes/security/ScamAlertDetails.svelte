@@ -67,7 +67,7 @@
 							? `**{{WALLET_NAME}}** helps you stay safe when sending funds by ${
 									outcome.metadata.scamAlerts.sendTransactionWarning.newRecipientWarning &&
 									outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
-										? 'warning you when sending funds to an address you have not sent or received funds from in the past, and allowing you to build a contact book of addresses and warning you when sending funds to addresses not in it.'
+										? 'warning you when sending funds to an address you have not sent or received funds from in the past. It also lets you build a contact book of addresses, and warns you when sending funds to addresses not in it.'
 										: outcome.metadata.scamAlerts.sendTransactionWarning.newRecipientWarning
 											? 'warning you when sending funds to an address you have not sent or received funds from in the past.'
 											: outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
@@ -121,13 +121,13 @@
 												.map(listItem => `\n* ${listItem}`)
 												.join('')}`
 										: outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry
-											? 'checking the contract or transaction data against a database of known scams.'
+											? ' checking the contract or transaction data against a database of known scams.'
 											: outcome.metadata.scamAlerts.contractTransactionWarning
 														.previousContractInteractionWarning
-												? 'warning you when interacting with a contract you have not interacted with before.'
+												? ' warning you when interacting with a contract you have not interacted with before.'
 												: outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning
-													? 'warning you when interacting with a contract that has only recently been created onchain.'
-													: 'providing contract warnings.'
+													? ' warning you when interacting with a contract that has only recently been created onchain.'
+													: ' providing contract warnings.'
 								}${leakClause(outcome.metadata.scamAlerts.contractTransactionWarning, [
 									[
 										outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress,
