@@ -322,7 +322,7 @@
 	{:else if item.icon}
 		{@const iconShape = depth === 0 ? 'circle' : ''}
 		{#if item.icon.startsWith('ICON_WALLET_IMG:')}
-			<span data-icon>
+			<span data-icon="wallet">
 				<img src={item.icon.slice('ICON_WALLET_IMG:'.length)} alt="" />
 			</span>
 		{:else if item.icon in LUCIDE_ICONS}
@@ -452,6 +452,7 @@
 			li > details > summary,
 			li > a {
 				--icon-size: var(--navIcon-size);
+				--icon-wallet-filter: saturate(0.15) grayscale(1) opacity(0.9);
 
 				---backgroundColor: transparent;
 				---color: inherit;
@@ -462,6 +463,7 @@
 				&:interest-source {
 					---backgroundColor: var(--navItem-hover-backgroundColor);
 					---color: var(--accent);
+					--icon-wallet-filter: none;
 				}
 
 				&:is(a):is(
@@ -483,6 +485,7 @@
 					)
 				) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
+					--icon-wallet-filter: none;
 
 					&:hover,
 					&:focus-visible,
