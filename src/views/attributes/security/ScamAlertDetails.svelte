@@ -100,6 +100,20 @@
 						outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning,
 					].filter(Boolean)
 				: []}
+			{@const contractLeak = isSupported(outcome.metadata.scamAlerts.contractTransactionWarning)
+				? leakClause(outcome.metadata.scamAlerts.contractTransactionWarning, [
+						[
+							outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress,
+							'the contract address',
+						],
+					])
+				: ''}
+			<!-- When the features are listed as bullets, the leak clause has to stand on its own
+			     rather than trailing the last bullet, which would read as part of it. -->
+			{@const contractLeakSuffix =
+				contractFeatures.length > 1 && contractLeak !== ''
+					? `\n\n${contractLeak.trimStart()}`
+					: contractLeak}
 
 			<li data-list-item="gap-2">
 				<Typography
@@ -128,12 +142,7 @@
 												: outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning
 													? ' warning you when interacting with a contract that has only recently been created onchain.'
 													: ' providing contract warnings.'
-								}${leakClause(outcome.metadata.scamAlerts.contractTransactionWarning, [
-									[
-										outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress,
-										'the contract address',
-									],
-								])}`
+								}${contractLeakSuffix}`
 							: '**{{WALLET_NAME}}** does not warn you when making arbitrary onchain transactions.',
 					}}
 					strings={getWalletEvalStrings(wallet)}
