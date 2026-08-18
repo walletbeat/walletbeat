@@ -38,3 +38,5 @@ description: "A log of positive social media mentions as a result of Walletbeat'
 - https://x.com/theZeugh/status/2048769781516406985
 - https://x.com/binji_x/status/2040703905378546038
 - https://x.com/0xcyp/status/2040791676738847185
+- https://x.com/walletbeat/status/2017683277730001010
+- https://x.com/cinesiusss/status/2013279535374959012
