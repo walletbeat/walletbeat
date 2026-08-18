@@ -208,6 +208,7 @@ export const ambire: SoftwareWallet = {
 		id: 'ambire',
 		displayName: 'Ambire',
 		tableName: 'Ambire',
+		coinspectId: 'ambire',
 		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-07-22',

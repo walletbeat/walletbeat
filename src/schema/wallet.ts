@@ -85,6 +85,11 @@ export interface WalletMetadata {
 	id: string
 
 	/**
+	 * Coinspect wallet-maker ID for this Walletbeat wallet, if any.
+	 */
+	coinspectId?: string
+
+	/**
 	 * Human-readable name of the wallet, when written in a sentence.
 	 * For example, `Users of ${displayName} are happy with their experience`
 	 * should make sense.

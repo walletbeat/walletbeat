@@ -16,6 +16,7 @@ export const gemwallet: SoftwareWallet = {
 		id: 'gemwallet',
 		displayName: 'Gem Wallet',
 		tableName: 'Gem Wallet',
+		coinspectId: 'gem',
 		contributors: [h3rman],
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-14',

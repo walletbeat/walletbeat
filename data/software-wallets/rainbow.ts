@@ -80,6 +80,7 @@ export const rainbow: SoftwareWallet = {
 		id: 'rainbow',
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
+		coinspectId: 'rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-22',

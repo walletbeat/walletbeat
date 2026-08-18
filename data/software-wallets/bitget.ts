@@ -29,6 +29,7 @@ export const bitget: SoftwareWallet = {
 		id: 'bitget',
 		displayName: 'Bitget Wallet',
 		tableName: 'Bitget',
+		coinspectId: 'bitget',
 		contributors: [mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-17',
