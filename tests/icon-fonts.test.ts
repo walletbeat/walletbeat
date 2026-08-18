@@ -36,7 +36,7 @@ describe('wbicons', async () => {
 			':is(&[data-icon~="security"], [data-list-item-marker="security"]) {\n\t--icon-content: "🔒";\n\t--list-marker-fontFamily: var(--fontFamily-wbicons);\n}',
 		])
 
-		expect(css).toContain('[data-icon~="wbicons"] {')
+		expect(css).toContain("[data-icon~='wbicons'] {")
 		expect(css).toContain(
 			'font-family: var(--fontFamily-wbicons);\n\tfont-style: normal;\n\t-webkit-font-smoothing: subpixel-antialiased;',
 		)
@@ -44,7 +44,7 @@ describe('wbicons', async () => {
 		expect(css).toContain(':is(&[data-icon~="security"], [data-list-item-marker="security"])')
 		expect(css).toContain('--list-marker-fontFamily: var(--fontFamily-wbicons);')
 		expect(css).not.toContain(':where(')
-		expect(css).toContain('&[data-icon~="emoji"]')
+		expect(css).toContain("&[data-icon~='emoji']")
 	})
 	it('has only monochrome files', async () => {
 		const results: Record<string, string[]> = await wbicons.nonMonochromeFiles()

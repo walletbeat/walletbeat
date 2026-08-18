@@ -37,7 +37,6 @@ import {
 	getCriterionAttributeId,
 	type StageCountsStatus,
 } from '@/utils/stage-attributes'
-import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
 
@@ -146,7 +145,6 @@ export interface RatedWalletJsonExport {
 	variants: Variant[]
 	walletId: string
 	displayName: string
-	description: string
 	lastUpdated: string
 	stage: string | null
 	stageBreakdown: StageBreakdownItemJsonExport[] | null
@@ -376,7 +374,6 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 		types: setItems(wallet.types),
 		variants: setItems(getVariants(wallet.variants)),
 		displayName: metadata.displayName,
-		description: walletBlurbText(wallet),
 		lastUpdated: metadata.lastUpdated,
 		stage: stageExport,
 		stageBreakdown,

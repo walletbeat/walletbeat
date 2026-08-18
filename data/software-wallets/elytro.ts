@@ -10,7 +10,6 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 const elytroAudits: SecurityAudit[] = [
 	{
@@ -46,9 +45,6 @@ export const elytro: SoftwareWallet = {
 		id: 'elytro',
 		displayName: 'Elytro',
 		tableName: 'Elytro',
-		blurb: paragraph(
-			'Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open, and self-own internet. We start by building a smart contract account.',
-		),
 		coinspectId: 'elytro',
 		contributors: [nconsigny],
 		iconExtension: 'svg',

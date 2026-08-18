@@ -4,18 +4,12 @@ import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const unratedTemplate: SoftwareWallet = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated wallet template',
 		tableName: 'Unrated',
-		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
-		`),
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',

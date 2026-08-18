@@ -65,7 +65,6 @@ import {
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
@@ -78,10 +77,6 @@ export const rabby: SoftwareWallet = {
 		id: 'rabby',
 		displayName: 'Rabby',
 		tableName: 'Rabby',
-		blurb: paragraph(`
-			Rabby is a user-friendly Ethereum wallet focusing on smooth UX and security.
-			It features an intuitive transaction preview feature and works on many chains.
-		`),
 		coinspectId: 'rabby-wallet',
 		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',

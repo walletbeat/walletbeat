@@ -15,13 +15,11 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 export const frame: SoftwareWallet = {
 	metadata: {
 		id: 'frame',
 		displayName: 'Frame',
 		tableName: 'Frame',
-		blurb: paragraph('Frame...'),
 		coinspectId: 'frame',
 		contributors: [polymutex, nconsigny, lucemans, mattmatt],
 		iconExtension: 'svg',

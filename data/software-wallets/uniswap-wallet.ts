@@ -10,17 +10,12 @@ import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
 		id: 'uniswap-wallet',
 		displayName: 'Uniswap Wallet',
 		tableName: 'Uniswap',
-		blurb: paragraph(`
-			The self-custody wallet for swapping, sending, bridging,
-			and exploring apps across 16+ networks.
-		`),
 		coinspectId: 'uniswap',
 		contributors: [ren2140],
 		iconExtension: 'svg',

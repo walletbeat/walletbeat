@@ -12,6 +12,9 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
 	(await import('./2026-06-03-tropic01-secure-element-fault-injection')).default,
 	(await import('./2026-07-17-consensys-metamask-north-korean-hacker')).default,
 	(await import('./2026-07-30-coldcard-mk3-seed-generation')).default,
+	(await import('./2026-08-06-privy-metabase-security-incident')).default,
+	(await import('./2026-08-13-trezor-shipmonk-data-breach')).default,
+	(await import('./2026-08-16-safepal-customer-order-data-exposure')).default,
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
 /**

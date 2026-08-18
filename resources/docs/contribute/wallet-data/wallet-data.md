@@ -153,7 +153,7 @@ export const chainMonkey: Contributor = {
 
 - Create a copy of `/data/software-wallets/unrated.tmpl.ts` at `/data/software-wallets/my-little-wallet.ts`.
 - Rename the top-level object from `unratedTemplate` to `myLittleWallet`.
-- Change all `metadata.*` fields such as `id` (set to `'myLittleWallet'`), `displayName`, `blurb`, `lastUpdated` (set to today's date in `YYYY-MM-DD` format), `urls`, etc.
+- Change all `metadata.*` fields such as `id` (set to `'myLittleWallet'`), `displayName`, `lastUpdated` (set to today's date in `YYYY-MM-DD` format), `urls`, etc.
 - Find an SVG icon of the wallet and crop all the transparent edges out of the SVG. Save it as `/public/images/wallet/myLittleWallet.svg` (the filename matches the `metadata.id` field).
   - _(If you cannot find an SVG version of the icon, find a PNG or JPG version instead, crop it similarly, save it as `/public/images/wallet/myLittleWallet.png` or `/public/images/wallet/myLittleWallet.jpg`, and set `metadata.iconExtension` to `'png'` or `'jpg'` in the wallet data file.)_
 - Set yourself as the sole contributor in `metadata.contributors`.
@@ -170,10 +170,6 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 		id: 'myLittleWallet',
 		displayName: 'My Little Wallet',
 		tableName: 'My Little Wallet',
-		blurb: paragraph(`
-			This is an example wallet that was made up for the sake of
-			this contributor guide.
-		`),
 		contributors: [chainMonkey],
 		iconExtension: 'svg',
 		lastUpdated: '2077-01-01',

@@ -6,9 +6,17 @@ import { eips } from '@/data/eips'
 import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
-import { ratedWalletEipSupport } from '@/schema/eip-support'
+import {
+	ratedWalletEipSupport,
+	type EipSupportRow,
+	EipSupportStatus,
+	eipSupportStatus,
+} from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
+import { refs } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
+import { getWalletUrl } from '@/utils/urls'
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -29,16 +37,44 @@ type Props = { eip: Eip }
 
 const { eip } = Astro.props
 
-/** Whether the EIP applies to at least one of the given wallets. */
-function isApplicable(wallets: Array<RatedWallet<string>>): boolean {
-	return wallets.some(
-		wallet => ratedWalletEipSupport(wallet, eip.number).overall !== 'NOT_APPLICABLE',
-	)
+/** Precompute the EIP support table rows at build time. */
+function eipSupportRows(wallets: Array<RatedWallet<string>>): EipSupportRow[] {
+	return wallets.flatMap(wallet => {
+		const support = ratedWalletEipSupport(wallet, eip.number)
+		const overall = eipSupportStatus(support.overall)
+
+		if (overall === EipSupportStatus.NOT_APPLICABLE) {
+			return []
+		}
+
+		return [
+			{
+				id: wallet.metadata.id,
+				displayName: wallet.metadata.displayName,
+				iconExtension: wallet.metadata.iconExtension,
+				url: getWalletUrl(wallet),
+				overall,
+				variants: Object.values(Variant).flatMap(variant => {
+					const variantSupport = support.perVariant[variant]
+
+					return variantSupport === undefined
+						? []
+						: [{ variant, status: eipSupportStatus(variantSupport) }]
+				}),
+				sourceUrls:
+					typeof support.overall === 'string'
+						? []
+						: refs(support.overall).flatMap(ref =>
+								ref.urls.map(({ url, label }) => ({ url, label })),
+							),
+			},
+		]
+	})
 }
 
-const softwareWallets = Object.values(ratedSoftwareWallets)
-const hardwareWallets = Object.values(ratedHardwareWallets)
-const embeddedWallets = Object.values(ratedEmbeddedWallets)
+const softwareRows = eipSupportRows(Object.values(ratedSoftwareWallets))
+const hardwareRows = eipSupportRows(Object.values(ratedHardwareWallets))
+const embeddedRows = eipSupportRows(Object.values(ratedEmbeddedWallets))
 ---
 
 <Layout
@@ -55,33 +91,30 @@ const embeddedWallets = Object.values(ratedEmbeddedWallets)
 		</header>
 
 		{
-			isApplicable(softwareWallets) && (
+			softwareRows.length > 0 && (
 				<EipSupportTable
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
-					eip={eip}
-					wallets={softwareWallets}
+					rows={softwareRows}
 					client:visible
 				/>
 			)
 		}
 
 		{
-			isApplicable(hardwareWallets) && (
+			hardwareRows.length > 0 && (
 				<EipSupportTable
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
-					eip={eip}
-					wallets={hardwareWallets}
+					rows={hardwareRows}
 					client:visible
 				/>
 			)
 		}
 
 		{
-			isApplicable(embeddedWallets) && (
+			embeddedRows.length > 0 && (
 				<EipSupportTable
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
-					eip={eip}
-					wallets={embeddedWallets}
+					rows={embeddedRows}
 					client:visible
 				/>
 			)

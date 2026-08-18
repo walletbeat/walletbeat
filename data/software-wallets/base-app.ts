@@ -35,17 +35,12 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const baseApp: SoftwareWallet = {
 	metadata: {
 		id: 'base-app',
 		displayName: 'Base App',
 		tableName: 'Base App',
-		blurb: paragraph(`
-			Base is a secure onchain wallet and browser that puts you in
-			control of your crypto, NFTs, DeFi activity, and digital assets.
-		`),
 		coinspectId: 'coinbase-wallet',
 		contributors: [ren2140],
 		iconExtension: 'svg',

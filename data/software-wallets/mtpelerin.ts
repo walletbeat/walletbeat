@@ -13,16 +13,12 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const mtpelerin: SoftwareWallet = {
 	metadata: {
 		id: 'mtpelerin',
 		displayName: 'Bridge Wallet',
 		tableName: 'Bridge Wallet',
-		blurb: paragraph(
-			'Buy, swap, and sell crypto with the lowest fees, zero hidden costs, and full control over your cryptoassets.',
-		),
 		coinspectId: 'bridge-wallet',
 		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',

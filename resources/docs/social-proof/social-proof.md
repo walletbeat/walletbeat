@@ -1,0 +1,35 @@
+---
+title: 'Walletbeat wall of love'
+description: "A log of positive social media mentions as a result of Walletbeat's actions or existence."
+---
+
+- https://x.com/SCBuergel/status/2054251881916961048
+- https://x.com/alexanderchopan/status/2086600745202389183
+- https://x.com/alexanderchopan/status/2086600610087088299
+- https://x.com/borislavItskovv/status/2081582575790006360
+- https://x.com/ambire/status/2082816470560747558
+- https://x.com/coinspect/status/2084640808611770538
+- https://x.com/joddoss/status/2085383445421662515
+- https://x.com/ZkAv_Club/status/2084956394025807981
+- https://x.com/SoyAuraBrito/status/2084948003719127125
+- https://x.com/2ctv/status/2084943855099814320
+- https://x.com/scoutingcapie/status/2083149452530115011
+- https://x.com/marcxvlad/status/2084659094745407957
+- https://x.com/scoutingcapie/status/2084640012713578900
+- https://x.com/web3privacy/status/2082835011237990487
+- https://x.com/thomasbtc/status/2083937807245144370
+- https://x.com/AlpinaBG/status/2083622964071649458
+- https://x.com/defiscan_info/status/2083184534963597650
+- https://x.com/scoutingcapie/status/2083153202812522634
+- https://x.com/apoorveth/status/2082198239122751814
+- https://x.com/web3privacy/status/2082834961195843931
+- https://x.com/web3privacy/status/2082768261767155962
+- https://x.com/taliaobbu/status/2082717762380562535
+- https://x.com/alexanderchopan/status/2082293152636096767
+- https://x.com/alexanderchopan/status/2081896550633193867
+- https://x.com/Hiraweb3/status/2079953097892237425
+- https://x.com/web3privacy/status/2079190143152291997
+- https://x.com/benwoodall/status/2088433081577279986
+- https://x.com/anirudh_chohan/status/2088634185879556519
+- https://x.com/mteamisloading/status/2088270376010760395
+- https://x.com/Johnsondfirst/status/2087885164680515868

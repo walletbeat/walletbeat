@@ -14,7 +14,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
 
@@ -23,9 +22,6 @@ export const nufi: SoftwareWallet = {
 		id: 'nufi',
 		displayName: 'NuFi',
 		tableName: 'NuFi',
-		blurb: paragraph(`
-			Powerful wallet for powerful users.
-		`),
 		coinspectId: 'nu-fi',
 		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
