@@ -2,12 +2,18 @@ import type { Component } from 'svelte'
 import { render } from 'svelte/server'
 import TurndownService from 'turndown'
 
-import type { EvaluationData, Outcome, OutcomeMetadata } from '@/schema/attributes'
+import type {
+	EvaluationData,
+	Outcome,
+	OutcomeMetadata,
+	WalletNameAndPseudonymStrings,
+} from '@/schema/attributes'
 import type { AccountRecoveryMetadata } from '@/schema/attributes/security/account-recovery'
 import type { ScamPreventionMetadata } from '@/schema/attributes/security/scam-prevention'
 import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
 import type { AccountUnruggabilityMetadata } from '@/schema/attributes/self-sovereignty/account-unruggability'
-import { type CustomContent, isCustomContent } from '@/types/content'
+import { type Content, type CustomContent, isCustomContent } from '@/types/content'
+import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -20,29 +26,32 @@ import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/Tra
 import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 
 /**
- * Context that `WalletPage.svelte` injects into detail components on top of the
- * props baked into the `CustomContent` itself.
+ * Everything needed to render an evaluation's details block, on top of the
+ * props baked into the details themselves.
  *
- * This is the same `{ outcome, references, wallet }` triple that detail
- * components declare via `EvaluationData`, minus the per-attribute metadata
- * type, which `CustomContent` does not carry.
+ * `{ outcome, references, wallet }` is the same triple that detail components
+ * declare via `EvaluationData`, minus the per-attribute metadata type, which
+ * `CustomContent` does not carry.
  */
-export interface CustomContentContext extends EvaluationData<OutcomeMetadata> {}
+export interface DetailsMarkdownContext extends EvaluationData<OutcomeMetadata> {
+	/** Display name of the attribute being rendered, used for link text. */
+	attributeDisplayName: string
+
+	/** URL of this attribute's section on the wallet's HTML page. */
+	attributeUrl: string
+
+	/**
+	 * The attribute's short explanation as the page has already rendered it
+	 * above the details block, so that a component repeating it can be caught.
+	 */
+	shortExplanation: string
+}
 
 /**
- * Returned instead of Markdown by components that deliberately have no
- * Markdown rendering, so that callers omit the details section entirely rather
- * than falling back to something else.
+ * Returned by components that deliberately have no Markdown rendering, so that
+ * a link to the HTML page is emitted in their place.
  */
-export const NO_MARKDOWN_DETAILS = Symbol('NO_MARKDOWN_DETAILS')
-
-/**
- * Result of rendering evaluation details to Markdown:
- * - a string: the component's Markdown;
- * - `NO_MARKDOWN_DETAILS`: custom content that intentionally renders nothing;
- * - `null`: not custom content at all (i.e. typographic content).
- */
-export type CustomContentMarkdown = string | typeof NO_MARKDOWN_DETAILS | null
+const NO_MARKDOWN_DETAILS = Symbol('NO_MARKDOWN_DETAILS')
 
 /**
  * Heading level that component headings are rendered at.
@@ -51,7 +60,7 @@ export type CustomContentMarkdown = string | typeof NO_MARKDOWN_DETAILS | null
  * `#### References` sections around the details, so component headings (`<h4>`)
  * are demoted by one level to sit underneath those.
  */
-const headingDemotion = 1
+const HEADING_DEMOTION = 1
 
 /**
  * Turndown instance configured to match the Markdown conventions used by the
@@ -85,7 +94,7 @@ turndownService.remove(node => {
 turndownService.addRule('demotedHeading', {
 	filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 	replacement: (content, node) => {
-		const level = Math.min(Number(node.nodeName.charAt(1)) + headingDemotion, 6)
+		const level = Math.min(Number(node.nodeName.charAt(1)) + HEADING_DEMOTION, 6)
 
 		return `\n\n${'#'.repeat(level)} ${content}\n\n`
 	},
@@ -164,28 +173,79 @@ function narrowMetadata<_Metadata extends object>(outcome: Outcome<OutcomeMetada
 }
 
 /**
- * Render `CustomContent` (a Svelte component) to Markdown for the LLM-friendly
+ * Render an evaluation's details to Markdown for the LLM-friendly
  * `index.html.md` wallet pages.
+ *
+ * Callers hand over whatever `evaluation.details` holds and get back the
+ * Markdown to print, whichever of the three shapes it turns out to be:
+ * typographic content is rendered as text, a detail component is
+ * server-rendered and converted, and a component with no Markdown rendering
+ * becomes a link to the attribute's section on the HTML page.
+ *
+ * @param details The evaluation's details.
+ * @param context The attribute being rendered, plus the props that the wallet
+ * page injects into every detail component.
+ * @returns Markdown for the details block; empty when there is nothing to say.
+ */
+export function renderDetailsMarkdown(
+	details: Content<WalletNameAndPseudonymStrings>,
+	context: DetailsMarkdownContext,
+): string {
+	if (!isCustomContent(details)) {
+		return withoutShortExplanation(
+			normalizeMarkdownBlankLines(
+				renderContentToText(details, getWalletEvalStrings(context.wallet), { trim: true }),
+			),
+			context,
+		)
+	}
+
+	const markdown = renderComponentMarkdown(details.component, context)
+
+	if (markdown === NO_MARKDOWN_DETAILS) {
+		return `[See full details for ${context.attributeDisplayName}](${context.attributeUrl})`
+	}
+
+	return withoutShortExplanation(markdown, context)
+}
+
+/**
+ * Drop the outcome's short explanation from the front of a details block.
+ *
+ * The page prints the short explanation directly above the details, so details
+ * that open by restating it read as a repeat. Both kinds of details do this:
+ * `ScamAlertDetails` renders `outcome.shortExplanation` itself, and some
+ * attributes give typographic details identical to their short explanation.
+ * Neither repeats on the HTML page, which does not print the short explanation
+ * separately.
+ *
+ * @param markdown The rendered details block.
+ * @param context The context it was rendered with.
+ * @returns The details block without the leading repeat.
+ */
+function withoutShortExplanation(markdown: string, context: DetailsMarkdownContext): string {
+	return markdown.startsWith(context.shortExplanation)
+		? markdown.slice(context.shortExplanation.length).trimStart()
+		: markdown
+}
+
+/**
+ * Server-render one detail component and convert it to Markdown.
  *
  * Every component in `ComponentAndProps` is handled here; the `assertNever` in
  * the default case makes adding one to that union a compile error until it is.
  * The props each component receives must stay in sync with the dispatch in
  * `WalletPage.svelte`.
  *
- * @param content The content to render; typographic content returns `null`.
+ * @param componentAndProps The component to render and the props baked into the
+ * `CustomContent`.
  * @param context Props that the wallet page injects into every detail component.
- * @returns Markdown for the component, or one of the sentinels documented on
- * `CustomContentMarkdown`.
+ * @returns The component's Markdown, or `NO_MARKDOWN_DETAILS`.
  */
-export function renderCustomContentToMarkdown(
-	content: unknown,
-	context: CustomContentContext,
-): CustomContentMarkdown {
-	if (!isCustomContent(content)) {
-		return null
-	}
-
-	const componentAndProps: CustomContent['component'] = content.component
+function renderComponentMarkdown(
+	componentAndProps: CustomContent['component'],
+	context: DetailsMarkdownContext,
+): string | typeof NO_MARKDOWN_DETAILS {
 	const { wallet, outcome, references } = context
 
 	switch (componentAndProps.component) {
@@ -253,8 +313,6 @@ export function renderCustomContentToMarkdown(
 	}
 }
 
-function assertNever(componentAndProps: never): never {
-	const { component } = componentAndProps as CustomContent['component']
-
-	throw new Error(`No Markdown renderer for detail component: ${component}`)
+function assertNever(_componentAndProps: never): never {
+	throw new Error('No Markdown renderer for detail component')
 }

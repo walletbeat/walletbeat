@@ -89,7 +89,7 @@ export function securityAuditsDetailsContent(
 </div>
 ```
 
-- Edit `src/utils/custom-content-markdown.ts` to add a `case` for your component. This is what renders it into the LLM-friendly `index.html.md` version of each wallet page, following the [llms.txt](https://llmstxt.org/) convention. The `assertNever` in the `default` case makes this a compile error until you do it. Pass the same props as the `WalletPage.svelte` dispatch above:
+- Edit `src/utils/details-markdown.ts` to add a `case` for your component. This is what renders it into the LLM-friendly `index.html.md` version of each wallet page, following the [llms.txt](https://llmstxt.org/) convention. The `assertNever` in the `default` case makes this a compile error until you do it. Pass the same props as the `WalletPage.svelte` dispatch above:
 
 ```typescript
 case 'SecurityAuditsDetails':

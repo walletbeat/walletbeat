@@ -14,22 +14,23 @@ import {
 	type CustomContent,
 	isCustomContent,
 	mdParagraph,
+	renderTypographicContentToString,
 	sentence,
 } from '@/types/content'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { privateTransfersDetailsContent } from '@/types/content/private-transfers-details'
-import {
-	type CustomContentContext,
-	NO_MARKDOWN_DETAILS,
-	renderCustomContentToMarkdown,
-} from '@/utils/custom-content-markdown'
+import { type DetailsMarkdownContext, renderDetailsMarkdown } from '@/utils/details-markdown'
+import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 /** A real wallet, since every detail component takes a full `RatedWallet`. */
 const wallet = allRatedWallets.rabby
 const walletName = wallet.metadata.displayName
 
 /** Context for synthetic content that does not come from a real evaluation. */
-const syntheticContext: CustomContentContext = {
+const syntheticContext: DetailsMarkdownContext = {
+	attributeDisplayName: 'Synthetic attribute',
+	attributeUrl: 'https://walletbeat.example/rabby/#synthetic',
+	shortExplanation: 'Synthetic outcome.',
 	wallet,
 	outcome: {
 		id: 'synthetic',
@@ -50,7 +51,7 @@ interface CustomContentEntry {
 	attributeId: string
 	componentName: string
 	content: CustomContent
-	context: CustomContentContext
+	context: DetailsMarkdownContext
 }
 
 const realCustomContents: CustomContentEntry[] = Object.values(allRatedWallets).flatMap(w =>
@@ -71,6 +72,12 @@ const realCustomContents: CustomContentEntry[] = Object.values(allRatedWallets).
 					componentName: evaluation.details.component.component,
 					content: evaluation.details,
 					context: {
+						attributeDisplayName: attribute.displayName,
+						attributeUrl: `https://walletbeat.example/${w.metadata.id}/#${attribute.id}`,
+						shortExplanation: renderTypographicContentToString(
+							evaluation.outcome.shortExplanation,
+							getWalletEvalStrings(w),
+						),
 						wallet: w,
 						outcome: evaluation.outcome,
 						references:
@@ -116,16 +123,12 @@ function renderFirstInstanceOf(componentName: string): string {
 		throw new Error(`No wallet currently uses ${componentName}`)
 	}
 
-	const markdown = renderCustomContentToMarkdown(entry.content, entry.context)
-
-	if (typeof markdown !== 'string') {
-		throw new Error(`${componentName} did not render to Markdown`)
-	}
+	const markdown = renderDetailsMarkdown(entry.content, entry.context)
 
 	return `${entry.walletName} / ${entry.attributeId}\n\n${markdown}`
 }
 
-describe('renderCustomContentToMarkdown', () => {
+describe('renderDetailsMarkdown', () => {
 	it('renders every component found in the real wallet data', () => {
 		expect(realCustomContents.length).toBeGreaterThan(0)
 		expect([...new Set(realCustomContents.map(entry => entry.componentName))].toSorted())
@@ -146,20 +149,16 @@ describe('renderCustomContentToMarkdown', () => {
 	describe('real wallet data', () => {
 		for (const entry of realCustomContents) {
 			it(`${entry.walletName} / ${entry.attributeId} (${entry.componentName})`, () => {
-				const markdown = renderCustomContentToMarkdown(entry.content, entry.context)
+				const markdown = renderDetailsMarkdown(entry.content, entry.context)
 
-				// Every component in `ComponentAndProps` is handled, so `null`
-				// (meaning "not custom content") must never come back here.
-				expect(markdown).not.toBeNull()
-
+				// `UnratedAttribute` has no Markdown rendering, so it becomes a
+				// link to the attribute's section on the HTML page instead.
 				if (entry.componentName === 'UnratedAttribute') {
-					expect(markdown).toBe(NO_MARKDOWN_DETAILS)
+					expect(markdown).toBe(
+						`[See full details for ${entry.context.attributeDisplayName}](${entry.context.attributeUrl})`,
+					)
 
 					return
-				}
-
-				if (typeof markdown !== 'string') {
-					throw new TypeError(`${entry.componentName} did not render to Markdown`)
 				}
 
 				expectWellFormedMarkdown(markdown)
@@ -171,7 +170,7 @@ describe('renderCustomContentToMarkdown', () => {
 	// so they get synthetic props rather than being exercised by the sweep above.
 	describe('components with no real wallet data', () => {
 		it('renders ChainVerificationDetails and strips its inline sources', () => {
-			const markdown = renderCustomContentToMarkdown(
+			const markdown = renderDetailsMarkdown(
 				chainVerificationDetailsContent({ lightClients: [EthereumL1LightClient.helios] }),
 				{
 					...syntheticContext,
@@ -190,7 +189,7 @@ describe('renderCustomContentToMarkdown', () => {
 		})
 
 		it('renders PrivateTransfersDetails', () => {
-			const markdown = renderCustomContentToMarkdown(
+			const markdown = renderDetailsMarkdown(
 				privateTransfersDetailsContent({
 					privateTransferDetails: new Map([
 						[
@@ -251,14 +250,14 @@ describe('renderCustomContentToMarkdown', () => {
 			expect(renderFirstInstanceOf('ScamAlertDetails')).toMatchInlineSnapshot(`
 				"Ambire / scamPrevention
 
-				Ambire warns the user about outgoing transactions to unknown addresses, transactions with potential scam contracts, and connections to potential scam applications but not about transactions that grant unlimited token approvals
-
 				- **Ambire** helps you stay safe when sending funds by warning you when sending funds to an address you have not sent or received funds from in the past. However, in doing so, it leaks your IP and the recipient's Ethereum address to an external provider which can correlate them.
 
 				- **Ambire** helps you stay safe when doing onchain transactions by:
 
 				  - Checking the contract or transaction data against a database of known scams
-				  - Warning you when interacting with a contract you have not interacted with before However, in doing so, it leaks your IP and the contract address to an external provider which can correlate them.
+				  - Warning you when interacting with a contract you have not interacted with before
+
+				  However, in doing so, it leaks your IP and the contract address to an external provider which can correlate them.
 
 				- **Ambire** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.
 
@@ -340,12 +339,9 @@ describe('renderCustomContentToMarkdown', () => {
 		})
 	})
 
-	it('returns null for typographic content', () => {
+	it('renders typographic content as text', () => {
 		expect(
-			renderCustomContentToMarkdown(
-				{ contentType: ContentType.TEXT, text: 'hello' },
-				syntheticContext,
-			),
-		).toBeNull()
+			renderDetailsMarkdown({ contentType: ContentType.TEXT, text: 'hello' }, syntheticContext),
+		).toBe('hello')
 	})
 })

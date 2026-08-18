@@ -15,7 +15,7 @@ import { isTypographicContent, renderTypographicContentToString } from '@/types/
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
-import { NO_MARKDOWN_DETAILS, renderCustomContentToMarkdown } from '@/utils/custom-content-markdown'
+import { renderDetailsMarkdown } from '@/utils/details-markdown'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
@@ -236,22 +236,14 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 				const qualifiedRefs =
 					evaluation.references === undefined ? [] : toFullyQualified(evaluation.references)
 
-				// Detail components are server-rendered to Markdown; anything
-				// else is typographic content. A component may also opt out of
-				// Markdown entirely, in which case no details are emitted.
-				const customDetails = renderCustomContentToMarkdown(evaluation.details, {
+				const details = renderDetailsMarkdown(evaluation.details, {
 					wallet,
 					outcome: evaluation.outcome,
 					references: qualifiedRefs,
+					attributeDisplayName: attribute.displayName,
+					attributeUrl: walletAttrUrl,
+					shortExplanation: shortExpl,
 				})
-				const details =
-					customDetails === null
-						? normalizeMarkdownBlankLines(
-								renderContentToText(evaluation.details, evalStrings, { trim: true }),
-							)
-						: customDetails === NO_MARKDOWN_DETAILS
-							? ''
-							: customDetails
 
 				if (details.trim() !== '') {
 					parts.push(details, '')

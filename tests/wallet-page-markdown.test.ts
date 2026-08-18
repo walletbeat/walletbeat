@@ -58,6 +58,24 @@ describe('walletPageMarkdown', () => {
 				expect(md).not.toContain('[object Object]')
 			})
 
+			// Detail components are rendered into the page, and one of them
+			// (`ScamAlertDetails`) opens by restating the outcome's short
+			// explanation, which the page has already printed above it.
+			it('does not repeat a paragraph back to back', () => {
+				// Headings are kept, so that identical paragraphs belonging to
+				// two different attributes are not seen as adjacent.
+				const paragraphs = md
+					.split('\n\n')
+					.map(paragraph => paragraph.trim())
+					.filter(paragraph => paragraph !== '')
+
+				for (const [index, paragraph] of paragraphs.entries()) {
+					expect(paragraph, `repeated paragraph: ${paragraph.slice(0, 80)}`).not.toBe(
+						paragraphs[index - 1],
+					)
+				}
+			})
+
 			it('contains the lastUpdated date', () => {
 				expect(md).toContain(wallet.metadata.lastUpdated)
 			})
