@@ -42,7 +42,6 @@ function decodeHtmlEntities(value: string): string {
 		.replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(parseInt(code, 10)))
 		.replace(/&#x([0-9a-f]+);/gi, (_, code: string) => String.fromCodePoint(parseInt(code, 16)))
 		.replace(/&quot;/g, '"')
-		.replace(/&apos;/g, "'")
 		.replace(/&lt;/g, '<')
 		.replace(/&gt;/g, '>')
 		.replace(/&amp;/g, '&')
