@@ -1,0 +1,80 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"manifest_version": 3,
+	"name": "Vultisig Extension",
+	"description": "Vultisig Extension integrates Vultisig into web applications, enabling users to securely sign blockchain transactions.",
+	"author": {
+		"name": "Vultisig",
+		"email": "info@vultisig.com",
+		"url": "https://vultisig.com"
+	},
+	"version": "0.2.23",
+	"version_name": "0.2.23",
+	"action": {
+		"default_icon": {
+			"16": "icon16.png",
+			"32": "icon32.png",
+			"48": "icon48.png",
+			"64": "icon64.png",
+			"128": "icon128.png"
+		},
+		"default_popup": "index.html?view=popup"
+	},
+	"background": {
+		"service_worker": "background.js",
+		"type": "module"
+	},
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"exclude_matches": ["https://*.google.com/*"],
+			"js": ["content.js"],
+			"run_at": "document_start",
+			"all_frames": true
+		},
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"exclude_matches": ["https://*.google.com/*"],
+			"js": ["inpage.js"],
+			"run_at": "document_start",
+			"world": "MAIN",
+			"all_frames": true
+		}
+	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval';object-src 'self'"
+	},
+	"host_permissions": ["https://*/*"],
+	"icons": {
+		"16": "icon16.png",
+		"32": "icon32.png",
+		"48": "icon48.png",
+		"64": "icon64.png",
+		"128": "icon128.png"
+	},
+	"permissions": [
+		"activeTab",
+		"clipboardRead",
+		"clipboardWrite",
+		"notifications",
+		"sidePanel",
+		"storage",
+		"windows",
+		"tabs"
+	],
+	"side_panel": {
+		"default_path": "index.html"
+	},
+	"web_accessible_resources": [
+		{
+			"matches": ["<all_urls>"],
+			"resources": ["wallet-core.wasm", "popup.html", "zxing_reader.wasm"],
+			"use_dynamic_url": false
+		},
+		{
+			"matches": ["<all_urls>"],
+			"resources": ["inpage.js"],
+			"use_dynamic_url": false
+		}
+	]
+}

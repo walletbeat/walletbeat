@@ -2765,6 +2765,7 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `WEB_NAVIGATION` = `'webNavigation'`: Observe all navigation events across tabs.
 - `WEB_REQUEST` = `'webRequest'`: Observe (and with blocking, modify) all HTTP/S requests.
 - `WEB_REQUEST_BLOCKING` = `'webRequestBlocking'`: Block or modify HTTP/S requests synchronously.
+- `WINDOWS` = `'windows'`: Create, move, resize, and close browser windows.
 
 ---
 

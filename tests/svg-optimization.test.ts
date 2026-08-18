@@ -58,6 +58,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'cd02c36fcc597604fbc553a8c2e26497352c7575a3e2611011fdea6a886adf16',
 	'public/images/entities/veridise.svg':
 		'a4ddafddcf20876b72b8771bb328b4813bfd69aec12a76774bbd958502430808',
+	'public/images/entities/vultisig.svg':
+		'8f461c3fe134298ab694d09480f3f9721130f13d2553a8dd5a8cef971dc4249e',
 	'public/images/ethereum-logo.svg':
 		'828632d7d47bda7b0330f4f78b872421affb32a1d16abf90d47acd4212c8a81d',
 	'public/images/wallets/ambire.svg':
@@ -116,6 +118,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'cd76b5398b2172adc9129745117be2605e53e5283da38425b05831d58d44395c',
 	'public/images/wallets/uniswap-wallet.svg':
 		'75f2862c1f84a239580469d96de0740729e5522ffb53a41433050f38029fa5b4',
+	'public/images/wallets/vultisig.svg':
+		'8f461c3fe134298ab694d09480f3f9721130f13d2553a8dd5a8cef971dc4249e',
 	'public/images/wallets/zerion.svg':
 		'446e789e7c40c2a0d2b6ef449c31c2821d141cb2b3c1cf396dd7833639cdeaa1',
 	'public/images/wallets/zeus.svg':
