@@ -23,6 +23,7 @@ export const mtpelerin: SoftwareWallet = {
 		blurb: paragraph(
 			'Buy, swap, and sell crypto with the lowest fees, zero hidden costs, and full control over your cryptoassets.',
 		),
+		coinspectId: 'bridge-wallet',
 		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',

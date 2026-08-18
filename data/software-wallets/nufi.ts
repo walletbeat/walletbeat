@@ -26,6 +26,7 @@ export const nufi: SoftwareWallet = {
 		blurb: paragraph(`
 			Powerful wallet for powerful users.
 		`),
+		coinspectId: 'nu-fi',
 		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',

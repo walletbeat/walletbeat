@@ -49,6 +49,7 @@ export const elytro: SoftwareWallet = {
 		blurb: paragraph(
 			'Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open, and self-own internet. We start by building a smart contract account.',
 		),
+		coinspectId: 'elytro',
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',

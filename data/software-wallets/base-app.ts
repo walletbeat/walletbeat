@@ -46,6 +46,7 @@ export const baseApp: SoftwareWallet = {
 			Base is a secure onchain wallet and browser that puts you in
 			control of your crypto, NFTs, DeFi activity, and digital assets.
 		`),
+		coinspectId: 'coinbase-wallet',
 		contributors: [ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-03-19',

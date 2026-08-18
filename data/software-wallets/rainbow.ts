@@ -84,6 +84,7 @@ export const rainbow: SoftwareWallet = {
 		blurb: paragraph(`
 			Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
+		coinspectId: 'rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-02',

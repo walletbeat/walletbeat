@@ -30,6 +30,7 @@ export const okx: SoftwareWallet = {
 		blurb: paragraph(`
 OKX Wallet is a universal crypto wallet available on multiple platforms, including app, web, and extension
 		`),
+		coinspectId: 'okx',
 		contributors: [mattmatt],
 		iconExtension: 'png',
 		lastUpdated: '2026-01-28',

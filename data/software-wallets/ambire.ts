@@ -210,9 +210,10 @@ export const ambire: SoftwareWallet = {
 		displayName: 'Ambire',
 		tableName: 'Ambire',
 		blurb: paragraph(`
-			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
+			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts,
 			improving security and user experience.
 			`),
+		coinspectId: 'ambire',
 		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-07-22',

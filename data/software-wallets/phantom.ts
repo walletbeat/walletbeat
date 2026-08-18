@@ -26,6 +26,7 @@ export const phantom: SoftwareWallet = {
 			on ease of use, easy swapping of tokens and NFTs, and integration
 			with popular DeFi and NFT exchange protocols within the wallet.
 		`),
+		coinspectId: 'phantom',
 		contributors: [nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',

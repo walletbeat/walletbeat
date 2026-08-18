@@ -64,6 +64,7 @@ export const zerion: SoftwareWallet = {
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		blurb: paragraph(''),
+		coinspectId: 'zerion',
 		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-10',

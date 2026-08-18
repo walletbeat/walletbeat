@@ -89,6 +89,7 @@ export const metamask: SoftwareWallet = {
 			been around for a long time. It is a jack-of-all-trades wallet that can
 			be extended through MetaMask Snaps.
 		`),
+		coinspectId: 'metamask',
 		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-05-06',

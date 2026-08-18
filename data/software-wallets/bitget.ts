@@ -33,6 +33,7 @@ export const bitget: SoftwareWallet = {
 		blurb: paragraph(`
 			Bitget Wallet is a leading multi-chain decentralized wallet that is committed to providing a wide range of asset management and DeFi services for its users.
 		`),
+		coinspectId: 'bitget',
 		contributors: [mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-17',

@@ -22,6 +22,7 @@ export const gemwallet: SoftwareWallet = {
 			revenue reporting. Built for iOS and Android with a focus on security and
 			user sovereignty.
 		`),
+		coinspectId: 'gem',
 		contributors: [h3rman],
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-14',

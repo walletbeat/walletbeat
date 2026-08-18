@@ -15,6 +15,7 @@ export const family: SoftwareWallet = {
 		displayName: 'Family',
 		tableName: 'Family',
 		blurb: paragraph(''),
+		coinspectId: 'family',
 		contributors: [lucemans],
 		iconExtension: 'png',
 		lastUpdated: '2025-04-22',

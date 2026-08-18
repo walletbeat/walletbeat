@@ -21,6 +21,7 @@ export const uniswapWallet: SoftwareWallet = {
 			The self-custody wallet for swapping, sending, bridging,
 			and exploring apps across 16+ networks.
 		`),
+		coinspectId: 'uniswap',
 		contributors: [ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-04-04',

@@ -22,6 +22,7 @@ export const frame: SoftwareWallet = {
 		displayName: 'Frame',
 		tableName: 'Frame',
 		blurb: paragraph('Frame...'),
+		coinspectId: 'frame',
 		contributors: [polymutex, nconsigny, lucemans, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',

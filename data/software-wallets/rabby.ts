@@ -82,6 +82,7 @@ export const rabby: SoftwareWallet = {
 			Rabby is a user-friendly Ethereum wallet focusing on smooth UX and security.
 			It features an intuitive transaction preview feature and works on many chains.
 		`),
+		coinspectId: 'rabby-wallet',
 		contributors: [polymutex, nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-07-20',
