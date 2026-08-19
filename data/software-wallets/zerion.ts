@@ -50,17 +50,17 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
-import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
-import { Variant } from '@/schema/variants'
-import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-
-import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 import {
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import { refTodo, type WithRef } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
+
+import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -121,15 +121,15 @@ export const zerion: SoftwareWallet = {
 					ref: {
 						explanation:
 							'The default swap view shows only the Network Fee, with a collapsed "Details" section for the rest of the fee breakdown.',
-						label: 'Zerion Dashboard, default swap view',
 						file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-default-swap-view.png',
+						label: 'Zerion Dashboard, default swap view',
 					},
 					feesLargerThan1bps: {
 						ref: {
 							explanation:
 								'Expanding "Details" shows the full fee breakdown, including the Zerion Fee expressed as a percentage (0.67%).',
-							label: 'Zerion Dashboard, comprehensive swap view',
 							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-comprehensive-swap-view.png',
+							label: 'Zerion Dashboard, comprehensive swap view',
 						},
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.AGGREGATED,
@@ -144,22 +144,22 @@ export const zerion: SoftwareWallet = {
 				ref: {
 					explanation:
 						'The Zerion dashboard shows the total account value across all networks by default, and can be filtered down to a single network to see that network’s balance in isolation.',
-					label: 'Zerion Dashboard',
 					file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png',
+					label: 'Zerion Dashboard',
 				},
 				ether: supported({
 					ref: [
 						{
 							explanation:
 								'The "All Networks" view sums the user’s ETH holdings across every network into a single item.',
-							label: 'Zerion Dashboard, all networks',
 							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png',
+							label: 'Zerion Dashboard, all networks',
 						},
 						{
 							explanation:
 								'Filtering the dashboard to the Ethereum network shows the ETH balance held on that network specifically (0.0016 ETH / $3.00), isolated from other networks.',
-							label: 'Zerion Dashboard, filtered to Ethereum',
 							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-ethereum-network-view.png',
+							label: 'Zerion Dashboard, filtered to Ethereum',
 						},
 					],
 					crossChainSumView: featureSupported,
@@ -172,14 +172,14 @@ export const zerion: SoftwareWallet = {
 						{
 							explanation:
 								'The "All Networks" view sums the user’s USDC holdings across every network into a single item.',
-							label: 'Zerion Dashboard, all networks',
 							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png',
+							label: 'Zerion Dashboard, all networks',
 						},
 						{
 							explanation:
 								'Filtering the dashboard to the Ethereum network shows the USDC balance held on that network specifically (6.918 USDC / $6.92), isolated from other networks.',
-							label: 'Zerion Dashboard, filtered to Ethereum',
 							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-ethereum-network-view.png',
+							label: 'Zerion Dashboard, filtered to Ethereum',
 						},
 					],
 					crossChainSumView: featureSupported,
