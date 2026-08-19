@@ -76,6 +76,14 @@ export interface Eip {
 
 	/** Walletbeat-specific notes (e.g. precedent/alternative EIPs). */
 	noteMarkdown?: string
+
+	/**
+	 * Overrides the default eips.ethereum.org URL, e.g. for EIPs that are
+	 * still an unmerged draft and have no published page yet.
+	 * 
+	 * TODO: Remove if not used in any ERCs. Currently used in ERC-8213
+	 */
+	urlOverride?: string
 }
 
 /** Return a short label for an EIP (example: "ERC-20"). */
@@ -88,8 +96,12 @@ export function eipLabel(eip: Eip): string {
 	return `${eipShortLabel(eip)}: ${eip.friendlyName}`
 }
 
-/** Return the eips.ethereum.org URL for an EIP. */
+/** Return the eips.ethereum.org URL for an EIP, or its `urlOverride` if set. */
 export function eipEthereumDotOrgUrl(eip: EipNumber | Eip): string {
+	if (typeof eip !== 'string' && eip.urlOverride !== undefined) {
+		return eip.urlOverride
+	}
+
 	return `https://eips.ethereum.org/EIPS/eip-${typeof eip === 'string' ? eip : eip.number}`
 }
 

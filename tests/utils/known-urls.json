@@ -2893,5 +2893,10 @@
 		"url": "https://trustwallet.com/blog/company/trust-wallet-browser-extension-v268-incident-community-update",
 		"urlHash": "7745dcd401dc9b2cee66cd3e9fe226e55c7b6868",
 		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/ethereum/ERCs/pull/1639",
+		"urlHash": "2b304525802d86135cfa9dc22b9a6ec12764de0f",
+		"retrieved": "2026-08-19"
 	}
 ]
