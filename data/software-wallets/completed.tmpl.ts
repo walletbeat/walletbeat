@@ -683,7 +683,7 @@ export const completedTemplate: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: true,
+					warnsOnUnlimitedApproval: 'ALWAYS',
 				}),
 			},
 			securityBestPractices: {
