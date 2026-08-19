@@ -2268,5 +2268,630 @@
 		"url": "https://zerion.io/blog/genesis-meets-dna/",
 		"urlHash": "15fd7537e58778b070420394d3d18f4975347c52",
 		"retrieved": "2026-08-17"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat",
+		"urlHash": "a5d78060df424b02c1097745ab46d717277199f9",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://x.com/walletbeat",
+		"urlHash": "c3ad7d2d7ea04242ce0f465c9924d36deb9c618b",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://farcaster.xyz/~/channel/walletbeat",
+		"urlHash": "3a24ba140c5c799687a109e484e5c0d0513bde7e",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/graphs/contributors?all=1",
+		"urlHash": "cc799e17f35270b3db64ce949d17387b41a6e8d1",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://l2beat.com",
+		"urlHash": "67e1c6e82ef2592fe3f6112138b6767722bd2ce2",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://anticapture.com/",
+		"urlHash": "d748ff68e8e7a77b27755ac32e05bf64ce30e3b5",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.defiscan.info/",
+		"urlHash": "a093cc207c20c0f63b967746c288e0c6787b9a3d",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://blog.ethereum.org/2026/05/12/clear-signing-announcement",
+		"urlHash": "bb8425a49137733d1a9479f86ecad9dcd597895b",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://blog.ethereum.org/2025/08/20/trillion-dollar-sec-2",
+		"urlHash": "66c703d4b5cf1ed53164200959ca379089072929",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://qf.giveth.io/project/walletbeat",
+		"urlHash": "f5331cf257f59ebffe929f4f2fce8b30d0413e2c",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://docs.google.com/spreadsheets/d/1s8mUBHZIu2CRUVzkJ29g8aUek9g1iwCmz5hgVgdmORA/edit?gid=0",
+		"urlHash": "684c3ba4b48de45ce7cd52862ac7b60acef51a9d",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.huntersec.co/",
+		"urlHash": "89273e5633a5f3d3521ed8bac9b90c4953f68f4e",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html",
+		"urlHash": "42be242aa1565672f0b9ea026643e58910f155ba",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-7730",
+		"urlHash": "6393682be8c8cc594ee39bf2ad9d55ab3cef07a4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-4361",
+		"urlHash": "5f914b31d30c6d57e8642e0faa07a387d3fbf139",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-712",
+		"urlHash": "e6a4988d9bb44cb0144206a0adbba2c395b7d511",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf",
+		"urlHash": "d2b60dd941f980f94d68bf082c9659a12a4b6468",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.pimlico.io/privacy",
+		"urlHash": "3deab6ca8f6a296fc61395c30d89c403c595b3ba",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md",
+		"urlHash": "09dd27caf3960784153e37e26dcf7a8b768b0b75",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-5564",
+		"urlHash": "e31584b23e778da439ede34e4850faf91050bdde",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://privacypools.com/",
+		"urlHash": "ef9acc6e7ff304d8a6c7eda3960f31d09f2f63de",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.railgun.org/",
+		"urlHash": "10dece7e8b887fff2cc6593e2cfbe4813fabe724",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://decrypt.co/106680/solana-hack-blamed-slope-mobile-wallet-exploit",
+		"urlHash": "3f609ea7b1d883140de91e79d394a4b8488d9636",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki",
+		"urlHash": "c6a308eeb6f3d625d91a0276b12b354e7116ad5f",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki",
+		"urlHash": "569e9088c457d98064232b1fcb7ba13a952d84e4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki",
+		"urlHash": "61894ea4e6e365219161cf817970cfc94de88ba9",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-4337",
+		"urlHash": "b2cceb3b1dcf8be46c650907c48615314f5836fd",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-7702",
+		"urlHash": "d88b3f9b541ea780ccd0357828d0ca687fc71f39",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://spdx.org/licenses/GPL-3.0.html",
+		"urlHash": "28f96692a37948e0e2dc840f0bde2e56b88fffa3",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://opensource.org/license/MIT",
+		"urlHash": "f5e9155aaf1544a0c2d67012a6ed088f8b6ef992",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://opensource.org/license/bsd-1-clause",
+		"urlHash": "2fd572c9c3f08bc06be2ae1f5868f88ebc2185b4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://spdx.org/licenses/BUSL-1.1.html",
+		"urlHash": "efc499b4fa6fd474e5dfc025e08f8fbf72496fd2",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.pimlico.io/",
+		"urlHash": "95c3e782fe6c89d7f5b2e633c0b8dc70f006459c",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.biconomy.io/",
+		"urlHash": "873167ce9480b89c981efebe965cdcf6019e3754",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-7600",
+		"urlHash": "daa621eb522fad714559abdd290bc754c03578e4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-7828",
+		"urlHash": "da12cdd13cc21b08f839f4db52b631d9cbbad521",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-7831",
+		"urlHash": "2a31a961b7a76130c18a8522e302b704abce7357",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-1193",
+		"urlHash": "15eab4a9824442967440306f319706a8b13b7858",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-2700",
+		"urlHash": "dd4f993a534972e400d0262f56f1e90da50ac753",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-6963",
+		"urlHash": "be00e80e0e08ccacf831a48cef43469b6fca7e95",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://l2beat.com/",
+		"urlHash": "a0d95522f15d5dfef5b0d13009c628774c69c000",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eips.ethereum.org/EIPS/eip-5792",
+		"urlHash": "970e3d34dd9b0d33986c968c0bb3707aac3f7834",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://code4rena.com/",
+		"urlHash": "68bed9c0df99bae64318728122ea8b50411e44bd",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.certora.com/",
+		"urlHash": "563185660b94d99b230db7fb4bb7e653725af549",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/base-app.ts",
+		"urlHash": "5cab906710382a5b0abcdc18a1529674d2275574",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://xkcd.com/538/",
+		"urlHash": "f285034eef550d7a6afbf4c83f12690562ae9301",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/bitbox.ts",
+		"urlHash": "6a97baaea662b680bbf6913d2b1771b70a4bb469",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://spdx.org/licenses/Apache-2.0.html",
+		"urlHash": "69a8635654a917de85fc49ae7f5252a585555cda",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/bitget.ts",
+		"urlHash": "4dad2792928527fac7395f76fc7d8cf2cf9c8237",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://keylabs.io/",
+		"urlHash": "c328a59edea05413a5e38e4e32cd73b8838faca4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/cypherock.ts",
+		"urlHash": "c81de6d2c4b30b6c09b25b57b26014ad79df40e1",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://commonsclause.com/",
+		"urlHash": "96bfcf7382d86eb27c63cb57de6f9cb4b0b487bf",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/daimo.ts",
+		"urlHash": "f8db598c8e4ad483e104ef3a4038f949453e3b4a",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/elytro.ts",
+		"urlHash": "ab9a17fada40867ecbdd78610ecfbc6dc79464e4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/family.ts",
+		"urlHash": "e307896d340544f8fbfcdc0c1cf3faee8203d916",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/graphs/contributors",
+		"urlHash": "564ead4ec966948346b4570033e85d2504b214eb",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/firefly.ts",
+		"urlHash": "7da9e99125c52b0420463b7b59e86752b464a4d5",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/frame.ts",
+		"urlHash": "3bb63fe669f0e58a7b0da09412d0a2e7dc1cb768",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/gridplus.ts",
+		"urlHash": "be9c0c33676c09fccc28859c63cccf741d456c37",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/imkey.ts",
+		"urlHash": "de6a2eacf1255a61267b5e35f908f21542861fd9",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://cure53.de/",
+		"urlHash": "c51d1273e6fdb6ddd91ebb8ef191afff5853b1e7",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/imtoken.ts",
+		"urlHash": "f66b4d6291836fad5a299d9b1cfb5463e1a38ff1",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/CONTRIBUTING.md",
+		"urlHash": "79ae1f741f2c17127a0fa7247332c14ea512ffd6",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/keycard-shell.ts",
+		"urlHash": "8cfeb9719ebb62e569735f6afdce623e4332ece7",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://spdx.org/licenses/MIT.html",
+		"urlHash": "fe1667a6a616314a2ee56bbdb9337c120b5bdebe",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.slowmist.com/",
+		"urlHash": "0cc819a9dd7b9b38846c7123151fafd0fc48e80b",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/keystone.ts",
+		"urlHash": "f41377200989a98a6b5219a39c4af7949ee052f0",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://x.com/zachxbt/status/2008139053544194545",
+		"urlHash": "d156f790c1fdddbf44f8527d64920a8f9753d7eb",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/ledger.ts",
+		"urlHash": "a3cd32b9b97a7cde3146a9ea953b872b46809630",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.dropsitenews.com/p/consensys-metamask-crypto-wallet-hired-north-korean-hacker",
+		"urlHash": "74a98a2b690a3f29c4f873e223f502ccc3aa6f2d",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.cyfrin.io",
+		"urlHash": "9c2913d5f75a41f6ad4c2276a9cd655323bacf83",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/metamask.ts",
+		"urlHash": "be91f7040863ac8e18e0f56b4d6d77248e484fd5",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/mtpelerin.ts",
+		"urlHash": "274ad28596bf9aa870aed2909238af2b5313a088",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.safepal.com/en/blog/security-update",
+		"urlHash": "5c5bb088211d47b11ff1ca69d5ef46fde1901434",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://x.com/SafePal/status/2088937173139812792",
+		"urlHash": "e892e28cec2fe186ed706dc830c0bccb34589c44",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://trezor.io/blog/news/recent-customer-data-exposed-in-shipping-provider-incident",
+		"urlHash": "a6b53ec0a510862cc1cbd666297e88a0bc5c8803",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://x.com/Trezor/status/2087885428313543059",
+		"urlHash": "8c9f27fa0068cf1155f694d7258ce363ab065bcc",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://privy.dev/blog/post-mortem-on-august-6-2026-metabase-security-incident",
+		"urlHash": "f6b866831e07670e7b5fdebd176101d1e2c6f3dd",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://blog.coinkite.com/coldcard-mk3-seed-generation-warning/",
+		"urlHash": "be45ce7f99fa89bdc6961eee893523a521a5b27c",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://donjon.ledger.com/blog/tropic01-laser-fault-injection/",
+		"urlHash": "610a865fddc973499551c4bcf3e20b9e0e4fd9b0",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://trezor.io/learn/security-privacy/how-trezor-keeps-you-safe/tropic-01-chip-vulnerability-disclosure-what-happened",
+		"urlHash": "5d125a252049140831355c2985b210d559e71a14",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://x.com/bankrbot/status/2056764771488436320",
+		"urlHash": "caa358f285db6a62de4379055eb0166fe859a86b",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://web.archive.org/web/20240226112518/https://osec.io/reports/slope-investigation-report.pdf",
+		"urlHash": "b70cba8b595ea280123b69a1e7482ae9650a3a71",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/ngrave.ts",
+		"urlHash": "e3ce33e8d40ea5298e4e6fb217dff36fef005a2f",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/nufi.ts",
+		"urlHash": "42fffc46fde60ae94554e5ae6907ef7f0e228269",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/okx.ts",
+		"urlHash": "a2459af315e90367568ed3b7058f7a5225d9a99a",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/onekey.ts",
+		"urlHash": "177d6c9e2f9e9178e957f59f1cc11a51adb8f5f6",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/phantom.ts",
+		"urlHash": "aecaf309c675ddb5aac9b5db50f8e33648c84e5b",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/pillarx.ts",
+		"urlHash": "33e167a2f7917eae55f68b49682fa03c395535be",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://leastauthority.com/",
+		"urlHash": "128fc5b0968fd51ab438654eeb36164fa4497291",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/rabby.ts",
+		"urlHash": "6ad3f6ad495759429144f63b6ef5ba70686a6660",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/rainbow.ts",
+		"urlHash": "45b394783c59765a90e270a677b9ec95ec5e722a",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/safe.ts",
+		"urlHash": "3cebc285f7b85e8633fc4c67433a92e75c699f1b",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/trezor.ts",
+		"urlHash": "ccdf18402689ecc794059e7bc1e57b59271e7be7",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/uniswap-wallet.ts",
+		"urlHash": "e6174e4bccdeab339a651892b62994641dfe518e",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://eip.tools/eip/7702",
+		"urlHash": "7d9e4c8f4a4e3f6d5e12e02244f82613246301f3",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://swiss-knife.xyz/7702beat",
+		"urlHash": "a00db3f271e994f64049e0da0917b1d6f7dcfb67",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://swiss-knife.xyz",
+		"urlHash": "28727a6f41aab80bb7c4ebf87ae7338ca3496de1",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.bundlebear.com/eip7702-authorized-contracts/all",
+		"urlHash": "6d35008421141dbf3c7060508e1f2c0090b5b1bb",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/zerion.ts",
+		"urlHash": "dab12594ba10d7ac175dd953ec0487568a2819e3",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/zeus.ts",
+		"urlHash": "a1aa7b0c502e9e295e1ad5c355fe05d98f942cc2",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://vitalik.eth.limo/general/2024/12/03/wallets.html",
+		"urlHash": "a9cb60d0339baf5e10eb38762f66cd9ca46b6ed4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://slope-finance.medium.com/slope-update-11-august-2022-31d678d7cd97",
+		"urlHash": "b3ff6115437e998462d29bd670fe660ab15f9ed2",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://slowmist.medium.com/analysis-of-a-large-scale-attack-on-solana-part-2-ee105d907c12",
+		"urlHash": "90d53ee5d0fb3f302cc2c566a398bc05bb232bd0",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://esp.ethereum.foundation/",
+		"urlHash": "bcc794842317b314bc739ccffd5b8907f0320278",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.fluidkey.com/",
+		"urlHash": "7e7f2165af999d5794d1bf5129b5f9b6f531388e",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://farcaster.xyz/moritz/",
+		"urlHash": "d189485ed2ba21164063bb6648e407850eae01d6",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://farcaster.xyz/polymutex.eth",
+		"urlHash": "adfe9e7afead560fd203aa4b538897525f4893e4",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://ethereum.org/roadmap/account-abstraction/",
+		"urlHash": "468538f2766c0e9ce1c8ad79952562ddda7b7145",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://vitalik.eth.limo/general/2021/01/11/recovery.html",
+		"urlHash": "de57a3184105ec5a32821cca01dffaf70c544870",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://biconomy.zendesk.com/hc/en-us/articles/360036040012-Privacy-policy",
+		"urlHash": "28c4b62cdfcb742fcfbb4c534d4dd37ffa75c5ef",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://nova.tornadocash.eth.limo/",
+		"urlHash": "2c1c8b8dfa40b3982315d8daa480566eee6c8255",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://en.wikipedia.org/wiki/Same-origin_policy",
+		"urlHash": "bd8e19a800ec28575fad96df5cf11a54bdc6981a",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://en.wikipedia.org/wiki/Open-source_license",
+		"urlHash": "0c9d563523b2f4153de0280a9d1c58d222b344bc",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://en.wikipedia.org/wiki/The_Open_Source_Definition",
+		"urlHash": "6cb47d83e4270d421a2d265398526a7f03b54a60",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://www.pashov.com/",
+		"urlHash": "e04b6988791eb7b0e6062d076a6abbebd7ba1fcb",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://ethereum.org/developers/docs/nodes-and-clients/light-clients/",
+		"urlHash": "7cdb0e00af156db98b013822f8b67123e9f34272",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://sentry.io/welcome/",
+		"urlHash": "99ccc5f54d71dc6dce9b85effe1bdfaf3ff0e1ec",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://opensource.org/license/apache-2.0",
+		"urlHash": "d0a6c5afd4492027537b5fd284608af802dbd38e",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://opensource.org/license/gpl-2.0",
+		"urlHash": "320e31159e49a81ef859c966043f53095067a637",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://docs.ens.domains/resolvers/ccip-read/",
+		"urlHash": "b5ed85f491d209241000c644901e8d1a73c7efbc",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://cantina.xyz/welcome",
+		"urlHash": "2d5fbdb8d29240060e3178987545ff03eff6eb95",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://en.wikipedia.org/wiki/Cypherpunk",
+		"urlHash": "3e519d99491c0a6aaa30b097a740c2fde84be800",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://diligence.security//",
+		"urlHash": "2bdb22dc61f73acd6015d1c267380816278931c3",
+		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://trustwallet.com/blog/company/trust-wallet-browser-extension-v268-incident-community-update",
+		"urlHash": "7745dcd401dc9b2cee66cd3e9fe226e55c7b6868",
+		"retrieved": "2026-08-19"
 	}
 ]

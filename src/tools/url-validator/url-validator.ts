@@ -1,3 +1,4 @@
+import { execSync } from 'child_process'
 import { createHash } from 'crypto'
 import { writeFile } from 'fs/promises'
 import { request } from 'https'
@@ -9,11 +10,15 @@ import { hasRefs, toFullyQualified } from '@/schema/reference'
 import { getUrl, labeledUrl, type Url } from '@/schema/url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 import { type KnownValidUrl, knownValidUrls, URLS_TO_SKIP } from '@/tests/utils/known-urls'
+import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 import { today } from '@/types/date'
 
 /**
- * Validates all reference URLs found in wallet data and updates the
- * known-valid URL list in tests/utils/known-urls.json:
+ * Validates all reference URLs found in wallet data, plus every external URL
+ * linked from the built site's HTML (hardcoded links in components,
+ * markdown content, etc. — the same set that the post-build external URL
+ * check enforces), and updates the known-valid URL list in
+ * tests/utils/known-urls.json:
  *
  * - URLs already in the list are not re-fetched.
  * - New URLs are fetched once (plain node.js request, no browser spoofing);
@@ -26,7 +31,9 @@ import { today } from '@/types/date'
  * add the printed entry to the list by hand.
  */
 
-const KNOWN_URLS_FILE = path.join(getRepositoryRoot(), 'tests', 'utils', 'known-urls.json')
+const REPO_ROOT = getRepositoryRoot()
+const KNOWN_URLS_FILE = path.join(REPO_ROOT, 'tests', 'utils', 'known-urls.json')
+const DIST_DIR = path.join(REPO_ROOT, 'dist')
 const FETCH_TIMEOUT_MS = 15000
 const FETCH_CONCURRENCY = 4
 
@@ -163,7 +170,7 @@ async function rewriteKnownUrls(entries: KnownValidUrl[]): Promise<void> {
 }
 
 async function main(): Promise<void> {
-	// hash -> href, deduplicated across all wallets.
+	// hash -> href, deduplicated across all wallets and the built HTML.
 	const referenced = new Map<string, string>()
 	let nonHttps = 0
 
@@ -176,6 +183,22 @@ async function main(): Promise<void> {
 
 		// Repository-relative references (e.g. screenshots) and other non-HTTPS
 		// URLs cannot be fetched; the URL check test skips them too.
+		if (!href.startsWith('https://')) {
+			nonHttps++
+			continue
+		}
+
+		referenced.set(sha1(href), href)
+	}
+
+	process.stdout.write('Building site to scan for hardcoded external URLs...\n')
+	execSync('pnpm run build', { cwd: REPO_ROOT, stdio: 'inherit' })
+
+	for (const [href] of findExternalUrlsInDist(DIST_DIR)) {
+		if (URLS_TO_SKIP.some(skipped => href.includes(skipped))) {
+			continue
+		}
+
 		if (!href.startsWith('https://')) {
 			nonHttps++
 			continue
