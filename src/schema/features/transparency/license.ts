@@ -379,6 +379,13 @@ export function isSourcePubliclyVisible(licensing: ResolvedWalletLicensing): boo
  * @returns The SPDX URL of the license.
  */
 export function licenseUrl(license: FOSSLicense): LabeledUrl {
+	if (license === FOSSLicense.MIT_WITH_CLAUSE) {
+		return {
+			url: 'https://commonsclause.com/',
+			label: licenseName(license),
+		}
+	}
+
 	return {
 		url: `https://spdx.org/licenses/${license}.html`,
 		label: licenseName(license),
