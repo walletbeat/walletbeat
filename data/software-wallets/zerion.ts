@@ -117,7 +117,29 @@ export const zerion: SoftwareWallet = {
 		},
 		chainAbstraction: {
 			bridging: {
-				builtInBridging: null,
+				builtInBridging: supported({
+					ref: {
+						explanation:
+							'The default swap view shows only the Network Fee, with a collapsed "Details" section for the rest of the fee breakdown.',
+						label: 'Zerion Dashboard, default swap view',
+						file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-default-swap-view.png',
+					},
+					feesLargerThan1bps: {
+						ref: {
+							explanation:
+								'Expanding "Details" shows the full fee breakdown, including the Zerion Fee expressed as a percentage (0.67%).',
+							label: 'Zerion Dashboard, comprehensive swap view',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-comprehensive-swap-view.png',
+						},
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
 			crossChainBalances: {
 				ref: {
 					explanation:
