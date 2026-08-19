@@ -29,5 +29,5 @@ export const pashov: SecurityAuditor = {
 	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
 	repoUrl: 'https://github.com/pashov/audits',
 	twitter: 'https://x.com/pashovkrum',
-	url: 'https://www.pashov.net/',
+	url: 'https://www.pashov.com/',
 }

@@ -93,24 +93,19 @@ export function eipEthereumDotOrgUrl(eip: EipNumber | Eip): string {
 	return `https://eips.ethereum.org/EIPS/eip-${typeof eip === 'string' ? eip : eip.number}`
 }
 
-/** Return a magic URL which the Markdown parser can turn into an EIP link. */
-function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): string {
-	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`
-}
-
 /** Return a markdown link for an EIP using only its short label (e.g. "EIP-712"). */
 export function eipMarkdownShortLink(eip: Eip): string {
-	return `[${eipShortLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
+	return `[${eipShortLabel(eip)}](${eipEthereumDotOrgUrl(eip)})`
 }
 
 /** Return a markdown link for an EIP. */
 export function eipMarkdownLink(eip: Eip): string {
-	return `[${eipLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
+	return `[${eipLabel(eip)}](${eipEthereumDotOrgUrl(eip)})`
 }
 
 /** Return a markdown link and a title for an EIP. */
 export function eipMarkdownLinkAndTitle(eip: Eip): string {
-	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
+	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${eipEthereumDotOrgUrl(eip)})`
 }
 
 /** Return a human-readable label for an EIP status. */
