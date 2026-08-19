@@ -74,7 +74,7 @@ Define the best measure(s) of your traction. Provide numbers and links. See our 
 Be specific.
 
 ## What type of non-financial support (if any) would make a difference in your progress and growth journey *
-Be specific. Talent, time, legal, distribution, infraestructure, etc?
+Be specific. Talent, time, legal, distribution, infrastructure, etc?
 
 ## Have you raised venture capital or launched a token? *
 If applicable, please give details on amounts, timing, and structure.
