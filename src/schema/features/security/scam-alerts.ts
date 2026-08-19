@@ -93,10 +93,17 @@ export type SendTransactionWarning = WithRef<
 export type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Does the wallet warn the user before a transaction or signature that
-		 * grants unlimited/infinite token allowance?
+		 * Under which circumstances the wallet warns the user before a
+		 * transaction or signature that grants unlimited/infinite token
+		 * allowance.
+		 *
+		 * - `ALWAYS`: The wallet warns regardless of whether the spender is
+		 *   considered trusted/known.
+		 * - `CONDITIONAL`: The wallet only warns in certain scenarios, e.g.
+		 *   only when the spender is an untrusted/unknown contract, or only
+		 *   when the request originates from an untrusted domain.
 		 */
-		warnsOnUnlimitedApproval: boolean
+		warnsOnUnlimitedApproval: 'ALWAYS' | 'CONDITIONAL'
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address
