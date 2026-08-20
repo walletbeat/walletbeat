@@ -1354,12 +1354,14 @@ export const rainbow: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The Rainbow browser extension registers an EIP-5792 `wallet_getCapabilities` handler that reports the `atomic` capability per chain, returning `supported` for an account that already holds a delegation and `ready` for one that would be delegated on first use. It also registers the `wallet_sendCalls` batch-record handlers alongside it.',
+							'The extension tells a site whether it can bundle several transactions into one, and answers yes for accounts that have been upgraded with EIP-7702.',
+						label: 'Batching support in the extension source code',
 						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/background/handlers/handleProviderRequest.ts#L429-L484',
 					},
 					{
 						explanation:
-							"Batches are executed through Rainbow's delegation SDK, which errors out when delegation is not enabled or not supported for the account and chain. Rainbow therefore has no non-atomic batching path: a batch either executes atomically through the EIP-7702 delegate, or it does not execute at all.",
+							'Bundles are only ever run through the EIP-7702 upgrade. An account that has not been upgraded cannot bundle at all, and a bundle that does run is all-or-nothing: either every transaction in it happens, or none of them do.',
+						label: 'Batch execution in the extension source code',
 						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58',
 					},
 				],
@@ -1369,15 +1371,15 @@ export const rainbow: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Running Walletbeat\'s own test page inside the Rainbow mobile app\'s in-app browser and triggering the EIP-7702 Multi-Call test (an EIP-5792 `wallet_sendCalls` batch) returns `Method "wallet_sendCalls" is not supported`.',
+							'Asking the wallet to send a bundle of transactions from the Walletbeat test page in the Rainbow in-app browser returns an error saying the method is not supported.',
 						file: 'public/references/wallets/rainbow/screenshots/2026-08-20-wallet-call-mobile-sendcalls-unsupported.png',
-						label:
-							'Walletbeat test page in the Rainbow mobile in-app browser showing the EIP-5792 batch call method reported as not supported',
+						label: 'Walletbeat test page in the Rainbow in-app browser',
 						lastRetrieved: '2026-08-20',
 					},
 					{
 						explanation:
-							'The Rainbow mobile app wires its in-app browser to the same shared provider-request handler as the extension, but its registration passes only chain, session, and provider callbacks. It supplies none of the EIP-5792 handlers (`wallet_getCapabilities`, `wallet_sendCalls` batch records) that the extension registers, which is why the call above is rejected.',
+							'The mobile app sets up the same site-facing code as the extension, but leaves the batching part out entirely.',
+						label: 'Rainbow mobile app source code',
 						url: 'https://github.com/rainbow-me/rainbow/blob/bb6110b846ca6955125d490c0eb1f0812fccadf7/src/features/dapp-browser/services/handleProviderRequest.ts#L350-L362',
 					},
 				],
