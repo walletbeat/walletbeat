@@ -53,7 +53,7 @@ for (const wallet of Object.values(allWallets)) {
 describe('coinspect mapping', () => {
 	// Coinspect added a wallet we have not tracked yet: it is neither mapped
 	// on a Walletbeat wallet nor listed in knownUnmappedCoinspect.
-	it('has a WalletBeat mapping or known-unmapped entry for every Coinspect wallet', () => {
+	it('has a Walletbeat mapping or known-unmapped entry for every Coinspect wallet', () => {
 		const unmapped: string[] = []
 
 		for (const walletMakerUID of snapshotIds) {
