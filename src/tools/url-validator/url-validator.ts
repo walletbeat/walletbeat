@@ -9,7 +9,7 @@ import { allWallets } from '@/data/wallets'
 import { hasRefs, toFullyQualified } from '@/schema/reference'
 import { getUrl, labeledUrl, type Url } from '@/schema/url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
-import { type KnownValidUrl, knownValidUrls, URLS_TO_SKIP } from '@/tests/utils/known-urls'
+import { type KnownValidUrl, knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
 import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 import { today } from '@/types/date'
 
@@ -175,7 +175,7 @@ async function main(): Promise<void> {
 	let nonHttps = 0
 
 	for (const url of collectUrls()) {
-		if (URLS_TO_SKIP.some(skipped => getUrl(url).includes(skipped))) {
+		if (shouldSkipUrl(getUrl(url))) {
 			continue
 		}
 
@@ -195,7 +195,7 @@ async function main(): Promise<void> {
 	execSync('pnpm run build', { cwd: REPO_ROOT, stdio: 'inherit' })
 
 	for (const [href] of findExternalUrlsInDist(DIST_DIR)) {
-		if (URLS_TO_SKIP.some(skipped => href.includes(skipped))) {
+		if (shouldSkipUrl(href)) {
 			continue
 		}
 

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { allWallets } from '@/data/wallets'
 import { hasRefs, toFullyQualified, type WithRef } from '@/schema/reference'
 import { getUrl, labeledUrl, type Url } from '@/schema/url'
-import { type KnownValidUrl, knownValidUrls, URLS_TO_SKIP } from '@/tests/utils/known-urls'
+import { type KnownValidUrl, knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
 import { today } from '@/types/date'
 
 const newValidUrls: KnownValidUrl[] = []
@@ -15,9 +15,8 @@ const verifiedUrls: KnownValidUrl[] = []
 async function checkValidUrl(url: Url): Promise<void> {
 	const href = labeledUrl(url).url
 	const urlString = getUrl(url)
-	const shouldSkip = URLS_TO_SKIP.some(s => urlString.includes(s))
 
-	if (shouldSkip) {
+	if (shouldSkipUrl(urlString)) {
 		return
 	}
 

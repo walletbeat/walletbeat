@@ -16,7 +16,7 @@ export const URLS_TO_SKIP = [
 	'docs.phantom.com',
 	'developers.zerion.io',
 	'help.ambire.com/hc/en-us',
-	'nufi.gitbook.io/',
+	'nufi.gitbook.io',
 	'linkedin.com',
 	'facebook.com',
 	'instagram.com',
@@ -27,10 +27,47 @@ export const URLS_TO_SKIP = [
 	'coinbase.com',
 	'sec.gov',
 	'defillama.com',
-	'defillama.com',
 	'coingecko.com',
 	'api.github.com',
 ]
+
+/**
+ * Returns true if `url` matches an entry in {@link URLS_TO_SKIP}.
+ * This avoids the false positives a plain substring check produces,
+ * e.g. a skipped host of `sec.gov` must not also match an unrelated host that merely contains that
+ * string, such as "sec.gov" appearing as a subdirectory of another domain.
+ */
+export function shouldSkipUrl(url: string): boolean {
+	let hostname: string
+	let pathname: string
+
+	try {
+		const parsed = new URL(url)
+
+		hostname = parsed.hostname.toLowerCase()
+		pathname = parsed.pathname
+	} catch {
+		return false
+	}
+
+	return URLS_TO_SKIP.some(skip => {
+		const slashIndex = skip.indexOf('/')
+		const skipHost = (slashIndex === -1 ? skip : skip.slice(0, slashIndex)).toLowerCase()
+		const skipPath = slashIndex === -1 ? '' : skip.slice(slashIndex).replace(/\/+$/, '')
+
+		const hostMatches = hostname === skipHost || hostname.endsWith(`.${skipHost}`)
+
+		if (!hostMatches) {
+			return false
+		}
+
+		if (skipPath === '') {
+			return true
+		}
+
+		return pathname === skipPath || pathname.startsWith(`${skipPath}/`)
+	})
+}
 
 /**
  * The list in known-urls.json exists to prevent hallucinated URLs from creeping

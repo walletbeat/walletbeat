@@ -80,7 +80,7 @@ export interface Eip {
 	/**
 	 * Overrides the default eips.ethereum.org URL, e.g. for EIPs that are
 	 * still an unmerged draft and have no published page yet.
-	 * 
+	 *
 	 * TODO: Remove if not used in any ERCs. Currently used in ERC-8213
 	 */
 	urlOverride?: string

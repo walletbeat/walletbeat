@@ -2898,5 +2898,25 @@
 		"url": "https://github.com/ethereum/ERCs/pull/1639",
 		"urlHash": "2b304525802d86135cfa9dc22b9a6ec12764de0f",
 		"retrieved": "2026-08-19"
+	},
+	{
+		"url": "https://blog.bitbox.swiss/en/bitbox-08-2026-dixence-update/",
+		"urlHash": "5099f43e77d14b45d6ddbba433da9a9a427e2acb",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/gemwallet.ts",
+		"urlHash": "cbec6a66c18d2f6d561fca483a93f7e4a1f7ca5f",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://x.com/v12sec/status/2090114226320977931",
+		"urlHash": "21adbeaccff08ef2a5ed03ad62f8376785cdacb9",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://x.com/Rabby_io/status/2090269706087514615",
+		"urlHash": "82385b3cc828db6a5de2b5d746633a2dad9f0426",
+		"retrieved": "2026-08-21"
 	}
 ]

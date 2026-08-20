@@ -1,4 +1,4 @@
-import { knownValidUrls, URLS_TO_SKIP } from '@/tests/utils/known-urls'
+import { knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
 import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 
 /**
@@ -26,7 +26,7 @@ let checked = 0
 for (const [url, firstFile] of findExternalUrlsInDist(distDir)) {
 	checked++
 
-	if (URLS_TO_SKIP.some(skipped => url.includes(skipped))) {
+	if (shouldSkipUrl(url)) {
 		continue
 	}
 
