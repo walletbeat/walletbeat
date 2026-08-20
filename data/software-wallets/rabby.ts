@@ -306,7 +306,20 @@ export const rabby: SoftwareWallet = {
 					}),
 					useAppSpecificLastConnectedAddresses: notSupported,
 				},
-				[Variant.MOBILE]: null,
+				[Variant.MOBILE]: {
+					createInAppConnectionFlow: notSupported,
+					erc7846WalletConnect: notSupported,
+					ethAccounts: supported({
+						ref: {
+							explanation:
+								'Rabby Mobile only exposes the active account when eth_accounts is called.',
+							file: 'public/references/wallets/rabby/screenshots/2026-08-19-rabby-mobile-eth_accounts.jpg',
+							label: 'Walletbeat testing page shows Rabby Mobile only exposes the active account',
+						},
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					useAppSpecificLastConnectedAddresses: notSupported,
+				},
 				[Variant.DESKTOP]: null,
 			},
 			dataCollection: null,
