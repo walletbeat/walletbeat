@@ -118,6 +118,9 @@ export function contentHashToCid(contentHash: Hex.Hex): string | null {
 }
 
 /** Minimal JSON-RPC client used to make `eth_call` queries against an RPC URL. */
+
+const ETH_CALL_GAS = '0x100000' // 1_048_576
+
 async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Promise<Hex.Hex> {
 	const response = await fetch(rpcUrl, {
 		method: 'POST',
@@ -125,7 +128,7 @@ async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Prom
 		body: JSON.stringify({
 			jsonrpc: '2.0',
 			method: 'eth_call',
-			params: [{ to, data }, 'latest'],
+			params: [{ to, data, gas: ETH_CALL_GAS }, 'latest'],
 			id: 1,
 		}),
 	})
