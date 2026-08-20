@@ -69,7 +69,6 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
-import { mdParagraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
@@ -1383,30 +1382,6 @@ export const rainbow: SoftwareWallet = {
 					},
 				],
 			}),
-		},
-	},
-	overrides: {
-		attributes: {
-			ecosystem: {
-				transactionBatching: {
-					note: mdParagraph(`
-						{{WALLET_NAME}}'s two variants differ here. The browser extension
-						implements the Wallet Call API; the mobile app does not implement it at
-						all. The overall rating reflects the weaker of the two.
-
-						On the browser extension, batching is only available to accounts that
-						hold an EIP-7702 delegation. {{WALLET_NAME}} executes batches solely
-						through its delegation SDK, so a plain EOA that has not been delegated
-						cannot batch at all: \`wallet_getCapabilities\` returns an error rather
-						than reporting the \`atomic\` capability as unsupported.
-
-						The upside of that design is that batching and atomicity are the same
-						question here. {{WALLET_NAME}} has no non-atomic fallback that would
-						leave a bundle half-executed, so whenever a batch runs at all, it runs
-						all-or-nothing.
-					`),
-				},
-			},
 		},
 	},
 	variants: {
