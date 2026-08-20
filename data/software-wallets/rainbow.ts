@@ -1372,7 +1372,7 @@ export const rainbow: SoftwareWallet = {
 					{
 						explanation:
 							'Asking the wallet to send a bundle of transactions from the Walletbeat test page in the Rainbow in-app browser returns an error saying the method is not supported.',
-						file: 'public/references/wallets/rainbow/screenshots/2026-08-20-wallet-call-mobile-sendcalls-unsupported.png',
+						file: 'public/references/wallets/rainbow/screenshots/2026-08-20-wallet-call-mobile-batch-unsupported.png',
 						label: 'Walletbeat test page in the Rainbow in-app browser',
 						lastRetrieved: '2026-08-20',
 					},
