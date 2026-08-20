@@ -1009,9 +1009,16 @@ interface CssAttributes {
 	 * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
 	 * - `mobile`: enable the paired role only through the layout mobile breakpoint
 	 *
+	 * `[data-sticky]` containers keep `position: sticky` for the whole scroll.
+	 * Items stay `position: fixed` so `anchor()` and `position-try` can
+	 * still follow variable crumb widths. Origin insets live on the item; intro
+	 * is to-only so named `anchor()` is not frozen in a `from` keyframe.
+	 * `position-try` applies at `to`. Do not change `position` in keyframes or
+	 * hide the handoff with opacity.
+	 *
 	 * ### CSS Variables
-	 * - `--stickyBreadcrumb-animationRangeStart`
-	 * - `--stickyBreadcrumb-animationRangeEnd`
+	 * - `--stickyBreadcrumb-animationRange`
+	 * - `--stickyBreadcrumb-animationTimingFunction`
 	 * - `--stickyBreadcrumb-gap`
 	 * - `--stickyBreadcrumb-position-minBlockSize`
 	 * - `--stickyBreadcrumb-position-insetBlockStart`

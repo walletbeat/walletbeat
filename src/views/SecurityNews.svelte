@@ -13,10 +13,12 @@
 		news,
 		shouldExpandNews = true,
 		allNewsResolved = false,
+		semanticHeadings = true,
 	}: {
 		news: WalletSecurityNews[]
 		shouldExpandNews?: boolean
 		allNewsResolved?: boolean
+		semanticHeadings?: boolean
 	} = $props()
 </script>
 
@@ -38,10 +40,14 @@
 				<div>
 					<div data-row="start gap-2">
 						<a data-link="camouflaged" href="#security-news">
-							<h3 data-row="start gap-2">
+							<svelte:element
+								this={semanticHeadings ? 'h3' : 'div'}
+								class="security-news-heading"
+								data-row="start gap-2"
+							>
 								<span data-icon="📰" aria-hidden="true"></span>
 								Security News
-							</h3>
+							</svelte:element>
 						</a>
 					</div>
 
@@ -76,7 +82,10 @@
 				<details data-card="padding-5 secondary radius-4" data-column="gap-0">
 					<summary data-row="gap-2">
 						<div data-column="gap-1" data-row-item="flexible">
-							<h4>{newsItem.title}</h4>
+							<svelte:element
+								this={semanticHeadings ? 'h4' : 'div'}
+								class="news-item-heading"
+							>{newsItem.title}</svelte:element>
 							<div class="news-meta" data-row="gap-2">
 								<span
 									class="news-badge news-type"
@@ -168,7 +177,7 @@
 						display: grid;
 						gap: 0.5rem;
 
-						h3 {
+						.security-news-heading {
 							font-weight: 600;
 						}
 					}
@@ -192,7 +201,7 @@
 			overflow: hidden;
 
 			summary {
-				h4 {
+				.news-item-heading {
 					max-width: 60ch;
 					word-wrap: break-word;
 					overflow-wrap: break-word;

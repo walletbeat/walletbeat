@@ -51,6 +51,6 @@ import WalletPageContext from '@/views/WalletPageContext.svelte'
 	/>
 
 	<main data-column-item='flexible' data-sticky-container>
-		<WalletPageContext walletId={wallet.metadata.id} client:idle />
+		<WalletPageContext walletId={wallet.metadata.id} client:load />
 	</main>
 </Layout>

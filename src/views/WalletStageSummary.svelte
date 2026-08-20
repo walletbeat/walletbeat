@@ -23,11 +23,13 @@
 		stage,
 		ladderEvaluation,
 		showNextStageCriteria = true,
+		semanticHeadings = true,
 	}: {
 		wallet: RatedWallet<_AttributeGroupId>
 		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 		showNextStageCriteria?: boolean
+		semanticHeadings?: boolean
 	} = $props()
 
 
@@ -116,16 +118,16 @@
 <section data-column>
 	{#if stage === 'NOT_APPLICABLE'}
 		<header data-column="gap-2">
-			<h2 data-row="gap-2">
+			<svelte:element this={semanticHeadings ? 'h2' : 'div'} data-row="gap-2">
 				<WalletStageBadge stage={stage} ladderEvaluation={ladderEvaluation} size="large" />
-			</h2>
+			</svelte:element>
 		</header>
 		<p>
 			Stage rating is not applicable to this wallet.
 		</p>
 	{:else if stage === 'QUALIFIED_FOR_NO_STAGES'}
 		<header data-column="gap-2">
-			<h3 data-row="gap-2">
+			<svelte:element this={semanticHeadings ? 'h3' : 'div'} data-row="gap-2">
 				<a data-link="camouflaged" href={getWalletUrl(wallet, { attributeAnchor: 'stages' })}>
 					<WalletStageBadge
 						stage={stage}
@@ -133,11 +135,11 @@
 						size="large"
 					/>
 				</a>
-			</h3>
+			</svelte:element>
 		</header>
 	{:else if displayStage}
 		<header data-column="gap-2">
-			<h3>
+			<svelte:element this={semanticHeadings ? 'h3' : 'div'}>
 				<a
 					data-link="camouflaged"
 					href={getWalletUrl(wallet, { attributeAnchor: displayStage.id })}
@@ -148,7 +150,7 @@
 						 size="large"
 					/>
 				</a>
-			</h3>
+			</svelte:element>
 			<p>
 				{#if isTypographicContent(displayStage.description)}
 					<Typography content={displayStage.description} />
@@ -166,7 +168,7 @@
 
 		<section data-column="gap-4">
 			{#if showNextStageCriteria && targetStage && typeof targetStage === 'object'}
-				<h4>
+				<svelte:element this={semanticHeadings ? 'h4' : 'div'}>
 					Criteria needed to advance to
 					<a
 						data-link="camouflaged"
@@ -178,7 +180,7 @@
 							size="medium"
 						/>
 					</a>:
-				</h4>
+				</svelte:element>
 			{/if}
 
 			<ul>

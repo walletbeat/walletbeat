@@ -139,8 +139,7 @@
 				currentId
 					? globalThis.document.getElementById(currentId)?.closest('.attribute-group')
 					: null
-				?? root.querySelector('.attribute-group')
-			)
+			) ?? root.querySelector('.attribute-group')
 
 			return currentGroup?.querySelectorAll<HTMLDetailsElement>('details') ?? []
 		}
@@ -172,13 +171,69 @@
 		}
 	}
 
-	$effect(() => {
-		openHashDetails()
-		globalThis.addEventListener('hashchange', openHashDetails)
+	function attachHashNavigation() {
+		let correction = 0
+		let inlineSize = globalThis.document.documentElement.clientWidth
+
+		const correctHashPosition = async (currentCorrection: number) => {
+			await globalThis.document.fonts.ready
+
+			const hash = globalThis.location.hash
+			const target = hash
+				? globalThis.document.getElementById(decodeURIComponent(hash.slice(1)))
+				: null
+			const layout = globalThis.document.getElementById('layout')
+
+			if(!(target instanceof HTMLElement) || !(layout instanceof HTMLElement))
+				return
+
+			let previousGeometry = ''
+			let stableFrames = 0
+
+			while(currentCorrection === correction && stableFrames < 3) {
+				await new Promise(globalThis.requestAnimationFrame)
+
+				if(hash !== globalThis.location.hash)
+					return
+
+				const targetRect = target.getBoundingClientRect()
+				const geometry = `${targetRect.top}:${targetRect.height}:${layout.scrollHeight}`
+
+				stableFrames = geometry === previousGeometry ? stableFrames + 1 : 0
+				previousGeometry = geometry
+			}
+
+			if(currentCorrection === correction)
+				target.scrollIntoView({ block: 'start', behavior: 'auto' })
+		}
+
+		const handleResize = () => {
+			const nextInlineSize = globalThis.document.documentElement.clientWidth
+
+			if(nextInlineSize === inlineSize)
+				return
+
+			inlineSize = nextInlineSize
+			void correctHashPosition(++correction)
+		}
+		const handleHashChange = () => {
+			openHashDetails()
+			void correctHashPosition(++correction)
+		}
+
+		globalThis.addEventListener('resize', handleResize)
+		globalThis.addEventListener('hashchange', handleHashChange)
+		handleHashChange()
 
 		return () => {
-			globalThis.removeEventListener('hashchange', openHashDetails)
+			correction++
+			globalThis.removeEventListener('resize', handleResize)
+			globalThis.removeEventListener('hashchange', handleHashChange)
 		}
+	}
+
+	$effect(() => {
+		return attachHashNavigation()
 	})
 
 	// (Derived)
@@ -281,7 +336,6 @@
 						id: `toc-${attrGroup.id}`,
 						title: attrGroup.displayName,
 						icon: attrGroup.icon,
-						iconVariant: 'emoji' as const,
 						accentColor: scoreToColor(
 							calculateAttributeGroupScore(attrGroup, evalGroup)?.score ?? null,
 						),
@@ -295,7 +349,6 @@
 								id: `toc-${attrGroup.id}-${attribute.id}`,
 								title: attribute.displayName,
 								icon: attribute.icon,
-								iconVariant: 'emoji' as const,
 								accentColor: ratingToColor(evalAttr.evaluation.outcome.rating),
 								href: `#${slugifyCamelCase(attribute.id)}`,
 							}]
@@ -382,14 +435,15 @@
 	const pieRotationAnimationTimingFunctions = $derived(
 		pieRotationSteps.map(step => `linear(0, ${step.delta})`).join(', ')
 	)
+	const pieRotationAnimationRanges = $derived(
+		pieRotationSteps.map(step => (
+			pieNavigationItems.some(group => group.href === step.href)
+				? 'var(---wallet-breadcrumb-animation-range)'
+				: 'var(---wallet-pie-attribute-animation-range)'
+		)).join(', ')
+	)
 	const pieTimelineByHref = $derived(
 		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
-	)
-
-	const sliceStylesByHref = $derived(
-		new Map(
-			pieRotationItems.map(item => [item.href, item.sliceStyle] as const)
-		)
 	)
 
 	const attrToRelevantVariants = $derived.by(() => {
@@ -632,7 +686,7 @@
 								/>
 
 								{#snippet TooltipContent()}
-									<WalletStageSummary {wallet} {ladders} {stage} {ladderEvaluation} />
+									<WalletStageSummary {wallet} {ladders} {stage} {ladderEvaluation} semanticHeadings={false} />
 								{/snippet}
 							</Tooltip>
 						{/if}
@@ -687,7 +741,7 @@
 		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
-				<SecurityNews news={walletNews} {shouldExpandNews} {allNewsResolved} />
+				<SecurityNews news={walletNews} {shouldExpandNews} {allNewsResolved} semanticHeadings={false} />
 			</div>
 		{/if}
 
@@ -713,6 +767,7 @@
 						style:---pie-rotation-animation-names={pieRotationAnimationNames}
 						style:---pie-rotation-animation-timelines={pieRotationAnimationTimelines}
 						style:---pie-rotation-animation-timing-functions={pieRotationAnimationTimingFunctions}
+						style:---pie-rotation-animation-ranges={pieRotationAnimationRanges}
 					>
 						<NavigationItems
 							items={pieNavigationItems}
@@ -756,7 +811,7 @@
 							{#if item.icon}
 								<span
 									class="toc-icon"
-									data-icon="wbicons emoji {item.icon}"
+									data-icon="wbicons {item.icon}"
 								></span>
 							{/if}
 						{/snippet}
@@ -882,7 +937,6 @@
 		{@const score = calculateAttributeGroupScore(attrGroup, evalGroup)}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
-		{@const sliceStyle = sliceStylesByHref.get(href)}
 
 		<hr />
 
@@ -897,22 +951,13 @@
 			<div
 				class="attribute-group-stack"
 				data-scroll-item="inline-detached padding-match-end"
-				style:--slice-totalAngle={sliceStyle?.totalAngle}
-				style:--slice-midAngle={sliceStyle?.midAngle}
-				style:--slice-offset={sliceStyle?.offset}
-				style:--slice-gap={sliceStyle?.gap}
-				style:--slice-outerR={sliceStyle?.outerR}
-				style:--slice-innerR={sliceStyle?.innerR}
-				style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-				style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-				style:--slice-labelSize={sliceStyle?.labelSize}
-				style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-				style:--slice-labelR={sliceStyle?.labelR}
+				style:---pie-timeline={pieTimelineByHref.get(href)}
 			>
 				<header
 					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-row="start gap-4"
 					data-scroll-item="inline-detached"
+					style:---wallet-icon-anchor={`--wallet-group-icon-${id}`}
 				>
 					<div
 						class="attribute-group-summary-layout"
@@ -926,7 +971,6 @@
 							<div
 								class="attribute-group-heading-position"
 								data-sticky-breadcrumb="position"
-								style:---pie-timeline={pieTimelineByHref.get(href)}
 							>
 								<a
 									data-link="camouflaged"
@@ -960,10 +1004,9 @@
 					>
 						<span
 							class="breadcrumb-icon"
-							data-icon="wbicons emoji {attrGroup.icon}"
+							data-icon="wbicons {attrGroup.icon}"
 							aria-hidden="true"
 						></span>
-						<span class="breadcrumb-slice-shape-layer" aria-hidden="true"></span>
 					</span>
 				</header>
 
@@ -996,7 +1039,6 @@
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
 	{@const id = slugifyCamelCase(attribute.id)}
 	{@const href = `#${id}`}
-	{@const sliceStyle = sliceStylesByHref.get(href)}
 	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 	{@const stageContext = showStage ? getWalletStageAndLadder(wallet) : null}
 	{@const relevantStage = (
@@ -1038,19 +1080,21 @@
 			data-sticky-breadcrumb="scope"
 		>
 			<summary data-row>
-				<header data-row-item="flexible" data-row="start gap-3">
+				<header
+					data-row-item="flexible"
+					data-row="start gap-3"
+					style:---wallet-icon-anchor={`--wallet-attribute-icon-${id}`}
+					style:---wallet-companion-anchor={`--wallet-attribute-companion-${id}`}
+				>
 					<div
-						class="attribute-summary-layout"
+						class="attribute-heading"
 						data-row-item="flexible basis-2"
-						data-row="start gap-2 wrap"
+						data-column="gap-2"
 					>
-						<div
-							class="attribute-heading"
-							data-row-item="flexible"
-							data-column="gap-2"
-						>
+						<div class="attribute-heading-row" data-row="start gap-2 wrap">
 							<div
 								class="attribute-heading-position"
+								data-row-item="flexible"
 								data-sticky-breadcrumb="position"
 								style:---pie-timeline={pieTimelineByHref.get(href)}
 							>
@@ -1061,9 +1105,7 @@
 									interestfor={id}
 									data-row="start gap-2"
 								>
-									<h3
-										title={formatAttributeTitleText(evalAttr)}
-									>
+									<h3 title={formatAttributeTitleText(evalAttr)}>
 										{attribute.displayName}
 									</h3>
 
@@ -1080,88 +1122,76 @@
 								</a>
 							</div>
 
-							{#if attribute.question}
-								<div class="subsection-caption">
-									<Typography
-										content={attribute.question}
-										strings={{ WALLET_NAME: wallet.metadata.displayName }}
-									/>
-								</div>
-							{/if}
-						</div>
-
-						<div
-							class="attribute-summary-companions-position"
-							data-row-item="wrap-end"
-						>
 							<div
-								class="attribute-summary-companions"
-								data-row="gap-2 wrap"
+								class="attribute-summary-companions-position"
+								data-row-item="wrap-end"
 							>
-								{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
 								<div
-									class="variant-indicator"
-									data-badge="small"
-									data-row="gap-2"
-									style:--accent="var(--color-accent-pink-light)"
-									title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
+									class="attribute-summary-companions"
+									data-row="end gap-2 wrap"
 								>
-									{#if relevantVariants.length === 1}
-										<small>Only</small>
+									{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
+									<div
+										class="variant-indicator"
+										data-badge="small"
+										data-row="gap-2"
+										style:--accent="var(--color-accent-pink-light)"
+										title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
+									>
+										{#if relevantVariants.length === 1}
+											<small>Only</small>
+										{/if}
+
+										{#each relevantVariants as variant}
+											<span class="variant-badge" data-row="gap-1">
+												{@html variants[variant].icon}
+											</span>
+										{/each}
+									</div>
 									{/if}
 
-									{#each relevantVariants as variant}
-										<span class="variant-badge" data-row="gap-1">
-											{@html variants[variant].icon}
-										</span>
-									{/each}
+									{#if verifiability === Verifiability.UNVERIFIABLE}
+										<data
+											data-row-item="wrap-end"
+											data-badge="medium"
+											value={verifiability}
+											style:--accent="var(--accent-color)"
+										>Unverifiable</data>
+									{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
+										<data
+											data-row-item="wrap-end"
+											data-badge="medium"
+											value={verifiability}
+											style:--accent="var(--accent-color)"
+										>Unverifiable but audited</data>
+									{/if}
+
+									<data
+										data-badge="medium"
+										value={evalAttr.evaluation.outcome.rating}
+									>{evalAttr.evaluation.outcome.rating}</data>
 								</div>
-								{/if}
-
-								{#if verifiability === Verifiability.UNVERIFIABLE}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)"
-									>Unverifiable</data>
-								{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)"
-									>Unverifiable but audited</data>
-								{/if}
-
-								<data
-									data-badge="medium"
-									value={evalAttr.evaluation.outcome.rating}
-								>{evalAttr.evaluation.outcome.rating}</data>
 							</div>
 						</div>
+
+						{#if attribute.question}
+							<div class="subsection-caption">
+								<Typography
+									content={attribute.question}
+									strings={{ WALLET_NAME: wallet.metadata.displayName }}
+								/>
+							</div>
+						{/if}
 					</div>
 
 					<span
 						class="attribute-icon"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
 					>
 						<span
 							class="breadcrumb-icon"
-							data-icon="wbicons emoji {attribute.icon}"
+							data-icon="wbicons {attribute.icon}"
 							aria-hidden="true"
 						></span>
-						<span class="breadcrumb-slice-shape-layer" aria-hidden="true"></span>
 					</span>
 				</header>
 			</summary>
@@ -1298,8 +1328,13 @@
 					data-sticky-container
 				>
 					<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-						<h4 data-sticky-breadcrumb="item mobile">
-							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
+						<h4
+							id={`${id}-why`}
+							data-sticky-breadcrumb="item mobile"
+						>
+							<a data-link="camouflaged" href={`#${id}-why`}>
+								{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
+							</a>
 						</h4>
 					</summary>
 
@@ -1321,8 +1356,13 @@
 					data-sticky-container
 				>
 					<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-						<h4 data-sticky-breadcrumb="item mobile">
-							{getHowIsEvaluatedHeading(attribute)}
+						<h4
+							id={`${id}-methodology`}
+							data-sticky-breadcrumb="item mobile"
+						>
+							<a data-link="camouflaged" href={`#${id}-methodology`}>
+								{getHowIsEvaluatedHeading(attribute)}
+							</a>
 						</h4>
 					</summary>
 
@@ -1426,8 +1466,13 @@
 						></span>
 
 						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-							<h4 data-sticky-breadcrumb="item mobile">
-								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
+							<h4
+								id={`${id}-improvement`}
+								data-sticky-breadcrumb="item mobile"
+							>
+								<a data-link="camouflaged" href={`#${id}-improvement`}>
+									{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
+								</a>
 							</h4>
 						</summary>
 
@@ -1457,6 +1502,7 @@
 
 <style>
 	.container {
+		---wallet-content-block-padding-max: 5rem;
 		---wallet-content-inline-padding: 2rem;
 		---wallet-icon-sticky-block-start: calc(
 			var(---wallet-page-block-offset)
@@ -1470,6 +1516,13 @@
 			)
 			/ 2
 		);
+		---wallet-name-flow-block-start: calc(
+			var(---wallet-page-block-offset)
+				+ min(
+					var(---wallet-content-inline-start),
+					var(---wallet-content-block-padding-max)
+				)
+		);
 		---wallet-breadcrumb-attribute-font-size: 1.17rem;
 		---wallet-breadcrumb-group-font-size: calc(
 			(
@@ -1478,8 +1531,6 @@
 			)
 			/ 2
 		);
-		---wallet-breadcrumb-heading-icon-size: 1.5rem;
-		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
 		---wallet-breadcrumb-icon-block-start: calc(
 			anchor(--sticky-breadcrumb-scope top)
 			+ (
@@ -1492,47 +1543,65 @@
 			anchor(var(--stickyBreadcrumb-parentAnchor) end)
 				+ var(---wallet-breadcrumb-gap)
 		);
-		---wallet-breadcrumb-icon-translate: none;
-		---wallet-breadcrumb-icon-transform-origin: top left;
+		---wallet-breadcrumb-heading-translate: calc(
+			var(---wallet-breadcrumb-heading-icon-size)
+				+ var(---wallet-breadcrumb-heading-icon-gap)
+		);
 		---wallet-breadcrumb-companion-block-start: calc(
 			var(---wallet-icon-sticky-block-start)
 				+ var(---wallet-breadcrumb-block-size) / 2
 		);
 		---wallet-breadcrumb-companion-inline-end-clearance: 0px;
-		---wallet-breadcrumb-companion-slot-inline-size: 6rem;
+		---wallet-breadcrumb-companion-slot-inline-size: 12rem;
 		---wallet-breadcrumb-surface-inline-end-clearance: var(
 			---wallet-page-navigation-inline-size
 		);
 		---wallet-attribute-heading-font-size: 1.17em;
-		/* Finish on the snap landing after the anchor candidate has settled. The
-		 * transparent handoff then changes owner only where geometries coincide.
-		 * Every depth derives its
-		 * compact approach from this same quarter-subject interval. */
+		/* One sticky row of travel: leave the flow pad and land as the source
+		 * would reach the sticky inset. */
 		---wallet-breadcrumb-arrival-offset: 0px;
 		---wallet-breadcrumb-animation-range:
-			exit-crossing calc(1px - var(---wallet-breadcrumb-arrival-offset) - 25%)
+			exit-crossing calc(
+				1px
+					- var(---wallet-breadcrumb-arrival-offset)
+					- var(---wallet-breadcrumb-block-size)
+			)
 			exit-crossing calc(1px - var(---wallet-breadcrumb-arrival-offset));
-		---wallet-group-header-padding-block: 0px;
+		---wallet-breadcrumb-attribute-arrival-offset: 0px;
+		---wallet-pie-attribute-animation-range:
+			exit-crossing calc(
+				1px
+					- var(---wallet-breadcrumb-attribute-arrival-offset)
+					- var(---wallet-breadcrumb-block-size)
+			)
+			exit-crossing calc(
+				1px - var(---wallet-breadcrumb-attribute-arrival-offset)
+			);
 		---wallet-group-icon-size: 2rem;
-		---wallet-group-slice-block-size: var(---wallet-group-icon-size);
+		---wallet-group-header-padding-block: 0px;
 		---wallet-group-heading-font-size: var(---wallet-breadcrumb-group-font-size);
-		---wallet-group-heading-direction: row;
-		---wallet-group-heading-align: baseline;
 		---wallet-group-caption-white-space: nowrap;
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 54rem;
-			--scrollItem-inlineDetached-paddingStart: var(---wallet-content-inline-padding);
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-paddingEnd: var(---wallet-content-inline-padding);
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-			--sticky-marginInlineEnd: var(---wallet-page-navigation-inline-size);
-		}
-
 		display: grid;
 		grid-template:
 			'Content Nav'
 			/ minmax(0, 1fr) auto
 		;
+		position: relative;
+		line-height: var(---wallet-line-height);
+
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 54rem;
+			--scrollItem-inlineDetached-paddingStart: var(---wallet-content-inline-padding);
+			--scrollItem-inlineDetached-maxPaddingMatchStart: var(---wallet-content-block-padding-max);
+			--scrollItem-inlineDetached-paddingEnd: var(---wallet-content-inline-padding);
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: var(---wallet-content-block-padding-max);
+			--sticky-marginInlineEnd: var(---wallet-page-navigation-inline-size);
+
+			@media (max-width: 1024px) {
+				--sticky-marginInlineEnd: 0px;
+			}
+		}
+
 		@media (max-width: 1024px) {
 			---wallet-mobile-pie-size-rem: 8;
 			---wallet-mobile-pie-size: calc(
@@ -1541,6 +1610,9 @@
 			---wallet-mobile-pie-flow-size-rem: 18;
 			---wallet-mobile-pie-flow-size: calc(
 				var(---wallet-mobile-pie-flow-size-rem) * 1rem
+			);
+			---wallet-mobile-pie-flow-inline-start: calc(
+				50vi - var(---wallet-mobile-pie-flow-size) / 2
 			);
 			---wallet-mobile-pie-scale: calc(
 				var(---wallet-mobile-pie-size-rem)
@@ -1580,6 +1652,13 @@
 							* var(---wallet-line-height)
 				) / 2
 			);
+			grid-template:
+				[Nav-start]
+				'Content'
+				[Nav-end]
+				/ [Nav-start] minmax(0, 1fr) [Nav-end]
+			;
+
 			@media (max-width: 480px) {
 				/* Keep the compact badge lane intrinsic-looking without allowing
 				 * its fixed handoff to collapse the summary's flow reservation. */
@@ -1587,47 +1666,8 @@
 					4.625rem
 						+ var(--navigation-mobile-gap)
 				);
-				---wallet-breadcrumb-attribute-row-offset: calc(
-					var(---wallet-breadcrumb-block-size)
-						+ var(---wallet-breadcrumb-mobile-row-gap)
-				);
 			}
-
-			.attribute {
-				/*
-				 * Attribute targets initially remain in flow while their group crumb is
-				 * already fixed. Reserve that occupied row through scroll geometry so
-				 * native anchor jumps and proximity snapping cannot paint both headings
-				 * into the same lane before the attribute handoff begins.
-				 */
-				---wallet-breadcrumb-arrival-offset: calc(
-					var(---wallet-breadcrumb-block-size)
-						+ var(---wallet-breadcrumb-mobile-row-gap)
-				);
-				---wallet-breadcrumb-animation-range:
-					exit-crossing calc(1px - var(---wallet-breadcrumb-arrival-offset) - 25%)
-					exit-crossing calc(1px - var(---wallet-breadcrumb-arrival-offset));
-				--stickyBreadcrumb-animationRange: var(
-					---wallet-breadcrumb-animation-range
-				);
-				scroll-margin-block-start: var(---wallet-breadcrumb-arrival-offset);
-			}
-
-			grid-template:
-				[Nav-start]
-				'Content'
-				[Nav-end]
-				/ [Nav-start] minmax(0, 1fr) [Nav-end]
-			;
 		}
-		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-breadcrumb-heading-icon-size: 1.25rem;
-			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
-		}
-
-		line-height: var(---wallet-line-height);
-
-		position: relative;
 
 		article {
 			grid-area: Content;
@@ -1712,6 +1752,7 @@
 				:global(.navigation-items menu[data-navigation-depth='1']) {
 					display: grid;
 					grid-template-columns: var(--navigation-items-level-2-grid-columns);
+					margin-inline-start: 0;
 				}
 
 				:global(
@@ -1722,14 +1763,6 @@
 						> [data-row-item='flexible']
 				) {
 					white-space: nowrap;
-				}
-			}
-
-			:global(a) {
-				--icon-filter: brightness(0) opacity(0.35);
-
-				&:hover {
-					--icon-filter: none;
 				}
 			}
 
@@ -1868,12 +1901,18 @@
 		---wallet-name-sticky-icon-size: 2rem;
 		---wallet-name-flow-icon-size: 3rem;
 		---wallet-name-flow-font-size: 2.25rem;
+		---wallet-name-scale: calc(
+			var(---wallet-breadcrumb-root-font-size)
+				/ var(---wallet-name-flow-font-size)
+		);
 		---wallet-line-height: 1.6;
 		---wallet-breadcrumb-root-font-size: 1.8rem;
 		---wallet-breadcrumb-gap: 1.5rem;
+		---wallet-breadcrumb-heading-icon-size: 1.5rem;
+		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
 		---wallet-breadcrumb-block-size: calc(
 			var(---wallet-breadcrumb-root-font-size)
-			* 1.6
+			* var(---wallet-line-height)
 		);
 		---wallet-breadcrumb-mobile-row-gap: 0.25rem;
 		---wallet-breadcrumb-attribute-row-offset: 0px;
@@ -1895,16 +1934,18 @@
 		---anchor-control-inset: 0.75rem;
 		---anchor-control-gap: 0.5rem;
 		scroll-marker-group: after;
-		scroll-snap-type: block proximity;
+		scroll-behavior: auto;
 		anchor-scope: --wallet-footer;
 		timeline-scope:
 			--wallet-ratings-start-timeline,
 			--wallet-footer-entry;
 
 		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-page-navigation-inline-size-rem: 16;
+			---wallet-page-navigation-inline-size-rem: 20;
 			---wallet-breadcrumb-root-font-size: 1.5rem;
 			---wallet-breadcrumb-gap: 1rem;
+			---wallet-breadcrumb-heading-icon-size: 1.25rem;
+			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
 		}
 
 		@media (max-width: 1024px) {
@@ -1922,10 +1963,6 @@
 				var(--navigation-mobile-trailingClearance)
 					+ var(--navigation-mobile-gap)
 			);
-			---wallet-name-scale: calc(
-				var(---wallet-breadcrumb-root-font-size)
-					/ var(---wallet-name-flow-font-size)
-			);
 			---wallet-name-icon-excess: calc(
 				var(---wallet-name-sticky-icon-size)
 					/ var(---wallet-name-scale)
@@ -1938,10 +1975,6 @@
 							+ var(---wallet-breadcrumb-gap)
 					) / 2
 			);
-			---wallet-sticky-stack-block-end: calc(
-				var(---wallet-page-block-offset)
-					+ var(--navigation-mobile-blockSize)
-			);
 			anchor-scope:
 				--wallet-footer,
 				--layout-site-logo,
@@ -1950,23 +1983,70 @@
 				--wallet-name-collision;
 			/* The target supplies the next row; do not reserve it before it sticks. */
 			--scrollContainer-scrollPaddingBlockStart: var(---wallet-page-block-offset);
+
+			@media (max-width: 480px) {
+				---wallet-breadcrumb-attribute-row-offset: calc(
+					var(---wallet-breadcrumb-block-size)
+						+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
+				/* The group crumb owns the first row under the nav; H3 owns the next. */
+				---wallet-breadcrumb-attribute-arrival-offset: calc(
+					var(---wallet-sticky-content-inset)
+						+ var(---wallet-breadcrumb-block-size)
+						+ var(---wallet-breadcrumb-mobile-row-gap)
+				);
+			}
 		}
-	}
 
-	:global(#wallet-page [id]) {
-		scroll-snap-align: start;
-	}
+		/* Keep the native scroll buttons; drop the marker surface and its anchors. */
+		&::scroll-marker-group {
+			display: none;
+		}
 
-	/*
-	 * The mobile navigation depth effect normally promotes `#content` with an
-	 * identity transform. That makes it the containing block for fixed
-	 * descendants, so fixed anchor-positioned breadcrumbs move with this scroll
-	 * root instead of the viewport. WalletPage's scroll-driven breadcrumbs need
-	 * the viewport containing block at every breakpoint.
-	 */
-	:global(#layout:has(#wallet-page) > #content) {
-		transform: none;
-		transform-style: flat;
+		&::scroll-button(block-start),
+		&::scroll-button(block-end) {
+			z-index: 5;
+			position: fixed;
+			inset-block-start: auto;
+			inset-block-end: var(---anchor-control-inset);
+			inline-size: var(---anchor-button-size);
+			block-size: var(---anchor-button-size);
+			padding: 0;
+			border: var(--separator-width) solid var(--border-color);
+			border-radius: 50%;
+			background-color: var(--background-secondary);
+			color: var(--text-primary);
+			font: inherit;
+			font-size: 1.25rem;
+			line-height: 1;
+			transition-property: scale, background-color, border-color, opacity;
+			animation: keep-anchor-controls-above-footer linear both;
+			animation-timeline: --wallet-footer-entry;
+			animation-range: entry 0% entry 100%;
+			&:is(:hover, :focus-visible) {
+				background-color: var(--background-tertiary);
+				border-color: var(--text-secondary);
+				scale: 1.05;
+			}
+
+			&:disabled {
+				opacity: 0.38;
+			}
+		}
+
+		&::scroll-button(block-start) {
+			inset-inline: auto calc(
+				var(---anchor-control-inset)
+				+ var(---anchor-button-size)
+				+ var(---anchor-control-gap)
+			);
+			content: '↑' / 'Scroll toward the previous rating section';
+		}
+
+		&::scroll-button(block-end) {
+			inset-inline: auto var(---anchor-control-inset);
+			content: '↓' / 'Scroll toward the next rating section';
+		}
 	}
 
 	/*
@@ -1979,67 +2059,24 @@
 		animation-play-state: paused;
 	}
 
+	/*
+	 * The mobile navigation depth effect promotes `#content` with an identity
+	 * transform. That containing block would make fixed breadcrumb insets track
+	 * the scroll root instead of the viewport.
+	 */
+	:global(#layout:has(#wallet-page) > #content) {
+		transform: none;
+		transform-style: flat;
+	}
+
 	:global(#content:has(#wallet-page) > footer) {
 		anchor-name: --wallet-footer;
 		view-timeline-name: --wallet-footer-entry;
 		view-timeline-axis: block;
 	}
 
-	/* Scroll buttons and marker groups share the generation switch. Keep the
-	 * native buttons, but remove the marker surface and its anchors entirely. */
-	:global(#layout:has(#wallet-page))::scroll-marker-group {
-		display: none;
-	}
-
 	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker {
 		content: none;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-start),
-	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-		z-index: 5;
-		position: fixed;
-		inset-block-start: auto;
-		inset-block-end: var(---anchor-control-inset);
-		inline-size: var(---anchor-button-size);
-		block-size: var(---anchor-button-size);
-		padding: 0;
-		border: var(--separator-width) solid var(--border-color);
-		border-radius: 50%;
-		background-color: var(--background-secondary);
-		color: var(--text-primary);
-		font: inherit;
-		font-size: 1.25rem;
-		line-height: 1;
-		transition-property: scale, background-color, border-color, opacity;
-		animation: keep-anchor-controls-above-footer linear both;
-		animation-timeline: --wallet-footer-entry;
-		animation-range: entry 0% entry 100%;
-		&:is(:hover, :focus-visible) {
-			background-color: var(--background-tertiary);
-			border-color: var(--text-secondary);
-			scale: 1.05;
-		}
-
-		&:disabled {
-			opacity: 0.38;
-		}
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-start) {
-		inset-inline: auto calc(
-			var(---anchor-control-inset)
-			+ var(---anchor-button-size)
-			+ var(---anchor-control-gap)
-		);
-		content: '↑' / 'Scroll toward the previous rating section';
-
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-		inset-inline: auto var(---anchor-control-inset);
-		content: '↓' / 'Scroll toward the next rating section';
-
 	}
 
 	@keyframes keep-anchor-controls-above-footer {
@@ -2083,10 +2120,6 @@
 			margin-inline: var(---anchor-control-inset) auto;
 		}
 
-		> li {
-			display: contents;
-		}
-
 		:global(button[data-details-scope]) {
 			background-color: var(---wallet-breadcrumb-surface-background);
 			transition-property: color, background-color, border-color, scale;
@@ -2106,9 +2139,15 @@
 		initial-value: 1;
 	}
 
+	@property ---pie-start-angle {
+		syntax: "<angle>";
+		inherits: true;
+		initial-value: 0deg;
+	}
+
 	@keyframes -global-WalletPieRotationStep {
 		from {
-			rotate: 0deg;
+			---pie-start-angle: 0deg;
 		}
 
 		to {
@@ -2116,7 +2155,7 @@
 			 * Each animation's linear() easing scales this unit angle by its
 			 * configured delta before native composition sums every step.
 			 */
-			rotate: calc(var(---pie-rotation-direction) * 1deg);
+			---pie-start-angle: 1deg;
 		}
 	}
 
@@ -2124,12 +2163,49 @@
 		display: none;
 	}
 
+	:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
+		display: inline-grid;
+		place-items: center;
+		position: relative;
+		inline-size: var(--icon-size);
+		block-size: var(--icon-size);
+		border: 0;
+		background: transparent;
+		color: var(--accent, currentColor);
+
+		&:is(.toc-icon)::before,
+		> .breadcrumb-icon {
+			position: absolute;
+			inset: 50% auto auto 50%;
+			translate: -50% -50%;
+		}
+
+		&:is(.toc-icon)::before {
+			font-size: calc(var(--icon-size) * 0.55);
+		}
+
+		&:is(.attribute-group-icon, .attribute-icon)::after {
+			content: '';
+			position: absolute;
+			inset: 50% auto auto 50%;
+			inline-size: 0;
+			block-size: 0;
+			anchor-name: var(---wallet-icon-anchor);
+		}
+
+		> .breadcrumb-icon {
+			font-size: var(--icon-size);
+			inline-size: 1em;
+			block-size: 1em;
+
+			&::before {
+				font-size: 1em;
+			}
+		}
+	}
+
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 		:is(
-			.toc-icon,
-			.attribute-group-stack,
-			.attribute-group-icon,
-			.attribute-icon,
 			:global(.pie-navigation .navigation-items summary > a),
 			:global(.pie-navigation .navigation-items menu[data-navigation-depth='1'] > li > a)
 		) {
@@ -2184,38 +2260,36 @@
 			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
 			---slice-unit: 1px;
 			---slice-arc-size: var(--slice-arcSize, small);
-			---slice-clip-origin-x: var(---slice-origin);
-			---slice-clip-origin-y: var(---slice-origin);
 			---slice-outer-start-x: calc(
-				var(---slice-clip-origin-x)
+				var(---slice-origin)
 				+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
 			);
 			---slice-outer-start-y: calc(
-				var(---slice-clip-origin-y)
+				var(---slice-origin)
 				- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
 			);
 			---slice-clip-path: shape(
 				from var(---slice-outer-start-x) var(---slice-outer-start-y),
 				arc to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
 					)
 					of calc(var(---slice-outer-r) * var(---slice-unit)) cw var(---slice-arc-size),
 				arc to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ (
 							sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
 							- cos(var(---slice-half-angle)) * var(---slice-half-gap)
 						) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- (
 							cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
 							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
@@ -2224,14 +2298,14 @@
 					of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
 				line to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ (
 							sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
 							- cos(var(---slice-half-angle)) * var(---slice-half-gap)
 						) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- (
 							cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
 							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
@@ -2239,34 +2313,34 @@
 					),
 				arc to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit)
 					)
 					of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
 				arc to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit)
 					)
 					of calc(var(---slice-inner-r) * var(---slice-unit)) ccw var(---slice-arc-size),
 				arc to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ (
 							cos(var(---slice-half-angle)) * var(---slice-half-gap)
 							- sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
 						) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- (
 							cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
 							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
@@ -2275,14 +2349,14 @@
 					of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
 				line to
 					calc(
-						var(---slice-clip-origin-x)
+						var(---slice-origin)
 						+ (
 							cos(var(---slice-half-angle)) * var(---slice-half-gap)
 							- sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
 						) * var(---slice-unit)
 					)
 					calc(
-						var(---slice-clip-origin-y)
+						var(---slice-origin)
 						- (
 							cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
 							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
@@ -2294,139 +2368,6 @@
 			);
 		}
 
-		:is(.toc-icon, .attribute-group-stack, .attribute-group-icon, .attribute-icon) {
-			---slice-unit: calc(
-				var(--icon-size) * 0.55 * var(--slice-labelSizeScale, 1)
-				/ var(--slice-labelSize)
-			);
-			---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
-			---slice-scaled-offset: calc(
-				var(--slice-offset)
-				* var(---slice-unit)
-			);
-			---slice-outer-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
-				* var(---slice-outer-r)
-			);
-			---slice-inner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
-				* var(---slice-inner-r)
-			);
-			---slice-outer-corner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
-				* var(---slice-outer-corner-center-r)
-				+ var(---slice-outer-corner-r)
-			);
-			---slice-inner-corner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
-				* var(---slice-inner-corner-center-r)
-				+ var(---slice-inner-corner-r)
-			);
-			---slice-block-half: max(
-				0,
-				var(---slice-outer-arc-block-half),
-				var(---slice-outer-corner-arc-block-half),
-				calc(
-					sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-				),
-				calc(
-					sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-				),
-				var(---slice-inner-corner-arc-block-half),
-				var(---slice-inner-arc-block-half)
-			);
-		}
-
-		.attribute-group-stack {
-			---wallet-group-slice-block-size: calc(
-				2 * var(---slice-block-half) * var(---slice-unit)
-			);
-		}
-
-		:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
-			display: inline-flex;
-			position: relative;
-			isolation: isolate;
-			/* The glyph leaves this box during sticky handoff; paint containment
-			 * would clip it before it reaches the breadcrumb lane. */
-			contain: style;
-			inline-size: calc(
-				(var(---slice-outer-r) - var(---slice-inner-r))
-				* var(---slice-unit)
-			);
-			block-size: calc(2 * var(---slice-block-half) * var(---slice-unit));
-			border: 0;
-			border-radius: 0;
-			background: transparent;
-
-			&:is(.toc-icon)::before,
-			> .breadcrumb-icon {
-				position: absolute;
-				inset:
-					50% auto auto
-					calc(
-						(
-							var(---slice-outer-r) - var(--slice-labelR)
-						)
-						/ (
-							var(---slice-outer-r) - var(---slice-inner-r)
-						)
-						* 100%
-					);
-				z-index: 1;
-				font-size: calc(
-					var(--icon-size) * 0.55
-					* var(--slice-labelSizeScale, 1)
-				);
-				translate: -50% -50%;
-			}
-
-			> .breadcrumb-icon {
-				inline-size: 1em;
-				block-size: 1em;
-
-				&::before {
-					font-size: 1em;
-				}
-			}
-
-			> .breadcrumb-slice-shape-layer {
-				/*
-				 * Keep the trigonometric clip path static. The lightweight wrapper owns
-				 * scroll-driven opacity so the shape math is not invalidated per frame.
-				 */
-				position: absolute;
-				inset: 0;
-				z-index: 0;
-				pointer-events: none;
-			}
-
-			&:is(.toc-icon)::after,
-			> .breadcrumb-slice-shape-layer::after {
-				content: '';
-
-				display: block;
-				position: absolute;
-				inset-inline-start: 0;
-				inset-block-start: calc(50% - var(---slice-origin));
-				inline-size: calc(2 * var(---slice-origin));
-				block-size: calc(2 * var(---slice-origin));
-				background: var(--accent, var(--background-tertiary));
-				clip-path: var(---slice-clip-path);
-				pointer-events: none;
-				transform-origin:
-					var(---slice-origin)
-					var(---slice-origin);
-				transform:
-					translateX(var(---slice-scaled-offset))
-					rotate(-0.25turn)
-					translateY(calc(-1 * var(---slice-scaled-offset)));
-				z-index: 0;
-			}
-		}
-
 		.container .page-navigation {
 			---pie-size-rem: var(---wallet-page-navigation-inline-size-rem);
 			---pie-size: calc(var(---pie-size-rem) * 1rem);
@@ -2434,19 +2375,21 @@
 			--sticky-marginBlockStart: calc(var(---pie-size) + 0.5rem);
 		}
 
-		.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
+		.container .page-navigation > .pie-navigation[data-sticky] {
+			/* Face the active slice toward the content lane. */
+			---pie-target-rotate: 0.75turn;
+
 			/* Match Pie's inline-configured view box, including its padding. */
 			---pie-diameter: calc(2 * (var(--pie-maxR) + var(--pie-padding)));
-			---pie-origin-x: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-			---pie-origin-y: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+			---pie-origin: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
 			/*
 			 * Unitless rem/pixel counts preserve Firefox's fallback without
 			 * duplicating the configured pie size.
 			 */
 			---pie-scale: calc(var(---pie-size-rem) / (var(---pie-diameter) / 16));
-			/* FullTop starts at 12 o'clock; the right-hand TOC faces west. */
+			/* FullTop starts at 12 o'clock. */
 			---pie-rotate: calc(
-				0.75turn
+				var(---pie-target-rotate)
 					- var(---initial-slice-mid-angle, 0deg)
 			);
 			--sticky-insetBlockStart: 0px;
@@ -2462,9 +2405,16 @@
 			max-block-size: none;
 			pointer-events: none;
 			border-radius: 0;
-			contain: layout style;
 			--sticky-backgroundColor: var(--background-secondary);
 			--sticky-backdropFilter: blur(1rem);
+
+			&:dir(rtl) {
+				---pie-target-rotate: 0.25turn;
+			}
+
+			@media (max-width: 1024px) {
+				---pie-target-rotate: 0.75turn;
+			}
 
 			.pie-navigation-placement,
 			.pie-navigation-geometry {
@@ -2475,23 +2425,21 @@
 
 			.pie-navigation-placement {
 				margin-inline: auto;
-				contain: layout style;
 			}
 
 			.pie-navigation-geometry {
-				---pie-rotation-direction: 1;
 				margin-inline: 0;
 				contain: strict;
-				rotate: 0deg;
-				transform-origin: center;
 			}
 
 			@supports (
 				((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
-					(animation-composition: accumulate)
+					(animation-composition: accumulate) and
+					(container-type: scroll-state) and
+					(position-anchor: --wallet-name) and
+					(inset-inline-start: anchor(--wallet-name end))
 			) {
-				.pie-navigation-geometry,
-				:global(.navigation-items .pie-navigation-icon) {
+				.pie-navigation-geometry {
 					animation-name: var(---pie-rotation-animation-names);
 					animation-timeline: var(---pie-rotation-animation-timelines);
 					animation-timing-function: var(
@@ -2500,13 +2448,12 @@
 					animation-duration: 1ms;
 					animation-fill-mode: both;
 					animation-composition: accumulate;
-					animation-range: exit-crossing 0% exit-crossing 100%;
+					animation-range: var(---pie-rotation-animation-ranges);
 				}
 			}
 
 			@media (prefers-reduced-motion: reduce) {
-				.pie-navigation-geometry,
-				:global(.navigation-items .pie-navigation-icon) {
+				.pie-navigation-geometry {
 					animation: none;
 				}
 			}
@@ -2519,12 +2466,11 @@
 				contain: strict;
 				translate: -50% -50%;
 				scale: var(---pie-scale);
-				transform: rotate(var(---pie-rotate)) translateZ(0);
+				transform: rotate(var(---pie-rotate));
 				transform-origin: center;
 				clip-path: circle(50%);
 				pointer-events: none;
 				isolation: isolate;
-				transition-property: transform;
 			}
 
 			:global(.navigation-items),
@@ -2560,18 +2506,19 @@
 
 			:global(.navigation-items summary) {
 				display: contents;
-				---backgroundColor: transparent;
 				background: none;
 			}
 
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
+				---slice-mid-angle: calc(
+					var(--slice-midAngle) * 1deg
+					+ var(---pie-start-angle)
+				);
 				---slice-label-size: var(--slice-labelSize);
 				---slice-scale: 1;
 				---slice-label-offset: calc(var(--slice-labelR) * 1px);
-				---slice-clip-origin-x: var(---pie-origin-x);
-				---slice-clip-origin-y: var(---pie-origin-y);
+				---slice-origin: var(---pie-origin);
 
 				display: block;
 				position: absolute;
@@ -2584,7 +2531,7 @@
 				color: var(--text-primary);
 				opacity: 0.62;
 				pointer-events: auto;
-				transform-origin: var(---pie-origin-x) var(---pie-origin-y);
+				transform-origin: var(---pie-origin) var(---pie-origin);
 				transform:
 					rotate(var(---slice-mid-angle))
 					scale(var(---slice-scale))
@@ -2623,18 +2570,15 @@
 			}
 
 			:global(.navigation-items a > .pie-navigation-icon) {
-				---pie-rotation-direction: -1;
 				--icon-size: calc(var(---slice-label-size) * 1px);
 
 				position: absolute;
-				inset: var(---pie-origin-y) auto auto var(---pie-origin-x);
+				inset: var(---pie-origin) auto auto var(---pie-origin);
 				translate: -50% calc(-50% - var(---slice-label-offset));
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
-				filter: var(
-					---linked-icon-filter,
+				filter:
 					contrast(0.5) brightness(3) opacity(0.7)
-						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
-				);
+					drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15));
 				transition-property: filter;
 			}
 
@@ -2664,7 +2608,7 @@
 				--sticky-marginBlockStart: 0px;
 			}
 
-			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
+			.container .page-navigation > .pie-navigation[data-sticky] {
 				---pie-size-rem: var(---wallet-mobile-pie-flow-size-rem);
 				---pie-size: var(---wallet-mobile-pie-flow-size);
 
@@ -2686,6 +2630,72 @@
 				&::before {
 					content: none;
 				}
+
+				@supports (
+					((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+						(container-type: scroll-state) and
+						(position-anchor: --wallet-name) and
+						(inset-inline-start: anchor(--wallet-name end))
+				) {
+					z-index: auto;
+
+					.pie-navigation-placement {
+						z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
+						position: fixed;
+						inset-inline-start: var(---wallet-mobile-pie-flow-inline-start);
+						pointer-events: none;
+						transform-origin: center;
+						animation: WalletMobilePiePlacement linear both;
+						animation-timeline: --wallet-stage-timeline;
+						animation-range: entry 60% entry 100%;
+					}
+
+					@media (prefers-reduced-motion: reduce) {
+						.pie-navigation-placement {
+							inset-block-start: var(---wallet-mobile-pie-target-block-start);
+							inset-inline-start: var(---wallet-mobile-pie-target-inline-start);
+							animation: none;
+							scale: var(---wallet-mobile-pie-scale);
+						}
+					}
+				}
+			}
+
+			.container
+				.page-navigation:has(.page-navigation-panel:popover-open)
+				> .pie-navigation[data-sticky] {
+				.pie-navigation-placement {
+					position: fixed;
+					inset-block-start: var(---wallet-mobile-pie-target-block-start);
+					inset-inline-start: var(---wallet-mobile-pie-target-inline-start);
+					translate: none;
+					scale: var(---wallet-mobile-pie-scale);
+					animation: none;
+				}
+			}
+		}
+
+		@keyframes WalletMobilePiePlacement {
+			from {
+				inset-block-start: calc(
+					anchor(--wallet-mobile-pie-flow top)
+						+ (
+							var(--navigation-mobile-blockSize)
+								- var(---wallet-mobile-pie-size)
+						) / 2
+				);
+				translate: none;
+				scale: 1;
+			}
+
+			to {
+				inset-block-start: var(---wallet-mobile-pie-target-block-start);
+				translate: calc(
+					var(---wallet-mobile-pie-target-inline-start)
+						- var(---wallet-mobile-pie-flow-inline-start)
+				)
+					0;
+				scale: var(---wallet-mobile-pie-scale);
 			}
 		}
 	}
@@ -2713,74 +2723,9 @@
 			transition-property: opacity;
 		}
 
-		&:not(:hover)::before {
+		&:not(:hover, :focus-visible)::before {
 			opacity: 0;
 		}
-	}
-
-	.attribute-group:interest-target > .attribute-group-stack > header,
-	.attribute:interest-target > details > summary > header {
-		--icon-filter: none;
-	}
-
-	/*
-	 * Native interest state lands on the shared in-page target. These static
-	 * target/href pairs let every matching invoker reuse that state without
-	 * runtime style construction; CSS cannot otherwise compare two attribute
-	 * values. Keep this list aligned with the schema's stable anchor ids.
-	 */
-	.container:has(#stages:interest-target) :global(:is(a[href='#stages'], summary:has(> a[href='#stages']))),
-	.container:has(#security:interest-target) :global(:is(a[href='#security'], summary:has(> a[href='#security']))),
-	.container:has(#security-audits-and-bounties:interest-target) :global(:is(a[href='#security-audits-and-bounties'], summary:has(> a[href='#security-audits-and-bounties']))),
-	.container:has(#scam-prevention:interest-target) :global(:is(a[href='#scam-prevention'], summary:has(> a[href='#scam-prevention']))),
-	.container:has(#chain-verification:interest-target) :global(:is(a[href='#chain-verification'], summary:has(> a[href='#chain-verification']))),
-	.container:has(#transaction-legibility:interest-target) :global(:is(a[href='#transaction-legibility'], summary:has(> a[href='#transaction-legibility']))),
-	.container:has(#hardware-wallet-support:interest-target) :global(:is(a[href='#hardware-wallet-support'], summary:has(> a[href='#hardware-wallet-support']))),
-	.container:has(#security-best-practices:interest-target) :global(:is(a[href='#security-best-practices'], summary:has(> a[href='#security-best-practices']))),
-	.container:has(#account-recovery:interest-target) :global(:is(a[href='#account-recovery'], summary:has(> a[href='#account-recovery']))),
-	.container:has(#duress-resistance:interest-target) :global(:is(a[href='#duress-resistance'], summary:has(> a[href='#duress-resistance']))),
-	.container:has(#bug-bounty-program:interest-target) :global(:is(a[href='#bug-bounty-program'], summary:has(> a[href='#bug-bounty-program']))),
-	.container:has(#supply-chain-factory:interest-target) :global(:is(a[href='#supply-chain-factory'], summary:has(> a[href='#supply-chain-factory']))),
-	.container:has(#firmware:interest-target) :global(:is(a[href='#firmware'], summary:has(> a[href='#firmware']))),
-	.container:has(#user-safety:interest-target) :global(:is(a[href='#user-safety'], summary:has(> a[href='#user-safety']))),
-	.container:has(#privacy:interest-target) :global(:is(a[href='#privacy'], summary:has(> a[href='#privacy']))),
-	.container:has(#address-correlation:interest-target) :global(:is(a[href='#address-correlation'], summary:has(> a[href='#address-correlation']))),
-	.container:has(#multi-address-correlation:interest-target) :global(:is(a[href='#multi-address-correlation'], summary:has(> a[href='#multi-address-correlation']))),
-	.container:has(#private-transfers:interest-target) :global(:is(a[href='#private-transfers'], summary:has(> a[href='#private-transfers']))),
-	.container:has(#app-isolation:interest-target) :global(:is(a[href='#app-isolation'], summary:has(> a[href='#app-isolation']))),
-	.container:has(#privacy-hygiene:interest-target) :global(:is(a[href='#privacy-hygiene'], summary:has(> a[href='#privacy-hygiene']))),
-	.container:has(#hardware-privacy:interest-target) :global(:is(a[href='#hardware-privacy'], summary:has(> a[href='#hardware-privacy']))),
-	.container:has(#self-sovereignty:interest-target) :global(:is(a[href='#self-sovereignty'], summary:has(> a[href='#self-sovereignty']))),
-	.container:has(#l1-provider-independence:interest-target) :global(:is(a[href='#l1-provider-independence'], summary:has(> a[href='#l1-provider-independence']))),
-	.container:has(#account-portability:interest-target) :global(:is(a[href='#account-portability'], summary:has(> a[href='#account-portability']))),
-	.container:has(#transaction-inclusion:interest-target) :global(:is(a[href='#transaction-inclusion'], summary:has(> a[href='#transaction-inclusion']))),
-	.container:has(#account-unruggability:interest-target) :global(:is(a[href='#account-unruggability'], summary:has(> a[href='#account-unruggability']))),
-	.container:has(#permissions-management:interest-target) :global(:is(a[href='#permissions-management'], summary:has(> a[href='#permissions-management']))),
-	.container:has(#transparency:interest-target) :global(:is(a[href='#transparency'], summary:has(> a[href='#transparency']))),
-	.container:has(#open-source:interest-target) :global(:is(a[href='#open-source'], summary:has(> a[href='#open-source']))),
-	.container:has(#source-visibility:interest-target) :global(:is(a[href='#source-visibility'], summary:has(> a[href='#source-visibility']))),
-	.container:has(#funding:interest-target) :global(:is(a[href='#funding'], summary:has(> a[href='#funding']))),
-	.container:has(#fee-transparency:interest-target) :global(:is(a[href='#fee-transparency'], summary:has(> a[href='#fee-transparency']))),
-	.container:has(#release-process:interest-target) :global(:is(a[href='#release-process'], summary:has(> a[href='#release-process']))),
-	.container:has(#reputation:interest-target) :global(:is(a[href='#reputation'], summary:has(> a[href='#reputation']))),
-	.container:has(#ecosystem:interest-target) :global(:is(a[href='#ecosystem'], summary:has(> a[href='#ecosystem']))),
-	.container:has(#account-abstraction:interest-target) :global(:is(a[href='#account-abstraction'], summary:has(> a[href='#account-abstraction']))),
-	.container:has(#address-resolution:interest-target) :global(:is(a[href='#address-resolution'], summary:has(> a[href='#address-resolution']))),
-	.container:has(#browser-integration:interest-target) :global(:is(a[href='#browser-integration'], summary:has(> a[href='#browser-integration']))),
-	.container:has(#chain-abstraction:interest-target) :global(:is(a[href='#chain-abstraction'], summary:has(> a[href='#chain-abstraction']))),
-	.container:has(#transaction-batching:interest-target) :global(:is(a[href='#transaction-batching'], summary:has(> a[href='#transaction-batching']))),
-	.container:has(#hardware-wallet-interoperability:interest-target) :global(:is(a[href='#hardware-wallet-interoperability'], summary:has(> a[href='#hardware-wallet-interoperability']))),
-	.container:has(#interoperability:interest-target) :global(:is(a[href='#interoperability'], summary:has(> a[href='#interoperability']))),
-	.container:has(#app-connection-support:interest-target) :global(:is(a[href='#app-connection-support'], summary:has(> a[href='#app-connection-support']))),
-	.container:has(#maintenance:interest-target) :global(:is(a[href='#maintenance'], summary:has(> a[href='#maintenance']))) {
-		---backgroundColor: var(--navItem-hover-backgroundColor);
-		---linked-icon-filter: none;
-		---slice-scale: 1.045;
-		--icon-filter: none;
-
-		color: var(--accent);
-		opacity: 1;
-		text-decoration: none;
 	}
 
 	article {
@@ -2817,37 +2762,6 @@
 					* var(---wallet-line-height)
 				)
 			);
-
-			.wallet-variant-picker-position {
-				display: inline-grid;
-
-				> :is(.wallet-variant-picker-anchor, .wallet-variant-picker-control) {
-					grid-area: 1 / 1;
-				}
-
-				.wallet-variant-picker-anchor {
-					anchor-name: --wallet-variant-picker-position;
-					display: inline-flex;
-					align-items: center;
-					gap: 0.5em;
-					padding: 0.66em;
-					border: 1px solid transparent;
-					font-size: smaller;
-					visibility: hidden;
-
-					> span:first-child,
-					&::after {
-						flex: none;
-						inline-size: 1em;
-						block-size: 1em;
-					}
-
-					&::after {
-						content: '';
-						inline-size: 0.75em;
-					}
-				}
-			}
 		}
 
 		@media (max-width: 1024px) {
@@ -2859,19 +2773,55 @@
 		}
 	}
 
+	.wallet-variant-picker-position {
+		display: inline-grid;
+
+		> :is(.wallet-variant-picker-anchor, .wallet-variant-picker-control) {
+			grid-area: 1 / 1;
+		}
+	}
+
+	.wallet-variant-picker-anchor {
+		anchor-name: --wallet-variant-picker-position;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.66em;
+		border: 1px solid transparent;
+		font-size: smaller;
+		visibility: hidden;
+
+		> span:first-child {
+			flex: none;
+			inline-size: 1em;
+			block-size: 1em;
+		}
+
+		&::after {
+			content: '';
+			flex: none;
+			inline-size: 0.75em;
+			block-size: 1em;
+		}
+	}
+
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		:is(.stage-heading-position, .attribute-group-heading-position, .attribute-heading-position) {
+		.attribute-heading-position {
 			/* One heading box publishes the synchronized breadcrumb and pie tracks. */
 			view-timeline-name:
 				--sticky-breadcrumb-timeline,
-				var(---pie-timeline, none),
-				var(---ratings-start-timeline, none);
+				var(---pie-timeline, none);
 			view-timeline-axis: block;
 			view-timeline-inset: var(--stickyBreadcrumb-item-insetBlockStart, 0px) 0;
 		}
 
-		#stages .stage-heading-position {
-			---ratings-start-timeline: --wallet-ratings-start-timeline;
+		:is(
+			.stage-heading-position,
+			.attribute-group-heading-position
+		)[data-sticky-breadcrumb~='position'] {
+			/* Its sticky header cannot exit-cross the viewport. The non-sticky
+			 * section or group stack owns the shared breadcrumb/pie timeline. */
+			view-timeline-name: none;
 		}
 
 		@keyframes WalletBreadcrumbRevealAnimation {
@@ -2896,21 +2846,67 @@
 				opacity: 1;
 			}
 		}
-	}
 
-	@supports (
-		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
-		(container-type: scroll-state) and
-		(position-anchor: --wallet-name) and
-		(inset-inline-start: anchor(--wallet-name end))
-	) {
-		:is(
-			#stages > header,
-			.attribute-group > .attribute-group-stack > header,
-			.attribute > details > summary > header
+		@supports (
+			(container-type: scroll-state) and
+			(position-anchor: --wallet-name) and
+			(inset-inline-start: anchor(--wallet-name end))
 		) {
-			anchor-scope: --sticky-breadcrumb-position;
+		.attribute > details > summary > header {
+			anchor-scope:
+				--sticky-breadcrumb-position,
+				var(---wallet-icon-anchor),
+				var(---wallet-companion-anchor);
 			timeline-scope: --sticky-breadcrumb-timeline;
+		}
+
+		#stages > header {
+			anchor-scope: --sticky-breadcrumb-position;
+		}
+
+		.attribute-group > .attribute-group-stack > header {
+			anchor-scope:
+				--sticky-breadcrumb-position,
+				var(---wallet-icon-anchor);
+		}
+
+		.attribute-group-stack {
+			timeline-scope: --sticky-breadcrumb-timeline;
+			view-timeline-name:
+				--sticky-breadcrumb-timeline,
+				var(---pie-timeline, none);
+			view-timeline-axis: block;
+		}
+
+		:is(#stages, .attribute-group-stack) {
+			view-timeline-inset:
+				calc(
+					var(--stickyBreadcrumb-item-insetBlockStart, 0px)
+						+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+				)
+					0;
+
+			@media (min-width: 1025px) {
+				view-timeline-inset:
+					calc(
+						var(---wallet-icon-sticky-block-start)
+							+ var(---wallet-breadcrumb-block-size)
+							+ var(---wallet-breadcrumb-surface-fade)
+					)
+					0;
+			}
+		}
+
+		#stages {
+			timeline-scope:
+				--sticky-breadcrumb-timeline,
+				--sticky-breadcrumb-scope-timeline;
+		}
+
+		#stages > [data-scroll-item] {
+			view-timeline-name: --sticky-breadcrumb-scope-timeline;
+			view-timeline-axis: block;
+			view-timeline-inset: var(--stickyBreadcrumb-trackBlockEnd, 0px) 0;
 		}
 
 		.container {
@@ -2932,13 +2928,10 @@
 				---wallet-group-header-padding-block: 1rem;
 				---wallet-group-icon-size: 4.125em;
 				---wallet-group-heading-font-size: 1.8rem;
-				---wallet-group-heading-direction: column;
-				---wallet-group-heading-align: stretch;
 				---wallet-group-caption-white-space: normal;
 			}
 
 			.attribute-group-stack {
-				/* Fixed/anchored crumbs replace the baseline sticky group row. */
 				---wallet-group-sticky-block-end-override: var(---wallet-sticky-stack-block-end);
 			}
 
@@ -2954,10 +2947,8 @@
 					> header[data-scroll-item][data-sticky]
 			) {
 				z-index: var(---wallet-breadcrumb-layer-group);
-				position: relative;
-				inset: auto;
+				overflow: visible;
 				max-block-size: none;
-				container-type: normal;
 
 				&::before {
 					content: none;
@@ -2995,6 +2986,18 @@
 			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-attribute;
 			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
 			--stickyBreadcrumb-iconAnchor: --wallet-breadcrumb-attribute-icon;
+			---wallet-breadcrumb-arrival-offset: var(
+				---wallet-breadcrumb-attribute-arrival-offset
+			);
+			---wallet-breadcrumb-animation-range: var(
+				---wallet-pie-attribute-animation-range
+			);
+			--stickyBreadcrumb-animationRange: var(
+				---wallet-breadcrumb-animation-range
+			);
+			scroll-margin-block-start: var(
+				---wallet-breadcrumb-attribute-arrival-offset
+			);
 		}
 
 		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
@@ -3101,7 +3104,6 @@
 					white var(---wallet-breadcrumb-surface-fade)
 				);
 				opacity: 0;
-				will-change: opacity;
 				animation: WalletBreadcrumbRevealAnimation linear both;
 				animation-timeline: --wallet-ratings-start-timeline;
 				animation-range:
@@ -3122,23 +3124,33 @@
 				anchor-name: none;
 				z-index: var(---wallet-breadcrumb-layer-root);
 				position: fixed;
+				inset-block-start: var(---wallet-icon-sticky-block-start);
+				inset-inline-start: calc(
+					var(--sticky-insetInlineStart)
+						+ var(---wallet-content-inline-start)
+				);
 				margin-inline-start: 0;
 				font-size: var(---wallet-name-flow-font-size);
 
-				animation: WalletNameAnimation var(--transition-easeOutExpo) both;
+				animation: WalletNameAnimation linear both;
 				animation-timeline: --wallet-page-scroll-timeline;
 				animation-range: var(---wallet-header-animation-range);
 
 				h1 {
 					anchor-name: --wallet-breadcrumb-root;
 					font-size: inherit;
+					transform-origin: left center;
+					animation: WalletRootContentAnimation linear both;
+					animation-timeline: --wallet-page-scroll-timeline;
+					animation-range: var(---wallet-header-animation-range);
 				}
 			}
 
 			.wallet-icon {
 				anchor-name: --wallet-breadcrumb-wallet-icon;
 				flex: none;
-				animation: WalletIconAnimation var(--transition-easeOutExpo) both;
+				transform-origin: center;
+				animation: WalletIconAnimation linear both;
 				animation-timeline: --wallet-page-scroll-timeline;
 				animation-range: var(---wallet-header-animation-range);
 			}
@@ -3162,14 +3174,9 @@
 			.attribute-group-heading-position
 		)[data-sticky-breadcrumb~='position'] {
 			--stickyBreadcrumb-position-minBlockSize: 2.875rem;
-			--stickyBreadcrumb-position-insetInlineStart: 0px;
 			---wallet-breadcrumb-heading-scale: calc(
 				var(---wallet-breadcrumb-group-font-size)
 					/ var(---wallet-group-heading-font-size)
-			);
-			---wallet-breadcrumb-heading-translate: calc(
-				var(---wallet-breadcrumb-heading-icon-size)
-					+ var(---wallet-breadcrumb-heading-icon-gap)
 			);
 
 			> [data-sticky-breadcrumb~='item'] {
@@ -3180,10 +3187,6 @@
 					font-size: var(---wallet-group-heading-font-size);
 				}
 			}
-		}
-
-		.stage-heading-position[data-sticky-breadcrumb~='position'] {
-			---wallet-breadcrumb-heading-translate: 0px;
 		}
 
 		.attribute-group-stack > header .section-caption {
@@ -3201,12 +3204,12 @@
 			 * while they animate (`translate`, fixed containing block).
 			 */
 			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
-			--stickyBreadcrumb-position-insetInlineStart: 0px;
 			--stickyBreadcrumb-item-insetInlineEnd: calc(
 				var(---wallet-content-inline-start)
 					+ var(---wallet-breadcrumb-surface-inline-end-clearance)
 					+ var(---wallet-breadcrumb-companion-inline-end-clearance)
 					+ var(---wallet-breadcrumb-companion-slot-inline-size)
+					+ var(---wallet-breadcrumb-heading-translate)
 					+ 0.5rem
 			);
 			--stickyBreadcrumb-item-inlineSize: auto;
@@ -3225,24 +3228,25 @@
 				var(---wallet-breadcrumb-attribute-font-size)
 					/ var(---wallet-attribute-heading-font-size)
 			);
-			---wallet-breadcrumb-heading-translate: calc(
-				var(---wallet-breadcrumb-heading-icon-size)
-					+ var(---wallet-breadcrumb-heading-icon-gap)
-			);
-
+			/* The view timeline ends where the anchored attribute crumb lands.
+			 * Compact layouts use the row below the group crumb; desktop's
+			 * constrained lane reserves one additional group-height row. */
 			@media (max-width: 1024px) {
-				--stickyBreadcrumb-item-blockOffset: 0px;
+				view-timeline-inset:
+					calc(
+						var(---wallet-icon-sticky-block-start)
+							+ var(---wallet-breadcrumb-block-size)
+					)
+					0;
 			}
 
-			@media (min-width: 1025px) and (max-width: 1399px) {
-				--stickyBreadcrumb-item-blockOffset: var(
-					---wallet-breadcrumb-attribute-row-offset
-				);
-				--stickyBreadcrumb-item-insetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-						+ var(---wallet-content-inline-start)
-						- var(---wallet-breadcrumb-gap)
-				);
+			@media (min-width: 1025px) {
+				view-timeline-inset:
+					calc(
+						var(---wallet-icon-sticky-block-start)
+							+ 2 * var(---wallet-breadcrumb-block-size)
+					)
+					0;
 			}
 
 			@media (max-width: 480px) {
@@ -3263,27 +3267,13 @@
 					---wallet-content-inline-start
 				);
 				--stickyBreadcrumb-item-positionTryFallbacks: none;
-				/*
-				 * The attribute handoff begins below the shared mobile header stack,
-				 * but its settled anchor remains the preceding group crumb. Native
-				 * position-try moves only genuinely overflowing trails to another row.
-				 */
-				view-timeline-inset:
-					calc(
-						var(---wallet-icon-sticky-block-start)
-							+ var(---wallet-breadcrumb-block-size)
-					)
-					0;
 			}
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-attribute);
 				container-type: anchored;
-				/*
-				 * Let position-try detect a trail too narrow to remain legible.
-				 * The constrained-row fallback resets this to zero after wrapping.
-				 */
-				min-inline-size: max-content;
+				/* Respect the end reservation owned by the companion lane. */
+				min-inline-size: 0;
 				max-inline-size: none;
 			}
 		}
@@ -3355,44 +3345,44 @@
 
 		.attribute > details {
 			.attribute-summary-companions-position {
-				inline-size: auto;
-				min-inline-size: 0;
-				max-inline-size: 100%;
+				anchor-name: var(---wallet-companion-anchor);
+				inline-size: min(
+					100%,
+					var(---wallet-breadcrumb-companion-slot-inline-size)
+				);
+				min-inline-size: min-content;
+				max-inline-size: var(---wallet-breadcrumb-companion-slot-inline-size);
 				min-block-size: 1.85rem;
-				flex: none;
-				white-space: nowrap;
-
-				/* Keep the source-sized flex slot while its child is anchored to the
-				 * sticky lane. The trailing pad follows the preceding named anchor,
-				 * avoiding a cyclic parent-from-descendant size query. */
-				&::after {
-					content: '';
-					display: block;
-					position: relative;
-					position-anchor: --sticky-breadcrumb-extra-position;
-					inline-size: anchor-size(
-						--sticky-breadcrumb-extra-position inline
-					);
-					block-size: anchor-size(
-						--sticky-breadcrumb-extra-position block
-					);
-				}
+				flex: 0 1 var(---wallet-breadcrumb-companion-slot-inline-size);
+				margin-inline-start: auto;
 
 				> .attribute-summary-companions {
-					anchor-name: --sticky-breadcrumb-extra-position;
 					z-index: var(---wallet-breadcrumb-layer-attribute);
-					min-inline-size: max-content;
-					max-inline-size: 100%;
-					flex-wrap: nowrap;
-					white-space: nowrap;
+					inline-size: anchor-size(
+						var(---wallet-companion-anchor) width
+					);
+					max-inline-size: none;
+					justify-content: end;
+					white-space: normal;
 					position-visibility: always;
 				}
 			}
 
 			&[open] .attribute-summary-companions {
+				position: fixed;
+				position-anchor: var(---wallet-companion-anchor);
+				inset-block-start: calc(
+					anchor(var(---wallet-companion-anchor) top)
+					+ anchor-size(var(---wallet-companion-anchor) height) / 2
+				);
+				inset-inline-start: anchor(
+					var(---wallet-companion-anchor) start
+				);
+				inset-inline-end: auto;
+				translate: 0 -50%;
 				animation:
-					AttributeBreadcrumbCompanionsAnimation var(--stickyBreadcrumb-animationTimingFunction) forwards,
-					AttributeBreadcrumbCompanionsOutAnimation linear forwards;
+					AttributeBreadcrumbCompanionsAnimation var(--stickyBreadcrumb-animationTimingFunction) both,
+					AttributeBreadcrumbCompanionsOutAnimation linear both;
 				animation-timeline:
 					--sticky-breadcrumb-timeline,
 					--sticky-breadcrumb-scope-timeline;
@@ -3415,8 +3405,7 @@
 				.attribute-heading-position > [data-sticky-breadcrumb~='item']::before,
 				.attribute-heading-position h3,
 				.attribute-summary-companions,
-				.attribute-icon > .breadcrumb-icon,
-				.attribute-icon > .breadcrumb-slice-shape-layer {
+				.attribute-icon > .breadcrumb-icon {
 					animation: none;
 				}
 
@@ -3424,45 +3413,21 @@
 		}
 
 		@keyframes AttributeBreadcrumbCompanionsAnimation {
-			from,
-			49.999% {
-				position: static;
-				position-anchor: auto;
-				inset: auto;
-				max-inline-size: 100%;
-				translate: none;
-			}
-			from {
-				opacity: 1;
-			}
-			49.999%,
-			95% {
-				opacity: 0;
-			}
-			50%,
 			to {
-				position: fixed;
-				position-anchor: auto;
 				inset-block-start: var(---wallet-breadcrumb-companion-block-start);
-				inset-inline:
-					auto
-					calc(
-						anchor(--wallet-breadcrumb-surface end)
-							+ var(---wallet-content-inline-start)
-							+ var(---wallet-breadcrumb-companion-inline-end-clearance)
-					);
-				max-inline-size: var(---wallet-breadcrumb-companion-slot-inline-size);
+				inset-inline-start: auto;
+				inset-inline-end: calc(
+					anchor(--wallet-breadcrumb-surface end)
+					+ var(---wallet-content-inline-start)
+					+ var(---wallet-breadcrumb-companion-inline-end-clearance)
+				);
 				translate: 0 -50%;
-			}
-			to {
-				opacity: 1;
 			}
 		}
 
 		@keyframes AttributeBreadcrumbCompanionsOutAnimation {
 			from {
 				visibility: visible;
-				position: fixed;
 				translate: 0 0;
 			}
 			to {
@@ -3472,15 +3437,7 @@
 		}
 
 		:is(.attribute-group-icon, .attribute-icon) {
-			contain: style;
 			transform-origin: top left;
-
-			> .breadcrumb-slice-shape-layer {
-				animation: BreadcrumbFadeOutAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range);
-			}
 
 			> .breadcrumb-icon {
 				position-visibility: always;
@@ -3499,79 +3456,63 @@
 			}
 		}
 
+		.container .attribute-group-icon > .breadcrumb-icon,
+		.container .attribute > details[open] .attribute-icon > .breadcrumb-icon {
+			position: fixed;
+			position-anchor: var(---wallet-icon-anchor);
+			inset-block-start: anchor(var(---wallet-icon-anchor) top);
+			inset-inline-start: anchor(var(---wallet-icon-anchor) start);
+		}
+
 		.attribute-group-icon {
 			z-index: var(---wallet-breadcrumb-layer-group);
 			---wallet-breadcrumb-icon-block-start: calc(
-				anchor(--sticky-breadcrumb-scope top)
-				+ (
-					var(---wallet-breadcrumb-block-size)
-						- var(---wallet-breadcrumb-group-font-size)
-				)
-				/ 2
+				var(--stickyBreadcrumb-item-insetBlockStart)
+					+ (
+						var(---wallet-breadcrumb-block-size)
+							- var(---wallet-breadcrumb-heading-icon-size)
+					) / 2
 			);
 			---wallet-breadcrumb-icon-inline-start: anchor(
 				--wallet-breadcrumb-group start
 			);
-			---wallet-breadcrumb-icon-translate: 0 -50%;
-			---wallet-breadcrumb-icon-transform-origin: left center;
 		}
 
 		.attribute-icon {
 			z-index: var(---wallet-breadcrumb-layer-attribute);
 			---wallet-breadcrumb-icon-block-start: calc(
-				anchor(--wallet-breadcrumb-attribute-icon center)
-					- var(---wallet-breadcrumb-heading-icon-size) / 2
+				var(--stickyBreadcrumb-item-insetBlockStart)
+					+ (
+						var(---wallet-breadcrumb-block-size)
+							- var(---wallet-breadcrumb-heading-icon-size)
+					) / 2
 			);
 			---wallet-breadcrumb-icon-inline-start: anchor(
 				--wallet-breadcrumb-attribute-icon start
 			);
+
+			@media (max-width: 480px), (min-width: 1025px) and (max-width: 1399px) {
+				---wallet-breadcrumb-icon-block-start: calc(
+					var(--stickyBreadcrumb-item-insetBlockStart)
+						+ var(---wallet-breadcrumb-attribute-row-offset)
+						+ (
+							var(---wallet-breadcrumb-block-size)
+								- var(---wallet-breadcrumb-heading-icon-size)
+						) / 2
+				);
+			}
 		}
 
 		@keyframes BreadcrumbSliceIconAnimation {
-			from,
-			49.999% {
-				position: absolute;
-				inset:
-					50% auto auto
-					calc(
-						100%
-							* (var(---slice-outer-r) - var(--slice-labelR))
-							/ (var(---slice-outer-r) - var(---slice-inner-r))
-					);
-				translate: -50% -50%;
-				scale: 1;
-			}
-			from {
-				opacity: 1;
-			}
-			49.999%,
-			95% {
-				opacity: 0;
-			}
-			50%,
 			to {
-				position: fixed;
+				position-anchor: auto;
 				inset-block-start: var(---wallet-breadcrumb-icon-block-start);
 				inset-inline-start: var(---wallet-breadcrumb-icon-inline-start);
-				transform-origin: var(
-					---wallet-breadcrumb-icon-transform-origin
-				);
-				filter: none;
-				translate: var(---wallet-breadcrumb-icon-translate);
+				translate: none;
 				scale: calc(
 					var(---wallet-breadcrumb-heading-icon-size)
 						/ 1em
 				);
-			}
-			to {
-				opacity: 1;
-			}
-		}
-
-		@keyframes BreadcrumbFadeOutAnimation {
-			50%,
-			to {
-				opacity: 0;
 			}
 		}
 
@@ -3599,35 +3540,47 @@
 
 		@keyframes WalletNameAnimation {
 			from {
-				inset-block-start: anchor(--wallet-title-flow-position top);
-				inset-inline-start: anchor(--wallet-title-flow-position start);
-				font-size: var(---wallet-name-flow-font-size);
-			}
-			to {
-				inset-block-start: var(---wallet-icon-sticky-block-start);
-				inset-inline-start: calc(
-					var(--sticky-insetInlineStart)
-						+ var(---wallet-content-inline-start)
+				translate: 0 calc(
+					var(---wallet-name-flow-block-start)
+						- var(---wallet-icon-sticky-block-start)
 				);
-				font-size: var(---wallet-breadcrumb-root-font-size);
+			}
+			to { translate: none; }
+		}
+
+		@keyframes WalletRootContentAnimation {
+			to {
+				scale: var(---wallet-name-scale);
+			}
+		}
+
+		@keyframes WalletIconAnimation {
+			to {
+				filter: none;
+				scale: calc(
+					var(---wallet-name-sticky-icon-size)
+						/ (
+							var(---wallet-name-flow-icon-size)
+								* var(---wallet-name-scale)
+						)
+				);
 			}
 		}
 
 		@keyframes WalletNameMobileAnimation {
 			from {
-				position: fixed;
-				inset-block-start: anchor(--wallet-title-flow-position top);
-				inset-inline-start: anchor(--wallet-title-flow-position start);
-				min-inline-size: max-content;
-				translate: none;
+				translate:
+					calc(
+						var(--sticky-insetInlineStart)
+							+ var(---wallet-content-inline-start)
+							- var(---wallet-name-target-inline-start)
+					)
+					calc(
+						var(---wallet-name-flow-block-start)
+							- var(---wallet-name-mobile-block-start)
+					);
 			}
-			to {
-				position: fixed;
-				inset-block-start: var(---wallet-name-mobile-block-start);
-				inset-inline-start: var(---wallet-name-target-inline-start);
-				min-inline-size: 0;
-				translate: none;
-			}
+			to { translate: none; }
 		}
 
 		@keyframes WalletRootContentMobileAnimation {
@@ -3641,14 +3594,44 @@
 			}
 		}
 
-		@keyframes WalletIconAnimation {
+		@keyframes WalletRootContentWithoutSiteLogoMobileAnimation {
 			from {
-				inline-size: var(---wallet-name-flow-icon-size);
-				block-size: var(---wallet-name-flow-icon-size);
+				translate: calc(
+					var(---wallet-name-target-inline-start) - 50vi
+				)
+					0;
+				scale: 1;
 			}
+
 			to {
-				inline-size: var(---wallet-name-sticky-icon-size);
-				block-size: var(---wallet-name-sticky-icon-size);
+				translate: -50% 0;
+				scale: var(---wallet-name-scale);
+			}
+		}
+
+		@keyframes WalletNameTextMobileAnimation {
+			to { translate: calc(var(---wallet-name-icon-excess) / 2) 0; }
+		}
+
+		@keyframes LayoutLogoWalletBreadcrumbAnimation {
+			from {
+				translate: var(---wallet-site-logo-center-offset) 0;
+			}
+
+			to {
+				translate: 0 0;
+			}
+		}
+
+		@keyframes LayoutLogoWalletBreadcrumbOutAnimation {
+			from {
+				translate: var(---wallet-site-logo-center-offset) 0;
+			}
+
+			to {
+				translate:
+					var(---wallet-site-logo-center-offset)
+					calc(-1rem - var(--navigation-logo-blockSize));
 			}
 		}
 
@@ -3660,25 +3643,53 @@
 				);
 			}
 
-			.attribute {
-				---wallet-breadcrumb-arrival-offset: calc(
-					var(---wallet-breadcrumb-attribute-row-offset)
-						+ var(---wallet-sticky-content-inset)
-				);
-				---wallet-breadcrumb-animation-range:
-					exit-crossing calc(1px - var(---wallet-breadcrumb-arrival-offset) - 25%)
-					exit-crossing calc(1px - var(---wallet-breadcrumb-arrival-offset));
-				--stickyBreadcrumb-animationRange: var(
-					---wallet-breadcrumb-animation-range
-				);
-			}
-
 			.container {
+				/* Scroll padding already includes this wrapped attribute row. */
 				---wallet-breadcrumb-companion-block-start: calc(
 					var(---wallet-icon-sticky-block-start)
 						+ var(---wallet-breadcrumb-attribute-row-offset)
 						+ var(---wallet-breadcrumb-block-size) / 2
 				);
+			}
+
+			.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+				--stickyBreadcrumb-item-blockOffset: var(
+					---wallet-breadcrumb-attribute-row-offset
+				);
+				--stickyBreadcrumb-item-inlineSize: anchor-size(
+					--sticky-breadcrumb-position width
+				);
+				--stickyBreadcrumb-item-insetInlineStart: calc(
+					anchor(--wallet-breadcrumb-surface start)
+						+ var(---wallet-content-inline-start)
+						- var(---wallet-breadcrumb-gap)
+				);
+			}
+
+			.page-navigation .pie-navigation-geometry {
+				/* The pie has no layout stake in the constrained breadcrumb's second
+				 * row, so advance both rotation ranges without moving hash targets. */
+				---wallet-breadcrumb-animation-range:
+					exit-crossing calc(
+						1px
+							- var(---wallet-breadcrumb-attribute-row-offset)
+							- var(---wallet-breadcrumb-block-size)
+					)
+					exit-crossing calc(
+						1px - var(---wallet-breadcrumb-attribute-row-offset)
+					);
+				---wallet-pie-attribute-animation-range: var(
+					---wallet-breadcrumb-animation-range
+				);
+			}
+
+		}
+
+		@media (max-width: 480px), (min-width: 1025px) and (max-width: 1399px) {
+			.attribute > details .attribute-summary-companions-position {
+				flex: 0 0 100%;
+				inline-size: 100%;
+				max-inline-size: 100%;
 			}
 
 			.attribute-heading-position[data-sticky-breadcrumb~='position']
@@ -3697,14 +3708,144 @@
 				);
 			}
 			article > header#top .wallet-name[data-sticky-breadcrumb] {
+				anchor-name: --wallet-name-collision;
+				container-type: anchored;
+				inset-block-start: var(---wallet-name-mobile-block-start);
+				inset-inline-start: var(---wallet-name-target-inline-start);
+				inline-size: max-content;
+				min-inline-size: 0;
+				position-try-fallbacks: --wallet-root-without-site-logo;
 				animation-name: WalletNameMobileAnimation;
 				animation-timing-function: linear;
 				animation-range: var(---wallet-header-animation-range);
 
+				@supports (inline-size: calc-size(max-content, size * 1)) {
+					inline-size: calc-size(
+						max-content,
+						size * var(---wallet-name-scale) / 2
+							+ var(---wallet-name-trailing-reserve)
+					);
+				}
+
+				h1 {
+					position: relative;
+					inline-size: max-content;
+					max-inline-size: none;
+					padding-inline-start: 0;
+					transform-origin: center;
+					animation: WalletRootContentMobileAnimation linear both;
+
+					&::before {
+						content: '›';
+						position: absolute;
+						inset-block: 0;
+						inset-inline-end: 100%;
+						display: grid;
+						place-items: center;
+						inline-size: var(---wallet-breadcrumb-gap);
+						font-size: 1em;
+						line-height: 1;
+						text-box: trim-both cap alphabetic;
+						pointer-events: none;
+						opacity: 0;
+						animation: WalletBreadcrumbRevealAnimation linear both;
+						animation-timeline: --wallet-page-scroll-timeline;
+						animation-range: var(---wallet-header-animation-range);
+					}
+
+					> * {
+						flex: none;
+					}
+
+					> span {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						animation: WalletNameTextMobileAnimation linear both;
+					}
+				}
+
+				h1,
 				h1 > span {
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
+					animation-timeline: --wallet-page-scroll-timeline;
+					animation-range: var(---wallet-header-animation-range);
+				}
+			}
+
+			:global(#layout:has(#wallet-page) > #nav) {
+				> :global(header) {
+					z-index: calc(var(---wallet-breadcrumb-layer-detail) + 2);
+				}
+
+				&:not(:popover-open) {
+					z-index: calc(var(---wallet-breadcrumb-layer-detail) + 2);
+					--sticky-backgroundColor: transparent;
+					background-color: transparent;
+					backdrop-filter: none;
+
+					> :global(header) {
+						--sticky-backgroundColor: transparent;
+						background-color: transparent;
+						backdrop-filter: none;
+					}
+				}
+			}
+
+			:global(#layout:has(#wallet-page) > .logo-position-area) {
+				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 3);
+
+				> :global(.logo) {
+					---wallet-site-logo-inline-size: calc(
+						2 * anchor-size(--wallet-name-collision inline)
+							- 2 * var(---wallet-name-trailing-reserve)
+							+ var(---wallet-breadcrumb-gap)
+							+ var(--navigation-logo-inlineSize)
+					);
+					---wallet-site-logo-center-offset: calc(
+						(100cqi - var(--navigation-logo-inlineSize)) / 2
+					);
+
+					position: fixed;
+					inset-block-start: 1rem;
+					inset-inline-start: 50vi;
+					inline-size: max(
+						var(--navigation-logo-inlineSize),
+						var(---wallet-site-logo-inline-size)
+					);
+					translate: -50% 0;
+					container-type: inline-size;
+					pointer-events: none;
+
+					> :global(img) {
+						pointer-events: auto;
+						animation: LayoutLogoWalletBreadcrumbAnimation linear both;
+						animation-timeline: --wallet-page-scroll-timeline;
+						animation-range: var(---wallet-header-animation-range);
+					}
+				}
+			}
+
+			/* The invisible logo box turns the anchored wallet-name width into a
+			 * local size query. Beyond half the viewport plus the logo's half-row
+			 * allowance, the child uses the vertical-only long-name route. */
+			@container (inline-size > calc(50vi + 4rem)) {
+				:global(
+					#layout:has(#wallet-page)
+						> .logo-position-area
+						> .logo
+						> img
+				) {
+					animation-name: LayoutLogoWalletBreadcrumbOutAnimation;
+				}
+			}
+
+			@container anchored(fallback: --wallet-root-without-site-logo) {
+				article > header#top .wallet-name[data-sticky-breadcrumb] h1 {
+					animation-name: WalletRootContentWithoutSiteLogoMobileAnimation;
+
+					&::before {
+						content: none;
+					}
 				}
 			}
 
@@ -3757,6 +3898,7 @@
 					}
 
 					&::before {
+						content: '#';
 						animation: none;
 						opacity: 0;
 					}
@@ -3776,7 +3918,7 @@
 		}
 
 		@media (prefers-reduced-motion: reduce) {
-			article > header#top .wallet-name[data-sticky-breadcrumb] {
+			.wallet-name[data-sticky-breadcrumb] {
 				position: static;
 			}
 
@@ -3789,17 +3931,40 @@
 				translate: none;
 			}
 
-			article > header#top :is(.wallet-name, .wallet-icon),
+			.container .wallet-name[data-sticky-breadcrumb],
+			.container .wallet-name[data-sticky-breadcrumb] h1,
+			.container .wallet-icon,
 			article > header#top::after,
 			[data-sticky-breadcrumb~='item']::before,
-			.attribute-group-heading-position h2,
 			.section-caption,
 			.attribute-heading-position h3,
 			.attribute-summary-companions,
-			.breadcrumb-icon,
-			.breadcrumb-slice-shape-layer {
+			.breadcrumb-icon {
 				animation: none;
 			}
+
+			:is(
+				.stage-heading-position,
+				.attribute-group-heading-position,
+				.attribute-heading-position
+			)[data-sticky-breadcrumb~='position']
+				> [data-sticky-breadcrumb~='item']
+				> :is(h2, h3),
+			:is(
+				#stages > header,
+				.attribute-group > .attribute-group-stack > header
+			)[data-sticky]::before {
+				animation: none;
+			}
+
+			article > header#top::after,
+			:is(
+				#stages > header,
+				.attribute-group > .attribute-group-stack > header
+			)[data-sticky]::before {
+				opacity: 1;
+			}
+		}
 		}
 	}
 
@@ -3810,6 +3975,8 @@
 	#stages {
 		view-timeline-name:
 			--wallet-stage-timeline,
+			--wallet-ratings-start-timeline,
+			--sticky-breadcrumb-timeline,
 			--sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
 
@@ -3822,29 +3989,36 @@
 		#stages > header,
 		.attribute-group > .attribute-group-stack > header
 	)[data-sticky]::before {
-		inset-block: -0.5rem;
+		inset-block: calc(-1 * var(---wallet-breadcrumb-surface-fade));
 		inset-inline: 0;
-		-webkit-mask-image: linear-gradient(to top, transparent, white 0.5rem);
-		mask-image: linear-gradient(to top, transparent, white 0.5rem);
+		-webkit-mask-image: linear-gradient(
+			to top,
+			transparent,
+			white var(---wallet-breadcrumb-surface-fade)
+		);
+		mask-image: linear-gradient(
+			to top,
+			transparent,
+			white var(---wallet-breadcrumb-surface-fade)
+		);
 	}
 
 	:is(
 		.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-scroll-item],
 		.attribute > details > summary > header
 	) {
-		--icon-filter: brightness(0) opacity(0.35);
 		min-inline-size: 0;
+	}
 
-		&:has(a:is(:hover, :focus-visible, :interest-source)) {
-			--icon-filter: none;
-		}
+	.attribute > details > summary > header {
+		align-items: start;
 	}
 
 	.page-navigation :global(.toc-icon)::before,
 	:is(.attribute-group-icon, .attribute-icon) > .breadcrumb-icon {
 		line-height: 1;
-		filter: var(--icon-filter);
-		transition-property: filter;
+		filter: none;
+		transition-property: color;
 	}
 
 	:is(.attribute-group-icon, .attribute-icon) {
@@ -3852,8 +4026,10 @@
 		flex: none;
 	}
 
-	.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source),
-	.attribute > details > summary > header a:is(:hover, :focus-visible, :interest-source) {
+	:is(
+		.attribute-group-summary-layout,
+		.attribute > details > summary > header
+	) a:is(:hover, :focus-visible, :interest-source) {
 		color: var(--accent);
 		text-decoration: none;
 	}
@@ -3866,12 +4042,12 @@
 
 	.attribute-group {
 		> .attribute-group-stack[data-scroll-item] {
-			--icon-size: var(---wallet-group-icon-size);
+			--icon-size: var(---wallet-breadcrumb-heading-icon-size);
 			---wallet-group-sticky-block-end: var(
 				---wallet-group-sticky-block-end-override,
 				calc(
 					var(---wallet-page-block-offset)
-					+ var(---wallet-group-slice-block-size)
+					+ var(---wallet-group-icon-size)
 				)
 			);
 		}
@@ -3882,8 +4058,6 @@
 			> .attribute-group-summary-layout {
 				> .attribute-group-heading {
 					flex: 1 1 16rem;
-					flex-direction: var(---wallet-group-heading-direction);
-					align-items: var(---wallet-group-heading-align);
 					column-gap: 0.5rem;
 					row-gap: 0.25rem;
 				}
@@ -3911,49 +4085,19 @@
 	.attribute {
 		> details {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-			contain: style;
-
-			> summary {
-				> header {
-					.attribute-icon {
-						--icon-size: 3.3em;
-					}
-
-					> .attribute-summary-layout {
-						> .attribute-heading {
-							.attribute-stage-badge {
-								white-space: nowrap;
-							}
-
-							 h3 {
-								font-size: var(---wallet-attribute-heading-font-size);
-								font-weight: 600;
-								overflow: hidden;
-								text-overflow: ellipsis;
-								white-space: nowrap;
-							}
-						}
-
-						> :not(.attribute-heading) {
-							flex: none;
-						}
-					}
-				}
-			}
 
 			:is(.attribute-rating-details, .variant-caption, .impact) {
 				color: var(--text-secondary);
 			}
 
 			.attribute-rating-details {
+				background-color: color-mix(in srgb, var(--accent) 5%, var(--background-secondary));
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+				font-weight: 500;
+
 				&:is(ul) {
 					--list-markerGap: 1em;
 				}
-
-				background-color: color-mix(in srgb, var(--accent) 5%, var(--background-secondary));
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-				font-weight: 500;
 
 				&[data-rating='exempt'] {
 					opacity: 0.7;
@@ -3968,6 +4112,22 @@
 		}
 	}
 
+	.attribute-icon {
+		--icon-size: var(---wallet-breadcrumb-heading-icon-size);
+	}
+
+	.attribute-stage-badge {
+		white-space: nowrap;
+	}
+
+	.attribute-heading h3 {
+		font-size: var(---wallet-attribute-heading-font-size);
+		font-weight: 600;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
 	.attribute-rating-methodology {
 		h5 {
 			font-size: 1rem;
@@ -3979,12 +4139,11 @@
 		details {
 			/*
 			 * Accordion sticky containers nest at sticky-level 4 under
-			 * #layout → #content → main → #wallet-page. The baseline group
-			 * heading is a real sticky row, so derive the next inset from its
-			 * mathematically exact slice bounding box.
+			 * #layout → #content → main → #wallet-page. Meet the complete
+			 * breadcrumb stack rather than the group lane alone.
 			 */
 			--sticky-marginBlockStart: calc(
-				var(---wallet-group-sticky-block-end)
+				var(---wallet-sticky-stack-block-end)
 				- var(--sticky3-insetBlockStart, 0px)
 			);
 
@@ -4065,6 +4224,10 @@
 			--scrollContainer-scrollPaddingBlockStart: var(---wallet-page-block-offset);
 		}
 
+		.attribute {
+			scroll-margin-block-start: var(---wallet-fallback-group-sticky-block-size);
+		}
+
 		:is(
 			#stages > header[data-sticky],
 			.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-sticky]
@@ -4092,7 +4255,13 @@
 			}
 		}
 
-		[data-sticky-breadcrumb~='position'] > [data-sticky-breadcrumb~='item'] {
+		:is(
+			[data-sticky-breadcrumb~='position'] > [data-sticky-breadcrumb~='item'],
+			.attribute-accordions
+				details
+				> summary
+				> h4[data-sticky-breadcrumb~='item']
+		) {
 			position: relative;
 			display: flex;
 			align-items: center;
@@ -4119,26 +4288,11 @@
 
 		}
 
-		:is(.attribute-group-icon, .attribute-icon) {
-			--icon-filter: none;
-
-			inline-size: var(---wallet-breadcrumb-heading-icon-size);
-			block-size: var(---wallet-breadcrumb-heading-icon-size);
-
-			> .breadcrumb-icon {
-				inset: 50% auto auto 50%;
-				inline-size: var(---wallet-breadcrumb-heading-icon-size);
-				block-size: var(---wallet-breadcrumb-heading-icon-size);
-				font-size: var(---wallet-breadcrumb-heading-icon-size);
-				display: grid;
-				place-items: center;
-				translate: -50% -50%;
-				filter: none;
-			}
-
-			> .breadcrumb-slice-shape-layer {
-				opacity: 0;
-			}
+		.attribute-accordions
+			details
+			> summary
+			> h4[data-sticky-breadcrumb~='item']::before {
+			inset-inline-start: -1rem;
 		}
 
 		.attribute-group .section-caption,
@@ -4166,10 +4320,6 @@
 			min-block-size: var(---wallet-fallback-attribute-sticky-block-size);
 			padding-block: var(---wallet-fallback-sticky-padding-block);
 			background-color: var(---wallet-breadcrumb-surface-background);
-			.attribute-summary-layout {
-				flex-wrap: nowrap;
-			}
-
 			.attribute-heading-position h3 {
 				font-size: var(---wallet-breadcrumb-attribute-font-size);
 			}
@@ -4183,13 +4333,6 @@
 			);
 		}
 
-		@supports ((animation-timeline: view()) and (animation-range: entry)) {
-			@media (max-width: 1024px) {
-				.attribute > details > summary .attribute-summary-layout {
-					margin-inline-end: var(---wallet-mobile-pie-inline-clearance);
-				}
-			}
-		}
 	}
 
 	:global(#layout:has(#wallet-page):has(.wallet-variant-picker-position)) {
@@ -4233,266 +4376,10 @@
 			}
 		}
 
-		@supports ((animation-timeline: view()) and (animation-range: entry)) {
-			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				z-index: auto;
-				contain: style;
-
-				.pie-navigation-placement {
-					z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
-					pointer-events: none;
-					transform-origin: center;
-					animation: WalletMobilePiePlacement linear both;
-					animation-timeline: --wallet-stage-timeline;
-					animation-range: entry 60% entry 100%;
-				}
-
-				@media (prefers-reduced-motion: reduce) {
-					.pie-navigation-placement {
-						inset-block-start: var(---wallet-mobile-pie-target-block-start);
-						inset-inline-start: var(---wallet-mobile-pie-target-inline-start);
-						animation: none;
-						scale: var(---wallet-mobile-pie-scale);
-					}
-				}
-			}
-		}
-
 		.attribute-accordions details > summary[data-sticky] {
 			flex-wrap: nowrap;
 		}
-	}
 
-	@supports (
-		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
-		(container-type: scroll-state) and
-		(position-anchor: --wallet-name) and
-		(inset-inline-start: anchor(--wallet-name end))
-	) {
-		@media (max-width: 1024px) {
-			:global(#layout:has(#wallet-page) > #nav:not(:popover-open)),
-			:global(#layout:has(#wallet-page) > #nav:not(:popover-open) > header) {
-				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 2);
-				--sticky-backgroundColor: transparent;
-				background-color: transparent;
-				backdrop-filter: none;
-			}
-
-			:global(#layout:has(#wallet-page) > .logo-position-area) {
-				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 3);
-			}
-
-			:global(#layout:has(#wallet-page) > #nav > header) {
-				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 2);
-			}
-
-			:global(#layout:has(#wallet-page) > .logo-position-area > .logo) {
-				---wallet-site-logo-inline-size: calc(
-					2 * anchor-size(--wallet-name-collision inline)
-						- 2 * var(---wallet-name-trailing-reserve)
-						+ var(---wallet-breadcrumb-gap)
-						+ var(--navigation-logo-inlineSize)
-				);
-				---wallet-site-logo-center-offset: calc(
-					(100cqi - var(--navigation-logo-inlineSize)) / 2
-				);
-
-				position: fixed;
-				inset-block-start: 1rem;
-				inset-inline-start: 50vi;
-				inline-size: max(
-					var(--navigation-logo-inlineSize),
-					var(---wallet-site-logo-inline-size)
-				);
-				translate: -50% 0;
-				container-type: inline-size;
-				pointer-events: none;
-
-				> :global(img) {
-					pointer-events: auto;
-					animation: LayoutLogoWalletBreadcrumbAnimation linear both;
-					animation-timeline: --wallet-page-scroll-timeline;
-					animation-range: var(---wallet-header-animation-range);
-				}
-
-			}
-
-			/* The invisible logo box turns the anchored wallet-name width into a
-			 * local size query. Beyond half the viewport plus the logo's half-row
-			 * allowance, the child uses the vertical-only long-name route. */
-			@container (inline-size > calc(50vi + 4rem)) {
-				:global(
-					#layout:has(#wallet-page)
-						> .logo-position-area
-						> .logo
-						> img
-				) {
-					animation-name: LayoutLogoWalletBreadcrumbOutAnimation;
-				}
-			}
-
-		article > header#top {
-			.wallet-name[data-sticky-breadcrumb] {
-				anchor-name: --wallet-name-collision;
-				container-type: anchored;
-					inset-block-start: var(---wallet-name-mobile-block-start);
-					inset-inline-start: var(---wallet-name-target-inline-start);
-					inline-size: max-content;
-					position-try-fallbacks: --wallet-root-without-site-logo;
-
-					@supports (inline-size: calc-size(max-content, size * 1)) {
-						inline-size: calc-size(
-							max-content,
-							size * var(---wallet-name-scale) / 2
-								+ var(---wallet-name-trailing-reserve)
-						);
-					}
-
-					h1 {
-						position: relative;
-						inline-size: max-content;
-						max-inline-size: none;
-						padding-inline-start: 0;
-						transform-origin: center;
-						animation: WalletRootContentMobileAnimation linear both;
-
-						&::before {
-							content: '›';
-							position: absolute;
-							inset-block: 0;
-							inset-inline-end: 100%;
-							display: grid;
-							place-items: center;
-							inline-size: var(---wallet-breadcrumb-gap);
-							font-size: 1em;
-							line-height: 1;
-							text-box: trim-both cap alphabetic;
-							pointer-events: none;
-							opacity: 0;
-							animation: WalletBreadcrumbRevealAnimation linear both;
-							animation-timeline: --wallet-page-scroll-timeline;
-							animation-range: var(---wallet-header-animation-range);
-						}
-
-						> * {
-							flex: none;
-						}
-
-						> span {
-							animation: WalletNameTextMobileAnimation linear both;
-						}
-					}
-
-					h1,
-					h1 > span {
-						animation-timeline: --wallet-page-scroll-timeline;
-						animation-range: var(---wallet-header-animation-range);
-					}
-				}
-
-				.wallet-icon {
-					inline-size: var(---wallet-name-flow-icon-size);
-					block-size: var(---wallet-name-flow-icon-size);
-					transform-origin: center;
-					animation-name: WalletIconMobileAnimation;
-					animation-range: var(---wallet-header-animation-range);
-				}
-			}
-
-			:is(
-				.stage-heading-position,
-				.attribute-group-heading-position
-			)[data-sticky-breadcrumb~='position']
-				> [data-sticky-breadcrumb~='item']::before {
-				content: '#';
-				animation: none;
-				opacity: 0;
-			}
-
-			.attribute-summary-companions {
-				flex-wrap: nowrap;
-				white-space: nowrap;
-			}
-
-			@keyframes LayoutLogoWalletBreadcrumbAnimation {
-				from {
-					translate: var(---wallet-site-logo-center-offset) 0;
-				}
-
-				to {
-					translate: 0 0;
-				}
-			}
-
-			@keyframes LayoutLogoWalletBreadcrumbOutAnimation {
-				from {
-					translate: var(---wallet-site-logo-center-offset) 0;
-				}
-				to {
-					translate:
-						var(---wallet-site-logo-center-offset)
-						calc(-1rem - var(--navigation-logo-blockSize));
-				}
-			}
-
-			@keyframes WalletIconMobileAnimation {
-				from { scale: 1; }
-				to {
-					filter: none;
-					scale: calc(
-						var(---wallet-name-sticky-icon-size)
-							/ (
-								var(---wallet-name-flow-icon-size)
-									* var(---wallet-name-scale)
-							)
-					);
-				}
-			}
-
-			@keyframes WalletNameTextMobileAnimation {
-				to { translate: calc(var(---wallet-name-icon-excess) / 2) 0; }
-			}
-
-			@container anchored(fallback: --wallet-root-without-site-logo) {
-				article > header#top .wallet-name[data-sticky-breadcrumb] h1 {
-					animation-name: WalletRootContentWithoutSiteLogoMobileAnimation;
-
-					&::before {
-						content: none;
-					}
-				}
-			}
-
-			@keyframes WalletRootContentWithoutSiteLogoMobileAnimation {
-				from {
-					translate: none;
-					scale: 1;
-				}
-
-				to {
-					translate:
-						calc(
-							-50%
-								- (
-									var(---wallet-name-target-inline-start)
-										- 50vi
-								)
-						)
-						0;
-					scale: var(---wallet-name-scale);
-				}
-			}
-
-		}
-	}
-
-	/* Permalink hashes yield to arrows only while a breadcrumb item is active. */
-	[data-sticky-breadcrumb~='position']
-		> [data-sticky-breadcrumb~='item']:is(:hover, :focus-visible)::before {
-		opacity: 1;
-	}
-
-	@media (max-width: 1024px) {
 		/* Opening the TOC reuses the settled header keyframes instead of defining a
 		 * second header layout. The long-name position fallback therefore remains
 		 * the sole authority for whether the site logo exits upward. */
@@ -4505,10 +4392,23 @@
 		.container:has(.page-navigation-panel:popover-open)
 			:is(.wallet-name, .wallet-name h1, .wallet-name h1 > span, .wallet-icon),
 		.container:has(.page-navigation-panel:popover-open) .wallet-name h1::before {
-			animation-timeline: auto !important;
-			animation-duration: 1ms !important;
-			animation-delay: -1ms !important;
+			animation-timeline: auto;
+			animation-duration: 1ms;
+			animation-delay: -1ms;
 		}
+
+	}
+
+	/* Permalink hashes yield to arrows only while a breadcrumb item is active. */
+	:is(
+		[data-sticky-breadcrumb~='position']
+			> [data-sticky-breadcrumb~='item']:is(:hover, :focus-visible),
+		.attribute-accordions
+			details
+			> summary:is(:hover, :focus-visible)
+			> h4[data-sticky-breadcrumb~='item']
+	)::before {
+		opacity: 1;
 	}
 
 	/* The variant control keeps one scroll handoff at every breakpoint. */
@@ -4614,13 +4514,7 @@
 		}
 
 		@keyframes WalletVariantPickerAnimation {
-			from {
-				position: fixed;
-				inset-block-start: anchor(--wallet-variant-picker-position top);
-				inset-inline-start: anchor(--wallet-variant-picker-position start);
-			}
 			to {
-				position: fixed;
 				inset-block-start: var(---wallet-variant-sticky-block-start);
 				inset-inline-start: var(---wallet-variant-sticky-inline-start);
 			}
@@ -4652,51 +4546,4 @@
 		inset-inline-start: 50vi;
 	}
 
-	@keyframes WalletMobilePiePlacement {
-		from {
-			position: fixed;
-			inset-block-start: anchor(--wallet-mobile-pie-flow top);
-			inset-inline-start: calc(
-				50vi - var(---wallet-mobile-pie-flow-size) / 2
-			);
-			margin-block-start: calc(
-				(
-					var(--navigation-mobile-blockSize)
-						- var(---wallet-mobile-pie-size)
-				) / 2
-			);
-			scale: 1;
-		}
-
-		to {
-			position: fixed;
-			inset-block-start: var(
-				---wallet-mobile-pie-target-block-start
-			);
-			inset-inline-start: var(
-				---wallet-mobile-pie-target-inline-start
-			);
-			margin-block-start: 0;
-			scale: var(---wallet-mobile-pie-scale);
-		}
-	}
-
-	@media (max-width: 1024px) {
-		.container
-			.page-navigation:has(.page-navigation-panel:popover-open)
-			> .pie-navigation[data-sticky][data-sticky] {
-			/* Layout containment makes fixed descendants wrapper-relative in
-			 * Firefox. Geometry remains strictly contained one level below. */
-			contain: style;
-
-			.pie-navigation-placement {
-				position: fixed;
-				inset-block-start: var(---wallet-mobile-pie-target-block-start);
-				inset-inline-start: var(---wallet-mobile-pie-target-inline-start);
-				margin-block-start: 0;
-				scale: var(---wallet-mobile-pie-scale);
-				animation: none;
-			}
-		}
-	}
 </style>

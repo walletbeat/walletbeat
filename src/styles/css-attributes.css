@@ -1207,6 +1207,13 @@ ol {
  * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
  * - `mobile`: enable the paired role only through the layout mobile breakpoint
  *
+ * `[data-sticky]` containers keep `position: sticky` for the whole scroll.
+ * Items stay `position: fixed` so `anchor()` and `position-try` can
+ * still follow variable crumb widths. Origin insets live on the item; intro
+ * is to-only so named `anchor()` is not frozen in a `from` keyframe.
+ * `position-try` applies at `to`. Do not change `position` in keyframes or
+ * hide the handoff with opacity.
+ *
  * ### CSS Variables
  * - `--stickyBreadcrumb-animationRange`
  * - `--stickyBreadcrumb-animationTimingFunction`
@@ -1312,6 +1319,8 @@ ol {
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
 			--sticky-breadcrumb-scope,
 			--sticky-breadcrumb-extra-position,
+			--sticky-breadcrumb-icon-pad,
+			--sticky-breadcrumb-companion-pad,
 			var(--stickyBreadcrumb-iconAnchor, --sticky-breadcrumb-extra-position);
 		timeline-scope: --sticky-breadcrumb-scope-timeline;
 		view-timeline-name: --sticky-breadcrumb-scope-timeline;
@@ -1352,9 +1361,9 @@ ol {
 			position: fixed;
 			position-anchor: --sticky-breadcrumb-position;
 			position-visibility: always;
-			inset-block-start: anchor(top);
+			inset-block-start: anchor(--sticky-breadcrumb-position top);
 			inset-inline-start: calc(
-				anchor(start)
+				anchor(--sticky-breadcrumb-position start)
 					+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
 			);
 			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
@@ -1364,10 +1373,7 @@ ol {
 			align-items: safe center;
 			inline-size: var(--stickyBreadcrumb-item-inlineSize, auto);
 			justify-self: var(--stickyBreadcrumb-item-justifySelf, auto);
-			position-try-fallbacks: var(
-				--stickyBreadcrumb-item-positionTryFallbacks,
-				none
-			);
+			position-try-fallbacks: none;
 
 			animation:
 				StickyBreadcrumbItemAnimation
@@ -1392,32 +1398,7 @@ ol {
 	}
 
 	@keyframes StickyBreadcrumbItemAnimation {
-		/* Repeated named anchors settle just after ownership changes in Chromium.
-		 * Keep that 50–95% interval transparent, then reveal the resolved pad. */
-		from,
-		49.999% {
-			position: fixed;
-			position-anchor: --sticky-breadcrumb-position;
-			inset-block-start: anchor(top);
-			inset-inline-start: calc(
-				anchor(start)
-					+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
-			);
-			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
-			translate: none;
-			margin-inline-start: 0;
-			min-block-size: 0;
-		}
-		from {
-			opacity: 1;
-		}
-		49.999%,
-		95% {
-			opacity: 0;
-		}
-		50%,
 		to {
-			position: fixed;
 			position-anchor: var(
 				--stickyBreadcrumb-item-targetAnchor,
 				var(
@@ -1446,9 +1427,10 @@ ol {
 			translate: var(--stickyBreadcrumb-item-translate, none);
 			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
 			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
-		}
-		to {
-			opacity: 1;
+			position-try-fallbacks: var(
+				--stickyBreadcrumb-item-positionTryFallbacks,
+				none
+			);
 		}
 	}
 
