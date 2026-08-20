@@ -69,6 +69,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { mdParagraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
@@ -82,7 +83,7 @@ export const rainbow: SoftwareWallet = {
 		tableName: 'Rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-02',
+		lastUpdated: '2026-08-20',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -1348,7 +1349,55 @@ export const rainbow: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
-		walletCall: notSupported,
+		// EIP-5792 is supported by the browser extension only, and only for accounts with an EIP-7702 delegation.
+		walletCall: {
+			[Variant.BROWSER]: supported({
+				ref: [
+					{
+						explanation:
+							'The Rainbow browser extension registers an EIP-5792 `wallet_getCapabilities` handler that reports the `atomic` capability per chain, returning `supported` for an account that already holds a delegation and `ready` for one that would be delegated on first use. It also registers the `wallet_sendCalls` batch-record handlers alongside it.',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/background/handlers/handleProviderRequest.ts#L429-L484',
+					},
+					{
+						explanation:
+							"Batches are executed through Rainbow's delegation SDK, which errors out when delegation is not enabled or not supported for the account and chain. Rainbow therefore has no non-atomic batching path: a batch either executes atomically through the EIP-7702 delegate, or it does not execute at all.",
+						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58',
+					},
+				],
+				atomicMultiTransactions: featureSupported,
+			}),
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: {
+					explanation:
+						'The Rainbow mobile app wires its in-app browser to the same shared provider-request handler as the extension, but its registration passes only chain, session, and provider callbacks. It supplies none of the EIP-5792 handlers (`wallet_getCapabilities`, `wallet_sendCalls` batch records) that the extension registers, so the mobile app does not implement the Wallet Call API.',
+					url: 'https://github.com/rainbow-me/rainbow/blob/bb6110b846ca6955125d490c0eb1f0812fccadf7/src/features/dapp-browser/services/handleProviderRequest.ts#L350-L362',
+				},
+			}),
+		},
+	},
+	overrides: {
+		attributes: {
+			ecosystem: {
+				transactionBatching: {
+					note: mdParagraph(`
+						{{WALLET_NAME}}'s two variants differ here. The browser extension
+						implements the Wallet Call API; the mobile app does not implement it at
+						all. The overall rating reflects the weaker of the two.
+
+						On the browser extension, batching is only available to accounts that
+						hold an EIP-7702 delegation. {{WALLET_NAME}} executes batches solely
+						through its delegation SDK, so a plain EOA that has not been delegated
+						cannot batch at all: \`wallet_getCapabilities\` returns an error rather
+						than reporting the \`atomic\` capability as unsupported.
+
+						The upside of that design is that batching and atomicity are the same
+						question here. {{WALLET_NAME}} has no non-atomic fallback that would
+						leave a bundle half-executed, so whenever a batch runs at all, it runs
+						all-or-nothing.
+					`),
+				},
+			},
+		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,
