@@ -1360,7 +1360,7 @@ export const rainbow: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'Multicall transactions are all-or-nothing: either every transaction in the batch happens, or none of them do.',
+							'Multicall transactions are atomic: they will either execute all transactions in the batch or revert.',
 						label: 'Batch execution in the extension source code',
 						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58',
 					},
