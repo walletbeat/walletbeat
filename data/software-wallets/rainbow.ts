@@ -1354,13 +1354,13 @@ export const rainbow: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The extension tells a site whether it can bundle several transactions into one, and answers yes for accounts that have been upgraded with EIP-7702.',
+							'The extension can execute EIP-5792 multicall transactions only if the account has been upgraded with EIP-7702.',
 						label: 'Batching support in the extension source code',
 						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/background/handlers/handleProviderRequest.ts#L429-L484',
 					},
 					{
 						explanation:
-							'Bundles are only ever run through the EIP-7702 upgrade. An account that has not been upgraded cannot bundle at all, and a bundle that does run is all-or-nothing: either every transaction in it happens, or none of them do.',
+							'Multicall transactions are all-or-nothing: either every transaction in the batch happens, or none of them do.',
 						label: 'Batch execution in the extension source code',
 						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58',
 					},
@@ -1377,8 +1377,7 @@ export const rainbow: SoftwareWallet = {
 						lastRetrieved: '2026-08-20',
 					},
 					{
-						explanation:
-							'The mobile app sets up the same site-facing code as the extension, but leaves the batching part out entirely.',
+						explanation: 'The mobile app has no EIP-5792 Wallet Call API code in its source.',
 						label: 'Rainbow mobile app source code',
 						url: 'https://github.com/rainbow-me/rainbow/blob/bb6110b846ca6955125d490c0eb1f0812fccadf7/src/features/dapp-browser/services/handleProviderRequest.ts#L350-L362',
 					},
