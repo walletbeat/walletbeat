@@ -34,6 +34,7 @@ export const keystoneWallet: HardwareWallet = {
 		id: 'keystone',
 		displayName: 'Keystone Wallet',
 		tableName: 'Keystone',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

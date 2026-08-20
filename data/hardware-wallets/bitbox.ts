@@ -38,6 +38,7 @@ export const bitboxWallet: HardwareWallet = {
 		id: 'bitbox',
 		displayName: 'BitBox',
 		tableName: 'BitBox',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

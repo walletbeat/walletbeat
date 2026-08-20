@@ -27,6 +27,7 @@ export const ngrave: HardwareWallet = {
 		id: 'ngrave',
 		displayName: 'NGRAVE Zero',
 		tableName: 'NGRAVE',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
