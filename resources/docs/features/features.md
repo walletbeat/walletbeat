@@ -86,7 +86,7 @@ type WalletAnalytics = WithRef<{
 
 A set of features about any type of wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
 
 - `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is _not_ per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
 - `security` (object): Security features.
