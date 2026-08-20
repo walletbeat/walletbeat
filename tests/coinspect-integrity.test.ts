@@ -5,7 +5,7 @@ import { allWallets } from '@/data/wallets'
 
 /**
  * Coinspect `walletMakerUID`s that Walletbeat does not track.
- * When Coinspect adds a wallet, either add `coinspectId` to the matching
+ * When Coinspect adds a wallet, either set `coinspectId` on the matching
  * Walletbeat wallet, or add the ID here after confirming it has no match.
  */
 const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
@@ -37,7 +37,7 @@ const walletsByCoinspectId = new Map<string, string[]>()
 for (const wallet of Object.values(allWallets)) {
 	const coinspectId = wallet.metadata.coinspectId
 
-	if (coinspectId === undefined) {
+	if (typeof coinspectId !== 'string') {
 		continue
 	}
 
@@ -85,7 +85,7 @@ describe('coinspect mapping', () => {
 		overlapping.sort()
 		expect(
 			overlapping,
-			`remove these IDs from knownUnmappedCoinspect, or drop coinspectId from the wallet: ${overlapping.join(', ')}`,
+			`remove these IDs from knownUnmappedCoinspect, or set coinspectId to { type: 'NO_COINSPECT_ID' }: ${overlapping.join(', ')}`,
 		).toEqual([])
 	})
 
@@ -108,7 +108,7 @@ describe('coinspect mapping', () => {
 	})
 
 	// Coinspect removed (or renamed) a wallet we still map via coinspectId;
-	// that field should be dropped or updated.
+	// that field should be set to { type: 'NO_COINSPECT_ID' } or updated.
 	it('maps only to Coinspect IDs present in the snapshot', () => {
 		const missing: string[] = []
 
@@ -121,7 +121,7 @@ describe('coinspect mapping', () => {
 		missing.sort()
 		expect(
 			missing,
-			`drop or update coinspectId; these IDs are not in reports-snapshot.json: ${missing.join(', ')}`,
+			`set coinspectId to { type: 'NO_COINSPECT_ID' } or update it; these IDs are not in reports-snapshot.json: ${missing.join(', ')}`,
 		).toEqual([])
 	})
 
