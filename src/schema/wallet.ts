@@ -85,9 +85,13 @@ export interface WalletMetadata {
 	id: string
 
 	/**
-	 * Coinspect wallet-maker ID for this Walletbeat wallet, if any.
+	 * Coinspect wallet-maker ID for this Walletbeat wallet.
+	 *
+	 * - A string is the Coinspect `walletMakerUID`.
+	 * - `null` means this has not been researched yet.
+	 * - `{ type: 'NO_COINSPECT_ID' }` means Coinspect does not list this wallet.
 	 */
-	coinspectId?: string
+	coinspectId: string | null | { type: 'NO_COINSPECT_ID' }
 
 	/**
 	 * Human-readable name of the wallet, when written in a sentence.

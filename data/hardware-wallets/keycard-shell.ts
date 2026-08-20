@@ -32,6 +32,7 @@ export const keycardShell: HardwareWallet = {
 		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [phift, mmlado],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

@@ -29,6 +29,7 @@ export const trezorWallet: HardwareWallet = {
 		id: 'trezor',
 		displayName: 'Trezor Wallet',
 		tableName: 'Trezor',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

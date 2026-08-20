@@ -46,6 +46,7 @@ export const daimo: SoftwareWallet = {
 		id: 'daimo',
 		displayName: 'Daimo',
 		tableName: 'Daimo',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [polymutex, nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',

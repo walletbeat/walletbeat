@@ -33,6 +33,7 @@ export const zeus: SoftwareWallet = {
 		id: 'zeus',
 		displayName: 'Zeus',
 		tableName: 'Zeus',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-12',

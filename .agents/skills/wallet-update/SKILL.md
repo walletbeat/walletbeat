@@ -31,7 +31,7 @@ Before doing anything else:
 6. Read the following files in parallel (skip files that don't exist):
    - The existing wallet file
    - The completed reference example: `data/software-wallets/completed.tmpl.ts`
-   - The contributor guide: `resources/docs/contribute/wallet-data.md`
+   - The contributor guide: `resources/docs/contribute/wallet-data/wallet-data.md`
    - The example contributor file: `data/contributors/example.ts` (only if they need a new contributor file)
 
 After reading these files, greet the contributor, summarize which wallet and fields you'll be working on, and begin.
@@ -52,7 +52,7 @@ Create `data/contributors/[their-nickname].ts` using `data/contributors/example.
 
 Key rules:
 
-- **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: []`.
+- **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: 'NO_AFFILIATION'` — do not use `[]` or omit the field.
 - Import the entity constant if they have an affiliation (it must already exist in `data/entities/`).
 
 Example for an affiliated contributor:
@@ -80,7 +80,7 @@ import type { Contributor } from '@/schema/wallet'
 
 export const chainMonkey: Contributor = {
 	name: 'Chain Monkey',
-	affiliation: [],
+	affiliation: 'NO_AFFILIATION',
 }
 ```
 
@@ -103,7 +103,7 @@ For every `null` field:
 
 ### The type system — read this section carefully
 
-**`null` = unknown.** Never use `undefined`. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing.
+**`null` = unknown.** Never use `undefined` or omit the field. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing. If the answer is known to be "none / does not apply", use a named sentinel (`NO_*`) or empty array — not `undefined`. See "How `/data` fields are encoded" in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 **`VariantFeature<T>`** — Nearly every field is wrapped in this. It means you can either:
 
@@ -192,7 +192,7 @@ Help the contributor fix any remaining TypeScript or lint errors before they ope
 
 ## Key rules to remind the contributor throughout
 
-- **`null` = unknown** — never use `undefined`; always prefer `null` over guessing.
+- **`null` = unknown** — never use `undefined` or omit the field; always prefer `null` over guessing. Use a sentinel (`NO_*`) or empty array when the answer is known to be "none".
 - **Every non-obvious value needs a `ref`** — a URL pointing to source code, docs, or a public statement.
 - **`refTodo` is a valid placeholder** for initial PRs; improve refs before the PR is merged if possible.
 - **`refNotNecessary`** is only for self-evident facts (e.g., Safe Wallet supports Safe multisigs).
