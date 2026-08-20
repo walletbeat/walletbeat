@@ -1,22 +1,25 @@
+import { execSync } from 'child_process'
 import { createHash } from 'crypto'
+import { existsSync } from 'fs'
 import { request } from 'https'
+import path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
 import { hasRefs, toFullyQualified, type WithRef } from '@/schema/reference'
-import { getUrl, labeledUrl, type Url } from '@/schema/url'
+import { getUrl, type Url } from '@/schema/url'
+import { getRepositoryRoot } from '@/tests/utils/codebase'
 import { type KnownValidUrl, knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
+import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 import { today } from '@/types/date'
 
 const newValidUrls: KnownValidUrl[] = []
 
 const verifiedUrls: KnownValidUrl[] = []
 
-async function checkValidUrl(url: Url): Promise<void> {
-	const href = labeledUrl(url).url
-	const urlString = getUrl(url)
-
-	if (shouldSkipUrl(urlString)) {
+/** Core validation logic, extracted so it can be shared by `checkValidUrl` (wallet-data `Url`s) and the built-HTML scan below (plain hrefs). */
+async function checkValidHref(href: string): Promise<void> {
+	if (shouldSkipUrl(href)) {
 		return
 	}
 
@@ -100,6 +103,29 @@ async function checkValidUrl(url: Url): Promise<void> {
 	if (failure === null) {
 		newValidUrls.push({ url: href, urlHash: digest, retrieved: today() })
 	}
+}
+
+/** Thin wrapper over `checkValidHref` for wallet-data references, which carry a `Url` rather than a plain string. */
+async function checkValidUrl(url: Url): Promise<void> {
+	await checkValidHref(getUrl(url))
+}
+
+/**
+ * `pnpm validate-urls` populates known-urls.json from both wallet-data
+ * references and every external link found in the built site's HTML (e.g.
+ * hardcoded links in markdown attribute descriptions or components). This
+ * test file must scan the same built HTML, or those entries would always
+ * appear as "extraneous" below, since nothing else in this file would ever
+ * visit them.
+ */
+function getDistDir(): string {
+	const distDir = process.env.DIST_DIR ?? path.join(getRepositoryRoot(), 'dist')
+
+	if (!existsSync(distDir)) {
+		execSync('pnpm run build', { cwd: getRepositoryRoot(), stdio: 'inherit' })
+	}
+
+	return distDir
 }
 
 describe('reference URLs', () => {
@@ -196,6 +222,18 @@ describe('reference URLs', () => {
 					}
 				})
 			}
+		})
+	}
+})
+
+describe('built site external URLs', () => {
+	const distDir = getDistDir()
+
+	for (const [href, firstFile] of findExternalUrlsInDist(distDir)) {
+		describe(href, () => {
+			it(`is valid URL (found in ${firstFile})`, async () => {
+				await checkValidHref(href)
+			})
 		})
 	}
 })
