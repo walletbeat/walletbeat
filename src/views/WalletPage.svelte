@@ -780,7 +780,8 @@
 								{#if item.icon}
 									<span
 										class="pie-navigation-icon"
-										data-icon="wbicons emoji {item.icon}"
+										data-icon="wbicons {item.icon}"
+										aria-hidden="true"
 									></span>
 								{/if}
 							{/snippet}
@@ -790,11 +791,6 @@
 			</nav>
 
 			<div id="wallet-page-navigation-panel" class="page-navigation-panel" popover="auto" data-column="gap-0">
-				<!--
-					The TOC title is intentionally disabled for this navigation surface.
-					Keep the panel and its nav in the DOM without reserving a heading row.
-				-->
-
 				<nav
 					data-column
 					data-column-item="flexible"
@@ -2414,13 +2410,7 @@
 				inset: var(---pie-origin) auto auto var(---pie-origin);
 				translate: -50% calc(-50% - var(---slice-label-offset));
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
-				filter:
-					contrast(0.5) brightness(3) opacity(0.7)
-					drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15));
-				transition-property: filter;
-			}
-
-			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current) > .pie-navigation-icon) {
+				color: var(--accent);
 				filter: none;
 			}
 		}
@@ -2435,9 +2425,6 @@
 			outline: none;
 			pointer-events: auto;
 
-			> .pie-navigation-icon {
-				filter: none;
-			}
 		}
 
 		@media (max-width: 1024px) {
