@@ -3997,9 +3997,9 @@
 	 * Browsers without the complete anchor/scroll-state breadcrumb stack keep
 	 * real sticky attribute headings. Use the same compact endpoint as the
 	 * animated path: the existing icon remains, its slice and the subtitle
-	 * recede, and H3 owns the next sticky layer. Stage Progress remains in its
-	 * native flow presentation because these engines cannot detect the exact
-	 * moment a sticky item becomes stuck.
+	 * recede, and H3 owns the next sticky layer. H2 headers share one native
+	 * sticky treatment because these engines cannot detect the exact moment a
+	 * sticky item becomes stuck.
 	 */
 	@supports not (
 		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
@@ -4128,7 +4128,9 @@
 		}
 
 		.attribute > details > summary {
-			z-index: calc(var(---wallet-breadcrumb-layer-detail) + 3);
+			/* The active group must paint over an outgoing attribute as native
+			 * sticky containment pushes that attribute through the group lane. */
+			z-index: calc(var(---wallet-breadcrumb-layer-detail) + 1);
 			position: sticky;
 			inset-block-start: var(---wallet-group-sticky-block-end);
 			min-block-size: var(---wallet-fallback-attribute-sticky-block-size);
