@@ -11,3 +11,5 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
   - **Reaction**: Ambire fixes this in their next release: https://x.com/borislavItskovv/status/2081582575790006360
   - **Reaction**: WalletChan fixes this in their next release: https://x.com/walletbeat/status/2082293464071373094
   - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention: https://x.com/ambire/status/2082816470560747558
+- **2026-08**: Walletbeat contributor polymutex points out that flagging IPFS gateways such as `.eth.limo` reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant).
+  - **Reaction**: Ambire unflags IPFS gateways: https://x.com/borislavItskovv/status/2090563980549042476 & https://x.com/ambire/status/2090483593407529375
