@@ -2918,5 +2918,40 @@
 		"url": "https://x.com/Rabby_io/status/2090269706087514615",
 		"urlHash": "82385b3cc828db6a5de2b5d746633a2dad9f0426",
 		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/background/handlers/handleProviderRequest.ts#L429-L484",
+		"urlHash": "7d4c82e3ed056226cea4e9b4d404ad288619539a",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58",
+		"urlHash": "b86d300c53699b11f15a7e3bce29edaa1cb63b97",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/rainbow-me/rainbow/blob/bb6110b846ca6955125d490c0eb1f0812fccadf7/src/features/dapp-browser/services/handleProviderRequest.ts#L350-L362",
+		"urlHash": "58e4933135e5be6d215253cc57ea3a9724b87ba5",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/background/messaging/port-message-handlers/createWalletMessageHandler.ts#L25-L38",
+		"urlHash": "9c84c6665381c724857ef6d67d09a340a3526f07",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/background/Wallet/Wallet.ts#L2232-L2242",
+		"urlHash": "1f8a975d14b5254f80eaee7659777b74e8d2efbf",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/RequestAccounts/RequestAccounts.tsx#L414-L428",
+		"urlHash": "353f8c2a8588a8d9bf9ea7e64026b2fadb23079f",
+		"retrieved": "2026-08-21"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/background/Wallet/Wallet.ts#L2498-L2504",
+		"urlHash": "772a21c5fdb673fc222774eadcfe2d712b1e5284",
+		"retrieved": "2026-08-21"
 	}
 ]
