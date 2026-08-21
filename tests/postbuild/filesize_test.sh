@@ -34,7 +34,7 @@ while IFS= read -r f; do
 		continue
 	fi
 	rel="${f#"$DIST_DIR"/}"
-	size="$(stat -f '%z' "$f" 2>/dev/null || stat -c '%s' "$f")"
+	size="$(wc -c < "$f")"
 	if is_known_too_large "$f"; then
 		if ((size <= MAX_BYTES)); then
 			# The file is no longer oversized, so its KNOWN_TOO_LARGE entry is stale.
