@@ -170,6 +170,9 @@ The Ethereum Foundation, through the ESP grant above, and several of our regular
 ## What KPIs do you want to be measured by? *
 
 Provide 1-2 verifiable measures.
+- Wallets changing behavior because we called something out, not because we asked:https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md
+- 21 software wallets and 11 hardware wallets under active, source-verified rating, live at beta.walletbeat.eth.limo.
+- Our repo: 114 GitHub stars, 83 forks, 2,576 commits on the beta branch, 107 open issues, 24 open PRs, MIT-licensed. github.com/walletbeat/walletbeat
 
 ## Need Help?
 
