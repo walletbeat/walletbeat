@@ -324,6 +324,15 @@
 		) satisfies EvaluationTree<_AttributeGroupId>
 	)
 
+	const groupTargetId = (groupId: string) => slugifyCamelCase(groupId)
+	const groupTargetIds = $derived(new Set(
+		Object.values(attributeTree).map(group => groupTargetId(group.id))
+	))
+	const attributeTargetId = (attributeId: string) => {
+		const targetId = slugifyCamelCase(attributeId)
+		return groupTargetIds.has(targetId) ? `${targetId}-attribute` : targetId
+	}
+
 	const tocNavigationItems = $derived.by<NavigationItem[]>(() => (
 		evalTree ?
 			Object.values(attributeTree)
@@ -339,7 +348,7 @@
 						accentColor: scoreToColor(
 							calculateAttributeGroupScore(attrGroup, evalGroup)?.score ?? null,
 						),
-						href: `#${slugifyCamelCase(attrGroup.id)}`,
+						href: `#${groupTargetId(attrGroup.id)}`,
 						children: attrGroup.attributes.flatMap(({ attribute }) => {
 							const evalAttr = evalGroup[attribute.id]
 
@@ -350,7 +359,7 @@
 								title: attribute.displayName,
 								icon: attribute.icon,
 								accentColor: ratingToColor(evalAttr.evaluation.outcome.rating),
-								href: `#${slugifyCamelCase(attribute.id)}`,
+								href: `#${attributeTargetId(attribute.id)}`,
 							}]
 						}),
 					}]
@@ -375,7 +384,7 @@
 					id: attribute.id,
 					color: attribute.accentColor ?? 'transparent',
 					weight: sourceGroup?.attributes.find(
-						({ attribute: sourceAttribute }) => `#${slugifyCamelCase(sourceAttribute.id)}` === attribute.href
+						({ attribute: sourceAttribute }) => `#${attributeTargetId(sourceAttribute.id)}` === attribute.href
 					)?.weight ?? 1,
 					arcLabel: '',
 					titleText: attribute.title,
@@ -928,7 +937,7 @@
 		}))}
 
 	{#if attributes.length > 0}
-		{@const id = slugifyCamelCase(attrGroup.id)}
+		{@const id = groupTargetId(attrGroup.id)}
 		{@const href = `#${id}`}
 		{@const score = calculateAttributeGroupScore(attrGroup, evalGroup)}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
@@ -1033,7 +1042,7 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
-	{@const id = slugifyCamelCase(attribute.id)}
+	{@const id = attributeTargetId(attribute.id)}
 	{@const href = `#${id}`}
 	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 	{@const stageContext = showStage ? getWalletStageAndLadder(wallet) : null}
