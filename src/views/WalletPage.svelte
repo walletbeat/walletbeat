@@ -1453,14 +1453,7 @@
 						data-card="secondary padding-5 radius-4"
 						data-column="gap-0"
 						data-sticky-container
-						data-sticky-breadcrumb="scope mobile"
 					>
-						<span
-							class="detail-breadcrumb-position"
-							data-sticky-breadcrumb="position mobile"
-							aria-hidden="true"
-						></span>
-
 						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
 							<h4
 								id={`${id}-improvement`}
@@ -3975,10 +3968,6 @@
 			overflow: visible;
 
 			&:not([open]) {
-				> .detail-breadcrumb-position {
-					display: none;
-				}
-
 				> summary[data-sticky] {
 					position: relative;
 					inset: auto;
