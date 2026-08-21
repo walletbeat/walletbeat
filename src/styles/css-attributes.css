@@ -1358,6 +1358,44 @@ ol {
 
 		&:not([data-sticky-breadcrumb~="root"]) {
 			--stickyBreadcrumb-exitTranslate: 0 -100vb;
+			---stickyBreadcrumb-targetInsetInlineStart: var(
+				--stickyBreadcrumb-item-insetInlineStart,
+				anchor(
+					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
+						end
+				)
+			);
+			---stickyBreadcrumb-targetInsetInlineEnd: var(
+				--stickyBreadcrumb-item-insetInlineEnd,
+				auto
+			);
+			---stickyBreadcrumb-animationInsetInlineStart: var(
+				---stickyBreadcrumb-targetInsetInlineStart
+			);
+			---stickyBreadcrumb-animationInsetInlineEnd: var(
+				---stickyBreadcrumb-targetInsetInlineEnd
+			);
+			---stickyBreadcrumb-animationMarginInlineStart: var(
+				--stickyBreadcrumb-gap,
+				1rem
+			);
+			---stickyBreadcrumb-animationMarginInlineEnd: 0px;
+
+			&:dir(rtl) {
+				/* Keyframe longhands resolve in the stylesheet's direction. Swap only
+				 * their logical inputs; timeline and animation ownership stay shared. */
+				---stickyBreadcrumb-animationInsetInlineStart: var(
+					---stickyBreadcrumb-targetInsetInlineEnd
+				);
+				---stickyBreadcrumb-animationInsetInlineEnd: var(
+					---stickyBreadcrumb-targetInsetInlineStart
+				);
+				---stickyBreadcrumb-animationMarginInlineStart: 0px;
+				---stickyBreadcrumb-animationMarginInlineEnd: var(
+					--stickyBreadcrumb-gap,
+					1rem
+				);
+			}
 
 			position: fixed;
 			position-anchor: --sticky-breadcrumb-position;
@@ -1417,16 +1455,11 @@ ol {
 					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
 				)
 			);
-			inset-inline-start: var(
-				--stickyBreadcrumb-item-insetInlineStart,
-				anchor(
-					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
-						end
-				)
-			);
-			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
+			inset-inline-start: var(---stickyBreadcrumb-animationInsetInlineStart);
+			inset-inline-end: var(---stickyBreadcrumb-animationInsetInlineEnd);
 			translate: var(--stickyBreadcrumb-item-translate, none);
-			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
+			margin-inline-start: var(---stickyBreadcrumb-animationMarginInlineStart);
+			margin-inline-end: var(---stickyBreadcrumb-animationMarginInlineEnd);
 			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
 			position-try-fallbacks: var(
 				--stickyBreadcrumb-item-positionTryFallbacks,

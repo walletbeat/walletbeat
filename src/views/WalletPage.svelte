@@ -1586,7 +1586,6 @@
 		;
 		position: relative;
 		line-height: var(---wallet-line-height);
-
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 54rem;
 			--scrollItem-inlineDetached-paddingStart: var(---wallet-content-inline-padding);
@@ -1869,6 +1868,7 @@
 	}
 
 	:global(#layout:has(#wallet-page)) {
+		---wallet-inline-translate-direction: 1;
 		/*
 		 * A perspective establishes a containing block for fixed descendants.
 		 * Breadcrumbs must remain fixed to this scroll container, not its moving
@@ -1931,6 +1931,10 @@
 		timeline-scope:
 			--wallet-ratings-start-timeline,
 			--wallet-footer-entry;
+
+		&:dir(rtl) {
+			---wallet-inline-translate-direction: -1;
+		}
 
 		@media (min-width: 865px) and (max-width: 1280px) {
 			---wallet-page-navigation-inline-size-rem: 20;
@@ -2512,8 +2516,11 @@
 			to {
 				inset-block-start: var(---wallet-mobile-pie-target-block-start);
 				translate: calc(
-					var(---wallet-mobile-pie-target-inline-start)
-						- var(---wallet-mobile-pie-flow-inline-start)
+					(
+						var(---wallet-mobile-pie-target-inline-start)
+							- var(---wallet-mobile-pie-flow-inline-start)
+					)
+						* var(---wallet-inline-translate-direction)
 				)
 					0;
 				scale: var(---wallet-mobile-pie-scale);
@@ -2985,6 +2992,11 @@
 			> [data-sticky-breadcrumb~='item']
 			> :is(h2, h3) {
 			transform-origin: left center;
+
+			&:dir(rtl) {
+				transform-origin: right center;
+			}
+
 			animation: BreadcrumbHeadingAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 			animation-timeline: --sticky-breadcrumb-timeline;
 			animation-range: var(---wallet-breadcrumb-animation-range);
@@ -3121,15 +3133,6 @@
 				var(---wallet-breadcrumb-animation-range);
 			/* Preserve the underlying hover/focus opacity before the scroll effect. */
 			animation-composition: add;
-		}
-
-		@container anchored(fallback: --sticky-breadcrumb-next-row) or anchored(fallback: --sticky-breadcrumb-constrained-row) {
-			.attribute-heading-position[data-sticky-breadcrumb~='position']
-				> [data-sticky-breadcrumb~='item']::before {
-				content: '#';
-				opacity: 0;
-				animation: none;
-			}
 		}
 
 		.attribute-accordions details {
@@ -3283,6 +3286,10 @@
 			position-anchor: var(---wallet-icon-anchor);
 			inset-block-start: anchor(var(---wallet-icon-anchor) top);
 			inset-inline-start: anchor(var(---wallet-icon-anchor) start);
+
+			&:dir(rtl) {
+				translate: 50% -50%;
+			}
 		}
 
 		.attribute-group-icon {
@@ -3354,7 +3361,10 @@
 				scale: 1;
 			}
 			to {
-				translate: var(---wallet-breadcrumb-heading-translate);
+				translate: calc(
+					var(---wallet-breadcrumb-heading-translate)
+						* var(---wallet-inline-translate-direction)
+				);
 				scale: var(---wallet-breadcrumb-heading-scale);
 			}
 		}
@@ -3392,9 +3402,12 @@
 			from {
 				translate:
 					calc(
-						var(--sticky-insetInlineStart)
-							+ var(---wallet-content-inline-start)
-							- var(---wallet-name-target-inline-start)
+						(
+							var(--sticky-insetInlineStart)
+								+ var(---wallet-content-inline-start)
+								- var(---wallet-name-target-inline-start)
+						)
+							* var(---wallet-inline-translate-direction)
 					)
 					calc(
 						var(---wallet-name-flow-block-start)
@@ -3410,7 +3423,10 @@
 				scale: 1;
 			}
 			to {
-				translate: -50% 0;
+				translate: calc(
+					-50% * var(---wallet-inline-translate-direction)
+				)
+					0;
 				scale: var(---wallet-name-scale);
 			}
 		}
@@ -3418,25 +3434,41 @@
 		@keyframes WalletRootContentWithoutSiteLogoMobileAnimation {
 			from {
 				translate: calc(
-					var(---wallet-name-target-inline-start) - 50vi
+					(
+						var(---wallet-name-target-inline-start) - 50vi
+					)
+						* var(---wallet-inline-translate-direction)
 				)
 					0;
 				scale: 1;
 			}
 
 			to {
-				translate: -50% 0;
+				translate: calc(
+					-50% * var(---wallet-inline-translate-direction)
+				)
+					0;
 				scale: var(---wallet-name-scale);
 			}
 		}
 
 		@keyframes WalletNameTextMobileAnimation {
-			to { translate: calc(var(---wallet-name-icon-excess) / 2) 0; }
+			to {
+				translate: calc(
+					var(---wallet-name-icon-excess) / 2
+						* var(---wallet-inline-translate-direction)
+				)
+					0;
+			}
 		}
 
 		@keyframes LayoutLogoWalletBreadcrumbAnimation {
 			from {
-				translate: var(---wallet-site-logo-center-offset) 0;
+				translate: calc(
+					var(---wallet-site-logo-center-offset)
+						* var(---wallet-inline-translate-direction)
+				)
+					0;
 			}
 
 			to {
@@ -3446,12 +3478,19 @@
 
 		@keyframes LayoutLogoWalletBreadcrumbOutAnimation {
 			from {
-				translate: var(---wallet-site-logo-center-offset) 0;
+				translate: calc(
+					var(---wallet-site-logo-center-offset)
+						* var(---wallet-inline-translate-direction)
+				)
+					0;
 			}
 
 			to {
 				translate:
-					var(---wallet-site-logo-center-offset)
+					calc(
+						var(---wallet-site-logo-center-offset)
+							* var(---wallet-inline-translate-direction)
+					)
 					calc(-1rem - var(--navigation-logo-blockSize));
 			}
 		}
@@ -3503,7 +3542,6 @@
 					---wallet-breadcrumb-animation-range
 				);
 			}
-
 		}
 
 		@media (max-width: 480px), (min-width: 1025px) and (max-width: 1399px) {
@@ -3511,13 +3549,6 @@
 				flex: 0 0 100%;
 				inline-size: 100%;
 				max-inline-size: 100%;
-			}
-
-			.attribute-heading-position[data-sticky-breadcrumb~='position']
-				> [data-sticky-breadcrumb~='item']::before {
-				content: '#';
-				animation: none;
-				opacity: 0;
 			}
 		}
 
@@ -3549,31 +3580,11 @@
 				}
 
 				h1 {
-					position: relative;
 					inline-size: max-content;
 					max-inline-size: none;
 					padding-inline-start: 0;
 					transform-origin: center;
 					animation: WalletRootContentMobileAnimation linear both;
-
-					&::before {
-						content: '›';
-						position: absolute;
-						inset-block: 0;
-						inset-inline-end: 100%;
-						display: grid;
-						place-items: center;
-						inline-size: var(---wallet-breadcrumb-gap);
-						font-size: 1em;
-						line-height: 1;
-						text-box: trim-both cap alphabetic;
-						pointer-events: none;
-						opacity: 0;
-						animation: WalletBreadcrumbRevealAnimation linear both;
-						animation-timeline: --wallet-page-scroll-timeline;
-						animation-range: var(---wallet-header-animation-range);
-					}
-
 					> * {
 						flex: none;
 					}
@@ -3628,7 +3639,9 @@
 
 					position: fixed;
 					inset-block-start: 1rem;
-					inset-inline-start: 50vi;
+					/* Viewport center is physical and direction-invariant. */
+					inset-inline: auto;
+					left: 50vi;
 					inline-size: max(
 						var(--navigation-logo-inlineSize),
 						var(---wallet-site-logo-inline-size)
@@ -3663,10 +3676,6 @@
 			@container anchored(fallback: --wallet-root-without-site-logo) {
 				article > header#top .wallet-name[data-sticky-breadcrumb] h1 {
 					animation-name: WalletRootContentWithoutSiteLogoMobileAnimation;
-
-					&::before {
-						content: none;
-					}
 				}
 			}
 
@@ -3717,13 +3726,6 @@
 						text-overflow: ellipsis;
 						white-space: nowrap;
 					}
-
-					&::before {
-						content: '#';
-						animation: none;
-						opacity: 0;
-					}
-
 				}
 			}
 
