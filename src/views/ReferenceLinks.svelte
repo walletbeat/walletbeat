@@ -216,8 +216,13 @@
 
 <style>
 	.references {
+		min-inline-size: 0;
 		font-size: 0.875em;
 		line-height: 1.7;
+	}
+
+	:is(.references-list, .explanation) {
+		overflow-wrap: anywhere;
 	}
 
 	h5 {
