@@ -1708,13 +1708,7 @@
 
 				@media (min-width: 1025px) {
 					display: flex;
-					overflow: visible;
-					/*
-					 * The panel is the TOC scroll viewport. Pull its box over the
-					 * pie while retaining the pie-sized flow reservation, so the
-					 * flower remains an overlay rather than a second scroll region.
-					 */
-					margin-block-start: calc(-1 * var(---pie-size));
+					overflow-block: auto;
 					position: static;
 					inline-size: 100%;
 				}
@@ -2199,7 +2193,7 @@
 			---pie-size-rem: var(---wallet-page-navigation-inline-size-rem);
 			---pie-size: calc(var(---pie-size-rem) * 1rem);
 
-			--sticky-marginBlockStart: calc(var(---pie-size) + 0.5rem);
+			--sticky-marginBlockStart: 0px;
 		}
 
 		.container .page-navigation > .pie-navigation[data-sticky] {
