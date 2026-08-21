@@ -1819,6 +1819,10 @@ ol {
 			--sticky-backgroundColor: light-dark(#F8EDFF, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
 
+			@media (prefers-reduced-transparency: reduce) {
+				--sticky-backdropFilter: none;
+			}
+
 			&[data-card] {
 				--sticky-backgroundColor: var(--card-backgroundColor);
 			}
@@ -1895,10 +1899,6 @@ ol {
 				&[data-sticky~="backdrop-before"]::before,
 				&[data-sticky~="backdrop-after"]::after {
 					transition-property: background-color, backdrop-filter;
-
-					@media (prefers-reduced-transparency: reduce) {
-						backdrop-filter: none;
-					}
 				}
 
 				&[data-sticky~="backdrop-before"]::before,
