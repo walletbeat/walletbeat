@@ -228,7 +228,6 @@
 		style:--slice-innerCornerRadius={slice.computed.innerCornerRadius}
 		style:--slice-totalAngle={slice.computed.totalAngle}
 		style:--slice-arcSize={Math.abs(slice.computed.totalAngle) > 180 ? 'large' : 'small'}
-		class:full-ring={Math.abs(slice.computed.totalAngle) >= 359.99}
 
 		style:--slice-color={slice.color}
 		style:--slice-fill={sliceFill(slice)}
@@ -241,6 +240,8 @@
 	>
 		<div
 			class="slice-shape"
+			data-pie-slice-geometry
+			data-pie-slice-full-ring={Math.abs(slice.computed.totalAngle) >= 359.99 ? '' : undefined}
 		>
 			{#if !slice.href && onSliceClick}
 				<noscript><span class="accessible-label">{slice.titleText}</span></noscript>
@@ -381,57 +382,6 @@
 				.slice-shape {
 					position: relative;
 
-					--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
-					--slice-halfGap: calc(var(--slice-gap) / 2);
-					--slice-outerCornerR: max(
-						0,
-						min(
-							var(--slice-outerCornerRadius),
-							calc((var(--slice-outerR) - var(--slice-innerR)) / 2),
-							max(
-								0,
-								(
-									(
-										sin(var(--slice-halfAngle)) * var(--slice-outerR)
-										- var(--slice-halfGap)
-									)
-									/ (1 + sin(var(--slice-halfAngle)))
-								)
-							)
-						)
-					);
-					--slice-innerCornerR: max(
-						0,
-						min(
-							var(--slice-innerCornerRadius),
-							calc((var(--slice-outerR) - var(--slice-innerR)) / 2),
-							max(
-								0,
-								(
-									(
-										sin(var(--slice-halfAngle)) * var(--slice-innerR)
-										- var(--slice-halfGap)
-									)
-									/ max(0.000001, 1 - sin(var(--slice-halfAngle)))
-								)
-							)
-						)
-					);
-					--slice-outerCornerOffset: calc(var(--slice-halfGap) + var(--slice-outerCornerR));
-					--slice-innerCornerOffset: calc(var(--slice-halfGap) + var(--slice-innerCornerR));
-					--slice-outerCornerCenterR: calc(var(--slice-outerR) - var(--slice-outerCornerR));
-					--slice-innerCornerCenterR: calc(var(--slice-innerR) + var(--slice-innerCornerR));
-					--slice-outerAngleInset: asin(var(--slice-outerCornerOffset) / var(--slice-outerCornerCenterR));
-					--slice-innerAngleInset: asin(var(--slice-innerCornerOffset) / var(--slice-innerCornerCenterR));
-					--slice-outerSideR: sqrt(pow(var(--slice-outerCornerCenterR), 2) - pow(var(--slice-outerCornerOffset), 2));
-					--slice-innerSideR: sqrt(pow(var(--slice-innerCornerCenterR), 2) - pow(var(--slice-innerCornerOffset), 2));
-					--slice-angleOuterStart: calc(var(--slice-outerAngleInset) - var(--slice-halfAngle));
-					--slice-angleOuterEnd: calc(var(--slice-halfAngle) - var(--slice-outerAngleInset));
-					--slice-angleInnerEnd: calc(var(--slice-halfAngle) - var(--slice-innerAngleInset));
-					--slice-angleInnerStart: calc(var(--slice-innerAngleInset) - var(--slice-halfAngle));
-					--slice-outerStartX: calc(var(--pie-originX) + sin(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
-					--slice-outerStartY: calc(var(--pie-originY) - cos(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px);
-
 					background: var(--slice-fill);
 					backdrop-filter: var(--slice-backdropFilter, none);
 
@@ -439,93 +389,6 @@
 						backdrop-filter: none;
 					}
 
-					clip-path: shape(
-						from
-							var(--slice-outerStartX)
-							var(--slice-outerStartY),
-						arc
-							to
-								calc(var(--pie-originX) + sin(var(--slice-angleOuterEnd)) * var(--slice-outerR) * 1px)
-								calc(var(--pie-originY) - cos(var(--slice-angleOuterEnd)) * var(--slice-outerR) * 1px)
-							of
-								calc(var(--slice-outerR) * 1px) cw var(--slice-arcSize),
-						arc
-							to
-								calc(var(--pie-originX) + (sin(var(--slice-halfAngle)) * var(--slice-outerSideR) - cos(var(--slice-halfAngle)) * var(--slice-halfGap)) * 1px)
-								calc(var(--pie-originY) - (cos(var(--slice-halfAngle)) * var(--slice-outerSideR) + sin(var(--slice-halfAngle)) * var(--slice-halfGap)) * 1px)
-							of
-								calc(var(--slice-outerCornerR) * 1px) cw small,
-						line
-							to
-								calc(var(--pie-originX) + (sin(var(--slice-halfAngle)) * var(--slice-innerSideR) - cos(var(--slice-halfAngle)) * var(--slice-halfGap)) * 1px)
-								calc(var(--pie-originY) - (cos(var(--slice-halfAngle)) * var(--slice-innerSideR) + sin(var(--slice-halfAngle)) * var(--slice-halfGap)) * 1px),
-						arc
-							to
-								calc(var(--pie-originX) + sin(var(--slice-angleInnerEnd)) * var(--slice-innerR) * 1px)
-								calc(var(--pie-originY) - cos(var(--slice-angleInnerEnd)) * var(--slice-innerR) * 1px)
-							of
-								calc(var(--slice-innerCornerR) * 1px) cw small,
-						arc
-							to
-								calc(var(--pie-originX) + sin(var(--slice-angleInnerStart)) * var(--slice-innerR) * 1px)
-								calc(var(--pie-originY) - cos(var(--slice-angleInnerStart)) * var(--slice-innerR) * 1px)
-							of
-								calc(var(--slice-innerR) * 1px) ccw var(--slice-arcSize),
-						arc
-							to
-								calc(var(--pie-originX) + (cos(var(--slice-halfAngle)) * var(--slice-halfGap) - sin(var(--slice-halfAngle)) * var(--slice-innerSideR)) * 1px)
-								calc(var(--pie-originY) - (cos(var(--slice-halfAngle)) * var(--slice-innerSideR) + sin(var(--slice-halfAngle)) * var(--slice-halfGap)) * 1px)
-							of
-								calc(var(--slice-innerCornerR) * 1px) cw small,
-						line
-							to
-								calc(var(--pie-originX) + (cos(var(--slice-halfAngle)) * var(--slice-halfGap) - sin(var(--slice-halfAngle)) * var(--slice-outerSideR)) * 1px)
-								calc(var(--pie-originY) - (cos(var(--slice-halfAngle)) * var(--slice-outerSideR) + sin(var(--slice-halfAngle)) * var(--slice-halfGap)) * 1px),
-						arc
-							to
-								var(--slice-outerStartX)
-								var(--slice-outerStartY)
-							of
-								calc(var(--slice-outerCornerR) * 1px) cw small,
-						close
-					);
-
-					.slice.full-ring & {
-						clip-path: shape(
-							from
-								calc(var(--pie-originX) + var(--slice-outerR) * 1px)
-								var(--pie-originY),
-							arc
-								to
-									calc(var(--pie-originX) - var(--slice-outerR) * 1px)
-									var(--pie-originY)
-								of
-									calc(var(--slice-outerR) * 1px) cw large,
-							arc
-								to
-									calc(var(--pie-originX) + var(--slice-outerR) * 1px)
-									var(--pie-originY)
-								of
-									calc(var(--slice-outerR) * 1px) cw large,
-							line
-								to
-									calc(var(--pie-originX) + var(--slice-innerR) * 1px)
-									var(--pie-originY),
-							arc
-								to
-									calc(var(--pie-originX) - var(--slice-innerR) * 1px)
-									var(--pie-originY)
-								of
-									calc(var(--slice-innerR) * 1px) ccw large,
-							arc
-								to
-									calc(var(--pie-originX) + var(--slice-innerR) * 1px)
-									var(--pie-originY)
-								of
-									calc(var(--slice-innerR) * 1px) ccw large,
-							close
-						);
-					}
 
 					transform-origin: var(--pie-originX) var(--pie-originY);
 					transform:

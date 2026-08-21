@@ -2205,168 +2205,6 @@
 	}
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
-		:is(
-			:global(.pie-navigation .navigation-items summary > a),
-			:global(.pie-navigation .navigation-items menu[data-navigation-depth='1'] > li > a)
-		) {
-			---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
-			---slice-offset: var(--slice-offset);
-			---slice-gap: var(--slice-gap);
-			---slice-outer-r: var(--slice-outerR);
-			---slice-inner-r: var(--slice-innerR);
-			---slice-outer-corner-radius: var(--slice-outerCornerRadius, calc(var(--slice-gap) / 2));
-			---slice-inner-corner-radius: var(--slice-innerCornerRadius, calc(var(--slice-gap) / 2));
-			---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
-			---slice-half-gap: calc(var(---slice-gap) / 2);
-			---slice-outer-corner-r: max(
-				0,
-				min(
-					var(---slice-outer-corner-radius),
-					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-					calc(
-						(
-							sin(var(---slice-half-angle)) * var(---slice-outer-r)
-							- var(---slice-half-gap)
-						)
-						/ (1 + sin(var(---slice-half-angle)))
-					)
-				)
-			);
-			---slice-inner-corner-r: max(
-				0,
-				min(
-					var(---slice-inner-corner-radius),
-					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-					calc(
-						(
-							sin(var(---slice-half-angle)) * var(---slice-inner-r)
-							- var(---slice-half-gap)
-						)
-						/ max(0.000001, 1 - sin(var(---slice-half-angle)))
-					)
-				)
-			);
-			---slice-outer-corner-offset: calc(var(---slice-half-gap) + var(---slice-outer-corner-r));
-			---slice-inner-corner-offset: calc(var(---slice-half-gap) + var(---slice-inner-corner-r));
-			---slice-outer-corner-center-r: calc(var(---slice-outer-r) - var(---slice-outer-corner-r));
-			---slice-inner-corner-center-r: calc(var(---slice-inner-r) + var(---slice-inner-corner-r));
-			---slice-outer-angle-inset: asin(var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r));
-			---slice-inner-angle-inset: asin(var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r));
-			---slice-outer-side-r: sqrt(pow(var(---slice-outer-corner-center-r), 2) - pow(var(---slice-outer-corner-offset), 2));
-			---slice-inner-side-r: sqrt(pow(var(---slice-inner-corner-center-r), 2) - pow(var(---slice-inner-corner-offset), 2));
-			---slice-angle-outer-start: calc(var(---slice-outer-angle-inset) - var(---slice-half-angle));
-			---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
-			---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
-			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-			---slice-unit: 1px;
-			---slice-arc-size: var(--slice-arcSize, small);
-			---slice-outer-start-x: calc(
-				var(---slice-origin)
-				+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-			);
-			---slice-outer-start-y: calc(
-				var(---slice-origin)
-				- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-			);
-			---slice-clip-path: shape(
-				from var(---slice-outer-start-x) var(---slice-outer-start-y),
-				arc to
-					calc(
-						var(---slice-origin)
-						+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-					)
-					of calc(var(---slice-outer-r) * var(---slice-unit)) cw var(---slice-arc-size),
-				arc to
-					calc(
-						var(---slice-origin)
-						+ (
-							sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-							- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-						) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- (
-							cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
-							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-						) * var(---slice-unit)
-					)
-					of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-				line to
-					calc(
-						var(---slice-origin)
-						+ (
-							sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-							- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-						) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- (
-							cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
-							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-						) * var(---slice-unit)
-					),
-				arc to
-					calc(
-						var(---slice-origin)
-						+ sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit)
-					)
-					of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-				arc to
-					calc(
-						var(---slice-origin)
-						+ sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit)
-					)
-					of calc(var(---slice-inner-r) * var(---slice-unit)) ccw var(---slice-arc-size),
-				arc to
-					calc(
-						var(---slice-origin)
-						+ (
-							cos(var(---slice-half-angle)) * var(---slice-half-gap)
-							- sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-						) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- (
-							cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
-							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-						) * var(---slice-unit)
-					)
-					of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-				line to
-					calc(
-						var(---slice-origin)
-						+ (
-							cos(var(---slice-half-angle)) * var(---slice-half-gap)
-							- sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-						) * var(---slice-unit)
-					)
-					calc(
-						var(---slice-origin)
-						- (
-							cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
-							+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-						) * var(---slice-unit)
-					),
-				arc to var(---slice-outer-start-x) var(---slice-outer-start-y)
-					of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-				close
-			);
-		}
 
 		.container .page-navigation {
 			---pie-size-rem: var(---wallet-page-navigation-inline-size-rem);
@@ -2518,7 +2356,8 @@
 				---slice-label-size: var(--slice-labelSize);
 				---slice-scale: 1;
 				---slice-label-offset: calc(var(--slice-labelR) * 1px);
-				---slice-origin: var(---pie-origin);
+				--pie-originX: var(---pie-origin);
+				--pie-originY: var(---pie-origin);
 
 				display: block;
 				position: absolute;
@@ -2531,12 +2370,11 @@
 				color: var(--text-primary);
 				opacity: 0.62;
 				pointer-events: auto;
-				transform-origin: var(---pie-origin) var(---pie-origin);
+				transform-origin: var(--pie-originX) var(--pie-originY);
 				transform:
 					rotate(var(---slice-mid-angle))
 					scale(var(---slice-scale))
-					translateY(calc(var(---slice-offset) * -1px));
-				clip-path: var(---slice-clip-path);
+					translateY(calc(var(--slice-offset) * -1px));
 				transition-property: opacity, ---slice-scale;
 			}
 

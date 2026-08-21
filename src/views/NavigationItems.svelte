@@ -282,6 +282,8 @@
 				interestfor: item.href.slice(1),
 			}}
 			data-row="start gap-2"
+			data-pie-slice-geometry={item.sliceStyle ? '' : undefined}
+			data-pie-slice-full-ring={Math.abs(item.sliceStyle?.totalAngle ?? 0) >= 359.99 ? '' : undefined}
 			style:--accent={item.accentColor ?? undefined}
 			style:--slice-totalAngle={item.sliceStyle?.totalAngle}
 			style:--slice-midAngle={item.sliceStyle?.midAngle}
