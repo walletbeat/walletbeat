@@ -11,3 +11,5 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
   - **Reaction**: Ambire fixes this in their next release: https://x.com/borislavItskovv/status/2081582575790006360
   - **Reaction**: WalletChan fixes this in their next release: https://x.com/walletbeat/status/2082293464071373094
   - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention: https://x.com/ambire/status/2082816470560747558
+- **2026-07** - Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited token approvals that caused a user to lose ~$500K: https://x.com/0xMattmatt/status/2089770628828237918
+	- **Reaction**: Ambire pushed an update to flag unlimited token approval for untrusted contracts and also thanked Walletbeat for its work: https://x.com/borislavItskovv/status/2090566092808982840
