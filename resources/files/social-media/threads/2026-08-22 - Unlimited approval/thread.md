@@ -37,24 +37,16 @@ But there was a tradeoff.
 
 If you leave an unlimited approval active, that contract can potentially spend your tokens later.
 
-If the contract gets exploited, compromised, or becomes malicious, those approved tokens can be at risk.
+If it gets exploited, compromised, or becomes malicious, those approved tokens could be at risk.
 
-The UX improvement introduced a security debt.
+The UX improvement came with a security risk.
 ---
 
-And there's a quieter risk nobody talks about enough:
+And there's another risk: we've normalized the approval itself.
 
-We've normalized the approval.
+Users see “Approve token” and instinctively click Confirm.
 
-Users see:
-
-“Approve token"
-
-…and instinctively click Confirm.
-
-After doing it hundreds of times, the approval becomes background noise.
-
-That's dangerous.
+After doing this hundreds of times, users stop thinking about what they're actually granting.
 ---
 
 An unlimited token approval isn't just saying:
@@ -92,8 +84,9 @@ No repeated approvals.
 
 No unlimited permissions.
 
-That's a much better tradeoff.
+No lingering permissions afterward.
 
+That's a much better tradeoff.
 ---
 
 But there's a coordination problem.
