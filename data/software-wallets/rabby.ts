@@ -709,13 +709,19 @@ export const rabby: SoftwareWallet = {
 								},
 							],
 						},
-						// The patch also drops upstream's NFKD normalization of the phrase before
+						// Rabby patched the seed-derivation step for speed, not for cryptographic
+						// reasons: commit 2694102dcd03 migrated off `react-native-quick-bip39` to
+						// `@scure/bip39` and patched `mnemonicToSeed(Sync)` back onto a native
+						// implementation "to keep same level performance as past". The parameters
+						// match BIP-39 either way: PBKDF2-SHA512, 2048 iterations, 64 bytes.
+						//
+						// The patch does drop upstream's NFKD normalization of the phrase before
 						// seed derivation. That is inert here because Rabby both generates and
 						// validates phrases against the English wordlist only, and those words are
 						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your own device, and takes the randomness it needs from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch changes how a phrase is turned into a seed, and leaves phrase generation on the same random source.',
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from, and leaves phrase generation on the same random source.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
