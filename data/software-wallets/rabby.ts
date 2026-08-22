@@ -696,7 +696,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Rabby keeps your recovery phrase on the device, encrypted with a key derived from your app password, so a copy of the stored file cannot be read without that password. The number of derivation rounds sets how slow each password guess is: the mobile app uses PBKDF2-HMAC-SHA256 at 5,000 rounds to a 256-bit key, and encrypts with AES-256-CBC.',
+								'Rabby keeps your recovery phrase on the device, encrypted with a key derived from your app password. The mobile app uses PBKDF2-HMAC-SHA256 at 5,000 rounds to a 256-bit key, and encrypts with AES-256-CBC.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -719,7 +719,7 @@ export const rabby: SoftwareWallet = {
 						// phrases against the English wordlist only, and those words are ASCII.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your own device rather than on a server, and takes the randomness it needs from the operating system rather than from its own code. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`.',
+								'Rabby creates your recovery phrase on your own device, and takes the randomness it needs from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
