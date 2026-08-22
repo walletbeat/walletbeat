@@ -100,3 +100,6 @@ Date	From	To	Amount	Purpose	ID
 2026-08-15	treasury	4everland_eoa	0.025 ETH [hosting-infra]	Seeding for 4everland EOA	0xe5bc4f12096f69a8dc7b2f768698951659d788931b24cac31211a882fac2c038
 2026-08-15	treasury	lucilajuliana.shefi.eth	1075 USDC [labor:comms] + 1075 USDC [labor:dev]	Payment for Lucila: Comms, UI/UX	0xadcb7062aec75b020561479d1a20afc95f593862ccf04dbd9ddb1395e972911f
 2026-08-15	treasury	treasury	2.75 WETH → 5170 USDC	Swap WETH to USDC on CoW swap	0xa5f7364f672e102ba8f4cf5f0ab532f392ecd941df266e7560a0f0e2e0c506ed
+2026-08-22	treasury	treasury	0	Approve 20 WETH for swapping on CoW Swap	0x5f74db6a2c3b53a93a6fefce53f85464ffd9af8f6f5755cb5237a739fb64d909
+2026-08-22	treasury	treasury	0	CoW Swap order creation	0x1087efdcb808d7fdea81926f93d7eb4e9008dce39d4375257afa20749458ce15
+2026-08-22	treasury	treasury	1.641313577910601550 WETH → 4000 USDC	CoW swap from WETH to USDC	0x4a03cd4b81c6ffdcd542179504e2a9bee2b96f7082a26368feec378e104c2636
