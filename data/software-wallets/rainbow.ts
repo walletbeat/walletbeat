@@ -766,8 +766,7 @@ export const rainbow: SoftwareWallet = {
 								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/keychain.ts#L399-L414',
 							},
 							{
-								explanation:
-									'On an Android phone with no screen lock set, the app asks for a PIN of its own.',
+								explanation: 'On an Android phone with no screen lock set, the app asks for a PIN.',
 								label: 'PIN screen in the mobile app source code',
 								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/pinAuthentication.ts#L116-L123',
 							},
