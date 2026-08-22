@@ -1206,6 +1206,8 @@ ol {
  * - `scope`: visibility boundary for descendant items
  * - `position`: regular-layout position anchor and view-timeline source
  * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+ * - `marker`: zero-shift separator/permalink slot inside an item
+ * - `backdrop`: row surface after an item; follows the same arrival and scope exit
  * - `mobile`: enable the paired role only through the layout mobile breakpoint
  *
  * `[data-sticky]` containers keep `position: sticky` for the whole scroll.
@@ -1240,6 +1242,14 @@ ol {
  * - `--stickyBreadcrumb-exitAnimationDistance`
  * - `--stickyBreadcrumb-itemAnchor`
  * - `--stickyBreadcrumb-parentAnchor`
+ * - `--stickyBreadcrumb-backdrop-display`
+ * - `--stickyBreadcrumb-backdrop-insetBlockStart`
+ * - `--stickyBreadcrumb-backdrop-insetInlineStart`
+ * - `--stickyBreadcrumb-backdrop-blockSize`
+ * - `--stickyBreadcrumb-backdrop-inlineSize`
+ * - `--stickyBreadcrumb-backdrop-backgroundColor`
+ * - `--stickyBreadcrumb-backdrop-backdropFilter`
+ * - `--stickyBreadcrumb-backdrop-zIndex`
  *
  * ### Example
  * ```html
@@ -1318,11 +1328,7 @@ ol {
 
 		anchor-scope:
 			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
-			--sticky-breadcrumb-scope,
-			--sticky-breadcrumb-extra-position,
-			--sticky-breadcrumb-icon-pad,
-			--sticky-breadcrumb-companion-pad,
-			var(--stickyBreadcrumb-iconAnchor, --sticky-breadcrumb-extra-position);
+			--sticky-breadcrumb-scope;
 		timeline-scope: --sticky-breadcrumb-scope-timeline;
 		view-timeline-name: --sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
@@ -1357,7 +1363,8 @@ ol {
 		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
 
 		&:not([data-sticky-breadcrumb~="root"]) {
-			--stickyBreadcrumb-exitTranslate: 0 -100vb;
+			--stickyBreadcrumb-exitTranslate: 0
+				calc(-2 * var(--stickyBreadcrumb-trackBlockEnd, 1lh));
 			---stickyBreadcrumb-targetInsetInlineStart: var(
 				--stickyBreadcrumb-item-insetInlineStart,
 				anchor(
@@ -1407,9 +1414,10 @@ ol {
 			);
 			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
 			margin-inline-start: 0;
+			block-size: var(--stickyBreadcrumb-item-blockSize, auto);
 			min-block-size: 0;
 			display: flex;
-			align-items: safe center;
+			align-items: center;
 			inline-size: var(--stickyBreadcrumb-item-inlineSize, auto);
 			justify-self: var(--stickyBreadcrumb-item-justifySelf, auto);
 			position-try-fallbacks: none;
@@ -1433,7 +1441,77 @@ ol {
 				var(---stickyBreadcrumb-exitAnimationRangeStart)
 				var(---stickyBreadcrumb-exitAnimationRangeEnd);
 			animation-composition: replace, add;
+
+			> [data-sticky-breadcrumb~="marker"],
+			> a > [data-sticky-breadcrumb~="marker"] {
+				position: absolute;
+				inset-block-start: 0;
+				inset-inline-start: calc(-1 * var(--stickyBreadcrumb-gap, 1rem));
+				display: grid;
+				place-items: center;
+				inline-size: var(--stickyBreadcrumb-gap, 1rem);
+				block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+				font-size: 1em;
+				line-height: 1;
+				text-box: trim-both cap alphabetic;
+				overflow: clip;
+				pointer-events: none;
+
+				&::before {
+					content: '#';
+					opacity: 0;
+				}
+			}
+
+			&:is(:hover, :focus-visible)
+				> [data-sticky-breadcrumb~="marker"]::before,
+			> a:is(:hover, :focus-visible)
+				> [data-sticky-breadcrumb~="marker"]::before {
+				opacity: 1;
+			}
 		}
+	}
+
+	[data-sticky-breadcrumb~="position"]
+		> [data-sticky-breadcrumb~="backdrop"] {
+		display: var(--stickyBreadcrumb-backdrop-display, none);
+		z-index: var(--stickyBreadcrumb-backdrop-zIndex, 0);
+		position: fixed;
+		position-anchor: var(
+			--stickyBreadcrumb-itemAnchor,
+			--sticky-breadcrumb-item
+		);
+		position-visibility: always;
+		inset-block-start: var(
+			--stickyBreadcrumb-backdrop-insetBlockStart,
+			anchor(top)
+		);
+		inset-inline-start: var(
+			--stickyBreadcrumb-backdrop-insetInlineStart,
+			anchor(start)
+		);
+		inline-size: var(--stickyBreadcrumb-backdrop-inlineSize, anchor-size(width));
+		block-size: var(--stickyBreadcrumb-backdrop-blockSize, anchor-size(height));
+		background-color: var(--stickyBreadcrumb-backdrop-backgroundColor, transparent);
+		backdrop-filter: var(--stickyBreadcrumb-backdrop-backdropFilter, none);
+		pointer-events: none;
+		opacity: 0;
+		animation:
+			StickyBreadcrumbBackdropRevealAnimation
+				var(--stickyBreadcrumb-animationTimingFunction, linear)
+				both,
+			StickyBreadcrumbItemExitAnimation linear both;
+		animation-timeline:
+			--sticky-breadcrumb-timeline,
+			--sticky-breadcrumb-scope-timeline;
+		animation-range:
+			var(
+				--stickyBreadcrumb-animationRange,
+				entry calc(100vh - 6rem) entry calc(100vh - 3rem)
+			),
+			var(---stickyBreadcrumb-exitAnimationRangeStart)
+			var(---stickyBreadcrumb-exitAnimationRangeEnd);
+		animation-composition: replace, add;
 	}
 
 	@keyframes StickyBreadcrumbItemAnimation {
@@ -1460,7 +1538,6 @@ ol {
 			translate: var(--stickyBreadcrumb-item-translate, none);
 			margin-inline-start: var(---stickyBreadcrumb-animationMarginInlineStart);
 			margin-inline-end: var(---stickyBreadcrumb-animationMarginInlineEnd);
-			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
 			position-try-fallbacks: var(
 				--stickyBreadcrumb-item-positionTryFallbacks,
 				none
@@ -1469,8 +1546,7 @@ ol {
 	}
 
 	@keyframes StickyBreadcrumbItemExitAnimation {
-		from,
-		99.999% {
+		from {
 			visibility: visible;
 			translate: none;
 		}
@@ -1481,15 +1557,27 @@ ol {
 		}
 	}
 
+	@keyframes StickyBreadcrumbBackdropRevealAnimation {
+		to {
+			opacity: 1;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		[data-sticky-breadcrumb~="item"]:not([data-sticky-breadcrumb~="root"]) {
 			position: static;
 			position-anchor: auto;
 			inset: auto;
 			inline-size: auto;
+			block-size: auto;
 			min-block-size: 0;
 			margin-inline-start: 0;
 			position-try-fallbacks: none;
+			animation: none;
+		}
+
+		[data-sticky-breadcrumb~="backdrop"] {
+			display: none;
 			animation: none;
 		}
 	}
@@ -1853,6 +1941,7 @@ ol {
 			--sticky-backdropFilter: blur(20px);
 
 			@media (prefers-reduced-transparency: reduce) {
+				--sticky-backgroundColor: light-dark(#F8EDFF, #130a2b);
 				--sticky-backdropFilter: none;
 			}
 

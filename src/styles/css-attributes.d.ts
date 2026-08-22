@@ -1007,6 +1007,8 @@ interface CssAttributes {
 	 * - `scope`: visibility boundary for descendant items
 	 * - `position`: regular-layout position anchor and view-timeline source
 	 * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+	 * - `marker`: zero-shift separator/permalink slot inside an item
+	 * - `backdrop`: row surface after an item; follows the same arrival and scope exit
 	 * - `mobile`: enable the paired role only through the layout mobile breakpoint
 	 *
 	 * `[data-sticky]` containers keep `position: sticky` for the whole scroll.
@@ -1041,6 +1043,14 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-exitAnimationDistance`
 	 * - `--stickyBreadcrumb-itemAnchor`
 	 * - `--stickyBreadcrumb-parentAnchor`
+	 * - `--stickyBreadcrumb-backdrop-display`
+	 * - `--stickyBreadcrumb-backdrop-insetBlockStart`
+	 * - `--stickyBreadcrumb-backdrop-insetInlineStart`
+	 * - `--stickyBreadcrumb-backdrop-blockSize`
+	 * - `--stickyBreadcrumb-backdrop-inlineSize`
+	 * - `--stickyBreadcrumb-backdrop-backgroundColor`
+	 * - `--stickyBreadcrumb-backdrop-backdropFilter`
+	 * - `--stickyBreadcrumb-backdrop-zIndex`
 	 *
 	 * ### Example
 	 * ```html
