@@ -87,7 +87,7 @@ export const metamask: SoftwareWallet = {
 		tableName: 'MetaMask',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-21',
+		lastUpdated: '2026-08-22',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -799,49 +799,18 @@ export const metamask: SoftwareWallet = {
 					requiredReview: true,
 					tagsImmutable: true,
 				},
-				reproducibleBuilds: {
-					// The extension release workflow rebuilds each published Firefox artifact
-					// from source and compares it against the release. The comparison runs
-					// after the release is created and is marked `continue-on-error`, so a
-					// mismatch fails the workflow rather than blocking publication. The build
-					// recipe, the source and the release zips are public, so an independent
-					// party can attempt the same rebuild; the comparison harness
-					// (`MetaMask/firefox-bundle-script`) is a private repository, so its
-					// matching criteria are not publicly auditable.
-					[Variant.BROWSER]: supported({
-						ref: [
-							{
-								explanation:
-									'The extension repository documents that its release pipeline runs `prepare_release.sh`, which rebuilds the Firefox artifact, runs `compare_builds.sh`, and exits non-zero when the reproduced build differs from the published one.',
-								url: 'https://github.com/MetaMask/metamask-extension/blob/36fd2b1e50ae2ee5b4de2b146929c61d07ab2f80/.github/scripts/publish-firefox-reviewer-artifacts.sh#L118-L120',
-							},
-							{
-								explanation:
-									'`compare_builds.sh` compares the two build trees file-by-file by SHA-256 digest, via `mtree -c -k sha256digest`.',
-								url: 'https://github.com/MetaMask/metamask-extension/blob/36fd2b1e50ae2ee5b4de2b146929c61d07ab2f80/.github/scripts/publish-firefox-reviewer-artifacts.sh#L49-L54',
-							},
-							{
-								explanation:
-									'The rebuild-and-compare step runs after the GitHub release is created and is marked `continue-on-error`, so a mismatch marks the workflow failed rather than preventing the release.',
-								url: 'https://github.com/MetaMask/metamask-extension/blob/36fd2b1e50ae2ee5b4de2b146929c61d07ab2f80/.github/workflows/publish-release-from-release-head.yml#L339-L348',
-							},
-							{
-								explanation:
-									'Release zip entry modification times are resolved from `SOURCE_DATE_EPOCH` when set and from the latest commit timestamp otherwise, so the archive does not vary with the time of the build.',
-								url: 'https://github.com/MetaMask/metamask-extension/blob/36fd2b1e50ae2ee5b4de2b146929c61d07ab2f80/development/webpack/utils/plugins/ManifestPlugin/zip-mtime.ts#L43-L53',
-							},
-							{
-								explanation:
-									'Each release publishes the built zips alongside a `SHA256SUMS` file, giving an independent party a published digest to compare a rebuild against.',
-								url: 'https://github.com/MetaMask/metamask-extension/releases/tag/v13.45.0',
-							},
-						],
-					}),
-					// The mobile app publishes no reproducible-build tooling, documentation or
-					// verification process, so an independent party cannot rebuild a released
-					// build and confirm a bit-for-bit match.
-					[Variant.MOBILE]: notSupported,
-				},
+				// MetaMask reproduces its Firefox builds internally: the release workflow
+				// rebuilds each published artifact and compares the build trees by SHA-256
+				// digest, and it ships a source package to Mozilla's reviewers. Neither is
+				// something an independent party can carry out. The comparison harness
+				// (`MetaMask/firefox-bundle-script`) and the reviewer instructions are
+				// private, no public procedure documents how to reproduce a release, and
+				// the public build recipe derives `SOURCE_DATE_EPOCH` from a checkout
+				// timestamp while the release build falls back to the latest commit
+				// timestamp, so an independent rebuild does not yield a byte-for-byte
+				// identical artifact. The mobile app publishes no reproducible-build
+				// tooling or verification process at all.
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
