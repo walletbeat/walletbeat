@@ -710,10 +710,13 @@ export const rabby: SoftwareWallet = {
 							],
 						},
 						// The repository patches `@scure/bip39` 1.3.0
-						// (.yarn/patches/@scure-bip39-npm-1.3.0-1d74c5c469.patch). The patch only
-						// replaces the seed-derivation PBKDF2 with a native implementation and adds
-						// `Uint8Array` mnemonic handling; it leaves `generateMnemonic` and its
-						// entropy source untouched, so the entropy claim below still holds.
+						// (.yarn/patches/@scure-bip39-npm-1.3.0-1d74c5c469.patch). It leaves
+						// `generateMnemonic` and its entropy source untouched, so the reference
+						// below holds. It does replace seed derivation (phrase to seed) with a
+						// native implementation, at BIP-39's parameters: PBKDF2-SHA512, 2048
+						// iterations, 64 bytes. It also drops upstream's NFKD normalization of the
+						// phrase, which is inert here because Rabby both generates and validates
+						// phrases against the English wordlist only, and those words are ASCII.
 						{
 							explanation:
 								'Recovery phrases are generated on device by `@scure/bip39`, drawing entropy from `crypto.getRandomValues` as provided by `react-native-quick-crypto`, which is backed by the platform CSPRNG.',
