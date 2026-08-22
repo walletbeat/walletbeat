@@ -82,7 +82,7 @@ export const rainbow: SoftwareWallet = {
 		tableName: 'Rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-20',
+		lastUpdated: '2026-08-22',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -733,18 +733,55 @@ export const rainbow: SoftwareWallet = {
 				}),
 			},
 			bugBountyProgram: notSupported,
-			duressResistance: supported({
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+			duressResistance: {
+				[Variant.BROWSER]: supported({
+					basicUnlock: {
+						ref: {
+							explanation: 'The extension is unlocked with a password.',
+							label: 'Extension unlock screen source code',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx',
+						},
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
 					},
-				},
-				duressMode: notSupported,
-			}),
+					duressMode: notSupported,
+				}),
+				[Variant.MOBILE]: supported({
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'Opening the mobile app requires the phone to authenticate the user first.',
+								label: 'App unlock check in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/isAuthenticated.ts#L16-L33',
+							},
+							{
+								explanation:
+									'That authentication is Face ID or Touch ID on iOS and fingerprint or face unlock on Android, with the phone passcode accepted in their place.',
+								label: 'Biometric unlock settings in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/keychain.ts#L399-L414',
+							},
+							{
+								explanation:
+									'On an Android phone with no screen lock set, the app asks for a PIN of its own.',
+								label: 'PIN screen in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/pinAuthentication.ts#L116-L123',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: true,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				}),
+			},
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
