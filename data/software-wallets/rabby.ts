@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
@@ -65,6 +66,7 @@ import {
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
@@ -72,20 +74,29 @@ import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
 import rabbyRawExtManifest from './manifests/rabby/acmacodkjbdgmoleebolmdjonilkdbch.manifest.json'
+import rabbyAndroidParsed from './manifests/rabby/android.parsed.json'
+import rabbyIosParsed from './manifests/rabby/ios.parsed.json'
 export const rabby: SoftwareWallet = {
 	metadata: {
 		id: 'rabby',
 		displayName: 'Rabby',
 		tableName: 'Rabby',
-		contributors: [polymutex, nconsigny, mattmatt],
+		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-07-20',
+		lastUpdated: '2026-08-22',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://rabbykit.rabby.io/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
 			],
-			repositories: ['https://github.com/RabbyHub/Rabby'],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/ios/RabbyMobile/Info.plist',
+			repositories: [
+				'https://github.com/RabbyHub/Rabby',
+				'https://github.com/RabbyHub/rabby-mobile',
+			],
 			socials: {
 				discord: 'https://discord.com/invite/seFBCWmUre',
 				x: 'https://x.com/Rabby_io',
@@ -681,7 +692,47 @@ export const rabby: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 				desktop: 'NOT_A_DESKTOP_APP',
-				mobile: 'NOT_A_MOBILE_APP',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								'The mobile app builds its keyring service with its own React Native encryption module rather than the `@metamask/browser-passworder` used by the extension. It derives the vault key from the user password with PBKDF2-HMAC-SHA256 at 5,000 iterations to a 256-bit key, and encrypts the vault with AES-256-CBC, both via `react-native-aes-crypto`.',
+							lastRetrieved: '2026-08-22',
+							url: [
+								{
+									label: 'Keyring service construction',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/core/services/startupCoreLoader.ts#L187-L188',
+								},
+								{
+									label: 'PBKDF2 parameters and AES mode',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/core/services/encryptor.ts#L12-L23',
+								},
+							],
+						},
+						{
+							explanation:
+								'Recovery phrases are generated on device by `@scure/bip39`, which draws entropy from `@noble/hashes` `randomBytes` and therefore from `crypto.getRandomValues`. The app installs that provider at startup via `react-native-quick-crypto`, which is backed by the platform CSPRNG. The repository patches `@scure/bip39` 1.3.0, but the patch only replaces the seed-derivation PBKDF2 with a native implementation and adds `Uint8Array` mnemonic handling; it does not alter `generateMnemonic` or its entropy source.',
+							lastRetrieved: '2026-08-22',
+							url: [
+								{
+									label: 'Recovery phrase generation',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2589',
+								},
+								{
+									label: 'Crypto provider installed at app startup',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts',
+								},
+								{
+									label: '`@scure/bip39` patch',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
+								},
+							],
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					mobileAppHardening: parseMobileManifestJson(rabbyAndroidParsed, rabbyIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
 			},
 			transactionLegibility: {
 				ref: refTodo,
