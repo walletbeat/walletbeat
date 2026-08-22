@@ -800,9 +800,8 @@ export const metamask: SoftwareWallet = {
 					tagsImmutable: true,
 				},
 				// MetaMask rebuilds and compares its own Firefox releases, but the harness
-				// and reviewer instructions are private and no public procedure documents
-				// reproducing a release, so no independent party can obtain a byte-for-byte
-				// match. The mobile app publishes no reproducible-build tooling at all.
+				// and reviewer instructions are private so it can't be independently
+				// reproduced. The mobile app publishes no reproducible-build tooling at all.
 				reproducibleBuilds: notSupported,
 			},
 		},
