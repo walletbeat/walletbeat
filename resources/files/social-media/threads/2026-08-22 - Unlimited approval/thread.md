@@ -82,8 +82,6 @@ Approve the exact amount AND swap at the same time, in a single transaction.
 
 No repeated approvals.
 
-No unlimited permissions.
-
 No lingering permissions afterward.
 
 That's a much better tradeoff.
