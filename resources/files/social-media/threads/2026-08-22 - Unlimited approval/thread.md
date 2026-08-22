@@ -1,3 +1,7 @@
+Quoting: https://x.com/osint_based/status/2087904964236501162
+
+---
+
 $500K USD was stolen from a user through a malicious approval.
 
 At @walletbeat, we use unlimited token approvals as part of our evaluation framework to test how wallets warn users about potentially dangerous transactions.
