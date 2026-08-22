@@ -703,6 +703,7 @@ summary {
  * - `--card-backgroundColor`
  * - `--card-radius`
  * - `--card-padding`
+ * - `--card-borderWidth`
  *
  * ### Examples
  * - Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):
@@ -728,6 +729,7 @@ summary {
 	--card-backgroundColor: var(--background-primary);
 	--card-radius: 0.5em;
 	--card-padding: 1em;
+	--card-borderWidth: 0px;
 
 	/* Rules */
 	background-color: var(--card-backgroundColor);
@@ -787,7 +789,8 @@ summary {
 	}
 
 	&[data-card~="border-accent"] {
-		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
+		--card-borderWidth: 2px;
+		border: var(--card-borderWidth) solid color-mix(in srgb, var(--accent) 90%, transparent);
 	}
 }
 
@@ -1219,6 +1222,7 @@ ol {
  *
  * ### CSS Variables
  * - `--stickyBreadcrumb-animationRange`
+ * - `--stickyBreadcrumb-inlineAnimationRange`
  * - `--stickyBreadcrumb-animationTimingFunction`
  * - `--stickyBreadcrumb-gap`
  * - `--stickyBreadcrumb-position-minBlockSize`
@@ -1423,24 +1427,33 @@ ol {
 			position-try-fallbacks: none;
 
 			animation:
-				StickyBreadcrumbItemAnimation
+				StickyBreadcrumbItemInlineAnimation
 					var(
 						--stickyBreadcrumb-animationTimingFunction,
 						var(--transition-easeInOutExpo)
 					)
 					both,
+				StickyBreadcrumbItemHandoffAnimation steps(1, end) both,
 				StickyBreadcrumbItemExitAnimation linear both;
 			animation-timeline:
 				--sticky-breadcrumb-timeline,
+				--sticky-breadcrumb-timeline,
 				--sticky-breadcrumb-scope-timeline;
 			animation-range:
+				var(
+					--stickyBreadcrumb-inlineAnimationRange,
+					var(
+						--stickyBreadcrumb-animationRange,
+						entry calc(100vh - 6rem) entry calc(100vh - 3rem)
+					)
+				),
 				var(
 					--stickyBreadcrumb-animationRange,
 					entry calc(100vh - 6rem) entry calc(100vh - 3rem)
 				),
 				var(---stickyBreadcrumb-exitAnimationRangeStart)
 				var(---stickyBreadcrumb-exitAnimationRangeEnd);
-			animation-composition: replace, add;
+			animation-composition: replace, replace, add;
 
 			> [data-sticky-breadcrumb~="marker"],
 			> a > [data-sticky-breadcrumb~="marker"] {
@@ -1514,7 +1527,20 @@ ol {
 		animation-composition: replace, add;
 	}
 
-	@keyframes StickyBreadcrumbItemAnimation {
+	@keyframes StickyBreadcrumbItemInlineAnimation {
+		to {
+			inset-inline-start: var(---stickyBreadcrumb-animationInsetInlineStart);
+			inset-inline-end: var(---stickyBreadcrumb-animationInsetInlineEnd);
+			margin-inline-start: var(---stickyBreadcrumb-animationMarginInlineStart);
+			margin-inline-end: var(---stickyBreadcrumb-animationMarginInlineEnd);
+			position-try-fallbacks: var(
+				--stickyBreadcrumb-item-positionTryFallbacks,
+				none
+			);
+		}
+	}
+
+	@keyframes StickyBreadcrumbItemHandoffAnimation {
 		to {
 			position-anchor: var(
 				--stickyBreadcrumb-item-targetAnchor,
@@ -1530,18 +1556,10 @@ ol {
 						var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
 						top
 					)
-					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+						+ var(--stickyBreadcrumb-item-blockOffset, 0px)
 				)
 			);
-			inset-inline-start: var(---stickyBreadcrumb-animationInsetInlineStart);
-			inset-inline-end: var(---stickyBreadcrumb-animationInsetInlineEnd);
 			translate: var(--stickyBreadcrumb-item-translate, none);
-			margin-inline-start: var(---stickyBreadcrumb-animationMarginInlineStart);
-			margin-inline-end: var(---stickyBreadcrumb-animationMarginInlineEnd);
-			position-try-fallbacks: var(
-				--stickyBreadcrumb-item-positionTryFallbacks,
-				none
-			);
 		}
 	}
 

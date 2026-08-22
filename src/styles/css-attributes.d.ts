@@ -46,6 +46,7 @@ interface CssAttributes {
 	 * - `--card-backgroundColor`
 	 * - `--card-radius`
 	 * - `--card-padding`
+	 * - `--card-borderWidth`
 	 *
 	 * ### Examples
 	 * - Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):
@@ -1020,6 +1021,7 @@ interface CssAttributes {
 	 *
 	 * ### CSS Variables
 	 * - `--stickyBreadcrumb-animationRange`
+	 * - `--stickyBreadcrumb-inlineAnimationRange`
 	 * - `--stickyBreadcrumb-animationTimingFunction`
 	 * - `--stickyBreadcrumb-gap`
 	 * - `--stickyBreadcrumb-position-minBlockSize`
