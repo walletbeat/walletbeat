@@ -4,7 +4,7 @@ Quoting: https://x.com/osint_based/status/2087904964236501162
 
 $500K USD was stolen from a user through a malicious approval.
 
-At @walletbeat, we use unlimited token approvals as part of our evaluation framework to test how wallets warn users about potentially dangerous transactions.
+At @Walletbeat, we use unlimited token approvals as part of our evaluation framework to test how wallets warn users about potentially dangerous transactions.
 
 But this raises an important question:
 
@@ -24,13 +24,13 @@ Approve token → TX
 Every time you want to use your tokens, you have to approve spending again.
 ---
 
-	Back then, token approvals were a huge UX problem.
+Back then, token approvals were a huge UX problem.
 
-	Unlimited approvals became the temporary solution.
+Unlimited approvals became the temporary solution.
 
-	Instead of approving a specific amount every time, you could approve a contract to spend an unlimited amount of your tokens.
+Instead of approving a specific amount every time, you could approve a contract to spend an unlimited amount of your tokens.
 
-	One unlimited approval = Much less friction.
+One unlimited approval = Much less friction.
 ---
 
 But there was a tradeoff.
@@ -61,7 +61,7 @@ An unlimited token approval isn't just saying:
 
 “Let this transaction spend my tokens.”
 
-It's effectively letting spenders use your tokens whenever the token contract allows it.
+It lets the contract spend your tokens as it sees fit, including long past your intended transaction.
 
 That's a much bigger permission than most users realize.
 ---
@@ -86,7 +86,7 @@ No need for unlimited approvals.
 
 The ideal UX becomes:
 
-One action → approve the exact amount → swap
+Approve the exact amount AND swap at the same time, in a single transaction.
 
 No repeated approvals.
 
@@ -100,13 +100,13 @@ But there's a coordination problem.
 
 For unlimited approvals to become unnecessary industry-wide:
 
-Both dapps and wallets need to support batched transactions.
+Both apps and wallets need to support batched transactions.
 
 Both sides need to move.
 
 ---
 
-Unfortunately, wallets and dapps have a history of waiting for the other side to adopt first.
+Unfortunately, apps and wallets have a history of waiting for the other side to adopt first.
 
 And that's how adoption stalls.
 
@@ -119,7 +119,7 @@ Unlimited approvals don't have to be the norm anymore. Let's change that.
 
 ---
 
-At @walletbeat, we're trying to make wallets better at communicating these risks.
+At @Walletbeat, we're trying to make wallets better at communicating these risks.
 
 The goal isn't more scary warnings.
 
