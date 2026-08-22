@@ -799,17 +799,10 @@ export const metamask: SoftwareWallet = {
 					requiredReview: true,
 					tagsImmutable: true,
 				},
-				// MetaMask reproduces its Firefox builds internally: the release workflow
-				// rebuilds each published artifact and compares the build trees by SHA-256
-				// digest, and it ships a source package to Mozilla's reviewers. Neither is
-				// something an independent party can carry out. The comparison harness
-				// (`MetaMask/firefox-bundle-script`) and the reviewer instructions are
-				// private, no public procedure documents how to reproduce a release, and
-				// the public build recipe derives `SOURCE_DATE_EPOCH` from a checkout
-				// timestamp while the release build falls back to the latest commit
-				// timestamp, so an independent rebuild does not yield a byte-for-byte
-				// identical artifact. The mobile app publishes no reproducible-build
-				// tooling or verification process at all.
+				// MetaMask rebuilds and compares its own Firefox releases, but the harness
+				// and reviewer instructions are private and no public procedure documents
+				// reproducing a release, so no independent party can obtain a byte-for-byte
+				// match. The mobile app publishes no reproducible-build tooling at all.
 				reproducibleBuilds: notSupported,
 			},
 		},
