@@ -721,7 +721,7 @@ export const rabby: SoftwareWallet = {
 						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the private key an account is derived from for efficiency gains.',
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
