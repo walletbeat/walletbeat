@@ -721,7 +721,7 @@ export const rabby: SoftwareWallet = {
 						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from, and leaves phrase generation on the same random source.',
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the private key an account is derived from for efficiency gains.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -735,6 +735,10 @@ export const rabby: SoftwareWallet = {
 								{
 									label: 'The patch, which leaves `generateMnemonic` untouched',
 									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
+								},
+								{
+									label: 'The patch was made "to keep same level performance as past"',
+									url: 'https://github.com/RabbyHub/rabby-mobile/commit/2694102dcd03',
 								},
 								{
 									label: '`@scure/bip39` 1.3.0 draws phrase entropy from `@noble/hashes`',
