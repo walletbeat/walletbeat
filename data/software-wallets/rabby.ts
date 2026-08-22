@@ -709,22 +709,34 @@ export const rabby: SoftwareWallet = {
 								},
 							],
 						},
-						// The repository patches `@scure/bip39` 1.3.0
-						// (.yarn/patches/@scure-bip39-npm-1.3.0-1d74c5c469.patch). It leaves
-						// `generateMnemonic` and its entropy source untouched, so the reference
-						// below holds. It does replace seed derivation (phrase to seed) with a
-						// native implementation, at BIP-39's parameters: PBKDF2-SHA512, 2048
-						// iterations, 64 bytes. It also drops upstream's NFKD normalization of the
-						// phrase, which is inert here because Rabby both generates and validates
-						// phrases against the English wordlist only, and those words are ASCII.
+						// The patch also drops upstream's NFKD normalization of the phrase before
+						// seed derivation. That is inert here because Rabby both generates and
+						// validates phrases against the English wordlist only, and those words are
+						// ASCII. It would not be inert if a non-English wordlist were ever added.
 						{
 							explanation:
-								'Rabby creates your recovery phrase on your own device, and takes the randomness it needs from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`.',
+								'Rabby creates your recovery phrase on your own device, and takes the randomness it needs from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch changes how a phrase is turned into a seed, and leaves phrase generation on the same random source.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
 									label: 'Recovery phrase generation',
 									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2589',
+								},
+								{
+									label: 'Every `@scure/bip39` request pinned to the patched build',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/package.json#L92-L97',
+								},
+								{
+									label: 'The patch, which leaves `generateMnemonic` untouched',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
+								},
+								{
+									label: '`@scure/bip39` 1.3.0 draws phrase entropy from `@noble/hashes`',
+									url: 'https://github.com/paulmillr/scure-bip39/blob/bcb06919feb3342ca116be125f126c8ad9052278/src/index.ts#L40-L44',
+								},
+								{
+									label: '`@noble/hashes` 1.4.0 sources that entropy from `crypto.getRandomValues`',
+									url: 'https://github.com/paulmillr/noble-hashes/blob/531daab72e8cef0dbaf2db134260c758a89a39ed/src/utils.ts#L249-L256',
 								},
 								{
 									label: 'Crypto provider installed at app startup',
