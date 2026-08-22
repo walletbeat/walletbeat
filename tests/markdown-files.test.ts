@@ -168,4 +168,12 @@ describe('markdown files', async () => {
 			)
 		}
 	})
+
+	describe('whitelist never grows', () => {
+		const whitelistExpectedSizePleaseNeverIncreaseThis = 27 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
+
+		it('has the expected size', () => {
+			expect(GRAMMAR_CHECK_WHITELIST.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThis)
+		})
+	})
 })
