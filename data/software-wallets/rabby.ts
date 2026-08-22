@@ -696,7 +696,7 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The mobile app builds its keyring service with its own React Native encryption module rather than the `@metamask/browser-passworder` used by the extension. It derives the vault key from the user password with PBKDF2-HMAC-SHA256 at 5,000 iterations to a 256-bit key, and encrypts the vault with AES-256-CBC, both via `react-native-aes-crypto`.',
+								'The mobile app builds its keyring service with its own React Native encryption module. It derives the vault key from the user password with PBKDF2-HMAC-SHA256 at 5,000 iterations to a 256-bit key, and encrypts the vault with AES-256-CBC.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -709,9 +709,14 @@ export const rabby: SoftwareWallet = {
 								},
 							],
 						},
+						// The repository patches `@scure/bip39` 1.3.0
+						// (.yarn/patches/@scure-bip39-npm-1.3.0-1d74c5c469.patch). The patch only
+						// replaces the seed-derivation PBKDF2 with a native implementation and adds
+						// `Uint8Array` mnemonic handling; it leaves `generateMnemonic` and its
+						// entropy source untouched, so the entropy claim below still holds.
 						{
 							explanation:
-								'Recovery phrases are generated on device by `@scure/bip39`, which draws entropy from `@noble/hashes` `randomBytes` and therefore from `crypto.getRandomValues`. The app installs that provider at startup via `react-native-quick-crypto`, which is backed by the platform CSPRNG. The repository patches `@scure/bip39` 1.3.0, but the patch only replaces the seed-derivation PBKDF2 with a native implementation and adds `Uint8Array` mnemonic handling; it does not alter `generateMnemonic` or its entropy source.',
+								'Recovery phrases are generated on device by `@scure/bip39`, drawing entropy from `crypto.getRandomValues` as provided by `react-native-quick-crypto`, which is backed by the platform CSPRNG.',
 							lastRetrieved: '2026-08-22',
 							url: [
 								{
@@ -721,10 +726,6 @@ export const rabby: SoftwareWallet = {
 								{
 									label: 'Crypto provider installed at app startup',
 									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts',
-								},
-								{
-									label: '`@scure/bip39` patch',
-									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
 								},
 							],
 						},
