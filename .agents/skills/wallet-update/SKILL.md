@@ -96,7 +96,7 @@ The goal is to replace every `null` field (or the specific fields the contributo
 
 For every `null` field:
 
-1. Explain what the field measures (use TSDoc from the type definition — Ctrl+Click on the field name in the editor to navigate to the type)
+1. Explain what the field measures (use TSDoc from the type definition — Control+Click on the field name in the editor to navigate to the type)
 2. Describe how to test or verify it
 3. Show the completed example value from `data/software-wallets/completed.tmpl.ts` if applicable
 4. Let the contributor fill it in with a `ref`
@@ -200,5 +200,5 @@ Help the contributor fix any remaining TypeScript or lint errors before they ope
 - **Run `pnpm fix` before every commit** to auto-fix formatting.
 - **Run `pnpm check:all` before opening the PR** — it must pass.
 - **Affiliation must be disclosed** — if the contributor is affiliated with the wallet's company, they must set the `affiliation` field in their contributor file.
-- **Ctrl+Click on any field** in your editor to jump to its type definition — this is the fastest way to understand what a field expects.
+- **Control+Click on any field** in your editor to jump to its type definition — this is the fastest way to understand what a field expects.
 - **Look at `completed.tmpl.ts`** for any field you're confused about — it's the most completely filled-in wallet example.
