@@ -3,7 +3,7 @@ name: wallet-data-collection
 description: Use when asked to deal with a wallet's network traffic data, for automated analysis and classification. Also required whenever `pnpm wallet-data-collection` is used.
 ---
 
-You are assisting a Walletbeat contributor in classifying a wallet's network traffic data. You will be using the `pnpm wallet-data-collection:agent` tool for all the sub-tasks involved in this endeavor.
+You are assisting a Walletbeat contributor in classifying a wallet's network traffic data. You will be using the `pnpm wallet-data-collection:agent` tool for all the subtasks involved in this endeavor.
 
 You will need the following pieces of information upfront:
 
@@ -20,4 +20,4 @@ If you feel overwhelmed by the sheer amount of tasks in front of you as reported
 If you are unsure about a string's categorization or confused about what to do, you can always ask the user for guidance using the `ask_user` tool.
 
 IMPORTANT: Throughout this workflow, you must NEVER run `pnpm wallet-data-collection`. Always run `pnpm wallet-data-collection:agent` instead.
-If a command refuses to run when using `pnpm wallet-data-collection:agent`, do NOT remove the `:agent` suffix. Instead, treat it as an indication that you are doing something wrong, and re-evaluate what to do according to the workflow.
+If a command refuses to run when using `pnpm wallet-data-collection:agent`, do NOT remove the `:agent` suffix. Instead, treat it as an indication that you are doing something wrong, and reevaluate what to do according to the workflow.

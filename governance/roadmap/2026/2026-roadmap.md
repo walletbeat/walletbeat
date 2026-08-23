@@ -38,12 +38,12 @@ At a high level:
 - This is critical, because without it, we'll forever face credibility challenges (egg on our face) when looking for further funding.
 - We do not need to finish everything, but we need at the minimum to show a _capacity for getting there_, i.e. an ability to execute.
 
-2. Priority #2 is to **increase the project's short-term and medium-term financial security**.
+1. Priority #2 is to **increase the project's short-term and medium-term financial security**.
 
 - This is necessary for the effort to continue uninterrupted. Going back to a volunteer-only, spare-time-only regime would set the project back quite a bit.
 - This is priority #2 only because priority #1 hinders it.
 
-3. Priority #3 is to **grow our ecosystem presence**.
+1. Priority #3 is to **grow our ecosystem presence**.
 
 - Social media presence is a necessary part of this, but not sufficient on its own.
 - We need investment and partnerships here. Any partnerships we draw here should be on the more mature side of Walletbeat, i.e. the software wallet side of things. More on this below.
@@ -206,7 +206,7 @@ Between now and the end of the year:
   - ≥20% of treasury held in USDC.
 - By end of September 2026:
   - Existing hardware wallet attributes all refactored or deleted.
-  - Clear Signing re-launch happens _(may postpone further if delayed due to non-Walletbeat factors)_
+  - Clear Signing relaunch happens _(may postpone further if delayed due to non-Walletbeat factors)_
   - ≥50% of video footage is released.
   - Set of meme templates exists for social media.
   - At least ≥10k USD future funding secured; ≥30% of treasury held in USDC.

@@ -1361,7 +1361,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension build job checks out an external repository (`rainbow-me/browser-extension-env`) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build. This means build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
+								'The browser extension build job checks out an external repository (`rainbow-me/browser-extension-env`) and reruns `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build. This means build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
 						},
 						{

@@ -69,13 +69,13 @@ function evaluateEoa(ctx: EvaluationContext, eoa: AccountTypeEoa): Evaluation {
 			outcome: {
 				id: 'nonstandard_eoa_exportable',
 				rating: Rating.PARTIAL,
-				displayName: 'Non-standard but exportable EOA',
+				displayName: 'Nonstandard but exportable EOA',
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not follow key derivation standards for EOA keys, but lets you export them to other wallets.',
 				),
 			},
 			details: paragraph(
-				'{{WALLET_NAME}} generates EOA keys in a non-standard way. However, these keys can be exported into other wallets, avoiding lock-in.',
+				'{{WALLET_NAME}} generates EOA keys in a nonstandard way. However, these keys can be exported into other wallets, avoiding lock-in.',
 			),
 			impact: paragraph(
 				'Using {{WALLET_NAME}} requires keeping backups of your keys in order to ensure portability of your account down the line.',

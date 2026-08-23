@@ -196,7 +196,7 @@ export const metamask: SoftwareWallet = {
 					explanation: `
 						MetaMask lets users set custom RPC endpoints for any network,
 						including mainnet. Before that, it contacts default endpoints
-						(mainnet.infura.io and some L2s) for non-sensitive RPCs
+						(mainnet.infura.io and some L2s) for nonsensitive RPCs
 						(\`eth_blockNumber\`, \`net_version\`).
 					`,
 					url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',

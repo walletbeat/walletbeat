@@ -806,7 +806,7 @@ function evaluateKeysHandling(
 					),
 				},
 				details: markdown(`
-					{{WALLET_NAME}} uses multi-party computation, but key reconstruction
+					{{WALLET_NAME}} uses multiparty computation, but key reconstruction
 					can occur on external servers without the user's device being
 					involved. The at-rest security of the reconstructed key material on
 					the provider's infrastructure cannot be independently verified.
@@ -969,7 +969,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 			exampleRating(
 				mdParagraph(
-					'(Desktop app) The app derives keys using a weak, non-standard key derivation function.',
+					'(Desktop app) The app derives keys using a weak, nonstandard key derivation function.',
 				),
 				evaluateKeyStorage(
 					EvaluationContext.forTest(() => securityBestPractices),

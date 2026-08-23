@@ -119,7 +119,7 @@ function evaluateGuardianRecoveryPolicy(
 			outcome: {
 				id: 'guardian_policy_nonrecoverable_specific_scenario',
 				rating: Rating.FAIL,
-				displayName: 'Account may be non-recoverable',
+				displayName: 'Account may be nonrecoverable',
 				shortExplanation: typographicContentWithExtraOptionalStrings(
 					nonRecoverableOutcomes[0].recovery.description,
 				),
@@ -137,7 +137,7 @@ function evaluateGuardianRecoveryPolicy(
 		outcome: {
 			id: 'guardian_policy_nonrecoverable_multiple_scenarios',
 			rating: Rating.FAIL,
-			displayName: 'Account may be non-recoverable',
+			displayName: 'Account may be nonrecoverable',
 			shortExplanation: mdSentence(`
 				{{WALLET_NAME}}'s account recovery feature cannot be
 				relied upon in multiple scenarios.

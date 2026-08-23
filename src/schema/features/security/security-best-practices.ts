@@ -13,7 +13,7 @@ export enum KeyStorageMechanism {
 
 	/**
 	 * The key is encrypted with a user-known secret before being stored on disk,
-	 * but the key derivation is non-standard or ad-hoc.
+	 * but the key derivation is nonstandard or ad-hoc.
 	 */
 	ENCRYPTED_WITH_USER_SECRET_WEAK_KDF = 'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF',
 

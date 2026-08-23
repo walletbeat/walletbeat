@@ -91,7 +91,7 @@ In either case, you should now have the wallet set up with an account created an
 
 Try to import an account that you've already sent Ether and USDC to (using a separate wallet/browser). Populate the `features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountImport` accordingly.
 
-If you cannot create an account with the proxy settings enabled, undo the proxy settings and the custom JSON-RPC endpoint. Import the account, and re-start the browser or wallet app with the proxy settings and custom JSON-RPC endpoint again.
+If you cannot create an account with the proxy settings enabled, undo the proxy settings and the custom JSON-RPC endpoint. Import the account, and restart the browser or wallet app with the proxy settings and custom JSON-RPC endpoint again.
 
 ### Step 7: Check your balance
 

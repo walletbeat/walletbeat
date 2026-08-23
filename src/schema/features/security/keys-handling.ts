@@ -27,7 +27,7 @@ export enum KeyGenerationLocation {
 	FULLY_OFF_USER_DEVICE = 'FULLY_OFF_USER_DEVICE',
 
 	/**
-	 * The key is computed through a multi-party protocol where both the user's
+	 * The key is computed through a multiparty protocol where both the user's
 	 * device and at least one remote party contribute randomness or key shares.
 	 * No single party ever holds the complete key — not even the user's device.
 	 * (e.g. An MPC wallet where the user's device and the wallet provider's
@@ -64,7 +64,7 @@ export enum MultiPartyKeyReconstruction {
 	ON_USER_DEVICE = 'RECONSTRUCTED_ON_USER_DEVICE',
 
 	/**
-	 * Signing is performed through a multi-party computation protocol that
+	 * Signing is performed through a multiparty computation protocol that
 	 * includes the user's device as one of the signing parties. The full key
 	 * is never reconstructed — each party signs with its share.
 	 * (e.g. An MPC wallet where the user's device holds one key share and the
@@ -76,7 +76,7 @@ export enum MultiPartyKeyReconstruction {
 	MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE = 'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE',
 
 	/**
-	 * Signing is performed through a multi-party computation entirely on
+	 * Signing is performed through a multiparty computation entirely on
 	 * remote infrastructure — the user's device does not participate in the
 	 * signing computation itself, only in authorizing it
 	 *
