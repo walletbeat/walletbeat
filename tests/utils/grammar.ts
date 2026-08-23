@@ -19,6 +19,13 @@ import { trimWhitespacePrefix } from '@/types/utils/text'
  */
 const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
 
+/**
+ * Proper nouns that Harper's OrthographicConsistency rule does not recognize and flags for a
+ * different capitalization (e.g. it wants "debank", "simplex", or title-case "Zeus" even
+ * though the lowercase forms here appear only in repo paths and the proper forms are brands).
+ */
+const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
+
 let vocabulary: string[] | null = null
 
 function getVocabulary(): string[] {
@@ -63,7 +70,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'OrthographicConsistency',
 	'QuiteQuiet',
 	'SafeToSave',
 	'SplitWords',
@@ -427,7 +433,8 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint =>
 			lint.lint_kind_pretty() !== 'Capitalization' ||
-			!PROPER_NOUNS_LOWERCASE_FIRST.has(lint.get_problem_text()),
+			(!PROPER_NOUNS_LOWERCASE_FIRST.has(lint.get_problem_text()) &&
+				!PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS.has(lint.get_problem_text())),
 	)
 
 	// Ignore Spelling lints for standalone "s" (false positive from markdown/punctuation tokenization).

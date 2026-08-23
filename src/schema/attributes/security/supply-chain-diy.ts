@@ -27,7 +27,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	question: sentence('Does {{WALLET_NAME}} have a transparent and flexible DIY supply chain?'),
 	why: markdown(
 		`For Do-It-Yourself (DIY) hardware wallets, a transparent and flexible supply chain allows users to source components independently and verify the hardware they are building.
-		Avoiding components that require NonDisclosure Agreements (NDAs) is crucial for transparency and auditability.`,
+		Avoiding components that require nondisclosure agreements (NDAs) is crucial for transparency and auditability.`,
 	),
 	methodology: markdown(
 		`Evaluated based on:

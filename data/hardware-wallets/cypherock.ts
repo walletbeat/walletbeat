@@ -79,7 +79,7 @@ export const cypherockWallet: HardwareWallet = {
 		monetization: {
 			ref: [
 				{
-					explanation: 'Hardware wallet startup Cypherock raises $1 Mn',
+					explanation: 'Hardware wallet startup Cypherock raises $1 million',
 					url: 'https://entrackr.com/2022/12/hardware-wallet-startup-cypherock-raises-1-mn/',
 				},
 			],
