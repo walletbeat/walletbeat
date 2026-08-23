@@ -11,5 +11,8 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
   - **Reaction**: Ambire fixes this in their next release: https://x.com/borislavItskovv/status/2081582575790006360
   - **Reaction**: WalletChan fixes this in their next release: https://x.com/walletbeat/status/2082293464071373094
   - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention: https://x.com/ambire/status/2082816470560747558
+- **2026-08** - Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited token approvals that caused a user to lose ~$500K: https://x.com/0xMattmatt/status/2089770628828237918
+  - **Reaction**: Ambire pushed an update to flag unlimited token approval for untrusted contracts also thanked Walletbeat for its work: https://x.com/borislavItskovv/status/2090566092808982840
+    - **Reaction**: Ambire's official update for flagging unlimited token approval credits Walletbeat contributor @0xmattmatt for the research.
 - **2026-08**: Walletbeat contributor polymutex points out that flagging IPFS gateways such as `.eth.limo` reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant).
   - **Reaction**: Ambire unflags IPFS gateways: https://x.com/borislavItskovv/status/2090563980549042476 & https://x.com/ambire/status/2090483593407529375
