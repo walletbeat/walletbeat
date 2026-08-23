@@ -58,16 +58,16 @@ export const testTransactions: TestTransaction[] = [
 			},
 			{
 				name: 'amount',
-				value: '1000000',
+				value: '10000',
 				type: 'uint256',
 			},
 		],
 		calldata:
-			'0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240',
+			'0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e20000000000000000000000000000000000000000000000000000000000002710',
 		contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-		description: 'Approve 1 token (6 decimals) to the specified address',
+		description: 'Approve 0.01 token (6 decimals) to the specified address',
 		requirements: [
-			'Have at least 1 USDC in your wallet',
+			'Have at least 0.01 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
 			"Make sure you're on the correct network (Ethereum Mainnet)",
 		],
@@ -84,16 +84,16 @@ export const testTransactions: TestTransaction[] = [
 			},
 			{
 				name: 'amount',
-				value: '1000000',
+				value: '10000',
 				type: 'uint256',
 			},
 		],
 		calldata:
-			'0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a00000000000000000000000000000000000000000000000000000000000f4240',
+			'0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a0000000000000000000000000000000000000000000000000000000000002710',
 		contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-		description: 'Transfer 1 token (6 decimals) to the specified address',
+		description: 'Transfer 0.01 token (6 decimals) to the specified address',
 		requirements: [
-			'Have at least 1 USDC in your wallet',
+			'Have at least 0.01 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
 			"Make sure you're on the correct network (Ethereum Mainnet)",
 		],
@@ -110,7 +110,7 @@ export const testTransactions: TestTransaction[] = [
 			},
 			{
 				name: 'amount',
-				value: '1000000',
+				value: '10000',
 				type: 'uint256',
 			},
 			{
@@ -125,11 +125,11 @@ export const testTransactions: TestTransaction[] = [
 			},
 		],
 		calldata:
-			'0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000f42400000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000',
+			'0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000027100000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000',
 		contractAddress: '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
-		description: 'Supply 1 token (6 decimals) to Aave protocol',
+		description: 'Supply 0.01 token (6 decimals) to Aave protocol',
 		requirements: [
-			'Have at least 1 token of the specified asset in your wallet',
+			'Have at least 0.01 token of the specified asset in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
 			"Make sure you're on the correct network",
 		],
@@ -146,7 +146,7 @@ export const testTransactions: TestTransaction[] = [
 			},
 			{
 				name: 'amount',
-				value: '1000000',
+				value: '10000',
 				type: 'uint256',
 			},
 			{
@@ -156,12 +156,12 @@ export const testTransactions: TestTransaction[] = [
 			},
 		],
 		calldata:
-			'0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240',
+			'0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e20000000000000000000000000000000000000000000000000000000000002710',
 		contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
 		description:
 			'Batch transactions using EIP-7702 (EIP-5792 sendCalls): Approve and transfer USDC',
 		requirements: [
-			'Have at least 1 USDC in your wallet',
+			'Have at least 0.01 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
 			"Make sure you're on the correct network (Ethereum Mainnet)",
 			'Requires wallet support for EIP-5792 (wallet_sendCalls)',
@@ -169,12 +169,12 @@ export const testTransactions: TestTransaction[] = [
 		calls: [
 			{
 				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-				data: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240',
+				data: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e20000000000000000000000000000000000000000000000000000000000002710',
 				value: BigInt(0),
 			},
 			{
 				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-				data: '0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a00000000000000000000000000000000000000000000000000000000000f4240',
+				data: '0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a0000000000000000000000000000000000000000000000000000000000002710',
 				value: BigInt(0),
 			},
 		],
