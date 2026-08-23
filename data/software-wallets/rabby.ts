@@ -466,7 +466,10 @@ export const rabby: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+					ref: {
+						label: '[20210623] Rabby Chrome Extension Penetration Testing Report.pdf',
+						url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+					},
 					auditDate: '2021-06-18',
 					auditor: slowMist,
 					codeSnapshot: {

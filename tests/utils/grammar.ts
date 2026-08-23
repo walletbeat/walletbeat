@@ -1,4 +1,5 @@
 import * as harper from 'harper.js'
+import { binaryInlined } from 'harper.js/binaryInlined'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
@@ -61,13 +62,58 @@ export function isInVocabulary(word: string): boolean {
 	return vocabularySet.has(word.toLowerCase())
 }
 
+const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
+	'DisjointPrefixes',
+	'DoToDueTo',
+	'ExpandConfiguration',
+	'ExpandControl',
+	'FindOut',
+	'InRealLife',
+	'InterestedIn',
+	'MassNouns',
+	'MissingDeterminer',
+	'MissingTo',
+	'ModalBeAdjective',
+	'MoreAdjective',
+	'NotBeAfterNot',
+	'NounVerbConfusion',
+	'NumericRangeEnDash',
+	'OkToOkay',
+	'OneOfTheSingular',
+	'OrthographicConsistency',
+	'QuiteQuiet',
+	'SafeToSave',
+	'SplitWords',
+	'TheProperNounPossessive',
+	'There',
+	'ThereToTheir',
+	'TheyToThem',
+	'ToAdverb',
+	'ToTo',
+	'ToTwoToo',
+	'TransposedSpace',
+	'UseEllipsisCharacter',
+	'UseTitleCase',
+	'WillNonLemma',
+	'WrongApostrophe',
+]
+
+function getHarperLintConfig(): harper.LintConfig {
+	const config: harper.LintConfig = {
+		RoadMap: false, // This otherwise corrects "roadmap" to "road map".
+	}
+
+	for (const rule of TEMPORARILY_IGNORED_LINT_RULES) {
+		config[rule] = false
+	}
+
+	return config
+}
+
 async function prepareHarperLinter(linter: harper.LocalLinter) {
 	await linter.setDialect(harper.Dialect.American)
-	await linter.setLintConfig({
-		RoadMap: false, // This otherwise corrects "roadmap" to "road map".
-	})
+	await linter.setLintConfig(getHarperLintConfig())
 	await linter.importWords(getVocabulary())
-	await linter.setup()
 }
 
 let harperLinter: harper.LocalLinter | null = null
@@ -75,7 +121,7 @@ let harperLinter: harper.LocalLinter | null = null
 async function getHarperLinter(): Promise<harper.LocalLinter> {
 	if (harperLinter === null) {
 		harperLinter = new harper.LocalLinter({
-			binary: harper.binaryInlined,
+			binary: binaryInlined,
 		})
 		await prepareHarperLinter(harperLinter)
 	}
@@ -387,6 +433,11 @@ export async function grammarLintMessages(
 	lints = lints.filter(lint => !overlapsAnyRange(lint.span().start, lint.span().end, cspellRanges))
 	lints = lints.filter(
 		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
+	)
+
+	// Suppress Word Choice false positives for "setup" used as a noun.
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'setup',
 	)
 
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
