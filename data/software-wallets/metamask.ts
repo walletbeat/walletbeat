@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -84,9 +85,9 @@ export const metamask: SoftwareWallet = {
 		id: 'metamask',
 		displayName: 'MetaMask',
 		tableName: 'MetaMask',
-		contributors: [polymutex, nconsigny, mattmatt],
+		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-06',
+		lastUpdated: '2026-08-22',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -798,7 +799,10 @@ export const metamask: SoftwareWallet = {
 					requiredReview: true,
 					tagsImmutable: true,
 				},
-				reproducibleBuilds: null,
+				// MetaMask rebuilds and compares its own Firefox releases, but the harness
+				// and reviewer instructions are private so it can't be independently
+				// reproduced. The mobile app publishes no reproducible-build tooling at all.
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
