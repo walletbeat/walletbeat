@@ -125,7 +125,7 @@ Between now and the end of the year:
   - **Top 5 wallets** on the homepage have ≤10% "unrated" slices.
     - Owner: ren2140
   - We feel confident saying that we will **not change the software wallet stages** for the next 6 months
-    - (With the possible exception of the stage 2 criteria, which is OK because no wallet is even close to stage 1, so changes in stage 2 criteria in that timeframe won't affect wallets in practice.)
+    - (With the possible exception of the stage 2 criteria, which is okay because no wallet is even close to stage 1, so changes in stage 2 criteria in that timeframe won't affect wallets in practice.)
     - Owner: polymutex
   - All **`pre-launch` issues are closed** on the issue tracker.
     - Owner: polymutex
