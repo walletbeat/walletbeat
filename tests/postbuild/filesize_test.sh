@@ -20,7 +20,7 @@ is_known_too_large() {
 	local f="$1"
 	local rel="${f#"$DIST_DIR"/}"
 	local known
-	for known in "${KNOWN_TOO_LARGE[@]}"; do
+	for known in "${KNOWN_TOO_LARGE[@]+"${KNOWN_TOO_LARGE[@]}"}"; do
 		if [[ "$rel" == "$known" ]]; then
 			return 0
 		fi
@@ -34,7 +34,7 @@ while IFS= read -r f; do
 		continue
 	fi
 	rel="${f#"$DIST_DIR"/}"
-	size="$(stat -c '%s' "$f")"
+	size="$(wc -c < "$f")"
 	if is_known_too_large "$f"; then
 		if ((size <= MAX_BYTES)); then
 			# The file is no longer oversized, so its KNOWN_TOO_LARGE entry is stale.

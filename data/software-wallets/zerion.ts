@@ -4,6 +4,10 @@ import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import {
+	ExposedAccountsBehavior,
+	type ExposedAccountSet,
+} from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -50,10 +54,15 @@ import {
 	notSupportedWithRef,
 	supported,
 } from '@/schema/features/support'
+import {
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 import zerionRawExtManifest from './manifests/zerion/klghhnkeealcohjjanjjdaeeggmfmlpl.manifest.json'
 
@@ -64,7 +73,7 @@ export const zerion: SoftwareWallet = {
 		tableName: 'Zerion',
 		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-10',
+		lastUpdated: '2026-08-19',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -110,7 +119,78 @@ export const zerion: SoftwareWallet = {
 				offchainProviderConnection: 'DIRECT_CONNECTION',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: {
+						explanation:
+							'The default swap view shows only the Network Fee, with a collapsed "Details" section for the rest of the fee breakdown.',
+						file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-default-swap-view.png',
+						label: 'Zerion Dashboard, default swap view',
+					},
+					feesLargerThan1bps: {
+						ref: {
+							explanation:
+								'Expanding "Details" shows the full fee breakdown, including the Zerion Fee expressed as a percentage (0.67%).',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-comprehensive-swap-view.png',
+							label: 'Zerion Dashboard, comprehensive swap view',
+						},
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ref: {
+					explanation:
+						'The Zerion dashboard shows the total account value across all networks by default, and can be filtered down to a single network to see that network’s balance in isolation.',
+					file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png',
+					label: 'Zerion Dashboard',
+				},
+				ether: supported({
+					ref: [
+						{
+							explanation:
+								'The "All Networks" view sums the user’s ETH holdings across every network into a single item.',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png',
+							label: 'Zerion Dashboard, all networks',
+						},
+						{
+							explanation:
+								'Filtering the dashboard to the Ethereum network shows the ETH balance held on that network specifically (0.0016 ETH / $3.00), isolated from other networks.',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-ethereum-network-view.png',
+							label: 'Zerion Dashboard, filtered to Ethereum',
+						},
+					],
+					crossChainSumView: featureSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				usdc: supported({
+					ref: [
+						{
+							explanation:
+								'The "All Networks" view sums the user’s USDC holdings across every network into a single item.',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png',
+							label: 'Zerion Dashboard, all networks',
+						},
+						{
+							explanation:
+								'Filtering the dashboard to the Ethereum network shows the USDC balance held on that network specifically (6.918 USDC / $6.92), isolated from other networks.',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-ethereum-network-view.png',
+							label: 'Zerion Dashboard, filtered to Ethereum',
+						},
+					],
+					crossChainSumView: featureSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+			},
+		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
 			ref: refTodo,
 			customChainRpcEndpoint: featureSupported,
@@ -220,7 +300,127 @@ export const zerion: SoftwareWallet = {
 				crashReports: null,
 				usage: null,
 			},
-			appIsolation: null,
+			appIsolation: {
+				[Variant.BROWSER]: {
+					createInAppConnectionFlow: notSupportedWithRef({
+						ref: {
+							explanation:
+								'The connection dialog lists the accounts that already exist, and offers no way to create a new one.',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-browser-connect-wallet-picker.png',
+							label: 'Zerion browser extension connection dialog with the account list expanded',
+							lastRetrieved: '2026-08-19',
+						},
+					}),
+					erc7846WalletConnect: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									"`wallet_connect` is not defined in Zerion's wallet and app integration connector code.",
+								label: 'Zerion browser extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/background/messaging/port-message-handlers/createWalletMessageHandler.ts#L25-L38',
+							},
+						],
+					}),
+					ethAccounts: supported<WithRef<ExposedAccountSet>>({
+						ref: [
+							{
+								explanation:
+									'A site is given the one account currently selected in the wallet, and only if the user has connected that account to that site. Otherwise, it is given nothing.',
+								label: '`eth_accounts` in the extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/background/Wallet/Wallet.ts#L2232-L2242',
+							},
+						],
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The connection dialog offers whichever account is currently selected in the wallet, not the account the site was connected with before.',
+								label: 'Connection dialog default selection',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/RequestAccounts/RequestAccounts.tsx#L414-L428',
+							},
+							{
+								explanation:
+									'Connecting to a site changes which account is selected in the wallet, so the change carries over to every other site.',
+								label: 'Connection approval in the extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/background/Wallet/Wallet.ts#L2498-L2504',
+							},
+						],
+					}),
+				},
+				[Variant.MOBILE]: {
+					createInAppConnectionFlow: notSupportedWithRef({
+						ref: [
+							{
+								explanation:
+									'The connection sheet shows one "Wallet" field, with Cancel and Connect.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-connect-sheet.png',
+								label: 'Zerion mobile app connection sheet',
+								lastRetrieved: '2026-08-19',
+							},
+							{
+								explanation:
+									'Opening the wallet field lists the accounts that already exist. Each one offers only "Copy address", and there is no way to create a new account.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-account-picker.png',
+								label: 'Zerion mobile connection sheet with the account list expanded',
+								lastRetrieved: '2026-08-19',
+							},
+						],
+					}),
+					erc7846WalletConnect: notSupportedWithRef({
+						ref: {
+							explanation:
+								'Calling `wallet_connect` from the Walletbeat test page in the Zerion in-app browser returns "the method wallet_connect does not exist/is not available".',
+							file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-wallet-connect-unsupported.png',
+							label: 'Walletbeat test page in the Zerion in-app browser',
+							lastRetrieved: '2026-08-19',
+						},
+					}),
+					ethAccounts: supported<WithRef<ExposedAccountSet>>({
+						ref: [
+							{
+								explanation: 'Before connecting, the site is given no accounts.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-eth-accounts-empty.png',
+								label: 'Walletbeat test page before connecting',
+								lastRetrieved: '2026-08-19',
+							},
+							{
+								explanation: 'After connecting, the site is given one account.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-eth-accounts-single.png',
+								label: 'Walletbeat test page after connecting',
+								lastRetrieved: '2026-08-19',
+							},
+							{
+								explanation:
+									'Selecting a different account in the wallet hands that account to a site that is already connected, without asking the user again.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-eth-accounts-after-account-switch.png',
+								label: 'Walletbeat test page after switching the selected account',
+								lastRetrieved: '2026-08-19',
+							},
+						],
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					useAppSpecificLastConnectedAddresses: notSupportedWithRef({
+						ref: [
+							{
+								explanation: 'A second account is connected to app.uniswap.org.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-uniswap-connected-second-account.png',
+								label: 'Zerion mobile showing the second account connected to app.uniswap.org',
+								lastRetrieved: '2026-08-19',
+							},
+							{
+								explanation:
+									'After disconnecting and connecting again, the sheet offers the first account instead of the one the site was connected with.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-uniswap-reconnect-default.png',
+								label:
+									'Zerion mobile connection sheet for app.uniswap.org offering the first account',
+								lastRetrieved: '2026-08-19',
+							},
+						],
+					}),
+				},
+			},
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: {
@@ -361,7 +561,7 @@ export const zerion: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 				desktop: 'NOT_A_DESKTOP_APP',
-				mobile: 'NOT_A_MOBILE_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
 			},
 			transactionLegibility: {
 				ref: refTodo,

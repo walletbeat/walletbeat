@@ -5,6 +5,9 @@ on:
     branches:
       - beta
 
+env:
+  ENS_DOMAIN: beta.walletbeat.eth
+
 jobs:
   check:
     name: Check and build
@@ -36,6 +39,7 @@ jobs:
           rm -rf dist &>/dev/null || true
           pnpm build
         env:
+          SITE_URL: https://${{ env.ENS_DOMAIN }}.limo
           WALLETBEAT_ENV: CI
           WALLETBEAT_BUILD_MUST_BE_SANDBOXED: true
           WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY: true
@@ -131,7 +135,6 @@ jobs:
       - name: Update beta.walletbeat.eth ENS records
         run: ./deploy/update-ens.sh
         env:
-          ENS_DOMAIN: beta.walletbeat.eth
           DEPLOY_DIRECTORY: dist
           OMNIPIN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
           SKIP_HELIOS: 'false'

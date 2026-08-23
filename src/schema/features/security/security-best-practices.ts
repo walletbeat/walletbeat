@@ -341,6 +341,9 @@ export enum AndroidPermission {
 
 	/** Write files to shared external storage (legacy, pre-scoped-storage). */
 	WRITE_EXTERNAL_STORAGE = 'android.permission.WRITE_EXTERNAL_STORAGE',
+
+	/** Be notified when the user screenshots the app (Android 14+). */
+	DETECT_SCREEN_CAPTURE = 'android.permission.DETECT_SCREEN_CAPTURE',
 }
 
 export const androidPermissions = new Enum<AndroidPermission>({
@@ -359,6 +362,7 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.USE_FULL_SCREEN_INTENT]: true,
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: true,
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: true,
+	[AndroidPermission.DETECT_SCREEN_CAPTURE]: true,
 })
 
 /**
@@ -392,6 +396,9 @@ export enum IosUsageDescription {
 
 	/** Read images from the photo library. */
 	PHOTO_LIBRARY = 'NSPhotoLibraryUsageDescription',
+
+	/** Prompt string for user notifications. */
+	USER_NOTIFICATIONS = 'NSUserNotificationsUsageDescription',
 }
 
 export const iosUsageDescriptions = new Enum<IosUsageDescription>({
@@ -403,6 +410,7 @@ export const iosUsageDescriptions = new Enum<IosUsageDescription>({
 	[IosUsageDescription.MICROPHONE]: true,
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: true,
 	[IosUsageDescription.PHOTO_LIBRARY]: true,
+	[IosUsageDescription.USER_NOTIFICATIONS]: true,
 })
 
 /**

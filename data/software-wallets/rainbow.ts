@@ -82,7 +82,7 @@ export const rainbow: SoftwareWallet = {
 		tableName: 'Rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-02',
+		lastUpdated: '2026-08-22',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -733,18 +733,54 @@ export const rainbow: SoftwareWallet = {
 				}),
 			},
 			bugBountyProgram: notSupported,
-			duressResistance: supported({
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+			duressResistance: {
+				[Variant.BROWSER]: supported({
+					basicUnlock: {
+						ref: {
+							explanation: 'The extension is unlocked with a password.',
+							label: 'Extension unlock screen source code',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx',
+						},
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
 					},
-				},
-				duressMode: notSupported,
-			}),
+					duressMode: notSupported,
+				}),
+				[Variant.MOBILE]: supported({
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'Opening the mobile app requires the phone to authenticate the user first.',
+								label: 'App unlock check in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/isAuthenticated.ts#L16-L33',
+							},
+							{
+								explanation:
+									'That authentication is Face ID or Touch ID on iOS and fingerprint or face unlock on Android, with the phone passcode accepted in their place.',
+								label: 'Biometric unlock settings in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/keychain.ts#L399-L414',
+							},
+							{
+								explanation: 'On an Android phone with no screen lock set, the app asks for a PIN.',
+								label: 'PIN screen in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/pinAuthentication.ts#L116-L123',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: true,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				}),
+			},
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -1348,7 +1384,42 @@ export const rainbow: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
-		walletCall: notSupported,
+		// EIP-5792 is supported by the browser extension only, and only for accounts with an EIP-7702 delegation.
+		walletCall: {
+			[Variant.BROWSER]: supported({
+				ref: [
+					{
+						explanation:
+							'The extension can execute EIP-5792 multicall transactions only if the account has been upgraded with EIP-7702.',
+						label: 'Batching support in the extension source code',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/background/handlers/handleProviderRequest.ts#L429-L484',
+					},
+					{
+						explanation:
+							'Multicall transactions are atomic: they will either execute all transactions in the batch or revert.',
+						label: 'Batch execution in the extension source code',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58',
+					},
+				],
+				atomicMultiTransactions: featureSupported,
+			}),
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: [
+					{
+						explanation:
+							'Asking the wallet to send a bundle of transactions from the Walletbeat test page in the Rainbow in-app browser returns an error saying the method is not supported.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-08-20-wallet-call-mobile-batch-unsupported.png',
+						label: 'Walletbeat test page in the Rainbow in-app browser',
+						lastRetrieved: '2026-08-20',
+					},
+					{
+						explanation: 'The mobile app has no EIP-5792 Wallet Call API code in its source.',
+						label: 'Rainbow mobile app source code',
+						url: 'https://github.com/rainbow-me/rainbow/blob/bb6110b846ca6955125d490c0eb1f0812fccadf7/src/features/dapp-browser/services/handleProviderRequest.ts#L350-L362',
+					},
+				],
+			}),
+		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,

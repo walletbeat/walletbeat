@@ -13,23 +13,29 @@ Before you can contribute wallet data to Walletbeat, you need to make a copy of 
 
 ### Get started
 
-```bash
-# Clone the repository and install dependencies:
-$ git clone https://github.com/walletbeat/walletbeat
-$ cd walletbeat
-$ pnpm install
+1. Clone the repository and install dependencies:
 
-# Run the website locally:
-$ pnpm dev
-# [...]
- astro  v5.15.2 ready in 1655 ms
-┃ Local    http://localhost:4321/
+   ```bash
+   git clone https://github.com/walletbeat/walletbeat
+   cd walletbeat
+   pnpm install
+   ```
 
-# Run tests
-$ pnpm check:quick # Quick tests only
-$ pnpm check:all   # All CI tests
-$ pnpm fix         # Automatically fix formatting problems
-```
+2. Run the website locally:
+
+   ```bash
+   pnpm dev
+   ```
+
+3. Browse the site at `http://localhost:4321/`.
+
+4. Run the tests:
+
+   ```bash
+   pnpm check:quick # Quick tests only
+   pnpm check:all   # All CI tests
+   pnpm fix         # Automatically fix formatting problems
+   ```
 
 If you are not familiar with using a terminal, `git`, `pnpm`, or TypeScript development in general, ask your friendly neighborhood LLM to help you out; these can be very helpful in helping you set up the required dependencies. Note that you need to [sign your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key) in order to pass CI, i.e. your git `commit.gpgsign` setting needs to be set to `true` and you should have a valid SSH or GPG key set up for commits. If you use GitHub, ensure to [add it to your GitHub profile](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) to get the "Verified" commit badge.
 

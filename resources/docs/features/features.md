@@ -2823,6 +2823,7 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `USE_FULL_SCREEN_INTENT` = `'android.permission.USE_FULL_SCREEN_INTENT'`: Display a full-screen intent, e.g. for incoming-call-style alerts.
 - `READ_EXTERNAL_STORAGE` = `'android.permission.READ_EXTERNAL_STORAGE'`: Read files from shared external storage (legacy, pre-scoped-storage).
 - `WRITE_EXTERNAL_STORAGE` = `'android.permission.WRITE_EXTERNAL_STORAGE'`: Write files to shared external storage (legacy, pre-scoped-storage).
+- `DETECT_SCREEN_CAPTURE` = `'android.permission.DETECT_SCREEN_CAPTURE'`: Be notified when the user screenshots the app (Android 14+).
 
 ---
 
@@ -2840,6 +2841,7 @@ All keys seen in any wallet plist must be listed here, including non-security-re
 - `MICROPHONE` = `'NSMicrophoneUsageDescription'`: Microphone access.
 - `PHOTO_LIBRARY_ADD` = `'NSPhotoLibraryAddUsageDescription'`: Save images to the photo library.
 - `PHOTO_LIBRARY` = `'NSPhotoLibraryUsageDescription'`: Read images from the photo library.
+- `USER_NOTIFICATIONS` = `'NSUserNotificationsUsageDescription'`: Prompt string for user notifications.
 
 ---
 

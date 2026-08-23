@@ -626,9 +626,9 @@
 						Website
 					</a>
 
-					{#if wallet.metadata.urls?.repository}
+					{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 						<a
-							href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
+							href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
 							data-badge="medium"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -798,13 +798,6 @@
 				</ScrollAngleSteps>
 			</div>
 		</nav>
-
-		<header
-			data-sticky="block block-start backdrop-self backdrop-always"
-			data-row
-		>
-			<h2>Table of contents</h2>
-		</header>
 
 		<nav
 			data-column
@@ -1553,7 +1546,7 @@
 			--sticky-marginInlineEnd: 0px;
 			--sticky-marginBlockStart: 0px;
 			--sticky-marginBlockEnd: 0px;
-			--sticky-paddingBlockStart: var(--pageNavigation-header-blockSize);
+			--sticky-paddingBlockStart: 0px;
 			--sticky0-insetInlineStart: 0px;
 			--sticky0-insetInlineEnd: 0px;
 			--sticky0-insetBlockStart: 0px;
@@ -1563,7 +1556,6 @@
 			--sticky-insetBlockStart: 0px;
 			--sticky-insetBlockEnd: 0px;
 
-			--pageNavigation-header-blockSize: 3.5rem;
 			--sticky-backgroundColor: var(--background-secondary);
 			anchor-name: --wallet-page-navigation;
 
@@ -1589,27 +1581,6 @@
 				margin-block-start: auto;
 				background-color: var(--background-secondary);
 				box-shadow: 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
-			}
-
-			> header {
-				--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
-
-				flex-shrink: 0;
-				block-size: var(--pageNavigation-header-blockSize);
-				box-shadow: inset 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
-				padding-inline: 1rem;
-
-				font-size: 0.875rem;
-				color: var(--text-secondary);
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				font-weight: 500;
-
-				h2 {
-					margin: 0;
-					font: inherit;
-					color: inherit;
-				}
 			}
 
 			> nav:not(.pie-navigation) {
@@ -1647,35 +1618,24 @@
 				background: none;
 				box-shadow: none;
 
-				> header,
 				> nav:not(.pie-navigation) {
 					z-index: 6;
 					position: fixed;
 					inset-inline: 0 auto;
+					inset-block: calc(var(---wallet-page-block-offset) + 4rem) 0;
 					inline-size: var(---wallet-page-navigation-inline-size);
 					translate: -100% 0;
 					transition: translate 0.3s var(--ease-out-expo);
 					background-color: var(--background-secondary);
+					overflow-y: auto;
+					min-block-size: 0;
+					box-shadow: 0 0 var(--separator-width) var(--border-color);
 				}
 
 				&::after {
 					content: none;
 				}
 
-				> header {
-					inset-block: calc(var(---wallet-page-block-offset) + 4rem) auto;
-				}
-
-				> nav:not(.pie-navigation) {
-					inset-block:
-						calc(var(---wallet-page-block-offset) + 4rem + var(--pageNavigation-header-blockSize))
-						0;
-					overflow-y: auto;
-					min-block-size: 0;
-					box-shadow: 0 0 var(--separator-width) var(--border-color);
-				}
-
-				&:focus-within > header,
 				&:focus-within > nav:not(.pie-navigation) {
 					translate: 0 0;
 				}

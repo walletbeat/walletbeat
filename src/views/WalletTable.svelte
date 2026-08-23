@@ -1017,11 +1017,11 @@
 										Website
 									</a>
 
-									{#if wallet.metadata.urls?.repository}
+									{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 										<hr>
 
 										<a
-											href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
+											href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
 											target="_blank"
 											rel="noopener noreferrer"
 										>
