@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'InRealLife',
 	'InterestedIn',
 	'MassNouns',
 	'MissingDeterminer',
