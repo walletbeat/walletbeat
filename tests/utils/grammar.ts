@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'MassNouns',
 	'MissingDeterminer',
 	'MissingTo',
 	'ModalBeAdjective',
@@ -477,6 +476,17 @@ export async function grammarLintMessages(
 	// where "do to" means "do, in order to" (Harper's DoToDueTo rule mistakes it for "due to").
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Usage' || lint.get_problem_text() !== 'do to',
+	)
+
+	// Ignore Agreement lints for "a USD", "a rating", and "each appearing". Harper's
+	// MassNouns rule misclassifies these as mass nouns:
+	// - "a USD 30 million Series B" — the "a" modifies the funding round, not USD.
+	// - "produce a rating" — a rating is countable.
+	// - "each appearing as" — a participial construction, not a mass noun.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Agreement' ||
+			!['a USD', 'a rating', 'each appearing'].includes(lint.get_problem_text()),
 	)
 
 	// Ignore hyphenization for known words.
