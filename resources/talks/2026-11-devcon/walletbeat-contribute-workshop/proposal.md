@@ -4,7 +4,7 @@
 - **Session type**: Workshop (50 minutes)
 - **Track**: Users, Builders, and Agents
 - **Abstract**:
-  _Keep it to 1-2 sentences: what the talk is about and what people will walk away with. Please write between 100 and 500 characters._
+  _Keep it to 1–2 sentences: what the talk is about and what people will walk away with. Please write between 100 and 500 characters._
   This hands-on workshop will guide you through contributing one verified wallet attribute end to end, with the help of AI and a human in the loop for verification. We'll discuss best practices for capturing evidence, write the entry and open the PR.
 
 - **Description**:

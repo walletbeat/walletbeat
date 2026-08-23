@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'NumericRangeEnDash',
 	'OkToOkay',
 	'OneOfTheSingular',
 	'OrthographicConsistency',
@@ -547,6 +546,27 @@ export async function grammarLintMessages(
 			lint.lint_kind_pretty() !== 'Style' ||
 			!lint.message().includes('inflected form of this adjective also exists'),
 	)
+
+	// Ignore NumericRangeEnDash lints on ISO dates (YYYY-MM or YYYY-MM-DD), which conventionally
+	// use a hyphen (e.g. "Established: 2025-08"). Harper cannot tell an ISO date from a range.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Formatting') {
+			return true
+		}
+
+		if (!lint.message().includes('Use an en dash')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 4), lint.span().start)
+		const after = trimmedText.substring(lint.span().end, lint.span().end + 4)
+
+		if (/^\d{4}$/.exec(before) !== null && /^\d{1,2}(?:\b|\/)/.exec(after) !== null) {
+			return false
+		}
+
+		return true
+	})
 
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
