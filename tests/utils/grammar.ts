@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'DoToDueTo',
 	'ExpandConfiguration',
 	'ExpandControl',
 	'FindOut',
@@ -477,6 +476,12 @@ export async function grammarLintMessages(
 	// Ignore Word Choice lints for "lockdown" — used intentionally as a compound noun (e.g. "onchain lockdown").
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'lockdown',
+	)
+
+	// Ignore Usage lints for "do to" in "what can X do to improve"-style constructions,
+	// where "do to" means "do, in order to" (Harper's DoToDueTo rule mistakes it for "due to").
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Usage' || lint.get_problem_text() !== 'do to',
 	)
 
 	// Ignore hyphenization for known words.
