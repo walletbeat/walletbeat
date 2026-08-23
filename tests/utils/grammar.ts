@@ -70,7 +70,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'SafeToSave',
 	'SplitWords',
 	'TheProperNounPossessive',
 	'There',
@@ -579,6 +578,12 @@ export async function grammarLintMessages(
 			lint.lint_kind_pretty() !== 'Typo' ||
 			!lint.message().includes('might be trying to say') ||
 			!['quite', 'Quite'].includes(lint.get_problem_text()),
+	)
+
+	// Ignore SafeToSave false positives where "Safe" is the Safe wallet name (a proper noun,
+	// e.g. "What can Safe do to improve..."), not the adjective "safe".
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'Safe',
 	)
 
 	// Ignore hyphenization for known words.
