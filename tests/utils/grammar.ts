@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'MissingDeterminer',
 	'MissingTo',
 	'ModalBeAdjective',
 	'MoreAdjective',
@@ -488,6 +487,22 @@ export async function grammarLintMessages(
 			lint.lint_kind_pretty() !== 'Agreement' ||
 			!['a USD', 'a rating', 'each appearing'].includes(lint.get_problem_text()),
 	)
+
+	// Ignore MissingDeterminer false positives for the uncountable mass noun "feature data"
+	// (e.g. "add feature data" / "need more feature data"), which needs no determiner.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Grammar') {
+			return true
+		}
+
+		if (!lint.message().includes('Add a determiner before this noun phrase')) {
+			return true
+		}
+
+		const after = trimmedText.substring(lint.span().end, lint.span().end + 40)
+
+		return !after.includes('feature data')
+	})
 
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
