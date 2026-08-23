@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'MissingTo',
 	'ModalBeAdjective',
 	'MoreAdjective',
 	'NotBeAfterNot',
@@ -502,6 +501,28 @@ export async function grammarLintMessages(
 		const after = trimmedText.substring(lint.span().end, lint.span().end + 40)
 
 		return !after.includes('feature data')
+	})
+
+	// Ignore MissingTo false positives, which suggest inserting "to" to complete an
+	// infinitive where the word is actually an adjective in a heading ("## Intended timeline")
+	// or an imperative verb in a task-list item ("- [x] Prepare conference materials").
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Word Choice') {
+			return true
+		}
+
+		if (!lint.message().includes('Insert `to` to complete the infinitive')) {
+			return true
+		}
+
+		const lineStart = trimmedText.lastIndexOf('\n', lint.span().start - 1) + 1
+		const line = trimmedText.substring(lineStart, lint.span().end).trimStart()
+
+		if (line.startsWith('#') || /^-\s*\[[ xX]\]/.exec(line) !== null) {
+			return false
+		}
+
+		return true
 	})
 
 	// Ignore hyphenization for known words.
