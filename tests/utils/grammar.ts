@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'ModalBeAdjective',
 	'MoreAdjective',
 	'NotBeAfterNot',
 	'NounVerbConfusion',
@@ -523,6 +522,23 @@ export async function grammarLintMessages(
 		}
 
 		return true
+	})
+
+	// Ignore ModalBeAdjective false positives where a modal verb (can/should/may) is followed
+	// by an action verb rather than an adjective, e.g. "What can X do to improve...",
+	// "X should first ensure that...", "it may later decide to...".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Miscellaneous') {
+			return true
+		}
+
+		if (!lint.message().includes('missing the word `be` between this modal verb and adjective')) {
+			return true
+		}
+
+		const following = trimmedText.substring(lint.span().end, lint.span().end + 25)
+
+		return !/^\s+(?:\w+\s+)?(do|first ensure|later decide)\b/.exec(following)
 	})
 
 	// Ignore hyphenization for known words.
