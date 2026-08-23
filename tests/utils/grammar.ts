@@ -70,7 +70,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'QuiteQuiet',
 	'SafeToSave',
 	'SplitWords',
 	'TheProperNounPossessive',
@@ -572,6 +571,15 @@ export async function grammarLintMessages(
 
 		return true
 	})
+
+	// Ignore QuiteQuiet false positives: Harper flags "quite" (meaning "rather") as a possible
+	// typo for "quiet", but it is used correctly in our content (e.g. "quite enough", "quite a small").
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Typo' ||
+			!lint.message().includes('might be trying to say') ||
+			!['quite', 'Quite'].includes(lint.get_problem_text()),
+	)
 
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
