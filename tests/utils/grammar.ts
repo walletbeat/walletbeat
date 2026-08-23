@@ -63,7 +63,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'MoreAdjective',
 	'NotBeAfterNot',
 	'NounVerbConfusion',
 	'NumericRangeEnDash',
@@ -540,6 +539,16 @@ export async function grammarLintMessages(
 
 		return !/^\s+(?:\w+\s+)?(do|first ensure|later decide)\b/.exec(following)
 	})
+
+	// Ignore MoreAdjective style suggestions. Harper explicitly labels these "This is not an
+	// error, but an inflected form of this adjective also exists" (e.g. "more secure" → "safer",
+	// and it even treats the noun in "more choice" as an adjective). These are legitimate
+	// constructions, not grammar errors, so we do not rewrite the site's voice to the inflected forms.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Style' ||
+			!lint.message().includes('inflected form of this adjective also exists'),
+	)
 
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
