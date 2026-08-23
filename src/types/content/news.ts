@@ -123,13 +123,13 @@ export const newsTypes = {
  * Its meaning depends on the NewsType; see above.
  */
 export enum Severity {
-	/** Critical severity - immediate action required, significant impact */
+	/** Critical severity. See NewsType for meaning. */
 	CRITICAL = 'CRITICAL',
-	/** High severity - serious issue requiring prompt attention */
+	/** High severity. See NewsType for meaning. */
 	HIGH = 'HIGH',
-	/** Medium severity - moderate impact */
+	/** Medium severity. See NewsType for meaning. */
 	MEDIUM = 'MEDIUM',
-	/** Low severity - minor impact or informational */
+	/** Low severity. See NewsType for meaning. */
 	LOW = 'LOW',
 }
 
