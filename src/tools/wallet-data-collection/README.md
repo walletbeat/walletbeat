@@ -168,7 +168,7 @@ Requests can also be assigned to a collection policy, i.e. whether the wallet ma
 Valid policy options are:
 
 - `OPT_IN`: The wallet only makes this request if the user has actively configured the wallet to do so, and this configuration wasn't part of the regular wallet onboarding flow.
-- `PROMPTED`: The wallet only makes this request after asking the user whether they are OK with this request being made, e.g. opt-in analytics during the onboarding flow.
+- `PROMPTED`: The wallet only makes this request after asking the user whether they are okay with this request being made, e.g. opt-in analytics during the onboarding flow.
 - `BY_DEFAULT`: The wallet makes this request by default. The user may configure the wallet to avoid this request being made, but this option isn't presented to the user by default.
 - `ALWAYS`: The wallet makes this request, and there is nothing the user can do about it.
 

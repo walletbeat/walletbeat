@@ -39,7 +39,7 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 		This involves presenting information legibly (human-readable addresses/contracts/parameters), providing tools to verify raw data, offering risk analysis and transaction simulation, and preventing unintended actions.
 	`),
 	methodology: markdown(`
-		Evaluated based on the following criteria (mapped to 16 internal sub-criteria):
+		Evaluated based on the following criteria (mapped to 16 internal subcriteria):
 
 		- **Human readable addresses:** Are raw addresses easy to review? Is the HWW displaying the ENS linked to an address if available?	 
 
@@ -84,19 +84,19 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The hardware wallet passes 11 or more user safety sub-criteria.'),
+				sentence('The hardware wallet passes 11 or more user safety subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The hardware wallet passes 6 to 10 user safety sub-criteria.'),
+				sentence('The hardware wallet passes 6 to 10 user safety subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The hardware wallet passes 5 or fewer user safety sub-criteria.'),
+				sentence('The hardware wallet passes 5 or fewer user safety subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -176,11 +176,11 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 		const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
 		const rating = passCount >= 11 ? Rating.PASS : passCount >= 6 ? Rating.PARTIAL : Rating.FAIL
 
-		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}. It passes ${passCount} out of 16 sub-criteria.`
+		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}. It passes ${passCount} out of 16 subcriteria.`
 
 		const howToImproveText =
 			rating !== Rating.PASS
-				? '{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
+				? '{{WALLET_NAME}} should improve subcriteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
 				: ''
 
 		return ctx.build({

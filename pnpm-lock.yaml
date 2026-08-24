@@ -124,8 +124,8 @@ importers:
         specifier: ^17.8.0
         version: 17.8.0
       harper.js:
-        specifier: ^0.61.0
-        version: 0.61.0
+        specifier: ^2.7.0
+        version: 2.7.0
       omnipin:
         specifier: ^3.1.1
         version: 3.1.1
@@ -3445,8 +3445,8 @@ packages:
   h3@1.15.11:
     resolution: {integrity: sha512-L3THSe2MPeBwgIZVSH5zLdBBU90TOxarvhK9d04IDY2AmVS8j2Jz2LIWtwsGOU3lu2I5jCN7FNvVfY2+XyF+mg==}
 
-  harper.js@0.61.0:
-    resolution: {integrity: sha512-k0RzwF6muwkZ6O13F/t+0i35NZonJ3fHy99LO0dFCS2CwSg47dPbL9cbrj1aZSUsjxicsbEAAQq3IOGjJKflJw==}
+  harper.js@2.7.0:
+    resolution: {integrity: sha512-INDnUMNJvQzv5Zv9lhgGuIRYNIpDvOXcieCbo5ED/dwn8V/02zVW5kKvU6jSJJHq1MpY0VDyg+5RjE7z5D+FeA==}
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -9475,7 +9475,9 @@ snapshots:
       ufo: 1.6.4
       uncrypto: 0.1.3
 
-  harper.js@0.61.0: {}
+  harper.js@2.7.0:
+    dependencies:
+      fflate: 0.8.3
 
   has-bigints@1.1.0: {}
 

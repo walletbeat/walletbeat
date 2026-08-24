@@ -438,7 +438,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
 		scams. This is measured along four scenarios:
-		**Does the wallet *warn* the user when...**
+		**Does the wallet *warn* the user when…**
 
 		* Sending funds to an address the user has never previously sent or
 			received funds from before

@@ -24,7 +24,7 @@ export default {
 		fundsImpacted: false,
 	},
 	publishedAt: '2026-08-13',
-	severity: Severity.MEDIUM,
+	severity: Severity.HIGH,
 	status: IncidentStatus.MITIGATED,
 	summary:
 		"ShipMonk, an independent shipping provider for Trezor, experienced a data breach that exposed customer personal information including full names, shipping addresses, phone numbers, and email addresses. 13,689 customers were affected, with exposure limited by Trezor's 90-day data retention policy. Trezor's own systems were not compromised and its devices remain secure, but affected customers may face an increase in phishing attempts and wrench attacks.",

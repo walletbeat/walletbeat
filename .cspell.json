@@ -261,6 +261,7 @@
 		"Headshot",
 		"hesterbruikman",
 		"Hinkal",
+		"HMAC",
 		"hmargin",
 		"hmmmm",
 		"hostable",
@@ -307,6 +308,7 @@
 		"Kernal",
 		"keycard",
 		"KeyLabs",
+		"keyst",
 		"keystone3",
 		"keystore",
 		"kickoff",
@@ -528,6 +530,7 @@
 		"Sergey",
 		"setmonofont",
 		"sfnt",
+		"SHA256",
 		"Shamir",
 		"shareability",
 		"shefi",
@@ -583,7 +586,7 @@
 		"topbar",
 		"torrc",
 		"torsocks",
-		"TOS",
+		"ToS",
 		"Trezor",
 		"triaging",
 		"trixie",
@@ -660,6 +663,7 @@
 		"WiFi",
 		"Wintermute",
 		"Wireshark",
+		"wordlist",
 		"workstreams",
 		"worktree",
 		"worktrees",
@@ -703,6 +707,10 @@
 			"name": "Chrome extension IDs",
 			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
+		{
+			"name": "Chrome extension literally",
+			"pattern": "/\\bChrome extensions?\\b/g"
+		},
 		{ "name": "Git commit ref pins", "pattern": "/@(?:[0-9a-f]{40}|[0-9a-f]{7})\\b/g" },
 		{ "name": "Git short commit hashes", "pattern": "/\\b[0-9a-f]{8}\\b/g" },
 		{ "name": "GitHub line anchors", "pattern": "/\\bL\\d+(?:-\\d+)?\\b/g" },
@@ -714,21 +722,40 @@
 		},
 		{ "name": "Seven Seven Six", "pattern": "/Seven Seven Six/g" },
 		{ "name": "svgicons2svgfont", "pattern": "/svgicons2svgfont/g" },
-		{ "name": "Version numbers", "pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g" }
+		{ "name": "Version numbers", "pattern": "/\\bv[0-9]+(?:\\.[0-9]+)?(?:\\.[0-9]+)?\\b/g" },
+		{ "name": "backdoor", "pattern": "/\\bbackdoor\\b/gi" },
+		{ "name": "C.", "pattern": "/\\bC\\./g" },
+		{ "name": "N/A", "pattern": "/\\bN\\/A\\b/g" },
+		{ "name": "tl;dr", "pattern": "/\\btl;dr\\b/g" },
+		{
+			"name": "Technical tokens",
+			"pattern": "/\\b[a-z0-9_-]+(?:\\.[a-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
+		},
+		{
+			"name": "Mixed-case filenames",
+			"pattern": "/\\b(?=[a-z0-9_-]*[A-Z])[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
+		}
 	],
 	"ignoreRegExpList": [
 		"4everland",
+		"backdoor",
 		"Bitcoin addresses",
 		"CIDv1",
 		"Chrome extension IDs",
+		"Chrome extension literally",
+		"C.",
 		"Git commit ref pins",
 		"Git short commit hashes",
 		"GitHub line anchors",
 		"Hexadecimal addresses",
 		"Million-dollar and billion-dollar amounts",
+		"Mixed-case filenames",
+		"N/A",
 		"Rabby Walle audit PDF filename",
 		"Seven Seven Six",
 		"svgicons2svgfont",
+		"Technical tokens",
+		"tl;dr",
 		"Version numbers"
 	]
 }

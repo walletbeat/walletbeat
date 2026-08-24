@@ -37,7 +37,7 @@ Wallets can implement this in different ways:
 
 • Decoy wallet: opens a separate wallet with different accounts and balances
 • Self-destruct: wipes all wallet data
-• Wipe and forward: wipes data and sends funds to a pre-configured safe address
+• Wipe and forward: wipes data and sends funds to a preconfigured safe address
 • Onchain lockdown: freezes the smart contract, blocking unauthorized transfers
 
 ---
