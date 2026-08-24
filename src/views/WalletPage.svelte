@@ -1240,14 +1240,17 @@
 
 			<div class="attribute-accordions" data-column="gap-3">
 				<details
+					id={`${id}-why`}
+					aria-labelledby={`${id}-why-heading`}
 					open
 					data-card="padding-5 secondary radius-4"
 					data-column="gap-0"
 					data-sticky-container
+					data-sticky-breadcrumb="scope"
 				>
 					<summary data-sticky="block block-start backdrop-before backdrop-stuck">
 						<h4
-							id={`${id}-why`}
+							id={`${id}-why-heading`}
 							data-sticky-breadcrumb="item mobile"
 						>
 							<a data-link="camouflaged" href={`#${id}-why`}>
@@ -1268,14 +1271,17 @@
 				</details>
 
 				<details
+					id={`${id}-methodology`}
+					aria-labelledby={`${id}-methodology-heading`}
 					open
 					data-card="secondary padding-5 radius-4"
 					data-column="gap-0"
 					data-sticky-container
+					data-sticky-breadcrumb="scope"
 				>
 					<summary data-sticky="block block-start backdrop-before backdrop-stuck">
 						<h4
-							id={`${id}-methodology`}
+							id={`${id}-methodology-heading`}
 							data-sticky-breadcrumb="item mobile"
 						>
 							<a data-link="camouflaged" href={`#${id}-methodology`}>
@@ -1371,14 +1377,17 @@
 
 				{#if howToImprove}
 					<details
+						id={`${id}-improvement`}
+						aria-labelledby={`${id}-improvement-heading`}
 						open
 						data-card="secondary padding-5 radius-4"
 						data-column="gap-0"
 						data-sticky-container
+						data-sticky-breadcrumb="scope"
 					>
 						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
 							<h4
-								id={`${id}-improvement`}
+								id={`${id}-improvement-heading`}
 								data-sticky-breadcrumb="item mobile"
 							>
 								<a data-link="camouflaged" href={`#${id}-improvement`}>
@@ -1454,9 +1463,6 @@
 		);
 		---wallet-breadcrumb-heading-flow-translate: 0px;
 		---wallet-breadcrumb-trailing-control-inline-clearance: 0px;
-		---wallet-breadcrumb-surface-inline-end-clearance: var(
-			---wallet-page-navigation-inline-size
-		);
 		---wallet-attribute-heading-font-size: 1.17em;
 		/* The leading edge supplies one shared arrival interval. It ends exactly
 		 * when the native sticky owner reaches its lane. */
@@ -1550,7 +1556,6 @@
 			---wallet-breadcrumb-trailing-control-inline-clearance: var(
 				---wallet-mobile-pie-inline-clearance
 			);
-			---wallet-breadcrumb-surface-inline-end-clearance: 0px;
 			---wallet-name-mobile-block-start: calc(
 				(
 					var(--navigation-mobile-blockSize)
@@ -1805,6 +1810,11 @@
 			2 * var(---wallet-sticky-content-inset)
 				+ var(---wallet-breadcrumb-block-size)
 		);
+		---wallet-summary-companions-row-block-size: 0px;
+		---wallet-attribute-row-block-size: calc(
+			var(---wallet-breadcrumb-row-block-size)
+				+ var(---wallet-summary-companions-row-block-size)
+		);
 		---wallet-breadcrumb-mobile-row-gap: 0.25rem;
 		---wallet-breadcrumb-attribute-row-offset: 0px;
 		---wallet-breadcrumb-surface-fade: 0.5rem;
@@ -1883,12 +1893,16 @@
 			);
 
 			@media (max-width: 480px) {
+				---wallet-summary-companions-row-block-size: calc(
+					2rem + var(---wallet-breadcrumb-mobile-row-gap)
+				);
 				---wallet-breadcrumb-attribute-row-offset: var(
 					---wallet-breadcrumb-row-block-size
 				);
 				---wallet-sticky-stack-block-end: calc(
 					var(---wallet-root-row-block-size)
-						+ 2 * var(---wallet-breadcrumb-row-block-size)
+						+ var(---wallet-breadcrumb-row-block-size)
+						+ var(---wallet-attribute-row-block-size)
 				);
 				/* The group crumb owns the first row under the nav; H3 owns the next. */
 				---wallet-breadcrumb-attribute-arrival-offset: calc(
@@ -2732,20 +2746,6 @@
 				);
 			}
 
-			.attribute-summary-companions {
-				flex: 0 1 auto;
-				inline-size: max-content;
-				max-inline-size: min(50vi, 100%);
-				min-inline-size: 0;
-				margin-inline-start: auto;
-				justify-content: end;
-
-				> * {
-					flex: none;
-					white-space: nowrap;
-				}
-			}
-
 			&:not([open]) {
 				> summary[data-sticky] {
 					position: relative;
@@ -2997,7 +2997,7 @@
 		.attribute > details[open] > summary[data-sticky] {
 			--sticky-insetBlockStart: calc(
 				var(---wallet-sticky-stack-block-end)
-					- var(---wallet-breadcrumb-row-block-size)
+					- var(---wallet-attribute-row-block-size)
 			);
 
 			z-index: var(---wallet-breadcrumb-layer-attribute);
@@ -3725,6 +3725,35 @@
 		---wallet-breadcrumb-heading-flow-translate: 0px;
 		---wallet-breadcrumb-icon-scale: 1;
 
+		.attribute-summary-companions {
+			flex: 0 1 auto;
+			inline-size: max-content;
+			max-inline-size: min(50vi, 100%);
+			min-inline-size: 0;
+			margin-inline-start: auto;
+			justify-content: end;
+
+			> * {
+				flex: none;
+				white-space: nowrap;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.attribute-heading-row {
+				flex-wrap: wrap;
+			}
+
+			.attribute-summary-companions {
+				flex-basis: 100%;
+				max-inline-size: 100%;
+				padding-inline-start: calc(
+					var(---wallet-breadcrumb-heading-icon-size)
+						+ var(---wallet-breadcrumb-heading-icon-gap)
+				);
+			}
+		}
+
 		> details {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
@@ -3785,6 +3814,7 @@
 	.attribute-accordions {
 		details {
 			overflow: visible;
+			scroll-margin-block-start: var(---wallet-sticky-stack-block-end);
 
 			> summary[data-sticky] {
 				/* H4 consumes the complete visible stack directly; nested sticky
@@ -3845,7 +3875,7 @@
 						+ 2 * var(---wallet-fallback-sticky-padding-block)
 				)
 			);
-			---wallet-fallback-attribute-sticky-block-size: max(
+			---wallet-fallback-attribute-heading-block-size: max(
 				calc(
 					var(---wallet-breadcrumb-attribute-font-size)
 						* var(---wallet-line-height)
@@ -3855,6 +3885,10 @@
 					var(---wallet-breadcrumb-heading-icon-size)
 						+ 2 * var(---wallet-fallback-sticky-padding-block)
 				)
+			);
+			---wallet-fallback-attribute-sticky-block-size: calc(
+				var(---wallet-fallback-attribute-heading-block-size)
+					+ var(---wallet-summary-companions-row-block-size)
 			);
 		}
 
@@ -3955,9 +3989,9 @@
 		.attribute > details[open] > summary {
 			/* The active group must paint over an outgoing attribute as native
 			 * sticky containment pushes that attribute through the group lane. */
+			--sticky-insetBlockStart: var(---wallet-group-sticky-block-end);
 			z-index: calc(var(---wallet-breadcrumb-layer-detail) + 1);
 			position: sticky;
-			inset-block-start: var(---wallet-group-sticky-block-end);
 			min-block-size: var(---wallet-fallback-attribute-sticky-block-size);
 			padding-block: var(---wallet-fallback-sticky-padding-block);
 			background-color: var(---wallet-breadcrumb-surface-background);
