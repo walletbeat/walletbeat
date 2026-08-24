@@ -47,19 +47,19 @@ export const maintenance: Attribute<MaintenanceMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The wallet passes most maintenance sub-criteria.'),
+				sentence('The wallet passes most maintenance subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet passes some maintenance sub-criteria.'),
+				sentence('The wallet passes some maintenance subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The wallet fails most or all maintenance sub-criteria.'),
+				sentence('The wallet fails most or all maintenance subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -117,7 +117,7 @@ export const maintenance: Attribute<MaintenanceMetadata> = {
 				},
 			},
 			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 		})
 	},
 }

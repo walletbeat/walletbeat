@@ -57,7 +57,7 @@ _Need more help?_: For more help on creating PRs, check out [GitHub's own guide]
 After sending a PR, a Walletbeat contributor should soon review your changes. If there are problems (test failures, invalid data, etc.), your PR may need further work. You can update your PR by pushing additional changes to the same branch. Follow this workflow:
 
 - Make the requested changes in your editor.
-- Re-run all tests: `pnpm check:all`. If they do not pass, fix that first.
+- Rerun all tests: `pnpm check:all`. If they do not pass, fix that first.
 - Commit your changes: `git add -p` then `git commit -m 'Some more fixes'`
 - Upload your changes to GitHub: `git push`
 - Write a comment on the PR to explain your fixes and to notify your reviewer that they need to take another look at your PR.

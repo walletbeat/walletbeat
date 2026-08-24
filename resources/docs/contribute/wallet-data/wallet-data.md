@@ -264,7 +264,7 @@ _This example walks through the use of the `VariantFeature` and `Support` types,
 
 This field relates to whether or not the wallet lets you use multiple addresses. It is a simple yes/no question.
 
-In your code editor, you should be able to click (perhaps `Ctrl+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
+In your code editor, you should be able to click (perhaps `Control+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
 
 ![](../images/navigate-to-type-definition.gif 'Navigating to a type definition in VSCode')
 

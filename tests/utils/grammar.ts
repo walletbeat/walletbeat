@@ -1,4 +1,5 @@
 import * as harper from 'harper.js'
+import { binaryInlined } from 'harper.js/binaryInlined'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
@@ -17,6 +18,13 @@ import { trimWhitespacePrefix } from '@/types/utils/text'
  * We ignore Capitalization lints for these so the grammar rule does not force "ImKey" etc.
  */
 const PROPER_NOUNS_LOWERCASE_FIRST = new Set(['imKey', 'imToken', 'polymutex'])
+
+/**
+ * Proper nouns that Harper's OrthographicConsistency rule does not recognize and flags for a
+ * different capitalization (e.g. it wants "debank", "simplex", or title-case "Zeus" even
+ * though the lowercase forms here appear only in repo paths and the proper forms are brands).
+ */
+const PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS = new Set(['DeBank', 'SimpleX', 'zeus'])
 
 let vocabulary: string[] | null = null
 
@@ -61,13 +69,18 @@ export function isInVocabulary(word: string): boolean {
 	return vocabularySet.has(word.toLowerCase())
 }
 
+function getHarperLintConfig(): harper.LintConfig {
+	const config: harper.LintConfig = {
+		RoadMap: false, // This otherwise corrects "roadmap" to "road map".
+	}
+
+	return config
+}
+
 async function prepareHarperLinter(linter: harper.LocalLinter) {
 	await linter.setDialect(harper.Dialect.American)
-	await linter.setLintConfig({
-		RoadMap: false, // This otherwise corrects "roadmap" to "road map".
-	})
+	await linter.setLintConfig(getHarperLintConfig())
 	await linter.importWords(getVocabulary())
-	await linter.setup()
 }
 
 let harperLinter: harper.LocalLinter | null = null
@@ -75,7 +88,7 @@ let harperLinter: harper.LocalLinter | null = null
 async function getHarperLinter(): Promise<harper.LocalLinter> {
 	if (harperLinter === null) {
 		harperLinter = new harper.LocalLinter({
-			binary: harper.binaryInlined,
+			binary: binaryInlined,
 		})
 		await prepareHarperLinter(harperLinter)
 	}
@@ -389,11 +402,17 @@ export async function grammarLintMessages(
 		lint => !overlapsAnyRange(lint.span().start, lint.span().end, githubLabelRanges),
 	)
 
+	// Suppress Word Choice false positives for "setup" used as a noun.
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'setup',
+	)
+
 	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
 	lints = lints.filter(
 		lint =>
 			lint.lint_kind_pretty() !== 'Capitalization' ||
-			!PROPER_NOUNS_LOWERCASE_FIRST.has(lint.get_problem_text()),
+			(!PROPER_NOUNS_LOWERCASE_FIRST.has(lint.get_problem_text()) &&
+				!PROPER_NOUNS_CAPITALIZATION_EXCEPTIONS.has(lint.get_problem_text())),
 	)
 
 	// Ignore Spelling lints for standalone "s" (false positive from markdown/punctuation tokenization).
@@ -428,6 +447,215 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'lockdown',
 	)
+
+	// Ignore Usage lints for "do to" in "what can X do to improve"-style constructions,
+	// where "do to" means "do, in order to" (Harper's DoToDueTo rule mistakes it for "due to").
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Usage' || lint.get_problem_text() !== 'do to',
+	)
+
+	// Ignore Agreement lints for "a USD", "a rating", and "each appearing". Harper's
+	// MassNouns rule misclassifies these as mass nouns:
+	// - "a USD 30 million Series B" — the "a" modifies the funding round, not USD.
+	// - "produce a rating" — a rating is countable.
+	// - "each appearing as" — a participial construction, not a mass noun.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Agreement' ||
+			!['a USD', 'a rating', 'each appearing'].includes(lint.get_problem_text()),
+	)
+
+	// Ignore MissingDeterminer false positives for the uncountable mass noun "feature data"
+	// (e.g. "add feature data" / "need more feature data"), which needs no determiner.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Grammar') {
+			return true
+		}
+
+		if (!lint.message().includes('Add a determiner before this noun phrase')) {
+			return true
+		}
+
+		const after = trimmedText.substring(lint.span().end, lint.span().end + 40)
+
+		return !after.includes('feature data')
+	})
+
+	// Ignore MissingTo false positives, which suggest inserting "to" to complete an
+	// infinitive where the word is actually an adjective in a heading ("## Intended timeline")
+	// or an imperative verb in a task-list item ("- [x] Prepare conference materials").
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Word Choice') {
+			return true
+		}
+
+		if (!lint.message().includes('Insert `to` to complete the infinitive')) {
+			return true
+		}
+
+		const lineStart = trimmedText.lastIndexOf('\n', lint.span().start - 1) + 1
+		const line = trimmedText.substring(lineStart, lint.span().end).trimStart()
+
+		if (line.startsWith('#') || /^-\s*\[[ xX]\]/.exec(line) !== null) {
+			return false
+		}
+
+		return true
+	})
+
+	// Ignore ModalBeAdjective false positives where a modal verb (can/should/may) is followed
+	// by an action verb rather than an adjective, e.g. "What can X do to improve...",
+	// "X should first ensure that...", "it may later decide to...".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Miscellaneous') {
+			return true
+		}
+
+		if (!lint.message().includes('missing the word `be` between this modal verb and adjective')) {
+			return true
+		}
+
+		const following = trimmedText.substring(lint.span().end, lint.span().end + 25)
+
+		return !/^\s+(?:\w+\s+)?(do|first ensure|later decide)\b/.exec(following)
+	})
+
+	// Ignore MoreAdjective style suggestions. Harper explicitly labels these "This is not an
+	// error, but an inflected form of this adjective also exists" (e.g. "more secure" → "safer",
+	// and it even treats the noun in "more choice" as an adjective). These are legitimate
+	// constructions, not grammar errors, so we do not rewrite the site's voice to the inflected forms.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Style' ||
+			!lint.message().includes('inflected form of this adjective also exists'),
+	)
+
+	// Ignore NumericRangeEnDash lints on ISO dates (YYYY-MM or YYYY-MM-DD), which conventionally
+	// use a hyphen (e.g. "Established: 2025-08"). Harper cannot tell an ISO date from a range.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Formatting') {
+			return true
+		}
+
+		if (!lint.message().includes('Use an en dash')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 4), lint.span().start)
+		const after = trimmedText.substring(lint.span().end, lint.span().end + 4)
+
+		if (/^\d{4}$/.exec(before) !== null && /^\d{1,2}(?:\b|\/)/.exec(after) !== null) {
+			return false
+		}
+
+		return true
+	})
+
+	// Ignore QuiteQuiet false positives: Harper flags "quite" (meaning "rather") as a possible
+	// typo for "quiet", but it is used correctly in our content (e.g. "quite enough", "quite a small").
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Typo' ||
+			!lint.message().includes('might be trying to say') ||
+			!['quite', 'Quite'].includes(lint.get_problem_text()),
+	)
+
+	// Ignore SafeToSave false positives where "Safe" is the Safe wallet name (a proper noun,
+	// e.g. "What can Safe do to improve..."), not the adjective "safe".
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'Safe',
+	)
+
+	// Ignore ThereToTheir false positives on the existential "there" in questions
+	// (e.g. "Are there restrictions?"), where "there" is correct, not "their".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Grammar') {
+			return true
+		}
+
+		if (!lint.message().includes('Did you mean `their`?')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 8), lint.span().start)
+
+		return !/\b(?:are|is|was|were)\s+$/i.exec(before)
+	})
+
+	// Ignore ToTwoToo false positives where "to" is a preposition or a transaction field
+	// label (e.g. "linkable to IP", "gas, nonce, from, to, chain, value"), not the adverb
+	// "too" meaning "also"/"excessively".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Word Choice') {
+			return true
+		}
+
+		if (lint.get_problem_text() !== 'to') {
+			return true
+		}
+
+		if (!lint.message().includes('Use `too` here')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 14), lint.span().start)
+		const after = trimmedText.substring(
+			lint.span().end,
+			Math.min(trimmedText.length, lint.span().end + 14),
+		)
+
+		// "to" as the object of a prepositional phrase, e.g. "linkable to IP".
+		if (/\blinkable\s+$/i.exec(before) !== null) {
+			return false
+		}
+
+		// "to" as a transaction field label in a comma-separated list, e.g. "from, to, chain".
+		if (/, $/.exec(before) !== null && /^,/.exec(after) !== null) {
+			return false
+		}
+
+		return true
+	})
+
+	// Ignore UseTitleCase suggestions: the site uses sentence case for headings by design
+	// (e.g. "## Development commands", "### Step 1: ..."), not title case.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Capitalization' ||
+			!lint.message().includes('title case in headings'),
+	)
+
+	// Ignore ToTo false positives on the idiomatic "as to how to X" construction
+	// (e.g. "instructions as to how to use it"), where the two "to"s are not a repeated
+	// infinitive but part of "as to" + "how to".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Miscellaneous') {
+			return true
+		}
+
+		if (!lint.message().includes('Remove the repeated `to` in this infinitive')) {
+			return true
+		}
+
+		return lint.get_problem_text() !== 'to how to'
+	})
+
+	// Ignore TheyToThem false positives where "they" is the subject of a subordinate clause
+	// following an infinitive (e.g. "to show they still hold it"), not the object of a
+	// preposition or transitive verb.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Grammar') {
+			return true
+		}
+
+		if (!lint.message().includes('Use `them` when the pronoun follows')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 16), lint.span().start)
+
+		return !/\bto \w+\s+$/i.exec(before)
+	})
 
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
