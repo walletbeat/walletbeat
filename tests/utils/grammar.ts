@@ -69,15 +69,9 @@ export function isInVocabulary(word: string): boolean {
 	return vocabularySet.has(word.toLowerCase())
 }
 
-const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = []
-
 function getHarperLintConfig(): harper.LintConfig {
 	const config: harper.LintConfig = {
 		RoadMap: false, // This otherwise corrects "roadmap" to "road map".
-	}
-
-	for (const rule of TEMPORARILY_IGNORED_LINT_RULES) {
-		config[rule] = false
 	}
 
 	return config
@@ -659,6 +653,46 @@ export async function grammarLintMessages(
 		}
 
 		return true
+	})
+
+	// Ignore UseTitleCase suggestions: the site uses sentence case for headings by design
+	// (e.g. "## Development commands", "### Step 1: ..."), not title case.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Capitalization' ||
+			!lint.message().includes('title case in headings'),
+	)
+
+	// Ignore ToTo false positives on the idiomatic "as to how to X" construction
+	// (e.g. "instructions as to how to use it"), where the two "to"s are not a repeated
+	// infinitive but part of "as to" + "how to".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Miscellaneous') {
+			return true
+		}
+
+		if (!lint.message().includes('Remove the repeated `to` in this infinitive')) {
+			return true
+		}
+
+		return lint.get_problem_text() !== 'to how to'
+	})
+
+	// Ignore TheyToThem false positives where "they" is the subject of a subordinate clause
+	// following an infinitive (e.g. "to show they still hold it"), not the object of a
+	// preposition or transitive verb.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Grammar') {
+			return true
+		}
+
+		if (!lint.message().includes('Use `them` when the pronoun follows')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 16), lint.span().start)
+
+		return !/\bto \w+\s+$/i.exec(before)
 	})
 
 	// Ignore hyphenization for known words.
