@@ -69,11 +69,7 @@ export function isInVocabulary(word: string): boolean {
 	return vocabularySet.has(word.toLowerCase())
 }
 
-const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'UseTitleCase',
-	'WillNonLemma',
-	'WrongApostrophe',
-]
+const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = ['WillNonLemma', 'WrongApostrophe']
 
 function getHarperLintConfig(): harper.LintConfig {
 	const config: harper.LintConfig = {
