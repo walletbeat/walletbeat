@@ -69,7 +69,7 @@ export function isInVocabulary(word: string): boolean {
 	return vocabularySet.has(word.toLowerCase())
 }
 
-const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = ['WrongApostrophe']
+const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = []
 
 function getHarperLintConfig(): harper.LintConfig {
 	const config: harper.LintConfig = {
