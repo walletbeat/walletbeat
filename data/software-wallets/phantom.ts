@@ -11,7 +11,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -72,9 +72,9 @@ export const phantom: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
 		},
 		licensing: {
@@ -181,7 +181,7 @@ export const phantom: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
-		walletCall: null,
+		walletCall: notSupported,
 	},
 	variants: {
 		[Variant.MOBILE]: true,
