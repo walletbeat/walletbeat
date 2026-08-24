@@ -70,7 +70,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'ThereToTheir',
 	'TheyToThem',
 	'ToAdverb',
 	'ToTo',
@@ -582,6 +581,22 @@ export async function grammarLintMessages(
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'Safe',
 	)
+
+	// Ignore ThereToTheir false positives on the existential "there" in questions
+	// (e.g. "Are there restrictions?"), where "there" is correct, not "their".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Grammar') {
+			return true
+		}
+
+		if (!lint.message().includes('Did you mean `their`?')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 8), lint.span().start)
+
+		return !/\b(?:are|is|was|were)\s+$/i.exec(before)
+	})
 
 	// Ignore hyphenization for known words.
 	lints = lints.filter(
