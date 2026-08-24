@@ -1,6 +1,8 @@
 {
 	"apple.com": "apple",
+	"cloudinary.com": "cloudinary",
 	"debank.com": "debank",
+	"microsoft.com": "microsoft",
 	"google-analytics.com": "alphabet",
 	"google.com": "alphabet",
 	"googleapis.com": "alphabet",
@@ -10,6 +12,9 @@
 	"gvt1.com": "alphabet",
 	"hyperliquid.xyz": "hyperFoundation",
 	"rabby.io": "debank",
+	"imgix.net": "imgix",
+	"rainbow.me": "rainbow",
+	"rudderstack.com": "rudderstack",
 	"sentry.io": "sentry",
 	"walletbeat.eth": "walletbeat",
 	"walletbeat.eth.limo": "walletbeat",

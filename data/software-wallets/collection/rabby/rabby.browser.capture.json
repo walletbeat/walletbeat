@@ -28767,39 +28767,5 @@
 			"piece": "TRACKING_IDENTIFIER"
 		}
 	],
-	"sessions": 11,
-	"captureInfo": [
-		{
-			"walletAddresses": [
-				"0x58cb0D9D6fA1ebd9B4076a59e7D0471322F7bBb3",
-				"0x62fEa53FD7CE1C3a37647321F5b20CB835A66dc7",
-				"0x807be577bC7F8F2701843824E7FFf220317b9006",
-				"0xD510d107D9ceea9030b7C508B305cdD1c7A1c27c"
-			],
-			"connectedApps": [
-				"beta.walletbeat.eth.limo"
-			],
-			"swapTokenAddresses": [
-				"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-			],
-			"transactions": [
-				{
-					"txHash": "0x24d31fd2fd611473ba6257376eeed068e91e05eded07c20ac0bf2bd7f9d4ee30",
-					"timestamp": 1771809227
-				},
-				{
-					"txHash": "0x86fd836347bbb99d72e7a2881ae6af98d1f590416fc02dbf3bef203bc4b97b96",
-					"timestamp": 1771808999
-				},
-				{
-					"txHash": "0xba7dae405a6aa4f5e22fe348f0a079e070f7e0f1f710579ebd0c096a83b54825",
-					"timestamp": 1771808831
-				},
-				{
-					"txHash": "0x5a6dd4d961330826a90e9ed430a249a3533c63ac6662993305f10d33a385a908",
-					"timestamp": 1771808711
-				}
-			]
-		}
-	]
+	"sessions": 11
 }
