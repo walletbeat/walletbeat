@@ -247,9 +247,9 @@ function evaluateMultifactor(
 				`),
 				howToImprove: mdParagraph(`
 					{{WALLET_NAME}} should:
-					* ... Either change the smart contract's default control configuration
+					* … Either change the smart contract's default control configuration
 					such that the account is self-custodied by the user from the start
-					* ... Either release an open-source standalone application that allows
+					* … Either release an open-source standalone application that allows
 					users to switch their account to be effectively self-custodied.
 				`),
 			})
