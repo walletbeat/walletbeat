@@ -16,7 +16,7 @@ A Walletbeat thread
 
 ---
 
-Blind signing has always been an industry problem. It has been one of the cause of stolen funds, wallet drainage, and hacks.
+Blind signing has always been an industry problem. It has been one of the causes of stolen funds, wallet drainage, and hacks.
 
 In fact, the $1.5B Bybit exploit highlighted just how dangerous blind signing can be.
 

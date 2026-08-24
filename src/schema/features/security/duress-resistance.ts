@@ -64,7 +64,7 @@ export enum DuressAction {
 	/** Freezes the smart contract onchain, preventing unauthorized transfers. */
 	ONCHAIN_LOCKDOWN = 'ONCHAIN_LOCKDOWN',
 
-	/** Wipes wallet data and forwards all funds to a pre-configured safe address. */
+	/** Wipes wallet data and forwards all funds to a preconfigured safe address. */
 	WIPE_AND_FORWARD = 'WIPE_AND_FORWARD',
 }
 
@@ -92,7 +92,7 @@ export function duressActionDescription(action: DuressAction): string {
 		case DuressAction.SELF_DESTRUCT:
 			return 'wipes the wallet, preventing the attacker from accessing funds'
 		case DuressAction.WIPE_AND_FORWARD:
-			return 'wipes the wallet and forwards all funds to a pre-configured safe address'
+			return 'wipes the wallet and forwards all funds to a preconfigured safe address'
 	}
 }
 

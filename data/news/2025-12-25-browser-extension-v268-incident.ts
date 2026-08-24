@@ -18,7 +18,7 @@ export default {
 		fundsImpacted: true,
 	},
 	publishedAt: '2025-12-25',
-	severity: Severity.CRITICAL,
+	severity: Severity.HIGH,
 	status: IncidentStatus.MITIGATED,
 	summary:
 		'A malicious version of Trust Wallet Browser Extension (v2.68) was published to the Chrome Web Store on December 24, 2025, through a compromised API key. The attack, linked to the industry-wide Sha1-Hulud supply chain incident, affected users who logged in during December 24-26, 2025. Approximately 2,520 wallet addresses were impacted with $8.5M in losses. Trust Wallet has committed to reimbursing all affected users.',

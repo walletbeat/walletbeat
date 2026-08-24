@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -85,9 +86,9 @@ export const metamask: SoftwareWallet = {
 		displayName: 'MetaMask',
 		tableName: 'MetaMask',
 		coinspectId: 'metamask',
-		contributors: [polymutex, nconsigny, mattmatt],
+		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-06',
+		lastUpdated: '2026-08-22',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -196,7 +197,7 @@ export const metamask: SoftwareWallet = {
 					explanation: `
 						MetaMask lets users set custom RPC endpoints for any network,
 						including mainnet. Before that, it contacts default endpoints
-						(mainnet.infura.io and some L2s) for non-sensitive RPCs
+						(mainnet.infura.io and some L2s) for nonsensitive RPCs
 						(\`eth_blockNumber\`, \`net_version\`).
 					`,
 					url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',
@@ -395,7 +396,7 @@ export const metamask: SoftwareWallet = {
 					type: LegalProtectionType.SAFE_HARBOR,
 					ref: {
 						explanation:
-							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here.',
+							'Metamask waives any relevant restriction in our Terms of Service ("ToS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here.',
 						url: 'https://hackerone.com/metamask/safe_harbor',
 					},
 				}),
@@ -799,7 +800,10 @@ export const metamask: SoftwareWallet = {
 					requiredReview: true,
 					tagsImmutable: true,
 				},
-				reproducibleBuilds: null,
+				// MetaMask rebuilds and compares its own Firefox releases, but the harness
+				// and reviewer instructions are private so it can't be independently
+				// reproduced. The mobile app publishes no reproducible-build tooling at all.
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({

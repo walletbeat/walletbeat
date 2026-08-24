@@ -593,6 +593,10 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
 	// Writes to shared storage, e.g. to export transaction receipts or QR codes.
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.PASS,
+	// Delivers a callback when the user screenshots the app (Android 14+). It grants no access to
+	// screen contents, and wallets use it defensively, e.g. to warn a user who screenshots their
+	// recovery phrase.
+	[AndroidPermission.DETECT_SCREEN_CAPTURE]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
@@ -620,6 +624,9 @@ const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAI
 	[IosUsageDescription.FACE_ID]: Rating.PASS,
 	// Allows saving exported transaction receipts or QR codes to the photo library.
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: Rating.PASS,
+	// Prompt string for notifications such as transaction confirmations. It grants no access to
+	// user data; iOS gates notifications on a runtime request rather than this key.
+	[IosUsageDescription.USER_NOTIFICATIONS]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Microphone access enables covert audio recording of sensitive conversations near the device.
@@ -799,7 +806,7 @@ function evaluateKeysHandling(
 					),
 				},
 				details: markdown(`
-					{{WALLET_NAME}} uses multi-party computation, but key reconstruction
+					{{WALLET_NAME}} uses multiparty computation, but key reconstruction
 					can occur on external servers without the user's device being
 					involved. The at-rest security of the reconstructed key material on
 					the provider's infrastructure cannot be independently verified.
@@ -962,7 +969,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 			exampleRating(
 				mdParagraph(
-					'(Desktop app) The app derives keys using a weak, non-standard key derivation function.',
+					'(Desktop app) The app derives keys using a weak, nonstandard key derivation function.',
 				),
 				evaluateKeyStorage(
 					EvaluationContext.forTest(() => securityBestPractices),

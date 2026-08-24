@@ -325,7 +325,7 @@ export const imtoken: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'imToken warns about risky signatures such as eth_sign, non-standard EIP-712 type signatures, and ENS security risks including zero-width characters. It also marks risky tokens, addresses, and apps. Processing happens on-device.',
+								'imToken warns about risky signatures such as eth_sign, nonstandard EIP-712 type signatures, and ENS security risks including zero-width characters. It also marks risky tokens, addresses, and apps. Processing happens on-device.',
 							url: 'https://support.token.im/hc/en-us/articles/21850966355737-Revamped-imToken-signature-for-safer-and-more-intuitive-transactions',
 						},
 					],
