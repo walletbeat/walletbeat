@@ -25,7 +25,7 @@ using one of many **transparent and open** wallets within an **interoperable and
 
 - **CROPS**, as current technology and cryptography enable.
 - **Opinionated methodology**, **verifiable data**, **impartial assessments**.
-- **Verifiability matters**. Fully-open is best, independently-audited is a compromise, closed is a non-starter.
+- **Verifiability matters**. Fully-open is best, independently-audited is a compromise, closed is a nonstarter.
 - **Walk the talk**. Walletbeat itself has to be the first to uphold the values it wishes to impose on others.
 - **Legitimacy is the most important scarce resource**. Walletbeat succeeds only if perceived as legitimate.
 

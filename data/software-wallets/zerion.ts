@@ -561,7 +561,7 @@ export const zerion: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 				desktop: 'NOT_A_DESKTOP_APP',
-				mobile: 'NOT_A_MOBILE_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
 			},
 			transactionLegibility: {
 				ref: refTodo,

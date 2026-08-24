@@ -94,7 +94,7 @@
 		"eslint-plugin-sort-keys-custom-order": "^3.1.2",
 		"eslint-plugin-svelte": "^3.22.0",
 		"globals": "^17.8.0",
-		"harper.js": "^0.61.0",
+		"harper.js": "^2.7.0",
 		"omnipin": "^3.1.1",
 		"ox": "^0.12.4",
 		"p-limit": "^7.3.1",

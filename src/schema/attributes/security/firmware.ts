@@ -68,19 +68,19 @@ export const firmware: Attribute<FirmwareMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The hardware wallet passes most firmware sub-criteria.'),
+				sentence('The hardware wallet passes most firmware subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The hardware wallet passes some firmware sub-criteria.'),
+				sentence('The hardware wallet passes some firmware subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The hardware wallet fails most or all firmware sub-criteria.'),
+				sentence('The hardware wallet fails most or all firmware subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -138,7 +138,7 @@ export const firmware: Attribute<FirmwareMetadata> = {
 				},
 			},
 			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 			// TODO: References.
 		})
 	},
