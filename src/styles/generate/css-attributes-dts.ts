@@ -44,8 +44,7 @@ const attributeValueType = (name: string): string =>
 const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 	(() => {
 		const sortedEntries = [...entries.values()].sort((a, b) => a.name.localeCompare(b.name))
-
-		return [
+		const globalDeclarations = [
 			'interface CssAttributes {',
 			...sortedEntries.flatMap((entry, i) => [
 				...buildDocLines(entry),
@@ -57,9 +56,17 @@ const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 			'declare namespace astroHTML.JSX {',
 			'\tinterface HTMLAttributes extends CssAttributes {}',
 			'}',
+		]
+
+		return [
+			"import 'svelte/elements'",
+			'',
+			'declare global {',
+			...globalDeclarations.map(line => (line.length === 0 ? '' : `\t${line}`)),
+			'}',
 			'',
 			"declare module 'svelte/elements' {",
-			'\texport interface HTMLAttributes<_T extends EventTarget> extends CssAttributes {}',
+			'\texport interface HTMLAttributes<T extends EventTarget> extends CssAttributes {}',
 			'}',
 			'',
 		].join('\n')
