@@ -16,9 +16,15 @@ on:
       - review_requested
 
 # Supersede in-flight runs for the same PR (or the same branch, for pushes),
-# but never cancel a run on the trunk.
+# but never cancel a run on the trunk. Runs that `check-quick` is going to
+# skip are placed in a separate group, so that they cannot evict a run that
+# is doing real work and leave only a skipped -- and therefore passing --
+# result behind.
 concurrency:
-  group: check-${{ github.event.pull_request.number || github.ref }}
+  group: >-
+    check-${{ github.event.pull_request.number || github.ref }}-${{
+    (github.event.action == 'edited' && github.event.changes.base == null)
+    && 'noop' || 'work' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/beta' }}
 
 jobs:
