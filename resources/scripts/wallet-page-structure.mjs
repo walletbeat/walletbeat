@@ -45,6 +45,9 @@ for (const slug of Object.keys(allRatedWalletsBySlug).sort()) {
 			const targetHashes = [
 				...document.querySelectorAll('.page-navigation .navigation-items a[href^="#"]'),
 			].map(link => link.getAttribute('href'))
+			const navigationLinks = [
+				...document.querySelectorAll('.page-navigation .navigation-items a[href^="#"]'),
+			]
 
 			return {
 				h1Count: headings.filter(heading => heading.tagName === 'H1').length,
@@ -57,8 +60,12 @@ for (const slug of Object.keys(allRatedWalletsBySlug).sort()) {
 				missingTargets: [...new Set(targetHashes)].filter(
 					href => !document.querySelector(`#${CSS.escape(href.slice(1))}`),
 				),
-				groupCount: document.querySelectorAll('.attribute-group[id]').length,
-				attributeCount: document.querySelectorAll('.attribute[id]').length,
+				unsharedInterestTargets: navigationLinks
+					.filter(link => link.getAttribute('interestfor') !== link.hash.slice(1))
+					.map(link => link.hash),
+				markerElements: document.querySelectorAll('[data-sticky-breadcrumb~="marker"]').length,
+				groupCount: document.querySelectorAll('.attribute-group-target[id]').length,
+				attributeCount: document.querySelectorAll('.attribute > details[id]').length,
 				documentOverflow:
 					document.documentElement.scrollWidth - document.documentElement.clientWidth,
 				layoutOverflow: (() => {
@@ -66,8 +73,11 @@ for (const slug of Object.keys(allRatedWalletsBySlug).sort()) {
 					return layout ? layout.scrollWidth - layout.clientWidth : null
 				})(),
 				shapeLayers: document.querySelectorAll('.breadcrumb-slice-shape-layer').length,
-				emojiIcons: document.querySelectorAll(
-					':is(.toc-icon, .attribute-group-icon, .attribute-icon, .pie-navigation-icon)[data-icon~="emoji"]',
+				iconCount: document.querySelectorAll(
+					':is(.toc-icon, .attribute-group-icon > .breadcrumb-icon, .attribute-icon > .breadcrumb-icon, .pie-navigation-icon)',
+				).length,
+				emojiIconCount: document.querySelectorAll(
+					':is(.toc-icon, .attribute-group-icon > .breadcrumb-icon, .attribute-icon > .breadcrumb-icon, .pie-navigation-icon)[data-icon~="emoji"]',
 				).length,
 			}
 		})
@@ -99,16 +109,30 @@ for (const slug of Object.keys(allRatedWalletsBySlug).sort()) {
 			'navigation hashes resolve',
 			structure.missingTargets,
 		)
+		check(
+			structure.unsharedInterestTargets.length === 0,
+			slug,
+			size,
+			'navigation links share their in-page interest target',
+			structure.unsharedInterestTargets,
+		)
+		check(
+			structure.markerElements === 0,
+			slug,
+			size,
+			'heading pseudo-elements own breadcrumb markers',
+			structure.markerElements,
+		)
 		check(structure.groupCount > 0, slug, size, 'attribute groups render', structure.groupCount)
 		check(structure.attributeCount > 0, slug, size, 'attributes render', structure.attributeCount)
 		check(structure.documentOverflow <= 0.75, slug, size, 'document is contained', structure)
 		check(structure.layoutOverflow <= 0.75, slug, size, 'layout is contained', structure)
 		check(structure.shapeLayers === 0, slug, size, 'content icons have no shape layers', structure)
 		check(
-			structure.emojiIcons === 0,
+			structure.emojiIconCount > 0 && structure.emojiIconCount === structure.iconCount,
 			slug,
 			size,
-			'navigation icons are monochrome glyphs',
+			'all navigation and breadcrumb glyphs use emoji variants',
 			structure,
 		)
 

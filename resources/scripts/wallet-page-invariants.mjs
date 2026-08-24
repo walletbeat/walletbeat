@@ -19,6 +19,7 @@ const tolerance = Number(process.env.WALLETBEAT_TOLERANCE ?? 0.75)
 const startServer = process.env.WALLETBEAT_START_SERVER === 'true'
 const serverMode = process.env.WALLETBEAT_SERVER_MODE ?? 'dev'
 const reducedMotion = process.env.WALLETBEAT_REDUCED_MOTION === 'true'
+const reducedTransparency = process.env.WALLETBEAT_REDUCED_TRANSPARENCY === 'true'
 const measurePerformance = process.env.WALLETBEAT_PERFORMANCE === 'true'
 const measureTransitions = process.env.WALLETBEAT_TRANSITIONS === 'true'
 const direction = process.env.WALLETBEAT_DIRECTION ?? 'ltr'
@@ -93,6 +94,19 @@ const page = await browser.newPage({
 	viewport: { width, height },
 	reducedMotion: reducedMotion ? 'reduce' : 'no-preference',
 })
+if (engineName === 'chromium') {
+	const session = await page.context().newCDPSession(page)
+	await session.send('Emulation.setEmulatedMedia', {
+		features: [
+			{
+				name: 'prefers-reduced-transparency',
+				value: reducedTransparency ? 'reduce' : 'no-preference',
+			},
+		],
+	})
+} else if (reducedTransparency) {
+	throw new Error('Reduced-transparency emulation is only available in Chromium')
+}
 
 const failures = []
 const results = []
@@ -168,6 +182,11 @@ const inspect = state =>
 				const iconRect = wrapper.matches('.toc-icon') ? wrapperRect : rect(icon)
 				const iconStyle = getComputedStyle(icon, wrapper.matches('.toc-icon') ? '::before' : null)
 				const accent = getComputedStyle(wrapper).getPropertyValue('--accent').trim()
+				const accentProbe = document.createElement('span')
+				accentProbe.style.color = 'var(--accent)'
+				wrapper.append(accentProbe)
+				const accentColor = getComputedStyle(accentProbe).color
+				accentProbe.remove()
 				const expected = {
 					x: wrapperRect.left + wrapperRect.width / 2,
 					y: wrapperRect.top + wrapperRect.height / 2,
@@ -181,9 +200,12 @@ const inspect = state =>
 					error: Math.hypot(iconRect.x - expected.x, iconRect.y - expected.y),
 					opacity: iconStyle.opacity,
 					color: iconStyle.color,
+					textShadow: iconStyle.textShadow,
 					accent,
-					accentColor: accent ? getComputedStyle(wrapper).color : null,
+					accentColor,
 					filter: iconStyle.filter,
+					emoji: icon.matches('[data-icon~="emoji"]'),
+					active: wrapper.closest('a')?.matches(':hover, :focus-visible, :target-current') ?? false,
 				}
 			})
 			.filter(Boolean)
@@ -235,7 +257,7 @@ const inspect = state =>
 				link.append(accentProbe)
 				const accentColor = getComputedStyle(accentProbe).color
 				accentProbe.remove()
-				const iconStyle = getComputedStyle(icon)
+				const iconStyle = getComputedStyle(icon, '::before')
 				return {
 					href: link.getAttribute('href'),
 					icon: iconRect,
@@ -243,9 +265,15 @@ const inspect = state =>
 					error: Math.hypot(iconRect.x - expected.x, iconRect.y - expected.y),
 					transformError,
 					color: iconStyle.color,
+					textShadow: iconStyle.textShadow,
 					accentColor,
 					filter: iconStyle.filter,
 					decorative: icon.getAttribute('aria-hidden') === 'true',
+					emoji: icon.matches('[data-icon~="emoji"]'),
+					active:
+						link.matches(':hover, :focus-visible') ||
+						(CSS.supports('selector(:interest-source)') && link.matches(':interest-source')) ||
+						(CSS.supports('selector(:target-current)') && link.matches(':target-current')),
 				}
 			})
 			.filter(Boolean)
@@ -260,14 +288,22 @@ const inspect = state =>
 			const style = getComputedStyle(cluster)
 			const owner = cluster.parentElement
 			const ownerRect = owner ? rect(owner) : null
+			const card = cluster.closest('.attribute > details')
+			const cardStyle = card ? getComputedStyle(card) : null
 			return {
-				section: cluster.closest('.attribute')?.id,
+				section: cluster.closest('.attribute')?.querySelector(':scope > details[id]')?.id,
 				cluster: clusterRect,
 				owner: ownerRect,
 				summary: summaryRect,
 				tokens,
 				rows,
 				position: style.position,
+				cardBorderWidth: cardStyle
+					? Math.max(
+							Number.parseFloat(cardStyle.borderInlineStartWidth),
+							Number.parseFloat(cardStyle.borderInlineEndWidth),
+						)
+					: 0,
 				visible:
 					clusterRect.bottom >= 0 &&
 					clusterRect.top <= innerHeight &&
@@ -333,6 +369,13 @@ const inspect = state =>
 					? element
 					: element.querySelector('h1,h2,h3,h4')
 				const style = getComputedStyle(element)
+				const markerSource =
+					Number(heading?.tagName.slice(1)) === 1
+						? heading
+						: element.matches('a,h4')
+							? element
+							: element.querySelector(':scope > a')
+				const markerStyle = getComputedStyle(markerSource ?? element, '::before')
 				return {
 					text: heading?.textContent?.trim(),
 					level: Number(heading?.tagName.slice(1)),
@@ -340,8 +383,8 @@ const inspect = state =>
 					heading: heading ? rect(heading) : null,
 					opacity: Number(style.opacity),
 					position: style.position,
-					separator: getComputedStyle(element, '::before').content,
-					separatorOpacity: Number(getComputedStyle(element, '::before').opacity),
+					separator: markerStyle.content,
+					separatorOpacity: Number(markerStyle.opacity),
 				}
 			})
 			.filter(
@@ -352,6 +395,7 @@ const inspect = state =>
 					item.opacity > 0.5,
 			)
 		const siteLogo = document.querySelector('.logo-position-area .logo img')
+		const topHeader = document.querySelector('#top')
 		const componentOverflows = [
 			...document.querySelectorAll(
 				'.attribute-content, .attribute-rating-details, .attribute-rating-details li, .references, .references-list, .references-list > li, .explanation',
@@ -392,10 +436,22 @@ const inspect = state =>
 						}
 					: null,
 			piePlacement: piePlacement ? rect(piePlacement) : null,
+			pageNavigation: (() => {
+				const element = document.querySelector('.page-navigation')
+				return element
+					? { box: rect(element), zIndex: Number(getComputedStyle(element).zIndex) }
+					: null
+			})(),
 			breadcrumbMeasurements,
 			siteLogo: siteLogo ? rect(siteLogo) : null,
+			topHeader: topHeader ? rect(topHeader) : null,
 			currentPieLinks: CSS.supports('selector(:target-current)')
 				? [...document.querySelectorAll('.pie-navigation a:target-current')].map(link =>
+						link.getAttribute('href'),
+					)
+				: [],
+			currentNavigationLinks: CSS.supports('selector(:target-current)')
+				? [...document.querySelectorAll('.page-navigation a:target-current')].map(link =>
 						link.getAttribute('href'),
 					)
 				: [],
@@ -409,7 +465,11 @@ const inspect = state =>
 			emojiIcons: document.querySelectorAll(
 				':is(.toc-icon, .attribute-group-icon, .attribute-icon) [data-icon~="emoji"], :is(.toc-icon, .attribute-group-icon, .attribute-icon)[data-icon~="emoji"]',
 			).length,
+			contentIconCount: document.querySelectorAll(
+				':is(.toc-icon, .attribute-group-icon > .breadcrumb-icon, .attribute-icon > .breadcrumb-icon)',
+			).length,
 			pieEmojiIcons: document.querySelectorAll('.pie-navigation-icon[data-icon~="emoji"]').length,
+			pieIconCount: document.querySelectorAll('.pie-navigation-icon').length,
 		}
 	}, state)
 
@@ -441,6 +501,8 @@ try {
 		title: document.title,
 		readyState: document.readyState,
 		reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+		reducedTransparency: matchMedia('(prefers-reduced-transparency: reduce)').matches,
+		targetCurrentSupported: CSS.supports('selector(:target-current)'),
 		direction: getComputedStyle(document.documentElement).direction,
 		layout: document.querySelectorAll('#layout').length,
 		walletPage: document.querySelectorAll('#wallet-page').length,
@@ -454,18 +516,24 @@ try {
 			text: element.textContent?.trim(),
 		})),
 		ids: [...document.querySelectorAll('#wallet-page [id]')].map(element => element.id),
-		groupTarget: document.querySelector('.attribute-group[id]')?.id ?? null,
-		attributeTarget: document.querySelector('.attribute:has(.attribute-heading)[id]')?.id ?? null,
+		groupTarget: document.querySelector('.attribute-group-target[id]')?.id ?? null,
+		attributeTarget:
+			document.querySelector('.attribute:has(.attribute-heading) > details[id]')?.id ?? null,
 		detailsTarget:
-			document.querySelector('.attribute:has(.attribute-accordions details)')?.id ?? null,
+			document.querySelector('.attribute:has(.attribute-accordions details) > details[id]')?.id ??
+			null,
 		detailsHeadingTarget: document.querySelector('.attribute-accordions h4[id]')?.id ?? null,
 		shapeLayers: document.querySelectorAll('#wallet-page .breadcrumb-slice-shape-layer').length,
 		emojiIcons: document.querySelectorAll(
 			'#wallet-page :is(.toc-icon, .attribute-group-icon, .attribute-icon) [data-icon~="emoji"], #wallet-page :is(.toc-icon, .attribute-group-icon, .attribute-icon)[data-icon~="emoji"]',
 		).length,
+		contentIconCount: document.querySelectorAll(
+			'#wallet-page :is(.toc-icon, .attribute-group-icon > .breadcrumb-icon, .attribute-icon > .breadcrumb-icon)',
+		).length,
 		pieEmojiIcons: document.querySelectorAll(
 			'#wallet-page .pie-navigation-icon[data-icon~="emoji"]',
 		).length,
+		pieIconCount: document.querySelectorAll('#wallet-page .pie-navigation-icon').length,
 		documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
 		layoutOverflow: (() => {
 			const layout = document.querySelector('#layout')
@@ -484,6 +552,11 @@ try {
 		actual: diagnostic.reducedMotion,
 		expected: reducedMotion,
 	})
+	check(
+		diagnostic.reducedTransparency === reducedTransparency,
+		'requested transparency preference is active',
+		{ actual: diagnostic.reducedTransparency, expected: reducedTransparency },
+	)
 	check(diagnostic.direction === direction, 'requested writing direction is active', {
 		actual: diagnostic.direction,
 		expected: direction,
@@ -495,12 +568,22 @@ try {
 	check(diagnostic.shapeLayers === 0, 'content icons contain no slice-shape layers', {
 		actual: diagnostic.shapeLayers,
 	})
-	check(diagnostic.emojiIcons === 0, 'content icons use monochrome icon glyphs', {
-		actual: diagnostic.emojiIcons,
-	})
-	check(diagnostic.pieEmojiIcons === 0, 'pie icons use monochrome icon glyphs', {
-		actual: diagnostic.pieEmojiIcons,
-	})
+	check(
+		diagnostic.emojiIcons > 0 && diagnostic.emojiIcons === diagnostic.contentIconCount,
+		'all content icons use emoji glyph variants',
+		{
+			actual: diagnostic.emojiIcons,
+			expected: diagnostic.contentIconCount,
+		},
+	)
+	check(
+		diagnostic.pieEmojiIcons > 0 && diagnostic.pieEmojiIcons === diagnostic.pieIconCount,
+		'all pie icons use emoji glyph variants',
+		{
+			actual: diagnostic.pieEmojiIcons,
+			expected: diagnostic.pieIconCount,
+		},
+	)
 	check(
 		diagnostic.headings.every(
 			(heading, index, headings) => index === 0 || heading.level <= headings[index - 1].level + 1,
@@ -516,7 +599,10 @@ try {
 	const states = [
 		{ name: 'top', selector: '#top' },
 		{ name: 'stage', selector: '#stages' },
-		{ name: 'group', selector: `#${diagnostic.groupTarget}` },
+		{
+			name: 'group',
+			selector: `#${diagnostic.groupTarget} + .attribute-group`,
+		},
 		{ name: 'attribute', selector: `#${diagnostic.attributeTarget}` },
 	]
 	const stateMeasurements = new Map()
@@ -555,9 +641,19 @@ try {
 					actual: icon.filter,
 				})
 				check(
-					!icon.accent || icon.color === icon.accentColor,
-					`content icon uses its accent color: ${icon.section}`,
-					{ color: icon.color, accent: icon.accent, accentColor: icon.accentColor },
+					icon.emoji &&
+						(icon.active
+							? icon.textShadow === 'none'
+							: icon.color === 'rgba(0, 0, 0, 0)' &&
+								icon.textShadow.startsWith(`${icon.accentColor} `)),
+					`content emoji is monochrome accent-colored: ${icon.section}`,
+					{
+						color: icon.color,
+						textShadow: icon.textShadow,
+						active: icon.active,
+						accent: icon.accent,
+						accentColor: icon.accentColor,
+					},
 				)
 			}
 		}
@@ -577,11 +673,24 @@ try {
 			check(icon.filter === 'none', `${state.name}: pie icon is unfiltered: ${icon.href}`, {
 				actual: icon.filter,
 			})
-			check(icon.color === icon.accentColor, `${state.name}: pie icon uses accent: ${icon.href}`, {
-				actual: icon.color,
-				expected: icon.accentColor,
-			})
+			check(icon.emoji, `${state.name}: pie icon uses emoji variant: ${icon.href}`)
+			check(
+				icon.active
+					? icon.textShadow === 'none'
+					: icon.textShadow.startsWith('rgba(255, 255, 255, 0.7) '),
+				`${state.name}: pie emoji has the correct active/base color: ${icon.href}`,
+				{ active: icon.active, color: icon.color, textShadow: icon.textShadow },
+			)
 			check(icon.decorative, `${state.name}: pie icon is decorative: ${icon.href}`)
+		}
+		const activePieIcon = measurement.pieIconMeasurements.find(icon => icon.active)
+		if (activePieIcon && measurement.piePlacement) {
+			check(
+				activePieIcon.icon.x < measurement.piePlacement.x - tolerance &&
+					Math.abs(activePieIcon.icon.y - measurement.piePlacement.y) <= tolerance,
+				`${state.name}: active pie item faces west`,
+				{ icon: activePieIcon.icon, pie: measurement.piePlacement },
+			)
 		}
 		for (const breadcrumb of measurement.breadcrumbMeasurements) {
 			check(
@@ -592,48 +701,60 @@ try {
 				`${state.name}: active breadcrumb heading is visible: h${breadcrumb.level}`,
 				breadcrumb,
 			)
-			if (breadcrumb.level === 1) {
-				check(
-					breadcrumb.separator !== '"›"' || breadcrumb.separatorOpacity <= 0.5,
-					`${state.name}: root breadcrumb has no orphaned separator`,
-					breadcrumb,
+			if (measurement.enhancedBreadcrumbs) {
+				const parent = measurement.breadcrumbMeasurements.find(
+					candidate => candidate.level === breadcrumb.level - 1,
 				)
-			} else if (measurement.enhancedBreadcrumbs && breadcrumb.separatorOpacity > 0.5) {
+				const blockOverlap = parent
+					? Math.min(parent.item.bottom, breadcrumb.item.bottom) -
+						Math.max(parent.item.top, breadcrumb.item.top)
+					: 0
+				const sameRow = parent
+					? blockOverlap >= Math.min(parent.item.height, breadcrumb.item.height) / 2
+					: false
+				const visibleSeparator = breadcrumb.separator === '"›"' && breadcrumb.separatorOpacity > 0.5
+				const logoBlockOverlap = measurement.siteLogo
+					? Math.min(measurement.siteLogo.bottom, breadcrumb.item.bottom) -
+						Math.max(measurement.siteLogo.top, breadcrumb.item.top)
+					: 0
+				const logoInlineGap =
+					measurement.siteLogo && breadcrumb.heading
+						? Math.max(
+								0,
+								breadcrumb.heading.left - measurement.siteLogo.right,
+								measurement.siteLogo.left - breadcrumb.heading.right,
+							)
+						: Number.POSITIVE_INFINITY
+				const rootAdjacent =
+					breadcrumb.level === 1 && logoBlockOverlap > tolerance && logoInlineGap <= 32
 				check(
-					breadcrumb.separator === '"›"',
-					`${state.name}: every visible breadcrumb marker is a separator: h${breadcrumb.level}`,
-					breadcrumb,
-				)
-			}
-		}
-		if (measurement.enhancedBreadcrumbs) {
-			const requiredSeparatorLevels = {
-				top: [],
-				stage: [2],
-				group: [2],
-				attribute: [2, 3],
-			}[state.name]
-			for (const level of requiredSeparatorLevels) {
-				check(
-					measurement.breadcrumbMeasurements.some(
-						breadcrumb =>
-							breadcrumb.level === level &&
-							breadcrumb.separator === '"›"' &&
-							breadcrumb.separatorOpacity > 0.5,
-					),
-					`${state.name}: authoritative h${level} lane has one visible separator`,
-					{ breadcrumbs: measurement.breadcrumbMeasurements },
+					breadcrumb.level === 1 ? visibleSeparator === rootAdjacent : visibleSeparator === sameRow,
+					`${state.name}: h${breadcrumb.level} marker matches visual-row adjacency`,
+					{
+						breadcrumb,
+						parent,
+						blockOverlap,
+						sameRow,
+						logoBlockOverlap,
+						logoInlineGap,
+						rootAdjacent,
+					},
 				)
 			}
 		}
 		for (const [index, breadcrumb] of measurement.breadcrumbMeasurements.entries()) {
 			for (const other of measurement.breadcrumbMeasurements.slice(index + 1)) {
+				const breadcrumbPaint = breadcrumb.level === 1 ? breadcrumb.heading : breadcrumb.item
+				const otherPaint = other.level === 1 ? other.heading : other.item
+				if (!breadcrumbPaint || !otherPaint) {
+					continue
+				}
 				const inlineOverlap =
-					Math.min(breadcrumb.item.right, other.item.right) -
-					Math.max(breadcrumb.item.left, other.item.left)
+					Math.min(breadcrumbPaint.right, otherPaint.right) -
+					Math.max(breadcrumbPaint.left, otherPaint.left)
 				const blockOverlap =
-					Math.min(breadcrumb.item.bottom, other.item.bottom) -
-					Math.max(breadcrumb.item.top, other.item.top)
+					Math.min(breadcrumbPaint.bottom, otherPaint.bottom) -
+					Math.max(breadcrumbPaint.top, otherPaint.top)
 				check(
 					inlineOverlap <= tolerance || blockOverlap <= 2,
 					`${state.name}: active breadcrumb boxes do not collide: h${breadcrumb.level}/h${other.level}`,
@@ -658,21 +779,30 @@ try {
 		check(measurement.shapeLayers === 0, `${state.name}: no content icon shape layers`, {
 			actual: measurement.shapeLayers,
 		})
-		check(measurement.emojiIcons === 0, `${state.name}: no multicolor content emoji`, {
-			actual: measurement.emojiIcons,
-		})
-		check(measurement.pieEmojiIcons === 0, `${state.name}: no multicolor pie emoji`, {
-			actual: measurement.pieEmojiIcons,
-		})
+		check(
+			measurement.emojiIcons === measurement.contentIconCount,
+			`${state.name}: every content icon uses an emoji variant`,
+			{ actual: measurement.emojiIcons, expected: measurement.contentIconCount },
+		)
+		check(
+			measurement.pieEmojiIcons === measurement.pieIconCount,
+			`${state.name}: every pie icon uses an emoji variant`,
+			{ actual: measurement.pieEmojiIcons, expected: measurement.pieIconCount },
+		)
 
 		for (const companions of measurement.companionMeasurements) {
+			check(
+				companions.position === 'static',
+				`${state.name}: companion cluster remains in flow: ${companions.section}`,
+				{ actual: companions.position },
+			)
 			const summaryIsVisible =
 				companions.summary && companions.summary.bottom >= 0 && companions.summary.top <= height
 			if (!summaryIsVisible) {
 				continue
 			}
 			check(
-				companions.ownerOverflow <= tolerance,
+				companions.ownerOverflow <= companions.cardBorderWidth + tolerance,
 				`${state.name}: companion flow reservation contained: ${companions.section}`,
 				{
 					actual: companions.ownerOverflow,
@@ -726,6 +856,12 @@ try {
 				'attribute: pie current state converges on the visible target',
 				{ actual: measurement.currentPieLinks, expected: state.selector },
 			)
+			check(
+				measurement.currentNavigationLinks.length === 2 &&
+					measurement.currentNavigationLinks.every(href => href === state.selector),
+				'attribute: pie and TOC share the current target',
+				{ actual: measurement.currentNavigationLinks, expected: state.selector },
+			)
 		}
 		if (state.name === 'attribute' && width <= 1024 && measurement.enhancedBreadcrumbs) {
 			const pieCenter = measurement.piePlacement?.x
@@ -734,6 +870,24 @@ try {
 					(direction === 'ltr' ? pieCenter > width / 2 : pieCenter < width / 2),
 				'compact pie occupies the logical inline end',
 				{ actual: measurement.piePlacement, direction, viewportWidth: width },
+			)
+		}
+		if (state.name === 'top' && width <= 1024) {
+			check(
+				measurement.pageNavigation &&
+					measurement.piePlacement &&
+					measurement.topHeader &&
+					Math.abs(measurement.pageNavigation.box.x - measurement.piePlacement.x) <= tolerance &&
+					Math.abs(measurement.topHeader.bottom - measurement.piePlacement.top) <=
+						Math.max(tolerance, 4),
+				'mobile pie begins at its inline flow position',
+				{ navigation: measurement.pageNavigation, pie: measurement.piePlacement },
+			)
+			check(
+				measurement.pageNavigation.zIndex >
+					Math.max(...Object.values(measurement.fallbackLayering).filter(Number.isFinite)),
+				'mobile pie paints above sticky breadcrumb layers',
+				{ navigation: measurement.pageNavigation, breadcrumbs: measurement.fallbackLayering },
 			)
 		}
 		if (width >= 1025) {
@@ -761,6 +915,14 @@ try {
 			{
 				actual: stateMeasurements.get('stage').h2Measurements.map(heading => heading.animationName),
 			},
+		)
+	}
+	if (reducedTransparency) {
+		check(
+			[...stateMeasurements.values()].every(measurement =>
+				measurement.h2Measurements.every(heading => heading.backdrop?.backdropFilter === 'none'),
+			),
+			'reduced transparency disables h2 backdrop blur',
 		)
 	}
 	check(sameBackdrop(stageBackdrop, groupBackdrop), 'Active Stage and group h2 share backdrop', {
@@ -831,11 +993,30 @@ try {
 				return null
 			}
 			const rect = element.getBoundingClientRect()
+			const relatedHeading = element.matches('.attribute-group-target')
+				? element.nextElementSibling?.querySelector('h2')
+				: null
+			const relatedHeadingRect = relatedHeading?.getBoundingClientRect()
+			const attributeTarget = element.closest('.attribute > details[id]')
+			const hasExactNavigationTarget = [
+				...document.querySelectorAll('.pie-navigation a[href^="#"]'),
+			].some(link => link.getAttribute('href') === targetSelector)
+			const expectedCurrent = attributeTarget
+				? `#${attributeTarget.id}`
+				: hasExactNavigationTarget
+					? targetSelector
+					: null
 			return {
 				top: rect.top,
 				bottom: rect.bottom,
 				viewportHeight: innerHeight,
+				relatedHeadingTop: relatedHeadingRect?.top ?? null,
+				relatedHeadingBottom: relatedHeadingRect?.bottom ?? null,
 				scrollTop: layout.scrollTop,
+				expectedCurrent,
+				current: [...document.querySelectorAll('.pie-navigation a:target-current[href^="#"]')].map(
+					link => link.getAttribute('href'),
+				),
 			}
 		}, selector)
 		check(
@@ -843,12 +1024,29 @@ try {
 			`direct hash target is visible: ${selector}`,
 			{ actual: target },
 		)
+		if (target?.relatedHeadingTop != null) {
+			check(
+				target.relatedHeadingBottom >= -tolerance &&
+					target.relatedHeadingTop < target.viewportHeight,
+				`direct group hash heading is visible: ${selector}`,
+				{ actual: target },
+			)
+		}
+		if (diagnostic.targetCurrentSupported && target?.expectedCurrent) {
+			check(
+				target !== null &&
+					target.current.length > 0 &&
+					target.current.every(href => href === target.expectedCurrent),
+				`direct hash current slice converges: ${selector}`,
+				{ actual: target },
+			)
+		}
 	}
 
 	let transitions = null
 	if (measureTransitions) {
 		const transitionTargets = await page.evaluate(() => {
-			const attributes = [...document.querySelectorAll('.attribute[id]')]
+			const attributes = [...document.querySelectorAll('.attribute > details[id]')]
 			return [attributes[0]?.id, attributes[Math.min(5, attributes.length - 1)]?.id].filter(Boolean)
 		})
 		const transitionPositions = []
@@ -1054,6 +1252,9 @@ try {
 
 	let resize = null
 	if (Number.isFinite(resizeWidth) && resizeWidth > 0 && resizeWidth !== width) {
+		/* Let hash arrival leave the browser's scroll-anchoring suppression window
+		 * before measuring a user-driven viewport change. */
+		await page.waitForTimeout(250)
 		const resizeBefore = await page.evaluate(() => {
 			window.__walletResizeEvents = 0
 			addEventListener('resize', () => (window.__walletResizeEvents += 1))
@@ -1070,14 +1271,20 @@ try {
 		const resizeState = await page.evaluate(() => {
 			const layout = document.querySelector('#layout')
 			const target = document.querySelector(location.hash)
+			const attributeTarget = target?.closest('.attribute > details[id]')
 			return {
 				documentOverflow:
 					document.documentElement.scrollWidth - document.documentElement.clientWidth,
 				layoutOverflow:
 					layout instanceof HTMLElement ? layout.scrollWidth - layout.clientWidth : null,
 				targetTop: target instanceof HTMLElement ? target.getBoundingClientRect().top : null,
+				targetBottom: target instanceof HTMLElement ? target.getBoundingClientRect().bottom : null,
 				scrollTop: layout instanceof HTMLElement ? layout.scrollTop : null,
 				resizeEvents: window.__walletResizeEvents,
+				expectedCurrent: attributeTarget ? `#${attributeTarget.id}` : location.hash,
+				current: [...document.querySelectorAll('.pie-navigation a:target-current[href^="#"]')].map(
+					link => link.getAttribute('href'),
+				),
 			}
 		})
 		let nativeCorrection = null
@@ -1091,6 +1298,8 @@ try {
 				const target = document.querySelector(location.hash)
 				return {
 					targetTop: target instanceof HTMLElement ? target.getBoundingClientRect().top : null,
+					targetBottom:
+						target instanceof HTMLElement ? target.getBoundingClientRect().bottom : null,
 					scrollTop: layout instanceof HTMLElement ? layout.scrollTop : null,
 				}
 			})
@@ -1099,10 +1308,21 @@ try {
 		check(resizeState.documentOverflow <= tolerance, 'resize: no document overflow', resizeState)
 		check(resizeState.layoutOverflow <= tolerance, 'resize: no layout overflow', resizeState)
 		check(
-			resizeState.targetTop !== null && resizeState.targetTop >= -tolerance,
+			resizeState.targetTop !== null &&
+				resizeState.targetBottom !== null &&
+				resizeState.targetBottom >= -tolerance &&
+				resizeState.targetTop <= height + tolerance,
 			'resize: active hash target remains visible',
 			resize,
 		)
+		if (diagnostic.targetCurrentSupported) {
+			check(
+				resizeState.current.length > 0 &&
+					resizeState.current.every(href => href === resizeState.expectedCurrent),
+				'resize: current slice remains in the active target scope',
+				resize,
+			)
+		}
 	}
 
 	let performance = null
