@@ -336,8 +336,6 @@ function evaluateScamAlerts(
 
 	if (
 		requiredFeatures.includes(unlimitedApprovalWarning) &&
-		unlimitedApprovalWarning.supported &&
-		unlimitedApprovalWarning.conditionalOnly &&
 		isSupported(scamAlerts.unlimitedApprovalWarning) &&
 		scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval !== 'ALWAYS'
 	) {
