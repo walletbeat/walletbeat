@@ -992,67 +992,34 @@ interface CssAttributes {
 	/**
 	 * ## [data-sticky-breadcrumb]
 	 *
-	 * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
-	 * resolves its configurable parent anchor: root → section → subsection. A `position` preserves the
-	 * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
-	 * remains visible.
+	 * Flow-native scroll-driven sticky breadcrumbs. A page's real sticky row owns block positioning;
+	 * this attribute supplies repeatable arrival/exit timelines and the zero-shift marker slot for the
+	 * real heading item. A `position` remains in regular layout and publishes the arrival timeline;
+	 * a `scope` publishes the shared fly-up exit timeline.
 	 *
-	 * This is a progressive enhancement. Without the complete recursive-positioning capability set,
-	 * every item remains in regular document flow. Scroll-state support is also a compatibility guard:
-	 * current WebKit advertises the anchor/timeline syntax but incorrectly applies fixed-position
-	 * keyframes before their view-animation range. Keep independent timeline-only effects in their own
-	 * feature query so they remain available there.
+	 * This is a progressive enhancement. Without scroll timelines every item remains in regular
+	 * document flow and the page's simpler native sticky layout remains authoritative.
 	 *
 	 * ### Tokens
-	 * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
+	 * - `root`: first breadcrumb item; not repositioned by this primitive
 	 * - `scope`: visibility boundary for descendant items
 	 * - `position`: regular-layout position anchor and view-timeline source
-	 * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
-	 * - `marker`: zero-shift separator/permalink slot inside an item
-	 * - `backdrop`: row surface after an item; follows the same arrival and scope exit
+	 * - `item`: real breadcrumb heading/link and shared exit-animation consumer
 	 * - `mobile`: enable the paired role only through the layout mobile breakpoint
 	 *
-	 * `[data-sticky]` containers keep `position: sticky` for the whole scroll.
-	 * Items stay `position: fixed` so `anchor()` and `position-try` can
-	 * still follow variable crumb widths. Origin insets live on the item; intro
-	 * is to-only so named `anchor()` is not frozen in a `from` keyframe.
-	 * `position-try` applies at `to`. Do not change `position` in keyframes or
-	 * hide the handoff with opacity.
+	 * The item itself remains `position: relative`; the page's sticky row and in-flow adjacency slot
+	 * own layout. The primitive never changes position mode or removes a heading from flow.
 	 *
 	 * ### CSS Variables
 	 * - `--stickyBreadcrumb-animationRange`
-	 * - `--stickyBreadcrumb-inlineAnimationRange`
 	 * - `--stickyBreadcrumb-animationTimingFunction`
 	 * - `--stickyBreadcrumb-gap`
 	 * - `--stickyBreadcrumb-position-minBlockSize`
-	 * - `--stickyBreadcrumb-position-insetBlockStart`
-	 * - `--stickyBreadcrumb-position-insetInlineStart`
 	 * - `--stickyBreadcrumb-item-insetBlockStart`
 	 * - `--stickyBreadcrumb-item-blockOffset`
-	 * - `--stickyBreadcrumb-item-insetInlineStart`
-	 * - `--stickyBreadcrumb-item-insetInlineEnd`
 	 * - `--stickyBreadcrumb-item-blockSize`
-	 * - `--stickyBreadcrumb-item-inlineSize`
-	 * - `--stickyBreadcrumb-item-translate`
-	 * - `--stickyBreadcrumb-item-justifySelf`
-	 * - `--stickyBreadcrumb-item-positionTryFallbacks`
-	 * - `--stickyBreadcrumb-item-nextRowInsetBlockStart`
-	 * - `--stickyBreadcrumb-item-nextRowInsetInlineStart`
-	 * - `--stickyBreadcrumb-item-nextRowInsetInlineEnd`
-	 * - `--stickyBreadcrumb-item-nextRowJustifySelf`
-	 * - `--stickyBreadcrumb-item-rowGap`
 	 * - `--stickyBreadcrumb-trackBlockEnd`
 	 * - `--stickyBreadcrumb-exitAnimationDistance`
-	 * - `--stickyBreadcrumb-itemAnchor`
-	 * - `--stickyBreadcrumb-parentAnchor`
-	 * - `--stickyBreadcrumb-backdrop-display`
-	 * - `--stickyBreadcrumb-backdrop-insetBlockStart`
-	 * - `--stickyBreadcrumb-backdrop-insetInlineStart`
-	 * - `--stickyBreadcrumb-backdrop-blockSize`
-	 * - `--stickyBreadcrumb-backdrop-inlineSize`
-	 * - `--stickyBreadcrumb-backdrop-backgroundColor`
-	 * - `--stickyBreadcrumb-backdrop-backdropFilter`
-	 * - `--stickyBreadcrumb-backdrop-zIndex`
 	 *
 	 * ### Example
 	 * ```html

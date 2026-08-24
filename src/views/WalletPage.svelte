@@ -752,6 +752,7 @@
 						class="stage-heading-position"
 						data-sticky-breadcrumb="position"
 					>
+						{@render breadcrumbParentSlot()}
 						<a
 							data-link="camouflaged"
 							data-sticky-breadcrumb="item"
@@ -760,7 +761,6 @@
 						>
 							<h2>Stage Progress</h2>
 						</a>
-						<span data-sticky-breadcrumb="backdrop" aria-hidden="true"></span>
 					</div>
 				</header>
 
@@ -890,6 +890,7 @@
 								class="attribute-group-heading-position"
 								data-sticky-breadcrumb="position"
 							>
+								{@render breadcrumbParentSlot()}
 								<a
 									data-link="camouflaged"
 									data-sticky-breadcrumb="item"
@@ -907,7 +908,6 @@
 										{attrGroup.displayName}
 									</h2>
 								</a>
-								<span data-sticky-breadcrumb="backdrop" aria-hidden="true"></span>
 							</div>
 
 							{#if attrGroup.perWalletQuestion}
@@ -931,6 +931,7 @@
 						{#each attributes as { attribute, evalAttr }}
 							{@render attributeSnippet({
 								attrGroupId: attrGroup.id,
+								attrGroupTitle: attrGroup.displayName,
 								attribute,
 								evalAttr,
 							})}
@@ -945,10 +946,12 @@
 
 {#snippet attributeSnippet({
 	attrGroupId,
+	attrGroupTitle,
 	attribute,
 	evalAttr,
 }: {
 	attrGroupId: string
+	attrGroupTitle: string
 	attribute: Attribute<OutcomeMetadata>
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
@@ -994,8 +997,12 @@
 			data-card="radius-8 padding-6 border-accent"
 			data-column="gap-0"
 			data-sticky-breadcrumb="scope"
+			style:---pie-timeline={pieRotation.timelineByHref.get(href)}
 		>
-			<summary data-row>
+			<summary
+				data-row
+				data-sticky="block block-start backdrop-before backdrop-stuck"
+			>
 				<header
 					data-row-item="flexible"
 					data-row="start gap-3"
@@ -1008,8 +1015,8 @@
 						<div
 							class="attribute-heading-position"
 							data-sticky-breadcrumb="position"
-							style:---pie-timeline={pieRotation.timelineByHref.get(href)}
 						>
+							{@render breadcrumbParentSlot(attrGroupTitle)}
 							<div
 								class="attribute-heading-row"
 								data-row="start gap-2"
@@ -1092,20 +1099,20 @@
 									>{evalAttr.evaluation.outcome.rating}</data>
 								</div>
 							</div>
-							<span data-sticky-breadcrumb="backdrop" aria-hidden="true"></span>
 						</div>
 
-						{#if attribute.question}
-							<div class="subsection-caption">
-								<Typography
-									content={attribute.question}
-									strings={{ WALLET_NAME: wallet.metadata.displayName }}
-								/>
-							</div>
-						{/if}
 					</div>
 				</header>
 			</summary>
+
+			{#if attribute.question}
+				<div class="subsection-caption">
+					<Typography
+						content={attribute.question}
+						strings={{ WALLET_NAME: wallet.metadata.displayName }}
+					/>
+				</div>
+			{/if}
 			<div class="attribute-content" data-column="gap-6">
 
 			<ul
@@ -1404,6 +1411,16 @@
 {/snippet}
 
 
+{#snippet breadcrumbParentSlot(groupTitle?: string)}
+	<span class="breadcrumb-parent-slot" aria-hidden="true">
+		<span class="breadcrumb-parent-root">{wallet.metadata.displayName}</span>
+		{#if groupTitle}
+			<span class="breadcrumb-parent-group">{groupTitle}</span>
+		{/if}
+	</span>
+{/snippet}
+
+
 <style>
 	.container {
 		---wallet-content-block-padding-max: 5rem;
@@ -1435,44 +1452,18 @@
 			)
 			/ 2
 		);
-		---wallet-breadcrumb-icon-block-start: calc(
-			anchor(--sticky-breadcrumb-scope top)
-			+ (
-				var(---wallet-breadcrumb-block-size)
-					- var(---wallet-breadcrumb-heading-icon-size)
-			)
-			/ 2
-		);
-		---wallet-breadcrumb-icon-inline-start: calc(
-			anchor(var(--stickyBreadcrumb-parentAnchor) end)
-				+ var(---wallet-breadcrumb-gap)
-		);
-		---wallet-breadcrumb-heading-translate: calc(
-			var(---wallet-breadcrumb-heading-icon-size)
-				+ var(---wallet-breadcrumb-heading-icon-gap)
-		);
+		---wallet-breadcrumb-heading-flow-translate: 0px;
 		---wallet-breadcrumb-trailing-control-inline-clearance: 0px;
 		---wallet-breadcrumb-surface-inline-end-clearance: var(
 			---wallet-page-navigation-inline-size
 		);
 		---wallet-attribute-heading-font-size: 1.17em;
-		/* Settle the coupled heading/pie state one icon gap before the old scope
-		 * crosses its lane, so native current-target selection never leads motion. */
-		---wallet-breadcrumb-crossing-offset: calc(
-			-1 * var(---wallet-breadcrumb-heading-icon-gap)
-		);
-		/* Inline arrival finishes one row before the source reaches its lane.
-		 * The block handoff then occurs at the spatially identical endpoint. */
+		/* The leading edge supplies one shared arrival interval. It ends exactly
+		 * when the native sticky owner reaches its lane. */
 		---wallet-breadcrumb-animation-range:
-			exit-crossing calc(
-				var(---wallet-breadcrumb-crossing-offset)
-					- 2 * var(---wallet-breadcrumb-heading-icon-gap)
-					- var(---wallet-breadcrumb-block-size)
-			)
-			exit-crossing calc(
-				var(---wallet-breadcrumb-crossing-offset)
-					- 2 * var(---wallet-breadcrumb-heading-icon-gap)
-			);
+			entry calc(100% - var(---wallet-breadcrumb-row-block-size))
+			entry 100%;
+		---wallet-breadcrumb-crossing-offset: 0px;
 		---wallet-breadcrumb-attribute-arrival-offset: 0px;
 		---wallet-group-icon-size: 2rem;
 		---wallet-group-header-padding-block: 0px;
@@ -1633,11 +1624,6 @@
 			}
 
 			.page-navigation-panel > nav {
-				--navigation-items-level-2-grid-columns: repeat(
-					auto-fit,
-					minmax(min(100%, calc(32ch + 3rem)), 1fr)
-				);
-
 				position: relative;
 				z-index: 0;
 				min-block-size: max-content;
@@ -1646,24 +1632,6 @@
 				&[data-sticky-container] {
 					--sticky-paddingBlockStart: 0.75rem;
 					--sticky-paddingBlockEnd: 0.75rem;
-				}
-
-				/* TOC attributes are the same semantic level as the main nav's
-				 * depth-2 grid; the TOC starts one DOM depth earlier. */
-				:global(.navigation-items menu[data-navigation-depth='1']) {
-					display: grid;
-					grid-template-columns: var(--navigation-items-level-2-grid-columns);
-					margin-inline-start: 0;
-				}
-
-				:global(
-					.navigation-items
-						menu[data-navigation-depth='1']
-						> li
-						> a
-						> [data-row-item='flexible']
-				) {
-					white-space: nowrap;
 				}
 			}
 
@@ -2093,6 +2061,10 @@
 	}
 
 	.pie-navigation {
+		display: none;
+	}
+
+	.breadcrumb-parent-slot {
 		display: none;
 	}
 
@@ -2569,8 +2541,9 @@
 	}
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.attribute-heading-position {
-			/* One heading box publishes the synchronized breadcrumb and pie tracks. */
+		.attribute > details {
+			/* The non-sticky attribute scope publishes the synchronized breadcrumb
+			 * and pie tracks; the sticky summary only consumes them. */
 			view-timeline-name:
 				--sticky-breadcrumb-timeline,
 				var(---pie-timeline, none);
@@ -2663,28 +2636,6 @@
 			--stickyBreadcrumb-animationRange: var(---wallet-breadcrumb-animation-range);
 			/* Scroll position already supplies progression; easing only adds perceived lag. */
 			--stickyBreadcrumb-animationTimingFunction: linear;
-			--stickyBreadcrumb-backdrop-insetBlockStart: calc(
-				anchor(center)
-					- var(--stickyBreadcrumb-backdrop-blockSize) / 2
-			);
-			--stickyBreadcrumb-backdrop-insetInlineStart: anchor(
-				--wallet-breadcrumb-surface start
-			);
-			--stickyBreadcrumb-backdrop-inlineSize: anchor-size(
-				--wallet-breadcrumb-surface width
-			);
-			--stickyBreadcrumb-backdrop-blockSize: var(
-				---wallet-breadcrumb-row-block-size
-			);
-			--stickyBreadcrumb-backdrop-backgroundColor: var(
-				---wallet-breadcrumb-surface-background
-			);
-			--stickyBreadcrumb-backdrop-backdropFilter: var(
-				---wallet-breadcrumb-surface-backdrop-filter
-			);
-			--stickyBreadcrumb-backdrop-zIndex: calc(
-				var(---wallet-breadcrumb-layer-root) - 1
-			);
 		}
 
 		@media (prefers-reduced-motion: no-preference) {
@@ -2724,10 +2675,10 @@
 				}
 			}
 
-		}
+			.attribute > details > summary[data-sticky]::before {
+				content: none;
+			}
 
-		article > header#top .wallet-name {
-			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-root;
 		}
 
 		article > header#top .wallet-title-row::after {
@@ -2746,11 +2697,6 @@
 			white-space: nowrap;
 		}
 
-		:is(#stages, .attribute-group) {
-			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-group;
-			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-root;
-		}
-
 		.attribute-group-target {
 			scroll-margin-block-start: calc(
 				-1 * var(---wallet-breadcrumb-crossing-offset)
@@ -2767,11 +2713,6 @@
 
 		:target {
 			scroll-snap-align: start;
-		}
-
-		.attribute {
-			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-attribute;
-			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
 		}
 
 		.attribute > details {
@@ -2806,12 +2747,9 @@
 			}
 
 			&:not([open]) {
-				.attribute-heading-position > [data-sticky-breadcrumb~='item'] {
-					position: static;
-					position-anchor: auto;
+				> summary[data-sticky] {
+					position: relative;
 					inset: auto;
-					margin-inline-start: 0;
-					animation: none;
 				}
 
 				.attribute-heading-position
@@ -2825,7 +2763,6 @@
 		}
 
 		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
-			anchor-name: var(--stickyBreadcrumb-itemAnchor);
 			display: flex;
 			align-items: center;
 
@@ -2840,18 +2777,8 @@
 				min-inline-size: 0;
 			}
 
-			&:has(> .attribute-group-icon) {
-				padding-inline-start: calc(
-					var(---wallet-group-icon-size)
-						+ var(---wallet-breadcrumb-heading-icon-gap)
-				);
-			}
-
-			&:has(> .attribute-icon) {
-				padding-inline-start: calc(
-					var(---wallet-breadcrumb-heading-icon-size)
-						+ var(---wallet-breadcrumb-heading-icon-gap)
-				);
+			&:has(> :is(.attribute-group-icon, .attribute-icon)) {
+				column-gap: var(---wallet-breadcrumb-heading-icon-gap);
 			}
 		}
 
@@ -2961,6 +2888,8 @@
 			.stage-heading-position,
 			.attribute-group-heading-position
 		)[data-sticky-breadcrumb~='position'] {
+			display: flex;
+			align-items: center;
 			--stickyBreadcrumb-position-minBlockSize: 2.875rem;
 			---wallet-breadcrumb-heading-scale: calc(
 				var(---wallet-breadcrumb-group-font-size)
@@ -2969,11 +2898,62 @@
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-group);
-				position-visibility: always;
 
 				h2 {
 					font-size: var(---wallet-group-heading-font-size);
 				}
+			}
+		}
+
+		.breadcrumb-parent-slot {
+			interpolate-size: allow-keywords;
+			display: flex;
+			align-items: center;
+			flex: none;
+			inline-size: 0;
+			overflow: clip;
+			visibility: hidden;
+			white-space: nowrap;
+			animation: BreadcrumbParentSlotAnimation
+				var(--stickyBreadcrumb-animationTimingFunction)
+				both;
+			animation-timeline: --sticky-breadcrumb-timeline;
+			animation-range: var(---wallet-breadcrumb-animation-range);
+
+			> span {
+				display: inline-flex;
+				align-items: center;
+				flex: none;
+				margin-inline-end: var(---wallet-breadcrumb-gap);
+				font-family: var(--fontFamily-spaceGrotesk), 'Noto Color Emoji';
+				font-weight: 700;
+
+				&::before {
+					content: '';
+					flex: none;
+					inline-size: var(---wallet-breadcrumb-heading-icon-size);
+					block-size: var(---wallet-breadcrumb-heading-icon-size);
+					margin-inline-end: var(---wallet-breadcrumb-heading-icon-gap);
+				}
+			}
+
+			.breadcrumb-parent-root {
+				font-size: var(---wallet-breadcrumb-root-font-size);
+
+				&::before {
+					inline-size: 2rem;
+					block-size: 2rem;
+				}
+			}
+
+			.breadcrumb-parent-group {
+				font-size: var(---wallet-breadcrumb-group-font-size);
+			}
+		}
+
+		@keyframes BreadcrumbParentSlotAnimation {
+			to {
+				inline-size: max-content;
 			}
 		}
 
@@ -2998,40 +2978,30 @@
 		}
 
 		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+			display: flex;
+			align-items: center;
 			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
-			--stickyBreadcrumb-item-insetInlineEnd: calc(
-				var(---wallet-content-inline-start)
-					+ var(---wallet-breadcrumb-surface-inline-end-clearance)
-					+ var(---wallet-breadcrumb-trailing-control-inline-clearance)
-			);
-			--stickyBreadcrumb-item-inlineSize: auto;
-			--stickyBreadcrumb-item-positionTryFallbacks: none;
 			---wallet-breadcrumb-heading-scale: calc(
 				var(---wallet-breadcrumb-attribute-font-size)
 					/ var(---wallet-attribute-heading-font-size)
 			);
-			@media (max-width: 480px) {
-				--stickyBreadcrumb-item-blockOffset: var(
-					---wallet-breadcrumb-attribute-row-offset
-				);
-				--stickyBreadcrumb-item-targetInsetBlockStart: calc(
-					anchor(--wallet-breadcrumb-group top)
-						+ var(---wallet-breadcrumb-attribute-row-offset)
-				);
-				--stickyBreadcrumb-item-insetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-						+ var(---wallet-content-inline-start)
-						- var(---wallet-breadcrumb-gap)
-				);
-				--stickyBreadcrumb-item-positionTryFallbacks: none;
-			}
 
 			> [data-sticky-breadcrumb~='item'] {
 				z-index: var(---wallet-breadcrumb-layer-attribute);
-				container-type: anchored;
+				inline-size: 100%;
 				min-inline-size: 0;
 				max-inline-size: none;
 			}
+		}
+
+		.attribute > details[open] > summary[data-sticky] {
+			--sticky-insetBlockStart: calc(
+				var(---wallet-sticky-stack-block-end)
+					- var(---wallet-breadcrumb-row-block-size)
+			);
+
+			z-index: var(---wallet-breadcrumb-layer-attribute);
+			inline-size: 100%;
 		}
 
 		:is(
@@ -3063,9 +3033,16 @@
 			:is(.stage-heading-position, .attribute-group-heading-position) {
 				---wallet-breadcrumb-marker-animation: none;
 
-				> [data-sticky-breadcrumb~='backdrop'] {
-					--stickyBreadcrumb-backdrop-display: block;
+				> .breadcrumb-parent-slot {
+					display: none;
 				}
+			}
+
+			:is(
+				#stages > header[data-sticky],
+				.attribute-group > .attribute-group-stack > header[data-sticky]
+			)::before {
+				content: '';
 			}
 		}
 
@@ -3073,20 +3050,19 @@
 			.attribute-heading-position {
 				---wallet-breadcrumb-marker-animation: none;
 
-				> [data-sticky-breadcrumb~='backdrop'] {
-					--stickyBreadcrumb-backdrop-display: block;
+				> .breadcrumb-parent-slot {
+					display: none;
 				}
+			}
+
+			.attribute > details > summary[data-sticky]::before {
+				content: '';
 			}
 		}
 
 		.attribute-accordions details {
 			@media (max-width: 1024px) {
-				> summary[data-sticky] {
-					z-index: var(---wallet-breadcrumb-layer-detail);
-				}
-
 				> summary > h4[data-sticky-breadcrumb~='item'] {
-					z-index: var(---wallet-breadcrumb-layer-detail);
 					position: relative;
 					position-anchor: auto;
 					inset: auto;
@@ -3112,10 +3088,11 @@
 		}
 
 		:is(.attribute-group-icon, .attribute-icon) {
-			position: absolute;
-			inset-block-start: 50%;
-			inset-inline-start: 0;
-			translate: 0 -50%;
+			--icon-size: var(---wallet-breadcrumb-heading-icon-size);
+
+			position: relative;
+			inline-size: var(---wallet-breadcrumb-heading-icon-size);
+			block-size: var(---wallet-breadcrumb-heading-icon-size);
 			transform-origin: center;
 
 			> .breadcrumb-icon {
@@ -3128,6 +3105,20 @@
 
 		.attribute-group-icon {
 			z-index: var(---wallet-breadcrumb-layer-group);
+
+			> .breadcrumb-icon {
+				inset: 50% auto auto 0;
+				translate: 0 -50%;
+				inline-size: 1em;
+				block-size: 1em;
+				font-size: var(---wallet-group-icon-size);
+				transform-origin: left center;
+
+				&:dir(rtl) {
+					inset-inline: auto 0;
+					transform-origin: right center;
+				}
+			}
 		}
 
 		.attribute-icon {
@@ -3136,23 +3127,20 @@
 
 		@keyframes BreadcrumbSliceIconAnimation {
 			to {
-				scale: calc(
-					var(---wallet-breadcrumb-heading-icon-size)
-						/ 1em
-				);
+				scale: var(---wallet-breadcrumb-icon-scale, 1);
 			}
 		}
 
 		@keyframes BreadcrumbHeadingAnimation {
 			from {
-				translate: none;
+				translate: calc(
+					var(---wallet-breadcrumb-heading-flow-translate)
+						* var(---wallet-inline-translate-direction)
+				);
 				scale: 1;
 			}
 			to {
-				translate: calc(
-					var(---wallet-breadcrumb-heading-translate)
-						* var(---wallet-inline-translate-direction)
-				);
+				translate: none;
 				scale: var(---wallet-breadcrumb-heading-scale);
 			}
 		}
@@ -3307,11 +3295,6 @@
 				) 0;
 				--stickyBreadcrumb-item-blockOffset: var(
 					---wallet-breadcrumb-attribute-row-offset
-				);
-				--stickyBreadcrumb-item-insetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-						+ var(---wallet-content-inline-start)
-						- var(---wallet-breadcrumb-gap)
 				);
 			}
 
@@ -3478,41 +3461,12 @@
 				.stage-heading-position[data-sticky-breadcrumb~='position'],
 				.attribute-group-heading-position[data-sticky-breadcrumb~='position']
 			) {
-				/*
-				 * The root occupies the layout-navigation row at this breakpoint, so
-				 * the group begins a new breadcrumb chain on the content row. Ground
-				 * that row in the shared content inset instead of centering it in the
-				 * space after an unrelated root anchor.
-				 */
-				--stickyBreadcrumb-item-insetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-					+ var(---wallet-content-inline-start)
-				);
-				--stickyBreadcrumb-item-insetInlineEnd: var(---wallet-breadcrumb-inline-end);
-				--stickyBreadcrumb-item-inlineSize: max-content;
-				--stickyBreadcrumb-item-translate: none;
-				--stickyBreadcrumb-item-justifySelf: start;
-				--stickyBreadcrumb-item-positionTryFallbacks: --sticky-breadcrumb-constrained-row;
-				--stickyBreadcrumb-item-blockOffset: var(--navigation-mobile-blockSize);
-				--stickyBreadcrumb-item-nextRowInsetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-					+ var(---wallet-content-inline-start)
-				);
-				--stickyBreadcrumb-item-nextRowInsetInlineEnd: var(
-					---wallet-breadcrumb-inline-end
-				);
-				--stickyBreadcrumb-item-nextRowJustifySelf: start;
-				--stickyBreadcrumb-item-rowGap: var(---wallet-breadcrumb-mobile-row-gap);
 				> [data-sticky-breadcrumb~='item'] {
 					max-inline-size: calc(
 						100vi
 							- var(--sticky-insetInlineStart)
 							- var(---wallet-content-inline-start)
 							- var(---wallet-breadcrumb-inline-end)
-					);
-					inset-block-start: max(
-						anchor(--sticky-breadcrumb-position top),
-						var(---wallet-icon-sticky-block-start)
 					);
 					h2 {
 						flex: 0 1 auto;
@@ -3594,7 +3548,7 @@
 
 	#stages {
 		/* Stage has no slice glyph, so its ordinary H2 transition has no icon gap. */
-		---wallet-breadcrumb-heading-translate: 0px;
+		---wallet-breadcrumb-heading-flow-translate: 0px;
 		view-timeline-name:
 			--wallet-stage-timeline,
 			--sticky-breadcrumb-timeline,
@@ -3670,17 +3624,30 @@
 		.attribute-group-summary-layout,
 		.attribute > details > summary > header
 	) a:is(:hover, :focus-visible, :interest-source) {
-		color: var(--accent);
 		text-decoration: none;
 	}
 
+	.attribute-group-target:target
+		+ .attribute-group
+		.attribute-group-summary-layout
+		.breadcrumb-icon,
+	.attribute
+		> details:target
+		> summary
+		> header
+		.breadcrumb-icon {
+		color: initial;
+		text-shadow: none;
+		filter: none;
+	}
+
 	@supports selector(:interest-target) {
-		.attribute-group-target:is(:target, :interest-target)
+		.attribute-group-target:interest-target
 			+ .attribute-group
 			.attribute-group-summary-layout
 			.breadcrumb-icon,
 		.attribute
-			> details:is(:target, :interest-target)
+			> details:interest-target
 			> summary
 			> header
 			.breadcrumb-icon {
@@ -3689,12 +3656,11 @@
 			filter: none;
 		}
 
-		.attribute-group-target:is(:target, :interest-target)
+		.attribute-group-target:interest-target
 			+ .attribute-group
 			.attribute-group-heading-position
 			> a,
-		.attribute > details:is(:target, :interest-target) .attribute-heading-row > a {
-			color: var(--accent);
+		.attribute > details:interest-target .attribute-heading-row > a {
 			text-decoration: none;
 		}
 	}
@@ -3708,6 +3674,14 @@
 	.attribute-group {
 		> .attribute-group-stack[data-scroll-item] {
 			--icon-size: var(---wallet-group-icon-size);
+			---wallet-breadcrumb-heading-flow-translate: calc(
+				var(---wallet-group-icon-size)
+					- var(---wallet-breadcrumb-heading-icon-size)
+			);
+			---wallet-breadcrumb-icon-scale: calc(
+				var(---wallet-breadcrumb-heading-icon-size)
+					/ var(---wallet-group-icon-size)
+			);
 			---wallet-group-sticky-block-end: var(
 				---wallet-group-sticky-block-end-override,
 				calc(
@@ -3748,6 +3722,9 @@
 	}
 
 	.attribute {
+		---wallet-breadcrumb-heading-flow-translate: 0px;
+		---wallet-breadcrumb-icon-scale: 1;
+
 		> details {
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
