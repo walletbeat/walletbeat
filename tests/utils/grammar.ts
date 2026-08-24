@@ -70,7 +70,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'UseEllipsisCharacter',
 	'UseTitleCase',
 	'WillNonLemma',
 	'WrongApostrophe',
@@ -622,6 +621,44 @@ export async function grammarLintMessages(
 
 		// "to" as a transaction field label in a comma-separated list, e.g. "from, to, chain".
 		if (/, $/.exec(before) !== null && /^,/.exec(after) !== null) {
+			return false
+		}
+
+		return true
+	})
+
+	// Ignore UseEllipsisCharacter lints for "..." used intentionally as a list-item
+	// continuation marker (e.g. "* ... Either change...") or as a trailing ellipsis
+	// (e.g. "Does the wallet warn the user when..."), matching the site's "..." convention.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Formatting') {
+			return true
+		}
+
+		if (lint.get_problem_text() !== '...') {
+			return true
+		}
+
+		if (!lint.message().includes('Unicode ellipsis')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 10), lint.span().start)
+		const after = trimmedText.substring(
+			lint.span().end,
+			Math.min(trimmedText.length, lint.span().end + 10),
+		)
+
+		// "..." used as a placeholder bullet at the start of a markdown list item.
+		if (/(?:^|\n)\s*\*\s$/.exec(before) !== null) {
+			return false
+		}
+
+		// "..." used as a trailing ellipsis, followed only by closing markdown/punctuation
+		// and then whitespace or the end of the content.
+		const afterStripped = after.replace(/^[*_`)\]]+/, '')
+
+		if (/^\s|^$/.exec(afterStripped) !== null) {
 			return false
 		}
 
