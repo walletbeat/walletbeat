@@ -155,3 +155,12 @@ export interface ScamAlerts {
 	 */
 	unlimitedApprovalWarning: Support<UnlimitedApprovalWarning>
 }
+
+export const unlimitedApprovalWarningConditionLabels: Record<UnlimitedApprovalWarningCondition, string> = {
+		[UnlimitedApprovalWarningCondition.EOA]: 'the spender is not a contract',
+		[UnlimitedApprovalWarningCondition.UNKNOWN_CONTRACTS]: 'the spender is an unknown/unverified contract',
+		[UnlimitedApprovalWarningCondition.BLACKLISTED_CONTRACTS]: 'the spender is a known-scam contract',
+		[UnlimitedApprovalWarningCondition.NEW_CONTRACTS]: 'the spender contract was recently deployed',
+		[UnlimitedApprovalWarningCondition.CONTRACTS_NOT_INTERACTED_BEFORE]:
+			"you haven't interacted with the spender contract before",
+	}
