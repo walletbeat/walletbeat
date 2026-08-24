@@ -10,6 +10,7 @@ import {
 	type ScamAlertLeaks,
 	type ScamAlerts,
 	UnlimitedApprovalWarningCondition,
+	unlimitedApprovalWarningConditionLabels,
 } from '@/schema/features/security/scam-alerts'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
@@ -336,17 +337,25 @@ function evaluateScamAlerts(
 	if (
 		requiredFeatures.includes(unlimitedApprovalWarning) &&
 		unlimitedApprovalWarning.supported &&
-		unlimitedApprovalWarning.conditionalOnly
+		unlimitedApprovalWarning.conditionalOnly &&
+		isSupported(scamAlerts.unlimitedApprovalWarning) &&
+		scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval !== 'ALWAYS'
 	) {
 		// Warns about unlimited approvals, but only in certain scenarios
 		// (e.g. only for untrusted spenders) rather than unconditionally.
+		const conditions = commaListFormat(
+			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval.map(
+				condition => unlimitedApprovalWarningConditionLabels[condition],
+			),
+		)
+
 		return ctx.build({
 			outcome: {
 				id: 'conditional_unlimited_approval_warning',
 				displayName: 'Selective unlimited approval warning',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence(
-					'{{WALLET_NAME}} only warns about unlimited token approvals in certain scenarios, not unconditionally.',
+					`{{WALLET_NAME}} only warns about unlimited token approvals when ${conditions}, not unconditionally.`,
 				),
 				metadata,
 			},
