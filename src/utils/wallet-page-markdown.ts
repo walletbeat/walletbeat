@@ -231,8 +231,6 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 					),
 				)
 
-				parts.push(shortExpl, '')
-
 				const qualifiedRefs =
 					evaluation.references === undefined ? [] : toFullyQualified(evaluation.references)
 

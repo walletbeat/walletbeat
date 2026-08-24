@@ -41,8 +41,7 @@ export interface DetailsMarkdownContext extends EvaluationData<OutcomeMetadata> 
 	attributeUrl: string
 
 	/**
-	 * The attribute's short explanation as the page has already rendered it
-	 * above the details block, so that a component repeating it can be caught.
+	 * The attribute's short explanation, rendered before any additional details.
 	 */
 	shortExplanation: string
 }
@@ -62,62 +61,75 @@ const NO_MARKDOWN_DETAILS = Symbol('NO_MARKDOWN_DETAILS')
  */
 const HEADING_DEMOTION = 1
 
-/**
- * Turndown instance configured to match the Markdown conventions used by the
- * rest of the wallet page (ATX headings, `-` bullets, `**` for strong).
- */
-const turndownService = new TurndownService({
-	headingStyle: 'atx',
-	bulletListMarker: '-',
-	codeBlockStyle: 'fenced',
-	emDelimiter: '*',
-	strongDelimiter: '**',
-})
+let turndownService: TurndownService | null = null
 
-// `ReferenceLinks` renders sources inline within some detail components, but
-// the Markdown page already emits a single `#### References` section per
-// attribute from `evaluation.references`. Keeping both would duplicate every
-// URL, so the inline ones are dropped.
-// Known limitation: components that call `ReferenceLinks` more than once
-// (`ScamAlertDetails`, `SecurityAuditsDetails`) lose their per-claim source
-// attribution, since the page-level section is a flat list. See issue #550.
-turndownService.remove(node => {
-	if (node.nodeName !== 'SECTION') {
-		return false
+/**
+ * Return the Turndown instance configured to match the Markdown conventions
+ * used by the rest of the wallet page (ATX headings, `-` bullets, `**` for
+ * strong), initializing it on first use.
+ */
+function getTurndownService(): TurndownService {
+	if (turndownService !== null) {
+		return turndownService
 	}
 
-	// Svelte appends a scoping class, so match on the class list rather than
-	// the whole attribute.
-	return (node.getAttribute('class') ?? '').split(/\s+/).includes('references')
-})
+	const service = new TurndownService({
+		headingStyle: 'atx',
+		bulletListMarker: '-',
+		codeBlockStyle: 'fenced',
+		emDelimiter: '*',
+		strongDelimiter: '**',
+	})
 
-turndownService.addRule('demotedHeading', {
-	filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-	replacement: (content, node) => {
-		const level = Math.min(Number(node.nodeName.charAt(1)) + HEADING_DEMOTION, 6)
+	// `ReferenceLinks` renders sources inline within some detail components, but
+	// the Markdown page already emits a single `#### References` section per
+	// attribute from `evaluation.references`. Keeping both would duplicate every
+	// URL, so the inline ones are dropped.
+	// Known limitation: components that call `ReferenceLinks` more than once
+	// (`ScamAlertDetails`, `SecurityAuditsDetails`) lose their per-claim source
+	// attribution, since the page-level section is a flat list. See issue #550.
+	service.remove(node => {
+		if (node.nodeName !== 'SECTION') {
+			return false
+		}
 
-		return `\n\n${'#'.repeat(level)} ${content}\n\n`
-	},
-})
+		// Svelte appends a scoping class, so match on the class list rather than
+		// the whole attribute.
+		return (node.getAttribute('class') ?? '').split(/\s+/).includes('references')
+	})
 
-// Turndown pads list markers to a fixed width (`-   item`); the wallet page
-// writes plain `- item`, so use that instead.
-turndownService.addRule('compactListItem', {
-	filter: 'li',
-	replacement: (content, node) => {
-		const parent = node.parentElement
-		const prefix =
-			parent !== null && parent.nodeName === 'OL'
-				? `${Number(parent.getAttribute('start') ?? 1) + [...parent.children].indexOf(node)}. `
-				: '- '
-		const body = content
-			.replace(/^\n+/, '')
-			.replace(/\n+$/, '\n')
-			.replace(/\n/gm, `\n${' '.repeat(prefix.length)}`)
+	service.addRule('demotedHeading', {
+		filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+		replacement: (content, node) => {
+			const level = Math.min(Number(node.nodeName.charAt(1)) + HEADING_DEMOTION, 6)
 
-		return prefix + body + (node.nextSibling !== null && !/\n$/.test(body) ? '\n' : '')
-	},
-})
+			return `\n\n${'#'.repeat(level)} ${content}\n\n`
+		},
+	})
+
+	// Turndown pads list markers to a fixed width (`-   item`); the wallet page
+	// writes plain `- item`, so use that instead.
+	service.addRule('compactListItem', {
+		filter: 'li',
+		replacement: (content, node) => {
+			const parent = node.parentElement
+			const prefix =
+				parent !== null && parent.nodeName === 'OL'
+					? `${Number(parent.getAttribute('start') ?? 1) + [...parent.children].indexOf(node)}. `
+					: '- '
+			const body = content
+				.replace(/^\n+/, '')
+				.replace(/\n+$/, '\n')
+				.replace(/\n/gm, `\n${' '.repeat(prefix.length)}`)
+
+			return prefix + body + (node.nextSibling !== null && !/\n$/.test(body) ? '\n' : '')
+		},
+	})
+
+	turndownService = service
+
+	return turndownService
+}
 
 /**
  * Server-render a Svelte component and convert its HTML output to Markdown.
@@ -136,7 +148,9 @@ function renderComponentToMarkdown<_Props extends Record<string, unknown>>(
 
 	// Indenting nested list items leaves lines that hold nothing but the
 	// indentation; blank them out so blank lines are really blank.
-	const markdown = turndownService.turndown(body).replace(/^[ \t]+$/gm, '')
+	const markdown = getTurndownService()
+		.turndown(body)
+		.replace(/^[ \t]+$/gm, '')
 
 	return normalizeMarkdownBlankLines(markdown).trim()
 }
@@ -176,11 +190,11 @@ function narrowMetadata<_Metadata extends object>(outcome: Outcome<OutcomeMetada
  * Render an evaluation's details to Markdown for the LLM-friendly
  * `index.html.md` wallet pages.
  *
- * Callers hand over whatever `evaluation.details` holds and get back the
- * Markdown to print, whichever of the three shapes it turns out to be:
- * typographic content is rendered as text, a detail component is
- * server-rendered and converted, and a component with no Markdown rendering
- * becomes a link to the attribute's section on the HTML page.
+ * Callers hand over whatever `evaluation.details` holds and get back the whole
+ * Markdown block, beginning with the outcome's short explanation. Typographic
+ * details are rendered as text, a detail component is server-rendered and
+ * converted, and a component with no Markdown rendering becomes a link to the
+ * attribute's section on the HTML page.
  *
  * @param details The evaluation's details.
  * @param context The attribute being rendered, plus the props that the wallet
@@ -191,42 +205,24 @@ export function renderDetailsMarkdown(
 	details: Content<WalletNameAndPseudonymStrings>,
 	context: DetailsMarkdownContext,
 ): string {
+	let detailsMarkdown: string
+
 	if (!isCustomContent(details)) {
-		return withoutShortExplanation(
-			normalizeMarkdownBlankLines(
-				renderContentToText(details, getWalletEvalStrings(context.wallet), { trim: true }),
-			),
-			context,
+		const renderedDetails = normalizeMarkdownBlankLines(
+			renderContentToText(details, getWalletEvalStrings(context.wallet), { trim: true }),
 		)
+
+		detailsMarkdown = renderedDetails === context.shortExplanation ? '' : renderedDetails
+	} else {
+		const renderedDetails = renderComponentMarkdown(details.component, context)
+
+		detailsMarkdown =
+			renderedDetails === NO_MARKDOWN_DETAILS
+				? `[See full details for ${context.attributeDisplayName}](${context.attributeUrl})`
+				: renderedDetails
 	}
 
-	const markdown = renderComponentMarkdown(details.component, context)
-
-	if (markdown === NO_MARKDOWN_DETAILS) {
-		return `[See full details for ${context.attributeDisplayName}](${context.attributeUrl})`
-	}
-
-	return withoutShortExplanation(markdown, context)
-}
-
-/**
- * Drop the outcome's short explanation from the front of a details block.
- *
- * The page prints the short explanation directly above the details, so details
- * that open by restating it read as a repeat. Both kinds of details do this:
- * `ScamAlertDetails` renders `outcome.shortExplanation` itself, and some
- * attributes give typographic details identical to their short explanation.
- * Neither repeats on the HTML page, which does not print the short explanation
- * separately.
- *
- * @param markdown The rendered details block.
- * @param context The context it was rendered with.
- * @returns The details block without the leading repeat.
- */
-function withoutShortExplanation(markdown: string, context: DetailsMarkdownContext): string {
-	return markdown.startsWith(context.shortExplanation)
-		? markdown.slice(context.shortExplanation.length).trimStart()
-		: markdown
+	return [context.shortExplanation, detailsMarkdown].filter(part => part !== '').join('\n\n')
 }
 
 /**
@@ -270,6 +266,7 @@ function renderComponentMarkdown(
 				...componentAndProps.componentProps,
 				wallet,
 				outcome: narrowOutcome<ScamPreventionMetadata>(outcome),
+				includeShortExplanation: false,
 			})
 		case 'SecurityAuditsDetails':
 			return renderComponentToMarkdown(SecurityAuditsDetails, {

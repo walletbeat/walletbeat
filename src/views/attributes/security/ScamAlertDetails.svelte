@@ -15,9 +15,11 @@
 	const {
 		wallet,
 		outcome,
+		includeShortExplanation = true,
 	}: {
 		wallet: RatedWallet
 		outcome: Outcome<ScamPreventionMetadata>
+		includeShortExplanation?: boolean
 	} = $props()
 
 	// Components
@@ -51,10 +53,12 @@
 </script>
 
 
-<Typography
-	content={outcome.shortExplanation}
-	strings={getWalletEvalStrings(wallet)}
-/>
+{#if includeShortExplanation}
+	<Typography
+		content={outcome.shortExplanation}
+		strings={getWalletEvalStrings(wallet)}
+	/>
+{/if}
 
 {#if outcome.metadata?.scamAlerts}
 	<ul data-list="gap-4">
