@@ -1222,7 +1222,6 @@ ol {
  *
  * ### CSS Variables
  * - `--stickyBreadcrumb-animationRange`
- * - `--stickyBreadcrumb-inlineAnimationRange`
  * - `--stickyBreadcrumb-animationTimingFunction`
  * - `--stickyBreadcrumb-gap`
  * - `--stickyBreadcrumb-position-minBlockSize`
@@ -1367,8 +1366,6 @@ ol {
 		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
 
 		&:not([data-sticky-breadcrumb~="root"]) {
-			--stickyBreadcrumb-exitTranslate: 0
-				calc(-2 * var(--stickyBreadcrumb-trackBlockEnd, 1lh));
 			---stickyBreadcrumb-targetInsetInlineStart: var(
 				--stickyBreadcrumb-item-insetInlineStart,
 				anchor(
@@ -1409,7 +1406,7 @@ ol {
 			}
 
 			position: fixed;
-			position-anchor: --sticky-breadcrumb-position;
+			position-anchor: auto;
 			position-visibility: always;
 			inset-block-start: anchor(--sticky-breadcrumb-position top);
 			inset-inline-start: calc(
@@ -1433,35 +1430,29 @@ ol {
 						var(--transition-easeInOutExpo)
 					)
 					both,
-				StickyBreadcrumbItemHandoffAnimation steps(1, end) both,
 				StickyBreadcrumbItemExitAnimation linear both;
 			animation-timeline:
 				--sticky-breadcrumb-timeline,
-				--sticky-breadcrumb-timeline,
 				--sticky-breadcrumb-scope-timeline;
 			animation-range:
-				var(
-					--stickyBreadcrumb-inlineAnimationRange,
-					var(
-						--stickyBreadcrumb-animationRange,
-						entry calc(100vh - 6rem) entry calc(100vh - 3rem)
-					)
-				),
 				var(
 					--stickyBreadcrumb-animationRange,
 					entry calc(100vh - 6rem) entry calc(100vh - 3rem)
 				),
 				var(---stickyBreadcrumb-exitAnimationRangeStart)
 				var(---stickyBreadcrumb-exitAnimationRangeEnd);
-			animation-composition: replace, replace, add;
+			animation-composition: replace, replace;
 
-			> [data-sticky-breadcrumb~="marker"],
-			> a > [data-sticky-breadcrumb~="marker"] {
+			&::before,
+			> a::before {
+				content: '# ';
 				position: absolute;
-				inset-block-start: 0;
+				inset-block-start: 50%;
 				inset-inline-start: calc(-1 * var(--stickyBreadcrumb-gap, 1rem));
-				display: grid;
-				place-items: center;
+				display: inline-flex;
+				align-items: center;
+				justify-content: end;
+				translate: 0 -50%;
 				inline-size: var(--stickyBreadcrumb-gap, 1rem);
 				block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
 				font-size: 1em;
@@ -1469,17 +1460,11 @@ ol {
 				text-box: trim-both cap alphabetic;
 				overflow: clip;
 				pointer-events: none;
-
-				&::before {
-					content: '#';
-					opacity: 0;
-				}
+				opacity: 0;
 			}
 
-			&:is(:hover, :focus-visible)
-				> [data-sticky-breadcrumb~="marker"]::before,
-			> a:is(:hover, :focus-visible)
-				> [data-sticky-breadcrumb~="marker"]::before {
+			&:is(:hover, :focus-visible)::before,
+			> a:is(:hover, :focus-visible)::before {
 				opacity: 1;
 			}
 		}
@@ -1529,26 +1514,6 @@ ol {
 
 	@keyframes StickyBreadcrumbItemInlineAnimation {
 		to {
-			inset-inline-start: var(---stickyBreadcrumb-animationInsetInlineStart);
-			inset-inline-end: var(---stickyBreadcrumb-animationInsetInlineEnd);
-			margin-inline-start: var(---stickyBreadcrumb-animationMarginInlineStart);
-			margin-inline-end: var(---stickyBreadcrumb-animationMarginInlineEnd);
-			position-try-fallbacks: var(
-				--stickyBreadcrumb-item-positionTryFallbacks,
-				none
-			);
-		}
-	}
-
-	@keyframes StickyBreadcrumbItemHandoffAnimation {
-		to {
-			position-anchor: var(
-				--stickyBreadcrumb-item-targetAnchor,
-				var(
-					--stickyBreadcrumb-parentAnchor,
-					--sticky-breadcrumb-scope
-				)
-			);
 			inset-block-start: var(
 				--stickyBreadcrumb-item-targetInsetBlockStart,
 				calc(
@@ -1559,19 +1524,33 @@ ol {
 						+ var(--stickyBreadcrumb-item-blockOffset, 0px)
 				)
 			);
+			inset-inline-start: var(---stickyBreadcrumb-animationInsetInlineStart);
+			inset-inline-end: var(---stickyBreadcrumb-animationInsetInlineEnd);
+			margin-inline-start: var(---stickyBreadcrumb-animationMarginInlineStart);
+			margin-inline-end: var(---stickyBreadcrumb-animationMarginInlineEnd);
 			translate: var(--stickyBreadcrumb-item-translate, none);
+			position-try-fallbacks: var(
+				--stickyBreadcrumb-item-positionTryFallbacks,
+				none
+			);
 		}
 	}
 
 	@keyframes StickyBreadcrumbItemExitAnimation {
 		from {
 			visibility: visible;
-			translate: none;
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		20%,
+		to {
+			opacity: 0;
 		}
 
 		to {
 			visibility: hidden;
-			translate: var(--stickyBreadcrumb-exitTranslate, none);
+			transform: translateY(calc(-2 * var(--stickyBreadcrumb-trackBlockEnd, 1lh)));
 		}
 	}
 

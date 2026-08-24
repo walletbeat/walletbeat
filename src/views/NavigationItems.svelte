@@ -479,6 +479,7 @@
 					)
 				) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
+					---color: var(--accent);
 
 					&:hover,
 					&:focus-visible,

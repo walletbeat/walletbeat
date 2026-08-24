@@ -122,11 +122,15 @@
 			const currentId = currentLink?.hash
 				? decodeURIComponent(currentLink.hash.slice(1))
 				: decodeURIComponent(globalThis.location.hash.slice(1))
-			const currentGroup = (
-				currentId
-					? globalThis.document.getElementById(currentId)?.closest('.attribute-group')
-					: null
-			) ?? root.querySelector('.attribute-group')
+			const currentTarget = currentId
+				? globalThis.document.getElementById(currentId)
+				: null
+			const adjacentGroup = currentTarget?.matches('.attribute-group-target') &&
+				currentTarget.nextElementSibling?.matches('.attribute-group')
+				? currentTarget.nextElementSibling
+				: null
+			const currentGroup = currentTarget?.closest('.attribute-group') ??
+				adjacentGroup ?? root.querySelector('.attribute-group')
 
 			return currentGroup?.querySelectorAll<HTMLDetailsElement>('details') ?? []
 		}
@@ -743,7 +747,6 @@
 					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-row
 					data-scroll-item="inline-detached"
-					style:---wallet-heading-anchor="--wallet-stage-heading"
 				>
 					<div
 						class="stage-heading-position"
@@ -755,7 +758,6 @@
 							href="#stages"
 							interestfor="stages"
 						>
-							<span data-sticky-breadcrumb="marker" aria-hidden="true"></span>
 							<h2>Stage Progress</h2>
 						</a>
 						<span data-sticky-breadcrumb="backdrop" aria-hidden="true"></span>
@@ -856,11 +858,10 @@
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
-		<hr />
+		<hr class="attribute-group-target" {id} />
 
 		<section
 			class="attribute-group"
-			{id}
 			aria-label={attrGroup.displayName}
 			data-sticky-breadcrumb="scope"
 			data-score={scoreLevel}
@@ -875,8 +876,6 @@
 					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-row="start gap-4"
 					data-scroll-item="inline-detached"
-					style:---wallet-icon-anchor={`--wallet-group-icon-${id}`}
-					style:---wallet-heading-anchor={`--wallet-group-heading-${id}`}
 				>
 					<div
 						class="attribute-group-summary-layout"
@@ -897,7 +896,13 @@
 									{href}
 									interestfor={id}
 								>
-									<span data-sticky-breadcrumb="marker" aria-hidden="true"></span>
+									<span class="attribute-group-icon">
+										<span
+											class="breadcrumb-icon"
+											data-icon="wbicons emoji {attrGroup.icon}"
+											aria-hidden="true"
+										></span>
+									</span>
 									<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 										{attrGroup.displayName}
 									</h2>
@@ -919,14 +924,6 @@
 							<ScoreBadge {score} size="medium" />
 						{/if}
 					</div>
-
-					<span class="attribute-group-icon">
-						<span
-							class="breadcrumb-icon"
-							data-icon="wbicons emoji {attrGroup.icon}"
-							aria-hidden="true"
-						></span>
-					</span>
 				</header>
 
 				<div data-column>
@@ -1002,8 +999,6 @@
 				<header
 					data-row-item="flexible"
 					data-row="start gap-3"
-					style:---wallet-icon-anchor={`--wallet-attribute-icon-${id}`}
-					style:---wallet-heading-anchor={`--wallet-attribute-heading-${id}`}
 				>
 					<div
 						class="attribute-heading"
@@ -1020,6 +1015,13 @@
 								data-row="start gap-2"
 								data-sticky-breadcrumb="item"
 							>
+								<span class="attribute-icon">
+									<span
+										class="breadcrumb-icon"
+										data-icon="wbicons emoji {attribute.icon}"
+										aria-hidden="true"
+									></span>
+								</span>
 								<a
 									data-link="camouflaged"
 									data-row-item="flexible"
@@ -1027,7 +1029,6 @@
 									interestfor={id}
 									data-row="start gap-0"
 								>
-									<span data-sticky-breadcrumb="marker" aria-hidden="true"></span>
 									<h3 title={formatAttributeTitleText(evalAttr)}>
 										{attribute.displayName}
 									</h3>
@@ -1103,14 +1104,6 @@
 							</div>
 						{/if}
 					</div>
-
-					<span class="attribute-icon">
-						<span
-							class="breadcrumb-icon"
-							data-icon="wbicons emoji {attribute.icon}"
-							aria-hidden="true"
-						></span>
-					</span>
 				</header>
 			</summary>
 			<div class="attribute-content" data-column="gap-6">
@@ -1463,23 +1456,22 @@
 			---wallet-page-navigation-inline-size
 		);
 		---wallet-attribute-heading-font-size: 1.17em;
-		---wallet-breadcrumb-crossing-offset: 1px;
+		/* Settle the coupled heading/pie state one icon gap before the old scope
+		 * crosses its lane, so native current-target selection never leads motion. */
+		---wallet-breadcrumb-crossing-offset: calc(
+			-1 * var(---wallet-breadcrumb-heading-icon-gap)
+		);
 		/* Inline arrival finishes one row before the source reaches its lane.
 		 * The block handoff then occurs at the spatially identical endpoint. */
 		---wallet-breadcrumb-animation-range:
 			exit-crossing calc(
 				var(---wallet-breadcrumb-crossing-offset)
+					- 2 * var(---wallet-breadcrumb-heading-icon-gap)
 					- var(---wallet-breadcrumb-block-size)
-			)
-			exit-crossing var(---wallet-breadcrumb-crossing-offset);
-		---wallet-breadcrumb-inline-animation-range:
-			exit-crossing calc(
-				var(---wallet-breadcrumb-crossing-offset)
-					- 2 * var(---wallet-breadcrumb-block-size)
 			)
 			exit-crossing calc(
 				var(---wallet-breadcrumb-crossing-offset)
-					- var(---wallet-breadcrumb-block-size)
+					- 2 * var(---wallet-breadcrumb-heading-icon-gap)
 			);
 		---wallet-breadcrumb-attribute-arrival-offset: 0px;
 		---wallet-group-icon-size: 2rem;
@@ -1678,7 +1670,7 @@
 			@media (max-width: 1024px) {
 				--navigation-menu-maskFade: 9rem;
 
-				z-index: var(---wallet-breadcrumb-layer-root);
+				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 4);
 				position: relative;
 				inset: auto;
 				inline-size: 100%;
@@ -1799,6 +1791,10 @@
 		--scrollContainer-perspective: none;
 		scroll-timeline-name: --wallet-page-scroll-timeline;
 		scroll-timeline-axis: block;
+		/* The active hash is the sole responsive reflow anchor. Wallet-page
+		 * scrolling is instant, so proximity snapping cannot compete with smooth
+		 * navigation and the UA can re-snap the same target after width changes. */
+		scroll-snap-type: block proximity;
 		/* Longest depth-2 attribute label plus its icon and row padding. */
 		---wallet-page-navigation-inline-size-rem: 26;
 		---wallet-page-navigation-inline-size: calc(
@@ -2121,15 +2117,6 @@
 			font-size: calc(var(--icon-size) * 0.55);
 		}
 
-		&:is(.attribute-group-icon, .attribute-icon)::after {
-			content: '';
-			position: absolute;
-			inset: 50% auto auto 50%;
-			inline-size: 0;
-			block-size: 0;
-			anchor-name: var(---wallet-icon-anchor);
-		}
-
 		> .breadcrumb-icon {
 			font-size: var(--icon-size);
 			inline-size: 1em;
@@ -2182,16 +2169,6 @@
 			border-radius: 0;
 			--sticky-backgroundColor: var(--background-secondary);
 			--sticky-backdropFilter: blur(1rem);
-
-			@media (max-width: 1024px) {
-				---pie-target-rotate: 0.5turn;
-			}
-
-			@media (min-width: 1025px) {
-				&:dir(rtl) {
-					---pie-target-rotate: 0.25turn;
-				}
-			}
 
 			.pie-navigation-placement,
 			.pie-navigation-geometry {
@@ -2528,7 +2505,7 @@
 			align-self: start;
 			inline-size: max-content;
 
-			h1 {
+					h1 {
 				font-size: var(---wallet-name-flow-font-size);
 			}
 		}
@@ -2620,15 +2597,14 @@
 		}
 
 		@keyframes WalletBreadcrumbMarkerAnimation {
-			from {
+			from,
+			99.99% {
 				content: '#';
 				opacity: 0;
 			}
-			0.01%,
+
 			to {
 				content: '›';
-			}
-			to {
 				opacity: 1;
 			}
 		}
@@ -2639,24 +2615,16 @@
 			(inset-inline-start: anchor(--wallet-name end))
 		) {
 		.attribute > details > summary > header {
-			anchor-scope:
-				--sticky-breadcrumb-position,
-				var(---wallet-icon-anchor),
-				var(---wallet-heading-anchor);
+			anchor-scope: --sticky-breadcrumb-position;
 			timeline-scope: --sticky-breadcrumb-timeline;
 		}
 
 		#stages > header {
-			anchor-scope:
-				--sticky-breadcrumb-position,
-				var(---wallet-heading-anchor);
+			anchor-scope: --sticky-breadcrumb-position;
 		}
 
 		.attribute-group > .attribute-group-stack > header {
-			anchor-scope:
-				--sticky-breadcrumb-position,
-				var(---wallet-icon-anchor),
-				var(---wallet-heading-anchor);
+			anchor-scope: --sticky-breadcrumb-position;
 		}
 
 		.attribute-group-stack {
@@ -2693,9 +2661,6 @@
 				+ var(---wallet-breadcrumb-surface-fade)
 			);
 			--stickyBreadcrumb-animationRange: var(---wallet-breadcrumb-animation-range);
-			--stickyBreadcrumb-inlineAnimationRange: var(
-				---wallet-breadcrumb-inline-animation-range
-			);
 			/* Scroll position already supplies progression; easing only adds perceived lag. */
 			--stickyBreadcrumb-animationTimingFunction: linear;
 			--stickyBreadcrumb-backdrop-insetBlockStart: calc(
@@ -2786,7 +2751,7 @@
 			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-root;
 		}
 
-		.attribute-group {
+		.attribute-group-target {
 			scroll-margin-block-start: calc(
 				-1 * var(---wallet-breadcrumb-crossing-offset)
 			);
@@ -2798,6 +2763,10 @@
 						- var(---wallet-breadcrumb-crossing-offset)
 				);
 			}
+		}
+
+		:target {
+			scroll-snap-align: start;
 		}
 
 		.attribute {
@@ -2847,8 +2816,7 @@
 
 				.attribute-heading-position
 					> [data-sticky-breadcrumb~='item']
-					> a
-					> [data-sticky-breadcrumb~='marker']::before,
+					> a::before,
 				.attribute-heading-position h3,
 				.attribute-icon > .breadcrumb-icon {
 					animation: none;
@@ -2857,9 +2825,7 @@
 		}
 
 		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
-			anchor-name:
-				var(--stickyBreadcrumb-itemAnchor),
-				var(---wallet-heading-anchor);
+			anchor-name: var(--stickyBreadcrumb-itemAnchor);
 			display: flex;
 			align-items: center;
 
@@ -2873,11 +2839,20 @@
 				flex: 1 1 0;
 				min-inline-size: 0;
 			}
-		}
 
-		[data-sticky-breadcrumb~='position']
-			> [data-sticky-breadcrumb~='backdrop'] {
-			position-anchor: var(---wallet-heading-anchor);
+			&:has(> .attribute-group-icon) {
+				padding-inline-start: calc(
+					var(---wallet-group-icon-size)
+						+ var(---wallet-breadcrumb-heading-icon-gap)
+				);
+			}
+
+			&:has(> .attribute-icon) {
+				padding-inline-start: calc(
+					var(---wallet-breadcrumb-heading-icon-size)
+						+ var(---wallet-breadcrumb-heading-icon-gap)
+				);
+			}
 		}
 
 		.attribute-accordions {
@@ -3039,7 +3014,6 @@
 				--stickyBreadcrumb-item-blockOffset: var(
 					---wallet-breadcrumb-attribute-row-offset
 				);
-				--stickyBreadcrumb-item-targetAnchor: auto;
 				--stickyBreadcrumb-item-targetInsetBlockStart: calc(
 					anchor(--wallet-breadcrumb-group top)
 						+ var(---wallet-breadcrumb-attribute-row-offset)
@@ -3065,12 +3039,10 @@
 			.attribute-group-heading-position,
 			.attribute-heading-position
 		)[data-sticky-breadcrumb~='position']
-			> [data-sticky-breadcrumb~='item']
-			> [data-sticky-breadcrumb~='marker']::before,
+			> [data-sticky-breadcrumb~='item']::before,
 		.attribute-heading-position[data-sticky-breadcrumb~='position']
 			> [data-sticky-breadcrumb~='item']
-			> a
-			> [data-sticky-breadcrumb~='marker']::before {
+			> a::before {
 			animation:
 				var(
 					---wallet-breadcrumb-marker-animation,
@@ -3090,9 +3062,6 @@
 		@media (max-width: 1024px) {
 			:is(.stage-heading-position, .attribute-group-heading-position) {
 				---wallet-breadcrumb-marker-animation: none;
-				--stickyBreadcrumb-inlineAnimationRange: var(
-					---wallet-breadcrumb-animation-range
-				);
 
 				> [data-sticky-breadcrumb~='backdrop'] {
 					--stickyBreadcrumb-backdrop-display: block;
@@ -3103,9 +3072,6 @@
 		@media (max-width: 480px), (min-width: 1025px) and (max-width: 1599px) {
 			.attribute-heading-position {
 				---wallet-breadcrumb-marker-animation: none;
-				--stickyBreadcrumb-inlineAnimationRange: var(
-					---wallet-breadcrumb-animation-range
-				);
 
 				> [data-sticky-breadcrumb~='backdrop'] {
 					--stickyBreadcrumb-backdrop-display: block;
@@ -3146,57 +3112,17 @@
 		}
 
 		:is(.attribute-group-icon, .attribute-icon) {
-			transform-origin: top left;
-			---wallet-breadcrumb-icon-block-start: calc(
-				anchor(var(---wallet-heading-anchor) center)
-					- var(---wallet-breadcrumb-heading-icon-size) / 2
-			);
-			---wallet-breadcrumb-icon-inline-start: anchor(
-				var(---wallet-heading-anchor) start
-			);
-			---wallet-breadcrumb-icon-animation-inset-inline-start: var(
-				---wallet-breadcrumb-icon-inline-start
-			);
-			---wallet-breadcrumb-icon-animation-inset-inline-end: auto;
-
-			&:dir(rtl) {
-				---wallet-breadcrumb-icon-animation-inset-inline-start: auto;
-				---wallet-breadcrumb-icon-animation-inset-inline-end: var(
-					---wallet-breadcrumb-icon-inline-start
-				);
-			}
+			position: absolute;
+			inset-block-start: 50%;
+			inset-inline-start: 0;
+			translate: 0 -50%;
+			transform-origin: center;
 
 			> .breadcrumb-icon {
-				position-visibility: always;
-				transform-origin: top left;
-
-				&:dir(rtl) {
-					transform-origin: top right;
-				}
-
-				animation:
-					BreadcrumbSliceIconAnimation var(--stickyBreadcrumb-animationTimingFunction) both,
-					BreadcrumbFlyOutAnimation linear both;
-				animation-timeline:
-					--sticky-breadcrumb-timeline,
-					--sticky-breadcrumb-scope-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range),
-					var(---stickyBreadcrumb-exitAnimationRangeStart)
-					var(---stickyBreadcrumb-exitAnimationRangeEnd);
-				animation-composition: replace, add;
-			}
-		}
-
-		.container .attribute-group-icon > .breadcrumb-icon,
-		.container .attribute > details[open] .attribute-icon > .breadcrumb-icon {
-			position: fixed;
-			position-anchor: var(---wallet-icon-anchor);
-			inset-block-start: anchor(var(---wallet-icon-anchor) top);
-			inset-inline-start: anchor(var(---wallet-icon-anchor) start);
-
-			&:dir(rtl) {
-				translate: 50% -50%;
+				transform-origin: center;
+				animation: BreadcrumbSliceIconAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
+				animation-timeline: --sticky-breadcrumb-timeline;
+				animation-range: var(---wallet-breadcrumb-animation-range);
 			}
 		}
 
@@ -3210,30 +3136,10 @@
 
 		@keyframes BreadcrumbSliceIconAnimation {
 			to {
-				position-anchor: auto;
-				inset-block-start: var(---wallet-breadcrumb-icon-block-start);
-				inset-inline-start: var(
-					---wallet-breadcrumb-icon-animation-inset-inline-start
-				);
-				inset-inline-end: var(
-					---wallet-breadcrumb-icon-animation-inset-inline-end
-				);
-				translate: none;
 				scale: calc(
 					var(---wallet-breadcrumb-heading-icon-size)
 						/ 1em
 				);
-			}
-		}
-
-		@keyframes BreadcrumbFlyOutAnimation {
-			from {
-				visibility: visible;
-				translate: 0 0;
-			}
-			to {
-				visibility: hidden;
-				translate: 0 calc(-1 * var(--stickyBreadcrumb-trackBlockEnd));
 			}
 		}
 
@@ -3432,12 +3338,28 @@
 					);
 				}
 
-				h1 {
+				 h1 {
 					inline-size: max-content;
 					max-inline-size: none;
 					padding-inline-start: 0;
 					transform-origin: center;
 					animation: WalletRootContentMobileAnimation linear both;
+
+					&::before {
+						content: '# ';
+						display: inline-flex;
+						justify-content: end;
+						inline-size: 0;
+						padding-inline-end: 0.66rem;
+						margin-inline-start: -0.66rem;
+						line-height: 1;
+						opacity: 0;
+						animation: WalletBreadcrumbMarkerAnimation linear forwards;
+						animation-timeline: --wallet-page-scroll-timeline;
+						animation-range: var(---wallet-header-animation-range);
+						animation-composition: add;
+					}
+
 					> * {
 						flex: none;
 					}
@@ -3448,6 +3370,10 @@
 						white-space: nowrap;
 						animation: WalletNameTextMobileAnimation linear both;
 					}
+				}
+
+				&:is(:hover, :focus-visible) h1::before {
+					opacity: 1;
 				}
 
 				h1,
@@ -3480,11 +3406,25 @@
 				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 3);
 
 				> :global(.logo) {
-					---wallet-site-logo-inline-size: calc(
-						2 * anchor-size(--wallet-name-collision inline)
-							- 2 * var(---wallet-name-trailing-reserve)
-							+ var(---wallet-breadcrumb-gap)
-							+ var(--navigation-logo-inlineSize)
+					---wallet-site-logo-visual-inline-size: max(
+						var(--navigation-logo-inlineSize),
+						calc(
+							2 * anchor-size(--wallet-name-collision inline)
+								- 2 * var(---wallet-name-trailing-reserve)
+								+ var(---wallet-breadcrumb-gap)
+								+ var(--navigation-logo-inlineSize)
+						)
+					);
+					---wallet-site-logo-query-block-size: max(
+						var(--navigation-logo-inlineSize),
+						calc(
+							50vi
+								+ anchor-size(--wallet-name-collision inline)
+								- (
+									100vi
+										- var(---wallet-name-target-inline-start)
+								)
+						)
 					);
 					---wallet-site-logo-center-offset: calc(
 						(100cqi - var(--navigation-logo-inlineSize)) / 2
@@ -3495,12 +3435,10 @@
 					/* Viewport center is physical and direction-invariant. */
 					inset-inline: auto;
 					left: 50vi;
-					inline-size: max(
-						var(--navigation-logo-inlineSize),
-						var(---wallet-site-logo-inline-size)
-					);
+					inline-size: var(---wallet-site-logo-visual-inline-size);
+					block-size: var(---wallet-site-logo-query-block-size);
 					translate: -50% 0;
-					container-type: inline-size;
+					container-type: size;
 					pointer-events: none;
 
 					> :global(img) {
@@ -3512,10 +3450,9 @@
 				}
 			}
 
-			/* The invisible logo box turns the anchored wallet-name width into a
-			 * local size query. Beyond half the viewport plus the logo's half-row
-			 * allowance, the child uses the vertical-only long-name route. */
-			@container (inline-size > calc(50vi + 4rem)) {
+			/* The invisible logo box encodes the anchored wallet-name overflow as a
+			 * local size query, so the logo and wallet name share one collision state. */
+			@container (block-size > 50vi) {
 				:global(
 					#layout:has(#wallet-page)
 						> .logo-position-area
@@ -3529,6 +3466,11 @@
 			@container anchored(fallback: --wallet-root-without-site-logo) {
 				article > header#top .wallet-name[data-sticky-breadcrumb] h1 {
 					animation-name: WalletRootContentWithoutSiteLogoMobileAnimation;
+
+					&::before {
+						display: none;
+						animation: none;
+					}
 				}
 			}
 
@@ -3605,7 +3547,8 @@
 			.container .wallet-name[data-sticky-breadcrumb],
 			.container .wallet-name[data-sticky-breadcrumb] h1,
 			.container .wallet-icon,
-			[data-sticky-breadcrumb~='marker']::before,
+			[data-sticky-breadcrumb~='item']::before,
+			[data-sticky-breadcrumb~='item'] > a::before,
 			.section-caption,
 			.subsection-caption,
 			.attribute-heading-position h3,
@@ -3704,7 +3647,7 @@
 	.page-navigation
 		:global(
 			.navigation-items
-				a:is(:hover, :focus-visible, :interest-source)
+				a:is(:hover, :focus-visible, :interest-source, :target-current)
 				.toc-icon::before
 		),
 	:is(
@@ -3729,6 +3672,31 @@
 	) a:is(:hover, :focus-visible, :interest-source) {
 		color: var(--accent);
 		text-decoration: none;
+	}
+
+	@supports selector(:interest-target) {
+		.attribute-group-target:is(:target, :interest-target)
+			+ .attribute-group
+			.attribute-group-summary-layout
+			.breadcrumb-icon,
+		.attribute
+			> details:is(:target, :interest-target)
+			> summary
+			> header
+			.breadcrumb-icon {
+			color: initial;
+			text-shadow: none;
+			filter: none;
+		}
+
+		.attribute-group-target:is(:target, :interest-target)
+			+ .attribute-group
+			.attribute-group-heading-position
+			> a,
+		.attribute > details:is(:target, :interest-target) .attribute-heading-row > a {
+			color: var(--accent);
+			text-decoration: none;
+		}
 	}
 
 	:is(.section-caption, .subsection-caption) {
@@ -3807,6 +3775,10 @@
 				opacity: 0.7;
 			}
 		}
+	}
+
+	.attribute-content :global(code) {
+		overflow-wrap: anywhere;
 	}
 
 	.attribute-icon {
@@ -4092,12 +4064,10 @@
 
 	/* Permalink hashes yield to arrows only while a breadcrumb item is active. */
 	[data-sticky-breadcrumb~='position']
-		> [data-sticky-breadcrumb~='item']:is(:hover, :focus-visible)
-		> [data-sticky-breadcrumb~='marker']::before,
+		> [data-sticky-breadcrumb~='item']:is(:hover, :focus-visible)::before,
 	.attribute-heading-position
 		> [data-sticky-breadcrumb~='item']
-		> a:is(:hover, :focus-visible)
-		> [data-sticky-breadcrumb~='marker']::before,
+		> a:is(:hover, :focus-visible)::before,
 	.attribute-accordions
 		details
 		> summary:is(:hover, :focus-visible)
