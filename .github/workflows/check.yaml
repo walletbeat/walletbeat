@@ -10,35 +10,20 @@ on:
     types:
       - opened
       - reopened
-      - edited # Filtered down to base-branch changes; see `check-quick`.
       - synchronize
       - ready_for_review
       - review_requested
 
 # Supersede in-flight runs for the same PR (or the same branch, for pushes),
-# but never cancel a run on the trunk. Runs that `check-quick` is going to
-# skip are placed in a separate group, so that they cannot evict a run that
-# is doing real work and leave only a skipped -- and therefore passing --
-# result behind.
+# but never cancel a run on the trunk.
 concurrency:
-  group: >-
-    check-${{ github.event.pull_request.number || github.ref }}-${{
-    (github.event.action == 'edited' && github.event.changes.base == null)
-    && 'noop' || 'work' }}
+  group: check-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/beta' }}
 
 jobs:
   check-quick:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    # `edited` fires for title, body and base-branch changes alike, and GitHub
-    # offers no way to subscribe to only the last one. Title and body edits
-    # cannot affect the result of any check here, so skip those runs; a
-    # base-branch change alters the merge commit under test, so keep those.
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.action != 'edited' ||
-      github.event.changes.base != null
     strategy:
       fail-fast: false
       matrix:
