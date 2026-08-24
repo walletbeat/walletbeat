@@ -70,7 +70,6 @@ export function isInVocabulary(word: string): boolean {
 }
 
 const TEMPORARILY_IGNORED_LINT_RULES: readonly string[] = [
-	'ToTwoToo',
 	'TransposedSpace',
 	'UseEllipsisCharacter',
 	'UseTitleCase',
@@ -593,6 +592,41 @@ export async function grammarLintMessages(
 		const before = trimmedText.substring(Math.max(0, lint.span().start - 8), lint.span().start)
 
 		return !/\b(?:are|is|was|were)\s+$/i.exec(before)
+	})
+
+	// Ignore ToTwoToo false positives where "to" is a preposition or a transaction field
+	// label (e.g. "linkable to IP", "gas, nonce, from, to, chain, value"), not the adverb
+	// "too" meaning "also"/"excessively".
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Word Choice') {
+			return true
+		}
+
+		if (lint.get_problem_text() !== 'to') {
+			return true
+		}
+
+		if (!lint.message().includes('Use `too` here')) {
+			return true
+		}
+
+		const before = trimmedText.substring(Math.max(0, lint.span().start - 14), lint.span().start)
+		const after = trimmedText.substring(
+			lint.span().end,
+			Math.min(trimmedText.length, lint.span().end + 14),
+		)
+
+		// "to" as the object of a prepositional phrase, e.g. "linkable to IP".
+		if (/\blinkable\s+$/i.exec(before) !== null) {
+			return false
+		}
+
+		// "to" as a transaction field label in a comma-separated list, e.g. "from, to, chain".
+		if (/, $/.exec(before) !== null && /^,/.exec(after) !== null) {
+			return false
+		}
+
+		return true
 	})
 
 	// Ignore hyphenization for known words.
