@@ -3847,6 +3847,7 @@
 		---wallet-breadcrumb-icon-scale: 1;
 
 		.attribute-summary-companions {
+			box-sizing: border-box;
 			flex: 1 1 12rem;
 			inline-size: auto;
 			max-inline-size: 100%;
