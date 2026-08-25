@@ -1,0 +1,783 @@
+{
+    "wallet": "Zerion",
+    "platform": "Browser",
+    "version": "1.30.0",
+    "date": "2026-01-12T17:52:05.136Z",
+    "walletUID": "zerion-browser",
+    "walletMakerUID": "zerion",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Browser.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-008~Browser.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Browser.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-010~Browser.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-eeeed97f.png",
+                        "zerion-browser-1.30.0-b4c86533.png",
+                        "zerion-browser-1.30.0-185f48d9.png",
+                        "zerion-browser-1.30.0-6fe165ac.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It doesn't show any warning about incorrect address checksums and fixes the address, letting you confirm the transaction."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-48e889fd.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It doesn't warn the user about the risks of copying mnemonics to the clipboard and exceeds the minute."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-99252728.png",
+                        "zerion-browser-1.30.0-4a7017d0.png",
+                        "zerion-browser-1.30.0-d344e351.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't inform users when they are interacting with well-known, verified URLs (DApps) like 1inch or uniswap."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-PERM-008~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-fb07961e.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Requires user connection before processing each DApp request"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073830917
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-e5ed092b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet alerts users about interactions with known phishing or scam addresses."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-dd470b2d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet supports biometrics but is not enabled by default. It enforces rate limits on login attempts, requires a password of at least six characters, and does not allow weak passwords."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-42a0b93b.png",
+                        "zerion-browser-1.30.0-cb6f4cd3.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't warn users of domain or scheme mismatches when signing an EIP-4361 message."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-818673ae.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet alerts users about connections to known phishing dApps like https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-9d712ac9.png",
+                        "zerion-browser-1.30.0-882607ff.png",
+                        "zerion-browser-1.30.0-97878412.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes clickable links in the transaction history and during the process of sending a transaction."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-f8be9bda.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It shows the NFT we are receiving when providing liquidity to a pool."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-3d613e72.png",
+                        "zerion-browser-1.30.0-50311a29.png",
+                        "zerion-browser-1.30.0-bf364062.png",
+                        "zerion-browser-1.30.0-3ea47738.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet parses EIP-712 Opensea Seaport listings and ERC-20 Permits"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-ef030fa4.png",
+                        "zerion-browser-1.30.0-250a0ba2.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet clearly informs users, within the connection dialog, that by connecting they are allowing the DApp to view their wallet balance and activity, as well as to request transaction approvals."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-8cce80b9.png",
+                        "zerion-browser-1.30.0-25db958d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't emit any warnings when trying to send a transaction to an unknown address."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-1640a474.png",
+                        "zerion-browser-1.30.0-f96e001f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet truncates the website URL when it detects a phishing url"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-002~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-ae1e7862.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Requires the user to unlock the wallet before processing each DApp request"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073854135
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-5689f915.png",
+                        "zerion-browser-1.30.0-af30f913.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't warn the user about the mismatching chain ID."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-a856e085.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It shows all connected DApps and also the chance to revoke access to them"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-d220bafa.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It includes token, effect, allowance, and contract spender address."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-19e4a4a6.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It doesn\u00b4t require user confirmation before processing the method"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-e0fd0deb.png",
+                        "zerion-browser-1.30.0-33bcf45e.png",
+                        "zerion-browser-1.30.0-0f533e51.png",
+                        "zerion-browser-1.30.0-ac520cc6.png",
+                        "zerion-browser-1.30.0-6236b00c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays all the information in a JSON without parsing."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-443a278e.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not include functionality to revoke approvals; it only allows users to view them."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-PERM-010~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-78e9edc7.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Requires user confirmation before processing each DApp request"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073875210
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-9789f8a1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet hides spam or scam tokens and NFTs sent to the wallet."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-7ef06999.png",
+                        "zerion-browser-1.30.0-25d561e8.png",
+                        "zerion-browser-1.30.0-aa21124f.png",
+                        "zerion-browser-1.30.0-3dd9a64c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The sign button is always available"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-006~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-caf7e8da.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet's default lock time is more than 20 minutes"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073891383
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-6a3f58dd.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet has a \"Lock Button\"."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-b80fece1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The 'eth_sign' method is disabled by default"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-43448139.png",
+                        "zerion-browser-1.30.0-441f14df.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "After clicking the 'Recovery phrase' button, the wallet requires a password to display the mnemonics or private keys."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-browser-1.30.0-1ece9778.png",
+                        "zerion-browser-1.30.0-910914a4.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It tells you it's risky to share your secret words or private keys with others. These alerts appear before the mnemonic viewing process."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}

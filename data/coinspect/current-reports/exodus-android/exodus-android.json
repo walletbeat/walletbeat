@@ -1,0 +1,780 @@
+{
+    "wallet": "Exodus",
+    "platform": "Android",
+    "version": "25.43.16",
+    "date": "2025-12-12T13:54:35.964Z",
+    "walletUID": "exodus-android",
+    "walletMakerUID": "exodus",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-11749e3d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not enable biometrics or passphrases by default. Users must manually configure these options in the settings, starting with setting up a passphrase before enabling biometrics. It allows an easy-to-guess passphrase that rate-limits failed authentication attempts to 5, after which a 2-minute cooldown period is enforced."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-6e08e5e8.png",
+                        "exodus-android-25.43.16-ca909a19.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not feature a manual lock button."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-bfef009c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Passphrase or biometrics are disabled by default, meaning the wallet remains unlocked if not configured. Once configured, the wallet locks after one minute of inactivity."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-eed146bc.png",
+                        "exodus-android-25.43.16-07142963.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows users to complete the setup process without enabling biometrics or setting up a passphrase. Additionally, it does not proactively suggest adding a passphrase for enhanced security. As a result, users can access and view their mnemonics without being prompted for any form of authentication. If biometrics or a passphrase is configured, it will ask for user authentication before showing the seed phrase."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-ef83afb8.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet warns users about the risks associated with sharing or revealing mnemonics/private keys."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073810696
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-8a6b7a01.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not allow copying mnemonics to the clipboard and also prevents users from taking screenshots."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-fa8899a8.png",
+                        "exodus-android-25.43.16-82253d4b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet hides spam or scam tokens and NFTs sent to the wallet."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-bb467d0e.png",
+                        "exodus-android-25.43.16-963b1302.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not offer the ability to list and revoke token approvals, via in-app functionality or through links to external dApps."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-140c0a7b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not alert about connections to known phishing dApps."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-4d1813ab.png",
+                        "exodus-android-25.43.16-d659cedc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not inform users when they are interacting with well-known, verified dApps."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-cf5dbe83.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the full dApp origin URL, without truncation, within the connection dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-b83cf27b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not inform users, within the connection dialog, that by connecting they are allowing the dApp to view their wallet balance and activity, as well as to request transaction approvals."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-06842851.png",
+                        "exodus-android-25.43.16-2597fa01.png",
+                        "exodus-android-25.43.16-4d8f5537.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lists connected dApps and allows effective access revocation."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-098e4974.png",
+                        "exodus-android-25.43.16-b5f76263.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet has eth_sign enabled and working."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-5dd95fa6.png",
+                        "exodus-android-25.43.16-2f4b70a6.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet enforces user confirmation for every request. While `wallet_watchAsset` and `wallet_addEthereumChain` may return a success response when bypassed, the wallet does not actually add the requested asset or chain."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-b668dd6c.png",
+                        "exodus-android-25.43.16-66fcad02.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not prompt the user for confirmation when switching networks, and it does not provide a way to modify networks within the connection dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-cd19d61b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet has Wallet Connect and requires user confirmation before processing each request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData*, personal_sign, eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-45799c01.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not process any requests while in a locked state. Once unlocked, it does not display or resume any of the requests that were made prior to unlocking."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-e51ca5eb.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet only provides the spender address."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-9d0a618b.png",
+                        "exodus-android-25.43.16-b944a2ff.png",
+                        "exodus-android-25.43.16-0940ee76.png",
+                        "exodus-android-25.43.16-20bb50a4.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not truncate large messages in a personal sign, but it does not display the verifying contract in an EIP-712 object."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-272d5519.png",
+                        "exodus-android-25.43.16-525327be.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes clickable links when viewing the wallet history, but it does not provide any within the transaction preview when attempting to send a transaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-a170e076.png",
+                        "exodus-android-25.43.16-09cfb82c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not parse EIP-712 objects and instead displays the raw, unparsed data."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-69cb7695.png",
+                        "exodus-android-25.43.16-10876eb8.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Sign buttons are always enabled."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-ffa9eb45.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not offer transaction simulation."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-b946f181.png",
+                        "exodus-android-25.43.16-fc42c1cc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet refuses to sign an EIP-712 object with a chainId that does not match the currently active chain."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-e0d29012.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn users when they are not interacting with a previously known or trusted address."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-37c7cd42.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn or prevent users from interacting with a known phishing address, such as the Tornado Cash attacker."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-6a49df7b.png",
+                        "exodus-android-25.43.16-2bddc235.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn users of a domain or scheme mismatch when signing an EIP-4361 (Sign in With Ethereum - SIWE) message."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-android-25.43.16-f776afe6.png",
+                        "exodus-android-25.43.16-0bc7b5f0.png",
+                        "exodus-android-25.43.16-e75e1ef0.png",
+                        "exodus-android-25.43.16-15ebbf0d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn or block transactions to addresses with invalid checksums when using a dApp. However, it does provide warnings and prevents the transaction when the address is entered manually."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073195124
+        }
+    ]
+}
