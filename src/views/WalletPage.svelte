@@ -2393,6 +2393,8 @@
 				.pie-navigation-placement {
 					margin-inline: auto;
 					translate: none;
+					overflow: clip;
+					border-radius: 50%;
 				}
 
 				&::before {
@@ -2405,8 +2407,6 @@
 						(position-anchor: --wallet-name) and
 						(inset-inline-start: anchor(--wallet-name end))
 				) {
-					z-index: auto;
-
 					.pie-navigation-placement {
 						z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
 						pointer-events: none;
