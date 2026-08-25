@@ -1813,7 +1813,7 @@
 		);
 		---wallet-page-block-offset: 0px;
 		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
-		---wallet-breadcrumb-surface-backdrop-filter: blur(20px);
+		---wallet-breadcrumb-surface-backdrop-filter: none;
 		---wallet-breadcrumb-layer-root: 20;
 		---wallet-breadcrumb-layer-group: 21;
 		---wallet-breadcrumb-layer-attribute: 22;
@@ -1868,10 +1868,6 @@
 		scroll-behavior: auto;
 		anchor-scope: --wallet-footer;
 		timeline-scope: --wallet-footer-entry;
-
-		@media (prefers-reduced-transparency: reduce) {
-			---wallet-breadcrumb-surface-backdrop-filter: none;
-		}
 
 		&:dir(rtl) {
 			---wallet-inline-translate-direction: -1;
