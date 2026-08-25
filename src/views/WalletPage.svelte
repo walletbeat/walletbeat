@@ -1485,7 +1485,6 @@
 			entry calc(100% - var(---wallet-breadcrumb-row-block-size))
 			entry 100%;
 		---wallet-breadcrumb-crossing-offset: 0px;
-		---wallet-breadcrumb-attribute-arrival-offset: 0px;
 		---wallet-group-icon-size: 2rem;
 		---wallet-group-header-padding-block: 0px;
 		---wallet-group-heading-font-size: var(---wallet-breadcrumb-group-font-size);
@@ -1828,6 +1827,7 @@
 				+ var(---wallet-breadcrumb-block-size)
 		);
 		---wallet-summary-companions-row-block-size: 0px;
+		---wallet-breadcrumb-attribute-arrival-offset: 0px;
 		---wallet-attribute-row-block-size: calc(
 			var(---wallet-breadcrumb-row-block-size)
 				+ var(---wallet-summary-companions-row-block-size)
@@ -2534,6 +2534,10 @@
 				flex-basis: 100%;
 				justify-content: end;
 				padding-inline-end: var(---wallet-breadcrumb-trailing-control-inline-clearance);
+			}
+
+			.attribute > details > summary {
+				padding-inline-end: var(---wallet-breadcrumb-inline-end);
 			}
 		}
 	}
