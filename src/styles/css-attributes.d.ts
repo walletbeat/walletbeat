@@ -1015,6 +1015,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-animationTimingFunction`
 	 * - `--stickyBreadcrumb-gap`
 	 * - `--stickyBreadcrumb-position-minBlockSize`
+	 * - `--stickyBreadcrumb-viewTimelineBlockSize`
 	 * - `--stickyBreadcrumb-item-insetBlockStart`
 	 * - `--stickyBreadcrumb-item-blockOffset`
 	 * - `--stickyBreadcrumb-item-blockSize`

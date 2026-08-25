@@ -1268,7 +1268,7 @@
 					data-sticky-breadcrumb="scope"
 				>
 					<summary
-						data-sticky="block block-start backdrop-before backdrop-stuck"
+						data-sticky="block block-start backdrop-self backdrop-stuck"
 						data-sticky-breadcrumb="exit"
 						data-sticky-row-backdrop="detail"
 					>
@@ -1303,7 +1303,7 @@
 					data-sticky-breadcrumb="scope"
 				>
 					<summary
-						data-sticky="block block-start backdrop-before backdrop-stuck"
+						data-sticky="block block-start backdrop-self backdrop-stuck"
 						data-sticky-breadcrumb="exit"
 						data-sticky-row-backdrop="detail"
 					>
@@ -1413,7 +1413,7 @@
 						data-sticky-breadcrumb="scope"
 					>
 						<summary
-							data-sticky="block block-start backdrop-before backdrop-stuck"
+							data-sticky="block block-start backdrop-self backdrop-stuck"
 							data-sticky-breadcrumb="exit"
 							data-sticky-row-backdrop="detail"
 						>
@@ -1812,10 +1812,7 @@
 			* 1rem
 		);
 		---wallet-page-block-offset: 0px;
-		---wallet-breadcrumb-surface-background: light-dark(
-			rgb(248 237 255 / 0.9),
-			rgb(19 10 43 / 0.86)
-		);
+		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
 		---wallet-breadcrumb-surface-backdrop-filter: blur(20px);
 		---wallet-breadcrumb-layer-root: 20;
 		---wallet-breadcrumb-layer-group: 21;
@@ -1873,7 +1870,6 @@
 		timeline-scope: --wallet-footer-entry;
 
 		@media (prefers-reduced-transparency: reduce) {
-			---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
 			---wallet-breadcrumb-surface-backdrop-filter: none;
 		}
 
@@ -2428,6 +2424,16 @@
 					content: none;
 				}
 
+				@supports not (
+					((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+						(container-type: scroll-state) and
+						(position-anchor: --wallet-name) and
+						(inset-inline-start: anchor(--wallet-name end))
+				) {
+					position: relative;
+					inset: auto;
+				}
+
 				@supports (
 					((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
 						(container-type: scroll-state) and
@@ -2588,6 +2594,7 @@
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		:is(
+			.stage-heading-position,
 			.attribute-group-heading-position,
 			.attribute-heading-position
 		)[data-sticky-breadcrumb~='position'] {
@@ -2657,6 +2664,7 @@
 			--stickyBreadcrumb-gap: var(---wallet-breadcrumb-gap);
 			--stickyBreadcrumb-item-insetBlockStart: var(---wallet-icon-sticky-block-start);
 			--stickyBreadcrumb-item-blockSize: var(---wallet-breadcrumb-block-size);
+			--stickyBreadcrumb-viewTimelineBlockSize: var(---wallet-breadcrumb-row-block-size);
 			--stickyBreadcrumb-trackBlockEnd: calc(
 				var(---wallet-icon-sticky-block-start)
 				+ var(---wallet-breadcrumb-block-size)
@@ -3648,12 +3656,17 @@
 		---wallet-breadcrumb-heading-flow-translate: 0px;
 		view-timeline-name:
 			--wallet-stage-timeline,
-			--sticky-breadcrumb-timeline,
 			--sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
 
 		> header {
 			padding-block: var(---wallet-group-header-padding-block);
+		}
+	}
+
+	@media (max-width: 1024px) {
+		[data-sticky-breadcrumb='scope'] > header[data-sticky-breadcrumb='exit'] + [data-scroll-item] {
+			margin-block-start: var(---wallet-breadcrumb-block-size);
 		}
 	}
 
@@ -3684,6 +3697,16 @@
 	[data-sticky-row-backdrop='detail'] {
 		--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
 		--sticky-backdropFilter: var(---wallet-breadcrumb-surface-backdrop-filter);
+	}
+
+	@media (max-width: 1024px) {
+		:is(
+			[data-sticky-row-backdrop='group'],
+			[data-sticky-row-backdrop='attribute']
+		)[data-sticky] {
+			background-color: var(--sticky-backgroundColor);
+			backdrop-filter: var(--sticky-backdropFilter);
+		}
 	}
 
 	:is(
@@ -4142,11 +4165,20 @@
 			}
 		}
 
+		@media (max-width: 1024px) {
+			:is(
+				#stages > header[data-sticky],
+				.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-sticky],
+				.attribute > details[open] > summary[data-sticky]
+			) {
+				position: relative;
+				inset: auto;
+			}
+		}
+
 		.attribute-accordions details > summary[data-sticky] {
-			--sticky-insetBlockStart: calc(
-				var(---wallet-group-sticky-block-end)
-					+ var(---wallet-fallback-attribute-sticky-block-size)
-			);
+			position: relative;
+			inset: auto;
 		}
 
 	}
