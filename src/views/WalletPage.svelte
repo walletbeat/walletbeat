@@ -1557,6 +1557,13 @@
 							+ var(---wallet-mobile-pie-size)
 					) / 2
 			);
+			---wallet-mobile-pie-inline-translate: calc(
+				(
+					var(---wallet-mobile-pie-target-inline-start)
+						- var(---wallet-mobile-pie-flow-inline-start)
+				)
+					* var(---wallet-inline-translate-direction)
+			);
 			---wallet-mobile-pie-inline-clearance: calc(
 				var(---wallet-mobile-pie-size)
 					+ 0.5rem
@@ -2363,7 +2370,8 @@
 		}
 
 		@media (max-width: 1024px) {
-			.container .page-navigation {
+			.container aside.page-navigation {
+				display: contents;
 				padding-block-start: 0;
 				--sticky-marginBlockStart: 0px;
 			}
@@ -2374,8 +2382,8 @@
 
 				z-index: calc(var(---wallet-breadcrumb-layer-detail) + 1);
 				anchor-name: --wallet-mobile-pie-flow;
+				--sticky-insetBlockStart: var(--navigation-mobile-blockSize);
 				flex: 0 0 var(---wallet-mobile-pie-flow-size);
-				inset-block-start: 0;
 				inset-inline: 0;
 				inline-size: 100%;
 				block-size: var(---wallet-mobile-pie-flow-size);
@@ -2401,10 +2409,8 @@
 
 					.pie-navigation-placement {
 						z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
-						position: fixed;
-						inset-inline-start: var(---wallet-mobile-pie-flow-inline-start);
 						pointer-events: none;
-						transform-origin: center;
+						transform-origin: center top;
 						animation: WalletMobilePiePlacement linear both;
 						animation-timeline: --wallet-stage-timeline;
 						animation-range: entry 60% entry 100%;
@@ -2412,9 +2418,8 @@
 
 					@media (prefers-reduced-motion: reduce) {
 						.pie-navigation-placement {
-							inset-block-start: var(---wallet-mobile-pie-target-block-start);
-							inset-inline-start: var(---wallet-mobile-pie-target-inline-start);
 							animation: none;
+							translate: var(---wallet-mobile-pie-inline-translate) 0;
 							scale: var(---wallet-mobile-pie-scale);
 						}
 					}
@@ -2425,10 +2430,7 @@
 				.page-navigation:has(.page-navigation-panel:popover-open)
 				> .pie-navigation[data-sticky] {
 				.pie-navigation-placement {
-					position: fixed;
-					inset-block-start: var(---wallet-mobile-pie-target-block-start);
-					inset-inline-start: var(---wallet-mobile-pie-target-inline-start);
-					translate: none;
+					translate: var(---wallet-mobile-pie-inline-translate) 0;
 					scale: var(---wallet-mobile-pie-scale);
 					animation: none;
 				}
@@ -2437,27 +2439,12 @@
 
 		@keyframes WalletMobilePiePlacement {
 			from {
-				inset-block-start: calc(
-					anchor(--wallet-mobile-pie-flow top)
-						+ (
-							var(--navigation-mobile-blockSize)
-								- var(---wallet-mobile-pie-size)
-						) / 2
-				);
 				translate: none;
 				scale: 1;
 			}
 
 			to {
-				inset-block-start: var(---wallet-mobile-pie-target-block-start);
-				translate: calc(
-					(
-						var(---wallet-mobile-pie-target-inline-start)
-							- var(---wallet-mobile-pie-flow-inline-start)
-					)
-						* var(---wallet-inline-translate-direction)
-				)
-					0;
+				translate: var(---wallet-mobile-pie-inline-translate) 0;
 				scale: var(---wallet-mobile-pie-scale);
 			}
 		}
