@@ -687,6 +687,7 @@
 		"**/fonts/**/*.svg",
 		"data/software-wallets/manifests/**",
 		"data/collection/global.annotations.json",
+		"data/coinspect/current-reports/**",
 		"data/entities/domains/entity-domains.json",
 		"data/*-wallets/collection/*/*.json",
 		"dist/**",

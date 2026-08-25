@@ -45,6 +45,7 @@
 		"fix": "pnpm run lint && pnpm run check:treasury:markdown && pnpm run wallet-data-collection lint-fix && pnpm run check:features:markdown && pnpm run generate:css-attributes && pnpm run generate:wbicons",
 		"helios": "deploy/helios/helios.sh",
 		"helios:wrap": "deploy/helios/helios-wrap.sh",
+		"coinspect:update": "deploy/coinspect/coinspect-update.sh",
 		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts",
 		"deploy:4everland-pin-tool": "tsx src/4everland-pin-tool/4everland-pin-tool.ts",
 		"deploy:ens-content-hash-check": "tsx src/tools/ens-content-hash-checker/ens-content-hash-checker.ts",
