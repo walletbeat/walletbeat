@@ -744,6 +744,8 @@
 
 			<section id="stages" data-sticky-breadcrumb="scope">
 				<header
+					data-sticky-breadcrumb="exit"
+					data-sticky-row-backdrop="group"
 					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-row
 					data-scroll-item="inline-detached"
@@ -873,6 +875,8 @@
 				style:---pie-timeline={pieRotation.timelineByHref.get(href)}
 			>
 				<header
+					data-sticky-breadcrumb="exit"
+					data-sticky-row-backdrop="group"
 					data-sticky="block block-start backdrop-before backdrop-stuck"
 					data-row="start gap-4"
 					data-scroll-item="inline-detached"
@@ -1001,6 +1005,8 @@
 		>
 			<summary
 				data-row
+				data-sticky-breadcrumb="exit"
+				data-sticky-row-backdrop="attribute"
 				data-sticky="block block-start backdrop-before backdrop-stuck"
 			>
 				<header
@@ -1248,10 +1254,14 @@
 					data-sticky-container
 					data-sticky-breadcrumb="scope"
 				>
-					<summary data-sticky="block block-start backdrop-before backdrop-stuck">
+					<summary
+						data-sticky="block block-start backdrop-before backdrop-stuck"
+						data-sticky-breadcrumb="exit"
+						data-sticky-row-backdrop="detail"
+					>
 						<h4
 							id={`${id}-why-heading`}
-							data-sticky-breadcrumb="item mobile"
+							data-sticky-breadcrumb="item"
 						>
 							<a data-link="camouflaged" href={`#${id}-why`}>
 								{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
@@ -1279,10 +1289,14 @@
 					data-sticky-container
 					data-sticky-breadcrumb="scope"
 				>
-					<summary data-sticky="block block-start backdrop-before backdrop-stuck">
+					<summary
+						data-sticky="block block-start backdrop-before backdrop-stuck"
+						data-sticky-breadcrumb="exit"
+						data-sticky-row-backdrop="detail"
+					>
 						<h4
 							id={`${id}-methodology-heading`}
-							data-sticky-breadcrumb="item mobile"
+							data-sticky-breadcrumb="item"
 						>
 							<a data-link="camouflaged" href={`#${id}-methodology`}>
 								{getHowIsEvaluatedHeading(attribute)}
@@ -1385,10 +1399,14 @@
 						data-sticky-container
 						data-sticky-breadcrumb="scope"
 					>
-						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
+						<summary
+							data-sticky="block block-start backdrop-before backdrop-stuck"
+							data-sticky-breadcrumb="exit"
+							data-sticky-row-backdrop="detail"
+						>
 							<h4
 								id={`${id}-improvement-heading`}
-								data-sticky-breadcrumb="item mobile"
+								data-sticky-breadcrumb="item"
 							>
 								<a data-link="camouflaged" href={`#${id}-improvement`}>
 									{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
@@ -1785,7 +1803,7 @@
 		---wallet-breadcrumb-layer-attribute: 22;
 		---wallet-breadcrumb-layer-detail: 23;
 		---wallet-sticky-content-inset: 1rem;
-		---wallet-name-sticky-icon-size: 2rem;
+		---wallet-name-sticky-icon-size: 32px;
 		---wallet-name-flow-icon-size: 3rem;
 		---wallet-name-flow-font-size: 2.25rem;
 		---wallet-name-scale: calc(
@@ -1855,7 +1873,6 @@
 			---wallet-breadcrumb-gap: 1.25rem;
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 			---wallet-root-row-block-size: var(--navigation-mobile-blockSize);
-			---wallet-name-sticky-icon-size: 2.4rem;
 			---wallet-breadcrumb-root-font-size: 1.25rem;
 			---wallet-sticky-content-inset: calc(
 				(
@@ -2557,12 +2574,13 @@
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
 		.attribute > details {
 			/* The non-sticky attribute scope publishes the synchronized breadcrumb
-			 * and pie tracks; the sticky summary only consumes them. */
-			view-timeline-name:
+			 * arrival, pie, and exit tracks; the sticky summary only consumes them. */
+			--stickyBreadcrumb-additionalViewTimelineNames:
 				--sticky-breadcrumb-timeline,
 				var(---pie-timeline, none);
-			view-timeline-axis: block;
-			view-timeline-inset: var(---wallet-attribute-row-block-start) 0;
+			--stickyBreadcrumb-additionalViewTimelineInsets:
+				var(---wallet-attribute-row-block-start) 0,
+				var(---wallet-attribute-row-block-start) 0;
 		}
 
 		:is(
@@ -2656,6 +2674,17 @@
 			.container {
 				---wallet-group-header-padding-block: 1rem;
 				---wallet-group-heading-font-size: 1.8rem;
+				---wallet-group-flow-row-block-size: calc(
+					2 * var(---wallet-group-header-padding-block)
+						+ var(---wallet-group-heading-font-size)
+							* var(---wallet-line-height)
+				);
+				---wallet-group-sticky-content-block-translate: calc(
+					(
+						var(---wallet-breadcrumb-row-block-size)
+							- var(---wallet-group-flow-row-block-size)
+					) / 2
+				);
 				---wallet-group-icon-size: calc(
 					var(---wallet-group-heading-font-size)
 						* var(---wallet-line-height)
@@ -2683,14 +2712,20 @@
 				z-index: var(---wallet-breadcrumb-layer-group);
 				overflow: visible;
 				max-block-size: none;
+				pointer-events: none;
 
-				&::before {
-					content: none;
+				a {
+					pointer-events: auto;
 				}
+
 			}
 
-			.attribute > details > summary[data-sticky]::before {
+			[data-sticky-row-backdrop]::before {
 				content: none;
+			}
+
+			[data-sticky-row-backdrop='detail']::before {
+				content: '';
 			}
 
 		}
@@ -2957,6 +2992,12 @@
 			}
 		}
 
+		@keyframes WalletBreadcrumbGroupRowAlignment {
+			to {
+				translate: 0 var(---wallet-group-sticky-content-block-translate);
+			}
+		}
+
 		:is(.section-caption, .subsection-caption) {
 			animation: BreadcrumbFlowContentAnimation var(--stickyBreadcrumb-animationTimingFunction) both;
 			animation-timeline: --sticky-breadcrumb-timeline;
@@ -3038,11 +3079,17 @@
 				}
 			}
 
-			:is(
-				#stages > header[data-sticky],
-				.attribute-group > .attribute-group-stack > header[data-sticky]
-			)::before {
+			[data-sticky-row-backdrop='group']::before {
 				content: '';
+			}
+
+			:is(
+				.stage-heading-position,
+				.attribute-group-heading-position
+			) > [data-sticky-breadcrumb~='item'] {
+				animation: WalletBreadcrumbGroupRowAlignment linear both;
+				animation-timeline: --sticky-breadcrumb-timeline;
+				animation-range: var(---wallet-breadcrumb-animation-range);
 			}
 		}
 
@@ -3055,7 +3102,7 @@
 				}
 			}
 
-			.attribute > details > summary[data-sticky]::before {
+			[data-sticky-row-backdrop='attribute']::before {
 				content: '';
 			}
 		}
@@ -3563,19 +3610,30 @@
 	:is(
 		#stages > header,
 		.attribute-group > .attribute-group-stack > header
-	)[data-sticky]::before {
-		inset-block: calc(-1 * var(---wallet-breadcrumb-surface-fade));
-		inset-inline: 0;
-		-webkit-mask-image: linear-gradient(
-			to top,
-			transparent,
-			white var(---wallet-breadcrumb-surface-fade)
-		);
-		mask-image: linear-gradient(
-			to top,
-			transparent,
-			white var(---wallet-breadcrumb-surface-fade)
-		);
+	)[data-sticky-row-backdrop='group'] {
+		--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
+		--sticky-backdropFilter: var(---wallet-breadcrumb-surface-backdrop-filter);
+
+		&::before {
+			inset-block: 0 auto;
+			inset-inline: 0;
+			block-size: var(---wallet-breadcrumb-row-block-size);
+		}
+	}
+
+	[data-sticky-row-backdrop='attribute'] {
+		--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
+		--sticky-backdropFilter: var(---wallet-breadcrumb-surface-backdrop-filter);
+
+		&::before {
+			inset-block: 0 auto;
+			block-size: var(---wallet-attribute-row-block-size);
+		}
+	}
+
+	[data-sticky-row-backdrop='detail'] {
+		--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
+		--sticky-backdropFilter: var(---wallet-breadcrumb-surface-backdrop-filter);
 	}
 
 	:is(
@@ -3740,12 +3798,24 @@
 		}
 
 		@media (max-width: 480px) {
+			> details > summary {
+				padding-block: var(---wallet-sticky-content-inset);
+			}
+
 			.attribute-heading-row {
 				flex-wrap: wrap;
+				row-gap: var(---wallet-breadcrumb-mobile-row-gap);
+
+				> a {
+					align-items: center;
+					min-block-size: var(---wallet-breadcrumb-block-size);
+				}
 			}
 
 			.attribute-summary-companions {
 				flex-basis: 100%;
+				align-items: center;
+				min-block-size: 2rem;
 				max-inline-size: 100%;
 				padding-inline-start: calc(
 					var(---wallet-breadcrumb-heading-icon-size)

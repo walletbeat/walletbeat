@@ -995,7 +995,7 @@ interface CssAttributes {
 	 * Flow-native scroll-driven sticky breadcrumbs. A page's real sticky row owns block positioning;
 	 * this attribute supplies repeatable arrival/exit timelines and the zero-shift marker slot for the
 	 * real heading item. A `position` remains in regular layout and publishes the arrival timeline;
-	 * a `scope` publishes the shared fly-up exit timeline.
+	 * a `scope` publishes the shared fly-up exit timeline; an `exit` row consumes that timeline.
 	 *
 	 * This is a progressive enhancement. Without scroll timelines every item remains in regular
 	 * document flow and the page's simpler native sticky layout remains authoritative.
@@ -1004,8 +1004,8 @@ interface CssAttributes {
 	 * - `root`: first breadcrumb item; not repositioned by this primitive
 	 * - `scope`: visibility boundary for descendant items
 	 * - `position`: regular-layout position anchor and view-timeline source
-	 * - `item`: real breadcrumb heading/link and shared exit-animation consumer
-	 * - `mobile`: enable the paired role only through the layout mobile breakpoint
+	 * - `item`: real breadcrumb heading/link and zero-shift marker owner
+	 * - `exit`: complete sticky row, including companions and backdrop, that leaves with its scope
 	 *
 	 * The item itself remains `position: relative`; the page's sticky row and in-flow adjacency slot
 	 * own layout. The primitive never changes position mode or removes a heading from flow.
@@ -1020,6 +1020,8 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-item-blockSize`
 	 * - `--stickyBreadcrumb-trackBlockEnd`
 	 * - `--stickyBreadcrumb-exitAnimationDistance`
+	 * - `--stickyBreadcrumb-additionalViewTimelineNames`
+	 * - `--stickyBreadcrumb-additionalViewTimelineInsets`
 	 *
 	 * ### Example
 	 * ```html
