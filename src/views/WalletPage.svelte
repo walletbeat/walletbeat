@@ -3805,6 +3805,12 @@
 					column-gap: 0.5rem;
 					row-gap: 0.25rem;
 				}
+
+				> :not(.attribute-group-heading) {
+					flex: none;
+					margin-inline-start: auto;
+					white-space: nowrap;
+				}
 			}
 
 			h2 {
@@ -3831,15 +3837,18 @@
 		---wallet-breadcrumb-icon-scale: 1;
 
 		.attribute-summary-companions {
-			flex: 0 1 auto;
-			inline-size: max-content;
-			max-inline-size: min(50vi, 100%);
+			flex: 1 1 12rem;
+			inline-size: auto;
+			max-inline-size: 100%;
 			min-inline-size: 0;
 			margin-inline-start: auto;
 			justify-content: end;
+			align-content: start;
+			row-gap: 0.375rem;
 
 			> * {
 				flex: none;
+				max-inline-size: 100%;
 				white-space: nowrap;
 			}
 		}
