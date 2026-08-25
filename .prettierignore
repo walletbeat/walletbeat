@@ -1,4 +1,5 @@
 *.css
+*.snippet
 .playwright-cli/
 .pnpm-store/
 data/*-wallets/collection/*

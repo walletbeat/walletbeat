@@ -59,6 +59,8 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.tsv',
 	'.yaml',
 	'.toml',
+	// Stored code snippets from external repositories,
+	'.snippet',
 ])
 
 /** Filenames that are allowed without a recognized extension. */
