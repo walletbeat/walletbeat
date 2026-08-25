@@ -107,6 +107,7 @@
 		"remark-lint-no-literal-urls": "^4.0.1",
 		"remark-preset-lint-recommended": "^7.0.1",
 		"sax": "^1.6.1",
+		"shiki": "^4.4.3",
 		"svgo": "^4.0.2",
 		"svgtofont": "^6.5.3",
 		"tsx": "^4.23.1",
