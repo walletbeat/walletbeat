@@ -5,12 +5,19 @@ import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+} from '@/schema/features/security/bug-bounty-program'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { TransactionSubmissionL2Support, TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
@@ -92,9 +99,9 @@ export const phantom: SoftwareWallet = {
 			nonChainSpecificEnsResolution: notSupported,
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: notSupported,
 		ecosystem: {
-			delegation: null,
+			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},
 		integration: {
 			browser: {
@@ -162,7 +169,7 @@ export const phantom: SoftwareWallet = {
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY
 			},
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: securityAudits,
