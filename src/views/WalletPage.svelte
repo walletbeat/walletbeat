@@ -1479,11 +1479,9 @@
 		---wallet-breadcrumb-heading-flow-translate: 0px;
 		---wallet-breadcrumb-trailing-control-inline-clearance: 0px;
 		---wallet-attribute-heading-font-size: 1.17em;
-		/* The leading edge supplies one shared arrival interval. It ends exactly
-		 * when the native sticky owner reaches its lane. */
-		---wallet-breadcrumb-animation-range:
-			entry calc(100% - var(---wallet-breadcrumb-row-block-size))
-			entry 100%;
+		/* The effective view-timeline viewport is the sticky lane itself, so its
+		 * complete entry phase is the one shared arrival interval. */
+		---wallet-breadcrumb-animation-range: entry 0% entry 100%;
 		---wallet-breadcrumb-crossing-offset: 0px;
 		---wallet-group-icon-size: 2rem;
 		---wallet-group-header-padding-block: 0px;
@@ -2575,20 +2573,14 @@
 	}
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+		:is(
+			.attribute-group-heading-position,
+			.attribute-heading-position
+		)[data-sticky-breadcrumb~='position'] {
 			/* Heading and pie consume the same source and arrival range. */
 			view-timeline-name:
 				--sticky-breadcrumb-timeline,
 				var(---pie-timeline, none);
-		}
-
-		:is(
-			.stage-heading-position,
-			.attribute-group-heading-position
-		)[data-sticky-breadcrumb~='position'] {
-			/* Its sticky header cannot exit-cross the viewport. The non-sticky
-			 * section or group stack owns the shared breadcrumb/pie timeline. */
-			view-timeline-name: none;
 		}
 
 		@keyframes WalletBreadcrumbRevealAnimation {
@@ -2633,14 +2625,6 @@
 
 		.attribute-group-stack {
 			timeline-scope: --sticky-breadcrumb-timeline;
-			view-timeline-name:
-				--sticky-breadcrumb-timeline,
-				var(---pie-timeline, none);
-			view-timeline-axis: block;
-		}
-
-		:is(#stages, .attribute-group-stack) {
-			view-timeline-inset: var(---wallet-group-container-block-start) 0;
 		}
 
 		#stages {
@@ -3331,10 +3315,10 @@
 			}
 
 			.attribute-heading-position[data-sticky-breadcrumb~='position'] {
-				view-timeline-inset: calc(
+				---stickyBreadcrumb-viewTimelineBlockStart: calc(
 					var(---wallet-attribute-row-block-start)
 						- var(---wallet-group-header-padding-block)
-				) 0;
+				);
 				--stickyBreadcrumb-item-blockOffset: var(
 					---wallet-breadcrumb-attribute-row-offset
 				);

@@ -1270,15 +1270,23 @@ ol {
 	}
 
 	[data-sticky-breadcrumb~="position"] {
+		---stickyBreadcrumb-viewTimelineBlockStart: calc(
+			var(--stickyBreadcrumb-item-insetBlockStart, 0px)
+				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+		);
 		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
 		view-timeline-name: --sticky-breadcrumb-timeline;
 		view-timeline-axis: block;
 		view-timeline-inset:
+			var(---stickyBreadcrumb-viewTimelineBlockStart)
 			calc(
-				var(--stickyBreadcrumb-item-insetBlockStart, 0px)
-				+ var(--stickyBreadcrumb-item-blockOffset, 0px)
-			)
-			0;
+				100%
+					- var(---stickyBreadcrumb-viewTimelineBlockStart)
+					- var(
+						--stickyBreadcrumb-position-minBlockSize,
+						var(--stickyBreadcrumb-item-blockSize, 1lh)
+					)
+			);
 	}
 
 	[data-sticky-breadcrumb~="item"]:not([data-sticky-breadcrumb~="root"]) {
