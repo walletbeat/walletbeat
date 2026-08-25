@@ -15,6 +15,10 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import {
@@ -28,10 +32,6 @@ import { Variant } from '@/schema/variants'
 
 import { kudelskiSecurity } from '../entities/kudelski-security'
 import { leastAuthority } from '../entities/least-authority'
-import {
-	KeyGenerationLocation,
-	MultiPartyKeyReconstruction,
-} from '@/schema/features/security/keys-handling'
 
 const securityAudits: SecurityAudit[] = [
 	{
