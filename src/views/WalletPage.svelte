@@ -3849,8 +3849,8 @@
 
 		.attribute-summary-companions {
 			box-sizing: border-box;
-			flex: 1 1 12rem;
-			inline-size: auto;
+			flex: 0 1 max-content;
+			inline-size: max-content;
 			max-inline-size: 100%;
 			min-inline-size: 0;
 			margin-inline-start: auto;
