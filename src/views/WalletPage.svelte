@@ -4000,7 +4000,10 @@
 		}
 
 		.attribute-target {
-			scroll-margin-block-start: var(---wallet-fallback-group-sticky-block-size);
+			scroll-margin-block-start: calc(
+				var(---wallet-fallback-group-sticky-block-size)
+					+ var(---wallet-fallback-attribute-heading-block-size)
+			);
 		}
 
 		:is(
