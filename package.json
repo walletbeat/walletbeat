@@ -46,6 +46,7 @@
 		"helios": "deploy/helios/helios.sh",
 		"helios:wrap": "deploy/helios/helios-wrap.sh",
 		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts",
+		"collect:snippets": "tsx src/tools/code-snippet-collector/code-snippet-collector.ts",
 		"deploy:4everland-pin-tool": "tsx src/4everland-pin-tool/4everland-pin-tool.ts",
 		"deploy:ens-content-hash-check": "tsx src/tools/ens-content-hash-checker/ens-content-hash-checker.ts",
 		"wallet-data-collection": "cross-env WALLETBEAT_ENV=HUMAN tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts",
