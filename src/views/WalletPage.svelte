@@ -2091,12 +2091,6 @@
 		initial-value: 1;
 	}
 
-	@property ---slice-current-correction {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 0deg;
-	}
-
 	@property ---pie-start-angle {
 		syntax: "<angle>";
 		inherits: true;
@@ -2323,7 +2317,7 @@
 					))
 					scale(var(---slice-scale))
 					translateY(calc(var(--slice-offset) * -1px));
-				transition-property: opacity, ---slice-scale, ---slice-current-correction;
+				transition-property: opacity, ---slice-scale;
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current, [aria-current='page'])) {
