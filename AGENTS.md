@@ -174,7 +174,7 @@ The final requirement supersedes the earlier “never wrap” interpretation:
 5. `:target-current` and related target state must invalidate correctly.
 6. Direct hash navigation must immediately converge on the correct current slice.
 7. Opening or closing the TOC must not corrupt the active slice.
-8. Current items remain interactable where interaction is intended.
+8. Current items remain interactive where interaction is intended.
 9. Pointer-event handling must not block unrelated controls or content.
 
 ## 14. Hash navigation and scroll ownership
@@ -223,7 +223,7 @@ The final requirement supersedes the earlier “never wrap” interpretation:
 4. Firefox, WebKit, and Chromium must all remain usable and geometrically correct.
 5. Reduced motion disables decorative interpolation while retaining correct final layout and hierarchy.
 6. Reduced transparency removes blur while retaining an opaque, readable backdrop.
-7. Production minification must preserve valid `animation-timeline` longhands.
+7. Production minification must preserve valid `animation-timeline` longhand properties.
 8. Production-preview behavior must match development behavior.
 
 ## 17. Layout and visual robustness
