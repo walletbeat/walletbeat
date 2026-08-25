@@ -2332,12 +2332,12 @@
 				inset: var(---pie-origin) auto auto var(---pie-origin);
 				translate: -50% calc(-50% - var(---slice-label-offset));
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
-				color: transparent;
+				color: rgb(255 255 255 / 0.7);
+				font-variant-emoji: text;
 				filter: none;
 
 				&::before {
-					text-shadow: 0 0 0 rgb(255 255 255 / 0.7);
-					transition-property: color, filter, text-shadow;
+					transition-property: color, filter;
 				}
 			}
 
@@ -2347,7 +2347,7 @@
 					> .pie-navigation-icon::before
 			) {
 				color: initial;
-				text-shadow: none;
+				font-variant-emoji: emoji;
 				filter: none;
 			}
 		}
@@ -3646,8 +3646,9 @@
 	:is(.attribute-group-icon, .attribute-icon) > .breadcrumb-icon {
 		line-height: 1;
 		filter: none;
-		color: transparent;
-		text-shadow: 0 0 0 var(--accent, currentColor);
+		color: var(--accent, currentColor);
+		font-variant-emoji: text;
+		text-shadow: none;
 		transition-property: color, filter, text-shadow;
 	}
 
@@ -3663,6 +3664,7 @@
 	):has(a:is(:hover, :focus-visible, :interest-source))
 		.breadcrumb-icon {
 		color: initial;
+		font-variant-emoji: emoji;
 		text-shadow: none;
 		filter: none;
 	}
@@ -3696,6 +3698,7 @@
 		> header
 		.breadcrumb-icon {
 		color: initial;
+		font-variant-emoji: emoji;
 		text-shadow: none;
 		filter: none;
 	}
@@ -3710,6 +3713,7 @@
 			> header
 			.breadcrumb-icon {
 			color: initial;
+			font-variant-emoji: emoji;
 			text-shadow: none;
 			filter: none;
 		}
