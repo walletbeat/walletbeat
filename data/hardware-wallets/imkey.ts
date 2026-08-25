@@ -30,6 +30,7 @@ export const imkeyWallet: HardwareWallet = {
 		id: 'imkey',
 		displayName: 'imKey',
 		tableName: 'imKey',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [mako],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

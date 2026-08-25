@@ -9,6 +9,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		id: 'unrated',
 		displayName: 'Unrated embedded wallet template',
 		tableName: 'Unrated',
+		coinspectId: null,
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',

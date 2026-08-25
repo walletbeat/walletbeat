@@ -12,6 +12,7 @@ export const fireflyWallet: HardwareWallet = {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [
