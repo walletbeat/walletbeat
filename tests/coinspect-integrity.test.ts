@@ -1,7 +1,11 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
-import reportsSnapshot from '@/data/coinspect/reports-snapshot.json'
 import { allWallets } from '@/data/wallets'
+
+import { getRepositoryRoot } from './utils/codebase'
 
 /**
  * Coinspect `walletMakerUID`s that Walletbeat does not track.
@@ -30,7 +34,58 @@ const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
 	'zengo',
 ])
 
-const snapshotIds = new Set(reportsSnapshot.map(entry => entry.walletMakerUID))
+const CURRENT_REPORTS_DIR = 'data/coinspect/current-reports'
+
+function walletMakerUIDFromReport(parsed: unknown, reportPath: string): string {
+	if (typeof parsed !== 'object' || parsed === null) {
+		throw new Error(`${reportPath} is not a JSON object`)
+	}
+
+	if (!('walletMakerUID' in parsed)) {
+		throw new Error(`${reportPath} is missing walletMakerUID`)
+	}
+
+	const { walletMakerUID } = parsed
+
+	if (typeof walletMakerUID !== 'string' || walletMakerUID === '') {
+		throw new Error(`${reportPath} walletMakerUID must be a non-empty string`)
+	}
+
+	return walletMakerUID
+}
+
+function coinspectIdsFromReports(): Set<string> {
+	const reportsDir = path.join(getRepositoryRoot(), CURRENT_REPORTS_DIR)
+	const ids = new Set<string>()
+
+	for (const entry of fs.readdirSync(reportsDir, { withFileTypes: true })) {
+		if (!entry.isDirectory()) {
+			continue
+		}
+
+		const reportDir = path.join(reportsDir, entry.name)
+
+		for (const file of fs.readdirSync(reportDir, { withFileTypes: true })) {
+			if (!file.isFile() || !file.name.endsWith('.json')) {
+				continue
+			}
+
+			const reportPath = path.join(reportDir, file.name)
+			const relativePath = path.join(CURRENT_REPORTS_DIR, entry.name, file.name)
+			const parsed: unknown = JSON.parse(fs.readFileSync(reportPath, { encoding: 'utf-8' }))
+
+			ids.add(walletMakerUIDFromReport(parsed, relativePath))
+		}
+	}
+
+	if (ids.size === 0) {
+		throw new Error(`No Coinspect reports found in ${CURRENT_REPORTS_DIR}/`)
+	}
+
+	return ids
+}
+
+const coinspectIds = coinspectIdsFromReports()
 
 const walletsByCoinspectId = new Map<string, string[]>()
 
@@ -56,7 +111,7 @@ describe('coinspect mapping', () => {
 	it('has a Walletbeat mapping or known-unmapped entry for every Coinspect wallet', () => {
 		const unmapped: string[] = []
 
-		for (const walletMakerUID of snapshotIds) {
+		for (const walletMakerUID of coinspectIds) {
 			if (knownUnmappedCoinspect.has(walletMakerUID) || walletsByCoinspectId.has(walletMakerUID)) {
 				continue
 			}
@@ -91,11 +146,11 @@ describe('coinspect mapping', () => {
 
 	// Coinspect removed (or renamed) a wallet we listed as unmapped; that ID
 	// should be dropped from knownUnmappedCoinspect.
-	it('has no known-unmapped IDs absent from the snapshot', () => {
+	it('has no known-unmapped IDs absent from current-reports', () => {
 		const removed: string[] = []
 
 		for (const walletMakerUID of knownUnmappedCoinspect) {
-			if (!snapshotIds.has(walletMakerUID)) {
+			if (!coinspectIds.has(walletMakerUID)) {
 				removed.push(walletMakerUID)
 			}
 		}
@@ -103,17 +158,17 @@ describe('coinspect mapping', () => {
 		removed.sort()
 		expect(
 			removed,
-			`remove these IDs from knownUnmappedCoinspect; they are no longer in reports-snapshot.json: ${removed.join(', ')}`,
+			`remove these IDs from knownUnmappedCoinspect; they are no longer in ${CURRENT_REPORTS_DIR}/: ${removed.join(', ')}`,
 		).toEqual([])
 	})
 
 	// Coinspect removed (or renamed) a wallet we still map via coinspectId;
 	// that field should be set to { type: 'NO_COINSPECT_ID' } or updated.
-	it('maps only to Coinspect IDs present in the snapshot', () => {
+	it('maps only to Coinspect IDs present in current-reports', () => {
 		const missing: string[] = []
 
 		for (const coinspectId of walletsByCoinspectId.keys()) {
-			if (!snapshotIds.has(coinspectId)) {
+			if (!coinspectIds.has(coinspectId)) {
 				missing.push(coinspectId)
 			}
 		}
@@ -121,7 +176,7 @@ describe('coinspect mapping', () => {
 		missing.sort()
 		expect(
 			missing,
-			`set coinspectId to { type: 'NO_COINSPECT_ID' } or update it; these IDs are not in reports-snapshot.json: ${missing.join(', ')}`,
+			`set coinspectId to { type: 'NO_COINSPECT_ID' } or update it; these IDs are not in ${CURRENT_REPORTS_DIR}/: ${missing.join(', ')}`,
 		).toEqual([])
 	})
 
