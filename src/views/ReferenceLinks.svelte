@@ -1,7 +1,8 @@
 <script lang="ts">
 	// Types/constants
 	import type { FullyQualifiedReference } from '@/schema/reference'
-	import { isRepoImageUrl } from '@/schema/url'
+	import { isRepoImageUrl, type LabeledUrl } from '@/schema/url'
+	import { codeSnippetForUrl, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 
 
 	// Props
@@ -38,6 +39,26 @@
 	)
 
 
+	// A reference URL together with its locally stored code snippet.
+	// Snippet-backed URLs are rendered as inline code blocks with their own
+	// caption link, so they are excluded from the plain link list.
+	const codeSnippetEntries = (
+		urls: LabeledUrl[],
+	): { url: LabeledUrl; snippet: ResolvedCodeSnippet }[] => {
+		const entries: { url: LabeledUrl; snippet: ResolvedCodeSnippet }[] = []
+
+		for (const url of urls) {
+			const snippet = codeSnippetForUrl(url.url)
+
+			if (snippet !== null) {
+				entries.push({ snippet, url })
+			}
+		}
+
+		return entries
+	}
+
+
 	// Actions
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
 		// Plain left-clicks open the lightbox; modified clicks
@@ -56,6 +77,7 @@
 	// Components
 	import ImageLightbox from '@/components/ImageLightbox.svelte'
 	import Typography from '@/components/Typography.svelte'
+	import CodeIcon from 'lucide-static/icons/code.svg?raw'
 	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 	import ImageIcon from 'lucide-static/icons/image.svg?raw'
 	import { markdown } from '@/types/content'
@@ -80,10 +102,11 @@
 			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
-				{@const linkUrls =
-					inlineImage === undefined
-						? ref.urls
-						: ref.urls.filter(url => url.url !== inlineImage.url)}
+				{@const refSnippets = codeSnippetEntries(ref.urls)}
+				{@const snippetUrls = new Set(refSnippets.map(entry => entry.url.url))}
+				{@const linkUrls = ref.urls.filter(
+					url => url.url !== inlineImage?.url && !snippetUrls.has(url.url),
+				)}
 
 				{#snippet Url({ url, label }: { url: string, label: string })}
 					{#if isRepoImageUrl(url)}
@@ -135,6 +158,22 @@
 							{/each}
 						</ul>
 					{/if}
+
+					{#each refSnippets as { url, snippet } (url.url)}
+						<figure class="code-snippet" data-column="start gap-1">
+							<figcaption>
+								<a
+									href={url.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<cite>{url.label}</cite>
+									<span>{@html CodeIcon}</span>
+								</a>
+							</figcaption>
+							<pre><code>{#each snippet.htmlLines as htmlLine, lineIndex (lineIndex)}<span class="line"><span class="line-number">{snippet.source.firstLine + lineIndex}</span><span class="line-content">{@html htmlLine}</span></span>{/each}</code></pre>
+						</figure>
+					{/each}
 
 					{#if inlineImage !== undefined}
 						<figure class="inline-image" data-column="start gap-1">
@@ -243,6 +282,52 @@
 
 			border: 1px solid var(--border-color);
 			border-radius: 0.5em;
+		}
+	}
+
+	.code-snippet {
+		margin: 0;
+		inline-size: 100%;
+		max-inline-size: 100%;
+		min-inline-size: 0;
+
+		pre {
+			margin: 0;
+			contain: inline-size;
+			inline-size: 100%;
+			max-inline-size: 100%;
+			min-inline-size: 0;
+			max-block-size: 20em;
+			overflow: auto;
+
+			padding: 0.75em 1em;
+			border: 1px solid var(--border-color);
+			border-radius: 0.5em;
+			background-color: var(--background-secondary);
+
+			font-size: 0.8125em;
+			line-height: 1.6;
+		}
+
+		code {
+			font-family:
+				ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+				'Courier New', monospace;
+		}
+
+		.line {
+			display: flex;
+			white-space: pre;
+		}
+
+		.line-number {
+			flex-shrink: 0;
+			min-inline-size: 4ch;
+			margin-inline-end: 1.25em;
+
+			text-align: end;
+			color: var(--text-secondary);
+			user-select: none;
 		}
 	}
 
