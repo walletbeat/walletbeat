@@ -2415,6 +2415,7 @@
 				block-size: var(---wallet-mobile-pie-flow-size);
 				display: flex;
 				align-items: center;
+				overflow: clip;
 
 				.pie-navigation-placement {
 					margin-inline: auto;
