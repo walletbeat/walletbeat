@@ -86,10 +86,10 @@ export const phantom: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: null,
+			nonChainSpecificEnsResolution: notSupported,
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
