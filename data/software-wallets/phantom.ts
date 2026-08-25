@@ -156,7 +156,11 @@ export const phantom: SoftwareWallet = {
 					}),
 				},
 			},
-			keysHandling: null,
+			keysHandling: {
+				ref: refTodo,
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
