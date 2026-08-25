@@ -2446,7 +2446,7 @@
 						transform-origin: center top;
 						animation: WalletMobilePiePlacement linear both;
 						animation-timeline: --wallet-stage-timeline;
-						animation-range: entry 60% entry 100%;
+						animation-range: var(---wallet-breadcrumb-animation-range);
 					}
 
 					@media (prefers-reduced-motion: reduce) {
