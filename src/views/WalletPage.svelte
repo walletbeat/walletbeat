@@ -2075,6 +2075,12 @@
 		initial-value: 1;
 	}
 
+	@property ---slice-current-correction {
+		syntax: "<angle>";
+		inherits: true;
+		initial-value: 0deg;
+	}
+
 	@property ---pie-start-angle {
 		syntax: "<angle>";
 		inherits: true;
@@ -2295,10 +2301,13 @@
 				pointer-events: auto;
 				transform-origin: var(--pie-originX) var(--pie-originY);
 				transform:
-					rotate(var(---slice-mid-angle))
+					rotate(calc(
+						var(---slice-mid-angle)
+							+ var(---slice-current-correction, 0deg)
+					))
 					scale(var(---slice-scale))
 					translateY(calc(var(--slice-offset) * -1px));
-				transition-property: opacity, ---slice-scale;
+				transition-property: opacity, ---slice-scale, ---slice-current-correction;
 			}
 
 			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)) {
@@ -2336,7 +2345,13 @@
 				position: absolute;
 				inset: var(---pie-origin) auto auto var(---pie-origin);
 				translate: -50% calc(-50% - var(---slice-label-offset));
-				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
+				rotate: calc(
+					-1 * (
+						var(---pie-rotate)
+							+ var(---slice-mid-angle)
+							+ var(---slice-current-correction, 0deg)
+					)
+				);
 				color: rgb(255 255 255 / 0.7);
 				font-variant-emoji: text;
 				filter: none;
@@ -2362,6 +2377,7 @@
 		 * nested beneath the pie rule. Keep this state selector flat.
 		 */
 		:global(#wallet-page .pie-navigation .navigation-items a:target-current) {
+			---slice-current-correction: calc(-1 * var(---slice-mid-angle));
 			---slice-scale: 1.075;
 			opacity: 1;
 			outline: none;
