@@ -125,12 +125,8 @@
 			const currentTarget = currentId
 				? globalThis.document.getElementById(currentId)
 				: null
-			const adjacentGroup = currentTarget?.matches('.attribute-group-target') &&
-				currentTarget.nextElementSibling?.matches('.attribute-group')
-				? currentTarget.nextElementSibling
-				: null
 			const currentGroup = currentTarget?.closest('.attribute-group') ??
-				adjacentGroup ?? root.querySelector('.attribute-group')
+				root.querySelector('.attribute-group')
 
 			return currentGroup?.querySelectorAll<HTMLDetailsElement>('details') ?? []
 		}
@@ -860,8 +856,6 @@
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
-		<hr class="attribute-group-target" {id} />
-
 		<section
 			class="attribute-group"
 			aria-label={attrGroup.displayName}
@@ -869,6 +863,8 @@
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
 		>
+			<hr class="attribute-group-target" {id} />
+
 			<div
 				class="attribute-group-stack"
 				data-scroll-item="inline-detached padding-match-end"
@@ -2749,12 +2745,6 @@
 			white-space: nowrap;
 		}
 
-		:is(.attribute-group-target, .attribute-target) {
-			border: 0;
-			margin: 0;
-			block-size: 0;
-		}
-
 		.attribute-group-target {
 			scroll-margin-block-start: calc(
 				-1 * var(---wallet-breadcrumb-crossing-offset)
@@ -3683,6 +3673,13 @@
 		pointer-events: none;
 	}
 
+	:is(.attribute-group-target, .attribute-target) {
+		border: 0;
+		margin: 0;
+		padding: 0;
+		block-size: 0;
+	}
+
 	:is(
 		.attribute-group-summary-layout,
 		.attribute > details > summary > header
@@ -3690,8 +3687,7 @@
 		text-decoration: none;
 	}
 
-	.attribute-group-target:target
-		+ .attribute-group
+	.attribute-group:has(> .attribute-group-target:target)
 		.attribute-group-summary-layout
 		.breadcrumb-icon,
 	.attribute-target:target
@@ -3705,8 +3701,7 @@
 	}
 
 	@supports selector(:interest-target) {
-		.attribute-group-target:interest-target
-			+ .attribute-group
+		.attribute-group:has(> .attribute-group-target:interest-target)
 			.attribute-group-summary-layout
 			.breadcrumb-icon,
 		.attribute-target:interest-target
@@ -3719,8 +3714,7 @@
 			filter: none;
 		}
 
-		.attribute-group-target:interest-target
-			+ .attribute-group
+		.attribute-group:has(> .attribute-group-target:interest-target)
 			.attribute-group-heading-position
 			> a,
 		.attribute-target:interest-target + details .attribute-heading-row > a {
