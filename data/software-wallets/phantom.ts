@@ -17,7 +17,10 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
-import { TransactionSubmissionL2Support, TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
@@ -25,7 +28,10 @@ import { Variant } from '@/schema/variants'
 
 import { kudelskiSecurity } from '../entities/kudelski-security'
 import { leastAuthority } from '../entities/least-authority'
-import { KeyGenerationLocation, MultiPartyKeyReconstruction } from '@/schema/features/security/keys-handling'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 
 const securityAudits: SecurityAudit[] = [
 	{
@@ -200,7 +206,7 @@ export const phantom: SoftwareWallet = {
 			keysHandling: {
 				ref: refTodo,
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
-				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
 			lightClient: {
 				ethereumL1: notSupported,
@@ -235,8 +241,10 @@ export const phantom: SoftwareWallet = {
 				},
 				l2: {
 					ref: refTodo,
-					[TransactionSubmissionL2Type.arbitrum]: TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
-					[TransactionSubmissionL2Type.opStack]:  TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
 				},
 			},
 		},
