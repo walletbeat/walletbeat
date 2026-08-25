@@ -2575,15 +2575,11 @@
 	}
 
 	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.attribute > details {
-			/* The non-sticky attribute scope publishes the synchronized breadcrumb
-			 * arrival, pie, and exit tracks; the sticky summary only consumes them. */
-			--stickyBreadcrumb-additionalViewTimelineNames:
+		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+			/* Heading and pie consume the same source and arrival range. */
+			view-timeline-name:
 				--sticky-breadcrumb-timeline,
 				var(---pie-timeline, none);
-			--stickyBreadcrumb-additionalViewTimelineInsets:
-				var(---wallet-attribute-row-block-start) 0,
-				var(---wallet-attribute-row-block-start) 0;
 		}
 
 		:is(
