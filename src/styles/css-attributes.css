@@ -1319,6 +1319,12 @@ ol {
 		> a:is(:hover, :focus-visible)::before {
 			opacity: 1;
 		}
+
+		&:has(> a)::before {
+			content: none;
+			animation: none;
+			opacity: 0;
+		}
 	}
 
 	[data-sticky-breadcrumb~="exit"] {

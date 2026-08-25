@@ -3038,6 +3038,13 @@
 			animation-composition: add;
 		}
 
+		.attribute-heading-position[data-sticky-breadcrumb~='position']
+			> [data-sticky-breadcrumb~='item']:has(> a)::before {
+			content: none;
+			animation: none;
+			opacity: 0;
+		}
+
 		/* A row-leading crumb owns the row surface and keeps its permalink marker.
 		 * Trailing crumbs own only the adjacent-level separator. */
 		@media (max-width: 1024px) {
