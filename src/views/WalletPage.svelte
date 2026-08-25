@@ -4048,6 +4048,11 @@
 				var(---wallet-fallback-attribute-heading-block-size)
 					+ var(---wallet-summary-companions-row-block-size)
 			);
+			---wallet-fallback-detail-sticky-block-start: calc(
+				var(---wallet-page-block-offset)
+					+ var(---wallet-fallback-group-sticky-block-size)
+					+ var(---wallet-fallback-attribute-sticky-block-size)
+			);
 		}
 
 		:global(#layout:has(#wallet-page)) {
@@ -4172,9 +4177,27 @@
 			}
 		}
 
-		.attribute-accordions details > summary[data-sticky] {
-			position: relative;
-			inset: auto;
+		@media (min-width: 1025px) {
+			.container {
+				---wallet-sticky-stack-block-end: var(
+					---wallet-fallback-detail-sticky-block-start
+				);
+			}
+
+			.attribute-accordions details[open] > summary[data-sticky] {
+				--sticky-insetBlockStart: var(
+					---wallet-fallback-detail-sticky-block-start
+				);
+				position: sticky;
+				z-index: var(---wallet-breadcrumb-layer-detail);
+			}
+		}
+
+		@media (max-width: 1024px) {
+			.attribute-accordions details > summary[data-sticky] {
+				position: relative;
+				inset: auto;
+			}
 		}
 
 	}
