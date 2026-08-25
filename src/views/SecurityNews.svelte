@@ -77,7 +77,7 @@
 					<summary data-row="gap-2">
 						<div data-column="gap-1" data-row-item="flexible">
 							<h4>{newsItem.title}</h4>
-							<div class="news-meta" data-row="gap-2">
+							<div class="news-meta" data-row="start gap-2 wrap">
 								<span
 									class="news-badge news-type"
 									data-badge="small"
