@@ -2698,6 +2698,10 @@
 				content: '';
 			}
 
+			[data-sticky-row-backdrop][data-sticky]::before {
+				transition: none;
+			}
+
 		}
 
 		article > header#top .wallet-title-row::after {
@@ -3284,10 +3288,50 @@
 			}
 		}
 
-		@media (min-width: 1025px) and (max-width: 1599px) {
-			/* The 26rem pie rail and 2rem trailing control leave less than the
-			 * canonical H3-plus-metadata row below 100rem. H3 therefore owns the
-			 * next row throughout that constrained desktop interval. */
+		@media (min-width: 1025px) and (max-width: 1279px) {
+			/* The 20rem pie rail leaves the content lane too narrow for stable
+			 * root/H2/H3 adjacency. Each level owns its own breadcrumb row in this
+			 * tight desktop interval. */
+			:global(#layout:has(#wallet-page)) {
+				---wallet-group-row-block-start: var(---wallet-root-row-block-size);
+				---wallet-breadcrumb-attribute-row-offset: var(
+					---wallet-breadcrumb-row-block-size
+				);
+				---wallet-sticky-stack-block-end: calc(
+					var(---wallet-root-row-block-size)
+						+ var(---wallet-breadcrumb-row-block-size)
+						+ var(---wallet-attribute-row-block-size)
+				);
+			}
+
+			:is(
+				#stages > header[data-scroll-item][data-sticky],
+				.attribute-group
+					> .attribute-group-stack[data-scroll-item]
+					> header[data-scroll-item][data-sticky]
+			) {
+				--sticky-insetBlockStart: var(---wallet-root-row-block-size);
+			}
+
+			:is(
+				.stage-heading-position,
+				.attribute-group-heading-position
+			) {
+				---wallet-breadcrumb-marker-animation: none;
+
+				> .breadcrumb-parent-slot {
+					display: none;
+				}
+			}
+
+			[data-sticky-row-backdrop='group'][data-sticky]::before {
+				content: '';
+			}
+		}
+
+		@media (min-width: 1280px) and (max-width: 1599px) {
+			/* Above the tight desktop band H2 remains adjacent to H1, but the
+			 * H3-plus-metadata row still needs its own sticky lane. */
 			:global(#layout:has(#wallet-page)) {
 				---wallet-breadcrumb-attribute-row-offset: calc(
 					(
@@ -3300,7 +3344,9 @@
 						+ var(---wallet-breadcrumb-row-block-size)
 				);
 			}
+		}
 
+		@media (min-width: 1025px) and (max-width: 1599px) {
 			.attribute-heading-position[data-sticky-breadcrumb~='position'] {
 				---stickyBreadcrumb-viewTimelineBlockStart: calc(
 					var(---wallet-attribute-row-block-start)
