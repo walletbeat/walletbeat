@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -35,6 +36,10 @@ const knownUnmappedCoinspect: ReadonlySet<string> = new Set([
 ])
 
 const CURRENT_REPORTS_DIR = 'data/coinspect/current-reports'
+const UPSTREAM_COMMIT_FILE = 'data/coinspect/upstream-commit'
+const UPSTREAM_REPO = 'https://github.com/coinspect/wallet-security-ranking'
+const UPSTREAM_REF = 'main'
+const FULL_SHA1 = /^[0-9a-f]{40}$/
 
 function walletMakerUIDFromReport(parsed: unknown, reportPath: string): string {
 	if (typeof parsed !== 'object' || parsed === null) {
@@ -192,5 +197,37 @@ describe('coinspect mapping', () => {
 
 		duplicates.sort()
 		expect(duplicates, `duplicate coinspectId mappings: ${duplicates.join('; ')}`).toEqual([])
+	})
+})
+
+/**
+ * Vendored Coinspect data must track upstream tip.
+ * If this fails, refresh with `pnpm coinspect:update` (or wait for the
+ * weekly `.github/workflows/coinspect-refresh.yaml` bot run).
+ */
+describe('coinspect upstream sync', () => {
+	it('has a well-formed upstream-commit pin', () => {
+		const pinPath = path.join(getRepositoryRoot(), UPSTREAM_COMMIT_FILE)
+		const localSha = fs.readFileSync(pinPath, { encoding: 'utf-8' }).trim()
+
+		expect(localSha, `${UPSTREAM_COMMIT_FILE} must be a full 40-character SHA-1`).toMatch(FULL_SHA1)
+	})
+
+	it('pins the same commit as upstream main', () => {
+		const pinPath = path.join(getRepositoryRoot(), UPSTREAM_COMMIT_FILE)
+		const localSha = fs.readFileSync(pinPath, { encoding: 'utf-8' }).trim()
+		const lsRemote = execSync(`git ls-remote ${UPSTREAM_REPO} ${UPSTREAM_REF}`, {
+			encoding: 'utf-8',
+		})
+		const remoteSha = lsRemote.split('\t')[0]?.trim() ?? ''
+
+		expect(
+			remoteSha,
+			`failed to resolve ${UPSTREAM_REPO} ${UPSTREAM_REF} via git ls-remote`,
+		).toMatch(FULL_SHA1)
+		expect(
+			localSha,
+			`${UPSTREAM_COMMIT_FILE} is behind upstream; run \`pnpm coinspect:update\` (local ${localSha}, remote ${remoteSha})`,
+		).toBe(remoteSha)
 	})
 })
