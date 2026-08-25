@@ -16,6 +16,7 @@ export const pillarx: SoftwareWallet = {
 		id: 'pillarx',
 		displayName: 'PillarX',
 		tableName: 'PillarX',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [iamkio],
 		iconExtension: 'svg',
 		lastUpdated: '2025-12-16',

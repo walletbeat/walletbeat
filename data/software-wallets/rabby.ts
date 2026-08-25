@@ -81,6 +81,7 @@ export const rabby: SoftwareWallet = {
 		id: 'rabby',
 		displayName: 'Rabby',
 		tableName: 'Rabby',
+		coinspectId: 'rabby-wallet',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-22',

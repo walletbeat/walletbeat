@@ -27,6 +27,7 @@ export const ledgerWalletMetadata: WalletMetadata = {
 	id: 'ledger',
 	displayName: 'Ledger Wallet',
 	tableName: 'Ledger',
+	coinspectId: { type: 'NO_COINSPECT_ID' },
 	contributors: [nconsigny, patrickalphac, mattmatt],
 	hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 	hardwareWalletModels: [

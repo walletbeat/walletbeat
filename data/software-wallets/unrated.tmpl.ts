@@ -10,6 +10,7 @@ export const unratedTemplate: SoftwareWallet = {
 		id: 'unrated',
 		displayName: 'Unrated wallet template',
 		tableName: 'Unrated',
+		coinspectId: null,
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',

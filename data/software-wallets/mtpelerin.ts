@@ -19,6 +19,7 @@ export const mtpelerin: SoftwareWallet = {
 		id: 'mtpelerin',
 		displayName: 'Bridge Wallet',
 		tableName: 'Bridge Wallet',
+		coinspectId: 'bridge-wallet',
 		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',

@@ -47,6 +47,7 @@ export const imtoken: SoftwareWallet = {
 		id: 'imtoken',
 		displayName: 'imToken',
 		tableName: 'imToken',
+		coinspectId: 'im-token',
 		contributors: [mako, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-28',

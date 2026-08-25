@@ -33,6 +33,7 @@ export const safe: SoftwareWallet = {
 		id: 'safe',
 		displayName: 'Safe',
 		tableName: 'Safe',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
