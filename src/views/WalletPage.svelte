@@ -3834,6 +3834,7 @@
 
 			.attribute-summary-companions {
 				flex-basis: 100%;
+				inline-size: 100%;
 				align-items: center;
 				min-block-size: 2rem;
 				max-inline-size: 100%;
