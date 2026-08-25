@@ -106,11 +106,11 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 
 		for (const dirPrefix of dirPrefixes) {
 			const normalizedDirPrefix = normalizePath(dirPrefix)
+			const dirPath = normalizedDirPrefix.endsWith('/')
+				? normalizedDirPrefix.slice(0, -1)
+				: normalizedDirPrefix
 
-			if (
-				normalizedPath === normalizedDirPrefix ||
-				normalizedPath.startsWith(normalizedDirPrefix)
-			) {
+			if (normalizedPath === dirPath || normalizedPath.startsWith(`${dirPath}/`)) {
 				return true
 			}
 		}

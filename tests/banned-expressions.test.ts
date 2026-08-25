@@ -6,6 +6,8 @@ interface BannedExpression {
 	name: string
 	regexp: RegExp
 	explanation: string
+	/** Exact match text that the regexp may capture but that should not count as a violation. */
+	allowedExact?: string[]
 }
 
 const bannedExpressions: BannedExpression[] = [
@@ -14,6 +16,13 @@ const bannedExpressions: BannedExpression[] = [
 		regexp: /\bthird([-_ ]|\s*)?part(y|ies)\b/i,
 		explanation:
 			'To distinguish between "third-party" as in "other than the wallet developer" and "non-local", use another term. Consider using "external" or "external provider" when talking about a network-level "third party", or "independent" when talking about a party different from the wallet developer.',
+	},
+	{
+		name: 'incorrect Walletbeat casing',
+		regexp: /\bwalletbeat\b/i,
+		allowedExact: ['Walletbeat', 'walletbeat'],
+		explanation:
+			'The project name is "Walletbeat" (lowercase "b") or "walletbeat" in URLs and identifiers, not "WalletBeat" or other casings. cSpell does not catch this because its dictionary match is case-insensitive.',
 	},
 ]
 
@@ -42,14 +51,32 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 			}
 
 			for (const bannedExpr of bannedExpressions) {
-				const regexp = new RegExp(bannedExpr.regexp, 'gi')
+				const flags = bannedExpr.regexp.flags.includes('g')
+					? bannedExpr.regexp.flags
+					: `${bannedExpr.regexp.flags}g`
+				const regexp = new RegExp(bannedExpr.regexp.source, flags)
 				let match
 
 				while ((match = regexp.exec(fileContents)) !== null) {
-					if (!isInsideUrl(match.index)) {
-						matched.add(bannedExpr.name)
-						break
+					if (isInsideUrl(match.index)) {
+						continue
 					}
+
+					const matchedText = match[0]
+
+					if (matchedText === undefined) {
+						continue
+					}
+
+					if (
+						bannedExpr.allowedExact !== undefined &&
+						bannedExpr.allowedExact.includes(matchedText)
+					) {
+						continue
+					}
+
+					matched.add(bannedExpr.name)
+					break
 				}
 			}
 
@@ -68,8 +95,8 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 			}
 		},
 		ignore: commonExclusions.concat([
-			// Exclude test files.
-			/\.test.ts$/i,
+			// This file mentions banned expressions by design.
+			'tests/banned-expressions.test.ts',
 
 			// Exclude governance documents (meeting transcripts etc).
 			/^governance\//i,

@@ -85,6 +85,7 @@ export const metamask: SoftwareWallet = {
 		id: 'metamask',
 		displayName: 'MetaMask',
 		tableName: 'MetaMask',
+		coinspectId: 'metamask',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-22',

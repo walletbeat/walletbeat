@@ -30,6 +30,7 @@ export const onekeyWallet: HardwareWallet = {
 		id: 'onekey',
 		displayName: 'OneKey Pro',
 		tableName: 'OneKey Pro',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

@@ -16,6 +16,7 @@ export const uniswapWallet: SoftwareWallet = {
 		id: 'uniswap-wallet',
 		displayName: 'Uniswap Wallet',
 		tableName: 'Uniswap',
+		coinspectId: 'uniswap',
 		contributors: [ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-04-04',

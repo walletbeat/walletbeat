@@ -41,6 +41,7 @@ export const gridplusWallet: HardwareWallet = {
 		id: 'gridplus',
 		displayName: 'GridPlus Wallet',
 		tableName: 'GridPlus',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
