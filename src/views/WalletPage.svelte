@@ -4216,10 +4216,14 @@
 			position: fixed;
 			inset-block-start: anchor(--wallet-variant-picker-position top);
 			inset-inline-start: anchor(--wallet-variant-picker-position start);
+			inline-size: anchor-size(--wallet-variant-picker-position inline);
+			block-size: var(---wallet-variant-sticky-size);
+			overflow: clip;
 			clip-path: inset(0 round var(---wallet-variant-flow-radius));
 			animation:
 				WalletVariantPickerAnimation linear both,
-				WalletVariantPickerClipAnimation linear both;
+				WalletVariantPickerClipAnimation linear both,
+				WalletVariantPickerInlineSizeAnimation linear both;
 
 			&::after {
 				content: '';
@@ -4239,6 +4243,8 @@
 		}
 
 		:global(.wallet-variant-picker) {
+			inline-size: 100%;
+			min-inline-size: 0;
 			animation: WalletVariantPickerSelectAnimation linear both;
 		}
 
@@ -4295,6 +4301,10 @@
 					at calc(var(---wallet-variant-sticky-size) / 2) 50%
 				);
 			}
+		}
+
+		@keyframes WalletVariantPickerInlineSizeAnimation {
+			to { inline-size: var(---wallet-variant-sticky-size); }
 		}
 
 		@keyframes WalletVariantPickerCircleAnimation { to { opacity: 1; } }
