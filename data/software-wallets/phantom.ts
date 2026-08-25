@@ -15,6 +15,32 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+
+import { kudelskiSecurity } from '../entities/kudelski-security'
+import { leastAuthority } from '../entities/least-authority'
+import { KeyGenerationLocation, MultiPartyKeyReconstruction } from '@/schema/features/security/keys-handling'
+
+const securityAudits: SecurityAudit[] = [
+	{
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Kudelski-Security-2021.pdf',
+		auditDate: '2021-05-07',
+		auditor: kudelskiSecurity,
+		unpatchedFlaws: 'ALL_FIXED',
+		variantsScope: { [Variant.BROWSER]: true },
+	},
+	{
+		ref: 'https://github.com/phantom/audit-reports/blob/3450f82bc6c633f5d2eceee9a979f98ac1ca3cb3/Least_Authority-2024.pdf',
+		auditDate: '2024-06-07',
+		auditor: leastAuthority,
+		codeSnapshot: {
+			commit: 'https://github.com/phantom/wallet/commit/aea4d38d3c4e9ebc7a02839c94e7b9fb381f1dbf',
+			date: '2024-04-03' as const,
+		},
+		unpatchedFlaws: 'NONE_FOUND',
+		variantsScope: 'ALL_VARIANTS',
+	},
+]
+
 export const phantom: SoftwareWallet = {
 	metadata: {
 		id: 'phantom',
@@ -135,7 +161,7 @@ export const phantom: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: securityAudits,
 			scamAlerts: null,
 			securityBestPractices: null,
 			transactionLegibility: {
