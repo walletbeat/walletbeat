@@ -269,7 +269,7 @@
 		return groupTargetIds.has(targetId) ? `${targetId}-attribute` : targetId
 	}
 
-	const tocNavigationItems = $derived.by<NavigationItem[]>(() => (
+	const navigationItems = $derived.by<NavigationItem[]>(() => (
 		evalTree ?
 			Object.values(attributeTree)
 				.flatMap(attrGroup => {
@@ -304,8 +304,8 @@
 			[]
 	))
 
-	const pieNavigationItems = $derived.by(() => {
-		const referenceSlices = tocNavigationItems.map<Slice>(group => {
+	const navigationItemsWithSliceGeometry = $derived.by(() => {
+		const referenceSlices = navigationItems.map<Slice>(group => {
 			const sourceGroup = Object.values(attributeTree).find(
 				candidate => `toc-${candidate.id}` === group.id
 			)
@@ -335,7 +335,7 @@
 			centerFirstSlice: true,
 		})
 
-		return tocNavigationItems.map((group, groupIndex) => {
+		return navigationItems.map((group, groupIndex) => {
 			const computedGroup = computedReferenceSlices[groupIndex]
 
 			return {
@@ -355,7 +355,7 @@
 	 * read a target descendant's computed custom property.
 	 */
 	const pieRotation = $derived.by(() => {
-		const items = pieNavigationItems.flatMap(
+		const items = navigationItemsWithSliceGeometry.flatMap(
 			group => [group, ...(group.children ?? [])]
 		)
 		const steps = items.slice(1).map((item, index) => ({
@@ -702,7 +702,7 @@
 						style:---pie-rotation-animation-timing-functions={pieRotation.animationTimingFunctions}
 					>
 						<NavigationItems
-							items={pieNavigationItems}
+							items={navigationItemsWithSliceGeometry}
 							currentHref={currentHash}
 							showSearch={false}
 							enableSticky={false}
@@ -730,7 +730,7 @@
 					data-sticky-container
 				>
 					<NavigationItems
-						items={pieNavigationItems}
+						items={navigationItemsWithSliceGeometry}
 						currentHref={currentHash}
 						showSearch={false}
 						defaultOpen
