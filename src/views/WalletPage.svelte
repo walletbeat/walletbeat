@@ -995,8 +995,9 @@
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
+		<hr class="attribute-target" {id} />
+
 		<details
-			{id}
 			open
 			data-card="radius-8 padding-6 border-accent"
 			data-column="gap-0"
@@ -1782,10 +1783,12 @@
 		--scrollContainer-perspective: none;
 		scroll-timeline-name: --wallet-page-scroll-timeline;
 		scroll-timeline-axis: block;
-		/* The active hash is the sole responsive reflow anchor. Wallet-page
-		 * scrolling is instant, so proximity snapping cannot compete with smooth
-		 * navigation and the UA can re-snap the same target after width changes. */
+		/* Proximity snapping is useful only until a fragment owns navigation. */
 		scroll-snap-type: block proximity;
+
+		&:has(#wallet-page :target) {
+			scroll-snap-type: none;
+		}
 		/* Longest depth-2 attribute label plus its icon and row padding. */
 		---wallet-page-navigation-inline-size-rem: 26;
 		---wallet-page-navigation-inline-size: calc(
@@ -2720,11 +2723,11 @@
 
 			}
 
-			[data-sticky-row-backdrop]::before {
+			[data-sticky-row-backdrop][data-sticky]::before {
 				content: none;
 			}
 
-			[data-sticky-row-backdrop='detail']::before {
+			[data-sticky-row-backdrop='detail'][data-sticky]::before {
 				content: '';
 			}
 
@@ -2746,6 +2749,12 @@
 			white-space: nowrap;
 		}
 
+		:is(.attribute-group-target, .attribute-target) {
+			border: 0;
+			margin: 0;
+			block-size: 0;
+		}
+
 		.attribute-group-target {
 			scroll-margin-block-start: calc(
 				-1 * var(---wallet-breadcrumb-crossing-offset)
@@ -2760,11 +2769,7 @@
 			}
 		}
 
-		:target {
-			scroll-snap-align: start;
-		}
-
-		.attribute > details {
+		.attribute-target {
 			scroll-margin-block-start: calc(
 				var(---wallet-breadcrumb-attribute-arrival-offset)
 					- var(---wallet-breadcrumb-crossing-offset)
@@ -2780,20 +2785,20 @@
 						- var(---wallet-breadcrumb-crossing-offset)
 				);
 			}
+		}
 
-			&:not([open]) {
-				> summary[data-sticky] {
-					position: relative;
-					inset: auto;
-				}
+		.attribute > details:not([open]) {
+			> summary[data-sticky] {
+				position: relative;
+				inset: auto;
+			}
 
-				.attribute-heading-position
-					> [data-sticky-breadcrumb~='item']
-					> a::before,
-				.attribute-heading-position h3,
-				.attribute-icon > .breadcrumb-icon {
-					animation: none;
-				}
+			.attribute-heading-position
+				> [data-sticky-breadcrumb~='item']
+				> a::before,
+			.attribute-heading-position h3,
+			.attribute-icon > .breadcrumb-icon {
+				animation: none;
 			}
 		}
 
@@ -3079,7 +3084,7 @@
 				}
 			}
 
-			[data-sticky-row-backdrop='group']::before {
+			[data-sticky-row-backdrop='group'][data-sticky]::before {
 				content: '';
 			}
 
@@ -3102,7 +3107,7 @@
 				}
 			}
 
-			[data-sticky-row-backdrop='attribute']::before {
+			[data-sticky-row-backdrop='attribute'][data-sticky]::before {
 				content: '';
 			}
 		}
@@ -3689,8 +3694,8 @@
 		+ .attribute-group
 		.attribute-group-summary-layout
 		.breadcrumb-icon,
-	.attribute
-		> details:target
+	.attribute-target:target
+		+ details
 		> summary
 		> header
 		.breadcrumb-icon {
@@ -3704,8 +3709,8 @@
 			+ .attribute-group
 			.attribute-group-summary-layout
 			.breadcrumb-icon,
-		.attribute
-			> details:interest-target
+		.attribute-target:interest-target
+			+ details
 			> summary
 			> header
 			.breadcrumb-icon {
@@ -3718,7 +3723,7 @@
 			+ .attribute-group
 			.attribute-group-heading-position
 			> a,
-		.attribute > details:interest-target .attribute-heading-row > a {
+		.attribute-target:interest-target + details .attribute-heading-row > a {
 			text-decoration: none;
 		}
 	}
@@ -3967,7 +3972,7 @@
 			--scrollContainer-scrollPaddingBlockStart: var(---wallet-page-block-offset);
 		}
 
-		.attribute > details {
+		.attribute-target {
 			scroll-margin-block-start: var(---wallet-fallback-group-sticky-block-size);
 		}
 
