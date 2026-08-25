@@ -95,6 +95,20 @@
 	let queryParams = $state<URLSearchParams | undefined>(
 		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
 	)
+	let currentHash = $state(globalThis.location?.hash ?? '')
+
+	$effect(() => {
+		const syncCurrentHash = () => {
+			currentHash = globalThis.location.hash
+		}
+
+		syncCurrentHash()
+		globalThis.addEventListener('hashchange', syncCurrentHash)
+
+		return () => {
+			globalThis.removeEventListener('hashchange', syncCurrentHash)
+		}
+	})
 
 	$effect(() => {
 		const queryString = queryParams?.toString()
@@ -689,6 +703,7 @@
 					>
 						<NavigationItems
 							items={pieNavigationItems}
+							currentHref={currentHash}
 							showSearch={false}
 							enableSticky={false}
 							defaultOpen
@@ -716,6 +731,7 @@
 				>
 					<NavigationItems
 						items={pieNavigationItems}
+						currentHref={currentHash}
 						showSearch={false}
 						defaultOpen
 						ariaLabel="Table of contents"
@@ -2310,7 +2326,7 @@
 				transition-property: opacity, ---slice-scale, ---slice-current-correction;
 			}
 
-			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)) {
+			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current, [aria-current='page'])) {
 				---slice-scale: 1.045;
 				opacity: 1;
 				outline: none;
@@ -2363,7 +2379,7 @@
 
 			:global(
 				.navigation-items
-					a:is(:hover, :focus-visible, :interest-source, :target-current)
+					a:is(:hover, :focus-visible, :interest-source, :target-current, [aria-current='page'])
 					> .pie-navigation-icon::before
 			) {
 				color: initial;
@@ -2376,7 +2392,7 @@
 		 * Chromium currently fails to invalidate :target-current when it is
 		 * nested beneath the pie rule. Keep this state selector flat.
 		 */
-		:global(#wallet-page .pie-navigation .navigation-items a:target-current) {
+		:global(#wallet-page .pie-navigation .navigation-items a:is(:target-current, [aria-current='page'])) {
 			---slice-current-correction: calc(-1 * var(---slice-mid-angle));
 			---slice-scale: 1.075;
 			opacity: 1;
@@ -3699,7 +3715,7 @@
 	.page-navigation
 		:global(
 			.navigation-items
-				a:is(:hover, :focus-visible, :interest-source, :target-current)
+				a:is(:hover, :focus-visible, :interest-source, :target-current, [aria-current='page'])
 				.toc-icon::before
 		),
 	:is(
