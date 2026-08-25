@@ -152,9 +152,43 @@ export const phantom: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
-			bugBountyProgram: null,
-			duressResistance: null,
+			accountRecovery: {
+				drills: notSupported,
+				guardianRecovery: notSupported,
+			},
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: [
+					{
+						explanation:
+							'Phantom operates an active bug bounty program through Cantina, covering client-side applications, web applications, platform infrastructure, and onchain assets.',
+						url: 'https://cantina.xyz/bounties/5314819f-b0b2-4d39-b953-d02ec74cac1a?overviewTab=1&assetGroup=3',
+					},
+				],
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2026-07-01',
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.CANTINA,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 100000,
+					minimum: 0,
+				}),
+				upgradePathAvailable: true,
+			}),
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: false,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
