@@ -205,6 +205,7 @@ export const completedTemplate: SoftwareWallet = {
 		id: 'completed',
 		displayName: 'Completed wallet template',
 		tableName: 'Completed',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2026-02-27',

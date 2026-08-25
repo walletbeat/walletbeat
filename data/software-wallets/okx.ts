@@ -26,6 +26,7 @@ export const okx: SoftwareWallet = {
 		id: 'okx',
 		displayName: 'OKX Wallet',
 		tableName: 'OKX',
+		coinspectId: 'okx',
 		contributors: [mattmatt],
 		iconExtension: 'png',
 		lastUpdated: '2026-01-28',

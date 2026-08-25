@@ -99,10 +99,24 @@ but _should not_ be subject to be rated on whether it implements scam prevention
 
 Unlike `Variant` and `WalletType`, a single wallet (regardless of how many `Variant`s it has) can only have one `WalletProfile`.
 
+## `/data` field encoding
+
+Fields in `/data` (wallet metadata, wallet features, entities, contributors) must be written down. Do not omit a field (`undefined` / `?`) when adding a new property.
+
+- `null` means "we have not researched this yet."
+- A named sentinel (`NO_*`) or empty array means "we checked; there is none / it does not apply."
+- A concrete value means "we know what it is."
+
+Searching `/data` for `null` is how incomplete research is found. Omitted fields are invisible.
+
+`Entity` is the model for this: every field is required, and absence uses sentinels such as `NO_WEBSITE` and `NO_ICON`. Some older `WalletMetadata` / `WalletUrls` properties are still optional; treat those as legacy and do not add more.
+
+See `resources/docs/contribute/wallet-data/wallet-data.md` (section "How `/data` fields are encoded").
+
 ## Wallet features
 
-- None of the fields in `WalletFeatures` should be able to be `undefined` (i.e. none of them should end with `?`). None of the fields in this type should be marked as possibly undefined.
-- When a wallet feature is not known, it is represented by `null`. This means that searching for `null` in `/data` is an effective way to find which pieces of wallet feature data is missing from this project's database.
+- The `/data` encoding rule above applies to `WalletFeatures`: none of its fields should be able to be `undefined` (i.e. none of them should end with `?`).
+- When a wallet feature is not known, it is represented by `null`. When the answer is known to be "none", use a sentinel or empty array, not an omitted field.
 - Most wallet features in `WalletFeatures` should be wrapped with `VariantFeature`. This is defined as `type VariantFeature<T> = T | AtLeastOneVariant<T> | null`.
   In other words, `VariantFeature` wraps feature data `T` in such a way that it can either be:
 

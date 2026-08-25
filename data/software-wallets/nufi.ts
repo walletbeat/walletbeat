@@ -22,6 +22,7 @@ export const nufi: SoftwareWallet = {
 		id: 'nufi',
 		displayName: 'NuFi',
 		tableName: 'NuFi',
+		coinspectId: 'nu-fi',
 		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',

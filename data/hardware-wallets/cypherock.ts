@@ -30,6 +30,7 @@ export const cypherockWallet: HardwareWallet = {
 		id: 'cypherock',
 		displayName: 'Cypherock Wallet',
 		tableName: 'Cypherock',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [

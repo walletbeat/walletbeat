@@ -45,6 +45,7 @@ export const elytro: SoftwareWallet = {
 		id: 'elytro',
 		displayName: 'Elytro',
 		tableName: 'Elytro',
+		coinspectId: 'elytro',
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
