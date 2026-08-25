@@ -2744,9 +2744,13 @@
 				scroll-margin-block-start: calc(
 					var(---wallet-attribute-row-block-start)
 						- var(---wallet-sticky-stack-block-end)
-						- var(--card-padding)
-						- var(--card-borderWidth)
+						- var(--card-padding, 0px)
+						- var(--card-borderWidth, 0px)
 						- var(---wallet-group-header-padding-block)
+						- (
+							var(---wallet-breadcrumb-attribute-font-size)
+								* var(---wallet-line-height)
+						)
 						- var(---wallet-breadcrumb-crossing-offset)
 				);
 			}
