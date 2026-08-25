@@ -1,0 +1,13 @@
+  handleProviderRequest({
+    providerRequestTransport,
+    isSupportedChain,
+    getFeatureFlags,
+    messengerProviderRequest,
+    onAddEthereumChain,
+    checkRateLimit,
+    onSwitchEthereumChainNotSupported,
+    onSwitchEthereumChainSupported,
+    getProvider,
+    getActiveSession,
+    getChainNativeCurrency: chainId => useBackendNetworksStore.getState().getChainsNativeAsset()[chainId],
+  });

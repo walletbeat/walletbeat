@@ -1,0 +1,3 @@
+  getAtomicStatus(): 'unsupported' | 'supported' | 'ready' {
+    return this.accountState.isSmarterEoa ? 'supported' : 'ready'
+  }

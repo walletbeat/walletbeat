@@ -1,0 +1,56 @@
+    getCapabilities: async ({ address, chainIds }) => {
+      if (!getEip5792Enabled()) {
+        throw createProviderError(
+          'METHOD_NOT_SUPPORTED',
+          'EIP-5792 methods are not enabled',
+        );
+      }
+      const delegationAvailability = getDelegationAvailable(address);
+      if (!delegationAvailability.available) {
+        // Non-compliant: spec expects a capabilities object (e.g. atomic: unsupported) rather than an error.
+        // We throw here because some dapps (e.g. revoke.cash) interpret any non-error response from
+        // wallet_getCapabilities as full EIP-5792 support and immediately call wallet_sendCalls.
+        // Since Rainbow only executes batches atomically via delegation, returning unsupported capabilities
+        // would mislead those dapps into attempting a flow that will always fail.
+        throw createProviderError(
+          'METHOD_NOT_SUPPORTED',
+          `Delegation not available: ${delegationAvailability.reason}`,
+        );
+      }
+
+      // Pre-warm delegation cache: getDelegations fetches WalletStatus (all chains
+      // in one request). Both getDelegationStatus and getChainDelegationStatus
+      // share the same cache keyed by { address }, so subsequent
+      // supportsDelegation/willDelegate calls hit cache. Without this, each chain
+      // would trigger a separate NetworkStatus request.
+      await getDelegations({ address });
+
+      const results = await Promise.all(
+        chainIds.map(async (chainId) => {
+          try {
+            const { supported } = await supportsDelegation({
+              address,
+              chainId,
+            });
+            if (!supported) {
+              throw new Error('Delegation not supported');
+            }
+            const { willDelegate: needsAuth } = await willDelegate({
+              address,
+              chainId,
+            });
+            return [
+              chainId,
+              {
+                atomic: {
+                  status: needsAuth ? 'ready' : 'supported',
+                },
+              },
+            ] as const;
+          } catch {
+            return [chainId, { atomic: { status: 'unsupported' } }] as const;
+          }
+        }),
+      );
+      return Object.fromEntries(results);
+    },

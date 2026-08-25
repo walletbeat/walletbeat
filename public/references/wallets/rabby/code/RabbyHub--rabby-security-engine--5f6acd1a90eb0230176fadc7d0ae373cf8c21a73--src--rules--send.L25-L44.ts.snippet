@@ -1,0 +1,20 @@
+  {
+    id: "1018",
+    enable: true,
+    valueDescription: "Have you transferred to this address before",
+    descriptions: {
+      warning: `You've never transferred token to this address before`,
+    },
+    valueDefine: {
+      type: "boolean",
+    },
+    defaultThreshold: {
+      warning: false,
+    },
+    customThreshold: {},
+    requires: ["send"],
+    async getValue(ctx) {
+      const { hasTransfer } = ctx.send!;
+      return hasTransfer;
+    },
+  },

@@ -1,0 +1,15 @@
+          isMatchForEcosystem(wallet.address, ecosystem)
+        );
+      });
+
+      const currentAddress = currentWallet?.address;
+
+      let wallet: typeof currentWallet = null;
+      if (currentAddress && isMatchForEcosystem(currentAddress, ecosystem)) {
+        wallet = currentWallet;
+      } else {
+        wallet =
+          walletGroups
+            ?.at(0)
+            ?.walletContainer.wallets.find((wallet) =>
+              isMatchForEcosystem(wallet.address, ecosystem)

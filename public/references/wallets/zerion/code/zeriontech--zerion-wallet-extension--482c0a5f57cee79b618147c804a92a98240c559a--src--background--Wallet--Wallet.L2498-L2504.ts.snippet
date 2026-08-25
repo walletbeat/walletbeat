@@ -1,0 +1,7 @@
+          const currentAddress = this.wallet.ensureCurrentAddress();
+          if (normalizeAddress(address) !== normalizeAddress(currentAddress)) {
+            await this.wallet.setCurrentAddress({
+              params: { address },
+              context: INTERNAL_SYMBOL_CONTEXT,
+            });
+          }

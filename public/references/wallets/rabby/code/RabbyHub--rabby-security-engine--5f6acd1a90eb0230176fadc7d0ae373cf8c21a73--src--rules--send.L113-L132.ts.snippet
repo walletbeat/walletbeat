@@ -1,0 +1,20 @@
+  {
+    id: "1033",
+    enable: true,
+    valueDescription: "Recipient address is in your whitelist",
+    descriptions: {
+      safe: "The recipient address is in your whitelist",
+    },
+    valueDefine: {
+      type: "boolean",
+    },
+    defaultThreshold: {
+      safe: true,
+    },
+    customThreshold: {},
+    requires: ["send"],
+    async getValue(ctx) {
+      const { onTransferWhitelist } = ctx.send!;
+      return onTransferWhitelist;
+    },
+  },

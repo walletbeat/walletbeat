@@ -1,0 +1,14 @@
+      if (
+        isClassProperty(controller, method) &&
+        typeof controller[method as keyof typeof controller] === 'function'
+      ) {
+        mapRPCMessageToController(port, msg, controller, context);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    if (port.name === `${browser.runtime.id}/ethereum`) {
+      const controller = getWallet().publicEthereumController;
+      return mapToControllerIfPossible(controller);

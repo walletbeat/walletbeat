@@ -1,0 +1,19 @@
+export interface FeeBreakdown {
+  hyperliquidRate: number;
+  zerionRate: number;
+  totalRate: number;
+}
+
+export function calculateFeeBreakdown({
+  userCrossRate,
+  referralDiscount,
+  builderFeeUnits,
+}: FeeRateInputs): FeeBreakdown {
+  const hyperliquidRate = userCrossRate * (1 - referralDiscount);
+  const zerionRate = builderFeeUnitToRate(builderFeeUnits);
+  return {
+    hyperliquidRate,
+    zerionRate,
+    totalRate: hyperliquidRate + zerionRate,
+  };
+}

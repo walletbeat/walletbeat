@@ -1,0 +1,29 @@
+  {
+    id: "1079",
+    enable: true,
+    valueDescription: "Contract deployment duration is too short",
+    valueDefine: {
+      type: "int",
+      min: 0,
+      minIncluded: true,
+      max: null,
+      maxIncluded: false,
+    },
+    defaultThreshold: {
+      warning: {
+        min: 0,
+        minIncluded: true,
+        max: 3,
+        maxIncluded: false,
+      },
+    },
+    customThreshold: {},
+    requires: ["permit"],
+    async getValue(ctx) {
+      const data = ctx.permit!;
+      return data.deployDays;
+    },
+    descriptions: {
+      warning: `The contract is only deployed within 3 days, indicating a scam`,
+    },
+  },

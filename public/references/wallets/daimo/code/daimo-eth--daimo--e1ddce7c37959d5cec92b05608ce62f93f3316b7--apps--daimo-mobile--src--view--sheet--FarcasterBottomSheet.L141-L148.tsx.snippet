@@ -1,0 +1,8 @@
+  const linkFC = async () => {
+    console.log("[FARCASTER] link profile");
+    const action: OffchainAction = {
+      time: now(),
+      type: "profileLink",
+      link: { addr: account.address, linkedAccount: fcAcc },
+    };
+    await updateProfileLinks(account, action);

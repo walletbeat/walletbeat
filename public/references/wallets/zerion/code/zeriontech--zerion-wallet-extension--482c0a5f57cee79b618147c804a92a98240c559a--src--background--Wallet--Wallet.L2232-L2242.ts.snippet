@@ -1,0 +1,11 @@
+  async eth_accounts({ context }: PublicMethodParams) {
+    const currentAddress = this.wallet.readCurrentAddress();
+    if (!currentAddress) {
+      return [];
+    }
+    if (this.wallet.allowedOrigin(context, currentAddress)) {
+      return [currentAddress];
+    } else {
+      return [];
+    }
+  }

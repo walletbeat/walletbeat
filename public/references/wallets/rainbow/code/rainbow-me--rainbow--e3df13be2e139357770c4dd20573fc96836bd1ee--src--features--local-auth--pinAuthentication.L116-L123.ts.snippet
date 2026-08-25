@@ -1,0 +1,8 @@
+export async function shouldAuthenticateWithPIN(): Promise<boolean> {
+  if (Platform.OS !== 'android') {
+    return false;
+  }
+
+  const hasPasscode = await kc.isPasscodeAuthAvailable();
+  return !hasPasscode;
+}

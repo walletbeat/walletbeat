@@ -1,0 +1,18 @@
+    defaultValues: {
+      search: ''
+    }
+  })
+
+  const searchValue = watch('search')
+
+  const tokens = useMemo(() => {
+    const tokenList = (portfolio?.tokens || []).filter((token) => {
+      // Hide gas tank and borrowed defi tokens from the list
+      if (token.flags.onGasTank || token.flags.defiTokenType === AssetType.Borrow) return false
+
+      if (!dashboardNetworkFilter) return true
+      if (dashboardNetworkFilter === 'rewards') return token.flags.rewardsType
+      if (dashboardNetworkFilter === 'gasTank') return token.flags.onGasTank
+
+      return token?.chainId?.toString() === dashboardNetworkFilter.toString()
+    })

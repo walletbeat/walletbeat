@@ -1,0 +1,7 @@
+export function needsBackup(group: WalletGroup) {
+  return (
+    isMnemonicContainer(group.walletContainer) &&
+    group.origin === WalletOrigin.extension &&
+    group.lastBackedUp == null
+  );
+}

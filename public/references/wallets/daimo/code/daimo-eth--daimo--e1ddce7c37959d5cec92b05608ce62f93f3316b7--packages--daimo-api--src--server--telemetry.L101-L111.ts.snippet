@@ -1,0 +1,11 @@
+    this.honeyEvents?.sendNow({
+      "service.name": "daimo-api",
+      "event.type": "user-action",
+      "event.account_name": action.accountName,
+      "event.name": action.name,
+      ...action.keys,
+
+      "rpc.ip_addr": ipAddr,
+      "rpc.ip_country": ipCountry,
+      "rpc.user_agent": userAgent,
+    });

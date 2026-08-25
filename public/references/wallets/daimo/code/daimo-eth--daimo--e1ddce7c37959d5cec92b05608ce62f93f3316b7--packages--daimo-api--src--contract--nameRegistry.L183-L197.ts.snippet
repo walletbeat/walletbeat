@@ -1,0 +1,15 @@
+  /** Get call for registering a Daimo name to an address. */
+  getRegisterNameCall(name: string): DaimoAccountCall {
+    validateName(name);
+    const nameHex = Buffer.from(name.padEnd(32, "\0")).toString("hex");
+
+    return {
+      dest: nameRegistryProxyConfig.address,
+      value: 0n,
+      data: encodeFunctionData({
+        abi: nameRegistryProxyConfig.abi,
+        functionName: "registerSelf",
+        args: [`0x${nameHex}`],
+      }),
+    };
+  }

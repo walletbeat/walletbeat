@@ -1,0 +1,18 @@
+export async function isAuthenticated(): Promise<boolean> {
+  const usePin = await shouldAuthenticateWithPIN();
+  if (!usePin || IS_DEV) {
+    await maybeSaveFakeAuthKey();
+    const options = await keychain.getPrivateAccessControlOptions();
+    const { value } = await keychain.get(FAKE_LOCAL_AUTH_KEY, options);
+    return Boolean(value === FAKE_LOCAL_AUTH_VALUE);
+  } else {
+    // if user does not have biometrics enabled, we fallback to PIN
+    try {
+      const pin = await authenticateWithPINAndCreateIfNeeded();
+      return Boolean(pin === (await getExistingPIN()));
+    } catch (e) {
+      // authenticatePin will throw if user rejects pin screen
+      return false;
+    }
+  }
+}

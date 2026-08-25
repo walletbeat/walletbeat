@@ -1,0 +1,20 @@
+
+  useEffect(() => {
+    if (!reminded && walletsFromKeychain.length) {
+      const needsBackupReminder = walletsFromKeychain.find((wallet) => {
+        const walletBackup = getWalletBackup({ wallet });
+        return !walletBackup?.backedUp;
+      });
+      if (needsBackupReminder) {
+        setShowWalletBackupReminder(true);
+      } else {
+        popQueue();
+      }
+      setReminded();
+    }
+  }, [
+    getWalletBackup,
+    popQueue,
+    reminded,
+    setReminded,
+    setShowWalletBackupReminder,

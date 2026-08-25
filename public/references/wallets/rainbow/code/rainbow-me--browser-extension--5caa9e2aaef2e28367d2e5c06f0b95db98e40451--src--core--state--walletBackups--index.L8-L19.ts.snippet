@@ -1,0 +1,12 @@
+export interface WalletBackupReminderStore {
+  reminded: boolean;
+  setReminded: () => void;
+}
+
+export const useWalletBackupReminderStore =
+  createBaseStore<WalletBackupReminderStore>((set) => ({
+    reminded: false,
+    setReminded: () => {
+      set({ reminded: true });
+    },
+  }));

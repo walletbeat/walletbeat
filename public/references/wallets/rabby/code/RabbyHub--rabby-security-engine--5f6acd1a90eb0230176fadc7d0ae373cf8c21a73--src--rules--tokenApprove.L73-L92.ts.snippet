@@ -1,0 +1,20 @@
+  {
+    id: "1029",
+    enable: true,
+    valueDescription: "Spender address is a risky contract",
+    descriptions: {
+      danger: "The spender address is a risky contract",
+    },
+    valueDefine: {
+      type: "boolean",
+    },
+    defaultThreshold: {
+      danger: true,
+    },
+    customThreshold: {},
+    requires: ["tokenApprove"],
+    async getValue(ctx) {
+      const { isDanger } = ctx.tokenApprove!;
+      return isDanger;
+    },
+  },

@@ -1,0 +1,5 @@
+export function generateMnemonic(wordlist: string[], strength: number = 128): string {
+  assertNumber(strength);
+  if (strength % 32 !== 0 || strength > 256) throw new TypeError('Invalid entropy');
+  return entropyToMnemonic(randomBytes(strength / 8), wordlist);
+}

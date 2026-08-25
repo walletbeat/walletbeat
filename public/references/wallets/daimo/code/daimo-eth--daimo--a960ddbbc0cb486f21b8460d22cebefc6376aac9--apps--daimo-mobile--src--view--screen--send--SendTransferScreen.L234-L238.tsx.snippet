@@ -1,0 +1,5 @@
+  // Warn if paying new account
+  let infoBubble = <Spacer h={16} />;
+  if (recipient.lastSendTime == null) {
+    infoBubble = <InfoBox title={i18.firstTime(getContactName(recipient))} />;
+  }
