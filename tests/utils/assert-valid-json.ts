@@ -7,9 +7,7 @@ import { ratedWalletExportSchemaPath } from '@/constants'
 
 import { getRepositoryRoot } from './codebase'
 
-/** Read and parse the published rated wallet export schema. */
 function readRatedWalletExportSchema(): object {
-	/** Schema lives in public/; Astro serves public/ at /. Path is repo root + public + path constant. */
 	const schemaFilePath = path.join(getRepositoryRoot(), 'public', ratedWalletExportSchemaPath)
 	const schemaJson = fs.readFileSync(schemaFilePath, { encoding: 'utf-8' })
 	const parsedSchema: unknown = JSON.parse(schemaJson)

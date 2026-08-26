@@ -13,10 +13,6 @@
 		context: StructuredDetailsContext
 	} = $props()
 
-	// (Derived)
-
-	// Canonical models store spans, never markup: this view is the only place
-	// that decides what a link, emphasis or code span looks like on the web.
 	const spans = $derived(
 		inline.map(span => ({ ...span, text: renderStrings(span.text, { ...context.strings }) })),
 	)

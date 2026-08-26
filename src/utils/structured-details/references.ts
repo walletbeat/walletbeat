@@ -41,7 +41,6 @@ const noContext: StructuredDetailsContext = {
 	},
 }
 
-/** Every claim-level reference carried by these details, in model order. */
 export function structuredDetailsReferences(details: StructuredDetails): FullyQualifiedReference[] {
 	return dispatchStructuredDetails(referenceCollectors, details, noContext)
 }
@@ -65,7 +64,6 @@ function sameReference(
 	return urls.size === otherUrls.size && [...urls].every(url => otherUrls.has(url))
 }
 
-/** The references in `references` that `displayed` does not already cover. */
 export function referencesNotIn(
 	references: FullyQualifiedReference[],
 	displayed: FullyQualifiedReference[],

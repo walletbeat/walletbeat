@@ -10,17 +10,6 @@ import type { ScamPreventionDetails } from './scam-alert-details'
 import type { SecurityAuditsDetails } from './security-audits-details'
 import type { TransactionInclusionDetails } from './transaction-inclusion-details'
 
-/**
- * The single source of truth for canonical structured evaluation details.
- *
- * Each entry is a format-neutral domain model produced by an attribute
- * evaluator and consumed by the web, Markdown and JSON adapters. Adding an
- * entry here fails compilation in every adapter registry that does not handle
- * it, which is the point: meaning is derived once, adapters only format.
- *
- * New entries exist because of distinct domain meaning, not because an
- * attribute or a view exists.
- */
 export interface StructuredDetailsByType {
 	accountRecovery: AccountRecoveryDetails
 	accountUnruggability: AccountUnruggabilityDetails
@@ -33,10 +22,8 @@ export interface StructuredDetailsByType {
 	transactionInclusion: TransactionInclusionDetails
 }
 
-/** Discriminator values of all canonical structured detail models. */
 export type StructuredDetailsType = keyof StructuredDetailsByType
 
-/** Any canonical structured evaluation detail model. */
 export type StructuredDetails = StructuredDetailsByType[StructuredDetailsType]
 
 /**
@@ -65,7 +52,6 @@ const structuredDetailsTypes: Record<StructuredDetailsType, true> = {
 	transactionInclusion: true,
 }
 
-/** Type predicate for canonical structured details. */
 export function isStructuredDetails(
 	details: EvaluationDetails<Strings> | undefined,
 ): details is StructuredDetails {

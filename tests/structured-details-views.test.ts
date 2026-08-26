@@ -13,14 +13,6 @@ import type { StructuredDetails } from '@/types/content/structured-details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 
-/**
- * Semantic assertions on the web adapter's server-rendered output.
- *
- * These check what a reader ends up with — the resolved wallet name, the
- * links, the claim references — rather than the markup around it, so styling
- * changes do not break them.
- */
-
 const context: StructuredDetailsContext = {
 	strings: {
 		WALLET_NAME: 'Test Wallet',
@@ -110,7 +102,6 @@ describe('structured details web adapter', () => {
 		})
 
 		expect(body).toContain('Ackee')
-		// The date is formatted in UTC, so it never slips to the previous day.
 		expect(body).toContain('January 2, 2020')
 		expect(body).toContain('A live flaw')
 		expect(body).toContain('https://ackee.example/audit.pdf')

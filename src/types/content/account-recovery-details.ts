@@ -14,28 +14,18 @@ import { typographicSourceText } from '@/types/content'
 import { buildGuardianPolicyDetail, type GuardianPolicyDetail } from './guardian-policy'
 import type { GuardianScenarioOutcomeDetail } from './guardian-scenarios'
 
-/** A drill the wallet runs, and how often it reminds the user. */
 export interface AccountRecoveryDrillDetail {
 	type: AccountRecoveryDrillType
 	reminderEveryNDays: number
 
-	/** References backing this drill's claim. */
 	references: FullyQualifiedReference[]
 }
 
-/** What the wallet drills its users on, and what it does not. */
 export interface AccountRecoveryDrillsDetail {
 	configured: AccountRecoveryDrillDetail[]
 	missing: AccountRecoveryDrillType[]
 }
 
-/**
- * Canonical detail model for guardian-based account recovery.
- *
- * The model reports the recovery dimension only: each scenario says whether
- * the account can still be recovered, never whether it can be taken over.
- * That is the account unruggability attribute's subject.
- */
 export interface AccountRecoveryDetails {
 	type: 'accountRecovery'
 
@@ -52,14 +42,12 @@ export interface AccountRecoveryDetails {
 	drills?: AccountRecoveryDrillsDetail
 }
 
-/** Build the guardian policy part of the recovery details, when there is one. */
 export function guardianPolicyDetailOrUndefined(
 	policy: GuardianPolicy | null,
 ): GuardianPolicyDetail | undefined {
 	return policy === null ? undefined : buildGuardianPolicyDetail(policy)
 }
 
-/** Build canonical recovery details once guardian and drill results are merged. */
 export function buildAccountRecoveryDetails({
 	guardianPolicy,
 	outcomes,

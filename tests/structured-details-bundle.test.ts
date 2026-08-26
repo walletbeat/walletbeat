@@ -15,7 +15,6 @@ import { getRepositoryRoot } from './utils/codebase'
 
 const root = getRepositoryRoot()
 
-/** Module specifiers the web adapter must never reach, transitively. */
 const serverOnlyModules = [
 	'src/utils/structured-details/markdown.ts',
 	'src/utils/structured-details/json.ts',
@@ -23,7 +22,6 @@ const serverOnlyModules = [
 	'src/utils/wallet-json-export.ts',
 ]
 
-/** Resolve an import specifier to a repository-relative file path. */
 function resolveImport(specifier: string, fromFile: string): string | null {
 	const relative = specifier.startsWith('@/data/')
 		? specifier.replace('@/data/', 'data/')
@@ -48,7 +46,6 @@ function resolveImport(specifier: string, fromFile: string): string | null {
 	return null
 }
 
-/** Every module reachable from `entry`, excluding type-only imports. */
 function reachableModules(entry: string): Set<string> {
 	const seen = new Set<string>()
 	const queue = [entry]
