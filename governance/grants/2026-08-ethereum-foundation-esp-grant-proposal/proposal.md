@@ -148,7 +148,13 @@ _Share plans towards achieving sustainability (both financial and non-financial)
 - We aim to diversify funding sources across the Ethereum ecosystem, for example Giveth,
   Octant, and The DAO Fund. We plan to capture funding sources that are not grant based, for
   example by accepting crypto donations.
-- We plan to improve our burn rate by automating more aspects of our workflow.
+- We plan to reduce our monthly expenses through automation:
+  - Automate more of the wallet data collection process.
+  - Ingest the Coinspect dataset. This is a one-time integration cost that immediately adds
+    a large amount of wallet data.
+  - Add automated regression tests, so that detectable issues are caught before they turn
+    into manual rework.
+  - Produce video content automatically from existing presentation footage.
 - Walletbeat is already being built with sustainability in mind. Every part of Walletbeat
   was built to be future-proof, in the spirit of the walkaway test. The rating pipeline is
   highly modular and can be adapted for rating projects that are not about wallets. The site
@@ -189,10 +195,12 @@ _Depending on the stage of this project, provide metrics for the project's curre
 
 ### Repository and contributors
 
-- 572 pull requests merged in the last 12 months; 711 all-time.
-- 2,151 commits in the last 12 months; 3,290 all-time.
-- 33 distinct commit authors in the last 12 months; 63 all-time.
-- 116 stars, 84 forks.
+Figures as of 2026-08-26:
+
+- 621 pull requests merged in the last 12 months; 765 all-time.
+- 2,310 commits in the last 12 months; 3,489 all-time.
+- 33 distinct commit authors in the last 12 months; 64 all-time.
+- 117 stars, 86 forks.
 
 ### Effects on wallets
 
