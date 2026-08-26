@@ -4133,9 +4133,10 @@
 		}
 
 		.attribute-group > .attribute-group-stack[data-scroll-item] {
+			--icon-size: var(---wallet-breadcrumb-heading-icon-size);
 			---wallet-group-sticky-block-end-override: calc(
 				var(---wallet-page-block-offset)
-				+ var(---wallet-fallback-group-sticky-block-size)
+					+ var(---wallet-fallback-group-sticky-block-size)
 			);
 
 			> header[data-sticky] > .attribute-group-summary-layout {
