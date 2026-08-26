@@ -4127,6 +4127,10 @@
 			justify-content: start;
 		}
 
+		#stages > header[data-sticky] + [data-scroll-item] {
+			margin-block-start: var(---wallet-fallback-sticky-padding-block);
+		}
+
 		.attribute-group > .attribute-group-stack[data-scroll-item] {
 			---wallet-group-sticky-block-end-override: calc(
 				var(---wallet-page-block-offset)
@@ -4217,13 +4221,30 @@
 		}
 
 		@media (max-width: 1024px) {
-			:is(
-				#stages > header[data-sticky],
-				.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-sticky],
-				.attribute > details[open] > summary[data-sticky]
-			) {
+			.container:has(:target)
+				.attribute:not(:has(:target))
+				> details[open]
+				> summary[data-sticky] {
 				position: relative;
 				inset: auto;
+				inset-block: auto;
+				inset-inline: auto;
+				max-block-size: none;
+				max-inline-size: none;
+				transform: none;
+				translate: none;
+			}
+
+			.attribute-heading-position[data-sticky-breadcrumb~='position'] {
+				> [data-sticky-breadcrumb~='item'],
+				> [data-sticky-breadcrumb~='item'] > a,
+				h3,
+				.breadcrumb-icon,
+				.attribute-summary-companions {
+					animation: none;
+					transform: none;
+					translate: none;
+				}
 			}
 		}
 
@@ -4232,6 +4253,16 @@
 				---wallet-sticky-stack-block-end: var(
 					---wallet-fallback-detail-sticky-block-start
 				);
+			}
+
+			@media (max-width: 1279px) {
+				.container {
+					---wallet-fallback-attribute-sticky-block-start: calc(
+						var(---wallet-root-row-block-size)
+							+ var(---wallet-fallback-group-sticky-block-size)
+							+ var(---wallet-fallback-sticky-padding-block)
+					);
+				}
 			}
 
 			@media (min-width: 1280px) {
@@ -4256,8 +4287,26 @@
 		}
 
 		.attribute-accordions details > summary[data-sticky] {
+			--sticky-insetBlockStart: auto;
+			--sticky-insetBlockEnd: auto;
+
 			position: relative;
 			inset: auto;
+			inset-block: auto;
+			inset-inline: auto;
+			inset-block-start: auto;
+			inset-block-end: auto;
+			inset-inline-start: auto;
+			inset-inline-end: auto;
+			top: auto;
+			right: auto;
+			bottom: auto;
+			left: auto;
+			max-block-size: none;
+			max-inline-size: none;
+			animation: none;
+			transform: none;
+			translate: none;
 		}
 
 	}
