@@ -24,9 +24,7 @@ const isContent = (content: unknown): content is Content =>
 	typeof content === 'object' &&
 	content !== null &&
 	'contentType' in content &&
-	(content.contentType === ContentType.TEXT ||
-		content.contentType === ContentType.MARKDOWN ||
-		content.contentType === ContentType.COMPONENT)
+	(content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN)
 
 const normalizeRatings = (ratings: unknown): { description: TypographicContent }[] =>
 	(Array.isArray(ratings) ? ratings : [ratings]).filter(hasDescription)

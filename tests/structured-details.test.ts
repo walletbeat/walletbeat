@@ -4,6 +4,7 @@ import { ackee } from '@/data/entities/ackee'
 import type { CorporateEntity } from '@/schema/entity'
 import { PersonalInfo, WalletInfo } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
+import { AccountRecoveryDrillType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
@@ -23,6 +24,7 @@ import {
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/details'
 import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
+import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
 import { inline, inlineCode, inlineEmphasis, inlineLink } from '@/types/content/details/inline'
 import { mergePrivateTransfersDetails } from '@/types/content/details/private-transfers'
 import {
@@ -34,7 +36,11 @@ import type { CalendarDate } from '@/types/date'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import { serializeStructuredDetails } from '@/utils/structured-details/json'
 import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
-import { bugBountySentences, securityAuditsSummary } from '@/utils/structured-details/prose'
+import {
+	bugBountySentences,
+	guardianPolicyBlocks,
+	securityAuditsSummary,
+} from '@/utils/structured-details/prose'
 import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 
 import { assertValidStructuredDetails } from './utils/assert-valid-json'
@@ -603,6 +609,188 @@ describe('securityAudits structured details', () => {
 	})
 })
 
+function throwUnexpectedPolicyKind(): never {
+	throw new Error('Fixture policy must be a secret-split policy')
+}
+
+describe('guardian-based details', () => {
+	const policy: GuardianPolicyDetail = {
+		description: ['The wallet splits the recovery secret across two providers.'],
+		facts: {
+			kind: 'secretSplit',
+			requiredGuardians: [{ type: GuardianType.WALLET_PASSWORD }],
+			optionalGuardians: [
+				{ type: GuardianType.USER_EXTERNAL_ACCOUNT, description: 'Google account', entity: ackee },
+				{ type: GuardianType.USER_EXTERNAL_ACCOUNT, description: 'Apple account', entity: ackee },
+			],
+			optionalGuardiansMinimumConfigurable: 1,
+			optionalGuardiansMinimumNeededForRecovery: 1,
+			secretReconstitution: 'CLIENT_SIDE',
+		},
+	}
+
+	it('describes a policy once, for every adapter', () => {
+		expect(guardianPolicyBlocks(policy)).toEqual([
+			{ kind: 'paragraph', text: 'The wallet splits the recovery secret across two providers.' },
+			{
+				kind: 'paragraph',
+				text: "The recovery process **critically depends** on The user's wallet password.",
+			},
+			{
+				kind: 'list',
+				lead: 'The recovery process requires setting up recovery with at least 1 of the following:',
+				items: ["The user's Google account", "The user's Apple account"],
+			},
+			{
+				kind: 'paragraph',
+				text: 'For evaluation purposes, Walletbeat assumes the user will use the policy requiring the _least amount of effort_ that the wallet allows, i.e. a single recovery guardian.',
+			},
+			{ kind: 'paragraph', text: 'The key is reconstituted **client-side**.' },
+		])
+	})
+
+	const secretSplitFacts =
+		policy.facts.kind === 'secretSplit' ? policy.facts : throwUnexpectedPolicyKind()
+
+	it('states plainly when a policy needs no optional guardian', () => {
+		const blocks = guardianPolicyBlocks({
+			...policy,
+			facts: { ...secretSplitFacts, optionalGuardians: [] },
+		})
+
+		expect(blocks).toContainEqual({
+			kind: 'paragraph',
+			text: 'The recovery process does not require setting up any other guardian.',
+		})
+	})
+
+	it('account recovery reports the recovery dimension, with no dangling colon', () => {
+		const details: StructuredDetails = {
+			type: 'accountRecovery',
+			guardianPolicy: policy,
+			recoverableScenarios: [{ id: 'ok', scenario: 'User forgets their wallet password' }],
+			unrecoverableScenarios: [
+				{
+					id: 'ko',
+					scenario: 'User loses access to their Google account',
+					consequence: 'Recovery is no longer possible.',
+				},
+			],
+			drills: {
+				configured: [
+					{
+						type: AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+						reminderEveryNDays: 90,
+						references: [refWithUrl('https://example.com/drills', 'Drill docs')],
+					},
+				],
+				missing: [AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK],
+			},
+		}
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown).toContain(
+			'Test Wallet implements a Guardian-based account recovery feature which does not pass all the tested scenarios.',
+		)
+		expect(markdown).toContain(
+			'- **User loses access to their Google account**: Recovery is no longer possible.',
+		)
+		// A successful scenario introduces nothing, so it ends without a colon.
+		expect(markdown).toContain('- **User forgets their wallet password**\n')
+		expect(markdown).not.toContain('User forgets their wallet password**:')
+		expect(markdown).toContain(
+			'- seed phrase check-ups (every 90 days) ([Drill docs](https://example.com/drills))',
+		)
+		expect(markdown).toContain('- guardian account check-ups')
+	})
+
+	it('account recovery keeps drill references available for de-duplication', () => {
+		const details: StructuredDetails = {
+			type: 'accountRecovery',
+			recoverableScenarios: [],
+			unrecoverableScenarios: [],
+			drills: {
+				configured: [
+					{
+						type: AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+						reminderEveryNDays: 90,
+						references: [refWithUrl('https://example.com/drills', 'Drill docs')],
+					},
+				],
+				missing: [],
+			},
+		}
+
+		expect(structuredDetailsReferences(details)).toHaveLength(1)
+	})
+
+	it('account unruggability reports takeovers, not recovery failures', () => {
+		const details: StructuredDetails = {
+			type: 'accountUnruggability',
+			guardianPolicy: policy,
+			safeScenarios: [{ id: 'ok', scenario: 'User forgets their wallet password' }],
+			takeoverScenarios: [
+				{
+					id: 'ko',
+					scenario: 'Ackee turns evil or is compromised',
+					consequence: 'Ackee can take over the account on their own.',
+				},
+			],
+		}
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown).toContain('#### Account takeover scenarios')
+		expect(markdown).toContain(
+			'- **Ackee turns evil or is compromised**: Ackee can take over the account on their own.',
+		)
+		expect(markdown).not.toContain('Account recovery failure scenarios')
+	})
+
+	it('serializes guardian policy facts alongside the authored description', () => {
+		const json = serializeStructuredDetails(
+			{
+				type: 'accountUnruggability',
+				guardianPolicy: policy,
+				safeScenarios: [],
+				takeoverScenarios: [
+					{ id: 'ko', scenario: 'A guardian turns evil', consequence: 'Rugged.' },
+				],
+			},
+			context,
+		)
+
+		expect(json).toEqual({
+			type: 'accountUnruggability',
+			guardianPolicy: {
+				description: ['The wallet splits the recovery secret across two providers.'],
+				facts: {
+					kind: 'secretSplit',
+					requiredGuardians: [
+						{ type: GuardianType.WALLET_PASSWORD, description: "The user's wallet password" },
+					],
+					optionalGuardians: [
+						{
+							type: GuardianType.USER_EXTERNAL_ACCOUNT,
+							description: "The user's Google account",
+							entityId: 'ackee',
+						},
+						{
+							type: GuardianType.USER_EXTERNAL_ACCOUNT,
+							description: "The user's Apple account",
+							entityId: 'ackee',
+						},
+					],
+					optionalGuardiansMinimumConfigurable: 1,
+					optionalGuardiansMinimumNeededForRecovery: 1,
+					secretReconstitution: 'CLIENT_SIDE',
+				},
+			},
+			safeScenarios: [],
+			takeoverScenarios: [{ id: 'ko', scenario: 'A guardian turns evil', consequence: 'Rugged.' }],
+		})
+	})
+})
+
 describe('published JSON schema', () => {
 	/** One fixture per structured-details variant; every variant must validate. */
 	const variants: StructuredDetails[] = [
@@ -658,6 +846,43 @@ describe('published JSON schema', () => {
 				upgradePathAvailable: true,
 				references: [refWithUrl('https://ackee.example/bounty', 'Bounty page')],
 			},
+		},
+		{
+			type: 'accountRecovery',
+			guardianPolicy: {
+				description: ['The wallet splits the recovery secret across two providers.'],
+				facts: {
+					kind: 'secretSplit',
+					requiredGuardians: [],
+					optionalGuardians: [
+						{
+							type: GuardianType.USER_EXTERNAL_ACCOUNT,
+							description: 'Google account',
+							entity: ackee,
+						},
+					],
+					optionalGuardiansMinimumConfigurable: 1,
+					optionalGuardiansMinimumNeededForRecovery: 1,
+					secretReconstitution: ackee,
+				},
+			},
+			recoverableScenarios: [{ id: 'ok', scenario: 'User forgets their wallet password' }],
+			unrecoverableScenarios: [],
+			drills: {
+				configured: [
+					{
+						type: AccountRecoveryDrillType.SEED_PHRASE_QUIZ,
+						reminderEveryNDays: 90,
+						references: [refWithUrl('https://example.com/drills', 'Drill docs')],
+					},
+				],
+				missing: [AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK],
+			},
+		},
+		{
+			type: 'accountUnruggability',
+			safeScenarios: [{ id: 'ok', scenario: 'User forgets their wallet password' }],
+			takeoverScenarios: [],
 		},
 		{
 			type: 'scamPrevention',

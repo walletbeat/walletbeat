@@ -1,5 +1,7 @@
-import type { CustomContent, TypographicContent } from '../../content'
+import type { TypographicContent } from '../../content'
 import type { Strings } from '../../utils/string-templates'
+import type { AccountRecoveryDetails } from './account-recovery'
+import type { AccountUnruggabilityDetails } from './account-unruggability'
 import type { AddressCorrelationDetails } from './address-correlation'
 import type { ChainVerificationDetails } from './chain-verification'
 import type { FundingDetails } from './funding'
@@ -20,6 +22,8 @@ import type { TransactionInclusionDetails } from './transaction-inclusion'
  * attribute or a view exists.
  */
 export interface StructuredDetailsByType {
+	accountRecovery: AccountRecoveryDetails
+	accountUnruggability: AccountUnruggabilityDetails
 	addressCorrelation: AddressCorrelationDetails
 	chainVerification: ChainVerificationDetails
 	funding: FundingDetails
@@ -40,12 +44,7 @@ export type StructuredDetails = StructuredDetailsByType[StructuredDetailsType]
  * canonical structured model, or nothing at all.
  */
 export type EvaluationDetails<_Strings extends Strings = null> =
-	| TypographicContent<_Strings>
-	| StructuredDetails
-	// TEMPORARY: bridge for detail families not yet migrated to canonical models.
-	// Removed once every family is structured; see `CustomContent`.
-	| CustomContent
-	| undefined
+	TypographicContent<_Strings> | StructuredDetails | undefined
 
 /** Type predicate for canonical structured details. */
 export function isStructuredDetails(details: unknown): details is StructuredDetails {

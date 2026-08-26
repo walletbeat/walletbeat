@@ -420,9 +420,9 @@ export async function grammarLintMessages(
 		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
 	)
 
-	// Ignore Spelling lints for words the project's cspell dictionary already
+	// Ignore Spelling lints for words the project's spelling dictionary already
 	// accepts (entity and platform names such as auditors or bounty platforms).
-	// cspell is the project's spelling authority; Harper only adds grammar.
+	// That dictionary is the project's spelling authority; Harper adds grammar.
 	lints = lints.filter(
 		lint => lint.lint_kind_pretty() !== 'Spelling' || !isInCspellWords(lint.get_problem_text()),
 	)
