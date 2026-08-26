@@ -1094,18 +1094,20 @@
 				</div>
 			{/if}
 
-			{@const undisplayedReferences = referencesNotIn(
-				toFullyQualified(evalAttr.evaluation.references),
-				isStructuredDetails(evalAttr.evaluation.details) ?
-					structuredDetailsReferences(evalAttr.evaluation.details)
-				: []
-			)}
+			{#if evalAttr.evaluation.references?.length}
+				{@const undisplayedReferences = referencesNotIn(
+					toFullyQualified(evalAttr.evaluation.references),
+					isStructuredDetails(evalAttr.evaluation.details) ?
+						structuredDetailsReferences(evalAttr.evaluation.details)
+					: []
+				)}
 
-			{#if undisplayedReferences.length > 0}
-				<ReferenceLinks
-					references={undisplayedReferences}
-					cardBackground="secondary"
-				/>
+				{#if undisplayedReferences.length > 0}
+					<ReferenceLinks
+						references={undisplayedReferences}
+						cardBackground="secondary"
+					/>
+				{/if}
 			{/if}
 
 			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
