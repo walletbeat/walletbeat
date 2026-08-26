@@ -2622,11 +2622,6 @@
 			}
 		}
 
-		@supports (
-			(container-type: scroll-state) and
-			(position-anchor: --wallet-name) and
-			(inset-inline-start: anchor(--wallet-name end))
-		) {
 		.attribute > details > summary > header {
 			anchor-scope: --sticky-breadcrumb-position;
 			timeline-scope: --sticky-breadcrumb-timeline;
@@ -3639,7 +3634,6 @@
 			article > header#top::after {
 				display: none;
 			}
-		}
 		}
 	}
 
