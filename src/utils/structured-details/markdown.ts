@@ -27,6 +27,8 @@ import { commaListFormat, renderStrings } from '@/types/utils/text'
 
 import type { StructuredDetailsContext } from './context'
 import {
+	accountRecoveryConfiguredDrillsIntro,
+	accountRecoveryMissingDrillsIntro,
 	accountRecoverySummary,
 	accountUnruggabilitySummary,
 	addressCorrelationIntro,
@@ -150,7 +152,7 @@ function renderAccountRecoveryMarkdown(
 
 		if (details.drills.configured.length > 0) {
 			blocks.push(
-				'{{WALLET_NAME}} periodically runs the following account recovery drills:',
+				accountRecoveryConfiguredDrillsIntro,
 				details.drills.configured
 					.map(
 						drill =>
@@ -162,7 +164,7 @@ function renderAccountRecoveryMarkdown(
 
 		if (details.drills.missing.length > 0) {
 			blocks.push(
-				'{{WALLET_NAME}} does not run the following recommended account recovery drills:',
+				accountRecoveryMissingDrillsIntro,
 				details.drills.missing
 					.map(drillType => `- ${accountRecoveryDrillWording(drillType).label}`)
 					.join('\n'),
@@ -249,10 +251,7 @@ function renderScamPreventionMarkdown(
 ): string {
 	return details.warnings
 		.map(warning => {
-			const description = renderStrings(warning.description, {
-				...context.strings,
-				WALLET_NAME: `**${context.strings.WALLET_NAME}**`,
-			})
+			const description = renderStrings(warning.description, { ...context.strings })
 			const nestedItems = warning.items?.map(item => `\n  - ${item}`).join('') ?? ''
 			const conclusion = warning.conclusion === undefined ? '' : `\n\n  ${warning.conclusion}`
 			const references = referencesSuffixMarkdown(warning.references)

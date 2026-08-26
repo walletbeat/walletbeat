@@ -11,12 +11,6 @@
 	// Components
 	import Typography from '@/components/Typography.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
-
-	// This renderer emphasizes the wallet name in bold; the detail model stays format-neutral.
-	const emphasizedStrings = $derived({
-		...context.strings,
-		WALLET_NAME: `**${context.strings.WALLET_NAME}**`,
-	})
 </script>
 
 
@@ -29,7 +23,7 @@
 						contentType: ContentType.MARKDOWN,
 						markdown: detail.description,
 					}}
-					strings={emphasizedStrings}
+					strings={context.strings}
 				/>
 
 				{#if detail.items}
