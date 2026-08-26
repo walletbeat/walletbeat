@@ -4253,20 +4253,11 @@
 				}
 			}
 
-			.attribute-accordions details[open] > summary[data-sticky] {
-				--sticky-insetBlockStart: var(
-					---wallet-fallback-detail-sticky-block-start
-				);
-				position: sticky;
-				z-index: var(---wallet-breadcrumb-layer-detail);
-			}
 		}
 
-		@media (max-width: 1024px) {
-			.attribute-accordions details > summary[data-sticky] {
-				position: relative;
-				inset: auto;
-			}
+		.attribute-accordions details > summary[data-sticky] {
+			position: relative;
+			inset: auto;
 		}
 
 	}
