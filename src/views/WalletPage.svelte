@@ -2691,6 +2691,32 @@
 			--stickyBreadcrumb-animationTimingFunction: linear;
 		}
 
+		/* The footer is the next authority after the terminal breadcrumb chain.
+		 * Its native entry phase supplies the final scope's otherwise-unreachable
+		 * exit crossing without adding artificial page-end clearance. */
+		article > .attribute-group:last-of-type {
+			> .attribute-group-stack
+				> header[data-sticky-breadcrumb~='exit'],
+			.attribute:last-of-type > details > summary[data-sticky-breadcrumb~='exit'],
+			.attribute:last-of-type
+				.attribute-accordions
+				> details[open]:not(:has(~ details[open]))
+				> summary[data-sticky-breadcrumb~='exit'] {
+				animation-timeline: --wallet-footer-entry;
+				animation-range: entry 0% entry 100%;
+			}
+		}
+
+		.container .page-navigation > .pie-navigation[data-sticky] {
+			animation: StickyBreadcrumbItemExitAnimation linear both;
+			animation-timeline: --wallet-footer-entry;
+			animation-range: entry 0% entry 100%;
+
+			@media (prefers-reduced-motion: reduce) {
+				--stickyBreadcrumb-exitAnimationDistance: 0px;
+			}
+		}
+
 		@media (prefers-reduced-motion: no-preference) {
 			.container {
 				---wallet-group-header-padding-block: 1rem;
@@ -2875,9 +2901,9 @@
 				);
 				block-size: var(---wallet-root-row-block-size);
 				opacity: 0;
-				animation: WalletBreadcrumbRevealAnimation linear both;
-				animation-timeline: --wallet-page-scroll-timeline;
-				animation-range: var(---wallet-header-animation-range);
+				animation:
+					WalletBreadcrumbRevealAnimation linear both,
+					StickyBreadcrumbItemExitAnimation linear both;
 
 				@media (max-width: 1024px) {
 					inset-block-start: 0;
@@ -2898,9 +2924,9 @@
 				margin-inline-start: 0;
 				font-size: var(---wallet-name-flow-font-size);
 
-				animation: WalletNameAnimation linear both;
-				animation-timeline: --wallet-page-scroll-timeline;
-				animation-range: var(---wallet-header-animation-range);
+				animation:
+					WalletNameAnimation linear both,
+					StickyBreadcrumbItemExitAnimation linear both;
 
 				h1 {
 					anchor-name: --wallet-breadcrumb-root;
@@ -2919,6 +2945,16 @@
 				animation: WalletIconAnimation linear both;
 				animation-timeline: --wallet-page-scroll-timeline;
 				animation-range: var(---wallet-header-animation-range);
+			}
+
+			&::after,
+			.wallet-name[data-sticky-breadcrumb] {
+				animation-timeline:
+					--wallet-page-scroll-timeline,
+					--wallet-footer-entry;
+				animation-range:
+					var(---wallet-header-animation-range),
+					entry 0% entry 100%;
 			}
 		}
 
@@ -2963,6 +2999,7 @@
 					font-size: var(---wallet-group-heading-font-size);
 				}
 			}
+
 		}
 
 		.breadcrumb-parent-slot {
@@ -3427,9 +3464,10 @@
 				inline-size: max-content;
 				min-inline-size: 0;
 				position-try-fallbacks: --wallet-root-without-site-logo;
-				animation-name: WalletNameMobileAnimation;
+				animation-name:
+					WalletNameMobileAnimation,
+					StickyBreadcrumbItemExitAnimation;
 				animation-timing-function: linear;
-				animation-range: var(---wallet-header-animation-range);
 
 				@supports (inline-size: calc-size(max-content, size * 1)) {
 					inline-size: calc-size(
@@ -3717,6 +3755,12 @@
 		}
 	}
 
+	@media (min-width: 1280px) {
+		[data-sticky-row-backdrop='group'][data-sticky]::before {
+			display: none;
+		}
+	}
+
 	[data-sticky-row-backdrop='attribute'] {
 		--sticky-backgroundColor: var(---wallet-breadcrumb-surface-background);
 		--sticky-backdropFilter: var(---wallet-breadcrumb-surface-backdrop-filter);
@@ -3727,7 +3771,7 @@
 		}
 	}
 
-	@media (min-width: 481px) and (max-width: 1024px) {
+	@media (min-width: 481px) and (max-width: 1024px), (min-width: 1600px) {
 		[data-sticky-row-backdrop='attribute'][data-sticky]::before {
 			display: none;
 		}
@@ -4444,7 +4488,8 @@
 			animation:
 				WalletVariantPickerAnimation linear both,
 				WalletVariantPickerClipAnimation linear both,
-				WalletVariantPickerInlineSizeAnimation linear both;
+				WalletVariantPickerInlineSizeAnimation linear both,
+				StickyBreadcrumbItemExitAnimation linear both;
 
 			&::after {
 				content: '';
@@ -4483,6 +4528,19 @@
 		:global(.wallet-variant-picker::picker-icon) {
 			animation-timeline: --wallet-page-scroll-timeline;
 			animation-range: var(---wallet-header-animation-range);
+		}
+
+		.wallet-variant-picker-control {
+			animation-timeline:
+				--wallet-page-scroll-timeline,
+				--wallet-page-scroll-timeline,
+				--wallet-page-scroll-timeline,
+				--wallet-footer-entry;
+			animation-range:
+				var(---wallet-header-animation-range),
+				var(---wallet-header-animation-range),
+				var(---wallet-header-animation-range),
+				entry 0% entry 100%;
 		}
 
 		:global(.wallet-variant-picker selectedcontent > span:first-child :is(svg, img)) {
