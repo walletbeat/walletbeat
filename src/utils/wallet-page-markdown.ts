@@ -23,8 +23,10 @@ import {
 	VariantSpecificity,
 } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
+import { isStructuredDetails } from '@/types/content/details'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
+import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
@@ -244,10 +246,9 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 				parts.push(shortExpl, '')
 
 				const details = normalizeMarkdownBlankLines(
-					renderContentToText(evaluation.details, evalStrings, {
-						fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
-						trim: true,
-					}),
+					isStructuredDetails(evaluation.details)
+						? renderStructuredDetailsMarkdown(evaluation.details, { strings: evalStrings })
+						: renderContentToText(evaluation.details, evalStrings, { trim: true }),
 				)
 
 				if (details.trim() !== '') {

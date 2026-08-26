@@ -14,11 +14,8 @@ import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import {
-	ratedWalletJsonExport,
-	serializeReferences,
-	stageToExportString,
-} from '@/utils/wallet-json-export'
+import { serializeReferences } from '@/utils/structured-details/json'
+import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
 
 import { RatedWalletExportValidator } from './utils/assert-valid-json'
 
@@ -34,6 +31,40 @@ const payloadForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRated
 					})()
 
 describe('ratedWalletJsonExport', () => {
+	it('renders custom scam-prevention details instead of the generic fallback', () => {
+		const payload = payloadForWallet(allRatedWallets.metamask)
+		const evaluation = payload.overall.security?.scamPrevention?.evaluation
+		const details = evaluation?.details
+
+		expect(details).not.toBe('See full details on the wallet page.')
+		expect(details).toContain('**MetaMask** helps you stay safe when sending funds by:')
+		expect(details).toContain(
+			'Warning you when sending funds to an address you have not sent or received funds from in the past',
+		)
+		expect(details).toContain(
+			'**MetaMask** helps you stay safe when doing onchain transactions by:',
+		)
+		expect(details).toContain(
+			'**MetaMask** does not warn you when granting unlimited token approvals.',
+		)
+		expect(evaluation?.structuredDetails).toMatchObject({
+			type: 'scamPrevention',
+			warnings: [
+				{
+					kind: 'sendTransaction',
+					description: 'MetaMask helps you stay safe when sending funds by:',
+					items: [
+						'Warning you when sending funds to an address you have not sent or received funds from in the past',
+						'Allowing you to build a contact book and warning you when sending funds to addresses not in it',
+					],
+				},
+				{ kind: 'contractTransaction' },
+				{ kind: 'scamUrl' },
+				{ kind: 'unlimitedApproval' },
+			],
+		})
+	})
+
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
 			const payload = payloadForWallet(wallet)

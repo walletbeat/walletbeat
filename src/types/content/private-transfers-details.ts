@@ -9,6 +9,7 @@ import {
 	isCustomContent,
 	type MarkdownParagraph,
 } from '../content'
+import type { EvaluationDetails } from './details'
 import type { Strings } from '../utils/string-templates'
 
 interface PrivateTokenTransferDetails {
@@ -22,14 +23,9 @@ export interface PrivateTransfersDetailsProps extends EvaluationData<PrivateTran
 	privateTransferDetails: Map<PrivateTransferTechnology, PrivateTokenTransferDetails>
 }
 
-export type PrivateTransfersDetailsBakedProps = Omit<
-	PrivateTransfersDetailsProps,
-	keyof EvaluationData<PrivateTransfersMetadata>
->
-
 export interface PrivateTransfersDetailsContent {
 	component: 'PrivateTransfersDetails'
-	componentProps: PrivateTransfersDetailsBakedProps
+	componentProps: PrivateTransfersDetailsProps
 }
 
 /** Type predicate for PrivateTransfersDetailsContent. */
@@ -40,8 +36,8 @@ function isPrivateTransferDetailsContent(
 }
 
 export function extractPrivateTransferDetails<S extends Strings>(
-	content: Content<S>,
-): PrivateTransfersDetailsBakedProps | null {
+	content: EvaluationDetails<S>,
+): PrivateTransfersDetailsProps | null {
 	if (!isCustomContent(content)) {
 		return null
 	}
@@ -54,9 +50,9 @@ export function extractPrivateTransferDetails<S extends Strings>(
 }
 
 export function mergePrivateTransferDetails(
-	details1: PrivateTransfersDetailsBakedProps | null,
-	details2: PrivateTransfersDetailsBakedProps,
-): PrivateTransfersDetailsBakedProps {
+	details1: PrivateTransfersDetailsProps | null,
+	details2: PrivateTransfersDetailsProps,
+): Pick<PrivateTransfersDetailsProps, 'privateTransferDetails'> {
 	if (details1 === null) {
 		return details2
 	}
@@ -79,7 +75,10 @@ export function mergePrivateTransferDetails(
 }
 
 export function privateTransfersDetailsContent(
-	bakedProps: PrivateTransfersDetailsBakedProps,
+	bakedProps: Omit<PrivateTransfersDetailsProps, keyof EvaluationData<PrivateTransfersMetadata>>,
 ): Content<{ WALLET_NAME: string }> {
-	return component('PrivateTransfersDetails', bakedProps)
+	return component<PrivateTransfersDetailsContent, keyof typeof bakedProps>(
+		'PrivateTransfersDetails',
+		bakedProps,
+	)
 }

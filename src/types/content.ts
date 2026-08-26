@@ -1,13 +1,11 @@
 import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
-import type { ChainVerificationDetailsContent } from './content/chain-verification-details'
 import type { FundingDetailsContent } from './content/funding-details'
 import type { PrivateTransfersDetailsContent } from './content/private-transfers-details'
-import type { ScamAlertDetailsContent } from './content/scam-alert-details'
 import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
-import type { UnratedAttributeContent } from './content/unrated-attribute'
+import type { EvaluationDetails } from './content/details'
 import type { Strings, StringsFromTemplate, ValidateText } from './utils/string-templates'
 import { renderStrings, trimWhitespacePrefix } from './utils/text'
 
@@ -30,15 +28,12 @@ export enum ContentType {
  */
 export type ComponentAndProps =
 	| AddressCorrelationDetailsContent
-	| ChainVerificationDetailsContent
 	| FundingDetailsContent
 	| PrivateTransfersDetailsContent
-	| ScamAlertDetailsContent
 	| SecurityAuditsDetailsContent
 	| TransactionInclusionDetailsContent
 	| AccountRecoveryDetailsContent
 	| AccountUnruggabilityDetailsContent
-	| UnratedAttributeContent
 
 /**
  * Text-based content that may be displayed on the UI.
@@ -120,9 +115,16 @@ export type Content<_Strings extends Strings = null> = TypographicContent<_Strin
  * @returns Whether `content` is of type `TypographicContent`.
  */
 export function isTypographicContent<_Strings extends Strings = null>(
-	content: Content<_Strings>,
+	content: EvaluationDetails<_Strings> | Content<_Strings>,
 ): content is TypographicContent<_Strings> {
-	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
+	if (content === undefined || !Object.hasOwn(content, 'contentType')) {
+		return false
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Only content carrying a `contentType` reaches here.
+	const { contentType } = content as Content<_Strings>
+
+	return contentType === ContentType.TEXT || contentType === ContentType.MARKDOWN
 }
 
 /**
@@ -323,28 +325,18 @@ export function mdParagraph<_Strings extends Strings, _Text extends string = str
 /**
  * Custom content with a custom component type.
  */
-type ComponentName = ComponentAndProps['component']
-
-type ComponentPropsFor<_Name extends ComponentName> = Extract<
-	ComponentAndProps,
-	{ component: _Name }
->['componentProps']
-
-export function component<_Name extends ComponentName>(
-	componentName: _Name,
-	componentProps: ComponentPropsFor<NoInfer<_Name>>,
-): {
-	contentType: ContentType.COMPONENT
-	component: {
-		component: _Name
-		componentProps: ComponentPropsFor<NoInfer<_Name>>
-	}
-} {
+export function component<
+	C extends ComponentAndProps,
+	B extends keyof C['componentProps'],
+	// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
+	// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
+>(componentName: C['component'], componentProps: Pick<C['componentProps'], B>): CustomContent {
 	return {
 		contentType: ContentType.COMPONENT,
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- This is actually not safe; `componentProps` is actually only a `Partial` version here. This is meant to be merged later when rendering to make a complete `componentProps`.
 		component: {
 			component: componentName,
 			componentProps,
-		},
+		} as C,
 	}
 }

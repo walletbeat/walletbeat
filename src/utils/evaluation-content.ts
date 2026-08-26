@@ -1,10 +1,7 @@
 import type { ConcreteWalletEvalStrings, WalletNameAndPseudonymStrings } from '@/schema/attributes'
 import type { WalletMetadata } from '@/schema/wallet'
-import {
-	type Content,
-	isTypographicContent,
-	renderTypographicContentToString,
-} from '@/types/content'
+import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
+import type { EvaluationDetails } from '@/types/content/details'
 import { trimWhitespacePrefix } from '@/types/utils/text'
 
 /**
@@ -25,13 +22,13 @@ export function getWalletEvalStrings(wallet: {
 
 /**
  * Render content to plain text. Typographic content is rendered with eval strings;
- * CustomContent yields the given fallback.
+ * structured details and absent details yield the given fallback.
  * Optionally normalizes whitespace by stripping the longest common leading whitespace
  * from each line (via trimWhitespacePrefix).
  * Accepts Content (e.g. Paragraph from stage definitions).
  */
 export function renderContentToText(
-	content: Content<WalletNameAndPseudonymStrings>,
+	content: EvaluationDetails<WalletNameAndPseudonymStrings>,
 	strings: WalletNameAndPseudonymStrings,
 	options: { fallback?: string; trim?: boolean } = {},
 ): string {
