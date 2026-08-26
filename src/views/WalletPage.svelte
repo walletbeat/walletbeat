@@ -1276,9 +1276,15 @@
 							id={`${id}-why-heading`}
 							data-sticky-breadcrumb="item"
 						>
-							<a data-link="camouflaged" href={`#${id}-why`}>
+							<span>
 								{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
-							</a>
+							</span>
+							<a
+								data-link="camouflaged"
+								data-heading-permalink
+								href={`#${id}-why`}
+								aria-label={`${evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'} permalink`}
+							></a>
 						</h4>
 					</summary>
 
@@ -1311,9 +1317,15 @@
 							id={`${id}-methodology-heading`}
 							data-sticky-breadcrumb="item"
 						>
-							<a data-link="camouflaged" href={`#${id}-methodology`}>
+							<span>
 								{getHowIsEvaluatedHeading(attribute)}
-							</a>
+							</span>
+							<a
+								data-link="camouflaged"
+								data-heading-permalink
+								href={`#${id}-methodology`}
+								aria-label={`${getHowIsEvaluatedHeading(attribute)} permalink`}
+							></a>
 						</h4>
 					</summary>
 
@@ -1421,9 +1433,15 @@
 								id={`${id}-improvement-heading`}
 								data-sticky-breadcrumb="item"
 							>
-								<a data-link="camouflaged" href={`#${id}-improvement`}>
+								<span>
 									{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
-								</a>
+								</span>
+								<a
+									data-link="camouflaged"
+									data-heading-permalink
+									href={`#${id}-improvement`}
+									aria-label={`${getHowToImproveHeading(attribute, wallet.metadata.displayName)} permalink`}
+								></a>
 							</h4>
 						</summary>
 
@@ -2807,7 +2825,7 @@
 				min-inline-size: 0;
 			}
 
-			> a {
+			> a:not([data-heading-permalink]) {
 				flex: 1 1 0;
 				min-inline-size: 0;
 			}
@@ -4006,8 +4024,24 @@
 				--sticky-backgroundColor: var(--background-secondary);
 
 				h4 {
+					margin-inline-start: -1rem;
 					max-inline-size: 60ch;
 					overflow-wrap: break-word;
+					padding-inline-start: 1rem;
+
+					> span {
+						min-inline-size: 0;
+					}
+
+					> a[data-heading-permalink] {
+						z-index: 1;
+						position: absolute;
+						inset-block-start: 50%;
+						inset-inline-start: 0;
+						inline-size: 1em;
+						block-size: 1lh;
+						translate: 0 -50%;
+					}
 				}
 			}
 
@@ -4146,7 +4180,7 @@
 			details
 			> summary
 			> h4[data-sticky-breadcrumb~='item']::before {
-			inset-inline-start: -1rem;
+			inset-inline-start: 0;
 		}
 
 		.attribute-group .section-caption,
