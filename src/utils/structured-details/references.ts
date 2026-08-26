@@ -16,6 +16,10 @@ const referenceCollectors: StructuredDetailsRenderers<FullyQualifiedReference[]>
 	chainVerification: () => [],
 	funding: () => [],
 	privateTransfers: () => [],
+	securityAudits: details => [
+		...details.audits.flatMap(audit => audit.references),
+		...(details.bugBounty === undefined ? [] : details.bugBounty.references),
+	],
 	scamPrevention: details =>
 		details.warnings.flatMap(warning => toFullyQualified(warning.references)),
 	transactionInclusion: details => [

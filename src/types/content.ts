@@ -1,7 +1,6 @@
 import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { EvaluationDetails } from './content/details'
-import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
 import type { Strings, StringsFromTemplate, ValidateText } from './utils/string-templates'
 import { renderStrings, trimWhitespacePrefix } from './utils/text'
 
@@ -22,8 +21,7 @@ export enum ContentType {
 /**
  * Set of custom-component-typed components that may be displayed on the UI.
  */
-export type ComponentAndProps =
-	SecurityAuditsDetailsContent | AccountRecoveryDetailsContent | AccountUnruggabilityDetailsContent
+export type ComponentAndProps = AccountRecoveryDetailsContent | AccountUnruggabilityDetailsContent
 
 /**
  * Text-based content that may be displayed on the UI.
