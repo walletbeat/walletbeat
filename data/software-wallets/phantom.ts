@@ -20,6 +20,7 @@ export const phantom: SoftwareWallet = {
 		id: 'phantom',
 		displayName: 'Phantom',
 		tableName: 'Phantom',
+		coinspectId: 'phantom',
 		contributors: [nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',

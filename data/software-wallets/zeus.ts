@@ -33,6 +33,7 @@ export const zeus: SoftwareWallet = {
 		id: 'zeus',
 		displayName: 'Zeus',
 		tableName: 'Zeus',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-12',
@@ -50,7 +51,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Zeus derives a Hierarchical Deterministic Wallet from a username and password using the BIP32 standard. Users can also import wallets using either a 12-24 word phrase or a private key.',
+							'Zeus derives a Hierarchical Deterministic Wallet from a username and password using the BIP32 standard. Users can also import wallets using either a 12–24 word phrase or a private key.',
 						url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
 					},
 				],

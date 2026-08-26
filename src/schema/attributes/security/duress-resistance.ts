@@ -69,7 +69,7 @@ function basicLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>
 			- Open a **decoy wallet** with a different set of accounts and balances (provides plausible deniability), or
 			- **Wipe the wallet** (self-destruct), preventing the attacker from accessing funds, or
 			- Trigger an **onchain lockdown**, preventing unauthorized transfers of funds, or
-			- **Wipe and forward**, wiping the wallet and forwarding all funds to a pre-configured safe address.
+			- **Wipe and forward**, wiping the wallet and forwarding all funds to a preconfigured safe address.
 		`),
 	})
 }
@@ -136,7 +136,7 @@ export const duressResistance: Attribute = {
 
 		2. **Duress mode (stronger)**: A separate duress PIN or passphrase that, when entered,
 		   either opens a decoy wallet (providing plausible deniability) or wipes the device and
-		   immediately forwards all funds to a pre-configured address not controlled by the user alone.
+		   immediately forwards all funds to a preconfigured address not controlled by the user alone.
 
 		This attribute is only evaluated for **hardware wallets** and **mobile app wallets**, as
 		desktop and browser extension wallets do not meaningfully face this threat model.

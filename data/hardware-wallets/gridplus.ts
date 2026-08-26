@@ -41,6 +41,7 @@ export const gridplusWallet: HardwareWallet = {
 		id: 'gridplus',
 		displayName: 'GridPlus Wallet',
 		tableName: 'GridPlus',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
@@ -72,7 +73,7 @@ export const gridplusWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The Lattice1 supports full BIP-32, BIP-39, and BIP-44 key derivation standards, along with custom derivation paths and non-standard formats such as Ledger Live, Ledger Legacy, and Solflare/Ledger derivation paths for Solana.',
+							'The Lattice1 supports full BIP-32, BIP-39, and BIP-44 key derivation standards, along with custom derivation paths and nonstandard formats such as Ledger Live, Ledger Legacy, and Solflare/Ledger derivation paths for Solana.',
 						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
 					},
 				],

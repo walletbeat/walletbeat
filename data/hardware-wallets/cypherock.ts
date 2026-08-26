@@ -30,6 +30,7 @@ export const cypherockWallet: HardwareWallet = {
 		id: 'cypherock',
 		displayName: 'Cypherock Wallet',
 		tableName: 'Cypherock',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
@@ -79,7 +80,7 @@ export const cypherockWallet: HardwareWallet = {
 		monetization: {
 			ref: [
 				{
-					explanation: 'Hardware wallet startup Cypherock raises $1 Mn',
+					explanation: 'Hardware wallet startup Cypherock raises $1 million',
 					url: 'https://entrackr.com/2022/12/hardware-wallet-startup-cypherock-raises-1-mn/',
 				},
 			],

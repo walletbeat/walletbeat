@@ -264,7 +264,7 @@ function evaluateChainAbstraction(
 				implementing:
 
 				- Global (cross-chain) account valuation.
-				- Cross-chain token balances ("How many Ether do I have
+				- Cross-chain token balances ("How much Ether do I have
 					across all chains?"), while still allowing the user to go into
 					per-chain balances if they wish.
 				- Cross-chain bridging with transparent fee breakdown and risk
@@ -294,7 +294,7 @@ function evaluateChainAbstraction(
 			implementing:
 
 			- Global (cross-chain) account valuation.
-			- Cross-chain token balances ("How many Ether do I have
+			- Cross-chain token balances ("How much Ether do I have
 				across all chains?"), while still allowing the user to go into
 				per-chain balances if they wish.
 			- Cross-chain bridging with transparent fee breakdown and risk

@@ -32,6 +32,7 @@ export const keycardShell: HardwareWallet = {
 		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [phift, mmlado],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
@@ -235,7 +236,7 @@ export const keycardShell: HardwareWallet = {
 					},
 					{
 						explanation:
-							'Product page emphasizes human-readable transaction data and verifying tx data on-device display',
+							'Product page emphasizes human-readable transaction data and verifying transaction data on-device display',
 						url: 'https://get.keycard.tech/pages/keycard-shell',
 					},
 				],

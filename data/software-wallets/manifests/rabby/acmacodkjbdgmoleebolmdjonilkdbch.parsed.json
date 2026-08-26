@@ -1,6 +1,6 @@
 {
 	"contentScripts": "UNRESTRICTED",
-	"externallyConnectable": "NOT_EXTERNALLY_CONNECTABLE",
+	"externallyConnectable": { "extensionIds": "NONE", "pageMatches": "NONE" },
 	"hostPermissions": "UNRESTRICTED",
 	"permissions": [
 		"scripting",
