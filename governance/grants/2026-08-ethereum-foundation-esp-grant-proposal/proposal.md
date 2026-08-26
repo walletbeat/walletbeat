@@ -189,11 +189,11 @@ _Depending on the stage of this project, provide metrics for the project's curre
 
 ### Repository and contributors
 
-Figures as of 2026-08-26:
+Figures as of 2026-08-26, as shown on the repository's public GitHub pages:
 
 - 621 pull requests merged in the last 12 months; 765 all-time.
-- 2,310 commits in the last 12 months; 3,489 all-time.
-- 33 distinct commit authors in the last 12 months; 64 all-time.
+- 2,177 commits in the last 12 months; 3,279 all-time.
+- 26 contributors active in the last 12 months; 49 all-time.
 - 117 stars, 86 forks.
 
 ### Effects on wallets
