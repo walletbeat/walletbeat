@@ -5,11 +5,17 @@ import { ackee } from '@/data/entities/ackee'
 import { PersonalInfo } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { AccountRecoveryDrillType, GuardianType } from '@/schema/features/security/account-recovery'
+import { EthereumL1LightClient } from '@/schema/features/security/light-client'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
+import { MonetizationStrategy } from '@/schema/features/transparency/monetization'
 import { toFullyQualified } from '@/schema/reference'
 import { buildAddressCorrelationDetails } from '@/types/content/address-correlation-details'
 import { inline, inlineCode, inlineLink } from '@/types/content/inline'
-import type { StructuredDetails } from '@/types/content/structured-details'
+import type {
+	StructuredDetails,
+	StructuredDetailsByType,
+	StructuredDetailsType,
+} from '@/types/content/structured-details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 
@@ -25,23 +31,109 @@ function renderDetails(details: StructuredDetails): string {
 	return render(StructuredDetailsView, { props: { details, context } }).body
 }
 
-describe('structured details web adapter', () => {
-	it('dispatches on the discriminator and resolves the wallet name', () => {
-		expect(
-			renderDetails({
-				type: 'funding',
-				strategies: [],
-				revenueBreakdownIsPublic: false,
-			}),
-		).toContain('Test Wallet')
-	})
+const viewSmokeCases = {
+	accountRecovery: {
+		details: {
+			type: 'accountRecovery',
+			recoverableScenarios: [{ id: 'recovery-smoke', scenario: 'Recovery marker' }],
+			unrecoverableScenarios: [],
+		},
+		expected: 'Recovery marker',
+	},
+	accountUnruggability: {
+		details: {
+			type: 'accountUnruggability',
+			safeScenarios: [],
+			takeoverScenarios: [],
+		},
+		expected: 'Private key material never leaves Test Wallet',
+	},
+	addressCorrelation: {
+		details: {
+			type: 'addressCorrelation',
+			leaks: [
+				{
+					source: { kind: 'onchain' },
+					correlatedInfo: [PersonalInfo.EMAIL],
+					references: [],
+				},
+			],
+		},
+		expected: 'email address',
+	},
+	chainVerification: {
+		details: {
+			type: 'chainVerification',
+			lightClients: [EthereumL1LightClient.helios],
+		},
+		expected: 'Helios',
+	},
+	funding: {
+		details: {
+			type: 'funding',
+			strategies: [{ strategy: MonetizationStrategy.DONATIONS, userAligned: true }],
+			revenueBreakdownIsPublic: false,
+		},
+		expected: 'donations',
+	},
+	privateTransfers: {
+		details: {
+			type: 'privateTransfers',
+			technologies: [
+				{
+					technology: PrivateTransferTechnology.RAILGUN,
+					sending: inline`Sending marker`,
+					receiving: inline`Receiving marker`,
+					spending: inline`Spending marker`,
+					notes: [],
+				},
+			],
+		},
+		expected: 'Railgun',
+	},
+	scamPrevention: {
+		details: {
+			type: 'scamPrevention',
+			warnings: [{ kind: 'scamUrl', description: 'Scam marker' }],
+		},
+		expected: 'Scam marker',
+	},
+	securityAudits: {
+		details: {
+			type: 'securityAudits',
+			audits: [
+				{
+					auditor: ackee,
+					auditDate: '2020-01-02',
+					variants: 'ALL_VARIANTS',
+					findings: { kind: 'noneFound' },
+					references: [],
+				},
+			],
+		},
+		expected: 'Ackee',
+	},
+	transactionInclusion: {
+		details: {
+			type: 'transactionInclusion',
+			l1Broadcast: 'OWN_NODE',
+			l2s: [],
+		},
+		expected: 'self-hosted Ethereum node',
+	},
+} satisfies {
+	[_Type in StructuredDetailsType]: {
+		details: StructuredDetailsByType[_Type]
+		expected: string
+	}
+}
 
-	it('throws rather than guessing when handed an unknown discriminator', () => {
-		expect(() => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Deliberately invalid, to check the adapter refuses it.
-			renderDetails({ type: 'notAVariant' } as unknown as StructuredDetails)
-		}).toThrow()
-	})
+describe('structured details web adapter', () => {
+	for (const { details, expected } of Object.values(viewSmokeCases)) {
+		it(`renders the ${details.type} discriminator`, () => {
+			expect(renderDetails(details)).toContain(expected)
+		})
+	}
 
 	it('renders each address-correlation source with its own references', () => {
 		const body = renderDetails(

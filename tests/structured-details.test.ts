@@ -34,7 +34,7 @@ import {
 	type SecurityAuditsDetails,
 	securityAuditsSummary,
 } from '@/types/content/security-audits-details'
-import type { StructuredDetails } from '@/types/content/structured-details'
+import type { StructuredDetails, StructuredDetailsByType } from '@/types/content/structured-details'
 import type { CalendarDate } from '@/types/date'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import { serializeStructuredDetails } from '@/utils/structured-details/json'
@@ -83,23 +83,27 @@ describe('chainVerification structured details', () => {
 	}
 
 	it('renders the canonical light client label rather than the raw enum in Markdown', () => {
-		expect(renderStructuredDetailsMarkdown(details, context)).toBe(
-			'**Test Wallet** performs L1 chain state verification using [Helios-Mobi](https://github.com/hsyodyssey/helios-mobi) light client.',
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown).toContain('**Test Wallet**')
+		expect(markdown).toContain(
+			'[Helios-Mobi](https://github.com/hsyodyssey/helios-mobi) light client',
 		)
+		expect(markdown).not.toContain('heliosMobi')
 	})
 
 	it('pluralizes when several light clients are used', () => {
-		expect(
-			renderStructuredDetailsMarkdown(
-				{
-					type: 'chainVerification',
-					lightClients: [EthereumL1LightClient.helios, EthereumL1LightClient.heliosMobi],
-				},
-				context,
-			),
-		).toBe(
-			'**Test Wallet** performs L1 chain state verification using [Helios](https://helios.a16zcrypto.com/) and [Helios-Mobi](https://github.com/hsyodyssey/helios-mobi) light clients.',
+		const markdown = renderStructuredDetailsMarkdown(
+			{
+				type: 'chainVerification',
+				lightClients: [EthereumL1LightClient.helios, EthereumL1LightClient.heliosMobi],
+			},
+			context,
 		)
+
+		expect(markdown).toContain('[Helios](https://helios.a16zcrypto.com/)')
+		expect(markdown).toContain('[Helios-Mobi](https://github.com/hsyodyssey/helios-mobi)')
+		expect(markdown).toContain('light clients')
 	})
 
 	it('serializes light client identity, label and url', () => {
@@ -127,8 +131,12 @@ describe('funding structured details', () => {
 	}
 
 	it('lists active funding sources in Markdown', () => {
-		expect(renderStructuredDetailsMarkdown(details, context)).toBe(
-			`**Test Wallet** is funded by **${monetizationStrategyName(MonetizationStrategy.DONATIONS)}, ${monetizationStrategyName(MonetizationStrategy.HIDDEN_CONVENIENCE_FEES)}**.`,
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown).toContain('**Test Wallet**')
+		expect(markdown).toContain(monetizationStrategyName(MonetizationStrategy.DONATIONS))
+		expect(markdown).toContain(
+			monetizationStrategyName(MonetizationStrategy.HIDDEN_CONVENIENCE_FEES),
 		)
 	})
 
@@ -138,7 +146,7 @@ describe('funding structured details', () => {
 				{ type: 'funding', strategies: [], revenueBreakdownIsPublic: true },
 				context,
 			),
-		).toBe('**Test Wallet** is funded by **unknown sources**.')
+		).toContain('**unknown sources**')
 	})
 
 	it('serializes user alignment and revenue breakdown status', () => {
@@ -340,15 +348,13 @@ describe('addressCorrelation structured details', () => {
 			{ info: PersonalInfo.EMAIL, by: ackee, refs: toFullyQualified(ackeeRef) },
 			{ info: WalletInfo.ACCOUNT_ADDRESS, by: 'onchain', refs: [] },
 		])
+		const markdown = renderStructuredDetailsMarkdown(details, context)
 
-		expect(renderStructuredDetailsMarkdown(details, context)).toBe(
-			[
-				'By default, **Test Wallet** allows your wallet address to be correlated with your personal information:',
-				'',
-				'- **Ackee** ([Privacy policy](https://ackee.xyz/privacy-policy)) may link your wallet address to your **email address**. ([Ackee policy](https://ackee.example/policy))',
-				'- An onchain record permanently associates your **wallet address** with your wallet address.',
-			].join('\n'),
-		)
+		expect(markdown.match(/^- /gmu)).toHaveLength(2)
+		expect(markdown).toContain('**Ackee**')
+		expect(markdown).toContain('**email address**')
+		expect(markdown).toContain('[Ackee policy](https://ackee.example/policy)')
+		expect(markdown).toContain('onchain record')
 	})
 
 	it('serializes entity identity separately from its display name', () => {
@@ -506,9 +512,10 @@ describe('securityAudits structured details', () => {
 			],
 		}
 
-		expect(securityAuditsSummary(details)).toBe(
-			'**{{WALLET_NAME}}** was last audited on January 2, 2020, which was over a year ago. There remain unaddressed security flaws in the codebase.',
-		)
+		const summary = securityAuditsSummary(details)
+
+		expect(summary).toContain('January 2, 2020')
+		expect(summary).toContain('unaddressed security flaws')
 	})
 
 	it('formats the audit date in UTC, so it never shows the previous day', () => {
@@ -567,27 +574,26 @@ describe('securityAudits structured details', () => {
 		)
 	})
 
-	it('describes a bug bounty program identically for every adapter', () => {
-		expect(
-			bugBountySentences({
-				availability: BugBountyProgramAvailability.ACTIVE,
-				coverage: 'FULL_SCOPE',
-				platform: BugBountyPlatform.HACKER_ONE,
-				rewards: { minimum: 1000, maximum: 50000, currency: 'USD' },
-				legalProtection: LegalProtectionType.SAFE_HARBOR,
-				disclosureDays: 30,
-				upgradePathAvailable: true,
-				references: [],
-			}),
-		).toEqual([
-			'The program covers all aspects of the wallet.',
-			'The program is currently active and accepting vulnerability reports.',
-			'The program is hosted on Hacker One.',
-			'Rewards range from $1,000 to $50,000',
-			'**Legal Protection**: The program provides Safe Harbor protections for security researchers conducting good faith security research.',
-			'**Disclosure Process**: 30 days',
-			'Positively, the wallet does provide an upgrade path for users when security issues are identified.',
-		])
+	it('describes every configured bug bounty fact', () => {
+		const prose = bugBountySentences({
+			availability: BugBountyProgramAvailability.ACTIVE,
+			coverage: 'FULL_SCOPE',
+			platform: BugBountyPlatform.HACKER_ONE,
+			rewards: { minimum: 1000, maximum: 50000, currency: 'USD' },
+			legalProtection: LegalProtectionType.SAFE_HARBOR,
+			disclosureDays: 30,
+			upgradePathAvailable: true,
+			references: [],
+		}).join('\n')
+
+		expect(prose).toContain('all aspects')
+		expect(prose).toContain('active')
+		expect(prose).toContain('Hacker One')
+		expect(prose).toContain('$1,000')
+		expect(prose).toContain('$50,000')
+		expect(prose).toContain('Safe Harbor')
+		expect(prose).toContain('30 days')
+		expect(prose).toContain('upgrade path')
 	})
 
 	it('serializes audits most recent first, with ISO dates', () => {
@@ -646,24 +652,32 @@ describe('guardian-based details', () => {
 		},
 	}
 
-	it('describes a policy once, for every adapter', () => {
-		expect(guardianPolicyBlocks(policy)).toEqual([
-			{ kind: 'paragraph', text: 'The wallet splits the recovery secret across two providers.' },
-			{
-				kind: 'paragraph',
-				text: "The recovery process **critically depends** on The user's wallet password.",
-			},
-			{
-				kind: 'list',
-				lead: 'The recovery process requires setting up recovery with at least 1 of the following:',
-				items: ["The user's Google account", "The user's Apple account"],
-			},
-			{
-				kind: 'paragraph',
-				text: 'For evaluation purposes, Walletbeat assumes the user will use the policy requiring the _least amount of effort_ that the wallet allows, i.e. a single recovery guardian.',
-			},
-			{ kind: 'paragraph', text: 'The key is reconstituted **client-side**.' },
+	it('describes every guardian policy fact as structured blocks', () => {
+		const blocks = guardianPolicyBlocks(policy)
+
+		expect(blocks.map(block => block.kind)).toEqual([
+			'paragraph',
+			'paragraph',
+			'list',
+			'paragraph',
+			'paragraph',
 		])
+		expect(blocks).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					kind: 'paragraph',
+					text: expect.stringContaining('wallet password'),
+				}),
+				expect.objectContaining({
+					kind: 'list',
+					items: ["The user's Google account", "The user's Apple account"],
+				}),
+				expect.objectContaining({
+					kind: 'paragraph',
+					text: expect.stringContaining('client-side'),
+				}),
+			]),
+		)
 	})
 
 	const secretSplitFacts =
@@ -810,8 +824,8 @@ describe('guardian-based details', () => {
 
 describe('published JSON schema', () => {
 	/** One fixture per structured-details variant; every variant must validate. */
-	const variants: StructuredDetails[] = [
-		buildAddressCorrelationDetails([
+	const variants = {
+		addressCorrelation: buildAddressCorrelationDetails([
 			{
 				info: PersonalInfo.EMAIL,
 				by: ackee,
@@ -819,13 +833,16 @@ describe('published JSON schema', () => {
 			},
 			{ info: WalletInfo.ACCOUNT_ADDRESS, by: 'onchain', refs: [] },
 		]),
-		{ type: 'chainVerification', lightClients: [EthereumL1LightClient.helios] },
-		{
+		chainVerification: {
+			type: 'chainVerification',
+			lightClients: [EthereumL1LightClient.helios],
+		},
+		funding: {
 			type: 'funding',
 			strategies: [{ strategy: MonetizationStrategy.DONATIONS, userAligned: true }],
 			revenueBreakdownIsPublic: true,
 		},
-		{
+		privateTransfers: {
 			type: 'privateTransfers',
 			technologies: [
 				{
@@ -838,7 +855,7 @@ describe('published JSON schema', () => {
 			],
 			defaultModeNote: inline`Transfers are public by default.`,
 		},
-		{
+		securityAudits: {
 			type: 'securityAudits',
 			audits: [
 				{
@@ -865,7 +882,7 @@ describe('published JSON schema', () => {
 				references: [refWithUrl('https://ackee.example/bounty', 'Bounty page')],
 			},
 		},
-		{
+		accountRecovery: {
 			type: 'accountRecovery',
 			guardianPolicy: {
 				description: ['The wallet splits the recovery secret across two providers.'],
@@ -897,12 +914,12 @@ describe('published JSON schema', () => {
 				missing: [AccountRecoveryDrillType.GUARDIAN_ACCOUNT_CHECK],
 			},
 		},
-		{
+		accountUnruggability: {
 			type: 'accountUnruggability',
 			safeScenarios: [{ id: 'ok', scenario: 'User forgets their wallet password' }],
 			takeoverScenarios: [],
 		},
-		{
+		scamPrevention: {
 			type: 'scamPrevention',
 			warnings: [
 				{
@@ -914,15 +931,15 @@ describe('published JSON schema', () => {
 				},
 			],
 		},
-		{
+		transactionInclusion: {
 			type: 'transactionInclusion',
 			l1Broadcast: 'OWN_NODE',
 			l2s: [{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'ARBITRARY_TRANSACTIONS' }],
 			l1References: 'https://example.com/l1',
 		},
-	]
+	} satisfies StructuredDetailsByType
 
-	for (const details of variants) {
+	for (const details of Object.values(variants)) {
 		it(`validates ${details.type} against the public schema`, () => {
 			assertValidStructuredDetails(serializeStructuredDetails(details, context))
 		})

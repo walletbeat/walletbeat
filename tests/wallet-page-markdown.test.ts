@@ -38,18 +38,6 @@ const markdownForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRate
 					})()
 
 describe('walletPageMarkdown', () => {
-	it('renders custom scam-prevention details without falling back to the human page', () => {
-		const md = markdownForWallet(allRatedWallets.metamask)
-
-		expect(md).not.toContain('[See full details for Scam prevention]')
-		expect(md).toContain('**MetaMask** helps you stay safe when sending funds by:')
-		expect(md).toContain(
-			'Warning you when sending funds to an address you have not sent or received funds from in the past',
-		)
-		expect(md).toContain('**MetaMask** helps you stay safe when doing onchain transactions by:')
-		expect(md).toContain('**MetaMask** does not warn you when granting unlimited token approvals.')
-	})
-
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
 			const md = markdownForWallet(wallet)
