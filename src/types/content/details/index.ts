@@ -5,6 +5,7 @@ import type { ChainVerificationDetails } from './chain-verification'
 import type { FundingDetails } from './funding'
 import type { PrivateTransfersDetails } from './private-transfers'
 import type { ScamPreventionDetails } from './scam-prevention'
+import type { SecurityAuditsDetails } from './security-audits'
 import type { TransactionInclusionDetails } from './transaction-inclusion'
 
 /**
@@ -24,6 +25,7 @@ export interface StructuredDetailsByType {
 	funding: FundingDetails
 	privateTransfers: PrivateTransfersDetails
 	scamPrevention: ScamPreventionDetails
+	securityAudits: SecurityAuditsDetails
 	transactionInclusion: TransactionInclusionDetails
 }
 

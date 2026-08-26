@@ -4,7 +4,14 @@ import { ackee } from '@/data/entities/ackee'
 import type { CorporateEntity } from '@/schema/entity'
 import { PersonalInfo, WalletInfo } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	CoverageBreadth,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import { EthereumL1LightClient } from '@/schema/features/security/light-client'
+import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import {
 	TransactionSubmissionL2Type,
 	transactionSubmissionL2TypeName,
@@ -18,9 +25,16 @@ import type { StructuredDetails } from '@/types/content/details'
 import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import { inline, inlineCode, inlineEmphasis, inlineLink } from '@/types/content/details/inline'
 import { mergePrivateTransfersDetails } from '@/types/content/details/private-transfers'
+import {
+	formatCalendarDate,
+	mergeSecurityAuditsDetails,
+	type SecurityAuditsDetails,
+} from '@/types/content/details/security-audits'
+import type { CalendarDate } from '@/types/date'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import { serializeStructuredDetails } from '@/utils/structured-details/json'
 import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
+import { bugBountySentences, securityAuditsSummary } from '@/utils/structured-details/prose'
 import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 
 import { assertValidStructuredDetails } from './utils/assert-valid-json'
@@ -464,6 +478,131 @@ describe('privateTransfers structured details', () => {
 	})
 })
 
+describe('securityAudits structured details', () => {
+	const audit = (
+		auditDate: CalendarDate,
+		findings: SecurityAuditsDetails['audits'][number]['findings'],
+	): SecurityAuditsDetails['audits'][number] => ({
+		auditor: ackee,
+		auditDate,
+		findings,
+		references: [refWithUrl('https://ackee.example/audit.pdf', 'Audit report')],
+	})
+
+	it('derives its summary from the audits it carries', () => {
+		const details: SecurityAuditsDetails = {
+			type: 'securityAudits',
+			audits: [
+				audit('2019-06-01', { kind: 'allFixed' }),
+				audit('2020-01-02', {
+					kind: 'flaws',
+					flaws: [{ name: 'A flaw', severity: SecurityFlawSeverity.HIGH, status: 'NOT_FIXED' }],
+				}),
+			],
+		}
+
+		expect(securityAuditsSummary(details)).toBe(
+			'**{{WALLET_NAME}}** was last audited on January 2, 2020, which was over a year ago. There remain unaddressed security flaws in the codebase.',
+		)
+	})
+
+	it('formats the audit date in UTC, so it never shows the previous day', () => {
+		expect(formatCalendarDate('2020-01-01')).toBe('January 1, 2020')
+	})
+
+	it('merging variants keeps every audit once and updates the summary', () => {
+		const worst: SecurityAuditsDetails = {
+			type: 'securityAudits',
+			audits: [audit('2019-06-01', { kind: 'allFixed' })],
+		}
+		const merged = mergeSecurityAuditsDetails(worst, [
+			worst,
+			{ type: 'securityAudits', audits: [audit('2020-01-02', { kind: 'noneFound' })] },
+		])
+
+		expect(merged.audits.map(entry => entry.auditDate)).toEqual(['2019-06-01', '2020-01-02'])
+		expect(securityAuditsSummary(merged)).toContain('last audited on January 2, 2020')
+	})
+
+	it('renders each audit with its findings and its own references in Markdown', () => {
+		const details: StructuredDetails = {
+			type: 'securityAudits',
+			audits: [
+				audit('2020-01-02', {
+					kind: 'flaws',
+					flaws: [
+						{ name: 'A fixed flaw', severity: SecurityFlawSeverity.MEDIUM, status: 'FIXED' },
+						{ name: 'A live flaw', severity: SecurityFlawSeverity.CRITICAL, status: 'NOT_FIXED' },
+					],
+				}),
+			],
+		}
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown).toContain('#### Audit by Ackee (January 2, 2020)')
+		expect(markdown).toContain('The following security flaws were identified:')
+		expect(markdown).toContain('- **Medium**: `A fixed flaw` (fixed)')
+		expect(markdown).toContain('- **Critical**: `A live flaw` (not fixed)')
+		expect(markdown).toContain('[Audit report](https://ackee.example/audit.pdf)')
+	})
+
+	it('describes a bug bounty program identically for every adapter', () => {
+		expect(
+			bugBountySentences({
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverage: 'FULL_SCOPE',
+				platform: BugBountyPlatform.HACKER_ONE,
+				rewards: { minimum: 1000, maximum: 50000, currency: 'USD' },
+				legalProtection: LegalProtectionType.SAFE_HARBOR,
+				disclosureDays: 30,
+				upgradePathAvailable: true,
+				references: [],
+			}),
+		).toEqual([
+			'The program covers all aspects of the wallet.',
+			'The program is currently active and accepting vulnerability reports.',
+			'The program is hosted on Hacker One.',
+			'Rewards range from $1,000 to $50,000',
+			'**Legal Protection**: The program provides Safe Harbor protections for security researchers conducting good faith security research.',
+			'**Disclosure Process**: 30 days',
+			'Positively, the wallet does provide an upgrade path for users when security issues are identified.',
+		])
+	})
+
+	it('serializes audits most recent first, with ISO dates', () => {
+		const details: StructuredDetails = {
+			type: 'securityAudits',
+			audits: [
+				audit('2019-06-01', { kind: 'allFixed' }),
+				audit('2020-01-02', { kind: 'noneFound' }),
+			],
+		}
+		const json = serializeStructuredDetails(details, context)
+
+		expect(json).toEqual({
+			type: 'securityAudits',
+			audits: [
+				{
+					auditor: { id: 'ackee', name: 'Ackee' },
+					auditDate: '2020-01-02',
+					findings: 'NONE_FOUND',
+					references: [
+						{ urls: [{ label: 'Audit report', url: 'https://ackee.example/audit.pdf' }] },
+					],
+				},
+				{
+					auditor: { id: 'ackee', name: 'Ackee' },
+					auditDate: '2019-06-01',
+					findings: 'ALL_FIXED',
+					references: [
+						{ urls: [{ label: 'Audit report', url: 'https://ackee.example/audit.pdf' }] },
+					],
+				},
+			],
+		})
+	})
+})
+
 describe('published JSON schema', () => {
 	/** One fixture per structured-details variant; every variant must validate. */
 	const variants: StructuredDetails[] = [
@@ -493,6 +632,32 @@ describe('published JSON schema', () => {
 				},
 			],
 			defaultModeNote: inline`Transfers are public by default.`,
+		},
+		{
+			type: 'securityAudits',
+			audits: [
+				{
+					auditor: ackee,
+					auditDate: '2020-01-02',
+					findings: {
+						kind: 'flaws',
+						flaws: [
+							{ name: 'A live flaw', severity: SecurityFlawSeverity.CRITICAL, status: 'NOT_FIXED' },
+						],
+					},
+					references: [refWithUrl('https://ackee.example/audit.pdf', 'Audit report')],
+				},
+			],
+			bugBounty: {
+				availability: BugBountyProgramAvailability.INACTIVE,
+				coverage: [CoverageBreadth.APP_ONLY],
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: { minimum: 5000, maximum: 5000, currency: 'USD' },
+				legalProtection: LegalProtectionType.LEGAL_ASSURANCE,
+				disclosureDays: 90,
+				upgradePathAvailable: true,
+				references: [refWithUrl('https://ackee.example/bounty', 'Bounty page')],
+			},
 		},
 		{
 			type: 'scamPrevention',
