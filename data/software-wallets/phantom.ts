@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
+import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -20,30 +21,29 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { type SecurityAudit } from '@/schema/features/security/security-audits'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
 import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
-import { Variant } from '@/schema/variants'
-
-import { kudelskiSecurity } from '../entities/kudelski-security'
-import { leastAuthority } from '../entities/least-authority'
-import {
-	KeyStorageMechanism,
-	SecureRngSource,
-} from '@/schema/features/security/security-best-practices'
-import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa.manifest.json'
-import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import {
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
+import { refNotNecessary, refTodo } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
+
+import { kudelskiSecurity } from '../entities/kudelski-security'
+import { leastAuthority } from '../entities/least-authority'
+import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa.manifest.json'
 
 const securityAudits: SecurityAudit[] = [
 	{
@@ -125,7 +125,20 @@ export const phantom: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						ref: [],
+						ref: [
+							{
+								explanation:
+									'By default, Phantom aggregates swap fees into a single displayed amount.',
+								file: 'public/references/wallets/phantom/screenshots/2026-08-26-swap-default-view.png',
+								label: 'Phantom swap default fee view',
+							},
+							{
+								explanation:
+									'Hovering over the fee reveals a comprehensive breakdown of all fees for a single swap.',
+								file: 'public/references/wallets/phantom/screenshots/2026-08-26-swap-hover.png',
+								label: 'Phantom swap fee hover breakdown',
+							},
+						],
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
@@ -136,7 +149,12 @@ export const phantom: SoftwareWallet = {
 				suggestedBridging: notSupported,
 			},
 			crossChainBalances: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						'Phantom token dashboard shows a global account value and per-chain token balances across multiple chains, but no per-token cross-chain sum view.',
+					file: 'public/references/wallets/phantom/screenshots/2026-08-26-token-dashboard.png',
+					label: 'Phantom token dashboard',
+				},
 				ether: supported({
 					ref: refTodo,
 					crossChainSumView: notSupported,
@@ -254,7 +272,11 @@ export const phantom: SoftwareWallet = {
 				duressMode: notSupported,
 			},
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: {
+					explanation: 'Phantom supports importing a Ledger hardware wallet via WebUSB.',
+					file: 'public/references/wallets/phantom/screenshots/2026-08-26-ledger-import.png',
+					label: 'Phantom Ledger import screen',
+				},
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
@@ -307,7 +329,12 @@ export const phantom: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					ref: refTodo,
+					ref: {
+						explanation:
+							"Phantom's networks list shows no L2 support for Arbitrum or OP Stack chains.",
+						file: 'public/references/wallets/phantom/screenshots/2026-08-26-networks-list.png',
+						label: 'Phantom networks list',
+					},
 					[TransactionSubmissionL2Type.arbitrum]:
 						TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
 					[TransactionSubmissionL2Type.opStack]:
