@@ -3782,13 +3782,6 @@
 		--sticky-backdropFilter: var(---wallet-breadcrumb-surface-backdrop-filter);
 	}
 
-	@media (max-width: 1024px) {
-		[data-sticky-row-backdrop='group'][data-sticky] {
-			background-color: var(--sticky-backgroundColor);
-			backdrop-filter: var(--sticky-backdropFilter);
-		}
-	}
-
 	:is(
 		.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-scroll-item],
 		.attribute > details > summary > header
