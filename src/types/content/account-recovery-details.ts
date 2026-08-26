@@ -86,3 +86,24 @@ function scenarioDetail(
 		scenario: typographicSourceText(outcome.scenario.description),
 	}
 }
+
+export const accountRecoveryConfiguredDrillsIntro =
+	'{{WALLET_NAME}} periodically runs the following account recovery drills:'
+
+export const accountRecoveryMissingDrillsIntro =
+	'{{WALLET_NAME}} does not run the following recommended account recovery drills:'
+
+export function accountRecoverySummary(details: AccountRecoveryDetails): string {
+	if (details.guardianPolicy === undefined) {
+		return '{{WALLET_NAME}} does not implement guardian-based account recovery. The user will lose access to their account if they lose their seed phrase.'
+	}
+
+	const scenarios =
+		details.unrecoverableScenarios.length === 0
+			? 'passes all the tested scenarios.'
+			: details.recoverableScenarios.length === 0
+				? 'does not pass any of the tested scenarios.'
+				: 'does not pass all the tested scenarios.'
+
+	return `{{WALLET_NAME}} implements a Guardian-based account recovery feature which ${scenarios}`
+}

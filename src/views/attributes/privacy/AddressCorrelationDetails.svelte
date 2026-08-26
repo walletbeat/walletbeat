@@ -1,11 +1,11 @@
 <script lang="ts">
 	// Types/constants
 	import { ContentType } from '@/types/content'
-	import type { AddressCorrelationDetails } from '@/types/content/address-correlation-details'
 	import {
+		type AddressCorrelationDetails,
 		addressCorrelationIntro,
 		addressCorrelationLeakSentence,
-	} from '@/utils/structured-details/prose'
+	} from '@/types/content/address-correlation-details'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props

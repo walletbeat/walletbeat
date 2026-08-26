@@ -6,16 +6,14 @@
 	import {
 		auditsByRecency,
 		auditVariantNames,
-		formatCalendarDate,
-		type SecurityAuditsDetails,
-	} from '@/types/content/security-audits-details'
-	import { commaListFormat } from '@/types/utils/text'
-	import {
 		bugBountySentences,
+		formatCalendarDate,
 		securityAuditFindingsSentence,
 		securityAuditsSummary,
 		securityFlawSeverityLabel,
-	} from '@/utils/structured-details/prose'
+		type SecurityAuditsDetails,
+	} from '@/types/content/security-audits-details'
+	import { commaListFormat } from '@/types/utils/text'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	const severityIcons: Record<SecurityFlawSeverity, string> = {
