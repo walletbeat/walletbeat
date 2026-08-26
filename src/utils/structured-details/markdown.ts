@@ -25,7 +25,7 @@ import type { StructuredDetails } from '@/types/content/structured-details'
 import type { TransactionInclusionDetails } from '@/types/content/transaction-inclusion-details'
 import { commaListFormat, renderStrings } from '@/types/utils/text'
 
-import type { StructuredDetailsContext } from './context'
+import { emphasizedStrings, type StructuredDetailsContext } from './context'
 import {
 	accountRecoveryConfiguredDrillsIntro,
 	accountRecoveryMissingDrillsIntro,
@@ -240,7 +240,7 @@ function renderScamPreventionMarkdown(
 ): string {
 	return details.warnings
 		.map(warning => {
-			const description = renderStrings(warning.description, { ...context.strings })
+			const description = renderStrings(warning.description, emphasizedStrings(context))
 			const nestedItems = warning.items?.map(item => `\n  - ${item}`).join('') ?? ''
 			const conclusion = warning.conclusion === undefined ? '' : `\n\n  ${warning.conclusion}`
 			const references = referencesSuffixMarkdown(warning.references)
