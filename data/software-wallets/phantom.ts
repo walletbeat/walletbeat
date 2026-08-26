@@ -114,7 +114,37 @@ export const phantom: SoftwareWallet = {
 			},
 			nonChainSpecificEnsResolution: notSupported,
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: refTodo,
+					feesLargerThan1bps: {
+						ref: [],
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ref: refTodo,
+				ether: supported({
+					ref: refTodo,
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: supported({
+					ref: refTodo,
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+			},
+		},
 		chainConfigurability: notSupported,
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
