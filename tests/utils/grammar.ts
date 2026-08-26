@@ -420,6 +420,13 @@ export async function grammarLintMessages(
 		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
 	)
 
+	// Ignore Spelling lints for words the project's cspell dictionary already
+	// accepts (entity and platform names such as auditors or bounty platforms).
+	// cspell is the project's spelling authority; Harper only adds grammar.
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Spelling' || !isInCspellWords(lint.get_problem_text()),
+	)
+
 	// Ignore Spelling lints for possessive proper nouns whose base word is in the cspell
 	// vocabulary (e.g. "Gnosis's": "Gnosis" is in .cspell.json so it is a valid proper noun).
 	lints = lints.filter(lint => {

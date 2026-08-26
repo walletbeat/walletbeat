@@ -1,9 +1,16 @@
 import { type UserInfo, userInfoName } from '@/schema/features/privacy/data-collection'
 import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
+import type {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	CoverageBreadth,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	type EthereumL1LightClient,
 	ethereumL1LightClientUrl,
 } from '@/schema/features/security/light-client'
+import type { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import {
 	type TransactionSubmissionL2Type,
 	transactionSubmissionL2TypeName,
@@ -26,11 +33,16 @@ import type {
 	ScamPreventionDetails,
 	ScamWarningKind,
 } from '@/types/content/details/scam-prevention'
+import {
+	auditsByRecency,
+	type SecurityAuditsDetails,
+} from '@/types/content/details/security-audits'
 import type {
 	L1BroadcastSupport,
 	L2ForceInclusionCapability,
 	TransactionInclusionDetails,
 } from '@/types/content/details/transaction-inclusion'
+import type { CalendarDate } from '@/types/date'
 import { renderStrings } from '@/types/utils/text'
 
 import type { StructuredDetailsContext } from './context'
@@ -123,6 +135,39 @@ export interface ScamPreventionDetailsJsonExport {
 	warnings: ScamWarningDetailsJsonExport[]
 }
 
+export interface SecurityAuditFlawJsonExport {
+	name: string
+	severity: SecurityFlawSeverity
+	status: 'FIXED' | 'NOT_FIXED'
+}
+
+export interface SecurityAuditJsonExport {
+	auditor: { id: string; name: string }
+
+	/** Audit date as `YYYY-MM-DD`. */
+	auditDate: CalendarDate
+	findings: 'NONE_FOUND' | 'ALL_FIXED' | 'FLAWS'
+	flaws?: SecurityAuditFlawJsonExport[]
+	references?: ReferenceJsonExport[]
+}
+
+export interface BugBountyJsonExport {
+	availability: BugBountyProgramAvailability | 'NONE'
+	coverage: 'FULL_SCOPE' | CoverageBreadth[]
+	platform?: BugBountyPlatform
+	rewards?: { minimum?: number; maximum?: number; currency: string }
+	legalProtection?: LegalProtectionType
+	disclosureDays?: number
+	upgradePathAvailable: boolean
+	references?: ReferenceJsonExport[]
+}
+
+export interface SecurityAuditsDetailsJsonExport {
+	type: 'securityAudits'
+	audits: SecurityAuditJsonExport[]
+	bugBounty?: BugBountyJsonExport
+}
+
 export interface TransactionInclusionL2JsonExport {
 	l2: TransactionSubmissionL2Type
 	name: string
@@ -144,6 +189,7 @@ export type StructuredDetailsJsonExport =
 	| FundingDetailsJsonExport
 	| PrivateTransfersDetailsJsonExport
 	| ScamPreventionDetailsJsonExport
+	| SecurityAuditsDetailsJsonExport
 	| TransactionInclusionDetailsJsonExport
 
 /** Normalize references to the published reference shape. */
@@ -264,6 +310,49 @@ function serializeScamPreventionDetails(
 	}
 }
 
+function serializeSecurityAuditsDetails(
+	details: SecurityAuditsDetails,
+): SecurityAuditsDetailsJsonExport {
+	const bugBountyReferences =
+		details.bugBounty === undefined ? [] : serializeReferences(details.bugBounty.references)
+
+	return {
+		type: 'securityAudits',
+		audits: auditsByRecency(details).map(audit => {
+			const references = serializeReferences(audit.references)
+
+			return {
+				auditor: { id: audit.auditor.id, name: audit.auditor.name },
+				auditDate: audit.auditDate,
+				findings:
+					audit.findings.kind === 'noneFound'
+						? 'NONE_FOUND'
+						: audit.findings.kind === 'allFixed'
+							? 'ALL_FIXED'
+							: 'FLAWS',
+				...(audit.findings.kind === 'flaws' && { flaws: [...audit.findings.flaws] }),
+				...(references.length > 0 && { references }),
+			}
+		}),
+		...(details.bugBounty !== undefined && {
+			bugBounty: {
+				availability: details.bugBounty.availability,
+				coverage: details.bugBounty.coverage,
+				...(details.bugBounty.platform !== undefined && { platform: details.bugBounty.platform }),
+				...(details.bugBounty.rewards !== undefined && { rewards: details.bugBounty.rewards }),
+				...(details.bugBounty.legalProtection !== undefined && {
+					legalProtection: details.bugBounty.legalProtection,
+				}),
+				...(details.bugBounty.disclosureDays !== undefined && {
+					disclosureDays: details.bugBounty.disclosureDays,
+				}),
+				upgradePathAvailable: details.bugBounty.upgradePathAvailable,
+				...(bugBountyReferences.length > 0 && { references: bugBountyReferences }),
+			},
+		}),
+	}
+}
+
 function serializeTransactionInclusionDetails(
 	details: TransactionInclusionDetails,
 ): TransactionInclusionDetailsJsonExport {
@@ -292,6 +381,7 @@ const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> =
 	funding: serializeFundingDetails,
 	privateTransfers: serializePrivateTransfersDetails,
 	scamPrevention: serializeScamPreventionDetails,
+	securityAudits: serializeSecurityAuditsDetails,
 	transactionInclusion: serializeTransactionInclusionDetails,
 }
 

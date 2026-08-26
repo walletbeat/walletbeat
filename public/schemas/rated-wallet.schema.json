@@ -290,6 +290,9 @@
 					"$ref": "#/$defs/scamPreventionDetails"
 				},
 				{
+					"$ref": "#/$defs/securityAuditsDetails"
+				},
+				{
 					"$ref": "#/$defs/transactionInclusionDetails"
 				}
 			]
@@ -554,6 +557,134 @@
 								"items": {
 									"$ref": "#/$defs/reference"
 								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"securityAuditsDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "audits"],
+			"properties": {
+				"type": {
+					"const": "securityAudits"
+				},
+				"audits": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["auditor", "auditDate", "findings"],
+						"properties": {
+							"auditor": {
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["id", "name"],
+								"properties": {
+									"id": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									}
+								}
+							},
+							"auditDate": {
+								"type": "string",
+								"pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+							},
+							"findings": {
+								"type": "string",
+								"enum": ["NONE_FOUND", "ALL_FIXED", "FLAWS"]
+							},
+							"flaws": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"additionalProperties": false,
+									"required": ["name", "severity", "status"],
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"severity": {
+											"type": "string",
+											"enum": ["CRITICAL", "HIGH", "MEDIUM"]
+										},
+										"status": {
+											"type": "string",
+											"enum": ["FIXED", "NOT_FIXED"]
+										}
+									}
+								}
+							},
+							"references": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/reference"
+								}
+							}
+						}
+					}
+				},
+				"bugBounty": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["availability", "coverage", "upgradePathAvailable"],
+					"properties": {
+						"availability": {
+							"type": "string",
+							"enum": ["ACTIVE", "INACTIVE", "NONE"]
+						},
+						"coverage": {
+							"oneOf": [
+								{
+									"const": "FULL_SCOPE"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": ["APP_ONLY", "FIRMWARE_ONLY", "HARDWARE_ONLY"]
+									}
+								}
+							]
+						},
+						"platform": {
+							"type": "string"
+						},
+						"rewards": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["currency"],
+							"properties": {
+								"minimum": {
+									"type": "number"
+								},
+								"maximum": {
+									"type": "number"
+								},
+								"currency": {
+									"type": "string"
+								}
+							}
+						},
+						"legalProtection": {
+							"type": "string",
+							"enum": ["SAFE_HARBOR", "LEGAL_ASSURANCE"]
+						},
+						"disclosureDays": {
+							"type": "number"
+						},
+						"upgradePathAvailable": {
+							"type": "boolean"
+						},
+						"references": {
+							"type": "array",
+							"items": {
+								"$ref": "#/$defs/reference"
 							}
 						}
 					}

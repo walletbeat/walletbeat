@@ -8,7 +8,6 @@ import {
 import { Rating, ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
-import { gitCommitRefPinRegExp } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
@@ -24,7 +23,10 @@ import {
 	computeCountsAndStatus,
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
-import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
+import {
+	markdownLinkLabel,
+	renderStructuredDetailsMarkdown,
+} from '@/utils/structured-details/markdown'
 import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 import { getWalletUrl } from '@/utils/urls'
 
@@ -286,13 +288,7 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 										? ''
 										: `${collapseToSingleLine(ref.explanation)} Source: `
 
-								// Escape square brackets (e.g. in filename-derived labels)
-								// so they cannot parse as nested/reference-style links, and
-								// render commit-hash pins in GitHub-like labels (`foo.ts
-								// L1-2 @abcdef1`) as the code they are.
-								const label = labeledUrl.label
-									.replace(/[[\]]/g, String.raw`\$&`)
-									.replace(gitCommitRefPinRegExp, '`$&`')
+								const label = markdownLinkLabel(labeledUrl.label)
 
 								parts.push(`- ${prefix}[${label}](${labeledUrl.url})`)
 							}

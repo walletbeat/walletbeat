@@ -20,7 +20,6 @@
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isCustomContent, isTypographicContent } from '@/types/content'
 	import { isStructuredDetails } from '@/types/content/details'
-	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
 	import {
@@ -343,7 +342,6 @@
 	// Components
 	import { Github, Globe } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
-	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
 	import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
@@ -1078,9 +1076,7 @@
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
-							{#if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'AccountRecoveryDetails'}
+							{#if componentName === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
 								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
@@ -1124,17 +1120,7 @@
 				: []
 			)}
 
-			{#if (
-				undisplayedReferences.length > 0 &&
-				(
-					!isCustomContent(evalAttr.evaluation.details) ||
-					!(
-						// TEMPORARY: custom components that render their own reference links.
-						['SecurityAuditsDetails']
-							.includes(evalAttr.evaluation.details.component.component)
-					)
-				)
-			)}
+			{#if undisplayedReferences.length > 0}
 				<ReferenceLinks
 					references={undisplayedReferences}
 					cardBackground="secondary"

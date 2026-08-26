@@ -1,6 +1,7 @@
 import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
+import { gitCommitRefPinRegExp } from '@/schema/url'
 import type { StructuredDetails } from '@/types/content/details'
 import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
@@ -11,6 +12,11 @@ import {
 	privateTransferTechnologyName,
 } from '@/types/content/details/private-transfers'
 import type { ScamPreventionDetails } from '@/types/content/details/scam-prevention'
+import {
+	auditsByRecency,
+	formatCalendarDate,
+	type SecurityAuditsDetails,
+} from '@/types/content/details/security-audits'
 import type { TransactionInclusionDetails } from '@/types/content/details/transaction-inclusion'
 import { commaListFormat, renderStrings } from '@/types/utils/text'
 
@@ -18,6 +24,10 @@ import type { StructuredDetailsContext } from './context'
 import {
 	addressCorrelationIntro,
 	addressCorrelationLeakSentence,
+	bugBountySentences,
+	securityAuditFindingsSentence,
+	securityAuditsSummary,
+	securityFlawSeverityLabel,
 	transactionInclusionProse,
 } from './prose'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'
@@ -57,6 +67,17 @@ export function renderInlineTextMarkdown(
 }
 
 /**
+ * A reference label, safe to place inside a Markdown link.
+ *
+ * Square brackets (common in filename-derived labels) are escaped so they
+ * cannot parse as nested or reference-style links, and commit-hash pins in
+ * GitHub-like labels (`foo.ts L1-2 @abcdef1`) render as the code they are.
+ */
+export function markdownLinkLabel(label: string): string {
+	return label.replace(/[[\]]/gu, String.raw`\$&`).replace(gitCommitRefPinRegExp, '`$&`')
+}
+
+/**
  * Claim references as a parenthesized list of links.
  *
  * Markdown has no reference sidebar, so every claim carries its own sources
@@ -66,7 +87,7 @@ export function renderInlineTextMarkdown(
 function referencesSuffixMarkdown(references: ReferenceInput): string {
 	const links = toFullyQualified(references)
 		.flatMap(reference => reference.urls)
-		.map(url => `[${url.label}](${url.url})`)
+		.map(url => `[${markdownLinkLabel(url.label)}](${url.url})`)
 
 	return links.length === 0 ? '' : ` (${links.join(', ')})`
 }
@@ -151,6 +172,53 @@ function renderScamPreventionMarkdown(
 		.join('\n')
 }
 
+function renderSecurityAuditsMarkdown(
+	details: SecurityAuditsDetails,
+	context: StructuredDetailsContext,
+): string {
+	const blocks: string[] = [securityAuditsSummary(details)]
+
+	for (const audit of auditsByRecency(details)) {
+		blocks.push(
+			`#### Audit by ${audit.auditor.name} (${formatCalendarDate(audit.auditDate)})`,
+			securityAuditFindingsSentence(audit),
+		)
+
+		if (audit.findings.kind === 'flaws') {
+			blocks.push(
+				audit.findings.flaws
+					.map(
+						// Finding titles are verbatim strings from third-party audit
+						// reports, so they are quoted as code rather than reflowed as prose.
+						flaw =>
+							`- **${securityFlawSeverityLabel[flaw.severity]}**: \`${flaw.name}\` (${
+								flaw.status === 'FIXED' ? 'fixed' : 'not fixed'
+							})`,
+					)
+					.join('\n'),
+			)
+		}
+
+		const references = referencesSuffixMarkdown(audit.references).trim()
+
+		if (references !== '') {
+			blocks.push(references)
+		}
+	}
+
+	if (details.bugBounty !== undefined) {
+		blocks.push('#### Bug bounty program', ...bugBountySentences(details.bugBounty))
+
+		const references = referencesSuffixMarkdown(details.bugBounty.references).trim()
+
+		if (references !== '') {
+			blocks.push(references)
+		}
+	}
+
+	return renderStrings(blocks.join('\n\n'), { ...context.strings })
+}
+
 function renderTransactionInclusionMarkdown(
 	details: TransactionInclusionDetails,
 	context: StructuredDetailsContext,
@@ -172,6 +240,7 @@ const markdownRenderers: StructuredDetailsRenderers<string> = {
 	funding: renderFundingMarkdown,
 	privateTransfers: renderPrivateTransfersMarkdown,
 	scamPrevention: renderScamPreventionMarkdown,
+	securityAudits: renderSecurityAuditsMarkdown,
 	transactionInclusion: renderTransactionInclusionMarkdown,
 }
 
