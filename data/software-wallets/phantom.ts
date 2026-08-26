@@ -32,6 +32,12 @@ import { Variant } from '@/schema/variants'
 
 import { kudelskiSecurity } from '../entities/kudelski-security'
 import { leastAuthority } from '../entities/least-authority'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa.manifest.json'
 
 const securityAudits: SecurityAudit[] = [
 	{
@@ -218,7 +224,16 @@ export const phantom: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: securityAudits,
 			scamAlerts: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: parseBrowserExtensionManifest(phantomRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.NOT_VERIFIABLE,
+					secureRng: SecureRngSource.NOT_VERIFIABLE,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'SOURCE_NOT_AVAILABLE',
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
