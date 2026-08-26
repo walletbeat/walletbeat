@@ -36,20 +36,9 @@ import {
 } from '@/types/content/transaction-inclusion-details'
 import { commaListFormat } from '@/types/utils/text'
 
-/**
- * Shared prose derived from canonical detail models.
- *
- * Wording lives here once so the web view and the Markdown adapter cannot
- * drift. Sentences use `{{WALLET_NAME}}` placeholders and light Markdown
- * emphasis, which every visual adapter already renders; the canonical models
- * themselves stay free of any markup.
- */
-
-/** Introduction shared by every address-correlation rendering. */
 export const addressCorrelationIntro =
 	'By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:'
 
-/** Comma-separated list ending in "and", as used in correlation sentences. */
 function joinedList(items: string[]): string {
 	if (items.length <= 1) {
 		return items.join('')
@@ -58,7 +47,6 @@ function joinedList(items: string[]): string {
 	return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
 }
 
-/** The bullet describing what one source can correlate. */
 export function addressCorrelationLeakSentence(leak: AddressCorrelationLeak): string {
 	const info = `**${joinedList(correlatedInfoNames(leak))}**`
 
@@ -83,7 +71,6 @@ export interface TransactionInclusionBlock {
 	text: string
 }
 
-/** How a wallet's funding reads, whatever the adapter. */
 export function fundingSentence(details: FundingDetails): string {
 	const sources =
 		details.strategies.length === 0
@@ -93,7 +80,6 @@ export function fundingSentence(details: FundingDetails): string {
 	return `**{{WALLET_NAME}}** is funded by **${sources}**.`
 }
 
-/** How a wallet's L1 chain verification reads, whatever the adapter. */
 export function chainVerificationSentence(details: ChainVerificationDetails): string {
 	const clients = details.lightClients.map(client => {
 		const { url, label } = ethereumL1LightClientUrl(client)
@@ -106,7 +92,6 @@ export function chainVerificationSentence(details: ChainVerificationDetails): st
 	)} light client${details.lightClients.length === 1 ? '' : 's'}.`
 }
 
-/** Sentences describing transaction inclusion, one per rendered block. */
 export function transactionInclusionProse(
 	details: TransactionInclusionDetails,
 ): TransactionInclusionBlock[] {
@@ -180,7 +165,6 @@ export function securityAuditsSummary(details: SecurityAuditsDetails): string {
 	return `**{{WALLET_NAME}}** was last audited on ${formatCalendarDate(mostRecent.auditDate)}${recency}${flaws}`
 }
 
-/** How an audit's conclusion reads, whatever the adapter. */
 export function securityAuditFindingsSentence(audit: SecurityAuditDetail): string {
 	switch (audit.findings.kind) {
 		case 'noneFound':
@@ -194,14 +178,12 @@ export function securityAuditFindingsSentence(audit: SecurityAuditDetail): strin
 	}
 }
 
-/** Human-readable label of a security flaw severity. */
 export const securityFlawSeverityLabel: Record<SecurityFlawSeverity, string> = {
 	[SecurityFlawSeverity.CRITICAL]: 'Critical',
 	[SecurityFlawSeverity.HIGH]: 'High',
 	[SecurityFlawSeverity.MEDIUM]: 'Medium',
 }
 
-/** What one part of the wallet being in scope reads as. */
 function coverageBreadthDescription(breadth: CoverageBreadth): string {
 	switch (breadth) {
 		case CoverageBreadth.APP_ONLY:
@@ -213,7 +195,6 @@ function coverageBreadthDescription(breadth: CoverageBreadth): string {
 	}
 }
 
-/** The reward range of a bug bounty program, as a sentence. */
 function bugBountyRewardsSentence(bounty: BugBountyDetail): string | null {
 	if (bounty.rewards === undefined) {
 		return null
@@ -237,12 +218,6 @@ function bugBountyRewardsSentence(bounty: BugBountyDetail): string | null {
 	return minimum === undefined ? null : `Rewards start at ${amount(minimum)}${suffix}`.trim()
 }
 
-/**
- * Sentences describing a bug bounty program, in display order.
- *
- * Both visual adapters use these, so the web page and the exported Markdown
- * cannot describe the same program differently.
- */
 export function bugBountySentences(bounty: BugBountyDetail): string[] {
 	if (bounty.availability === 'NONE') {
 		return [
@@ -302,11 +277,9 @@ export function bugBountySentences(bounty: BugBountyDetail): string[] {
 	return sentences
 }
 
-/** A block of guardian-policy prose, so each adapter formats lists natively. */
 export type GuardianPolicyBlock =
 	{ kind: 'paragraph'; text: string } | { kind: 'list'; lead: string; items: string[] }
 
-/** Human-readable description of one guardian. */
 function guardianLabel(guardian: Guardian): string {
 	return guardianMarkdown(guardian)
 }
@@ -323,12 +296,6 @@ function secretReconstitutionParagraph(
 	}
 }
 
-/**
- * Describe a guardian policy, block by block.
- *
- * Both account recovery and account unruggability show the same policy, so
- * this wording lives here rather than in either attribute.
- */
 export function guardianPolicyBlocks(policy: GuardianPolicyDetail): GuardianPolicyBlock[] {
 	const blocks: GuardianPolicyBlock[] = policy.description.map(text => ({
 		kind: 'paragraph' as const,
@@ -431,7 +398,6 @@ export function guardianPolicyBlocks(policy: GuardianPolicyDetail): GuardianPoli
 	return blocks
 }
 
-/** One item reads as a sentence; several read as a list. */
 function listOrSentence(lead: string, items: string[]): GuardianPolicyBlock {
 	const [first] = items
 
@@ -444,15 +410,12 @@ function listOrSentence(lead: string, items: string[]): GuardianPolicyBlock {
 	return { kind: 'list', lead: lead.endsWith(':') ? lead : `${lead} the following:`, items }
 }
 
-/** Introduction to the drills a wallet does run, shared by every rendering. */
 export const accountRecoveryConfiguredDrillsIntro =
 	'{{WALLET_NAME}} periodically runs the following account recovery drills:'
 
-/** Introduction to the drills a wallet does not run, shared by every rendering. */
 export const accountRecoveryMissingDrillsIntro =
 	'{{WALLET_NAME}} does not run the following recommended account recovery drills:'
 
-/** The sentence introducing a wallet's guardian-based account recovery. */
 export function accountRecoverySummary(details: AccountRecoveryDetails): string {
 	if (details.guardianPolicy === undefined) {
 		return '{{WALLET_NAME}} does not implement guardian-based account recovery. The user will lose access to their account if they lose their seed phrase.'
@@ -468,7 +431,6 @@ export function accountRecoverySummary(details: AccountRecoveryDetails): string 
 	return `{{WALLET_NAME}} implements a Guardian-based account recovery feature which ${scenarios}`
 }
 
-/** The sentence introducing how ruggable a wallet's account recovery is. */
 export function accountUnruggabilitySummary(details: AccountUnruggabilityDetails): string {
 	if (details.guardianPolicy === undefined) {
 		return 'Private key material never leaves {{WALLET_NAME}}, so no external entity may take over your account.'

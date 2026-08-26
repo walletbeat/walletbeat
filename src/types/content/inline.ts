@@ -1,29 +1,16 @@
-/**
- * Narrow inline prose tokens for canonical structured detail models.
- *
- * Canonical models never store Markdown or HTML. When a sentence needs a link
- * (an entity page, an EIP, a chain explorer), it is expressed as a sequence of
- * spans that each adapter formats in its own syntax.
- */
-
-/** A run of plain text within an inline sentence. */
 export interface InlineTextSpan {
 	kind: 'text'
 
 	/** Plain text. May contain `{{WALLET_NAME}}`-style template placeholders. */
 	text: string
 
-	/** Whether the run is strongly emphasized (bold in visual adapters). */
 	strong?: boolean
 
-	/** Whether the run is emphasized (italic in visual adapters). */
 	emphasis?: boolean
 
-	/** Whether the run is code (monospace in visual adapters). */
 	code?: boolean
 }
 
-/** A linked run of text within an inline sentence. */
 export interface InlineLinkSpan {
 	kind: 'link'
 
@@ -33,41 +20,33 @@ export interface InlineLinkSpan {
 	/** Absolute URL, or a site-root-relative path such as `/entity/foo`. */
 	url: string
 
-	/** Whether the link label is strongly emphasized (bold in visual adapters). */
 	strong?: boolean
 }
 
 export type InlineSpan = InlineTextSpan | InlineLinkSpan
 
-/** A format-neutral sentence or fragment made of inline spans. */
 export type InlineText = InlineSpan[]
 
-/** Build an inline text made of a single plain-text span. */
 export function inlineText(text: string): InlineText {
 	return [{ kind: 'text', text }]
 }
 
-/** Build a single inline link span. */
 export function inlineLink(text: string, url: string): InlineLinkSpan {
 	return { kind: 'link', text, url }
 }
 
-/** Build a single emphasized (italic) inline span. */
 export function inlineEmphasis(text: string): InlineTextSpan {
 	return { kind: 'text', text, emphasis: true }
 }
 
-/** Build a single strongly emphasized (bold) inline span. */
 export function inlineStrong(text: string): InlineTextSpan {
 	return { kind: 'text', text, strong: true }
 }
 
-/** Build a single code inline span. */
 export function inlineCode(text: string): InlineTextSpan {
 	return { kind: 'text', text, code: true }
 }
 
-/** What may be interpolated into an `inline` template. */
 export type InlineValue = string | InlineSpan | InlineSpan[]
 
 /**

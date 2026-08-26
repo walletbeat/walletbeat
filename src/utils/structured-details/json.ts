@@ -84,13 +84,11 @@ export interface ReferenceJsonExport {
 	}
 }
 
-/** An inline sentence: resolved plain text, plus its links when it has any. */
 export interface InlineTextJsonExport {
 	text: string
 	links?: Array<{ text: string; url: string }>
 }
 
-/** An entity referred to by a detail model. */
 export interface EntityRefJsonExport {
 	entityId: string
 	entityName: string
@@ -227,10 +225,8 @@ export interface SecurityAuditFlawJsonExport {
 export interface SecurityAuditJsonExport {
 	auditor: { id: string; name: string }
 
-	/** Audit date as `YYYY-MM-DD`. */
 	auditDate: CalendarDate
 
-	/** Which variants the audit covered. */
 	variants: Variant[] | 'ALL_VARIANTS'
 	findings: 'NONE_FOUND' | 'ALL_FIXED' | 'FLAWS'
 	flaws?: SecurityAuditFlawJsonExport[]
@@ -268,7 +264,6 @@ export interface TransactionInclusionDetailsJsonExport {
 	l2References?: ReferenceJsonExport[]
 }
 
-/** Public discriminated union of exported structured details. */
 export type StructuredDetailsJsonExport =
 	| AccountRecoveryDetailsJsonExport
 	| AccountUnruggabilityDetailsJsonExport
@@ -280,7 +275,6 @@ export type StructuredDetailsJsonExport =
 	| SecurityAuditsDetailsJsonExport
 	| TransactionInclusionDetailsJsonExport
 
-/** Normalize references to the published reference shape. */
 export function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
 	return toFullyQualified(references).map(ref => ({
 		...(ref.explanation !== undefined && { explanation: ref.explanation }),
@@ -299,7 +293,6 @@ export function serializeReferences(references: ReferenceInput): ReferenceJsonEx
 	}))
 }
 
-/** Serialize an inline sentence, resolving templates and preserving links. */
 export function serializeInlineText(
 	inline: InlineText,
 	context: StructuredDetailsContext,
@@ -563,7 +556,6 @@ function serializeTransactionInclusionDetails(
 	}
 }
 
-/** Exhaustive JSON serializer registry. */
 const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> = {
 	accountRecovery: serializeAccountRecoveryDetails,
 	accountUnruggability: serializeAccountUnruggabilityDetails,
@@ -576,7 +568,6 @@ const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> =
 	transactionInclusion: serializeTransactionInclusionDetails,
 }
 
-/** Serialize canonical structured details to their published JSON DTO. */
 export function serializeStructuredDetails(
 	details: StructuredDetails,
 	context: StructuredDetailsContext,

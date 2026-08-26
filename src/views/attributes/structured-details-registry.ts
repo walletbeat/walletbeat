@@ -15,19 +15,11 @@ import AccountUnruggabilityDetails from '@/views/attributes/self-sovereignty/Acc
 import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 
-/** Props every structured-details view receives. */
 export interface StructuredDetailsViewProps<_Details> {
 	details: _Details
 	context: StructuredDetailsContext
 }
 
-/**
- * Exhaustive web renderer registry.
- *
- * Adding a member to `StructuredDetailsByType` without adding its view here is
- * a compile error. This registry is bundled for the browser only; the Markdown
- * and JSON registries live separately so their dependencies stay server-side.
- */
 export const structuredDetailsViews: {
 	[_Type in StructuredDetailsType]: Component<
 		StructuredDetailsViewProps<StructuredDetailsByType[_Type]>

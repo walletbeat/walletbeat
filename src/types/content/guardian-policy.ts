@@ -34,7 +34,6 @@ export interface GuardianPolicyDetail {
 	facts: GuardianPolicyFacts
 }
 
-/** Build the canonical guardian policy detail from the wallet's features. */
 export function buildGuardianPolicyDetail(policy: GuardianPolicy): GuardianPolicyDetail {
 	return {
 		description: policyParagraphs(policy.description),
@@ -60,7 +59,6 @@ export function buildGuardianPolicyDetail(policy: GuardianPolicy): GuardianPolic
 	}
 }
 
-/** Split authored prose into paragraphs, dropping authored indentation. */
 function policyParagraphs(description: string): string[] {
 	return description
 		.split(/\n\s*\n/u)

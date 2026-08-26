@@ -11,13 +11,6 @@ import { guardianPolicyDetailOrUndefined } from './account-recovery-details'
 import type { GuardianPolicyDetail } from './guardian-policy'
 import type { GuardianScenarioOutcomeDetail } from './guardian-scenarios'
 
-/**
- * Canonical detail model for account unruggability.
- *
- * The model reports the takeover dimension only: each failing scenario carries
- * the reason the account can be taken over, not the reason recovery failed.
- * Account recovery is the other attribute's subject.
- */
 export interface AccountUnruggabilityDetails {
 	type: 'accountUnruggability'
 
@@ -31,7 +24,6 @@ export interface AccountUnruggabilityDetails {
 	takeoverScenarios: GuardianScenarioOutcomeDetail[]
 }
 
-/** Build canonical unruggability details from the evaluated scenarios. */
 export function buildAccountUnruggabilityDetails({
 	guardianPolicy,
 	outcomes,

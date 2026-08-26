@@ -10,10 +10,6 @@
 		context: StructuredDetailsContext
 	} = $props()
 
-	// The single web entry point for canonical structured details.
-	// Layout, badges and interactions belong to the per-type views below.
-	// An unknown discriminator throws rather than rendering nothing, matching
-	// the Markdown and JSON adapters: a detail must never silently disappear.
 	const View = $derived.by(() => {
 		const view = structuredDetailsViews[details.type]
 

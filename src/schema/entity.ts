@@ -103,14 +103,6 @@ export type TransactionBroadcastProvider = EntityWithType<EntityType.transaction
 export type SecurityAuditor = EntityWithType<EntityType.securityAuditor>
 export type WalletDeveloper = EntityWithType<EntityType.walletDeveloper>
 
-/**
- * A Markdown link to an Entity.
- */
-/**
- * Inline span linking to an entity, for canonical structured detail models.
- * Mirrors `entityMarkdownLink`: bold, and plain bold text when the entity has
- * no page of its own.
- */
 export function entityInlineLink(entity: Entity): InlineSpan {
 	const url = entityUrl(entity)
 
@@ -119,6 +111,9 @@ export function entityInlineLink(entity: Entity): InlineSpan {
 		: { kind: 'link', text: entity.name, url: getUrl(url), strong: true }
 }
 
+/**
+ * A Markdown link to an Entity.
+ */
 export function entityMarkdownLink(entity: Entity): string {
 	const url = entityUrl(entity)
 
