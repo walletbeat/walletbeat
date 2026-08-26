@@ -1,4 +1,5 @@
 import { type UserInfo, userInfoName } from '@/schema/features/privacy/data-collection'
+import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import {
 	type EthereumL1LightClient,
 	ethereumL1LightClientUrl,
@@ -18,6 +19,10 @@ import type { AddressCorrelationDetails } from '@/types/content/details/address-
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
 import type { FundingDetails } from '@/types/content/details/funding'
 import type { InlineText } from '@/types/content/details/inline'
+import {
+	type PrivateTransfersDetails,
+	privateTransferTechnologyName,
+} from '@/types/content/details/private-transfers'
 import type {
 	ScamPreventionDetails,
 	ScamWarningKind,
@@ -97,6 +102,21 @@ export interface FundingDetailsJsonExport {
 	revenueBreakdownIsPublic: boolean
 }
 
+export interface PrivateTransferTechnologyJsonExport {
+	technology: PrivateTransferTechnology
+	name: string
+	sending: InlineTextJsonExport
+	receiving: InlineTextJsonExport
+	spending: InlineTextJsonExport
+	notes?: InlineTextJsonExport[]
+}
+
+export interface PrivateTransfersDetailsJsonExport {
+	type: 'privateTransfers'
+	technologies: PrivateTransferTechnologyJsonExport[]
+	defaultModeNote?: InlineTextJsonExport
+}
+
 export interface ScamWarningDetailsJsonExport {
 	kind: ScamWarningKind
 	description: string
@@ -129,6 +149,7 @@ export type StructuredDetailsJsonExport =
 	| AddressCorrelationDetailsJsonExport
 	| ChainVerificationDetailsJsonExport
 	| FundingDetailsJsonExport
+	| PrivateTransfersDetailsJsonExport
 	| ScamPreventionDetailsJsonExport
 	| TransactionInclusionDetailsJsonExport
 
@@ -218,6 +239,28 @@ function serializeFundingDetails(details: FundingDetails): FundingDetailsJsonExp
 	}
 }
 
+function serializePrivateTransfersDetails(
+	details: PrivateTransfersDetails,
+	context: StructuredDetailsContext,
+): PrivateTransfersDetailsJsonExport {
+	return {
+		type: 'privateTransfers',
+		technologies: details.technologies.map(technology => ({
+			technology: technology.technology,
+			name: privateTransferTechnologyName[technology.technology],
+			sending: serializeInlineText(technology.sending, context),
+			receiving: serializeInlineText(technology.receiving, context),
+			spending: serializeInlineText(technology.spending, context),
+			...(technology.notes.length > 0 && {
+				notes: technology.notes.map(note => serializeInlineText(note, context)),
+			}),
+		})),
+		...(details.defaultModeNote !== undefined && {
+			defaultModeNote: serializeInlineText(details.defaultModeNote, context),
+		}),
+	}
+}
+
 function serializeScamPreventionDetails(
 	details: ScamPreventionDetails,
 	context: StructuredDetailsContext,
@@ -265,6 +308,7 @@ const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> =
 	addressCorrelation: serializeAddressCorrelationDetails,
 	chainVerification: serializeChainVerificationDetails,
 	funding: serializeFundingDetails,
+	privateTransfers: serializePrivateTransfersDetails,
 	scamPrevention: serializeScamPreventionDetails,
 	transactionInclusion: serializeTransactionInclusionDetails,
 }

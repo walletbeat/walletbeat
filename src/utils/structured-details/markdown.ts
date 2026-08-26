@@ -6,6 +6,10 @@ import type { AddressCorrelationDetails } from '@/types/content/details/address-
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
 import type { FundingDetails } from '@/types/content/details/funding'
 import type { InlineText } from '@/types/content/details/inline'
+import {
+	type PrivateTransfersDetails,
+	privateTransferTechnologyName,
+} from '@/types/content/details/private-transfers'
 import type { ScamPreventionDetails } from '@/types/content/details/scam-prevention'
 import type { TransactionInclusionDetails } from '@/types/content/details/transaction-inclusion'
 import { commaListFormat, renderStrings } from '@/types/utils/text'
@@ -35,7 +39,19 @@ export function renderInlineTextMarkdown(
 		.map(span => {
 			const text = renderStrings(span.text, { ...context.strings })
 
-			return span.kind === 'link' ? `[${text}](${span.url})` : text
+			if (span.kind === 'link') {
+				return span.strong === true ? `[**${text}**](${span.url})` : `[${text}](${span.url})`
+			}
+
+			if (span.code === true) {
+				return `\`${text}\``
+			}
+
+			if (span.strong === true) {
+				return `**${text}**`
+			}
+
+			return span.emphasis === true ? `*${text}*` : text
 		})
 		.join('')
 }
@@ -93,6 +109,29 @@ function renderFundingMarkdown(details: FundingDetails, context: StructuredDetai
 	return renderStrings(`**{{WALLET_NAME}}** is funded by **${sources}**.`, { ...context.strings })
 }
 
+function renderPrivateTransfersMarkdown(
+	details: PrivateTransfersDetails,
+	context: StructuredDetailsContext,
+): string {
+	const blocks: string[] = []
+
+	if (details.defaultModeNote !== undefined) {
+		blocks.push(renderInlineTextMarkdown(details.defaultModeNote, context))
+	}
+
+	for (const technology of details.technologies) {
+		blocks.push(
+			`#### ${privateTransferTechnologyName[technology.technology]}`,
+			`**Sending:** ${renderInlineTextMarkdown(technology.sending, context)}`,
+			`**Receiving:** ${renderInlineTextMarkdown(technology.receiving, context)}`,
+			`**Spending:** ${renderInlineTextMarkdown(technology.spending, context)}`,
+			...technology.notes.map(note => renderInlineTextMarkdown(note, context)),
+		)
+	}
+
+	return blocks.join('\n\n')
+}
+
 function renderScamPreventionMarkdown(
 	details: ScamPreventionDetails,
 	context: StructuredDetailsContext,
@@ -131,6 +170,7 @@ const markdownRenderers: StructuredDetailsRenderers<string> = {
 	addressCorrelation: renderAddressCorrelationMarkdown,
 	chainVerification: renderChainVerificationMarkdown,
 	funding: renderFundingMarkdown,
+	privateTransfers: renderPrivateTransfersMarkdown,
 	scamPrevention: renderScamPreventionMarkdown,
 	transactionInclusion: renderTransactionInclusionMarkdown,
 }
