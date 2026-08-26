@@ -2952,7 +2952,7 @@
 			animation: BreadcrumbParentSlotAnimation
 				var(--stickyBreadcrumb-animationTimingFunction)
 				both;
-			animation-timeline: --sticky-breadcrumb-timeline;
+			animation-timeline: --sticky-breadcrumb-scope-timeline;
 			animation-range: var(---wallet-breadcrumb-animation-range);
 
 			> span {
@@ -3061,7 +3061,7 @@
 				)
 				var(--stickyBreadcrumb-animationTimingFunction)
 				forwards;
-			animation-timeline: --sticky-breadcrumb-timeline;
+			animation-timeline: --sticky-breadcrumb-scope-timeline;
 			animation-range:
 				var(---wallet-breadcrumb-animation-range);
 			/* Preserve the underlying hover/focus opacity before the scroll effect. */
