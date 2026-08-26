@@ -10,9 +10,8 @@ Application-form: https://esp.ethereum.foundation/form-direct/apply
 
 # Walletbeat 2026 EF ESP grant application
 
-The final text of Walletbeat's application to the Ethereum Foundation's
+Walletbeat's application to the Ethereum Foundation's
 [Ecosystem Support Program direct grant form](https://esp.ethereum.foundation/form-direct/apply).
-It has not been submitted yet; it will be submitted once this document is merged.
 
 Each section below corresponds to one field of that form, in the order the form presents
 them. The italicized text under each heading is the form's own prompt for that field.
