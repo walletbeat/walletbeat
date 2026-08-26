@@ -13,38 +13,26 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
  */
 export type AddressCorrelationSource = { kind: 'onchain' } | { kind: 'entity'; entity: Entity }
 
-/** One group of personal information correlatable by a single source. */
 export interface AddressCorrelationLeak {
 	source: AddressCorrelationSource
 
 	/** The correlated personal information, deduplicated and ordered worst-first. */
 	correlatedInfo: NonEmptyArray<UserInfo>
 
-	/** References backing this source's claim. */
 	references: FullyQualifiedReference[]
 }
 
-/**
- * Canonical detail model for address correlation.
- *
- * Leaks are grouped by stable source identity (entity id, or the onchain
- * source), never by display name, so two entities that happen to share a name
- * cannot be merged into one claim. Grouping, ordering and deduplication happen
- * once here rather than in each adapter.
- */
 export interface AddressCorrelationDetails {
 	type: 'addressCorrelation'
 	leaks: AddressCorrelationLeak[]
 }
 
-/** A linkable fact: some personal information correlatable by some source. */
 export interface AddressCorrelationLinkable {
 	info: UserInfo
 	by: Entity | 'onchain'
 	refs: FullyQualifiedReference[]
 }
 
-/** Stable identity for a correlation source. */
 function sourceKey(by: Entity | 'onchain'): string {
 	return by === 'onchain' ? 'onchain' : `entity:${by.id}`
 }
@@ -100,7 +88,6 @@ export function buildAddressCorrelationDetails(
 	return { type: 'addressCorrelation', leaks }
 }
 
-/** Long human-readable names of the correlated information, in model order. */
 export function correlatedInfoNames(leak: AddressCorrelationLeak): string[] {
 	return leak.correlatedInfo.map(info => userInfoName(info).long)
 }

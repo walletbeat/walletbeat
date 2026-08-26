@@ -6,14 +6,6 @@ import type {
 
 import type { StructuredDetailsContext } from './context'
 
-/**
- * An exhaustive set of renderers, one per canonical structured detail type.
- *
- * Each adapter (web, Markdown, JSON) declares its own registry of this shape
- * and bundles separately, so adding a member to `StructuredDetailsByType`
- * fails compilation in every adapter that does not handle it, and no adapter
- * drags another adapter's dependencies into its bundle.
- */
 export type StructuredDetailsRenderers<_Result> = {
 	[_Type in StructuredDetailsType]: (
 		details: StructuredDetailsByType[_Type],

@@ -2,7 +2,6 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 
 import type { InlineText } from './inline'
 
-/** Human-readable name of a private transfer technology. */
 export const privateTransferTechnologyName: Record<PrivateTransferTechnology, string> = {
 	[PrivateTransferTechnology.STEALTH_ADDRESSES]: 'ERC-5564 Stealth Addresses',
 	[PrivateTransferTechnology.TORNADO_CASH_NOVA]: 'Tornado Cash Nova',
@@ -10,32 +9,18 @@ export const privateTransferTechnologyName: Record<PrivateTransferTechnology, st
 	[PrivateTransferTechnology.RAILGUN]: 'Railgun',
 }
 
-/** What one private transfer technology means for each phase of a transfer. */
 export interface PrivateTransferTechnologyDetail {
 	technology: PrivateTransferTechnology
 
-	/** Privacy of sending funds with this technology. */
 	sending: InlineText
 
-	/** Privacy of receiving funds with this technology. */
 	receiving: InlineText
 
-	/** Privacy of spending received funds with this technology. */
 	spending: InlineText
 
-	/** Caveats that apply to this technology as a whole. */
 	notes: InlineText[]
 }
 
-/**
- * Canonical detail model for private token transfers.
- *
- * Technologies are an ordered array rather than a `Map`, so the model is
- * directly serializable and every adapter sees the same order. A note about
- * the wallet's default transfer mode belongs to the evaluation as a whole and
- * is therefore top-level, never attached to whichever technology happens to
- * come first.
- */
 export interface PrivateTransfersDetails {
 	type: 'privateTransfers'
 
@@ -50,7 +35,6 @@ export interface PrivateTransfersDetails {
 	defaultModeNote?: InlineText
 }
 
-/** Type predicate for private transfer details. */
 export function isPrivateTransfersDetails(details: unknown): details is PrivateTransfersDetails {
 	return (
 		typeof details === 'object' &&
@@ -60,12 +44,10 @@ export function isPrivateTransfersDetails(details: unknown): details is PrivateT
 	)
 }
 
-/** Build details carrying only a wallet-wide transfer mode note. */
 export function privateTransfersModeNote(note: InlineText): PrivateTransfersDetails {
 	return { type: 'privateTransfers', technologies: [], defaultModeNote: note }
 }
 
-/** Build details for a single technology. */
 export function privateTransfersDetails(
 	detail: PrivateTransferTechnologyDetail,
 ): PrivateTransfersDetails {

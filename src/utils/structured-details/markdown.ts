@@ -44,15 +44,6 @@ import {
 } from './prose'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'
 
-/**
- * Markdown adapter for canonical structured evaluation details.
- *
- * This module owns Markdown syntax and nothing else. It never decides what a
- * detail means, which claims belong together, or how they are worded beyond
- * the shared templates the evaluator authored.
- */
-
-/** Render an inline sentence as Markdown, resolving template placeholders. */
 export function renderInlineTextMarkdown(
 	inline: InlineText,
 	context: StructuredDetailsContext,
@@ -104,7 +95,6 @@ function referencesSuffixMarkdown(references: ReferenceInput): string {
 	return links.length === 0 ? '' : ` (${links.join(', ')})`
 }
 
-/** Render guardian policy blocks, which lists render natively in Markdown. */
 function renderGuardianPolicyMarkdown(policy: GuardianPolicyDetail): string[] {
 	return guardianPolicyBlocks(policy).map(block =>
 		block.kind === 'paragraph'
@@ -113,7 +103,6 @@ function renderGuardianPolicyMarkdown(policy: GuardianPolicyDetail): string[] {
 	)
 }
 
-/** A scenario bullet: the scenario, and its consequence when it has one. */
 function renderScenarioMarkdown(scenario: GuardianScenarioOutcomeDetail): string {
 	return scenario.consequence === undefined
 		? `- **${scenario.scenario}**`
@@ -261,7 +250,6 @@ function renderScamPreventionMarkdown(
 		.join('\n')
 }
 
-/** States which variants an audit covered, when it did not cover them all. */
 function auditScopeSuffix(audit: SecurityAuditDetail): string {
 	const variants = auditVariantNames(audit)
 
@@ -329,7 +317,6 @@ function renderTransactionInclusionMarkdown(
 		.join('\n\n')
 }
 
-/** Exhaustive Markdown renderer registry. */
 const markdownRenderers: StructuredDetailsRenderers<string> = {
 	accountRecovery: renderAccountRecoveryMarkdown,
 	accountUnruggability: renderAccountUnruggabilityMarkdown,
@@ -342,7 +329,6 @@ const markdownRenderers: StructuredDetailsRenderers<string> = {
 	transactionInclusion: renderTransactionInclusionMarkdown,
 }
 
-/** Render canonical structured details as Markdown. */
 export function renderStructuredDetailsMarkdown(
 	details: StructuredDetails,
 	context: StructuredDetailsContext,
