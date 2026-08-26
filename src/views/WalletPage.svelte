@@ -3553,6 +3553,27 @@
 				}
 			}
 
+			@supports not (container-type: anchored) {
+				article > header#top .wallet-name[data-sticky-breadcrumb] h1 {
+					animation-name: WalletRootContentWithoutSiteLogoMobileAnimation;
+
+					&::before {
+						display: none;
+						animation: none;
+					}
+				}
+
+				:global(
+					#layout:has(#wallet-page)
+						> .logo-position-area
+						> .logo
+						> img
+				) {
+					animation: none;
+					translate: 0 calc(-1rem - var(--navigation-logo-blockSize));
+				}
+			}
+
 			:is(
 				.stage-heading-position[data-sticky-breadcrumb~='position'],
 				.attribute-group-heading-position[data-sticky-breadcrumb~='position']
@@ -4042,9 +4063,12 @@
 				var(---wallet-fallback-attribute-heading-block-size)
 					+ var(---wallet-summary-companions-row-block-size)
 			);
-			---wallet-fallback-detail-sticky-block-start: calc(
+			---wallet-fallback-attribute-sticky-block-start: calc(
 				var(---wallet-page-block-offset)
 					+ var(---wallet-fallback-group-sticky-block-size)
+			);
+			---wallet-fallback-detail-sticky-block-start: calc(
+				var(---wallet-fallback-attribute-sticky-block-start)
 					+ var(---wallet-fallback-attribute-sticky-block-size)
 			);
 		}
@@ -4146,15 +4170,16 @@
 			font-size: var(---wallet-breadcrumb-group-font-size);
 		}
 
-		.attribute > details[open] > summary {
-			/* The active group must paint over an outgoing attribute as native
-			 * sticky containment pushes that attribute through the group lane. */
-			--sticky-insetBlockStart: var(---wallet-group-sticky-block-end);
-			z-index: calc(var(---wallet-breadcrumb-layer-detail) + 1);
+		.attribute > details[open] > summary[data-sticky] {
+			--sticky-insetBlockStart: var(
+				---wallet-fallback-attribute-sticky-block-start
+			);
+			z-index: var(---wallet-breadcrumb-layer-attribute);
 			position: sticky;
 			min-block-size: var(---wallet-fallback-attribute-sticky-block-size);
 			padding-block: var(---wallet-fallback-sticky-padding-block);
 			background-color: var(---wallet-breadcrumb-surface-background);
+
 			.attribute-heading-position h3 {
 				font-size: var(---wallet-breadcrumb-attribute-font-size);
 			}
@@ -4176,6 +4201,25 @@
 				---wallet-sticky-stack-block-end: var(
 					---wallet-fallback-detail-sticky-block-start
 				);
+			}
+
+			@media (min-width: 1280px) {
+				.container {
+					---wallet-fallback-attribute-sticky-block-start: var(
+						---wallet-root-row-block-size
+					);
+				}
+
+				:is(
+					#stages > header[data-sticky],
+					.attribute-group > .attribute-group-stack[data-scroll-item] > header[data-sticky]
+				) {
+					background-color: transparent;
+
+					&::before {
+						content: none;
+					}
+				}
 			}
 
 			.attribute-accordions details[open] > summary[data-sticky] {
