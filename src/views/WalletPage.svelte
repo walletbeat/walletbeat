@@ -1268,7 +1268,7 @@
 					data-sticky-breadcrumb="scope"
 				>
 					<summary
-						data-sticky="block block-start backdrop-self backdrop-stuck"
+						data-sticky="block block-start backdrop-before backdrop-stuck"
 						data-sticky-breadcrumb="exit"
 						data-sticky-row-backdrop="detail"
 					>
@@ -1309,7 +1309,7 @@
 					data-sticky-breadcrumb="scope"
 				>
 					<summary
-						data-sticky="block block-start backdrop-self backdrop-stuck"
+						data-sticky="block block-start backdrop-before backdrop-stuck"
 						data-sticky-breadcrumb="exit"
 						data-sticky-row-backdrop="detail"
 					>
@@ -1425,7 +1425,7 @@
 						data-sticky-breadcrumb="scope"
 					>
 						<summary
-							data-sticky="block block-start backdrop-self backdrop-stuck"
+							data-sticky="block block-start backdrop-before backdrop-stuck"
 							data-sticky-breadcrumb="exit"
 							data-sticky-row-backdrop="detail"
 						>
@@ -1602,13 +1602,20 @@
 				var(---wallet-mobile-pie-size)
 					+ 0.5rem
 			);
-			---wallet-breadcrumb-inline-end: calc(
-				var(---wallet-mobile-pie-inline-clearance)
-				+ var(--navigation-mobile-gap)
-			);
-			---wallet-breadcrumb-trailing-control-inline-clearance: var(
-				---wallet-mobile-pie-inline-clearance
-			);
+			@supports (
+				((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
+					(container-type: scroll-state) and
+					(position-anchor: --wallet-name) and
+					(inset-inline-start: anchor(--wallet-name end))
+			) {
+				---wallet-breadcrumb-inline-end: calc(
+					var(---wallet-mobile-pie-inline-clearance)
+						+ var(--navigation-mobile-gap)
+				);
+				---wallet-breadcrumb-trailing-control-inline-clearance: var(
+					---wallet-mobile-pie-inline-clearance
+				);
+			}
 			---wallet-name-mobile-block-start: calc(
 				(
 					var(--navigation-mobile-blockSize)
@@ -3145,9 +3152,6 @@
 					margin-inline-start: 0;
 					position-try-fallbacks: none;
 					font-size: 1rem;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
 					animation: none;
 
 					&::before {
@@ -3990,9 +3994,6 @@
 	.attribute-heading h3 {
 		font-size: var(---wallet-attribute-heading-font-size);
 		font-weight: 600;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	.attribute-rating-methodology {
