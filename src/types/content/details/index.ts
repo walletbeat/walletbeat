@@ -1,7 +1,9 @@
 import type { CustomContent, TypographicContent } from '../../content'
 import type { Strings } from '../../utils/string-templates'
 import type { ChainVerificationDetails } from './chain-verification'
+import type { FundingDetails } from './funding'
 import type { ScamPreventionDetails } from './scam-prevention'
+import type { TransactionInclusionDetails } from './transaction-inclusion'
 
 /**
  * The single source of truth for canonical structured evaluation details.
@@ -16,7 +18,9 @@ import type { ScamPreventionDetails } from './scam-prevention'
  */
 export interface StructuredDetailsByType {
 	chainVerification: ChainVerificationDetails
+	funding: FundingDetails
 	scamPrevention: ScamPreventionDetails
+	transactionInclusion: TransactionInclusionDetails
 }
 
 /** Discriminator values of all canonical structured detail models. */

@@ -3,7 +3,9 @@ import type { Component } from 'svelte'
 import type { StructuredDetailsByType, StructuredDetailsType } from '@/types/content/details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
+import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
+import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 
 /** Props every structured-details view receives. */
 export interface StructuredDetailsViewProps<_Details> {
@@ -31,7 +33,9 @@ export const structuredDetailsViews: {
 	}
 } = {
 	chainVerification: { view: ChainVerificationDetails, rendersOwnReferences: false },
+	funding: { view: FundingDetails, rendersOwnReferences: false },
 	scamPrevention: { view: ScamAlertDetails, rendersOwnReferences: true },
+	transactionInclusion: { view: TransactionInclusionDetails, rendersOwnReferences: true },
 }
 
 /** Whether the view for these details renders their references itself. */
