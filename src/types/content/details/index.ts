@@ -40,25 +40,34 @@ export type StructuredDetailsType = keyof StructuredDetailsByType
 export type StructuredDetails = StructuredDetailsByType[StructuredDetailsType]
 
 /**
- * The detail content an evaluation may carry: ordinary typographic prose, a
- * canonical structured model, or nothing at all.
+ * The detail content an evaluation may carry: ordinary typographic prose or a
+ * canonical structured model. An evaluation with nothing to detail, such as an
+ * unrated one, simply omits it.
  */
 export type EvaluationDetails<_Strings extends Strings = null> =
-	TypographicContent<_Strings> | StructuredDetails | undefined
+	TypographicContent<_Strings> | StructuredDetails
 
-/** Type predicate for canonical structured details. */
-export function isStructuredDetails(details: unknown): details is StructuredDetails {
-	return (
-		typeof details === 'object' &&
-		details !== null &&
-		Object.hasOwn(details, 'type') &&
-		!Object.hasOwn(details, 'contentType')
-	)
+/**
+ * Every discriminator value, at runtime.
+ *
+ * Typed as a record of the same keys, so a new member of
+ * `StructuredDetailsByType` fails compilation here too.
+ */
+const structuredDetailsTypes: Record<StructuredDetailsType, true> = {
+	accountRecovery: true,
+	accountUnruggability: true,
+	addressCorrelation: true,
+	chainVerification: true,
+	funding: true,
+	privateTransfers: true,
+	scamPrevention: true,
+	securityAudits: true,
+	transactionInclusion: true,
 }
 
-/** Thrown when an adapter is handed a discriminator it does not know about. */
-export function unknownStructuredDetailsType(details: never): never {
-	const type = (details as { type?: unknown }).type
-
-	throw new Error(`Unknown structured details type: ${String(type)}`)
+/** Type predicate for canonical structured details. */
+export function isStructuredDetails(
+	details: EvaluationDetails<Strings> | undefined,
+): details is StructuredDetails {
+	return details !== undefined && 'type' in details && details.type in structuredDetailsTypes
 }

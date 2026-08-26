@@ -5,9 +5,11 @@
 	import { ContentType } from '@/types/content'
 	import {
 		auditsByRecency,
+		auditVariantNames,
 		formatCalendarDate,
 		type SecurityAuditsDetails,
 	} from '@/types/content/details/security-audits'
+	import { commaListFormat } from '@/types/utils/text'
 	import {
 		bugBountySentences,
 		securityAuditFindingsSentence,
@@ -125,6 +127,10 @@
 				</summary>
 
 				<section data-column="gap-4">
+					{#if auditVariantNames(audit).length > 0}
+						<p>This audit covered {commaListFormat(auditVariantNames(audit))}.</p>
+					{/if}
+
 					<p>{securityAuditFindingsSentence(audit)}</p>
 
 					{#if audit.findings.kind === 'flaws'}

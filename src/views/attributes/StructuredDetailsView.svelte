@@ -12,7 +12,17 @@
 
 	// The single web entry point for canonical structured details.
 	// Layout, badges and interactions belong to the per-type views below.
-	const View = $derived(structuredDetailsViews[details.type])
+	// An unknown discriminator throws rather than rendering nothing, matching
+	// the Markdown and JSON adapters: a detail must never silently disappear.
+	const View = $derived.by(() => {
+		const view = structuredDetailsViews[details.type]
+
+		if (view === undefined) {
+			throw new Error(`No view for structured details type: ${String(details.type)}`)
+		}
+
+		return view
+	})
 </script>
 
 <div data-column>

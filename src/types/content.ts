@@ -61,7 +61,7 @@ export type Content<_Strings extends Strings = null> = TypographicContent<_Strin
  * @returns Whether `content` is of type `TypographicContent`.
  */
 export function isTypographicContent<_Strings extends Strings = null>(
-	content: EvaluationDetails<_Strings> | Content<_Strings>,
+	content: EvaluationDetails<_Strings> | Content<_Strings> | undefined,
 ): content is TypographicContent<_Strings> {
 	if (content === undefined || !Object.hasOwn(content, 'contentType')) {
 		return false

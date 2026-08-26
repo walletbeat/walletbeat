@@ -420,12 +420,23 @@ export async function grammarLintMessages(
 		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
 	)
 
-	// Ignore Spelling lints for words the project's spelling dictionary already
-	// accepts (entity and platform names such as auditors or bounty platforms).
-	// That dictionary is the project's spelling authority; Harper adds grammar.
-	lints = lints.filter(
-		lint => lint.lint_kind_pretty() !== 'Spelling' || !isInCspellWords(lint.get_problem_text()),
-	)
+	// Ignore Spelling lints for capitalized proper nouns the project's spelling
+	// dictionary already accepts, such as auditor and bug bounty platform names.
+	// Lowercase words stay checked, so ordinary prose is unaffected.
+	lints = lints.filter(lint => {
+		if (lint.lint_kind_pretty() !== 'Spelling') {
+			return true
+		}
+
+		const text = lint.get_problem_text()
+		const firstChar = text[0]
+
+		if (firstChar === undefined || firstChar.toUpperCase() !== firstChar) {
+			return true
+		}
+
+		return !isInCspellWords(text)
+	})
 
 	// Ignore Spelling lints for possessive proper nouns whose base word is in the cspell
 	// vocabulary (e.g. "Gnosis's": "Gnosis" is in .cspell.json so it is a valid proper noun).

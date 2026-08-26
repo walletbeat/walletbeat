@@ -6,16 +6,19 @@ import {
 	CoverageBreadth,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import { transactionSubmissionL2TypeName } from '@/schema/features/self-sovereignty/transaction-submission'
+import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
 import { getUrl, isUrl } from '@/schema/url'
 import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
 import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
 import {
-	type AddressCorrelationDetails,
 	type AddressCorrelationLeak,
 	correlatedInfoNames,
 } from '@/types/content/details/address-correlation'
+import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
+import type { FundingDetails } from '@/types/content/details/funding'
 import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
 import {
 	auditedInLastYear,
@@ -71,11 +74,6 @@ export function addressCorrelationLeakSentence(leak: AddressCorrelationLeak): st
 	return `**${entity.name}**${privacyPolicy} may link your wallet address to your ${info}.`
 }
 
-/** Every address-correlation bullet, in canonical order. */
-export function addressCorrelationSentences(details: AddressCorrelationDetails): string[] {
-	return details.leaks.map(addressCorrelationLeakSentence)
-}
-
 /**
  * One rendered transaction-inclusion block, tagged with the claim it makes so
  * adapters can attach the right references to it.
@@ -83,6 +81,29 @@ export function addressCorrelationSentences(details: AddressCorrelationDetails):
 export interface TransactionInclusionBlock {
 	claim: 'l1' | 'l2'
 	text: string
+}
+
+/** How a wallet's funding reads, whatever the adapter. */
+export function fundingSentence(details: FundingDetails): string {
+	const sources =
+		details.strategies.length === 0
+			? 'unknown sources'
+			: details.strategies.map(({ strategy }) => monetizationStrategyName(strategy)).join(', ')
+
+	return `**{{WALLET_NAME}}** is funded by **${sources}**.`
+}
+
+/** How a wallet's L1 chain verification reads, whatever the adapter. */
+export function chainVerificationSentence(details: ChainVerificationDetails): string {
+	const clients = details.lightClients.map(client => {
+		const { url, label } = ethereumL1LightClientUrl(client)
+
+		return `[${label}](${url})`
+	})
+
+	return `**{{WALLET_NAME}}** performs L1 chain state verification using ${commaListFormat(
+		clients,
+	)} light client${details.lightClients.length === 1 ? '' : 's'}.`
 }
 
 /** Sentences describing transaction inclusion, one per rendered block. */
