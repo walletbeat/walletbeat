@@ -315,6 +315,8 @@ function auditDetail(audit: SecurityAudit): SecurityAuditDetail {
 	return {
 		auditor: audit.auditor,
 		auditDate: audit.auditDate,
+		variants:
+			audit.variantsScope === 'ALL_VARIANTS' ? 'ALL_VARIANTS' : setItems(audit.variantsScope),
 		findings:
 			audit.unpatchedFlaws === 'NONE_FOUND'
 				? { kind: 'noneFound' }

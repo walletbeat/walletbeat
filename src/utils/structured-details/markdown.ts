@@ -1,6 +1,4 @@
 import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
-import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
-import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import { gitCommitRefPinRegExp } from '@/schema/url'
 import type { StructuredDetails } from '@/types/content/details'
@@ -19,7 +17,9 @@ import {
 import type { ScamPreventionDetails } from '@/types/content/details/scam-prevention'
 import {
 	auditsByRecency,
+	auditVariantNames,
 	formatCalendarDate,
+	type SecurityAuditDetail,
 	type SecurityAuditsDetails,
 } from '@/types/content/details/security-audits'
 import type { TransactionInclusionDetails } from '@/types/content/details/transaction-inclusion'
@@ -32,6 +32,8 @@ import {
 	addressCorrelationIntro,
 	addressCorrelationLeakSentence,
 	bugBountySentences,
+	chainVerificationSentence,
+	fundingSentence,
 	guardianPolicyBlocks,
 	securityAuditFindingsSentence,
 	securityAuditsSummary,
@@ -211,25 +213,11 @@ function renderChainVerificationMarkdown(
 	details: ChainVerificationDetails,
 	context: StructuredDetailsContext,
 ): string {
-	const clients = details.lightClients.map(client => {
-		const { url, label } = ethereumL1LightClientUrl(client)
-
-		return `[${label}](${url})`
-	})
-
-	return renderStrings(
-		`**{{WALLET_NAME}}** performs L1 chain state verification using ${commaListFormat(clients)} light client${details.lightClients.length === 1 ? '' : 's'}.`,
-		{ ...context.strings },
-	)
+	return renderStrings(chainVerificationSentence(details), { ...context.strings })
 }
 
 function renderFundingMarkdown(details: FundingDetails, context: StructuredDetailsContext): string {
-	const sources =
-		details.strategies.length === 0
-			? 'unknown sources'
-			: details.strategies.map(({ strategy }) => monetizationStrategyName(strategy)).join(', ')
-
-	return renderStrings(`**{{WALLET_NAME}}** is funded by **${sources}**.`, { ...context.strings })
+	return renderStrings(fundingSentence(details), { ...context.strings })
 }
 
 function renderPrivateTransfersMarkdown(
@@ -274,6 +262,13 @@ function renderScamPreventionMarkdown(
 		.join('\n')
 }
 
+/** States which variants an audit covered, when it did not cover them all. */
+function auditScopeSuffix(audit: SecurityAuditDetail): string {
+	const variants = auditVariantNames(audit)
+
+	return variants.length === 0 ? '' : `\n\nThis audit covered ${commaListFormat(variants)}.`
+}
+
 function renderSecurityAuditsMarkdown(
 	details: SecurityAuditsDetails,
 	context: StructuredDetailsContext,
@@ -282,7 +277,7 @@ function renderSecurityAuditsMarkdown(
 
 	for (const audit of auditsByRecency(details)) {
 		blocks.push(
-			`#### Audit by ${audit.auditor.name} (${formatCalendarDate(audit.auditDate)})`,
+			`#### Audit by ${audit.auditor.name} (${formatCalendarDate(audit.auditDate)})${auditScopeSuffix(audit)}`,
 			securityAuditFindingsSentence(audit),
 		)
 

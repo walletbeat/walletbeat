@@ -46,8 +46,19 @@ export function structuredDetailsReferences(details: StructuredDetails): FullyQu
 	return dispatchStructuredDetails(referenceCollectors, details, noContext)
 }
 
-/** Whether two references point at exactly the same set of URLs. */
-function sameUrls(reference: FullyQualifiedReference, other: FullyQualifiedReference): boolean {
+/**
+ * Whether two references make the same claim: the same set of URLs, with the
+ * same explanation. Two references sharing URLs but explaining different
+ * things are different claims, and both must still be shown.
+ */
+function sameReference(
+	reference: FullyQualifiedReference,
+	other: FullyQualifiedReference,
+): boolean {
+	if (reference.explanation !== other.explanation) {
+		return false
+	}
+
 	const urls = new Set(reference.urls.map(url => url.url))
 	const otherUrls = new Set(other.urls.map(url => url.url))
 
@@ -59,5 +70,5 @@ export function referencesNotIn(
 	references: FullyQualifiedReference[],
 	displayed: FullyQualifiedReference[],
 ): FullyQualifiedReference[] {
-	return references.filter(reference => !displayed.some(shown => sameUrls(reference, shown)))
+	return references.filter(reference => !displayed.some(shown => sameReference(reference, shown)))
 }

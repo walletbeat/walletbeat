@@ -1,6 +1,5 @@
 import type { LucideNavigationIcon } from '@/constants/navigation'
 import type { WBIconID } from '@/styles/wbicons'
-import type { InlineLinkSpan } from '@/types/content/details/inline'
 
 import type { AtLeastOneTrueVariant } from './variants'
 
@@ -102,15 +101,6 @@ function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): strin
 /** Return a markdown link for an EIP using only its short label (e.g. "EIP-712"). */
 export function eipMarkdownShortLink(eip: Eip): string {
 	return `[${eipShortLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
-}
-
-/**
- * Inline span linking to an EIP, for canonical structured detail models.
- * Uses the plain eips.ethereum.org URL: the Markdown-only magic fragment is
- * adapter detail and has no consumer.
- */
-export function eipInlineLink(eip: Eip): InlineLinkSpan {
-	return { kind: 'link', text: eipLabel(eip), url: eipEthereumDotOrgUrl(eip) }
 }
 
 /** Return a markdown link for an EIP. */
