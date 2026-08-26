@@ -18,10 +18,8 @@
 	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
-	import { ContentType, isCustomContent, isTypographicContent } from '@/types/content'
+	import { ContentType, isTypographicContent } from '@/types/content'
 	import { isStructuredDetails } from '@/types/content/details'
-	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
-	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
 	import {
 		computePieSlices,
 		overallRatingPieLevels,
@@ -350,8 +348,6 @@
 	import WalletPageNavigationBadge from '@/views/WalletPageNavigationBadge.svelte'
 	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
 	import Typography from '@/components/Typography.svelte'
-	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
-	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
@@ -1066,21 +1062,6 @@
 								details={evalAttr.evaluation.details}
 								context={detailsContext}
 							/>
-						</div>
-
-					<!-- TEMPORARY: detail families not yet migrated to canonical structured models. -->
-					{:else if isCustomContent(evalAttr.evaluation.details)}
-						{@const componentName = evalAttr.evaluation.details.component.component}
-						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
-						{@const outcome = evalAttr.evaluation.outcome}
-						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
-
-						<div data-column>
-							{#if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{/if}
 						</div>
 
 					{:else}

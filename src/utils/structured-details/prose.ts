@@ -1,3 +1,5 @@
+import type { Entity } from '@/schema/entity'
+import { type Guardian, guardianMarkdown } from '@/schema/features/security/account-recovery'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
@@ -7,11 +9,14 @@ import {
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import { transactionSubmissionL2TypeName } from '@/schema/features/self-sovereignty/transaction-submission'
 import { getUrl, isUrl } from '@/schema/url'
+import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
+import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
 import {
 	type AddressCorrelationDetails,
 	type AddressCorrelationLeak,
 	correlatedInfoNames,
 } from '@/types/content/details/address-correlation'
+import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
 import {
 	auditedInLastYear,
 	auditsByRecency,
@@ -274,4 +279,178 @@ export function bugBountySentences(bounty: BugBountyDetail): string[] {
 	)
 
 	return sentences
+}
+
+/** A block of guardian-policy prose, so each adapter formats lists natively. */
+export type GuardianPolicyBlock =
+	{ kind: 'paragraph'; text: string } | { kind: 'list'; lead: string; items: string[] }
+
+/** Human-readable description of one guardian. */
+function guardianLabel(guardian: Guardian): string {
+	return guardianMarkdown(guardian)
+}
+
+function secretReconstitutionParagraph(
+	reconstitution: 'CLIENT_SIDE' | Entity,
+): GuardianPolicyBlock {
+	return {
+		kind: 'paragraph',
+		text:
+			reconstitution === 'CLIENT_SIDE'
+				? 'The key is reconstituted **client-side**.'
+				: `The key is reconstituted on infrastructure **owned by ${reconstitution.name}**.`,
+	}
+}
+
+/**
+ * Describe a guardian policy, block by block.
+ *
+ * Both account recovery and account unruggability show the same policy, so
+ * this wording lives here rather than in either attribute.
+ */
+export function guardianPolicyBlocks(policy: GuardianPolicyDetail): GuardianPolicyBlock[] {
+	const blocks: GuardianPolicyBlock[] = policy.description.map(text => ({
+		kind: 'paragraph' as const,
+		text,
+	}))
+
+	if (policy.facts.kind === 'secretSplit') {
+		const {
+			requiredGuardians,
+			optionalGuardians,
+			optionalGuardiansMinimumConfigurable,
+			optionalGuardiansMinimumNeededForRecovery,
+			secretReconstitution,
+		} = policy.facts
+
+		if (requiredGuardians.length > 0) {
+			blocks.push(
+				listOrSentence(
+					'The recovery process **critically depends** on',
+					requiredGuardians.map(guardianLabel),
+				),
+			)
+		}
+
+		// A wallet may require no optional guardian at all; saying so is more
+		// useful than an empty list, which the previous helper threw on.
+		blocks.push(
+			optionalGuardians.length === 0
+				? {
+						kind: 'paragraph',
+						text: 'The recovery process does not require setting up any other guardian.',
+					}
+				: listOrSentence(
+						`The recovery process requires setting up recovery with at least ${optionalGuardiansMinimumConfigurable.toString()} of the following:`,
+						optionalGuardians.map(guardianLabel),
+					),
+		)
+
+		if (optionalGuardiansMinimumConfigurable !== optionalGuardiansMinimumNeededForRecovery) {
+			blocks.push({
+				kind: 'paragraph',
+				text: `At least ${optionalGuardiansMinimumNeededForRecovery.toString()} of the above are required for recovery.`,
+			})
+		}
+
+		blocks.push({
+			kind: 'paragraph',
+			text: `For evaluation purposes, Walletbeat assumes the user will use the policy requiring the _least amount of effort_ that the wallet allows, i.e. ${
+				optionalGuardiansMinimumConfigurable === 1
+					? 'a single recovery guardian'
+					: `${optionalGuardiansMinimumConfigurable.toString()} recovery guardians`
+			}.`,
+		})
+		blocks.push(secretReconstitutionParagraph(secretReconstitution))
+
+		return blocks
+	}
+
+	const {
+		configuredGuardians,
+		requiredGuardians,
+		timelockWarningSentByAllOf,
+		minimumSignaturesWithTimelock,
+		minimumSignaturesBypassTimelock,
+	} = policy.facts
+
+	blocks.push(
+		listOrSentence(
+			`Recovery requires the approval of at least ${minimumSignaturesWithTimelock.toString()} of the following guardians:`,
+			configuredGuardians.map(guardianLabel),
+		),
+	)
+
+	if (requiredGuardians.length > 0) {
+		blocks.push(
+			listOrSentence(
+				'The recovery process **critically depends** on',
+				requiredGuardians.map(guardianLabel),
+			),
+		)
+	}
+
+	blocks.push({
+		kind: 'paragraph',
+		text:
+			minimumSignaturesBypassTimelock === minimumSignaturesWithTimelock
+				? 'There is no way to bypass the timelock delay.'
+				: `The timelock delay may be bypassed with the approval of at least ${minimumSignaturesBypassTimelock.toString()} guardians.`,
+	})
+
+	if (timelockWarningSentByAllOf.length > 0) {
+		blocks.push({
+			kind: 'paragraph',
+			text: `During the timelock delay, the user is warned by ${commaListFormat(
+				timelockWarningSentByAllOf.map(entity => `**${entity.name}**`),
+			)}.`,
+		})
+	}
+
+	return blocks
+}
+
+/** One item reads as a sentence; several read as a list. */
+function listOrSentence(lead: string, items: string[]): GuardianPolicyBlock {
+	const [first] = items
+
+	if (items.length === 1 && first !== undefined) {
+		const sentence = lead.endsWith(':') ? `${lead.slice(0, -1)}: ${first}.` : `${lead} ${first}.`
+
+		return { kind: 'paragraph', text: sentence }
+	}
+
+	return { kind: 'list', lead: lead.endsWith(':') ? lead : `${lead} the following:`, items }
+}
+
+/** The sentence introducing a wallet's guardian-based account recovery. */
+export function accountRecoverySummary(details: AccountRecoveryDetails): string {
+	if (details.guardianPolicy === undefined) {
+		return '{{WALLET_NAME}} does not implement guardian-based account recovery. The user will lose access to their account if they lose their seed phrase.'
+	}
+
+	const scenarios =
+		details.unrecoverableScenarios.length === 0
+			? 'passes all the tested scenarios.'
+			: details.recoverableScenarios.length === 0
+				? 'does not pass any of the tested scenarios.'
+				: 'does not pass all the tested scenarios.'
+
+	return `{{WALLET_NAME}} implements a Guardian-based account recovery feature which ${scenarios}`
+}
+
+/** The sentence introducing how ruggable a wallet's account recovery is. */
+export function accountUnruggabilitySummary(details: AccountUnruggabilityDetails): string {
+	if (details.guardianPolicy === undefined) {
+		return 'Private key material never leaves {{WALLET_NAME}}, so no external entity may take over your account.'
+	}
+
+	const scenarios =
+		details.takeoverScenarios.length === 0
+			? 'passes all the tested scenarios'
+			: details.safeScenarios.length === 0
+				? 'does not pass any of the tested scenarios'
+				: 'does not pass all the tested scenarios'
+
+	return `{{WALLET_NAME}} implements a Guardian-based account recovery feature which ${scenarios} when it comes to anti-ruggability.`
 }

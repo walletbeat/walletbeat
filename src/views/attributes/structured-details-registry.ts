@@ -4,9 +4,11 @@ import type { StructuredDetailsByType, StructuredDetailsType } from '@/types/con
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
+import AccountRecoveryDetails from '@/views/attributes/security/AccountRecoveryDetails.svelte'
 import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
 import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
 import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
+import AccountUnruggabilityDetails from '@/views/attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 
@@ -28,6 +30,8 @@ export const structuredDetailsViews: {
 		StructuredDetailsViewProps<StructuredDetailsByType[_Type]>
 	>
 } = {
+	accountRecovery: AccountRecoveryDetails,
+	accountUnruggability: AccountUnruggabilityDetails,
 	addressCorrelation: AddressCorrelationDetails,
 	chainVerification: ChainVerificationDetails,
 	funding: FundingDetails,

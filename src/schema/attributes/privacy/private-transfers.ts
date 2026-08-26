@@ -364,9 +364,6 @@ function rateStealthAddressSupport(
 		switch (stealthAddresses.balanceLookup.type) {
 			case 'EXTERNAL_SERVICE':
 				return (() => {
-					const externalServiceLink = entityMarkdownLink(
-						stealthAddresses.balanceLookup.externalService,
-					)
 					const externalServiceSpan = entityInlineLink(
 						stealthAddresses.balanceLookup.externalService,
 					)

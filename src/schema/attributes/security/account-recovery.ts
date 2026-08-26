@@ -27,7 +27,12 @@ import {
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
-import { refNotNecessary, type WithRef } from '@/schema/reference'
+import {
+	type FullyQualifiedReference,
+	refNotNecessary,
+	toFullyQualified,
+	type WithRef,
+} from '@/schema/reference'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
 	markdown,
@@ -36,7 +41,10 @@ import {
 	sentence,
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
-import { accountRecoveryDetailsContent } from '@/types/content/account-recovery-details'
+import {
+	type AccountRecoveryDrillsDetail,
+	buildAccountRecoveryDetails,
+} from '@/types/content/details/account-recovery'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
@@ -110,7 +118,6 @@ function evaluateGuardianRecoveryPolicy(
 					drills: null,
 				},
 			},
-			details: accountRecoveryDetailsContent({}),
 		})
 	}
 
@@ -129,7 +136,6 @@ function evaluateGuardianRecoveryPolicy(
 					drills: null,
 				},
 			},
-			details: accountRecoveryDetailsContent({}),
 		})
 	}
 
@@ -148,7 +154,6 @@ function evaluateGuardianRecoveryPolicy(
 				drills: null,
 			},
 		},
-		details: accountRecoveryDetailsContent({}),
 	})
 }
 
@@ -237,7 +242,6 @@ function evaluateAccountRecoveryDrills(
 						drills: { configured, missing: [] },
 					},
 				},
-				details: accountRecoveryDetailsContent({}),
 			})
 		}
 
@@ -252,7 +256,6 @@ function evaluateAccountRecoveryDrills(
 				`),
 				metadata: { minimumGuardianPolicy: null, outcomes: null, drills: { configured, missing } },
 			},
-			details: accountRecoveryDetailsContent({}),
 			howToImprove: drillsHowToImprove(missing),
 		})
 	}
@@ -274,7 +277,6 @@ function evaluateAccountRecoveryDrills(
 					drills: { configured: [], missing: [] },
 				},
 			},
-			details: accountRecoveryDetailsContent({}),
 		})
 	}
 
@@ -293,7 +295,6 @@ function evaluateAccountRecoveryDrills(
 				drills: { configured: [], missing: recommendedDrillTypes },
 			},
 		},
-		details: accountRecoveryDetailsContent({}),
 		howToImprove: drillsHowToImprove(recommendedDrillTypes),
 	})
 }
@@ -333,6 +334,37 @@ function getRecommendedDrillTypes(
 	]
 }
 
+/**
+ * Pair each configured drill with the reference backing it.
+ *
+ * The rated metadata drops drill references; they are restored here so the
+ * details can attribute every drill claim.
+ */
+function drillsDetail(
+	drills: Support<{ entries: NonEmptyArray<WithRef<AccountRecoveryDrill>> }>,
+	rated: AccountRecoveryMetadata['drills'],
+): AccountRecoveryDrillsDetail | null {
+	if (rated === null) {
+		return null
+	}
+
+	const references = new Map<AccountRecoveryDrillType, FullyQualifiedReference[]>()
+
+	if (isSupported(drills)) {
+		for (const drill of drills.entries) {
+			references.set(drill.type, toFullyQualified(drill.ref))
+		}
+	}
+
+	return {
+		configured: rated.configured.map(drill => ({
+			...drill,
+			references: references.get(drill.type) ?? [],
+		})),
+		missing: rated.missing,
+	}
+}
+
 function evaluateAccountRecovery(
 	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	accountRecovery: AccountRecovery,
@@ -367,7 +399,6 @@ function evaluateAccountRecovery(
 						drills: null,
 					},
 				},
-				details: accountRecoveryDetailsContent({}),
 			})
 
 	// `pickWorstRating` returns one sub-evaluation wholesale, so whichever
@@ -381,10 +412,21 @@ function evaluateAccountRecovery(
 		drills: drillsEval.outcome.metadata.drills,
 	}
 
-	return pickWorstRating<AccountRecoveryMetadata>([
-		{ ...guardianEval, outcome: { ...guardianEval.outcome, metadata: mergedMetadata } },
-		{ ...drillsEval, outcome: { ...drillsEval.outcome, metadata: mergedMetadata } },
-	])
+	// Details are built from the merged metadata, so they describe the whole
+	// evaluation rather than whichever half won the worst rating.
+	const details = buildAccountRecoveryDetails({
+		guardianPolicy: mergedMetadata.minimumGuardianPolicy,
+		outcomes: mergedMetadata.outcomes,
+		drills: drillsDetail(accountRecovery.drills, mergedMetadata.drills),
+	})
+
+	return {
+		...pickWorstRating<AccountRecoveryMetadata>([
+			{ ...guardianEval, outcome: { ...guardianEval.outcome, metadata: mergedMetadata } },
+			{ ...drillsEval, outcome: { ...drillsEval.outcome, metadata: mergedMetadata } },
+		]),
+		details,
+	}
 }
 
 /** A sample seed-phrase-based EOA account support, used by example ratings. */
@@ -519,7 +561,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [
 									{
 										type: GuardianType.WALLET_PROVIDER,
@@ -554,7 +596,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [],
 								optionalGuardians: [
 									{
@@ -594,7 +636,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [],
 								optionalGuardians: [
 									{
@@ -634,7 +676,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [],
 								optionalGuardians: [
 									{
@@ -687,7 +729,7 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [],
 								optionalGuardians: [
 									{

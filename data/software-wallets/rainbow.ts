@@ -708,7 +708,7 @@ export const rainbow: SoftwareWallet = {
 					},
 					minimumGuardianPolicy: {
 						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-						descriptionMarkdown:
+						description:
 							'Rainbow encrypts the seed phrase with the user wallet password and stores it in iCloud or Google Drive. Recovery requires the backup password and access to either cloud provider.',
 						optionalGuardians: [
 							{

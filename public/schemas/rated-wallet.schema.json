@@ -275,6 +275,12 @@
 		"structuredDetails": {
 			"oneOf": [
 				{
+					"$ref": "#/$defs/accountRecoveryDetails"
+				},
+				{
+					"$ref": "#/$defs/accountUnruggabilityDetails"
+				},
+				{
 					"$ref": "#/$defs/addressCorrelationDetails"
 				},
 				{
@@ -296,6 +302,254 @@
 					"$ref": "#/$defs/transactionInclusionDetails"
 				}
 			]
+		},
+		"guardian": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "description"],
+			"properties": {
+				"type": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"entityId": {
+					"type": "string"
+				}
+			}
+		},
+		"entityRef": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["entityId", "entityName"],
+			"properties": {
+				"entityId": {
+					"type": "string"
+				},
+				"entityName": {
+					"type": "string"
+				}
+			}
+		},
+		"guardianPolicy": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["description", "facts"],
+			"properties": {
+				"description": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"facts": {
+					"oneOf": [
+						{
+							"type": "object",
+							"additionalProperties": false,
+							"required": [
+								"kind",
+								"requiredGuardians",
+								"optionalGuardians",
+								"optionalGuardiansMinimumConfigurable",
+								"optionalGuardiansMinimumNeededForRecovery",
+								"secretReconstitution"
+							],
+							"properties": {
+								"kind": {
+									"const": "secretSplit"
+								},
+								"requiredGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"optionalGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"optionalGuardiansMinimumConfigurable": {
+									"type": "number"
+								},
+								"optionalGuardiansMinimumNeededForRecovery": {
+									"type": "number"
+								},
+								"secretReconstitution": {
+									"oneOf": [
+										{
+											"const": "CLIENT_SIDE"
+										},
+										{
+											"$ref": "#/$defs/entityRef"
+										}
+									]
+								}
+							}
+						},
+						{
+							"type": "object",
+							"additionalProperties": false,
+							"required": [
+								"kind",
+								"configuredGuardians",
+								"requiredGuardians",
+								"timelockWarningSentByAllOf",
+								"minimumSignaturesWithTimelock",
+								"minimumSignaturesBypassTimelock"
+							],
+							"properties": {
+								"kind": {
+									"const": "kOfNWithTimelock"
+								},
+								"configuredGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"requiredGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"timelockWarningSentByAllOf": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/entityRef"
+									}
+								},
+								"minimumSignaturesWithTimelock": {
+									"type": "number"
+								},
+								"minimumSignaturesBypassTimelock": {
+									"type": "number"
+								}
+							}
+						}
+					]
+				}
+			}
+		},
+		"guardianScenario": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["id", "scenario"],
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"scenario": {
+					"type": "string"
+				},
+				"consequence": {
+					"type": "string"
+				}
+			}
+		},
+		"accountRecoveryDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "recoverableScenarios", "unrecoverableScenarios"],
+			"properties": {
+				"type": {
+					"const": "accountRecovery"
+				},
+				"guardianPolicy": {
+					"$ref": "#/$defs/guardianPolicy"
+				},
+				"recoverableScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				},
+				"unrecoverableScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				},
+				"drills": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["configured", "missing"],
+					"properties": {
+						"configured": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["type", "name", "reminderEveryNDays"],
+								"properties": {
+									"type": {
+										"type": "string",
+										"enum": ["PRIVATE_KEY_QUIZ", "SEED_PHRASE_QUIZ", "GUARDIAN_ACCOUNT_CHECK"]
+									},
+									"name": {
+										"type": "string"
+									},
+									"reminderEveryNDays": {
+										"type": "number"
+									},
+									"references": {
+										"type": "array",
+										"items": {
+											"$ref": "#/$defs/reference"
+										}
+									}
+								}
+							}
+						},
+						"missing": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["type", "name"],
+								"properties": {
+									"type": {
+										"type": "string",
+										"enum": ["PRIVATE_KEY_QUIZ", "SEED_PHRASE_QUIZ", "GUARDIAN_ACCOUNT_CHECK"]
+									},
+									"name": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"accountUnruggabilityDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "safeScenarios", "takeoverScenarios"],
+			"properties": {
+				"type": {
+					"const": "accountUnruggability"
+				},
+				"guardianPolicy": {
+					"$ref": "#/$defs/guardianPolicy"
+				},
+				"safeScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				},
+				"takeoverScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				}
+			}
 		},
 		"addressCorrelationDetails": {
 			"type": "object",

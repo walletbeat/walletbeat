@@ -1,5 +1,13 @@
+import type { Entity } from '@/schema/entity'
 import { type UserInfo, userInfoName } from '@/schema/features/privacy/data-collection'
 import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
+import {
+	type AccountRecoveryDrillType,
+	accountRecoveryDrillWording,
+	type Guardian,
+	guardianMarkdown,
+	type GuardianType,
+} from '@/schema/features/security/account-recovery'
 import type {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
@@ -21,9 +29,13 @@ import {
 } from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/details'
+import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
+import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
 import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
 import type { FundingDetails } from '@/types/content/details/funding'
+import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
+import type { GuardianScenarioOutcomeDetail } from '@/types/content/details/guardian-scenarios'
 import type { InlineText } from '@/types/content/details/inline'
 import {
 	type PrivateTransfersDetails,
@@ -71,6 +83,66 @@ export interface ReferenceJsonExport {
 export interface InlineTextJsonExport {
 	text: string
 	links?: Array<{ text: string; url: string }>
+}
+
+export interface GuardianJsonExport {
+	type: GuardianType
+	description: string
+	entityId?: string
+}
+
+export type GuardianPolicyFactsJsonExport =
+	| {
+			kind: 'secretSplit'
+			requiredGuardians: GuardianJsonExport[]
+			optionalGuardians: GuardianJsonExport[]
+			optionalGuardiansMinimumConfigurable: number
+			optionalGuardiansMinimumNeededForRecovery: number
+			secretReconstitution: 'CLIENT_SIDE' | { entityId: string; entityName: string }
+	  }
+	| {
+			kind: 'kOfNWithTimelock'
+			configuredGuardians: GuardianJsonExport[]
+			requiredGuardians: GuardianJsonExport[]
+			timelockWarningSentByAllOf: Array<{ entityId: string; entityName: string }>
+			minimumSignaturesWithTimelock: number
+			minimumSignaturesBypassTimelock: number
+	  }
+
+export interface GuardianPolicyJsonExport {
+	description: string[]
+	facts: GuardianPolicyFactsJsonExport
+}
+
+export interface GuardianScenarioJsonExport {
+	id: string
+	scenario: string
+	consequence?: string
+}
+
+export interface AccountRecoveryDrillJsonExport {
+	type: AccountRecoveryDrillType
+	name: string
+	reminderEveryNDays: number
+	references?: ReferenceJsonExport[]
+}
+
+export interface AccountRecoveryDetailsJsonExport {
+	type: 'accountRecovery'
+	guardianPolicy?: GuardianPolicyJsonExport
+	recoverableScenarios: GuardianScenarioJsonExport[]
+	unrecoverableScenarios: GuardianScenarioJsonExport[]
+	drills?: {
+		configured: AccountRecoveryDrillJsonExport[]
+		missing: Array<{ type: AccountRecoveryDrillType; name: string }>
+	}
+}
+
+export interface AccountUnruggabilityDetailsJsonExport {
+	type: 'accountUnruggability'
+	guardianPolicy?: GuardianPolicyJsonExport
+	safeScenarios: GuardianScenarioJsonExport[]
+	takeoverScenarios: GuardianScenarioJsonExport[]
 }
 
 export interface AddressCorrelationLeakJsonExport {
@@ -184,6 +256,8 @@ export interface TransactionInclusionDetailsJsonExport {
 
 /** Public discriminated union of exported structured details. */
 export type StructuredDetailsJsonExport =
+	| AccountRecoveryDetailsJsonExport
+	| AccountUnruggabilityDetailsJsonExport
 	| AddressCorrelationDetailsJsonExport
 	| ChainVerificationDetailsJsonExport
 	| FundingDetailsJsonExport
@@ -212,6 +286,99 @@ export function serializeInlineText(
 	return {
 		text: inline.map(span => renderStrings(span.text, { ...context.strings })).join(''),
 		...(links.length > 0 && { links }),
+	}
+}
+
+function serializeGuardian(guardian: Guardian): GuardianJsonExport {
+	return {
+		type: guardian.type,
+		description: guardianMarkdown(guardian),
+		...('entity' in guardian && { entityId: guardian.entity.id }),
+	}
+}
+
+function serializeEntityRef(entity: Entity): { entityId: string; entityName: string } {
+	return { entityId: entity.id, entityName: entity.name }
+}
+
+function serializeGuardianPolicy(policy: GuardianPolicyDetail): GuardianPolicyJsonExport {
+	return {
+		description: policy.description,
+		facts:
+			policy.facts.kind === 'secretSplit'
+				? {
+						kind: 'secretSplit',
+						requiredGuardians: policy.facts.requiredGuardians.map(serializeGuardian),
+						optionalGuardians: policy.facts.optionalGuardians.map(serializeGuardian),
+						optionalGuardiansMinimumConfigurable: policy.facts.optionalGuardiansMinimumConfigurable,
+						optionalGuardiansMinimumNeededForRecovery:
+							policy.facts.optionalGuardiansMinimumNeededForRecovery,
+						secretReconstitution:
+							policy.facts.secretReconstitution === 'CLIENT_SIDE'
+								? 'CLIENT_SIDE'
+								: serializeEntityRef(policy.facts.secretReconstitution),
+					}
+				: {
+						kind: 'kOfNWithTimelock',
+						configuredGuardians: policy.facts.configuredGuardians.map(serializeGuardian),
+						requiredGuardians: policy.facts.requiredGuardians.map(serializeGuardian),
+						timelockWarningSentByAllOf:
+							policy.facts.timelockWarningSentByAllOf.map(serializeEntityRef),
+						minimumSignaturesWithTimelock: policy.facts.minimumSignaturesWithTimelock,
+						minimumSignaturesBypassTimelock: policy.facts.minimumSignaturesBypassTimelock,
+					},
+	}
+}
+
+function serializeScenario(scenario: GuardianScenarioOutcomeDetail): GuardianScenarioJsonExport {
+	return {
+		id: scenario.id,
+		scenario: scenario.scenario,
+		...(scenario.consequence !== undefined && { consequence: scenario.consequence }),
+	}
+}
+
+function serializeAccountRecoveryDetails(
+	details: AccountRecoveryDetails,
+): AccountRecoveryDetailsJsonExport {
+	return {
+		type: 'accountRecovery',
+		...(details.guardianPolicy !== undefined && {
+			guardianPolicy: serializeGuardianPolicy(details.guardianPolicy),
+		}),
+		recoverableScenarios: details.recoverableScenarios.map(serializeScenario),
+		unrecoverableScenarios: details.unrecoverableScenarios.map(serializeScenario),
+		...(details.drills !== undefined && {
+			drills: {
+				configured: details.drills.configured.map(drill => {
+					const references = serializeReferences(drill.references)
+
+					return {
+						type: drill.type,
+						name: accountRecoveryDrillWording(drill.type).label,
+						reminderEveryNDays: drill.reminderEveryNDays,
+						...(references.length > 0 && { references }),
+					}
+				}),
+				missing: details.drills.missing.map(type => ({
+					type,
+					name: accountRecoveryDrillWording(type).label,
+				})),
+			},
+		}),
+	}
+}
+
+function serializeAccountUnruggabilityDetails(
+	details: AccountUnruggabilityDetails,
+): AccountUnruggabilityDetailsJsonExport {
+	return {
+		type: 'accountUnruggability',
+		...(details.guardianPolicy !== undefined && {
+			guardianPolicy: serializeGuardianPolicy(details.guardianPolicy),
+		}),
+		safeScenarios: details.safeScenarios.map(serializeScenario),
+		takeoverScenarios: details.takeoverScenarios.map(serializeScenario),
 	}
 }
 
@@ -376,6 +543,8 @@ function serializeTransactionInclusionDetails(
 
 /** Exhaustive JSON serializer registry. */
 const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> = {
+	accountRecovery: serializeAccountRecoveryDetails,
+	accountUnruggability: serializeAccountUnruggabilityDetails,
 	addressCorrelation: serializeAddressCorrelationDetails,
 	chainVerification: serializeChainVerificationDetails,
 	funding: serializeFundingDetails,

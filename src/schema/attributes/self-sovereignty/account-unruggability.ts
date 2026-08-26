@@ -31,7 +31,7 @@ import {
 	sentence,
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
-import { accountUnruggabilityDetailsContent } from '@/types/content/account-unruggability-details'
+import { buildAccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 
 import {
@@ -81,7 +81,7 @@ function evaluateGuardianUnruggabilityPolicy(
 					outcomes,
 				},
 			},
-			details: accountUnruggabilityDetailsContent({}),
+			details: buildAccountUnruggabilityDetails({ guardianPolicy, outcomes }),
 		})
 	}
 
@@ -99,7 +99,7 @@ function evaluateGuardianUnruggabilityPolicy(
 					outcomes,
 				},
 			},
-			details: accountUnruggabilityDetailsContent({}),
+			details: buildAccountUnruggabilityDetails({ guardianPolicy, outcomes }),
 		})
 	}
 
@@ -117,7 +117,7 @@ function evaluateGuardianUnruggabilityPolicy(
 				outcomes,
 			},
 		},
-		details: accountUnruggabilityDetailsContent({}),
+		details: buildAccountUnruggabilityDetails({ guardianPolicy, outcomes }),
 	})
 }
 
@@ -211,7 +211,10 @@ function evaluateAccountUnruggability(
 				outcomes: null,
 			},
 		},
-		details: accountUnruggabilityDetailsContent({}),
+		details: buildAccountUnruggabilityDetails({
+			guardianPolicy: null,
+			outcomes: null,
+		}),
 	})
 }
 
@@ -304,7 +307,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [
 									{
 										type: GuardianType.WALLET_PROVIDER,
@@ -340,7 +343,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [],
 								optionalGuardians: [
 									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
@@ -382,7 +385,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 							ref: refNotNecessary,
 							minimumGuardianPolicy: {
 								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-								descriptionMarkdown: '',
+								description: '',
 								requiredGuardians: [],
 								optionalGuardians: [
 									{

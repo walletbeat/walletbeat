@@ -1,11 +1,16 @@
+import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import { gitCommitRefPinRegExp } from '@/schema/url'
 import type { StructuredDetails } from '@/types/content/details'
+import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
+import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
 import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
 import type { FundingDetails } from '@/types/content/details/funding'
+import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
+import type { GuardianScenarioOutcomeDetail } from '@/types/content/details/guardian-scenarios'
 import type { InlineText } from '@/types/content/details/inline'
 import {
 	type PrivateTransfersDetails,
@@ -22,9 +27,12 @@ import { commaListFormat, renderStrings } from '@/types/utils/text'
 
 import type { StructuredDetailsContext } from './context'
 import {
+	accountRecoverySummary,
+	accountUnruggabilitySummary,
 	addressCorrelationIntro,
 	addressCorrelationLeakSentence,
 	bugBountySentences,
+	guardianPolicyBlocks,
 	securityAuditFindingsSentence,
 	securityAuditsSummary,
 	securityFlawSeverityLabel,
@@ -90,6 +98,100 @@ function referencesSuffixMarkdown(references: ReferenceInput): string {
 		.map(url => `[${markdownLinkLabel(url.label)}](${url.url})`)
 
 	return links.length === 0 ? '' : ` (${links.join(', ')})`
+}
+
+/** Render guardian policy blocks, which lists render natively in Markdown. */
+function renderGuardianPolicyMarkdown(policy: GuardianPolicyDetail): string[] {
+	return guardianPolicyBlocks(policy).map(block =>
+		block.kind === 'paragraph'
+			? block.text
+			: [block.lead, '', ...block.items.map(item => `- ${item}`)].join('\n'),
+	)
+}
+
+/** A scenario bullet: the scenario, and its consequence when it has one. */
+function renderScenarioMarkdown(scenario: GuardianScenarioOutcomeDetail): string {
+	return scenario.consequence === undefined
+		? `- **${scenario.scenario}**`
+		: `- **${scenario.scenario}**: ${scenario.consequence}`
+}
+
+function renderAccountRecoveryMarkdown(
+	details: AccountRecoveryDetails,
+	context: StructuredDetailsContext,
+): string {
+	const blocks: string[] = [accountRecoverySummary(details)]
+
+	if (details.guardianPolicy !== undefined) {
+		blocks.push(
+			'#### Account recovery implementation',
+			...renderGuardianPolicyMarkdown(details.guardianPolicy),
+		)
+	}
+
+	if (details.unrecoverableScenarios.length > 0) {
+		blocks.push(
+			'#### Account recovery failure scenarios',
+			details.unrecoverableScenarios.map(renderScenarioMarkdown).join('\n'),
+		)
+	}
+
+	if (details.recoverableScenarios.length > 0) {
+		blocks.push(
+			'#### Account recovery success scenarios',
+			details.recoverableScenarios.map(renderScenarioMarkdown).join('\n'),
+		)
+	}
+
+	if (details.drills !== undefined) {
+		blocks.push('#### Account recovery drills')
+
+		if (details.drills.configured.length > 0) {
+			blocks.push(
+				'{{WALLET_NAME}} periodically runs the following account recovery drills:',
+				details.drills.configured
+					.map(
+						drill =>
+							`- ${accountRecoveryDrillWording(drill.type).label} (every ${drill.reminderEveryNDays.toString()} days)${referencesSuffixMarkdown(drill.references)}`,
+					)
+					.join('\n'),
+			)
+		}
+
+		if (details.drills.missing.length > 0) {
+			blocks.push(
+				'{{WALLET_NAME}} does not run the following recommended account recovery drills:',
+				details.drills.missing
+					.map(drillType => `- ${accountRecoveryDrillWording(drillType).label}`)
+					.join('\n'),
+			)
+		}
+	}
+
+	return renderStrings(blocks.join('\n\n'), { ...context.strings })
+}
+
+function renderAccountUnruggabilityMarkdown(
+	details: AccountUnruggabilityDetails,
+	context: StructuredDetailsContext,
+): string {
+	const blocks: string[] = [accountUnruggabilitySummary(details)]
+
+	if (details.guardianPolicy !== undefined) {
+		blocks.push(
+			'#### Account recovery implementation',
+			...renderGuardianPolicyMarkdown(details.guardianPolicy),
+		)
+	}
+
+	if (details.takeoverScenarios.length > 0) {
+		blocks.push(
+			'#### Account takeover scenarios',
+			details.takeoverScenarios.map(renderScenarioMarkdown).join('\n'),
+		)
+	}
+
+	return renderStrings(blocks.join('\n\n'), { ...context.strings })
 }
 
 function renderAddressCorrelationMarkdown(
@@ -188,7 +290,7 @@ function renderSecurityAuditsMarkdown(
 			blocks.push(
 				audit.findings.flaws
 					.map(
-						// Finding titles are verbatim strings from third-party audit
+						// Finding titles are verbatim strings from independent audit
 						// reports, so they are quoted as code rather than reflowed as prose.
 						flaw =>
 							`- **${securityFlawSeverityLabel[flaw.severity]}**: \`${flaw.name}\` (${
@@ -235,6 +337,8 @@ function renderTransactionInclusionMarkdown(
 
 /** Exhaustive Markdown renderer registry. */
 const markdownRenderers: StructuredDetailsRenderers<string> = {
+	accountRecovery: renderAccountRecoveryMarkdown,
+	accountUnruggability: renderAccountUnruggabilityMarkdown,
 	addressCorrelation: renderAddressCorrelationMarkdown,
 	chainVerification: renderChainVerificationMarkdown,
 	funding: renderFundingMarkdown,
