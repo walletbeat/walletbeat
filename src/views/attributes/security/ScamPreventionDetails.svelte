@@ -3,10 +3,13 @@
 	import { toFullyQualified } from '@/schema/reference'
 	import { ContentType } from '@/types/content'
 	import type { ScamPreventionDetails } from '@/types/content/scam-alert-details'
+	import { emphasizedStrings } from '@/utils/structured-details/context'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props
 	const { details, context }: StructuredDetailsViewProps<ScamPreventionDetails> = $props()
+
+	const strings = $derived(emphasizedStrings(context))
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
@@ -23,7 +26,7 @@
 						contentType: ContentType.MARKDOWN,
 						markdown: detail.description,
 					}}
-					strings={context.strings}
+					{strings}
 				/>
 
 				{#if detail.items}
