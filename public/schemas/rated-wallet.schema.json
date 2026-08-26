@@ -284,6 +284,9 @@
 					"$ref": "#/$defs/fundingDetails"
 				},
 				{
+					"$ref": "#/$defs/privateTransfersDetails"
+				},
+				{
 					"$ref": "#/$defs/scamPreventionDetails"
 				},
 				{
@@ -441,6 +444,77 @@
 				},
 				"revenueBreakdownIsPublic": {
 					"type": "boolean"
+				}
+			}
+		},
+		"inlineText": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["text"],
+			"properties": {
+				"text": {
+					"type": "string"
+				},
+				"links": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["text", "url"],
+						"properties": {
+							"text": {
+								"type": "string"
+							},
+							"url": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"privateTransfersDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "technologies"],
+			"properties": {
+				"type": {
+					"const": "privateTransfers"
+				},
+				"technologies": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["technology", "name", "sending", "receiving", "spending"],
+						"properties": {
+							"technology": {
+								"type": "string",
+								"enum": ["stealthAddresses", "tornadoCashNova", "privacyPools", "railgun"]
+							},
+							"name": {
+								"type": "string"
+							},
+							"sending": {
+								"$ref": "#/$defs/inlineText"
+							},
+							"receiving": {
+								"$ref": "#/$defs/inlineText"
+							},
+							"spending": {
+								"$ref": "#/$defs/inlineText"
+							},
+							"notes": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/inlineText"
+								}
+							}
+						}
+					}
+				},
+				"defaultModeNote": {
+					"$ref": "#/$defs/inlineText"
 				}
 			}
 		},

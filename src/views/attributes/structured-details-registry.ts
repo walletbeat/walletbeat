@@ -3,6 +3,7 @@ import type { Component } from 'svelte'
 import type { StructuredDetailsByType, StructuredDetailsType } from '@/types/content/details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
+import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
 import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
 import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
 import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
@@ -29,6 +30,7 @@ export const structuredDetailsViews: {
 	addressCorrelation: AddressCorrelationDetails,
 	chainVerification: ChainVerificationDetails,
 	funding: FundingDetails,
+	privateTransfers: PrivateTransfersDetails,
 	scamPrevention: ScamAlertDetails,
 	transactionInclusion: TransactionInclusionDetails,
 }

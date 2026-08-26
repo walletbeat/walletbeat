@@ -1,6 +1,7 @@
+import { type InlineSpan, inlineStrong } from '@/types/content/details/inline'
 import { commaListFormat } from '@/types/utils/text'
 
-import { type DomainUrl, isUrl, markdownUrlLink, type Url } from './url'
+import { type DomainUrl, getUrl, isUrl, markdownUrlLink, type Url } from './url'
 
 export enum EntityType {
 	chainDataProvider = 'chainDataProvider',
@@ -105,6 +106,19 @@ export type WalletDeveloper = EntityWithType<EntityType.walletDeveloper>
 /**
  * A Markdown link to an Entity.
  */
+/**
+ * Inline span linking to an entity, for canonical structured detail models.
+ * Mirrors `entityMarkdownLink`: bold, and plain bold text when the entity has
+ * no page of its own.
+ */
+export function entityInlineLink(entity: Entity): InlineSpan {
+	const url = entityUrl(entity)
+
+	return url === null
+		? inlineStrong(entity.name)
+		: { kind: 'link', text: entity.name, url: getUrl(url), strong: true }
+}
+
 export function entityMarkdownLink(entity: Entity): string {
 	const url = entityUrl(entity)
 

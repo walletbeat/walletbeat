@@ -20,7 +20,6 @@
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isCustomContent, isTypographicContent } from '@/types/content'
 	import { isStructuredDetails } from '@/types/content/details'
-	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
 	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
@@ -344,7 +343,6 @@
 	// Components
 	import { Github, Globe } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
-	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
 	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
 	import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
@@ -1080,9 +1078,7 @@
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
-							{#if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
-							{:else if componentName === 'SecurityAuditsDetails'}
+							{#if componentName === 'SecurityAuditsDetails'}
 								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { ackee } from '@/data/entities/ackee'
 import type { CorporateEntity } from '@/schema/entity'
 import { PersonalInfo, WalletInfo } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { EthereumL1LightClient } from '@/schema/features/security/light-client'
 import {
 	TransactionSubmissionL2Type,
@@ -15,6 +16,8 @@ import {
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/details'
 import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
+import { inline, inlineCode, inlineEmphasis, inlineLink } from '@/types/content/details/inline'
+import { mergePrivateTransfersDetails } from '@/types/content/details/private-transfers'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import { serializeStructuredDetails } from '@/utils/structured-details/json'
 import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
@@ -34,6 +37,26 @@ const context: StructuredDetailsContext = {
 function refWithUrl(url: string, label: string): FullyQualifiedReference {
 	return { urls: [{ label, url }] }
 }
+
+describe('inline authoring', () => {
+	it('normalizes authored indentation and keeps interpolated spans intact', () => {
+		expect(inline`
+			Spending relies on
+			${inlineLink('a broadcaster', 'https://example.com/broadcaster')}
+			and a ${inlineCode('0zk')} address.
+		`).toEqual([
+			{ kind: 'text', text: 'Spending relies on ' },
+			{ kind: 'link', text: 'a broadcaster', url: 'https://example.com/broadcaster' },
+			{ kind: 'text', text: ' and a ' },
+			{ kind: 'text', text: '0zk', code: true },
+			{ kind: 'text', text: ' address.' },
+		])
+	})
+
+	it('merges adjacent plain text and drops empty runs', () => {
+		expect(inline`One ${'two'} three`).toEqual([{ kind: 'text', text: 'One two three' }])
+	})
+})
 
 describe('chainVerification structured details', () => {
 	const details: StructuredDetails = {
@@ -339,6 +362,108 @@ describe('addressCorrelation structured details', () => {
 	})
 })
 
+describe('privateTransfers structured details', () => {
+	const details: StructuredDetails = {
+		type: 'privateTransfers',
+		technologies: [
+			{
+				technology: PrivateTransferTechnology.RAILGUN,
+				sending: inline`Shielding tokens is done directly to the smart contract.`,
+				receiving: inline`The merkle tree is synced on the ${inlineEmphasis('user')}'s device.`,
+				spending: inline`Spending relies on ${inlineLink('a broadcaster', 'https://example.com/broadcaster')} and a ${inlineCode('0zk')} address.`,
+				notes: [inline`The broadcaster is not user-customizable.`],
+			},
+		],
+		defaultModeNote: inline`{{WALLET_NAME}} supports private token transfers, but transfers are public by default.`,
+	}
+
+	it('renders the wallet-wide note before any technology in Markdown', () => {
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown.split('\n\n')[0]).toBe(
+			'Test Wallet supports private token transfers, but transfers are public by default.',
+		)
+		expect(markdown).toContain('#### Railgun')
+	})
+
+	it('formats inline spans in each phase of a transfer', () => {
+		const markdown = renderStructuredDetailsMarkdown(details, context)
+
+		expect(markdown).toContain("**Receiving:** The merkle tree is synced on the *user*'s device.")
+		expect(markdown).toContain(
+			'**Spending:** Spending relies on [a broadcaster](https://example.com/broadcaster) and a `0zk` address.',
+		)
+		expect(markdown).toContain('The broadcaster is not user-customizable.')
+	})
+
+	it('serializes resolved text plus the links of each sentence', () => {
+		const json = serializeStructuredDetails(details, context)
+
+		expect(json).toEqual({
+			type: 'privateTransfers',
+			technologies: [
+				{
+					technology: 'railgun',
+					name: 'Railgun',
+					sending: { text: 'Shielding tokens is done directly to the smart contract.' },
+					receiving: { text: "The merkle tree is synced on the user's device." },
+					spending: {
+						text: 'Spending relies on a broadcaster and a 0zk address.',
+						links: [{ text: 'a broadcaster', url: 'https://example.com/broadcaster' }],
+					},
+					notes: [{ text: 'The broadcaster is not user-customizable.' }],
+				},
+			],
+			defaultModeNote: {
+				text: 'Test Wallet supports private token transfers, but transfers are public by default.',
+			},
+		})
+	})
+
+	it('keeps the wallet-wide note top-level when merging two evaluations', () => {
+		const merged = mergePrivateTransfersDetails(
+			{ type: 'privateTransfers', technologies: details.technologies },
+			{
+				type: 'privateTransfers',
+				technologies: [],
+				defaultModeNote: inline`Transfers are public by default.`,
+			},
+		)
+
+		expect(merged.defaultModeNote).toEqual(inline`Transfers are public by default.`)
+		expect(merged.technologies[0].notes).toEqual(details.technologies[0].notes)
+	})
+
+	it('keeps the first detail of each technology when merging', () => {
+		const other = {
+			...details.technologies[0],
+			notes: [inline`A later, discarded note.`],
+		}
+		const merged = mergePrivateTransfersDetails(
+			{ type: 'privateTransfers', technologies: details.technologies },
+			{
+				type: 'privateTransfers',
+				technologies: [
+					other,
+					{
+						technology: PrivateTransferTechnology.PRIVACY_POOLS,
+						sending: inline`Deposits are supported.`,
+						receiving: inline`Receiving needs no special support.`,
+						spending: inline`Withdrawals use a relayer.`,
+						notes: [],
+					},
+				],
+			},
+		)
+
+		expect(merged.technologies.map(technology => technology.technology)).toEqual([
+			PrivateTransferTechnology.RAILGUN,
+			PrivateTransferTechnology.PRIVACY_POOLS,
+		])
+		expect(merged.technologies[0].notes).toEqual(details.technologies[0].notes)
+	})
+})
+
 describe('published JSON schema', () => {
 	/** One fixture per structured-details variant; every variant must validate. */
 	const variants: StructuredDetails[] = [
@@ -355,6 +480,19 @@ describe('published JSON schema', () => {
 			type: 'funding',
 			strategies: [{ strategy: MonetizationStrategy.DONATIONS, userAligned: true }],
 			revenueBreakdownIsPublic: true,
+		},
+		{
+			type: 'privateTransfers',
+			technologies: [
+				{
+					technology: PrivateTransferTechnology.PRIVACY_POOLS,
+					sending: inline`Deposits are supported.`,
+					receiving: inline`Receiving needs no special support.`,
+					spending: inline`Withdrawals use ${inlineLink('a relayer', 'https://example.com/relayer')}.`,
+					notes: [inline`The relayer may censor withdrawals.`],
+				},
+			],
+			defaultModeNote: inline`Transfers are public by default.`,
 		},
 		{
 			type: 'scamPrevention',

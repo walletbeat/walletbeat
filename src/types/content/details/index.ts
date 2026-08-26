@@ -3,6 +3,7 @@ import type { Strings } from '../../utils/string-templates'
 import type { AddressCorrelationDetails } from './address-correlation'
 import type { ChainVerificationDetails } from './chain-verification'
 import type { FundingDetails } from './funding'
+import type { PrivateTransfersDetails } from './private-transfers'
 import type { ScamPreventionDetails } from './scam-prevention'
 import type { TransactionInclusionDetails } from './transaction-inclusion'
 
@@ -21,6 +22,7 @@ export interface StructuredDetailsByType {
 	addressCorrelation: AddressCorrelationDetails
 	chainVerification: ChainVerificationDetails
 	funding: FundingDetails
+	privateTransfers: PrivateTransfersDetails
 	scamPrevention: ScamPreventionDetails
 	transactionInclusion: TransactionInclusionDetails
 }

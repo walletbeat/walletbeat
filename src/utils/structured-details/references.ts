@@ -15,6 +15,7 @@ const referenceCollectors: StructuredDetailsRenderers<FullyQualifiedReference[]>
 	addressCorrelation: details => details.leaks.flatMap(leak => leak.references),
 	chainVerification: () => [],
 	funding: () => [],
+	privateTransfers: () => [],
 	scamPrevention: details =>
 		details.warnings.flatMap(warning => toFullyQualified(warning.references)),
 	transactionInclusion: details => [
