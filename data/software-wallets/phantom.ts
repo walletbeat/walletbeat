@@ -97,7 +97,11 @@ export const phantom: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation: 'Phantom uses username-based sending, which does not support ENS.',
+				file: 'public/references/wallets/phantom/screenshots/2026-08-26-address-resolution-confirm-send-ens-name.png',
+				label: 'Phantom Confirm Send screen with unresolved ENS name',
+			},
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
