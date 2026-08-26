@@ -38,6 +38,12 @@ import {
 } from '@/schema/features/security/security-best-practices'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import phantomRawExtManifest from './manifests/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa.manifest.json'
+import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
+import {
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
+import { nonEmptySet } from '@/types/utils/non-empty'
 
 const securityAudits: SecurityAudit[] = [
 	{
