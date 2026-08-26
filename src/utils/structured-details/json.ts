@@ -1,29 +1,31 @@
+import { type UserInfo, userInfoName } from '@/schema/features/privacy/data-collection'
 import {
 	type EthereumL1LightClient,
 	ethereumL1LightClientUrl,
 } from '@/schema/features/security/light-client'
 import {
-	type MonetizationStrategy,
-	monetizationStrategyName,
-} from '@/schema/features/transparency/monetization'
-import {
 	type TransactionSubmissionL2Type,
 	transactionSubmissionL2TypeName,
 } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	type MonetizationStrategy,
+	monetizationStrategyName,
+} from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/details'
+import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
 import type { FundingDetails } from '@/types/content/details/funding'
 import type { InlineText } from '@/types/content/details/inline'
+import type {
+	ScamPreventionDetails,
+	ScamWarningKind,
+} from '@/types/content/details/scam-prevention'
 import type {
 	L1BroadcastSupport,
 	L2ForceInclusionCapability,
 	TransactionInclusionDetails,
 } from '@/types/content/details/transaction-inclusion'
-import type {
-	ScamPreventionDetails,
-	ScamWarningKind,
-} from '@/types/content/details/scam-prevention'
 import { renderStrings } from '@/types/utils/text'
 
 import type { StructuredDetailsContext } from './context'
@@ -52,6 +54,17 @@ export interface ReferenceJsonExport {
 export interface InlineTextJsonExport {
 	text: string
 	links?: Array<{ text: string; url: string }>
+}
+
+export interface AddressCorrelationLeakJsonExport {
+	source: { kind: 'onchain' } | { kind: 'entity'; entityId: string; entityName: string }
+	correlatedInfo: Array<{ info: UserInfo; name: string }>
+	references?: ReferenceJsonExport[]
+}
+
+export interface AddressCorrelationDetailsJsonExport {
+	type: 'addressCorrelation'
+	leaks: AddressCorrelationLeakJsonExport[]
 }
 
 export interface ChainVerificationLightClientJsonExport {
@@ -106,6 +119,7 @@ export interface TransactionInclusionDetailsJsonExport {
 
 /** Public discriminated union of exported structured details. */
 export type StructuredDetailsJsonExport =
+	| AddressCorrelationDetailsJsonExport
 	| ChainVerificationDetailsJsonExport
 	| FundingDetailsJsonExport
 	| ScamPreventionDetailsJsonExport
@@ -131,6 +145,33 @@ export function serializeInlineText(
 	return {
 		text: inline.map(span => renderStrings(span.text, { ...context.strings })).join(''),
 		...(links.length > 0 && { links }),
+	}
+}
+
+function serializeAddressCorrelationDetails(
+	details: AddressCorrelationDetails,
+): AddressCorrelationDetailsJsonExport {
+	return {
+		type: 'addressCorrelation',
+		leaks: details.leaks.map(leak => {
+			const references = serializeReferences(leak.references)
+
+			return {
+				source:
+					leak.source.kind === 'onchain'
+						? { kind: 'onchain' }
+						: {
+								kind: 'entity',
+								entityId: leak.source.entity.id,
+								entityName: leak.source.entity.name,
+							},
+				correlatedInfo: leak.correlatedInfo.map(info => ({
+					info,
+					name: userInfoName(info).long,
+				})),
+				...(references.length > 0 && { references }),
+			}
+		}),
 	}
 }
 
@@ -203,6 +244,7 @@ function serializeTransactionInclusionDetails(
 
 /** Exhaustive JSON serializer registry. */
 const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> = {
+	addressCorrelation: serializeAddressCorrelationDetails,
 	chainVerification: serializeChainVerificationDetails,
 	funding: serializeFundingDetails,
 	scamPrevention: serializeScamPreventionDetails,

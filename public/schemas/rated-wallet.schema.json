@@ -275,6 +275,9 @@
 		"structuredDetails": {
 			"oneOf": [
 				{
+					"$ref": "#/$defs/addressCorrelationDetails"
+				},
+				{
 					"$ref": "#/$defs/chainVerificationDetails"
 				},
 				{
@@ -287,6 +290,96 @@
 					"$ref": "#/$defs/transactionInclusionDetails"
 				}
 			]
+		},
+		"addressCorrelationDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "leaks"],
+			"properties": {
+				"type": {
+					"const": "addressCorrelation"
+				},
+				"leaks": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["source", "correlatedInfo"],
+						"properties": {
+							"source": {
+								"oneOf": [
+									{
+										"type": "object",
+										"additionalProperties": false,
+										"required": ["kind"],
+										"properties": {
+											"kind": {
+												"const": "onchain"
+											}
+										}
+									},
+									{
+										"type": "object",
+										"additionalProperties": false,
+										"required": ["kind", "entityId", "entityName"],
+										"properties": {
+											"kind": {
+												"const": "entity"
+											},
+											"entityId": {
+												"type": "string"
+											},
+											"entityName": {
+												"type": "string"
+											}
+										}
+									}
+								]
+							},
+							"correlatedInfo": {
+								"type": "array",
+								"minItems": 1,
+								"items": {
+									"type": "object",
+									"additionalProperties": false,
+									"required": ["info", "name"],
+									"properties": {
+										"info": {
+											"type": "string",
+											"enum": [
+												"IP_ADDRESS",
+												"TRACKING_IDENTIFIER",
+												"PSEUDONYM",
+												"LEGAL_NAME",
+												"EMAIL",
+												"PHONE",
+												"BROWSING_HISTORY_URLS",
+												"CONTACTS",
+												"PHYSICAL_ADDRESS",
+												"USER_ACTIONS",
+												"ACCOUNT_ADDRESS",
+												"BALANCE",
+												"ASSETS",
+												"MEMPOOL_TRANSACTIONS",
+												"WALLET_CONNECTED_DOMAINS"
+											]
+										},
+										"name": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"references": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/reference"
+								}
+							}
+						}
+					}
+				}
+			}
 		},
 		"chainVerificationDetails": {
 			"type": "object",

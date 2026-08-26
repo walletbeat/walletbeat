@@ -7,6 +7,20 @@ import { ratedWalletExportSchemaPath } from '@/constants'
 
 import { getRepositoryRoot } from './codebase'
 
+/** Read and parse the published rated wallet export schema. */
+function readRatedWalletExportSchema(): object {
+	/** Schema lives in public/; Astro serves public/ at /. Path is repo root + public + path constant. */
+	const schemaFilePath = path.join(getRepositoryRoot(), 'public', ratedWalletExportSchemaPath)
+	const schemaJson = fs.readFileSync(schemaFilePath, { encoding: 'utf-8' })
+	const parsedSchema: unknown = JSON.parse(schemaJson)
+
+	if (typeof parsedSchema !== 'object' || parsedSchema === null) {
+		throw new Error('Rated wallet export schema must be a JSON object')
+	}
+
+	return parsedSchema
+}
+
 /**
  * Encapsulates the rated wallet export JSON schema and a single AJV validator instance.
  * Each instance has its own validator so that validate.errors is not shared across callers.
@@ -15,18 +29,9 @@ class RatedWalletExportValidator {
 	private readonly validate: ReturnType<Ajv2020['compile']>
 
 	constructor() {
-		/** Schema lives in public/; Astro serves public/ at /. Path is repo root + public + path constant. */
-		const schemaFilePath = path.join(getRepositoryRoot(), 'public', ratedWalletExportSchemaPath)
-		const schemaJson = fs.readFileSync(schemaFilePath, { encoding: 'utf-8' })
-		const parsedSchema: unknown = JSON.parse(schemaJson)
-
-		if (typeof parsedSchema !== 'object' || parsedSchema === null) {
-			throw new Error('Rated wallet export schema must be a JSON object')
-		}
-
 		const ajv = new Ajv2020({ allErrors: true })
 
-		this.validate = ajv.compile(parsedSchema)
+		this.validate = ajv.compile(readRatedWalletExportSchema())
 	}
 
 	private jsonSnippet(jsonString: string): string {
@@ -69,4 +74,29 @@ class RatedWalletExportValidator {
 	}
 }
 
-export { RatedWalletExportValidator }
+/**
+ * Validates one structured-details payload against the published
+ * `structuredDetails` definition, so every variant is checked directly rather
+ * than only through a whole wallet export that happens to contain it.
+ */
+function assertValidStructuredDetails(details: unknown): void {
+	const ajv = new Ajv2020({ allErrors: true })
+
+	ajv.addSchema(readRatedWalletExportSchema(), 'ratedWalletExport')
+
+	const validate = ajv.compile({ $ref: 'ratedWalletExport#/$defs/structuredDetails' })
+
+	if (!validate(details)) {
+		const errors = validate.errors ?? []
+
+		throw new Error(
+			`Structured details failed schema validation:\n${errors
+				.map(error =>
+					`${error.instancePath === '' ? '/' : error.instancePath} ${error.message ?? ''}`.trim(),
+				)
+				.join('\n')}`,
+		)
+	}
+}
+
+export { assertValidStructuredDetails, RatedWalletExportValidator }

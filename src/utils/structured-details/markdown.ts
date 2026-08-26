@@ -1,15 +1,21 @@
 import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
+import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/details'
+import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
 import type { FundingDetails } from '@/types/content/details/funding'
 import type { InlineText } from '@/types/content/details/inline'
-import type { TransactionInclusionDetails } from '@/types/content/details/transaction-inclusion'
 import type { ScamPreventionDetails } from '@/types/content/details/scam-prevention'
+import type { TransactionInclusionDetails } from '@/types/content/details/transaction-inclusion'
 import { commaListFormat, renderStrings } from '@/types/utils/text'
 
 import type { StructuredDetailsContext } from './context'
-import { transactionInclusionProse } from './prose'
+import {
+	addressCorrelationIntro,
+	addressCorrelationLeakSentence,
+	transactionInclusionProse,
+} from './prose'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'
 
 /**
@@ -34,6 +40,34 @@ export function renderInlineTextMarkdown(
 		.join('')
 }
 
+/**
+ * Claim references as a parenthesized list of links.
+ *
+ * Markdown has no reference sidebar, so every claim carries its own sources
+ * inline. `wallet-page-markdown` then drops these from the flat reference list
+ * so each source is listed exactly once.
+ */
+function referencesSuffixMarkdown(references: ReferenceInput): string {
+	const links = toFullyQualified(references)
+		.flatMap(reference => reference.urls)
+		.map(url => `[${url.label}](${url.url})`)
+
+	return links.length === 0 ? '' : ` (${links.join(', ')})`
+}
+
+function renderAddressCorrelationMarkdown(
+	details: AddressCorrelationDetails,
+	context: StructuredDetailsContext,
+): string {
+	const bullets = details.leaks.map(
+		leak => `- ${addressCorrelationLeakSentence(leak)}${referencesSuffixMarkdown(leak.references)}`,
+	)
+
+	return renderStrings([addressCorrelationIntro, '', ...bullets].join('\n'), {
+		...context.strings,
+	})
+}
+
 function renderChainVerificationMarkdown(
 	details: ChainVerificationDetails,
 	context: StructuredDetailsContext,
@@ -50,16 +84,11 @@ function renderChainVerificationMarkdown(
 	)
 }
 
-function renderFundingMarkdown(
-	details: FundingDetails,
-	context: StructuredDetailsContext,
-): string {
+function renderFundingMarkdown(details: FundingDetails, context: StructuredDetailsContext): string {
 	const sources =
 		details.strategies.length === 0
 			? 'unknown sources'
-			: details.strategies
-					.map(({ strategy }) => monetizationStrategyName(strategy))
-					.join(', ')
+			: details.strategies.map(({ strategy }) => monetizationStrategyName(strategy)).join(', ')
 
 	return renderStrings(`**{{WALLET_NAME}}** is funded by **${sources}**.`, { ...context.strings })
 }
@@ -76,8 +105,9 @@ function renderScamPreventionMarkdown(
 			})
 			const nestedItems = warning.items?.map(item => `\n  - ${item}`).join('') ?? ''
 			const conclusion = warning.conclusion === undefined ? '' : `\n\n  ${warning.conclusion}`
+			const references = referencesSuffixMarkdown(warning.references)
 
-			return `- ${description}${nestedItems}${conclusion}`
+			return `- ${description}${nestedItems}${conclusion}${references}`
 		})
 		.join('\n')
 }
@@ -87,12 +117,18 @@ function renderTransactionInclusionMarkdown(
 	context: StructuredDetailsContext,
 ): string {
 	return transactionInclusionProse(details)
-		.map(block => renderStrings(block, { ...context.strings }))
+		.map(
+			block =>
+				`${renderStrings(block.text, { ...context.strings })}${referencesSuffixMarkdown(
+					block.claim === 'l1' ? details.l1References : details.l2References,
+				)}`,
+		)
 		.join('\n\n')
 }
 
 /** Exhaustive Markdown renderer registry. */
 const markdownRenderers: StructuredDetailsRenderers<string> = {
+	addressCorrelation: renderAddressCorrelationMarkdown,
 	chainVerification: renderChainVerificationMarkdown,
 	funding: renderFundingMarkdown,
 	scamPrevention: renderScamPreventionMarkdown,

@@ -18,7 +18,7 @@ import type {
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
-import { type ReferenceInput, refNotNecessary, type WithRef } from '../../reference'
+import { refNotNecessary, type WithRef } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{

@@ -15,7 +15,6 @@ import { isTypographicContent, renderTypographicContentToString } from '@/types/
 import { isStructuredDetails } from '@/types/content/details'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
-import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
@@ -25,6 +24,8 @@ import {
 	computeCountsAndStatus,
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
+import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
+import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 import { getWalletUrl } from '@/utils/urls'
 
 /**
@@ -267,7 +268,13 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 				}
 
 				if (evaluation.references !== undefined && evaluation.references.length > 0) {
-					const qualifiedRefs = toFullyQualified(evaluation.references)
+					// References already shown next to a structured claim are not repeated.
+					const qualifiedRefs = referencesNotIn(
+						toFullyQualified(evaluation.references),
+						isStructuredDetails(evaluation.details)
+							? structuredDetailsReferences(evaluation.details)
+							: [],
+					)
 
 					if (qualifiedRefs.length > 0) {
 						parts.push('#### References', '')

@@ -1,137 +1,44 @@
 <script lang="ts">
 	// Types/constants
-	import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
-	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
-	import type { NonEmptyArray } from '@/types/utils/non-empty'
-	import { getWalletEvalStrings } from '@/utils/evaluation-content'
-
-	type LeakInfo = {
-		key: string
-		value: string
-	}
+	import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
+	import {
+		addressCorrelationIntro,
+		addressCorrelationLeakSentence,
+	} from '@/utils/structured-details/prose'
+	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props
-	const {
-		wallet,
-		linkables,
-	}: {
-		wallet: RatedWallet
-		linkables?: NonEmptyArray<WalletAddressLinkableBy> | undefined
-	} = $props()
-
-
-	// Functions
-	import { compareUserInfo, userInfoName } from '@/schema/features/privacy/data-collection'
-	import { mergeRefs } from '@/schema/reference'
-	import { isUrl } from '@/schema/url'
-	import { nonEmptyGet, nonEmptySorted } from '@/types/utils/non-empty'
-
-	const joinedListText = (
-		items: LeakInfo[],
-		separator = ', ',
-		lastSeparator = ' and ',
-	): string => (
-		items
-			.map((item, index) => (
-				item.value + (
-					index === items.length - 2 ?
-						lastSeparator
-					: index !== items.length - 1 ?
-						separator
-					:
-						''
-				)
-			))
-			.join('')
-	)
-
+	const { details, context }: StructuredDetailsViewProps<AddressCorrelationDetails> = $props()
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
+	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
 
-{#if !linkables}
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: 'By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:'
-		}}
-		strings={getWalletEvalStrings(wallet)}
-	/>
-{:else}
-	{@const sortedLinkables = nonEmptySorted(
-		linkables,
-		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) => (
-			linkableA.by === 'onchain' ?
-				1
-			: linkableB.by === 'onchain' ?
-				-1
-			:
-				compareUserInfo(linkableA.info, linkableB.info)
-		),
-		true,
-	)}
+<Typography
+	content={{
+		contentType: ContentType.MARKDOWN,
+		markdown: addressCorrelationIntro,
+	}}
+	strings={context.strings}
+/>
 
-	{@const bySource = (() => {
-		const map = new Map<string, NonEmptyArray<WalletAddressLinkableBy>>()
+<ul data-list="gap-2">
+	{#each details.leaks as leak (leak.source.kind === 'entity' ? leak.source.entity.id : 'onchain')}
+		<li data-list-item="gap-1">
+			<Typography
+				content={{
+					contentType: ContentType.MARKDOWN,
+					markdown: addressCorrelationLeakSentence(leak),
+				}}
+				strings={context.strings}
+			/>
 
-		for (const linkable of sortedLinkables) {
-			const sourceName = typeof linkable.by === 'string' ? linkable.by : linkable.by.name
-			const forSource = map.get(sourceName)
-
-			if (forSource === undefined) {
-				map.set(sourceName, [linkable] as NonEmptyArray<WalletAddressLinkableBy>)
-			} else {
-				forSource.push(linkable)
-			}
-		}
-
-		return map
-	})()}
-
-	{@const leaksList = Array.from(
-		bySource,
-		([sourceName, linkables]) => ({
-			sourceName,
-			linkables,
-			linkableInfos: linkables
-				.map(linkable => ({
-					key: linkable.info,
-					value: userInfoName(linkable.info).long
-				}))
-				.filter((info, index, allInfo) =>
-					allInfo.slice(index + 1).every(otherInfo => otherInfo.key !== info.key)
-				),
-			refs: mergeRefs(...linkables.flatMap(linkable => linkable.refs)),
-			entity: nonEmptyGet(linkables).by
-		})
-	)}
-
-	{@const leaksText = leaksList.map(leak => (
-		leak.entity === 'onchain' ?
-			`- An onchain record permanently associates your **${joinedListText(leak.linkableInfos)}** with your wallet address.`
-		:
-			(() => {
-				const privacyPolicyText = (
-					isUrl(leak.entity.privacyPolicy) ?
-						` ([Privacy policy](${typeof leak.entity.privacyPolicy === 'string' ? leak.entity.privacyPolicy : leak.entity.privacyPolicy.url}))`
-					:
-						''
-				)
-
-				return `- **${leak.entity.name}**${privacyPolicyText} may link your wallet address to your **${joinedListText(leak.linkableInfos)}**.`
-			})()
-	)).join('\n')}
-
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: `By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:
-
-${leaksText}`
-		}}
-		strings={getWalletEvalStrings(wallet)}
-	/>
-{/if}
+			{#if leak.references.length > 0}
+				<ReferenceLinks references={leak.references} />
+			{/if}
+		</li>
+	{/each}
+</ul>

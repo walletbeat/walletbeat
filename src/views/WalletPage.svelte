@@ -20,7 +20,6 @@
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isCustomContent, isTypographicContent } from '@/types/content'
 	import { isStructuredDetails } from '@/types/content/details'
-	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
 	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
 	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
@@ -56,6 +55,7 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
+	import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
@@ -344,11 +344,9 @@
 	// Components
 	import { Github, Globe } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
-	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
 	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
 	import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
-	import { structuredDetailsRendersOwnReferences } from '@/views/attributes/structured-details-registry'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
@@ -1082,9 +1080,7 @@
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
-							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
-							{:else if componentName === 'PrivateTransfersDetails'}
+							{#if componentName === 'PrivateTransfersDetails'}
 								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
 							{:else if componentName === 'SecurityAuditsDetails'}
 								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
@@ -1125,27 +1121,26 @@
 				</div>
 			{/if}
 
+			{@const undisplayedReferences = referencesNotIn(
+				toFullyQualified(evalAttr.evaluation.references),
+				isStructuredDetails(evalAttr.evaluation.details) ?
+					structuredDetailsReferences(evalAttr.evaluation.details)
+				: []
+			)}
+
 			{#if (
-				evalAttr.evaluation.references?.length &&
+				undisplayedReferences.length > 0 &&
 				(
-					isTypographicContent(evalAttr.evaluation.details) ||
-					(
-						isStructuredDetails(evalAttr.evaluation.details) ?
-							// Structured views that render their own claim-level references.
-							!structuredDetailsRendersOwnReferences(evalAttr.evaluation.details.type)
-						: isCustomContent(evalAttr.evaluation.details) ?
-							!(
-								// TEMPORARY: custom components that render their own reference links.
-								['SecurityAuditsDetails']
-									.includes(evalAttr.evaluation.details.component.component)
-							)
-						:
-							false
+					!isCustomContent(evalAttr.evaluation.details) ||
+					!(
+						// TEMPORARY: custom components that render their own reference links.
+						['SecurityAuditsDetails']
+							.includes(evalAttr.evaluation.details.component.component)
 					)
 				)
 			)}
 				<ReferenceLinks
-					references={toFullyQualified(evalAttr.evaluation.references)}
+					references={undisplayedReferences}
 					cardBackground="secondary"
 				/>
 			{/if}
