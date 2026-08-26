@@ -82,10 +82,10 @@ Every H2—Stage Progress included—must receive the same backdrop:
 
 1. Content slices and navigation slices use the same mathematical construction.
 2. Group and child slices share exact start-angle derivations.
-3. Gaps, inner and outer radii, corner radii, offsets, and large/small arc selection must match.
+3. Gaps, inner, and outer radii, corner radii, offsets, and large/small arc selection must match.
 4. Slice paths must remain correct across item counts and responsive sizes.
 5. No hand-authored approximation may diverge from the canonical Pie geometry.
-6. The current slice must resolve correctly after hash navigation, popover interaction, resize, and reverse scrolling.
+6. The current slice must resolve correctly after hash navigation, interaction with the popover, resize, and reverse scrolling.
 
 ## 8. Summary-side badges and metadata
 
@@ -137,7 +137,7 @@ The final requirement supersedes the earlier “never wrap” interpretation:
 
 1. Remove the old attribute-group-level pie and TOC sections and their obsolete animation machinery.
 2. Render one `NavigationItems` dataset for both pie navigation and TOC behavior.
-3. Do not modify `NavigationItems` markup merely to accommodate animation.
+3. Do not modify `NavigationItems` HTML merely to accommodate animation.
 4. The same aside/TOC DOM exists before Stage Progress in source order at every breakpoint.
 5. There is one responsive layout owner, not separate desktop and mobile page structures.
 6. Only the TOC panel is a native popover.
@@ -146,7 +146,7 @@ The final requirement supersedes the earlier “never wrap” interpretation:
 9. It has no redundant “Platforms” heading.
 10. TOC links and pie slices target the same unique IDs.
 11. The TOC grid accommodates the longest depth-two labels without track overflow.
-12. Popover open/close, keyboard focus, Escape, and click behavior work in Chromium, WebKit, and Firefox.
+12. Opening and closing the popover, keyboard focus, Escape, and click behavior work in Chromium, WebKit, and Firefox.
 13. Native no-JS operation remains available; controls requiring JavaScript are hidden without JavaScript.
 
 ## 12. Responsive navigation placement
@@ -209,7 +209,7 @@ The final requirement supersedes the earlier “never wrap” interpretation:
 15. Motion must be monotonic during monotonic scrolling.
 16. There must be no jumps, reversals, or layout shifts at transition boundaries.
 17. Performance must be compared with the same machine, browser, viewport, and scroll trace.
-18. The target is approximately one-frame p95 delivery, with zero or near-zero frames beyond 33ms after startup noise is excluded.
+18. The target is approximately one-frame p95 delivery, with zero or near-zero frames beyond 33 milliseconds after startup noise is excluded.
 19. The change must produce no meaningful regression in p50, p95, p99, maximum frame delay, long tasks, or frame-over-budget ratios.
 20. Visual smoothness must be verified with real scrolling, not inferred from property names.
 
@@ -226,7 +226,7 @@ The final requirement supersedes the earlier “never wrap” interpretation:
 7. Production minification must preserve valid `animation-timeline` longhand properties.
 8. Production-preview behavior must match development behavior.
 
-## 17. Layout and visual robustness
+## 17. Visual layout and robustness
 
 Test at minimum:
 

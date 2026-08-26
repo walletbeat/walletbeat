@@ -80,6 +80,16 @@ interface JsonRpcResponse {
 	result?: unknown
 	error?: unknown
 }
+
+type ProxyRequest = AsyncIterable<Uint8Array> & {
+	method?: string
+}
+
+type ProxyResponse = {
+	headersSent: boolean
+	writeHead: http.ServerResponse['writeHead']
+	end: http.ServerResponse['end']
+}
 // Type guards
 function isJsonRpcRequest(value: unknown): value is JsonRpcRequest {
 	return (
@@ -160,7 +170,7 @@ function jsonError(message: string): Buffer {
 }
 
 function createHandler(upstream: string, multiplier: bigint) {
-	return async (req: http.IncomingMessage, res: http.ServerResponse): Promise<void> => {
+	return async (req: ProxyRequest, res: ProxyResponse): Promise<void> => {
 		if (req.method !== 'POST') {
 			res.writeHead(405, { 'Content-Type': 'application/json' })
 			res.end(jsonError('Method not allowed – use POST'))

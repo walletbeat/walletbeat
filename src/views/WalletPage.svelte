@@ -535,6 +535,7 @@
 	data-sticky-container
 	style:timeline-scope={[
 		'--header-timeline',
+		'--wallet-stage-timeline',
 		...pieRotation.timelineScopes,
 	].join(', ')}
 	{@attach attachDetailsControls}
@@ -765,6 +766,7 @@
 					<div
 						class="stage-heading-position"
 						data-sticky-breadcrumb="position"
+						style:---pie-timeline="--wallet-stage-timeline"
 					>
 						{@render breadcrumbParentSlot()}
 						<a
@@ -1502,6 +1504,14 @@
 					var(---wallet-content-block-padding-max)
 				)
 		);
+		---wallet-header-animation-distance: max(
+			0px,
+			calc(
+				var(---wallet-name-flow-block-start)
+					- var(---wallet-icon-sticky-block-start)
+			)
+		);
+		---wallet-header-animation-range: 0px var(---wallet-header-animation-distance);
 		---wallet-breadcrumb-attribute-font-size: 1.17rem;
 		---wallet-breadcrumb-group-font-size: calc(
 			(
@@ -1513,9 +1523,13 @@
 		---wallet-breadcrumb-heading-flow-translate: 0px;
 		---wallet-breadcrumb-trailing-control-inline-clearance: 0px;
 		---wallet-attribute-heading-font-size: 1.17em;
-		/* The effective view-timeline viewport is the sticky lane itself, so its
-		 * complete entry phase is the one shared arrival interval. */
+		/* Heading box fills the sticky lane (view-timeline inset = that lane). */
 		---wallet-breadcrumb-animation-range: entry 0% entry 100%;
+		---wallet-terminal-exit-distance: var(--stickyBreadcrumb-trackBlockEnd, 0px);
+		/* Last fly-up distance before the next box meets the sticky stack. */
+		---wallet-footer-breadcrumb-exit-range:
+			entry-crossing calc(100% - 2 * var(---wallet-terminal-exit-distance))
+			entry-crossing calc(100% - var(---wallet-terminal-exit-distance));
 		---wallet-breadcrumb-crossing-offset: 0px;
 		---wallet-group-icon-size: 2rem;
 		---wallet-group-header-padding-block: 0px;
@@ -1623,6 +1637,14 @@
 							* var(---wallet-line-height)
 				) / 2
 			);
+			---wallet-header-animation-distance: max(
+				0px,
+				calc(
+					var(---wallet-name-flow-block-start)
+						- var(---wallet-name-mobile-block-start)
+				)
+			);
+			---wallet-header-animation-range: 0px var(---wallet-header-animation-distance);
 			grid-template:
 				[Nav-start]
 				'Content'
@@ -1635,7 +1657,6 @@
 		article {
 			grid-area: Content;
 			position: relative;
-			timeline-scope: --wallet-stage-timeline;
 		}
 
 		.page-navigation {
@@ -1844,6 +1865,23 @@
 		---wallet-breadcrumb-layer-attribute: 22;
 		---wallet-breadcrumb-layer-detail: 23;
 		---wallet-sticky-content-inset: 1rem;
+		---wallet-header-sticky-block-start: calc(
+			var(---wallet-page-block-offset)
+				+ var(---wallet-sticky-content-inset)
+		);
+		---wallet-header-animation-distance: max(
+			0px,
+			calc(
+				var(---wallet-page-block-offset)
+					+ min(
+						5rem,
+						max(2rem, (100vi - 54rem) / 2)
+					)
+					- var(---wallet-header-sticky-block-start)
+			)
+		);
+		/* First scroll pixels until the in-flow title has reached the sticky slot. */
+		---wallet-header-animation-range: 0px var(---wallet-header-animation-distance);
 		---wallet-name-sticky-icon-size: 32px;
 		---wallet-name-flow-icon-size: 3rem;
 		---wallet-name-flow-font-size: 2.25rem;
@@ -1878,7 +1916,11 @@
 		---wallet-breadcrumb-mobile-row-gap: 0.25rem;
 		---wallet-breadcrumb-attribute-row-offset: 0px;
 		---wallet-breadcrumb-surface-fade: 0.5rem;
-		---wallet-header-animation-range: 1px 7.5rem;
+		anchor-scope: --wallet-footer;
+		timeline-scope:
+			--wallet-footer-entry,
+			--header-timeline,
+			--wallet-stage-timeline;
 		/*
 		 * Scroll padding / sticky h4 sit flush under crumb text.
 		 * `--stickyBreadcrumb-trackBlockEnd` still includes the surface fade for
@@ -1891,8 +1933,6 @@
 		---anchor-control-gap: 0.5rem;
 		scroll-marker-group: after;
 		scroll-behavior: auto;
-		anchor-scope: --wallet-footer;
-		timeline-scope: --wallet-footer-entry;
 
 		&:dir(rtl) {
 			---wallet-inline-translate-direction: -1;
@@ -1917,6 +1957,25 @@
 						- var(---wallet-breadcrumb-block-size)
 				) / 2
 			);
+			---wallet-header-sticky-block-start: calc(
+				(
+					var(--navigation-mobile-blockSize)
+						- var(---wallet-name-flow-font-size)
+							* var(---wallet-line-height)
+				) / 2
+			);
+			---wallet-header-animation-distance: max(
+				0px,
+				calc(
+					var(---wallet-page-block-offset)
+						+ min(
+							5rem,
+							max(2rem, (100vi - 54rem) / 2)
+						)
+						- var(---wallet-header-sticky-block-start)
+				)
+			);
+			---wallet-header-animation-range: 0px var(---wallet-header-animation-distance);
 			---wallet-name-trailing-reserve: calc(
 				var(--navigation-mobile-trailingClearance)
 					+ var(--navigation-mobile-gap)
@@ -2686,14 +2745,13 @@
 				+ var(---wallet-breadcrumb-block-size)
 				+ var(---wallet-breadcrumb-surface-fade)
 			);
+			---wallet-terminal-exit-distance: var(--stickyBreadcrumb-trackBlockEnd);
 			--stickyBreadcrumb-animationRange: var(---wallet-breadcrumb-animation-range);
 			/* Scroll position already supplies progression; easing only adds perceived lag. */
 			--stickyBreadcrumb-animationTimingFunction: linear;
 		}
 
-		/* The footer is the next authority after the terminal breadcrumb chain.
-		 * Its native entry phase supplies the final scope's otherwise-unreachable
-		 * exit crossing without adding artificial page-end clearance. */
+		/* Footer start meets the sticky stack; fly-up occupies the last track distance. */
 		article > .attribute-group:last-of-type {
 			> .attribute-group-stack
 				> header[data-sticky-breadcrumb~='exit'],
@@ -2703,14 +2761,14 @@
 				> details[open]:not(:has(~ details[open]))
 				> summary[data-sticky-breadcrumb~='exit'] {
 				animation-timeline: --wallet-footer-entry;
-				animation-range: entry 0% entry 100%;
+				animation-range: var(---wallet-footer-breadcrumb-exit-range);
 			}
 		}
 
 		.container .page-navigation > .pie-navigation[data-sticky] {
 			animation: StickyBreadcrumbItemExitAnimation linear both;
 			animation-timeline: --wallet-footer-entry;
-			animation-range: entry 0% entry 100%;
+			animation-range: var(---wallet-footer-breadcrumb-exit-range);
 
 			@media (prefers-reduced-motion: reduce) {
 				--stickyBreadcrumb-exitAnimationDistance: 0px;
@@ -2954,7 +3012,7 @@
 					--wallet-footer-entry;
 				animation-range:
 					var(---wallet-header-animation-range),
-					entry 0% entry 100%;
+					var(---wallet-footer-breadcrumb-exit-range);
 			}
 		}
 
@@ -3014,7 +3072,7 @@
 			animation: BreadcrumbParentSlotAnimation
 				var(--stickyBreadcrumb-animationTimingFunction)
 				both;
-			animation-timeline: --sticky-breadcrumb-scope-timeline;
+			animation-timeline: --sticky-breadcrumb-timeline;
 			animation-range: var(---wallet-breadcrumb-animation-range);
 
 			> span {
@@ -3123,7 +3181,7 @@
 				)
 				var(--stickyBreadcrumb-animationTimingFunction)
 				forwards;
-			animation-timeline: --sticky-breadcrumb-scope-timeline;
+			animation-timeline: --sticky-breadcrumb-timeline;
 			animation-range:
 				var(---wallet-breadcrumb-animation-range);
 			/* Preserve the underlying hover/focus opacity before the scroll effect. */
@@ -3663,6 +3721,7 @@
 					var(---wallet-sticky-stack-block-end)
 						+ var(---wallet-breadcrumb-surface-fade)
 				);
+				---wallet-terminal-exit-distance: var(--stickyBreadcrumb-trackBlockEnd);
 			}
 		}
 
@@ -3725,10 +3784,6 @@
 	#stages {
 		/* Stage has no slice glyph, so its ordinary H2 transition has no icon gap. */
 		---wallet-breadcrumb-heading-flow-translate: 0px;
-		view-timeline-name:
-			--wallet-stage-timeline,
-			--sticky-breadcrumb-scope-timeline;
-		view-timeline-axis: block;
 
 		> header {
 			padding-block: var(---wallet-group-header-padding-block);
@@ -4533,7 +4588,7 @@
 				var(---wallet-header-animation-range),
 				var(---wallet-header-animation-range),
 				var(---wallet-header-animation-range),
-				entry 0% entry 100%;
+				var(---wallet-footer-breadcrumb-exit-range);
 		}
 
 		:global(.wallet-variant-picker selectedcontent > span:first-child :is(svg, img)) {
