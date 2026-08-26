@@ -18,17 +18,15 @@
 	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
-	import { ContentType, isTypographicContent } from '@/types/content'
+	import { ContentType, isCustomContent, isTypographicContent } from '@/types/content'
+	import { isStructuredDetails } from '@/types/content/details'
 	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
-	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
 	import type { FundingDetailsProps } from '@/types/content/funding-details'
 	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
-	import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
 	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
 	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
-	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
 	import {
 		computePieSlices,
 		overallRatingPieLevels,
@@ -350,11 +348,11 @@
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
-	import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
-	import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
 	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
 	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
+	import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
+	import { structuredDetailsRendersOwnReferences } from '@/views/attributes/structured-details-registry'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
@@ -1066,7 +1064,22 @@
 							strings={{ WALLET_NAME: wallet.metadata.displayName }}
 						/>
 
-					{:else if evalAttr.evaluation.details}
+					{:else if isStructuredDetails(evalAttr.evaluation.details)}
+						{@const detailsContext = { strings: getWalletEvalStrings(wallet) }}
+
+						<div data-column>
+							<Typography
+								content={evalAttr.evaluation.outcome.shortExplanation}
+								strings={detailsContext.strings}
+							/>
+							<StructuredDetailsView
+								details={evalAttr.evaluation.details}
+								context={detailsContext}
+							/>
+						</div>
+
+					<!-- TEMPORARY: detail families not yet migrated to canonical structured models. -->
+					{:else if isCustomContent(evalAttr.evaluation.details)}
 						{@const componentName = evalAttr.evaluation.details.component.component}
 						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
 						{@const outcome = evalAttr.evaluation.outcome}
@@ -1077,10 +1090,6 @@
 								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
 							{:else if componentName === 'PrivateTransfersDetails'}
 								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
-							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
-							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
 							{:else if componentName === 'SecurityAuditsDetails'}
 								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'TransactionInclusionDetails'}
@@ -1091,19 +1100,16 @@
 								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
 								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
 							{/if}
 						</div>
 
 					{:else}
 						<div data-column>
 							<Typography
-								content={{
-									contentType: ContentType.TEXT,
-									text: `No detailed evaluation available for ${attribute.displayName}`,
-								}}
+								content={evalAttr.evaluation.outcome.shortExplanation}
+								strings={getWalletEvalStrings(wallet)}
 							/>
+							<UnratedAttribute {wallet} />
 						</div>
 					{/if}
 				</li>
@@ -1131,15 +1137,21 @@
 				evalAttr.evaluation.references?.length &&
 				(
 					isTypographicContent(evalAttr.evaluation.details) ||
-					!(
-						// Custom components that render their own reference links
-						[
-							'ChainVerificationDetails',
-							'FundingDetails',
-							'ScamAlertDetails',
-							'SecurityAuditsDetails',
-						]
-							.includes(evalAttr.evaluation.details.component.component)
+					(
+						isStructuredDetails(evalAttr.evaluation.details) ?
+							// Structured views that render their own claim-level references.
+							!structuredDetailsRendersOwnReferences(evalAttr.evaluation.details.type)
+						: isCustomContent(evalAttr.evaluation.details) ?
+							!(
+								// TEMPORARY: custom components that render their own reference links.
+								[
+									'FundingDetails',
+									'SecurityAuditsDetails',
+								]
+									.includes(evalAttr.evaluation.details.component.component)
+							)
+						:
+							false
 					)
 				)
 			)}

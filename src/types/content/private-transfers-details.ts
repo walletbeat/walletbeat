@@ -9,6 +9,7 @@ import {
 	isCustomContent,
 	type MarkdownParagraph,
 } from '../content'
+import type { EvaluationDetails } from './details'
 import type { Strings } from '../utils/string-templates'
 
 interface PrivateTokenTransferDetails {
@@ -35,7 +36,7 @@ function isPrivateTransferDetailsContent(
 }
 
 export function extractPrivateTransferDetails<S extends Strings>(
-	content: Content<S>,
+	content: EvaluationDetails<S>,
 ): PrivateTransfersDetailsProps | null {
 	if (!isCustomContent(content)) {
 		return null

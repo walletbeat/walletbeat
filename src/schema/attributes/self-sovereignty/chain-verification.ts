@@ -13,7 +13,6 @@ import {
 } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
 
 import {
@@ -37,7 +36,7 @@ function supportsChainVerification(
 			displayName: 'L1 chain state verification',
 			shortExplanation: sentence('{{WALLET_NAME}} verifies chain integrity of the Ethereum L1.'),
 		},
-		details: chainVerificationDetailsContent({ lightClients }),
+		details: { type: 'chainVerification', lightClients },
 	})
 }
 
