@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import { ContentType } from '@/types/content'
-	import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
+	import type { AddressCorrelationDetails } from '@/types/content/address-correlation-details'
 	import {
 		addressCorrelationIntro,
 		addressCorrelationLeakSentence,

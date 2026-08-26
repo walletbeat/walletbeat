@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import { ContentType } from '@/types/content'
-	import type { FundingDetails } from '@/types/content/details/funding'
+	import type { FundingDetails } from '@/types/content/funding-details'
 	import { fundingSentence } from '@/utils/structured-details/prose'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 

@@ -23,7 +23,7 @@ import {
 	VariantSpecificity,
 } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
-import { isStructuredDetails } from '@/types/content/details'
+import { isStructuredDetails } from '@/types/content/structured-details'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'

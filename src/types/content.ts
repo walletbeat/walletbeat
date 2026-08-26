@@ -1,4 +1,4 @@
-import type { EvaluationDetails } from './content/details'
+import type { EvaluationDetails } from './content/structured-details'
 import type { Strings, StringsFromTemplate, ValidateText } from './utils/string-templates'
 import { renderStrings, trimWhitespacePrefix } from './utils/text'
 

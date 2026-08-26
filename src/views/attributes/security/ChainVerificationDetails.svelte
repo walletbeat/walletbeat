@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import { ContentType } from '@/types/content'
-	import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
+	import type { ChainVerificationDetails } from '@/types/content/chain-verification-details'
 	import { chainVerificationSentence } from '@/utils/structured-details/prose'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 

@@ -22,12 +22,12 @@ import type {
 	L1BroadcastSupport,
 	TransactionInclusionDetails,
 	TransactionInclusionL2Detail,
-} from '@/types/content/details/transaction-inclusion'
+} from '@/types/content/transaction-inclusion-details'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type { L1BroadcastSupport } from '@/types/content/details/transaction-inclusion'
+export type { L1BroadcastSupport } from '@/types/content/transaction-inclusion-details'
 
 function transactionSubmissionEvaluation(
 	ctx: EvaluationContext,

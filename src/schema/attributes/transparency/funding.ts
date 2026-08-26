@@ -20,7 +20,7 @@ import {
 	verifiabilityRequiresAtLeastOneReference,
 } from '@/schema/verifiability'
 import { markdown, paragraph, sentence } from '@/types/content'
-import { buildFundingDetails } from '@/types/content/details/funding'
+import { buildFundingDetails } from '@/types/content/funding-details'
 
 import { pickWorstRating, unrated } from '../common'
 

@@ -7,9 +7,9 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 import { AccountRecoveryDrillType, GuardianType } from '@/schema/features/security/account-recovery'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import { toFullyQualified } from '@/schema/reference'
-import type { StructuredDetails } from '@/types/content/details'
-import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
-import { inline, inlineCode, inlineLink } from '@/types/content/details/inline'
+import { buildAddressCorrelationDetails } from '@/types/content/address-correlation-details'
+import { inline, inlineCode, inlineLink } from '@/types/content/inline'
+import type { StructuredDetails } from '@/types/content/structured-details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 

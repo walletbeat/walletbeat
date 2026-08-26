@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { InlineText } from '@/types/content/details/inline'
+	import type { InlineText } from '@/types/content/inline'
 	import { renderStrings } from '@/types/utils/text'
 	import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 

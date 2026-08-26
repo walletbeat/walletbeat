@@ -44,7 +44,7 @@ import {
 import {
 	type AccountRecoveryDrillsDetail,
 	buildAccountRecoveryDetails,
-} from '@/types/content/details/account-recovery'
+} from '@/types/content/account-recovery-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
