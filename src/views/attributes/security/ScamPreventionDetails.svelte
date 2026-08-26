@@ -2,7 +2,7 @@
 	// Types/constants
 	import { toFullyQualified } from '@/schema/reference'
 	import { ContentType } from '@/types/content'
-	import type { ScamPreventionDetails } from '@/types/content/details/scam-prevention'
+	import type { ScamPreventionDetails } from '@/types/content/scam-alert-details'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props

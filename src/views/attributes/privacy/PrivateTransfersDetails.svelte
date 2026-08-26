@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
-	import type { PrivateTransfersDetails } from '@/types/content/details/private-transfers'
-	import { privateTransferTechnologyName } from '@/types/content/details/private-transfers'
+	import type { PrivateTransfersDetails } from '@/types/content/private-transfers-details'
+	import { privateTransferTechnologyName } from '@/types/content/private-transfers-details'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props

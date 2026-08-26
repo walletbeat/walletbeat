@@ -27,7 +27,7 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { markdown, paragraph, sentence } from '@/types/content'
-import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
+import { buildAddressCorrelationDetails } from '@/types/content/address-correlation-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty'
 
 import type { Entity } from '../../entity'

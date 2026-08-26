@@ -1,5 +1,5 @@
 import type { Paragraph, Sentence, TypographicContent } from '@/types/content'
-import type { EvaluationDetails } from '@/types/content/details'
+import type { EvaluationDetails } from '@/types/content/structured-details'
 import {
 	assertNonEmptyArray,
 	type NonEmptyArray,

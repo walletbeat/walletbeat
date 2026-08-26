@@ -7,7 +7,7 @@ import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian
 import type { GuardianPolicy } from '@/schema/features/security/account-recovery'
 import { typographicSourceText } from '@/types/content'
 
-import { guardianPolicyDetailOrUndefined } from './account-recovery'
+import { guardianPolicyDetailOrUndefined } from './account-recovery-details'
 import type { GuardianPolicyDetail } from './guardian-policy'
 import type { GuardianScenarioOutcomeDetail } from './guardian-scenarios'
 

@@ -1,4 +1,4 @@
-import { type InlineSpan, inlineStrong } from '@/types/content/details/inline'
+import { type InlineSpan, inlineStrong } from '@/types/content/inline'
 import { commaListFormat } from '@/types/utils/text'
 
 import { type DomainUrl, getUrl, isUrl, markdownUrlLink, type Url } from './url'

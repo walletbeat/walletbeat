@@ -23,16 +23,16 @@ import {
 } from '@/schema/features/transparency/monetization'
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { StructuredDetails } from '@/types/content/details'
-import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
-import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
-import { inline, inlineCode, inlineEmphasis, inlineLink } from '@/types/content/details/inline'
-import { mergePrivateTransfersDetails } from '@/types/content/details/private-transfers'
+import { buildAddressCorrelationDetails } from '@/types/content/address-correlation-details'
+import type { GuardianPolicyDetail } from '@/types/content/guardian-policy'
+import { inline, inlineCode, inlineEmphasis, inlineLink } from '@/types/content/inline'
+import { mergePrivateTransfersDetails } from '@/types/content/private-transfers-details'
 import {
 	formatCalendarDate,
 	mergeSecurityAuditsDetails,
 	type SecurityAuditsDetails,
-} from '@/types/content/details/security-audits'
+} from '@/types/content/security-audits-details'
+import type { StructuredDetails } from '@/types/content/structured-details'
 import type { CalendarDate } from '@/types/date'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import { serializeStructuredDetails } from '@/utils/structured-details/json'
