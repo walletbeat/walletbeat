@@ -61,3 +61,18 @@ function scenarioDetail(
 		scenario: typographicSourceText(outcome.scenario.description),
 	}
 }
+
+export function accountUnruggabilitySummary(details: AccountUnruggabilityDetails): string {
+	if (details.guardianPolicy === undefined) {
+		return 'Private key material never leaves {{WALLET_NAME}}, so no external entity may take over your account.'
+	}
+
+	const scenarios =
+		details.takeoverScenarios.length === 0
+			? 'passes all the tested scenarios'
+			: details.safeScenarios.length === 0
+				? 'does not pass any of the tested scenarios'
+				: 'does not pass all the tested scenarios'
+
+	return `{{WALLET_NAME}} implements a Guardian-based account recovery feature which ${scenarios} when it comes to anti-ruggability.`
+}

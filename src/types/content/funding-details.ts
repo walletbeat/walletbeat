@@ -3,6 +3,7 @@ import {
 	monetizationStrategies,
 	MonetizationStrategy,
 	monetizationStrategyIsUserAligned,
+	monetizationStrategyName,
 } from '@/schema/features/transparency/monetization'
 
 export interface FundingStrategyDetail {
@@ -29,4 +30,13 @@ export function buildFundingDetails(monetization: Monetization): FundingDetails 
 			})),
 		revenueBreakdownIsPublic: monetization.revenueBreakdownIsPublic,
 	}
+}
+
+export function fundingSentence(details: FundingDetails): string {
+	const sources =
+		details.strategies.length === 0
+			? 'unknown sources'
+			: details.strategies.map(({ strategy }) => monetizationStrategyName(strategy)).join(', ')
+
+	return `**{{WALLET_NAME}}** is funded by **${sources}**.`
 }
