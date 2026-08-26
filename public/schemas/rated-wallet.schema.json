@@ -278,7 +278,13 @@
 					"$ref": "#/$defs/chainVerificationDetails"
 				},
 				{
+					"$ref": "#/$defs/fundingDetails"
+				},
+				{
 					"$ref": "#/$defs/scamPreventionDetails"
+				},
+				{
+					"$ref": "#/$defs/transactionInclusionDetails"
 				}
 			]
 		},
@@ -310,6 +316,38 @@
 							}
 						}
 					}
+				}
+			}
+		},
+		"fundingDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "strategies", "revenueBreakdownIsPublic"],
+			"properties": {
+				"type": {
+					"const": "funding"
+				},
+				"strategies": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["strategy", "name", "userAligned"],
+						"properties": {
+							"strategy": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"userAligned": {
+								"type": "boolean"
+							}
+						}
+					}
+				},
+				"revenueBreakdownIsPublic": {
+					"type": "boolean"
 				}
 			}
 		},
@@ -351,6 +389,52 @@
 								}
 							}
 						}
+					}
+				}
+			}
+		},
+		"transactionInclusionDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "l1Broadcast", "l2s"],
+			"properties": {
+				"type": {
+					"const": "transactionInclusion"
+				},
+				"l1Broadcast": {
+					"type": "string",
+					"enum": ["NO", "SELF_GOSSIP", "OWN_NODE"]
+				},
+				"l2s": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["l2", "name", "forceInclusion"],
+						"properties": {
+							"l2": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"forceInclusion": {
+								"type": "string",
+								"enum": ["ARBITRARY_TRANSACTIONS", "WITHDRAWALS_ONLY", "NONE"]
+							}
+						}
+					}
+				},
+				"l1References": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/reference"
+					}
+				},
+				"l2References": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/reference"
 					}
 				}
 			}

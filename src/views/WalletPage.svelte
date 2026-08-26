@@ -21,10 +21,8 @@
 	import { ContentType, isCustomContent, isTypographicContent } from '@/types/content'
 	import { isStructuredDetails } from '@/types/content/details'
 	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
-	import type { FundingDetailsProps } from '@/types/content/funding-details'
 	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
 	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
-	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
 	import {
@@ -349,8 +347,6 @@
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
 	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
-	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
-	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 	import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 	import { structuredDetailsRendersOwnReferences } from '@/views/attributes/structured-details-registry'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
@@ -1092,10 +1088,6 @@
 								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
 							{:else if componentName === 'SecurityAuditsDetails'}
 								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
-							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
 							{:else if componentName === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
@@ -1144,10 +1136,7 @@
 						: isCustomContent(evalAttr.evaluation.details) ?
 							!(
 								// TEMPORARY: custom components that render their own reference links.
-								[
-									'FundingDetails',
-									'SecurityAuditsDetails',
-								]
+								['SecurityAuditsDetails']
 									.includes(evalAttr.evaluation.details.component.component)
 							)
 						:

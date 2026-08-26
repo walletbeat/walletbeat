@@ -1,11 +1,15 @@
 import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
+import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
 import type { StructuredDetails } from '@/types/content/details'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
+import type { FundingDetails } from '@/types/content/details/funding'
 import type { InlineText } from '@/types/content/details/inline'
+import type { TransactionInclusionDetails } from '@/types/content/details/transaction-inclusion'
 import type { ScamPreventionDetails } from '@/types/content/details/scam-prevention'
 import { commaListFormat, renderStrings } from '@/types/utils/text'
 
 import type { StructuredDetailsContext } from './context'
+import { transactionInclusionProse } from './prose'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'
 
 /**
@@ -46,6 +50,20 @@ function renderChainVerificationMarkdown(
 	)
 }
 
+function renderFundingMarkdown(
+	details: FundingDetails,
+	context: StructuredDetailsContext,
+): string {
+	const sources =
+		details.strategies.length === 0
+			? 'unknown sources'
+			: details.strategies
+					.map(({ strategy }) => monetizationStrategyName(strategy))
+					.join(', ')
+
+	return renderStrings(`**{{WALLET_NAME}}** is funded by **${sources}**.`, { ...context.strings })
+}
+
 function renderScamPreventionMarkdown(
 	details: ScamPreventionDetails,
 	context: StructuredDetailsContext,
@@ -64,10 +82,21 @@ function renderScamPreventionMarkdown(
 		.join('\n')
 }
 
+function renderTransactionInclusionMarkdown(
+	details: TransactionInclusionDetails,
+	context: StructuredDetailsContext,
+): string {
+	return transactionInclusionProse(details)
+		.map(block => renderStrings(block, { ...context.strings }))
+		.join('\n\n')
+}
+
 /** Exhaustive Markdown renderer registry. */
 const markdownRenderers: StructuredDetailsRenderers<string> = {
 	chainVerification: renderChainVerificationMarkdown,
+	funding: renderFundingMarkdown,
 	scamPrevention: renderScamPreventionMarkdown,
+	transactionInclusion: renderTransactionInclusionMarkdown,
 }
 
 /** Render canonical structured details as Markdown. */

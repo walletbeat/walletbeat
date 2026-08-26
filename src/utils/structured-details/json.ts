@@ -2,10 +2,24 @@ import {
 	type EthereumL1LightClient,
 	ethereumL1LightClientUrl,
 } from '@/schema/features/security/light-client'
+import {
+	type MonetizationStrategy,
+	monetizationStrategyName,
+} from '@/schema/features/transparency/monetization'
+import {
+	type TransactionSubmissionL2Type,
+	transactionSubmissionL2TypeName,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/details'
 import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
+import type { FundingDetails } from '@/types/content/details/funding'
 import type { InlineText } from '@/types/content/details/inline'
+import type {
+	L1BroadcastSupport,
+	L2ForceInclusionCapability,
+	TransactionInclusionDetails,
+} from '@/types/content/details/transaction-inclusion'
 import type {
 	ScamPreventionDetails,
 	ScamWarningKind,
@@ -51,6 +65,18 @@ export interface ChainVerificationDetailsJsonExport {
 	lightClients: ChainVerificationLightClientJsonExport[]
 }
 
+export interface FundingStrategyJsonExport {
+	strategy: MonetizationStrategy
+	name: string
+	userAligned: boolean
+}
+
+export interface FundingDetailsJsonExport {
+	type: 'funding'
+	strategies: FundingStrategyJsonExport[]
+	revenueBreakdownIsPublic: boolean
+}
+
 export interface ScamWarningDetailsJsonExport {
 	kind: ScamWarningKind
 	description: string
@@ -64,10 +90,26 @@ export interface ScamPreventionDetailsJsonExport {
 	warnings: ScamWarningDetailsJsonExport[]
 }
 
+export interface TransactionInclusionL2JsonExport {
+	l2: TransactionSubmissionL2Type
+	name: string
+	forceInclusion: L2ForceInclusionCapability
+}
+
+export interface TransactionInclusionDetailsJsonExport {
+	type: 'transactionInclusion'
+	l1Broadcast: L1BroadcastSupport
+	l2s: TransactionInclusionL2JsonExport[]
+	l1References?: ReferenceJsonExport[]
+	l2References?: ReferenceJsonExport[]
+}
+
 /** Public discriminated union of exported structured details. */
 export type StructuredDetailsJsonExport =
 	| ChainVerificationDetailsJsonExport
+	| FundingDetailsJsonExport
 	| ScamPreventionDetailsJsonExport
+	| TransactionInclusionDetailsJsonExport
 
 /** Normalize references to the published reference shape. */
 export function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
@@ -105,6 +147,18 @@ function serializeChainVerificationDetails(
 	}
 }
 
+function serializeFundingDetails(details: FundingDetails): FundingDetailsJsonExport {
+	return {
+		type: 'funding',
+		strategies: details.strategies.map(({ strategy, userAligned }) => ({
+			strategy,
+			name: monetizationStrategyName(strategy),
+			userAligned,
+		})),
+		revenueBreakdownIsPublic: details.revenueBreakdownIsPublic,
+	}
+}
+
 function serializeScamPreventionDetails(
 	details: ScamPreventionDetails,
 	context: StructuredDetailsContext,
@@ -126,10 +180,33 @@ function serializeScamPreventionDetails(
 	}
 }
 
+function serializeTransactionInclusionDetails(
+	details: TransactionInclusionDetails,
+): TransactionInclusionDetailsJsonExport {
+	const l1References =
+		details.l1References === undefined ? [] : serializeReferences(details.l1References)
+	const l2References =
+		details.l2References === undefined ? [] : serializeReferences(details.l2References)
+
+	return {
+		type: 'transactionInclusion',
+		l1Broadcast: details.l1Broadcast,
+		l2s: details.l2s.map(({ l2, forceInclusion }) => ({
+			l2,
+			name: transactionSubmissionL2TypeName(l2),
+			forceInclusion,
+		})),
+		...(l1References.length > 0 && { l1References }),
+		...(l2References.length > 0 && { l2References }),
+	}
+}
+
 /** Exhaustive JSON serializer registry. */
 const jsonSerializers: StructuredDetailsRenderers<StructuredDetailsJsonExport> = {
 	chainVerification: serializeChainVerificationDetails,
+	funding: serializeFundingDetails,
 	scamPrevention: serializeScamPreventionDetails,
+	transactionInclusion: serializeTransactionInclusionDetails,
 }
 
 /** Serialize canonical structured details to their published JSON DTO. */

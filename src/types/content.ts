@@ -1,10 +1,8 @@
 import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
-import type { FundingDetailsContent } from './content/funding-details'
 import type { PrivateTransfersDetailsContent } from './content/private-transfers-details'
 import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
-import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { EvaluationDetails } from './content/details'
 import type { Strings, StringsFromTemplate, ValidateText } from './utils/string-templates'
 import { renderStrings, trimWhitespacePrefix } from './utils/text'
@@ -28,10 +26,8 @@ export enum ContentType {
  */
 export type ComponentAndProps =
 	| AddressCorrelationDetailsContent
-	| FundingDetailsContent
 	| PrivateTransfersDetailsContent
 	| SecurityAuditsDetailsContent
-	| TransactionInclusionDetailsContent
 	| AccountRecoveryDetailsContent
 	| AccountUnruggabilityDetailsContent
 
