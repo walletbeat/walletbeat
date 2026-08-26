@@ -43,7 +43,6 @@ const GRAMMAR_CHECK_WHITELIST: Set<string> = new Set([
 	'resources/files/social-media/threads/2026-01-29 - Bitget Wallet/thread.md',
 	'resources/files/social-media/threads/2026-01-30 - Okx Wallet/thread.md',
 	'resources/files/social-media/threads/2026-04-22 - Security Best Practices/thread.md',
-	'resources/files/social-media/threads/2026-05-15 - Transaction legibility ERC-8213 ERC-7730/thread.md',
 ])
 
 /**
@@ -170,7 +169,7 @@ describe('markdown files', async () => {
 	})
 
 	describe('whitelist never grows', () => {
-		const whitelistExpectedSizePleaseNeverIncreaseThis = 27 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
+		const whitelistExpectedSizePleaseNeverIncreaseThis = 26 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
 
 		it('has the expected size', () => {
 			expect(GRAMMAR_CHECK_WHITELIST.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThis)

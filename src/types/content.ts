@@ -1,5 +1,3 @@
-import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
-import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { EvaluationDetails } from './content/details'
 import type { Strings, StringsFromTemplate, ValidateText } from './utils/string-templates'
 import { renderStrings, trimWhitespacePrefix } from './utils/text'
@@ -13,15 +11,7 @@ export enum ContentType {
 
 	/** Markdown-based typographic content. */
 	MARKDOWN = 'MARKDOWN',
-
-	/** Arbitrary content using a custom component. */
-	COMPONENT = 'COMPONENT',
 }
-
-/**
- * Set of custom-component-typed components that may be displayed on the UI.
- */
-export type ComponentAndProps = AccountRecoveryDetailsContent | AccountUnruggabilityDetailsContent
 
 /**
  * Text-based content that may be displayed on the UI.
@@ -55,38 +45,6 @@ export type MarkdownContentWithFrontmatter<
 }
 
 /**
- * Custom-component-based content that may be displayed on the UI.
- */
-export type CustomContent = {
-	contentType: ContentType.COMPONENT
-	component: ComponentAndProps
-}
-
-/** Type predicate for CustomContent. */
-export function isCustomContent(content: unknown): content is CustomContent {
-	if (typeof content !== 'object') {
-		return false
-	}
-
-	if (content === null) {
-		return false
-	}
-
-	if (!Object.hasOwn(content, 'component') || !Object.hasOwn(content, 'contentType')) {
-		return false
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe as we just determined it has the right properties. We will check the `contentType` value just after this.
-	const customContent = content as CustomContent
-
-	if (customContent.contentType !== ContentType.COMPONENT) {
-		return false
-	}
-
-	return true
-}
-
-/**
  * Typographic content that may be displayed on the UI.
  */
 export type TypographicContent<_Strings extends Strings = null> =
@@ -95,7 +53,7 @@ export type TypographicContent<_Strings extends Strings = null> =
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content<_Strings extends Strings = null> = TypographicContent<_Strings> | CustomContent
+export type Content<_Strings extends Strings = null> = TypographicContent<_Strings>
 
 /**
  * Type predicate for TypographicContent.
@@ -173,6 +131,25 @@ function typographicContentToPlainString(rendered: TypographicContent<null>): st
 			return rendered.markdown
 		default:
 			return assertNever(rendered)
+	}
+}
+
+/**
+ * The authored text of typographic content, template placeholders intact.
+ *
+ * Used when moving authored prose into a canonical detail model, where
+ * placeholders are resolved by whichever adapter renders the model.
+ */
+export function typographicSourceText<_Strings extends Strings = null>(
+	content: TypographicContent<_Strings>,
+): string {
+	switch (content.contentType) {
+		case ContentType.TEXT:
+			return content.text
+		case ContentType.MARKDOWN:
+			return content.markdown
+		default:
+			return assertNever(content)
 	}
 }
 
@@ -308,23 +285,4 @@ export function mdParagraph<_Strings extends Strings, _Text extends string = str
 	}
 
 	return markdown(text, strings)
-}
-
-/**
- * Custom content with a custom component type.
- */
-export function component<
-	C extends ComponentAndProps,
-	B extends keyof C['componentProps'],
-	// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
-	// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
->(componentName: C['component'], componentProps: Pick<C['componentProps'], B>): CustomContent {
-	return {
-		contentType: ContentType.COMPONENT,
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- This is actually not safe; `componentProps` is actually only a `Partial` version here. This is meant to be merged later when rendering to make a complete `componentProps`.
-		component: {
-			component: componentName,
-			componentProps,
-		} as C,
-	}
 }

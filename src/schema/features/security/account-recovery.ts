@@ -266,7 +266,13 @@ export enum GuardianPolicyType {
 
 interface GuardianPolicyBase {
 	type: GuardianPolicyType
-	descriptionMarkdown: string
+
+	/**
+	 * How the wallet describes its own recovery policy, in plain prose.
+	 * Format-neutral: no Markdown, so every adapter can render it.
+	 * Separate paragraphs with a blank line.
+	 */
+	description: string
 }
 
 /**

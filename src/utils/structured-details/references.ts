@@ -12,6 +12,11 @@ import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './re
  * every reference is displayed exactly once and none is silently lost.
  */
 const referenceCollectors: StructuredDetailsRenderers<FullyQualifiedReference[]> = {
+	accountRecovery: details =>
+		details.drills === undefined
+			? []
+			: details.drills.configured.flatMap(drill => drill.references),
+	accountUnruggability: () => [],
 	addressCorrelation: details => details.leaks.flatMap(leak => leak.references),
 	chainVerification: () => [],
 	funding: () => [],
