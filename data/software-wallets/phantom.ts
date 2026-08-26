@@ -155,7 +155,19 @@ export const phantom: SoftwareWallet = {
 				crashReports: null,
 				usage: null,
 			},
-			appIsolation: null,
+			appIsolation: {
+				[Variant.BROWSER]: {
+					createInAppConnectionFlow: notSupported,
+					erc7846WalletConnect: notSupported,
+					ethAccounts: supported({
+						ref: refTodo,
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					useAppSpecificLastConnectedAddresses: notSupported,
+				},
+				[Variant.MOBILE]: null,
+				[Variant.DESKTOP]: null,
+			},
 			dataCollection: null,
 			privacyPolicy: 'https://phantom.com/privacy',
 			transactionPrivacy: {
