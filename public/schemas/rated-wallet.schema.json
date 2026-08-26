@@ -830,7 +830,7 @@
 					"items": {
 						"type": "object",
 						"additionalProperties": false,
-						"required": ["auditor", "auditDate", "findings"],
+						"required": ["auditor", "auditDate", "variants", "findings"],
 						"properties": {
 							"auditor": {
 								"type": "object",
@@ -848,6 +848,20 @@
 							"auditDate": {
 								"type": "string",
 								"pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+							},
+							"variants": {
+								"oneOf": [
+									{
+										"const": "ALL_VARIANTS"
+									},
+									{
+										"type": "array",
+										"items": {
+											"type": "string",
+											"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+										}
+									}
+								]
 							},
 							"findings": {
 								"type": "string",

@@ -28,6 +28,7 @@ import {
 	monetizationStrategyName,
 } from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
+import type { Variant } from '@/schema/variants'
 import type { StructuredDetails } from '@/types/content/details'
 import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
 import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
@@ -85,6 +86,12 @@ export interface InlineTextJsonExport {
 	links?: Array<{ text: string; url: string }>
 }
 
+/** An entity referred to by a detail model. */
+export interface EntityRefJsonExport {
+	entityId: string
+	entityName: string
+}
+
 export interface GuardianJsonExport {
 	type: GuardianType
 	description: string
@@ -98,13 +105,13 @@ export type GuardianPolicyFactsJsonExport =
 			optionalGuardians: GuardianJsonExport[]
 			optionalGuardiansMinimumConfigurable: number
 			optionalGuardiansMinimumNeededForRecovery: number
-			secretReconstitution: 'CLIENT_SIDE' | { entityId: string; entityName: string }
+			secretReconstitution: 'CLIENT_SIDE' | EntityRefJsonExport
 	  }
 	| {
 			kind: 'kOfNWithTimelock'
 			configuredGuardians: GuardianJsonExport[]
 			requiredGuardians: GuardianJsonExport[]
-			timelockWarningSentByAllOf: Array<{ entityId: string; entityName: string }>
+			timelockWarningSentByAllOf: EntityRefJsonExport[]
 			minimumSignaturesWithTimelock: number
 			minimumSignaturesBypassTimelock: number
 	  }
@@ -146,7 +153,7 @@ export interface AccountUnruggabilityDetailsJsonExport {
 }
 
 export interface AddressCorrelationLeakJsonExport {
-	source: { kind: 'onchain' } | { kind: 'entity'; entityId: string; entityName: string }
+	source: { kind: 'onchain' } | ({ kind: 'entity' } & EntityRefJsonExport)
 	correlatedInfo: Array<{ info: UserInfo; name: string }>
 	references?: ReferenceJsonExport[]
 }
@@ -218,6 +225,9 @@ export interface SecurityAuditJsonExport {
 
 	/** Audit date as `YYYY-MM-DD`. */
 	auditDate: CalendarDate
+
+	/** Which variants the audit covered. */
+	variants: Variant[] | 'ALL_VARIANTS'
 	findings: 'NONE_FOUND' | 'ALL_FIXED' | 'FLAWS'
 	flaws?: SecurityAuditFlawJsonExport[]
 	references?: ReferenceJsonExport[]
@@ -297,7 +307,7 @@ function serializeGuardian(guardian: Guardian): GuardianJsonExport {
 	}
 }
 
-function serializeEntityRef(entity: Entity): { entityId: string; entityName: string } {
+function serializeEntityRef(entity: Entity): EntityRefJsonExport {
 	return { entityId: entity.id, entityName: entity.name }
 }
 
@@ -394,11 +404,7 @@ function serializeAddressCorrelationDetails(
 				source:
 					leak.source.kind === 'onchain'
 						? { kind: 'onchain' }
-						: {
-								kind: 'entity',
-								entityId: leak.source.entity.id,
-								entityName: leak.source.entity.name,
-							},
+						: { kind: 'entity', ...serializeEntityRef(leak.source.entity) },
 				correlatedInfo: leak.correlatedInfo.map(info => ({
 					info,
 					name: userInfoName(info).long,
@@ -491,6 +497,7 @@ function serializeSecurityAuditsDetails(
 			return {
 				auditor: { id: audit.auditor.id, name: audit.auditor.name },
 				auditDate: audit.auditDate,
+				variants: audit.variants,
 				findings:
 					audit.findings.kind === 'noneFound'
 						? 'NONE_FOUND'

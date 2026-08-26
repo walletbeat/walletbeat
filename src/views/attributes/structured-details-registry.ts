@@ -6,7 +6,7 @@ import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrela
 import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
 import AccountRecoveryDetails from '@/views/attributes/security/AccountRecoveryDetails.svelte'
 import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
-import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
+import ScamPreventionDetails from '@/views/attributes/security/ScamPreventionDetails.svelte'
 import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
 import AccountUnruggabilityDetails from '@/views/attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
@@ -36,7 +36,7 @@ export const structuredDetailsViews: {
 	chainVerification: ChainVerificationDetails,
 	funding: FundingDetails,
 	privateTransfers: PrivateTransfersDetails,
-	scamPrevention: ScamAlertDetails,
+	scamPrevention: ScamPreventionDetails,
 	securityAudits: SecurityAuditsDetails,
 	transactionInclusion: TransactionInclusionDetails,
 }

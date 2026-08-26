@@ -22,6 +22,7 @@ import {
 	monetizationStrategyName,
 } from '@/schema/features/transparency/monetization'
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
 import type { StructuredDetails } from '@/types/content/details'
 import { buildAddressCorrelationDetails } from '@/types/content/details/address-correlation'
 import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
@@ -491,6 +492,7 @@ describe('securityAudits structured details', () => {
 	): SecurityAuditsDetails['audits'][number] => ({
 		auditor: ackee,
 		auditDate,
+		variants: 'ALL_VARIANTS',
 		findings,
 		references: [refWithUrl('https://ackee.example/audit.pdf', 'Audit report')],
 	})
@@ -552,6 +554,22 @@ describe('securityAudits structured details', () => {
 		expect(markdown).toContain('[Audit report](https://ackee.example/audit.pdf)')
 	})
 
+	it('states which variants a partial audit covered', () => {
+		const details: StructuredDetails = {
+			type: 'securityAudits',
+			audits: [
+				{
+					...audit('2020-01-02', { kind: 'noneFound' }),
+					variants: [Variant.MOBILE, Variant.BROWSER],
+				},
+			],
+		}
+
+		expect(renderStructuredDetailsMarkdown(details, context)).toContain(
+			'This audit covered Mobile app and Browser extension.',
+		)
+	})
+
 	it('describes a bug bounty program identically for every adapter', () => {
 		expect(
 			bugBountySentences({
@@ -591,6 +609,7 @@ describe('securityAudits structured details', () => {
 				{
 					auditor: { id: 'ackee', name: 'Ackee' },
 					auditDate: '2020-01-02',
+					variants: 'ALL_VARIANTS',
 					findings: 'NONE_FOUND',
 					references: [
 						{ urls: [{ label: 'Audit report', url: 'https://ackee.example/audit.pdf' }] },
@@ -599,6 +618,7 @@ describe('securityAudits structured details', () => {
 				{
 					auditor: { id: 'ackee', name: 'Ackee' },
 					auditDate: '2019-06-01',
+					variants: 'ALL_VARIANTS',
 					findings: 'ALL_FIXED',
 					references: [
 						{ urls: [{ label: 'Audit report', url: 'https://ackee.example/audit.pdf' }] },
@@ -827,6 +847,7 @@ describe('published JSON schema', () => {
 				{
 					auditor: ackee,
 					auditDate: '2020-01-02',
+					variants: 'ALL_VARIANTS',
 					findings: {
 						kind: 'flaws',
 						flaws: [

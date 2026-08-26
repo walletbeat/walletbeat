@@ -7,6 +7,7 @@ import type {
 } from '@/schema/features/security/bug-bounty-program'
 import type { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import type { FullyQualifiedReference } from '@/schema/reference'
+import { type Variant, variantLabel } from '@/schema/variants'
 import type { CalendarDate } from '@/types/date'
 import { daysSince } from '@/types/date'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -28,8 +29,20 @@ export type SecurityAuditFindings =
 export interface SecurityAuditDetail {
 	auditor: SecurityAuditor
 	auditDate: CalendarDate
+
+	/**
+	 * Which variants the audit covered. Aggregated evaluations show audits from
+	 * several variants, so each audit states its own scope rather than being
+	 * presented as covering the whole wallet.
+	 */
+	variants: Variant[] | 'ALL_VARIANTS'
 	findings: SecurityAuditFindings
 	references: FullyQualifiedReference[]
+}
+
+/** The variants an audit covered, as display labels. */
+export function auditVariantNames(audit: SecurityAuditDetail): string[] {
+	return audit.variants === 'ALL_VARIANTS' ? [] : audit.variants.map(variantLabel)
 }
 
 /** The state of a wallet's bug bounty program. */

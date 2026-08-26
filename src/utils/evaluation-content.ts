@@ -28,7 +28,7 @@ export function getWalletEvalStrings(wallet: {
  * Accepts Content (e.g. Paragraph from stage definitions).
  */
 export function renderContentToText(
-	content: EvaluationDetails<WalletNameAndPseudonymStrings>,
+	content: EvaluationDetails<WalletNameAndPseudonymStrings> | undefined,
 	strings: WalletNameAndPseudonymStrings,
 	options: { fallback?: string; trim?: boolean } = {},
 ): string {
