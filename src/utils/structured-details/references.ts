@@ -1,5 +1,5 @@
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
-import type { StructuredDetails } from '@/types/content/details'
+import type { StructuredDetails } from '@/types/content/structured-details'
 
 import type { StructuredDetailsContext } from './context'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'

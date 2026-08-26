@@ -31,7 +31,7 @@ import {
 	sentence,
 	typographicContentWithExtraOptionalStrings,
 } from '@/types/content'
-import { buildAccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
+import { buildAccountUnruggabilityDetails } from '@/types/content/account-unruggability-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 
 import {

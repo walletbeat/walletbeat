@@ -1,7 +1,7 @@
 import type { ConcreteWalletEvalStrings, WalletNameAndPseudonymStrings } from '@/schema/attributes'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
-import type { EvaluationDetails } from '@/types/content/details'
+import type { EvaluationDetails } from '@/types/content/structured-details'
 import { trimWhitespacePrefix } from '@/types/utils/text'
 
 /**

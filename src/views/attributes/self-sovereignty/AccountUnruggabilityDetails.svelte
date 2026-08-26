@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import { ContentType } from '@/types/content'
-	import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
+	import type { AccountUnruggabilityDetails } from '@/types/content/account-unruggability-details'
 	import { accountUnruggabilitySummary } from '@/utils/structured-details/prose'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 

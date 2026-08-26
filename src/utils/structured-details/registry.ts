@@ -2,7 +2,7 @@ import type {
 	StructuredDetails,
 	StructuredDetailsByType,
 	StructuredDetailsType,
-} from '@/types/content/details'
+} from '@/types/content/structured-details'
 
 import type { StructuredDetailsContext } from './context'
 

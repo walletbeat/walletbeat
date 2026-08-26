@@ -8,7 +8,7 @@
 		auditVariantNames,
 		formatCalendarDate,
 		type SecurityAuditsDetails,
-	} from '@/types/content/details/security-audits'
+	} from '@/types/content/security-audits-details'
 	import { commaListFormat } from '@/types/utils/text'
 	import {
 		bugBountySentences,

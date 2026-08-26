@@ -2,7 +2,7 @@
 	// Types/constants
 	import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 	import { ContentType } from '@/types/content'
-	import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
+	import type { AccountRecoveryDetails } from '@/types/content/account-recovery-details'
 	import {
 		accountRecoveryConfiguredDrillsIntro,
 		accountRecoveryMissingDrillsIntro,

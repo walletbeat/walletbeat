@@ -28,7 +28,7 @@ import {
 	isSecurityAuditsDetails,
 	mergeSecurityAuditsDetails,
 	type SecurityAuditDetail,
-} from '@/types/content/details/security-audits'
+} from '@/types/content/security-audits-details'
 import { daysSince } from '@/types/date'
 import {
 	isNonEmptyArray,

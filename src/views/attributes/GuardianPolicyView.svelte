@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import { ContentType } from '@/types/content'
-	import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
+	import type { GuardianPolicyDetail } from '@/types/content/guardian-policy'
 	import { guardianPolicyBlocks } from '@/utils/structured-details/prose'
 	import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 

@@ -11,15 +11,15 @@ import { SecurityFlawSeverity } from '@/schema/features/security/security-audits
 import { transactionSubmissionL2TypeName } from '@/schema/features/self-sovereignty/transaction-submission'
 import { monetizationStrategyName } from '@/schema/features/transparency/monetization'
 import { getUrl, isUrl } from '@/schema/url'
-import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
-import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
+import type { AccountRecoveryDetails } from '@/types/content/account-recovery-details'
+import type { AccountUnruggabilityDetails } from '@/types/content/account-unruggability-details'
 import {
 	type AddressCorrelationLeak,
 	correlatedInfoNames,
-} from '@/types/content/details/address-correlation'
-import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
-import type { FundingDetails } from '@/types/content/details/funding'
-import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
+} from '@/types/content/address-correlation-details'
+import type { ChainVerificationDetails } from '@/types/content/chain-verification-details'
+import type { FundingDetails } from '@/types/content/funding-details'
+import type { GuardianPolicyDetail } from '@/types/content/guardian-policy'
 import {
 	auditedInLastYear,
 	auditsByRecency,
@@ -28,12 +28,12 @@ import {
 	hasUnaddressedFlaws,
 	type SecurityAuditDetail,
 	type SecurityAuditsDetails,
-} from '@/types/content/details/security-audits'
+} from '@/types/content/security-audits-details'
 import {
 	forceInclusionCapableL2s,
 	forceInclusionIncapableL2s,
 	type TransactionInclusionDetails,
-} from '@/types/content/details/transaction-inclusion'
+} from '@/types/content/transaction-inclusion-details'
 import { commaListFormat } from '@/types/utils/text'
 
 /**

@@ -29,32 +29,29 @@ import {
 } from '@/schema/features/transparency/monetization'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import type { Variant } from '@/schema/variants'
-import type { StructuredDetails } from '@/types/content/details'
-import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
-import type { AccountUnruggabilityDetails } from '@/types/content/details/account-unruggability'
-import type { AddressCorrelationDetails } from '@/types/content/details/address-correlation'
-import type { ChainVerificationDetails } from '@/types/content/details/chain-verification'
-import type { FundingDetails } from '@/types/content/details/funding'
-import type { GuardianPolicyDetail } from '@/types/content/details/guardian-policy'
-import type { GuardianScenarioOutcomeDetail } from '@/types/content/details/guardian-scenarios'
-import type { InlineText } from '@/types/content/details/inline'
+import type { AccountRecoveryDetails } from '@/types/content/account-recovery-details'
+import type { AccountUnruggabilityDetails } from '@/types/content/account-unruggability-details'
+import type { AddressCorrelationDetails } from '@/types/content/address-correlation-details'
+import type { ChainVerificationDetails } from '@/types/content/chain-verification-details'
+import type { FundingDetails } from '@/types/content/funding-details'
+import type { GuardianPolicyDetail } from '@/types/content/guardian-policy'
+import type { GuardianScenarioOutcomeDetail } from '@/types/content/guardian-scenarios'
+import type { InlineText } from '@/types/content/inline'
 import {
 	type PrivateTransfersDetails,
 	privateTransferTechnologyName,
-} from '@/types/content/details/private-transfers'
-import type {
-	ScamPreventionDetails,
-	ScamWarningKind,
-} from '@/types/content/details/scam-prevention'
+} from '@/types/content/private-transfers-details'
+import type { ScamPreventionDetails, ScamWarningKind } from '@/types/content/scam-alert-details'
 import {
 	auditsByRecency,
 	type SecurityAuditsDetails,
-} from '@/types/content/details/security-audits'
+} from '@/types/content/security-audits-details'
+import type { StructuredDetails } from '@/types/content/structured-details'
 import type {
 	L1BroadcastSupport,
 	L2ForceInclusionCapability,
 	TransactionInclusionDetails,
-} from '@/types/content/details/transaction-inclusion'
+} from '@/types/content/transaction-inclusion-details'
 import type { CalendarDate } from '@/types/date'
 import { renderStrings } from '@/types/utils/text'
 

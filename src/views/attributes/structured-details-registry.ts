@@ -1,6 +1,9 @@
 import type { Component } from 'svelte'
 
-import type { StructuredDetailsByType, StructuredDetailsType } from '@/types/content/details'
+import type {
+	StructuredDetailsByType,
+	StructuredDetailsType,
+} from '@/types/content/structured-details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'

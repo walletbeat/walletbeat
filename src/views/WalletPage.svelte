@@ -19,7 +19,7 @@
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
-	import { isStructuredDetails } from '@/types/content/details'
+	import { isStructuredDetails } from '@/types/content/structured-details'
 	import {
 		computePieSlices,
 		overallRatingPieLevels,

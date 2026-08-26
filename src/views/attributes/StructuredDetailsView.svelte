@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { StructuredDetails } from '@/types/content/details'
+	import type { StructuredDetails } from '@/types/content/structured-details'
 	import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 	import { structuredDetailsViews } from '@/views/attributes/structured-details-registry'
 

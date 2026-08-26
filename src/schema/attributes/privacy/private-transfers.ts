@@ -36,13 +36,13 @@ import {
 	inlineLink,
 	type InlineText,
 	inlineText,
-} from '@/types/content/details/inline'
+} from '@/types/content/inline'
 import {
 	isPrivateTransfersDetails,
 	mergePrivateTransfersDetails,
 	privateTransfersDetails,
 	privateTransfersModeNote,
-} from '@/types/content/details/private-transfers'
+} from '@/types/content/private-transfers-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty'
 import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 
