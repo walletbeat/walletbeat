@@ -9,7 +9,8 @@ export type HasPublicChangelog = Support<MustRef<{}>>
 
 /**
  * Whether the wallet's release builds are reproducible, i.e. the same source
- * revision and target can be rebuilt to produce bit-for-bit identical artifacts.
+ * revision and target can be rebuilt to produce bit-for-bit identical artifacts
+ * by an independent third party.
  */
 export type ReproducibleBuilds = Support<WithRef<{}>>
 
