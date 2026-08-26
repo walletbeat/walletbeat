@@ -1,12 +1,27 @@
 import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import { gitCommitRefPinRegExp } from '@/schema/url'
-import type { AccountRecoveryDetails } from '@/types/content/account-recovery-details'
-import type { AccountUnruggabilityDetails } from '@/types/content/account-unruggability-details'
-import type { AddressCorrelationDetails } from '@/types/content/address-correlation-details'
-import type { ChainVerificationDetails } from '@/types/content/chain-verification-details'
-import type { FundingDetails } from '@/types/content/funding-details'
-import type { GuardianPolicyDetail } from '@/types/content/guardian-policy'
+import {
+	accountRecoveryConfiguredDrillsIntro,
+	type AccountRecoveryDetails,
+	accountRecoveryMissingDrillsIntro,
+	accountRecoverySummary,
+} from '@/types/content/account-recovery-details'
+import {
+	type AccountUnruggabilityDetails,
+	accountUnruggabilitySummary,
+} from '@/types/content/account-unruggability-details'
+import {
+	type AddressCorrelationDetails,
+	addressCorrelationIntro,
+	addressCorrelationLeakSentence,
+} from '@/types/content/address-correlation-details'
+import {
+	type ChainVerificationDetails,
+	chainVerificationSentence,
+} from '@/types/content/chain-verification-details'
+import { type FundingDetails, fundingSentence } from '@/types/content/funding-details'
+import { guardianPolicyBlocks, type GuardianPolicyDetail } from '@/types/content/guardian-policy'
 import type { GuardianScenarioOutcomeDetail } from '@/types/content/guardian-scenarios'
 import type { InlineText } from '@/types/content/inline'
 import {
@@ -17,31 +32,22 @@ import type { ScamPreventionDetails } from '@/types/content/scam-alert-details'
 import {
 	auditsByRecency,
 	auditVariantNames,
+	bugBountySentences,
 	formatCalendarDate,
 	type SecurityAuditDetail,
+	securityAuditFindingsSentence,
 	type SecurityAuditsDetails,
+	securityAuditsSummary,
+	securityFlawSeverityLabel,
 } from '@/types/content/security-audits-details'
 import type { StructuredDetails } from '@/types/content/structured-details'
-import type { TransactionInclusionDetails } from '@/types/content/transaction-inclusion-details'
+import {
+	type TransactionInclusionDetails,
+	transactionInclusionProse,
+} from '@/types/content/transaction-inclusion-details'
 import { commaListFormat, renderStrings } from '@/types/utils/text'
 
 import { emphasizedStrings, type StructuredDetailsContext } from './context'
-import {
-	accountRecoveryConfiguredDrillsIntro,
-	accountRecoveryMissingDrillsIntro,
-	accountRecoverySummary,
-	accountUnruggabilitySummary,
-	addressCorrelationIntro,
-	addressCorrelationLeakSentence,
-	bugBountySentences,
-	chainVerificationSentence,
-	fundingSentence,
-	guardianPolicyBlocks,
-	securityAuditFindingsSentence,
-	securityAuditsSummary,
-	securityFlawSeverityLabel,
-	transactionInclusionProse,
-} from './prose'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'
 
 export function renderInlineTextMarkdown(

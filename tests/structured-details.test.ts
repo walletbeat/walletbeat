@@ -24,24 +24,21 @@ import {
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { buildAddressCorrelationDetails } from '@/types/content/address-correlation-details'
-import type { GuardianPolicyDetail } from '@/types/content/guardian-policy'
+import { guardianPolicyBlocks, type GuardianPolicyDetail } from '@/types/content/guardian-policy'
 import { inline, inlineCode, inlineEmphasis, inlineLink } from '@/types/content/inline'
 import { mergePrivateTransfersDetails } from '@/types/content/private-transfers-details'
 import {
+	bugBountySentences,
 	formatCalendarDate,
 	mergeSecurityAuditsDetails,
 	type SecurityAuditsDetails,
+	securityAuditsSummary,
 } from '@/types/content/security-audits-details'
 import type { StructuredDetails } from '@/types/content/structured-details'
 import type { CalendarDate } from '@/types/date'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
 import { serializeStructuredDetails } from '@/utils/structured-details/json'
 import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
-import {
-	bugBountySentences,
-	guardianPolicyBlocks,
-	securityAuditsSummary,
-} from '@/utils/structured-details/prose'
 import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 
 import { assertValidStructuredDetails } from './utils/assert-valid-json'

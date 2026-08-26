@@ -2,8 +2,10 @@
 	// Types/constants
 	import { toFullyQualified } from '@/schema/reference'
 	import { ContentType } from '@/types/content'
-	import type { TransactionInclusionDetails } from '@/types/content/transaction-inclusion-details'
-	import { transactionInclusionProse } from '@/utils/structured-details/prose'
+	import {
+		type TransactionInclusionDetails,
+		transactionInclusionProse,
+	} from '@/types/content/transaction-inclusion-details'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props

@@ -2,12 +2,12 @@
 	// Types/constants
 	import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 	import { ContentType } from '@/types/content'
-	import type { AccountRecoveryDetails } from '@/types/content/account-recovery-details'
 	import {
+		type AccountRecoveryDetails,
 		accountRecoveryConfiguredDrillsIntro,
 		accountRecoveryMissingDrillsIntro,
 		accountRecoverySummary,
-	} from '@/utils/structured-details/prose'
+	} from '@/types/content/account-recovery-details'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props

@@ -5,6 +5,7 @@ import {
 	userInfoName,
 } from '@/schema/features/privacy/data-collection'
 import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference'
+import { getUrl, isUrl } from '@/schema/url'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 /**
@@ -90,4 +91,30 @@ export function buildAddressCorrelationDetails(
 
 export function correlatedInfoNames(leak: AddressCorrelationLeak): string[] {
 	return leak.correlatedInfo.map(info => userInfoName(info).long)
+}
+
+export const addressCorrelationIntro =
+	'By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:'
+
+function joinedList(items: string[]): string {
+	if (items.length <= 1) {
+		return items.join('')
+	}
+
+	return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+}
+
+export function addressCorrelationLeakSentence(leak: AddressCorrelationLeak): string {
+	const info = `**${joinedList(correlatedInfoNames(leak))}**`
+
+	if (leak.source.kind === 'onchain') {
+		return `An onchain record permanently associates your ${info} with your wallet address.`
+	}
+
+	const { entity } = leak.source
+	const privacyPolicy = isUrl(entity.privacyPolicy)
+		? ` ([Privacy policy](${getUrl(entity.privacyPolicy)}))`
+		: ''
+
+	return `**${entity.name}**${privacyPolicy} may link your wallet address to your ${info}.`
 }
