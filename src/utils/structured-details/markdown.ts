@@ -240,7 +240,7 @@ function renderScamPreventionMarkdown(
 ): string {
 	return details.warnings
 		.map(warning => {
-			const description = renderStrings(warning.description, emphasizedStrings(context))
+			const description = renderStrings(warning.description, { ...emphasizedStrings(context) })
 			const nestedItems = warning.items?.map(item => `\n  - ${item}`).join('') ?? ''
 			const conclusion = warning.conclusion === undefined ? '' : `\n\n  ${warning.conclusion}`
 			const references = referencesSuffixMarkdown(warning.references)
