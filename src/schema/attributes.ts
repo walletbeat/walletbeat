@@ -1,4 +1,5 @@
-import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content'
+import type { Paragraph, Sentence, TypographicContent } from '@/types/content'
+import type { EvaluationDetails } from '@/types/content/details'
 import {
 	assertNonEmptyArray,
 	type NonEmptyArray,
@@ -423,7 +424,7 @@ export interface Evaluation<
 	 * This can be more verbose but should still avoid repeating information
 	 * already stated in the attribute explanation.
 	 */
-	details: Content<WalletNameStrings>
+	details?: EvaluationDetails<WalletNameStrings>
 
 	/**
 	 * An optional paragraph explaining the consequence of this outcome on the

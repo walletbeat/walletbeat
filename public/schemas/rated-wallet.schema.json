@@ -258,6 +258,10 @@
 					"type": "string",
 					"description": "Additional wallet-specific context or clarification about this attribute's rating."
 				},
+				"structuredDetails": {
+					"$ref": "#/$defs/structuredDetails",
+					"description": "Optional format-neutral detail model for attributes with structured evaluation content."
+				},
 				"impact": {
 					"type": "string"
 				},
@@ -268,6 +272,89 @@
 					"type": "array",
 					"items": {
 						"$ref": "#/$defs/reference"
+					}
+				}
+			}
+		},
+		"structuredDetails": {
+			"oneOf": [
+				{
+					"$ref": "#/$defs/chainVerificationDetails"
+				},
+				{
+					"$ref": "#/$defs/scamPreventionDetails"
+				}
+			]
+		},
+		"chainVerificationDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "lightClients"],
+			"properties": {
+				"type": {
+					"const": "chainVerification"
+				},
+				"lightClients": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["id", "name", "url"],
+						"properties": {
+							"id": {
+								"type": "string",
+								"enum": ["helios", "heliosMobi"]
+							},
+							"name": {
+								"type": "string"
+							},
+							"url": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"scamPreventionDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "warnings"],
+			"properties": {
+				"type": {
+					"const": "scamPrevention"
+				},
+				"warnings": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["kind", "description"],
+						"properties": {
+							"kind": {
+								"type": "string",
+								"enum": ["sendTransaction", "contractTransaction", "scamUrl", "unlimitedApproval"]
+							},
+							"description": {
+								"type": "string"
+							},
+							"items": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"conclusion": {
+								"type": "string"
+							},
+							"references": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/reference"
+								}
+							}
+						}
 					}
 				}
 			}
