@@ -42,16 +42,12 @@ export interface TransactionInclusionDetails {
 export function forceInclusionCapableL2s(
 	details: TransactionInclusionDetails,
 ): TransactionSubmissionL2Type[] {
-	return details.l2s
-		.filter(({ forceInclusion }) => forceInclusion !== 'NONE')
-		.map(({ l2 }) => l2)
+	return details.l2s.filter(({ forceInclusion }) => forceInclusion !== 'NONE').map(({ l2 }) => l2)
 }
 
 /** The L2s a wallet cannot force-include anything on. */
 export function forceInclusionIncapableL2s(
 	details: TransactionInclusionDetails,
 ): TransactionSubmissionL2Type[] {
-	return details.l2s
-		.filter(({ forceInclusion }) => forceInclusion === 'NONE')
-		.map(({ l2 }) => l2)
+	return details.l2s.filter(({ forceInclusion }) => forceInclusion === 'NONE').map(({ l2 }) => l2)
 }

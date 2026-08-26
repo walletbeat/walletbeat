@@ -2,9 +2,10 @@ import type { Component } from 'svelte'
 
 import type { StructuredDetailsByType, StructuredDetailsType } from '@/types/content/details'
 import type { StructuredDetailsContext } from '@/utils/structured-details/context'
+import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
-import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
+import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 
 /** Props every structured-details view receives. */
@@ -21,24 +22,13 @@ export interface StructuredDetailsViewProps<_Details> {
  * and JSON registries live separately so their dependencies stay server-side.
  */
 export const structuredDetailsViews: {
-	[_Type in StructuredDetailsType]: {
-		view: Component<StructuredDetailsViewProps<StructuredDetailsByType[_Type]>>
-
-		/**
-		 * Whether the view renders the model's claim-level references itself.
-		 * When it does, the wallet page omits the flat evaluation reference list
-		 * so each reference is displayed exactly once.
-		 */
-		rendersOwnReferences: boolean
-	}
+	[_Type in StructuredDetailsType]: Component<
+		StructuredDetailsViewProps<StructuredDetailsByType[_Type]>
+	>
 } = {
-	chainVerification: { view: ChainVerificationDetails, rendersOwnReferences: false },
-	funding: { view: FundingDetails, rendersOwnReferences: false },
-	scamPrevention: { view: ScamAlertDetails, rendersOwnReferences: true },
-	transactionInclusion: { view: TransactionInclusionDetails, rendersOwnReferences: true },
-}
-
-/** Whether the view for these details renders their references itself. */
-export function structuredDetailsRendersOwnReferences(type: StructuredDetailsType): boolean {
-	return structuredDetailsViews[type].rendersOwnReferences
+	addressCorrelation: AddressCorrelationDetails,
+	chainVerification: ChainVerificationDetails,
+	funding: FundingDetails,
+	scamPrevention: ScamAlertDetails,
+	transactionInclusion: TransactionInclusionDetails,
 }

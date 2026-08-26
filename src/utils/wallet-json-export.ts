@@ -24,15 +24,8 @@ import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
 import { isStructuredDetails } from '@/types/content/details'
 import { setItems } from '@/types/utils/non-empty'
-import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
 import { getHowIsEvaluatedHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
-import {
-	type ReferenceJsonExport,
-	serializeReferences,
-	serializeStructuredDetails,
-	type StructuredDetailsJsonExport,
-} from '@/utils/structured-details/json'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import {
 	allCriteriaInStage,
@@ -40,6 +33,13 @@ import {
 	getCriterionAttributeId,
 	type StageCountsStatus,
 } from '@/utils/stage-attributes'
+import {
+	type ReferenceJsonExport,
+	serializeReferences,
+	serializeStructuredDetails,
+	type StructuredDetailsJsonExport,
+} from '@/utils/structured-details/json'
+import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
 
 /** Attributes without details (e.g. unrated ones) export an empty legacy `details` string. */
 const DETAILS_FALLBACK = ''

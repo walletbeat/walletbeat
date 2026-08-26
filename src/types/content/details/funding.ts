@@ -1,7 +1,7 @@
-import type { MonetizationStrategy } from '@/schema/features/transparency/monetization'
-import {
+import type {
 	type Monetization,
 	monetizationStrategies,
+	MonetizationStrategy,
 	monetizationStrategyIsUserAligned,
 } from '@/schema/features/transparency/monetization'
 

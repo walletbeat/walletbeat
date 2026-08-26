@@ -1,5 +1,6 @@
 import type { CustomContent, TypographicContent } from '../../content'
 import type { Strings } from '../../utils/string-templates'
+import type { AddressCorrelationDetails } from './address-correlation'
 import type { ChainVerificationDetails } from './chain-verification'
 import type { FundingDetails } from './funding'
 import type { ScamPreventionDetails } from './scam-prevention'
@@ -17,6 +18,7 @@ import type { TransactionInclusionDetails } from './transaction-inclusion'
  * attribute or a view exists.
  */
 export interface StructuredDetailsByType {
+	addressCorrelation: AddressCorrelationDetails
 	chainVerification: ChainVerificationDetails
 	funding: FundingDetails
 	scamPrevention: ScamPreventionDetails
@@ -53,7 +55,6 @@ export function isStructuredDetails(details: unknown): details is StructuredDeta
 
 /** Thrown when an adapter is handed a discriminator it does not know about. */
 export function unknownStructuredDetailsType(details: never): never {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Only reachable if a caller bypasses the type system.
 	const type = (details as { type?: unknown }).type
 
 	throw new Error(`Unknown structured details type: ${String(type)}`)
