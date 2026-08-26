@@ -148,13 +148,7 @@ _Share plans towards achieving sustainability (both financial and non-financial)
 - We aim to diversify funding sources across the Ethereum ecosystem, for example Giveth,
   Octant, and The DAO Fund. We plan to capture funding sources that are not grant based, for
   example by accepting crypto donations.
-- We plan to reduce our monthly expenses through automation:
-  - Automate more of the wallet data collection process.
-  - Ingest the Coinspect dataset. This is a one-time integration cost that immediately adds
-    a large amount of wallet data.
-  - Add automated regression tests, so that detectable issues are caught before they turn
-    into manual rework.
-  - Produce video content automatically from existing presentation footage.
+- We plan to reduce our monthly expenses by automating more aspects of our workflow.
 - Walletbeat is already being built with sustainability in mind. Every part of Walletbeat
   was built to be future-proof, in the spirit of the walkaway test. The rating pipeline is
   highly modular and can be adapted for rating projects that are not about wallets. The site
