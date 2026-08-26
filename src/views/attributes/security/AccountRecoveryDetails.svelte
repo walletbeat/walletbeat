@@ -3,7 +3,11 @@
 	import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 	import { ContentType } from '@/types/content'
 	import type { AccountRecoveryDetails } from '@/types/content/details/account-recovery'
-	import { accountRecoverySummary } from '@/utils/structured-details/prose'
+	import {
+		accountRecoveryConfiguredDrillsIntro,
+		accountRecoveryMissingDrillsIntro,
+		accountRecoverySummary,
+	} from '@/utils/structured-details/prose'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props
@@ -59,7 +63,7 @@
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: '{{WALLET_NAME}} periodically runs the following account recovery drills:',
+				markdown: accountRecoveryConfiguredDrillsIntro,
 			}}
 			strings={context.strings}
 		/>
@@ -80,8 +84,7 @@
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown:
-					'{{WALLET_NAME}} does not run the following recommended account recovery drills:',
+				markdown: accountRecoveryMissingDrillsIntro,
 			}}
 			strings={context.strings}
 		/>

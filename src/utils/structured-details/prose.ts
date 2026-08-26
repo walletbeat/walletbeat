@@ -444,6 +444,14 @@ function listOrSentence(lead: string, items: string[]): GuardianPolicyBlock {
 	return { kind: 'list', lead: lead.endsWith(':') ? lead : `${lead} the following:`, items }
 }
 
+/** Introduction to the drills a wallet does run, shared by every rendering. */
+export const accountRecoveryConfiguredDrillsIntro =
+	'{{WALLET_NAME}} periodically runs the following account recovery drills:'
+
+/** Introduction to the drills a wallet does not run, shared by every rendering. */
+export const accountRecoveryMissingDrillsIntro =
+	'{{WALLET_NAME}} does not run the following recommended account recovery drills:'
+
 /** The sentence introducing a wallet's guardian-based account recovery. */
 export function accountRecoverySummary(details: AccountRecoveryDetails): string {
 	if (details.guardianPolicy === undefined) {

@@ -94,11 +94,11 @@ export function buildScamPreventionDetails(
 			kind: 'sendTransaction',
 			description: isSupported(warning)
 				? warningFeatures.length > 1
-					? '{{WALLET_NAME}} helps you stay safe when sending funds by:'
-					: `{{WALLET_NAME}} helps you stay safe when sending funds by ${
+					? '**{{WALLET_NAME}}** helps you stay safe when sending funds by:'
+					: `**{{WALLET_NAME}}** helps you stay safe when sending funds by ${
 							warningFeatures[0]?.toLowerCase() ?? 'providing transaction warnings'
 						}.`
-				: '{{WALLET_NAME}} does not warn you when sending funds to suspicious addresses.',
+				: '**{{WALLET_NAME}}** does not warn you when sending funds to suspicious addresses.',
 			items: warningFeatures.length > 1 ? warningFeatures : undefined,
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [[warning.leaksRecipient, "the recipient's Ethereum address"]])
@@ -123,7 +123,7 @@ export function buildScamPreventionDetails(
 		warnings.push({
 			kind: 'contractTransaction',
 			description: isSupported(warning)
-				? `{{WALLET_NAME}} helps you stay safe when doing onchain transactions by${
+				? `**{{WALLET_NAME}}** helps you stay safe when doing onchain transactions by${
 						contractFeatures.length > 1
 							? ':'
 							: warning.contractRegistry
@@ -134,7 +134,7 @@ export function buildScamPreventionDetails(
 										? ' warning you when interacting with a contract that has only recently been created onchain.'
 										: ' providing contract warnings.'
 					}`
-				: '{{WALLET_NAME}} does not warn you when making arbitrary onchain transactions.',
+				: '**{{WALLET_NAME}}** does not warn you when making arbitrary onchain transactions.',
 			items: contractFeatures.length > 1 ? contractFeatures : undefined,
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [[warning.leaksContractAddress, 'the contract address']])
@@ -149,8 +149,8 @@ export function buildScamPreventionDetails(
 		warnings.push({
 			kind: 'scamUrl',
 			description: isSupported(warning)
-				? '{{WALLET_NAME}} helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.'
-				: '{{WALLET_NAME}} does not check URLs against known scam sites.',
+				? '**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.'
+				: '**{{WALLET_NAME}}** does not check URLs against known scam sites.',
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [
 						[warning.leaksVisitedUrl === 'FULL_URL', 'the full URL of the app'],
@@ -167,8 +167,8 @@ export function buildScamPreventionDetails(
 		warnings.push({
 			kind: 'unlimitedApproval',
 			description: isSupported(warning)
-				? '{{WALLET_NAME}} warns you before granting an unlimited ERC-20 token approval.'
-				: '{{WALLET_NAME}} does not warn you when granting unlimited token approvals.',
+				? '**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.'
+				: '**{{WALLET_NAME}}** does not warn you when granting unlimited token approvals.',
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [[warning.leaksSpenderAddress, 'the spender address']])
 				: undefined,
