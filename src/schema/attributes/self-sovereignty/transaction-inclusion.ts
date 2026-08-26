@@ -179,9 +179,7 @@ export const transactionInclusion: Attribute = {
 					{
 						type: 'transactionInclusion',
 						l1Broadcast: 'OWN_NODE',
-						l2s: [
-							{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'WITHDRAWALS_ONLY' },
-						],
+						l2s: [{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'WITHDRAWALS_ONLY' }],
 					},
 				),
 			),
@@ -194,9 +192,7 @@ export const transactionInclusion: Attribute = {
 					{
 						type: 'transactionInclusion',
 						l1Broadcast: 'SELF_GOSSIP',
-						l2s: [
-							{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'WITHDRAWALS_ONLY' },
-						],
+						l2s: [{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'WITHDRAWALS_ONLY' }],
 					},
 				),
 			),
@@ -211,9 +207,7 @@ export const transactionInclusion: Attribute = {
 					{
 						type: 'transactionInclusion',
 						l1Broadcast: 'NO',
-						l2s: [
-							{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'WITHDRAWALS_ONLY' },
-						],
+						l2s: [{ l2: TransactionSubmissionL2Type.opStack, forceInclusion: 'WITHDRAWALS_ONLY' }],
 					},
 				),
 			),
@@ -239,10 +233,10 @@ export const transactionInclusion: Attribute = {
 			transactionSubmissionEvaluation(
 				EvaluationContext.forTest(() => transactionInclusion),
 				{
-						type: 'transactionInclusion',
-						l1Broadcast: 'NO',
-						l2s: [],
-					},
+					type: 'transactionInclusion',
+					l1Broadcast: 'NO',
+					l2s: [],
+				},
 			),
 		),
 	},

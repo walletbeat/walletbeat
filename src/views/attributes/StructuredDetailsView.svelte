@@ -12,7 +12,7 @@
 
 	// The single web entry point for canonical structured details.
 	// Layout, badges and interactions belong to the per-type views below.
-	const View = $derived(structuredDetailsViews[details.type].view)
+	const View = $derived(structuredDetailsViews[details.type])
 </script>
 
 <div data-column>

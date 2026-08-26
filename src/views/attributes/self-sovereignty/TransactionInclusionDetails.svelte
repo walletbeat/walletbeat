@@ -23,11 +23,11 @@
 </script>
 
 
-{#each blocks as block (block)}
+{#each blocks as block (block.text)}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
-			markdown: block,
+			markdown: block.text,
 		}}
 		strings={context.strings}
 	/>

@@ -9,8 +9,8 @@ import {
 	isCustomContent,
 	type MarkdownParagraph,
 } from '../content'
-import type { EvaluationDetails } from './details'
 import type { Strings } from '../utils/string-templates'
+import type { EvaluationDetails } from './details'
 
 interface PrivateTokenTransferDetails {
 	sendingDetails: MarkdownParagraph<WalletNameStrings>
