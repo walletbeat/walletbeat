@@ -6,7 +6,7 @@ Grant-recipient: Walletbeat (collective)
 Amount: 90000
 Currency: USD
 Application-form: https://esp.ethereum.foundation/form-direct/apply
-Submission-date: 2026-08-26
+Submission-date: 2026-08-27
 ---
 
 # Walletbeat 2026 EF ESP grant application
