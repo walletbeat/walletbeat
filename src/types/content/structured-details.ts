@@ -6,7 +6,7 @@ import type { AddressCorrelationDetails } from './address-correlation-details'
 import type { ChainVerificationDetails } from './chain-verification-details'
 import type { FundingDetails } from './funding-details'
 import type { PrivateTransfersDetails } from './private-transfers-details'
-import type { ScamPreventionDetails } from './scam-alert-details'
+import type { ScamPreventionDetails } from './scam-prevention-details'
 import type { SecurityAuditsDetails } from './security-audits-details'
 import type { TransactionInclusionDetails } from './transaction-inclusion-details'
 
