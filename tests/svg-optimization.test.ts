@@ -48,6 +48,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'c6343ee01fbea1f2644b843ce29af66dd489834cd9421c4da74e0546bc5f4868',
 	'public/images/entities/keylabs.svg':
 		'455aacb92608050aa44dabe82211820caa515a2217da8caa0ecf7be30441be0a',
+	'public/images/entities/kudelski-security.svg':
+		'e9019a41ee4e1364da2aa27d51395f0a06d6d5d48569716929b7ce9a7fb37033',
 	'public/images/entities/ledger.svg':
 		'fea6a0525e93805dfb2b52cbbacee8422ff7b5ba0534bfb8fd226af01bf30b8a',
 	'public/images/entities/lifi.svg':
