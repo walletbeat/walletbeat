@@ -11,7 +11,10 @@ import { isSupported, notSupported, type Support, supported } from '@/schema/fea
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
-import type { ScamPreventionDetails, ScamWarningDetail } from '@/types/content/scam-alert-details'
+import type {
+	ScamPreventionDetails,
+	ScamWarningDetail,
+} from '@/types/content/scam-prevention-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 

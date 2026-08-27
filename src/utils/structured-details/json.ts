@@ -41,7 +41,10 @@ import {
 	type PrivateTransfersDetails,
 	privateTransferTechnologyName,
 } from '@/types/content/private-transfers-details'
-import type { ScamPreventionDetails, ScamWarningKind } from '@/types/content/scam-alert-details'
+import type {
+	ScamPreventionDetails,
+	ScamWarningKind,
+} from '@/types/content/scam-prevention-details'
 import {
 	auditsByRecency,
 	type SecurityAuditsDetails,
