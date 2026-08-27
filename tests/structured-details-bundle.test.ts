@@ -66,7 +66,7 @@ function isRuntimeImport(node: ts.ImportDeclaration): boolean {
 		return true
 	}
 
-	if (clause.isTypeOnly) {
+	if (clause.phaseModifier === ts.SyntaxKind.TypeKeyword) {
 		return false
 	}
 
