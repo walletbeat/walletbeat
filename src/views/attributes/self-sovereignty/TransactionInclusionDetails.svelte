@@ -1,9 +1,9 @@
 <script lang="ts">
 	// Types/constants
-	import { toFullyQualified } from '@/schema/reference'
 	import { ContentType } from '@/types/content'
 	import {
 		type TransactionInclusionDetails,
+		transactionInclusionClaimReferences,
 		transactionInclusionProse,
 	} from '@/types/content/transaction-inclusion-details'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
@@ -16,12 +16,7 @@
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 
 	const blocks = $derived(transactionInclusionProse(details))
-	const references = $derived(
-		toFullyQualified([
-			...toFullyQualified(details.l2References),
-			...toFullyQualified(details.l1References),
-		])
-	)
+	const references = $derived(transactionInclusionClaimReferences(details))
 </script>
 
 

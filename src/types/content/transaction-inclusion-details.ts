@@ -2,7 +2,11 @@ import {
 	type TransactionSubmissionL2Type,
 	transactionSubmissionL2TypeName,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import type { ReferenceInput } from '@/schema/reference'
+import {
+	type FullyQualifiedReference,
+	type ReferenceInput,
+	toFullyQualified,
+} from '@/schema/reference'
 
 /** How a wallet can broadcast an L1 transaction without an intermediary. */
 export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE'
@@ -102,4 +106,22 @@ export function transactionInclusionProse(
 	}
 
 	return blocks
+}
+
+/**
+ * References attached to claims that {@link transactionInclusionProse} renders.
+ *
+ * A wallet with no configured L2s produces no L2 block, so its `l2References`
+ * support no rendered claim. Adapters must not treat those as displayed, or
+ * they would be dropped from the evaluation's reference list and shown nowhere.
+ */
+export function transactionInclusionClaimReferences(
+	details: TransactionInclusionDetails,
+): FullyQualifiedReference[] {
+	const claims = new Set(transactionInclusionProse(details).map(block => block.claim))
+
+	return [
+		...(claims.has('l2') ? toFullyQualified(details.l2References) : []),
+		...(claims.has('l1') ? toFullyQualified(details.l1References) : []),
+	]
 }
