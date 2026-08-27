@@ -70,76 +70,56 @@ exports Ethereum's CROPS values to the wallet layer.
 
 _Provide a detailed breakdown of the project scope of work and timeline including milestones, deliverables, and expected outcomes._
 
-Walletbeat's current development pace costs approximately 10,000 USD per month, and
-conference travel adds an additional 5,000 USD per attendee per conference. We expect our
-current treasury to carry us to September, so the 90,000 USD budget request will afford us
-nine more incremental months of runway spanning October 2026 to June 2027 and allow us to
-attend Devcon and EthCC.
-
-Here is a detailed breakdown of monthly deliverables and milestones we aim to achieve in
-this period.
+Walletbeat's current development pace is $10k per month, and conference travel adds an
+additional $5k per attendee. We expect our current treasury to carry us to September, so
+the $90k budget request will afford us nine more months of runway from Oct 2026 - Jun 2027
+and allow us to attend Devcon and EthCC.
 
 ### Completed prior to October
 
-- Finishing up the top-5 software wallet ratings.
-- All pre-launch issues are closed.
-- Existing hardware wallet attributes are all refactored or deleted.
-- The clear signing relaunch happens.
-- UI improvements: legibility (especially on smaller screens), responsiveness, and polish.
-- Grow ecosystem presence and tangible impact _(ongoing)_.
+- Finishing up the top-5 software wallet ratings
+- All pre-launch issues are closed
+- Existing hardware wallet attributes are all refactored or deleted
+- The clear signing relaunch happens
+- UI improvements: legibility (especially on smaller screens), responsiveness, and polish
+- Grow ecosystem presence and tangible impact (ongoing)
 
 ### October 2026
 
-- A Walletbeat donation page exists and has badge NFTs.
-- The Kohaku partnership is active, and Kohaku is tested for privacy leaks.
-- At least one grant matching round is ongoing.
+- A Walletbeat donation page exists and has badge NFTs
+- The Kohaku partnership is active, and Kohaku is tested for privacy leaks
+- At least one grant matching round is ongoing
 
 ### November 2026
 
-- Devcon Mumbai engagements have happened. This encompasses talks, workshops, and booth
-  programming.
-- OpenGraph preview images exist for wallet pages.
-- Coinspect data is ingested.
-- EIP tracker pages exist.
-- The formal launch on `walletbeat.eth` happens.
+- Devcon Mumbai talks, workshops, and booth programming have happened
+- OpenGraph preview images exist for wallet pages
+- Coinspect data is ingested
+- EIP tracker pages exist
+- The formal launch on walletbeat.eth happens
 
 ### December 2026
 
-- Both the SheFi and the Cyfrin Updraft curriculum materials are created, though not
-  necessarily approved yet.
-- We reach at least 2,000 followers on the X platform.
-- A progress slider on wallet pages shows each wallet's position along the stage ladder.
+- SheFi and Cyfrin Updraft curriculum materials are created, though not yet approved
+- We reach at least 2,000 followers on the X platform
+- A progress slider on wallet pages shows each wallet's position along the stage ladder
 
 ### January 2027
 
-- By now Walletbeat has established itself as a well respected entity in the ecosystem and
-  has a track record of pushing wallets to become more CROPS aligned. The
-  [impact log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md)
-  has several net new additions.
-- Work begins on the hardware and embedded wallet methodology and ratings.
+- Walletbeat has a track record of pushing wallets to become more CROPS aligned; the impact
+  log has several net new additions
+- Work begins on the hardware and embedded wallet methodology and ratings
 
-### February 2027
+### February - May 2027
 
-- Work continues on hardware and embedded wallets.
-
-### March 2027
-
-- Work continues on hardware and embedded wallets.
-
-### April 2027
-
-- Talks, workshops, and booth programming at EthCC.
-- Work continues on hardware and embedded wallets.
-
-### May 2027
-
-- Work continues on hardware and embedded wallets.
+- Work continues on the hardware and embedded wallet methodology and ratings
+- Talks, workshops, and booth programming at EthCC in April
 
 ### June 2027
 
-- Long term stable funding is established.
-- The hardware wallet methodology and ratings are finished.
-- We reach at least 5,000 followers on the X platform.
+- Long term stable funding is established
+- The hardware wallet methodology and ratings are finished
+- We reach at least 5,000 followers on the X platform
 
 ## Sustainability plan
 
