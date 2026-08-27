@@ -62,6 +62,8 @@ function scenarioDetail(
 	}
 }
 
+export const accountTakeoverScenariosHeading = 'Account takeover scenarios'
+
 export function accountUnruggabilitySummary(details: AccountUnruggabilityDetails): string {
 	if (details.guardianPolicy === undefined) {
 		return 'Private key material never leaves {{WALLET_NAME}}, so no external entity may take over your account.'

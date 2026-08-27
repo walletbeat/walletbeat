@@ -87,6 +87,12 @@ function scenarioDetail(
 	}
 }
 
+export const accountRecoveryFailureScenariosHeading = 'Account recovery failure scenarios'
+
+export const accountRecoverySuccessScenariosHeading = 'Account recovery success scenarios'
+
+export const accountRecoveryDrillsHeading = 'Account recovery drills'
+
 export const accountRecoveryConfiguredDrillsIntro =
 	'{{WALLET_NAME}} periodically runs the following account recovery drills:'
 

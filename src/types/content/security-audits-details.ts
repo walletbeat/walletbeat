@@ -198,6 +198,8 @@ function bugBountyRewardsSentence(bounty: BugBountyDetail): string | null {
 	return minimum === undefined ? null : `Rewards start at ${amount(minimum)}${suffix}`.trim()
 }
 
+export const bugBountyHeading = 'Bug bounty program'
+
 export function bugBountySentences(bounty: BugBountyDetail): string[] {
 	if (bounty.availability === 'NONE') {
 		return [

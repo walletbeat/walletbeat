@@ -6,6 +6,7 @@
 	import {
 		auditsByRecency,
 		auditVariantNames,
+		bugBountyHeading,
 		bugBountySentences,
 		formatCalendarDate,
 		securityAuditFindingsSentence,
@@ -171,7 +172,7 @@
 
 {#if details.bugBounty}
 	<section data-column="gap-2">
-		<h4>Bug bounty program</h4>
+		<h4>{bugBountyHeading}</h4>
 
 		{#each bugBountySentences(details.bugBounty) as sentence (sentence)}
 			<Typography
