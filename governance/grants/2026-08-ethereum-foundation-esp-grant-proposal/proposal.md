@@ -100,7 +100,7 @@ and allow us to attend Devcon and EthCC.
 
 ### December 2026
 
-- SheFi and Cyfrin Updraft curriculum materials are created, though not yet approved
+- SheFi and Cyfrin Updraft curriculum materials are created
 - We reach at least 2,000 followers on the X platform
 - A progress slider on wallet pages shows each wallet's position along the stage ladder
 
@@ -191,10 +191,10 @@ _Depending on the stage of this project, provide metrics for the project's curre
   channels with several teams
 - Walletbeat data is consumed by external projects such as WalletRadar, evidence of standalone value
 - Grew to >1k followers on X
-- Presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026: a Privacy in Web3
-  panel, a Neocypherpunk Summit talk, a CROPS-in-wallets talk on Ethereum Day, and a Dappcon
+- Presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026: a privacy panel and
+  session at the Neocypherpunk Summit, a CROPS-in-wallets talk on Ethereum Day, and a Dappcon
   workshop on ERC-7730 and ERC-8213. We also ran a Brew workshop teaching attendees to
-  capture wallet network traffic and find privacy leaks. Recordings and slides:
+  capture wallet network traffic and find privacy leaks. Recordings and slides are public:
   https://github.com/walletbeat/walletbeat/tree/beta/resources/talks
 - Social proof log:
   https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md
