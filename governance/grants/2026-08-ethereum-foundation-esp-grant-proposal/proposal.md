@@ -1,11 +1,12 @@
 ---
 title: Walletbeat 2026 EF ESP grant application
-description: 'Ethereum Foundation ESP direct grant application for Walletbeat, prepared in August 2026.'
-Status: Not yet submitted
+description: 'Ethereum Foundation ESP direct grant application for Walletbeat, submitted in August 2026.'
+Status: Submitted
 Grant-recipient: Walletbeat (collective)
 Amount: 90000
 Currency: USD
 Application-form: https://esp.ethereum.foundation/form-direct/apply
+Submission-date: 2026-08-26
 ---
 
 # Walletbeat 2026 EF ESP grant application
