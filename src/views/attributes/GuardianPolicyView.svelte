@@ -34,16 +34,9 @@
 			strings={context.strings}
 		/>
 	{:else}
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: block.lead,
-			}}
-			strings={context.strings}
-		/>
 		<ul>
-			{#each block.items as item (item)}
-				<li>{item}</li>
+			{#each block.items as item (item.text)}
+				<li>{item.text}</li>
 			{/each}
 		</ul>
 	{/if}

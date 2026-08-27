@@ -5,9 +5,13 @@
 	import {
 		type AccountRecoveryDetails,
 		accountRecoveryConfiguredDrillsIntro,
+		accountRecoveryDrillsHeading,
+		accountRecoveryFailureScenariosHeading,
 		accountRecoveryMissingDrillsIntro,
+		accountRecoverySuccessScenariosHeading,
 		accountRecoverySummary,
 	} from '@/types/content/account-recovery-details'
+	import { guardianPolicyHeading } from '@/types/content/guardian-policy'
 	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props
@@ -29,13 +33,13 @@
 />
 
 {#if details.guardianPolicy}
-	<h4>Account recovery implementation</h4>
+	<h4>{guardianPolicyHeading}</h4>
 
 	<GuardianPolicyView policy={details.guardianPolicy} {context} />
 {/if}
 
 {#if details.unrecoverableScenarios.length > 0}
-	<h4>Account recovery failure scenarios</h4>
+	<h4>{accountRecoveryFailureScenariosHeading}</h4>
 
 	<ul>
 		{#each details.unrecoverableScenarios as scenario (scenario.id)}
@@ -47,7 +51,7 @@
 {/if}
 
 {#if details.recoverableScenarios.length > 0}
-	<h4>Account recovery success scenarios</h4>
+	<h4>{accountRecoverySuccessScenariosHeading}</h4>
 
 	<ul>
 		{#each details.recoverableScenarios as scenario (scenario.id)}
@@ -57,7 +61,7 @@
 {/if}
 
 {#if details.drills}
-	<h4>Account recovery drills</h4>
+	<h4>{accountRecoveryDrillsHeading}</h4>
 
 	{#if details.drills.configured.length > 0}
 		<Typography
