@@ -658,6 +658,9 @@ describe('guardian-based details', () => {
 		expect(blocks.map(block => block.kind)).toEqual([
 			'paragraph',
 			'paragraph',
+			// The lead-in to a list is a paragraph of its own, so every adapter
+			// lays it out the same way it lays out any other paragraph.
+			'paragraph',
 			'list',
 			'paragraph',
 			'paragraph',
@@ -666,9 +669,11 @@ describe('guardian-based details', () => {
 
 		expect(paragraphs.some(text => text.includes('wallet password'))).toBe(true)
 		expect(paragraphs.some(text => text.includes('client-side'))).toBe(true)
-		expect(blocks.filter(block => block.kind === 'list').map(block => block.items)).toEqual([
-			["The user's Google account", "The user's Apple account"],
-		])
+		expect(
+			blocks
+				.filter(block => block.kind === 'list')
+				.map(block => block.items.map(item => item.text)),
+		).toEqual([["The user's Google account", "The user's Apple account"]])
 	})
 
 	const secretSplitFacts =

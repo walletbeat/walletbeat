@@ -1,13 +1,18 @@
+import type { ConcreteWalletEvalStrings } from '@/schema/attributes'
 import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 import { type ReferenceInput, toFullyQualified } from '@/schema/reference'
 import { gitCommitRefPinRegExp } from '@/schema/url'
 import {
 	accountRecoveryConfiguredDrillsIntro,
 	type AccountRecoveryDetails,
+	accountRecoveryDrillsHeading,
+	accountRecoveryFailureScenariosHeading,
 	accountRecoveryMissingDrillsIntro,
+	accountRecoverySuccessScenariosHeading,
 	accountRecoverySummary,
 } from '@/types/content/account-recovery-details'
 import {
+	accountTakeoverScenariosHeading,
 	type AccountUnruggabilityDetails,
 	accountUnruggabilitySummary,
 } from '@/types/content/account-unruggability-details'
@@ -20,8 +25,9 @@ import {
 	type ChainVerificationDetails,
 	chainVerificationSentence,
 } from '@/types/content/chain-verification-details'
+import type { DetailBlock, DetailListItem } from '@/types/content/detail-block'
 import { type FundingDetails, fundingSentence } from '@/types/content/funding-details'
-import { guardianPolicyBlocks, type GuardianPolicyDetail } from '@/types/content/guardian-policy'
+import { guardianPolicyBlocks, guardianPolicyHeading } from '@/types/content/guardian-policy'
 import type { GuardianScenarioOutcomeDetail } from '@/types/content/guardian-scenarios'
 import type { InlineText } from '@/types/content/inline'
 import {
@@ -32,9 +38,9 @@ import type { ScamPreventionDetails } from '@/types/content/scam-prevention-deta
 import {
 	auditsByRecency,
 	auditVariantNames,
+	bugBountyHeading,
 	bugBountySentences,
 	formatCalendarDate,
-	type SecurityAuditDetail,
 	securityAuditFindingsSentence,
 	type SecurityAuditsDetails,
 	securityAuditsSummary,
@@ -101,229 +107,255 @@ function referencesSuffixMarkdown(references: ReferenceInput): string {
 	return links.length === 0 ? '' : ` (${links.join(', ')})`
 }
 
-function renderGuardianPolicyMarkdown(policy: GuardianPolicyDetail): string[] {
-	return guardianPolicyBlocks(policy).map(block =>
-		block.kind === 'paragraph'
-			? block.text
-			: [block.lead, '', ...block.items.map(item => `- ${item}`)].join('\n'),
-	)
-}
-
-function renderScenarioMarkdown(scenario: GuardianScenarioOutcomeDetail): string {
-	return scenario.consequence === undefined
-		? `- **${scenario.scenario}**`
-		: `- **${scenario.scenario}**: ${scenario.consequence}`
-}
-
-function renderAccountRecoveryMarkdown(
-	details: AccountRecoveryDetails,
-	context: StructuredDetailsContext,
+/**
+ * One bullet: sub-bullets are indented under it and its conclusion is indented
+ * to the same depth, so both stay inside the bullet rather than ending the list.
+ */
+function renderDetailListItemMarkdown(
+	item: DetailListItem,
+	strings: ConcreteWalletEvalStrings,
 ): string {
-	const blocks: string[] = [accountRecoverySummary(details)]
+	const text = renderStrings(item.text, { ...strings })
+	const items = item.items?.map(sub => `\n  - ${renderStrings(sub, { ...strings })}`).join('') ?? ''
+	const conclusion =
+		item.conclusion === undefined ? '' : `\n\n  ${renderStrings(item.conclusion, { ...strings })}`
+
+	return `- ${text}${items}${conclusion}${referencesSuffixMarkdown(item.references)}`
+}
+
+/**
+ * The single place that knows Markdown's block syntax.
+ *
+ * Every structured detail renders through here, so heading depth, bullet
+ * markers, indentation and blank-line separation are decided once instead of
+ * being re-derived by each model's renderer.
+ */
+export function renderDetailBlocksMarkdown(
+	blocks: DetailBlock[],
+	strings: ConcreteWalletEvalStrings,
+): string {
+	return blocks
+		.map(block => {
+			switch (block.kind) {
+				case 'heading':
+					return `#### ${renderStrings(block.text, { ...strings })}`
+				case 'paragraph':
+					return `${renderStrings(block.text, { ...strings })}${referencesSuffixMarkdown(block.references)}`
+				case 'list':
+					return block.items.map(item => renderDetailListItemMarkdown(item, strings)).join('\n')
+				case 'references':
+					return referencesSuffixMarkdown(block.references).trim()
+			}
+		})
+		.filter(rendered => rendered !== '')
+		.join('\n\n')
+}
+
+function scenarioItem(scenario: GuardianScenarioOutcomeDetail): DetailListItem {
+	return {
+		text:
+			scenario.consequence === undefined
+				? `**${scenario.scenario}**`
+				: `**${scenario.scenario}**: ${scenario.consequence}`,
+	}
+}
+
+function renderAccountRecoveryMarkdown(details: AccountRecoveryDetails): DetailBlock[] {
+	const blocks: DetailBlock[] = [{ kind: 'paragraph', text: accountRecoverySummary(details) }]
 
 	if (details.guardianPolicy !== undefined) {
 		blocks.push(
-			'#### Account recovery implementation',
-			...renderGuardianPolicyMarkdown(details.guardianPolicy),
+			{ kind: 'heading', text: guardianPolicyHeading },
+			...guardianPolicyBlocks(details.guardianPolicy),
 		)
 	}
 
 	if (details.unrecoverableScenarios.length > 0) {
 		blocks.push(
-			'#### Account recovery failure scenarios',
-			details.unrecoverableScenarios.map(renderScenarioMarkdown).join('\n'),
+			{ kind: 'heading', text: accountRecoveryFailureScenariosHeading },
+			{ kind: 'list', items: details.unrecoverableScenarios.map(scenarioItem) },
 		)
 	}
 
 	if (details.recoverableScenarios.length > 0) {
 		blocks.push(
-			'#### Account recovery success scenarios',
-			details.recoverableScenarios.map(renderScenarioMarkdown).join('\n'),
+			{ kind: 'heading', text: accountRecoverySuccessScenariosHeading },
+			{ kind: 'list', items: details.recoverableScenarios.map(scenarioItem) },
 		)
 	}
 
 	if (details.drills !== undefined) {
-		blocks.push('#### Account recovery drills')
+		blocks.push({ kind: 'heading', text: accountRecoveryDrillsHeading })
 
 		if (details.drills.configured.length > 0) {
 			blocks.push(
-				accountRecoveryConfiguredDrillsIntro,
-				details.drills.configured
-					.map(
-						drill =>
-							`- ${accountRecoveryDrillWording(drill.type).label} (every ${drill.reminderEveryNDays.toString()} days)${referencesSuffixMarkdown(drill.references)}`,
-					)
-					.join('\n'),
+				{ kind: 'paragraph', text: accountRecoveryConfiguredDrillsIntro },
+				{
+					kind: 'list',
+					items: details.drills.configured.map(drill => ({
+						text: `${accountRecoveryDrillWording(drill.type).label} (every ${drill.reminderEveryNDays.toString()} days)`,
+						references: drill.references,
+					})),
+				},
 			)
 		}
 
 		if (details.drills.missing.length > 0) {
 			blocks.push(
-				accountRecoveryMissingDrillsIntro,
-				details.drills.missing
-					.map(drillType => `- ${accountRecoveryDrillWording(drillType).label}`)
-					.join('\n'),
+				{ kind: 'paragraph', text: accountRecoveryMissingDrillsIntro },
+				{
+					kind: 'list',
+					items: details.drills.missing.map(drillType => ({
+						text: accountRecoveryDrillWording(drillType).label,
+					})),
+				},
 			)
 		}
 	}
 
-	return renderStrings(blocks.join('\n\n'), { ...context.strings })
+	return blocks
 }
 
-function renderAccountUnruggabilityMarkdown(
-	details: AccountUnruggabilityDetails,
-	context: StructuredDetailsContext,
-): string {
-	const blocks: string[] = [accountUnruggabilitySummary(details)]
+function renderAccountUnruggabilityMarkdown(details: AccountUnruggabilityDetails): DetailBlock[] {
+	const blocks: DetailBlock[] = [{ kind: 'paragraph', text: accountUnruggabilitySummary(details) }]
 
 	if (details.guardianPolicy !== undefined) {
 		blocks.push(
-			'#### Account recovery implementation',
-			...renderGuardianPolicyMarkdown(details.guardianPolicy),
+			{ kind: 'heading', text: guardianPolicyHeading },
+			...guardianPolicyBlocks(details.guardianPolicy),
 		)
 	}
 
 	if (details.takeoverScenarios.length > 0) {
 		blocks.push(
-			'#### Account takeover scenarios',
-			details.takeoverScenarios.map(renderScenarioMarkdown).join('\n'),
+			{ kind: 'heading', text: accountTakeoverScenariosHeading },
+			{ kind: 'list', items: details.takeoverScenarios.map(scenarioItem) },
 		)
 	}
 
-	return renderStrings(blocks.join('\n\n'), { ...context.strings })
+	return blocks
 }
 
-function renderAddressCorrelationMarkdown(
-	details: AddressCorrelationDetails,
-	context: StructuredDetailsContext,
-): string {
-	const bullets = details.leaks.map(
-		leak => `- ${addressCorrelationLeakSentence(leak)}${referencesSuffixMarkdown(leak.references)}`,
-	)
-
-	return renderStrings([addressCorrelationIntro, '', ...bullets].join('\n'), {
-		...context.strings,
-	})
+function renderAddressCorrelationMarkdown(details: AddressCorrelationDetails): DetailBlock[] {
+	return [
+		{ kind: 'paragraph', text: addressCorrelationIntro },
+		{
+			kind: 'list',
+			items: details.leaks.map(leak => ({
+				text: addressCorrelationLeakSentence(leak),
+				references: leak.references,
+			})),
+		},
+	]
 }
 
-function renderChainVerificationMarkdown(
-	details: ChainVerificationDetails,
-	context: StructuredDetailsContext,
-): string {
-	return renderStrings(chainVerificationSentence(details), { ...context.strings })
+function renderChainVerificationMarkdown(details: ChainVerificationDetails): DetailBlock[] {
+	return [{ kind: 'paragraph', text: chainVerificationSentence(details) }]
 }
 
-function renderFundingMarkdown(details: FundingDetails, context: StructuredDetailsContext): string {
-	return renderStrings(fundingSentence(details), { ...context.strings })
+function renderFundingMarkdown(details: FundingDetails): DetailBlock[] {
+	return [{ kind: 'paragraph', text: fundingSentence(details) }]
 }
 
 function renderPrivateTransfersMarkdown(
 	details: PrivateTransfersDetails,
 	context: StructuredDetailsContext,
-): string {
-	const blocks: string[] = []
+): DetailBlock[] {
+	const paragraph = (text: string): DetailBlock => ({ kind: 'paragraph', text })
+	const blocks: DetailBlock[] = []
 
 	if (details.defaultModeNote !== undefined) {
-		blocks.push(renderInlineTextMarkdown(details.defaultModeNote, context))
+		blocks.push(paragraph(renderInlineTextMarkdown(details.defaultModeNote, context)))
 	}
 
 	for (const technology of details.technologies) {
 		blocks.push(
-			`#### ${privateTransferTechnologyName[technology.technology]}`,
-			`**Sending:** ${renderInlineTextMarkdown(technology.sending, context)}`,
-			`**Receiving:** ${renderInlineTextMarkdown(technology.receiving, context)}`,
-			`**Spending:** ${renderInlineTextMarkdown(technology.spending, context)}`,
-			...technology.notes.map(note => renderInlineTextMarkdown(note, context)),
+			{ kind: 'heading', text: privateTransferTechnologyName[technology.technology] },
+			paragraph(`**Sending:** ${renderInlineTextMarkdown(technology.sending, context)}`),
+			paragraph(`**Receiving:** ${renderInlineTextMarkdown(technology.receiving, context)}`),
+			paragraph(`**Spending:** ${renderInlineTextMarkdown(technology.spending, context)}`),
+			...technology.notes.map(note => paragraph(renderInlineTextMarkdown(note, context))),
 		)
 	}
 
-	return blocks.join('\n\n')
+	return blocks
 }
 
 function renderScamPreventionMarkdown(
 	details: ScamPreventionDetails,
 	context: StructuredDetailsContext,
-): string {
-	return details.warnings
-		.map(warning => {
-			const description = renderStrings(warning.description, { ...emphasizedStrings(context) })
-			const nestedItems = warning.items?.map(item => `\n  - ${item}`).join('') ?? ''
-			const conclusion = warning.conclusion === undefined ? '' : `\n\n  ${warning.conclusion}`
-			const references = referencesSuffixMarkdown(warning.references)
-
-			return `- ${description}${nestedItems}${conclusion}${references}`
-		})
-		.join('\n')
+): DetailBlock[] {
+	return [
+		{
+			kind: 'list',
+			items: details.warnings.map(warning => ({
+				// The wallet name leads each warning, so it is emphasized here
+				// rather than everywhere the name appears in a detail.
+				text: renderStrings(warning.description, { ...emphasizedStrings(context) }),
+				...(warning.items !== undefined && { items: warning.items }),
+				...(warning.conclusion !== undefined && { conclusion: warning.conclusion }),
+				references: warning.references,
+			})),
+		},
+	]
 }
 
-function auditScopeSuffix(audit: SecurityAuditDetail): string {
-	const variants = auditVariantNames(audit)
-
-	return variants.length === 0 ? '' : `\n\nThis audit covered ${commaListFormat(variants)}.`
-}
-
-function renderSecurityAuditsMarkdown(
-	details: SecurityAuditsDetails,
-	context: StructuredDetailsContext,
-): string {
-	const blocks: string[] = [securityAuditsSummary(details)]
+function renderSecurityAuditsMarkdown(details: SecurityAuditsDetails): DetailBlock[] {
+	const blocks: DetailBlock[] = [{ kind: 'paragraph', text: securityAuditsSummary(details) }]
 
 	for (const audit of auditsByRecency(details)) {
-		blocks.push(
-			`#### Audit by ${audit.auditor.name} (${formatCalendarDate(audit.auditDate)})${auditScopeSuffix(audit)}`,
-			securityAuditFindingsSentence(audit),
-		)
+		const variants = auditVariantNames(audit)
+
+		blocks.push({
+			kind: 'heading',
+			text: `Audit by ${audit.auditor.name} (${formatCalendarDate(audit.auditDate)})`,
+		})
+
+		if (variants.length > 0) {
+			blocks.push({ kind: 'paragraph', text: `This audit covered ${commaListFormat(variants)}.` })
+		}
+
+		blocks.push({ kind: 'paragraph', text: securityAuditFindingsSentence(audit) })
 
 		if (audit.findings.kind === 'flaws') {
-			blocks.push(
-				audit.findings.flaws
-					.map(
-						// Finding titles are verbatim strings from independent audit
-						// reports, so they are quoted as code rather than reflowed as prose.
-						flaw =>
-							`- **${securityFlawSeverityLabel[flaw.severity]}**: \`${flaw.name}\` (${
-								flaw.status === 'FIXED' ? 'fixed' : 'not fixed'
-							})`,
-					)
-					.join('\n'),
-			)
+			blocks.push({
+				kind: 'list',
+				items: audit.findings.flaws.map(flaw => ({
+					// Finding titles are verbatim strings from independent audit
+					// reports, so they are quoted as code rather than reflowed as prose.
+					text: `**${securityFlawSeverityLabel[flaw.severity]}**: \`${flaw.name}\` (${
+						flaw.status === 'FIXED' ? 'fixed' : 'not fixed'
+					})`,
+				})),
+			})
 		}
 
-		const references = referencesSuffixMarkdown(audit.references).trim()
-
-		if (references !== '') {
-			blocks.push(references)
-		}
+		blocks.push({ kind: 'references', references: audit.references })
 	}
 
 	if (details.bugBounty !== undefined) {
-		blocks.push('#### Bug bounty program', ...bugBountySentences(details.bugBounty))
-
-		const references = referencesSuffixMarkdown(details.bugBounty.references).trim()
-
-		if (references !== '') {
-			blocks.push(references)
-		}
+		blocks.push(
+			{ kind: 'heading', text: bugBountyHeading },
+			...bugBountySentences(details.bugBounty).map((text): DetailBlock => ({
+				kind: 'paragraph',
+				text,
+			})),
+			{ kind: 'references', references: details.bugBounty.references },
+		)
 	}
 
-	return renderStrings(blocks.join('\n\n'), { ...context.strings })
+	return blocks
 }
 
-function renderTransactionInclusionMarkdown(
-	details: TransactionInclusionDetails,
-	context: StructuredDetailsContext,
-): string {
-	return transactionInclusionProse(details)
-		.map(
-			block =>
-				`${renderStrings(block.text, { ...context.strings })}${referencesSuffixMarkdown(
-					block.claim === 'l1' ? details.l1References : details.l2References,
-				)}`,
-		)
-		.join('\n\n')
+function renderTransactionInclusionMarkdown(details: TransactionInclusionDetails): DetailBlock[] {
+	return transactionInclusionProse(details).map(block => ({
+		kind: 'paragraph',
+		text: block.text,
+		references: block.claim === 'l1' ? details.l1References : details.l2References,
+	}))
 }
 
-const markdownRenderers: StructuredDetailsRenderers<string> = {
+const markdownRenderers: StructuredDetailsRenderers<DetailBlock[]> = {
 	accountRecovery: renderAccountRecoveryMarkdown,
 	accountUnruggability: renderAccountUnruggabilityMarkdown,
 	addressCorrelation: renderAddressCorrelationMarkdown,
@@ -339,5 +371,8 @@ export function renderStructuredDetailsMarkdown(
 	details: StructuredDetails,
 	context: StructuredDetailsContext,
 ): string {
-	return dispatchStructuredDetails(markdownRenderers, details, context)
+	return renderDetailBlocksMarkdown(
+		dispatchStructuredDetails(markdownRenderers, details, context),
+		context.strings,
+	)
 }
