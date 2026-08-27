@@ -17,8 +17,9 @@ set -euo pipefail
 # HEAD, the test passes vacuously.
 #
 # This test is intentionally NOT part of the default `check:all` runs.
-# It is invoked only by a dedicated CI workflow on pull requests.
-# It can be invoked manually with: pnpm run check:build:size-delta
+# It runs in the `check-dist` job of the check workflow, and on `beta` pushes
+# via the deploy workflow's `pnpm run check:ci`.
+# It can be invoked manually with: pnpm run check:dist:size-delta
 
 # Known reference branches, in priority order.
 REFERENCES=('beta' 'main')

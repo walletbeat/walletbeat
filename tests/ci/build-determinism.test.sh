@@ -19,8 +19,9 @@ set -euo pipefail
 # *requires* bwrap and installs dependencies cleanly inside the sandbox.
 #
 # This test is intentionally NOT part of the default `check:all` runs.
-# It is invoked only by the dedicated CI workflow via `pnpm run check:ci`.
-# It can be invoked manually with `pnpm run check:ci:build-determinism`.
+# It runs in the `check-dist` job of the check workflow, and on `beta` pushes
+# via the deploy workflow's `pnpm run check:ci`.
+# It can be invoked manually with `pnpm run check:dist:determinism`.
 
 # Number of parallel builds to compare.
 BUILD_COUNT=4
