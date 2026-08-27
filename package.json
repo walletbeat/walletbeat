@@ -7,7 +7,7 @@
 		"astro": "cross-env ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "deploy/build.sh",
 		"check:all": "pnpm run \"/^check:(astro|vitest|lint|syntax|spelling:quiet|misc|build:post:quiet|signed-commit:quiet)$/\"",
-		"check:ci": "cross-env WALLETBEAT_ENV=CI pnpm run \"/^check:(all|dist:.*)$/\"",
+		"check:ci": "cross-env WALLETBEAT_ENV=CI pnpm run \"/^check:(all|dist)$/\"",
 		"check:quick": "pnpm run \"/^check:(lint:quick|syntax|spelling:quiet|misc)$/\"",
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
 		"check:build:post": "tests/postbuild.sh",
