@@ -167,61 +167,37 @@ See the
 
 _Depending on the stage of this project, provide metrics for the project's current impact on the ecosystem, e.g. users, page visits, code contributors._
 
-### Repository and contributors
-
-Figures as of 2026-08-26, as shown on the repository's public GitHub pages:
-
-- 621 pull requests merged in the last 12 months; 765 all-time.
-- 2,177 commits in the last 12 months; 3,279 all-time.
-- 26 contributors active in the last 12 months; 49 all-time.
-- 117 stars, 86 forks.
-
 ### Effects on wallets
 
-- **2025-12**: Walletbeat publishes the L1 Provider Independence Test. Two major wallets
-  shipped fixes in response.
-  - **2026-01 reaction**: Ambire fixes its L1 RPC configuration option to be available at
-    wallet setup time.
-  - **2026-07 reaction**: MetaMask quietly fixes its hard reliance on a Consensys token
-    metadata service when sending tokens.
-- **2026-07**: Walletbeat contributor 0xMattmatt shows how multiple wallets handle a
-  malicious Ethereum transaction that caused a user to lose approximately 300,000 USD. Two
-  wallets shipped fixes within days.
-  - **Reaction**: Ambire fixes this in their next release.
-  - **Reaction**: WalletChan fixes this in their next release.
-  - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention.
-- **2026-08**: Walletbeat contributor polymutex points out that flagging IPFS gateways such
-  as `.eth.limo` reduces incentives for Ethereum applications to move to IPFS, which would
-  make them more secure and censorship-resistant.
-  - **Reaction**: Ambire unflags IPFS gateways.
-    [Announcement](https://x.com/borislavItskovv/status/2090563980549042476),
-    [follow-up](https://x.com/ambire/status/2090483593407529375).
-- **2026-08**: Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited
-  token approvals that caused a user to lose approximately 500,000 USD.
-  [Thread](https://x.com/0xMattmatt/status/2089770628828237918).
-  - **Reaction**: Ambire pushed an update to flag unlimited token approvals for untrusted
-    contracts, and thanked Walletbeat for its work.
-    [Announcement](https://x.com/borislavItskovv/status/2090566092808982840).
-  - **Reaction**: Ambire's official update for flagging unlimited token approvals credits
-    Walletbeat contributor 0xMattmatt for the research.
+- **2025-12**: We publish the L1 Provider Independence Test; two major wallets shipped fixes
+  in response. Ambire made its L1 RPC option available at wallet setup (2026-01), and
+  MetaMask quietly removed its hard reliance on a Consensys token metadata service when
+  sending tokens (2026-07).
+- **2026-07**: We show how wallets handle a malicious Ethereum transaction that cost a user
+  ~$300k; Ambire and WalletChan both shipped fixes within days, and Ambire thanked Walletbeat
+  for bringing the issue to their attention.
+- **2026-08**: We point out that flagging IPFS gateways such as `.eth.limo` discourages apps
+  from moving to IPFS, which would make them more secure and censorship-resistant. Ambire
+  unflagged them: https://x.com/borislavItskovv/status/2090563980549042476 and
+  https://x.com/ambire/status/2090483593407529375
+- **2026-08**: We show how wallets handle unlimited token approvals that cost a user ~$500k:
+  https://x.com/0xMattmatt/status/2089770628828237918. Ambire pushed an update flagging
+  unlimited approvals to untrusted contracts and credited Walletbeat's research:
+  https://x.com/borislavItskovv/status/2090566092808982840
 
-### Ecosystem adoption
+### Ecosystem adoption and presence
 
 - Multiple wallet teams have contributed their own data directly, and we run ongoing direct
-  channels with several teams.
-- Walletbeat data is being consumed downstream by external projects, for example
-  WalletRadar, which is evidence that the dataset has standalone value.
-
-### Ecosystem presence
-
-- Grew from approximately zero to over 1,000 followers on the X platform.
-- Presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026. That run included
-  a privacy panel and session at the Neocypherpunk Summit, a CROPS-in-wallets talk on
-  Ethereum Day, and a Dappcon workshop on ERC-7730 and ERC-8213. It also included a Brew
-  workshop teaching attendees to capture wallet network traffic and find privacy leaks.
-  Recordings and slides are
-  [public](https://github.com/walletbeat/walletbeat/tree/beta/resources/talks).
-- [Social proof log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md).
+  channels with several teams
+- Walletbeat data is consumed by external projects such as WalletRadar, evidence of standalone value
+- Grew to >1k followers on X
+- Presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026: a Privacy in Web3
+  panel, a Neocypherpunk Summit talk, a CROPS-in-wallets talk on Ethereum Day, and a Dappcon
+  workshop on ERC-7730 and ERC-8213. We also ran a Brew workshop teaching attendees to
+  capture wallet network traffic and find privacy leaks. Recordings and slides:
+  https://github.com/walletbeat/walletbeat/tree/beta/resources/talks
+- Social proof log:
+  https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md
 
 ## Success metrics
 
