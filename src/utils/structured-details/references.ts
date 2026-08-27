@@ -1,5 +1,6 @@
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
 import type { StructuredDetails } from '@/types/content/structured-details'
+import { transactionInclusionClaimReferences } from '@/types/content/transaction-inclusion-details'
 
 import type { StructuredDetailsContext } from './context'
 import { dispatchStructuredDetails, type StructuredDetailsRenderers } from './registry'
@@ -27,10 +28,7 @@ const referenceCollectors: StructuredDetailsRenderers<FullyQualifiedReference[]>
 	],
 	scamPrevention: details =>
 		details.warnings.flatMap(warning => toFullyQualified(warning.references)),
-	transactionInclusion: details => [
-		...toFullyQualified(details.l2References),
-		...toFullyQualified(details.l1References),
-	],
+	transactionInclusion: transactionInclusionClaimReferences,
 }
 
 const noContext: StructuredDetailsContext = {
