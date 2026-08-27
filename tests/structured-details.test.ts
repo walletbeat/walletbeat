@@ -662,22 +662,13 @@ describe('guardian-based details', () => {
 			'paragraph',
 			'paragraph',
 		])
-		expect(blocks).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					kind: 'paragraph',
-					text: expect.stringContaining('wallet password'),
-				}),
-				expect.objectContaining({
-					kind: 'list',
-					items: ["The user's Google account", "The user's Apple account"],
-				}),
-				expect.objectContaining({
-					kind: 'paragraph',
-					text: expect.stringContaining('client-side'),
-				}),
-			]),
-		)
+		const paragraphs = blocks.filter(block => block.kind === 'paragraph').map(block => block.text)
+
+		expect(paragraphs.some(text => text.includes('wallet password'))).toBe(true)
+		expect(paragraphs.some(text => text.includes('client-side'))).toBe(true)
+		expect(blocks.filter(block => block.kind === 'list').map(block => block.items)).toEqual([
+			["The user's Google account", "The user's Apple account"],
+		])
 	})
 
 	const secretSplitFacts =
