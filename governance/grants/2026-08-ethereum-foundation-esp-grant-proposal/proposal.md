@@ -70,76 +70,56 @@ exports Ethereum's CROPS values to the wallet layer.
 
 _Provide a detailed breakdown of the project scope of work and timeline including milestones, deliverables, and expected outcomes._
 
-Walletbeat's current development pace costs approximately 10,000 USD per month, and
-conference travel adds an additional 5,000 USD per attendee per conference. We expect our
-current treasury to carry us to September, so the 90,000 USD budget request will afford us
-nine more incremental months of runway spanning October 2026 to June 2027 and allow us to
-attend Devcon and EthCC.
-
-Here is a detailed breakdown of monthly deliverables and milestones we aim to achieve in
-this period.
+Walletbeat's current development pace is $10k per month, and conference travel adds an
+additional $5k per attendee. We expect our current treasury to carry us to September, so
+the $90k budget request will afford us nine more months of runway from Oct 2026 - Jun 2027
+and allow us to attend Devcon and EthCC.
 
 ### Completed prior to October
 
-- Finishing up the top-5 software wallet ratings.
-- All pre-launch issues are closed.
-- Existing hardware wallet attributes are all refactored or deleted.
-- The clear signing relaunch happens.
-- UI improvements: legibility (especially on smaller screens), responsiveness, and polish.
-- Grow ecosystem presence and tangible impact _(ongoing)_.
+- Finishing up the top-5 software wallet ratings
+- All pre-launch issues are closed
+- Existing hardware wallet attributes are all refactored or deleted
+- The clear signing relaunch happens
+- UI improvements: legibility (especially on smaller screens), responsiveness, and polish
+- Grow ecosystem presence and tangible impact (ongoing)
 
 ### October 2026
 
-- A Walletbeat donation page exists and has badge NFTs.
-- The Kohaku partnership is active, and Kohaku is tested for privacy leaks.
-- At least one grant matching round is ongoing.
+- A Walletbeat donation page exists and has badge NFTs
+- The Kohaku partnership is active, and Kohaku is tested for privacy leaks
+- At least one grant matching round is ongoing
 
 ### November 2026
 
-- Devcon Mumbai engagements have happened. This encompasses talks, workshops, and booth
-  programming.
-- OpenGraph preview images exist for wallet pages.
-- Coinspect data is ingested.
-- EIP tracker pages exist.
-- The formal launch on `walletbeat.eth` happens.
+- Devcon Mumbai talks, workshops, and booth programming have happened
+- OpenGraph preview images exist for wallet pages
+- Coinspect data is ingested
+- EIP tracker pages exist
+- The formal launch on walletbeat.eth happens
 
 ### December 2026
 
-- Both the SheFi and the Cyfrin Updraft curriculum materials are created, though not
-  necessarily approved yet.
-- We reach at least 2,000 followers on the X platform.
-- A progress slider on wallet pages shows each wallet's position along the stage ladder.
+- SheFi and Cyfrin Updraft curriculum materials are created
+- We reach at least 2,000 followers on the X platform
+- A progress slider on wallet pages shows each wallet's position along the stage ladder
 
 ### January 2027
 
-- By now Walletbeat has established itself as a well respected entity in the ecosystem and
-  has a track record of pushing wallets to become more CROPS aligned. The
-  [impact log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md)
-  has several net new additions.
-- Work begins on the hardware and embedded wallet methodology and ratings.
+- Walletbeat has a track record of pushing wallets to become more CROPS aligned; the impact
+  log has several net new additions
+- Work begins on the hardware and embedded wallet methodology and ratings
 
-### February 2027
+### February - May 2027
 
-- Work continues on hardware and embedded wallets.
-
-### March 2027
-
-- Work continues on hardware and embedded wallets.
-
-### April 2027
-
-- Talks, workshops, and booth programming at EthCC.
-- Work continues on hardware and embedded wallets.
-
-### May 2027
-
-- Work continues on hardware and embedded wallets.
+- Work continues on the hardware and embedded wallet methodology and ratings
+- Talks, workshops, and booth programming at EthCC in April
 
 ### June 2027
 
-- Long term stable funding is established.
-- The hardware wallet methodology and ratings are finished.
-- We reach at least 5,000 followers on the X platform.
+- Long term stable funding is established
+- The hardware wallet methodology and ratings are finished
+- We reach at least 5,000 followers on the X platform
 
 ## Sustainability plan
 
@@ -187,61 +167,37 @@ See the
 
 _Depending on the stage of this project, provide metrics for the project's current impact on the ecosystem, e.g. users, page visits, code contributors._
 
-### Repository and contributors
-
-Figures as of 2026-08-26, as shown on the repository's public GitHub pages:
-
-- 621 pull requests merged in the last 12 months; 765 all-time.
-- 2,177 commits in the last 12 months; 3,279 all-time.
-- 26 contributors active in the last 12 months; 49 all-time.
-- 117 stars, 86 forks.
-
 ### Effects on wallets
 
-- **2025-12**: Walletbeat publishes the L1 Provider Independence Test. Two major wallets
-  shipped fixes in response.
-  - **2026-01 reaction**: Ambire fixes its L1 RPC configuration option to be available at
-    wallet setup time.
-  - **2026-07 reaction**: MetaMask quietly fixes its hard reliance on a Consensys token
-    metadata service when sending tokens.
-- **2026-07**: Walletbeat contributor 0xMattmatt shows how multiple wallets handle a
-  malicious Ethereum transaction that caused a user to lose approximately 300,000 USD. Two
-  wallets shipped fixes within days.
-  - **Reaction**: Ambire fixes this in their next release.
-  - **Reaction**: WalletChan fixes this in their next release.
-  - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention.
-- **2026-08**: Walletbeat contributor polymutex points out that flagging IPFS gateways such
-  as `.eth.limo` reduces incentives for Ethereum applications to move to IPFS, which would
-  make them more secure and censorship-resistant.
-  - **Reaction**: Ambire unflags IPFS gateways.
-    [Announcement](https://x.com/borislavItskovv/status/2090563980549042476),
-    [follow-up](https://x.com/ambire/status/2090483593407529375).
-- **2026-08**: Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited
-  token approvals that caused a user to lose approximately 500,000 USD.
-  [Thread](https://x.com/0xMattmatt/status/2089770628828237918).
-  - **Reaction**: Ambire pushed an update to flag unlimited token approvals for untrusted
-    contracts, and thanked Walletbeat for its work.
-    [Announcement](https://x.com/borislavItskovv/status/2090566092808982840).
-  - **Reaction**: Ambire's official update for flagging unlimited token approvals credits
-    Walletbeat contributor 0xMattmatt for the research.
+- **2025-12**: We publish the L1 Provider Independence Test; two major wallets shipped fixes
+  in response. Ambire made its L1 RPC option available at wallet setup (2026-01), and
+  MetaMask quietly removed its hard reliance on a Consensys token metadata service when
+  sending tokens (2026-07).
+- **2026-07**: We show how wallets handle a malicious Ethereum transaction that cost a user
+  ~$300k; Ambire and WalletChan both shipped fixes within days, and Ambire thanked Walletbeat
+  for bringing the issue to their attention.
+- **2026-08**: We point out that flagging IPFS gateways such as `.eth.limo` discourages apps
+  from moving to IPFS, which would make them more secure and censorship-resistant. Ambire
+  unflagged them: https://x.com/borislavItskovv/status/2090563980549042476 and
+  https://x.com/ambire/status/2090483593407529375
+- **2026-08**: We show how wallets handle unlimited token approvals that cost a user ~$500k:
+  https://x.com/0xMattmatt/status/2089770628828237918. Ambire pushed an update flagging
+  unlimited approvals to untrusted contracts and credited Walletbeat's research:
+  https://x.com/borislavItskovv/status/2090566092808982840
 
-### Ecosystem adoption
+### Ecosystem adoption and presence
 
 - Multiple wallet teams have contributed their own data directly, and we run ongoing direct
-  channels with several teams.
-- Walletbeat data is being consumed downstream by external projects, for example
-  WalletRadar, which is evidence that the dataset has standalone value.
-
-### Ecosystem presence
-
-- Grew from approximately zero to over 1,000 followers on the X platform.
-- Presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026. That run included
-  a privacy panel and session at the Neocypherpunk Summit, a CROPS-in-wallets talk on
-  Ethereum Day, and a Dappcon workshop on ERC-7730 and ERC-8213. It also included a Brew
-  workshop teaching attendees to capture wallet network traffic and find privacy leaks.
-  Recordings and slides are
-  [public](https://github.com/walletbeat/walletbeat/tree/beta/resources/talks).
-- [Social proof log](https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md).
+  channels with several teams
+- Walletbeat data is consumed by external projects such as WalletRadar, evidence of standalone value
+- Grew to >1k followers on X
+- Presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026: a privacy panel and
+  session at the Neocypherpunk Summit, a CROPS-in-wallets talk on Ethereum Day, and a Dappcon
+  workshop on ERC-7730 and ERC-8213. We also ran a Brew workshop teaching attendees to
+  capture wallet network traffic and find privacy leaks. Recordings and slides are public:
+  https://github.com/walletbeat/walletbeat/tree/beta/resources/talks
+- Social proof log:
+  https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/social-proof/social-proof.md
 
 ## Success metrics
 
