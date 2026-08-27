@@ -32,7 +32,7 @@ Walletbeat
 
 ## Project Website
 
-walletbeat.eth.limo
+https://walletbeat.eth.limo/
 
 ## Your Project's X Username:
 
@@ -62,35 +62,34 @@ https://x.com/walletbeat
 # Your Work & Traction
 
 ## What are you building and who is worse off if it stops existing? *
+Privacy is one of the core values of Ethereum, yet it's often treated as a nice-to-have feature instead of a fundamental property of a wallet. We believe the Ethereum ecosystem should develop and adopt a minimum privacy standard for wallets, which can serve as a trusted and legitimate reference point for which wallets are safe for ordinary users of Ethereum. 
 
-Walletbeat rates Ethereum wallets publicly, on a methodology anyone can check, without asking the teams being rated for permission. We look at what a wallet's code and network traffic actually do, not what its landing page says, and score it pass/fail across five categories: Security, Privacy, Self-sovereignty, Transparency, and Ecosystem fit. Today that's 21 software wallets and 11 hardware wallets, plus open trackers for privacy- and security-relevant standards like stealth addresses (ERC-5564) and clear signing (ERC-7730/ERC-8213).
+We believe this Privacy Standard for wallets could help address two different sides of this problem: 
+- First, giving ordinary users a reliable guide to choosing only those wallets that meet this standard means that a greater share of Ethereum users will have access to the features they need to have a private on-chain experience. To do this effectively, the standard must be a very high bar and it must regularly be raised as new privacy features are developed by the ecosystem or new threats are found. 
+- Second, the standard will encourage wallet teams to prioritize important features to remain compliant.
 
-If we stopped, three things get worse.
-
-- Users lose the only standardized way to tell which wallets actually protect their privacy versus which ones just say they do.
-- Wallets lose a public accountability mechanism that has already changed what they ship, not hypothetically, we have the receipts below.
-- The ecosystem-wide privacy efforts we support from the sidelines, Kohaku, Encrypt the Mempool, Clear Signing, lose the one observer mapping their standards to real wallet adoption without a wallet-industry conflict of interest.
+Ethereum is built around a clear set of CROPS values. Users experience Ethereum through wallets, yet most wallets today don't live up to these very values. No CROPS in wallets results in no CROPS for users. 
+Walletbeat exports Ethereum’s CROPS values to the wallet layer. Privacy is the P in CROPS. As users' gateway into Ethereum, wallets themselves need to embody Privacy such that users actually get to have any.
 
 ## What privacy properties do you provide and what does a user have to trust for them to hold? *
+Walletbeat is a public good that aims to shine a light on this CROPS last mile problem. By providing a dashboard and a rating system for how CROPS aligned wallets are, we help to increase the adoption of CROPS values at this critical ecosystem access layer. 
 
-We're not a privacy tool a user installs. What we provide is visibility into whether the wallets people already use actually implement privacy properly, and public pressure when they don't.
+Concretely, Walletbeat pushes wallet teams to adopt ecosystem initiatives like clear signing, 7702 and many others. Here's how Walletbeat evaluates privacy, and why these attributes matter: 
 
-Concretely, we track per wallet, pass or fail:
+- Wallet address Privacy: Is your wallet address linkable to other information about yourself?
+Your wallet address is permanent and publicly visible. The more personal information linked to it, the easier it becomes to track your activity across apps, devices, and services. A private wallet minimizes that linkability.
 
-- Stealth address support, and private token transfers beyond it, tracked via our ERC-5564 tracker.
-- Multi-address correlation privacy: does the wallet give you a fresh address per app, or can your activity be trivially linked across everything you touch.
-- Per-app wallet address isolation.
-- Orderflow transparency: does the wallet disclose how, or whether, it profits from routing your transactions. We shipped this attribute in July 2026, borrowing the disclosure logic TradFi already applies to payment-for-order-flow, and applied it immediately to MetaMask, Rainbow, and Zerion.
-- Data collection: what telemetry or third-party RPC traffic leaves your device. We verify this from source code, and we teach people to check it themselves too. Our Berlin Blockchain Week "Brew" workshop was a live session on capturing a wallet's network traffic to look for exactly this kind of leak.
+- Multi address Privacy: Can your multiple wallet addresses be correlated with one another?
+Just like people have multiple emails for different purposes, they also have multiple addresses for different reasons. A private wallet should avoid unnecessarily revealing that those addresses belong to the same person.
 
-For any of this to mean something, a user has to trust a few things about us specifically:
+- Private token transfers: Can you send and receive tokens without revealing your transaction history to others?
+Everything on Ethereum is public by default. Privacy tools exist, but they're only useful if wallets make them easy to use. A private wallet makes private transfers accessible to users.
 
-- That our rules are objective: we only score what's checkable from public source or observable traffic, never a team's word for it.
-- That we have no reason to go easy on anyone: we turn down funding from wallet-related entities specifically so no wallet team is ever also a funder.
-- That we're not creating a new privacy risk ourselves: the site is static, hosted on IPFS, no accounts, nothing to leak.
-- That the whole process is checkable: the ruleset, the wallet data, and the pipeline that turns one into the other are all open-source on GitHub, so anyone who disagrees with a rating can show us why in public.
+- App Isolation: If you connect to an app, will it be able to learn your past activity from other apps by default?
+By default, wallets shouldn't encourage reusing the same account across every app or exposing more accounts than necessary. A private wallet allows users to create app-specific accounts during the connection flow and make privacy-preserving choices the default.
 
-None of this makes a wallet more private on its own. What it does is make it costly for a wallet to be quietly bad at privacy, and cheap for a good one to prove it. That's the lever we pull.
+- Privacy Hygiene: Does your wallet only send sensitive data with your explicit consent?
+Users shouldn't have to wonder whether their wallet is sending analytics, crash reports, or account information without their knowledge. A private wallet only collects and sends sensitive data after explicit user consent. 
 
 ## Github Repository Links *
 
@@ -98,54 +97,40 @@ List all relevant Github repos separated by commas.
 https://github.com/walletbeat/walletbeat
 
 ## Software License(s) *
-
 List the license(s) of your privacy-critical code. They must be a recognizable open-source license to be eligible for the round.
-MIT License
+
+Walletbeat's website code, rating pipeline, and wallet database are all and will all remain licensed under the MIT License, a Free and Open Source Software license.
 
 ## What is your quantifiable traction? *
 
 Define the best measure(s) of your traction. Provide numbers and links. See our examples based on category. https://docs.google.com/document/d/1nGZTwhXyxolIKDYhaOFSNapbnwnWBJedo-InIhe-T94/edit?usp=sharing
 
-Here's where we actually stand:
-
-- 21 software wallets and 11 hardware wallets under active, source-verified rating, live at beta.walletbeat.eth.limo.
-- Our repo: 114 GitHub stars, 83 forks, 2,576 commits on the beta branch, 107 open issues, 24 open PRs, MIT-licensed. github.com/walletbeat/walletbeat
-- Wallets changing behavior because we called something out, not because we asked:https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md
-- Grown from close to zero to 1,000+ followers on X (@walletbeat) with no paid promotion.
-- Talks and workshops at Berlin Blockchain Week 2026 (four sessions, including a Neo-Cypherpunk Summit privacy panel and the network-traffic "Brew" workshop above), EthCC[8], and Devcon Buenos Aires.
-- Named by @web3privacynow alongside GrapheneOS, Tor Project, Brave, Nym, Radicle, DarkFi, and Kohaku Wallet in their overview of the on-chain privacy landscape.
-- $106,100 USD from the Ethereum Foundation's ESP program, funded and disbursed starting September 2025, which paid for finalizing our rating methodology (including the privacy attributes above), our stage-rating system, and early governance.
-- One prior Giveth quadratic-funding round, which raised roughly two months of operating costs.
-- A public treasury transparency report we update continuously, address by address, expense by expense.
-
 # Your Funding & Future
 
 ## Please share funding goal for Epoch 13: *
 
-$10,000 USD in USD.
-It's our own internal floor for what a matching round like this should raise. It sits inside a bigger 2026 target of $90,000 across all funding sources. Our treasury is around $20,000 right now against roughly $10,000 a month in operating costs, covering one full-time and four part-time contributors, so this round buys real, specific time.
-
-One honest note on how we'd handle it: we learned the hard way that holding our whole treasury in ETH cost us around 35% of our EF grant's value to market movement over the past year. We've since moved to splitting new funding between ETH and USDC and are gradually converting the rest, so this isn't a repeat mistake.
+$5,000 USD in USD.
 
 ## What would this funding unlock for your project? *
 
 Be specific.
 
-Two things we've already committed to publicly and would move faster with support: reviewing Kohaku's privacy profile using our own tooling before its launch, and extending our hardware wallet privacy methodology.
+this should be focused on expanding the privacy tooling. Once you post the tweet thread where we show the wallet privacy analysis workshop video, you can link it here, I think it would show off what we're doing here and why it's difficult to scale to more wallets.
 
-It also funds turning our Berlin Blockchain Week footage into content people can actually learn the methodology from, and it keeps our monthly ecosystem updates landing on time, which is what keeps the pressure on wallets consistent instead of one-off.
+Kohaku is one wallet but we want others as well.
+
+You can also link to #1111 to show that this can get complicated.
 
 ## What type of non-financial support (if any) would make a difference in your progress and growth journey *
 
 Be specific. Talent, time, legal, distribution, infrastructure, etc?
 
-Amplification within Octant's network, since almost all of our growth so far has been organic and we don't have a marketing budget to speak of.
+Amplification within Octant's network, since almost all of our growth so far has been organic and we don't have a paid media budget to speak of.
 
 ## Have you raised venture capital or launched a token? *
-
 If applicable, please give details on amounts, timing, and structure.
 
-No, and we don't plan to. We're a working group that turns down funding from wallet-related entities on purpose, because the moment a wallet team is also a funder, our ratings stop being trustworthy. Our funding has been grants and public donation rounds, nothing else.
+No, but we plan to capture non-grant-based sources of funding (e.g. accept crypto donations).
 
 ## Have you received direct grant funding or sponsorship in the last year? *
 
@@ -153,7 +138,7 @@ If applicable, please give details on amounts, timing, and what it funded.
 
 Yes: $106,100 USD from the Ethereum Foundation's ESP program, proposed July 2025, funds disbursed starting September 2025. It funded finishing our software wallet rating methodology, our stage system, initial data collection, and early marketing work.
 
-We also participated on one Giveth Ethereum Security round that raised about two months of operating costs.
+We also participated on the Ethereum Security QF round that raised $5,464 in donations plus 9.247 ETH from the matching pool.
 
 ## Have you received Octant funding before? *
 
@@ -165,14 +150,29 @@ No.
 
 Please provide references.
 
-The Ethereum Foundation, through the ESP grant above, and several of our regular technical contributors are also EF members. We presented at EthCC[8], introduced by the EF's Tomasz K. Stańczak. @web3privacynow named us alongside GrapheneOS, Tor Project, Brave, Nym, Radicle, DarkFi, and Kohaku Wallet in their privacy landscape overview. And our data already gets used under the hood by third-party tools like WalletRadar.
+The Ethereum Foundation, through the ESP grant above, and several of our regular technical contributors are also EF members. https://blog.ethereum.org/2025/08/20/trillion-dollar-sec-2 
+
+We were presented at EthCC[9], introduced by Hester Bruikman (Ethereum Foundation) https://youtu.be/xMu5IoY9Djc?si=pTpn53XnD3cV6IYB 
+
+Web 3 Privacy Now named us in their privacy landscape overview.[ADD LINKS] 
+
+And our data already gets used under the hood by third-party tools like WalletRadar and Casberi App: https://x.com/walletbeat/status/2090690312574234815
+
+We presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026: 
+- Web2 lessons for Web3 privacy at Ethereum Privacy Stack (Devconnect 2025): https://youtu.be/dxvwrqGBBZE?si=ihoAW8GucaIh5hcn
+- Nico Consigny (EF) broke down the criteria behind Walletbeat at Devconnect 2025: https://youtu.be/w9QUkdH9n8I?si=RiEWAR8YtvQEyJ7K
+- A State of Privacy in Web3 panel at the Neocypherpunk Summit: https://youtu.be/myRlASvXA_w?si=KAoGuqqkNH9yLE8R  
+- a CROPS-in-wallets talk on Ethereum Day: https://youtu.be/2rIVB8WH_-I  
+- a Brew workshop teaching attendees to capture wallet network traffic and find privacy leaks: https://youtu.be/w9QUkdH9n8I?si=RiEWAR8YtvQEyJ7K  
+
+Recordings and slides are public (https://github.com/walletbeat/walletbeat/tree/beta/resources/talks)
 
 ## What KPIs do you want to be measured by? *
 
 Provide 1-2 verifiable measures.
-- Wallets changing behavior because we called something out, not because we asked:https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md
-- 21 software wallets and 11 hardware wallets under active, source-verified rating, live at beta.walletbeat.eth.limo.
-- Our repo: 114 GitHub stars, 83 forks, 2,576 commits on the beta branch, 107 open issues, 24 open PRs, MIT-licensed. github.com/walletbeat/walletbeat
+
+This needs to be scoped to the privacy work being funded specifically.
+Link to #1111, and the other "Data Collection" issues in the issue tracker.
 
 ## Need Help?
 
