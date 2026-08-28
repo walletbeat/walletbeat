@@ -1,16 +1,21 @@
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
-import { KeyGenerationLocation, MultiPartyKeyReconstruction } from '@/schema/features/security/keys-handling'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -36,7 +41,31 @@ export const uniswapWallet: SoftwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: supported({
+				ref: {
+					explanation:
+						'Uniswap smart wallet uses the Calibur implementation with EIP-7702 delegation across supported networks.',
+					url: 'https://developers.uniswap.org/docs/protocols/smart-wallet/overview',
+				},
+				contract: uniswapCalibur,
+			}),
+			eoa: supported({
+				ref: refTodo,
+				canExportPrivateKey: false,
+				canExportSeedPhrase: true,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
