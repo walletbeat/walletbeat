@@ -70,8 +70,8 @@ export const uniswapWallet: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
 			// uniswap/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
