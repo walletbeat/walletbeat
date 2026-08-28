@@ -14,9 +14,10 @@ import {
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
+import { RpcEndpointConfiguration, type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -81,7 +82,12 @@ export const uniswapWallet: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: refTodo,
+			customChainRpcEndpoint: notSupported,
+			l1: notSupported,
+			nonL1: notSupported,
+		}),
 		ecosystem: {
 			delegation: {
 				duringEOACreation: 'NO',
