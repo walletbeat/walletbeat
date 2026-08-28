@@ -105,9 +105,9 @@ export const uniswapWallet: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
 		},
 		licensing: {
@@ -222,7 +222,10 @@ export const uniswapWallet: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
-		walletCall: null,
+		walletCall: supported({
+			ref: refTodo,
+			atomicMultiTransactions: notSupported
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,
