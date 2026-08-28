@@ -5,6 +5,7 @@ import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
+import { KeyGenerationLocation, MultiPartyKeyReconstruction } from '@/schema/features/security/keys-handling'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -127,7 +128,11 @@ export const uniswapWallet: SoftwareWallet = {
 			}),
 			duressResistance: null,
 			hardwareWalletSupport: null,
-			keysHandling: null,
+			keysHandling: {
+				ref: refTodo,
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: null,
 			},
