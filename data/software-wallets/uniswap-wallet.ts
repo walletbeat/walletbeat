@@ -7,7 +7,7 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { KeyGenerationLocation, MultiPartyKeyReconstruction } from '@/schema/features/security/keys-handling'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -48,7 +48,18 @@ export const uniswapWallet: SoftwareWallet = {
 		chainAbstraction: null,
 		chainConfigurability: null,
 		ecosystem: {
-			delegation: null,
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: false,
+				}),
+				fee: {
+					crossChainGas: featureSupported,
+					walletSponsored: notSupported,
+				},
+			},
 		},
 		integration: {
 			browser: {
