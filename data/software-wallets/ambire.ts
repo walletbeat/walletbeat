@@ -400,7 +400,25 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Ambire raised $2.5M in a round led by LAUNCHub Ventures in December 2021.',
+					label: 'We raised $2.5m in funding for Ambire Wallet',
+					url: 'https://blog.ambire.com/we-raised-2-5m-in-funding-for-ambire-wallet/',
+				},
+				{
+					explanation:
+						'Ambire was one of 18 projects awarded an Ethereum Foundation account abstraction grant in 2023, to build email recovery with DKIM.',
+					label: 'Ambire wins an EF account abstraction grant 2023',
+					url: 'https://blog.ambire.com/ambire-wins-an-ef-aa-grant/',
+				},
+				{
+					explanation:
+						'Ambire charges 0.5% on swaps and bridges, raised from 0.25% by a governance vote. The fees pay for $WALLET buybacks.',
+					label: 'Ambire governance proposal: swap and bridge fee increase',
+					url: 'https://blog.ambire.com/swap-bridge-fee-increase/',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: false,
