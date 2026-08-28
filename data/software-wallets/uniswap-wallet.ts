@@ -186,7 +186,7 @@ export const uniswapWallet: SoftwareWallet = {
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
