@@ -195,7 +195,7 @@ export const uniswapWallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
