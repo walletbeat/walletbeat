@@ -199,8 +199,8 @@ export const uniswapWallet: SoftwareWallet = {
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]: null,
