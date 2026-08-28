@@ -2,6 +2,7 @@ import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
@@ -72,7 +73,12 @@ export const uniswapWallet: SoftwareWallet = {
 				erc7828: null,
 				erc7831: null,
 			},
-			nonChainSpecificEnsResolution: null,
+			// uniswap/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'OFFCHAIN',
+				offchainDataVerifiability: 'VERIFIABLE',
+				offchainProviderConnection: 'DIRECT_CONNECTION',
+			}),
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
