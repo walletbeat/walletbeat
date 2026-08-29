@@ -419,9 +419,14 @@ export const ambire: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Of the 1 billion $WALLET supply, 30% goes to early Ambire Wallet users and those who stake it over four years, and about 35% to the WalletDAO. Early backers hold 12.7%, the team 10%, and $ADX holders who stake 10%. A public sale on Huobi in January 2022 offered 6 million tokens, 0.6% of the supply, at $0.03.',
+						'A public sale on Huobi in January 2022 offered 6 million $WALLET, 0.6% of the supply, at $0.03. Early backers were allocated 12.7% of the 1 billion supply and the team 10%.',
 					label: 'Announcing the $WALLET token',
 					url: 'https://blog.ambire.com/announcing-the-wallet-token/',
+				},
+				{
+					explanation:
+						'723.9 million $WALLET are circulating of a 1 billion maximum supply, a float of about 72%, as of August 2026.',
+					url: 'https://www.coingecko.com/en/coins/ambire-wallet',
 				},
 			],
 			revenueBreakdownIsPublic: false,
