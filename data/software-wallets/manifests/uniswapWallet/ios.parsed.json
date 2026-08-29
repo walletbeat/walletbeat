@@ -1,0 +1,10 @@
+{
+	"usageDescriptions": [
+		"NSCameraUsageDescription",
+		"NSFaceIDUsageDescription",
+		"NSLocationAlwaysAndWhenInUseUsageDescription",
+		"NSLocationWhenInUseUsageDescription",
+		"NSMicrophoneUsageDescription",
+		"NSPhotoLibraryUsageDescription"
+	]
+}
