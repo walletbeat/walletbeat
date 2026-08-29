@@ -408,15 +408,20 @@ export const ambire: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Ambire was one of 18 projects awarded an Ethereum Foundation account abstraction grant in 2023, to build email recovery with DKIM.',
+						'Ambire was one of 18 projects awarded an Ethereum Foundation account abstraction grant in 2023.',
 					label: 'Ambire wins an EF account abstraction grant 2023',
 					url: 'https://blog.ambire.com/ambire-wins-an-ef-aa-grant/',
 				},
 				{
-					explanation:
-						'Ambire charges 0.5% on swaps and bridges, raised from 0.25% by a governance vote. The fees pay for $WALLET buybacks.',
+					explanation: 'Ambire charges 0.5% on swaps and bridges.',
 					label: 'Ambire governance proposal: swap and bridge fee increase',
 					url: 'https://blog.ambire.com/swap-bridge-fee-increase/',
+				},
+				{
+					explanation:
+						'Of the 1 billion $WALLET supply, 30% goes to early Ambire Wallet users and those who stake it over four years, and about 35% to the WalletDAO. Early backers hold 12.7%, the team 10%, and $ADX holders who stake 10%. A public sale on Huobi in January 2022 offered 6 million tokens, 0.6% of the supply, at $0.03.',
+					label: 'Announcing the $WALLET token',
+					url: 'https://blog.ambire.com/announcing-the-wallet-token/',
 				},
 			],
 			revenueBreakdownIsPublic: false,
@@ -424,9 +429,9 @@ export const ambire: SoftwareWallet = {
 				donations: false,
 				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
-				governanceTokenMostlyDistributed: false,
+				governanceTokenMostlyDistributed: true,
 				hiddenConvenienceFees: false,
-				publicOffering: false,
+				publicOffering: true,
 				selfFunded: true,
 				transparentConvenienceFees: true,
 				ventureCapital: true,
