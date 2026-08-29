@@ -419,7 +419,7 @@ export const ambire: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'A public sale on Huobi in January 2022 offered 6 million $WALLET, 0.6% of the supply, at $0.03. Early backers were allocated 12.7% of the 1 billion supply and the team 10%.',
+						'A public sale on Huobi in January 2022 offered 6 million $WALLET, 0.6% of the supply, at $0.03.',
 					label: 'Announcing the $WALLET token',
 					url: 'https://blog.ambire.com/announcing-the-wallet-token/',
 				},
