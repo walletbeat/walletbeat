@@ -230,7 +230,7 @@ export const uniswapWallet: SoftwareWallet = {
 		},
 		walletCall: supported({
 			ref: refTodo,
-			atomicMultiTransactions: notSupported
+			atomicMultiTransactions: notSupported,
 		}),
 	},
 	variants: {
