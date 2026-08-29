@@ -215,7 +215,7 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								"The extension derives the mnemonic-encryption key from the user's password via PBKDF2 (Web Crypto's deriveKey, 100,000 iterations, SHA-256) — a standardized KDF — then encrypts the mnemonic with AES-GCM. The code itself notes this should eventually move to Argon2.",
+								"The extension derives the mnemonic-encryption key from the user's password via PBKDF2 (Web Crypto's deriveKey, 100,000 iterations, SHA-256), then encrypts the mnemonic with AES-GCM.",
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/crypto.ts#L100-L118',
 						},
 					],
@@ -228,7 +228,7 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'On Android, mnemonics are stored in EncryptedSharedPreferences backed by an Android Keystore hardware master key (AES-256) — not a user-password-derived KDF. iOS mirrors this by storing mnemonics directly in the native Keychain (hardware-backed Secure Enclave). Mnemonic generation on both platforms delegates to a native Rust FFI function whose entropy source is not vendored as readable source in this repository.',
+								'On Android, mnemonics are stored in EncryptedSharedPreferences backed by an Android Keystore hardware master key (AES-256). iOS mirrors this by storing mnemonics directly in the native Keychain (hardware-backed Secure Enclave).',
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/android/app/src/main/java/com/uniswap/RnEthersRs.kt#L24-L34',
 						},
 					],
