@@ -207,8 +207,10 @@ export const uniswapWallet: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					[TransactionSubmissionL2Type.opStack]: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
 				},
 			},
