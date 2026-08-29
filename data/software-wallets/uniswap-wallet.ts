@@ -11,13 +11,28 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import { TransactionSubmissionL2Support, TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
-import { RpcEndpointConfiguration, type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	RpcEndpointConfiguration,
+	type ChainConfigurability,
+} from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
+import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
+import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -195,7 +210,33 @@ export const uniswapWallet: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: [
+						{
+							explanation:
+								"The extension derives the mnemonic-encryption key from the user's password via PBKDF2 (Web Crypto's deriveKey, 100,000 iterations, SHA-256) — a standardized KDF — then encrypts the mnemonic with AES-GCM. The code itself notes this should eventually move to Argon2.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/crypto.ts#L100-L118',
+						},
+					],
+					browserExtensionHardening: parseBrowserExtensionManifest(uniswapRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								'On Android, mnemonics are stored in EncryptedSharedPreferences backed by an Android Keystore hardware master key (AES-256) — not a user-password-derived KDF. iOS mirrors this by storing mnemonics directly in the native Keychain (hardware-backed Secure Enclave). Mnemonic generation on both platforms delegates to a native Rust FFI function whose entropy source is not vendored as readable source in this repository.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/android/app/src/main/java/com/uniswap/RnEthersRs.kt#L24-L34',
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					mobileAppHardening: parseMobileManifestJson(uniswapAndroidParsed, uniswapIosParsed),
+					secureRng: SecureRngSource.LIBRARY_RNG,
+				},
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
