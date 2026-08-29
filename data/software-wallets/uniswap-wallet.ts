@@ -33,13 +33,17 @@ export const uniswapWallet: SoftwareWallet = {
 			extensions: [
 				'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
 			],
-			repositories: ['https://github.com/Uniswap'],
+			repositories: ['https://github.com/Uniswap/interface'],
 			socials: {
 				discord: 'https://discord.com/invite/uniswap',
 				farcaster: 'https://farcaster.xyz/uniswap',
 				x: 'https://x.com/Uniswap',
 			},
 			websites: ['https://wallet.uniswap.org/'],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/ios/Uniswap/Info.plist',
+			androidManifestXml:
+				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml',
 		},
 	},
 	features: {
