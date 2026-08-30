@@ -3,6 +3,7 @@ import { trailOfBits } from '@/data/entities/trail-of-bits'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -257,7 +258,15 @@ export const uniswapWallet: SoftwareWallet = {
 				crashReports: null,
 				usage: null,
 			},
-			appIsolation: null,
+			appIsolation: {
+				createInAppConnectionFlow: notSupported,
+				erc7846WalletConnect: notSupported,
+				ethAccounts: supported({
+					ref: refTodo,
+					defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupported,
+			},
 			dataCollection: null,
 			privacyPolicy:
 				'https://support.uniswap.org/hc/en-us/articles/30934457771405-Uniswap-Labs-Privacy-Policy',
