@@ -1,4 +1,5 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import { trailOfBits } from '@/data/entities/trail-of-bits'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
@@ -28,11 +29,63 @@ import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
+import {
+	SecurityFlawSeverity,
+	type SecurityAudit,
+} from '@/schema/features/security/security-audits'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
 import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
 import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
+
+const trailOfBitsAudits: SecurityAudit[] = [
+	{
+		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf',
+		auditDate: '2023-11-02',
+		auditor: trailOfBits,
+		codeSnapshot: {
+			commit:
+				'https://github.com/Uniswap/interface/commit/392a770fce5656119c0b20816b70321972796a07',
+			date: '2023-09-25',
+		},
+		unpatchedFlaws: [
+			{
+				name: 'Third-party applications can take and read screenshots of the Android client screen (TOB-UNIMOB2-12)',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+				presentStatus: 'NOT_FIXED',
+			},
+			{
+				name: 'Local biometric authentication is prone to bypasses (TOB-UNIMOB2-13)',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+				presentStatus: 'NOT_FIXED',
+			},
+		],
+		variantsScope: { [Variant.MOBILE]: true },
+	},
+	{
+		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf',
+		auditDate: '2024-04-30',
+		auditor: trailOfBits,
+		codeSnapshot: {
+			commit: 'https://github.com/Uniswap/universe/commit/5632372416423c9e755492c8f3ffd1f94b863d79',
+			date: '2024-02-05',
+		},
+		unpatchedFlaws: [
+			{
+				name: 'Sidebar approval screen may be suddenly switched (TOB-UNIEXT-1)',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+				presentStatus: 'NOT_FIXED',
+			},
+			{
+				name: 'Data displayed for user confirmation may differ from actually signed data (TOB-UNIEXT-20)',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+				presentStatus: 'NOT_FIXED',
+			},
+		],
+		variantsScope: { [Variant.BROWSER]: true },
+	},
+]
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -198,7 +251,10 @@ export const uniswapWallet: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: null,
-			hardwareWalletSupport: null,
+			hardwareWalletSupport: {
+				ref: refTodo,
+				wallets: {},
+			},
 			keysHandling: {
 				ref: refTodo,
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
@@ -208,7 +264,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: trailOfBitsAudits,
 			scamAlerts: null,
 			securityBestPractices: {
 				browser: {
