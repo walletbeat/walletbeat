@@ -58,7 +58,11 @@ import {
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
-import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import {
+	FOSSLicense,
+	LicensingType,
+	SourceNotAvailableLicense,
+} from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -221,10 +225,53 @@ export const zerion: SoftwareWallet = {
 			},
 		},
 		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
+			coreLicense: {
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							'The browser extension is built from a single GPL-3.0 repository, so the same license covers its core code.',
+						label: 'Zerion extension LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+					},
+					license: FOSSLicense.GPL_3_0,
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'Zerion publishes the wallet core used by its iOS app, containing the key container, signer, and key storage, under the Apache-2.0 license.',
+							label: 'Zerion Wallet Core for iOS',
+							url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
+						},
+						{
+							explanation:
+								'The wallet core used by the Android app is published under the same license.',
+							label: 'Zerion Wallet Core for Android',
+							url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
+						},
+					],
+					license: FOSSLicense.APACHE_2_0,
+				},
+			},
 			walletAppLicense: {
-				ref: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
-				license: FOSSLicense.GPL_3_0,
+				[Variant.BROWSER]: {
+					ref: {
+						explanation: 'The browser extension is licensed under GPL-3.0.',
+						label: 'Zerion extension LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+					},
+					license: FOSSLicense.GPL_3_0,
+				},
+				[Variant.MOBILE]: {
+					ref: {
+						explanation:
+							'Zerion states that the core code of its iOS and Android apps is open for review, and links only the two wallet-core repositories. The source of the mobile apps themselves is not published, and the zeriontech GitHub organization contains no mobile app repository.',
+						label: 'Zerion security page, "Open source"',
+						url: 'https://zerion.io/security',
+					},
+					license: SourceNotAvailableLicense.PROPRIETARY,
+				},
 			},
 		},
 		monetization: {
