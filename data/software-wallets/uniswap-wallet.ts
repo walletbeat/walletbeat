@@ -227,7 +227,10 @@ export const uniswapWallet: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: notSupported,
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported({
 				ref: [
 					{
