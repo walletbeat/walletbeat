@@ -1,17 +1,27 @@
 import { ren2140 } from '@/data/contributors/ren2140'
 import { trailOfBits } from '@/data/entities/trail-of-bits'
 import type { SoftwareWallet } from '@/data/software-wallets'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
+import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import {
+	type SecurityAudit,
+	SecurityFlawSeverity,
+} from '@/schema/features/security/security-audits'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -20,21 +30,10 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
-import {
-	RpcEndpointConfiguration,
-	type ChainConfigurability,
-} from '@/schema/features/self-sovereignty/chain-configurability'
-import {
-	KeyStorageMechanism,
-	SecureRngSource,
-} from '@/schema/features/security/security-best-practices'
-import {
-	SecurityFlawSeverity,
-	type SecurityAudit,
-} from '@/schema/features/security/security-audits'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+
+import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
 import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
 import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
 import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
@@ -52,13 +51,13 @@ const trailOfBitsAudits: SecurityAudit[] = [
 		unpatchedFlaws: [
 			{
 				name: 'Third-party applications can take and read screenshots of the Android client screen (TOB-UNIMOB2-12)',
-				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 			},
 			{
 				name: 'Local biometric authentication is prone to bypasses (TOB-UNIMOB2-13)',
-				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 			},
 		],
 		variantsScope: { [Variant.MOBILE]: true },
@@ -74,13 +73,13 @@ const trailOfBitsAudits: SecurityAudit[] = [
 		unpatchedFlaws: [
 			{
 				name: 'Sidebar approval screen may be suddenly switched (TOB-UNIEXT-1)',
-				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 			},
 			{
 				name: 'Data displayed for user confirmation may differ from actually signed data (TOB-UNIEXT-20)',
-				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 			},
 		],
 		variantsScope: { [Variant.BROWSER]: true },
@@ -97,10 +96,14 @@ export const uniswapWallet: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2026-04-04',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://docs.uniswap.org/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
 			],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/ios/Uniswap/Info.plist',
 			repositories: ['https://github.com/Uniswap/interface'],
 			socials: {
 				discord: 'https://discord.com/invite/uniswap',
@@ -108,10 +111,6 @@ export const uniswapWallet: SoftwareWallet = {
 				x: 'https://x.com/Uniswap',
 			},
 			websites: ['https://wallet.uniswap.org/'],
-			iosInfoPlist:
-				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/ios/Uniswap/Info.plist',
-			androidManifestXml:
-				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml',
 		},
 	},
 	features: {
@@ -250,7 +249,32 @@ export const uniswapWallet: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			duressResistance: {
+				[Variant.BROWSER]: {
+					basicUnlock: {
+						ref: refTodo,
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				},
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: refTodo,
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				},
+			},
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
