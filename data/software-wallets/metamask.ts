@@ -278,7 +278,7 @@ export const metamask: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						"DeFiLlama publishes MetaMask's fee and revenue figures, broken down by product line (wallet swaps, perpetuals, predictions and MetaMask USD) and by chain, with 24-hour, 30-day and all-time totals.",
+						"DeFiLlama publishes MetaMask's fee and revenue figures, broken down by product line (wallet swaps, perpetuals, predictions and MetaMask USD) and by chain.",
 					url: 'https://defillama.com/protocol/fees/metamask',
 				},
 				{
