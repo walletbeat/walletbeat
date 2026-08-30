@@ -3992,7 +3992,7 @@ type HasPublicChangelog = Support<MustRef<{}>>
 
 ### Type: `ReproducibleBuilds`
 
-Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts.
+Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts by an independent party.
 
 ```typescript
 type ReproducibleBuilds = Support<WithRef<{}>>

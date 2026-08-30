@@ -400,15 +400,43 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Ambire raised $2.5M in a round led by LAUNCHub Ventures in December 2021.',
+					label: 'We raised $2.5m in funding for Ambire Wallet',
+					url: 'https://blog.ambire.com/we-raised-2-5m-in-funding-for-ambire-wallet/',
+				},
+				{
+					explanation:
+						'Ambire was one of 18 projects awarded an Ethereum Foundation account abstraction grant in 2023.',
+					label: 'Ambire wins an EF account abstraction grant 2023',
+					url: 'https://blog.ambire.com/ambire-wins-an-ef-aa-grant/',
+				},
+				{
+					explanation: 'Ambire charges 0.5% on swaps and bridges.',
+					label: 'Ambire governance proposal: swap and bridge fee increase',
+					url: 'https://blog.ambire.com/swap-bridge-fee-increase/',
+				},
+				{
+					explanation:
+						'A public sale on Huobi in January 2022 offered 6 million $WALLET, 0.6% of the supply, at $0.03.',
+					label: 'Announcing the $WALLET token',
+					url: 'https://blog.ambire.com/announcing-the-wallet-token/',
+				},
+				{
+					explanation:
+						'723.9 million $WALLET are circulating of a 1 billion maximum supply, a float of about 72%, as of August 2026.',
+					url: 'https://www.coingecko.com/en/coins/ambire-wallet',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: false,
 				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
-				governanceTokenMostlyDistributed: false,
+				governanceTokenMostlyDistributed: true,
 				hiddenConvenienceFees: false,
-				publicOffering: false,
+				publicOffering: true,
 				selfFunded: true,
 				transparentConvenienceFees: true,
 				ventureCapital: true,
