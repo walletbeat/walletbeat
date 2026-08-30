@@ -78,7 +78,7 @@ export const zerion: SoftwareWallet = {
 		coinspectId: 'zerion',
 		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-19',
+		lastUpdated: '2026-08-30',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -230,7 +230,7 @@ export const zerion: SoftwareWallet = {
 				[Variant.BROWSER]: {
 					ref: {
 						explanation:
-							'The browser extension is built from a single GPL-3.0 repository, so the same license covers its core code.',
+							'The browser extension is a single repository licensed under GPL-3.0, covering both its core and its app code.',
 						label: 'Zerion extension LICENSE',
 						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
 					},
@@ -257,19 +257,30 @@ export const zerion: SoftwareWallet = {
 			walletAppLicense: {
 				[Variant.BROWSER]: {
 					ref: {
-						explanation: 'The browser extension is licensed under GPL-3.0.',
+						explanation:
+							'The browser extension is a single repository licensed under GPL-3.0, covering both its core and its app code.',
 						label: 'Zerion extension LICENSE',
 						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
 					},
 					license: FOSSLicense.GPL_3_0,
 				},
 				[Variant.MOBILE]: {
-					ref: {
-						explanation:
-							'Zerion states that the core code of its iOS and Android apps is open for review, and links only the two wallet-core repositories. The source of the mobile apps themselves is not published, and the zeriontech GitHub organization contains no mobile app repository.',
-						label: 'Zerion security page, "Open source"',
-						url: 'https://zerion.io/security',
-					},
+					ref: [
+						{
+							explanation:
+								'Under the heading "Open source", Zerion states that the core code of its iOS, Android, and Chrome Extension apps is open for review, and links the two wallet-core repositories for the mobile apps rather than an app repository.',
+							label: 'Zerion security page, "Open source"',
+							lastRetrieved: '2026-08-30',
+							url: 'https://zerion.io/security',
+						},
+						{
+							explanation:
+								'The zeriontech organization publishes no iOS or Android app repository; the mobile source that is published is the wallet core alone.',
+							label: 'Zerion repository listing',
+							lastRetrieved: '2026-08-30',
+							url: 'https://github.com/orgs/zeriontech/repositories',
+						},
+					],
 					license: SourceNotAvailableLicense.PROPRIETARY,
 				},
 			},
