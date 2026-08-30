@@ -37,6 +37,7 @@ import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
 import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
 import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
 import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 
 const trailOfBitsAudits: SecurityAudit[] = [
 	{
@@ -223,7 +224,13 @@ export const uniswapWallet: SoftwareWallet = {
 			dataCollection: null,
 			privacyPolicy:
 				'https://support.uniswap.org/hc/en-us/articles/30934457771405-Uniswap-Labs-Privacy-Policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
