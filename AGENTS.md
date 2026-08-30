@@ -55,11 +55,12 @@ Each attribute evaluates wallet features and returns one of 5 ratings:
 
 ### Schema rules
 
-- No `WalletFeatures` fields should be `undefined` (use `null` for unknown data).
+- `/data` fields must be explicit: never `undefined` / `?` for new properties. Use `null` for unknown, and a named sentinel (`NO_*`) or empty array for "none / does not apply". This applies to features, entities, contributors, and new wallet metadata — not only `WalletFeatures`. See `resources/docs/contribute/wallet-data/wallet-data.md`.
 - Wallet feature data must be objective and unopinionated.
 - Attributes evaluate only feature data, no other inputs.
 - Some feature blobs allow per-field unknowns while `/data` is incomplete. For those, keep the exported feature type as the complete shape `F`, put `Nullable<F>` only on the `WalletBaseFeatures` field, and let `ResolvedFeatures` expose either a full `F` or `null`. In `resolveFeatures`, wrap these entries with `nullable()` so any remaining `null` property makes the whole resolved feature `null`; for `Support`-wrapped blobs, put `Nullable` inside the supported payload and resolve with `nullable<Support<ResolvedShape>>(...)`. See `.cursor/rules/50-wallet-schema.mdc` for the full pattern.
 - Read `resources/docs/features/features.md` if you need to understand wallet feature types.
+- Bare `YYYY-MM-DD` dates are UTC, matching the treasury and wallet-data-collection tooling.
 
 ### Code quality
 

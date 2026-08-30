@@ -128,7 +128,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 A set of features for any software wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletSoftwareFeatures = WalletBaseFeatures & {
@@ -202,7 +202,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 A set of features for any hardware wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletHardwareFeatures = WalletBaseFeatures & {
@@ -236,7 +236,7 @@ type WalletHardwareFeatures = WalletBaseFeatures & {
 
 A set of features for any embedded wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletEmbeddedFeatures = WalletBaseFeatures & {
@@ -3992,7 +3992,7 @@ type HasPublicChangelog = Support<MustRef<{}>>
 
 ### Type: `ReproducibleBuilds`
 
-Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts.
+Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts by an independent party.
 
 ```typescript
 type ReproducibleBuilds = Support<WithRef<{}>>

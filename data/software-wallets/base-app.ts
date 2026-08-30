@@ -41,6 +41,7 @@ export const baseApp: SoftwareWallet = {
 		id: 'base-app',
 		displayName: 'Base App',
 		tableName: 'Base App',
+		coinspectId: 'coinbase-wallet',
 		contributors: [ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-03-19',
