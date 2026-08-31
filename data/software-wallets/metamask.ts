@@ -278,8 +278,21 @@ export const metamask: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'MetaMask is funded through transparent swap fees and venture capital with publicly disclosed funding rounds.',
+						"DeFiLlama publishes MetaMask's fee and revenue figures, broken down by product line (wallet swaps, perpetuals, predictions and MetaMask USD) and by chain.",
+					url: 'https://defillama.com/protocol/fees/metamask',
+				},
+				{
+					explanation:
+						'Consensys, which develops MetaMask, raised a $450 million Series D round led by ParaFi Capital in March 2022.',
+					label: 'Consensys Raises $450M Series D Funding',
 					url: 'https://consensys.io/blog/consensys-raises-450m-series-d-funding',
+				},
+				{
+					explanation:
+						'MetaMask discloses a 0.875% fee on its built-in swaps as a percentage via the Rate info tooltip.',
+					file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
+					label:
+						'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
 				},
 			],
 			revenueBreakdownIsPublic: true,
