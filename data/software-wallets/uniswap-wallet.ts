@@ -147,17 +147,23 @@ export const uniswapWallet: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: {
-				explanation:
-					'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
-				file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
-				label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
-			},
+			ref: [
+				{
+					explanation:
+						'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
+					file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
+					label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
+				},
+				{
+					explanation:
+						'Username/ENS resolution is fetched from the Uniswap Unitags API, an offchain service, rather than resolved directly on-chain.',
+					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts',
+				},
+			],
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			// uniswap/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'OFFCHAIN',
 				offchainDataVerifiability: 'VERIFIABLE',
