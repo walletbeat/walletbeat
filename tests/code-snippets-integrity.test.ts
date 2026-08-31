@@ -22,7 +22,7 @@ describe('code snippets', () => {
 			const fixInstructions = [
 				needsFetch
 					? 'Run `pnpm collect:snippets -- --all` to fetch missing snippets ' +
-						'(delete the file first for LINE_COUNT_MISMATCH).'
+						'and refetch any with a line count mismatch.'
 					: null,
 				needsPrune
 					? 'Run `pnpm collect:snippets -- --prune` to delete orphaned snippet files.'

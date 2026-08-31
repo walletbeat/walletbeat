@@ -4,6 +4,7 @@ import * as path from 'node:path'
 import {
 	type CodeSnippetSource,
 	parseGitHubBlobUrl,
+	snippetLineCount,
 	snippetRelativePath,
 } from '@/schema/code-snippets'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
@@ -108,9 +109,17 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 	const absolutePath = path.join(REPO_ROOT, relativePath)
 
 	if (fs.existsSync(absolutePath)) {
-		process.stderr.write(`Already stored: ${relativePath}\n`)
+		const contents = fs.readFileSync(absolutePath, 'utf8')
+		const lines = contents.split('\n')
+		const lineCount = lines[lines.length - 1] === '' ? lines.length - 1 : lines.length
 
-		return
+		if (lineCount === snippetLineCount(source)) {
+			process.stderr.write(`Already stored: ${relativePath}\n`)
+
+			return
+		}
+
+		process.stderr.write(`Refetching (line count mismatch): ${relativePath}\n`)
 	}
 
 	const fileText = await fetchSourceFileCached(source)
