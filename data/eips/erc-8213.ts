@@ -19,6 +19,8 @@ export const erc8213: Eip = {
 		For EIP-712 signing, wallets SHOULD display at least the EIP-712 Digest (or Domain Hash + Message Hash together).
 		For transactions with calldata, wallets SHOULD display the Calldata Digest as a \`0x\`-prefixed hex string.
 	`,
+	// Not yet merged/published on eips.ethereum.org; link to the draft PR instead.
+	urlOverride: 'https://github.com/ethereum/ERCs/pull/1639',
 	whyItMattersMarkdown: `
 		Recent high-profile exchange compromises showed that users cannot safely
 		rely on a website's description of what they are signing, if the signing

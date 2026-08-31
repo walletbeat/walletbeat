@@ -76,6 +76,14 @@ export interface Eip {
 
 	/** Walletbeat-specific notes (e.g. precedent/alternative EIPs). */
 	noteMarkdown?: string
+
+	/**
+	 * Overrides the default eips.ethereum.org URL, e.g. for EIPs that are
+	 * still an unmerged draft and have no published page yet.
+	 *
+	 * TODO: Remove if not used in any ERCs. Currently used in ERC-8213
+	 */
+	urlOverride?: string
 }
 
 /** Return a short label for an EIP (example: "ERC-20"). */
@@ -88,29 +96,28 @@ export function eipLabel(eip: Eip): string {
 	return `${eipShortLabel(eip)}: ${eip.friendlyName}`
 }
 
-/** Return the eips.ethereum.org URL for an EIP. */
+/** Return the eips.ethereum.org URL for an EIP, or its `urlOverride` if set. */
 export function eipEthereumDotOrgUrl(eip: EipNumber | Eip): string {
-	return `https://eips.ethereum.org/EIPS/eip-${typeof eip === 'string' ? eip : eip.number}`
-}
+	if (typeof eip !== 'string' && eip.urlOverride !== undefined) {
+		return eip.urlOverride
+	}
 
-/** Return a magic URL which the Markdown parser can turn into an EIP link. */
-function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): string {
-	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`
+	return `https://eips.ethereum.org/EIPS/eip-${typeof eip === 'string' ? eip : eip.number}`
 }
 
 /** Return a markdown link for an EIP using only its short label (e.g. "EIP-712"). */
 export function eipMarkdownShortLink(eip: Eip): string {
-	return `[${eipShortLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
+	return `[${eipShortLabel(eip)}](${eipEthereumDotOrgUrl(eip)})`
 }
 
 /** Return a markdown link for an EIP. */
 export function eipMarkdownLink(eip: Eip): string {
-	return `[${eipLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
+	return `[${eipLabel(eip)}](${eipEthereumDotOrgUrl(eip)})`
 }
 
 /** Return a markdown link and a title for an EIP. */
 export function eipMarkdownLinkAndTitle(eip: Eip): string {
-	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
+	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${eipEthereumDotOrgUrl(eip)})`
 }
 
 /** Return a human-readable label for an EIP status. */

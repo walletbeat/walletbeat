@@ -450,7 +450,7 @@ export const zerion: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Since March 2022, Zerion has a live bug bounty program.',
-						url: 'https://immunefi.com/bug-bounty/zerion',
+						url: 'https://immunefi.com/bug-bounty/zerion/information/',
 					},
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,

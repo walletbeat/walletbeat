@@ -236,7 +236,7 @@ function evaluateChainAbstraction(
 				- Risks involved in L2-to-L2 interoperability (when applicable)
 
 				Bridging assets to an L2 chain also inherently implies accepting the
-				risk of that L2 chain, which [our friends at L2BEAT](https://l2beat/)
+				risk of that L2 chain, which [our friends at L2BEAT](https://l2beat.com/)
 				do a great job documenting.
 			`),
 			howToImprove: markdown(`
