@@ -14,8 +14,10 @@ import * as path from 'node:path'
  * (e.g. `...--Wallet.L2232-L2242.ts.snippet` → `ts`).
  */
 
-/** Shiki theme used for all snippets. The site is dark-only. */
-const theme = 'one-dark-pro'
+/**
+ * Shiki themes used for all snippets
+ */
+const themes = { light: 'one-light', dark: 'one-dark-pro' }
 
 /** Snippet source file extension → Shiki language identifier. */
 const extensionToLanguage = {
@@ -56,7 +58,7 @@ let highlighterPromise
 function getHighlighter() {
 	if (highlighterPromise === undefined) {
 		highlighterPromise = import('shiki').then(shiki =>
-			shiki.createHighlighter({ langs: [], themes: [theme] }),
+			shiki.createHighlighter({ langs: [], themes: Object.values(themes) }),
 		)
 	}
 
@@ -132,18 +134,21 @@ export function codeSnippetHighlight() {
 					loadedLanguages.add(language)
 				}
 
-				const { tokens } = highlighter.codeToTokens(code, {
+				const tokenLines = highlighter.codeToTokensWithThemes(code, {
 					lang: /** @type {import('shiki').BundledLanguage} */ (language),
-					theme,
+					themes,
 				})
 
-				htmlLines = tokens.map(lineTokens =>
+				htmlLines = tokenLines.map(lineTokens =>
 					lineTokens
-						.map(token =>
-							token.color === undefined
+						.map(token => {
+							const light = token.variants.light?.color
+							const dark = token.variants.dark?.color
+
+							return light === undefined && dark === undefined
 								? escapeHtml(token.content)
-								: `<span style="color:${token.color}">${escapeHtml(token.content)}</span>`,
-						)
+								: `<span style="color:light-dark(${light ?? 'inherit'},${dark ?? 'inherit'})">${escapeHtml(token.content)}</span>`
+						})
 						.join(''),
 				)
 			}
