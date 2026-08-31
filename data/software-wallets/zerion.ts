@@ -230,7 +230,7 @@ export const zerion: SoftwareWallet = {
 				[Variant.BROWSER]: {
 					ref: {
 						explanation:
-							'The browser extension is a single repository licensed under GPL-3.0, covering both its core and its app code.',
+							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
 						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
 					},
@@ -258,7 +258,7 @@ export const zerion: SoftwareWallet = {
 				[Variant.BROWSER]: {
 					ref: {
 						explanation:
-							'The browser extension is a single repository licensed under GPL-3.0, covering both its core and its app code.',
+							"The browser extension's core and app code are open source under the GPL-3.0 license.",
 						label: 'Zerion extension LICENSE',
 						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
 					},
