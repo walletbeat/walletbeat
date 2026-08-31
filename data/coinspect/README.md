@@ -10,5 +10,5 @@ data repository.
 - Upstream commit pin: `upstream-commit`
 - License: see [`LICENSE`](./LICENSE) (CC BY 4.0)
 
-Refreshed by `deploy/coinspect/coinspect-update.sh` (see also
-`.github/workflows/coinspect-refresh.yaml`).
+Refreshed by `/deploy/coinspect/coinspect-update.sh` (see also
+`/.github/workflows/coinspect-refresh.yaml`).

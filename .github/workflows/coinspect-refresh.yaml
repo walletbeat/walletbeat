@@ -1,8 +1,6 @@
 name: Update Coinspect snapshot
 on:
-  workflow_dispatch: {} # On demand
-  schedule: # On schedule
-    - cron: '0 0 * * 0' # Weekly, Sunday 00:00 UTC
+  workflow_dispatch: {} # On demand; restore a weekly cron once a few manual runs succeed
 permissions:
   contents: write
 jobs:
