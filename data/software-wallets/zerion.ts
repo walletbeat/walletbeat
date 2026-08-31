@@ -237,20 +237,20 @@ export const zerion: SoftwareWallet = {
 					license: FOSSLicense.GPL_3_0,
 				},
 				[Variant.MOBILE]: {
-					ref: [
-						{
-							explanation:
-								'Zerion publishes the wallet core used by its iOS app, containing the key container, signer, and key storage, under the Apache-2.0 license.',
-							label: 'Zerion Wallet Core for iOS',
-							url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
-						},
-						{
-							explanation:
-								'The wallet core used by the Android app is published under the same license.',
-							label: 'Zerion Wallet Core for Android',
-							url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
-						},
-					],
+					ref: {
+						explanation:
+							'Zerion publishes the wallet core used by its iOS and Android apps, containing the key container, signer, and key storage, under the Apache-2.0 license.',
+						url: [
+							{
+								label: 'Zerion Wallet Core for iOS',
+								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
+							},
+							{
+								label: 'Zerion Wallet Core for Android',
+								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
+							},
+						],
+					},
 					license: FOSSLicense.APACHE_2_0,
 				},
 			},
