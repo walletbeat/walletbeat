@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { FullyQualifiedReference } from '@/schema/reference'
-	import { isRepoImageUrl, type LabeledUrl } from '@/schema/url'
+	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
 	import { codeSnippetForUrl, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
 
 
@@ -60,6 +60,25 @@
 
 
 	// Actions
+
+	// Scope-header/context lines can push the highlighted (referenced) lines
+	// below the fold of the fixed-height snippet box, so scroll them into view
+	// as soon as the box mounts. Sets `pre.scrollTop` directly (rather than
+	// `scrollIntoView`) so only the snippet box scrolls, not the page.
+	const scrollToHighlight = (pre: HTMLElement) => {
+		const highlighted = pre.querySelectorAll<HTMLElement>('.row.highlighted')
+
+		if (highlighted.length === 0) {
+			return
+		}
+
+		const first = highlighted[0]
+		const last = highlighted[highlighted.length - 1]
+		const center = (first.offsetTop + last.offsetTop + last.offsetHeight) / 2
+
+		pre.scrollTop = Math.max(0, center - pre.clientHeight / 2)
+	}
+
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
 		// Plain left-clicks open the lightbox; modified clicks
 		// (middle, ctrl/cmd/shift) keep default link behavior
@@ -160,6 +179,7 @@
 					{/if}
 
 					{#each refSnippets as { url, snippet } (url.url)}
+						{@const sourceLocation = getUrlLabel(url.url)}
 						<figure class="code-snippet" data-column="start gap-1">
 							<figcaption>
 								<a
@@ -168,10 +188,14 @@
 									rel="noopener noreferrer"
 								>
 									<cite>{url.label}</cite>
+									{#if sourceLocation !== url.label}
+										<br>
+										<span class="source-location">{sourceLocation}</span>
+									{/if}
 									<span>{@html CodeIcon}</span>
 								</a>
 							</figcaption>
-							<pre><code>{#each snippet.htmlLines as htmlLine, lineIndex (lineIndex)}<span class="line"><span class="line-number">{snippet.source.firstLine + lineIndex}</span><span class="line-content">{@html htmlLine}</span></span>{/each}</code></pre>
+							<pre use:scrollToHighlight><code>{#each snippet.rows as row, rowIndex (rowIndex)}{#if row.type === 'gap'}<span class="row gap"><span class="line-number">...</span><span class="line-content"></span></span>{:else}<span class="row line" class:highlighted={row.highlighted}><span class="line-number">{row.number}</span><span class="line-content">{@html row.html}</span></span>{/if}{/each}</code></pre>
 						</figure>
 					{/each}
 
@@ -267,6 +291,12 @@
 		font-style: normal;
 	}
 
+	.source-location {
+		font-weight: normal;
+		font-size: 0.85em;
+		color: var(--text-secondary);
+	}
+
 	.last-retrieved {
 		color: var(--text-secondary);
 		font-size: 0.875em;
@@ -297,7 +327,7 @@
 			inline-size: 100%;
 			max-inline-size: 100%;
 			min-inline-size: 0;
-			max-block-size: 20em;
+			max-block-size: 32em;
 			overflow: auto;
 
 			padding: 0.75em 1em;
@@ -310,14 +340,38 @@
 		}
 
 		code {
+			display: block;
+			inline-size: max-content;
+			min-inline-size: 100%;
+
 			font-family:
 				ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
 				'Courier New', monospace;
 		}
 
-		.line {
+		.row {
 			display: flex;
 			white-space: pre;
+		}
+
+		.row.line.highlighted {
+			inline-size: calc(100% + 2em);
+			margin-inline: -1em;
+			padding-inline: 1em;
+			background-color: var(--background-tertiary);
+		}
+
+		.row.gap {
+			justify-content: center;
+
+			.line-number {
+				min-inline-size: 0;
+				margin-inline-end: 0;
+			}
+
+			.line-content {
+				display: none;
+			}
 		}
 
 		.line-number {
@@ -328,6 +382,10 @@
 			text-align: end;
 			color: var(--text-secondary);
 			user-select: none;
+		}
+
+		.line-content {
+			flex: 1;
 		}
 	}
 
