@@ -8,9 +8,9 @@ import { fullCommitHashRegExp, lineFragmentRegExp } from './url'
  * `public/references/wallets/<wallet-id>/code/`, named
  * `<org>--<repo>--<commit>--<path with '/' as '--'>.L<first>[-L<last>].<ext>.snippet`
  * (the source file's extension is kept right before `.snippet` so the language
- * remains identifiable when rendered). They hold only the referenced lines,
- * not the whole file, so that storing them stays within fair use regardless of
- * the source repository's license.
+ * remains identifiable when rendered). They hold the referenced lines plus a
+ * small bounded window of surrounding context and enclosing scope headers,
+ * never the whole file, so that storing them stays within fair use regardless of the source repository's license.
  */
 export interface CodeSnippetSource {
 	org: string
@@ -25,10 +25,34 @@ export interface CodeSnippetSource {
 	lastLine: number
 }
 
-/** Number of lines a snippet for `source` must contain. */
-export function snippetLineCount(source: CodeSnippetSource): number {
-	return source.lastLine - source.firstLine + 1
+/** A contiguous run of source lines stored in a `.snippet` file. */
+export interface StoredSnippetSegment {
+	/** 1-based source line number of `lines[0]`. */
+	startLine: number
+	lines: string[]
 }
+
+/**
+ * The JSON content of a `.snippet` file: the referenced range
+ * (`highlightFirstLine`-`highlightLastLine`, matching a `CodeSnippetSource`'s
+ * `firstLine`/`lastLine`) plus the surrounding-context and scope-header
+ * segments built around it. Segments are ordered by `startLine` and are never
+ * adjacent or overlapping (adjacent runs are merged into one segment), so a
+ * gap between two segments always means source lines were omitted there.
+ */
+export interface StoredSnippetContent {
+	highlightFirstLine: number
+	highlightLastLine: number
+	segments: StoredSnippetSegment[]
+}
+
+/**
+ * One renderable row of a resolved snippet: either a divider marking omitted
+ * source lines between two segments, or a single source line, flagged as
+ * `highlighted` when it falls within the referenced range.
+ */
+export type SnippetRow =
+	{ type: 'gap' } | { type: 'line'; number: number; html: string; highlighted: boolean }
 
 /** The `L123` / `L123-L456` filename and URL-fragment suffix for a snippet. */
 function snippetLineSuffix(source: CodeSnippetSource): string {

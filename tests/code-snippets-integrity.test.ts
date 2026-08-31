@@ -16,13 +16,13 @@ describe('code snippets', () => {
 			const needsFetch = problems.some(
 				p =>
 					p.kind === SnippetProblemKind.MISSING_SNIPPET ||
-					p.kind === SnippetProblemKind.LINE_COUNT_MISMATCH,
+					p.kind === SnippetProblemKind.STALE_CONTENT,
 			)
 			const needsPrune = problems.some(p => p.kind === SnippetProblemKind.ORPHAN_SNIPPET)
 			const fixInstructions = [
 				needsFetch
 					? 'Run `pnpm collect:snippets -- --all` to fetch missing snippets ' +
-						'and refetch any with a line count mismatch.'
+						'and refetch any with stale or mismatched content.'
 					: null,
 				needsPrune
 					? 'Run `pnpm collect:snippets -- --prune` to delete orphaned snippet files.'

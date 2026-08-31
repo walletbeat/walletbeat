@@ -4,16 +4,16 @@ import * as path from 'node:path'
 import {
 	type CodeSnippetSource,
 	parseGitHubBlobUrl,
-	snippetLineCount,
 	snippetRelativePath,
 } from '@/schema/code-snippets'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
 import {
+	buildSnippetContent,
 	checkSnippets,
-	extractSnippet,
 	fetchSnippetSourceFile,
 	findSnippetOccurrences,
+	parseStoredSnippetContent,
 	SnippetProblemKind,
 } from './code-snippet-collector-lib'
 
@@ -26,8 +26,10 @@ Usage: pnpm collect:snippets [options]
 Stores local copies of the code snippets that wallet data files reference via
 commit-pinned, line-anchored GitHub blob URLs
 (https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>-L<last>).
-Only the referenced lines are stored, never the whole file, to stay within
-fair use regardless of the source repository's license.
+The referenced lines are stored along with a small bounded window of
+surrounding context and enclosing scope-header lines (e.g. the containing
+function/class signature) — never the whole file — to stay within fair use
+regardless of the source repository's license.
 
 Modes (pick one):
   --all                  Scan data/*-wallets/*.ts for snippet URLs and fetch
@@ -110,20 +112,23 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 
 	if (fs.existsSync(absolutePath)) {
 		const contents = fs.readFileSync(absolutePath, 'utf8')
-		const lines = contents.split('\n')
-		const lineCount = lines[lines.length - 1] === '' ? lines.length - 1 : lines.length
+		const parsed = parseStoredSnippetContent(contents)
 
-		if (lineCount === snippetLineCount(source)) {
+		if (
+			parsed !== null &&
+			parsed.highlightFirstLine === source.firstLine &&
+			parsed.highlightLastLine === source.lastLine
+		) {
 			process.stderr.write(`Already stored: ${relativePath}\n`)
 
 			return
 		}
 
-		process.stderr.write(`Refetching (line count mismatch): ${relativePath}\n`)
+		process.stderr.write(`Refetching (stale or mismatched content): ${relativePath}\n`)
 	}
 
 	const fileText = await fetchSourceFileCached(source)
-	const snippet = extractSnippet(fileText, source)
+	const snippet = buildSnippetContent(fileText, source)
 
 	fs.mkdirSync(path.dirname(absolutePath), { recursive: true })
 	fs.writeFileSync(absolutePath, snippet)

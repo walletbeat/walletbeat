@@ -1,16 +1,21 @@
-import { type CodeSnippetSource, parseGitHubBlobUrl, snippetFileName } from '@/schema/code-snippets'
+import {
+	type CodeSnippetSource,
+	parseGitHubBlobUrl,
+	snippetFileName,
+	type SnippetRow,
+} from '@/schema/code-snippets'
 
 /** A stored code snippet resolved from a reference URL. */
 export interface ResolvedCodeSnippet {
 	source: CodeSnippetSource
 
 	/**
-	 * The snippet's lines as HTML: syntax-highlighted at build time by
+	 * The snippet's renderable rows: syntax-highlighted at build time by
 	 * vite-plugin-code-snippet-highlight.mjs (language inferred from the
 	 * source file extension in the snippet filename), with all snippet
-	 * content HTML-escaped. Safe to render with `{@html}`.
+	 * content HTML-escaped. Line HTML is safe to render with `{@html}`.
 	 */
-	htmlLines: string[]
+	rows: SnippetRow[]
 }
 
 /**
@@ -23,16 +28,36 @@ export interface ResolvedCodeSnippet {
  * This lets references resolve snippets without knowing the wallet they
  * belong to.
  */
-const snippetsByFileName = new Map<string, string[]>()
+const snippetsByFileName = new Map<string, SnippetRow[]>()
 
-for (const [modulePath, htmlLines] of Object.entries(
+function isSnippetRow(row: unknown): row is SnippetRow {
+	if (typeof row !== 'object' || row === null || !('type' in row)) {
+		return false
+	}
+
+	if (row.type === 'gap') {
+		return true
+	}
+
+	return (
+		row.type === 'line' &&
+		'number' in row &&
+		typeof row.number === 'number' &&
+		'html' in row &&
+		typeof row.html === 'string' &&
+		'highlighted' in row &&
+		typeof row.highlighted === 'boolean'
+	)
+}
+
+for (const [modulePath, rows] of Object.entries(
 	import.meta.glob('/public/references/wallets/*/code/*.snippet', {
 		eager: true,
 		import: 'default',
 	}),
 )) {
-	if (!Array.isArray(htmlLines) || htmlLines.some(line => typeof line !== 'string')) {
-		throw new Error(`Snippet file did not import as an array of HTML lines: ${modulePath}`)
+	if (!Array.isArray(rows) || !rows.every(isSnippetRow)) {
+		throw new Error(`Snippet file did not import as an array of snippet rows: ${modulePath}`)
 	}
 
 	const fileName = modulePath.split('/').pop()
@@ -41,8 +66,7 @@ for (const [modulePath, htmlLines] of Object.entries(
 		throw new Error(`Cannot extract filename from snippet module path: ${modulePath}`)
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Checked line-by-line above
-	snippetsByFileName.set(fileName, htmlLines as string[])
+	snippetsByFileName.set(fileName, rows)
 }
 
 /**
@@ -58,11 +82,11 @@ export function codeSnippetForUrl(url: string): ResolvedCodeSnippet | null {
 		return null
 	}
 
-	const htmlLines = snippetsByFileName.get(snippetFileName(source))
+	const rows = snippetsByFileName.get(snippetFileName(source))
 
-	if (htmlLines === undefined) {
+	if (rows === undefined) {
 		return null
 	}
 
-	return { htmlLines, source }
+	return { rows, source }
 }
