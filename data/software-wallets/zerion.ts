@@ -265,21 +265,13 @@ export const zerion: SoftwareWallet = {
 					license: FOSSLicense.GPL_3_0,
 				},
 				[Variant.MOBILE]: {
-					ref: [
-						{
-							explanation:
-								'Under the heading "Open source", Zerion states that the core code of its iOS, Android, and Chrome Extension apps is open for review, and links the two wallet-core repositories for the mobile apps rather than an app repository.',
-							label: 'Zerion security page, "Open source"',
-							lastRetrieved: '2026-08-30',
-							url: 'https://zerion.io/security',
-						},
-						{
-							explanation: 'The iOS and Android apps are closed source.',
-							label: 'Zerion repository listing',
-							lastRetrieved: '2026-08-30',
-							url: 'https://github.com/orgs/zeriontech/repositories',
-						},
-					],
+					ref: {
+						explanation:
+							'Zerion states only that the core code of its iOS and Android apps is open for review.',
+						label: 'Zerion security page, "Open source"',
+						lastRetrieved: '2026-08-30',
+						url: 'https://zerion.io/security',
+					},
 					license: SourceNotAvailableLicense.PROPRIETARY,
 				},
 			},
