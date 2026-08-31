@@ -147,7 +147,12 @@ export const uniswapWallet: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: {
+				explanation:
+					'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
+				file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
+				label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
+			},
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
@@ -166,7 +171,18 @@ export const uniswapWallet: SoftwareWallet = {
 				builtInBridging: supported({
 					ref: refTodo,
 					feesLargerThan1bps: {
-						ref: [],
+						ref: [
+							{
+								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-default.png',
+								label:
+									'Uniswap Wallet swap review screen, collapsed, showing only aggregated network cost',
+							},
+							{
+								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-comprehensive.png',
+								label:
+									'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
+							},
+						],
 						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
 						byDefault: FeeDisplayLevel.AGGREGATED,
 						fullySponsored: false,
@@ -177,23 +193,37 @@ export const uniswapWallet: SoftwareWallet = {
 				suggestedBridging: notSupported,
 			},
 			crossChainBalances: {
-				ref: refTodo,
+				ref: {
+					file: 'public/references/wallets/uniswap/screenshots/2026-08-31-tokens-aggregated.png',
+					label: 'Uniswap Wallet Tokens tab, showing aggregated per-token balances across chains',
+				},
 				ether: supported({
+					ref: {
+						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-eth-comprehensive.png',
+						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain ETH balances',
+					},
 					crossChainSumView: featureSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
-					refTodo,
 				}),
 				globalAccountValue: featureSupported,
 				perChainAccountValue: notSupported,
 				usdc: supported({
-					ref: refTodo,
+					ref: {
+						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png',
+						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain USDC balances',
+					},
 					crossChainSumView: notSupported,
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
 				}),
 			},
 		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: refTodo,
+			ref: {
+				explanation:
+					'The Settings screen has no network-management section, confirming the wallet does not let users add or configure chains or RPC endpoints.',
+				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-no-network-settings.png',
+				label: 'Uniswap Wallet Settings screen, with no network management option',
+			},
 			customChainRpcEndpoint: notSupported,
 			l1: notSupported,
 			nonL1: notSupported,
@@ -406,7 +436,12 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 		},
 		walletCall: supported({
-			ref: refTodo,
+			ref: {
+				explanation:
+					'An EIP-5792 wallet capability test shows wallet_sendCalls is supported, but atomicity support is not declared, so batched calls are not guaranteed atomic.',
+				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png',
+				label: 'EIP-5792 wallet capability test results for Uniswap Wallet',
+			},
 			atomicMultiTransactions: notSupported,
 		}),
 	},
