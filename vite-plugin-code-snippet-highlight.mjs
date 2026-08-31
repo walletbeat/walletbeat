@@ -25,6 +25,7 @@ const extensionToLanguage = {
 	cjs: 'javascript',
 	cpp: 'cpp',
 	css: 'css',
+	example: 'text',
 	go: 'go',
 	graphql: 'graphql',
 	h: 'c',
@@ -34,6 +35,7 @@ const extensionToLanguage = {
 	json: 'json',
 	jsx: 'jsx',
 	kt: 'kotlin',
+	lock: 'text', 
 	md: 'markdown',
 	mjs: 'javascript',
 	py: 'python',
@@ -77,24 +79,25 @@ function escapeHtml(text) {
 }
 
 /**
- * The Shiki language for a snippet file path, or undefined for extensions
- * without a known grammar (rendered as plain escaped text).
+ * The Shiki language for a snippet file path. Throws for any extension not
+ * present in `extensionToLanguage`, since that's either a typo or a new
+ * extension that needs to be classified there (as a real language, or as
+ * `'text'` if it shouldn't be highlighted).
  *
  * @param {string} filePath
- * @returns {string | undefined}
+ * @returns {string}
  */
 function snippetLanguage(filePath) {
 	const parts = path.basename(filePath).split('.')
+	const extension = parts.length < 2 ? '' : parts[parts.length - 2]
 
-	if (parts.length < 2) {
-		return undefined
+	if (!Object.hasOwn(extensionToLanguage, extension)) {
+		throw new Error(
+			`Unknown snippet extension "${extension}" in ${filePath}. Add it to extensionToLanguage in vite-plugin-code-snippet-highlight.mjs (as 'text' if it shouldn't be highlighted).`,
+		)
 	}
 
-	const extension = parts[parts.length - 2]
-
-	return Object.hasOwn(extensionToLanguage, extension)
-		? extensionToLanguage[/** @type {keyof typeof extensionToLanguage} */ (extension)]
-		: undefined
+	return extensionToLanguage[/** @type {keyof typeof extensionToLanguage} */ (extension)]
 }
 
 /**
@@ -120,38 +123,32 @@ export function codeSnippetHighlight() {
 
 			const code = (await fs.readFile(filePath, 'utf8')).replace(/\n$/, '')
 			const language = snippetLanguage(filePath)
+			const highlighter = await getHighlighter()
 
-			/** @type {string[]} */
-			let htmlLines
-
-			if (language === undefined) {
-				htmlLines = code.split('\n').map(escapeHtml)
-			} else {
-				const highlighter = await getHighlighter()
-
-				if (!loadedLanguages.has(language)) {
-					await highlighter.loadLanguage(/** @type {import('shiki').BundledLanguage} */ (language))
-					loadedLanguages.add(language)
-				}
-
-				const tokenLines = highlighter.codeToTokensWithThemes(code, {
-					lang: /** @type {import('shiki').BundledLanguage} */ (language),
-					themes,
-				})
-
-				htmlLines = tokenLines.map(lineTokens =>
-					lineTokens
-						.map(token => {
-							const light = token.variants.light?.color
-							const dark = token.variants.dark?.color
-
-							return light === undefined && dark === undefined
-								? escapeHtml(token.content)
-								: `<span style="color:light-dark(${light ?? 'inherit'},${dark ?? 'inherit'})">${escapeHtml(token.content)}</span>`
-						})
-						.join(''),
+			if (!loadedLanguages.has(language)) {
+				await highlighter.loadLanguage(
+					/** @type {import('shiki').BundledLanguage | 'text'} */ (language),
 				)
+				loadedLanguages.add(language)
 			}
+
+			const tokenLines = highlighter.codeToTokensWithThemes(code, {
+				lang: /** @type {import('shiki').BundledLanguage | 'text'} */ (language),
+				themes,
+			})
+
+			const htmlLines = tokenLines.map(lineTokens =>
+				lineTokens
+					.map(token => {
+						const light = token.variants.light?.color
+						const dark = token.variants.dark?.color
+
+						return light === undefined && dark === undefined
+							? escapeHtml(token.content)
+							: `<span style="color:light-dark(${light ?? 'inherit'},${dark ?? 'inherit'})">${escapeHtml(token.content)}</span>`
+					})
+					.join(''),
+			)
 
 			return `export default ${JSON.stringify(htmlLines)}\n`
 		},
