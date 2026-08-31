@@ -281,7 +281,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ecosystemGrants: false,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: true,
-				hiddenConvenienceFees: null,
+				hiddenConvenienceFees: false,
 				publicOffering: false,
 				selfFunded: false,
 				transparentConvenienceFees: true,
