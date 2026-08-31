@@ -1,15 +1,49 @@
-query dApp($shortName: String!, $url: String!, $status: Boolean!) {
-  dApp(shortName: $shortName, url: $url) {
-    name
-    status @include(if: $status)
-    colors {
-      primary
-      fallback
-      shadow
-    }
-    iconURL
-    url
-    description
-    shortName
-  }
+{
+	"highlightFirstLine": 106,
+	"highlightLastLine": 120,
+	"segments": [
+		{
+			"lines": [
+				"query priceChart(",
+				"  $chainId: Int!",
+				"  $address: String!",
+				"  $day: Boolean!",
+				"  $hour: Boolean!",
+				"  $week: Boolean!",
+				"  $month: Boolean!",
+				"  $year: Boolean!",
+				") {",
+				"  token(chainID: $chainId, address: $address) {"
+			],
+			"startLine": 76
+		},
+		{
+			"lines": [
+				"    }",
+				"  }",
+				"}",
+				"",
+				"query dApp($shortName: String!, $url: String!, $status: Boolean!) {",
+				"  dApp(shortName: $shortName, url: $url) {",
+				"    name",
+				"    status @include(if: $status)",
+				"    colors {",
+				"      primary",
+				"      fallback",
+				"      shadow",
+				"    }",
+				"    iconURL",
+				"    url",
+				"    description",
+				"    shortName",
+				"  }",
+				"}",
+				"",
+				"fragment asset on TransactionSimulationAsset {",
+				"  assetCode",
+				"  decimals"
+			],
+			"startLine": 102
+		}
+	]
 }

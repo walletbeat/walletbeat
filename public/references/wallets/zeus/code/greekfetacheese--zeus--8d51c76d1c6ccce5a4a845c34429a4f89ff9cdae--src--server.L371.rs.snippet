@@ -1,1 +1,30 @@
-         result: Some(json!(vec![current_wallet.to_string()])),
+{
+	"highlightFirstLine": 371,
+	"highlightLastLine": 371,
+	"segments": [
+		{
+			"lines": [
+				"async fn request_accounts(",
+				"   ctx: ZeusCtx,",
+				"   origin: &str,",
+				"   payload: JsonRpcRequest,",
+				") -> Result<JsonRpcResponse, Infallible> {"
+			],
+			"startLine": 359
+		},
+		{
+			"lines": [
+				"   if connected {",
+				"      Ok(JsonRpcResponse {",
+				"         jsonrpc: \"2.0\".to_string(),",
+				"         id: payload.id,",
+				"         result: Some(json!(vec![current_wallet.to_string()])),",
+				"         error: None,",
+				"      })",
+				"   } else {",
+				"      return Ok(JsonRpcResponse {"
+			],
+			"startLine": 367
+		}
+	]
+}

@@ -1,12 +1,54 @@
-  if (isRecipientAddressFirstTimeSend) {
-    let message = isRecipientAddressUnknown
-      ? FIRST_TIME_SEND_MESSAGE
-      : FIRST_TIME_SEND_IN_ADDRESS_BOOK_MESSAGE
-    if (lastRecipientTransactionDate) {
-      message = `Last transaction to this address was ${getTimeAgo(lastRecipientTransactionDate)}.`
-    }
-    return {
-      message,
-      severity: lastRecipientTransactionDate ? 'success' : 'warning'
-    }
-  }
+{
+	"highlightFirstLine": 122,
+	"highlightLastLine": 133,
+	"segments": [
+		{
+			"lines": [
+				"const validateSendTransferAddress = (",
+				"  address: string,",
+				"  selectedAcc: string,",
+				"  addressConfirmed: any,",
+				"  isRecipientAddressUnknown: boolean,",
+				"  isRecipientHumanizerKnownTokenOrSmartContract: boolean,",
+				"  isEnsAddress: boolean,",
+				"  isRecipientDomainResolving: boolean,",
+				"  isRecipientAddressFirstTimeSend?: boolean,",
+				"  lastRecipientTransactionDate?: Date | null",
+				"): Validation => {"
+			],
+			"startLine": 89
+		},
+		{
+			"lines": [
+				"  if (isRecipientHumanizerKnownTokenOrSmartContract) {",
+				"    return {"
+			],
+			"startLine": 115
+		},
+		{
+			"lines": [
+				"      severity: 'error'",
+				"    }",
+				"  }",
+				"",
+				"  if (isRecipientAddressFirstTimeSend) {",
+				"    let message = isRecipientAddressUnknown",
+				"      ? FIRST_TIME_SEND_MESSAGE",
+				"      : FIRST_TIME_SEND_IN_ADDRESS_BOOK_MESSAGE",
+				"    if (lastRecipientTransactionDate) {",
+				"      message = `Last transaction to this address was ${getTimeAgo(lastRecipientTransactionDate)}.`",
+				"    }",
+				"    return {",
+				"      message,",
+				"      severity: lastRecipientTransactionDate ? 'success' : 'warning'",
+				"    }",
+				"  }",
+				"",
+				"  if (",
+				"    isRecipientAddressUnknown &&",
+				"    isRecipientAddressFirstTimeSend &&"
+			],
+			"startLine": 118
+		}
+	]
+}

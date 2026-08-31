@@ -1,76 +1,95 @@
-  const isContract = metaTo?.function || metaTo?.created;
-
-  const nonce = useNonceStore((s) => s.getNonce(session)?.currentNonce);
-
-  const functionName = metaTo?.function?.split('(')[0];
-  const contract = metaTo && {
-    address: metaTo.address as Address,
-    name: metaTo.name,
-    iconUrl: metaTo.iconURL,
-  };
-  const isSourceCodeVerified = metaTo?.sourceCodeStatus === 'VERIFIED';
-  const contractCreatedAt = metaTo?.created;
-
-  return (
-    <Box gap="16px" display="flex" flexDirection="column" paddingTop="14px">
-      {metaTransferTo && (
-        <InfoRow
-          symbol="person"
-          label={i18n.t('simulation.to')}
-          value={
-            <AddressDisplay
-              address={metaTransferTo.address as Address}
-              chainId={session.chainId}
-            />
-          }
-        />
-      )}
-      {contract && (
-        <InfoRow
-          symbol={isContract ? 'doc.plaintext' : 'person'}
-          label={
-            isContract ? i18n.t('simulation.contract') : i18n.t('simulation.to')
-          }
-          value={
-            <AddressDisplay
-              address={contract.address}
-              contract={contract}
-              chainId={session.chainId}
-              color="labelSecondary"
-            />
-          }
-        />
-      )}
-      {functionName && (
-        <InfoRow
-          symbol="curlybraces"
-          label={i18n.t('simulation.function')}
-          value={
-            <Tag size="12pt" color="labelSecondary" bleed>
-              {functionName}
-            </Tag>
-          }
-        />
-      )}
-      {metaTo?.sourceCodeStatus && (
-        <InfoRow
-          symbol="doc.text.magnifyingglass"
-          label={i18n.t('simulation.source_code')}
-          value={
-            <Tag
-              size="12pt"
-              color={isSourceCodeVerified ? 'green' : 'labelSecondary'}
-              bleed
-            >
-              {isSourceCodeVerified ? i18n.t('verified') : i18n.t('unverified')}
-            </Tag>
-          }
-        />
-      )}
-      {contractCreatedAt && (
-        <InfoRow
-          symbol="calendar"
-          label={i18n.t('simulation.contract_created_at')}
-          value={formatRelativeDate(contractCreatedAt)}
-        />
-      )}
+{
+	"highlightFirstLine": 206,
+	"highlightLastLine": 281,
+	"segments": [
+		{
+			"lines": [
+				"}) {",
+				"  const metaTo = simulation.meta?.to;",
+				"  const metaTransferTo = simulation.meta?.transferTo;",
+				"",
+				"  const isContract = metaTo?.function || metaTo?.created;",
+				"",
+				"  const nonce = useNonceStore((s) => s.getNonce(session)?.currentNonce);",
+				"",
+				"  const functionName = metaTo?.function?.split('(')[0];",
+				"  const contract = metaTo && {",
+				"    address: metaTo.address as Address,",
+				"    name: metaTo.name,",
+				"    iconUrl: metaTo.iconURL,",
+				"  };",
+				"  const isSourceCodeVerified = metaTo?.sourceCodeStatus === 'VERIFIED';",
+				"  const contractCreatedAt = metaTo?.created;",
+				"",
+				"  return (",
+				"    <Box gap=\"16px\" display=\"flex\" flexDirection=\"column\" paddingTop=\"14px\">",
+				"      {metaTransferTo && (",
+				"        <InfoRow",
+				"          symbol=\"person\"",
+				"          label={i18n.t('simulation.to')}",
+				"          value={",
+				"            <AddressDisplay",
+				"              address={metaTransferTo.address as Address}",
+				"              chainId={session.chainId}",
+				"            />",
+				"          }",
+				"        />",
+				"      )}",
+				"      {contract && (",
+				"        <InfoRow",
+				"          symbol={isContract ? 'doc.plaintext' : 'person'}",
+				"          label={",
+				"            isContract ? i18n.t('simulation.contract') : i18n.t('simulation.to')",
+				"          }",
+				"          value={",
+				"            <AddressDisplay",
+				"              address={contract.address}",
+				"              contract={contract}",
+				"              chainId={session.chainId}",
+				"              color=\"labelSecondary\"",
+				"            />",
+				"          }",
+				"        />",
+				"      )}",
+				"      {functionName && (",
+				"        <InfoRow",
+				"          symbol=\"curlybraces\"",
+				"          label={i18n.t('simulation.function')}",
+				"          value={",
+				"            <Tag size=\"12pt\" color=\"labelSecondary\" bleed>",
+				"              {functionName}",
+				"            </Tag>",
+				"          }",
+				"        />",
+				"      )}",
+				"      {metaTo?.sourceCodeStatus && (",
+				"        <InfoRow",
+				"          symbol=\"doc.text.magnifyingglass\"",
+				"          label={i18n.t('simulation.source_code')}",
+				"          value={",
+				"            <Tag",
+				"              size=\"12pt\"",
+				"              color={isSourceCodeVerified ? 'green' : 'labelSecondary'}",
+				"              bleed",
+				"            >",
+				"              {isSourceCodeVerified ? i18n.t('verified') : i18n.t('unverified')}",
+				"            </Tag>",
+				"          }",
+				"        />",
+				"      )}",
+				"      {contractCreatedAt && (",
+				"        <InfoRow",
+				"          symbol=\"calendar\"",
+				"          label={i18n.t('simulation.contract_created_at')}",
+				"          value={formatRelativeDate(contractCreatedAt)}",
+				"        />",
+				"      )}",
+				"      {!!nonce && (",
+				"        <InfoRow symbol=\"number\" label={i18n.t('nonce')} value={nonce} />",
+				"      )}",
+				"    </Box>"
+			],
+			"startLine": 202
+		}
+	]
+}

@@ -1,8 +1,33 @@
-  const linkFC = async () => {
-    console.log("[FARCASTER] link profile");
-    const action: OffchainAction = {
-      time: now(),
-      type: "profileLink",
-      link: { addr: account.address, linkedAccount: fcAcc },
-    };
-    await updateProfileLinks(account, action);
+{
+	"highlightFirstLine": 141,
+	"highlightLastLine": 148,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 121
+		},
+		{
+			"lines": [
+				"  useEffect(() => dispatcher.dispatch({ name: \"linkFarcaster\" }), []);",
+				"",
+				"  const cancelFC = () => dispatcher.dispatch({ name: \"hideBottomSheet\" });",
+				"",
+				"  const linkFC = async () => {",
+				"    console.log(\"[FARCASTER] link profile\");",
+				"    const action: OffchainAction = {",
+				"      time: now(),",
+				"      type: \"profileLink\",",
+				"      link: { addr: account.address, linkedAccount: fcAcc },",
+				"    };",
+				"    await updateProfileLinks(account, action);",
+				"    dispatcher.dispatch({ name: \"hideBottomSheet\" });",
+				"  };",
+				"",
+				"  const unlinkFC = async () => {"
+			],
+			"startLine": 137
+		}
+	]
+}

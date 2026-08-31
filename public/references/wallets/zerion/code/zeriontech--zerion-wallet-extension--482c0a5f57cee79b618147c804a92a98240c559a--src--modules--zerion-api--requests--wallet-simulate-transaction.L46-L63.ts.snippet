@@ -1,18 +1,33 @@
-export async function walletSimulateTransaction(
-  this: ZerionApiContext,
-  params: Payload,
-  options: ClientOptions = CLIENT_DEFAULTS
-) {
-  const provider = await this.getAddressProviderHeader(params.address);
-  const kyOptions = this.getKyOptions();
-  const endpoint = 'wallet/simulate-transaction/v1';
-  return ZerionHttpClient.post<Response>(
-    {
-      endpoint,
-      body: JSON.stringify(params),
-      headers: { 'Zerion-Wallet-Provider': provider },
-      ...options,
-    },
-    kyOptions
-  );
+{
+	"highlightFirstLine": 46,
+	"highlightLastLine": 63,
+	"segments": [
+		{
+			"lines": [
+				"};",
+				"",
+				"export type InterpretResponse = Response;",
+				"",
+				"export async function walletSimulateTransaction(",
+				"  this: ZerionApiContext,",
+				"  params: Payload,",
+				"  options: ClientOptions = CLIENT_DEFAULTS",
+				") {",
+				"  const provider = await this.getAddressProviderHeader(params.address);",
+				"  const kyOptions = this.getKyOptions();",
+				"  const endpoint = 'wallet/simulate-transaction/v1';",
+				"  return ZerionHttpClient.post<Response>(",
+				"    {",
+				"      endpoint,",
+				"      body: JSON.stringify(params),",
+				"      headers: { 'Zerion-Wallet-Provider': provider },",
+				"      ...options,",
+				"    },",
+				"    kyOptions",
+				"  );",
+				"}"
+			],
+			"startLine": 42
+		}
+	]
 }

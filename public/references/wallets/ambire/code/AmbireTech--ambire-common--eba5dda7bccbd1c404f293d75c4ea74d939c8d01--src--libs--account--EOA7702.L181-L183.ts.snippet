@@ -1,3 +1,28 @@
-  getAtomicStatus(): 'unsupported' | 'supported' | 'ready' {
-    return this.accountState.isSmarterEoa ? 'supported' : 'ready'
-  }
+{
+	"highlightFirstLine": 181,
+	"highlightLastLine": 183,
+	"segments": [
+		{
+			"lines": [
+				"export class EOA7702 extends BaseAccount {"
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"  isSponsorable(): boolean {",
+				"    return this.network.chainId === 100n",
+				"  }",
+				"",
+				"  getAtomicStatus(): 'unsupported' | 'supported' | 'ready' {",
+				"    return this.accountState.isSmarterEoa ? 'supported' : 'ready'",
+				"  }",
+				"",
+				"  getNonceId(): string {",
+				"    // 7702 accounts have an execution layer nonce and an entry point nonce",
+				"    return `${this.accountState.eoaNonce!.toString()}-${this.accountState.erc4337Nonce.toString()}`"
+			],
+			"startLine": 177
+		}
+	]
+}

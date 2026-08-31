@@ -1,1 +1,27 @@
-        const result = await wallet.openapi.getEnsAddressByName(address);
+{
+	"highlightFirstLine": 170,
+	"highlightLastLine": 170,
+	"segments": [
+		{
+			"lines": [
+				"const ImportWatchAddress = () => {"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"  const handleValuesChange = async ({ address }: { address: string }) => {",
+				"    setTags([]);",
+				"    if (!isValidAddress(address)) {",
+				"      setIsValidAddr(false);",
+				"      try {",
+				"        const result = await wallet.openapi.getEnsAddressByName(address);",
+				"        setDisableKeydown(true);",
+				"        if (result && result.addr) {",
+				"          setEnsResult(result);",
+				"        }"
+			],
+			"startLine": 165
+		}
+	]
+}

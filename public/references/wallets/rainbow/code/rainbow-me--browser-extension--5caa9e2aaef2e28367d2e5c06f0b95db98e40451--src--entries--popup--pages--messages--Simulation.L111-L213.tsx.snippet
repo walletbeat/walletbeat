@@ -1,103 +1,153 @@
-        <Inline wrap={false} space="4px" alignVertical="center">
-          <TextOverflow size="14pt" weight="bold" color={color}>
-            {quantity === 'UNLIMITED' || +changeAmount > 999e12 // say unlimited if more than 999T
-              ? i18n.t('approvals.unlimited')
-              : formatNumber(changeAmount)}{' '}
-          </TextOverflow>
-          <Text size="14pt" weight="bold" color={color}>
-            {asset.symbol}
-          </Text>
-        </Inline>
-      </Inline>
-    </Inline>
-  );
+{
+	"highlightFirstLine": 111,
+	"highlightLastLine": 213,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 60
+		},
+		{
+			"lines": [
+				"  return ("
+			],
+			"startLine": 72
+		},
+		{
+			"lines": [
+				"    >"
+			],
+			"startLine": 78
+		},
+		{
+			"lines": [
+				"      <Inline wrap={false} space=\"6px\" alignVertical=\"center\">"
+			],
+			"startLine": 99
+		},
+		{
+			"lines": [
+				"        ) : (",
+				"          <CoinIcon"
+			],
+			"startLine": 102
+		},
+		{
+			"lines": [
+				"            badgePositionBottom={1.5}",
+				"            badgePositionLeft={-4}",
+				"          />",
+				"        )}",
+				"        <Inline wrap={false} space=\"4px\" alignVertical=\"center\">",
+				"          <TextOverflow size=\"14pt\" weight=\"bold\" color={color}>",
+				"            {quantity === 'UNLIMITED' || +changeAmount > 999e12 // say unlimited if more than 999T",
+				"              ? i18n.t('approvals.unlimited')",
+				"              : formatNumber(changeAmount)}{' '}",
+				"          </TextOverflow>",
+				"          <Text size=\"14pt\" weight=\"bold\" color={color}>",
+				"            {asset.symbol}",
+				"          </Text>",
+				"        </Inline>",
+				"      </Inline>",
+				"    </Inline>",
+				"  );",
+				"}",
+				"",
+				"export function SimulationOverview({",
+				"  simulation,",
+				"  status,",
+				"  error,",
+				"}: {",
+				"  simulation: TransactionSimulation | undefined;",
+				"  status: 'pending' | 'error' | 'success';",
+				"  error: SimulationError | null;",
+				"}) {",
+				"  const isMalicious = simulation?.scanning.result !== 'OK';",
+				"  return (",
+				"    <>",
+				"      {status === 'pending' && (",
+				"        <Inline alignVertical=\"center\" space=\"8px\">",
+				"          <Spinner size={16} color=\"blue\" />",
+				"          <Text size=\"14pt\" weight=\"semibold\" color=\"blue\">",
+				"            {i18n.t('simulation.loading')}",
+				"          </Text>",
+				"        </Inline>",
+				"      )}",
+				"",
+				"      {status === 'error' && (",
+				"        <Inline alignVertical=\"center\" space=\"8px\">",
+				"          <Symbol symbol=\"xmark.circle\" size={16} color=\"red\" weight=\"bold\" />",
+				"          <Text size=\"14pt\" weight=\"semibold\" color=\"red\">",
+				"            {error === 'REVERT'",
+				"              ? i18n.t('simulation.reverted')",
+				"              : i18n.t('simulation.error')}",
+				"          </Text>",
+				"        </Inline>",
+				"      )}",
+				"",
+				"      {status === 'success' &&",
+				"        (!simulation?.hasChanges ? (",
+				"          <SimulationNoChangesDetected />",
+				"        ) : (",
+				"          <Stack space=\"14px\">",
+				"            {simulation.out.map(({ asset, quantity }, i) => (",
+				"              <SimulatedChangeRow",
+				"                key={`${asset.address}${i}`}",
+				"                asset={asset}",
+				"                quantity={quantity}",
+				"                color=\"red\"",
+				"                symbol={",
+				"                  <Symbol",
+				"                    size={14}",
+				"                    symbol=\"arrow.up.circle.fill\"",
+				"                    weight=\"bold\"",
+				"                    color=\"red\"",
+				"                  />",
+				"                }",
+				"                label={i18n.t('simulation.sent')}",
+				"              />",
+				"            ))}",
+				"            {simulation.in.map(({ asset, quantity }, i) => (",
+				"              <SimulatedChangeRow",
+				"                key={`${asset.address}${i}`}",
+				"                asset={asset}",
+				"                quantity={quantity}",
+				"                color=\"green\"",
+				"                symbol={",
+				"                  <Symbol",
+				"                    size={14}",
+				"                    symbol=\"arrow.down.circle.fill\"",
+				"                    weight=\"bold\"",
+				"                    color=\"green\"",
+				"                  />",
+				"                }",
+				"                label={i18n.t('simulation.received')}",
+				"              />",
+				"            ))}",
+				"            {simulation?.approvals?.map(({ asset, quantityAllowed }, i) => (",
+				"              <SimulatedChangeRow",
+				"                key={`${asset.address}${i}`}",
+				"                asset={asset}",
+				"                quantity={quantityAllowed}",
+				"                color=\"label\"",
+				"                symbol={",
+				"                  <Symbol",
+				"                    size={14}",
+				"                    symbol=\"checkmark.seal.fill\"",
+				"                    weight=\"bold\"",
+				"                    color={isMalicious ? 'red' : 'blue'}",
+				"                  />",
+				"                }",
+				"                label={i18n.t('simulation.approved')}",
+				"              />",
+				"            ))}",
+				"          </Stack>",
+				"        ))}",
+				"    </>",
+				"  );"
+			],
+			"startLine": 107
+		}
+	]
 }
-
-export function SimulationOverview({
-  simulation,
-  status,
-  error,
-}: {
-  simulation: TransactionSimulation | undefined;
-  status: 'pending' | 'error' | 'success';
-  error: SimulationError | null;
-}) {
-  const isMalicious = simulation?.scanning.result !== 'OK';
-  return (
-    <>
-      {status === 'pending' && (
-        <Inline alignVertical="center" space="8px">
-          <Spinner size={16} color="blue" />
-          <Text size="14pt" weight="semibold" color="blue">
-            {i18n.t('simulation.loading')}
-          </Text>
-        </Inline>
-      )}
-
-      {status === 'error' && (
-        <Inline alignVertical="center" space="8px">
-          <Symbol symbol="xmark.circle" size={16} color="red" weight="bold" />
-          <Text size="14pt" weight="semibold" color="red">
-            {error === 'REVERT'
-              ? i18n.t('simulation.reverted')
-              : i18n.t('simulation.error')}
-          </Text>
-        </Inline>
-      )}
-
-      {status === 'success' &&
-        (!simulation?.hasChanges ? (
-          <SimulationNoChangesDetected />
-        ) : (
-          <Stack space="14px">
-            {simulation.out.map(({ asset, quantity }, i) => (
-              <SimulatedChangeRow
-                key={`${asset.address}${i}`}
-                asset={asset}
-                quantity={quantity}
-                color="red"
-                symbol={
-                  <Symbol
-                    size={14}
-                    symbol="arrow.up.circle.fill"
-                    weight="bold"
-                    color="red"
-                  />
-                }
-                label={i18n.t('simulation.sent')}
-              />
-            ))}
-            {simulation.in.map(({ asset, quantity }, i) => (
-              <SimulatedChangeRow
-                key={`${asset.address}${i}`}
-                asset={asset}
-                quantity={quantity}
-                color="green"
-                symbol={
-                  <Symbol
-                    size={14}
-                    symbol="arrow.down.circle.fill"
-                    weight="bold"
-                    color="green"
-                  />
-                }
-                label={i18n.t('simulation.received')}
-              />
-            ))}
-            {simulation?.approvals?.map(({ asset, quantityAllowed }, i) => (
-              <SimulatedChangeRow
-                key={`${asset.address}${i}`}
-                asset={asset}
-                quantity={quantityAllowed}
-                color="label"
-                symbol={
-                  <Symbol
-                    size={14}
-                    symbol="checkmark.seal.fill"
-                    weight="bold"
-                    color={isMalicious ? 'red' : 'blue'}
-                  />
-                }
-                label={i18n.t('simulation.approved')}
-              />
-            ))}

@@ -1,2 +1,33 @@
-  const keyringService = new KeyringService({
-    encryptor: new RNEncryptor(),
+{
+	"highlightFirstLine": 187,
+	"highlightLastLine": 188,
+	"segments": [
+		{
+			"lines": [
+				"export function loadStartupCoreServices() {"
+			],
+			"startLine": 124
+		},
+		{
+			"lines": [
+				"  contactService.subscribeStoreFields((key, value) => {"
+			],
+			"startLine": 178
+		},
+		{
+			"lines": [
+				"    }",
+				"  });",
+				"  migrateService(APP_STORE_NAMES.contactBook, contactService);",
+				"",
+				"  const keyringService = new KeyringService({",
+				"    encryptor: new RNEncryptor(),",
+				"    keyringClasses,",
+				"    onSetAddressAlias,",
+				"    onCreateKeyring,",
+				"    contactService,"
+			],
+			"startLine": 183
+		}
+	]
+}

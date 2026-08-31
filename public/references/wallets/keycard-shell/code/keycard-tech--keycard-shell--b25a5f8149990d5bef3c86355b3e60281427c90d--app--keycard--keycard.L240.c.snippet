@@ -1,1 +1,26 @@
-static app_err_t keycard_authenticate(keycard_t* kc, uint8_t* pin, uint8_t* cached_pin) {
+{
+	"highlightFirstLine": 240,
+	"highlightLastLine": 240,
+	"segments": [
+		{
+			"lines": [
+				"static app_err_t keycard_unblock(keycard_t* kc, uint8_t pukRetries) {"
+			],
+			"startLine": 203
+		},
+		{
+			"lines": [
+				"",
+				"  return keycard_factoryreset_on_init(kc);",
+				"}",
+				"",
+				"static app_err_t keycard_authenticate(keycard_t* kc, uint8_t* pin, uint8_t* cached_pin) {",
+				"  if (keycard_cmd_get_status(kc) != ERR_OK) {",
+				"    return ERR_TXRX;",
+				"  }",
+				""
+			],
+			"startLine": 236
+		}
+	]
+}

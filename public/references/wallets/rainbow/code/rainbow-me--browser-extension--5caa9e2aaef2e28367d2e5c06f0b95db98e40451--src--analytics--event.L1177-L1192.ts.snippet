@@ -1,16 +1,48 @@
-  [event.walletBackupQuizSubmitted]: {
-    /**
-     * Completed: if the user successfully completes the wallet backup quiz.
-     * Failed: if the user fails to complete the backup quiz.
-     * Skipped: if the user opts to skip the backup quiz completely.
-     */
-    status: 'completed' | 'failed' | 'skipped';
-    /**
-     * The entry point of the wallet backup quiz.
-     */
-    entryPoint: 'onboarding' | 'settings';
-    /**
-     * Index of the wallet seed to track how many backups are completed.
-     */
-    index: number;
-  };
+{
+	"highlightFirstLine": 1177,
+	"highlightLastLine": 1192,
+	"segments": [
+		{
+			"lines": [
+				"export type EventProperties = {"
+			],
+			"startLine": 282
+		},
+		{
+			"lines": [
+				"  [event.tokenUnhidden]: {"
+			],
+			"startLine": 1162
+		},
+		{
+			"lines": [
+				"    /**",
+				"     * Details about hidden assets.",
+				"     */",
+				"    hiddenTokens: number;",
+				"  };",
+				"  [event.walletBackupQuizSubmitted]: {",
+				"    /**",
+				"     * Completed: if the user successfully completes the wallet backup quiz.",
+				"     * Failed: if the user fails to complete the backup quiz.",
+				"     * Skipped: if the user opts to skip the backup quiz completely.",
+				"     */",
+				"    status: 'completed' | 'failed' | 'skipped';",
+				"    /**",
+				"     * The entry point of the wallet backup quiz.",
+				"     */",
+				"    entryPoint: 'onboarding' | 'settings';",
+				"    /**",
+				"     * Index of the wallet seed to track how many backups are completed.",
+				"     */",
+				"    index: number;",
+				"  };",
+				"  [event.walletAdded]:",
+				"    | {",
+				"        type: KeychainType;",
+				"      }"
+			],
+			"startLine": 1172
+		}
+	]
+}

@@ -1,20 +1,47 @@
-  {
-    id: "1018",
-    enable: true,
-    valueDescription: "Have you transferred to this address before",
-    descriptions: {
-      warning: `You've never transferred token to this address before`,
-    },
-    valueDefine: {
-      type: "boolean",
-    },
-    defaultThreshold: {
-      warning: false,
-    },
-    customThreshold: {},
-    requires: ["send"],
-    async getValue(ctx) {
-      const { hasTransfer } = ctx.send!;
-      return hasTransfer;
-    },
-  },
+{
+	"highlightFirstLine": 25,
+	"highlightLastLine": 44,
+	"segments": [
+		{
+			"lines": [
+				"const rules: RuleConfig[] = [",
+				"  {"
+			],
+			"startLine": 3
+		},
+		{
+			"lines": [
+				"    async getValue(ctx) {",
+				"      const { isTokenContract } = ctx.send!;",
+				"      return isTokenContract;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1018\",",
+				"    enable: true,",
+				"    valueDescription: \"Have you transferred to this address before\",",
+				"    descriptions: {",
+				"      warning: `You've never transferred token to this address before`,",
+				"    },",
+				"    valueDefine: {",
+				"      type: \"boolean\",",
+				"    },",
+				"    defaultThreshold: {",
+				"      warning: false,",
+				"    },",
+				"    customThreshold: {},",
+				"    requires: [\"send\"],",
+				"    async getValue(ctx) {",
+				"      const { hasTransfer } = ctx.send!;",
+				"      return hasTransfer;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1019\",",
+				"    enable: true,",
+				"    valueDescription:"
+			],
+			"startLine": 20
+		}
+	]
+}

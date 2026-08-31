@@ -1,5 +1,32 @@
-  // Warn if paying new account
-  let infoBubble = <Spacer h={16} />;
-  if (recipient.lastSendTime == null) {
-    infoBubble = <InfoBox title={i18.firstTime(getContactName(recipient))} />;
-  }
+{
+	"highlightFirstLine": 234,
+	"highlightLastLine": 238,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 215
+		},
+		{
+			"lines": [
+				"  const setSendAmount = () =>",
+				"    nav.navigate(\"SendTab\", {",
+				"      screen: \"SendTransfer\",",
+				"      params: { money, memo, recipient, toCoin },",
+				"    });",
+				"",
+				"  // Warn if paying new account",
+				"  let infoBubble = <Spacer h={16} />;",
+				"  if (recipient.lastSendTime == null) {",
+				"    infoBubble = <InfoBox title={i18.firstTime(getContactName(recipient))} />;",
+				"  }",
+				"  const hasLinkedAccounts =",
+				"    recipient?.type === \"eAcc\" && recipient.linkedAccounts?.length;",
+				"",
+				"  // Validate memo"
+			],
+			"startLine": 228
+		}
+	]
+}

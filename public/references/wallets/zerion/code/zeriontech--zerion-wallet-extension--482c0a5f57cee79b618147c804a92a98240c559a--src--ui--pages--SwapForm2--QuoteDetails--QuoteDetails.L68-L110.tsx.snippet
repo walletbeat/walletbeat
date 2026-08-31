@@ -1,43 +1,68 @@
-function ZerionFeeLabel() {
-  const { data: config, isLoading: isConfigLoading } = useFirebaseConfig([
-    'zerion_fee_learn_more_link',
-  ]);
-  const learnMoreLink = config?.zerion_fee_learn_more_link;
-
-  return (
-    <TooltipProvider placement="top" timeout={150}>
-      <HStack gap={0} alignItems="center">
-        <span>Zerion Fee</span>
-        <TooltipAnchor
-          render={
-            <span
-              style={{
-                display: 'inline-flex',
-                cursor: 'help',
-              }}
-            />
-          }
-        >
-          <InfoIcon
-            style={{
-              width: 20,
-              height: 20,
-              color: 'var(--neutral-500)',
-              display: 'block',
-            }}
-          />
-        </TooltipAnchor>
-      </HStack>
-      <Tooltip className={styles.tooltip} gutter={8} portal={false}>
-        <UIText kind="caption/regular" color="var(--white)">
-          Applies to all Multichain transactions. Zerion Premium DNA holders get
-          discounts.{' '}
-          {isConfigLoading || !learnMoreLink ? null : (
-            <UnstyledAnchor
-              href={learnMoreLink}
-              rel="noopener noreferrer"
-              target="_blank"
-              style={{ color: 'var(--white)', textDecoration: 'underline' }}
-            >
-              Learn more
-            </UnstyledAnchor>
+{
+	"highlightFirstLine": 68,
+	"highlightLastLine": 110,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 51
+		},
+		{
+			"lines": [
+				"  }",
+				"  return content;",
+				"}",
+				"",
+				"function ZerionFeeLabel() {",
+				"  const { data: config, isLoading: isConfigLoading } = useFirebaseConfig([",
+				"    'zerion_fee_learn_more_link',",
+				"  ]);",
+				"  const learnMoreLink = config?.zerion_fee_learn_more_link;",
+				"",
+				"  return (",
+				"    <TooltipProvider placement=\"top\" timeout={150}>",
+				"      <HStack gap={0} alignItems=\"center\">",
+				"        <span>Zerion Fee</span>",
+				"        <TooltipAnchor",
+				"          render={",
+				"            <span",
+				"              style={{",
+				"                display: 'inline-flex',",
+				"                cursor: 'help',",
+				"              }}",
+				"            />",
+				"          }",
+				"        >",
+				"          <InfoIcon",
+				"            style={{",
+				"              width: 20,",
+				"              height: 20,",
+				"              color: 'var(--neutral-500)',",
+				"              display: 'block',",
+				"            }}",
+				"          />",
+				"        </TooltipAnchor>",
+				"      </HStack>",
+				"      <Tooltip className={styles.tooltip} gutter={8} portal={false}>",
+				"        <UIText kind=\"caption/regular\" color=\"var(--white)\">",
+				"          Applies to all Multichain transactions. Zerion Premium DNA holders get",
+				"          discounts.{' '}",
+				"          {isConfigLoading || !learnMoreLink ? null : (",
+				"            <UnstyledAnchor",
+				"              href={learnMoreLink}",
+				"              rel=\"noopener noreferrer\"",
+				"              target=\"_blank\"",
+				"              style={{ color: 'var(--white)', textDecoration: 'underline' }}",
+				"            >",
+				"              Learn more",
+				"            </UnstyledAnchor>",
+				"          )}",
+				"        </UIText>",
+				"      </Tooltip>",
+				"    </TooltipProvider>"
+			],
+			"startLine": 64
+		}
+	]
+}

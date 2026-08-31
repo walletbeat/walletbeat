@@ -1,70 +1,102 @@
-      - name: Audit -- find baseline run
-        id: find-baseline-run
-        if: >-
-          ${{
-            !cancelled()
-            && (
-              github.event_name == 'pull_request'
-              || github.event_name == 'push'
-              || github.event_name == 'schedule'
-            )
-          }}
-        continue-on-error: true
-        uses: actions/github-script@v8
-        with:
-          script: |
-            // Artifact-first search: find the audit-baseline artifact from
-            // the most recent main-branch run. Using the artifact API avoids
-            // race conditions with re-runs — a re-run of an older run may
-            // upload a newer artifact, but we always prefer the highest
-            // run ID (latest workflow run) to stay on the newest commit.
-            //
-            // Security: filter to head_branch === 'main' so a PR branch
-            // can never supply a poisoned baseline.
-            const { data } = await github.rest.actions.listArtifactsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'audit-baseline',
-              per_page: 20,
-            });
-            const baseline = data.artifacts
-              .filter(a => a.workflow_run?.head_branch === 'main')
-              .sort((a, b) => b.workflow_run.id - a.workflow_run.id)[0];
-            if (!baseline) {
-              core.setFailed('No audit-baseline artifact found from a main-branch run');
-              return;
-            }
-            const runId = baseline.workflow_run.id;
-            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId}`;
-            core.info(`Using baseline from run ${runId} (${runUrl})`);
-            core.setOutput('run-id', String(runId));
-
-      - name: Audit -- download baseline
-        id: download-baseline
-        if: ${{ !cancelled() && steps.find-baseline-run.outcome == 'success' }}
-        continue-on-error: true
-        uses: actions/download-artifact@v8
-        with:
-          name: audit-baseline
-          path: .tmp
-          run-id: ${{ steps.find-baseline-run.outputs.run-id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Audit -- check for vulnerabilities
-        if: ${{ !cancelled() && github.event_name != 'merge_group' }}
-        env:
-          NO_BASELINE: ${{ steps.download-baseline.outcome != 'success' }}
-        run: |
-          mkdir -p .tmp
-          yarn tsx .github/scripts/yarn-audit-and-triage.mts
-
-      # --- Diff (runs when a real baseline was downloaded) ---
-      # On push-to-main and cron this detects advisories introduced since the
-      # last green build and sends a Slack notification. On PRs it fails the
-      # check when new production moderate+ advisories are found.
-      - name: Audit -- diff against baseline
-        if: ${{ !cancelled() && steps.download-baseline.outcome == 'success' }}
-        env:
-          BASELINE_RUN_ID: ${{ steps.find-baseline-run.outputs.run-id }}
-        run: |
-          yarn tsx .github/scripts/yarn-audit-diff.mts
+{
+	"highlightFirstLine": 63,
+	"highlightLastLine": 132,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  repository-health-checks:"
+			],
+			"startLine": 6
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"      #",
+				"      # schedule (cron) runs also diff against the latest baseline. This",
+				"      # catches newly published CVEs overnight — even when no code was pushed —",
+				"      # and sends a Slack alert. The cron schedule is defined in main.yml.",
+				"      - name: Audit -- find baseline run",
+				"        id: find-baseline-run",
+				"        if: >-",
+				"          ${{",
+				"            !cancelled()",
+				"            && (",
+				"              github.event_name == 'pull_request'",
+				"              || github.event_name == 'push'",
+				"              || github.event_name == 'schedule'",
+				"            )",
+				"          }}",
+				"        continue-on-error: true",
+				"        uses: actions/github-script@v8",
+				"        with:",
+				"          script: |",
+				"            // Artifact-first search: find the audit-baseline artifact from",
+				"            // the most recent main-branch run. Using the artifact API avoids",
+				"            // race conditions with re-runs — a re-run of an older run may",
+				"            // upload a newer artifact, but we always prefer the highest",
+				"            // run ID (latest workflow run) to stay on the newest commit.",
+				"            //",
+				"            // Security: filter to head_branch === 'main' so a PR branch",
+				"            // can never supply a poisoned baseline.",
+				"            const { data } = await github.rest.actions.listArtifactsForRepo({",
+				"              owner: context.repo.owner,",
+				"              repo: context.repo.repo,",
+				"              name: 'audit-baseline',",
+				"              per_page: 20,",
+				"            });",
+				"            const baseline = data.artifacts",
+				"              .filter(a => a.workflow_run?.head_branch === 'main')",
+				"              .sort((a, b) => b.workflow_run.id - a.workflow_run.id)[0];",
+				"            if (!baseline) {",
+				"              core.setFailed('No audit-baseline artifact found from a main-branch run');",
+				"              return;",
+				"            }",
+				"            const runId = baseline.workflow_run.id;",
+				"            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId}`;",
+				"            core.info(`Using baseline from run ${runId} (${runUrl})`);",
+				"            core.setOutput('run-id', String(runId));",
+				"",
+				"      - name: Audit -- download baseline",
+				"        id: download-baseline",
+				"        if: ${{ !cancelled() && steps.find-baseline-run.outcome == 'success' }}",
+				"        continue-on-error: true",
+				"        uses: actions/download-artifact@v8",
+				"        with:",
+				"          name: audit-baseline",
+				"          path: .tmp",
+				"          run-id: ${{ steps.find-baseline-run.outputs.run-id }}",
+				"          github-token: ${{ secrets.GITHUB_TOKEN }}",
+				"",
+				"      - name: Audit -- check for vulnerabilities",
+				"        if: ${{ !cancelled() && github.event_name != 'merge_group' }}",
+				"        env:",
+				"          NO_BASELINE: ${{ steps.download-baseline.outcome != 'success' }}",
+				"        run: |",
+				"          mkdir -p .tmp",
+				"          yarn tsx .github/scripts/yarn-audit-and-triage.mts",
+				"",
+				"      # --- Diff (runs when a real baseline was downloaded) ---",
+				"      # On push-to-main and cron this detects advisories introduced since the",
+				"      # last green build and sends a Slack notification. On PRs it fails the",
+				"      # check when new production moderate+ advisories are found.",
+				"      - name: Audit -- diff against baseline",
+				"        if: ${{ !cancelled() && steps.download-baseline.outcome == 'success' }}",
+				"        env:",
+				"          BASELINE_RUN_ID: ${{ steps.find-baseline-run.outputs.run-id }}",
+				"        run: |",
+				"          yarn tsx .github/scripts/yarn-audit-diff.mts",
+				"",
+				"      # On push-to-main, rename the audit output to audit-baseline.json so the",
+				"      # uploaded artifact name matches what PR runs download to .tmp.",
+				"      - name: Audit -- rename baseline"
+			],
+			"startLine": 59
+		}
+	]
+}

@@ -1,1 +1,27 @@
-query getdApp($shortName: String!, $url: String!, $status: Boolean!) {
+{
+	"highlightFirstLine": 98,
+	"highlightLastLine": 98,
+	"segments": [
+		{
+			"lines": [
+				"query reverseResolveENSProfile($chainID: Int!, $address: String!, $fields: [String!]) {",
+				"  reverseResolveENSProfile(chainID: $chainID, address: $address, fields: $fields) {"
+			],
+			"startLine": 84
+		},
+		{
+			"lines": [
+				"    }",
+				"  }",
+				"}",
+				"",
+				"query getdApp($shortName: String!, $url: String!, $status: Boolean!) {",
+				"  dApp(shortName: $shortName, url: $url) {",
+				"    name",
+				"    status @include(if: $status)",
+				"    colors {"
+			],
+			"startLine": 94
+		}
+	]
+}

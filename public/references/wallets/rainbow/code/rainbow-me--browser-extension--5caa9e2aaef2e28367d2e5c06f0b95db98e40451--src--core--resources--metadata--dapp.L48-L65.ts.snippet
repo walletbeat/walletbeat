@@ -1,18 +1,37 @@
-async function fetchDappMetadata({
-  url,
-  status,
-}: {
-  url: string;
-  status: boolean;
-}) {
-  const appHostName = url && isValidUrl(url) ? getDappHostname(url) : '';
-  const hardcodedAppName =
-    url && isValidUrl(url)
-      ? getHardcodedDappInformation(appHostName)?.name || ''
-      : '';
-
-  const response = await metadataClient.dApp({
-    shortName: hardcodedAppName,
-    url,
-    status,
-  });
+{
+	"highlightFirstLine": 48,
+	"highlightLastLine": 65,
+	"segments": [
+		{
+			"lines": [
+				"",
+				"// ///////////////////////////////////////////////",
+				"// Query Function",
+				"",
+				"async function fetchDappMetadata({",
+				"  url,",
+				"  status,",
+				"}: {",
+				"  url: string;",
+				"  status: boolean;",
+				"}) {",
+				"  const appHostName = url && isValidUrl(url) ? getDappHostname(url) : '';",
+				"  const hardcodedAppName =",
+				"    url && isValidUrl(url)",
+				"      ? getHardcodedDappInformation(appHostName)?.name || ''",
+				"      : '';",
+				"",
+				"  const response = await metadataClient.dApp({",
+				"    shortName: hardcodedAppName,",
+				"    url,",
+				"    status,",
+				"  });",
+				"",
+				"  const appHost = url && isValidUrl(url) ? getDappHost(url) : '';",
+				"  const appName = response?.dApp?.name",
+				"    ? capitalize(response?.dApp?.name)"
+			],
+			"startLine": 44
+		}
+	]
+}

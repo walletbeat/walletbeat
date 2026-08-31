@@ -1,1 +1,27 @@
-  const walletSeed = seed || generateMnemonic();
+{
+	"highlightFirstLine": 656,
+	"highlightLastLine": 656,
+	"segments": [
+		{
+			"lines": [
+				"}: CreateWalletParams = {}): Promise<null | EthereumWallet> => {",
+				"  if (clearCallbackOnStartCreation) {"
+			],
+			"startLine": 649
+		},
+		{
+			"lines": [
+				"    callbackAfterSeeds = null;",
+				"  }",
+				"  const isImported = !!seed;",
+				"  logger.debug(`[wallet]: ${isImported ? 'Importing new wallet' : 'Creating new wallet'}`, {}, DebugContext.wallet);",
+				"  const walletSeed = seed || generateMnemonic();",
+				"  const addresses: RainbowAccount[] = [];",
+				"  const baseAnalyticsParams = {",
+				"    isImported,",
+				"    isRestoring,"
+			],
+			"startLine": 652
+		}
+	]
+}

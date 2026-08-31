@@ -1,36 +1,56 @@
- * Execute a wallet_sendCalls batch via delegation SDK.
- * Errors out if delegation is not supported or execution fails.
- */
-export async function executeSendCallsBatch({
-  sendParams,
-  from,
-}: {
-  sendParams: SendCallsParams;
-  from: Address;
-}): Promise<ExecuteSendCallsBatchResult> {
-  const chainId = Number(sendParams.chainId);
-
-  const calls: BatchCall[] = sendParams.calls.map((call) => ({
-    to: call.to ?? from,
-    value: toHex(BigInt(call.value ?? '0x0')),
-    data: call.data ?? '0x',
-  }));
-
-  if (!calls.length) {
-    return { success: false, error: 'No calls to execute' };
-  }
-
-  const totalValue = calls.reduce(
-    (sum, c) => sum + BigInt(c.value ?? 0),
-    BigInt(0),
-  );
-
-  const delegationEnabled = getDelegationEnabled();
-  const { supported } = await supportsDelegation({ address: from, chainId });
-  const walletClient = await getViemWalletClient({ address: from, chainId });
-
-  if (!delegationEnabled || !supported || !walletClient) {
-    return {
-      success: false,
-      error: 'Delegation not supported for this wallet or chain',
-    };
+{
+	"highlightFirstLine": 23,
+	"highlightLastLine": 58,
+	"segments": [
+		{
+			"lines": [
+				"export type ExecuteSendCallsBatchResult =",
+				"  | { success: true; nonces: number[] }",
+				"  | { success: false; error: string };",
+				"",
+				"/**",
+				" * Execute a wallet_sendCalls batch via delegation SDK.",
+				" * Errors out if delegation is not supported or execution fails.",
+				" */",
+				"export async function executeSendCallsBatch({",
+				"  sendParams,",
+				"  from,",
+				"}: {",
+				"  sendParams: SendCallsParams;",
+				"  from: Address;",
+				"}): Promise<ExecuteSendCallsBatchResult> {",
+				"  const chainId = Number(sendParams.chainId);",
+				"",
+				"  const calls: BatchCall[] = sendParams.calls.map((call) => ({",
+				"    to: call.to ?? from,",
+				"    value: toHex(BigInt(call.value ?? '0x0')),",
+				"    data: call.data ?? '0x',",
+				"  }));",
+				"",
+				"  if (!calls.length) {",
+				"    return { success: false, error: 'No calls to execute' };",
+				"  }",
+				"",
+				"  const totalValue = calls.reduce(",
+				"    (sum, c) => sum + BigInt(c.value ?? 0),",
+				"    BigInt(0),",
+				"  );",
+				"",
+				"  const delegationEnabled = getDelegationEnabled();",
+				"  const { supported } = await supportsDelegation({ address: from, chainId });",
+				"  const walletClient = await getViemWalletClient({ address: from, chainId });",
+				"",
+				"  if (!delegationEnabled || !supported || !walletClient) {",
+				"    return {",
+				"      success: false,",
+				"      error: 'Delegation not supported for this wallet or chain',",
+				"    };",
+				"  }",
+				"",
+				"  const gas = useGasStore.getState().selectedGas.transactionGasParams;",
+				"  const maxFee = (gas as { maxFeePerGas?: string }).maxFeePerGas;"
+			],
+			"startLine": 18
+		}
+	]
+}

@@ -1,1 +1,38 @@
-      // EIP-5792
+{
+	"highlightFirstLine": 184,
+	"highlightLastLine": 184,
+	"segments": [
+		{
+			"lines": [
+				"export class SafeWalletProvider {"
+			],
+			"startLine": 125
+		},
+		{
+			"lines": [
+				"  private async makeRequest(request: RpcRequest, appInfo: AppInfo): Promise<unknown> {"
+			],
+			"startLine": 135
+		},
+		{
+			"lines": [
+				"    switch (method) {"
+			],
+			"startLine": 138
+		},
+		{
+			"lines": [
+				"      case 'eth_getTransactionReceipt': {",
+				"        return this.eth_getTransactionReceipt(...(params as [string]))",
+				"      }",
+				"",
+				"      // EIP-5792",
+				"      // @see https://eips.ethereum.org/EIPS/eip-5792",
+				"      case 'wallet_sendCalls': {",
+				"        return this.wallet_sendCalls(...(params as [SendCallsParams]), appInfo)",
+				"      }"
+			],
+			"startLine": 180
+		}
+	]
+}

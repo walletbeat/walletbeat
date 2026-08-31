@@ -1,14 +1,42 @@
-      if (
-        isClassProperty(controller, method) &&
-        typeof controller[method as keyof typeof controller] === 'function'
-      ) {
-        mapRPCMessageToController(port, msg, controller, context);
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    if (port.name === `${browser.runtime.id}/ethereum`) {
-      const controller = getWallet().publicEthereumController;
-      return mapToControllerIfPossible(controller);
+{
+	"highlightFirstLine": 25,
+	"highlightLastLine": 38,
+	"segments": [
+		{
+			"lines": [
+				"export function createWalletMessageHandler(",
+				"  getWallet: () => Wallet",
+				"): PortMessageHandler {",
+				"  return function walletMessageHandler(port, msg): boolean {"
+			],
+			"startLine": 12
+		},
+		{
+			"lines": [
+				"    const context = getPortContext(port);",
+				"    const { method } = msg;",
+				"",
+				"    function mapToControllerIfPossible<T>(controller: T) {",
+				"      if (",
+				"        isClassProperty(controller, method) &&",
+				"        typeof controller[method as keyof typeof controller] === 'function'",
+				"      ) {",
+				"        mapRPCMessageToController(port, msg, controller, context);",
+				"        return true;",
+				"      } else {",
+				"        return false;",
+				"      }",
+				"    }",
+				"",
+				"    if (port.name === `${browser.runtime.id}/ethereum`) {",
+				"      const controller = getWallet().publicEthereumController;",
+				"      return mapToControllerIfPossible(controller);",
+				"    } else if (port.name === `${browser.runtime.id}/wallet`) {",
+				"      const controller = getWallet();",
+				"      return mapToControllerIfPossible(controller);",
+				"    } else {"
+			],
+			"startLine": 21
+		}
+	]
+}

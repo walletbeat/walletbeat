@@ -1,3 +1,42 @@
-  generateMnemonic(): string {
-    return bip39.generateMnemonic(wordlist);
-  }
+{
+	"highlightFirstLine": 288,
+	"highlightLastLine": 290,
+	"segments": [
+		{
+			"lines": [
+				"export class KeyringService extends EventEmitter {"
+			],
+			"startLine": 111
+		},
+		{
+			"lines": [
+				"  async importPrivateKeys(",
+				"    privateKeys: string[]",
+				"  ): Promise<BatchImportPrivateKeysResult> {"
+			],
+			"startLine": 212
+		},
+		{
+			"lines": [
+				"    return {"
+			],
+			"startLine": 282
+		},
+		{
+			"lines": [
+				"      duplicateAddresses,",
+				"    };",
+				"  }",
+				"",
+				"  generateMnemonic(): string {",
+				"    return bip39.generateMnemonic(wordlist);",
+				"  }",
+				"",
+				"  async generatePreMnemonic(): Promise<string> {",
+				"    if (!this.isUnlocked()) {",
+				"      throw new Error(i18n.t('background.error.unlock'));"
+			],
+			"startLine": 284
+		}
+	]
+}

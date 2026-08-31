@@ -1,1 +1,26 @@
-  const isScam = metadata?.status === DAppStatus.Scam || verifiedData?.isScam;
+{
+	"highlightFirstLine": 181,
+	"highlightLastLine": 181,
+	"segments": [
+		{
+			"lines": [
+				"export function WalletConnectApprovalSheet() {"
+			],
+			"startLine": 129
+		},
+		{
+			"lines": [
+				"  const { data: metadata } = useDappMetadata({",
+				"    url: verifiedData?.origin || dappUrl,",
+				"  });",
+				"",
+				"  const isScam = metadata?.status === DAppStatus.Scam || verifiedData?.isScam;",
+				"",
+				"  // we can only safely mark a dapp as verified if the source is the browser",
+				"  const isVerified = metadata?.status === DAppStatus.Verified && source === 'browser';",
+				""
+			],
+			"startLine": 177
+		}
+	]
+}

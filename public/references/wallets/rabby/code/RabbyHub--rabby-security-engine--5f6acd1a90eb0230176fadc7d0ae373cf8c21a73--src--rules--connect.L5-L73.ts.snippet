@@ -1,69 +1,88 @@
-  {
-    id: "1001",
-    enable: true,
-    valueDescription: "Site has been flagged as phishing by Rabby",
-    valueDefine: {
-      type: "boolean",
-    },
-    descriptions: {
-      danger: "The website has been flagged as scam by Rabby",
-    },
-    defaultThreshold: {
-      danger: true,
-    },
-    customThreshold: {},
-    requires: ["origin"],
-    async getValue(ctx, apiService) {
-      const origin = ctx.origin!;
-      const { is_scam } = await apiService.getOriginIsScam(origin.url, "rabby");
-      return is_scam;
-    },
-  },
-  {
-    id: "1002",
-    enable: true,
-    valueDescription: "Site has been flagged as phishing by MetaMask",
-    valueDefine: {
-      type: "boolean",
-    },
-    descriptions: {
-      danger: "The website has been flagged as scam by MetaMask",
-    },
-    defaultThreshold: {
-      danger: true,
-    },
-    customThreshold: {},
-    requires: ["origin"],
-    async getValue(ctx, apiService) {
-      const origin = ctx.origin!;
-      const { is_scam } = await apiService.getOriginIsScam(
-        origin.url,
-        "metamask"
-      );
-      return is_scam;
-    },
-  },
-  {
-    id: "1003",
-    enable: true,
-    valueDescription: "Site has been flagged as phishing by ScamSniffer",
-    descriptions: {
-      danger: "The website has been flagged as scam by ScamSniffer",
-    },
-    valueDefine: {
-      type: "boolean",
-    },
-    defaultThreshold: {
-      danger: true,
-    },
-    customThreshold: {},
-    requires: ["origin"],
-    async getValue(ctx, apiService) {
-      const origin = ctx.origin!;
-      const { is_scam } = await apiService.getOriginIsScam(
-        origin.url,
-        "scamsniffer"
-      );
-      return is_scam;
-    },
-  },
+{
+	"highlightFirstLine": 5,
+	"highlightLastLine": 73,
+	"segments": [
+		{
+			"lines": [
+				"import { RuleConfig } from \".\";",
+				"import { caseInsensitiveCompare } from \"../utils\";",
+				"",
+				"const rules: RuleConfig[] = [",
+				"  {",
+				"    id: \"1001\",",
+				"    enable: true,",
+				"    valueDescription: \"Site has been flagged as phishing by Rabby\",",
+				"    valueDefine: {",
+				"      type: \"boolean\",",
+				"    },",
+				"    descriptions: {",
+				"      danger: \"The website has been flagged as scam by Rabby\",",
+				"    },",
+				"    defaultThreshold: {",
+				"      danger: true,",
+				"    },",
+				"    customThreshold: {},",
+				"    requires: [\"origin\"],",
+				"    async getValue(ctx, apiService) {",
+				"      const origin = ctx.origin!;",
+				"      const { is_scam } = await apiService.getOriginIsScam(origin.url, \"rabby\");",
+				"      return is_scam;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1002\",",
+				"    enable: true,",
+				"    valueDescription: \"Site has been flagged as phishing by MetaMask\",",
+				"    valueDefine: {",
+				"      type: \"boolean\",",
+				"    },",
+				"    descriptions: {",
+				"      danger: \"The website has been flagged as scam by MetaMask\",",
+				"    },",
+				"    defaultThreshold: {",
+				"      danger: true,",
+				"    },",
+				"    customThreshold: {},",
+				"    requires: [\"origin\"],",
+				"    async getValue(ctx, apiService) {",
+				"      const origin = ctx.origin!;",
+				"      const { is_scam } = await apiService.getOriginIsScam(",
+				"        origin.url,",
+				"        \"metamask\"",
+				"      );",
+				"      return is_scam;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1003\",",
+				"    enable: true,",
+				"    valueDescription: \"Site has been flagged as phishing by ScamSniffer\",",
+				"    descriptions: {",
+				"      danger: \"The website has been flagged as scam by ScamSniffer\",",
+				"    },",
+				"    valueDefine: {",
+				"      type: \"boolean\",",
+				"    },",
+				"    defaultThreshold: {",
+				"      danger: true,",
+				"    },",
+				"    customThreshold: {},",
+				"    requires: [\"origin\"],",
+				"    async getValue(ctx, apiService) {",
+				"      const origin = ctx.origin!;",
+				"      const { is_scam } = await apiService.getOriginIsScam(",
+				"        origin.url,",
+				"        \"scamsniffer\"",
+				"      );",
+				"      return is_scam;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1004\",",
+				"    enable: true,",
+				"    valueDescription:"
+			],
+			"startLine": 1
+		}
+	]
+}

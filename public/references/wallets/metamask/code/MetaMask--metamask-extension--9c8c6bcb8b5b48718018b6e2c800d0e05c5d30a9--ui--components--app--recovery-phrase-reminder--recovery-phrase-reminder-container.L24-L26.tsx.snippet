@@ -1,3 +1,28 @@
-  if (!showRecoveryPhraseReminder || isPrimarySeedPhraseBackedUp) {
-    return null;
-  }
+{
+	"highlightFirstLine": 24,
+	"highlightLastLine": 26,
+	"segments": [
+		{
+			"lines": [
+				"export function RecoveryPhraseReminderContainer() {"
+			],
+			"startLine": 12
+		},
+		{
+			"lines": [
+				"  const onConfirm = useCallback(() => {",
+				"    dispatch(setRecoveryPhraseReminderHasBeenShown());",
+				"    dispatch(setRecoveryPhraseReminderLastShown(new Date().getTime()));",
+				"  }, [dispatch]);",
+				"",
+				"  if (!showRecoveryPhraseReminder || isPrimarySeedPhraseBackedUp) {",
+				"    return null;",
+				"  }",
+				"",
+				"  return <RecoveryPhraseReminder onConfirm={onConfirm} />;",
+				"}"
+			],
+			"startLine": 19
+		}
+	]
+}
