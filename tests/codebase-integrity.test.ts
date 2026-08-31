@@ -59,7 +59,6 @@ const ALLOWED_EXTENSIONS = new Set([
 	'.tsv',
 	'.yaml',
 	'.toml',
-	// Stored code snippets from external repositories,
 	'.snippet',
 ])
 

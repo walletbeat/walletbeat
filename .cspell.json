@@ -701,7 +701,7 @@
 		"node_modules/**",
 		"pnpm-lock.yaml",
 		"public/**/*.svg",
-		"public/references/wallets/*/code/**",
+		"public/references/wallets/*/code/*.snippet",
 		"resources/files/**",
 		"src/generated/**",
 		"src/legacy/**",
