@@ -274,8 +274,7 @@ export const zerion: SoftwareWallet = {
 							url: 'https://zerion.io/security',
 						},
 						{
-							explanation:
-								'The zeriontech organization publishes no iOS or Android app repository; the mobile source that is published is the wallet core alone.',
+							explanation: 'The iOS and Android apps are closed source.',
 							label: 'Zerion repository listing',
 							lastRetrieved: '2026-08-30',
 							url: 'https://github.com/orgs/zeriontech/repositories',
