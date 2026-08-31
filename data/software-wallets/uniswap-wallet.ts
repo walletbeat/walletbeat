@@ -57,7 +57,7 @@ const trailOfBitsAudits: SecurityAudit[] = [
 		},
 		unpatchedFlaws: [
 			{
-				name: 'Third-party applications can take and read screenshots of the Android client screen (TOB-UNIMOB2-12)',
+				name: 'External applications can take and read screenshots of the Android client screen (TOB-UNIMOB2-12)',
 				presentStatus: 'NOT_FIXED',
 				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
 			},
@@ -156,7 +156,7 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Username/ENS resolution is fetched from the Uniswap Unitags API, an offchain service, rather than resolved directly on-chain.',
+						'Username/ENS resolution is fetched from the Uniswap Unitags API, an offchain service, rather than resolved directly onchain.',
 					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts',
 				},
 			],
@@ -387,7 +387,7 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								"The extension derives the mnemonic-encryption key from the user's password via PBKDF2 (Web Crypto's deriveKey, 100,000 iterations, SHA-256), then encrypts the mnemonic with AES-GCM.",
+								"The extension derives the mnemonic-encryption key from the user's password via PBKDF2 (Web Crypto's `deriveKey`, 100,000 iterations, SHA-256), then encrypts the mnemonic with `AES-GCM`.",
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/crypto.ts#L100-L118',
 						},
 					],
@@ -400,7 +400,7 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'On Android, mnemonics are stored in EncryptedSharedPreferences backed by an Android Keystore hardware master key (AES-256). iOS mirrors this by storing mnemonics directly in the native Keychain (hardware-backed Secure Enclave).',
+								'On Android, mnemonics are stored in `EncryptedSharedPreferences` backed by an Android Keystore hardware master key (AES-256). iOS mirrors this by storing mnemonics directly in the native Keychain (hardware-backed Secure Enclave).',
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/android/app/src/main/java/com/uniswap/RnEthersRs.kt#L24-L34',
 						},
 					],
@@ -444,7 +444,7 @@ export const uniswapWallet: SoftwareWallet = {
 		walletCall: supported({
 			ref: {
 				explanation:
-					'An EIP-5792 wallet capability test shows wallet_sendCalls is supported, but atomicity support is not declared, so batched calls are not guaranteed atomic.',
+					'An EIP-5792 wallet capability test shows `wallet_sendCalls` is supported, but atomicity support is not declared, so batched calls are not guaranteed atomic.',
 				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png',
 				label: 'EIP-5792 wallet capability test results for Uniswap Wallet',
 			},

@@ -12,7 +12,7 @@ export const uniswapCalibur: SmartWalletContract = {
 	sourceCode: {
 		ref: {
 			explanation:
-				"Calibur is Uniswap's open-source, non-upgradeable EIP-7702 smart-wallet delegate contract. It inherits ERC4337Account (implementing validateUserOp) and ERC1271 (implementing isValidSignature) alongside ERC7821 batching, key management, and other modules.",
+				"Calibur is Uniswap's open-source, non-upgradeable EIP-7702 smart-wallet delegate contract. It inherits `ERC4337Account` (implementing `validateUserOp`) and ERC1271 (implementing `isValidSignature`) alongside `ERC7821` batching, key management, and other modules.",
 			label: 'Calibur (Uniswap)',
 			url: 'https://github.com/Uniswap/calibur',
 		},
