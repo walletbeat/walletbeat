@@ -74,7 +74,7 @@ export const zerion: SoftwareWallet = {
 		coinspectId: 'zerion',
 		contributors: [lucemans, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-19',
+		lastUpdated: '2026-08-31',
 		urls: {
 			docs: ['https://developers.zerion.io/'],
 			extensions: [
@@ -467,16 +467,30 @@ export const zerion: SoftwareWallet = {
 				upgradePathAvailable: false,
 			}),
 			duressResistance: {
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: true,
-						[BasicUnlockMechanism.PASSWORD]: false,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation: 'The app unlocks with a PIN or with fingerprint or face unlock.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-31-zerion-android-security-settings.png',
+								label: 'Security settings on Android',
+							},
+							{
+								explanation: 'The app unlocks with a PIN or with fingerprint or face unlock.',
+								file: 'public/references/wallets/zerion/screenshots/2026-08-31-zerion-ios-security-settings.png',
+								label: 'Security settings on iOS',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: true,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
 					},
+					duressMode: notSupported,
 				},
-				duressMode: notSupported,
 			},
 			hardwareWalletSupport: {
 				ref: [
