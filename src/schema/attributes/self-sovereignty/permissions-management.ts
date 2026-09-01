@@ -150,6 +150,9 @@ export const permissionsManagement: Attribute = {
 		permission to spend tokens on your behalf.
 		Malicious or compromised contracts with existing approvals can drain your wallet,
 		and approvals to other accounts carry the same risk.
+		[Over $362M has been stolen since 2020](https://revoke.cash/exploits) through such
+		approval hacks and exploits, where attackers use an existing approval to drain
+		the funds a user approved without directly compromising their wallet.
 
 		Being able to inspect and revoke approvals is an important tool for protecting
 		your assets from unnecessary or dangerous delegated spending authority.

@@ -371,7 +371,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	},
 	question: sentence('Does the wallet warn the user about potential scams?'),
 	why: markdown(
-		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.',
+		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction. This is especially true for unlimited token approvals: if the approved contract is later exploited, attackers can use that approval to drain the funds a user approved, a class of exploit that has [stolen over $362M since 2020](https://revoke.cash/exploits).',
 	),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
