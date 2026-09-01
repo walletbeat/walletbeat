@@ -344,7 +344,18 @@ export const uniswapWallet: SoftwareWallet = {
 			duressResistance: {
 				[Variant.BROWSER]: {
 					basicUnlock: {
-						ref: refTodo,
+						ref: [
+							{
+								explanation:
+									'The extension unlock screen dispatches an Unlock auth action with the user-entered password, confirming password is a supported basic-unlock mechanism.',
+								url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/lockScreen/useUnlockWithPassword.ts#L1-L17',
+							},
+							{
+								explanation:
+									'authenticateWithBiometricCredential() calls navigator.credentials.get() (WebAuthn) with userVerification: "required" and uses the resulting credential to derive a CryptoKey that decrypts a stored copy of the user\'s password, i.e. biometric unlock is implemented and used to unlock the extension.',
+								url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/biometricUnlock/biometricAuthUtils.ts#L18-L50',
+							},
+						],
 						mechanisms: {
 							[BasicUnlockMechanism.PIN]: false,
 							[BasicUnlockMechanism.PASSWORD]: true,
@@ -356,7 +367,11 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 				[Variant.MOBILE]: {
 					basicUnlock: {
-						ref: refTodo,
+						ref: {
+							explanation:
+								'tryLocalAuthenticate() calls expo-local-authentication\'s authenticateAsync() with biometricsSecurityLevel: "strong" to unlock via the OS biometric prompt (Face ID / Touch ID / Android fingerprint), confirming biometric is the app\'s unlock mechanism.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/features/biometrics/biometrics-utils.ts#L34-L84',
+						},
 						mechanisms: {
 							[BasicUnlockMechanism.PIN]: false,
 							[BasicUnlockMechanism.PASSWORD]: false,
