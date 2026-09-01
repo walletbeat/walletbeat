@@ -132,7 +132,9 @@
 		"Crecimiento",
 		"cron",
 		"Crunchbase",
+		"CryptoKey",
 		"Cryptpad",
+		"cspell",
 		"CSPRNG",
 		"ctfassets",
 		"ctrl",
@@ -202,6 +204,7 @@
 		"eth",
 		"EthCC",
 		"Ethereans",
+		"ethers",
 		"Etherscan",
 		"evenodd",
 		"everland",
@@ -236,6 +239,7 @@
 		"Game7",
 		"Gantt",
 		"gatekeeping",
+		"GCM",
 		"gemwallet",
 		"geolocation",
 		"Geth",
@@ -500,7 +504,7 @@
 		"riscv",
 		"rman",
 		"RNBW",
-		"RnEthersRs",
+		"RNEthersRS",
 		"roadmap",
 		"roadmaps",
 		"rollouts",
@@ -619,6 +623,7 @@
 		"uniswap",
 		"Unitags",
 		"unopinionated",
+		"unpatched",
 		"unproxied",
 		"unresearched",
 		"unreviewable",
@@ -739,11 +744,11 @@
 		{ "name": "tl;dr", "pattern": "/\\btl;dr\\b/g" },
 		{
 			"name": "Technical tokens",
-			"pattern": "/\\b[a-z0-9_-]+(?:\\.[a-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
+			"pattern": "/\\b[a-z0-9_-]+(?:\\.[a-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|kt|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swift|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
 		},
 		{
 			"name": "Mixed-case filenames",
-			"pattern": "/\\b(?=[a-z0-9_-]*[A-Z])[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
+			"pattern": "/\\b(?=[a-z0-9_-]*[A-Z])[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|kt|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swift|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
 		}
 	],
 	"ignoreRegExpList": [

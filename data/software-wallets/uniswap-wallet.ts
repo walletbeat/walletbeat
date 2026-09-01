@@ -352,7 +352,7 @@ export const uniswapWallet: SoftwareWallet = {
 							},
 							{
 								explanation:
-									'authenticateWithBiometricCredential() calls navigator.credentials.get() (WebAuthn) with userVerification: "required" and uses the resulting credential to derive a CryptoKey that decrypts a stored copy of the user\'s password, i.e. biometric unlock is implemented and used to unlock the extension.',
+									'`authenticateWithBiometricCredential()` calls `navigator.credentials.get()` (WebAuthn) with `userVerification`: "required" and uses the resulting credential to derive a CryptoKey that decrypts a stored copy of the user\'s password, i.e. biometric unlock is implemented and used to unlock the extension.',
 								url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/biometricUnlock/biometricAuthUtils.ts#L18-L50',
 							},
 						],
@@ -369,7 +369,7 @@ export const uniswapWallet: SoftwareWallet = {
 					basicUnlock: {
 						ref: {
 							explanation:
-								'tryLocalAuthenticate() calls expo-local-authentication\'s authenticateAsync() with biometricsSecurityLevel: "strong" to unlock via the OS biometric prompt (Face ID / Touch ID / Android fingerprint), confirming biometric is the app\'s unlock mechanism.',
+								'`tryLocalAuthenticate()` calls expo-local-authentication\'s `authenticateAsync()` with `biometricsSecurityLevel`: "strong" to unlock via the OS biometric prompt (Face ID / Touch ID / Android fingerprint), confirming biometric is the app\'s unlock mechanism.',
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/features/biometrics/biometrics-utils.ts#L34-L84',
 						},
 						mechanisms: {
@@ -390,17 +390,17 @@ export const uniswapWallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"generateAndStoreMnemonic() on the browser extension calls ethers Wallet.createRandom() locally and stores the resulting mnemonic client-side, with no network call, confirming key generation happens entirely on the user's device for this wallet mode.",
+							"`generateAndStoreMnemonic()` on the browser extension calls ethers `Wallet.createRandom()` locally and stores the resulting mnemonic client-side, with no network call, confirming key generation happens entirely on the user's device for this wallet mode.",
 						url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/Keyring.web.ts#L274-L284',
 					},
 					{
 						explanation:
-							'generateAndStoreMnemonic() on mobile delegates to the RNEthersRS native module, whose Swift/Kotlin implementation (see below) shows the actual key generation is a local FFI call, not a network request.',
+							'`generateAndStoreMnemonic()` on mobile delegates to the `RNEthersRS` native module, whose Swift/Kotlin implementation (see below) shows the actual key generation is a local FFI call, not a network request.',
 						url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/Keyring.native.ts#L76-L78',
 					},
 					{
 						explanation:
-							'The iOS native module calls generate_mnemonic() (a local FFI call into a bundled Rust library, source not present in this repo) and stores the result directly in the iOS Keychain with .accessibleWhenUnlockedThisDeviceOnly, confirming on-device generation and storage with no server round trip.',
+							'The iOS native module calls `generate_mnemonic()`, a local FFI call into a bundled Rust library whose source is not present in this repo. It stores the result directly in the iOS Keychain with `.accessibleWhenUnlockedThisDeviceOnly`. This confirms on-device generation and storage with no server round trip.',
 						url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Uniswap/RNEthersRs/RNEthersRS.swift#L98-L119',
 					},
 				],
