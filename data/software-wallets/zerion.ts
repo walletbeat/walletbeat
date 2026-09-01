@@ -267,7 +267,7 @@ export const zerion: SoftwareWallet = {
 				[Variant.MOBILE]: {
 					ref: {
 						explanation:
-							'Zerion states only that the core code of its iOS and Android apps is open for review.',
+							'While Zerion states that the core code of its iOS and Android apps is open for review, the broader mobile application code is not.',
 						label: 'Zerion security page, "Open source"',
 						lastRetrieved: '2026-08-30',
 						url: 'https://zerion.io/security',
