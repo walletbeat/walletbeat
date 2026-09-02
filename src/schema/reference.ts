@@ -17,6 +17,7 @@
  * ```
  */
 
+import type { DataSource } from '@/schema/data-sources'
 import type { CalendarDate } from '@/types/date'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
@@ -115,6 +116,11 @@ export interface FullyQualifiedReference {
 
 	/** The date the reference was last retrieved. */
 	lastRetrieved?: CalendarDate
+
+	/**
+	 * External dataset this citation was adapted from, when applicable.
+	 */
+	source?: DataSource
 }
 
 /** Type predicate for FullyQualifiedReference. */

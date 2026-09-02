@@ -421,6 +421,7 @@
 	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
+	import DataSourceCredits from '@/views/DataSourceCredits.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
@@ -1248,6 +1249,10 @@
 					cardBackground="secondary"
 				/>
 			{/if}
+
+			<DataSourceCredits
+				references={toFullyQualified(evalAttr.evaluation.references)}
+			/>
 
 			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
 				{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
