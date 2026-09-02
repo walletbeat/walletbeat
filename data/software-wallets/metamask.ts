@@ -3,6 +3,7 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { coinspectRef } from '@/schema/data-sources/coinspect'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -88,7 +89,7 @@ export const metamask: SoftwareWallet = {
 		coinspectId: 'metamask',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-22',
+		lastUpdated: '2026-09-01',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -539,6 +540,14 @@ export const metamask: SoftwareWallet = {
 								'Metamask provides address poisoning alerts live on Metamask and Extension across all networks',
 							url: 'https://x.com/MetaMask/status/2067299428680265791',
 						},
+						coinspectRef({
+							check: 'WSR-THRE-002.v1',
+							note: 'The wallet successfully warns the user about a deceptive address while trying to send funds to the Tornado Cash Attacker address.',
+							report: {
+								date: '2026-01-12T17:52:05.136Z',
+								walletUID: 'metamask-browser',
+							},
+						}),
 					],
 					addressPoisoningDetection: true,
 					leaksRecipient: true,
