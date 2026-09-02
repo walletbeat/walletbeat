@@ -119,7 +119,7 @@ this should be focused on expanding the privacy tooling. Once you post the tweet
 
 Kohaku is one wallet but we want others as well.
 
-You can also link to #1111 to show that this can get complicated.
+You can also link to #1111 to show that this can get complicated: https://github.com/walletbeat/walletbeat/issues/1111
 
 ## What type of non-financial support (if any) would make a difference in your progress and growth journey *
 
@@ -154,7 +154,9 @@ The Ethereum Foundation, through the ESP grant above, and several of our regular
 
 We were presented at EthCC[9], introduced by Hester Bruikman (Ethereum Foundation) https://youtu.be/xMu5IoY9Djc?si=pTpn53XnD3cV6IYB 
 
-Web 3 Privacy Now named us in their privacy landscape overview.[ADD LINKS] 
+Web 3 Privacy Now named us in their privacy landscape overview:
+https://x.com/web3privacy/status/2082834950110273749 
+https://docs.fileverse.io/document/vbfFeSm9V5KhggKed3rnWE
 
 And our data already gets used under the hood by third-party tools like WalletRadar and Casberi App: https://x.com/walletbeat/status/2090690312574234815
 
