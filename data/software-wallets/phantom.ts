@@ -346,7 +346,7 @@ export const phantom: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
+				artifactSigning: notSupported,
 				dependencyLocking: notSupported,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
