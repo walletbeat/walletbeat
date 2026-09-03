@@ -97,7 +97,7 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 			for (let stageIndex = 0; stageIndex < ladderEvaluation.ladder.stages.length; stageIndex++) {
 				const s = ladderEvaluation.ladder.stages[stageIndex]
 
-				stageSection.push(`### Stage ${stageIndex}: ${s.label}`, '')
+				stageSection.push(`### ${s.label}`, '')
 
 				const { passedCount, totalCount } = computeCountsAndStatus(
 					allCriteriaInStage(s),

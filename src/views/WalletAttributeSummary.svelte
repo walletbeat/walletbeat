@@ -81,6 +81,15 @@
 		||
 			undefined
 	)
+
+	const relevantStageLabels = $derived(
+		ladderEvaluation
+			? relevantStages
+				.map(stageIndex => ladderEvaluation.ladder.stages[stageIndex])
+				.filter(stage => stage !== undefined)
+				.map(stage => stage.label.replace(/^Stage /, ''))
+			: []
+	)
 </script>
 
 
@@ -102,13 +111,13 @@
 					<a
 						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
 						data-link="camouflaged"
-						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+						title={`This attribute is required for stage${relevantStageLabels.length > 1 ? 's' : ''} ${relevantStageLabels.join(', ')}`}
 					>
 						<div
 							data-badge="small"
 							style:--accent="var(--accent-color)"
 						>
-							<small>Stage {relevantStages.join(', ')}</small>
+							<small>Stage {relevantStageLabels.join(', ')}</small>
 						</div>
 					</a>
 
