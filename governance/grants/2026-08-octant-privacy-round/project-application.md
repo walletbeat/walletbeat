@@ -105,6 +105,38 @@ Walletbeat's website code, rating pipeline, and wallet database are all and will
 
 Define the best measure(s) of your traction. Provide numbers and links. See our examples based on category. https://docs.google.com/document/d/1nGZTwhXyxolIKDYhaOFSNapbnwnWBJedo-InIhe-T94/edit?usp=sharing
 
+1) Repository and contributors:
+
+572 pull requests merged in the last 12 months; 711 all-time.
+
+2,151 commits in the last 12 months; 3,290 all-time.
+
+33 distinct commit authors in the last 12 months; 63 all-time.
+
+116 stars, 84 forks.
+
+2) Effects on Wallets:
+
+- 2025-12: Walletbeat publishes the L1 Provider Independence Test; two major wallets shipped in fixes in response
+
+	- 2026-01: Reaction: Ambire fixes its L1 RPC configuration option to be available at wallet setup time
+
+	- 2026-07: Reaction: MetaMask (quietly) fixes its hard-reliance on a Consensys token metadata service when sending tokens
+
+- 2026-07: Walletbeat contributor 0xMattmatt shows how multiple wallets handle a malicious Ethereum transaction that caused a user to lose ~300k USD; two wallets shipped fixes within days
+	- Reaction: Ambire fixes this in their next release
+	- Reaction: WalletChan fixes this in their next release
+	- Reaction: Ambire thanks Walletbeat for bringing this issue to their attention
+
+- 2026-08: Walletbeat contributor polymutex points out that flagging IPFS gateways such as .eth.limo reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant). 
+	- Reaction: Ambire unflags IPFS gateways: https://x.com/borislavItskovv/status/2090563980549042476 & https://x.com/ambire/status/2090483593407529375
+
+- 2026-08 - Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited token approvals that caused a user to lose ~$500K: https://x.com/0xMattmatt/status/2089770628828237918 
+	- Reaction: Ambire pushed an update to flag unlimited token approval for untrusted contracts also thanked Walletbeat for its work: https://x.com/borislavItskovv/status/2090566092808982840
+ 	- Reaction: Ambire's official update for flagging unlimited token approval credits Walletbeat contributor @0xmattmatt for the research.
+
+- Multiple wallet teams have contributed their own data directly, and we run ongoing direct channels with several teams.
+
 # Your Funding & Future
 
 ## Please share funding goal for Epoch 13: *
@@ -115,11 +147,10 @@ $5,000 USD in USD.
 
 Be specific.
 
-this should be focused on expanding the privacy tooling. Once you post the tweet thread where we show the wallet privacy analysis workshop video, you can link it here, I think it would show off what we're doing here and why it's difficult to scale to more wallets.
+This funding will be focused on expanding the privacy tooling. 
 
-Kohaku is one wallet but we want others as well.
-
-You can also link to #1111 to show that this can get complicated: https://github.com/walletbeat/walletbeat/issues/1111
+This wallet privacy analysis workshop video shows off what we're doing here and why it's difficult to scale to more wallets: https://x.com/walletbeat/status/2092001260853702694
+This can get complicated: https://github.com/walletbeat/walletbeat/issues/1111
 
 ## What type of non-financial support (if any) would make a difference in your progress and growth journey *
 
@@ -154,9 +185,10 @@ The Ethereum Foundation, through the ESP grant above, and several of our regular
 
 We were presented at EthCC[9], introduced by Hester Bruikman (Ethereum Foundation) https://youtu.be/xMu5IoY9Djc?si=pTpn53XnD3cV6IYB 
 
-Web 3 Privacy Now named us in their privacy landscape overview:
-https://x.com/web3privacy/status/2082834950110273749 
+Web 3 Privacy Now named us in their privacy landscape overview: 
 https://docs.fileverse.io/document/vbfFeSm9V5KhggKed3rnWE
+https://x.com/web3privacy/status/2082834950110273749
+https://x.com/web3privacy/status/2082835011237990487
 
 And our data already gets used under the hood by third-party tools like WalletRadar and Casberi App: https://x.com/walletbeat/status/2090690312574234815
 
@@ -173,7 +205,12 @@ Recordings and slides are public (https://github.com/walletbeat/walletbeat/tree/
 
 Provide 1-2 verifiable measures.
 
-This needs to be scoped to the privacy work being funded specifically.
+By the privacy work being funded specifically. Find bellow the links to those issues:
+- https://github.com/walletbeat/walletbeat/issues/1111
+- https://github.com/walletbeat/walletbeat/issues/1062
+- https://github.com/walletbeat/walletbeat/issues/1061
+- https://github.com/walletbeat/walletbeat/issues/1055
+
 Link to #1111, and the other "Data Collection" issues in the issue tracker.
 
 ## Need Help?
