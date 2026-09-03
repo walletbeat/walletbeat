@@ -218,7 +218,28 @@ export const zerion: SoftwareWallet = {
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'The extension assigns its provider to the standard provider property of the web page. That provider implements the EIP-1193 request method, and inherits from its JSON-RPC base class the listener methods that EIP-2700 requires.',
+						url: [
+							{
+								label: 'Provider class in the extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/modules/ethereum/provider.ts#L53-L185',
+							},
+							{
+								label: 'Provider assignment in the extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/in-page.ts#L115-L145',
+							},
+						],
+					},
+					{
+						explanation:
+							'The extension announces its provider to web pages with an EIP-6963 announcement event, and announces it again whenever a web page requests it.',
+						label: 'EIP-6963 provider announcement in the extension source code',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/eip6963.ts#L23-L47',
+					},
+				],
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
