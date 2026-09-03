@@ -35,6 +35,43 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import type { Nullable } from '@/types/utils/nullable'
+
+import { certik } from '../entities/certik'
+import gemwalletAndroidParsed from './manifests/gemwallet/android.parsed.json'
+import gemwalletIosParsed from './manifests/gemwallet/ios.parsed.json'
+
+const securityAudits: SecurityAudit[] = [
+	{
+		ref: {
+			explanation:
+				'CertiK performed a security audit of Gem Wallet covering key management, transaction signing, seed handling, and address derivation. The report lists 0 critical and 0 major findings, 6 medium-severity findings (all resolved), and 5 minor findings (below the medium-severity threshold tracked here).',
+			label: 'Gem Wallet CertiK Security Audit (April 2026)',
+			url: 'https://static.gemwallet.com/audits/Gem-Wallet-CertiK-Security-Audit-April-2026.pdf',
+		},
+		auditDate: '2026-04-08',
+		auditor: certik,
+		unpatchedFlaws: 'ALL_FIXED',
+		variantsScope: 'ALL_VARIANTS',
+	},
+]
+
+const bugBountyRefs: References = [
+	{
+		explanation:
+			'Gem Wallet launched a self-hosted bug bounty program on November 12, 2025, covering the iOS and Android apps, open-source repositories, and backend infrastructure, with rewards from $100 to $8,000 based on severity.',
+		label: 'Gem Wallet Launches Bug Bounty Program',
+		url: 'https://gemwallet.com/learn/gem-wallet-launches-bug-bounty-program/',
+	},
+	{
+		explanation:
+			'As of June 2, 2026, Gem Wallet no longer operates a standing monetary bug bounty program; private/responsible vulnerability disclosure remains open for good-faith, reproducible reports, with in-scope targets being the latest iOS/Android apps, the Gem Wallet monorepo, and gemwallet.com/api.gemwallet.com/gemnodes.com. No Safe Harbor or other explicit legal-protection language is provided, only a requirement that testing be conducted in good faith.',
+		label: 'Gem Wallet Responsible Disclosure Policy',
+		lastRetrieved: '2026-09-03',
+		url: 'https://gemwallet.com/security/bug-bounty/',
+	},
+]
 
 export const gemwallet: SoftwareWallet = {
 	metadata: {
