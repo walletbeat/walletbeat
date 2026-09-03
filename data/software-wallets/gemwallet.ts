@@ -83,8 +83,12 @@ export const gemwallet: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-14',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml',
 			docs: ['https://docs.gemwallet.com/'],
-			repositories: ['https://github.com/gemwalletcom/gem-ios'],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/gemwalletcom/wallet/main/ios/Gem/Resources/Info.plist',
+			repositories: ['https://github.com/gemwalletcom/wallet'],
 			socials: {
 				discord: 'https://discord.com/invite/4jpxtwT8r6',
 				instagram: 'https://www.instagram.com/GemWalletApp/',
