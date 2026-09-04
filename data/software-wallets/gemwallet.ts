@@ -521,7 +521,9 @@ export const gemwallet: SoftwareWallet = {
 				artifactSigning: null,
 				dependencyLocking: null,
 				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				hasPublicChangelog: supported({
+					ref: 'https://github.com/gemwalletcom/wallet/releases',
+				}),
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
 				reproducibleBuilds: null,
