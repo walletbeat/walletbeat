@@ -280,9 +280,22 @@ export const gemwallet: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Both Arbitrum and OP Stack chains are supported chains with their own EVM provider wiring, but no force-inclusion. Yransactions can only be submitted through the configured RPC endpoint.',
+							urls: [
+								{
+									label: 'Arbitrum, Optimism, Base among the supported EVM chains',
+									url: 'https://github.com/gemwalletcom/wallet/blob/a226cade5f681218649cf75bbe26be07c3977329/core/crates/primitives/src/chain_evm.rs#L21-L23',
+								},
+							],
+						},
+					],
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
