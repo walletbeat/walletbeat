@@ -364,7 +364,26 @@ export const rainbow: SoftwareWallet = {
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation: 'Rainbow supports EIP-1193 and EIP-2700.',
+						url: [
+							{
+								label: 'Provider class in the Rainbow provider library',
+								url: 'https://github.com/rainbow-me/provider/blob/dfceaa7fb049cc486de43fc7af1bf68b458d39b9/src/RainbowProvider.ts#L12-L117',
+							},
+							{
+								label: 'Provider events emitted by the extension',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L40-L61',
+							},
+						],
+					},
+					{
+						explanation: 'Rainbow supports EIP-6963.',
+						label: 'EIP-6963 provider announcement in the extension source code',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L65-L80',
+					},
+				],
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
