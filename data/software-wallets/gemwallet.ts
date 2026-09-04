@@ -383,7 +383,28 @@ export const gemwallet: SoftwareWallet = {
 					newRecipientWarning: true,
 					userWhitelist: false,
 				}),
-				unlimitedApprovalWarning: null,
+				unlimitedApprovalWarning: supported<UnlimitedApprovalWarning>({
+					ref: [
+						{
+							explanation:
+								'Gem Wallet\'s simulation engine detects ERC-20 `approve` calls whose amount equals the max uint160/uint256 value and displays the approval value as "Unlimited" (rather than an exact amount) as part of a transaction warning, purely from local calldata decoding.',
+							urls: [
+								{
+									label: 'Unlimited approval detection',
+									url: 'https://github.com/gemwalletcom/wallet/blob/c8721ea2ea2d612a71acd8d4a243815751e6a860/core/crates/simulation/src/evm/approval_value.rs#L8-L34',
+								},
+								{
+									label: 'Approval simulation warning built from the decoded value',
+									url: 'https://github.com/gemwalletcom/wallet/blob/a51a29c1015ffa9af3896c313aebd65ee63ece52/core/crates/simulation/src/evm/approval_request.rs#L143-L160',
+								},
+							],
+						},
+					],
+					leaksSpenderAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					warnsOnUnlimitedApproval: true,
+				}),
 			},
 			securityBestPractices: null,
 			transactionLegibility: null,
