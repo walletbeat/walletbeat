@@ -20,7 +20,10 @@ import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
-import type { ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -163,8 +166,8 @@ export const gemwallet: SoftwareWallet = {
 				},
 				{
 					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configureable.jpg',
-					label: 'Gem wallet allows configureable RPC.'
-				}
+					label: 'Gem wallet allows configureable RPC.',
+				},
 			],
 			customChainRpcEndpoint: featureSupported,
 			l1: null,
@@ -219,7 +222,8 @@ export const gemwallet: SoftwareWallet = {
 						{
 							explanation:
 								'No crash-reporting SDK (e.g. Crashlytics, Sentry) was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Performance Monitoring explicitly deactivated via manifest meta-data.',
-							label: 'No crash-reporting SDK; Firebase Performance explicitly disabled in AndroidManifest.xml',
+							label:
+								'No crash-reporting SDK; Firebase Performance explicitly disabled in AndroidManifest.xml',
 							url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
 						},
 					],
@@ -229,7 +233,8 @@ export const gemwallet: SoftwareWallet = {
 						{
 							explanation:
 								'No product-analytics SDK (e.g. Amplitude, Mixpanel, PostHog) was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Analytics and ad-ID collection explicitly deactivated via manifest meta-data.',
-							label: 'No product-analytics SDK; Firebase Analytics/ad-ID explicitly disabled in AndroidManifest.xml',
+							label:
+								'No product-analytics SDK; Firebase Analytics/ad-ID explicitly disabled in AndroidManifest.xml',
 							url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
 						},
 					],
@@ -290,8 +295,9 @@ export const gemwallet: SoftwareWallet = {
 						},
 						{
 							file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-security-face-id.jpg',
-							label: `Gem Wallet's mobile app shows Face ID as a security lock but no pin or passwords.`
-						}
+							label:
+								"Gem Wallet's mobile app shows Face ID as a security lock but no pin or passwords.",
+						},
 					],
 					mechanisms: {
 						[BasicUnlockMechanism.PIN]: false,
@@ -390,11 +396,10 @@ export const gemwallet: SoftwareWallet = {
 						{
 							explanation:
 								'Every chain client (including the EVM broadcast path) is built from a single per-chain endpoint URL supplied by the platform-side `AlienProvider.get_endpoint(chain)`, the same endpoint Gem Wallet lets users override with a fully custom RPC node from Settings > Network. There is no separate relay/bundler path for transaction broadcast: `eth_sendRawTransaction` goes out over that same client.',
-							url: 
-								{
-									label: 'EVM transaction broadcast goes through that same client',
-									url: 'https://github.com/gemwalletcom/wallet/blob/61971f542acbe85caabea6363fb84e4a612cf701/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L20-L26',
-								},
+							url: {
+								label: 'EVM transaction broadcast goes through that same client',
+								url: 'https://github.com/gemwalletcom/wallet/blob/61971f542acbe85caabea6363fb84e4a612cf701/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L20-L26',
+							},
 						},
 					],
 					selfBroadcastViaDirectGossip: notSupported,
