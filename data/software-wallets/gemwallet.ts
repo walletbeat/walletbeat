@@ -254,9 +254,19 @@ export const gemwallet: SoftwareWallet = {
 			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					ref: [
+						{
+							explanation:
+								'Every chain client (including the EVM broadcast path) is built from a single per-chain endpoint URL supplied by the platform-side `AlienProvider.get_endpoint(chain)`, the same endpoint Gem Wallet lets users override with a fully custom RPC node from Settings > Network. There is no separate relay/bundler path for transaction broadcast: `eth_sendRawTransaction` goes out over that same client.',
+							url: 
+								{
+									label: 'EVM transaction broadcast goes through that same client',
+									url: 'https://github.com/gemwalletcom/wallet/blob/61971f542acbe85caabea6363fb84e4a612cf701/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L20-L26',
+								},
+						},
+					],
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]: null,
