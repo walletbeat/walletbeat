@@ -196,7 +196,16 @@ export const gemwallet: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: false,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
+				},
+			},
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
