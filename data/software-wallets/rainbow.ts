@@ -366,8 +366,7 @@ export const rainbow: SoftwareWallet = {
 			browser: {
 				ref: [
 					{
-						explanation:
-							'The provider that the Rainbow extension injects into web pages implements the EIP-1193 request method, and extends an event emitter, which gives it the listener methods that EIP-2700 requires. The extension emits connection, disconnection, chain change and account change events on it.',
+						explanation: 'Rainbow supports EIP-1193 and EIP-2700.',
 						url: [
 							{
 								label: 'Provider class in the Rainbow provider library',
@@ -380,8 +379,7 @@ export const rainbow: SoftwareWallet = {
 						],
 					},
 					{
-						explanation:
-							'The extension announces its provider to web pages with an EIP-6963 announcement event.',
+						explanation: 'Rainbow supports EIP-6963.',
 						label: 'EIP-6963 provider announcement in the extension source code',
 						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L65-L80',
 					},
