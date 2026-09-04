@@ -67,7 +67,7 @@ const bugBountyRefs: References = [
 	{
 		explanation:
 			'As of June 2, 2026, Gem Wallet no longer operates a standing monetary bug bounty program; private/responsible vulnerability disclosure remains open for good-faith, reproducible reports, with in-scope targets being the latest iOS/Android apps, the Gem Wallet monorepo, and gemwallet.com/api.gemwallet.com/gemnodes.com. No Safe Harbor or other explicit legal-protection language is provided, only a requirement that testing be conducted in good faith.',
-		label: 'Gem Wallet Responsible Disclosure Policy',
+		label: 'Gem Wallet no longer runs a standing bug bounty program',
 		lastRetrieved: '2026-09-03',
 		url: 'https://gemwallet.com/security/bug-bounty/',
 	},
