@@ -215,6 +215,7 @@ export const gemwallet: SoftwareWallet = {
 						[BasicUnlockMechanism.PATTERN]: false,
 					},
 				},
+				duressMode: notSupported,
 			},
 			hardwareWalletSupport: null,
 			keysHandling: null,
