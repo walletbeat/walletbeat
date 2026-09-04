@@ -230,6 +230,34 @@ export const gemwallet: SoftwareWallet = {
 			}),
 			duressResistance: {
 				basicUnlock: {
+					ref: [
+						{
+							explanation:
+								"On iOS, unlocking the wallet's keystore password stored in the Keychain is gated behind Face ID/Touch ID or the device passcode. On Android, the equivalent Tink-encrypted secret store is gated behind BiometricPrompt.",
+							urls: [
+								{
+									label: 'iOS keystore password gated by biometrics/device passcode',
+									url: 'https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L104',
+								},
+								{
+									label: 'Android BiometricPrompt authenticators (biometric or device credential)',
+									url: 'https://github.com/gemwalletcom/wallet/blob/5225ec8834ee5ff33ffe64a7b9c9b1c3ff026762/android/app/src/main/kotlin/com/gemwallet/android/SystemAuthPolicy.kt#L18-L19',
+								},
+							],
+						},
+
+						{
+							explanation:
+								'Face ID / biometric app-lock is documented as a Settings > Security toggle.',
+							label: 'How to Configure Your Gem Wallet Settings',
+							lastRetrieved: '2026-09-03',
+							url: 'https://docs.gemwallet.com/guides/configure-settings/',
+						},
+						{
+							file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-security-face-id.jpg',
+							label: `Gem Wallet's mobile app shows Face ID as a security lock but no pin or passwords.`
+						}
+					],
 					mechanisms: {
 						[BasicUnlockMechanism.PIN]: false,
 						[BasicUnlockMechanism.PASSWORD]: false,
