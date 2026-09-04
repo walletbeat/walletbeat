@@ -407,6 +407,8 @@ export const gemwallet: SoftwareWallet = {
 				}),
 			},
 			securityBestPractices: {
+				browser: 'NOT_A_BROWSER_EXTENSION',
+				desktop: 'NOT_A_DESKTOP_APP',
 				mobile: {
 					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
 					mobileAppHardening: parseMobileManifestJson(gemwalletAndroidParsed, gemwalletIosParsed),
