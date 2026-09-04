@@ -230,6 +230,14 @@ export const zerion: SoftwareWallet = {
 								label: 'Provider assignment in the extension source code',
 								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/in-page.ts#L115-L145',
 							},
+							{
+								label: 'Event listener methods inherited from the provider dependency',
+								url: 'https://github.com/WalletConnect/walletconnect-utils/blob/cf54c6dd7a535498dae31205a57f51bd1468c7f8/jsonrpc/provider/src/provider.ts#L38-L53',
+							},
+							{
+								label: 'Provider dependency version pinned in the extension lockfile',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/package-lock.json#L6502-L6505',
+							},
 						],
 					},
 					{
