@@ -410,6 +410,37 @@ export const gemwallet: SoftwareWallet = {
 				browser: 'NOT_A_BROWSER_EXTENSION',
 				desktop: 'NOT_A_DESKTOP_APP',
 				mobile: {
+					ref: [
+						{
+							explanation:
+								"Gem Wallet's shared Rust core (`gem_keystore` v4) encrypts each wallet's mnemonic/private key with AES-256-GCM under a key derived via Argon2id from a 256-bit random per-device password, using a random salt/nonce per encryption and an authenticated file format.",
+								label: 'Argon2id key derivation and AES-256-GCM seal/open',
+								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_keystore/src/storage/crypto.rs#L1-L26',
+						},
+						{
+							explanation:
+								'The 256-bit device password that seals the keystore file is itself generated with `SecureRandom` and stored via Tink, wrapped by an AES-256-GCM key held in the Android Keystore. On iOS, the equivalent device secret is stored in the system Keychain.',
+							urls: [
+								{
+									label: 'Random 256-bit device password generation',
+									url: 'https://github.com/gemwalletcom/wallet/blob/34fdd5958f97b860b75789513c6869ee8c8fe8d0/android/app/src/main/kotlin/com/gemwallet/android/data/password/TinkPasswordStore.kt#L26-L52',
+								},
+								{
+									label: 'Tink AEAD keyset wrapped by an Android Keystore master key',
+									url: 'https://github.com/gemwalletcom/wallet/blob/eaf09d562edaee530d0d12b5214d1125031ea656/android/app/src/main/kotlin/com/gemwallet/android/data/password/TinkEncryptedKeyValueStore.kt#L60-L91',
+								},
+								{
+									label: 'iOS Keychain-backed device secret storage',
+									url: 'https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L100-L106',
+								},
+							],
+						},
+						{
+							explanation:
+								'Entropy for mnemonic/salt generation is drawn from the OS CSPRNG via the `getrandom` crate.',
+							url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_crypto/src/random.rs',
+						},
+					],
 					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
 					mobileAppHardening: parseMobileManifestJson(gemwalletAndroidParsed, gemwalletIosParsed),
 					secureRng: SecureRngSource.OS_CSPRNG,
