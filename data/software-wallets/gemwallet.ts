@@ -46,7 +46,7 @@ const securityAudits: SecurityAudit[] = [
 	{
 		ref: {
 			explanation:
-				'CertiK performed a security audit of Gem Wallet covering key management, transaction signing, seed handling, and address derivation. The report lists 0 critical and 0 major findings, 6 medium-severity findings (all resolved), and 5 minor findings (below the medium-severity threshold tracked here).',
+				'CertiK performed a security audit of Gem Wallet covering key management, transaction signing, seed handling, and address derivation. The report lists 0 critical and 0 major findings, 6 medium-severity findings, and 5 minor findings, all resolved.',
 			label: 'Gem Wallet CertiK Security Audit (April 2026)',
 			url: 'https://static.gemwallet.com/audits/Gem-Wallet-CertiK-Security-Audit-April-2026.pdf',
 		},
