@@ -267,7 +267,24 @@ export const gemwallet: SoftwareWallet = {
 				},
 				duressMode: notSupported,
 			},
-			hardwareWalletSupport: null,
+			hardwareWalletSupport: {
+				ref: [
+					{
+						explanation:
+							'Ledger and Trezor hardware wallet integration is listed as a "Coming Soon" item on Gem Wallet\'s public roadmaps.',
+						label: 'Gem Wallet security page (hardware wallet roadmap) and public roadmap',
+						lastRetrieved: '2026-09-03',
+						urls: [
+							{ label: 'Security page', url: 'https://gemwallet.com/security/' },
+							{
+								label: 'Public roadmap',
+								url: 'https://github.com/orgs/gemwalletcom/projects/4',
+							},
+						],
+					},
+				],
+				wallets: {},
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: notSupported,
