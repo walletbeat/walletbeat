@@ -519,7 +519,28 @@ export const gemwallet: SoftwareWallet = {
 			orderflowPractices: null,
 			releaseTransparency: {
 				artifactSigning: null,
-				dependencyLocking: null,
+				dependencyLocking: supported<WithRef<{}>>({
+					ref: [
+						{
+							explanation:
+								'Gradle dependency locking is enabled for the Android build (committed `settings-gradle.lockfile`); the Rust core commits a `Cargo.lock`. Each Swift Package commits a `Package.resolved`, resolved by CI via `just spm-resolve` before building.',
+							urls: [
+								{
+									label: 'Android Gradle settings lockfile',
+									url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/settings-gradle.lockfile',
+								},
+								{
+									label: 'Rust core Cargo.lock',
+									url: 'https://github.com/gemwalletcom/wallet/blob/d88663d1e12e4f15b041bf36a00ef9bb89a2293b/core/Cargo.lock',
+								},
+								{
+									label: 'iOS SPM Package.resolved (example package)',
+									url: 'https://github.com/gemwalletcom/wallet/blob/d705e619cc493eeba850d0eb5eaf7ddded043937/ios/Packages/Validators/Package.resolved',
+								},
+							],
+						},
+					],
+				}),
 				dependencyVulnerabilityScanning: null,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/gemwalletcom/wallet/releases',
