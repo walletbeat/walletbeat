@@ -406,7 +406,13 @@ export const gemwallet: SoftwareWallet = {
 					warnsOnUnlimitedApproval: true,
 				}),
 			},
-			securityBestPractices: null,
+			securityBestPractices: {
+				mobile: {
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					mobileAppHardening: parseMobileManifestJson(gemwalletAndroidParsed, gemwalletIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
