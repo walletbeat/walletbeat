@@ -83,7 +83,7 @@ export const rainbow: SoftwareWallet = {
 		coinspectId: 'rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-22',
+		lastUpdated: '2026-09-03',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -802,14 +802,85 @@ export const rainbow: SoftwareWallet = {
 				}),
 			},
 			hardwareWalletSupport: {
-				ref: refTodo,
-				wallets: {
-					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB, HardwareWalletConnection.bluetooth],
-					}),
-					[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
-					}),
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'Rainbow documents connecting Ledger and Trezor devices to the extension.',
+							label: 'Connecting a hardware wallet to the Rainbow extension',
+							lastRetrieved: '2026-09-03',
+							url: 'https://rainbow.me/support/extension/connect-your-hardware-wallet',
+						},
+						{
+							explanation: 'The extension signs with Ledger devices over WebHID.',
+							label: 'Extension opening the Ledger device over WebHID to sign',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/handlers/ledger.ts#L12-L55',
+						},
+						{
+							explanation:
+								'The extension connects to Trezor devices over WebUSB, through Trezor Connect.',
+							url: [
+								{
+									label: 'Trezor Connect transports the extension configures',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/App.tsx#L53-L61',
+								},
+								{
+									label: 'Trezor Connect used by the extension to sign',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/handlers/trezor.ts#L13-L75',
+								},
+								{
+									label: 'WebUSB permission page the extension ships for Trezor Connect',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/vendor/trezor-usb-permissions.js#L58-L67',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
+					},
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'Rainbow documents connecting Ledger devices to the mobile app over Bluetooth.',
+							label: 'Adding a wallet from Ledger to the Rainbow mobile app',
+							lastRetrieved: '2026-09-03',
+							url: 'https://rainbow.me/support/app/add-a-wallet-from-ledger-to-rainbow',
+						},
+						{
+							explanation: 'The mobile app signs with Ledger devices over Bluetooth Low Energy.',
+							label: 'Mobile app opening the Ledger device over Bluetooth to sign',
+							url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/features/hardware-wallet/utils/ledger.ts#L1-L48',
+						},
+						{
+							explanation: 'The mobile app does not connect to Trezor devices.',
+							url: [
+								{
+									label: 'Mobile app source code calling Trezor unsupported',
+									url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/analytics/userProperties.ts#L28-L29',
+								},
+								{
+									label: 'Account types the mobile app supports',
+									url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/helpers/walletTypes.ts#L1-L7',
+								},
+								{
+									label: 'Hardware wallet libraries in the mobile app dependencies',
+									url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/package.json#L194-L195',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.bluetooth],
+						}),
+					},
 				},
 			},
 			keysHandling: {
