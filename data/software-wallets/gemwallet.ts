@@ -449,7 +449,7 @@ export const gemwallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: [
