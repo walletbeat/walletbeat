@@ -240,7 +240,7 @@ export const gemwallet: SoftwareWallet = {
 					],
 				}),
 			},
-			appIsolation: null,
+			appIsolation: {type:'APP_CONNECTION_NOT_SUPPORTED'},
 			dataCollection: null,
 			privacyPolicy: 'https://gemwallet.com/privacy',
 			transactionPrivacy: {
