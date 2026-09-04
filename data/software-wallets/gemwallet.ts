@@ -105,7 +105,24 @@ export const gemwallet: SoftwareWallet = {
 			defaultAccountType: AccountType.eoa,
 			eip7702: notSupported,
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							"Gem Wallet's shared Rust core generates a BIP-39 mnemonic locally (entropy from the OS CSPRNG via the `getrandom` crate) and derives account private keys using BIP-44 (BIP-32-style secp256k1 derivation for EVM chains).",
+						label:
+							'Mnemonic generation (`Mnemonic::generate`) and BIP-44 derivation (`derive_private_key_from_mnemonic`)',
+						urls: [
+							{
+								label: 'gem_keystore mnemonic generation',
+								url: 'https://github.com/gemwalletcom/wallet/blob/d597d9bcc391be24cb5be2e7afaee0e5276a9ec5/core/crates/gem_keystore/src/mnemonic.rs#L10-L14',
+							},
+							{
+								label: 'gem_derivation BIP-44 private key derivation',
+								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_derivation/src/mnemonic/derivation.rs#L39-L58',
+							},
+						],
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
