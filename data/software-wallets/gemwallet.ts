@@ -69,7 +69,7 @@ const bugBountyRefs: References = [
 	},
 	{
 		explanation:
-			'As of June 2, 2026, Gem Wallet no longer operates a standing monetary bug bounty program; private/responsible vulnerability disclosure remains open for good-faith, reproducible reports, with in-scope targets being the latest iOS/Android apps, the Gem Wallet monorepo, and gemwallet.com/api.gemwallet.com/gemnodes.com. No Safe Harbor or other explicit legal-protection language is provided, only a requirement that testing be conducted in good faith.',
+			'As of June 2, 2026, Gem Wallet no longer operates a standing monetary bug bounty program. Private/responsible vulnerability disclosure remains open for good-faith, reproducible reports, with in-scope targets being the latest iOS/Android apps, the Gem Wallet monorepo, and gemwallet.com/api.gemwallet.com/gemnodes.com. No Safe Harbor or other explicit legal-protection language is provided, only a requirement that testing be conducted in good faith.',
 		label: 'Gem Wallet no longer runs a standing bug bounty program',
 		lastRetrieved: '2026-09-03',
 		url: 'https://gemwallet.com/security/bug-bounty/',
@@ -111,7 +111,7 @@ export const gemwallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Gem Wallet's shared Rust core generates a BIP-39 mnemonic locally (entropy from the OS CSPRNG via the `getrandom` crate) and derives account private keys using BIP-44 (BIP-32-style secp256k1 derivation for EVM chains).",
+							"Gem Wallet's shared Rust core generates a BIP-39 mnemonic locally (entropy from the OS CSPRNG via the `getrandom` crate) and derives account private keys using BIP-44 (BIP-32-style `secp256k1` derivation for EVM chains).",
 						label:
 							'Mnemonic generation (`Mnemonic::generate`) and BIP-44 derivation (`derive_private_key_from_mnemonic`)',
 						urls: [
@@ -120,7 +120,7 @@ export const gemwallet: SoftwareWallet = {
 								url: 'https://github.com/gemwalletcom/wallet/blob/d597d9bcc391be24cb5be2e7afaee0e5276a9ec5/core/crates/gem_keystore/src/mnemonic.rs#L10-L14',
 							},
 							{
-								label: 'gem_derivation BIP-44 private key derivation',
+								label: '`gem_derivation` BIP-44 private key derivation',
 								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_derivation/src/mnemonic/derivation.rs#L39-L58',
 							},
 						],
@@ -165,8 +165,8 @@ export const gemwallet: SoftwareWallet = {
 					url: 'https://docs.gemwallet.com/guides/custom-rpc/',
 				},
 				{
-					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configureable.jpg',
-					label: 'Gem wallet allows configureable RPC.',
+					file: 'public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg',
+					label: 'Gem wallet allows configurable RPC.',
 				},
 			],
 			customChainRpcEndpoint: featureSupported,
@@ -232,7 +232,7 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'No product-analytics SDK (e.g. Amplitude, Mixpanel, PostHog) was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Analytics and ad-ID collection explicitly deactivated via manifest meta-data.',
+								'No product-analytics SDK was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Analytics and ad-ID collection explicitly deactivated via manifest meta-data.',
 							label:
 								'No product-analytics SDK; Firebase Analytics/ad-ID explicitly disabled in AndroidManifest.xml',
 							url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
@@ -240,7 +240,7 @@ export const gemwallet: SoftwareWallet = {
 					],
 				}),
 			},
-			appIsolation: {type:'APP_CONNECTION_NOT_SUPPORTED'},
+			appIsolation: { type: 'APP_CONNECTION_NOT_SUPPORTED' },
 			dataCollection: null,
 			privacyPolicy: 'https://gemwallet.com/privacy',
 			transactionPrivacy: {
@@ -273,14 +273,15 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								"On iOS, unlocking the wallet's keystore password stored in the Keychain is gated behind Face ID/Touch ID or the device passcode. On Android, the equivalent Tink-encrypted secret store is gated behind BiometricPrompt.",
+								"On iOS, unlocking the wallet's keystore password stored in the Keychain is gated behind Face ID/Touch ID or the device passcode. On Android, the equivalent Tink-encrypted secret store is gated behind `BiometricPrompt`.",
 							urls: [
 								{
 									label: 'iOS keystore password gated by biometrics/device passcode',
 									url: 'https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L104',
 								},
 								{
-									label: 'Android BiometricPrompt authenticators (biometric or device credential)',
+									label:
+										'Android `BiometricPrompt` authenticators (biometric or device credential)',
 									url: 'https://github.com/gemwalletcom/wallet/blob/5225ec8834ee5ff33ffe64a7b9c9b1c3ff026762/android/app/src/main/kotlin/com/gemwallet/android/SystemAuthPolicy.kt#L18-L19',
 								},
 							],
@@ -330,7 +331,7 @@ export const gemwallet: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Gem Wallet's shared Rust core generates the BIP-39 mnemonic entropy locally via the OS CSPRNG (`getrandom` crate) with no server involvement, and the full private key/mnemonic is held and used entirely on the user's device (standard BIP-32/44 derivation, no key splitting or MPC).",
+							"Gem Wallet's shared Rust core generates the BIP-39 mnemonic entropy locally via the OS CSPRNG (`getrandom` crate) with no server involvement. The full private key/mnemonic is held and used entirely on the user's device (standard BIP-32/44 derivation, no key splitting or MPC).",
 						urls: [
 							{
 								label: 'Local entropy generation via OS CSPRNG',
@@ -387,7 +388,7 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Gem Wallet\'s simulation engine detects ERC-20 `approve` calls whose amount equals the max uint160/uint256 value and displays the approval value as "Unlimited" (rather than an exact amount) as part of a transaction warning, purely from local calldata decoding.',
+								'Gem Wallet\'s simulation engine detects ERC-20 `approve` calls whose amount equals the max `uint160`/`uint256` value and displays the approval value as "Unlimited" (rather than an exact amount) as part of a transaction warning, purely from local calldata decoding.',
 							urls: [
 								{
 									label: 'Unlimited approval detection',
@@ -413,9 +414,9 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								"Gem Wallet's shared Rust core (`gem_keystore` v4) encrypts each wallet's mnemonic/private key with AES-256-GCM under a key derived via Argon2id from a 256-bit random per-device password, using a random salt/nonce per encryption and an authenticated file format.",
-								label: 'Argon2id key derivation and AES-256-GCM seal/open',
-								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_keystore/src/storage/crypto.rs#L1-L26',
+								"Gem Wallet's shared Rust core (`gem_keystore` v4) encrypts each wallet's mnemonic/private key with AES-256-GCM under a key derived via Argon2Id from a 256-bit random per-device password, using a random salt/nonce per encryption and an authenticated file format.",
+							label: 'Argon2Id key derivation and AES-256-GCM seal/open',
+							url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_keystore/src/storage/crypto.rs#L1-L26',
 						},
 						{
 							explanation:
@@ -469,7 +470,7 @@ export const gemwallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Both Arbitrum and OP Stack chains are supported chains with their own EVM provider wiring, but no force-inclusion. Yransactions can only be submitted through the configured RPC endpoint.',
+								'Both Arbitrum and OP Stack chains are supported chains with their own EVM provider wiring, but no force-inclusion. Transactions can only be submitted through the configured RPC endpoint.',
 							urls: [
 								{
 									label: 'Arbitrum, Optimism, Base among the supported EVM chains',
@@ -534,7 +535,7 @@ export const gemwallet: SoftwareWallet = {
 									url: 'https://github.com/gemwalletcom/wallet/blob/d88663d1e12e4f15b041bf36a00ef9bb89a2293b/core/Cargo.lock',
 								},
 								{
-									label: 'iOS SPM Package.resolved (example package)',
+									label: 'iOS SPM `Package.resolved` (example package)',
 									url: 'https://github.com/gemwalletcom/wallet/blob/d705e619cc493eeba850d0eb5eaf7ddded043937/ios/Packages/Validators/Package.resolved',
 								},
 							],
