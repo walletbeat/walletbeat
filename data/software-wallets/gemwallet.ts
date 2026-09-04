@@ -203,7 +203,7 @@ export const gemwallet: SoftwareWallet = {
 				ethereumL1: notSupported,
 			},
 			passkeyVerification: notSupported,
-			publicSecurityAudits: null,
+			publicSecurityAudits: securityAudits,
 			scamAlerts: {
 				contractTransactionWarning: supported({
 					ref: [
