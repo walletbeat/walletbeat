@@ -195,7 +195,17 @@ export const gemwallet: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: null,
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: bugBountyRefs,
+				availability: BugBountyProgramAvailability.INACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2025-11-12',
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
+				upgradePathAvailable: true,
+			}),
 			duressResistance: {
 				basicUnlock: {
 					mechanisms: {
