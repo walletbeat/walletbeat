@@ -214,8 +214,26 @@ export const gemwallet: SoftwareWallet = {
 		multiAddress: featureSupported,
 		privacy: {
 			analytics: {
-				crashReports: null,
-				usage: null,
+				crashReports: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'No crash-reporting SDK (e.g. Crashlytics, Sentry) was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Performance Monitoring explicitly deactivated via manifest meta-data.',
+							label: 'No crash-reporting SDK; Firebase Performance explicitly disabled in AndroidManifest.xml',
+							url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
+						},
+					],
+				}),
+				usage: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'No product-analytics SDK (e.g. Amplitude, Mixpanel, PostHog) was found in the iOS or Android codebases. The Google Play build flavor bundles Firebase only for push notifications (FCM), with Firebase Analytics and ad-ID collection explicitly deactivated via manifest meta-data.',
+							label: 'No product-analytics SDK; Firebase Analytics/ad-ID explicitly disabled in AndroidManifest.xml',
+							url: 'https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/app/src/google/AndroidManifest.xml#L29-L31',
+						},
+					],
+				}),
 			},
 			appIsolation: null,
 			dataCollection: null,
