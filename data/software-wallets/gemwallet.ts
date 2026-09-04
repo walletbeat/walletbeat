@@ -213,7 +213,10 @@ export const gemwallet: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: notSupported,
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: bugBountyRefs,
 				availability: BugBountyProgramAvailability.INACTIVE,
