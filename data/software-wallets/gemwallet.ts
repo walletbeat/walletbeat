@@ -320,7 +320,26 @@ export const gemwallet: SoftwareWallet = {
 				],
 				wallets: {},
 			},
-			keysHandling: null,
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							"Gem Wallet's shared Rust core generates the BIP-39 mnemonic entropy locally via the OS CSPRNG (`getrandom` crate) with no server involvement, and the full private key/mnemonic is held and used entirely on the user's device (standard BIP-32/44 derivation, no key splitting or MPC).",
+						urls: [
+							{
+								label: 'Local entropy generation via OS CSPRNG',
+								url: 'https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_crypto/src/random.rs',
+							},
+							{
+								label: 'Mnemonic generated on-device from that entropy',
+								url: 'https://github.com/gemwalletcom/wallet/blob/d597d9bcc391be24cb5be2e7afaee0e5276a9ec5/core/crates/gem_keystore/src/mnemonic.rs#L10-L14',
+							},
+						],
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
 			lightClient: {
 				ethereumL1: notSupported,
 			},
