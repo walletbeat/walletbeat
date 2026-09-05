@@ -2527,16 +2527,35 @@ type SendTransactionWarning = WithRef<
 
 ---
 
+### Enum: `UnlimitedApprovalWarningCondition`
+
+A specific scenario in which a wallet may choose to warn the user before granting an unlimited/infinite ERC-20 token allowance, when it does not warn unconditionally.
+
+- `EOA` = `'EOA'`: The spender is an externally-owned account (EOA), not a contract.
+- `UNKNOWN_CONTRACTS` = `'UNKNOWN_CONTRACTS'`: The spender contract is not a known/verified contract.
+- `BLACKLISTED_CONTRACTS` = `'BLACKLISTED_CONTRACTS'`: The spender contract appears on a blocklist of known-scam contracts.
+- `NEW_CONTRACTS` = `'NEW_CONTRACTS'`: The spender contract was only recently deployed onchain.
+- `CONTRACTS_NOT_INTERACTED_BEFORE` = `'CONTRACTS_NOT_INTERACTED_BEFORE'`: The wallet has not seen the user interact with the spender contract before.
+
+---
+
 ### Type: `UnlimitedApprovalWarning`
 
 ```typescript
 type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Does the wallet warn the user before a transaction or signature that
-		 * grants unlimited/infinite token allowance?
+		 * Under which circumstances the wallet warns the user before a
+		 * transaction or signature that grants unlimited/infinite token
+		 * allowance.
+		 *
+		 * - `ALWAYS`: The wallet warns regardless of whether the spender is
+		 *   considered trusted/known.
+		 * - A non-empty array of `UnlimitedApprovalWarningCondition`: The
+		 *   wallet only warns in the listed scenarios, e.g. only when the
+		 *   spender is an untrusted/unknown contract.
 		 */
-		warnsOnUnlimitedApproval: boolean
+		warnsOnUnlimitedApproval: 'ALWAYS' | NonEmptyArray<UnlimitedApprovalWarningCondition>
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address

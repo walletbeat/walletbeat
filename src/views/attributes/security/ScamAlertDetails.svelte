@@ -5,6 +5,7 @@
 	} from '@/schema/attributes/security/scam-prevention'
 	import type { Outcome } from '@/schema/attributes'
 	import { isSupported } from '@/schema/features/support'
+	import { UnlimitedApprovalWarningCondition, unlimitedApprovalWarningConditionLabels } from '@/schema/features/security/scam-alerts'
 	import { toFullyQualified } from '@/schema/reference'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -47,6 +48,22 @@
 		return ` However, in doing so, it leaks ${commaListFormat(leaking)} to an external provider${
 			leaking.length > 1 ? ' which can correlate them' : ''
 		}.`
+	}
+
+	/**
+	 * Builds the "but only when X" clause for the unlimited-approval warning
+	 * when it is not shown unconditionally.
+	 */
+	function unlimitedApprovalConditionClause(
+		warnsOnUnlimitedApproval: 'ALWAYS' | UnlimitedApprovalWarningCondition[],
+	): string {
+		if (warnsOnUnlimitedApproval === 'ALWAYS') {
+			return ''
+		}
+
+		return `, but only when ${commaListFormat(
+			warnsOnUnlimitedApproval.map(condition => unlimitedApprovalWarningConditionLabels[condition]),
+		)}, not unconditionally`
 	}
 </script>
 
@@ -182,7 +199,7 @@
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning)
-							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval.${leakClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning, [
+							? `**{{WALLET_NAME}}** warns you before granting an unlimited ERC-20 token approval${unlimitedApprovalConditionClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval)}.${leakClause(outcome.metadata.scamAlerts.unlimitedApprovalWarning, [
 									[
 										outcome.metadata.scamAlerts.unlimitedApprovalWarning.leaksSpenderAddress,
 										'the spender address',
