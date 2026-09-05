@@ -63,12 +63,12 @@ https://x.com/walletbeat
 
 ## What are you building and who is worse off if it stops existing? *
 
-Privacy is one of the core values of Ethereum, yet it's often treated as a nice-to-have feature instead of a fundamental property of a wallet. We believe the Ethereum ecosystem should develop and adopt a minimum privacy standard for wallets, which can serve as a trusted and legitimate reference point for which wallets are safe for ordinary users of Ethereum.
+Privacy is one of the core values of Ethereum, yet it's often treated as a nice-to-have feature instead of a fundamental property of a wallet. The Ethereum ecosystem should develop and adopt a minimum privacy standard for wallets, which can serve as a trusted and legitimate reference point for which wallets are safe for users of Ethereum.
 
-We believe this Privacy Standard for wallets could help address two different sides of this problem:
+This Privacy Standard for wallets could help address two different sides of this problem:
 
-- First, giving ordinary users a reliable guide to choosing only those wallets that meet this standard means that a greater share of Ethereum users will have access to the features they need to have a private on-chain experience. To do this effectively, the standard must be a very high bar and it must regularly be raised as new privacy features are developed by the ecosystem or new threats are found.
-- Second, the standard will encourage wallet teams to prioritize important features to remain compliant.
+- Giving ordinary users a reliable guide to choosing only those wallets that meet this standard means that a greater share of Ethereum users will have access to the features they need to have a private on-chain experience. To do this effectively, the standard must be a very high bar and it must regularly be raised as new privacy features are developed by the ecosystem or new threats are found.
+- The standard will encourage wallet teams to prioritize important features to remain compliant.
 
 Ethereum is built around a clear set of CROPS values. Users experience Ethereum through wallets, yet most wallets today don't live up to these very values. No CROPS in wallets results in no CROPS for users.
 Walletbeat exports Ethereum’s CROPS values to the wallet layer. Privacy is the P in CROPS. As users' gateway into Ethereum, wallets themselves need to embody Privacy such that users actually get to have any.
@@ -77,7 +77,7 @@ Walletbeat exports Ethereum’s CROPS values to the wallet layer. Privacy is the
 
 Walletbeat is a public good that aims to shine a light on this CROPS last mile problem. By providing a dashboard and a rating system for how CROPS aligned wallets are, we help to increase the adoption of CROPS values at this critical ecosystem access layer.
 
-Concretely, Walletbeat pushes wallet teams to adopt ecosystem initiatives like clear signing, 7702 and many others. Here's how Walletbeat evaluates privacy, and why these attributes matter:
+Concretely, Walletbeat pushes wallet teams to adopt ecosystem initiatives like Kohaku, 7702 and many others. Here's how Walletbeat evaluates privacy, and why these attributes matter:
 
 - Wallet address Privacy: Is your wallet address linkable to other information about yourself?
   Your wallet address is permanent and publicly visible. The more personal information linked to it, the easier it becomes to track your activity across apps, devices, and services. A private wallet minimizes that linkability.
@@ -103,7 +103,7 @@ https://github.com/walletbeat/walletbeat
 
 List the license(s) of your privacy-critical code. They must be a recognizable open-source license to be eligible for the round.
 
-Walletbeat's website code, rating pipeline, and wallet database are all and will all remain licensed under the MIT License, a Free and Open Source Software license.
+Walletbeat's website code, rating pipeline, and wallet database are all and will all remain licensed under the MIT License, a Free and Open Source Software license: https://mit-license.org/
 
 ## What is your quantifiable traction? *
 
@@ -119,7 +119,9 @@ Define the best measure(s) of your traction. Provide numbers and links. See our 
 
 116 stars, 84 forks.
 
-2. Effects on Wallets:
+2. Effects on Wallets: Actions that wallets have taken as a result of Walletbeat's actions or existence
+
+https://github.com/walletbeat/walletbeat/blob/beta/resources/docs/impact/impact.md
 
 - 2025-12: Walletbeat publishes the L1 Provider Independence Test; two major wallets shipped in fixes in response
 
@@ -151,10 +153,7 @@ $5,000 in USD.
 
 Be specific.
 
-This funding will be focused on expanding the privacy tooling.
-
-This wallet privacy analysis workshop video shows off what we're doing here and why it's difficult to scale to more wallets: https://x.com/walletbeat/status/2092001260853702694
-This can get complicated: https://github.com/walletbeat/walletbeat/issues/1111
+This funding will be focused on expanding the privacy tooling, wallet-privacy research, and Walletbeat privacy data fill up.
 
 ## What type of non-financial support (if any) would make a difference in your progress and growth journey *
 
@@ -204,6 +203,7 @@ We presented at Devcon Buenos Aires and across Berlin Blockchain Week 2026:
 - A State of Privacy in Web3 panel at the Neocypherpunk Summit: https://youtu.be/myRlASvXA_w?si=KAoGuqqkNH9yLE8R
 - a CROPS-in-wallets talk on Ethereum Day: https://youtu.be/2rIVB8WH_-I
 - a Brew workshop teaching attendees to capture wallet network traffic and find privacy leaks: https://youtu.be/w9QUkdH9n8I?si=RiEWAR8YtvQEyJ7K
+- A Dappcon workshop that breaks down what makes an Ethereum wallet “good”, and how standards shape interoperability across the ecosystem: https://youtu.be/zOL73Ll_6N0?si=T6B_RU2ceS76wUlo
 
 Recordings and slides are public (https://github.com/walletbeat/walletbeat/tree/beta/resources/talks)
 
@@ -211,14 +211,13 @@ Recordings and slides are public (https://github.com/walletbeat/walletbeat/tree/
 
 Provide 1-2 verifiable measures.
 
-By the privacy work being funded specifically. Find bellow the links to those issues:
+By the privacy work being funded specifically:
 
+Network privacy tooling expansion and wallet research
 - https://github.com/walletbeat/walletbeat/issues/1111
 - https://github.com/walletbeat/walletbeat/issues/1062
 - https://github.com/walletbeat/walletbeat/issues/1061
 - https://github.com/walletbeat/walletbeat/issues/1055
-
-Link to #1111, and the other "Data Collection" issues in the issue tracker.
 
 ## Need Help?
 
