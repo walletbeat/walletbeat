@@ -1,15 +1,22 @@
 name: Check
 
 on:
-  push: {}
+  push:
+    # Pushes to PR branches are already covered by the `synchronize` event
+    # below; only the trunk needs its own push trigger.
+    branches:
+      - beta
   pull_request:
     types:
       - opened
       - reopened
-      - edited
       - synchronize
-      - ready_for_review
-      - review_requested
+
+# Supersede in-flight runs for the same PR. Give every trunk commit its own
+# group so that each one receives a recorded result.
+concurrency:
+  group: check-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check-quick:
