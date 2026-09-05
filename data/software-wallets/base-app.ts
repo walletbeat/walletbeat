@@ -62,8 +62,23 @@ export const baseApp: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			// New accounts created via passkey onboarding are ERC-4337 Smart Wallets per https://docs.base.org/base-account/overview/what-is-base-account.
-			// Legacy 12-word-recovery-phrase users still hold EOAs; Coinbase is migrating them to Base Accounts.
+			// New default accounts are EIP-7702-delegated EOAs, not raw ERC-4337
+			// contracts: the address is an EOA whose key is the server-held Coinbase
+			// "email signer", with delegation code pointing at the Coinbase EIP-7702
+			// proxy → Coinbase Smart Wallet (ERC-4337) implementation, operated via
+			// EntryPoint v0.6 (confirmed on-chain; see PR #845). `defaultAccountType`
+			// below is nonetheless kept as `rawErc4337` on purpose — it is the only
+			// slot the schema can use today to carry the non-self-custodial downgrade;
+			// the 7702 + provider-held-key custody combo is not expressible yet
+			// (schema follow-up). The default signed-out
+			// onboarding ("Welcome to Base App", v30.1.0, recorded 2026-06-27) offers only
+			// custodial sign-ins up front — Apple, Google, and the prominent
+			// "Continue with Email" — each provisioning an account whose sole
+			// signer is held server-side by Coinbase (no passkey, no seed phrase
+			// generated). Self-custody exists but is not the default: a one-tap
+			// "More Options" sheet reveals "Create recovery phrase" (BIP39 seed)
+			// plus "Import Recovery Phrase" and "Import Passkey" for pre-existing
+			// wallets. There is no "create passkey" path — passkeys are import-only.
 			defaultAccountType: AccountType.rawErc4337,
 			eip7702: supported({
 				ref: [
@@ -82,7 +97,16 @@ export const baseApp: SoftwareWallet = {
 				contract: coinbaseEip7702ProxyContract,
 			}),
 			eoa: supported({
-				ref: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
+				ref: [
+					'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
+					{
+						explanation:
+							'First-hand (2026-06-27, fully signed out): the "More Options" sheet on the onboarding screen offers "Create recovery phrase" (`BIP39` seed) alongside "Import Recovery Phrase" and "Import Passkey". Self-custody seed-phrase accounts can be created in the current app, but sit behind "More Options" rather than the default flow.',
+						file: 'public/references/wallets/base-app/screenshots/2026-06-27-onboarding-more-options.png',
+						label:
+							'Onboarding "More Options" sheet: Create recovery phrase / Import Recovery Phrase / Import Passkey',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -93,13 +117,38 @@ export const baseApp: SoftwareWallet = {
 			}),
 			mpc: notSupported,
 			rawErc4337: supported({
-				ref: {
-					explanation:
-						'Base Accounts are ERC-4337 Smart Wallets created via passkey onboarding. The user is sole owner by default (passkey held in device secure enclave). Coinbase does not hold a co-owner key per Terms of Service. The underlying contract supports multi-owner via `addOwner`/`removeOwnerAtIndex`, but the mobile app does not expose passkey or owner management UI. Account Management shows only "Sign out". Optional recovery-key setup lives in `keys.coinbase.com` rather than the mobile app.',
-					url: 'https://docs.base.org/base-account/overview/what-is-base-account',
-				},
+				ref: [
+					{
+						explanation:
+							'Base Accounts are ERC-4337 smart wallets. The default in-app onboarding (the prominent "Continue with Email", confirmed through v30.1.0) provisions an account whose sole signer is a Coinbase-operated "email signer". No passkey and no seed phrase are generated. On keys.coinbase.com, Settings lists the only sign-in method as "Email signer — Only one email permitted per account". The underlying contract supports multi-owner via `addOwner`/`removeOwnerAtIndex`, but the app exposes no owner-management UI.',
+						url: 'https://docs.base.org/base-account/overview/what-is-base-account',
+					},
+					{
+						explanation:
+							"First-hand verification (2026-06-19, Base App v29.99.7): we signed into keys.coinbase.com from a desktop browser with no synced passkey, using only an emailed one-time code. That granted full wallet control and let us sign and broadcast a real send. Because a passkey-less device could authorize a signature with email auth alone, the signing key is held server-side by Coinbase and is reachable via email. It is therefore not in the user's sole self-custody by default: a key share is stored solely on the provider's servers.",
+						file: 'public/references/wallets/base-app/screenshots/2026-06-19-email-signer.png',
+						label:
+							'keys.coinbase.com Sign-in Methods showing "Email signer" as the only signer (no passkey)',
+					},
+					{
+						explanation:
+							'The send review screen ("Request from Base Account", Ethereum, ~$0.10) signed and broadcast on email-only auth, with "Signing with `0xFF7E…d323`" — the Coinbase-operated signer.',
+						file: 'public/references/wallets/base-app/screenshots/2026-06-19-email-account-send-review.png',
+						label: 'Email-only send review on keys.coinbase.com, signing with the email signer',
+					},
+					{
+						explanation:
+							'First-hand (2026-06-27, fully signed out): the default "Welcome to Base App" onboarding surfaces only custodial sign-in methods — Apple, Google, and a prominent "Continue with Email". No self-custody option appears until the user taps "More Options". This confirms the default new-account path yields a server-side-signer smart account.',
+						file: 'public/references/wallets/base-app/screenshots/2026-06-27-onboarding-default-options.png',
+						label: 'Default signed-out onboarding: Apple / Google / Continue with Email only',
+					},
+				],
 				contract: coinbaseSmartWalletContract,
-				controllingSharesInSelfCustodyByDefault: 'YES',
+				// The default email-onboarded account's signing key is operated by
+				// Coinbase server-side and is reachable with email auth alone.
+				// Passkey-import accounts remain self-custody, but that is not the
+				// default.
+				controllingSharesInSelfCustodyByDefault: 'NO',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
@@ -306,11 +355,15 @@ export const baseApp: SoftwareWallet = {
 				ref: refNotNecessary,
 				wallets: {},
 			},
-			// New passkey accounts (rawErc4337 default): WebAuthn passkey generated in
-			// the device secure enclave (iOS) / Android Keystore. Legacy 12-word-phrase
-			// accounts: BIP39 seed phrase generated locally. Both paths fall under
-			// FULLY_ON_USER_DEVICE / NON_MULTIPARTY — keys never leave the device
-			// during generation, and there is no key-splitting or threshold scheme.
+			// keyGeneration reflects the DEFAULT new-user path (v29.99.7): the
+			// in-app "Create Wallet" flow yields a Coinbase-operated "email signer"
+			// — no passkey, no seed phrase. Email-only auth from a passkey-less
+			// device can sign (verified first-hand), so key material is not produced
+			// or held solely on the user's device; this matches the schema's
+			// FULLY_OFF_USER_DEVICE criteria ("requires login before any key material
+			// is available"). Legacy/import paths still generate on-device (BIP39
+			// seed shown locally; imported passkeys live in the device secure
+			// enclave).
 			keysHandling: {
 				ref: [
 					{
@@ -323,8 +376,15 @@ export const baseApp: SoftwareWallet = {
 							'Per Coinbase Help, legacy 12-word recovery phrase accounts are generated on-device using BIP39; the seed phrase is shown only to the user and stored locally.',
 						url: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 					},
+					{
+						explanation:
+							'First-hand (2026-06-19, v29.99.7): the default "Create Wallet" account exposes only an "Email signer" at keys.coinbase.com, and email-only auth from a passkey-less desktop browser could sign a transaction — so the default signer key is held by Coinbase server-side, not generated/held solely on the user device.',
+						file: 'public/references/wallets/base-app/screenshots/2026-06-19-email-signer.png',
+						label:
+							'keys.coinbase.com Sign-in Methods: "Email signer" is the account\'s only signer',
+					},
 				],
-				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
 			lightClient: {
