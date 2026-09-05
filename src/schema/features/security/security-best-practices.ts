@@ -315,6 +315,9 @@ export enum AndroidPermission {
 	/** Modify global audio settings. */
 	MODIFY_AUDIO_SETTINGS = 'android.permission.MODIFY_AUDIO_SETTINGS',
 
+	/** Control device vibration. */
+	VIBRATE = 'android.permission.VIBRATE',
+
 	/** Bluetooth (Android < 12). */
 	BLUETOOTH = 'android.permission.BLUETOOTH',
 
@@ -353,6 +356,7 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.CAMERA]: true,
 	[AndroidPermission.RECORD_AUDIO]: true,
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: true,
+	[AndroidPermission.VIBRATE]: true,
 	[AndroidPermission.BLUETOOTH]: true,
 	[AndroidPermission.BLUETOOTH_ADMIN]: true,
 	[AndroidPermission.BLUETOOTH_CONNECT]: true,
