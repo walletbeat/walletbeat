@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 8,
+	"highlightLastLine": 19,
+	"segments": [
+		{
+			"lines": [
+				"import { KeychainType, KeychainWallet } from '~/core/types/keychainTypes';",
+				"",
+				"import { createExtensionStoreOptions } from '../_internal';",
+				"",
+				"export interface WalletBackupReminderStore {",
+				"  reminded: boolean;",
+				"  setReminded: () => void;",
+				"}",
+				"",
+				"export const useWalletBackupReminderStore =",
+				"  createBaseStore<WalletBackupReminderStore>((set) => ({",
+				"    reminded: false,",
+				"    setReminded: () => {",
+				"      set({ reminded: true });",
+				"    },",
+				"  }));",
+				"",
+				"export interface WalletBackupsStore {",
+				"  needsInitialization: boolean;",
+				"  walletBackups: {"
+			],
+			"startLine": 4
+		}
+	]
+}

@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 37,
+	"highlightLastLine": 47,
+	"segments": [
+		{
+			"lines": [
+				"jobs:",
+				"  repository-health-checks:"
+			],
+			"startLine": 6
+		},
+		{
+			"lines": [
+				"    steps:"
+			],
+			"startLine": 18
+		},
+		{
+			"lines": [
+				"      - name: Validate release candidate changelog",
+				"        if: ${{ startsWith(env.BRANCH, 'release/') }}",
+				"        run: .github/scripts/validate-changelog-in-rc.sh",
+				"",
+				"      - name: Lint lockfile",
+				"        if: ${{ !cancelled() }}",
+				"        run: yarn lint:lockfile",
+				"",
+				"      - name: Lint console baseline",
+				"        if: ${{ !cancelled() }}",
+				"        run: yarn lint:baseline",
+				"",
+				"      - name: Check yarn resolutions",
+				"        if: ${{ !cancelled() }}",
+				"        run: yarn --check-resolutions",
+				"",
+				"      # --- Baseline download (PR, push-to-main, and cron) ---",
+				"      # When the download fails (first rollout, expired artifact, or cross-repo PR",
+				"      # with read-only token), NO_BASELINE=true tells the triage script to"
+			],
+			"startLine": 33
+		}
+	]
+}

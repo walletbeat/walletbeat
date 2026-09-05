@@ -1,0 +1,48 @@
+{
+	"highlightFirstLine": 2232,
+	"highlightLastLine": 2242,
+	"segments": [
+		{
+			"lines": [
+				"class PublicController {"
+			],
+			"startLine": 2164
+		},
+		{
+			"lines": [
+				"  }): Promise<void> {"
+			],
+			"startLine": 2200
+		},
+		{
+			"lines": [
+				"    return new Promise<void>((resolve, reject) => {"
+			],
+			"startLine": 2208
+		},
+		{
+			"lines": [
+				"      });",
+				"    });",
+				"  }",
+				"",
+				"  async eth_accounts({ context }: PublicMethodParams) {",
+				"    const currentAddress = this.wallet.readCurrentAddress();",
+				"    if (!currentAddress) {",
+				"      return [];",
+				"    }",
+				"    if (this.wallet.allowedOrigin(context, currentAddress)) {",
+				"      return [currentAddress];",
+				"    } else {",
+				"      return [];",
+				"    }",
+				"  }",
+				"",
+				"  async sol_connect({ context, id }: PublicMethodParams) {",
+				"    invariant(context?.origin, 'This method requires origin');",
+				"    return this.eth_requestAccounts("
+			],
+			"startLine": 2228
+		}
+	]
+}

@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 146,
+	"highlightLastLine": 150,
+	"segments": [
+		{
+			"lines": [
+				"export class Portfolio {"
+			],
+			"startLine": 70
+		},
+		{
+			"lines": [
+				"  async get(accountAddr: string, opts: Partial<GetOptions> = {}): Promise<PortfolioLibGetResult> {"
+			],
+			"startLine": 125
+		},
+		{
+			"lines": [
+				"    try {",
+				"      // if the network doesn't have a relayer, velcro will not work",
+				"      // but we should not record an error if such is the case",
+				"      if (!disableAutoDiscovery) {",
+				"        hintsFromExternalAPI = await this.batchedVelcroDiscovery({",
+				"          chainId,",
+				"          accountAddr,",
+				"          baseCurrency",
+				"        })",
+				"",
+				"        if (",
+				"          hintsFromExternalAPI &&",
+				"          hintsFromExternalAPI.skipOverrideSavedHints &&"
+			],
+			"startLine": 142
+		}
+	]
+}

@@ -1,0 +1,40 @@
+{
+	"highlightFirstLine": 843,
+	"highlightLastLine": 857,
+	"segments": [
+		{
+			"lines": [
+				"}: CreateBusinessKeychainApiOptions) {"
+			],
+			"startLine": 663
+		},
+		{
+			"lines": [
+				"  function getAuthOptionsForType(type: KEYCHAIN_AUTH_TYPES) {",
+				"    const authOptions: Partial<KeychainCompatibleOptions> = {",
+				"      accessible: keychainModule.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,",
+				"    };",
+				"",
+				"    if (type === KEYCHAIN_AUTH_TYPES.BIOMETRICS) {",
+				"      authOptions.accessControl =",
+				"        keychainModule.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;",
+				"      authOptions.androidKeychainAuthProfile =",
+				"        ANDROID_KEYCHAIN_AUTH_PROFILES.BIOMETRIC_STRONG;",
+				"    } else if (type === KEYCHAIN_AUTH_TYPES.PASSCODE) {",
+				"      authOptions.accessControl = keychainModule.ACCESS_CONTROL.DEVICE_PASSCODE;",
+				"      authOptions.androidKeychainAuthProfile =",
+				"        ANDROID_KEYCHAIN_AUTH_PROFILES.DEVICE_CREDENTIAL;",
+				"    } else if (type === KEYCHAIN_AUTH_TYPES.BIOMETRICS_OR_PASSCODE) {",
+				"      authOptions.accessControl =",
+				"        keychainModule.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE;",
+				"      authOptions.androidKeychainAuthProfile =",
+				"        ANDROID_KEYCHAIN_AUTH_PROFILES.BIOMETRIC_OR_DEVICE_CREDENTIAL;",
+				"    } else if (type !== KEYCHAIN_AUTH_TYPES.REMEMBER_ME) {",
+				"      return null;",
+				"    }",
+				""
+			],
+			"startLine": 839
+		}
+	]
+}

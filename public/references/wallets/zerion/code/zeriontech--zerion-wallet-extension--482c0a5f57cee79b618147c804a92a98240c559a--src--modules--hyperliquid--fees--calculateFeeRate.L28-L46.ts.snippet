@@ -1,0 +1,40 @@
+{
+	"highlightFirstLine": 28,
+	"highlightLastLine": 46,
+	"segments": [
+		{
+			"lines": [
+				"export interface FeeRateInputs {"
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"  referralDiscount: number;",
+				"  builderFeeUnits: number;",
+				"}",
+				"",
+				"export interface FeeBreakdown {",
+				"  hyperliquidRate: number;",
+				"  zerionRate: number;",
+				"  totalRate: number;",
+				"}",
+				"",
+				"export function calculateFeeBreakdown({",
+				"  userCrossRate,",
+				"  referralDiscount,",
+				"  builderFeeUnits,",
+				"}: FeeRateInputs): FeeBreakdown {",
+				"  const hyperliquidRate = userCrossRate * (1 - referralDiscount);",
+				"  const zerionRate = builderFeeUnitToRate(builderFeeUnits);",
+				"  return {",
+				"    hyperliquidRate,",
+				"    zerionRate,",
+				"    totalRate: hyperliquidRate + zerionRate,",
+				"  };",
+				"}"
+			],
+			"startLine": 24
+		}
+	]
+}

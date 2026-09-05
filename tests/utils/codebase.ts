@@ -23,6 +23,9 @@ export const commonExclusions: PathPredicate[] = [
 	// Exclude known binary files and macOS metadata files.
 	/\.(png|pdf|jpg|jpeg|gif|ico|eot|otf|ttf|woff|woff2)$/i,
 
+	// Exclude stored code snippets, not Walletbeat source.
+	/\.snippet$/i,
+
 	// Helios binary checkpoint file.
 	'deploy/helios/data/checkpoint',
 ]

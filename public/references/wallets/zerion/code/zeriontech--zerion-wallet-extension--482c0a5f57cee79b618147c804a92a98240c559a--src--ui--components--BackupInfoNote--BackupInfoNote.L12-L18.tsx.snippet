@@ -1,0 +1,27 @@
+{
+	"highlightFirstLine": 12,
+	"highlightLastLine": 18,
+	"segments": [
+		{
+			"lines": [
+				"import {",
+				"  isHardwareContainer,",
+				"  isMnemonicContainer,",
+				"} from 'src/shared/types/validators';",
+				"",
+				"export function needsBackup(group: WalletGroup) {",
+				"  return (",
+				"    isMnemonicContainer(group.walletContainer) &&",
+				"    group.origin === WalletOrigin.extension &&",
+				"    group.lastBackedUp == null",
+				"  );",
+				"}",
+				"",
+				"export function BackupInfoNote({ group }: { group: WalletGroup }) {",
+				"  const isHardwareGroup = isHardwareContainer(group.walletContainer);",
+				"  return group.lastBackedUp != null ? ("
+			],
+			"startLine": 7
+		}
+	]
+}

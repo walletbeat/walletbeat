@@ -1,0 +1,26 @@
+{
+	"highlightFirstLine": 132,
+	"highlightLastLine": 132,
+	"segments": [
+		{
+			"lines": [
+				"export class BinanceClient {"
+			],
+			"startLine": 8
+		},
+		{
+			"lines": [
+				"  async createWithdrawalURL(addr: Address, platform: PlatformType) {",
+				"    const path = \"/v1/friendly/binance-pay/withdraw/pre-create\";",
+				"    const redirectUrl = \"https://daimo.com/l/deposit\";",
+				"",
+				"    const res = await this.queryBinanceAPI<{",
+				"      transactionId: string;",
+				"      universalLinkUrl: string;",
+				"    }>(path, {",
+				"      currency: \"USDC\","
+			],
+			"startLine": 128
+		}
+	]
+}
