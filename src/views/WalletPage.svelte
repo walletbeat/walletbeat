@@ -86,7 +86,7 @@
 
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
-	import { isLabeledUrl } from '@/schema/url'
+	import { getUrl } from '@/schema/url'
 	import { IncidentStatus } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
 	import { getNewsForWallet } from '@/data/news'
@@ -430,10 +430,10 @@
 				'@type': 'SoftwareApplication',
 				name: wallet.metadata.displayName,
 				url: (
-					typeof wallet.metadata.url === 'string' ?
-						wallet.metadata.url
+					wallet.metadata.urls?.websites?.[0] !== undefined ?
+						getUrl(wallet.metadata.urls.websites[0])
 					:
-						wallet.metadata.url?.url
+						undefined
 				),
 				applicationCategory: 'Cryptocurrency Wallet',
 				operatingSystem: (
@@ -550,19 +550,21 @@
 				data-column="gap-6"
 			>
 				<nav data-row="gap-2 start wrap">
-					<a
-						href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-						data-badge="medium"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{@html Globe}
-						Website
-					</a>
+					{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+						<a
+							href={getUrl(wallet.metadata.urls.websites[0])}
+							data-badge="medium"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{@html Globe}
+							Website
+						</a>
+					{/if}
 
 					{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 						<a
-							href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
+							href={getUrl(wallet.metadata.urls.repositories[0])}
 							data-badge="medium"
 							target="_blank"
 							rel="noopener noreferrer"
