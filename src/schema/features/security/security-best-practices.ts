@@ -344,6 +344,21 @@ export enum AndroidPermission {
 
 	/** Be notified when the user screenshots the app (Android 14+). */
 	DETECT_SCREEN_CAPTURE = 'android.permission.DETECT_SCREEN_CAPTURE',
+
+	/** Authenticate with biometric hardware (fingerprint, face, etc.). */
+	USE_BIOMETRIC = 'android.permission.USE_BIOMETRIC',
+
+	/** Legacy fingerprint authentication (superseded by USE_BIOMETRIC). */
+	USE_FINGERPRINT = 'android.permission.USE_FINGERPRINT',
+
+	/** Control device vibration. */
+	VIBRATE = 'android.permission.VIBRATE',
+
+	/** Read images from shared media storage (scoped storage, Android 13+). */
+	READ_MEDIA_IMAGES = 'android.permission.READ_MEDIA_IMAGES',
+
+	/** Access the Google advertising ID — used for ad attribution/tracking. */
+	AD_ID = 'com.google.android.gms.permission.AD_ID',
 }
 
 export const androidPermissions = new Enum<AndroidPermission>({
@@ -363,6 +378,11 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: true,
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: true,
 	[AndroidPermission.DETECT_SCREEN_CAPTURE]: true,
+	[AndroidPermission.USE_BIOMETRIC]: true,
+	[AndroidPermission.USE_FINGERPRINT]: true,
+	[AndroidPermission.VIBRATE]: true,
+	[AndroidPermission.READ_MEDIA_IMAGES]: true,
+	[AndroidPermission.AD_ID]: true,
 })
 
 /**
@@ -388,6 +408,9 @@ export enum IosUsageDescription {
 	/** Location access while the app is in use, required for BLE on iOS. */
 	LOCATION_WHEN_IN_USE = 'NSLocationWhenInUseUsageDescription',
 
+	/** Location access at all times, including while in use. */
+	LOCATION_ALWAYS_AND_WHEN_IN_USE = 'NSLocationAlwaysAndWhenInUseUsageDescription',
+
 	/** Microphone access. */
 	MICROPHONE = 'NSMicrophoneUsageDescription',
 
@@ -407,6 +430,7 @@ export const iosUsageDescriptions = new Enum<IosUsageDescription>({
 	[IosUsageDescription.CAMERA]: true,
 	[IosUsageDescription.FACE_ID]: true,
 	[IosUsageDescription.LOCATION_WHEN_IN_USE]: true,
+	[IosUsageDescription.LOCATION_ALWAYS_AND_WHEN_IN_USE]: true,
 	[IosUsageDescription.MICROPHONE]: true,
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: true,
 	[IosUsageDescription.PHOTO_LIBRARY]: true,

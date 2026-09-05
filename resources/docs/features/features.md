@@ -2824,6 +2824,11 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `READ_EXTERNAL_STORAGE` = `'android.permission.READ_EXTERNAL_STORAGE'`: Read files from shared external storage (legacy, pre-scoped-storage).
 - `WRITE_EXTERNAL_STORAGE` = `'android.permission.WRITE_EXTERNAL_STORAGE'`: Write files to shared external storage (legacy, pre-scoped-storage).
 - `DETECT_SCREEN_CAPTURE` = `'android.permission.DETECT_SCREEN_CAPTURE'`: Be notified when the user screenshots the app (Android 14+).
+- `USE_BIOMETRIC` = `'android.permission.USE_BIOMETRIC'`: Authenticate with biometric hardware (fingerprint, face, etc.).
+- `USE_FINGERPRINT` = `'android.permission.USE_FINGERPRINT'`: Legacy fingerprint authentication (superseded by USE_BIOMETRIC).
+- `VIBRATE` = `'android.permission.VIBRATE'`: Control device vibration.
+- `READ_MEDIA_IMAGES` = `'android.permission.READ_MEDIA_IMAGES'`: Read images from shared media storage (scoped storage, Android 13+).
+- `AD_ID` = `'com.google.android.gms.permission.AD_ID'`: Access the Google advertising ID — used for ad attribution/tracking.
 
 ---
 
@@ -2838,6 +2843,7 @@ All keys seen in any wallet plist must be listed here, including non-security-re
 - `CAMERA` = `'NSCameraUsageDescription'`: Camera access, typically for QR code scanning.
 - `FACE_ID` = `'NSFaceIDUsageDescription'`: Face ID biometric authentication.
 - `LOCATION_WHEN_IN_USE` = `'NSLocationWhenInUseUsageDescription'`: Location access while the app is in use, required for BLE on iOS.
+- `LOCATION_ALWAYS_AND_WHEN_IN_USE` = `'NSLocationAlwaysAndWhenInUseUsageDescription'`: Location access at all times, including while in use.
 - `MICROPHONE` = `'NSMicrophoneUsageDescription'`: Microphone access.
 - `PHOTO_LIBRARY_ADD` = `'NSPhotoLibraryAddUsageDescription'`: Save images to the photo library.
 - `PHOTO_LIBRARY` = `'NSPhotoLibraryUsageDescription'`: Read images from the photo library.

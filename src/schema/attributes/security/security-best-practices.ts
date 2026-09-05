@@ -597,6 +597,14 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	// screen contents, and wallets use it defensively, e.g. to warn a user who screenshots their
 	// recovery phrase.
 	[AndroidPermission.DETECT_SCREEN_CAPTURE]: Rating.PASS,
+	// Biometric authentication, used to unlock the wallet without a PIN.
+	[AndroidPermission.USE_BIOMETRIC]: Rating.PASS,
+	// Legacy fingerprint authentication (superseded by USE_BIOMETRIC), used to unlock the wallet without a PIN.
+	[AndroidPermission.USE_FINGERPRINT]: Rating.PASS,
+	// Haptic feedback on user actions; grants no access to sensitive data.
+	[AndroidPermission.VIBRATE]: Rating.PASS,
+	// Read access to shared photo media (scoped storage, Android 13+), e.g. to attach an image to support requests.
+	[AndroidPermission.READ_MEDIA_IMAGES]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
@@ -614,6 +622,8 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
 	// Broad read of shared storage exposes private files.
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: Rating.FAIL,
+	// Advertising ID access exists solely for ad attribution/tracking, not any wallet function.
+	[AndroidPermission.AD_ID]: Rating.FAIL,
 }
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
@@ -633,6 +643,8 @@ const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAI
 	[IosUsageDescription.MICROPHONE]: Rating.FAIL,
 	// Precise GPS location can be used to profile and deanonymize users; not required for any wallet function.
 	[IosUsageDescription.LOCATION_WHEN_IN_USE]: Rating.FAIL,
+	// Background location access enables continuous user tracking; not required for any wallet function.
+	[IosUsageDescription.LOCATION_ALWAYS_AND_WHEN_IN_USE]: Rating.FAIL,
 	// Read access to the full photo library exposes private images; wallets only ever need to write, not read.
 	[IosUsageDescription.PHOTO_LIBRARY]: Rating.FAIL,
 	// Always-on Bluetooth enables passive device-tracking and proximity-based attacks even when the app runs in the background.

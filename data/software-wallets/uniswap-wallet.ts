@@ -1,15 +1,97 @@
 import { ren2140 } from '@/data/contributors/ren2140'
+import { trailOfBits } from '@/data/entities/trail-of-bits'
 import type { SoftwareWallet } from '@/data/software-wallets'
+import { AccountType } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
+import {
+	type SecurityAudit,
+	SecurityFlawSeverity,
+} from '@/schema/features/security/security-audits'
+import {
+	KeyStorageMechanism,
+	SecureRngSource,
+} from '@/schema/features/security/security-best-practices'
+import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	FeeDisplayLevel,
+	WalletServiceFeeDisplayUnit,
+} from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { nonEmptySet } from '@/types/utils/non-empty'
+
+import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
+import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
+import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
+import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
+
+const trailOfBitsAudits: SecurityAudit[] = [
+	{
+		ref: 'https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf',
+		auditDate: '2023-11-02',
+		auditor: trailOfBits,
+		codeSnapshot: {
+			commit:
+				'https://github.com/Uniswap/interface/commit/392a770fce5656119c0b20816b70321972796a07',
+			date: '2023-09-25',
+		},
+		unpatchedFlaws: [
+			{
+				name: 'External applications can take and read screenshots of the Android client screen (TOB-UNIMOB2-12)',
+				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+			},
+			{
+				name: 'Local biometric authentication is prone to bypasses (TOB-UNIMOB2-13)',
+				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+			},
+		],
+		variantsScope: { [Variant.MOBILE]: true },
+	},
+	{
+		ref: 'https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf',
+		auditDate: '2024-04-30',
+		auditor: trailOfBits,
+		codeSnapshot: {
+			commit: 'https://github.com/Uniswap/universe/commit/5632372416423c9e755492c8f3ffd1f94b863d79',
+			date: '2024-02-05',
+		},
+		unpatchedFlaws: [
+			{
+				name: 'Sidebar approval screen may be suddenly switched (TOB-UNIEXT-1)',
+				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+			},
+			{
+				name: 'Data displayed for user confirmation may differ from actually signed data (TOB-UNIEXT-20)',
+				presentStatus: 'NOT_FIXED',
+				severityAtAuditPublication: SecurityFlawSeverity.MEDIUM,
+			},
+		],
+		variantsScope: { [Variant.BROWSER]: true },
+	},
+]
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
@@ -21,11 +103,15 @@ export const uniswapWallet: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2026-04-04',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://docs.uniswap.org/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
 			],
-			repositories: ['https://github.com/Uniswap'],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/ios/Uniswap/Info.plist',
+			repositories: ['https://github.com/Uniswap/interface'],
 			socials: {
 				discord: 'https://discord.com/invite/uniswap',
 				farcaster: 'https://farcaster.xyz/uniswap',
@@ -35,26 +121,139 @@ export const uniswapWallet: SoftwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
-		addressResolution: {
-			ref: refTodo,
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
-			},
-			nonChainSpecificEnsResolution: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: supported({
+				ref: {
+					explanation:
+						'Uniswap smart wallet uses the Calibur implementation with EIP-7702 delegation across supported networks.',
+					url: 'https://developers.uniswap.org/docs/protocols/smart-wallet/overview',
+				},
+				contract: uniswapCalibur,
+			}),
+			eoa: supported({
+				ref: refTodo,
+				canExportPrivateKey: false,
+				canExportSeedPhrase: true,
+				keyDerivation: {
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
 		},
-		chainAbstraction: null,
-		chainConfigurability: null,
+		addressResolution: {
+			ref: [
+				{
+					explanation:
+						'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
+					file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
+					label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
+				},
+				{
+					explanation:
+						'Username/ENS resolution is fetched from the Uniswap Unitags API, an offchain service, rather than resolved directly onchain.',
+					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts',
+				},
+			],
+			chainSpecificAddressing: {
+				erc7828: notSupported,
+				erc7831: notSupported,
+			},
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'OFFCHAIN',
+				offchainDataVerifiability: 'VERIFIABLE',
+				offchainProviderConnection: 'DIRECT_CONNECTION',
+			}),
+		},
+		chainAbstraction: {
+			/** Chain bridging features. */
+			bridging: {
+				/** Does the wallet have a built-in bridging feature? */
+				builtInBridging: supported({
+					ref: refTodo,
+					feesLargerThan1bps: {
+						ref: [
+							{
+								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-default.png',
+								label:
+									'Uniswap Wallet swap review screen, collapsed, showing only aggregated network cost',
+							},
+							{
+								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-comprehensive.png',
+								label:
+									'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
+							},
+						],
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+						walletServiceFeeDisplayUnits: nonEmptySet(WalletServiceFeeDisplayUnit.PERCENTAGE),
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ref: {
+					file: 'public/references/wallets/uniswap/screenshots/2026-08-31-tokens-aggregated.png',
+					label: 'Uniswap Wallet Tokens tab, showing aggregated per-token balances across chains',
+				},
+				ether: supported({
+					ref: {
+						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-eth-comprehensive.png',
+						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain ETH balances',
+					},
+					crossChainSumView: featureSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: supported({
+					ref: {
+						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png',
+						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain USDC balances',
+					},
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+			},
+		},
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: {
+				explanation:
+					'The Settings screen has no network-management section, confirming the wallet does not let users add or configure chains or RPC endpoints.',
+				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-no-network-settings.png',
+				label: 'Uniswap Wallet Settings screen, with no network management option',
+			},
+			customChainRpcEndpoint: notSupported,
+			l1: notSupported,
+			nonL1: notSupported,
+		}),
 		ecosystem: {
-			delegation: null,
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: false,
+				}),
+				fee: {
+					crossChainGas: featureSupported,
+					walletSponsored: notSupported,
+				},
+			},
 		},
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
 		},
 		licensing: {
@@ -82,7 +281,7 @@ export const uniswapWallet: SoftwareWallet = {
 				ecosystemGrants: false,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: true,
-				hiddenConvenienceFees: null,
+				hiddenConvenienceFees: false,
 				publicOffering: false,
 				selfFunded: false,
 				transparentConvenienceFees: true,
@@ -95,15 +294,32 @@ export const uniswapWallet: SoftwareWallet = {
 				crashReports: null,
 				usage: null,
 			},
-			appIsolation: null,
+			appIsolation: {
+				createInAppConnectionFlow: notSupported,
+				erc7846WalletConnect: notSupported,
+				ethAccounts: supported({
+					ref: refTodo,
+					defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupported,
+			},
 			dataCollection: null,
 			privacyPolicy:
 				'https://support.uniswap.org/hc/en-us/articles/30934457771405-Uniswap-Labs-Privacy-Policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				drills: notSupported,
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported({
 				ref: [
 					{
@@ -125,29 +341,120 @@ export const uniswapWallet: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
-			hardwareWalletSupport: null,
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
+			duressResistance: {
+				[Variant.BROWSER]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'The extension unlock screen dispatches an Unlock auth action with the user-entered password, confirming password is a supported basic-unlock mechanism.',
+								url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/lockScreen/useUnlockWithPassword.ts#L1-L17',
+							},
+							{
+								explanation:
+									'`authenticateWithBiometricCredential()` calls `navigator.credentials.get()` (WebAuthn) with `userVerification`: "required" and uses the resulting credential to derive a CryptoKey that decrypts a stored copy of the user\'s password, i.e. biometric unlock is implemented and used to unlock the extension.',
+								url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/biometricUnlock/biometricAuthUtils.ts#L18-L50',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				},
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: {
+							explanation:
+								'`tryLocalAuthenticate()` calls expo-local-authentication\'s `authenticateAsync()` with `biometricsSecurityLevel`: "strong" to unlock via the OS biometric prompt (Face ID / Touch ID / Android fingerprint), confirming biometric is the app\'s unlock mechanism.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/features/biometrics/biometrics-utils.ts#L34-L84',
+						},
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				},
 			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
+			hardwareWalletSupport: {
+				ref: refTodo,
+				wallets: {},
+			},
+			keysHandling: {
+				ref: [
+					{
+						explanation:
+							"`generateAndStoreMnemonic()` on the browser extension calls ethers `Wallet.createRandom()` locally and stores the resulting mnemonic client-side, with no network call, confirming key generation happens entirely on the user's device for this wallet mode.",
+						url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/Keyring.web.ts#L274-L284',
+					},
+					{
+						explanation:
+							'`generateAndStoreMnemonic()` on mobile delegates to the `RNEthersRS` native module, whose Swift/Kotlin implementation (see below) shows the actual key generation is a local FFI call, not a network request.',
+						url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/Keyring.native.ts#L76-L78',
+					},
+					{
+						explanation:
+							'The iOS native module calls `generate_mnemonic()`, a local FFI call into a bundled Rust library whose source is not present in this repo. It stores the result directly in the iOS Keychain with `.accessibleWhenUnlockedThisDeviceOnly`. This confirms on-device generation and storage with no server round trip.',
+						url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Uniswap/RNEthersRs/RNEthersRS.swift#L98-L119',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+			},
+			lightClient: {
+				ethereumL1: notSupported,
+			},
+			passkeyVerification: notSupported,
+			publicSecurityAudits: trailOfBitsAudits,
 			scamAlerts: null,
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: [
+						{
+							explanation:
+								"The extension derives the mnemonic-encryption key from the user's password via PBKDF2 (Web Crypto's `deriveKey`, 100,000 iterations, SHA-256), then encrypts the mnemonic with `AES-GCM`.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/crypto.ts#L100-L118',
+						},
+					],
+					browserExtensionHardening: parseBrowserExtensionManifest(uniswapRawExtManifest),
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								'On Android, mnemonics are stored in `EncryptedSharedPreferences` backed by an Android Keystore hardware master key (AES-256). iOS mirrors this by storing mnemonics directly in the native Keychain (hardware-backed Secure Enclave).',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/android/app/src/main/java/com/uniswap/RnEthersRs.kt#L24-L34',
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					mobileAppHardening: parseMobileManifestJson(uniswapAndroidParsed, uniswapIosParsed),
+					secureRng: SecureRngSource.LIBRARY_RNG,
+				},
+			},
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
 				},
 			},
@@ -165,7 +472,15 @@ export const uniswapWallet: SoftwareWallet = {
 				reproducibleBuilds: null,
 			},
 		},
-		walletCall: null,
+		walletCall: supported({
+			ref: {
+				explanation:
+					'An EIP-5792 wallet capability test shows `wallet_sendCalls` is supported, but atomicity support is not declared, so batched calls are not guaranteed atomic.',
+				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png',
+				label: 'EIP-5792 wallet capability test results for Uniswap Wallet',
+			},
+			atomicMultiTransactions: notSupported,
+		}),
 	},
 	variants: {
 		[Variant.MOBILE]: true,
