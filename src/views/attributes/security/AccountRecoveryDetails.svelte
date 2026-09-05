@@ -1,200 +1,99 @@
 <script lang="ts">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
+	import { accountRecoveryDrillWording } from '@/schema/features/security/account-recovery'
 	import { ContentType } from '@/types/content'
-	import { trimWhitespacePrefix } from '@/types/utils/text'
-	import type { AccountRecoveryMetadata } from '@/schema/attributes/security/account-recovery'
+	import {
+		type AccountRecoveryDetails,
+		accountRecoveryConfiguredDrillsIntro,
+		accountRecoveryDrillsHeading,
+		accountRecoveryFailureScenariosHeading,
+		accountRecoveryMissingDrillsIntro,
+		accountRecoverySuccessScenariosHeading,
+		accountRecoverySummary,
+	} from '@/types/content/account-recovery-details'
+	import { guardianPolicyHeading } from '@/types/content/guardian-policy'
+	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props
-	const {
-		wallet,
-		metadata,
-	}: {
-		wallet: RatedWallet
-		metadata: AccountRecoveryMetadata
-	} = $props()
+	const { details, context }: StructuredDetailsViewProps<AccountRecoveryDetails> = $props()
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
-	import {
-		accountRecoveryDrillWording,
-		guardianPolicyMarkdown,
-	} from '@/schema/features/security/account-recovery'
-	import { isAccountRecoverable } from '@/schema/features/guardian-scenario/guardian-scenario-common'
-	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
+	import GuardianPolicyView from '@/views/attributes/GuardianPolicyView.svelte'
+	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
-{#if metadata.outcomes === null}
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: trimWhitespacePrefix(`
-				{{WALLET_NAME}} does not implement guardian-based account recovery.
-				The user will lose access to their account if they lose their seed phrase.
-			`),
-		}}
-		strings={{ WALLET_NAME: wallet.metadata.displayName }}
-	/>
-{:else}
-	{@const successfulOutcomes = metadata.outcomes.filter(outcome =>
-		isAccountRecoverable(outcome.recovery),
-	)}
-	{@const failedOutcomes = metadata.outcomes.filter(
-		outcome => !isAccountRecoverable(outcome.recovery),
-	)}
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: trimWhitespacePrefix(`
-				{{WALLET_NAME}} implements a Guardian-based account recovery feature which
-				${failedOutcomes.length === 0 ? 'passes all of the tested scenarios.' : successfulOutcomes.length === 0 ? 'does not pass any of the tested scenarios.' : 'does not pass all of the tested scenarios.'}
-			`),
-		}}
-		strings={{ WALLET_NAME: wallet.metadata.displayName }}
-	/>
-	{#if metadata.minimumGuardianPolicy !== null}
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: `### ${wallet.metadata.displayName} account recovery implementation`,
-			}}
-		/>
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: trimWhitespacePrefix(metadata.minimumGuardianPolicy.descriptionMarkdown),
-			}}
-		/>
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: guardianPolicyMarkdown(metadata.minimumGuardianPolicy),
-			}}
-		/>
-	{/if}
-	{#if failedOutcomes.length > 0}
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: '### Account recovery failure scenarios',
-			}}
-		/>
-		<ul>
-			{#each failedOutcomes as outcome (`${guardianScenarioId(outcome.scenario)}_${outcome.outcomeId}`)}
-				<li>
-					<strong>
-						<Typography
-							content={outcome.scenario.description.contentType === ContentType.MARKDOWN
-								? {
-										contentType: ContentType.MARKDOWN,
-										markdown: outcome.scenario.description.markdown,
-									}
-								: {
-										contentType: ContentType.TEXT,
-										text: outcome.scenario.description.text,
-									}}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					</strong>:
-					{#if !isAccountRecoverable(outcome.recovery)}
-						<Typography
-							content={outcome.recovery.description.contentType === ContentType.MARKDOWN
-								? {
-										contentType: ContentType.MARKDOWN,
-										markdown: outcome.recovery.description.markdown,
-									}
-								: {
-										contentType: ContentType.TEXT,
-										text: outcome.recovery.description.text,
-									}}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					{/if}
-				</li>
-			{/each}
-		</ul>
-	{/if}
-	{#if successfulOutcomes.length > 0}
-		<Typography
-			content={{
-				contentType: ContentType.MARKDOWN,
-				markdown: '### Account recovery success scenarios',
-			}}
-		/>
-		<ul>
-			{#each successfulOutcomes as outcome (`${guardianScenarioId(outcome.scenario)}_${outcome.outcomeId}`)}
-				<li>
-					<strong>
-						<Typography
-							content={outcome.scenario.description.contentType === ContentType.MARKDOWN
-								? {
-										contentType: ContentType.MARKDOWN,
-										markdown: outcome.scenario.description.markdown,
-									}
-								: {
-										contentType: ContentType.TEXT,
-										text: outcome.scenario.description.text,
-									}}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					</strong>:
-					{#if !isAccountRecoverable(outcome.recovery)}
-						<Typography
-							content={outcome.recovery.description.contentType === ContentType.MARKDOWN
-								? {
-										contentType: ContentType.MARKDOWN,
-										markdown: outcome.recovery.description.markdown,
-									}
-								: {
-										contentType: ContentType.TEXT,
-										text: outcome.recovery.description.text,
-									}}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					{/if}
-				</li>
-			{/each}
-		</ul>
-	{/if}
+
+<Typography
+	content={{
+		contentType: ContentType.MARKDOWN,
+		markdown: accountRecoverySummary(details),
+	}}
+	strings={context.strings}
+/>
+
+{#if details.guardianPolicy}
+	<h4>{guardianPolicyHeading}</h4>
+
+	<GuardianPolicyView policy={details.guardianPolicy} {context} />
 {/if}
 
-{#if metadata.drills !== null}
-	<Typography
-		content={{
-			contentType: ContentType.MARKDOWN,
-			markdown: '### Account recovery drills',
-		}}
-	/>
-	{#if metadata.drills.configured.length > 0}
+{#if details.unrecoverableScenarios.length > 0}
+	<h4>{accountRecoveryFailureScenariosHeading}</h4>
+
+	<ul>
+		{#each details.unrecoverableScenarios as scenario (scenario.id)}
+			<li>
+				<strong>{scenario.scenario}</strong>{#if scenario.consequence}: {scenario.consequence}{/if}
+			</li>
+		{/each}
+	</ul>
+{/if}
+
+{#if details.recoverableScenarios.length > 0}
+	<h4>{accountRecoverySuccessScenariosHeading}</h4>
+
+	<ul>
+		{#each details.recoverableScenarios as scenario (scenario.id)}
+			<li><strong>{scenario.scenario}</strong></li>
+		{/each}
+	</ul>
+{/if}
+
+{#if details.drills}
+	<h4>{accountRecoveryDrillsHeading}</h4>
+
+	{#if details.drills.configured.length > 0}
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: trimWhitespacePrefix(`
-					{{WALLET_NAME}} periodically runs the following account recovery drills:
-				`),
+				markdown: accountRecoveryConfiguredDrillsIntro,
 			}}
-			strings={{ WALLET_NAME: wallet.metadata.displayName }}
+			strings={context.strings}
 		/>
 		<ul>
-			{#each metadata.drills.configured as drill (drill.type)}
+			{#each details.drills.configured as drill (drill.type)}
 				<li>
 					{accountRecoveryDrillWording(drill.type).label} (every {drill.reminderEveryNDays} days)
+
+					{#if drill.references.length > 0}
+						<ReferenceLinks references={drill.references} />
+					{/if}
 				</li>
 			{/each}
 		</ul>
 	{/if}
-	{#if metadata.drills.missing.length > 0}
+
+	{#if details.drills.missing.length > 0}
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: trimWhitespacePrefix(`
-					{{WALLET_NAME}} does not run the following recommended account recovery drills:
-				`),
+				markdown: accountRecoveryMissingDrillsIntro,
 			}}
-			strings={{ WALLET_NAME: wallet.metadata.displayName }}
+			strings={context.strings}
 		/>
 		<ul>
-			{#each metadata.drills.missing as drillType (drillType)}
+			{#each details.drills.missing as drillType (drillType)}
 				<li>{accountRecoveryDrillWording(drillType).label}</li>
 			{/each}
 		</ul>

@@ -1,23 +1,23 @@
-import type { EvaluationData } from '@/schema/attributes'
-import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
+import {
+	type EthereumL1LightClient,
+	ethereumL1LightClientUrl,
+} from '@/schema/features/security/light-client'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
-import { component, type Content } from '../content'
-import type { NonEmptyArray } from '../utils/non-empty'
-
-export interface ChainVerificationDetailsProps extends EvaluationData {
+export interface ChainVerificationDetails {
+	type: 'chainVerification'
 	lightClients: NonEmptyArray<EthereumL1LightClient>
 }
 
-export interface ChainVerificationDetailsContent {
-	component: 'ChainVerificationDetails'
-	componentProps: ChainVerificationDetailsProps
-}
+export function chainVerificationSentence(details: ChainVerificationDetails): string {
+	const clients = details.lightClients.map(client => {
+		const { url, label } = ethereumL1LightClientUrl(client)
 
-export function chainVerificationDetailsContent(
-	bakedProps: Omit<ChainVerificationDetailsProps, keyof EvaluationData>,
-): Content<{ WALLET_NAME: string }> {
-	return component<ChainVerificationDetailsContent, keyof typeof bakedProps>(
-		'ChainVerificationDetails',
-		bakedProps,
-	)
+		return `[${label}](${url})`
+	})
+
+	return `**{{WALLET_NAME}}** performs L1 chain state verification using ${commaListFormat(
+		clients,
+	)} light client${details.lightClients.length === 1 ? '' : 's'}.`
 }

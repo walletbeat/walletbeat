@@ -1,54 +1,21 @@
 <script lang="ts">
 	// Types/constants
-	import {
-		type Monetization,
-		monetizationStrategies,
-		monetizationStrategyName
-	} from '@/schema/features/transparency/monetization'
-	import { refs } from '@/schema/reference'
-	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
-
+	import { type FundingDetails, fundingSentence } from '@/types/content/funding-details'
+	import type { StructuredDetailsViewProps } from '@/views/attributes/structured-details-registry'
 
 	// Props
-	const {
-		wallet,
-		monetization,
-	}: {
-		wallet: RatedWallet
-		monetization: Monetization | undefined
-	} = $props()
-
+	const { details, context }: StructuredDetailsViewProps<FundingDetails> = $props()
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
-	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
 
 <Typography
 	content={{
 		contentType: ContentType.MARKDOWN,
-		markdown: (
-			monetization ?
-				(() => {
-					const strategies = monetizationStrategies(monetization)
-						.filter(({ value }) => value === true)
-						.map(({ strategy }) => strategy)
-					const strategiesText = strategies.length === 0 ? 'unknown sources' : strategies.map(strategy => monetizationStrategyName(strategy)).join(', ')
-
-					return `**{{WALLET_NAME}}** is funded by **${strategiesText}**.`
-				})()
-			:
-				'**{{WALLET_NAME}}** is funded by **unknown sources**.'
-		)
+		markdown: fundingSentence(details),
 	}}
-	strings={{ WALLET_NAME: wallet.metadata.displayName }}
+	strings={context.strings}
 />
-
-{#if monetization}
-	{@const references = refs(monetization)}
-	{#if references.length > 0}
-		<ReferenceLinks references={references} />
-	{/if}
-{/if}

@@ -1,83 +1,81 @@
-import type { EvaluationData, WalletNameStrings } from '@/schema/attributes'
-import type { PrivateTransfersMetadata } from '@/schema/attributes/privacy/private-transfers'
-import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 
-import {
-	component,
-	type ComponentAndProps,
-	type Content,
-	isCustomContent,
-	type MarkdownParagraph,
-} from '../content'
-import type { Strings } from '../utils/string-templates'
+import type { InlineText } from './inline'
 
-interface PrivateTokenTransferDetails {
-	sendingDetails: MarkdownParagraph<WalletNameStrings>
-	receivingDetails: MarkdownParagraph<WalletNameStrings>
-	spendingDetails: MarkdownParagraph<WalletNameStrings>
-	extraNotes: MarkdownParagraph<WalletNameStrings>[]
+export const privateTransferTechnologyName: Record<PrivateTransferTechnology, string> = {
+	[PrivateTransferTechnology.STEALTH_ADDRESSES]: 'ERC-5564 Stealth Addresses',
+	[PrivateTransferTechnology.TORNADO_CASH_NOVA]: 'Tornado Cash Nova',
+	[PrivateTransferTechnology.PRIVACY_POOLS]: 'Privacy Pools',
+	[PrivateTransferTechnology.RAILGUN]: 'Railgun',
 }
 
-export interface PrivateTransfersDetailsProps extends EvaluationData<PrivateTransfersMetadata> {
-	privateTransferDetails: Map<PrivateTransferTechnology, PrivateTokenTransferDetails>
+export interface PrivateTransferTechnologyDetail {
+	technology: PrivateTransferTechnology
+
+	sending: InlineText
+
+	receiving: InlineText
+
+	spending: InlineText
+
+	notes: InlineText[]
 }
 
-export interface PrivateTransfersDetailsContent {
-	component: 'PrivateTransfersDetails'
-	componentProps: PrivateTransfersDetailsProps
+export interface PrivateTransfersDetails {
+	type: 'privateTransfers'
+
+	/** Supported technologies, in evaluation order. Empty when none is supported. */
+	technologies: PrivateTransferTechnologyDetail[]
+
+	/**
+	 * A statement about the wallet's overall token transfer mode, such as
+	 * transfers being public by default. It belongs to the evaluation as a
+	 * whole, never to one technology.
+	 */
+	defaultModeNote?: InlineText
 }
 
-/** Type predicate for PrivateTransfersDetailsContent. */
-function isPrivateTransferDetailsContent(
-	componentAndProps: ComponentAndProps,
-): componentAndProps is PrivateTransfersDetailsContent {
-	return componentAndProps.component === 'PrivateTransfersDetails'
+export function isPrivateTransfersDetails(details: unknown): details is PrivateTransfersDetails {
+	return (
+		typeof details === 'object' &&
+		details !== null &&
+		'type' in details &&
+		details.type === 'privateTransfers'
+	)
 }
 
-export function extractPrivateTransferDetails<S extends Strings>(
-	content: Content<S>,
-): PrivateTransfersDetailsProps | null {
-	if (!isCustomContent(content)) {
-		return null
-	}
-
-	if (!isPrivateTransferDetailsContent(content.component)) {
-		return null
-	}
-
-	return content.component.componentProps
+export function privateTransfersModeNote(note: InlineText): PrivateTransfersDetails {
+	return { type: 'privateTransfers', technologies: [], defaultModeNote: note }
 }
 
-export function mergePrivateTransferDetails(
-	details1: PrivateTransfersDetailsProps | null,
-	details2: PrivateTransfersDetailsProps,
-): Pick<PrivateTransfersDetailsProps, 'privateTransferDetails'> {
-	if (details1 === null) {
-		return details2
-	}
+export function privateTransfersDetails(
+	detail: PrivateTransferTechnologyDetail,
+): PrivateTransfersDetails {
+	return { type: 'privateTransfers', technologies: [detail] }
+}
 
-	const mergedMap = new Map<PrivateTransferTechnology, PrivateTokenTransferDetails>()
+/**
+ * Merge two private-transfer details, keeping the first occurrence of each
+ * technology. Used when two variants of the same wallet support different
+ * technologies and their evaluations are merged.
+ */
+export function mergePrivateTransfersDetails(
+	first: PrivateTransfersDetails,
+	second: PrivateTransfersDetails,
+): PrivateTransfersDetails {
+	const technologies = [...first.technologies]
 
-	for (const [key, value] of details1.privateTransferDetails) {
-		mergedMap.set(key, value)
-	}
-
-	for (const [key, value] of details2.privateTransferDetails) {
-		if (!mergedMap.has(key)) {
-			mergedMap.set(key, value)
+	for (const detail of second.technologies) {
+		if (!technologies.some(existing => existing.technology === detail.technology)) {
+			technologies.push(detail)
 		}
 	}
 
-	return {
-		privateTransferDetails: mergedMap,
-	}
-}
+	const defaultModeNote = first.defaultModeNote ?? second.defaultModeNote
 
-export function privateTransfersDetailsContent(
-	bakedProps: Omit<PrivateTransfersDetailsProps, keyof EvaluationData<PrivateTransfersMetadata>>,
-): Content<{ WALLET_NAME: string }> {
-	return component<PrivateTransfersDetailsContent, keyof typeof bakedProps>(
-		'PrivateTransfersDetails',
-		bakedProps,
-	)
+	return {
+		type: 'privateTransfers',
+		technologies,
+		...(defaultModeNote !== undefined && { defaultModeNote }),
+	}
 }

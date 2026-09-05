@@ -254,6 +254,10 @@
 					"type": "string",
 					"description": "Longer explanation or summary of the evaluation; may be \"See full details on the wallet page.\" when details are not easily expressed in textual format."
 				},
+				"structuredDetails": {
+					"$ref": "#/$defs/structuredDetails",
+					"description": "Optional format-neutral detail model for attributes with structured evaluation content."
+				},
 				"impact": {
 					"type": "string"
 				},
@@ -261,6 +265,739 @@
 					"type": "string"
 				},
 				"references": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/reference"
+					}
+				}
+			}
+		},
+		"structuredDetails": {
+			"oneOf": [
+				{
+					"$ref": "#/$defs/accountRecoveryDetails"
+				},
+				{
+					"$ref": "#/$defs/accountUnruggabilityDetails"
+				},
+				{
+					"$ref": "#/$defs/addressCorrelationDetails"
+				},
+				{
+					"$ref": "#/$defs/chainVerificationDetails"
+				},
+				{
+					"$ref": "#/$defs/fundingDetails"
+				},
+				{
+					"$ref": "#/$defs/privateTransfersDetails"
+				},
+				{
+					"$ref": "#/$defs/scamPreventionDetails"
+				},
+				{
+					"$ref": "#/$defs/securityAuditsDetails"
+				},
+				{
+					"$ref": "#/$defs/transactionInclusionDetails"
+				}
+			]
+		},
+		"guardian": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "description"],
+			"properties": {
+				"type": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"entityId": {
+					"type": "string"
+				}
+			}
+		},
+		"entityRef": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["entityId", "entityName"],
+			"properties": {
+				"entityId": {
+					"type": "string"
+				},
+				"entityName": {
+					"type": "string"
+				}
+			}
+		},
+		"guardianPolicy": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["description", "facts"],
+			"properties": {
+				"description": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"facts": {
+					"oneOf": [
+						{
+							"type": "object",
+							"additionalProperties": false,
+							"required": [
+								"kind",
+								"requiredGuardians",
+								"optionalGuardians",
+								"optionalGuardiansMinimumConfigurable",
+								"optionalGuardiansMinimumNeededForRecovery",
+								"secretReconstitution"
+							],
+							"properties": {
+								"kind": {
+									"const": "secretSplit"
+								},
+								"requiredGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"optionalGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"optionalGuardiansMinimumConfigurable": {
+									"type": "number"
+								},
+								"optionalGuardiansMinimumNeededForRecovery": {
+									"type": "number"
+								},
+								"secretReconstitution": {
+									"oneOf": [
+										{
+											"const": "CLIENT_SIDE"
+										},
+										{
+											"$ref": "#/$defs/entityRef"
+										}
+									]
+								}
+							}
+						},
+						{
+							"type": "object",
+							"additionalProperties": false,
+							"required": [
+								"kind",
+								"configuredGuardians",
+								"requiredGuardians",
+								"timelockWarningSentByAllOf",
+								"minimumSignaturesWithTimelock",
+								"minimumSignaturesBypassTimelock"
+							],
+							"properties": {
+								"kind": {
+									"const": "kOfNWithTimelock"
+								},
+								"configuredGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"requiredGuardians": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/guardian"
+									}
+								},
+								"timelockWarningSentByAllOf": {
+									"type": "array",
+									"items": {
+										"$ref": "#/$defs/entityRef"
+									}
+								},
+								"minimumSignaturesWithTimelock": {
+									"type": "number"
+								},
+								"minimumSignaturesBypassTimelock": {
+									"type": "number"
+								}
+							}
+						}
+					]
+				}
+			}
+		},
+		"guardianScenario": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["id", "scenario"],
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"scenario": {
+					"type": "string"
+				},
+				"consequence": {
+					"type": "string"
+				}
+			}
+		},
+		"accountRecoveryDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "recoverableScenarios", "unrecoverableScenarios"],
+			"properties": {
+				"type": {
+					"const": "accountRecovery"
+				},
+				"guardianPolicy": {
+					"$ref": "#/$defs/guardianPolicy"
+				},
+				"recoverableScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				},
+				"unrecoverableScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				},
+				"drills": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["configured", "missing"],
+					"properties": {
+						"configured": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["type", "name", "reminderEveryNDays"],
+								"properties": {
+									"type": {
+										"type": "string",
+										"enum": ["PRIVATE_KEY_QUIZ", "SEED_PHRASE_QUIZ", "GUARDIAN_ACCOUNT_CHECK"]
+									},
+									"name": {
+										"type": "string"
+									},
+									"reminderEveryNDays": {
+										"type": "number"
+									},
+									"references": {
+										"type": "array",
+										"items": {
+											"$ref": "#/$defs/reference"
+										}
+									}
+								}
+							}
+						},
+						"missing": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["type", "name"],
+								"properties": {
+									"type": {
+										"type": "string",
+										"enum": ["PRIVATE_KEY_QUIZ", "SEED_PHRASE_QUIZ", "GUARDIAN_ACCOUNT_CHECK"]
+									},
+									"name": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"accountUnruggabilityDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "safeScenarios", "takeoverScenarios"],
+			"properties": {
+				"type": {
+					"const": "accountUnruggability"
+				},
+				"guardianPolicy": {
+					"$ref": "#/$defs/guardianPolicy"
+				},
+				"safeScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				},
+				"takeoverScenarios": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/guardianScenario"
+					}
+				}
+			}
+		},
+		"addressCorrelationDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "leaks"],
+			"properties": {
+				"type": {
+					"const": "addressCorrelation"
+				},
+				"leaks": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["source", "correlatedInfo"],
+						"properties": {
+							"source": {
+								"oneOf": [
+									{
+										"type": "object",
+										"additionalProperties": false,
+										"required": ["kind"],
+										"properties": {
+											"kind": {
+												"const": "onchain"
+											}
+										}
+									},
+									{
+										"type": "object",
+										"additionalProperties": false,
+										"required": ["kind", "entityId", "entityName"],
+										"properties": {
+											"kind": {
+												"const": "entity"
+											},
+											"entityId": {
+												"type": "string"
+											},
+											"entityName": {
+												"type": "string"
+											}
+										}
+									}
+								]
+							},
+							"correlatedInfo": {
+								"type": "array",
+								"minItems": 1,
+								"items": {
+									"type": "object",
+									"additionalProperties": false,
+									"required": ["info", "name"],
+									"properties": {
+										"info": {
+											"type": "string",
+											"enum": [
+												"IP_ADDRESS",
+												"TRACKING_IDENTIFIER",
+												"PSEUDONYM",
+												"LEGAL_NAME",
+												"EMAIL",
+												"PHONE",
+												"BROWSING_HISTORY_URLS",
+												"CONTACTS",
+												"PHYSICAL_ADDRESS",
+												"USER_ACTIONS",
+												"ACCOUNT_ADDRESS",
+												"BALANCE",
+												"ASSETS",
+												"MEMPOOL_TRANSACTIONS",
+												"WALLET_CONNECTED_DOMAINS"
+											]
+										},
+										"name": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"references": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/reference"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"chainVerificationDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "lightClients"],
+			"properties": {
+				"type": {
+					"const": "chainVerification"
+				},
+				"lightClients": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["id", "name", "url"],
+						"properties": {
+							"id": {
+								"type": "string",
+								"enum": ["helios", "heliosMobi"]
+							},
+							"name": {
+								"type": "string"
+							},
+							"url": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"fundingDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "strategies", "revenueBreakdownIsPublic"],
+			"properties": {
+				"type": {
+					"const": "funding"
+				},
+				"strategies": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["strategy", "name", "userAligned"],
+						"properties": {
+							"strategy": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"userAligned": {
+								"type": "boolean"
+							}
+						}
+					}
+				},
+				"revenueBreakdownIsPublic": {
+					"type": "boolean"
+				}
+			}
+		},
+		"inlineText": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["text"],
+			"properties": {
+				"text": {
+					"type": "string"
+				},
+				"links": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["text", "url"],
+						"properties": {
+							"text": {
+								"type": "string"
+							},
+							"url": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"privateTransfersDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "technologies"],
+			"properties": {
+				"type": {
+					"const": "privateTransfers"
+				},
+				"technologies": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["technology", "name", "sending", "receiving", "spending"],
+						"properties": {
+							"technology": {
+								"type": "string",
+								"enum": ["stealthAddresses", "tornadoCashNova", "privacyPools", "railgun"]
+							},
+							"name": {
+								"type": "string"
+							},
+							"sending": {
+								"$ref": "#/$defs/inlineText"
+							},
+							"receiving": {
+								"$ref": "#/$defs/inlineText"
+							},
+							"spending": {
+								"$ref": "#/$defs/inlineText"
+							},
+							"notes": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/inlineText"
+								}
+							}
+						}
+					}
+				},
+				"defaultModeNote": {
+					"$ref": "#/$defs/inlineText"
+				}
+			}
+		},
+		"scamPreventionDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "warnings"],
+			"properties": {
+				"type": {
+					"const": "scamPrevention"
+				},
+				"warnings": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["kind", "description"],
+						"properties": {
+							"kind": {
+								"type": "string",
+								"enum": ["sendTransaction", "contractTransaction", "scamUrl", "unlimitedApproval"]
+							},
+							"description": {
+								"type": "string"
+							},
+							"items": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"conclusion": {
+								"type": "string"
+							},
+							"references": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/reference"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"securityAuditsDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "audits"],
+			"properties": {
+				"type": {
+					"const": "securityAudits"
+				},
+				"audits": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["auditor", "auditDate", "variants", "findings"],
+						"properties": {
+							"auditor": {
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["id", "name"],
+								"properties": {
+									"id": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									}
+								}
+							},
+							"auditDate": {
+								"type": "string",
+								"pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+							},
+							"variants": {
+								"oneOf": [
+									{
+										"const": "ALL_VARIANTS"
+									},
+									{
+										"type": "array",
+										"items": {
+											"type": "string",
+											"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+										}
+									}
+								]
+							},
+							"findings": {
+								"type": "string",
+								"enum": ["NONE_FOUND", "ALL_FIXED", "FLAWS"]
+							},
+							"flaws": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"additionalProperties": false,
+									"required": ["name", "severity", "status"],
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"severity": {
+											"type": "string",
+											"enum": ["CRITICAL", "HIGH", "MEDIUM"]
+										},
+										"status": {
+											"type": "string",
+											"enum": ["FIXED", "NOT_FIXED"]
+										}
+									}
+								}
+							},
+							"references": {
+								"type": "array",
+								"items": {
+									"$ref": "#/$defs/reference"
+								}
+							}
+						}
+					}
+				},
+				"bugBounty": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["availability", "coverage", "upgradePathAvailable"],
+					"properties": {
+						"availability": {
+							"type": "string",
+							"enum": ["ACTIVE", "INACTIVE", "NONE"]
+						},
+						"coverage": {
+							"oneOf": [
+								{
+									"const": "FULL_SCOPE"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": ["APP_ONLY", "FIRMWARE_ONLY", "HARDWARE_ONLY"]
+									}
+								}
+							]
+						},
+						"platform": {
+							"type": "string"
+						},
+						"rewards": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["currency"],
+							"properties": {
+								"minimum": {
+									"type": "number"
+								},
+								"maximum": {
+									"type": "number"
+								},
+								"currency": {
+									"type": "string"
+								}
+							}
+						},
+						"legalProtection": {
+							"type": "string",
+							"enum": ["SAFE_HARBOR", "LEGAL_ASSURANCE"]
+						},
+						"disclosureDays": {
+							"type": "number"
+						},
+						"upgradePathAvailable": {
+							"type": "boolean"
+						},
+						"references": {
+							"type": "array",
+							"items": {
+								"$ref": "#/$defs/reference"
+							}
+						}
+					}
+				}
+			}
+		},
+		"transactionInclusionDetails": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "l1Broadcast", "l2s"],
+			"properties": {
+				"type": {
+					"const": "transactionInclusion"
+				},
+				"l1Broadcast": {
+					"type": "string",
+					"enum": ["NO", "SELF_GOSSIP", "OWN_NODE"]
+				},
+				"l2s": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["l2", "name", "forceInclusion"],
+						"properties": {
+							"l2": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"forceInclusion": {
+								"type": "string",
+								"enum": ["ARBITRARY_TRANSACTIONS", "WITHDRAWALS_ONLY", "NONE"]
+							}
+						}
+					}
+				},
+				"l1References": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/reference"
+					}
+				},
+				"l2References": {
 					"type": "array",
 					"items": {
 						"$ref": "#/$defs/reference"

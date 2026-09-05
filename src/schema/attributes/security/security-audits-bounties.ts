@@ -11,24 +11,33 @@ import {
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import {
-	type AtLeastOneCoverageBreadth,
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 	type BugBountyProgramSupport,
 	CoverageBreadth,
-	type LegalProtection,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
 import { isSupported, supported } from '@/schema/features/support'
-import { refNotNecessary } from '@/schema/reference'
+import { mergeRefs, refNotNecessary, toFullyQualified } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { markdown, mdSentence, paragraph, type Sentence, sentence } from '@/types/content'
-import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
+import {
+	type BugBountyDetail,
+	isSecurityAuditsDetails,
+	mergeSecurityAuditsDetails,
+	type SecurityAuditDetail,
+} from '@/types/content/security-audits-details'
 import { daysSince } from '@/types/date'
-import { isNonEmptyArray, type NonEmptyArray, nonEmptySet, setItems } from '@/types/utils/non-empty'
-import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
+import {
+	isNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyMap,
+	nonEmptySet,
+	setItems,
+} from '@/types/utils/non-empty'
+import { trimWhitespacePrefix } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
 
@@ -41,7 +50,7 @@ type BugBountyProgramSubResult = {
 	outcomeId: string
 	displayName: string
 	shortExplanation: Sentence<WalletNameStrings>
-	detailsMarkdown: string
+	details: BugBountyDetail
 	howToImproveMarkdown: string | null
 }
 
@@ -141,30 +150,6 @@ function audited(
 	}
 }
 
-function getCoverageDescription(breadth: AtLeastOneCoverageBreadth): string {
-	const items = setItems(breadth)
-	const descriptions = items
-		.map(item => {
-			switch (item) {
-				case CoverageBreadth.APP_ONLY:
-					return 'the application layer'
-				case CoverageBreadth.FIRMWARE_ONLY:
-					return 'firmware vulnerabilities'
-				case CoverageBreadth.HARDWARE_ONLY:
-					return 'hardware vulnerabilities'
-				default:
-					return ''
-			}
-		})
-		.filter(Boolean)
-
-	if (descriptions.length === 0) {
-		return ''
-	}
-
-	return `The program covers only ${commaListFormat(descriptions)}.`
-}
-
 function getRewardDescription(support: BugBountyProgramSupport): string {
 	if (!isSupported(support.rewards)) {
 		return ''
@@ -188,38 +173,6 @@ function getRewardDescription(support: BugBountyProgramSupport): string {
 	return ''
 }
 
-function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
-	if (!isSupported(support.rewards)) {
-		return ''
-	}
-
-	const min = support.rewards.minimum
-	const max = support.rewards.maximum
-	const currency = support.rewards.currency || 'USD'
-	const currencySymbol = currency === 'USD' ? '$' : ''
-
-	if (min != null && max != null) {
-		if (min === max) {
-			return `Rewards are ${currencySymbol}${min.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
-		} else {
-			return `Rewards range from ${currencySymbol}${min.toLocaleString()} to ${currencySymbol}${max.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
-		}
-	} else if (max != null) {
-		return `Rewards are up to ${currencySymbol}${max.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
-	} else if (typeof min === 'number') {
-		return `Rewards start at ${currencySymbol}${min.toLocaleString()} ${currency !== 'USD' ? currency : ''}`.trim()
-	}
-
-	return ''
-}
-
-function getLegalProtectionDescription(legalProtection: LegalProtection): string {
-	const protectionType =
-		legalProtection.type === LegalProtectionType.SAFE_HARBOR ? 'Safe Harbor' : 'Legal Assurance'
-
-	return `**Legal Protection**: The program provides ${protectionType} protections for security researchers conducting good faith security research.`
-}
-
 /**
  * Sub-result for wallets that do not implement any bug bounty program.
  */
@@ -231,8 +184,12 @@ function noBugBountyProgram(): BugBountyProgramSubResult {
 		shortExplanation: sentence(
 			"{{WALLET_NAME}} does not implement a bug bounty program and doesn't provide security updates.",
 		),
-		detailsMarkdown:
-			'{{WALLET_NAME}} does not implement a bug bounty program and does not provide a clear path for security researchers to report vulnerabilities. The wallet also lacks a documented process for providing security updates to address critical issues.',
+		details: {
+			availability: 'NONE',
+			coverage: [],
+			upgradePathAvailable: false,
+			references: [],
+		},
 		howToImproveMarkdown:
 			'{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.',
 	}
@@ -245,15 +202,6 @@ export function evaluateBugBountyProgram(
 	support: BugBountyProgramSupport,
 ): BugBountyProgramSubResult {
 	const rewardInfo = getRewardDescription(support)
-	const rewardDetailsInfo = getRewardDetailsDescription(support)
-	const coverageInfo =
-		support.coverageBreadth === 'FULL_SCOPE'
-			? 'The program covers all aspects of the wallet.'
-			: getCoverageDescription(support.coverageBreadth)
-	const legalProtectionInfo = isSupported(support.legalProtections)
-		? getLegalProtectionDescription(support.legalProtections)
-		: ''
-
 	const hasRewards =
 		isSupported(support.rewards) &&
 		support.rewards.minimum != null &&
@@ -272,19 +220,6 @@ export function evaluateBugBountyProgram(
 			? Rating.PARTIAL
 			: Rating.FAIL
 
-	const platformInfo =
-		support.platform === BugBountyPlatform.SELF_HOSTED
-			? 'The program is self-hosted.'
-			: support.platform
-				? `The program is hosted on ${support.platform}.`
-				: ''
-
-	const availabilityInfo = isActive
-		? 'The program is currently active and accepting vulnerability reports.'
-		: support.availability === BugBountyProgramAvailability.INACTIVE
-			? 'Note that the program is currently inactive and not accepting new reports.'
-			: 'No bug bounty program has been announced or is publicly available.'
-
 	return {
 		rating,
 		outcomeId: isActive ? 'bug_bounty_available' : 'bug_bounty_not_available',
@@ -292,27 +227,32 @@ export function evaluateBugBountyProgram(
 		shortExplanation: mdSentence<WalletNameStrings>(
 			`{{WALLET_NAME}} has a bug bounty program${rewardInfo ? ` ${rewardInfo}` : ''}${isActive ? '' : ', but it is currently inactive'}.`,
 		),
-		detailsMarkdown: `
-			${coverageInfo}
-
-			${availabilityInfo}
-
-			${platformInfo}
-
-			${rewardDetailsInfo}
-
-			${legalProtectionInfo}
-
-
-			${isSupported(support.disclosure) ? `**Disclosure Process**: ${support.disclosure.numberOfDays} days` : ''}
-
-			${
-				support.upgradePathAvailable
-					? 'Positively, the wallet does provide an upgrade path for users when security issues are identified.'
-					: 'Unfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.'
-			}
-
-		`,
+		details: {
+			availability: support.availability,
+			coverage:
+				support.coverageBreadth === 'FULL_SCOPE' ? 'FULL_SCOPE' : setItems(support.coverageBreadth),
+			...(support.platform !== undefined && { platform: support.platform }),
+			...(isSupported(support.rewards) && {
+				rewards: {
+					...(support.rewards.minimum !== undefined &&
+						support.rewards.minimum !== null && { minimum: support.rewards.minimum }),
+					...(support.rewards.maximum !== undefined &&
+						support.rewards.maximum !== null && { maximum: support.rewards.maximum }),
+					currency: support.rewards.currency === '' ? 'USD' : support.rewards.currency,
+				},
+			}),
+			...(isSupported(support.legalProtections) && {
+				legalProtection: support.legalProtections.type,
+			}),
+			...(isSupported(support.disclosure) && { disclosureDays: support.disclosure.numberOfDays }),
+			upgradePathAvailable: support.upgradePathAvailable,
+			references: mergeRefs(
+				...toFullyQualified(support.ref),
+				...(isSupported(support.legalProtections)
+					? toFullyQualified(support.legalProtections.ref)
+					: []),
+			),
+		},
 		howToImproveMarkdown: passesAll
 			? null
 			: `
@@ -370,6 +310,30 @@ const exampleInactiveBugBountyProgram: BugBountyProgramSupport = {
 	ref: refNotNecessary,
 }
 
+/** Canonical evidence for one audit, including the flaws it found. */
+function auditDetail(audit: SecurityAudit): SecurityAuditDetail {
+	return {
+		auditor: audit.auditor,
+		auditDate: audit.auditDate,
+		variants:
+			audit.variantsScope === 'ALL_VARIANTS' ? 'ALL_VARIANTS' : setItems(audit.variantsScope),
+		findings:
+			audit.unpatchedFlaws === 'NONE_FOUND'
+				? { kind: 'noneFound' }
+				: audit.unpatchedFlaws === 'ALL_FIXED'
+					? { kind: 'allFixed' }
+					: {
+							kind: 'flaws',
+							flaws: nonEmptyMap(audit.unpatchedFlaws, flaw => ({
+								name: flaw.name,
+								severity: flaw.severityAtAuditPublication,
+								status: flaw.presentStatus,
+							})),
+						},
+		references: toFullyQualified(audit.ref),
+	}
+}
+
 /**
  * Combine the security audits and bug bounty program sub-evaluations into a
  * single evaluation. The overall rating is the worst of the two sub-ratings
@@ -413,11 +377,11 @@ function combineEvaluation(
 				securityAudits: auditsPart.audits,
 			},
 		},
-		details: securityAuditsDetailsContent({
-			auditedInLastYear: auditsPart.auditedInLastYear,
-			hasUnaddressedFlaws: auditsPart.hasUnaddressedFlaws,
-			bugBountyDetails: bugBountyPart.detailsMarkdown,
-		}),
+		details: {
+			type: 'securityAudits',
+			audits: auditsPart.audits.map(auditDetail),
+			bugBounty: bugBountyPart.details,
+		},
 		howToImprove:
 			howToImproveParts.length === 0
 				? undefined
@@ -671,6 +635,18 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 		}
 		worstEvaluation.outcome.metadata = {
 			securityAudits: allAudits,
+		}
+
+		// The overall evaluation shows every variant's audit evidence, so its
+		// details must carry that same evidence: the summary they display is
+		// derived from these audits rather than from the worst variant alone.
+		if (isSecurityAuditsDetails(worstEvaluation.details)) {
+			worstEvaluation.details = mergeSecurityAuditsDetails(
+				worstEvaluation.details,
+				Object.values(perVariant)
+					.map(evaluation => evaluation?.details)
+					.filter(isSecurityAuditsDetails),
+			)
 		}
 
 		return worstEvaluation

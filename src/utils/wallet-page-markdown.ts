@@ -8,10 +8,10 @@ import {
 import { Rating, ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
-import { gitCommitRefPinRegExp } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
+import { isStructuredDetails } from '@/types/content/structured-details'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
@@ -23,6 +23,11 @@ import {
 	computeCountsAndStatus,
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
+import {
+	markdownLinkLabel,
+	renderStructuredDetailsMarkdown,
+} from '@/utils/structured-details/markdown'
+import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 import { getWalletUrl } from '@/utils/urls'
 
 /**
@@ -233,10 +238,9 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 				parts.push(shortExpl, '')
 
 				const details = normalizeMarkdownBlankLines(
-					renderContentToText(evaluation.details, evalStrings, {
-						fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
-						trim: true,
-					}),
+					isStructuredDetails(evaluation.details)
+						? renderStructuredDetailsMarkdown(evaluation.details, { strings: evalStrings })
+						: renderContentToText(evaluation.details, evalStrings, { trim: true }),
 				)
 
 				if (details.trim() !== '') {
@@ -266,7 +270,13 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 				}
 
 				if (evaluation.references !== undefined && evaluation.references.length > 0) {
-					const qualifiedRefs = toFullyQualified(evaluation.references)
+					// References already shown next to a structured claim are not repeated.
+					const qualifiedRefs = referencesNotIn(
+						toFullyQualified(evaluation.references),
+						isStructuredDetails(evaluation.details)
+							? structuredDetailsReferences(evaluation.details)
+							: [],
+					)
 
 					if (qualifiedRefs.length > 0) {
 						parts.push('#### References', '')
@@ -278,13 +288,7 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 										? ''
 										: `${collapseToSingleLine(ref.explanation)} Source: `
 
-								// Escape square brackets (e.g. in filename-derived labels)
-								// so they cannot parse as nested/reference-style links, and
-								// render commit-hash pins in GitHub-like labels (`foo.ts
-								// L1-2 @abcdef1`) as the code they are.
-								const label = labeledUrl.label
-									.replace(/[[\]]/g, String.raw`\$&`)
-									.replace(gitCommitRefPinRegExp, '`$&`')
+								const label = markdownLinkLabel(labeledUrl.label)
 
 								parts.push(`- ${prefix}[${label}](${labeledUrl.url})`)
 							}

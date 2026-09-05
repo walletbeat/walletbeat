@@ -356,7 +356,7 @@ export const metamask: SoftwareWallet = {
 					],
 					minimumGuardianPolicy: {
 						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-						descriptionMarkdown: `
+						description: `
 							MetaMask's account recovery feature splits recovery key shares across Google
 							and/or Apple. The user may configure a single one without the other,
 							in which case the key is effectively a 1-of-1.

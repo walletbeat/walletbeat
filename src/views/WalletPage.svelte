@@ -19,16 +19,7 @@
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
-	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
-	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
-	import type { FundingDetailsProps } from '@/types/content/funding-details'
-	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
-	import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
-	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
-	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
-	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
-	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
-	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
+	import { isStructuredDetails } from '@/types/content/structured-details'
 	import {
 		computePieSlices,
 		overallRatingPieLevels,
@@ -60,6 +51,7 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
+	import { referencesNotIn, structuredDetailsReferences } from '@/utils/structured-details/references'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
@@ -348,13 +340,7 @@
 	// Components
 	import { Github, Globe } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
-	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
-	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
-	import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
-	import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
-	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
-	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
-	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
+	import StructuredDetailsView from '@/views/attributes/StructuredDetailsView.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
@@ -362,8 +348,6 @@
 	import WalletPageNavigationBadge from '@/views/WalletPageNavigationBadge.svelte'
 	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
 	import Typography from '@/components/Typography.svelte'
-	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
-	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
 	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
@@ -1072,44 +1056,27 @@
 							strings={{ WALLET_NAME: wallet.metadata.displayName }}
 						/>
 
-					{:else if evalAttr.evaluation.details}
-						{@const componentName = evalAttr.evaluation.details.component.component}
-						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
-						{@const outcome = evalAttr.evaluation.outcome}
-						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
+					{:else if isStructuredDetails(evalAttr.evaluation.details)}
+						{@const detailsContext = { strings: getWalletEvalStrings(wallet) }}
 
 						<div data-column>
-							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
-							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
-							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
-							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
-							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
-							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
-							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
-							{/if}
+							<Typography
+								content={evalAttr.evaluation.outcome.shortExplanation}
+								strings={detailsContext.strings}
+							/>
+							<StructuredDetailsView
+								details={evalAttr.evaluation.details}
+								context={detailsContext}
+							/>
 						</div>
 
 					{:else}
 						<div data-column>
 							<Typography
-								content={{
-									contentType: ContentType.TEXT,
-									text: `No detailed evaluation available for ${attribute.displayName}`,
-								}}
+								content={evalAttr.evaluation.outcome.shortExplanation}
+								strings={getWalletEvalStrings(wallet)}
 							/>
+							<UnratedAttribute {wallet} />
 						</div>
 					{/if}
 				</li>
@@ -1133,26 +1100,20 @@
 				</div>
 			{/if}
 
-			{#if (
-				evalAttr.evaluation.references?.length &&
-				(
-					isTypographicContent(evalAttr.evaluation.details) ||
-					!(
-						// Custom components that render their own reference links
-						[
-							'ChainVerificationDetails',
-							'FundingDetails',
-							'ScamAlertDetails',
-							'SecurityAuditsDetails',
-						]
-							.includes(evalAttr.evaluation.details.component.component)
-					)
-				)
-			)}
-				<ReferenceLinks
-					references={toFullyQualified(evalAttr.evaluation.references)}
-					cardBackground="secondary"
-				/>
+			{#if evalAttr.evaluation.references?.length}
+				{@const undisplayedReferences = referencesNotIn(
+					toFullyQualified(evalAttr.evaluation.references),
+					isStructuredDetails(evalAttr.evaluation.details) ?
+						structuredDetailsReferences(evalAttr.evaluation.details)
+					: []
+				)}
+
+				{#if undisplayedReferences.length > 0}
+					<ReferenceLinks
+						references={undisplayedReferences}
+						cardBackground="secondary"
+					/>
+				{/if}
 			{/if}
 
 			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}

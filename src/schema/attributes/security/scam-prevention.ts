@@ -11,7 +11,10 @@ import { isSupported, notSupported, type Support, supported } from '@/schema/fea
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
-import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
+import type {
+	ScamPreventionDetails,
+	ScamWarningDetail,
+} from '@/types/content/scam-prevention-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
@@ -44,6 +47,137 @@ export type ScamPreventionMetadata =
 			}
 	  }
 	| { scamAlerts: null }
+
+/** Build the shared scam-prevention detail model used by every output adapter. */
+export function buildScamPreventionDetails(
+	metadata: ScamPreventionMetadata,
+): ScamPreventionDetails {
+	if (metadata.scamAlerts === null) {
+		return { type: 'scamPrevention', warnings: [] }
+	}
+
+	const { scamAlerts } = metadata
+	const warnings: ScamWarningDetail[] = []
+
+	function leakConclusion(
+		warning: { leaksUserIp: boolean; leaksUserAddress: boolean },
+		extraLeaks: Array<[boolean, string]> = [],
+	): string | undefined {
+		const leaks: Array<[boolean, string]> = [
+			[warning.leaksUserIp, 'your IP'],
+			[warning.leaksUserAddress, 'your Ethereum address'],
+			...extraLeaks,
+		]
+		const leaking = leaks.filter(([leak]) => leak).map(([, label]) => label)
+
+		if (leaking.length === 0) {
+			return undefined
+		}
+
+		return `However, in doing so, it leaks ${commaListFormat(leaking)} to an external provider${
+			leaking.length > 1 ? ' which can correlate them' : ''
+		}.`
+	}
+
+	if (metadata.sendTransactionWarning?.required) {
+		const warning = scamAlerts.sendTransactionWarning
+		const warningFeatures: string[] = isSupported(warning)
+			? [
+					warning.newRecipientWarning &&
+						'Warning you when sending funds to an address you have not sent or received funds from in the past',
+					warning.userWhitelist &&
+						'Allowing you to build a contact book and warning you when sending funds to addresses not in it',
+				].filter((feature): feature is string => typeof feature === 'string')
+			: []
+
+		warnings.push({
+			kind: 'sendTransaction',
+			description: isSupported(warning)
+				? warningFeatures.length > 1
+					? '{{WALLET_NAME}} helps you stay safe when sending funds by:'
+					: `{{WALLET_NAME}} helps you stay safe when sending funds by ${
+							warningFeatures[0]?.toLowerCase() ?? 'providing transaction warnings'
+						}.`
+				: '{{WALLET_NAME}} does not warn you when sending funds to suspicious addresses.',
+			items: warningFeatures.length > 1 ? warningFeatures : undefined,
+			conclusion: isSupported(warning)
+				? leakConclusion(warning, [[warning.leaksRecipient, "the recipient's Ethereum address"]])
+				: undefined,
+			references: isSupported(warning) ? warning.ref : undefined,
+		})
+	}
+
+	if (metadata.contractTransactionWarning?.required) {
+		const warning = scamAlerts.contractTransactionWarning
+		const contractFeatures: string[] = isSupported(warning)
+			? [
+					warning.contractRegistry &&
+						'Checking the contract or transaction data against a database of known scams',
+					warning.previousContractInteractionWarning &&
+						'Warning you when interacting with a contract you have not interacted with before',
+					warning.recentContractWarning &&
+						'Warning you when interacting with a contract that has only recently been created onchain',
+				].filter((feature): feature is string => typeof feature === 'string')
+			: []
+
+		warnings.push({
+			kind: 'contractTransaction',
+			description: isSupported(warning)
+				? `{{WALLET_NAME}} helps you stay safe when doing onchain transactions by${
+						contractFeatures.length > 1
+							? ':'
+							: warning.contractRegistry
+								? ' checking the contract or transaction data against a database of known scams.'
+								: warning.previousContractInteractionWarning
+									? ' warning you when interacting with a contract you have not interacted with before.'
+									: warning.recentContractWarning
+										? ' warning you when interacting with a contract that has only recently been created onchain.'
+										: ' providing contract warnings.'
+					}`
+				: '{{WALLET_NAME}} does not warn you when making arbitrary onchain transactions.',
+			items: contractFeatures.length > 1 ? contractFeatures : undefined,
+			conclusion: isSupported(warning)
+				? leakConclusion(warning, [[warning.leaksContractAddress, 'the contract address']])
+				: undefined,
+			references: isSupported(warning) ? warning.ref : undefined,
+		})
+	}
+
+	if (metadata.scamUrlWarning?.required) {
+		const warning = scamAlerts.scamUrlWarning
+
+		warnings.push({
+			kind: 'scamUrl',
+			description: isSupported(warning)
+				? '{{WALLET_NAME}} helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.'
+				: '{{WALLET_NAME}} does not check URLs against known scam sites.',
+			conclusion: isSupported(warning)
+				? leakConclusion(warning, [
+						[warning.leaksVisitedUrl === 'FULL_URL', 'the full URL of the app'],
+						[warning.leaksVisitedUrl === 'DOMAIN_ONLY', 'the domain name of the app'],
+					])
+				: undefined,
+			references: isSupported(warning) ? warning.ref : undefined,
+		})
+	}
+
+	if (metadata.unlimitedApprovalWarning?.required) {
+		const warning = scamAlerts.unlimitedApprovalWarning
+
+		warnings.push({
+			kind: 'unlimitedApproval',
+			description: isSupported(warning)
+				? '{{WALLET_NAME}} warns you before granting an unlimited ERC-20 token approval.'
+				: '{{WALLET_NAME}} does not warn you when granting unlimited token approvals.',
+			conclusion: isSupported(warning)
+				? leakConclusion(warning, [[warning.leaksSpenderAddress, 'the spender address']])
+				: undefined,
+			references: isSupported(warning) ? warning.ref : undefined,
+		})
+	}
+
+	return { type: 'scamPrevention', warnings }
+}
 
 /**
  * Shared rating logic for scam-alert warnings whose privacy score is a
@@ -207,6 +341,7 @@ function evaluateScamAlerts(
 	}
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
+	const details = buildScamPreventionDetails(metadata)
 
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
@@ -220,7 +355,7 @@ function evaluateScamAlerts(
 				),
 				metadata,
 			},
-			details: scamAlertsDetailsContent({}),
+			details,
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
 		})
 	}
@@ -244,7 +379,7 @@ function evaluateScamAlerts(
 					),
 					metadata,
 				},
-				details: scamAlertsDetailsContent({}),
+				details,
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
 
@@ -267,7 +402,7 @@ function evaluateScamAlerts(
 					),
 					metadata,
 				},
-				details: scamAlertsDetailsContent({}),
+				details,
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
 
@@ -289,7 +424,7 @@ function evaluateScamAlerts(
 				),
 				metadata,
 			},
-			details: scamAlertsDetailsContent({}),
+			details,
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should implement the following features:
 
@@ -319,7 +454,7 @@ function evaluateScamAlerts(
 				),
 				metadata,
 			},
-			details: scamAlertsDetailsContent({}),
+			details,
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should ensure all scam alerting features are implemented in a privacy-preserving manner.
 
@@ -358,7 +493,7 @@ function evaluateScamAlerts(
 			),
 			metadata,
 		},
-		details: scamAlertsDetailsContent({}),
+		details,
 	})
 }
 
