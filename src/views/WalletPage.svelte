@@ -983,18 +983,24 @@
 								{#if stageNumbers.length > 0}
 									{@const stageNumber = stageNumbers[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+									{@const stageLabels = ladderEvaluation ? (
+										stageNumbers
+											.map(n => ladderEvaluation.ladder.stages[n])
+											.filter(s => s !== undefined)
+											.map(s => s.label.replace(/^Stage /, ''))
+									) : []}
 
 									{#if stage}
 										<a
 											href={`#${stage.id}`}
 											data-link="camouflaged"
-											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+											title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
 										>
 											<div
 												data-badge="small"
 												style:--accent="var(--accent-color)"
 											>
-												<small>Stage {stageNumbers.join(', ')}</small>
+												<small>Stage {stageLabels.join(', ')}</small>
 											</div>
 										</a>
 									{/if}
