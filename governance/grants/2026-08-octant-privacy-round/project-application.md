@@ -214,6 +214,7 @@ Provide 1-2 verifiable measures.
 By the privacy work being funded specifically:
 
 Network privacy tooling expansion and wallet research
+
 - https://github.com/walletbeat/walletbeat/issues/1111
 - https://github.com/walletbeat/walletbeat/issues/1062
 - https://github.com/walletbeat/walletbeat/issues/1061
