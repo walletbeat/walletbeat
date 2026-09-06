@@ -173,7 +173,7 @@ If applicable, please give details on amounts, timing, and what it funded.
 
 Yes: $106,100 USD from the Ethereum Foundation's ESP program, proposed July 2025, funds disbursed starting September 2025. It funded finishing our software wallet rating methodology, our stage system, initial data collection, and early marketing work.
 
-We also participated on the Ethereum Security QF round that raised $5,464 in donations plus 9.247 ETH from the matching pool.
+We also participated on the Ethereum Security QF round that raised $5,464 in donations plus 9.247 ETH from the matching pool (=$16,480 USD at donation time).
 
 ## Have you received Octant funding before? *
 
