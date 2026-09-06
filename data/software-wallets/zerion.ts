@@ -58,7 +58,11 @@ import {
 	FeeDisplayLevel,
 	WalletServiceFeeDisplayUnit,
 } from '@/schema/features/transparency/fee-display'
-import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import {
+	FOSSLicense,
+	LicensingType,
+	SourceNotAvailableLicense,
+} from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
@@ -214,17 +218,89 @@ export const zerion: SoftwareWallet = {
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation: 'Zerion supports EIP-1193 and EIP-2700.',
+						url: [
+							{
+								label: 'Provider class in the extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/modules/ethereum/provider.ts#L53-L185',
+							},
+							{
+								label: 'Provider assignment in the extension source code',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/in-page.ts#L115-L145',
+							},
+							{
+								label: 'Event listener methods inherited from the provider dependency',
+								url: 'https://github.com/WalletConnect/walletconnect-utils/blob/cf54c6dd7a535498dae31205a57f51bd1468c7f8/jsonrpc/provider/src/provider.ts#L38-L53',
+							},
+							{
+								label: 'Provider dependency version pinned in the extension lockfile',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/package-lock.json#L6502-L6505',
+							},
+						],
+					},
+					{
+						explanation: 'Zerion supports EIP-6963.',
+						label: 'EIP-6963 provider announcement in the extension source code',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/eip6963.ts#L23-L47',
+					},
+				],
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
 			},
 		},
 		licensing: {
-			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
+			coreLicense: {
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							"The browser extension's core and app code are open source under the GPL-3.0 license.",
+						label: 'Zerion extension LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+					},
+					license: FOSSLicense.GPL_3_0,
+				},
+				[Variant.MOBILE]: {
+					ref: {
+						explanation:
+							'Zerion publishes the wallet core used by its iOS and Android apps, containing the key container, signer, and key storage, under the Apache-2.0 license.',
+						url: [
+							{
+								label: 'Zerion Wallet Core for iOS',
+								url: 'https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE',
+							},
+							{
+								label: 'Zerion Wallet Core for Android',
+								url: 'https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE',
+							},
+						],
+					},
+					license: FOSSLicense.APACHE_2_0,
+				},
+			},
 			walletAppLicense: {
-				ref: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
-				license: FOSSLicense.GPL_3_0,
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							"The browser extension's core and app code are open source under the GPL-3.0 license.",
+						label: 'Zerion extension LICENSE',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/500e694184a101189a1de3a05cb0f516c42f567c/LICENSE',
+					},
+					license: FOSSLicense.GPL_3_0,
+				},
+				[Variant.MOBILE]: {
+					ref: {
+						explanation:
+							'While Zerion states that the core code of its iOS and Android apps is open for review, the broader mobile application code is not.',
+						label: 'Zerion security page, "Open source"',
+						lastRetrieved: '2026-08-30',
+						url: 'https://zerion.io/security',
+					},
+					license: SourceNotAvailableLicense.PROPRIETARY,
+				},
 			},
 		},
 		monetization: {
