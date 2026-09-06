@@ -243,18 +243,19 @@ interface CssAttributes {
 	/**
 	 * ## [data-icon]
 	 *
-	 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+	 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds; add `wallet` for sidebar wallet logos that should appear muted by default.
 	 *
 	 * ### Tokens
 	 * - shape: `circle`, `filled`
 	 * - source: `wbicons`
-	 * - effect: `shadow`
+	 * - effect: `shadow`, `wallet`
 	 *
 	 * ### CSS Variables
 	 * - `--icon-content`
 	 * - `--icon-size`
 	 * - `--icon-navigation-borderColor`
 	 * - `--icon-navigation-color`
+	 * - `--icon-wallet-filter`
 	 *
 	 * ### Examples
 	 * ```html
@@ -262,6 +263,7 @@ interface CssAttributes {
 	 * <span data-icon="wbicons security"></span>
 	 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
 	 * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
+	 * <span data-icon="wallet"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
 	 * ```
 	 *
 	 * ### Source
