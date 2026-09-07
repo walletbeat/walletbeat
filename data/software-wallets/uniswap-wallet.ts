@@ -159,15 +159,18 @@ export const uniswapWallet: SoftwareWallet = {
 						'Username/ENS resolution is fetched from the Uniswap Unitags API, an offchain service, rather than resolved directly onchain.',
 					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts',
 				},
+      {
+        url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/features/ens/api.ts#L84-L113',
+        explanation:
+          '`getOnChainEnsFetch()` builds an ethers JsonRpcProvider for Ethereum mainnet and performs every ENS lookup through `provider.resolveName.',
+      },
 			],
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
-				medium: 'OFFCHAIN',
-				offchainDataVerifiability: 'NOT_VERIFIABLE',
-				offchainProviderConnection: 'DIRECT_CONNECTION',
+				medium: 'CHAIN_CLIENT',
 			}),
 		},
 		chainAbstraction: {
