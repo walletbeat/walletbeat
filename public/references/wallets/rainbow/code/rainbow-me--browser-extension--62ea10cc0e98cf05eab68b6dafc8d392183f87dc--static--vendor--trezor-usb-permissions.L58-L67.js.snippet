@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 58,
+	"highlightLastLine": 67,
+	"segments": [
+		{
+			"lines": [
+				"});",
+				"",
+				"window.addEventListener('beforeunload', switchToPopupTab);",
+				"window.addEventListener('load', () => {",
+				"    const instance = document.createElement('iframe');",
+				"    instance.id = 'trezor-usb-permissions';",
+				"    instance.frameBorder = '0';",
+				"    instance.width = '100%';",
+				"    instance.height = '100%';",
+				"    instance.style.border = '0px';",
+				"    instance.style.width = '100%';",
+				"    instance.style.height = '100%';",
+				"    instance.setAttribute('src', `${url}extension-permissions.html`);",
+				"    instance.setAttribute('allow', 'usb');",
+				"",
+				"    if (document.body) {",
+				"        document.body.appendChild(instance);",
+				"    }"
+			],
+			"startLine": 54
+		}
+	]
+}

@@ -119,8 +119,6 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 			parsed.highlightFirstLine === source.firstLine &&
 			parsed.highlightLastLine === source.lastLine
 		) {
-			process.stderr.write(`Already stored: ${relativePath}\n`)
-
 			return
 		}
 
