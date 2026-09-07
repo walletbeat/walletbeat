@@ -166,7 +166,7 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'OFFCHAIN',
-				offchainDataVerifiability: 'VERIFIABLE',
+				offchainDataVerifiability: 'NOT_VERIFIABLE',
 				offchainProviderConnection: 'DIRECT_CONNECTION',
 			}),
 		},
