@@ -254,19 +254,4 @@ export default [
 			'@typescript-eslint/no-unsafe-member-access': 'warn',
 		},
 	},
-	{
-		files: ['src/styles/css-attributes.d.ts'],
-		rules: {
-			// Must match Svelte's merged `HTMLAttributes<T>` declaration.
-			'unused-imports/no-unused-vars': [
-				'warn',
-				{
-					vars: 'all',
-					varsIgnorePattern: '^(?:_|T$)',
-					args: 'after-used',
-					argsIgnorePattern: '^_',
-				},
-			],
-		},
-	},
 ]

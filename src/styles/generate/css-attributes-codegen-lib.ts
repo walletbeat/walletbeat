@@ -112,6 +112,7 @@ const toDtsContent = (entries: Map<string, CssAttributeEntry>): string =>
 			'}',
 			'',
 			"declare module 'svelte/elements' {",
+			"\t// eslint-disable-next-line unused-imports/no-unused-vars -- `T` must match Svelte's `HTMLAttributes<T>` declaration for the merge to apply.",
 			'\texport interface HTMLAttributes<T extends EventTarget> extends CssAttributes {}',
 			'}',
 			'',
