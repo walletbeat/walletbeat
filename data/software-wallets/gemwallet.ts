@@ -159,7 +159,7 @@ export const gemwallet: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Gem Wallet lets users switch between a set of built-in RPC providers or add a fully custom RPC endpoint per chain, from Settings > Network, before making any further requests on that chain.',
+						'Gem Wallet lets users switch between a set of built-in RPC providers or add a fully custom RPC endpoint per chain, from Settings > Network.',
 					label: 'Setup a Custom RPC on Gem Wallet',
 					lastRetrieved: '2026-09-03',
 					url: 'https://docs.gemwallet.com/guides/custom-rpc/',
@@ -169,10 +169,10 @@ export const gemwallet: SoftwareWallet = {
 					label: 'Gem wallet allows configurable RPC.',
 				},
 			],
-			customChainRpcEndpoint: featureSupported,
+			customChainRpcEndpoint: notSupported,
 			l1: null,
 			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			}),
 		}),
 		ecosystem: {
