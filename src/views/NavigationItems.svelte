@@ -82,10 +82,8 @@
 	let effectiveSearchValue = $derived(searchValue.trim().toLowerCase())
 
 	// Functions
-	const hasCurrentPage = (item: NavigationItem) => (
-		currentHref === item.href
-		|| (item.children?.some(hasCurrentPage) ?? false)
-	)
+	const hasCurrentPage = (item: NavigationItem) =>
+		currentHref === item.href || (item.children?.some(hasCurrentPage) ?? false)
 
 	const fuzzyMatch = (text: string, query: string): [number, number][] | undefined => {
 		const ranges: [number, number][] = []
@@ -110,32 +108,26 @@
 		return ranges
 	}
 
-	const matchesSearch = (item: NavigationItem, query: string): boolean => (
-		!query
-		|| !!fuzzyMatch(item.title, query)
-		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
-	)
+	const matchesSearch = (item: NavigationItem, query: string): boolean =>
+		!query ||
+		!!fuzzyMatch(item.title, query) ||
+		(item.children?.some(child => matchesSearch(child, query)) ?? false)
 
-	const hasNestedNavigation = (items: NavigationItem[]): boolean => (
+	const hasNestedNavigation = (items: NavigationItem[]): boolean =>
 		items.some(item => item.children?.length)
-	)
 
 	const highlightText = (text: string, query: string) => {
 		const ranges = fuzzyMatch(text, query)
 
-		return (
-			ranges ?
-				[
+		return ranges
+			? [
 					...ranges.flatMap(([start, end], i, arr) => [
 						text.slice(arr[i - 1]?.[1] ?? 0, start),
 						`<mark>${text.slice(start, end)}</mark>`,
 					]),
 					text.slice(ranges.at(-1)?.[1] ?? 0),
-				]
-					.join('')
-			:
-				text
-		)
+				].join('')
+			: text
 	}
 </script>
 
@@ -147,9 +139,7 @@
 	data-sticky-container
 >
 	{#if showSearch}
-		<search
-			data-sticky="block backdrop-before backdrop-stuck"
-		>
+		<search data-sticky="block backdrop-before backdrop-stuck">
 			<label data-row="gap-0">
 				<span class="search-icon" aria-hidden="true">{@html SearchIcon}</span>
 
@@ -158,7 +148,6 @@
 					bind:value={searchValue}
 					placeholder="Search..."
 					data-row-item="flexible"
-
 					{@attach (input: HTMLInputElement) => {
 						const abortController = new AbortController()
 
@@ -167,23 +156,23 @@
 
 						const openNavPopover = () => {
 							if (
-								isMobileNav.matches
-								&& navPopover instanceof HTMLElement
-								&& !navPopover.matches(':popover-open')
+								isMobileNav.matches &&
+								navPopover instanceof HTMLElement &&
+								!navPopover.matches(':popover-open')
 							)
 								navPopover.showPopover()
 						}
 
 						globalThis.addEventListener(
 							'keydown',
-							(event) => {
+							event => {
 								if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
 									event.preventDefault()
 									openNavPopover()
 									input.focus()
 								}
 							},
-							{ signal: abortController.signal }
+							{ signal: abortController.signal },
 						)
 
 						input.addEventListener('focus', openNavPopover, { signal: abortController.signal })
@@ -193,8 +182,7 @@
 						}
 					}}
 					onkeyup={(event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
-						if (event.key === 'Escape')
-							event.currentTarget.blur()
+						if (event.key === 'Escape') event.currentTarget.blur()
 					}}
 				/>
 
@@ -206,13 +194,11 @@
 	{@render navigationGroupsList(navigationGroups)}
 </div>
 
-
 {#snippet navigationGroupsList(groups: NavigationGroup[])}
 	{#each groups as group, groupIndex (groupIndex)}
 		{@render navigationItems(group.items, 0)}
 	{/each}
 {/snippet}
-
 
 {#snippet navigationItems(items: NavigationItem[], depth = 0)}
 	{@const ownsStickyStep = depth > 0 || hasNestedNavigation(items)}
@@ -221,12 +207,7 @@
 		data-sticky-container={ownsStickyStep ? true : undefined}
 		data-column
 	>
-		{#each (
-			effectiveSearchValue ?
-				items.filter(item => matchesSearch(item, effectiveSearchValue))
-			:
-				items
-		) as item (item.id)}
+		{#each effectiveSearchValue ? items.filter( item => matchesSearch(item, effectiveSearchValue) ) : items as item (item.id)}
 			<li>
 				{@render navigationItem(item, depth)}
 			</li>
@@ -234,28 +215,22 @@
 	</menu>
 {/snippet}
 
-
 {#snippet navigationItem(item: NavigationItem, depth = 0)}
 	{#if !item.children?.length}
 		{@render linkable(item, depth)}
 	{:else}
 		<details
 			bind:open={
-				() => (
+				() =>
 					effectiveSearchValue
 						? matchesSearch(item, effectiveSearchValue)
-						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item)))
-				),
+						: (isOpen.get(item) ?? (defaultOpen || hasCurrentPage(item))),
 				(_: boolean) => {
-					if (!effectiveSearchValue && _ !== undefined)
-						isOpen.set(item, _)
+					if (!effectiveSearchValue && _ !== undefined) isOpen.set(item, _)
 				}
 			}
 		>
-			<summary
-				data-sticky="block backdrop-before backdrop-stuck"
-				data-row="gap-2"
-			>
+			<summary data-sticky="block backdrop-before backdrop-stuck" data-row="gap-2">
 				{@render linkable(item, depth)}
 			</summary>
 
@@ -263,7 +238,6 @@
 		</details>
 	{/if}
 {/snippet}
-
 
 {#snippet linkable(item: NavigationItem, depth = 0)}
 	{#if item.href}
@@ -279,6 +253,7 @@
 			}}
 			data-row="start gap-2"
 			style:--accent={item.accentColor ?? undefined}
+			style:--slice-fill={item.sliceStyle?.fill}
 			style:--slice-totalAngle={item.sliceStyle?.totalAngle}
 			style:--slice-midAngle={item.sliceStyle?.midAngle}
 			style:--slice-offset={item.sliceStyle?.offset}
@@ -290,11 +265,14 @@
 			style:--slice-labelSize={item.sliceStyle?.labelSize}
 			style:--slice-labelSizeScale={item.sliceStyle?.labelSizeScale}
 			style:--slice-labelR={item.sliceStyle?.labelR}
-			style:--slice-arcSize={Math.abs(item.sliceStyle?.totalAngle ?? 0) > 180 ? 'large' : 'small'}
 		>
 			{@render navigationIcon(item, depth)}
 
-			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+			<span data-row-item="flexible"
+				>{@html effectiveSearchValue
+					? highlightText(item.title, effectiveSearchValue)
+					: item.title}</span
+			>
 
 			{#if afterLabelSnippet}
 				<span class="navigation-item-after" data-row="gap-1">
@@ -305,7 +283,11 @@
 	{:else}
 		{@render navigationIcon(item, depth)}
 
-		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+		<span data-row-item="flexible"
+			>{@html effectiveSearchValue
+				? highlightText(item.title, effectiveSearchValue)
+				: item.title}</span
+		>
 
 		{#if afterLabelSnippet}
 			<span class="navigation-item-after" data-row="gap-1">
@@ -314,7 +296,6 @@
 		{/if}
 	{/if}
 {/snippet}
-
 
 {#snippet navigationIcon(item: NavigationItem, depth = 0)}
 	{#if iconSnippet}
@@ -337,17 +318,25 @@
 	{/if}
 {/snippet}
 
-
 <style>
 	.navigation-items {
+		scroll-target-group: auto;
 		--navItem-gap: 0.5rem;
 		--navItem-paddingBlock: 0.45rem;
 		--navItem-paddingInline: 0.45rem;
 		--navItem-rowGap: 0.5em;
 		--navItem-radius: 0.5em;
 		--navItem-current-backgroundColor: color-mix(in oklch, var(--accent) 25%, transparent);
-		--navItem-hover-backgroundColor: color-mix(in oklch, var(--accent) 15%, var(--background-primary));
-		--navItem-current-hover-backgroundColor: color-mix(in oklch, var(--accent) 30%, var(--background-primary) 20%);
+		--navItem-hover-backgroundColor: color-mix(
+			in oklch,
+			var(--accent) 15%,
+			var(--background-primary)
+		);
+		--navItem-current-hover-backgroundColor: color-mix(
+			in oklch,
+			var(--accent) 30%,
+			var(--background-primary) 20%
+		);
 		--navIcon-size: 1.25em;
 
 		--nav-submenu-gap: 0.33rem;
@@ -356,8 +345,6 @@
 		&:has(> search) {
 			--nav-search-blockSize: 3rem;
 		}
-
-		scroll-target-group: auto;
 
 		search {
 			@media (max-width: 1024px) {
@@ -400,7 +387,7 @@
 			margin: 0;
 			padding: 0;
 
-			&[data-navigation-depth='0'] {
+			&[data-navigation-depth="0"] {
 				--icon-navigation-borderColor: currentColor;
 				--navIcon-size: 2em;
 
@@ -413,20 +400,26 @@
 					}
 				}
 			}
-			&[data-navigation-depth='1'] {
+			&[data-navigation-depth="1"] {
 				--navIcon-size: 1.5em;
 
 				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
+					--sticky-marginBlockStart: calc(
+						var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) +
+							var(--nav-submenu-gap)
+					);
 					--sticky-marginBlockEnd: var(--navItem-gap);
 				}
 			}
-			&[data-navigation-depth='2'] {
+			&[data-navigation-depth="2"] {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
 
 				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap));
+					--sticky-marginBlockStart: calc(
+						var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) +
+							var(--nav-submenu-gap)
+					);
 					--sticky-marginBlockEnd: var(--navItem-gap);
 				}
 			}
@@ -464,24 +457,11 @@
 					---color: var(--accent);
 				}
 
-				&:is(a):is(
-					[aria-current='page'],
-					:target-current
-				),
+				&:is(a):is([aria-current="page"], :target-current),
 				&:is(summary):is(
-					:has(
-						a:is(
-							[aria-current='page'],
-							:target-current
-						)
-					),
-					:not(details:open > &):has(
-						~ menu a:is(
-							[aria-current='page'],
-							:target-current
-						)
-					)
-				) {
+						:has(a[aria-current="page"]),
+						:not(details:open > &):has(~ menu a[aria-current="page"])
+					) {
 					---backgroundColor: var(--navItem-current-backgroundColor);
 
 					&:hover,
@@ -494,8 +474,8 @@
 				---startRadius: var(--navItem-radius);
 				---endRadius: var(--navItem-radius);
 
-				&:is(a):has(> [data-icon~='circle']),
-				&:is(summary):has(> a > [data-icon~='circle']) {
+				&:is(a):has(> [data-icon~="circle"]),
+				&:is(summary):has(> a > [data-icon~="circle"]) {
 					---startRadius: 1.5rem;
 				}
 
@@ -506,31 +486,18 @@
 					--sticky-backgroundColor: var(---backgroundColor);
 					--sticky-backdropFilter: blur(16px);
 
-					&[data-sticky~='backdrop-stuck'][data-sticky~="backdrop-before"]::before {
+					&[data-sticky~="backdrop-stuck"][data-sticky~="backdrop-before"]::before {
 						background-color: var(---backgroundColor);
 					}
 				}
 
-				border-radius:
-					var(---startRadius)
-					var(---endRadius)
-					var(---endRadius)
-					var(---startRadius)
-				;
-				padding:
-					var(--navItem-paddingBlock)
-					var(--navItem-paddingInline)
-				;
+				border-radius: var(---startRadius) var(---endRadius) var(---endRadius) var(---startRadius);
+				padding: var(--navItem-paddingBlock) var(--navItem-paddingInline);
 
 				color: var(---color);
 				font-weight: 500;
 
-				transition-property:
-					opacity,
-					scale,
-					background-color,
-					color
-				;
+				transition-property: opacity, scale, background-color, color;
 
 				:global(mark) {
 					font-weight: 600;
@@ -541,6 +508,7 @@
 			}
 
 			summary {
+
 				&::after {
 					margin-inline-start: auto;
 				}
@@ -557,9 +525,7 @@
 
 			menu {
 				margin-block-start: var(--nav-submenu-gap);
-				margin-inline-start: calc(
-					var(--nav-submenu-parentIconSize) + var(--navItem-rowGap)
-				);
+				margin-inline-start: calc(var(--nav-submenu-parentIconSize) + var(--navItem-rowGap));
 
 				position: relative;
 				padding-inline-start: 0;
@@ -569,9 +535,8 @@
 					position: absolute;
 					inset-block: 0;
 					inset-inline-start: calc(
-						var(--navItem-paddingInline)
-						- var(--nav-submenu-parentIconSize) / 2
-						- var(--navItem-rowGap)
+						var(--navItem-paddingInline) - var(--nav-submenu-parentIconSize) / 2 -
+							var(--navItem-rowGap)
 					);
 					inline-size: 1px;
 					background-color: var(--border-color);
@@ -581,6 +546,25 @@
 			+ menu {
 				margin-block-start: auto;
 			}
+		}
+	}
+	@keyframes navigation-current {
+		from, to { ---navigation-current: 1; }
+	}
+	@supports (animation-timeline: scroll()) and (timeline-scope: --navigation-current) and (color: if(style(---navigation-current: 1): red)) {
+		.navigation-items details { timeline-scope: --navigation-current; }
+		.navigation-items summary {
+			---navigation-current: 0;
+			animation: navigation-current auto linear both;
+			animation-timeline: --navigation-current;
+			---backgroundColor: if(style(---navigation-current: 1): var(--navItem-current-backgroundColor); else: transparent);
+		}
+		.navigation-items summary:is(:hover, :focus-visible, :focus-within) {
+			---backgroundColor: if(style(---navigation-current: 1): var(--navItem-current-hover-backgroundColor); else: var(--navItem-hover-backgroundColor));
+		}
+		.navigation-items summary > a:target-current,
+		.navigation-items details:not([open]) > menu a:target-current {
+			view-timeline-name: var(---link-hover-source, none), var(---link-focus-source, none), var(---link-current-source, none), --navigation-current;
 		}
 	}
 </style>

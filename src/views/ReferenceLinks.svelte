@@ -3,7 +3,6 @@
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import { isRepoImageUrl } from '@/schema/url'
 
-
 	// Props
 	const {
 		references,
@@ -12,7 +11,6 @@
 		references: FullyQualifiedReference[]
 		cardBackground?: 'primary' | 'secondary'
 	} = $props()
-
 
 	// Internal state
 	let lightbox = $state<{ open: (url: string) => void }>()
@@ -37,7 +35,6 @@
 			: references.findIndex(ref => ref.urls.some(url => url.url === soleImage.url)),
 	)
 
-
 	// Actions
 	const interceptClickToLightbox = (event: MouseEvent, url: string) => {
 		// Plain left-clicks open the lightbox; modified clicks
@@ -45,13 +42,15 @@
 		// so the raw image URL stays reachable and copyable.
 		if (
 			event.button === 0 &&
-			!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey
+			!event.ctrlKey &&
+			!event.metaKey &&
+			!event.shiftKey &&
+			!event.altKey
 		) {
 			event.preventDefault()
 			lightbox?.open(url)
 		}
 	}
-
 
 	// Components
 	import ImageLightbox from '@/components/ImageLightbox.svelte'
@@ -61,14 +60,10 @@
 	import { markdown } from '@/types/content'
 </script>
 
-
 {#if references.length > 0}
 	{@const totalUrls = references.flatMap(ref => ref.urls).length}
 
-	<section
-		class="references"
-		data-card={cardBackground}
-	>
+	<section class="references" data-card={cardBackground}>
 		<h5>
 			{totalUrls > 1 ? 'Sources' : 'Source'}
 			{#if totalUrls > 1}
@@ -77,7 +72,10 @@
 		</h5>
 
 		<ul class="references-list" data-list="gap-2">
-			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
+			{#each references as ref, index (index + '::' + ref.urls
+					.map(url => url.url)
+					.toSorted()
+					.join('|'))}
 				{@const refImages = ref.urls.filter(url => isRepoImageUrl(url.url))}
 				{@const inlineImage = index === soleImageRefIndex ? soleImage : undefined}
 				{@const linkUrls =
@@ -85,7 +83,7 @@
 						? ref.urls
 						: ref.urls.filter(url => url.url !== inlineImage.url)}
 
-				{#snippet Url({ url, label }: { url: string, label: string })}
+				{#snippet Url({ url, label }: { url: string; label: string })}
 					{#if isRepoImageUrl(url)}
 						<a
 							href={url}
@@ -99,11 +97,7 @@
 							<span>{@html ImageIcon}</span>
 						</a>
 					{:else}
-						<a
-							href={url}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
+						<a href={url} target="_blank" rel="noopener noreferrer">
 							<cite>{label}</cite>
 							<span>{@html ExternalLinkIcon}</span>
 						</a>
@@ -112,14 +106,13 @@
 
 				{#snippet ReferenceContent()}
 					{#if ref.explanation}
-
-						<p class="explanation">
+						<div class="explanation">
 							{#if linkUrls.length === 1}
 								{@render Url(linkUrls[0])}
-								<br>
+								<br />
 							{/if}
 							<Typography content={markdown(ref.explanation)} />
-						</p>
+						</div>
 					{/if}
 
 					{#if linkUrls.length === 1}
@@ -146,18 +139,10 @@
 									interceptClickToLightbox(event, inlineImage.url)
 								}}
 							>
-								<img
-									src={inlineImage.url}
-									alt={inlineImage.label}
-									loading="lazy"
-								/>
+								<img src={inlineImage.url} alt={inlineImage.label} loading="lazy" />
 							</a>
 							<figcaption>
-								<a
-									href={inlineImage.url}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
+								<a href={inlineImage.url} target="_blank" rel="noopener noreferrer">
 									<cite>{inlineImage.label}</cite>
 									<span>{@html ImageIcon}</span>
 								</a>
@@ -190,11 +175,7 @@
 											interceptClickToLightbox(event, image.url)
 										}}
 									>
-										<img
-											src={image.url}
-											alt={image.label}
-											loading="lazy"
-										/>
+										<img src={image.url} alt={image.label} loading="lazy" />
 									</a>
 								{/each}
 							</div>
@@ -206,13 +187,9 @@
 			{/each}
 		</ul>
 
-		<ImageLightbox
-			bind:this={lightbox}
-			images={imageUrls}
-		/>
+		<ImageLightbox bind:this={lightbox} images={imageUrls} />
 	</section>
 {/if}
-
 
 <style>
 	.references {
@@ -253,7 +230,7 @@
 		img {
 			display: block;
 			/* Every thumbnail occupies the same fixed box regardless of
-			   the underlying image's aspect ratio. */
+				   the underlying image's aspect ratio. */
 			inline-size: 8em;
 			block-size: 6em;
 

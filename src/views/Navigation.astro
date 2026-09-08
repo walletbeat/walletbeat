@@ -27,17 +27,6 @@ const secondaryNavigationItems = [
 ] satisfies NavigationItem[]
 ---
 
-<script>
-	document.getElementById('theme-toggle')?.addEventListener('click', () => {
-		document.documentElement.style.colorScheme =
-			document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
-		localStorage.setItem('theme', document.documentElement.style.colorScheme)
-		document
-			.querySelector('meta[name="color-scheme"]')
-			?.setAttribute('content', document.documentElement.style.colorScheme)
-	})
-</script>
-
 <nav
 	id='nav'
 	popover='auto'
@@ -53,16 +42,23 @@ const secondaryNavigationItems = [
 
 		<menu data-row='gap-2'>
 			<li>
-				<button type='button' id='theme-toggle' data-icon='circle' data-stack>
-					<span set:html={LuSun} />
-					<span set:html={LuMoon} />
+				<button
+					type='button'
+					id='menu-toggle'
+					aria-label='Open navigation menu'
+					data-icon='circle'
+					popovertarget='nav'
+				>
+					<span set:html={LuMenu} />
 				</button>
 			</li>
 
 			<li>
-				<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav'>
-					<span set:html={LuMenu} />
-				</button>
+				<label data-icon='circle' data-stack title='Toggle color theme'>
+					<input type='checkbox' id='theme-toggle' aria-label='Use opposite color theme' />
+					<span aria-hidden='true' set:html={LuSun} />
+					<span aria-hidden='true' set:html={LuMoon} />
+				</label>
 			</li>
 		</menu>
 	</header>
@@ -113,8 +109,16 @@ const secondaryNavigationItems = [
 					}
 				}
 
-				#theme-toggle {
-					> :first-child {
+				label:has(> #theme-toggle) {
+					> input {
+						position: absolute;
+						inset: 0;
+						inline-size: 100%;
+						block-size: 100%;
+						opacity: 0;
+					}
+
+					> span:first-of-type {
 						color: light-dark(currentColor, transparent);
 					}
 					> :last-child {
@@ -141,13 +145,13 @@ const secondaryNavigationItems = [
 		}
 	}
 
-	@media (min-width: 1025px) {
+	@media (width > 1024px) {
 		nav:not(:popover-open) li:has(#menu-toggle) {
 			display: none;
 		}
 	}
 
-	@media (max-width: 1024px) {
+	@media (width <= 1024px) {
 		#nav {
 			--navigation-menu-maskFade: 9rem;
 
@@ -241,6 +245,17 @@ const secondaryNavigationItems = [
 			nav,
 			nav header ~ * {
 				translate: 0 0 0;
+			}
+		}
+	}
+
+	@media (width <= 1024px) {
+		:global(body:has([data-sticky-breadcrumb~="root"])) #nav > header {
+			justify-content: center;
+
+			> menu {
+				position: absolute;
+				inset-inline-start: var(--navigation-controlInsetInline);
 			}
 		}
 	}

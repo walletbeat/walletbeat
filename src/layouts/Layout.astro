@@ -43,12 +43,48 @@ import Footer from '@/views/Footer.astro'
 
 		<ClientRouter />
 		<script is:inline>
-			// `color-scheme` override
-			const colorScheme = localStorage.getItem('theme')
-			if (colorScheme) {
-				document.documentElement.style.colorScheme = colorScheme
-				document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', colorScheme)
-			}
+			;(() => {
+				const systemDark = matchMedia('(prefers-color-scheme: dark)')
+				let preference = null
+				try {
+					const stored = localStorage.getItem('theme')
+					if (stored === 'light' || stored === 'dark') {
+						preference = stored
+					}
+				} catch {
+					/* Storage may be disabled; native control still works. */
+				}
+				function restoreTheme(doc = document) {
+					const toggle = doc.getElementById('theme-toggle')
+					if (toggle) {
+						if (preference) {
+							toggle.checked = (preference === 'dark') !== systemDark.matches
+						}
+						doc.documentElement.style.removeProperty('color-scheme')
+					} else if (preference) {
+						// First paint precedes the native control. Retire these when it exists.
+						doc.documentElement.style.colorScheme = preference
+					}
+				}
+				document.addEventListener('change', ({ target }) => {
+					if (!(target instanceof HTMLInputElement) || target.id !== 'theme-toggle') {
+						return
+					}
+					preference = target.checked !== systemDark.matches ? 'dark' : 'light'
+					try {
+						localStorage.setItem('theme', preference)
+					} catch {
+						/* Retain the choice in this document when storage is unavailable. */
+					}
+					restoreTheme()
+				})
+				systemDark.addEventListener('change', () => restoreTheme())
+				document.addEventListener('DOMContentLoaded', () => restoreTheme(), { once: true })
+				document.addEventListener('astro:before-swap', ({ newDocument }) =>
+					restoreTheme(newDocument),
+				)
+				restoreTheme()
+			})()
 		</script>
 
 		{
@@ -60,6 +96,13 @@ import Footer from '@/views/Footer.astro'
 		}
 	</head>
 	<body>
+		<svg width='0' height='0' aria-hidden='true' style='position: absolute'>
+			<defs>
+				<filter id='icon-luminance' x='0' width='300%' color-interpolation-filters='sRGB'>
+					<feColorMatrix type='luminanceToAlpha'></feColorMatrix>
+				</filter>
+			</defs>
+		</svg>
 		<Background
 			blobs={{
 				purple: {
@@ -107,10 +150,19 @@ import Footer from '@/views/Footer.astro'
 </html>
 
 <style>
+	/* Fixed metric timelines use viewport coordinates; content retains its native direction. */
+	:root:has([data-sticky-breadcrumb~="root"]) {
+		direction: ltr;
+		body:dir(rtl) {
+			direction: rtl;
+		}
+	}
+
 	#layout {
 		/* Constants */
-		--navigation-desktop-inlineSize: 20rem;
+		--navigation-desktop-inlineSize: min(20rem, 320px);
 		--navigation-mobile-blockSize: 4.16rem;
+		--navigation-controlInsetInline: 0.75rem;
 
 		/* Rules */
 		inline-size: 100%;
@@ -128,7 +180,7 @@ import Footer from '@/views/Footer.astro'
 			--sticky-paddingInlineEnd: var(--safeArea-insetRight);
 		}
 
-		@media (min-width: 1025px) {
+		@media (width > 1024px) {
 			grid-template:
 				'Nav Content' minmax(0, 1fr)
 				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
@@ -139,7 +191,7 @@ import Footer from '@/views/Footer.astro'
 			}
 		}
 
-		@media (max-width: 1024px) {
+		@media (width <= 1024px) {
 			grid-template:
 				'Nav' var(--navigation-mobile-blockSize)
 				'Content' minmax(0, 1fr)
@@ -176,15 +228,299 @@ import Footer from '@/views/Footer.astro'
 			min-block-size: 0;
 			min-inline-size: 0;
 
-			@media (max-width: 1024px) and (prefers-reduced-motion: no-preference) {
-				transform-style: preserve-3d;
-				transform: translateZ(0);
+			@media (width <= 1024px) and (prefers-reduced-motion: no-preference) {
+				&:not(:has([data-sticky-breadcrumb~="root"])) {
+					transform-style: preserve-3d;
+					transform: translateZ(0);
+					transition-property: transform;
 
-				transition-property: transform;
-
-				nav:popover-open ~ & {
-					transform: translateZ(-2.5rem);
+					nav:popover-open ~ & {
+						transform: translateZ(-2.5rem);
+					}
 				}
+			}
+		}
+	}
+</style>
+
+<style is:global>
+	@property --navigation-mobile-blockSize {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property --navigation-logoInlineSize {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property --navigation-controlsInlineSize {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property ---wallet-chainWrap {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property ---wallet-terminal {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@keyframes wallet-terminal {
+		from {
+			---wallet-terminal: 0;
+		}
+		to {
+			---wallet-terminal: 1;
+		}
+	}
+	@property ---wallet-scrollEntry {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+	@property ---wallet-tocOpen {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property ---wallet-sourceOffset {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@keyframes wallet-scroll-entry {
+		from {
+			---wallet-scrollEntry: 0;
+		}
+		to {
+			---wallet-scrollEntry: 1;
+		}
+	}
+	@keyframes wallet-source-offset {
+		from {
+			---wallet-sourceOffset: var(--sticky-insetBlockStart);
+		}
+		to {
+			---wallet-sourceOffset: 0px;
+		}
+	}
+	#layout:has([data-sticky-breadcrumb~="root"]) {
+		---wallet-name-flow-font-size: 2.25rem;
+		---wallet-compact-h1: 1.5rem;
+		--stickyBreadcrumb-markerSize: 1.25rem;
+		timeline-scope: --wallet-end-inline, --wallet-end-block;
+	}
+	/* The site logo and wallet identity share native widths and arrival at Layout. */
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+		(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
+		@media (width <= 1024px) {
+			body:has([data-sticky-breadcrumb~="root"]) {
+				timeline-scope: --wallet-item-block;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) {
+				--navigation-mobile-blockSize: max(
+					4.16rem,
+					calc(
+						100vh * (1 / var(---breadcrumb-itemBlock) - 1) * var(---wallet-compact-h1) /
+							var(---wallet-name-flow-font-size) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)
+					)
+				);
+				---wallet-tocOpen: 0;
+				transition-property: ---wallet-tocOpen;
+				@media (prefers-reduced-motion: reduce) {
+					transition-duration: 0s;
+				}
+				timeline-scope:
+					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
+					--wallet-end-inline, --wallet-end-block, --wallet-entry;
+				animation:
+					column-inline-size auto linear both,
+					column-block-size auto linear both,
+					breadcrumb-item-block auto linear both,
+					wallet-terminal auto linear both;
+				animation-timeline:
+					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-block,
+					scroll(self block);
+				animation-range:
+					normal,
+					normal,
+					normal,
+					calc(100% - var(--navigation-mobile-blockSize)) 100%;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])::before {
+				content: '';
+				position: fixed;
+				inset: 0 auto auto 0;
+				visibility: hidden;
+				pointer-events: none;
+				inline-size: anchor-size(--navigation-logo inline);
+				block-size: anchor-size(--navigation-controls inline);
+				view-timeline-name: --navigation-logo-inline, --navigation-controls-inline;
+				view-timeline-axis: inline, block;
+				view-timeline-inset: 0;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) > * {
+				--navigation-logoInlineSize: calc(100vw * (1/var(---column-inlineFraction) - 1));
+				--navigation-controlsInlineSize: calc(100vh * (1/var(---column-blockFraction) - 1));
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > menu {
+				anchor-name: --navigation-controls;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"][data-sticky-breadcrumb~="scope"] {
+				--stickyBreadcrumb-insetBlockStart: 0px;
+				---breadcrumb-parentBlockEnd: var(--navigation-mobile-blockSize);
+				animation:
+					var(---breadcrumb-sizeAnimations),
+					wallet-source-offset auto linear both;
+				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --wallet-entry;
+				animation-range:
+					normal,
+					normal,
+					normal,
+					normal,
+					entry-crossing calc(var(--navigation-mobile-blockSize) - var(--sticky-insetBlockStart))
+						entry-crossing var(--navigation-mobile-blockSize);
+			}
+			/* The navigation owns the surface shared by the mobile identity row. */
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]::after {
+				display: none;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> :not([data-sticky-breadcrumb~="position"]) {
+				---wallet-sourceOffset: 0px;
+			}
+			#layout:has(#wallet-toc:popover-open) {
+				---wallet-tocOpen: 1;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo {
+				---breadcrumb-entry: max(var(---wallet-scrollEntry), var(---wallet-tocOpen));
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) [data-sticky-breadcrumb~="root"] > *,
+			#layout:has([data-sticky-breadcrumb~="root"]) [data-sticky-breadcrumb~="root"]::after {
+				---breadcrumb-blockStart: var(--stickyBreadcrumb-insetBlockStart);
+				---breadcrumb-blockEnd: var(--navigation-mobile-blockSize);
+				---breadcrumb-width: var(---breadcrumb-itemWidth);
+				---breadcrumb-height: var(---breadcrumb-compactItemHeight);
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo {
+				anchor-name: --navigation-logo;
+				animation:
+					breadcrumb-item-inline auto linear both,
+					breadcrumb-end-inline auto linear both,
+					wallet-scroll-entry auto linear both;
+				@media (prefers-reduced-motion: reduce) {
+					animation-timing-function: linear, linear, steps(1, end);
+				}
+				animation-timeline: --wallet-item-inline, --wallet-end-inline, --wallet-entry;
+				animation-range:
+					normal,
+					normal,
+					contain 0% contain 100%;
+				---breadcrumb-itemWidth: calc(100vw * (1/var(---breadcrumb-itemInline) - 1));
+				---breadcrumb-endWidth: calc(100vw * (1/var(---breadcrumb-endInline) - 1));
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo,
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"] {
+				---wallet-chainWrap: clamp(
+					0,
+					sign(
+						var(--navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
+							var(--stickyBreadcrumb-gap, 1rem)/2 + var(---breadcrumb-itemWidth) + 2 *
+							(
+								var(--navigation-controlInsetInline) +
+									max(
+										var(--navigation-controlsInlineSize),
+										2rem + 0.5rem + var(---breadcrumb-endWidth)
+									)
+							) -
+							100vw
+					),
+					1
+				);
+			}
+			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo {
+				translate: calc(
+						var(---inlineDirection) * (var(---wallet-chainWrap) - 1) * var(---breadcrumb-entry) *
+							(
+								var(---breadcrumb-itemWidth) + var(--stickyBreadcrumb-markerSize) +
+									var(--stickyBreadcrumb-gap, 1rem) / 2
+							) /
+							2
+					)
+					calc(
+						-1 * var(---wallet-chainWrap) * var(---breadcrumb-entry) *
+							var(--navigation-mobile-blockSize)
+					);
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]
+				[data-sticky-breadcrumb~="item"] {
+				---breadcrumb-translation: calc(
+						var(---inlineDirection) *
+							(
+								(
+										100vw - var(---breadcrumb-itemWidth) + (1 - var(---wallet-chainWrap)) *
+											(
+												var(--navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
+													var(--stickyBreadcrumb-gap, 1rem) / 2
+											)
+									) /
+									2 - var(--scrollItem-paddingInlineStart)
+							)
+					)
+					calc(
+						(
+								(
+										var(--navigation-mobile-blockSize) - var(---breadcrumb-itemHeight) *
+											var(--stickyBreadcrumb-scale)
+									) /
+									2 - var(--stickyBreadcrumb-sourcePaddingBlock) -
+									(1 - var(---breadcrumb-sourceEndWrap)) *
+									(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight)) / 2
+							) -
+							var(---wallet-tocOpen) * var(---wallet-sourceOffset) - var(---wallet-terminal) *
+							(1 - var(---wallet-tocOpen)) * var(--navigation-mobile-blockSize)
+					);
+			}
+			#layout:has(#wallet-toc:popover-open)
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]
+				[data-sticky-breadcrumb~="item"] {
+				animation-name: none;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"] {
+				opacity: calc(
+					1 - max(var(---breadcrumb-exit), var(---wallet-terminal) * (1 - var(---wallet-tocOpen)))
+				);
+				visibility: if(
+					style(---wallet-terminal: 1) and style(---wallet-tocOpen: 0): hidden; else: visible
+				);
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]
+				.wallet-name::before {
+				content: if(style(---breadcrumb-entry: 0) or style(---wallet-chainWrap: 1): '#' ;else: '›');
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]
+				.wallet-name:not(:hover, :focus-visible)::before {
+				opacity: calc(var(---breadcrumb-entry) * (1 - var(---wallet-chainWrap)));
 			}
 		}
 	}

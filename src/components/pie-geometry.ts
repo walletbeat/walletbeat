@@ -3,13 +3,13 @@ import type { WBIconID } from '@/styles/wbicons'
 export type Slice = {
 	id: string
 	color: string
+	opacity?: number
 	weight: number
 	arcLabel: string
 	arcIconId?: WBIconID
 	titleText: string
 	href?: string
 	gradient?: {
-		areaRadiusStops?: number[]
 		colors: string[]
 		transparentStopColor?: string
 	}
@@ -80,10 +80,15 @@ export const overallRatingPieLevels = (innerRadiusFraction = 0.15): LevelConfig[
 	},
 ]
 
-export const overallRatingPieMaxRadius = Math.max(
-	...overallRatingPieLevels().map(
-		level => overallRatingPieRadius * level.outerRadiusFraction + (level.offset ?? 0),
-	),
+export const pieMaxRadius = (radius: number, levels: LevelConfig[]): number =>
+	Math.max(
+		0,
+		...levels.map(level => radius * level.outerRadiusFraction + Math.abs(level.offset ?? 0)),
+	)
+
+export const overallRatingPieMaxRadius = pieMaxRadius(
+	overallRatingPieRadius,
+	overallRatingPieLevels(),
 )
 
 export const computePieSlices = ({
@@ -120,7 +125,7 @@ export const computePieSlices = ({
 		const levelConfig = getLevelConfig(level)
 		const parentLevelConfig = getLevelConfig(level - 1)
 		const outerR = radius * levelConfig.outerRadiusFraction
-		const innerR = radius * levelConfig.innerRadiusFraction
+		const configuredInnerR = radius * levelConfig.innerRadiusFraction
 		const orientation = Math.sign(endAngle - startAngle)
 		const anglePadding = levelConfig.anglePadding ?? 0
 		const angleGap = levelConfig.angleGap ?? 0
@@ -151,11 +156,36 @@ export const computePieSlices = ({
 			const labelSizeScale = levelConfig.labelSizeScale ?? 1
 			const effectiveLabelSize = (levelConfig.labelSize ?? labelSize) * labelSizeScale
 			const labelRadius = effectiveLabelSize / 2
-			const minimumLabelR = Math.sqrt((outerR - labelRadius) * (innerR + labelRadius))
 			const halfAngle = (Math.abs(totalAngle) * Math.PI) / 360
+			const gap = Math.abs(totalAngle) >= 360 ? 0 : levelConfig.gap
+			const halfGap = gap / 2
+			const innerR = Math.min(
+				outerR,
+				Math.max(
+					configuredInnerR,
+					halfAngle > 0 && halfAngle < Math.PI / 2 ? halfGap / Math.sin(halfAngle) : 0,
+				),
+			)
+			const minimumLabelR = Math.sqrt((outerR - labelRadius) * (innerR + labelRadius))
+			const outerCornerRadius = Math.max(
+				0,
+				Math.min(
+					levelConfig.outerCornerRadius ?? halfGap,
+					(outerR - innerR) / 2,
+					(Math.sin(halfAngle) * outerR - halfGap) / (1 + Math.sin(halfAngle)),
+				),
+			)
+			const innerCornerRadius = Math.max(
+				0,
+				Math.min(
+					levelConfig.innerCornerRadius ?? halfGap,
+					(outerR - innerR) / 2,
+					(Math.sin(halfAngle) * innerR - halfGap) / Math.max(0.000001, 1 - Math.sin(halfAngle)),
+				),
+			)
 			const centroidLabelR =
 				(2 / 3) *
-				((outerR ** 3 - innerR ** 3) / (outerR ** 2 - innerR ** 2)) *
+				((outerR ** 2 + outerR * innerR + innerR ** 2) / (outerR + innerR)) *
 				(halfAngle === 0 ? 1 : Math.sin(halfAngle) / halfAngle)
 			const maximumLabelR = outerR - labelRadius
 			const labelR = Math.max(minimumLabelR, Math.min(centroidLabelR, maximumLabelR))
@@ -169,11 +199,11 @@ export const computePieSlices = ({
 					midAngle,
 					outerR,
 					innerR,
-					outerCornerRadius: levelConfig.outerCornerRadius ?? levelConfig.gap / 2,
-					innerCornerRadius: levelConfig.innerCornerRadius ?? levelConfig.gap / 2,
+					outerCornerRadius,
+					innerCornerRadius,
 					level,
 					offset: levelConfig.offset ?? 0,
-					gap: levelConfig.gap,
+					gap,
 					labelSize: effectiveLabelSize,
 					labelSizeScale,
 					labelR,

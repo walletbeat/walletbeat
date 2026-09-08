@@ -8,15 +8,16 @@
 	}
 </script>
 
-
-<script lang="ts" generics="
+<script
+	lang="ts"
+	generics="
 	_SelectValue extends SelectValue = SelectValue,
 	_SelectOption extends SelectOption = SelectOption
-">
+"
+>
 	// Types/constants
 	import type { SvelteHTMLElements } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
-
 
 	// Props
 	let {
@@ -36,7 +37,6 @@
 		selectedOption?: _SelectOption
 	} = $props()
 
-
 	// State
 	// (Derived)
 	$effect(() => {
@@ -44,12 +44,7 @@
 	})
 </script>
 
-
-<select
-	{id}
-	bind:value
-	{...restProps}
->
+<select {id} bind:value {...restProps}>
 	{@render selectedContent()}
 	{#snippet selectedContent()}
 		<button
@@ -75,25 +70,21 @@
 			{:else}
 				{@render defaultOptionContent()}
 				{#snippet defaultOptionContent()}
-					<span aria-hidden="true">
+					<span class="select-icon" aria-hidden="true">
 						{#if option.icon}
 							{#if option.icon?.includes('<svg')}
 								{@html option.icon}
 							{:else}
-								<img
-									alt={option.label}
-									src={option.icon}
-								/>
+								<img alt={option.label} src={option.icon} />
 							{/if}
 						{/if}
 					</span>
-					{option.label}
+					<span class="select-label">{option.label}</span>
 				{/snippet}
 			{/if}
 		</option>
 	{/each}
 </select>
-
 
 <style>
 	@supports (appearance: base-select) {
@@ -156,16 +147,90 @@
 				}
 
 				&::checkmark {
-					content: "✓";
+					content: '✓';
 					order: 1;
 					color: var(--accent);
 					font-weight: bold;
 				}
 
-				img, svg {
+				:global(:is(img, svg)) {
 					height: 1em;
 					vertical-align: middle;
 				}
+			}
+		}
+
+		select[data-icon~="circle"] {
+			--select-compact-progress: 0;
+			position: relative;
+			inline-size: auto;
+			block-size: auto;
+			min-block-size: var(--icon-size, 2rem);
+			padding: 0.25em 0.5em;
+			border: 0;
+			border-radius: 0;
+			color: var(--text-primary);
+			clip-path: inset(
+				0 0 0 calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem))) round
+					calc(var(--select-compact-progress) * var(--icon-size, 2rem) / 2)
+			);
+			&:dir(rtl) {
+				clip-path: inset(
+					0 calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem))) 0 0 round
+						calc(var(--select-compact-progress) * var(--icon-size, 2rem) / 2)
+				);
+			}
+			/* Two border shapes share one real control and interpolate only their opacity. */
+			&::before,
+			&::after {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				border: 1px solid var(--icon-navigation-borderColor);
+			}
+			&::before {
+				inset: 0;
+				border-radius: 0.25em;
+				opacity: calc(1 - var(--select-compact-progress));
+			}
+			&::after {
+				inset-inline-end: 0;
+				inset-block-start: 50%;
+				translate: 0 -50%;
+				inline-size: var(--icon-size, 2rem);
+				block-size: var(--icon-size, 2rem);
+				border-radius: 50%;
+				opacity: var(--select-compact-progress);
+			}
+			> button > selectedcontent {
+				display: flex;
+				gap: 0.5rem;
+				translate: calc(
+						var(---inlineDirection, 1) * var(--select-compact-progress) *
+							(100% + 1.75em - 0.775 * var(--icon-size, 2rem))
+					)
+					0;
+				.select-label {
+					opacity: calc(1 - var(--select-compact-progress));
+				}
+				.select-icon:empty {
+					display: none;
+				}
+				.select-icon :global(:is(img, svg)) {
+					inline-size: calc(0.55 * var(--icon-size, 2rem));
+					block-size: calc(0.55 * var(--icon-size, 2rem));
+					object-fit: contain;
+				}
+			}
+			&::picker-icon {
+				translate: calc(
+						var(---inlineDirection, 1) * var(--select-compact-progress) *
+							(0.875em - var(--icon-size, 2rem) / 2)
+					)
+					0;
+			}
+			&:has(selectedcontent .select-icon:not(:empty))::picker-icon {
+				opacity: calc(0.66 * (1 - var(--select-compact-progress)));
 			}
 		}
 
@@ -175,7 +240,10 @@
 			margin-block: 0.25em;
 			position-area: block-end span-inline-end;
 			position-try-order: most-block-size;
-			position-try-fallbacks: block-start span-inline-end, block-end span-inline-start, block-start span-inline-start;
+			position-try-fallbacks:
+				block-start span-inline-end,
+				block-end span-inline-start,
+				block-start span-inline-start;
 			position-visibility: anchors-visible;
 			min-width: anchor-size(width);
 
@@ -199,10 +267,16 @@
 	}
 
 	@supports not (appearance: base-select) {
-		select {
-			appearance: none;
-			padding-right: 2.5em;
-			background: right 0.75rem center / 0.625rem no-repeat var(--icon-chevron);
+		select[data-icon] {
+			inline-size: auto;
+			block-size: auto;
+			min-block-size: unset;
+			border: revert;
+			border-radius: 0.25em;
+			padding: revert;
+			color: revert;
+			appearance: auto;
+			clip-path: none;
 		}
 	}
 </style>

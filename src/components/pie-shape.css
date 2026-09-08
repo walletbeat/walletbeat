@@ -1,0 +1,139 @@
+/* Shared highlight inputs; each renderer supplies its existing paint owner. */
+:where(.pie-container, .pie-navigation) {
+	--highlight-color: white;
+	--highlight-strokeWidth: 1.5px;
+	--hover-brightness: 1.1;
+	--hover-scale: 1.05;
+}
+:where(
+	.pie-container .slice,
+	.pie-navigation summary,
+	.pie-navigation menu[data-navigation-depth="1"] > li
+) {
+	---pie-highlightFilter: brightness(var(--hover-brightness))
+		drop-shadow(var(--highlight-strokeWidth) 0 var(--highlight-color))
+		drop-shadow(0 calc(-1 * var(--highlight-strokeWidth)) var(--highlight-color))
+		drop-shadow(calc(-1 * var(--highlight-strokeWidth)) 0 var(--highlight-color))
+		drop-shadow(0 var(--highlight-strokeWidth) var(--highlight-color));
+}
+
+/* Shared rounded slice geometry; layout and interaction remain with each consumer. */
+:where(
+	.pie-container .slice-shape,
+	.pie-navigation .navigation-items summary > a,
+	.pie-navigation .navigation-items menu[data-navigation-depth="1"] > li > a
+) {
+	--slice-halfAngle: calc(abs(var(--slice-totalAngle)) * 1deg / 2);
+	--slice-halfGap: calc(var(--slice-gap) / 2);
+	--slice-outerCornerOffset: calc(var(--slice-halfGap) + var(--slice-outerCornerRadius));
+	--slice-innerCornerOffset: calc(var(--slice-halfGap) + var(--slice-innerCornerRadius));
+	--slice-outerCornerCenterR: calc(var(--slice-outerR) - var(--slice-outerCornerRadius));
+	--slice-innerCornerCenterR: calc(var(--slice-innerR) + var(--slice-innerCornerRadius));
+	--slice-outerAngleInset: asin(var(--slice-outerCornerOffset) / var(--slice-outerCornerCenterR));
+	--slice-innerAngleInset: asin(var(--slice-innerCornerOffset) / var(--slice-innerCornerCenterR));
+	--slice-outerSideR: sqrt(
+		pow(var(--slice-outerCornerCenterR), 2) - pow(var(--slice-outerCornerOffset), 2)
+	);
+	--slice-innerSideR: sqrt(
+		pow(var(--slice-innerCornerCenterR), 2) - pow(var(--slice-innerCornerOffset), 2)
+	);
+	--slice-angleOuterStart: calc(var(--slice-outerAngleInset) - var(--slice-halfAngle));
+	--slice-angleOuterEnd: calc(var(--slice-halfAngle) - var(--slice-outerAngleInset));
+	--slice-angleInnerEnd: calc(var(--slice-halfAngle) - var(--slice-innerAngleInset));
+	--slice-angleInnerStart: calc(var(--slice-innerAngleInset) - var(--slice-halfAngle));
+	--slice-outerStartX: calc(
+		var(--pie-originX) + sin(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px
+	);
+	--slice-outerStartY: calc(
+		var(--pie-originY) - cos(var(--slice-angleOuterStart)) * var(--slice-outerR) * 1px
+	);
+	clip-path: shape(
+		from var(--slice-outerStartX) var(--slice-outerStartY),
+		arc to var(--pie-originX) calc(var(--pie-originY) - var(--slice-outerR) * 1px) of
+			calc(var(--slice-outerR) * 1px) cw,
+		arc to calc(var(--pie-originX) + sin(var(--slice-angleOuterEnd)) * var(--slice-outerR) * 1px)
+			calc(var(--pie-originY) - cos(var(--slice-angleOuterEnd)) * var(--slice-outerR) * 1px) of
+			calc(var(--slice-outerR) * 1px) cw,
+		arc to
+			calc(
+				var(--pie-originX) +
+					(
+						sin(var(--slice-halfAngle)) * var(--slice-outerSideR) - cos(var(--slice-halfAngle)) *
+							var(--slice-halfGap)
+					) *
+					1px
+			)
+			calc(
+				var(--pie-originY) -
+					(
+						cos(var(--slice-halfAngle)) * var(--slice-outerSideR) + sin(var(--slice-halfAngle)) *
+							var(--slice-halfGap)
+					) *
+					1px
+			)
+			of calc(var(--slice-outerCornerRadius) * 1px) cw small,
+		line to
+			calc(
+				var(--pie-originX) +
+					(
+						sin(var(--slice-halfAngle)) * var(--slice-innerSideR) - cos(var(--slice-halfAngle)) *
+							var(--slice-halfGap)
+					) *
+					1px
+			)
+			calc(
+				var(--pie-originY) -
+					(
+						cos(var(--slice-halfAngle)) * var(--slice-innerSideR) + sin(var(--slice-halfAngle)) *
+							var(--slice-halfGap)
+					) *
+					1px
+			),
+		arc to calc(var(--pie-originX) + sin(var(--slice-angleInnerEnd)) * var(--slice-innerR) * 1px)
+			calc(var(--pie-originY) - cos(var(--slice-angleInnerEnd)) * var(--slice-innerR) * 1px) of
+			calc(var(--slice-innerCornerRadius) * 1px) cw small,
+		arc to var(--pie-originX) calc(var(--pie-originY) - var(--slice-innerR) * 1px) of
+			calc(var(--slice-innerR) * 1px) ccw,
+		arc to calc(var(--pie-originX) + sin(var(--slice-angleInnerStart)) * var(--slice-innerR) * 1px)
+			calc(var(--pie-originY) - cos(var(--slice-angleInnerStart)) * var(--slice-innerR) * 1px) of
+			calc(var(--slice-innerR) * 1px) ccw,
+		arc to
+			calc(
+				var(--pie-originX) +
+					(
+						cos(var(--slice-halfAngle)) * var(--slice-halfGap) - sin(var(--slice-halfAngle)) *
+							var(--slice-innerSideR)
+					) *
+					1px
+			)
+			calc(
+				var(--pie-originY) -
+					(
+						cos(var(--slice-halfAngle)) * var(--slice-innerSideR) + sin(var(--slice-halfAngle)) *
+							var(--slice-halfGap)
+					) *
+					1px
+			)
+			of calc(var(--slice-innerCornerRadius) * 1px) cw small,
+		line to
+			calc(
+				var(--pie-originX) +
+					(
+						cos(var(--slice-halfAngle)) * var(--slice-halfGap) - sin(var(--slice-halfAngle)) *
+							var(--slice-outerSideR)
+					) *
+					1px
+			)
+			calc(
+				var(--pie-originY) -
+					(
+						cos(var(--slice-halfAngle)) * var(--slice-outerSideR) + sin(var(--slice-halfAngle)) *
+							var(--slice-halfGap)
+					) *
+					1px
+			),
+		arc to var(--slice-outerStartX) var(--slice-outerStartY) of
+			calc(var(--slice-outerCornerRadius) * 1px) cw small,
+		close
+	);
+}
