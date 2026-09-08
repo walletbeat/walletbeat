@@ -1594,26 +1594,6 @@
 					</div>
 				</div>
 
-				<!-- Attribute group circles -->
-				<div class="mobile-attr-grid">
-					{#each displayedAttributeGroups as attrGroup}
-						{@const evalGroup = wallet.overall[attrGroup.id]}
-						{@const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
-						<a
-							class="mobile-attr-item"
-							href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: attrGroup.id })}
-						>
-							<div
-								class="mobile-attr-circle"
-								style:--attr-color={groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)'}
-							>
-								<span data-icon="wbicons {attrGroup.icon}"></span>
-							</div>
-							<span class="mobile-attr-label">{attrGroup.displayName}</span>
-						</a>
-					{/each}
-				</div>
-
 				<!-- Full-size overall Pie -->
 				<div class="mobile-card-pie">
 					<Pie
@@ -2105,57 +2085,6 @@
 		&.active {
 			color: var(--accent);
 		}
-	}
-
-	.mobile-attr-grid {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 1.25rem 0.5rem;
-
-		/* First two items sit in row 1, centered across 6 columns */
-		.mobile-attr-item:nth-child(1) {
-			grid-column: 2 / span 2;
-		}
-		.mobile-attr-item:nth-child(2) {
-			grid-column: 4 / span 2;
-		}
-		/* Items 3-5 auto-fill row 2 spanning 2 columns each */
-		.mobile-attr-item:nth-child(n + 3) {
-			grid-column: span 2;
-		}
-	}
-
-	.mobile-attr-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.4rem;
-		text-decoration: none;
-	}
-
-	.mobile-attr-circle {
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		background: color-mix(in srgb, var(--attr-color) 20%, transparent);
-		color: var(--attr-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-
-		[data-icon~="wbicons"] {
-			font-size: 1.4rem;
-		}
-	}
-
-	.mobile-attr-label {
-		font-size: 0.6rem;
-		line-height: 1.3;
-		text-align: center;
-		color: var(--text-secondary);
-		max-width: 4.5rem;
-		overflow-wrap: break-word;
 	}
 
 	.mobile-card-pie {
