@@ -202,34 +202,52 @@ export const permissionsManagement: Attribute = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph('The wallet lets the user inspect and revoke token approvals.'),
+			paragraph(
+				'The wallet lets the user inspect and revoke token approvals, and its built-in swaps (if any) only request the amount needed.',
+			),
 			evaluate(
 				EvaluationContext.forTest(() => permissionsManagement),
-				supported({
+				{
 					ref: refTodo,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				}),
+					approvalsManagement: supported({
+						erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					}),
+					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+				},
 			),
 		),
 		partial: exampleRating(
 			paragraph('The wallet lets the user inspect token approvals but not revoke them.'),
 			evaluate(
 				EvaluationContext.forTest(() => permissionsManagement),
-				supported({
+				{
 					ref: refTodo,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE,
-					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE,
-				}),
+					approvalsManagement: supported({
+						erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE,
+						erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE,
+						erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE,
+					}),
+					builtInSwapApprovals: 'NO_BUILT_IN_SWAP',
+				},
 			),
 		),
 		fail: exampleRating(
-			paragraph('The wallet provides no way to inspect or revoke token approvals.'),
+			paragraph(
+				"The wallet's built-in swap feature silently requests unlimited token approvals without disclosing this to the user.",
+			),
 			evaluate(
 				EvaluationContext.forTest(() => permissionsManagement),
-				notSupported,
+				{
+					ref: refTodo,
+					approvalsManagement: supported({
+						erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					}),
+					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED,
+				},
 			),
 		),
 	},
