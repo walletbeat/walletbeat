@@ -58,6 +58,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import {
 	featureSupported,
@@ -945,7 +946,20 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Ambire\'s built-in swap confirmation screen shows a separate "Approve" line above the swap action itself. Swapping 1 USDC for ETH via 1inch, the Approve amount is exactly "1 USDC", matching the swap amount.',
+						file: 'public/references/wallets/ambire/screenshots/2026-09-08-ambire-swap-approve-exact-amount.png',
+						label:
+							'Ambire swap confirmation screen showing an Approve step for exactly 1 USDC.',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
