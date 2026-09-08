@@ -952,8 +952,7 @@ export const ambire: SoftwareWallet = {
 						explanation:
 							'Ambire\'s built-in swap confirmation screen shows a separate "Approve" line above the swap action itself. Swapping 1 USDC for ETH via 1inch, the Approve amount is exactly "1 USDC", matching the swap amount.',
 						file: 'public/references/wallets/ambire/screenshots/2026-09-08-ambire-swap-approve-exact-amount.png',
-						label:
-							'Ambire swap confirmation screen showing an Approve step for exactly 1 USDC.',
+						label: 'Ambire swap confirmation screen showing an Approve step for exactly 1 USDC.',
 						lastRetrieved: '2026-09-08',
 					},
 				],
