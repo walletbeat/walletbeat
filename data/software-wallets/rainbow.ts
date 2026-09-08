@@ -1262,7 +1262,7 @@ export const rainbow: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'The on-chain Approval event emitted for the swap shows value = 1000000, exactly 1 USDC, matching the swap amount.',
+							'The onchain Approval event emitted for the swap shows value = 1000000, exactly 1 USDC, matching the swap amount.',
 						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-approve-exact-amount-event.png',
 						label:
 							'Decoded Approval event log showing a value of 1000000 (exactly 1 USDC) for the swap',

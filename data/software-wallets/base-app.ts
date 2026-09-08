@@ -446,7 +446,7 @@ export const baseApp: SoftwareWallet = {
 					},
 					{
 						explanation:
-							'The on-chain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
+							'The onchain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
 						file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png',
 						label:
 							'Decoded Approval event log showing a value of 1524712 (1.524712 USDC) for the swap',
