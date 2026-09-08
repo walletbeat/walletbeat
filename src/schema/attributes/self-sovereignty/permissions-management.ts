@@ -63,19 +63,29 @@ function evaluate(
 		})
 	}
 
-	const { erc20Approvals, erc721Approvals, erc1155Approvals } = control
-	const worst = worstControl(erc20Approvals, erc721Approvals, erc1155Approvals)
-	const allSame = erc20Approvals === erc721Approvals && erc721Approvals === erc1155Approvals
-	const perStandardDetails = allSame
-		? null
-		: markdown(`
-			Per token standard:
-			- ERC-20 approvals: ${describeStandard(erc20Approvals)}
-			- ERC-721 approvals: ${describeStandard(erc721Approvals)}
-			- ERC-1155 approvals: ${describeStandard(erc1155Approvals)}
-		`)
+	if (overallRating === Rating.PASS) {
+		const approvalsText =
+			perStandardBreakdown ??
+			'{{WALLET_NAME}} allows you to view all existing token approvals granted to other addresses and revoke them directly from the wallet.'
 
-	if (worst === SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE) {
+		if (walletHasBuiltInSwap) {
+			return ctx.build({
+				outcome: {
+					id: 'can_inspect_and_revoke_exact_amount_swaps',
+					rating: Rating.PASS,
+					displayName: 'Can inspect and revoke approvals; exact-amount swaps',
+					shortExplanation: sentence(
+						'{{WALLET_NAME}} lets you inspect and revoke token approvals, and its built-in swaps only request the amount needed.',
+					),
+				},
+				details: markdown(`
+					${approvalsText}
+
+					Its built-in swap/bridge feature also ${swapBehaviorDescription(builtInSwapApprovals)}.
+				`),
+			})
+		}
+
 		return ctx.build({
 			outcome: {
 				id: 'can_inspect_and_revoke',
