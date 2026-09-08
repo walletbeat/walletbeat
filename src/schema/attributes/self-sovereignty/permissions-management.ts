@@ -162,8 +162,16 @@ export const permissionsManagement: Attribute = {
 		token approvals and revoke them directly from within the wallet interface.
 		ERC-20, ERC-721, and ERC-1155 approvals are each evaluated; the worst
 		result across all token standards determines the overall rating.
-		
-		As Account Abstraction becomes more prevalent, this methodology 
+
+		Wallets that offer a built-in swap or bridge feature are also evaluated on
+		whether that feature requests an exact-amount approval by default. Only an
+		exact-amount default passes. A default of unlimited fails this attribute
+		regardless of whether it is disclosed to the user, and regardless of how
+		well the wallet otherwise supports inspecting and revoking approvals; a
+		default of unlimited that the user can edit down before signing is rated
+		partial.
+
+		As Account Abstraction becomes more prevalent, this methodology
 		will also grow to encompass the management of more complex account permissions.
 	`),
 	ratingScale: {
