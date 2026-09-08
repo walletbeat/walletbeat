@@ -42,6 +42,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -709,7 +710,19 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'MetaMask mobile swap review screen for a 3 USDC to ETH swap, showing the quote, rate, network fee, slippage, and MetaMask fee. Does not itself show a separate approve step or its requested amount.',
+						file: 'public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png',
+						label: 'MetaMask mobile swap review screen for a 3 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
