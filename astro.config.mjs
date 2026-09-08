@@ -29,6 +29,8 @@ export default defineConfig({
 	),
 	vite: {
 		build: {
+			// Keep animation-timeline out of unsupported animation shorthands (https://github.com/parcel-bundler/lightningcss/issues/1283).
+			cssMinify: 'esbuild',
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
 		},
