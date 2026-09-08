@@ -1958,7 +1958,6 @@
 					.pie-navigation-geometry {
 						position: fixed;
 						position-anchor: --wallet-pie-source;
-						/* The row anchor measures geometry without painting. */
 						position-visibility: always;
 						opacity: calc(1 - var(---wallet-terminal) * (1 - var(---wallet-tocOpen)));
 						translate: 0
@@ -1979,15 +1978,8 @@
 						animation-range:
 							cover 0% exit-crossing 0%,
 							contain 0% contain 100%;
-						/* Source scrolling remains a paint translation until the row handoff. */
-						inset-block-start: calc(
-							(1 - var(---wallet-tocOpen)) *
-								max(
-									var(--navigation-mobile-blockSize),
-									anchor-size(--wallet-pie-row block, var(--navigation-mobile-blockSize))
-								) +
-								var(---wallet-tocOpen) * var(--navigation-mobile-blockSize)
-						);
+						/* The compact pie stays at the second sticky layer as nested rows change. */
+						inset-block-start: var(--navigation-mobile-blockSize);
 						inset-inline-start: anchor(--wallet-pie-source start);
 						inline-size: anchor-size(--wallet-pie-source inline);
 						margin: 0;
@@ -2359,9 +2351,9 @@
 				/* Native layout timing approximates transformed contact without resolving transformed anchors. */
 				timeline-scope: --pie-clearance;
 				view-timeline: --pie-clearance block;
-				view-timeline-inset: max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart))
+				view-timeline-inset: var(--navigation-mobile-blockSize)
 					calc(
-						100vh - max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart)) -
+						100vh - var(--navigation-mobile-blockSize) -
 							var(---pie-compactSize)
 					);
 			}
@@ -2373,19 +2365,7 @@
 				visibility: hidden;
 				pointer-events: none;
 				inline-size: 0;
-				/* The row offset is a size, independent of the sticky row's departure. */
-				block-size: calc(
-					max(var(--navigation-mobile-blockSize), var(---breadcrumb-parentBlockStart)) +
-						var(---breadcrumb-entry) * (1 - var(---breadcrumb-exit)) *
-						(
-							max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart)) -
-								max(var(--navigation-mobile-blockSize), var(---breadcrumb-parentBlockStart))
-						)
-				);
-				anchor-name: if(
-					style(---breadcrumb-entry: 0) or style(---breadcrumb-exit: 1): none;
-						else: if(style(---breadcrumb-wrap: 1): --wallet-pie-row; else: none)
-				);
+				block-size: 0;
 				inset-block-start: 0;
 				inset-inline-start: calc(
 					anchor(--column-firstRow self-start) - var(--stickyBreadcrumb-sourcePaddingInline)
