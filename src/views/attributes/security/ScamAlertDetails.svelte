@@ -6,7 +6,7 @@
 	import type { Outcome } from '@/schema/attributes'
 	import { isSupported } from '@/schema/features/support'
 	import { toFullyQualified } from '@/schema/reference'
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { commaListFormat } from '@/types/utils/text'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
@@ -16,7 +16,7 @@
 		wallet,
 		outcome,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		outcome: Outcome<ScamPreventionMetadata>
 	} = $props()
 
