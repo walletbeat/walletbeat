@@ -152,8 +152,13 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Username/ENS resolution is fetched from the Uniswap Unitags API, an offchain service, rather than resolved directly onchain.',
+						'`useUnitagsUsernameQuery` calls the Uniswap Unitags API, an offchain service, to resolve Uniswap handles.',
 					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts',
+				},
+				{
+					explanation:
+						'In the Send flow, whatever text is typed is looked up two ways in parallel: `useAddressFromEns` (onchain ENS resolution) and `useUnitagsUsernameQuery` (Uniswap\'s own offchain Unitags API for Uniswap handles). The resolved address is then picked with userInput (raw address) first, `forwardLookupAddress` (the ENS result) second, and `recipientInputUnitagAddress` (the Unitag result) last.',
+					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/web/src/pages/Swap/Send/state/hooks.tsx#L58-L86',
 				},
 				{
 					explanation:
