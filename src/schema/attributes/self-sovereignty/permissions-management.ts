@@ -1,16 +1,21 @@
 import {
 	type Attribute,
+	compareExplicitRatings,
 	type Evaluation,
 	EvaluationContext,
+	type ExplicitRating,
 	exampleRating,
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
 import {
+	BuiltInSwapDefaultApprovalBehavior,
+	hasBuiltInSwap,
 	type PermissionsManagementSupport,
 	SpendingApprovalsControl,
+	swapBehaviorDescription,
 } from '@/schema/features/self-sovereignty/permissions-management'
-import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
+import { isSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -39,27 +44,102 @@ function worstControl(...controls: SpendingApprovalsControl[]): SpendingApproval
 	return SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE
 }
 
-function evaluate(
-	ctx: EvaluationContext,
-	control: Support<PermissionsManagementSupport>,
-): Evaluation {
-	if (!isSupported(control)) {
+function approvalsManagementRating(control: SpendingApprovalsControl): ExplicitRating {
+	switch (control) {
+		case SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE:
+			return Rating.PASS
+		case SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE:
+			return Rating.PARTIAL
+		case SpendingApprovalsControl.CANNOT_INSPECT:
+			return Rating.FAIL
+	}
+}
+
+/** Only an exact-amount-by-default approval passes; any unlimited default fails, whether disclosed or not. */
+function ratingForSwapApprovals(behavior: BuiltInSwapDefaultApprovalBehavior): ExplicitRating {
+	switch (behavior) {
+		case BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT:
+			return Rating.PASS
+		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE:
+			return Rating.PARTIAL
+		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_DISCLOSED:
+		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED:
+			return Rating.FAIL
+	}
+}
+
+
+
+function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport): Evaluation {
+	const { approvalsManagement, builtInSwapApprovals } = control
+	
+	const walletHasBuiltInSwap = hasBuiltInSwap(builtInSwapApprovals)
+	const approvalsSupported = isSupported(approvalsManagement)
+	const approvalsRating: ExplicitRating = approvalsSupported
+		? approvalsManagementRating(
+				worstControl(
+					approvalsManagement.erc20Approvals,
+					approvalsManagement.erc721Approvals,
+					approvalsManagement.erc1155Approvals,
+				),
+			)
+		: Rating.FAIL
+	const perStandardBreakdown = approvalsSupported
+		? (() => {
+				const { erc20Approvals, erc721Approvals, erc1155Approvals } = approvalsManagement
+				const allSame = erc20Approvals === erc721Approvals && erc721Approvals === erc1155Approvals
+
+				return allSame
+					? null
+					: `
+						Per token standard:
+						- ERC-20 approvals: ${describeStandard(erc20Approvals)}
+						- ERC-721 approvals: ${describeStandard(erc721Approvals)}
+						- ERC-1155 approvals: ${describeStandard(erc1155Approvals)}
+					`
+			})()
+		: null
+	const perStandardDetails = perStandardBreakdown === null ? null : markdown(perStandardBreakdown)
+
+	const swapRating = walletHasBuiltInSwap
+		? ratingForSwapApprovals(builtInSwapApprovals)
+		: 'NO_BUILT_IN_SWAP'
+	const overallRating =
+		swapRating === 'NO_BUILT_IN_SWAP'
+			? approvalsRating
+			: compareExplicitRatings(approvalsRating, swapRating) <= 0
+				? approvalsRating
+				: swapRating
+	const requestExactAmountByDefaultAdvice = paragraph(
+		'{{WALLET_NAME}} should request only the amount needed for the swap by default, rather than an unlimited approval.',
+	)
+
+	if (walletHasBuiltInSwap && swapRating === Rating.FAIL) {
+		const undisclosed =
+			builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED
+
 		return ctx.build({
 			outcome: {
-				id: 'not_supported',
+				id: undisclosed
+					? 'undisclosed_unlimited_swap_approval'
+					: 'disclosed_unlimited_swap_approval',
 				rating: Rating.FAIL,
-				displayName: 'No approval management',
-				shortExplanation: sentence('{{WALLET_NAME}} does not support token approval management.'),
+				displayName: undisclosed
+					? 'Silently requests unlimited swap approvals'
+					: 'Requests unlimited swap approvals',
+				shortExplanation: undisclosed
+					? sentence(
+							"{{WALLET_NAME}}'s built-in swaps can silently request unlimited token approvals.",
+						)
+					: sentence("{{WALLET_NAME}}'s built-in swaps default to an unlimited token approval."),
 			},
 			details: paragraph(
-				'{{WALLET_NAME}} does not provide any functionality for managing token approvals.',
+				`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
 			),
 			impact: paragraph(
-				'Without the ability to inspect and revoke approvals, users are exposed to risks from unlimited or unnecessary token approvals granted to other addresses.',
+				'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.',
 			),
-			howToImprove: paragraph(
-				'{{WALLET_NAME}} should add the ability to view and revoke token approvals.',
-			),
+			howToImprove: requestExactAmountByDefaultAdvice,
 		})
 	}
 
@@ -93,11 +173,7 @@ function evaluate(
 				displayName: 'Can inspect and revoke approvals',
 				shortExplanation: sentence('{{WALLET_NAME}} lets you inspect and revoke token approvals.'),
 			},
-			details:
-				perStandardDetails ??
-				paragraph(
-					'{{WALLET_NAME}} allows you to view all existing token approvals granted to other addresses and revoke them directly from the wallet.',
-				),
+			details: perStandardDetails ?? paragraph(approvalsText),
 		})
 	}
 

@@ -1,5 +1,5 @@
-import type { WithRef } from '@/schema/reference'
 import type { Support } from '@/schema/features/support'
+import type { WithRef } from '@/schema/reference'
 
 /** The level of control a wallet provides over token approvals of a given standard. */
 export enum SpendingApprovalsControl {
@@ -70,7 +70,27 @@ export interface PermissionsManagement {
 	 * How the wallet's own built-in swap/bridge feature requests token
 	 * approvals on the user's behalf by default.
 	 */
-	builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior
+	builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior | 'NO_BUILT_IN_SWAP'
 }
 
 export type PermissionsManagementSupport = WithRef<PermissionsManagement>
+
+/** Whether the wallet has a built-in swap/bridge feature to rate approval behavior for. */
+export function hasBuiltInSwap(
+	builtInSwapApprovals: PermissionsManagement['builtInSwapApprovals'],
+): builtInSwapApprovals is BuiltInSwapDefaultApprovalBehavior {
+	return builtInSwapApprovals !== 'NO_BUILT_IN_SWAP'
+}
+
+export function swapBehaviorDescription(behavior: BuiltInSwapDefaultApprovalBehavior): string {
+	switch (behavior) {
+		case BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT:
+			return 'requests only the amount needed for the swap'
+		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE:
+			return 'defaults to an unlimited approval, but lets the user edit the amount before signing'
+		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_DISCLOSED:
+			return 'defaults to an unlimited approval and discloses this before signing, but does not let the user edit the amount'
+		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED:
+			return 'requests an unlimited approval by default without disclosing this before signing'
+	}
+}
