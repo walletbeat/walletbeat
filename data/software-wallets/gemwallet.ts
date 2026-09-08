@@ -28,12 +28,7 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import {
-	featureSupported,
-	notSupported,
-	notSupportedWithRef,
-	supported,
-} from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, type WithRef } from '@/schema/reference'
