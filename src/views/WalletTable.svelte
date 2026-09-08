@@ -237,7 +237,7 @@
 	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
 	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
-	import { isLabeledUrl } from '@/schema/url'
+	import { getUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
@@ -276,7 +276,7 @@
 
 
 	// Mobile filter helpers
-	const variantWbIconIds: Record<Variant, WBIconFontID> = {
+	const variantWbIconIds: Record<Variant, WBIconID> = {
 		[Variant.BROWSER]: 'wallet_browser',
 		[Variant.DESKTOP]: 'wallet_desktop',
 		[Variant.MOBILE]: 'wallet_mobile',
@@ -374,7 +374,7 @@
 
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
-	import type { WBIconFontID } from '@/styles/wbicons'
+	import type { WBIconID } from '@/styles/wbicons'
 
 
 	// Flower visualization helpers
@@ -1006,22 +1006,24 @@
 										View report
 									</a>
 
-									<hr>
+									{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+										<hr>
 
-									<a
-										href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<span aria-hidden="true">{@html GlobeIcon}</span>
-										Website
-									</a>
+										<a
+											href={getUrl(wallet.metadata.urls.websites[0])}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<span aria-hidden="true">{@html GlobeIcon}</span>
+											Website
+										</a>
+									{/if}
 
 									{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 										<hr>
 
 										<a
-											href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
+											href={getUrl(wallet.metadata.urls.repositories[0])}
 											target="_blank"
 											rel="noopener noreferrer"
 										>
