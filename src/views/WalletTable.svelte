@@ -1578,6 +1578,16 @@
 							<a data-link="camouflaged" href={walletUrl}>{wallet.metadata.displayName}</a>
 						</h3>
 
+						{#if stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null}
+							<span class="mobile-card-stage">
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="medium"
+								/>
+							</span>
+						{/if}
+
 						<div class="mobile-card-variants">
 							{#each cardSupportedVariants as variant}
 								<button
@@ -2060,6 +2070,7 @@
 	.mobile-name-and-variants {
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: 0.5rem;
 		flex: 1;
 		min-width: 0;
@@ -2077,6 +2088,10 @@
 			color: inherit;
 			text-decoration: none;
 		}
+	}
+
+	.mobile-card-stage {
+		flex-shrink: 0;
 	}
 
 	.mobile-card-variants {
