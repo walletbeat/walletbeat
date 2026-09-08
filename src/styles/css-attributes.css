@@ -1860,6 +1860,9 @@ ol {
 				}
 			}
 			[data-sticky-breadcrumb~="item"] {
+				---breadcrumb-paintScale: calc(
+					1 + var(---breadcrumb-entry) * (var(--stickyBreadcrumb-scale) - 1)
+				);
 				min-inline-size: 0;
 				max-inline-size: 100%;
 				flex-grow: 0;
@@ -1899,9 +1902,6 @@ ol {
 			[data-sticky-breadcrumb~="end"] {
 				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
 				---breadcrumb-sourceRowHeight: calc(100vh * (1 / var(---column-blockFraction, 1) - 1));
-				---breadcrumb-paintScale: calc(
-					1 + var(---breadcrumb-entry) * (var(--stickyBreadcrumb-scale) - 1)
-				);
 				---breadcrumb-sourceEndWrap: clamp(
 					0,
 					sign(
@@ -1979,28 +1979,11 @@ ol {
 							) +
 							var(---breadcrumb-sourceEndWrap) * (1 - var(---breadcrumb-endWrap)) *
 							(
-								(1 - var(---breadcrumb-endEntry)) *
-									(
-										var(---breadcrumb-itemHeight) * var(---breadcrumb-paintScale) +
-											var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight) -
-											var(---breadcrumb-endHeight)
-									) +
-									var(---breadcrumb-endEntry) *
-									(
-										var(---breadcrumb-itemHeight) * var(---breadcrumb-paintScale) -
-											var(---breadcrumb-endHeight)
-									) /
-									2 -
-									(
-										(1 - var(---breadcrumb-entry)) *
-											(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) +
-											var(---breadcrumb-entry) *
-											(
-												var(---breadcrumb-itemHeight) * var(--stickyBreadcrumb-scale) -
-													var(---breadcrumb-endHeight)
-											) /
-											2
-									)
+								(var(---breadcrumb-entry) - var(---breadcrumb-endEntry)) *
+									(var(---breadcrumb-sourceRowHeight) -
+										(var(---breadcrumb-itemHeight) + var(---breadcrumb-endHeight)) / 2) +
+									var(---breadcrumb-entry) * (1 - var(---breadcrumb-endEntry)) *
+										var(---breadcrumb-itemHeight) * (var(--stickyBreadcrumb-scale) - 1) / 2
 							)
 					);
 			}
