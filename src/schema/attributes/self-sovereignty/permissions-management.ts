@@ -156,6 +156,10 @@ export const permissionsManagement: Attribute = {
 
 		Being able to inspect and revoke approvals is an important tool for protecting
 		your assets from unnecessary or dangerous delegated spending authority.
+
+		A wallet's own built-in swap/bridge feature should also request proper
+		token approvals by default, limited to the amount actually needed, rather
+		than exposing users to the same risk through their own wallet's UI.
 	`),
 	methodology: markdown(`
 		Wallets are rated based on whether they allow users to inspect existing
