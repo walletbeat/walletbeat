@@ -249,15 +249,31 @@ import Footer from '@/views/Footer.astro'
 		inherits: true;
 		initial-value: 0px;
 	}
-	@property --navigation-logoInlineSize {
-		syntax: '<length>';
-		inherits: true;
-		initial-value: 0px;
+	@property ---navigation-logoFraction {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
 	}
-	@property --navigation-controlsInlineSize {
-		syntax: '<length>';
-		inherits: true;
-		initial-value: 0px;
+	@property ---navigation-controlsFraction {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@keyframes navigation-logo-size {
+		from {
+			---navigation-logoFraction: 0;
+		}
+		to {
+			---navigation-logoFraction: 1;
+		}
+	}
+	@keyframes navigation-controls-size {
+		from {
+			---navigation-controlsFraction: 0;
+		}
+		to {
+			---navigation-controlsFraction: 1;
+		}
 	}
 	@property ---wallet-chainWrap {
 		syntax: '<number>';
@@ -339,16 +355,10 @@ import Footer from '@/views/Footer.astro'
 					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
 					--wallet-end-inline, --wallet-end-block, --wallet-entry;
 				animation:
-					column-inline-size auto linear both,
-					column-block-size auto linear both,
 					breadcrumb-item-block auto linear both,
 					wallet-terminal auto linear both;
-				animation-timeline:
-					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-block,
-					scroll(self block);
+				animation-timeline: --wallet-item-block, scroll(self block);
 				animation-range:
-					normal,
-					normal,
 					normal,
 					calc(100% - var(--navigation-mobile-blockSize)) 100%;
 			}
@@ -364,9 +374,14 @@ import Footer from '@/views/Footer.astro'
 				view-timeline-axis: inline, block;
 				view-timeline-inset: 0;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) > * {
-				--navigation-logoInlineSize: calc(100vw * (1/var(---column-inlineFraction) - 1));
-				--navigation-controlsInlineSize: calc(100vh * (1/var(---column-blockFraction) - 1));
+			#layout:has([data-sticky-breadcrumb~="root"])
+				[data-sticky-breadcrumb~="root"]
+				> [data-sticky-breadcrumb~="position"]
+				[data-sticky-breadcrumb~="source"] {
+				animation:
+					navigation-logo-size auto linear both,
+					navigation-controls-size auto linear both;
+				animation-timeline: --navigation-logo-inline, --navigation-controls-inline;
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > menu {
 				anchor-name: --navigation-controls;
@@ -414,14 +429,20 @@ import Footer from '@/views/Footer.astro'
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo {
 				anchor-name: --navigation-logo;
 				animation:
+					navigation-logo-size auto linear both,
+					navigation-controls-size auto linear both,
 					breadcrumb-item-inline auto linear both,
 					breadcrumb-end-inline auto linear both,
 					wallet-scroll-entry auto linear both;
 				@media (prefers-reduced-motion: reduce) {
-					animation-timing-function: linear, linear, steps(1, end);
+					animation-timing-function: linear, linear, linear, linear, steps(1, end);
 				}
-				animation-timeline: --wallet-item-inline, --wallet-end-inline, --wallet-entry;
+				animation-timeline:
+					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
+					--wallet-end-inline, --wallet-entry;
 				animation-range:
+					normal,
+					normal,
 					normal,
 					normal,
 					contain 0% contain 100%;
@@ -431,16 +452,19 @@ import Footer from '@/views/Footer.astro'
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo,
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"]
-				> [data-sticky-breadcrumb~="position"] {
+				> [data-sticky-breadcrumb~="position"]
+				[data-sticky-breadcrumb~="source"] {
+				/* Navigation measurements belong to their two consumers, not the page subtree. */
+				---navigation-logoInlineSize: calc(100vw * (1 / var(---navigation-logoFraction) - 1));
 				---wallet-chainWrap: clamp(
 					0,
 					sign(
-						var(--navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
+						var(---navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
 							var(--stickyBreadcrumb-gap, 1rem)/2 + var(---breadcrumb-itemWidth) + 2 *
 							(
 								var(--navigation-controlInsetInline) +
 									max(
-										var(--navigation-controlsInlineSize),
+										calc(100vh * (1 / var(---navigation-controlsFraction) - 1)),
 										2rem + 0.5rem + var(---breadcrumb-endWidth)
 									)
 							) -
@@ -473,7 +497,7 @@ import Footer from '@/views/Footer.astro'
 								(
 										100vw - var(---breadcrumb-itemWidth) + (1 - var(---wallet-chainWrap)) *
 											(
-												var(--navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
+												var(---navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
 													var(--stickyBreadcrumb-gap, 1rem) / 2
 											)
 									) /
