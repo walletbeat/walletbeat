@@ -19,7 +19,7 @@ UPSTREAM_REF='main'
 LOCAL_COMMIT_FILE='data/coinspect/upstream-commit'
 LOCAL_REPORTS_DIR='data/coinspect/current-reports'
 
-remote_sha=$(git ls-remote "$UPSTREAM_REPO" "$UPSTREAM_REF" | cut -f1)
+remote_sha="$(git ls-remote "$UPSTREAM_REPO" "$UPSTREAM_REF" | cut -f1)"
 if [[ -z "$remote_sha" ]]; then
 	echo "Failed to resolve $UPSTREAM_REPO $UPSTREAM_REF." >&2
 	exit 1
@@ -36,7 +36,7 @@ if [[ "$local_sha" == "$remote_sha" ]]; then
 	exit 0
 fi
 
-tmp=$(mktemp -d)
+tmp="$(mktemp -d)"
 cleanup() {
 	# GNU rm supports --one-file-system; macOS BSD rm does not.
 	rm -rf --one-file-system "$tmp" 2>/dev/null || rm -rf "$tmp"
