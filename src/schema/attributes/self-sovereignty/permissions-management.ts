@@ -3,8 +3,8 @@ import {
 	compareExplicitRatings,
 	type Evaluation,
 	EvaluationContext,
-	type ExplicitRating,
 	exampleRating,
+	type ExplicitRating,
 	Rating,
 	Verifiability,
 } from '@/schema/attributes'
@@ -68,11 +68,9 @@ function ratingForSwapApprovals(behavior: BuiltInSwapDefaultApprovalBehavior): E
 	}
 }
 
-
-
 function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport): Evaluation {
 	const { approvalsManagement, builtInSwapApprovals } = control
-	
+
 	const walletHasBuiltInSwap = hasBuiltInSwap(builtInSwapApprovals)
 	const approvalsSupported = isSupported(approvalsManagement)
 	const approvalsRating: ExplicitRating = approvalsSupported
