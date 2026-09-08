@@ -430,7 +430,9 @@
 				const timeline = `--${item.href.slice(1)}-entry`
 
 				states.push(`wallet-pie-step auto linear(${step}, ${step}) forwards`)
-				animations.push(`${condition}: wallet-pie-rotation auto linear(${previousAngle}, ${angle}) both`)
+				animations.push(
+					`${condition}: wallet-pie-rotation auto linear(${previousAngle}, ${angle}) both`,
+				)
 				activeTimelines.push(`${condition}: ${timeline}`)
 				timelines.push(timeline)
 				previousAngle = angle
@@ -1001,6 +1003,7 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
+	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
@@ -1127,23 +1130,20 @@
 								</div>
 							{/if}
 
-							{#if true}
-								{@const verifiability = evalAttr.evaluation.outcome.verifiability}
-								{#if verifiability === Verifiability.UNVERIFIABLE}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)">Unverifiable</data
-									>
-								{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)">Unverifiable but audited</data
-									>
-								{/if}
+							{#if verifiability === Verifiability.UNVERIFIABLE}
+								<data
+									data-row-item="wrap-end"
+									data-badge="medium"
+									value={verifiability}
+									style:--accent="var(--accent-color)">Unverifiable</data
+								>
+							{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
+								<data
+									data-row-item="wrap-end"
+									data-badge="medium"
+									value={verifiability}
+									style:--accent="var(--accent-color)">Unverifiable but audited</data
+								>
 							{/if}
 
 							<data data-badge="medium" value={evalAttr.evaluation.outcome.rating}
@@ -1434,9 +1434,6 @@
 		---wallet-compact-h3: 1rem;
 		---wallet-line-height: 1.6;
 		---wallet-attribute-heading-font-size: 1.17rem;
-		--border-radius-lg: 1rem;
-		--border-radius: 0.5rem;
-		--border-radius-sm: 0.25rem;
 
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 54rem;
@@ -1599,7 +1596,8 @@
 									line to 100% 100%,
 									line to 0 100%,
 									close,
-									move to calc((1 + var(---inlineDirection)) / 2 * (100% - var(---pie-compactSize))) calc(var(---pie-compactSize) / 2),
+									move to calc((1 + var(---inlineDirection)) / 2 * (100% - var(---pie-compactSize)))
+										calc(var(---pie-compactSize) / 2),
 									arc by var(---pie-compactSize) 0 of calc(var(---pie-compactSize) / 2) cw,
 									arc by calc(-1 * var(---pie-compactSize)) 0 of calc(var(---pie-compactSize) / 2) cw,
 									close
@@ -1646,7 +1644,6 @@
 		--scrollContainer-perspective: none;
 		---wallet-page-navigation-inline-size: min(20rem, 320px);
 		---wallet-page-block-offset: 0px;
-		---wallet-sticky-content-inset: 1rem;
 		--scrollContainer-scrollPaddingBlockStart: 0px;
 
 		scroll-snap-type: block proximity;
@@ -1655,7 +1652,6 @@
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 		}
 	}
-
 
 	/* Fixed Wallet controls share the root navigation stacking context. */
 	:global(#layout:has([data-sticky-breadcrumb~="root"]) > #content > main) {
@@ -1670,15 +1666,18 @@
 		isolation: auto;
 	}
 
-
 	@property ---pie-rotation-step {
 		syntax: '<integer>';
 		inherits: true;
 		initial-value: 0;
 	}
 	@keyframes -global-wallet-pie-step {
-		from { ---pie-rotation-step: 0; }
-		to { ---pie-rotation-step: 1; }
+		from {
+			---pie-rotation-step: 0;
+		}
+		to {
+			---pie-rotation-step: 1;
+		}
 	}
 	@keyframes -global-wallet-pie-rotation {
 		from {
@@ -1757,8 +1756,7 @@
 			--sticky-insetBlockStart: 0px;
 
 			@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-				(animation-timing-function: linear(0, 2)) and
-				(color: if(style(---pie-rotation-step: 0): red)) {
+				(animation-timing-function: linear(0, 2)) and (color: if(style(---pie-rotation-step: 0): red)) {
 				/* Select the active range once; painted elements each receive one rotation. */
 				animation: var(---pie-rotation-states);
 				animation-timeline: var(---pie-rotation-timelines);
@@ -1861,8 +1859,6 @@
 			:global(.navigation-items summary > a),
 			:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
 				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
-				---slice-offset: var(--slice-offset);
-				---slice-label-size: var(--slice-labelSize);
 				scale: calc(1 + var(---link-active, 0) * (var(--hover-scale) - 1));
 
 				display: block;
@@ -1876,8 +1872,7 @@
 				color: var(--text-primary);
 				pointer-events: auto;
 				transform-origin: var(--pie-originX) var(--pie-originY);
-				transform: rotate(var(---slice-mid-angle))
-					translateY(calc(var(---slice-offset) * -1px));
+				transform: rotate(var(---slice-mid-angle)) translateY(calc(var(--slice-offset) * -1px));
 
 				transition-property: scale;
 				@media (prefers-reduced-motion: reduce) {
@@ -1906,7 +1901,7 @@
 			}
 
 			:global(.navigation-items a > .pie-navigation-icon) {
-				--icon-size: calc(var(---slice-label-size) * 1px);
+				--icon-size: calc(var(--slice-labelSize) * 1px);
 
 				position: absolute;
 				inset: var(--pie-originY) auto auto var(--pie-originX);
@@ -1929,9 +1924,9 @@
 		}
 
 		/*
-				 * Chromium currently fails to invalidate :target-current when it is
-				 * nested beneath the pie rule. Keep this state selector flat.
-				 */
+					 * Chromium currently fails to invalidate :target-current when it is
+					 * nested beneath the pie rule. Keep this state selector flat.
+					 */
 		:global([data-sticky-breadcrumb~="root"] .pie-navigation .navigation-items a:target-current) {
 			scale: var(--hover-scale);
 			opacity: 1;
@@ -1981,7 +1976,9 @@
 							animation-timing-function: linear, steps(1, end);
 						}
 						animation-timeline: --wallet-pie-source, var(--stickyBreadcrumb-entryTimeline);
-						animation-range: cover 0% exit-crossing 0%, contain 0% contain 100%;
+						animation-range:
+							cover 0% exit-crossing 0%,
+							contain 0% contain 100%;
 						/* Source scrolling remains a paint translation until the row handoff. */
 						inset-block-start: calc(
 							(1 - var(---wallet-tocOpen)) *
@@ -2005,8 +2002,7 @@
 		}
 	}
 
-	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-		(timeline-scope: --link) {
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --link) {
 		.attribute-group > header > [data-row],
 		.attribute > details > summary > header > [data-row],
 		.pie-navigation :global(details),
@@ -2016,8 +2012,7 @@
 				link-active auto linear both,
 				link-active auto linear both,
 				link-active auto linear both;
-			animation-timeline:
-				var(--link-hover, none), var(--link-focus, none), var(--link-current, none);
+			animation-timeline: var(--link-hover, none), var(--link-focus, none), var(--link-current, none);
 		}
 	}
 
@@ -2104,7 +2099,6 @@
 
 	[data-column~="span-start"] {
 		--column-supportLineHeight: calc(1rem * var(---wallet-line-height));
-		--column-supportFontSize: 1rem;
 
 		a:is(:hover, :focus-visible, :interest-source) {
 			color: var(--accent);
@@ -2228,7 +2222,8 @@
 			transform: translateX(0);
 			animation-timing-function: linear(0, 0.6726, 0.8773, 0.9755, 1);
 		}
-		entry 100%, exit 0% {
+		entry 100%,
+		exit 0% {
 			transform: translateX(calc(-1 * var(---inlineDirection) * var(---pie-inlineClearance)));
 			animation-timing-function: linear(0, 0.0245, 0.1227, 0.3274, 1);
 		}
@@ -2243,7 +2238,8 @@
 				transform: translateX(0);
 				animation-timing-function: steps(1, start);
 			}
-			entry 100%, exit 0% {
+			entry 100%,
+			exit 0% {
 				transform: translateX(calc(-1 * var(---inlineDirection) * var(---pie-inlineClearance)));
 				animation-timing-function: steps(1, end);
 			}
@@ -2263,25 +2259,34 @@
 
 	@keyframes -global-wallet-pie-compact {
 		from {
-			transform: translateX(calc(
-				var(---wallet-tocOpen) * var(---inlineDirection) *
-					(100% - var(---pie-size)) / 2 * var(---pie-compactSize) / var(---pie-size)
-			)) scale(calc(1 + var(---wallet-tocOpen) * (var(---pie-compactSize) / var(---pie-size) - 1)));
+			transform: translateX(
+					calc(
+						var(---wallet-tocOpen) * var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
+							var(---pie-compactSize) / var(---pie-size)
+					)
+				)
+				scale(calc(1 + var(---wallet-tocOpen) * (var(---pie-compactSize) / var(---pie-size) - 1)));
 		}
 		to {
-			transform: translateX(calc(
-				var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
-					var(---pie-compactSize) / var(---pie-size)
-			)) scale(calc(var(---pie-compactSize) / var(---pie-size)));
+			transform: translateX(
+					calc(
+						var(---inlineDirection) * (100% - var(---pie-size)) / 2 * var(---pie-compactSize) /
+							var(---pie-size)
+					)
+				)
+				scale(calc(var(---pie-compactSize) / var(---pie-size)));
 		}
 	}
 	@keyframes -global-wallet-pie-source {
 		from {
-			translate: 0 calc(
-				(1 - var(---wallet-tocOpen)) *
-					(var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize) -
-						var(---wallet-terminal) * var(--navigation-mobile-blockSize))
-			);
+			translate: 0
+				calc(
+					(1 - var(---wallet-tocOpen)) *
+						(
+							var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize) -
+								var(---wallet-terminal) * var(--navigation-mobile-blockSize)
+						)
+				);
 		}
 		/* The underlying translate owns terminal displacement at the source endpoint. */
 	}
@@ -2295,24 +2300,22 @@
 					animation-direction: normal, normal, normal, normal, reverse;
 				}
 				timeline-scope:
-					var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline),
-					--pie-inline;
+					var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
 				animation:
 					var(---breadcrumb-sizeAnimations),
 					pie-inline auto linear both;
-				animation-timeline:
-					var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
+				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
 				> :global(*) {
 					--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-compactSize));
 				}
 			}
-			[data-sticky-breadcrumb~="root"] :global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
+			[data-sticky-breadcrumb~="root"]
+				:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
 				timeline-scope: var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
 			}
 			[data-sticky-breadcrumb~="root"]
 				:global(
-					article
-						summary:has(> [data-column~="span-start"]):not([data-sticky-breadcrumb~="position"])
+					article summary:has(> [data-column~="span-start"]):not([data-sticky-breadcrumb~="position"])
 				) {
 				timeline-scope: --pie-inline;
 			}
@@ -2338,14 +2341,12 @@
 					0px,
 					calc(
 						100vw * (1 / var(---column-inlineFraction) - 1) +
-							var(--stickyBreadcrumb-sourcePaddingInline) -
-							var(---pie-inlineSpace)
+							var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace)
 					),
 					var(---pie-compactSize)
 				);
 			}
-			[data-sticky-breadcrumb~="root"]
-				:global(article [data-sticky-breadcrumb~="end"]),
+			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]),
 			[data-sticky-breadcrumb~="root"] :global(#wallet-toc .navigation-item-after),
 			[data-sticky-breadcrumb~="root"] :global(#wallet-toc summary::after) {
 				/* Sampled circular easing keeps clearance on the compositor. */
@@ -2358,12 +2359,15 @@
 				/* Native layout timing approximates transformed contact without resolving transformed anchors. */
 				timeline-scope: --pie-clearance;
 				view-timeline: --pie-clearance block;
-				view-timeline-inset:
-					max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart))
-					calc(100vh - max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart)) - var(---pie-compactSize));
+				view-timeline-inset: max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart))
+					calc(
+						100vh - max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart)) -
+							var(---pie-compactSize)
+					);
 			}
 
-			[data-sticky-breadcrumb~="root"] :global(article [data-column~="span-start"] > [data-row]::after) {
+			[data-sticky-breadcrumb~="root"]
+				:global(article [data-column~="span-start"] > [data-row]::after) {
 				content: '';
 				position: absolute;
 				visibility: hidden;
@@ -2373,12 +2377,14 @@
 				block-size: calc(
 					max(var(--navigation-mobile-blockSize), var(---breadcrumb-parentBlockStart)) +
 						var(---breadcrumb-entry) * (1 - var(---breadcrumb-exit)) *
-							(max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart)) -
-								max(var(--navigation-mobile-blockSize), var(---breadcrumb-parentBlockStart)))
+						(
+							max(var(--navigation-mobile-blockSize), var(---breadcrumb-blockStart)) -
+								max(var(--navigation-mobile-blockSize), var(---breadcrumb-parentBlockStart))
+						)
 				);
 				anchor-name: if(
 					style(---breadcrumb-entry: 0) or style(---breadcrumb-exit: 1): none;
-					else: if(style(---breadcrumb-wrap: 1): --wallet-pie-row; else: none)
+						else: if(style(---breadcrumb-wrap: 1): --wallet-pie-row; else: none)
 				);
 				inset-block-start: 0;
 				inset-inline-start: calc(
@@ -2386,29 +2392,28 @@
 				);
 				view-timeline: --pie-inline inline;
 			}
-			[data-sticky-breadcrumb~="root"]
-				:global(article :is([data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"])) {
-				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
-			}
-
-
 		}
 		@supports (appearance: base-select) {
-			[data-sticky-breadcrumb~="root"]:has(> [data-sticky-breadcrumb~="position"] :global(select))::after {
+			[data-sticky-breadcrumb~="root"]:has(
+					> [data-sticky-breadcrumb~="position"] :global(select)
+				)::after {
 				inline-size: 2rem;
 			}
-			[data-sticky-breadcrumb~="root"]:has(> [data-sticky-breadcrumb~="position"] :global(select ~ select))::after {
+			[data-sticky-breadcrumb~="root"]:has(
+					> [data-sticky-breadcrumb~="position"] :global(select ~ select)
+				)::after {
 				inline-size: calc(4rem + 0.5rem);
 			}
 		}
 		[data-sticky-breadcrumb~="root"] {
-			--stickyBreadcrumb-scale: calc(
-				var(---wallet-compact-h1) / var(---wallet-name-flow-font-size)
-			);
+			--stickyBreadcrumb-scale: calc(var(---wallet-compact-h1) / var(---wallet-name-flow-font-size));
 			--stickyBreadcrumb-insetBlockStart: var(--sticky-insetBlockStart);
 			--stickyBreadcrumb-minBlockSize: var(---wallet-compact-icon-size);
 			@media (width > 1024px) {
-				--stickyBreadcrumb-minBlockSize: max(var(---wallet-compact-icon-size), calc(var(--navigation-mobile-blockSize) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)));
+				--stickyBreadcrumb-minBlockSize: max(
+					var(---wallet-compact-icon-size),
+					calc(var(--navigation-mobile-blockSize) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem))
+				);
 			}
 		}
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
@@ -2440,7 +2445,9 @@
 				var(---wallet-compact-h3) / var(---wallet-attribute-heading-font-size)
 			);
 		}
-		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="source"] {
+		[data-sticky-breadcrumb~="root"]
+			> [data-sticky-breadcrumb~="position"]
+			[data-sticky-breadcrumb~="source"] {
 			---breadcrumb-iconCorrection: calc(
 				var(---wallet-compact-icon-size) / var(--stickyBreadcrumb-scale) - var(--wallet-icon-size)
 			);

@@ -735,8 +735,7 @@ summary {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	---row-gap: 1em;
-	gap: var(---row-gap);
+	gap: 1em;
 
 	> * {
 		min-inline-size: 0;
@@ -768,28 +767,28 @@ summary {
 	}
 
 	&[data-row~="gap-0"] {
-		---row-gap: 0em;
+		gap: 0em;
 	}
 	&[data-row~="gap-1"] {
-		---row-gap: 0.25em;
+		gap: 0.25em;
 	}
 	&[data-row~="gap-2"] {
-		---row-gap: 0.5em;
+		gap: 0.5em;
 	}
 	&[data-row~="gap-3"] {
-		---row-gap: 0.75em;
+		gap: 0.75em;
 	}
 	&[data-row~="gap-4"] {
-		---row-gap: 1em;
+		gap: 1em;
 	}
 	&[data-row~="gap-5"] {
-		---row-gap: 1.25em;
+		gap: 1.25em;
 	}
 	&[data-row~="gap-6"] {
-		---row-gap: 1.5em;
+		gap: 1.5em;
 	}
 	&[data-row~="gap-8"] {
-		---row-gap: 2em;
+		gap: 2em;
 	}
 
 	/**
@@ -1413,7 +1412,11 @@ ol {
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
  */
 [data-sticky-breadcrumb~="scope"]
-	:is(a[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > a:first-child, h4 > a:first-child) {
+	:is(
+		a[data-sticky-breadcrumb~="item"],
+		[data-sticky-breadcrumb~="item"] > a:first-child,
+		h4 > a:first-child
+	) {
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -1434,7 +1437,6 @@ ol {
 		opacity: 0;
 	}
 }
-
 
 [data-sticky-breadcrumb~="flow"] {
 	display: none;
@@ -1586,7 +1588,10 @@ ol {
 		}
 	}
 	[data-sticky-breadcrumb~="position"]
-		:is(a[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > a:first-child)::before {
+		:is(
+			a[data-sticky-breadcrumb~="item"],
+			[data-sticky-breadcrumb~="item"] > a:first-child
+		)::before {
 		content: if(style(---breadcrumb-entry: 0): '#' ;style(---breadcrumb-wrap: 0): '›' ;else: '#');
 		inline-size: var(--stickyBreadcrumb-markerSize);
 		font-size: var(--stickyBreadcrumb-markerSize);
@@ -1780,7 +1785,11 @@ ol {
 			animation-timeline:
 				var(--column-sizeTimelines, none, none), var(--stickyBreadcrumb-entryTimeline),
 				view(block var(---breadcrumb-blockStart) 0px);
-			animation-range: normal, normal, contain 0% contain 100%, exit 0% exit 100%;
+			animation-range:
+				normal,
+				normal,
+				contain 0% contain 100%,
+				exit 0% exit 100%;
 			&:is(summary):has(> [data-column~="span-start"]) {
 				align-items: start;
 				> [data-column~="span-start"] {
@@ -2027,7 +2036,7 @@ ol {
 			--stickyBreadcrumb-sourcePaddingInline: var(--card-padding);
 			> * {
 				--stickyBreadcrumb-paddingBlock: if(
-					style(---breadcrumb-wrap: 1): var(--stickyBreadcrumb-sourcePaddingBlock); else: 0.5rem
+					style(---breadcrumb-wrap: 1): var(--stickyBreadcrumb-sourcePaddingBlock) ; else: 0.5rem
 				);
 			}
 		}
@@ -2814,9 +2823,9 @@ details {
 
 		/* Keep the marker with the existing end cluster when the content row wraps. */
 		&:has(
-			> [data-row] > [data-row-item~="wrap-end"],
-			> [data-column~="span-start"] > [data-row] > [data-row-item~="wrap-end"]
-		)::after {
+				> [data-row] > [data-row-item~="wrap-end"],
+				> [data-column~="span-start"] > [data-row] > [data-row-item~="wrap-end"]
+			)::after {
 			content: none;
 		}
 
@@ -2842,7 +2851,6 @@ details {
 		---summary-markerRotation: 180deg;
 		cursor: zoom-out;
 	}
-
 }
 
 /* A card can own either the disclosure itself or its existing outer scope. */

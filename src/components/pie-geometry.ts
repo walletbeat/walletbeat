@@ -47,7 +47,6 @@ export type ComputedSlice = Slice & {
 		level: number
 		offset: number
 		labelSize: number
-		labelSizeScale: number
 		labelR: number
 	}
 	children?: ComputedSlice[]
@@ -205,7 +204,6 @@ export const computePieSlices = ({
 					offset: levelConfig.offset ?? 0,
 					gap,
 					labelSize: effectiveLabelSize,
-					labelSizeScale,
 					labelR,
 				},
 				...(children && {

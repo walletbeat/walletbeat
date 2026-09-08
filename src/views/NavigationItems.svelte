@@ -263,7 +263,6 @@
 			style:--slice-outerCornerRadius={item.sliceStyle?.outerCornerRadius}
 			style:--slice-innerCornerRadius={item.sliceStyle?.innerCornerRadius}
 			style:--slice-labelSize={item.sliceStyle?.labelSize}
-			style:--slice-labelSizeScale={item.sliceStyle?.labelSizeScale}
 			style:--slice-labelR={item.sliceStyle?.labelR}
 		>
 			{@render navigationIcon(item, depth)}
@@ -402,26 +401,17 @@
 			}
 			&[data-navigation-depth="1"] {
 				--navIcon-size: 1.5em;
-
-				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(
-						var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) +
-							var(--nav-submenu-gap)
-					);
-					--sticky-marginBlockEnd: var(--navItem-gap);
-				}
 			}
 			&[data-navigation-depth="2"] {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+			}
 
-				&[data-sticky-container] {
-					--sticky-marginBlockStart: calc(
-						var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) +
-							var(--nav-submenu-gap)
-					);
-					--sticky-marginBlockEnd: var(--navItem-gap);
-				}
+			&:is([data-navigation-depth="1"], [data-navigation-depth="2"])[data-sticky-container] {
+				--sticky-marginBlockStart: calc(
+					var(--nav-submenu-parentIconSize) + 2 * var(--navItem-paddingBlock) + var(--nav-submenu-gap)
+				);
+				--sticky-marginBlockEnd: var(--navItem-gap);
 			}
 
 			details {
@@ -508,7 +498,6 @@
 			}
 
 			summary {
-
 				&::after {
 					margin-inline-start: auto;
 				}
@@ -549,22 +538,35 @@
 		}
 	}
 	@keyframes navigation-current {
-		from, to { ---navigation-current: 1; }
+		from,
+		to {
+			---navigation-current: 1;
+		}
 	}
-	@supports (animation-timeline: scroll()) and (timeline-scope: --navigation-current) and (color: if(style(---navigation-current: 1): red)) {
-		.navigation-items details { timeline-scope: --navigation-current; }
+	@supports (animation-timeline: scroll()) and (timeline-scope: --navigation-current) and
+		(color: if(style(---navigation-current: 1): red)) {
+		.navigation-items details {
+			timeline-scope: --navigation-current;
+		}
 		.navigation-items summary {
 			---navigation-current: 0;
 			animation: navigation-current auto linear both;
 			animation-timeline: --navigation-current;
-			---backgroundColor: if(style(---navigation-current: 1): var(--navItem-current-backgroundColor); else: transparent);
+			---backgroundColor: if(
+				style(---navigation-current: 1): var(--navItem-current-backgroundColor) ; else: transparent
+			);
 		}
 		.navigation-items summary:is(:hover, :focus-visible, :focus-within) {
-			---backgroundColor: if(style(---navigation-current: 1): var(--navItem-current-hover-backgroundColor); else: var(--navItem-hover-backgroundColor));
+			---backgroundColor: if(
+				style(---navigation-current: 1): var(--navItem-current-hover-backgroundColor) ;
+					else: var(--navItem-hover-backgroundColor)
+			);
 		}
 		.navigation-items summary > a:target-current,
 		.navigation-items details:not([open]) > menu a:target-current {
-			view-timeline-name: var(---link-hover-source, none), var(---link-focus-source, none), var(---link-current-source, none), --navigation-current;
+			view-timeline-name:
+				var(---link-hover-source, none), var(---link-focus-source, none),
+				var(---link-current-source, none), --navigation-current;
 		}
 	}
 </style>

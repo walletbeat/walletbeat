@@ -230,7 +230,6 @@
 																? (attributesById.get(attributeId) ?? null)
 																: null}
 															{@const attributeName = attribute?.displayName ?? attributeId}
-															{@const attributeTitle = attribute?.displayName ?? attributeId}
 
 															<li
 																data-list-item-marker={criterionRatingMeta.icon}
@@ -240,7 +239,7 @@
 															>
 																{#if attributeName}
 																	{#if attributeLink}
-																		<a href={attributeLink} title={attributeTitle}>
+																		<a href={attributeLink} title={attributeName}>
 																			<strong>{attributeName}</strong>
 																		</a>
 																	{:else}
