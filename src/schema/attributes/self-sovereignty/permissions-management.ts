@@ -91,24 +91,34 @@ function evaluate(
 		})
 	}
 
-	if (worst === SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE) {
+	if (overallRating === Rating.PARTIAL) {
+		const isSwapDriven = approvalsRating === Rating.PASS && swapRating === Rating.PARTIAL
+
 		return ctx.build({
 			outcome: {
-				id: 'can_inspect_not_revoke',
+				id: isSwapDriven ? 'editable_unlimited_swap_approval' : 'can_inspect_not_revoke',
 				rating: Rating.PARTIAL,
-				displayName: 'Can inspect but not revoke approvals',
-				shortExplanation: sentence(
-					'{{WALLET_NAME}} lets you inspect token approvals but not revoke them.',
-				),
+				displayName: isSwapDriven
+					? 'Defaults to unlimited but editable swap approvals'
+					: 'Can inspect but not revoke approvals',
+				shortExplanation: isSwapDriven
+					? sentence(
+							"{{WALLET_NAME}}'s built-in swaps default to an unlimited approval, but let you edit the amount.",
+						)
+					: sentence('{{WALLET_NAME}} lets you inspect token approvals but not revoke them.'),
 			},
 			details:
-				perStandardDetails ??
-				paragraph(
-					'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
-				),
-			howToImprove: paragraph(
-				'{{WALLET_NAME}} should add the ability to revoke token approvals directly.',
-			),
+				isSwapDriven && walletHasBuiltInSwap
+					? paragraph(
+							`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
+						)
+					: (perStandardDetails ??
+						paragraph(
+							'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
+						)),
+			howToImprove: isSwapDriven
+				? requestExactAmountByDefaultAdvice
+				: paragraph('{{WALLET_NAME}} should add the ability to revoke token approvals directly.'),
 		})
 	}
 
