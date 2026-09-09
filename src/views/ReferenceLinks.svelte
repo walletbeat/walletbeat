@@ -334,9 +334,9 @@
 			overflow: auto;
 
 			padding: 0.75em 1em;
-			border: 1px solid var(--border-color);
+			border: 1px solid light-dark(#d1d9e0, #3d444d);
 			border-radius: 0.5em;
-			background-color: var(--background-secondary);
+			background-color: light-dark(#fff, #0d1117);
 
 			font-size: 0.8125em;
 			line-height: 1.6;
@@ -381,7 +381,8 @@
 			inline-size: calc(100% + 2em);
 			margin-inline: -1em;
 			padding-inline: 1em;
-			background-color: color-mix(in oklch, var(--accent) 20%, transparent);
+			background-color: light-dark(#fff8c5, #bb800926);
+			box-shadow: inset 3px 0 0 light-dark(#9a6700, #9e6a03);
 		}
 
 		.row.gap {
