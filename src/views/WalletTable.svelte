@@ -1084,8 +1084,10 @@
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
 								levels={overallRatingPieLevels(
-											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage || summaryVisualization === SummaryVisualization.Icon) ?
+											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Icon) ?
 												0.15
+											: summaryVisualization === SummaryVisualization.Stage ?
+												0.08
 											:
 												0.1
 								)}
@@ -1172,22 +1174,6 @@
 											height="40"
 											alt=""
 										/>
-									{:else if summaryVisualization === SummaryVisualization.Stage}
-										{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-											{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-											{@const maxStages = ladderEvaluation.ladder.stages.length}
-											{#if stageIndex >= 0}
-												<span
-													class="pie-center-stage-label"
-												>
-													{stageIndex}
-												</span>
-											{:else}
-												<span>❔</span>
-											{/if}
-										{:else}
-											<span>❔</span>
-										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(score)}
@@ -1633,12 +1619,12 @@
 						levels={[
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.15,
+								innerRadiusFraction: 0.08,
 								gap: 5,
 								angleGap: 5,
 								offset: 4,
 								outerCornerRadius: 35,
-								innerCornerRadius: 20,
+								innerCornerRadius: 10,
 								labelSizeScale: 1.25,
 							},
 							{
@@ -1688,16 +1674,7 @@
 								}
 							})
 						}
-					>
-						{#snippet centerContentSnippet()}
-							{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-								{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-								{#if stageIndex >= 0}
-									<span class="pie-center-stage-label">{stageIndex}</span>
-								{/if}
-							{/if}
-						{/snippet}
-					</Pie>
+					/>
 				</div>
 			</div>
 		{/each}
@@ -1879,10 +1856,6 @@
 
 	.eip-tooltip-content {
 		width: 34rem;
-	}
-
-	.pie-center-stage-label {
-		color: var(--pie-center-color);
 	}
 
 	.pie-center-dot {
