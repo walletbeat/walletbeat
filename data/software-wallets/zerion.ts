@@ -499,7 +499,7 @@ export const zerion: SoftwareWallet = {
 				},
 			},
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: "https://zerion.io/privacy-policy",
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
