@@ -277,6 +277,10 @@ export const duressResistance: Attribute = {
 
 		ctx.addRef(feature.basicUnlock)
 
+		if (!hasRequiredNonBiometricMechanism(feature.basicUnlock)) {
+			return weakLockOnly(ctx, feature.basicUnlock)
+		}
+
 		if (!isSupported(feature.duressMode)) {
 			return basicLockOnly(ctx, feature.basicUnlock)
 		}
