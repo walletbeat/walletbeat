@@ -249,15 +249,18 @@ export const duressResistance: Attribute = {
 				mdParagraph(
 					'The wallet only offers a biometric unlock, with no PIN, password, or pattern required.',
 				),
-				weakLockOnly(EvaluationContext.forTest(() => duressResistance), {
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.REQUIRED,
-						[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+				weakLockOnly(
+					EvaluationContext.forTest(() => duressResistance),
+					{
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+						},
+						ref: refNotNecessary,
 					},
-					ref: refNotNecessary,
-				}),
+				),
 			),
 		],
 	},

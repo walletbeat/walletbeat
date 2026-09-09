@@ -53,7 +53,11 @@ import {
 	type BugBountyProgramSupport,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -603,10 +607,10 @@ export const completedTemplate: SoftwareWallet = {
 				basicUnlock: {
 					ref: refTodo,
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+						[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
+						[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
+						[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.REQUIRED,
+						[BasicUnlockMechanism.PATTERN]: BasicUnlockMechanismSupport.REQUIRED,
 					},
 				},
 				duressMode: supported({

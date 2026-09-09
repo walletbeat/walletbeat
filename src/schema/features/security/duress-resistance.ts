@@ -54,7 +54,7 @@ export interface BasicUnlock {
 	 * Which unlock mechanisms the wallet supports, and whether each one is
 	 * required or merely optional.
 	 */
-	mechanisms: Record<BasicUnlockMechanism, BasicUnlockMechanismSupport | "NOT_SUPPORTED">
+	mechanisms: Record<BasicUnlockMechanism, BasicUnlockMechanismSupport | 'NOT_SUPPORTED'>
 }
 
 /**
