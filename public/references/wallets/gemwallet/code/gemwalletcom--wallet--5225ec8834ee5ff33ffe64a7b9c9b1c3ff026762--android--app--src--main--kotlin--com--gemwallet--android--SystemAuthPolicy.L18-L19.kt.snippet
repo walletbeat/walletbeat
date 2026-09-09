@@ -1,0 +1,21 @@
+{
+	"highlightFirstLine": 18,
+	"highlightLastLine": 19,
+	"segments": [
+		{
+			"lines": [
+				"internal object SystemAuthPolicy {",
+				"    val authRequestTimeout = 5.minutes",
+				"    val authRequestRestartDelay = 500.milliseconds",
+				"",
+				"    val allowedAuthenticators = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {",
+				"        BIOMETRIC_STRONG or DEVICE_CREDENTIAL",
+				"    } else {",
+				"        BIOMETRIC_WEAK or DEVICE_CREDENTIAL",
+				"    }",
+				""
+			],
+			"startLine": 14
+		}
+	]
+}
