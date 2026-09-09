@@ -47,24 +47,18 @@ const secondaryNavigationItems = [
 	data-sticky-container
 >
 	<header data-sticky='backdrop-self backdrop-always' data-row>
+		<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav'>
+			<span set:html={LuMenu} />
+		</button>
+
 		<a href='/' class='logo'>
 			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
 		</a>
 
-		<menu data-row='gap-2'>
-			<li>
-				<button type='button' id='theme-toggle' data-icon='circle' data-stack>
-					<span set:html={LuSun} />
-					<span set:html={LuMoon} />
-				</button>
-			</li>
-
-			<li>
-				<button type='button' id='menu-toggle' data-icon='circle' popovertarget='nav'>
-					<span set:html={LuMenu} />
-				</button>
-			</li>
-		</menu>
+		<button type='button' id='theme-toggle' data-icon='circle' data-stack>
+			<span set:html={LuSun} />
+			<span set:html={LuMoon} />
+		</button>
 	</header>
 
 	<div id='nav-menu' data-column data-column-item='flexible' data-sticky-container>
@@ -102,24 +96,18 @@ const secondaryNavigationItems = [
 				}
 			}
 
-			menu {
-				li {
-					display: contents;
+			button {
+				svg {
+					transition-property: color;
 				}
+			}
 
-				button {
-					svg {
-						transition-property: color;
-					}
+			#theme-toggle {
+				> :first-child {
+					color: light-dark(currentColor, transparent);
 				}
-
-				#theme-toggle {
-					> :first-child {
-						color: light-dark(currentColor, transparent);
-					}
-					> :last-child {
-						color: light-dark(transparent, currentColor);
-					}
+				> :last-child {
+					color: light-dark(transparent, currentColor);
 				}
 			}
 		}
@@ -142,7 +130,7 @@ const secondaryNavigationItems = [
 	}
 
 	@media (min-width: 1025px) {
-		nav:not(:popover-open) li:has(#menu-toggle) {
+		nav:not(:popover-open) #menu-toggle {
 			display: none;
 		}
 	}
@@ -164,6 +152,24 @@ const secondaryNavigationItems = [
 			block-size: 100dvh;
 			height: 100dvh;
 			transform-style: preserve-3d;
+
+			> header {
+				display: grid;
+				grid-template-columns: 1fr auto 1fr;
+				align-items: center;
+
+				#menu-toggle {
+					justify-self: start;
+				}
+
+				.logo {
+					justify-self: center;
+				}
+
+				#theme-toggle {
+					justify-self: end;
+				}
+			}
 
 			#nav-menu {
 				.navigation-note {
