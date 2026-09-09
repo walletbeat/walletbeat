@@ -41,6 +41,49 @@ function noLockScreen(ctx: EvaluationContext): Evaluation {
 	})
 }
 
+/**
+ * A biometric-only (or merely optional) lock is not duress-resistant: an
+ * attacker can force a fingerprint/face scan, and devices without biometric
+ * hardware may end up with no lock at all. At least one of PIN, password, or
+ * pattern must be REQUIRED for the lock screen to count.
+ */
+function hasRequiredNonBiometricMechanism(basicUnlock: WithRef<BasicUnlock>): boolean {
+	return (
+		basicUnlock.mechanisms[BasicUnlockMechanism.PIN] === BasicUnlockMechanismSupport.REQUIRED ||
+		basicUnlock.mechanisms[BasicUnlockMechanism.PASSWORD] ===
+			BasicUnlockMechanismSupport.REQUIRED ||
+		basicUnlock.mechanisms[BasicUnlockMechanism.PATTERN] === BasicUnlockMechanismSupport.REQUIRED
+	)
+}
+
+function weakLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
+	const mechNames = commaListFormat(
+		Object.keys(basicUnlock.mechanisms)
+			.filter(m => basicUnlock.mechanisms[m] !== 'NOT_SUPPORTED')
+			.map(basicUnlockMechanismName),
+	)
+
+	return ctx.build({
+		outcome: {
+			id: 'weak_lock_only',
+			rating: Rating.FAIL,
+			displayName: 'Biometric-only or optional lock',
+			shortExplanation: sentence(
+				`{{WALLET_NAME}}'s lock screen (${mechNames}) does not require a PIN, password, or pattern.`,
+			),
+		},
+		details: markdown(
+			`{{WALLET_NAME}} protects access with ${mechNames}, but does not require a PIN,
+			password, or pattern. A biometric-only or merely optional lock is not duress-resistant:
+			an attacker can force a fingerprint or face scan, and devices without biometric hardware
+			may end up with no lock at all.`,
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should require a PIN, password, or pattern to unlock the wallet, in addition to any optional biometric convenience unlock.',
+		),
+	})
+}
+
 function basicLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
