@@ -176,7 +176,7 @@ export const duressResistance: Attribute = {
 
 		1. **Lock screen (basic)**: Requiring a PIN, password, or pattern before granting access.
 		   Biometrics (Face ID, fingerprint) may be offered as an optional convenience, but must
-		   not be the only option: an attacker can force a fingerprint or face scan, and devices
+		   not be the only option. An attacker can force a fingerprint or face scan, and devices
 		   without biometric hardware would otherwise be left with no lock at all.
 
 		2. **Duress mode (stronger)**: A separate duress PIN or passphrase that, when entered,
