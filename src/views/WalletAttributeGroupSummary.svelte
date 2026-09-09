@@ -7,10 +7,9 @@
 
 
 <script lang="ts" generics="
-	_AttributeGroupId extends AttributeGroupId
+	_AttributeGroupId extends string
 ">
 	// Types/constants
-	import { AttributeGroupId } from '@/schema/attribute-tree'
 	import { calculateAttributeGroupScore, type AttributeGroup } from '@/schema/attribute-groups'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { scoreToColor } from '@/utils/colors'
