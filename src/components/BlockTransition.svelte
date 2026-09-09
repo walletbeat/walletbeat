@@ -7,8 +7,8 @@
 	import type { TransitionConfig } from 'svelte/transition'
 
 	type TransitionFn = {
-		bivarianceHack(node: Element, params?: unknown): TransitionConfig
-	}['bivarianceHack']
+		transition(node: Element, params?: unknown): TransitionConfig
+	}['transition']
 
 	type TransitionFnAndParams = [TransitionFn] | [TransitionFn, unknown]
 
