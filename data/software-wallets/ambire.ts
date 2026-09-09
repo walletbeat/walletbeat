@@ -470,17 +470,13 @@ export const ambire: SoftwareWallet = {
 				usage: notSupported,
 			},
 			appIsolation: {
-				[Variant.BROWSER]: {
-					createInAppConnectionFlow: notSupported,
-					erc7846WalletConnect: notSupported,
-					ethAccounts: supported({
-						ref: refTodo,
-						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
-					}),
-					useAppSpecificLastConnectedAddresses: notSupported,
-				},
-				[Variant.MOBILE]: null,
-				[Variant.DESKTOP]: null,
+				createInAppConnectionFlow: notSupported,
+				erc7846WalletConnect: notSupported,
+				ethAccounts: supported({
+					ref: refTodo,
+					defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupported,
 			},
 			dataCollection: {
 				[UserFlow.INSTALL]: { collected: [] },
