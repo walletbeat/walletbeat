@@ -1625,8 +1625,7 @@ ol {
 		&[data-card~="border-accent"] {
 			---breadcrumb-sourceOffsetBlock: var(--card-borderWidth);
 		}
-		/* Fragment navigation shares the natural source arrival boundary. */
-		scroll-snap-align: start;
+		/* Fragment navigation shares the natural flow's arrival boundary. */
 		scroll-margin-block-start: calc(
 			var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-sourceOffsetBlock)
 		);
@@ -1736,12 +1735,13 @@ ol {
 					var(--stickyBreadcrumb-paddingBlock, 0.5rem)
 			);
 		}
-		/* The flow clock retains the source height and never inherits sticky clamping. */
+		/* Natural flow owns both snap boundaries without sticky clamping or the section's extent. */
 		> [data-sticky-breadcrumb~="flow"] {
 			display: block;
 			content: '';
 			position: absolute;
-			visibility: hidden;
+			scroll-snap-align: start;
+			scroll-margin-block-start: var(---breadcrumb-parentBlockEnd);
 			pointer-events: none;
 			inset-inline-start: 0;
 			inset-block-start: 0;
@@ -1749,7 +1749,6 @@ ol {
 			block-size: anchor-size(--breadcrumb-position block);
 			&::after {
 				content: '';
-				visibility: visible;
 				position: absolute;
 				inset-block-start: 100%;
 				inset-inline-start: 0;
