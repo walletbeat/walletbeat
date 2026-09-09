@@ -603,8 +603,6 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.USE_BIOMETRIC]: Rating.PASS,
 	// Legacy fingerprint authentication (superseded by USE_BIOMETRIC), used to unlock the wallet without a PIN.
 	[AndroidPermission.USE_FINGERPRINT]: Rating.PASS,
-	// Haptic feedback on user actions; grants no access to sensitive data.
-	[AndroidPermission.VIBRATE]: Rating.PASS,
 	// Read access to shared photo media (scoped storage, Android 13+), e.g. to attach an image to support requests.
 	[AndroidPermission.READ_MEDIA_IMAGES]: Rating.PASS,
 
