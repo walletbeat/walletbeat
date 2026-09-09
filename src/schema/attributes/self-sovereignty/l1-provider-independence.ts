@@ -206,31 +206,34 @@ export const l1ProviderIndependence: Attribute = {
 		}
 
 		if (!isSupported(ctx.features.chainConfigurability)) {
+			ctx.addRef(ctx.features.chainConfigurability)
+
 			return noSelfHostedNode(ctx)
 		}
 
 		ctx.addRef(ctx.features.chainConfigurability)
 
 		if (!isSupported(ctx.features.chainConfigurability.l1)) {
+			ctx.addRef(ctx.features.chainConfigurability.l1)
+
 			return noSelfHostedNode(ctx)
 		}
 
+		const basicOperations =
+			ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
+
 		if (
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountCreation,
-			) ||
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
-					.etherBalanceLookup,
-			) ||
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
-					.erc20BalanceLookup,
-			) ||
-			!isSupported(
-				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20TokenSend,
-			)
+			!isSupported(basicOperations.accountCreation) ||
+			!isSupported(basicOperations.etherBalanceLookup) ||
+			!isSupported(basicOperations.erc20BalanceLookup) ||
+			!isSupported(basicOperations.erc20TokenSend)
 		) {
+			for (const operation of Object.values(basicOperations)) {
+				if (!isSupported(operation)) {
+					ctx.addRef(operation)
+				}
+			}
+
 			return supportsSelfHostedNodeButCannotDoBasicOperations(
 				ctx,
 				ctx.features.chainConfigurability.l1,
