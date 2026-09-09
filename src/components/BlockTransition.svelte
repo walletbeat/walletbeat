@@ -4,15 +4,6 @@
 ">
 	// Types
 	import type { Snippet } from 'svelte'
-	import type { TransitionConfig } from 'svelte/transition'
-
-	type TransitionFnAndParams<
-		Fn extends (node: Element, _?: unknown) => TransitionConfig = (node: Element, _?: unknown) => TransitionConfig
-	> = (
-		Fn extends (node: Element, _?: infer Params) => TransitionConfig
-			? [Fn] | [Fn, Params | undefined]
-			: never
-	)
 
 
 	// Props
@@ -26,7 +17,6 @@
 
 		// View options
 		align = 'top',
-		contentTransition = [fade, { duration: 200, easing: expoOut }],
 	}: {
 		key?: Key
 		value?: Value
@@ -37,7 +27,6 @@
 
 		// View options
 		align?: 'top' | 'center' | 'bottom'
-		contentTransition?: TransitionFnAndParams | { in?: TransitionFnAndParams, out?: TransitionFnAndParams }
 	} = $props()
 
 
@@ -68,101 +57,21 @@
 	data-stack
 	class={`align-${align}`}
 >
-	{#if contentTransition}
-		{#if 'in' in contentTransition && contentTransition.in && 'out' in contentTransition && contentTransition.out}
-			{@const { in: [inTransition, inParams], out: [outTransition, outParams] } = contentTransition}
-
-			{#key key ?? value}
-				<div
-					data-content
-					bind:borderBoxSize
-					data-column
-					class={`align-${align}`}
-					in:inTransition={inParams}
-					out:outTransition={outParams}
-				>
-					{#if children}
-						{@render children({ key, value })}
-					{:else}
-						{value}
-					{/if}
-				</div>
-			{/key}
-
-		{:else if 'in' in contentTransition && contentTransition.in}
-			{@const { in: [inTransition, inParams] } = contentTransition}
-
-			{#key key ?? value}
-				<div
-					data-content
-					bind:borderBoxSize
-					data-column
-					class={`align-${align}`}
-					in:inTransition={inParams}
-				>
-					{#if children}
-						{@render children({ key, value })}
-					{:else}
-						{value}
-					{/if}
-				</div>
-			{/key}
-
-		{:else if 'out' in contentTransition && contentTransition.out}
-			{@const { out: [outTransition, outParams] } = contentTransition}
-
-			{#key key ?? value}
-				<div
-					data-content
-					bind:borderBoxSize
-					data-column
-					class={`align-${align}`}
-					out:outTransition={outParams}
-				>
-					{#if children}
-						{@render children({ key, value })}
-					{:else}
-						{value}
-					{/if}
-				</div>
-			{/key}
-
-		{:else if Array.isArray(contentTransition)}
-			{@const [transition, transitionParams] = contentTransition}
-
-			{#key key ?? value}
-				<div
-					data-content
-					bind:borderBoxSize
-					data-column
-					class={`align-${align}`}
-					transition:transition={transitionParams}
-				>
-					{#if children}
-						{@render children({ key, value })}
-					{:else}
-						{value}
-					{/if}
-				</div>
-			{/key}
-		{/if}
-
-	{:else}
-		{#key key ?? value}
-			<div
-				data-content
-				bind:borderBoxSize
-				data-column
-				class={`align-${align}`}
-			>
-				{#if children}
-					{@render children({ key, value })}
-				{:else}
-					{value}
-				{/if}
-			</div>
-		{/key}
-	{/if}
+	{#key key ?? value}
+		<div
+			data-content
+			bind:borderBoxSize
+			data-column
+			class={`align-${align}`}
+			transition:fade={{ duration: 200, easing: expoOut }}
+		>
+			{#if children}
+				{@render children({ key, value })}
+			{:else}
+				{value}
+			{/if}
+		</div>
+	{/key}
 </div>
 
 

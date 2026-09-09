@@ -825,7 +825,7 @@
 						</div>
 					{/if}
 				{:else if column.id === 'displayName'}
-					{@const displayName = value}
+					{@const displayName = wallet.metadata.displayName}
 					{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
 					{@const supportedVariants = (
 						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
