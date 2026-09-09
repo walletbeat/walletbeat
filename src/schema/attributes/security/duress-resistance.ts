@@ -10,6 +10,7 @@ import {
 	type BasicUnlock,
 	BasicUnlockMechanism,
 	basicUnlockMechanismName,
+	BasicUnlockMechanismSupport,
 	DuressAction,
 	duressActionDescription,
 	duressActionName,
@@ -87,7 +88,7 @@ function weakLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>)
 function basicLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m])
+			.filter(m => basicUnlock.mechanisms[m] !== 'NOT_SUPPORTED')
 			.map(basicUnlockMechanismName),
 	)
 
@@ -124,7 +125,7 @@ function hasDuressMode(
 ): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m])
+			.filter(m => basicUnlock.mechanisms[m] !== 'NOT_SUPPORTED')
 			.map(basicUnlockMechanismName),
 	)
 	const activeActions = Object.keys(duressMode.actions).filter(a => duressMode.actions[a])
@@ -173,9 +174,10 @@ export const duressResistance: Attribute = {
 
 		Wallets can mitigate this threat by:
 
-		1. **Lock screen (basic)**: Requiring a PIN, password, or biometric before granting access.
-		   This protects against opportunistic thieves and buys time, but a determined coercer can
-		   watch you unlock it.
+		1. **Lock screen (basic)**: Requiring a PIN, password, or pattern before granting access.
+		   Biometrics (Face ID, fingerprint) may be offered as an optional convenience, but must
+		   not be the only option: an attacker can force a fingerprint or face scan, and devices
+		   without biometric hardware would otherwise be left with no lock at all.
 
 		2. **Duress mode (stronger)**: A separate duress PIN or passphrase that, when entered,
 		   either opens a decoy wallet (providing plausible deniability) or wipes the device and
@@ -199,10 +201,10 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
 						},
 						ref: refNotNecessary,
 					},
@@ -228,10 +230,10 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
 						},
 						ref: refNotNecessary,
 					},
