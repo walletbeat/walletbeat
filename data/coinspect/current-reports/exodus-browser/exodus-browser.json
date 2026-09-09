@@ -1,0 +1,769 @@
+{
+    "wallet": "Exodus",
+    "platform": "Browser",
+    "version": "25.34.3",
+    "date": "2026-01-12T17:52:05.136Z",
+    "walletUID": "exodus-browser",
+    "walletMakerUID": "exodus",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Browser.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-008~Browser.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Browser.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-010~Browser.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-cf4f3d26.png",
+                        "exodus-browser-25.34.3-3d3a8c18.png",
+                        "exodus-browser-25.34.3-9b56c73d.png",
+                        "exodus-browser-25.34.3-893d9f06.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet warns the user when attempting to manually send funds to an address with invalid checksums. When interacting through a dApp, the wallet does not process such requests, as shown in the console."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-63f4d0cd.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet prevents the user from copying the recovery phrase to the clipboard."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-a2a2f11a.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not feature a verified domain indicator for well-known dApps."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-PERM-008~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-0a68c854.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires the user's connection to access the RPC endpoints."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073830917
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-16dc2a92.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn the user when attempting to send funds to the Tornado Cash attacker address."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-e19919c1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet supports a 4-digit PIN code, such as 2025. It also prohibits easily guessable PINs like 1111 or 0101."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-32f7eebe.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn users of a domain or scheme mismatch when signing a SIWE message."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-d297c8b7.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet shows a warning message to the user when visiting dApps flagged as malicious."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-9079b4dc.png",
+                        "exodus-browser-25.34.3-e563eef4.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Wallet shows clickable links in wallet history but not in the transaction preview."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-43b62026.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet utilizes transaction simulation, displaying all incoming and outgoing assets involved in the transaction."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-842db3f3.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays an EIP-712 object as plain data without parsing it."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-91f2da76.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet's connection dialog clearly displays that the dApp being connected to can view the user's wallet balance and activity, as well as request transaction approvals."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-acc6cda6.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn the user when attempting to send funds to an unknown address."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-e1fdf86c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the full URL of the dApp the user is attempting to connect to."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-002~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-10544daa.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires the user to unlock it before processing every request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073854135
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-6e441c71.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet refuses to sign an EIP-712 message with a chainId that does not match the currently active chain."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-0596bacc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet offers a list of connected dApps and allows users to disconnect from them individually."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-75a66b83.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The spender address and token are displayed, but the amount is missing."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-5d464774.png",
+                        "exodus-browser-25.34.3-47a49051.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet switches chains without requesting user confirmation. Additionally, it does not offer a list of networks for the user to select or approve, limiting control over which networks the connected dApp can access."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-394fe480.png",
+                        "exodus-browser-25.34.3-fec57af4.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the verifying contract in an EIP-712 object and does not truncate large messages in a personal sign request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-039562ab.png",
+                        "exodus-browser-25.34.3-b38af10f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not offer token allowance revocation within the app, nor does it provide a third-party external link for this purpose."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-PERM-010~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-aa5f9113.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires the user to unlock it before processing every request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073875210
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-d333ae99.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet successfully hides spam/scam NFTs from the user, and it also offers the option to display them by applying the hidden filter."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-4cfaea4a.png",
+                        "exodus-browser-25.34.3-4e0840e7.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the sign button immediately when presented with a large input message."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-006~Browser.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-b6062ecc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet automatically locks itself by default after 60 minutes."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073891383
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-9c308074.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet offers a lock button in the security settings."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-1792a3a5.png",
+                        "exodus-browser-25.34.3-4a74aba5.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet used personal_sign converted to bytes."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-9a44ae0f.png",
+                        "exodus-browser-25.34.3-47224256.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires authentication before revealing the recovery phrase."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "exodus-browser-25.34.3-a25776fd.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not explicitly warn about the risks of sharing mnemonics but provides suggestions on what actions to avoid."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}
