@@ -17,6 +17,7 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
 	(await import('./2026-08-16-safepal-customer-order-data-exposure')).default,
 	(await import('./2026-08-17-bitbox-dixence-firmware-vulnerabilities')).default,
 	(await import('./2026-08-19-rabby-silent-signature-extraction')).default,
+	(await import('./2026-09-10-trezor-email-provider-breach-phishing')).default,
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
 /**
