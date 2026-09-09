@@ -24,6 +24,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -39,7 +40,6 @@ import type { Nullable } from '@/types/utils/nullable'
 import { certik } from '../entities/certik'
 import gemwalletAndroidParsed from './manifests/gemwallet/android.parsed.json'
 import gemwalletIosParsed from './manifests/gemwallet/ios.parsed.json'
-import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 
 const securityAudits: SecurityAudit[] = [
 	{
