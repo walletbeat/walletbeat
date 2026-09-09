@@ -133,7 +133,7 @@
 									<h3 data-row-item="flexible" data-sticky-breadcrumb="source">
 										<a
 											data-link="camouflaged"
-											data-row="start gap-2 wrap"
+											data-row="start gap-2"
 											data-sticky-breadcrumb="item"
 											href={`#${s.id}`}
 										>

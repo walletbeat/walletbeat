@@ -2396,6 +2396,13 @@
 				);
 			}
 		}
+		[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="source"]) {
+			/* Natural wrapping leaves room for the metadata's full cutout motion. */
+			max-inline-size: calc(
+				100% - var(---breadcrumb-endWidth) - var(---breadcrumb-endGap) -
+					var(---pie-inlineClearance, 0px)
+			);
+		}
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
 			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
 			timeline-scope: var(--stickyBreadcrumb-sizeTimelines);
