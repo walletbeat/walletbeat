@@ -1030,8 +1030,43 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
-				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				repositoryChangeControls: {
+					ref: [
+						{
+							explanation: 'The default branch (main) is unprotected.',
+							url: 'https://api.github.com/repos/AmbireTech/extension/branches/main',
+						},
+						{
+							explanation:
+								'The repository has zero active rulesets (covering both branches and tags).',
+							url: 'https://api.github.com/repos/AmbireTech/extension/rulesets',
+						},
+						{
+							explanation:
+								"This workflow's release-notes rewrite step strips and warns on links to `AmbireTech/ambire-app`, naming it as the private dev repo whose PR links must not leak into the public release notes.",
+							url: 'https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/.github/workflows/publish-public-release.yml#L119-L129',
+						},
+					],
+					branchDeletionBlocked: false,
+					forcePushBlocked: false,
+					requiredChecks: false,
+					requiredReview: false,
+					tagsImmutable: false,
+				},
+				reproducibleBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'Gecko is built natively on ARM64 solely so Firefox/Mozilla can privately reproduce the build during AMO review.',
+							url: 'https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/.github/workflows/build-extensions.yml#L25-L26',
+						},
+						{
+							explanation:
+								'Full source (including .env) is zipped and handed to Firefox reviewers only, not published or documented as a public rebuild harness.',
+							url: 'https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/.github/workflows/build-extensions.yml#L106-L116',
+						},
+					],
+				}),
 			},
 		},
 		walletCall: supported({
