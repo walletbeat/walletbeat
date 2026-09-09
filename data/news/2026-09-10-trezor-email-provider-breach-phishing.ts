@@ -10,7 +10,7 @@ export default {
 	slug: 'trezor-email-provider-breach-phishing',
 	type: NewsType.INCIDENT,
 	ref: {
-		label: 'Trezor on X: Third-party e-mail provider breach used for phishing',
+		label: 'Trezor on X: External e-mail provider breach used for phishing',
 		url: 'https://x.com/Trezor/status/2097786518110609620',
 	},
 	impact: {
@@ -21,8 +21,8 @@ export default {
 	severity: Severity.HIGH,
 	status: IncidentStatus.ONGOING,
 	summary:
-		"Trezor disclosed that its third-party e-mail provider was breached, allowing attackers to send phishing e-mails from Trezor's legitimate domain. The phishing e-mail, titled 'Critical Security Alert: STM32 Entropy Vulnerability', did not originate from Trezor. Trezor took down the compromised domain and is investigating how the attackers gained access to it.",
-	title: 'Trezor Warns of Phishing E-mails Sent via Breached Third-Party E-mail Provider',
+		"Trezor disclosed that its external e-mail provider was breached, allowing attackers to send phishing e-mails from Trezor's legitimate domain. The phishing e-mail, titled 'Critical Security Alert: STM32 Entropy Vulnerability', did not originate from Trezor. Trezor took down the compromised domain and is investigating how the attackers gained access to it.",
+	title: 'Trezor Warns of Phishing E-mails Sent via Breached External E-mail Provider',
 	updatedAt: '2026-09-10',
 	wallets: ['trezor'],
 } as const satisfies WalletSecurityNews
