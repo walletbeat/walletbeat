@@ -354,9 +354,6 @@ export enum AndroidPermission {
 	/** Legacy fingerprint authentication (superseded by USE_BIOMETRIC). */
 	USE_FINGERPRINT = 'android.permission.USE_FINGERPRINT',
 
-	/** Control device vibration. */
-	VIBRATE = 'android.permission.VIBRATE',
-
 	/** Read images from shared media storage (scoped storage, Android 13+). */
 	READ_MEDIA_IMAGES = 'android.permission.READ_MEDIA_IMAGES',
 
@@ -384,7 +381,6 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.DETECT_SCREEN_CAPTURE]: true,
 	[AndroidPermission.USE_BIOMETRIC]: true,
 	[AndroidPermission.USE_FINGERPRINT]: true,
-	[AndroidPermission.VIBRATE]: true,
 	[AndroidPermission.READ_MEDIA_IMAGES]: true,
 	[AndroidPermission.AD_ID]: true,
 })

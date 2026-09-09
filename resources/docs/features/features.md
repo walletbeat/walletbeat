@@ -2827,7 +2827,6 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `DETECT_SCREEN_CAPTURE` = `'android.permission.DETECT_SCREEN_CAPTURE'`: Be notified when the user screenshots the app (Android 14+).
 - `USE_BIOMETRIC` = `'android.permission.USE_BIOMETRIC'`: Authenticate with biometric hardware (fingerprint, face, etc.).
 - `USE_FINGERPRINT` = `'android.permission.USE_FINGERPRINT'`: Legacy fingerprint authentication (superseded by USE_BIOMETRIC).
-- `VIBRATE` = `'android.permission.VIBRATE'`: Control device vibration.
 - `READ_MEDIA_IMAGES` = `'android.permission.READ_MEDIA_IMAGES'`: Read images from shared media storage (scoped storage, Android 13+).
 - `AD_ID` = `'com.google.android.gms.permission.AD_ID'`: Access the Google advertising ID — used for ad attribution/tracking.
 
