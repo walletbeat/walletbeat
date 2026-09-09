@@ -340,6 +340,26 @@
 
 			font-size: 0.8125em;
 			line-height: 1.6;
+
+			scrollbar-width: none;
+
+			&:hover {
+				scrollbar-width: thin;
+			}
+
+			&::-webkit-scrollbar {
+				inline-size: 0.5em;
+				block-size: 0.5em;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background-color: transparent;
+				border-radius: 0.25em;
+			}
+
+			&:hover::-webkit-scrollbar-thumb {
+				background-color: var(--border-color);
+			}
 		}
 
 		code {
