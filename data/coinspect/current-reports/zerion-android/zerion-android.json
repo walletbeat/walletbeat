@@ -1,0 +1,783 @@
+{
+    "wallet": "Zerion",
+    "platform": "Android",
+    "version": "4.5.2",
+    "date": "2025-12-12T13:54:35.964Z",
+    "walletUID": "zerion-android",
+    "walletMakerUID": "zerion",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-146f7f32.png",
+                        "zerion-android-4.5.2-691b0dc8.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not allow easy-to-guess passwords and supports biometric authentication."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-07d86308.png",
+                        "zerion-android-4.5.2-b2d52d9c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not include a button to manually lock the wallet."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-9009f97d.png",
+                        "zerion-android-4.5.2-6c295259.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not lock itself after 1 minute of inactivity, when moved to background execution, or when the device gets locked. It also does not offer a settings menu to adjust the auto-lock time."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-9d69e65e.png",
+                        "zerion-android-4.5.2-96d23c08.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet enforces authentication to display the mnemonics or private keys."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-6e3480a5.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet warns users about the risks of sharing or revealing their mnemonics or private keys before displaying them."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073810696
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-a1523fe4.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not allow taking screenshots or copying mnemonics to the clipboard."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-4019198a.png",
+                        "zerion-android-4.5.2-2396d52e.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet successfully filters out scam and spam NFTs and tokens."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-9942707c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not provide an option to revoke token approvals, either through in-app functionality or via links to external dApps."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-66f2e715.png",
+                        "zerion-android-4.5.2-94e63ebe.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays a clear warning message and blocks interactions with known phishing dApps."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-ef4d9e09.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not prompt a connection dialog in several popular dApps (such as Uniswap, SushiSwap, or OpenSea). While it did display a connection dialog for 1inch, it did not inform the user that they were connecting to a well-known, verified dApp."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-ccc05911.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When the connection dialog appears, it displays the dApp\u2019s full origin URL without any truncation."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-f5cd7a5e.png",
+                        "zerion-android-4.5.2-0e9c5267.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet clearly informs users, within the connection dialog, that by connecting they are allowing the dApp to view their wallet balance and activity, as well as to request transaction approvals."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-a542afcb.png",
+                        "zerion-android-4.5.2-63cb6fed.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lists connected dApps and allows effective access revocation."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-6c3622c8.png",
+                        "zerion-android-4.5.2-d905de54.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows the use of the eth_sign method but internally converts it to personal_sign with the message encoded as bytes."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-d72a2efc.png",
+                        "zerion-android-4.5.2-acbbf40b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet has an embedded browser, it requires user confirmation before processing each DApp request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData*, personal_sign, eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-e2ab1514.png",
+                        "zerion-android-4.5.2-edb55225.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not prompt the user for confirmation when switching networks, and it does not provide a way to modify networks within the connection dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-0c3cd8f4.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet has an embedded browser, it requires user confirmation before processing each request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData*, personal_sign, eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-d6f54927.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet implements Wallet Connect and it requires users to unlock it to process requests from DApps to the following RPC endpoints when in a locked state: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData*, personal_sign, eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-7647ca1c.png",
+                        "zerion-android-4.5.2-4dbc6618.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays the spender address, token, effect, and amount being approved in an ERC-20 approval transaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-76cb204a.png",
+                        "zerion-android-4.5.2-5a197569.png",
+                        "zerion-android-4.5.2-c1b1b1cd.png",
+                        "zerion-android-4.5.2-f905820c.png",
+                        "zerion-android-4.5.2-472d50e7.png",
+                        "zerion-android-4.5.2-c483217f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display the verifying contract in EIP-712 objects and truncates messages in personal sign requests."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-7311c079.png",
+                        "zerion-android-4.5.2-414a6287.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes clickable links in both the transaction preview and the wallet history."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-dae37e24.png",
+                        "zerion-android-4.5.2-82894b0e.png",
+                        "zerion-android-4.5.2-d8ebe28d.png",
+                        "zerion-android-4.5.2-937faa84.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet attempts to parse the EIP-712 object, although its interpretation does not appear to be very accurate or clear."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-ff73a79d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The sign button remains enabled at all times, and the message is truncated."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-39a3b57e.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet leverages transaction simulation, effectively displaying all incoming and outgoing assets involved in the transaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-b9b4f596.png",
+                        "zerion-android-4.5.2-d6344f01.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows signing of an EIP-712 object even when its chain ID does not match the currently active chain."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-fc777069.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn the user when they are not interacting with a previously known or trusted address."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-0f6ebf8c.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet successfully alerts users when interacting with known phishing or scam addresses, such as the Tornado Cash attacker."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-43cc316c.png",
+                        "zerion-android-4.5.2-e6036679.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn users of a domain or scheme mismatch when signing an EIP-4361 (Sign in With Ethereum - SIWE) message."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "zerion-android-4.5.2-ee906fe2.png",
+                        "zerion-android-4.5.2-e41894c1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn users when entering addresses with invalid checksums. Testing both manually and through a dApp showed no warnings in any case."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073195124
+        }
+    ]
+}

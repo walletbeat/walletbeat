@@ -1,0 +1,786 @@
+{
+    "wallet": "Metamask",
+    "platform": "Android",
+    "version": "7.56.5",
+    "date": "2025-12-12T13:54:35.964Z",
+    "walletUID": "metamask-android",
+    "walletMakerUID": "metamask",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-7cef0f3f.png",
+                        "metamask-android-7.56.5-b2ffc142.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows easy-to-guess passwords like 11111111. It supports biometrics but does not limit login attempts to five\u2014you can try as many times as you want."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-1795b5a1.png",
+                        "metamask-android-7.56.5-7c9e93ac.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows manual locking through the settings menu."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-167e0dfb.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet automatically locks after 30 seconds of inactivity by default. It also locks when the device is locked or when the app moves to background execution."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-4f85f6d6.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires user authentication before displaying the mnemonic or private keys."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-fe8679dc.png",
+                        "metamask-android-7.56.5-7b725b0d.png",
+                        "metamask-android-7.56.5-6cf347d6.png",
+                        "metamask-android-7.56.5-dcfe8ecb.png",
+                        "metamask-android-7.56.5-06ed1773.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet implements a detailed mechanism to warn users about the risks of sharing their mnemonic or private keys before displaying them."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073810696
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-298d4bfd.png",
+                        "metamask-android-7.56.5-d5851a4b.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows users to copy their mnemonic to the clipboard without any time restriction and without explicitly warning them about the associated risks. It also prevents users from taking screenshots"
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-e01d8b49.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The NFTs section displays no information\u2014neither legitimate nor scam NFTs or tokens are shown."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-c086ff6f.png",
+                        "metamask-android-7.56.5-29065f19.jpg",
+                        "metamask-android-7.56.5-cf8b9151.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet provides token allowance revocation within its portfolio, in their browser."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-51fc2a94.png",
+                        "metamask-android-7.56.5-d57775a1.png",
+                        "metamask-android-7.56.5-e09bd0ca.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display any warning message in the connection dialog when attempting to access a malicious dApp through WalletConnect, but it does block and warn users about the risks when using the browser."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-6b4e40b2.png",
+                        "metamask-android-7.56.5-4b890d59.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet neither informs the user nor highlights well-known, verified dApps when attempting to connect to them."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-5f13fb37.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet successfully displays the full dApp origin URL in the connection dialog."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-dc81015a.png",
+                        "metamask-android-7.56.5-3a3bc1b7.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet clearly informs users within the connection dialog that, by connecting, they allow the dApp to view their wallet balance and activity, as well as request transaction approvals."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-82b226db.png",
+                        "metamask-android-7.56.5-17cf59cb.png",
+                        "metamask-android-7.56.5-24748901.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lists connected dApps and allows effective individual access revocation."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-14f1ccf2.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not support the eth_sign method."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-6cfcab7b.png",
+                        "metamask-android-7.56.5-b9620782.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet successfully requires user confirmation before processing any dApp request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData, personal_sign, and eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-72d6970e.png",
+                        "metamask-android-7.56.5-354e1abe.png",
+                        "metamask-android-7.56.5-092c8da6.png",
+                        "metamask-android-7.56.5-400e3cbc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows switching between preselected networks within the connection dialog, and if the user attempts to switch to a non-preselected chain, it will ask for confirmation."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-67a7f399.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires user confirmation before processing any request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData, personal_sign, and eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-9cebff5d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires the user to unlock it before processing any request to the following RPC endpoints: wallet_addEthereumChain, wallet_watchAsset, eth_decrypt, eth_getEncryptionPublicKey, eth_signTypedData, personal_sign, and eth_sendTransaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-50c7ea23.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet provides a clear interface for reviewing and approving transactions. It displays the recipient of the token approval, the token details, the amount, and the spending limit."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-9af441fc.png",
+                        "metamask-android-7.56.5-fccd6bb0.png",
+                        "metamask-android-7.56.5-fdc1bde0.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The user can scroll through large messages, allowing them to review the data before signing, without truncating any information or hiding any details. The wallet also displays the verifying contract when signing an EIP-712 message."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-c099ebec.png",
+                        "metamask-android-7.56.5-799857c1.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet includes clickable links when viewing transaction history but does not provide any within the transaction details view."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-92929acd.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet parses and displays the details when attempting to sign an EIP-712 object."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-10c119c8.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "When presented with a large message in a personal sign request, the confirm button remains enabled at all times."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-fd423bf9.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet offers transaction simulation, clearly displaying all incoming and outgoing assets involved in the transaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-15d76f6f.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet refuses to sign an EIP-712 object if its chain ID does not match the currently active chain."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-ecb91dbf.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays a question mark next to addresses that have not been interacted with before, indicating to the user that this is their first interaction."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-63e9d65a.png",
+                        "metamask-android-7.56.5-6f074a6e.png",
+                        "metamask-android-7.56.5-86321cb0.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet clearly warns the user when attempting to send a transaction to a known malicious address, such as the Tornado Cash attacker."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-45dc8db6.png",
+                        "metamask-android-7.56.5-a6902336.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays a warning when the user attempts to sign a SIWE message."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "metamask-android-7.56.5-d16777c0.png",
+                        "metamask-android-7.56.5-e85bf15f.png",
+                        "metamask-android-7.56.5-688704cc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not warn or block transactions to addresses with invalid checksums when using a dApp. However, it does provide warnings and prevents the transaction when the address is entered manually."
+                }
+            ],
+            "tester": 1,
+            "lastUpdated": 1761073195124
+        }
+    ]
+}
