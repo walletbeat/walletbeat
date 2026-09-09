@@ -948,7 +948,7 @@
 													[]
 											),
 										]
-											.filter(Boolean)
+											.filter(tag => tag !== false && tag !== undefined)
 									) as tag (tag.label)}
 										<button
 											data-tag={tag.type}
