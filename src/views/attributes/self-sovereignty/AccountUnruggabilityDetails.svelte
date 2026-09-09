@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import type { AccountUnruggabilityMetadata } from '@/schema/attributes/self-sovereignty/account-unruggability'
 	import {
 		isAccountRecoverable,
@@ -14,7 +14,7 @@
 		wallet,
 		metadata,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		metadata: AccountUnruggabilityMetadata
 	} = $props()
 

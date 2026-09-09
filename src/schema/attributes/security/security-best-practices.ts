@@ -591,6 +591,8 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
 	// Posts notifications such as transaction confirmations and price alerts (Android 13+).
 	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
+	// Haptic feedback, e.g. on transaction confirmation. No security-sensitive access.
+	[AndroidPermission.VIBRATE]: Rating.PASS,
 	// Writes to shared storage, e.g. to export transaction receipts or QR codes.
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.PASS,
 	// Delivers a callback when the user screenshots the app (Android 14+). It grants no access to
