@@ -243,6 +243,20 @@ export const duressResistance: Attribute = {
 				mdParagraph('The wallet has no lock screen and is accessible to anyone who opens it.'),
 				noLockScreen(EvaluationContext.forTest(() => duressResistance)),
 			),
+			exampleRating(
+				mdParagraph(
+					'The wallet only offers a biometric unlock, with no PIN, password, or pattern required.',
+				),
+				weakLockOnly(EvaluationContext.forTest(() => duressResistance), {
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+						[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
+						[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.REQUIRED,
+						[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+					},
+					ref: refNotNecessary,
+				}),
+			),
 		],
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation>) => pickWorstRating(perVariant),
