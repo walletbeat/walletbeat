@@ -1957,7 +1957,7 @@
 
 					.pie-navigation-geometry {
 						position: fixed;
-						position-anchor: --wallet-pie-source;
+						position-anchor: --navigation-row;
 						position-visibility: always;
 						opacity: calc(1 - var(---wallet-terminal) * (1 - var(---wallet-tocOpen)));
 						translate: 0
@@ -1978,8 +1978,8 @@
 						animation-range:
 							cover 0% exit-crossing 0%,
 							contain 0% contain 100%;
-						/* The compact pie stays at the second sticky layer as nested rows change. */
-						inset-block-start: var(--navigation-mobile-blockSize);
+						/* The first sticky row owns the compact pie’s block-start edge. */
+						inset-block-start: anchor(end);
 						inset-inline-start: anchor(--wallet-pie-source start);
 						inline-size: anchor-size(--wallet-pie-source inline);
 						margin: 0;
