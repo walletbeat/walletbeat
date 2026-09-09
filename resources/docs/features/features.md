@@ -2212,11 +2212,20 @@ Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is
 
 ---
 
+### Enum: `BasicUnlockMechanismSupport`
+
+Whether a given unlock mechanism is supported, and if so, whether the wallet requires it or merely offers it as one of several optional choices.
+
+- `OPTIONAL` = `'OPTIONAL'`: The wallet supports this unlock mechanism as an optional choice.
+- `REQUIRED` = `'REQUIRED'`: The wallet requires this unlock mechanism to unlock the wallet.
+
+---
+
 ### Interface: `BasicUnlock`
 
 Information about how the wallet locks itself against unauthorized access.
 
-- `mechanisms` (`Record<BasicUnlockMechanism, boolean>`): Which unlock mechanisms the wallet supports. Set each mechanism to `true` if supported, `false` if not.
+- `mechanisms` (`Record<BasicUnlockMechanism, BasicUnlockMechanismSupport | 'NOT_SUPPORTED'>`): Which unlock mechanisms the wallet supports, and whether each one is required or merely optional.
 
 ---
 
