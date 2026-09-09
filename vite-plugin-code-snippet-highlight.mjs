@@ -18,7 +18,7 @@ import * as path from 'node:path'
 /**
  * Shiki themes used for all snippets
  */
-const themes = { light: 'one-light', dark: 'one-dark-pro' }
+const themes = { light: 'github-light', dark: 'github-dark' }
 
 /** Snippet source file extension → Shiki language identifier. */
 const extensionToLanguage = {

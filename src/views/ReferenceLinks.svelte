@@ -74,7 +74,10 @@
 
 		const first = highlighted[0]
 		const last = highlighted[highlighted.length - 1]
-		const center = (first.offsetTop + last.offsetTop + last.offsetHeight) / 2
+		const preTop = pre.getBoundingClientRect().top
+		const firstTop = first.getBoundingClientRect().top - preTop + pre.scrollTop
+		const lastBottom = last.getBoundingClientRect().bottom - preTop + pre.scrollTop
+		const center = (firstTop + lastBottom) / 2
 
 		pre.scrollTop = Math.max(0, center - pre.clientHeight / 2)
 	}
@@ -358,7 +361,7 @@
 			inline-size: calc(100% + 2em);
 			margin-inline: -1em;
 			padding-inline: 1em;
-			background-color: var(--background-tertiary);
+			background-color: color-mix(in oklch, var(--accent) 20%, transparent);
 		}
 
 		.row.gap {
