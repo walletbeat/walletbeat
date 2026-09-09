@@ -15,7 +15,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -559,10 +562,10 @@ export const zerion: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
 						},
 					},
 					duressMode: notSupported,

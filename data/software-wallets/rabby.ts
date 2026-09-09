@@ -14,7 +14,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -385,10 +388,10 @@ export const rabby: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
 						},
 					},
 					duressMode: notSupported,

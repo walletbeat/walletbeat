@@ -14,7 +14,10 @@ import {
 	BugBountyProgramAvailability,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -444,10 +447,10 @@ export const metamask: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
 						},
 					},
 					duressMode: notSupported,
@@ -463,10 +466,10 @@ export const metamask: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
 						},
 					},
 					duressMode: notSupported,

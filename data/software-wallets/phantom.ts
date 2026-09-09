@@ -10,7 +10,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -260,16 +263,30 @@ export const phantom: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: {
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: false,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+				[Variant.BROWSER]: {
+					basicUnlock: {
+						ref: refTodo,
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
+							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+						},
 					},
+					duressMode: notSupported,
 				},
-				duressMode: notSupported,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: refTodo,
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
+							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+						},
+					},
+					duressMode: notSupported,
+				},
 			},
 			hardwareWalletSupport: {
 				ref: {
