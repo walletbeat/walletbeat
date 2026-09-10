@@ -2441,20 +2441,9 @@
 		}
 		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] .wallet-icon {
 			transform-origin: calc(50% - 50% * var(---inlineDirection)) 50%;
-			scale: calc(
-				(
-						1 + var(---breadcrumb-entry) *
-							(var(---wallet-compact-icon-size) / var(--wallet-icon-size) - 1)
-					) /
-					var(---breadcrumb-paintScale)
+			--stickyBreadcrumb-iconScale: calc(
+				var(---wallet-compact-icon-size) / var(--wallet-icon-size)
 			);
-		}
-		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] h1 > a > img ~ * {
-			translate: calc(
-					var(---inlineDirection) * var(---breadcrumb-entry) * var(--stickyBreadcrumb-scale) *
-						var(---breadcrumb-iconCorrection) / var(---breadcrumb-paintScale)
-				)
-				0;
 		}
 		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] {
 			--stickyBreadcrumb-sourcePaddingBlock: min(

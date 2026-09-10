@@ -650,6 +650,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
 	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline
 	 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
+	 * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
 	 * - `--stickyBreadcrumb-gap`: compact item gap; defaults to 1rem
 	 * - `--stickyBreadcrumb-markerSize`: physical separator slot between adjacent headings; defaults to 0px
 	 * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem

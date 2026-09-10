@@ -305,15 +305,16 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 
 		&::before {
 			filter: var(---icon-monochrome-filter);
+			transform: var(---icon-paint-transform);
 			inline-size: 1em;
 			pointer-events: none;
-			transform: translateX(calc(-1 * var(---icon-paint-offset)));
+			---icon-paint-transform: translateX(calc(-1 * var(---icon-paint-offset)));
 			clip-path: inset(0 calc(-1 * var(---icon-paint-offset)) 0 var(---icon-paint-offset));
 
 			@supports (color: if(style(---link-active: 1): red; else: blue)) {
 				filter: if(style(---link-active: 1): none; else: var(---icon-monochrome-filter));
-				transform: if(
-					style(---link-active: 1): none; else: translateX(calc(-1 * var(---icon-paint-offset)))
+				---icon-paint-transform: if(
+					style(---link-active: 1): translateX(0px); else: translateX(calc(-1 * var(---icon-paint-offset)))
 				);
 				clip-path: if(
 					style(---link-active: 1): none;
@@ -325,14 +326,14 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 		a:is(:hover, :focus-visible, [aria-current="page"], [aria-current="location"]) &::before,
 		&:is(:hover, :focus-visible, [aria-current="page"], [aria-current="location"])::before {
 			filter: none;
-			transform: none;
+			---icon-paint-transform: translateX(0px);
 			clip-path: none;
 		}
 
 		/* Keep newer selectors separate so unsupported ones cannot discard local interaction. */
 		a:is(:interest-source, :target-current) &::before {
 			filter: none;
-			transform: none;
+			---icon-paint-transform: translateX(0px);
 			clip-path: none;
 		}
 	}
@@ -1384,6 +1385,7 @@ ol {
  * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
  * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
+ * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
  * - `--stickyBreadcrumb-gap`: compact item gap; defaults to 1rem
  * - `--stickyBreadcrumb-markerSize`: physical separator slot between adjacent headings; defaults to 0px
  * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem
@@ -1570,6 +1572,31 @@ ol {
 			scale: var(--stickyBreadcrumb-scale);
 		}
 	}
+	/* Projection divides by the parent's interpolated scale, exactly countering it.
+	 * Matching transform lists keep every animated input linear and compositable. */
+	@keyframes breadcrumb-icon-motion {
+		from {
+			transform: perspective(1px) translateZ(0px) scale(1)
+				var(---icon-paint-transform, translateX(0px));
+		}
+		to {
+			transform: perspective(1px)
+				translateZ(calc((1 - var(--stickyBreadcrumb-scale)) * 1px))
+				scale(var(--stickyBreadcrumb-iconScale, 1))
+				var(---icon-paint-transform, translateX(0px));
+		}
+	}
+	@keyframes breadcrumb-text-motion {
+		from {
+			transform: perspective(1px) translateZ(0px) translateX(0px) scale(1);
+		}
+		to {
+			transform: perspective(1px)
+				translateZ(calc((1 - var(--stickyBreadcrumb-scale)) * 1px))
+				translateX(calc(var(---inlineDirection) * var(--stickyBreadcrumb-scale) * var(---breadcrumb-iconCorrection)))
+				scale(var(--stickyBreadcrumb-scale));
+		}
+	}
 	@keyframes breadcrumb-entry {
 		from {
 			---breadcrumb-entry: 0;
@@ -1598,7 +1625,12 @@ ol {
 		padding-inline-end: calc(var(--stickyBreadcrumb-gap, 1rem) / 2);
 		text-align: center;
 		transform-origin: 100% 50%;
-		scale: calc(1 / var(---breadcrumb-paintScale));
+		animation: breadcrumb-icon-motion auto linear both;
+		animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+		animation-range: contain 0% contain 100%;
+		@media (prefers-reduced-motion: reduce) {
+			animation-timing-function: steps(1, end);
+		}
 		transition-property: if(
 			style(---breadcrumb-entry: 0): opacity;style(---breadcrumb-wrap: 0): none;else: opacity
 		);
@@ -1859,9 +1891,6 @@ ol {
 				}
 			}
 			[data-sticky-breadcrumb~="item"] {
-				---breadcrumb-paintScale: calc(
-					1 + var(---breadcrumb-entry) * (var(--stickyBreadcrumb-scale) - 1)
-				);
 				min-inline-size: 0;
 				max-inline-size: 100%;
 				flex-grow: 0;
@@ -1871,25 +1900,30 @@ ol {
 				transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
 				scale: var(--stickyBreadcrumb-scale);
 				> [data-icon] ~ *,
+				> img ~ *,
 				> a:has(> [data-icon]) ~ *,
 				> a > [data-icon] ~ * {
-					translate: calc(
-							var(---inlineDirection) * var(---breadcrumb-entry) * var(--stickyBreadcrumb-scale) *
-								var(---breadcrumb-iconCorrection) / var(---breadcrumb-paintScale)
-						)
-						0;
+					animation: breadcrumb-text-motion auto linear both;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+					animation-range: contain 0% contain 100%;
+					@media (prefers-reduced-motion: reduce) {
+						animation-timing-function: steps(1, end);
+					}
+				}
+				[data-icon]::before,
+				> img {
+					animation: breadcrumb-icon-motion auto linear both;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+					animation-range: contain 0% contain 100%;
+					@media (prefers-reduced-motion: reduce) {
+						animation-timing-function: steps(1, end);
+					}
 				}
 				[data-icon]::before {
 					transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
-					scale: calc(
-						(
-								1 + var(---breadcrumb-entry) *
-									(
-										(var(---column-spanSize) + var(---breadcrumb-iconCorrection)) *
-											var(--stickyBreadcrumb-scale) / 1em - 1
-									)
-							) /
-							var(---breadcrumb-paintScale)
+					--stickyBreadcrumb-iconScale: calc(
+						(var(---column-spanSize) + var(---breadcrumb-iconCorrection)) *
+							var(--stickyBreadcrumb-scale) / 1em
 					);
 				}
 			}
