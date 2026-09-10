@@ -95,7 +95,7 @@ export type StageCriterionEvaluation = {
 } & (
 	| {
 			// If not unrated, the explanation must be provided.
-			rating: Omit<StageCriterionRating, StageCriterionRating.UNRATED>
+			rating: Exclude<StageCriterionRating, StageCriterionRating.UNRATED>
 
 			/** Explanation of the rating. */
 			explanation: Sentence<WalletNameStrings>
