@@ -60,7 +60,7 @@ function hasRequiredNonBiometricMechanism(basicUnlock: WithRef<BasicUnlock>): bo
 function weakLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m] !== 'NOT_SUPPORTED')
+			.filter(m => isSupported(basicUnlock.mechanisms[m]))
 			.map(basicUnlockMechanismName),
 	)
 
@@ -88,7 +88,7 @@ function weakLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>)
 function basicLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m] !== 'NOT_SUPPORTED')
+			.filter(m => isSupported(basicUnlock.mechanisms[m]))
 			.map(basicUnlockMechanismName),
 	)
 
@@ -125,7 +125,7 @@ function hasDuressMode(
 ): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m] !== 'NOT_SUPPORTED')
+			.filter(m => isSupported(basicUnlock.mechanisms[m]))
 			.map(basicUnlockMechanismName),
 	)
 	const activeActions = Object.keys(duressMode.actions).filter(a => duressMode.actions[a])
