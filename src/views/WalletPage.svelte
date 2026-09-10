@@ -730,7 +730,7 @@
 			style:---pie-rotation-states={pieRotation.states}
 			style:---pie-rotation-animation={pieRotation.animation}
 			style:---pie-rotation-timeline={pieRotation.timeline}
-			data-sticky="block-start backdrop-none"
+			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
 			style={`--pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
@@ -1762,6 +1762,12 @@
 					@media (prefers-reduced-motion: reduce) {
 						animation-range: contain 100% contain 100%;
 					}
+				}
+			}
+
+			@media (width <= 1024px) {
+				&::before {
+					display: none;
 				}
 			}
 
