@@ -46,6 +46,12 @@ export enum BasicUnlockMechanismSupport {
 	REQUIRED = 'REQUIRED',
 }
 
+/** Data about a supported unlock mechanism: whether it is required or optional. */
+export interface BasicUnlockMechanismData {
+	/** Whether the wallet requires this unlock mechanism, or merely offers it as an option. */
+	type: BasicUnlockMechanismSupport
+}
+
 /**
  * Information about how the wallet locks itself against unauthorized access.
  */
@@ -54,7 +60,7 @@ export interface BasicUnlock {
 	 * Which unlock mechanisms the wallet supports, and whether each one is
 	 * required or merely optional.
 	 */
-	mechanisms: Record<BasicUnlockMechanism, BasicUnlockMechanismSupport | 'NOT_SUPPORTED'>
+	mechanisms: Record<BasicUnlockMechanism, Support<BasicUnlockMechanismData>>
 }
 
 /**
