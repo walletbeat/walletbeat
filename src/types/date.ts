@@ -10,8 +10,14 @@ type MonthAndDay =
 	| `02-${FebruaryDays}`
 type Century = '20' | '21' // We're good from 2000 to 2199.
 
-/** A valid date in YYYY-MM-DD format. */
-export type CalendarDate = `${Century}${Digit}${Digit}-${MonthAndDay}`
+/**
+ * A calendar date with a 20xx/21xx year prefix and valid MM-DD shape.
+ *
+ * Using `${number}` for the year suffix avoids expanding this type into every possible date,
+ * which makes TypeScript checking pathologically slow. Use `assertCalendarDate` when exact
+ * YYYY-MM-DD validation is required at runtime.
+ */
+export type CalendarDate = `${Century}${number}-${MonthAndDay}`
 
 const CALENDAR_DATE_PATTERN = /^(20|21)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
 
