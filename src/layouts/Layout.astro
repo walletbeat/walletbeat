@@ -413,6 +413,11 @@ import Footer from '@/views/Footer.astro'
 				> :not([data-sticky-breadcrumb~="position"]) {
 				---wallet-sourceOffset: 0px;
 			}
+			/* Mobile navigation motion has no consumers in the article. */
+			[data-sticky-breadcrumb~="root"] > article {
+				---wallet-terminal: 0;
+				---wallet-tocOpen: 0;
+			}
 			#layout:has(#wallet-toc:popover-open) {
 				---wallet-tocOpen: 1;
 			}
