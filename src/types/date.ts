@@ -22,7 +22,7 @@ export type CalendarDate = `${Century}${number}-${MonthAndDay}`
 const CALENDAR_DATE_PATTERN = /^(20|21)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
 
 /** Check whether a string is a valid CalendarDate. */
-function isCalendarDate(date: string): date is CalendarDate {
+export function isCalendarDate(date: string): date is CalendarDate {
 	if (!CALENDAR_DATE_PATTERN.test(date)) {
 		return false
 	}
