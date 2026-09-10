@@ -245,6 +245,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  *
  * ### Tokens
  * - shape: `circle`, `filled`
+ * - color: `accent`
  * - source: `wbicons`, `emoji` (mapped emoji sequences)
  * - effect: `shadow`, `monochrome` (mapped emoji only)
  *
@@ -267,6 +268,10 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  */
 [data-icon] {
 	--icon-content: attr(data-icon);
+
+	&[data-icon~="accent"] {
+		color: var(--accent);
+	}
 
 	display: inline-flex;
 	align-items: center;

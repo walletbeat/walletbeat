@@ -172,6 +172,7 @@ interface CssAttributes {
 	 *
 	 * ### Tokens
 	 * - shape: `circle`, `filled`
+	 * - color: `accent`
 	 * - source: `wbicons`, `emoji` (mapped emoji sequences)
 	 * - effect: `shadow`, `monochrome` (mapped emoji only)
 	 *

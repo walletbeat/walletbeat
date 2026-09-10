@@ -767,7 +767,7 @@
 			>
 				{#snippet iconSnippet(item: NavigationItem, depth: number)}
 					{#if item.icon}
-						<span class="toc-icon" data-icon="wbicons emoji monochrome {item.icon}"></span>
+						<span data-icon="wbicons emoji monochrome accent {item.icon}"></span>
 					{/if}
 				{/snippet}
 			</NavigationItems>
@@ -949,8 +949,7 @@
 						>
 							<span
 								aria-hidden="true"
-								class="attribute-group-icon"
-								data-icon="wbicons emoji monochrome {attrGroup.icon}"
+								data-icon="wbicons emoji monochrome accent {attrGroup.icon}"
 							></span>
 							<h2>
 								{attrGroup.displayName}
@@ -1062,9 +1061,8 @@
 									interestfor={slugifyCamelCase(attribute.id)}
 								>
 									<span
-										class="attribute-icon"
 										aria-hidden="true"
-										data-icon="wbicons emoji monochrome {attribute.icon}"
+										data-icon="wbicons emoji monochrome accent {attribute.icon}"
 									></span>
 									<span>{attribute.displayName}</span>
 								</a>
@@ -2196,10 +2194,6 @@
 				}
 			}
 		}
-	}
-
-	:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
-		color: var(--accent);
 	}
 
 	.pie-navigation-icon {
