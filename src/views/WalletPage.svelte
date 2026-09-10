@@ -306,7 +306,13 @@
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
-		for (const [variant, variantSpecificityMap] of Object.entries(wallet.variantSpecificity)) {
+		for (const entry of Object.entries(wallet.variantSpecificity)) {
+			if (!entry) continue
+
+			const [variant, variantSpecificityMap] = entry
+
+			if (!variantSpecificityMap) continue
+
 			for (const [evalAttrId, variantSpecificity] of variantSpecificityMap) {
 				switch (variantSpecificity) {
 					case VariantSpecificity.ALL_SAME:
