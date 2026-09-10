@@ -210,11 +210,6 @@
 		"retrieved": "2025-12-04"
 	},
 	{
-		"url": "https://github.com/gemwalletcom/gem-ios",
-		"urlHash": "20ef1311fce88a839d49b4da560ece38514ed097",
-		"retrieved": "2025-12-04"
-	},
-	{
 		"url": "https://github.com/consenlabs/token-core-monorepo",
 		"urlHash": "24c27cb0b84e4936627f8b5550764f28a3e69949",
 		"retrieved": "2025-12-04"
@@ -3068,5 +3063,300 @@
 		"url": "https://kudelskisecurity.com/",
 		"urlHash": "2f28188e8247f2d916fc047069d3189c96f8a23b",
 		"retrieved": "2026-08-30"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet",
+		"urlHash": "a2c85ccaddb763d3913611f134d3b939ca6ce64c",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://raw.githubusercontent.com/gemwalletcom/wallet/main/android/app/src/raw/AndroidManifest.xml",
+		"urlHash": "2f1350ebf0785d49b1205515b8abe707e45c33dc",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://raw.githubusercontent.com/gemwalletcom/wallet/main/ios/Gem/Resources/Info.plist",
+		"urlHash": "3e40b836d327dd2ba28daeeccc3191ca66280613",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/d597d9bcc391be24cb5be2e7afaee0e5276a9ec5/core/crates/gem_keystore/src/mnemonic.rs#L10-L14",
+		"urlHash": "61d81360d47525a06c0843138715eb044ad34ccb",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_derivation/src/mnemonic/derivation.rs#L39-L58",
+		"urlHash": "7c0d7dedfb86166542b6cadb7fef7b1a048e714f",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://docs.gemwallet.com/guides/custom-rpc/",
+		"urlHash": "413ebfb7c7cc954caf884e0de9a7db5748dedec9",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://gemwallet.com/learn/gem-wallet-launches-bug-bounty-program/",
+		"urlHash": "5e3e4292bbe70a0b0a53d95f8d59797c577fc4f3",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://gemwallet.com/security/bug-bounty/",
+		"urlHash": "bb411721d97f8539f4457d127512a8a73d481187",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L104",
+		"urlHash": "3f1205cd215936aff2a2999e88fe4e9f86bf1e6f",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/5225ec8834ee5ff33ffe64a7b9c9b1c3ff026762/android/app/src/main/kotlin/com/gemwallet/android/SystemAuthPolicy.kt#L18-L19",
+		"urlHash": "cc419a0557a83a26e408284149044520ce0a1ac0",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://docs.gemwallet.com/guides/configure-settings/",
+		"urlHash": "f37c333f780998182b3d40f9e268207f1c6ddc88",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://gemwallet.com/security/",
+		"urlHash": "db178afc446303bd9eb3bc36abda9765353452dc",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/orgs/gemwalletcom/projects/4",
+		"urlHash": "69635ddecd527778aab1b191e828fcaaf9bdb43f",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_crypto/src/random.rs",
+		"urlHash": "b7149f2ed2835729dd87b7015a62365ce102f2a0",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://static.gemwallet.com/audits/Gem-Wallet-CertiK-Security-Audit-April-2026.pdf",
+		"urlHash": "ec8d8d401573d9af06ce1807b1adefa5d6cc217e",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/c8721ea2ea2d612a71acd8d4a243815751e6a860/core/crates/simulation/src/evm/approval_value.rs#L8-L34",
+		"urlHash": "14cdc382abc5db1883161f5297fe1f092bf4750e",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/a51a29c1015ffa9af3896c313aebd65ee63ece52/core/crates/simulation/src/evm/approval_request.rs#L143-L160",
+		"urlHash": "df3b1fcbfdbe80abb90f5ba7dd100c3912e73d2f",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/21ba20473238ae31d5406edbf2533a08d7c80878/core/crates/gem_keystore/src/storage/crypto.rs#L1-L26",
+		"urlHash": "a18d3e41eac88c492f168ff9cdbe280e53446067",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/34fdd5958f97b860b75789513c6869ee8c8fe8d0/android/app/src/main/kotlin/com/gemwallet/android/data/password/TinkPasswordStore.kt#L26-L52",
+		"urlHash": "33a35feb50f2894af73dacb190adb369a1f9f265",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/eaf09d562edaee530d0d12b5214d1125031ea656/android/app/src/main/kotlin/com/gemwallet/android/data/password/TinkEncryptedKeyValueStore.kt#L60-L91",
+		"urlHash": "2bddd3e640f67f95d05b406069414f53d7e35427",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/2458aaee288cb428e3ecc01a7beec66b3c4673ed/ios/Packages/GemstoneServices/Sources/Keystore/LocalKeystorePassword.swift#L100-L106",
+		"urlHash": "1ee52dab48cbdedbf4898fbce575908cf68a66b6",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/61971f542acbe85caabea6363fb84e4a612cf701/core/crates/gem_evm/src/provider/transaction_broadcast.rs#L20-L26",
+		"urlHash": "67515bd490757ae7b3e800f30a7a55467cb30a6c",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/a226cade5f681218649cf75bbe26be07c3977329/core/crates/primitives/src/chain_evm.rs#L21-L23",
+		"urlHash": "9d98e8952da01ec605058da78cb5e5f885cdf39c",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/03438ef394e821847b41346137b8f6650579df13/android/settings-gradle.lockfile",
+		"urlHash": "25c315f63e9cbc5ebbca71f365f9b7b4f3f1da7b",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/d88663d1e12e4f15b041bf36a00ef9bb89a2293b/core/Cargo.lock",
+		"urlHash": "1578789ff83fa01993b074db3ff8f8e6e1b0e202",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/blob/d705e619cc493eeba850d0eb5eaf7ddded043937/ios/Packages/Validators/Package.resolved",
+		"urlHash": "d793bcda5e653e364add0277c5e0da4ad6cae7c0",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/gemwalletcom/wallet/releases",
+		"urlHash": "ec1722e97f3209d2ddeb9bd0c31684b8738f6e13",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/ui/pages/unlock-page/unlock-page.component.tsx#L698-L753",
+		"urlHash": "9e400a33177ce11542887fdceb0654c163270c2d",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/ui/pages/unlock-page/unlock-page.component.tsx#L829-L831",
+		"urlHash": "e004c60dadebd35af4eacdb210d7edc9469e717f",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/builds.yml#L446-L447",
+		"urlHash": "30e5147d9985ac0306f86bbcd6bb2fa59fbe2857",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/MetaMask/metamask-mobile/blob/724b38f6f2777ba2bb6d88ccb4bd600220a89e2f/app/core/Authentication/Authentication.ts#L341-L390",
+		"urlHash": "b2f8e140368154ba77a5aa14ab87368a3304894f",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/RabbyHub/rabby-mobile/blob/12a0247a21b2898fb1295e32ebe96a84524f7f58/apps/mobile/src/screens/Unlock/Unlock.tsx#L1091-L1153",
+		"urlHash": "6780d5277bd5257941705705f53cc047a7e56bac",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/RabbyHub/rabby-mobile/blob/12a0247a21b2898fb1295e32ebe96a84524f7f58/apps/mobile/src/core/apis/keychainCommon.ts#L843-L857",
+		"urlHash": "7b873b2359d357eaee899be694eb36c760aac36b",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/provider/blob/dfceaa7fb049cc486de43fc7af1bf68b458d39b9/src/RainbowProvider.ts#L12-L117",
+		"urlHash": "e40bcf8f5ded7bd2e90e4f92fb851a64b503e941",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L40-L61",
+		"urlHash": "bca9a1270910e581849e18c168bb5d797eb6ef61",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L65-L80",
+		"urlHash": "e13cd711f8758401dad17882176f64eb3a946e9e",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://rainbow.me/support/extension/connect-your-hardware-wallet",
+		"urlHash": "45459f9c3bdc18205ab696ade132c942b4556ff1",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/handlers/ledger.ts#L12-L55",
+		"urlHash": "421edebe4144f365677eb9fe5b11d9521d3687bb",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/App.tsx#L53-L61",
+		"urlHash": "6cdb063934fc685ffb83f40db32b2c4d75ccb563",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/handlers/trezor.ts#L13-L75",
+		"urlHash": "d0273e3173301c8063821167924d9223b4c85119",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/vendor/trezor-usb-permissions.js#L58-L67",
+		"urlHash": "31cc0229489deedb19e9990a78d66ee95cbc4f2c",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://rainbow.me/support/app/add-a-wallet-from-ledger-to-rainbow",
+		"urlHash": "72b272d7d9b63c24118730e456648e73c1a24fd9",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/features/hardware-wallet/utils/ledger.ts#L1-L48",
+		"urlHash": "38d978ca31ae707d8ca50333f766aa7e39e278e3",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/analytics/userProperties.ts#L28-L29",
+		"urlHash": "5c65a2d63805bc462924950982ac470e7c0d14b3",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/helpers/walletTypes.ts#L1-L7",
+		"urlHash": "903c695cca1070fe93006c9a4678962e866323b4",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/package.json#L194-L195",
+		"urlHash": "5727fecded64c361c27ca91770141446b78b1849",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/modules/ethereum/provider.ts#L53-L185",
+		"urlHash": "294c820597edcd1845dc75a5a9bbb7e5a55172f0",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/in-page.ts#L115-L145",
+		"urlHash": "4a778087013e70edf0a4d43127640ab6d3995421",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/WalletConnect/walletconnect-utils/blob/cf54c6dd7a535498dae31205a57f51bd1468c7f8/jsonrpc/provider/src/provider.ts#L38-L53",
+		"urlHash": "66ee510b75437fa34d49930e2c4fff34063dcc60",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/package-lock.json#L6502-L6505",
+		"urlHash": "e09c15381f3ae917906a8e63807cdff1ac83c273",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/da2f64331b2f82275f63aec00f2a6e970f084098/src/content-script/eip6963.ts#L23-L47",
+		"urlHash": "f6d5f07ca2008a9f2791fead4840d0e7bb896fd2",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/zeriontech/wallet-core-ios/blob/f841ea553163b5682730b035b0938aef48aeaacc/LICENSE",
+		"urlHash": "082af0d69f3a7bb1ba677cf990d9ef17ced6b1ce",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/zeriontech/wallet-core-android/blob/644f50534bfa5fa8a133a260b3fca42546bdcd2b/LICENSE",
+		"urlHash": "8d18f6aa5cb31f1f3da9a447e6a017ccbe627065",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://zerion.io/security",
+		"urlHash": "6ca5a921c696d859b86cccd9b04961e6198a5ad6",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://revoke.cash/exploits",
+		"urlHash": "79c9a495181d8f1a8b978138e3bd82e98b8f69eb",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://x.com/Trezor/status/2097786518110609620",
+		"urlHash": "1b1ef6bc96eb9beb08fc16aca2ea87b2595e3756",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://x.com/BitBoxSwiss/status/2097793026336981079",
+		"urlHash": "9c96dd6cb5749a83c80de2b56ae1de3aa97256e9",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://www.certik.com/",
+		"urlHash": "fd43e44a372c49c7fde81cf6886410c659754bb5",
+		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://x.com/Trezor/status/2095807665603584085",
+		"urlHash": "0f0b7aafa66c29f05bd300d574091ef66c16a0d9",
+		"retrieved": "2026-09-10"
 	}
 ]
