@@ -16,6 +16,8 @@ import {
 } from '@/schema/attribute-groups'
 import { ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
+import { getUrl, isUrl } from '@/schema/url'
+import { computeDataSourceCredits } from '@/utils/data-source-credits'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
@@ -36,6 +38,21 @@ const markdownForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRate
 				: (() => {
 						throw new Error('Wallet has no recognized type')
 					})()
+
+function attributeSection(markdown: string, heading: string): string {
+	const sectionStart = markdown.indexOf(heading)
+
+	if (sectionStart === -1) {
+		throw new Error(`Missing attribute heading: ${heading}`)
+	}
+
+	const remainder = markdown.slice(sectionStart)
+	const nextSectionOffset = remainder.slice(heading.length).search(/\n#{2,3} /)
+
+	return nextSectionOffset === -1
+		? remainder
+		: remainder.slice(0, heading.length + nextSectionOffset)
+}
 
 describe('walletPageMarkdown', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
@@ -119,6 +136,44 @@ describe('walletPageMarkdown', () => {
 
 				for (const allUrls of urlSetsToCheck) {
 					expect(allUrls.some((url: string) => md.includes(url))).toBe(true)
+				}
+			})
+
+			it('includes data credits only for stamped references in each attribute section', () => {
+				const attributes = mapNonExemptAttributeGroupsInTree(
+					attributeTreeForWallet(wallet),
+					wallet.overall,
+					(_attrGroup, evalGroup) => mapNonExemptGroupAttributes(evalGroup, evalAttr => evalAttr),
+				).flat()
+
+				for (const evalAttr of attributes) {
+					const heading = `### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`
+					const section = attributeSection(md, heading)
+					const credits = computeDataSourceCredits(toFullyQualified(evalAttr.evaluation.references))
+
+					if (credits.length === 0) {
+						expect(section).not.toMatch(/^#### Data credits?$/m)
+						continue
+					}
+
+					expect(section).toContain(credits.length === 1 ? '#### Data credit' : '#### Data credits')
+
+					for (const credit of credits) {
+						const sourceName = credit.source.entity.name
+						const sourceLabel = isUrl(credit.source.entity.url)
+							? `[${sourceName}](${getUrl(credit.source.entity.url)})`
+							: sourceName
+						const reportLinks = credit.reportUrls
+							.map(report => `[${report.label}](${report.url})`)
+							.join(', ')
+
+						expect(section).toContain(`- ${sourceLabel}`)
+						expect(section).toContain(`  - Reports: ${reportLinks}`)
+						expect(section).toContain(
+							`  - License: [${credit.source.license.name}](${getUrl(credit.source.license.url)})`,
+						)
+						expect(section).toContain(`  - ${credit.source.attributionText}`)
+					}
 				}
 			})
 

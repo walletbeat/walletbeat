@@ -8,13 +8,14 @@ import {
 import { Rating, ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
-import { gitCommitRefPinRegExp } from '@/schema/url'
+import { getUrl, gitCommitRefPinRegExp, isUrl } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
+import { computeDataSourceCredits } from '@/utils/data-source-credits'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
@@ -291,6 +292,31 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 						}
 
 						parts.push('')
+
+						const credits = computeDataSourceCredits(qualifiedRefs)
+
+						if (credits.length > 0) {
+							parts.push(credits.length === 1 ? '#### Data credit' : '#### Data credits', '')
+
+							for (const credit of credits) {
+								const sourceName = credit.source.entity.name
+								const sourceLabel = isUrl(credit.source.entity.url)
+									? `[${sourceName}](${getUrl(credit.source.entity.url)})`
+									: sourceName
+								const reportLinks = credit.reportUrls
+									.map(report => `[${report.label}](${report.url})`)
+									.join(', ')
+
+								parts.push(
+									`- ${sourceLabel}`,
+									`  - Reports: ${reportLinks}`,
+									`  - License: [${credit.source.license.name}](${getUrl(credit.source.license.url)})`,
+									`  - ${credit.source.attributionText}`,
+								)
+							}
+
+							parts.push('')
+						}
 					}
 				}
 
