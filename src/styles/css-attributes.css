@@ -1389,7 +1389,7 @@ ol {
  * - `position`: real sticky heading container and source-height anchor
  * - `source`: untransformed intrinsic reservation for the item
  * - `item`: transformed real heading identity and native controls
- * - `support`: in-flow supporting content that fades as the heading compacts
+ * - `support`: supporting content follows its natural scroll position and fades as the heading compacts
  * - `end`: independently sized in-flow metadata
  * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
  *
@@ -1398,6 +1398,7 @@ ol {
  * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
  * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
+ * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
  * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
  * - `--stickyBreadcrumb-gap`: compact item gap; defaults to 1rem
  * - `--stickyBreadcrumb-markerSize`: physical separator slot between adjacent headings; defaults to 0px
@@ -1573,6 +1574,14 @@ ol {
 		}
 		to {
 			opacity: 0;
+		}
+	}
+	@keyframes breadcrumb-support-scroll {
+		from {
+			translate: 0 0;
+		}
+		to {
+			translate: 0 -100vh;
 		}
 	}
 	@keyframes breadcrumb-item-motion {
@@ -1758,7 +1767,8 @@ ol {
 					;else: var(---breadcrumb-parentRowAnchor)
 			);
 			---breadcrumb-inlineStart: calc(
-				(1 - var(---breadcrumb-wrap)) * var(---breadcrumb-parentInlineEnd)
+				(1 - var(---breadcrumb-wrap)) * var(---breadcrumb-parentInlineEnd) +
+					var(---breadcrumb-wrap) * var(--stickyBreadcrumb-sourcePaddingInline)
 			);
 			---breadcrumb-inlineEnd: calc(
 				var(---breadcrumb-inlineStart) + var(---breadcrumb-width) +
@@ -1845,11 +1855,19 @@ ol {
 			> :not([data-row], header[data-column~="span-start"], [data-sticky-breadcrumb~="source"]),
 			> header[data-column~="span-start"] > :not([data-row]),
 			[data-sticky-breadcrumb~="support"] {
-				animation: breadcrumb-support-motion auto linear both;
+				/* Scroll beneath the sticky surface while retaining natural source placement. */
+				z-index: -2;
+				animation:
+					breadcrumb-support-motion auto linear both,
+					breadcrumb-support-scroll auto linear both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-				animation-range: contain 0% contain 100%;
+				/* Equal range and travel give natural 1:1 scrolling after the owner sticks. */
+				animation-range:
+					contain 0% contain 100%,
+					contain calc(var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-blockStart))
+						contain calc(var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-blockStart) + 100vh);
 				@media (prefers-reduced-motion: reduce) {
-					animation-timing-function: steps(1, end);
+					animation-timing-function: steps(1, end), linear;
 				}
 				visibility: if(style(---breadcrumb-entry: 1): hidden; else: visible);
 				pointer-events: auto;
@@ -1864,7 +1882,9 @@ ol {
 					> [data-sticky-breadcrumb~="source"] > [data-sticky-breadcrumb~="item"] > [data-icon],
 					> [data-sticky-breadcrumb~="source"] > [data-sticky-breadcrumb~="item"] > a > [data-icon]
 				) {
-					---breadcrumb-iconCorrection: calc(1.5lh - var(---column-spanSize));
+					---breadcrumb-iconCorrection: calc(
+						var(--stickyBreadcrumb-iconRatio, calc(1.5lh / 1em)) * 1em - var(---column-spanSize)
+					);
 				}
 			}
 			[data-sticky-breadcrumb~="source"] {
@@ -2044,6 +2064,7 @@ ol {
 	[data-sticky-breadcrumb~="scope"]
 		[data-sticky-container]
 		> [data-sticky]:not([data-sticky-breadcrumb]) {
+		z-index: 0;
 		--sticky-insetBlockStart: var(---breadcrumb-blockEnd);
 	}
 

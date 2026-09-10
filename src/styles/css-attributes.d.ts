@@ -642,7 +642,7 @@ interface CssAttributes {
 	 * - `position`: real sticky heading container and source-height anchor
 	 * - `source`: untransformed intrinsic reservation for the item
 	 * - `item`: transformed real heading identity and native controls
-	 * - `support`: in-flow supporting content that fades as the heading compacts
+	 * - `support`: supporting content follows its natural scroll position and fades as the heading compacts
 	 * - `end`: independently sized in-flow metadata
 	 * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
 	 *
@@ -651,6 +651,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
 	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
 	 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
+	 * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
 	 * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
 	 * - `--stickyBreadcrumb-gap`: compact item gap; defaults to 1rem
 	 * - `--stickyBreadcrumb-markerSize`: physical separator slot between adjacent headings; defaults to 0px

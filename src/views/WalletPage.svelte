@@ -1430,6 +1430,7 @@
 		---wallet-compact-icon-size: 32px;
 		---pie-compactSize: 100px;
 		---wallet-compact-h3: 1rem;
+		--stickyBreadcrumb-iconRatio: calc(var(---wallet-compact-icon-size) / var(---wallet-compact-h1));
 		---wallet-line-height: 1.6;
 		---wallet-attribute-heading-font-size: 1.17rem;
 
@@ -2388,8 +2389,8 @@
 		}
 		:is(#stages, .attribute-group) {
 			--stickyBreadcrumb-scale: calc(
-				(var(---wallet-compact-h1) + var(---wallet-compact-h3)) / 2 /
-					var(---wallet-group-heading-font-size)
+				sqrt(var(---wallet-compact-h3) / var(---wallet-compact-h1)) *
+					var(---wallet-compact-h1) / var(---wallet-group-heading-font-size)
 			);
 			> header {
 				--stickyBreadcrumb-sourcePaddingBlock: 1rem;
