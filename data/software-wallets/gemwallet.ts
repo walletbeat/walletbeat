@@ -301,10 +301,12 @@ export const gemwallet: SoftwareWallet = {
 						},
 					],
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
-						[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+						[BasicUnlockMechanism.PIN]: notSupported,
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: supported({
+							type: BasicUnlockMechanismSupport.OPTIONAL,
+						}),
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: notSupported,

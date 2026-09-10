@@ -765,10 +765,12 @@ export const rainbow: SoftwareWallet = {
 							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx',
 						},
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
-							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -795,10 +797,14 @@ export const rainbow: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.OPTIONAL,
-							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,

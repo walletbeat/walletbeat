@@ -388,10 +388,14 @@ export const rabby: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
-							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,

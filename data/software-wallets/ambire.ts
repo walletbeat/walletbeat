@@ -746,10 +746,12 @@ export const ambire: SoftwareWallet = {
 				basicUnlock: {
 					ref: refTodo,
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
-						[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+						[BasicUnlockMechanism.PIN]: notSupported,
+						[BasicUnlockMechanism.PASSWORD]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: notSupported,

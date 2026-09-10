@@ -607,10 +607,18 @@ export const completedTemplate: SoftwareWallet = {
 				basicUnlock: {
 					ref: refTodo,
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
-						[BasicUnlockMechanism.PASSWORD]: BasicUnlockMechanismSupport.REQUIRED,
-						[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.REQUIRED,
-						[BasicUnlockMechanism.PATTERN]: BasicUnlockMechanismSupport.REQUIRED,
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.BIOMETRIC]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PATTERN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
 					},
 				},
 				duressMode: supported({

@@ -562,10 +562,14 @@ export const zerion: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
-							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.OPTIONAL,
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,

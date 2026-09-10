@@ -152,10 +152,12 @@ export const keycardShell: HardwareWallet = {
 						'https://docs.keycard.tech/duress_pin',
 					],
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
-						[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
-						[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: supported({
