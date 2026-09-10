@@ -201,10 +201,12 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
-							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 						ref: refNotNecessary,
 					},
@@ -230,10 +232,12 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: BasicUnlockMechanismSupport.REQUIRED,
-							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.BIOMETRIC]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 						ref: refNotNecessary,
 					},
@@ -253,10 +257,12 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.PASSWORD]: 'NOT_SUPPORTED',
-							[BasicUnlockMechanism.BIOMETRIC]: BasicUnlockMechanismSupport.REQUIRED,
-							[BasicUnlockMechanism.PATTERN]: 'NOT_SUPPORTED',
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 						ref: refNotNecessary,
 					},
