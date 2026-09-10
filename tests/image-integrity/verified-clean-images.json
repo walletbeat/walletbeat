@@ -1,0 +1,1138 @@
+{
+	"governance/decisions/2026/travel-policy/airfare.png": {
+		"hash": "9e3f925773dddf1c696cad25a166a9b72a480c0f8bbcbb7b865cbdd2821b946f",
+		"passedTests": ["blockiness"]
+	},
+	"governance/decisions/2026/travel-policy/hotel1.png": {
+		"hash": "05b3fa6313c158741e8bf030d4bc012d92477879c8235c20828e652dc62e8a78",
+		"passedTests": ["blockiness"]
+	},
+	"governance/decisions/2026/travel-policy/hotel2.png": {
+		"hash": "c94b1a5e615ede430d12d17baff913fa503b5c1691ad6f04098aa69d3f93b989",
+		"passedTests": ["blockiness"]
+	},
+	"governance/grants/2026-04-giveth-ethereum-security-qf-round/cover.png": {
+		"hash": "984966d3aab8e03ba11f4efd1abcdd8675d4caa2aae274b21107b7a769192599",
+		"passedTests": ["blockiness"]
+	},
+	"public/banner--small.png": {
+		"hash": "e50c5a38df9e91825138a229eab70ab6804ba2d78c187fe32ba7ddcc5b0ea62d",
+		"passedTests": ["blockiness"]
+	},
+	"public/banner.png": {
+		"hash": "54e9d728a7d7a93638ac0f9c75a848b0f550871b6a1a6aa162f4d765e7318e0a",
+		"passedTests": ["blockiness"]
+	},
+	"public/fonts/sp-monorium-dingbat.svg": {
+		"hash": "757059ff5be1ec5b94ddcc06458f6e38769d8251f6d75c571ad8008c1bd8b9fb",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/fonts/sp-monorium-regular.svg": {
+		"hash": "976e0b040fb3f3e53a384457b091c89c33f3dd5c5085f524c163b0c8020b4ec7",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/alphabet.svg": {
+		"hash": "e9e75fcfc51c870acf2b1f4cedf4cb3bb0d1cdad9c07760a01c8355ee2a59e6b",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/apple.svg": {
+		"hash": "f856b2270608a00928cc180b28b30d0472c3dcc7ece2dfd08663a351bc127f89",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/binance.svg": {
+		"hash": "12b2b1e267242e71ce389b0d22b7ab19031ef83d5fe6df18fd797c081b4e805d",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/coinbase.svg": {
+		"hash": "d451b6ab3368559fc2d6c03e89668bf745e91fc8417150c44ab7b11076c088e9",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/consensys.svg": {
+		"hash": "abf592c0ebf3188511b275c654ce1b91927488621a071a5967fdeb13286558fb",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/cure53.png": {
+		"hash": "ba93aee384a80a2a68ad423cd35ba35993c88fc42ff288c0c07d7a7726fcd62b",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/entities/cyfrin.svg": {
+		"hash": "3d5d75e4adaf821af6b1baa914f0ecb72673c3f14a36923a2471d287bed88c5a",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/daimo.svg": {
+		"hash": "edc4028ad4e9df1717e044536ab1d74aae8c5f2481735ffb7aed77b41974e2b5",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/debank.svg": {
+		"hash": "63f86409b977ef886db43f9778f52752e9be182d77a3ac233ae76a3fee8e8bcb",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/github.svg": {
+		"hash": "e7f8fbf3a9aa1c0b00ab924f6786bde8857a60a1060ce61aed9f5d110169ba8a",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/honeycomb.svg": {
+		"hash": "f5250ba9776653c69c7ebb7d423d795eeca60729abf012fd1c6c0973a1b73f25",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/jiffylabs.png": {
+		"hash": "5435cb63c2e7086b83c2313e2f6c8ebb4d3aaf19ddb55b6778cb2f0dccb5c50c",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/entities/keycard.svg": {
+		"hash": "358098d86167fb48947aa4edd8a994f2a2048d0f82df74096b074eadf16130a1",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/keylabs.svg": {
+		"hash": "ff4320c8f73abbbb63a1f1fb85d1f0e59b84e560245b558622c71641b794bbf6",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/kudelski-security.svg": {
+		"hash": "afbb34199d5c1208f88e3ad54ffa810320bfa1c876bd56e8327c144abcb801fe",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/least-authority.png": {
+		"hash": "0e0d40525facea46fc84e5e2ae035dd7b7e2ebb89b225f031faa5a0e1e309ba0",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/entities/ledger.svg": {
+		"hash": "ee5b596b2a23463dbd6970a20787335788406cf4a3a2f072e2ae12d80d1bb128",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/lifi.svg": {
+		"hash": "daad34d435e67e6694a11db27ac0a2eb440abe2fc757c40059d586a266ef0fac",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/mtpelerin.svg": {
+		"hash": "82ca026067fb3c643b3c642df8356035d99e6d680d8242c48b5f1b55da22c967",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/pimlico.png": {
+		"hash": "6d9ba8b0abf96cc67c267f0a38cfe26035baae6ae37f3a60082832d5ad5c5341",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/entities/rainbow.png": {
+		"hash": "0a7a84dbd45b5ca049612cceae644271d22fcded25064e845760f7a87a1727ba",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/entities/slowmist.png": {
+		"hash": "dd45661ffb6b18f48eb41e79c8543c84ab38caf0a342ff74b865179da6818c3a",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/entities/uniswapLabs.svg": {
+		"hash": "f558ef12e11e7e79a272449a4dc9c42d09b09c4433ea2ffdd799ed17db706ab0",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/entities/veridise.svg": {
+		"hash": "4b4f52035d676442baa7a3ed72751238ad6cd307088bcb442e8d46d5e2719074",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/ethereum-logo.svg": {
+		"hash": "7fc0107156fc3764e786f02f32a2879b6d359ed75c1d9108910e56e4d252455e",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/favicon.ico": {
+		"hash": "af3bd512033f76581d9414338ba965440ec5142064283a6d52a465244e0da058",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/icon.png": {
+		"hash": "af3bd512033f76581d9414338ba965440ec5142064283a6d52a465244e0da058",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/misc/extension-network-capture-screenshots/how-to-capture.png": {
+		"hash": "b7332d35e84f9f2209f6844744dc818d0320b41b2d0711eca5c3159ff158358a",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/misc/extension-network-capture-screenshots/network.png": {
+		"hash": "304abd38e152654bbf3e3100e98420c048c2344e3f305a0827e0e7bf5e0b9d7f",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/wallets/ambire.svg": {
+		"hash": "7d158b1cd8c4bfcf6d83ffe6913e54a59764666096b13de91fa0a878aff515d6",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/base-app.svg": {
+		"hash": "d8e9892066e3db9686e8ed63556884306b7068c068e0bf1bf561c272c16e1386",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/bitbox.svg": {
+		"hash": "bcf5c5ba7f095693a1cf402ebbaa31a4855f471979e0997c36d758ffc2a2cf00",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/bitget.svg": {
+		"hash": "f33d87558479be61e91b70a06ac9322bc592c05b52c39d10e61efb3318354549",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/cypherock.svg": {
+		"hash": "01d46eacc61d583a8249e55df6c3a8eeda2fe0cbd62ea05bece39a5b98edecb9",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/daimo.svg": {
+		"hash": "edc4028ad4e9df1717e044536ab1d74aae8c5f2481735ffb7aed77b41974e2b5",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/default.svg": {
+		"hash": "7b6ccad00c67e358f401b4b28a24e2cc498e630a6d1a23017cd7c8885b0c87ba",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/elytro.svg": {
+		"hash": "cb7955797c3d1511d279680c2aa44776f87480cbd847a8ec0801cd84db89909b",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/family.png": {
+		"hash": "bdea08cca8efa676101139da7014e5035bcc7bfad7e4338d1c0b1283931299b2",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/wallets/frame.svg": {
+		"hash": "b2ac2594c53d5b0dacd759dfe9da81f21b6208d034ff0b399322074c021f57c5",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/gemwallet.svg": {
+		"hash": "e267f43f9f7706efc250feaa827dd491d2e4771a6e55515d80813aa7dcd684fa",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/gridplus.svg": {
+		"hash": "95b09b4b928aca08d286cc979a181bb877acadc5c2e9277e451b7a6f19d95619",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/imkey.svg": {
+		"hash": "21d08e4011d25e5d7a7d58ac64c4e52542a52bd280192c6c295d961e43c8696e",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/imtoken.svg": {
+		"hash": "99873319aa6259b1f2f47261cd1b04b6047d535186dd3edaae4492a48086ffa4",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/keycard-shell.svg": {
+		"hash": "358098d86167fb48947aa4edd8a994f2a2048d0f82df74096b074eadf16130a1",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/keystone.svg": {
+		"hash": "b0fe212c6583010c77210cb5f704190298caa0f313cf792c24a9ea32c58d0712",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/ledger.svg": {
+		"hash": "ee5b596b2a23463dbd6970a20787335788406cf4a3a2f072e2ae12d80d1bb128",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/metamask.svg": {
+		"hash": "b680d3f3bcad4205c5c80fbf7809dc15531d44cd37cc01e6ba795b1109c2a0a0",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/mtpelerin.svg": {
+		"hash": "00fe7a67a6419b04e329d1d648f0d8fa2ec7db8a7f758e300a8d8dd911b7c4d1",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/ngrave.svg": {
+		"hash": "971e0db593122a751f9603d61fcb2ae89206f7e24541184da45eb5391b8d53e7",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/nufi.svg": {
+		"hash": "799972b0936c5634bdb759b60bbe1666e2340155c6dc370434f826fbcbf81405",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/okx.png": {
+		"hash": "e3ef3ce95edcdb45222cee38d0808d2ec0af59d8d51ef2401a211975e8ee8dd3",
+		"passedTests": ["blockiness"]
+	},
+	"public/images/wallets/onekey.svg": {
+		"hash": "f38235d605eb9ae057ac8a796957df3412d4df3c80fa03f0708ddd000cdeff76",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/phantom.svg": {
+		"hash": "9be4099723afac1e67fdfa016c67b8187ddd2d2e79c2fdf608f81226248a9720",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/pillarx.svg": {
+		"hash": "2009bbf3972a28beccefcf1efaa1299d26487a51dbeb1d717bd2de17e341103e",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/rabby.svg": {
+		"hash": "afc65e5c6c0046a8002ed85875f39de07e7a2f41934870156704d57345337146",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/rainbow.svg": {
+		"hash": "c050ab494ff611ed75e0ba88655b539ffcd831b1909c911839ebe8d31230998d",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/safe.svg": {
+		"hash": "b585a7c804cda44c869922f55ef2d6c4619d6abc8d2e44a7eb36de336b59d4bc",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/trezor.svg": {
+		"hash": "6765523805c5f15d0549e8a2cc8f97720e98acf196af748962a25815214cf488",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/uniswap-wallet.svg": {
+		"hash": "c8c7d819cee5310530a0e67f1213801960f5a05632b63e4b840a1e4aca16f89b",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/zerion.svg": {
+		"hash": "8117a299080eb4b793d51bb4bd7c5788978d9a812cc788e4186fcb54245c7d62",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/images/wallets/zeus.svg": {
+		"hash": "b12bbde397458f85030ae02e200b2807f0ba7c82c0381c0192715390362887b9",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/logo-dark.svg": {
+		"hash": "3afe0410d9d5940cc672131249f27807357687081ec7cefcd6a6d0e3f71a57ff",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/logo-light.svg": {
+		"hash": "4c9c5d983da63206999bf4283d2ebfb89a2d9eb72cae98c1652b11cdf95f5188",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/logo.svg": {
+		"hash": "3afe0410d9d5940cc672131249f27807357687081ec7cefcd6a6d0e3f71a57ff",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_1.png": {
+		"hash": "3bce9fce99c4d8bbbc19434f6df4a2dbd32ab4b90f6697c7aade861b1a6b5ec7",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-06-11-transaction_legibility_2.png": {
+		"hash": "1f8b6f961bae04fed0c48c6984b4520c9109c04663fd47881d45ad53fb7a8ba4",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-07-22-ambire-qr-hardware-wallets.png": {
+		"hash": "14fda38fdfc10fcfc7eed3e9fd4d8fbf059240c84e79e6fcee72b0bfa197df21",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-07-24-ambire-erc4361-siwe.png": {
+		"hash": "d1d62700a57205d1038421630136ccd2f867afe3899ee708f4564c650f1738f3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
+		"hash": "d541c23897a2ad6b1738080fbbe283ce9d6fc9be980bf7bfdfedb3d98e712bad",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-wallet-list.jpg": {
+		"hash": "77bd76042b6a90582a36aad4c8bebdaf67970f1ee5589e4693061a63f64ac061",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg": {
+		"hash": "445435961148f77b094496ac18b00113079dac75557f8155948f4b90851b1ecc",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-09-04-security-face-id.jpg": {
+		"hash": "105fde93dc57accd4a3e20f0185ebd10f5f823ea3f680bbddec861b5627bb3db",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
+		"hash": "7dae5595b0f1acda4f021170adc27fac9e3093495151f40ba18881326672293d",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_2.png": {
+		"hash": "6283016a7fe6a595b593f1baa0cf4b91e43dc7099db6316fa1b2286bb01fc799",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_3.png": {
+		"hash": "c9c537c28805e24ae0554bf9e469023da584a2aa0967c34353c2376692a4d70f",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_4.png": {
+		"hash": "f9a6cb943ab875100c05fa48dfe278c6c7db0d6eeec58bd1407e68b5cf194466",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_5.png": {
+		"hash": "8241186158dd6aa87919dbacc116c2ac6a87f31544d4a94062c19d831255a59d",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_6.png": {
+		"hash": "dc9658c4794ca5dee71019bde7108be4d8c9a5bbb705817f568a9dda4a2c890b",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_7.png": {
+		"hash": "135395666bcc767127575ec1cccf2d3de50a050d553a53a955ef3b92b6d4e553",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_8.png": {
+		"hash": "52406e2e1152eec025b8dbea1e7ec390ce09f839d8ddb3bb6a8999f69028ce1d",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_9.png": {
+		"hash": "66d6d27b644acd8d1c64e0b4d17c31e2a1cddfc0b791dbdba15f88fe30744c17",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-07-24-metamask-erc4361-siwe.png": {
+		"hash": "60c21c2b1048da6137760a28725dc5b1e68f0e26f0556bdb2102cd9b65545177",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png": {
+		"hash": "43b74085421b36fd5c9d4fe516d36d61f3aa2414ef80915698a0c28817d39d90",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-08-26-address-resolution-confirm-send-ens-name.png": {
+		"hash": "3fb02e0db59554960da2b3ac11a708a56cde6b00f55cac8bc5e047733f35717c",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-08-26-ledger-import.png": {
+		"hash": "8a027db249303be5e5174b44ff39487f13812fdae05a7b0f048de96e43c4fbbe",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-08-26-networks-list.png": {
+		"hash": "dd00e2774f9cb499d4a5e0d4eeaa24e8006abced1ab12a0f748a534d82112c90",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-08-26-swap-default-view.png": {
+		"hash": "53f5717b6cf844e568ff6e1bdce43a6c18b624574b96ae9c863ae4bfdd7109bb",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-08-26-swap-hover.png": {
+		"hash": "176f5141ff379071b9a8af43ee4009b01c5d19667970e984d858b412f40b6fdf",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-08-26-token-dashboard.png": {
+		"hash": "df08da170b86fe3ebed74c12e72d14e6062cfdeae72a93891b01fcec35cbf04c",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_1.png": {
+		"hash": "5c3679b50a6762b922bf6ddfe623e05f2ffbbd11456ac17ff4698a94e7ee3334",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_10.png": {
+		"hash": "cb7c295a49c6201dbf2d39dbcebe3e754af506a02f6c6f72d361170f692419dd",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_2.png": {
+		"hash": "e15615dbe7c2a069a48a36d23ac0cce7c57ec1a032f92d685d4ed3150d99bff9",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_3.png": {
+		"hash": "0e15668247b1509ac4b2d658e445bc59713dfb4a36e1f8b0000d1103d93a2205",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_4.png": {
+		"hash": "b14773ea443af31c377f49183f2ab8d361f374649e91abe6a19af5f191a6a0fc",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_5.png": {
+		"hash": "7278b7f7dd719729ee4b07f624e4e03c607afaf726e4403c0d331cbaf3bf041e",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_6.png": {
+		"hash": "be06363317fd9fe5d3c3da86cd70efb3e5934ceddb0ab120a8757b604e873deb",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_7.png": {
+		"hash": "24c7976af07f17f4b3d7757468b099c918513232aec434fa0ed393280afd3326",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_8.png": {
+		"hash": "40c5a6e6b98a4bf739da400129ed675cbcccf928e888eabf72aa660b1f963a97",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_9.png": {
+		"hash": "e848eccb5eab61b38fa32cca9ed24238476ac6f38a5ec7f5475d4a8693811846",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-07-24-rabby-erc4361-siwe.png": {
+		"hash": "ab6a7038a709fdf4c783be6e12b23d452ae083419699c41d5d02896f393b979b",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-08-19-rabby-mobile-eth_accounts.jpg": {
+		"hash": "7d54988e9725b465e410567a9960746b4a1a123a87a1e3f05560bf756acc77bb",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
+		"hash": "c42d787a0d410337e723cf46927c59e9dbf97fd187d9c7f135b2b5939b0c643f",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-input-gas-only.jpg": {
+		"hash": "e0c7f35e3b225bf69459f9523ee4ffd9be140cdfbb5ce9ece8c1715f6889c81f",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-bridge-review-fees.jpg": {
+		"hash": "3675cd23a6571a5fa9f5841870b4dd223aa14ab890f3a7c1ab34cddc7f138220",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-portfolio-per-chain-balances.jpg": {
+		"hash": "717af841d057a21822339e29164fcd461092b197967915e4d5a37c2e136423ef",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-17-chain-abstraction-send-insufficient-funds.jpg": {
+		"hash": "1cbe655ff18139534216b5be7d359c390f03ab953810b23e3ab818b70e5435cb",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-defaults-to-active-account.png": {
+		"hash": "b38cdb9b136982ad8a20cb81cff9a064ccd6c0b6c9874e131dcafe3d0f40f622",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-connect-wallet-picker.png": {
+		"hash": "928fe805de8942419875649b7cf0d6984fdf5d120fc6f96fd6bfd30b350131e3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-eth-accounts-single.png": {
+		"hash": "8b5e602f0abb9aeb7e45f97ddf1530eb04202b714c62c362601e8ee6dd884bca",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-18-app-isolation-wallet-connect-unsupported.png": {
+		"hash": "0834b4012e2915edec9647b1bf8f5f73bb967123544d514f66b3971872b982c5",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet-add-account.jpg": {
+		"hash": "50e23b4f20278203be46b678e1f86e05963f61e72a2d6339619a6f63213209fb",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-connect-sheet.png": {
+		"hash": "921ef76fd8b12d4310e55b9e921d504ed7c29c1f69fb0010fbf7d0da7c3debe1",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-after-account-switch.png": {
+		"hash": "d301ed5dd0af1801d71e6a4d698ee78d5e966daf6d963192e09614317b690e0a",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-eth-accounts-single.png": {
+		"hash": "3a306ae7d6c1a3d629f8fc467f7c7d655795af85461434bc396e478ec66a8e54",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-19-app-isolation-mobile-wallet-connect-unsupported.png": {
+		"hash": "531cbf95ada9bab40082f4c42febf43c4235dfc560cfaa8f15fe0ea6cc21bd50",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-browser-extension-view.png": {
+		"hash": "7011bb3f0db301e3f38091bf6bfa0f39b2e520c0ee24e843b726ede0b0b6274b",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-browser.png": {
+		"hash": "0b00663135f2e915c7fe7621870fb92b4b5c52dfcb09c3eedccaaee198480762",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-insufficient-funds-browser.png": {
+		"hash": "93025a3d2b493b1ad9b4bb40a0127939bb60ece390eead97f041bead6027efff",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-rainbow-fee.png": {
+		"hash": "86a2921e9145b08c16d58d9d9b427d7756c21cce4c0fada79708adc6ac01e4e1",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-chain-abstraction-browser-bridge-review.png": {
+		"hash": "53789120253971df32bc5a39271b8bf5b930f9f8308de8167c2e3fe96943c1cd",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-default.png": {
+		"hash": "97ef14c84bc6aa074c18faea1a3ac570be36bcc9c1eaaf65ed4c1b40b9a3e41b",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-builtin-swap-review.png": {
+		"hash": "6e6b2264cc4322319e556f2770fce1d993b3bd399b0e334352b9e66b3851b2e8",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-erc20-l1-send-screen.png": {
+		"hash": "5c6b0006654225125a02dea470ddfdfa24314810b708413522f00f0058a00a89",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-eth-l1-send-screen.png": {
+		"hash": "5a78bebf5cf69bcbb262d6e85d98c4db364e2f65def8a6203a3a7efeb7590bd9",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-gas-options-breakdown.png": {
+		"hash": "d913f0ede7f2212fa65863cd18a3300f6a2f565e00438497081abc480543958e",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-03-operation-fees-uniswap-swap.png": {
+		"hash": "bb27bf5899266d56ca62cc2def9203279564b43b0efed95d4498e950485d6b3a",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-04-chain-abstraction-mobile-bridge-percentage-fee.png": {
+		"hash": "49a9b365efb6b00f29eed920ca1f09e246a15e70861073bece1e0a42bcbed1f3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-04-operation-fees-browser-swap-percentage-fee.png": {
+		"hash": "a29dde81cc9e30efbebf26c6104cc04c87161598b7c73fa8a18fb1067226d2b3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-04-operation-fees-mobile-swap-percentage-fee.png": {
+		"hash": "7175196b22ce85695eb88939944ade8007a9623c5d321c681a03a181972858c9",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-18-scam-alerts-recent-deploy-contract-no-warning.png": {
+		"hash": "35e8b53ea456c02e5452cff4b521b833569e0a5db42ea5d9718ac6f797ad2bd5",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-18-scam-alerts-unlimited-approval-neutral-label.png": {
+		"hash": "fc0b0e32ac7887e232d950fc5118a471ad5686cf4fc57cb58e9df092228586b2",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-24-browser-siwe.png": {
+		"hash": "1b7f346fc63249ca8d99298047933760855ab5a2dd946901f565e0ca2b70adc3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-flagged-app-send-no-warning.png": {
+		"hash": "1b25f6331f7f3fff3ec761207114fabb8a5ff1bfc4ee2dad06a300bb9ab6b9b5",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-lookalike-recipient-no-warning.png": {
+		"hash": "14c0d53cd5369f3a05d3bf1ce3bfdd81c73a23a02481162fd7f37c34433390a9",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-malicious-dapp-connect-warning.png": {
+		"hash": "076a225dbd8631df707d7e2e24a212d05af9c61116e5f8e6d8df783183bf8b00",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-07-26-scam-alerts-suspicious-transaction-warning.png": {
+		"hash": "bdd305f3a882ab1a68cd41617f48ec1db7430bd9b3971a460377ed0cda323b2d",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-08-20-wallet-call-mobile-batch-unsupported.png": {
+		"hash": "d0710fd9547966ef17cb7104aca01bbb156d03a20667df6f2dc103aa665d4251",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-07-24-zerion-address-book.png": {
+		"hash": "dd799d976a0d430a950300b386c829c9786fc6013f9c64879abf4999fa96d603",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-07-24-zerion-erc4361-siwe.png": {
+		"hash": "2e8c3f89183ec3d7077a692c7fabdcca47c1bffcfa9ae188bef3dc5cedb1e29d",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-12-zerion-perps-fee-breakdown.png": {
+		"hash": "b7e1d64fd53efed13a2a814ff29dd0b894ad4907e5950b22645c8ea6dca75c52",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-12-zerion-swap-fee-disclosure.png": {
+		"hash": "d3dd8e8426556f1b84c18b099f14470987f636086081cc2b9e3609186f15d3c3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-account-picker.png": {
+		"hash": "311d78c821f32ca049be6e8bab946694c3cfcfdaafdc24ba8bbfd3b77fbc9b31",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-browser-connect-wallet-picker.png": {
+		"hash": "601faf5e149e7e08d2b8a7fe82b994944de8297f9bc10bc4447056d708c420af",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-connect-sheet.png": {
+		"hash": "5092d289f2126e70c87bc798236c17aa6a751ff18b902acc385eafcb98cda602",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-eth-accounts-after-account-switch.png": {
+		"hash": "fa6f5aa99c595ab7f5b622d4de057a5eb30053f41da1c1ad9514b60ba938a630",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-eth-accounts-empty.png": {
+		"hash": "2e2bde0e79df47b3bb0b02142aeecd30dab3a26fd96a442b244c94e4f72af8fc",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-eth-accounts-single.png": {
+		"hash": "f4edb61234a197f7fbfaa1d1a9161460fc06092beca2b7c46d3db659573d98b8",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-uniswap-connected-second-account.png": {
+		"hash": "a846b873fc4437372fa947c95e3fe7ecbfa648217681f9bfe92d4281a992f7cf",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-uniswap-reconnect-default.png": {
+		"hash": "66331b59d11b87f5bca5d200e2f3157015a0311555dabf1642b77bec4651e94f",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-app-isolation-wallet-connect-unsupported.png": {
+		"hash": "527d3c7e011f487500bd797f624eb3ea16282254ae4587c4d8822c52d363223d",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-comprehensive-swap-view.png": {
+		"hash": "d21ea311f166a0294936c039548795f47f62be083aaf64fa9475924f0c8b0339",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-dashboard.png": {
+		"hash": "0af1dddb44fff15fd3c048ef9be07f5a251a997033d4d2c9c22d8c9d527f2fb9",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-default-swap-view.png": {
+		"hash": "4d417fd66ae895fa2c8395a8b7a6992eeea627777e73cbf872ca5e29de6fd7e6",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-19-zerion-ethereum-network-view.png": {
+		"hash": "5da85a3b908ce959e3dd46ac8b70216624608e914e139f5f4d005e8b5366871f",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-31-zerion-android-security-settings.png": {
+		"hash": "0255ebff70254ead0cbd4b83f081354c76abe05d72a8ae3c45d2ec29e509f5a3",
+		"passedTests": ["blockiness"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-08-31-zerion-ios-security-settings.png": {
+		"hash": "0f6790b6ac67f2a9bda429e7de8af36b49f5a54c312797d75d4c9b1d57abb66a",
+		"passedTests": ["blockiness"]
+	},
+	"public/robot.png": {
+		"hash": "e79045fb9ca786cffb763c8bedccabc94161f2534418f7826c31f2a3e4210ce7",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/glow-0.svg": {
+		"hash": "277370d8f37596b474617cbdf8ec81e40592a2ac62185e949b9e9bf082c19e80",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/branding/glow-1.svg": {
+		"hash": "034cf7e4d3912527429228fd1baafc17fda360c971adf657867252cef0bc096b",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/branding/icon_dark.svg": {
+		"hash": "bcbdbe829c815e8aebe5cba3fc01a013e8375017e1d962742dffb7a8ae20e935",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/branding/icon_light.svg": {
+		"hash": "14fb550c21474bb8b5b074881ba6d808b8882ebf1d01c1eb88848612c2af5b3e",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/branding/icon_light_circle.png": {
+		"hash": "a436bcdfe14325f2ee00c431993ff6bee247c90c97ff9038e8ef20f0bfd9b7c7",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/icon_transparent_white.png": {
+		"hash": "af3bd512033f76581d9414338ba965440ec5142064283a6d52a465244e0da058",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/logo_dark.svg": {
+		"hash": "3afe0410d9d5940cc672131249f27807357687081ec7cefcd6a6d0e3f71a57ff",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/branding/logo_light.svg": {
+		"hash": "4c9c5d983da63206999bf4283d2ebfb89a2d9eb72cae98c1652b11cdf95f5188",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/branding/profile_circle.png": {
+		"hash": "a27dd9b62537854967da8a0e259516b7e158d04598213e5497a3d66cd030c051",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/flat-horizontal.png": {
+		"hash": "fb6901ed5676f9ac457600197558c3778299d4b6ee613309d9ccef7c88b0c171",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/flat-vertical.png": {
+		"hash": "72b8edc55b6abee819ce887e23edc4d664b47f295136182385ddbd910d29ee61",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/flat.png": {
+		"hash": "ad8e9c99c8512b60be2ea44b1922ecc31c31771bf93fd73d9a584eac5b691571",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/regular.png": {
+		"hash": "c55d1a04293c99a890f4f4d1c4fd77f80468321a4b06f1c4e0fc9796641a3c77",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/spotlight-bottom.png": {
+		"hash": "bbdeb240b9103011ee2173956d69147e72dfaac859b43510262bc88c5b074e76",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/spotlight-left.png": {
+		"hash": "cd794c60373239f5cf7ca43873693e9e09d93bb420a47152fb76af0ecaa544ef",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/spotlight-right.png": {
+		"hash": "059e0577507c69fcfda01127e4aac355293eef8723c0dd32b9373af052c44899",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide-templates/titular.png": {
+		"hash": "339e5aa710bfd5f3dfc950861daeab69a3e77a6580b227b0df60fa4997677a6e",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide_logo_dark.png": {
+		"hash": "ca44c260cbe1fcac0b7e9bed982d21e6bc832cdeccb16c79468ad977253d6204",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/slide_logo_light.png": {
+		"hash": "f9e447193c4c2c587ac353499adf9cbd978767ab8199e1ec36e88451ab38621c",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/who_watches_the_wallets.png": {
+		"hash": "52378a7acc0ac9ce1e4a417d31e9beb4d13282a4a266643147206c761acfd6ad",
+		"passedTests": ["blockiness"]
+	},
+	"resources/branding/x_dot_com_profile.jpg": {
+		"hash": "31b7aa56fc8780fec1badbd336405e1e3948ee930a7d96220118aca4b0b38be6",
+		"passedTests": ["blockiness"]
+	},
+	"resources/contracts/images/Walletbeat.svg": {
+		"hash": "ed4669e5237fc7d067b2725e138c07d3d9f1e0378e6cf15f4363204ac275d877",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/docs/contribute/images/navigate-to-type-definition.gif": {
+		"hash": "2dbf83000ab52904ac831c3ad669f78a25cc58317d94b25478b82d6ccf1f334a",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/contribute/images/privacy-rating.png": {
+		"hash": "d298b9569e5d187aa5e1b31a8b4ad3c12654dbe69a1951ec2a77b3fc537662de",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/contribute/images/self-hosted-node-attribute-details.png": {
+		"hash": "ade0a0f7706f82a13c29b96235a9b7368d2e7e1856496f6b1d9e0d381aacbbe4",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/contribute/images/self-hosted-node-rating.png": {
+		"hash": "d4084a8951089aa9582a7a52bb19e4b0c57acf0b54f0858f65dc0f5ccd0e5bca",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/contribute/images/wallet-in-table-initial.png": {
+		"hash": "e2c61181c6a7e29df5140a02855d7d975d413c638d5c9eaf21262a352055b842",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/android-studio-1.png": {
+		"hash": "f977c21c6e934ef9d8cbb2d4ee40294b2d9564eb83fdd9e45ac82a0324f5fcba",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/android-studio-2.png": {
+		"hash": "bb8a8458c7384c56244dcfebd1b74b5ce12546f6b8a89e039bcc86d5b751a088",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/mitmproxy-install-cert.png": {
+		"hash": "1e5db261d635ed21cd79cd59d287e92d237d384e07bef8705bcb7dd8e4df00e4",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/mitmweb-blank.png": {
+		"hash": "4eccf69d9a40620efa10db340c64a2600c27345ed06cac8d9adf1bee1c196b30",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/mitmweb-ethereum.png": {
+		"hash": "b9ef0f7575b22c5d2268a0a770430ebc90b9dfa3fba62fb10834e2b8e7b405a1",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/relevant-request-1.png": {
+		"hash": "b32cd4951c0c43117b6e4837a0aade96ced3a78d9b35d82997414d310e76d42a",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/relevant-request-2.png": {
+		"hash": "ba1c659e085d8adfabfe059a40c650c98c8133066980b53c0bcfde500946032a",
+		"passedTests": ["blockiness"]
+	},
+	"resources/docs/wallet-testing/data-collection/request-irrelevant.png": {
+		"hash": "de7c62b630f13f844e7c30a8fc6cffa2272eb95f7e03c80ec918707783ec0bee",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-13 - Walkaway Test/cover.png": {
+		"hash": "61d38aba060e67eee940b487c1950271a974dcaaf1a1cdff08096c760d201971",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-14 - Zeus Wallet/cover.png": {
+		"hash": "5c1a410fc5b660cc2e991e0f12bb3bba45975cf329278023887dfa70ec1d0362",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-20 - Wallet Security News Update/cover.png": {
+		"hash": "be2638b5af53958d1bbc4626adc4acde5f3928550698c266e8d7a34af276c5e1",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-20 - Wallet Security News Update/screenshot-1.png": {
+		"hash": "1f4098582a14cfa87b1a28fc3f34020bad2b7b7169e5c771912f37f82458ed6f",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-20 - Wallet Security News Update/screenshot-2.png": {
+		"hash": "3fa878c93a42e73e8efc529952d1f15caaf5e0db590e8ae1bbbc17c54b994d0e",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-29 - Bitget Wallet/cover.png": {
+		"hash": "679722a6311f06ae7ee79c002b30af9cf367922d2dba568f79093046d51e6bea",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-01-30 - Okx Wallet/cover.png": {
+		"hash": "d8d70f63fc07d700e91ae7ee85778a0f1f00e634d2383e82a3e22f8750a20dab",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-02-06 - January Monthly Update/cover.png": {
+		"hash": "0097b305f6818d6d1689b84ac85330e5ca09cce4cd232e6baa80e2c1e7c9bba2",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-03-18 - Permissions management/cover.png": {
+		"hash": "e71ff0f32859856472364d436ec47d93f0a4cce31190575463c781b17e93c802",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-03-27 - General Privacy Hygiene/cover.png": {
+		"hash": "2f92f0e6c0de1ae9d542e9e57d17d5dbf8d34b4f0896b1b6700e1c63090533ca",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-04-08 - Duress Resistance/XKCD.png": {
+		"hash": "1dfd9f6409fccd5316779b99b835fefd20bd0b57b8bcecc8156c5798af00e9eb",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-04-08 - Duress Resistance/cover.png": {
+		"hash": "113133c9533bdf43447b8baee0d9069fdf627ebcd30825b453442b5217bedf89",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-04-22 - Security Best Practices/cover.png": {
+		"hash": "3704b1d2c9c29549b019512e93019877449d2f725d490e434fc75762c0794583",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-05-15 - Transaction legibility ERC-8213 ERC-7730/cover.png": {
+		"hash": "68dadba01457b38db1887e5deaec33e8eda54ac28fb30d715565b4e0f59d947f",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-05-18 - Release process/cover.png": {
+		"hash": "a94ae9b90cb1625c8a2e2b3074e48394bd1627fec5cc57303974f57239fb7cb1",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-07 - Private wallets/app_isolation.png": {
+		"hash": "7b9bd1b29fb4b05484c41a355683f03d4fd17bf0bdd13c000051628fd8e9cb73",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-07 - Private wallets/multi_adress_privacy.png": {
+		"hash": "ee35aaa6857ac0869af0a690291bc400cde29da0666354497d8a8d6678fb841b",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-07 - Private wallets/privacy_hygiene.png": {
+		"hash": "4b7641df6c4053a43b5eb9dea4ea32a25054306ddbc029d0d54198c1d21c414f",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-07 - Private wallets/private_transfers.png": {
+		"hash": "dcc5d2f7ddbb690b8265b14c13cd22f385c3a95f3a83439d8da3336201d02e13",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-07 - Private wallets/wallet_address_privacy.png": {
+		"hash": "cf856f480b919a91a8f0f2b04ba058d2c5a85091033660860d5c8c25d7294933",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-07 - Private wallets/wallet_privacy.png": {
+		"hash": "7195a9d53ae935f1906a18e59027f351376916d9fc38ab277d52250629bb2941",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-09 - Orderflow Transparency/cover.png": {
+		"hash": "d98b88fed9f14d5ef086506382bc0d291c5e7b5ce1307d4f65272ff27d6ee56e",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-14 - Clear signing update/cover.png": {
+		"hash": "da42f58223a920d97932f90b9082122301c4c70e6bb162c33e7b8f7f6bb55529",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-15 - Walletbeat mission/acid_test_screenshot.png": {
+		"hash": "d938ee241d0e205b437cf33a02062c8f75599e1b71071090b8b3cef7985b1593",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-15 - Walletbeat mission/acid_test_screenshot_1.png": {
+		"hash": "6b13ffc1c3a3f63f1cf1940b31dae151bd8ab237f9e9c50b2bdc314009373460",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-07-15 - Walletbeat mission/cover.png": {
+		"hash": "0ee4f7add47ce23e85b10894820ee6ed44bba4d27aa54289a280c6fc8941e106",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-08-04 - Coldcard hack/foss.png": {
+		"hash": "363a779f10a32b5808a0bd33ad6099e2e9580636072ed6bf54951edec4131ae9",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-08-04 - Coldcard hack/security.png": {
+		"hash": "c98e99f6f6174fb53ea5511abf88ec4d0aa443aa59a2c21dc0d8a6b84a9c3152",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-08-12 - Address poisoning 2/quote.png": {
+		"hash": "d2697afc5e764146e3cb4a36fc0bb84437c8e4b71dcf2e2e54366b91b5d62be4",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-08-12 - Address poisoning/quote.png": {
+		"hash": "5e429c63752ff20962328403af6009ab66c1ba4b87610559396066362b08c1c2",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/wbicons/about.svg": {
+		"hash": "fb81ede02a0d4e3699a143be74cc64137cf9eaa699749c1c8f4054762e4f7550",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/account_abstraction.svg": {
+		"hash": "dc9796b8a35741572b084a358a40cd2a326a86ee7cd8738e06bd9f0e21a21eb1",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/account_portability.svg": {
+		"hash": "e23697f7535783044df66e92934309c1b6fdedc8ced4bde4d814cc0934d52b60",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/account_recovery.svg": {
+		"hash": "26712040ff772f83ddda00fb3b0b0662a3ce36061bb8b2a2d726e166ec5036c9",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/account_type.svg": {
+		"hash": "642477869ed7109fb2a46a45fd30d6f98b24710c845b372d5ef9884a6281eef5",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/account_unruggability.svg": {
+		"hash": "225d2ac514b518aea76a80d7702e64e8cedd33330e95ff6eef4b15f6357351c3",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/address_resolution.svg": {
+		"hash": "4c5da09008dc706ce07b63d4a08a4872407b785fabc5dc6490d09806ea8dae9f",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/app_isolation.svg": {
+		"hash": "8040be8ce5eda9b0c5c89e21fbc6a867a75eff90269881e49e6521d299f2b509",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/browser_integration.svg": {
+		"hash": "0485f181ffb3b86ee7bee47065389597fc3e877c5cf5d9b8b744d5543d9fa549",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/chain_abstraction.svg": {
+		"hash": "b42950c8929da2dd125a03a01492105025bc188caa8da322566dd95188921c58",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/chain_verification.svg": {
+		"hash": "104f3bdf9e7e85ce54e953f19f0b2c9978bc523bc26cf81930d3b6afd6b562d7",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/discuss.svg": {
+		"hash": "99ed53fabbe84cbba7829470d1aacb7f04d64da9098d5e9119017c235d915076",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/duress_resistance.svg": {
+		"hash": "aaa35442409855414c38acc743d669b14ff16bf04aa2eb5592d2a7490c012349",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/ecosystem.svg": {
+		"hash": "9e1b74c6fd0725a5ff8be1b30e84358de10f2a155883627276f1afcff7717aa3",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/faq.svg": {
+		"hash": "09a4361504b61e5efa1d1d70b6742279641b6f6f680bca4e3323509db393a073",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/fee_transparency.svg": {
+		"hash": "93aa52aeeb4056f63e727d1dffaa9a8c4601d40d7f9fb58d46959b5b6517c235",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/free_and_open_source_license.svg": {
+		"hash": "248ed5625a61cc99b569ce05f10b6c2ca424d0c86989217a3a3590d55c896af8",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/funding_transparency.svg": {
+		"hash": "c17d5341948f65e7c7d7b1260aa7f3cfab253b6dbe34154922cece893536cb0c",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/hardware_wallet_interoperability.svg": {
+		"hash": "00e67ad0ab9f5f6170130303b298694f40a71f8a7f5ed2c0eed54f157801769f",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/hardware_wallet_support.svg": {
+		"hash": "857959205dace625da8b448c9c97af8b77e15101cd56d8e42059a07d873d274a",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/l1_provider_independence.svg": {
+		"hash": "d5f30c916ef33a813cfea0c3fb20f1fe316dfa43def5911cb77772164e003b05",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/multi_address_privacy.svg": {
+		"hash": "289c647c3922e8f9d61bf0f2335b5e0250fdaecd468c893fd45459aea6e412e9",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/newsletter.svg": {
+		"hash": "203d26d877f177aba1d48efeb87208685aa29bd214bd55ba1ef1fd1a037f2ed0",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/orderflow_transparency.svg": {
+		"hash": "4e0bc1d963f0395d0f37a5a53ae858bee2467ea0182e32e319fa177ef3dbc590",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/passkey_verification.svg": {
+		"hash": "ddbb0caa15b51e041359d5dbf51c660d4c7d2f1bb96b501fa17ec1db4d8c2a70",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/permissions_management.svg": {
+		"hash": "419e3c7b3a2dd242762100a3b60328079fbdf25ed2ef757d12269fd7a6cd4403",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/privacy.svg": {
+		"hash": "e3f152ee03bfeca62ebc0657aedf9f719a0901a31120a3b9f5ac1874cc69ad14",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/privacy_hygiene.svg": {
+		"hash": "32d02f5c99102d7294b0e6e345233cac01b890dfea990a6d7479d9806f95283a",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/private_token_transfers.svg": {
+		"hash": "399dcdcc30a2047974219f05d4b7147ec2b9411cb8bb523efc0639ce9eb3541f",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/question_mark.svg": {
+		"hash": "25acd727c77f8f7de798bb7dde092fb96a5a3f5d51cd7ca8f6a5a26738695b5b",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/release_process_transparency.svg": {
+		"hash": "77bdc407035a6a148e9212fdcbe4c2c0ea4ee41b0508657704943b659c56e1ca",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/repository.svg": {
+		"hash": "15e2467e4fadbc89982eb37ef074a08651f6e90af331c57f6665f129c65c1f6c",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/scam_prevention.svg": {
+		"hash": "7bc7efcae9ce3e142d41794fc91dd3d34684b8f1c6f56e5e963dcf7e4b7c8874",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/security.svg": {
+		"hash": "92d42de7cd26ea45d4af6a466ddf99d5edf5499c5146dd6e48406ae424303f59",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/security_audits.svg": {
+		"hash": "307dd91eb3480a6d03110339e07a89c1eee9fdfa9e3e521ae278cf6125cd59d0",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/security_best_practices.svg": {
+		"hash": "da9dd08d3a26fb99b26a3919e2f9d8a830a6653e19175462b469009636a93cc7",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/self_sovereignty.svg": {
+		"hash": "689aecfec01d6963a1fb4cae64a4e0c2115186a84aecc19d2c016101bd3dfca0",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/transaction_batching.svg": {
+		"hash": "309c324a1a03cdbcb44debc888aebbdf9fa0bbf35db7bff72f856f5a53bf6d33",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/transaction_inclusion.svg": {
+		"hash": "d7e9a40f8254e0a79a8a3af8da258c250a08b7ce7e3788a04d6a4c001ece4cb6",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/transaction_legibility.svg": {
+		"hash": "da2b7f2fe763925e184e8410333e26c548ea6e6c00fa1f4f4eecb840e744555f",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/transparency.svg": {
+		"hash": "ad9ff9edcbc9525c12e4c6022830a30fd8dbdce9d4e7d8415282fde896e176c1",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/user_privacy.svg": {
+		"hash": "f17ffdd5ee63ccb29d29f167d6371ba4575068bce9f4690153c0fb4f3e043c12",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_address_privacy.svg": {
+		"hash": "77617a639ba9e97f147167d368d1b142d88fe9c4c6f5444c05c33378ac8e50c4",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_browser.svg": {
+		"hash": "d4738e4ae8d559fc3cf1e162901ec6c2efb58ac6d5b6e049f3856aece31acbe0",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_desktop.svg": {
+		"hash": "40ca5012ab806dd258c012efc2fac8a65d50557d5324ca147f2a8485af528a1c",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_embedded.svg": {
+		"hash": "40d729d15c25b09479a4c54888069915fd12775d63b70fb852b8305f3fabbee3",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_hardware.svg": {
+		"hash": "deba2919f376e1d599e6190ee79672b2e06b73584da0f83d7fa4c8824ab2ad86",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_mobile.svg": {
+		"hash": "7baa4e024437c3bd293220ebcf5acbd7642f453910b25f6c40bb5eac42f3f75e",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_software.svg": {
+		"hash": "4cc0019d25f3f93098835b3647052d10cb201d5e3f47475c11c08ca0c87b984b",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/files/wbicons/wallet_test.svg": {
+		"hash": "f557b4a60f36c047c832da1fc161f43c96e9a3516fba3400edb43a2674ed3eb1",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
+	"resources/talks/2026-03-ethcc/hesterbruikman-1ts-workshop/group1.png": {
+		"hash": "b457b19efdd1689316bbcf33cec09a538bf6b9e663edfb1a08e1ec27c79c9268",
+		"passedTests": ["blockiness"]
+	},
+	"resources/talks/2026-03-ethcc/hesterbruikman-1ts-workshop/group2.png": {
+		"hash": "e963cd3c265405c8ebbe55fa460eea733d7848b557e4c9668b325c5fe102388d",
+		"passedTests": ["blockiness"]
+	},
+	"resources/talks/2026-03-ethcc/hesterbruikman-1ts-workshop/group3.png": {
+		"hash": "032a51cfba34d76f5d8f031eb9a7c4614f9474911d5b979159f5670e9f91a5fe",
+		"passedTests": ["blockiness"]
+	},
+	"resources/talks/2026-03-ethcc/hesterbruikman-1ts-workshop/group4.png": {
+		"hash": "bd6361f5752584a405e22ca6579b48131f7822badc8e5b5de4ee2ce1da47cb0e",
+		"passedTests": ["blockiness"]
+	}
+}
