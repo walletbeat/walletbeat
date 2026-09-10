@@ -79,12 +79,14 @@ function weakLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>)
 		},
 		details: markdown(
 			`{{WALLET_NAME}} protects access with ${mechNames}, but does not require a PIN,
-			password, or pattern. A biometric-only or merely optional lock is not duress-resistant:
-			an attacker can force a fingerprint or face scan, and devices without biometric hardware
-			may end up with no lock at all.`,
+			password, or pattern. A biometric-only or merely optional lock offers no plausible
+			deniability. A forced PIN, password, or pattern entry leaves room for a decoy code
+			that unlocks a decoy wallet or wipes the device, indistinguishable to the attacker
+			from a genuine entry, and an attacker cannot tell a user who has forgotten their
+			credential from one who is only pretending to.`,
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should require a PIN, password, or pattern to unlock the wallet, in addition to any optional biometric convenience unlock.',
+			'{{WALLET_NAME}} should require a PIN, password, or pattern to unlock the wallet, in addition to any optional biometric convenience unlock. This keeps such entry methods normalized across wallets, preserving plausible deniability for wallets that support decoy codes.',
 		),
 	})
 }
@@ -180,8 +182,12 @@ export const duressResistance: Attribute = {
 
 		1. **Lock screen (basic)**: Requiring a PIN, password, or pattern before granting access.
 		   Biometrics (Face ID, fingerprint) may be offered as an optional convenience, but must
-		   not be the only option. An attacker can force a fingerprint or face scan, and devices
-		   without biometric hardware would otherwise be left with no lock at all.
+		   not be the only option, since they offer no plausible deniability. A forced
+		   PIN/password/pattern entry leaves room for a decoy code that unlocks a decoy wallet or
+		   wipes the device, indistinguishable to the attacker from a genuine entry, and an
+		   attacker cannot tell a user who has genuinely forgotten their credential from one who is
+		   only pretending to. Devices without biometric hardware would otherwise be left with no
+		   lock at all.
 
 		2. **Duress mode (stronger)**: A separate duress PIN or passphrase that, when entered,
 		   either opens a decoy wallet (providing plausible deniability) or wipes the device and
