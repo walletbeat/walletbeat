@@ -1963,15 +1963,7 @@
 						position: fixed;
 						position-anchor: --navigation-row;
 						position-visibility: always;
-						opacity: calc(1 - var(---wallet-terminal) * (1 - var(---wallet-tocOpen)));
-						translate: 0
-							calc(
-								-1 * var(---wallet-terminal) * (1 - var(---wallet-tocOpen)) *
-									var(--navigation-mobile-blockSize)
-							);
-						visibility: if(
-							style(---wallet-terminal: 1) and style(---wallet-tocOpen: 0): hidden; else: visible
-						);
+						translate: 0 0;
 						/* A native TOC opening uses the same compact endpoint as scrolling. */
 						transform: translateX(
 								calc(
@@ -1982,14 +1974,17 @@
 							scale(calc(var(---pie-compactSize) / var(---pie-size)));
 						animation:
 							wallet-pie-source auto linear both,
-							wallet-pie-compact auto linear both;
+							wallet-pie-compact auto linear both,
+							wallet-terminal auto linear forwards;
 						@media (prefers-reduced-motion: reduce) {
-							animation-timing-function: linear, steps(1, end);
+							animation-timing-function: linear, steps(1, end), linear;
 						}
-						animation-timeline: --wallet-pie-source, var(--stickyBreadcrumb-entryTimeline);
+						animation-timeline:
+							--wallet-pie-source, var(--stickyBreadcrumb-entryTimeline), --wallet-terminal;
 						animation-range:
 							cover 0% exit-crossing 0%,
-							contain 0% contain 100%;
+							contain 0% contain 100%,
+							calc(100% - var(--navigation-mobile-blockSize)) 100%;
 						/* The first sticky row owns the compact pie’s block-start edge. */
 						inset-block-start: anchor(end);
 						inset-inline-start: anchor(--wallet-pie-source start);
@@ -2268,13 +2263,8 @@
 	}
 	@keyframes -global-wallet-pie-source {
 		from {
-			translate: 0
-				calc(
-					var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize) -
-						var(---wallet-terminal) * var(--navigation-mobile-blockSize)
-				);
+			translate: 0 calc(var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize));
 		}
-		/* The underlying translate owns terminal displacement at the source endpoint. */
 	}
 
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
@@ -2466,6 +2456,11 @@
 				margin-inline-start: auto;
 			}
 			@media (width <= 1024px) {
+				.wallet-title-row {
+					animation: wallet-terminal auto linear forwards;
+					animation-timeline: --wallet-terminal;
+					animation-range: calc(100% - var(--navigation-mobile-blockSize)) 100%;
+				}
 				[data-sticky-breadcrumb~="end"] {
 					translate: calc(
 							var(---inlineDirection) * var(---breadcrumb-entry) *
@@ -2483,8 +2478,7 @@
 										(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2 -
 										var(---breadcrumb-endHeight) / 2
 								) -
-								var(---wallet-tocOpen) * var(---wallet-sourceOffset) - var(---wallet-terminal) *
-								(1 - var(---wallet-tocOpen)) * var(--navigation-mobile-blockSize)
+								var(---wallet-tocOpen) * var(---wallet-sourceOffset)
 						);
 				}
 			}

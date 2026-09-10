@@ -280,17 +280,15 @@ import Footer from '@/views/Footer.astro'
 		inherits: true;
 		initial-value: 0;
 	}
-	@property ---wallet-terminal {
-		syntax: '<number>';
-		inherits: true;
-		initial-value: 0;
-	}
 	@keyframes wallet-terminal {
 		from {
-			---wallet-terminal: 0;
+			translate: 0 0;
+			opacity: 1;
 		}
 		to {
-			---wallet-terminal: 1;
+			translate: 0 calc(-1 * var(--navigation-mobile-blockSize));
+			opacity: 0;
+			visibility: hidden;
 		}
 	}
 	@property ---wallet-scrollEntry {
@@ -354,13 +352,9 @@ import Footer from '@/views/Footer.astro'
 				timeline-scope:
 					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
 					--wallet-end-inline, --wallet-end-block, --wallet-entry;
-				animation:
-					breadcrumb-item-block auto linear both,
-					wallet-terminal auto linear both;
-				animation-timeline: --wallet-item-block, scroll(self block);
-				animation-range:
-					normal,
-					calc(100% - var(--navigation-mobile-blockSize)) 100%;
+				animation: breadcrumb-item-block auto linear both;
+				animation-timeline: --wallet-item-block;
+				scroll-timeline: --wallet-terminal block;
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])::before {
 				content: '';
@@ -417,7 +411,6 @@ import Footer from '@/views/Footer.astro'
 			[data-sticky-breadcrumb~="root"] > article,
 			#wallet-toc,
 			.pie-navigation-geometry > * {
-				---wallet-terminal: 0;
 				---wallet-tocOpen: 0;
 			}
 			#layout:has(#wallet-toc:popover-open) {
@@ -521,8 +514,7 @@ import Footer from '@/views/Footer.astro'
 									(1 - var(---breadcrumb-sourceEndWrap)) *
 									(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight)) / 2
 							) -
-							var(---wallet-tocOpen) * var(---wallet-sourceOffset) - var(---wallet-terminal) *
-							(1 - var(---wallet-tocOpen)) * var(--navigation-mobile-blockSize)
+							var(---wallet-tocOpen) * var(---wallet-sourceOffset)
 					);
 			}
 			#layout:has(#wallet-toc:popover-open)
@@ -534,17 +526,11 @@ import Footer from '@/views/Footer.astro'
 				[data-sticky-breadcrumb~="item"] {
 					--stickyBreadcrumb-entryTimeline: auto;
 				}
+				.wallet-title-row {
+					animation-name: none;
+				}
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])
-				[data-sticky-breadcrumb~="root"]
-				> [data-sticky-breadcrumb~="position"] {
-				opacity: calc(
-					1 - max(var(---breadcrumb-exit), var(---wallet-terminal) * (1 - var(---wallet-tocOpen)))
-				);
-				visibility: if(
-					style(---wallet-terminal: 1) and style(---wallet-tocOpen: 0): hidden; else: visible
-				);
-			}
+
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
