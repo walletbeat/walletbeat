@@ -1819,9 +1819,12 @@ ol {
 		}
 		> [data-sticky-breadcrumb~="position"],
 		> details > [data-sticky-breadcrumb~="position"] {
-			--sticky-insetBlockStart: var(---breadcrumb-blockStart);
+			--sticky-insetBlockStart: if(
+				style(---breadcrumb-wrap: 0): var(---breadcrumb-parentBlockEnd)
+					;else: var(---breadcrumb-blockStart)
+			);
 			position: sticky;
-			inset-block-start: var(---breadcrumb-blockStart);
+			inset-block-start: var(--sticky-insetBlockStart);
 			anchor-name: --breadcrumb-position;
 			opacity: calc(1 - var(---breadcrumb-exit));
 			z-index: 1;
@@ -1838,7 +1841,7 @@ ol {
 			}
 			animation-timeline:
 				var(--column-sizeTimelines, none, none), var(--stickyBreadcrumb-entryTimeline),
-				view(block var(---breadcrumb-blockStart) 0px);
+				view(block var(--sticky-insetBlockStart) 0px);
 			animation-range:
 				normal,
 				normal,
@@ -1858,14 +1861,14 @@ ol {
 				/* Scroll beneath the sticky surface while retaining natural source placement. */
 				z-index: -2;
 				animation:
-					breadcrumb-support-motion auto linear both,
+					breadcrumb-support-motion auto cubic-bezier(0, 1, 0, 1) both,
 					breadcrumb-support-scroll auto linear both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 				/* Equal range and travel give natural 1:1 scrolling after the owner sticks. */
 				animation-range:
 					contain 0% contain 100%,
-					contain calc(var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-blockStart))
-						contain calc(var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-blockStart) + 100vh);
+					contain calc(var(---breadcrumb-parentBlockEnd) - var(--sticky-insetBlockStart))
+						contain calc(var(---breadcrumb-parentBlockEnd) - var(--sticky-insetBlockStart) + 100vh);
 				@media (prefers-reduced-motion: reduce) {
 					animation-timing-function: steps(1, end), linear;
 				}
@@ -1986,7 +1989,8 @@ ol {
 					calc(
 						(
 							var(--stickyBreadcrumb-paddingBlock, 0.5rem) -
-								var(--stickyBreadcrumb-sourcePaddingBlock) + (1 - var(---breadcrumb-endWrap)) *
+								var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-blockStart) -
+								var(--sticky-insetBlockStart) + (1 - var(---breadcrumb-endWrap)) *
 								(
 									var(---breadcrumb-rowHeight) - var(---breadcrumb-itemHeight) *
 										var(--stickyBreadcrumb-scale)
@@ -2038,7 +2042,8 @@ ol {
 						var(---breadcrumb-entry) *
 							(
 								var(--stickyBreadcrumb-paddingBlock, 0.5rem) -
-									var(--stickyBreadcrumb-sourcePaddingBlock) + (1 + var(---breadcrumb-endWrap)) *
+									var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-blockStart) -
+									var(--sticky-insetBlockStart) + (1 + var(---breadcrumb-endWrap)) *
 									(var(---breadcrumb-rowHeight) - var(---breadcrumb-endHeight)) / 2 -
 									(1 + var(---breadcrumb-sourceEndWrap)) *
 									(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2
