@@ -199,11 +199,10 @@
 		href={slice.href}
 
 		class="slice"
-		title={slice.titleText}
 
 		role="button"
 		tabindex="0"
-		aria-label={slice.titleText}
+		aria-label={slice.ariaLabel}
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
