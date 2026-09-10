@@ -1513,11 +1513,6 @@
 				color: inherit;
 			}
 
-			:global(.toc-icon::before) {
-				line-height: 1;
-				transition-property: filter;
-			}
-
 			@media (width <= 1024px) {
 				display: flex;
 				z-index: auto;
