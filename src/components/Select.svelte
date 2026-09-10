@@ -26,7 +26,6 @@
 		value = $bindable(),
 		options,
 		optionContent,
-		selectedOption = $bindable(),
 		...restProps
 	}: Omit<SvelteHTMLElements['select'], 'value'> & {
 		id?: string
@@ -34,14 +33,7 @@
 		value?: _SelectValue
 		options: _SelectOption[]
 		optionContent?: Snippet<[_SelectOption]>
-		selectedOption?: _SelectOption
 	} = $props()
-
-	// State
-	// (Derived)
-	$effect(() => {
-		selectedOption = options.find(option => option.value === value) || options[0]
-	})
 </script>
 
 <select {id} bind:value {...restProps}>
