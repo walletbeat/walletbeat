@@ -9,6 +9,7 @@ import {
 import {
 	type BasicUnlock,
 	BasicUnlockMechanism,
+	type BasicUnlockMechanismData,
 	basicUnlockMechanismName,
 	BasicUnlockMechanismSupport,
 	DuressAction,
@@ -16,7 +17,13 @@ import {
 	duressActionName,
 	type DuressMode,
 } from '@/schema/features/security/duress-resistance'
-import { isSupported, type Supported } from '@/schema/features/support'
+import {
+	isSupported,
+	notSupported,
+	type Support,
+	type Supported,
+	supported,
+} from '@/schema/features/support'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type AtLeastOneVariant, Variant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
@@ -42,18 +49,15 @@ function noLockScreen(ctx: EvaluationContext): Evaluation {
 	})
 }
 
-/**
- * A biometric-only (or merely optional) lock is not duress-resistant: an
- * attacker can force a fingerprint/face scan, and devices without biometric
- * hardware may end up with no lock at all. At least one of PIN, password, or
- * pattern must be REQUIRED for the lock screen to count.
- */
+function isRequired(mechanism: Support<BasicUnlockMechanismData>): boolean {
+	return isSupported(mechanism) && mechanism.type === BasicUnlockMechanismSupport.REQUIRED
+}
+
 function hasRequiredNonBiometricMechanism(basicUnlock: WithRef<BasicUnlock>): boolean {
 	return (
-		basicUnlock.mechanisms[BasicUnlockMechanism.PIN] === BasicUnlockMechanismSupport.REQUIRED ||
-		basicUnlock.mechanisms[BasicUnlockMechanism.PASSWORD] ===
-			BasicUnlockMechanismSupport.REQUIRED ||
-		basicUnlock.mechanisms[BasicUnlockMechanism.PATTERN] === BasicUnlockMechanismSupport.REQUIRED
+		isRequired(basicUnlock.mechanisms[BasicUnlockMechanism.PIN]) ||
+		isRequired(basicUnlock.mechanisms[BasicUnlockMechanism.PASSWORD]) ||
+		isRequired(basicUnlock.mechanisms[BasicUnlockMechanism.PATTERN])
 	)
 }
 
