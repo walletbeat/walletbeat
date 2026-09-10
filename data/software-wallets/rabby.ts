@@ -958,8 +958,27 @@ export const rabby: SoftwareWallet = {
 					ref: 'https://github.com/RabbyHub/Rabby/releases',
 				}),
 				hermeticBuilds: notSupported,
+				// develop/master both show `protected: true`, but the repo has zero rulesets
+				// Can't confirm the individual controls.	Requires collaborator access
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				// Browser extension (RabbyHub/Rabby): only a deterministic packaging
+				// step, no rebuild-and-compare evidence. Mobile (RabbyHub/rabby-mobile)
+				// has a real public rebuild harness wired into release branches, but
+				// results only go to a private Lark chat.
+				reproducibleBuilds: notSupportedWithRef({
+					ref: [
+						{
+							explanation:
+								'Browser extension: the release zip step sorts files and pins a fixed mtime "to ensure build is reproducible," but this only makes the packaging step deterministic, There\'s no published rebuild harness or evidence of a third party independently rebuilding and comparing a release artifact.',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/build/zip.mjs#L9-L12',
+						},
+						{
+							explanation:
+								'Mobile: the CI-computed hash is only posted to a private Lark chat via notify-lark.js, not published as a release asset, checksum file, or anywhere a third party could look up an official expected hash to verify against.',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/290f342c0fb467c2aeb6d0dc369d6db6fb5487c6/apps/mobile/scripts/validate-hash/notify-lark.js#L7-L10',
+						},
+					],
+				}),
 			},
 		},
 		walletCall: notSupportedWithRef({
