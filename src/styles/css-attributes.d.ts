@@ -648,7 +648,7 @@ interface CssAttributes {
 	 * ### CSS Variables
 	 * - `--stickyBreadcrumb-itemTimelines`: unique inline and block source clocks
 	 * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
-	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline
+	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
 	 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
 	 * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
 	 * - `--stickyBreadcrumb-gap`: compact item gap; defaults to 1rem

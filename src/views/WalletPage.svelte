@@ -1955,6 +1955,10 @@
 					view-timeline-axis: block;
 					view-timeline-inset: var(--navigation-mobile-blockSize) 0;
 
+					&:has(+ #wallet-toc:popover-open) .pie-navigation-geometry {
+						animation-name: none;
+					}
+
 					.pie-navigation-geometry {
 						position: fixed;
 						position-anchor: --navigation-row;
@@ -1968,6 +1972,14 @@
 						visibility: if(
 							style(---wallet-terminal: 1) and style(---wallet-tocOpen: 0): hidden; else: visible
 						);
+						/* A native TOC opening uses the same compact endpoint as scrolling. */
+						transform: translateX(
+								calc(
+									var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
+										var(---pie-compactSize) / var(---pie-size)
+								)
+							)
+							scale(calc(var(---pie-compactSize) / var(---pie-size)));
 						animation:
 							wallet-pie-source auto linear both,
 							wallet-pie-compact auto linear both;
@@ -2251,33 +2263,15 @@
 
 	@keyframes -global-wallet-pie-compact {
 		from {
-			transform: translateX(
-					calc(
-						var(---wallet-tocOpen) * var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
-							var(---pie-compactSize) / var(---pie-size)
-					)
-				)
-				scale(calc(1 + var(---wallet-tocOpen) * (var(---pie-compactSize) / var(---pie-size) - 1)));
-		}
-		to {
-			transform: translateX(
-					calc(
-						var(---inlineDirection) * (100% - var(---pie-size)) / 2 * var(---pie-compactSize) /
-							var(---pie-size)
-					)
-				)
-				scale(calc(var(---pie-compactSize) / var(---pie-size)));
+			transform: translateX(0) scale(1);
 		}
 	}
 	@keyframes -global-wallet-pie-source {
 		from {
 			translate: 0
 				calc(
-					(1 - var(---wallet-tocOpen)) *
-						(
-							var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize) -
-								var(---wallet-terminal) * var(--navigation-mobile-blockSize)
-						)
+					var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize) -
+						var(---wallet-terminal) * var(--navigation-mobile-blockSize)
 				);
 		}
 		/* The underlying translate owns terminal displacement at the source endpoint. */

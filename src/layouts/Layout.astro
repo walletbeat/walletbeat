@@ -413,8 +413,10 @@ import Footer from '@/views/Footer.astro'
 				> :not([data-sticky-breadcrumb~="position"]) {
 				---wallet-sourceOffset: 0px;
 			}
-			/* Mobile navigation motion has no consumers in the article. */
-			[data-sticky-breadcrumb~="root"] > article {
+			/* These subtrees do not consume mobile navigation motion. */
+			[data-sticky-breadcrumb~="root"] > article,
+			#wallet-toc,
+			.pie-navigation-geometry > * {
 				---wallet-terminal: 0;
 				---wallet-tocOpen: 0;
 			}
@@ -525,9 +527,13 @@ import Footer from '@/views/Footer.astro'
 			}
 			#layout:has(#wallet-toc:popover-open)
 				[data-sticky-breadcrumb~="root"]
-				> [data-sticky-breadcrumb~="position"]
+				> [data-sticky-breadcrumb~="position"] {
+				:is([data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="end"]) {
+					---breadcrumb-entry: 1;
+				}
 				[data-sticky-breadcrumb~="item"] {
-				animation-name: none;
+					--stickyBreadcrumb-entryTimeline: auto;
+				}
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"]
