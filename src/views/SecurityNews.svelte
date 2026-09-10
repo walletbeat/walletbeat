@@ -133,7 +133,6 @@
 							{#if newsRefs.length > 0}
 								<ReferenceLinks
 									references={newsRefs}
-									cardBackground="tertiary"
 								/>
 							{/if}
 						</div>
