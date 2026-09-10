@@ -86,7 +86,7 @@
 
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
-	import { isLabeledUrl } from '@/schema/url'
+	import { getUrl } from '@/schema/url'
 	import { IncidentStatus } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
 	import { getNewsForWallet } from '@/data/news'
@@ -303,23 +303,16 @@
 		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
 	)
 
-	const attributeSliceStyles = $derived(
-		new Map(
-			pieNavigationItems.flatMap(group => (
-				group.children?.map(attribute => [attribute.href, attribute.sliceStyle] as const) ?? []
-			))
-		)
-	)
-	const attributeGroupSliceStyles = $derived(
-		new Map(
-			pieNavigationItems.map(group => [group.href, group.sliceStyle] as const)
-		)
-	)
-
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
-		for (const [variant, variantSpecificityMap] of Object.entries(wallet.variantSpecificity)) {
+		for (const entry of Object.entries(wallet.variantSpecificity)) {
+			if (!entry) continue
+
+			const [variant, variantSpecificityMap] = entry
+
+			if (!variantSpecificityMap) continue
+
 			for (const [evalAttrId, variantSpecificity] of variantSpecificityMap) {
 				switch (variantSpecificity) {
 					case VariantSpecificity.ALL_SAME:
@@ -430,10 +423,10 @@
 				'@type': 'SoftwareApplication',
 				name: wallet.metadata.displayName,
 				url: (
-					typeof wallet.metadata.url === 'string' ?
-						wallet.metadata.url
+					wallet.metadata.urls?.websites?.[0] !== undefined ?
+						getUrl(wallet.metadata.urls.websites[0])
 					:
-						wallet.metadata.url?.url
+						undefined
 				),
 				applicationCategory: 'Cryptocurrency Wallet',
 				operatingSystem: (
@@ -550,19 +543,21 @@
 				data-column="gap-6"
 			>
 				<nav data-row="gap-2 start wrap">
-					<a
-						href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-						data-badge="medium"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{@html Globe}
-						Website
-					</a>
+					{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+						<a
+							href={getUrl(wallet.metadata.urls.websites[0])}
+							data-badge="medium"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{@html Globe}
+							Website
+						</a>
+					{/if}
 
 					{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 						<a
-							href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
+							href={getUrl(wallet.metadata.urls.repositories[0])}
 							data-badge="medium"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -715,7 +710,7 @@
 					{#if item.icon}
 						<span
 							class="toc-icon"
-							data-icon="wbicons emoji {item.icon}"
+							data-icon="wbicons {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -764,7 +759,6 @@
 		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
-		{@const sliceStyle = attributeGroupSliceStyles.get(`#${slugifyCamelCase(attrGroup.id)}`)}
 
 		<hr
 			class="attribute-group-timeline"
@@ -784,23 +778,12 @@
 				data-scroll-item="inline-detached padding-match-end"
 			>
 				<header
-					data-row="start gap-4"
+					data-row="center gap-3"
 					data-scroll-item="inline-detached"
 				>
 					<span
 						class="attribute-group-icon"
-						data-icon="wbicons emoji {attrGroup.icon}"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
+						data-icon="wbicons {attrGroup.icon}"
 					></span>
 
 					<div
@@ -871,7 +854,6 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
-	{@const sliceStyle = attributeSliceStyles.get(`#${slugifyCamelCase(attribute.id)}`)}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
@@ -905,21 +887,10 @@
 			data-sticky-breadcrumb="scope"
 		>
 			<summary data-row>
-				<header data-row-item="flexible" data-row="start gap-3">
+				<header data-row-item="flexible" data-row="center gap-3">
 					<span
 						class="attribute-icon"
-						data-icon="wbicons emoji {attribute.icon}"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
+						data-icon="wbicons {attribute.icon}"
 					></span>
 
 					<div
@@ -983,18 +954,24 @@
 								{#if stageNumbers.length > 0}
 									{@const stageNumber = stageNumbers[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+									{@const stageLabels = ladderEvaluation ? (
+										stageNumbers
+											.map(n => ladderEvaluation.ladder.stages[n])
+											.filter(s => s !== undefined)
+											.map(s => s.label.replace(/^Stage /, ''))
+									) : []}
 
 									{#if stage}
 										<a
 											href={`#${stage.id}`}
 											data-link="camouflaged"
-											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+											title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
 										>
 											<div
 												data-badge="small"
 												style:--accent="var(--accent-color)"
 											>
-												<small>Stage {stageNumbers.join(', ')}</small>
+												<small>Stage {stageLabels.join(', ')}</small>
 											</div>
 										</a>
 									{/if}
@@ -1486,20 +1463,6 @@
 				}
 			}
 
-			:global(a) {
-				--icon-filter: brightness(0) opacity(0.35);
-
-				&:hover {
-					--icon-filter: none;
-				}
-			}
-
-			:global(.toc-icon::before) {
-				line-height: 1;
-				filter: var(--icon-filter);
-				transition-property: filter;
-			}
-
 			@media (max-width: 864px) {
 				display: contents;
 				z-index: auto;
@@ -1684,201 +1647,22 @@
 		display: none;
 	}
 
-	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
-		:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
-			---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
-			---slice-gap: var(--slice-gap);
-			---slice-outer-r: var(--slice-outerR);
-			---slice-inner-r: var(--slice-innerR);
-			---slice-outer-corner-radius: var(--slice-outerCornerRadius, calc(var(--slice-gap) / 2));
-			---slice-inner-corner-radius: var(--slice-innerCornerRadius, calc(var(--slice-gap) / 2));
-			---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
-			---slice-half-gap: calc(var(---slice-gap) / 2);
-			---slice-outer-corner-r: max(
-				0,
-				min(
-					var(---slice-outer-corner-radius),
-					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-					calc(
-						(
-							sin(var(---slice-half-angle)) * var(---slice-outer-r)
-							- var(---slice-half-gap)
-						)
-						/ (1 + sin(var(---slice-half-angle)))
-					)
-				)
-			);
-			---slice-inner-corner-r: max(
-				0,
-				min(
-					var(---slice-inner-corner-radius),
-					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-					calc(
-						(
-							sin(var(---slice-half-angle)) * var(---slice-inner-r)
-							- var(---slice-half-gap)
-						)
-						/ max(0.000001, 1 - sin(var(---slice-half-angle)))
-					)
-				)
-			);
-			---slice-outer-corner-offset: calc(var(---slice-half-gap) + var(---slice-outer-corner-r));
-			---slice-inner-corner-offset: calc(var(---slice-half-gap) + var(---slice-inner-corner-r));
-			---slice-outer-corner-center-r: calc(var(---slice-outer-r) - var(---slice-outer-corner-r));
-			---slice-inner-corner-center-r: calc(var(---slice-inner-r) + var(---slice-inner-corner-r));
-			---slice-outer-angle-inset: asin(var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r));
-			---slice-inner-angle-inset: asin(var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r));
-			---slice-outer-side-r: sqrt(pow(var(---slice-outer-corner-center-r), 2) - pow(var(---slice-outer-corner-offset), 2));
-			---slice-inner-side-r: sqrt(pow(var(---slice-inner-corner-center-r), 2) - pow(var(---slice-inner-corner-offset), 2));
-			---slice-angle-outer-start: calc(var(---slice-outer-angle-inset) - var(---slice-half-angle));
-			---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
-			---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
-			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-			---slice-unit: calc(
-				var(--icon-size) * 0.55 * var(--slice-labelSizeScale, 1)
-				/ var(--slice-labelSize)
-			);
-			---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
-			---slice-scaled-offset: calc(
-				var(--slice-offset)
-				* var(---slice-unit)
-			);
-			---slice-outer-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
-				* var(---slice-outer-r)
-			);
-			---slice-inner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
-				* var(---slice-inner-r)
-			);
-			---slice-outer-corner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
-				* var(---slice-outer-corner-center-r)
-				+ var(---slice-outer-corner-r)
-			);
-			---slice-inner-corner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
-				* var(---slice-inner-corner-center-r)
-				+ var(---slice-inner-corner-r)
-			);
-			---slice-block-half: max(
-				0,
-				var(---slice-outer-arc-block-half),
-				var(---slice-outer-corner-arc-block-half),
-				calc(
-					sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-				),
-				calc(
-					sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-				),
-				var(---slice-inner-corner-arc-block-half),
-				var(---slice-inner-arc-block-half)
-			);
+	:global(.toc-icon),
+	.attribute-group-icon,
+	.attribute-icon {
+		color: oklch(from var(--accent) l c h / 1);
+		flex: none;
 
-			position: relative;
-			isolation: isolate;
-			contain: content;
-			inline-size: calc(
-				(var(---slice-outer-r) - var(---slice-inner-r))
-				* var(---slice-unit)
-			);
-			block-size: calc(2 * var(---slice-block-half) * var(---slice-unit));
-			border: 0;
-			border-radius: 0;
-			background: transparent;
-
-			&::before {
-				position: absolute;
-				inset:
-					50% auto auto
-					calc(
-						(
-							var(---slice-outer-r) - var(--slice-labelR)
-						)
-						/ (
-							var(---slice-outer-r) - var(---slice-inner-r)
-						)
-						* 100%
-					);
-				z-index: 1;
-				font-size: calc(
-					var(--icon-size) * 0.55
-					* var(--slice-labelSizeScale, 1)
-				);
-				translate: -50% -50%;
-			}
-
-			&::after {
-				content: '';
-
-				display: block;
-				position: absolute;
-				inset-inline-start: 0;
-				inset-block-start: calc(50% - var(---slice-origin));
-				inline-size: calc(2 * var(---slice-origin));
-				block-size: calc(2 * var(---slice-origin));
-				background: var(--accent, var(--background-tertiary));
-				clip-path: shape(
-					from
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-						),
-					arc to
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						of calc(var(---slice-outer-r) * var(---slice-unit)) cw small,
-					arc to
-						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-outer-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-					line to
-						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-inner-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
-						of calc(var(---slice-inner-r) * var(---slice-unit)) ccw small,
-					arc to
-						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-inner-side-r)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-					line to
-						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-outer-side-r)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-					close
-				);
-				pointer-events: none;
-				transform-origin:
-					var(---slice-origin)
-					var(---slice-origin);
-				transform:
-					translateX(var(---slice-scaled-offset))
-					rotate(-0.25turn)
-					translateY(calc(-1 * var(---slice-scaled-offset)));
-				z-index: 0;
-			}
+		&::before {
+			line-height: 1;
+			filter:
+				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 80%, transparent))
+				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 50%, transparent));
+			transition-property: filter;
 		}
+	}
+
+	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 
 		.container .page-navigation {
 			---pie-size-rem: var(---wallet-page-navigation-inline-size-rem);
@@ -2478,7 +2262,6 @@
 		---color: var(--accent);
 		---linked-icon-filter: none;
 		---slice-scale: 1.045;
-		--icon-filter: none;
 
 		color: var(--accent);
 		opacity: 1;
@@ -2855,8 +2638,7 @@
 				.attribute-heading-position h3,
 				.attribute-summary-companions,
 				.attribute-icon,
-				.attribute-icon::before,
-				.attribute-icon::after {
+				.attribute-icon::before {
 					animation: none;
 				}
 			}
@@ -2910,15 +2692,6 @@
 		}
 
 		:is(.attribute-group-icon, .attribute-icon) {
-			---breadcrumb-slice-label-size: calc(
-				anchor-size(--breadcrumb-slice-icon-position inline)
-				* var(--slice-labelSize)
-				/ (
-					var(---slice-outer-r)
-					- var(---slice-inner-r)
-				)
-			);
-
 			anchor-name: --breadcrumb-slice-icon-position;
 			anchor-scope: --breadcrumb-slice-icon-position;
 			contain: style;
@@ -2930,14 +2703,6 @@
 				line-height: 1;
 
 				animation: BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-			}
-
-			&::after {
-				animation: BreadcrumbSliceShapeAnimation var(--transition-easeInOutExpo) both;
 				animation-timeline: --sticky-breadcrumb-timeline;
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
@@ -2970,37 +2735,10 @@
 			from {
 				position: fixed;
 				position-anchor: --breadcrumb-slice-icon-position;
-				inset-block-start: calc(
-					anchor(--breadcrumb-slice-icon-position top)
-					+ (
-						anchor-size(--breadcrumb-slice-icon-position block)
-						/ 2
-					)
-					- (
-						var(---breadcrumb-slice-label-size)
-						/ 2
-					)
-				);
-				inset-inline-start: calc(
-					anchor(--breadcrumb-slice-icon-position start)
-					+ (
-						anchor-size(--breadcrumb-slice-icon-position inline)
-						* (
-							var(---slice-outer-r)
-							- var(--slice-labelR)
-						)
-						/ (
-							var(---slice-outer-r)
-							- var(---slice-inner-r)
-						)
-					)
-					- (
-						var(---breadcrumb-slice-label-size)
-						/ 2
-					)
-				);
-				inline-size: var(---breadcrumb-slice-label-size);
-				block-size: var(---breadcrumb-slice-label-size);
+				inset-block-start: anchor(--breadcrumb-slice-icon-position top);
+				inset-inline-start: anchor(--breadcrumb-slice-icon-position start);
+				inline-size: anchor-size(--breadcrumb-slice-icon-position inline);
+				block-size: anchor-size(--breadcrumb-slice-icon-position block);
 				translate: none;
 			}
 			to {
@@ -3013,12 +2751,6 @@
 				font-size: var(---wallet-breadcrumb-heading-icon-size);
 				filter: none;
 				translate: none;
-			}
-		}
-
-		@keyframes BreadcrumbSliceShapeAnimation {
-			to {
-				opacity: 0;
 			}
 		}
 
@@ -3168,16 +2900,10 @@
 		}
 
 		> .attribute-group-stack[data-scroll-item] > header[data-scroll-item] {
-			--icon-filter: brightness(0) opacity(0.35);
 			position: relative;
 			inset-inline: auto;
 			min-inline-size: 0;
 			padding-block: 1rem;
-
-			&:has(a:is(:hover, :focus-visible, :interest-source)),
-			.attribute-group:interest-target > & {
-				--icon-filter: none;
-			}
 
 			.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source),
 			.attribute-group:interest-target > & .attribute-group-summary-layout a {
@@ -3186,14 +2912,7 @@
 			}
 
 			> .attribute-group-icon {
-				--icon-size: 4.125em;
-				flex: none;
-
-				&::before {
-					line-height: 1;
-					filter: var(--icon-filter);
-					transition-property: filter;
-				}
+				--icon-size: 1.75em;
 			}
 
 			> .attribute-group-summary-layout {
@@ -3254,13 +2973,7 @@
 		position: relative;
 
 		> details > summary > header {
-			--icon-filter: brightness(0) opacity(0.35);
 			min-inline-size: 0;
-
-			&:has(a:is(:hover, :focus-visible, :interest-source)),
-			.attribute:interest-target & {
-				--icon-filter: none;
-			}
 
 			a:is(:hover, :focus-visible, :interest-source),
 			.attribute:interest-target & a:has(h3) {
@@ -3273,14 +2986,7 @@
 			}
 
 			.attribute-icon {
-				--icon-size: 3.3em;
-				flex: none;
-
-				&::before {
-					line-height: 1;
-					filter: var(--icon-filter);
-					transition-property: filter;
-				}
+				--icon-size: 1.4em;
 			}
 		}
 
