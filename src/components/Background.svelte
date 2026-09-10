@@ -262,8 +262,4 @@
 			display: none;
 		}
 	}
-	/* Pause ambient motion while the wallet's scroll animations are active. */
-	:global(body:has([data-sticky-breadcrumb~="root"])) .background-blob * {
-		animation-play-state: paused;
-	}
 </style>
