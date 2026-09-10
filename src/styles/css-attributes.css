@@ -599,6 +599,14 @@ span svg {
 			gap: var(--column-supportGap, 0.5rem);
 		}
 
+		/* Wrapped companions stay in the title column; the first link retains the icon slot. */
+		[data-sticky-breadcrumb~="item"][data-row~="wrap"]:has(> a > [data-icon]) {
+			padding-inline-start: calc(var(---column-spanSize) + var(--column-supportGap, 0.5rem));
+			> a:first-child {
+				margin-inline-start: calc(-1 * (var(---column-spanSize) + var(--column-supportGap, 0.5rem)));
+			}
+		}
+
 		> [data-row-item~="flexible"] {
 			flex-basis: min-content;
 		}
