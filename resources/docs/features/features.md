@@ -2221,11 +2221,19 @@ Whether a given unlock mechanism is supported, and if so, whether the wallet req
 
 ---
 
+### Interface: `BasicUnlockMechanismData`
+
+Data about a supported unlock mechanism: whether it is required or optional.
+
+- `type` (`BasicUnlockMechanismSupport`): Whether the wallet requires this unlock mechanism, or merely offers it as an option.
+
+---
+
 ### Interface: `BasicUnlock`
 
 Information about how the wallet locks itself against unauthorized access.
 
-- `mechanisms` (`Record<BasicUnlockMechanism, BasicUnlockMechanismSupport | 'NOT_SUPPORTED'>`): Which unlock mechanisms the wallet supports, and whether each one is required or merely optional.
+- `mechanisms` (`Record<BasicUnlockMechanism, Support<BasicUnlockMechanismData>>`): Which unlock mechanisms the wallet supports, and whether each one is required or merely optional.
 
 ---
 
