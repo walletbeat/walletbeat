@@ -2814,6 +2814,7 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `CAMERA` = `'android.permission.CAMERA'`: Camera access, typically for QR code scanning.
 - `RECORD_AUDIO` = `'android.permission.RECORD_AUDIO'`: Microphone access.
 - `MODIFY_AUDIO_SETTINGS` = `'android.permission.MODIFY_AUDIO_SETTINGS'`: Modify global audio settings.
+- `VIBRATE` = `'android.permission.VIBRATE'`: Control device vibration.
 - `BLUETOOTH` = `'android.permission.BLUETOOTH'`: Bluetooth (Android < 12).
 - `BLUETOOTH_ADMIN` = `'android.permission.BLUETOOTH_ADMIN'`: Bluetooth administration (Android < 12).
 - `BLUETOOTH_CONNECT` = `'android.permission.BLUETOOTH_CONNECT'`: Initiate connections to paired Bluetooth devices (Android 12+).
@@ -3992,7 +3993,7 @@ type HasPublicChangelog = Support<MustRef<{}>>
 
 ### Type: `ReproducibleBuilds`
 
-Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts.
+Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts by an independent party.
 
 ```typescript
 type ReproducibleBuilds = Support<WithRef<{}>>

@@ -86,7 +86,7 @@
 
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
-	import { isLabeledUrl } from '@/schema/url'
+	import { getUrl } from '@/schema/url'
 	import { IncidentStatus } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
 	import { getNewsForWallet } from '@/data/news'
@@ -117,69 +117,6 @@
 
 		if(containingDetails)
 			containingDetails.open = true
-	}
-
-	function attachDetailsCommands(root: HTMLElement) {
-		const detailsForCommand = (command: string) => {
-			if (command === '--toggle-page-details')
-				return root.querySelectorAll<HTMLDetailsElement>(':scope > article details')
-
-			if (command !== '--toggle-group-details') return []
-
-			const currentLink = globalThis.CSS.supports('selector(:target-current)')
-				? root.querySelector<HTMLAnchorElement>(
-					'.page-navigation a:target-current[href^="#"]'
-				)
-				: null
-			const currentId = currentLink?.hash
-				? decodeURIComponent(currentLink.hash.slice(1))
-				: decodeURIComponent(globalThis.location.hash.slice(1))
-			const currentGroup = (
-				currentId
-					? globalThis.document.getElementById(currentId)?.closest('.attribute-group')
-					: null
-				?? root.querySelector('.attribute-group')
-			)
-
-			return currentGroup?.querySelectorAll<HTMLDetailsElement>('details') ?? []
-		}
-
-		const runCommand = (command?: string) => {
-			if (!command) return
-
-			const details = Array.from(detailsForCommand(command))
-			const open = details.some(detail => !detail.open)
-
-			for (const detail of details)
-				detail.open = open
-		}
-
-		const handleCommand = (event: Event) => {
-			runCommand((event as Event & { command?: string }).command)
-		}
-
-		root.addEventListener('command', handleCommand)
-
-		const handleClick = (event: MouseEvent) => {
-			const button = event.target instanceof Element
-				? event.target.closest<HTMLButtonElement>('button[commandfor="wallet-page"]')
-				: null
-
-			if (!button) return
-
-			/* An invoker cannot reliably target its own ancestor. Keep the native
-			 * command markup as the baseline and own this irreducible case. */
-			event.preventDefault()
-			runCommand(button.getAttribute('command') ?? undefined)
-		}
-
-		root.addEventListener('click', handleClick)
-
-		return () => {
-			root.removeEventListener('command', handleCommand)
-
-			root.removeEventListener('click', handleClick)
-		}
 	}
 
 	$effect(() => {
@@ -366,23 +303,16 @@
 		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
 	)
 
-	const attributeSliceStyles = $derived(
-		new Map(
-			pieNavigationItems.flatMap(group => (
-				group.children?.map(attribute => [attribute.href, attribute.sliceStyle] as const) ?? []
-			))
-		)
-	)
-	const attributeGroupSliceStyles = $derived(
-		new Map(
-			pieNavigationItems.map(group => [group.href, group.sliceStyle] as const)
-		)
-	)
-
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
-		for (const [variant, variantSpecificityMap] of Object.entries(wallet.variantSpecificity)) {
+		for (const entry of Object.entries(wallet.variantSpecificity)) {
+			if (!entry) continue
+
+			const [variant, variantSpecificityMap] = entry
+
+			if (!variantSpecificityMap) continue
+
 			for (const [evalAttrId, variantSpecificity] of variantSpecificityMap) {
 				switch (variantSpecificity) {
 					case VariantSpecificity.ALL_SAME:
@@ -410,8 +340,6 @@
 
 	// Components
 	import { Github, Globe } from 'lucide-static'
-	import ListCollapseIcon from 'lucide-static/icons/list-collapse.svg?raw'
-	import Rows3Icon from 'lucide-static/icons/rows-3.svg?raw'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -496,10 +424,10 @@
 				'@type': 'SoftwareApplication',
 				name: wallet.metadata.displayName,
 				url: (
-					typeof wallet.metadata.url === 'string' ?
-						wallet.metadata.url
+					wallet.metadata.urls?.websites?.[0] !== undefined ?
+						getUrl(wallet.metadata.urls.websites[0])
 					:
-						wallet.metadata.url?.url
+						undefined
 				),
 				applicationCategory: 'Cryptocurrency Wallet',
 				operatingSystem: (
@@ -522,7 +450,6 @@
 		'--header-timeline',
 		...pieRotationSteps.map(step => step.timeline),
 	].join(', ')}
-	{@attach attachDetailsCommands}
 >
 	<article
 		data-column="gap-8"
@@ -617,19 +544,21 @@
 				data-column="gap-6"
 			>
 				<nav data-row="gap-2 start wrap">
-					<a
-						href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-						data-badge="medium"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{@html Globe}
-						Website
-					</a>
+					{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+						<a
+							href={getUrl(wallet.metadata.urls.websites[0])}
+							data-badge="medium"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{@html Globe}
+							Website
+						</a>
+					{/if}
 
 					{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 						<a
-							href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
+							href={getUrl(wallet.metadata.urls.repositories[0])}
 							data-badge="medium"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -731,40 +660,6 @@
 			</div>
 		{/if}
 
-		<div class="details-controls-layer" data-sticky-container>
-			<menu
-				class="details-controls"
-				data-sticky="block-start backdrop-before backdrop-stuck"
-				data-row="gap-2"
-				aria-label="Expand or collapse rating details"
-			>
-				<li>
-					<button
-						type="button"
-						data-icon="circle"
-						commandfor="wallet-page"
-						command="--toggle-group-details"
-						aria-label="Expand or collapse details in the current attribute group"
-						title="Toggle current group details"
-					>
-						<span>{@html ListCollapseIcon}</span>
-					</button>
-				</li>
-
-				<li>
-					<button
-						type="button"
-						data-icon="circle"
-						commandfor="wallet-page"
-						command="--toggle-page-details"
-						aria-label="Expand or collapse all details on this page"
-						title="Toggle all page details"
-					>
-						<span>{@html Rows3Icon}</span>
-					</button>
-				</li>
-			</menu>
-		</div>
 	</article>
 
 	<aside
@@ -816,7 +711,7 @@
 					{#if item.icon}
 						<span
 							class="toc-icon"
-							data-icon="wbicons emoji {item.icon}"
+							data-icon="wbicons {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -836,7 +731,7 @@
 		{ladders}
 		{wallet}
 		{showScores}
-		{showStage}
+		showStage={false}
 	/>
 {/snippet}
 
@@ -865,7 +760,6 @@
 		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
-		{@const sliceStyle = attributeGroupSliceStyles.get(`#${slugifyCamelCase(attrGroup.id)}`)}
 
 		<hr
 			class="attribute-group-timeline"
@@ -885,23 +779,12 @@
 				data-scroll-item="inline-detached padding-match-end"
 			>
 				<header
-					data-row="start gap-4"
+					data-row="center gap-3"
 					data-scroll-item="inline-detached"
 				>
 					<span
 						class="attribute-group-icon"
-						data-icon="wbicons emoji {attrGroup.icon}"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
+						data-icon="wbicons {attrGroup.icon}"
 					></span>
 
 					<div
@@ -972,7 +855,6 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
-	{@const sliceStyle = attributeSliceStyles.get(`#${slugifyCamelCase(attribute.id)}`)}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
@@ -1006,21 +888,10 @@
 			data-sticky-breadcrumb="scope"
 		>
 			<summary data-row>
-				<header data-row-item="flexible" data-row="start gap-3">
+				<header data-row-item="flexible" data-row="center gap-3">
 					<span
 						class="attribute-icon"
-						data-icon="wbicons emoji {attribute.icon}"
-						style:--slice-totalAngle={sliceStyle?.totalAngle}
-						style:--slice-midAngle={sliceStyle?.midAngle}
-						style:--slice-offset={sliceStyle?.offset}
-						style:--slice-gap={sliceStyle?.gap}
-						style:--slice-outerR={sliceStyle?.outerR}
-						style:--slice-innerR={sliceStyle?.innerR}
-						style:--slice-outerCornerRadius={sliceStyle?.outerCornerRadius}
-						style:--slice-innerCornerRadius={sliceStyle?.innerCornerRadius}
-						style:--slice-labelSize={sliceStyle?.labelSize}
-						style:--slice-labelSizeScale={sliceStyle?.labelSizeScale}
-						style:--slice-labelR={sliceStyle?.labelR}
+						data-icon="wbicons {attribute.icon}"
 					></span>
 
 					<div
@@ -1084,18 +955,24 @@
 								{#if stageNumbers.length > 0}
 									{@const stageNumber = stageNumbers[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+									{@const stageLabels = ladderEvaluation ? (
+										stageNumbers
+											.map(n => ladderEvaluation.ladder.stages[n])
+											.filter(s => s !== undefined)
+											.map(s => s.label.replace(/^Stage /, ''))
+									) : []}
 
 									{#if stage}
 										<a
 											href={`#${stage.id}`}
 											data-link="camouflaged"
-											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+											title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
 										>
 											<div
 												data-badge="small"
 												style:--accent="var(--accent-color)"
 											>
-												<small>Stage {stageNumbers.join(', ')}</small>
+												<small>Stage {stageLabels.join(', ')}</small>
 											</div>
 										</a>
 									{/if}
@@ -1577,17 +1454,6 @@
 			background-color: var(--background-secondary);
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
-			&::after {
-				content: '';
-				z-index: 3;
-				position: sticky;
-				inset-block-end: 0;
-				flex: 0 0 var(---anchor-controls-reserved-block-size);
-				margin-block-start: auto;
-				background-color: var(--background-secondary);
-				box-shadow: 0 calc(-1 * var(--separator-width)) 0 var(--border-color);
-			}
-
 			> nav:not(.pie-navigation) {
 				position: relative;
 				z-index: 0;
@@ -1600,20 +1466,6 @@
 					--sticky-paddingBlockStart: 0.75rem;
 					--sticky-paddingBlockEnd: 0.75rem;
 				}
-			}
-
-			:global(a) {
-				--icon-filter: brightness(0) opacity(0.35);
-
-				&:hover {
-					--icon-filter: none;
-				}
-			}
-
-			:global(.toc-icon::before) {
-				line-height: 1;
-				filter: var(--icon-filter);
-				transition-property: filter;
 			}
 
 			@media (max-width: 864px) {
@@ -1680,36 +1532,8 @@
 			+ var(---wallet-breadcrumb-surface-fade)
 			+ var(---wallet-anchor-scroll-gap)
 		);
-		---anchor-button-size: 2.5rem;
-		---anchor-control-inset: 0.75rem;
-		---anchor-control-gap: 0.75rem;
-		---anchor-marker-padding: 0.5rem;
-		---anchor-marker-block-size: calc(
-			var(---anchor-button-size)
-			+ 2 * var(---anchor-marker-padding)
-		);
-		---anchor-controls-reserved-block-size: calc(
-			var(---anchor-control-inset)
-			+ var(---anchor-marker-block-size)
-			+ var(---anchor-control-gap)
-		);
-		---anchor-control-track-inset: calc(
-			var(---anchor-control-inset)
-			+ var(---anchor-button-size)
-			+ var(---anchor-control-gap)
-		);
-		---anchor-button-block-inset: calc(
-			var(---anchor-control-inset)
-			+ (
-				var(---anchor-marker-block-size)
-				- var(---anchor-button-size)
-			)
-			/ 2
-		);
 
-		scroll-marker-group: after;
 		scroll-snap-type: block proximity;
-		timeline-scope: --wallet-page-exit;
 
 		@media (max-width: 1024px) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
@@ -1756,224 +1580,6 @@
 	 */
 	:global(body:has(#wallet-page) .background-blob *) {
 		animation-play-state: paused;
-	}
-
-	#wallet-page {
-		view-timeline-name: --wallet-page-exit;
-		view-timeline-axis: block;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-marker-group {
-		z-index: 4;
-		position: fixed;
-		inset-block: auto var(---anchor-control-inset);
-		inset-inline: auto var(---anchor-control-track-inset);
-		box-sizing: border-box;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		inline-size: calc(
-			var(---wallet-page-navigation-inline-size)
-			- 2 * var(---anchor-control-track-inset)
-		);
-		block-size: var(---anchor-marker-block-size);
-		padding: var(---anchor-marker-padding);
-		overflow-x: auto;
-		overflow-y: clip;
-		scroll-snap-type: inline mandatory;
-		scrollbar-width: none;
-		border-radius: 100vmax;
-		background-color: color-mix(
-			in oklch,
-			var(--background-primary) 82%,
-			transparent
-		);
-		box-shadow: 0 0 var(--separator-width) var(--border-color);
-		backdrop-filter: blur(1rem);
-		transition: scroll-snap-type 0s 500ms allow-discrete;
-		animation: keep-anchor-navigation-in-wallet linear both;
-		animation-timeline: --wallet-page-exit;
-		animation-range: exit 0% exit 100%;
-
-		@media (prefers-reduced-transparency: reduce) {
-			backdrop-filter: none;
-		}
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-marker-group:is(
-		:hover,
-		:focus-within,
-		:active
-	) {
-		scroll-snap-type: none;
-		transition-delay: 0s;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-marker-group::-webkit-scrollbar {
-		display: none;
-	}
-
-	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker {
-		content: '' / attr(aria-label);
-		flex: 0 0 auto;
-		box-sizing: border-box;
-		inline-size: var(---anchor-button-size);
-		block-size: var(---anchor-button-size);
-		border: var(--separator-width) solid var(--border-color);
-		border-radius: 50%;
-		background-color: var(--background-secondary);
-		transition-property: scale, background-color, border-color;
-	}
-
-	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker:target-current {
-		scroll-snap-align: center;
-	}
-
-	:global(#wallet-page :is(.attribute-group, .attribute))::scroll-marker:is(
-		:hover,
-		:focus-visible,
-		:target-current
-	) {
-		background-color: var(--background-tertiary);
-		border-color: var(--text-secondary);
-		scale: 1.08;
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-start),
-	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-		z-index: 5;
-		position: fixed;
-		inset-block: auto var(---anchor-button-block-inset);
-		box-sizing: border-box;
-		inline-size: var(---anchor-button-size);
-		block-size: var(---anchor-button-size);
-		padding: 0;
-		border: var(--separator-width) solid var(--border-color);
-		border-radius: 50%;
-		background-color: var(--background-secondary);
-		color: var(--text-primary);
-		font: inherit;
-		font-size: 1.25rem;
-		line-height: 1;
-		transition-property: scale, background-color, border-color, opacity;
-		animation: keep-anchor-navigation-in-wallet linear both;
-		animation-timeline: --wallet-page-exit;
-		animation-range: exit 0% exit 100%;
-		&:is(:hover, :focus-visible) {
-			background-color: var(--background-tertiary);
-			border-color: var(--text-secondary);
-			scale: 1.05;
-		}
-
-		&:disabled {
-			opacity: 0.38;
-		}
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-start) {
-		inset-inline: auto calc(
-			var(---wallet-page-navigation-inline-size)
-			- var(---anchor-button-size)
-			- var(---anchor-control-inset)
-		);
-		content: '↑' / 'Scroll toward the previous rating section';
-
-	}
-
-	:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-		inset-inline: auto var(---anchor-control-inset);
-		content: '↓' / 'Scroll toward the next rating section';
-
-	}
-
-	@media (max-width: 1024px) {
-		:global(#layout:has(#wallet-page))::scroll-marker-group {
-			inset-inline: var(---anchor-control-track-inset) auto;
-
-		}
-
-		:global(#layout:has(#wallet-page))::scroll-button(block-start) {
-			inset-inline: var(---anchor-control-inset) auto;
-
-		}
-
-		:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-			inset-inline: calc(
-				var(---wallet-page-navigation-inline-size)
-				- var(---anchor-button-size)
-				- var(---anchor-control-inset)
-			) auto;
-
-		}
-	}
-
-	@media (max-width: 864px) {
-		:global(#layout:has(#wallet-page)) {
-			scroll-marker-group: none;
-		}
-
-		:global(#layout:has(#wallet-page))::scroll-button(block-start),
-		:global(#layout:has(#wallet-page))::scroll-button(block-end) {
-			content: none;
-		}
-	}
-
-	@keyframes keep-anchor-navigation-in-wallet {
-		to {
-			translate: 0 -100dvb;
-		}
-	}
-
-	.details-controls-layer {
-		position: absolute;
-		inset: 0;
-		z-index: 4;
-		pointer-events: none;
-	}
-
-	.details-controls {
-		--icon-size: 2.75rem;
-		--icon-navigation-borderColor: var(--border-color);
-		--icon-navigation-color: var(--text-primary);
-		--sticky-insetBlockStart: calc(100dvb - 4.75rem);
-		--sticky-insetInlineEnd: 1rem;
-
-		position: sticky;
-		inset-inline: auto 1rem;
-		inline-size: max-content;
-		margin: 0;
-		margin-inline-start: auto;
-		padding: 0.5rem;
-		border-radius: 100vmax;
-		list-style: none;
-		background-color: color-mix(
-			in oklch,
-			var(--background-primary) 82%,
-			transparent
-		);
-		box-shadow: 0 0 var(--separator-width) var(--border-color);
-		backdrop-filter: blur(1rem);
-		pointer-events: auto;
-
-		@media (prefers-reduced-transparency: reduce) {
-			backdrop-filter: none;
-		}
-
-		> li {
-			display: contents;
-		}
-
-		button {
-			background-color: var(--background-secondary);
-			transition-property: color, background-color, border-color, scale;
-
-			&:is(:hover, :focus-visible) {
-				background-color: var(--background-tertiary);
-				border-color: var(--text-secondary);
-				scale: 1.05;
-			}
-		}
-
 	}
 
 	@property ---pie-rotate {
@@ -2046,201 +1652,22 @@
 		display: none;
 	}
 
-	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
-		:is(.toc-icon, .attribute-group-icon, .attribute-icon) {
-			---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
-			---slice-gap: var(--slice-gap);
-			---slice-outer-r: var(--slice-outerR);
-			---slice-inner-r: var(--slice-innerR);
-			---slice-outer-corner-radius: var(--slice-outerCornerRadius, calc(var(--slice-gap) / 2));
-			---slice-inner-corner-radius: var(--slice-innerCornerRadius, calc(var(--slice-gap) / 2));
-			---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
-			---slice-half-gap: calc(var(---slice-gap) / 2);
-			---slice-outer-corner-r: max(
-				0,
-				min(
-					var(---slice-outer-corner-radius),
-					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-					calc(
-						(
-							sin(var(---slice-half-angle)) * var(---slice-outer-r)
-							- var(---slice-half-gap)
-						)
-						/ (1 + sin(var(---slice-half-angle)))
-					)
-				)
-			);
-			---slice-inner-corner-r: max(
-				0,
-				min(
-					var(---slice-inner-corner-radius),
-					calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-					calc(
-						(
-							sin(var(---slice-half-angle)) * var(---slice-inner-r)
-							- var(---slice-half-gap)
-						)
-						/ max(0.000001, 1 - sin(var(---slice-half-angle)))
-					)
-				)
-			);
-			---slice-outer-corner-offset: calc(var(---slice-half-gap) + var(---slice-outer-corner-r));
-			---slice-inner-corner-offset: calc(var(---slice-half-gap) + var(---slice-inner-corner-r));
-			---slice-outer-corner-center-r: calc(var(---slice-outer-r) - var(---slice-outer-corner-r));
-			---slice-inner-corner-center-r: calc(var(---slice-inner-r) + var(---slice-inner-corner-r));
-			---slice-outer-angle-inset: asin(var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r));
-			---slice-inner-angle-inset: asin(var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r));
-			---slice-outer-side-r: sqrt(pow(var(---slice-outer-corner-center-r), 2) - pow(var(---slice-outer-corner-offset), 2));
-			---slice-inner-side-r: sqrt(pow(var(---slice-inner-corner-center-r), 2) - pow(var(---slice-inner-corner-offset), 2));
-			---slice-angle-outer-start: calc(var(---slice-outer-angle-inset) - var(---slice-half-angle));
-			---slice-angle-outer-end: calc(var(---slice-half-angle) - var(---slice-outer-angle-inset));
-			---slice-angle-inner-end: calc(var(---slice-half-angle) - var(---slice-inner-angle-inset));
-			---slice-angle-inner-start: calc(var(---slice-inner-angle-inset) - var(---slice-half-angle));
-			---slice-unit: calc(
-				var(--icon-size) * 0.55 * var(--slice-labelSizeScale, 1)
-				/ var(--slice-labelSize)
-			);
-			---slice-origin: calc(var(---slice-outer-r) * var(---slice-unit));
-			---slice-scaled-offset: calc(
-				var(--slice-offset)
-				* var(---slice-unit)
-			);
-			---slice-outer-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
-				* var(---slice-outer-r)
-			);
-			---slice-inner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
-				* var(---slice-inner-r)
-			);
-			---slice-outer-corner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-outer-end), 90deg))
-				* var(---slice-outer-corner-center-r)
-				+ var(---slice-outer-corner-r)
-			);
-			---slice-inner-corner-arc-block-half: calc(
-				sin(clamp(0deg, var(---slice-angle-inner-end), 90deg))
-				* var(---slice-inner-corner-center-r)
-				+ var(---slice-inner-corner-r)
-			);
-			---slice-block-half: max(
-				0,
-				var(---slice-outer-arc-block-half),
-				var(---slice-outer-corner-arc-block-half),
-				calc(
-					sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-				),
-				calc(
-					sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-					- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-				),
-				var(---slice-inner-corner-arc-block-half),
-				var(---slice-inner-arc-block-half)
-			);
+	:global(.toc-icon),
+	.attribute-group-icon,
+	.attribute-icon {
+		color: oklch(from var(--accent) l c h / 1);
+		flex: none;
 
-			position: relative;
-			isolation: isolate;
-			contain: content;
-			inline-size: calc(
-				(var(---slice-outer-r) - var(---slice-inner-r))
-				* var(---slice-unit)
-			);
-			block-size: calc(2 * var(---slice-block-half) * var(---slice-unit));
-			border: 0;
-			border-radius: 0;
-			background: transparent;
-
-			&::before {
-				position: absolute;
-				inset:
-					50% auto auto
-					calc(
-						(
-							var(---slice-outer-r) - var(--slice-labelR)
-						)
-						/ (
-							var(---slice-outer-r) - var(---slice-inner-r)
-						)
-						* 100%
-					);
-				z-index: 1;
-				font-size: calc(
-					var(--icon-size) * 0.55
-					* var(--slice-labelSizeScale, 1)
-				);
-				translate: -50% -50%;
-			}
-
-			&::after {
-				content: '';
-
-				display: block;
-				position: absolute;
-				inset-inline-start: 0;
-				inset-block-start: calc(50% - var(---slice-origin));
-				inline-size: calc(2 * var(---slice-origin));
-				block-size: calc(2 * var(---slice-origin));
-				background: var(--accent, var(--background-tertiary));
-				clip-path: shape(
-					from
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit)
-						),
-					arc to
-						calc(
-							var(---slice-origin)
-							+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						calc(
-							var(---slice-origin)
-							- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit)
-						)
-						of calc(var(---slice-outer-r) * var(---slice-unit)) cw small,
-					arc to
-						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-outer-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-					line to
-						calc(var(---slice-origin) + (sin(var(---slice-half-angle)) * var(---slice-inner-side-r) - cos(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit))
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit))
-						of calc(var(---slice-inner-r) * var(---slice-unit)) ccw small,
-					arc to
-						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-inner-side-r)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-inner-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit))
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit)) cw small,
-					line to
-						calc(var(---slice-origin) + (cos(var(---slice-half-angle)) * var(---slice-half-gap) - sin(var(---slice-half-angle)) * var(---slice-outer-side-r)) * var(---slice-unit))
-						calc(var(---slice-origin) - (cos(var(---slice-half-angle)) * var(---slice-outer-side-r) + sin(var(---slice-half-angle)) * var(---slice-half-gap)) * var(---slice-unit)),
-					arc to
-						calc(var(---slice-origin) + sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
-						calc(var(---slice-origin) - cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit))
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit)) cw small,
-					close
-				);
-				pointer-events: none;
-				transform-origin:
-					var(---slice-origin)
-					var(---slice-origin);
-				transform:
-					translateX(var(---slice-scaled-offset))
-					rotate(-0.25turn)
-					translateY(calc(-1 * var(---slice-scaled-offset)));
-				z-index: 0;
-			}
+		&::before {
+			line-height: 1;
+			filter:
+				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 80%, transparent))
+				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 50%, transparent));
+			transition-property: filter;
 		}
+	}
+
+	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
 
 		.container .page-navigation {
 			---pie-size-rem: var(---wallet-page-navigation-inline-size-rem);
@@ -2840,7 +2267,6 @@
 		---color: var(--accent);
 		---linked-icon-filter: none;
 		---slice-scale: 1.045;
-		--icon-filter: none;
 
 		color: var(--accent);
 		opacity: 1;
@@ -3217,8 +2643,7 @@
 				.attribute-heading-position h3,
 				.attribute-summary-companions,
 				.attribute-icon,
-				.attribute-icon::before,
-				.attribute-icon::after {
+				.attribute-icon::before {
 					animation: none;
 				}
 			}
@@ -3272,15 +2697,6 @@
 		}
 
 		:is(.attribute-group-icon, .attribute-icon) {
-			---breadcrumb-slice-label-size: calc(
-				anchor-size(--breadcrumb-slice-icon-position inline)
-				* var(--slice-labelSize)
-				/ (
-					var(---slice-outer-r)
-					- var(---slice-inner-r)
-				)
-			);
-
 			anchor-name: --breadcrumb-slice-icon-position;
 			anchor-scope: --breadcrumb-slice-icon-position;
 			contain: style;
@@ -3292,14 +2708,6 @@
 				line-height: 1;
 
 				animation: BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-			}
-
-			&::after {
-				animation: BreadcrumbSliceShapeAnimation var(--transition-easeInOutExpo) both;
 				animation-timeline: --sticky-breadcrumb-timeline;
 				animation-range:
 					var(---wallet-breadcrumb-animation-range-start)
@@ -3332,37 +2740,10 @@
 			from {
 				position: fixed;
 				position-anchor: --breadcrumb-slice-icon-position;
-				inset-block-start: calc(
-					anchor(--breadcrumb-slice-icon-position top)
-					+ (
-						anchor-size(--breadcrumb-slice-icon-position block)
-						/ 2
-					)
-					- (
-						var(---breadcrumb-slice-label-size)
-						/ 2
-					)
-				);
-				inset-inline-start: calc(
-					anchor(--breadcrumb-slice-icon-position start)
-					+ (
-						anchor-size(--breadcrumb-slice-icon-position inline)
-						* (
-							var(---slice-outer-r)
-							- var(--slice-labelR)
-						)
-						/ (
-							var(---slice-outer-r)
-							- var(---slice-inner-r)
-						)
-					)
-					- (
-						var(---breadcrumb-slice-label-size)
-						/ 2
-					)
-				);
-				inline-size: var(---breadcrumb-slice-label-size);
-				block-size: var(---breadcrumb-slice-label-size);
+				inset-block-start: anchor(--breadcrumb-slice-icon-position top);
+				inset-inline-start: anchor(--breadcrumb-slice-icon-position start);
+				inline-size: anchor-size(--breadcrumb-slice-icon-position inline);
+				block-size: anchor-size(--breadcrumb-slice-icon-position block);
 				translate: none;
 			}
 			to {
@@ -3375,12 +2756,6 @@
 				font-size: var(---wallet-breadcrumb-heading-icon-size);
 				filter: none;
 				translate: none;
-			}
-		}
-
-		@keyframes BreadcrumbSliceShapeAnimation {
-			to {
-				opacity: 0;
 			}
 		}
 
@@ -3530,16 +2905,10 @@
 		}
 
 		> .attribute-group-stack[data-scroll-item] > header[data-scroll-item] {
-			--icon-filter: brightness(0) opacity(0.35);
 			position: relative;
 			inset-inline: auto;
 			min-inline-size: 0;
 			padding-block: 1rem;
-
-			&:has(a:is(:hover, :focus-visible, :interest-source)),
-			.attribute-group:interest-target > & {
-				--icon-filter: none;
-			}
 
 			.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source),
 			.attribute-group:interest-target > & .attribute-group-summary-layout a {
@@ -3548,14 +2917,7 @@
 			}
 
 			> .attribute-group-icon {
-				--icon-size: 4.125em;
-				flex: none;
-
-				&::before {
-					line-height: 1;
-					filter: var(--icon-filter);
-					transition-property: filter;
-				}
+				--icon-size: 1.75em;
 			}
 
 			> .attribute-group-summary-layout {
@@ -3616,13 +2978,7 @@
 		position: relative;
 
 		> details > summary > header {
-			--icon-filter: brightness(0) opacity(0.35);
 			min-inline-size: 0;
-
-			&:has(a:is(:hover, :focus-visible, :interest-source)),
-			.attribute:interest-target & {
-				--icon-filter: none;
-			}
 
 			a:is(:hover, :focus-visible, :interest-source),
 			.attribute:interest-target & a:has(h3) {
@@ -3635,14 +2991,7 @@
 			}
 
 			.attribute-icon {
-				--icon-size: 3.3em;
-				flex: none;
-
-				&::before {
-					line-height: 1;
-					filter: var(--icon-filter);
-					transition-property: filter;
-				}
+				--icon-size: 1.4em;
 			}
 		}
 

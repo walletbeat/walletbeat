@@ -204,7 +204,7 @@ describe('walletPageMarkdown', () => {
 				const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 
 				if (typeof stage === 'object' && stage !== null && ladderEvaluation !== null) {
-					expect(md).toMatch(/### Stage \d+: /)
+					expect(md).toMatch(`### ${stage.label}`)
 
 					const hasRatingIcon = /[✅❌➖❔]/.test(md)
 					const hasCriteriaPassed = /criteria passed/.test(md)
