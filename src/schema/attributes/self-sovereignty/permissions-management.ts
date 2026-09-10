@@ -61,7 +61,6 @@ function ratingForSwapApprovals(behavior: BuiltInSwapDefaultApprovalBehavior): E
 		case BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT:
 			return Rating.PASS
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE:
-			return Rating.PARTIAL
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_DISCLOSED:
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED:
 			return Rating.FAIL
@@ -135,7 +134,9 @@ function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport)
 				`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
 			),
 			impact: paragraph(
-				'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.',
+				undisclosed
+					? 'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.'
+					: 'Users who do not notice or adjust the default before signing grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain.',
 			),
 			howToImprove: requestExactAmountByDefaultAdvice,
 		})
@@ -176,33 +177,23 @@ function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport)
 	}
 
 	if (overallRating === Rating.PARTIAL) {
-		const isSwapDriven = approvalsRating === Rating.PASS && swapRating === Rating.PARTIAL
-
 		return ctx.build({
 			outcome: {
-				id: isSwapDriven ? 'editable_unlimited_swap_approval' : 'can_inspect_not_revoke',
+				id: 'can_inspect_not_revoke',
 				rating: Rating.PARTIAL,
-				displayName: isSwapDriven
-					? 'Defaults to unlimited but editable swap approvals'
-					: 'Can inspect but not revoke approvals',
-				shortExplanation: isSwapDriven
-					? sentence(
-							"{{WALLET_NAME}}'s built-in swaps default to an unlimited approval, but let you edit the amount.",
-						)
-					: sentence('{{WALLET_NAME}} lets you inspect token approvals but not revoke them.'),
+				displayName: 'Can inspect but not revoke approvals',
+				shortExplanation: sentence(
+					'{{WALLET_NAME}} lets you inspect token approvals but not revoke them.',
+				),
 			},
 			details:
-				isSwapDriven && walletHasBuiltInSwap
-					? paragraph(
-							`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
-						)
-					: (perStandardDetails ??
-						paragraph(
-							'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
-						)),
-			howToImprove: isSwapDriven
-				? requestExactAmountByDefaultAdvice
-				: paragraph('{{WALLET_NAME}} should add the ability to revoke token approvals directly.'),
+				perStandardDetails ??
+				paragraph(
+					'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
+				),
+			howToImprove: paragraph(
+				'{{WALLET_NAME}} should add the ability to revoke token approvals directly.',
+			),
 		})
 	}
 
@@ -264,9 +255,9 @@ export const permissionsManagement: Attribute = {
 		Wallets that offer a built-in swap or bridge feature are also evaluated on
 		whether that feature requests an exact-amount approval by default. Only an
 		exact-amount default passes. A default of unlimited fails this attribute,
-		regardless of disclosure, even if the wallet otherwise supports inspecting
-		and revoking approvals well. A default of unlimited that the user can edit
-		down before signing is rated partial instead.
+		regardless of disclosure or whether the user can edit the amount down
+		before signing, even if the wallet otherwise supports inspecting and
+		revoking approvals well.
 
 		As Account Abstraction becomes more prevalent, this methodology
 		will also grow to encompass the management of more complex account permissions.
