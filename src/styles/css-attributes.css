@@ -1598,16 +1598,10 @@ ol {
 		from {
 			transform: translateX(0px) scale(1);
 		}
-		to {
-			transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
-		}
 	}
 	@keyframes breadcrumb-item-block-motion {
 		from {
 			translate: 0px;
-		}
-		to {
-			translate: 0 var(---breadcrumb-translateBlock);
 		}
 	}
 	/* Projection divides by the parent's interpolated scale, exactly countering it.
@@ -1726,17 +1720,26 @@ ol {
 			---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 			---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
 		}
-		&::before {
-			content: '';
+		&::before,
+		&::after {
 			position: fixed;
 			inset: 0 auto auto 0;
 			visibility: hidden;
 			pointer-events: none;
+			view-timeline-axis: inline, block;
+			view-timeline-inset: 0;
+		}
+		&::before {
+			content: '';
 			inline-size: anchor-size(--breadcrumb-compact inline);
 			block-size: anchor-size(--breadcrumb-source block);
 			view-timeline-name: var(--stickyBreadcrumb-itemTimelines);
-			view-timeline-axis: inline, block;
-			view-timeline-inset: 0;
+		}
+		&::after {
+			content: if(style(---breadcrumb-hasEnd: 1): '' ; else: none);
+			inline-size: anchor-size(--breadcrumb-end inline, 0px);
+			block-size: anchor-size(--breadcrumb-end block, 0px);
+			view-timeline-name: var(--stickyBreadcrumb-endTimelines);
 		}
 		> *,
 		&::after {
@@ -2103,18 +2106,6 @@ ol {
 	}
 
 	[data-sticky-breadcrumb~="scope"] {
-		&::after {
-			content: if(style(---breadcrumb-hasEnd: 1): '' ; else: none);
-			visibility: hidden;
-			pointer-events: none;
-			position: fixed;
-			inset: 0 auto auto 0;
-			inline-size: anchor-size(--breadcrumb-end inline, 0px);
-			block-size: anchor-size(--breadcrumb-end block, 0px);
-			view-timeline-name: var(--stickyBreadcrumb-endTimelines);
-			view-timeline-axis: inline, block;
-			view-timeline-inset: 0;
-		}
 		&[data-card] {
 			--stickyBreadcrumb-sourcePaddingBlock: var(--card-padding);
 			--stickyBreadcrumb-sourcePaddingInline: var(--card-padding);
