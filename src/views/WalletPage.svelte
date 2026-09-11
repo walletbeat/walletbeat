@@ -576,14 +576,14 @@
 		data-scroll-item="inline-detached padding-match-start"
 	>
 		<div data-row="wrap">
-			<div class="wallet-title-row" data-row="wrap" data-row-item="flexible">
+			<div class="wallet-title-row" data-row="start wrap" data-row-item="flexible">
 				<h1 data-sticky-breadcrumb="source">
 					<a
 						data-link="camouflaged"
 						class="wallet-name"
 						href="#top"
 						data-sticky-breadcrumb="item"
-						data-row="gap-2"
+						data-row="gap-1"
 					>
 						<img
 							class="wallet-icon"
@@ -651,8 +651,33 @@
 			</div>
 		</div>
 
-		<section class="wallet-overview" data-column="gap-6">
-			<nav data-row="gap-2 start wrap">
+		<section class="wallet-overview" data-sticky-breadcrumb="support" data-row="wrap align-start">
+			{#if !hasSingleVariant(wallet.variants)}
+				<p data-row-item="flexible basis-4">
+					The ratings below may vary depending on the version.
+					{#if selectedVariant}
+						You are currently viewing the ratings for the
+						<strong>{variantToName(selectedVariant, false)}</strong> version.
+					{:else}
+						Select a version to see version-specific ratings.
+					{/if}
+				</p>
+			{/if}
+
+			{#if Variant.HARDWARE in wallet.variants}
+				{#if brandModels.length > 1}
+					<p data-row-item="flexible basis-4">
+						The ratings below may vary depending on the model.
+						{#if selectedModel}
+							You are currently viewing the ratings for the
+							<strong>{brandModels.find(m => m.modelId === selectedModel)?.modelName}</strong> model.
+						{:else}
+							Select a model to see model-specific ratings.
+						{/if}
+					</p>
+				{/if}
+			{/if}
+			<nav data-row="gap-2 start wrap" data-row-item="wrap-end">
 				<a
 					href={isLabeledUrl(wallet.metadata.urls?.websites[0])
 						? wallet.metadata.urls.websites[0].url
@@ -679,32 +704,6 @@
 					</a>
 				{/if}
 			</nav>
-
-			{#if !hasSingleVariant(wallet.variants)}
-				<p>
-					The ratings below may vary depending on the version.
-					{#if selectedVariant}
-						You are currently viewing the ratings for the
-						<strong>{variantToName(selectedVariant, false)}</strong> version.
-					{:else}
-						Select a version to see version-specific ratings.
-					{/if}
-				</p>
-			{/if}
-
-			{#if Variant.HARDWARE in wallet.variants}
-				{#if brandModels.length > 1}
-					<p>
-						The ratings below may vary depending on the model.
-						{#if selectedModel}
-							You are currently viewing the ratings for the
-							<strong>{brandModels.find(m => m.modelId === selectedModel)?.modelName}</strong> model.
-						{:else}
-							Select a model to see model-specific ratings.
-						{/if}
-					</p>
-				{/if}
-			{/if}
 		</section>
 	</header>
 
@@ -1477,8 +1476,6 @@
 			--sticky-insetBlockStart: 0px;
 			--sticky-insetBlockEnd: 0px;
 
-			--sticky-backgroundColor: var(--background-secondary);
-
 			grid-area: Nav;
 			z-index: 2;
 
@@ -2050,18 +2047,11 @@
 		}
 
 		.wallet-title-row {
-			flex-basis: min-content;
+			flex-basis: max-content;
 			min-block-size: max(
 				var(--wallet-icon-size),
 				calc(var(---wallet-name-flow-font-size) * var(---wallet-line-height))
 			);
-		}
-
-		@media (width <= 1024px) {
-			[data-sticky-breadcrumb~="support"] {
-				flex-basis: 100%;
-				justify-content: end;
-			}
 		}
 	}
 
@@ -2185,8 +2175,6 @@
 			overflow: visible;
 
 			summary {
-				--sticky-backgroundColor: var(--background-secondary);
-
 				h4 {
 					max-width: 60ch;
 					word-wrap: break-word;
@@ -2374,11 +2362,8 @@
 			}
 		}
 		[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="source"]) {
-			/* Natural wrapping leaves room for the metadata's full cutout motion. */
-			max-inline-size: calc(
-				100% - var(---breadcrumb-endWidth) - var(---breadcrumb-endGap) -
-					var(---pie-inlineClearance, 0px)
-			);
+			/* Reserve the pie cutout; row companions wrap before the title text. */
+			max-inline-size: calc(100% - var(---pie-inlineClearance, 0px));
 		}
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
 			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
@@ -2458,7 +2443,8 @@
 					translate: calc(
 							var(---inlineDirection) * var(---breadcrumb-entry) *
 								(
-									var(--scrollItem-paddingInlineEnd) - var(--navigation-controlInsetInline) - 2rem -
+									100cqi - var(---breadcrumb-sourceRowWidth) - var(--scrollItem-paddingInlineStart) -
+										var(--navigation-controlInsetInline) - 2rem -
 										0.5rem
 								)
 						)

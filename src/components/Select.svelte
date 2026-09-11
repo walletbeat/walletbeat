@@ -158,9 +158,9 @@
 			inline-size: auto;
 			block-size: auto;
 			min-block-size: var(--icon-size, 2rem);
-			padding: 0.25em 0.5em;
-			border: 0;
-			border-radius: 0;
+			padding: 0.66em;
+			border: 1px solid transparent;
+			border-radius: 0.5em;
 			color: var(--text-primary);
 			clip-path: inset(
 				0 0 0 calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem))) round
@@ -181,8 +181,9 @@
 				border: 1px solid var(--icon-navigation-borderColor);
 			}
 			&::before {
-				inset: 0;
-				border-radius: 0.25em;
+				inset: -1px;
+				border-color: var(--border-color);
+				border-radius: inherit;
 				opacity: calc(1 - var(--select-compact-progress));
 			}
 			&::after {
@@ -199,7 +200,7 @@
 				gap: 0.5rem;
 				translate: calc(
 						var(---inlineDirection, 1) * var(--select-compact-progress) *
-							(100% + 1.75em - 0.775 * var(--icon-size, 2rem))
+							(100% + 1.41em - var(--icon-size, 2rem) / 2)
 					)
 					0;
 				.select-label {
@@ -209,15 +210,15 @@
 					display: none;
 				}
 				.select-icon :global(:is(img, svg)) {
-					inline-size: calc(0.55 * var(--icon-size, 2rem));
-					block-size: calc(0.55 * var(--icon-size, 2rem));
+					inline-size: 1em;
+					block-size: 1em;
 					object-fit: contain;
 				}
 			}
 			&::picker-icon {
 				translate: calc(
 						var(---inlineDirection, 1) * var(--select-compact-progress) *
-							(0.875em - var(--icon-size, 2rem) / 2)
+							(1.035em - var(--icon-size, 2rem) / 2)
 					)
 					0;
 			}

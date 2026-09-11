@@ -243,6 +243,7 @@
 	{#if item.href}
 		<a
 			href={item.href}
+			data-link="camouflaged"
 			{...currentHref === item.href && { 'aria-current': 'page' }}
 			{...item.href.startsWith('http') && {
 				target: '_blank',

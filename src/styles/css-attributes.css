@@ -613,7 +613,7 @@ span svg {
 		}
 
 		> [data-row-item~="flexible"] {
-			flex-basis: min-content;
+			flex-basis: max-content;
 		}
 
 		[data-icon] {
@@ -2099,7 +2099,6 @@ ol {
 	[data-sticky-breadcrumb~="scope"]
 		[data-sticky-container]
 		> [data-sticky]:not([data-sticky-breadcrumb]) {
-		z-index: 0;
 		--sticky-insetBlockStart: var(---breadcrumb-blockEnd);
 	}
 
