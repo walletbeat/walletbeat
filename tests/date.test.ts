@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { assertCalendarDate, today } from '@/types/date'
+import { assertCalendarDate, type CalendarDate, today } from '@/types/date'
 
 // `CalendarDate` covers a fixed range of years. These tests catch today's date falling outside it,
 // and `CALENDAR_DATE_PATTERN` drifting away from it.
@@ -18,6 +18,13 @@ describe('datesAreWithinSupportedYearRange', () => {
 	it('accepts the first and last day of the range', () => {
 		expect(assertCalendarDate('2010-01-01')).toBe('2010-01-01')
 		expect(assertCalendarDate('2039-12-31')).toBe('2039-12-31')
+	})
+
+	it('expresses the supported year range in the type', () => {
+		expectTypeOf<'2009-12-31'>().not.toExtend<CalendarDate>()
+		expectTypeOf<'2010-01-01'>().toExtend<CalendarDate>()
+		expectTypeOf<'2039-12-31'>().toExtend<CalendarDate>()
+		expectTypeOf<'2040-01-01'>().not.toExtend<CalendarDate>()
 	})
 
 	it('rejects dates the type cannot express', () => {
