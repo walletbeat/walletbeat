@@ -126,13 +126,13 @@ export const sliceFill = (slice: ComputedSlice) => {
 		return slice.color
 	}
 
+	const childWeights = new Map<string, number>()
+
+	for (const child of children) {
+		childWeights.set(child.color, (childWeights.get(child.color) ?? 0) + child.weight)
+	}
 	const colorWeights = gradient.colors
-		.map(color => ({
-			color,
-			weight: children
-				.filter(child => child.color === color)
-				.reduce((sum, child) => sum + child.weight, 0),
-		}))
+		.map(color => ({ color, weight: childWeights.get(color) ?? 0 }))
 		.filter(({ weight }) => weight > 0)
 
 	if (colorWeights.length <= 1) {
