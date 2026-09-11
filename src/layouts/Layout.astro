@@ -476,31 +476,31 @@ import Footer from '@/views/Footer.astro'
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"]
 				[data-sticky-breadcrumb~="item"] {
-				---breadcrumb-translation: calc(
-						var(---inlineDirection) *
-							(
-								(
-										100vw - var(---breadcrumb-itemWidth) + (1 - var(---wallet-chainWrap)) *
-											(
-												var(---navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
-													var(--stickyBreadcrumb-gap, 1rem) / 2
-											)
-									) /
-									2 - var(--scrollItem-paddingInlineStart)
-							)
-					)
-					calc(
+				---breadcrumb-translateInline: calc(
+					var(---inlineDirection) *
 						(
-								(
-										var(--navigation-mobile-blockSize) - var(---breadcrumb-itemHeight) *
-											var(--stickyBreadcrumb-scale)
-									) /
-									2 - var(--stickyBreadcrumb-sourcePaddingBlock) -
-									(1 - var(---breadcrumb-sourceEndWrap)) *
-									(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight)) / 2
-							) -
-							var(---wallet-tocOpen) * var(---wallet-sourceOffset)
-					);
+							(
+									100vw - var(---breadcrumb-itemWidth) + (1 - var(---wallet-chainWrap)) *
+										(
+											var(---navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
+												var(--stickyBreadcrumb-gap, 1rem) / 2
+										)
+								) /
+								2 - var(--scrollItem-paddingInlineStart)
+						)
+				);
+				---breadcrumb-translateBlock: calc(
+					(
+							(
+									var(--navigation-mobile-blockSize) - var(---breadcrumb-itemHeight) *
+										var(--stickyBreadcrumb-scale)
+								) /
+								2 - var(--stickyBreadcrumb-sourcePaddingBlock) -
+								(1 - var(---breadcrumb-sourceEndWrap)) *
+								(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight)) / 2
+						) -
+						var(---wallet-tocOpen) * var(---wallet-sourceOffset)
+				);
 			}
 			#layout:has(#wallet-toc:popover-open)
 				[data-sticky-breadcrumb~="root"]

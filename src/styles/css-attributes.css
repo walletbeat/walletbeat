@@ -1586,12 +1586,18 @@ ol {
 	}
 	@keyframes breadcrumb-item-motion {
 		from {
-			translate: 0 0;
-			scale: 1;
+			transform: translateX(0px) scale(1);
 		}
 		to {
-			translate: var(---breadcrumb-translation);
-			scale: var(--stickyBreadcrumb-scale);
+			transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
+		}
+	}
+	@keyframes breadcrumb-item-block-motion {
+		from {
+			translate: 0px;
+		}
+		to {
+			translate: 0 var(---breadcrumb-translateBlock);
 		}
 	}
 	/* Projection divides by the parent's interpolated scale, exactly countering it.
@@ -1647,7 +1653,7 @@ ol {
 		padding-inline-end: calc(var(--stickyBreadcrumb-gap, 1rem) / 2);
 		text-align: center;
 		transform-origin: 100% 50%;
-		animation: breadcrumb-icon-motion auto linear both;
+		animation: breadcrumb-icon-motion auto var(---breadcrumb-compactionEasing) both;
 		animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 		animation-range: contain 0% contain 100%;
 		@media (prefers-reduced-motion: reduce) {
@@ -1823,6 +1829,9 @@ ol {
 				style(---breadcrumb-wrap: 0): var(---breadcrumb-parentBlockEnd)
 					;else: var(---breadcrumb-blockStart)
 			);
+			---breadcrumb-compactionEasing: if(
+				style(---breadcrumb-wrap: 0): var(--transition-easeOutExpo);else: linear
+			);
 			position: sticky;
 			inset-block-start: var(--sticky-insetBlockStart);
 			anchor-name: --breadcrumb-position;
@@ -1934,12 +1943,11 @@ ol {
 				inline-size: fit-content;
 				pointer-events: auto;
 				transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
-				scale: var(--stickyBreadcrumb-scale);
 				> [data-icon] ~ *,
 				> img ~ *,
 				> a:has(> [data-icon]) ~ *,
 				> a > [data-icon] ~ * {
-					animation: breadcrumb-text-motion auto linear both;
+					animation: breadcrumb-text-motion auto var(---breadcrumb-compactionEasing) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 					animation-range: contain 0% contain 100%;
 					@media (prefers-reduced-motion: reduce) {
@@ -1948,7 +1956,7 @@ ol {
 				}
 				[data-icon]::before,
 				> img {
-					animation: breadcrumb-icon-motion auto linear both;
+					animation: breadcrumb-icon-motion auto var(---breadcrumb-compactionEasing) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 					animation-range: contain 0% contain 100%;
 					@media (prefers-reduced-motion: reduce) {
@@ -1982,11 +1990,11 @@ ol {
 				);
 			}
 			[data-sticky-breadcrumb~="item"] {
-				---breadcrumb-translation: calc(
+				---breadcrumb-translateInline: calc(
 						var(---inlineDirection) *
 							(var(---breadcrumb-inlineStart) - var(--stickyBreadcrumb-sourcePaddingInline))
-					)
-					calc(
+					);
+				---breadcrumb-translateBlock: calc(
 						(
 							var(--stickyBreadcrumb-paddingBlock, 0.5rem) -
 								var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-blockStart) -
@@ -1999,8 +2007,12 @@ ol {
 								(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight)) / 2
 						)
 					);
-				translate: var(---breadcrumb-translation);
-				animation: breadcrumb-item-motion auto linear both;
+				translate: 0 var(---breadcrumb-translateBlock);
+				transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
+				/* Adjacent identities compact and clear the parent before the unchanged vertical arrival. */
+				animation:
+					breadcrumb-item-motion auto var(---breadcrumb-compactionEasing) both,
+					breadcrumb-item-block-motion auto linear both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 				animation-range: contain 0% contain 100%;
 				@media (prefers-reduced-motion: reduce) {
