@@ -2364,6 +2364,7 @@
 		[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="source"]) {
 			/* Reserve the pie cutout; row companions wrap before the title text. */
 			max-inline-size: calc(100% - var(---pie-inlineClearance, 0px));
+			margin-inline-end: var(---pie-inlineClearance, 0px);
 		}
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
 			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
