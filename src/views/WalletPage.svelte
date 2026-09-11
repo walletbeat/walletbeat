@@ -1430,7 +1430,9 @@
 		---wallet-compact-icon-size: 32px;
 		---pie-compactSize: 100px;
 		---wallet-compact-h3: 1rem;
-		--stickyBreadcrumb-iconRatio: calc(var(---wallet-compact-icon-size) / var(---wallet-compact-h1));
+		&[data-sticky-breadcrumb] {
+			--stickyBreadcrumb-iconRatio: calc(var(---wallet-compact-icon-size) / var(---wallet-compact-h1));
+		}
 		---wallet-line-height: 1.6;
 		---wallet-attribute-heading-font-size: 1.17rem;
 
@@ -1739,8 +1741,6 @@
 		.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
 			/* Match Pie's inline-configured view box, including its padding. */
 			---pie-diameter: calc(2 * (var(--pie-maxR) + var(--pie-padding)));
-			--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-			--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
 			/* Scale the canonical pixel-space diameter to the actual CSS length. */
 			---pie-scale: calc(var(---pie-size) / (var(---pie-diameter) * 1px));
 			@supports not (scale: calc(1px / 1px)) {
@@ -2273,9 +2273,7 @@
 				}
 				timeline-scope:
 					var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
-				animation:
-					var(---breadcrumb-sizeAnimations),
-					pie-inline auto linear both;
+				animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
 				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
 				> :global(*) {
 					--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-compactSize));
@@ -2302,10 +2300,7 @@
 				&:dir(rtl) {
 					animation-direction: normal, normal, reverse;
 				}
-				animation:
-					column-inline-size auto linear both,
-					column-block-size auto linear both,
-					pie-inline auto linear both;
+				animation-name: column-inline-size, column-block-size, pie-inline;
 				animation-timeline: var(--column-sizeTimelines), --pie-inline;
 			}
 			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="position"]) {

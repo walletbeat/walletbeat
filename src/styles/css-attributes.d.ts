@@ -2,7 +2,7 @@ interface CssAttributes {
 	/**
 	 * ## [data-badge]
 	 *
-	 * Compact badge / chip surface with size modifiers. Chip uses the medium size when the attribute is present without a token.
+	 * Compact badge / chip surface with explicit size modifiers. Without a size token, text size is inherited and no badge padding is added.
 	 *
 	 * ### Tokens
 	 * - `small`, `medium`, `large`
@@ -13,7 +13,7 @@ interface CssAttributes {
 	 * - `--badge-textColor`
 	 *
 	 * ### Examples
-	 * - Default size (medium — omit token):
+	 * - Default (inherited text size, no added padding):
 	 *   ```html
 	 *   <span data-badge>Status</span>
 	 *   ```
@@ -613,7 +613,7 @@ interface CssAttributes {
 	 * - `--sticky-backdropFilter`
 	 *
 	 * ### Examples
-	 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
+	 * - Default sticky on both axes (omit axis and edge tokens):
 	 *   ```html
 	 *   <header data-sticky>
 	 *     <h1>Title</h1>
@@ -635,6 +635,10 @@ interface CssAttributes {
 	 * Native sticky breadcrumbs use independent source and metadata dimensions to compose compact rows.
 	 * A source retains its intrinsic layout box while its real item receives paint transforms.
 	 * Compose the position with `data-sticky` for native fallback and explicit backdrop placement.
+	 *
+	 * ### Placement
+	 * - A scope contains its position (directly or inside details), followed by content and a flow marker.
+	 * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
 	 *
 	 * ### Tokens
 	 * - `scope`: natural section and animation-start fragment target containing a position and its following content
@@ -662,20 +666,21 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
 	 * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
 	 *
-	 * ### Example
-	 * ```html
-	 * <section id="section" data-sticky-breadcrumb="scope">
-	 *   <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
-	 *     <div data-row>
-	 *       <div data-sticky-breadcrumb="source" data-row-item="flexible">
-	 *         <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
+	 * ### Examples
+	 * - Native heading and its natural-flow boundary:
+	 *   ```html
+	 *   <section id="section" data-sticky-breadcrumb="scope">
+	 *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
+	 *       <div data-row>
+	 *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
+	 *           <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
+	 *         </div>
 	 *       </div>
-	 *     </div>
-	 *   </header>
-	 *   <div>Section content</div>
-	 *   <span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
-	 * </section>
-	 * ```
+	 *     </header>
+	 *     <div>Section content</div>
+	 *     <span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+	 *   </section>
+	 *   ```
 	 *
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`

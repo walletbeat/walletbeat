@@ -280,9 +280,6 @@
 		transition-duration: 0.4s;
 
 		.pie {
-			--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-			--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-
 			position: relative;
 			display: grid;
 			max-width: 100%;

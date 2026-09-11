@@ -376,9 +376,7 @@ import Footer from '@/views/Footer.astro'
 				[data-sticky-breadcrumb~="root"][data-sticky-breadcrumb~="scope"] {
 				--stickyBreadcrumb-insetBlockStart: 0px;
 				---breadcrumb-parentBlockEnd: var(--navigation-mobile-blockSize);
-				animation:
-					var(---breadcrumb-sizeAnimations),
-					wallet-source-offset auto linear both;
+				animation-name: var(---breadcrumb-sizeAnimationNames), wallet-source-offset;
 				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --wallet-entry;
 				animation-range:
 					normal,

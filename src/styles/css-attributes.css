@@ -977,7 +977,7 @@ summary {
 }
 
 /**
- * Compact badge / chip surface with size modifiers. Chip uses the medium size when the attribute is present without a token.
+ * Compact badge / chip surface with explicit size modifiers. Without a size token, text size is inherited and no badge padding is added.
  *
  * ### Tokens
  * - `small`, `medium`, `large`
@@ -988,7 +988,7 @@ summary {
  * - `--badge-textColor`
  *
  * ### Examples
- * - Default size (medium — omit token):
+ * - Default (inherited text size, no added padding):
  *   ```html
  *   <span data-badge>Status</span>
  *   ```
@@ -1383,6 +1383,10 @@ ol {
  * A source retains its intrinsic layout box while its real item receives paint transforms.
  * Compose the position with `data-sticky` for native fallback and explicit backdrop placement.
  *
+ * ### Placement
+ * - A scope contains its position (directly or inside details), followed by content and a flow marker.
+ * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
+ *
  * ### Tokens
  * - `scope`: natural section and animation-start fragment target containing a position and its following content
  * - `root`: starts a breadcrumb hierarchy
@@ -1409,20 +1413,21 @@ ol {
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
  * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
  *
- * ### Example
- * ```html
- * <section id="section" data-sticky-breadcrumb="scope">
- *   <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
- *     <div data-row>
- *       <div data-sticky-breadcrumb="source" data-row-item="flexible">
- *         <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
+ * ### Examples
+ * - Native heading and its natural-flow boundary:
+ *   ```html
+ *   <section id="section" data-sticky-breadcrumb="scope">
+ *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
+ *       <div data-row>
+ *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
+ *           <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
+ *         </div>
  *       </div>
- *     </div>
- *   </header>
- *   <div>Section content</div>
- *   <span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
- * </section>
- * ```
+ *     </header>
+ *     <div>Section content</div>
+ *     <span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+ *   </section>
+ *   ```
  *
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
@@ -1678,9 +1683,8 @@ ol {
 		anchor-scope:
 			--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact;
 		timeline-scope: var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
-		---breadcrumb-sizeAnimations:
-			breadcrumb-item-inline auto linear both, breadcrumb-item-block auto linear both,
-			breadcrumb-end-inline auto linear both, breadcrumb-end-block auto linear both;
+		---breadcrumb-sizeAnimationNames:
+			breadcrumb-item-inline, breadcrumb-item-block, breadcrumb-end-inline, breadcrumb-end-block;
 		---breadcrumb-sourceOffsetBlock: 0px;
 		&[data-card~="border-accent"] {
 			---breadcrumb-sourceOffsetBlock: var(--card-borderWidth);
@@ -1690,7 +1694,8 @@ ol {
 			var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-sourceOffsetBlock)
 		);
 		/* Sizes belong to the scope; changing arrival progress belongs to its heading. */
-		animation: var(---breadcrumb-sizeAnimations);
+		animation: none auto linear both;
+		animation-name: var(---breadcrumb-sizeAnimationNames);
 		animation-timeline: var(--stickyBreadcrumb-sizeTimelines);
 		---breadcrumb-itemWidth: calc(100vw * (1 / var(---breadcrumb-itemInline) - 1));
 		---breadcrumb-itemHeight: calc(100vh * (1 / var(---breadcrumb-itemBlock) - 1));
@@ -1946,7 +1951,9 @@ ol {
 				> [data-icon] ~ *,
 				> img ~ *,
 				> a:has(> [data-icon]) ~ *,
-				> a > [data-icon] ~ * {
+				> a > [data-icon] ~ *,
+				[data-icon]::before,
+				> img {
 					animation: breadcrumb-text-motion auto var(---breadcrumb-compactionEasing) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 					animation-range: contain 0% contain 100%;
@@ -1956,12 +1963,7 @@ ol {
 				}
 				[data-icon]::before,
 				> img {
-					animation: breadcrumb-icon-motion auto var(---breadcrumb-compactionEasing) both;
-					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-					animation-range: contain 0% contain 100%;
-					@media (prefers-reduced-motion: reduce) {
-						animation-timing-function: steps(1, end);
-					}
+					animation-name: breadcrumb-icon-motion;
 				}
 				[data-icon]::before {
 					transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
@@ -2544,7 +2546,7 @@ ol {
 		 * - `--sticky-backdropFilter`
 		 *
 		 * ### Examples
-		 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
+		 * - Default sticky on both axes (omit axis and edge tokens):
 		 *   ```html
 		 *   <header data-sticky>
 		 *     <h1>Title</h1>
