@@ -249,7 +249,7 @@
 				color: group.accentColor ?? 'transparent',
 				weight: 1,
 				arcLabel: '',
-				titleText: group.title,
+				ariaLabel: group.title,
 				children: (group.children ?? []).map(attribute => ({
 					id: attribute.id,
 					color: attribute.accentColor ?? 'transparent',
@@ -257,7 +257,7 @@
 						({ attribute: sourceAttribute }) => `#${slugifyCamelCase(sourceAttribute.id)}` === attribute.href
 					)?.weight ?? 1,
 					arcLabel: '',
-					titleText: attribute.title,
+					ariaLabel: attribute.title,
 				})),
 			}
 		})
