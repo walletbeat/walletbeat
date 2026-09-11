@@ -1471,6 +1471,11 @@ ol {
 		inherits: true;
 		initial-value: 1;
 	}
+	@property ---breadcrumb-iconTranslateBlock {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
 	@property ---breadcrumb-iconCorrection {
 		syntax: '<length>';
 		inherits: true;
@@ -1609,12 +1614,13 @@ ol {
 	 * Matching transform lists keep every animated input linear and compositable. */
 	@keyframes breadcrumb-icon-motion {
 		from {
-			transform: perspective(1px) translateZ(0px) scale(1)
+			transform: perspective(1px) translateZ(0px) translateY(0px) scale(1)
 				var(---icon-paint-transform, translateX(0px));
 		}
 		to {
 			transform: perspective(1px)
 				translateZ(calc((1 - var(--stickyBreadcrumb-scale)) * 1px))
+				translateY(var(---breadcrumb-iconTranslateBlock, 0px))
 				scale(var(--stickyBreadcrumb-iconScale, 1))
 				var(---icon-paint-transform, translateX(0px));
 		}
@@ -1872,8 +1878,11 @@ ol {
 			> :not([data-row], header[data-column~="span-start"], [data-sticky-breadcrumb~="source"]),
 			> header[data-column~="span-start"] > :not([data-row]),
 			[data-sticky-breadcrumb~="support"] {
-				/* Scroll beneath the sticky surface while retaining natural source placement. */
-				z-index: -2;
+				/* Source copy stays above its surface until compaction carries it beneath the row. */
+				z-index: if(style(---breadcrumb-entry: 0): 0; else: -2);
+				@container scroll-state(stuck: top) {
+					z-index: -2;
+				}
 				animation:
 					breadcrumb-support-motion auto cubic-bezier(0, 1, 0, 1) both,
 					breadcrumb-support-scroll auto linear both;
@@ -1964,6 +1973,13 @@ ol {
 				[data-icon]::before,
 				> img {
 					animation-name: breadcrumb-icon-motion;
+				}
+				[data-icon] {
+					/* Resolve native line height before the glyph changes its font size. */
+					---breadcrumb-iconTranslateBlock: calc(
+						(1.5lh - var(---column-spanSize) - var(---breadcrumb-iconCorrection)) *
+							var(--stickyBreadcrumb-scale) / 2
+					);
 				}
 				[data-icon]::before {
 					transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
