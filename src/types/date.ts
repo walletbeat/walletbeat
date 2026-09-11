@@ -8,12 +8,15 @@ type MonthAndDay =
 	| `${ThirtyDayMonths}-${ThirtyDays}`
 	| `${ThirtyOneDayMonths}-${ThirtyOneDays}`
 	| `02-${FebruaryDays}`
-type Century = '20' | '21' // We're good from 2000 to 2199.
+// Keep this range no wider than the data needs: `CalendarDate` expands to one member per day it
+// covers, and check time grows faster than that count does.
+type Year = `20${'1' | '2' | '3'}${Digit}` // We're good from 2010 to 2039.
 
 /** A valid date in YYYY-MM-DD format. */
-export type CalendarDate = `${Century}${Digit}${Digit}-${MonthAndDay}`
+export type CalendarDate = `${Year}-${MonthAndDay}`
 
-const CALENDAR_DATE_PATTERN = /^(20|21)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
+// Must accept the same years as `Year`, so `assertCalendarDate` cannot return a value the type rejects.
+const CALENDAR_DATE_PATTERN = /^20[123]\d-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
 
 /** Check whether a string is a valid CalendarDate. */
 function isCalendarDate(date: string): date is CalendarDate {
