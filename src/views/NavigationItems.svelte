@@ -266,38 +266,14 @@
 			style:--slice-labelSize={item.sliceStyle?.labelSize}
 			style:--slice-labelR={item.sliceStyle?.labelR}
 		>
-			{@render navigationIcon(item, depth)}
-
-			<span data-row-item="flexible"
-				>{@html effectiveSearchValue
-					? highlightText(item.title, effectiveSearchValue)
-					: item.title}</span
-			>
-
-			{#if afterLabelSnippet}
-				<span class="navigation-item-after" data-row="gap-1">
-					{@render afterLabelSnippet(item, depth)}
-				</span>
-			{/if}
+			{@render navigationContent(item, depth)}
 		</a>
 	{:else}
-		{@render navigationIcon(item, depth)}
-
-		<span data-row-item="flexible"
-			>{@html effectiveSearchValue
-				? highlightText(item.title, effectiveSearchValue)
-				: item.title}</span
-		>
-
-		{#if afterLabelSnippet}
-			<span class="navigation-item-after" data-row="gap-1">
-				{@render afterLabelSnippet(item, depth)}
-			</span>
-		{/if}
+		{@render navigationContent(item, depth)}
 	{/if}
 {/snippet}
 
-{#snippet navigationIcon(item: NavigationItem, depth = 0)}
+{#snippet navigationContent(item: NavigationItem, depth: number)}
 	{#if iconSnippet}
 		{@render iconSnippet(item, depth)}
 	{:else if item.icon}
@@ -315,6 +291,16 @@
 				data-icon="{iconShape} wbicons {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
 			></span>
 		{/if}
+	{/if}
+
+	<span data-row-item="flexible"
+		>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span
+	>
+
+	{#if afterLabelSnippet}
+		<span class="navigation-item-after" data-row="gap-1">
+			{@render afterLabelSnippet(item, depth)}
+		</span>
 	{/if}
 {/snippet}
 
