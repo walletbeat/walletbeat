@@ -3,6 +3,7 @@
 	import type { MaybeUnratedScore } from '@/schema/score'
 	import type { SvelteHTMLElements } from 'svelte/elements'
 
+
 	// Props
 	const {
 		score,
@@ -13,9 +14,11 @@
 		size?: 'small' | 'medium' | 'large'
 	} & Omit<SvelteHTMLElements['data'], 'value'> = $props()
 
+
 	// Functions
 	import { scoreToColor } from '@/utils/colors'
 </script>
+
 
 {#if score !== null && score.score !== null}
 	<data
@@ -27,13 +30,20 @@
 	>
 		<strong>
 			{`${Math.round(score.score * 100)}%`}
-		</strong>{#if score.hasUnratedComponent}*{/if}
+		</strong
+		>{#if score.hasUnratedComponent}*{/if}
 	</data>
 {:else}
-	<data {...restProps} data-badge={size} value="UNRATED" title="*contains unrated components">
+	<data
+		{...restProps}
+		data-badge={size}
+		value="UNRATED"
+		title="*contains unrated components"
+	>
 		<small>UNRATED</small>
 	</data>
 {/if}
+
 
 <style>
 	data {

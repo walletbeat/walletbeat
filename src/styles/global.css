@@ -12,30 +12,30 @@
 	--separator-width: 1px;
 
 	/* Main canvas + default cards (dark: deep purple) */
-	--background-primary: light-dark(#f8edff, #110c1f);
+	--background-primary: light-dark(#F8EDFF, #110c1f);
 	/* Elevated panels, tabs, modals (dark: slightly lifted purple) */
-	--background-secondary: light-dark(#ffffff80, #1c1038);
+	--background-secondary: light-dark(#FFFFFF80, #1c1038);
 	--background-tertiary: light-dark(#eeeff4, #251544);
-	--navigation-borderColor: light-dark(#100b1d66, #f1eef733);
+	--navigation-borderColor: light-dark(#100B1D66, #f1eef733);
 
 	--accent: var(--accent-color);
-	--accent-color: light-dark(#3d2b6e, #f078c8);
+	--accent-color: light-dark(#3D2B6E, #f078c8);
 	--accent-backgroundColor: light-dark(#fbdcf2, #3d0a32);
-	--text-primary: light-dark(#130a2b, #f5f2f7);
-	--text-secondary: light-dark(#130a2b, #b6aec1);
+	--text-primary: light-dark(#130A2B, #F5F2F7);
+	--text-secondary: light-dark(#130A2B, #B6AEC1);
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
-	--icon-navigation-borderColor: light-dark(#100b1d80, #f1eef780);
+	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
 
-	--rating-pass: light-dark(#b5ed9d99, #b5ed9d);
-	--rating-fail: light-dark(#ff969699, #fb6682);
-	--rating-partial: light-dark(#ffcc7399, #ffcc73);
+	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
+	--rating-fail: light-dark(#FF969699,#FB6682);
+	--rating-partial: light-dark(#FFCC7399,#FFCC73);
 	--rating-neutral: #bdc3c7;
 	--rating-unrated: light-dark(oklch(0.75 0.02 244.87 / 0.45), oklch(0.72 0.015 264.61 / 0.35));
 	--rating-unrated-backdropFilter: blur(6px);
 	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
-	--fontFamily-emoji: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+	--fontFamily-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 
 	--safeArea-insetTop: env(safe-area-inset-top, 0px);
 	--safeArea-insetBottom: env(safe-area-inset-bottom, 0px);
