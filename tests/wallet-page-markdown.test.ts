@@ -15,9 +15,8 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { ratingToText } from '@/schema/attributes'
-import { toFullyQualified } from '@/schema/reference'
+import { computeDataSourceCredits, toFullyQualified } from '@/schema/reference'
 import { getUrl, isUrl } from '@/schema/url'
-import { computeDataSourceCredits } from '@/utils/data-source-credits'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'

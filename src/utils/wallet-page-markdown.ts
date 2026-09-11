@@ -6,7 +6,7 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { Rating, ratingToText } from '@/schema/attributes'
-import { toFullyQualified } from '@/schema/reference'
+import { computeDataSourceCredits, toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
 import { getUrl, gitCommitRefPinRegExp, isUrl } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
@@ -15,7 +15,6 @@ import { isTypographicContent, renderTypographicContentToString } from '@/types/
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
-import { computeDataSourceCredits } from '@/utils/data-source-credits'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { collapseToSingleLine, normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'

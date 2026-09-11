@@ -3,8 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { exampleNodeCompany } from '@/data/entities/example'
 import type { DataSource } from '@/schema/data-sources'
 import { coinspectDataSource, coinspectRef } from '@/schema/data-sources/coinspect'
-import type { FullyQualifiedReference } from '@/schema/reference'
-import { computeDataSourceCredits } from '@/utils/data-source-credits'
+import { computeDataSourceCredits, type FullyQualifiedReference } from '@/schema/reference'
 
 const REPORT_DATE = '2026-01-12T17:52:05.136Z'
 

@@ -1,8 +1,7 @@
 <script lang="ts">
 	// Types/constants
-	import type { FullyQualifiedReference } from '@/schema/reference'
+	import { computeDataSourceCredits, type FullyQualifiedReference } from '@/schema/reference'
 	import { getUrl, isUrl } from '@/schema/url'
-	import { computeDataSourceCredits } from '@/utils/data-source-credits'
 
 
 	// Props

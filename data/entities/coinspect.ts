@@ -11,7 +11,7 @@ export const coinspect: CorporateEntity = {
 		exchange: false,
 		infrastructureProvider: false,
 		offchainDataProvider: false,
-		securityAuditor: false,
+		securityAuditor: true,
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
 	},
