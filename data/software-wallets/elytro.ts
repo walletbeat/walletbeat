@@ -13,20 +13,7 @@ import { Variant } from '@/schema/variants'
 
 const elytroAudits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/132867d031f25261562128e15a73da3c6bed671f/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf',
-		auditDate: '2025-07-07',
-		auditor: slowMist,
-		codeSnapshot: {
-			commit:
-				'https://github.com/Elytro-eth/Elytro-wallet-contract/commit/3d64ccd3d0cd8228298cedb25af81eb042172c59',
-			date: '2025-06-26',
-			tag: 'v1.1.1',
-		},
-		unpatchedFlaws: 'ALL_FIXED',
-		variantsScope: 'ALL_VARIANTS',
-	},
-	{
-		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/2686012c743f222b61b19b9435016117d59b7d5e/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
+		ref: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/2686012c743f222b61b19b9435016117d59b7d5e/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
 		auditDate: '2024-05-16',
 		auditor: slowMist,
 		codeSnapshot: {
@@ -150,7 +137,7 @@ export const elytro: SoftwareWallet = {
 					{
 						explanation:
 							'Elytro implements P256 verification using OpenZeppelin P256 verifier in their WebAuthn library.',
-						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/9c6d5d9a8c3aa58a92b02ddb901478cd429569c7/contracts/libraries/WebAuthn.sol',
+						url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/fc7cc084563ad1bda870df841b77caa9ee3a3661/contracts/libraries/WebAuthn.sol',
 					},
 				],
 				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',

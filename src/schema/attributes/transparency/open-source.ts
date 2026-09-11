@@ -147,7 +147,7 @@ export const openSource: Attribute = {
 		exhaustive: true,
 		pass: exampleRating(
 			mdParagraph(
-				'The wallet is licensed under a Free & Open Source Software (FOSS) license. Examples of such licenses include [MIT](https://opensource.org/license/MIT), [Apache](https://opensource.org/license/apache-2-0), [BSD](https://opensource.org/license/bsd-1-clause), and [GPL](https://opensource.org/license/gpl-2-0).',
+				'The wallet is licensed under a Free & Open Source Software (FOSS) license. Examples of such licenses include [MIT](https://opensource.org/license/MIT), [Apache](https://opensource.org/license/apache-2.0), [BSD](https://opensource.org/license/bsd-1-clause), and [GPL](https://opensource.org/license/gpl-2.0).',
 			),
 			Rating.PASS,
 		),

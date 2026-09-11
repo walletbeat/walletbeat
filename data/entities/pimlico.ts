@@ -16,7 +16,7 @@ export const pimlico: CorporateEntity & TransactionBroadcastProvider = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/pimlico',
-	farcaster: 'https://warpcast.com/pimlico',
+	farcaster: 'https://farcaster.xyz/pimlico',
 	icon: {
 		extension: 'png',
 		height: 200,

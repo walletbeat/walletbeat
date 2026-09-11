@@ -26,7 +26,7 @@ export const ambireEntity: OffchainDataProvider &
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/adex-03c2',
-	farcaster: 'https://warpcast.com/ambirewallet',
+	farcaster: 'https://farcaster.xyz/ambirewallet',
 	icon: {
 		extension: 'svg',
 	},
@@ -35,5 +35,5 @@ export const ambireEntity: OffchainDataProvider &
 	privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20%2826%20November%202021%29.pdf',
 	repoUrl: 'https://github.com/AmbireTech',
 	twitter: 'https://x.com/ambireWallet',
-	url: 'https://ambire.com/',
+	url: 'https://www.ambire.com/',
 }

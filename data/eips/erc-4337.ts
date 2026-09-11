@@ -28,7 +28,7 @@ export const erc4337: Eip = {
 		flexibility over how their wallet is secured and recoverable, can be
 		used to avoid needing to keep the wallet topped up with Ether to pay for
 		gas fees, etc. See
-		[Account Abstraction](https://ethereum.org/en/roadmap/account-abstraction/)
+		[Account Abstraction](https://ethereum.org/roadmap/account-abstraction/)
 		for more information.
 	`,
 }

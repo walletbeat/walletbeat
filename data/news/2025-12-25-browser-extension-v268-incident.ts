@@ -11,7 +11,7 @@ export default {
 	type: NewsType.HACK,
 	ref: {
 		label: 'Trust Wallet Browser Extension v2.68 Incident: Community Update',
-		url: 'https://trustwallet.com/blog/announcements/trust-wallet-browser-extension-v268-incident-community-update',
+		url: 'https://trustwallet.com/blog/company/trust-wallet-browser-extension-v268-incident-community-update',
 	},
 	impact: {
 		category: ImpactCategory.SUPPLY_CHAIN,

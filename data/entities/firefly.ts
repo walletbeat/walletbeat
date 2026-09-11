@@ -16,7 +16,7 @@ export const firefly: CorporateEntity & WalletDeveloper = {
 		walletDeveloper: true,
 	},
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
-	farcaster: 'https://warpcast.com/firefly',
+	farcaster: 'https://farcaster.xyz/firefly',
 	icon: {
 		extension: 'jpg',
 		height: 400,
