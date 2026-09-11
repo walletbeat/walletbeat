@@ -1493,6 +1493,8 @@
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
 			> nav:not(.pie-navigation) {
+				/* The desktop rail owns scrolling; the native popover does only on mobile. */
+				overflow: visible;
 				position: relative;
 				z-index: 0;
 				align-content: stretch;
