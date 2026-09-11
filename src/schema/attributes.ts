@@ -33,7 +33,7 @@ import type { WBIconID } from '@/styles/wbicons'
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
-import { isMaybeSupported, isSupported, type Support } from './features/support'
+import { isMaybeSupported, type Support } from './features/support'
 import {
 	type FullyQualifiedReference,
 	hasRefs,
@@ -736,8 +736,8 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 		}
 
 		if (isMaybeSupported(x)) {
-			if (isSupported(x)) {
-				this.addRef(...toFullyQualified(x.ref))
+			if (hasRefs(x)) {
+				this.addRef(...refs(x))
 			}
 
 			return

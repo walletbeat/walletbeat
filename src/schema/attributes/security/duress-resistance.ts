@@ -235,6 +235,8 @@ export const duressResistance: Attribute = {
 		ctx.addRef(feature.basicUnlock)
 
 		if (!isSupported(feature.duressMode)) {
+			ctx.addRef(feature.duressMode)
+
 			return basicLockOnly(ctx, feature.basicUnlock)
 		}
 

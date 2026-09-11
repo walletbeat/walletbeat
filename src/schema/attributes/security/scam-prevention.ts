@@ -15,7 +15,7 @@ import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
-import { refNotNecessary, type WithRef } from '../../reference'
+import { hasRefs, refNotNecessary, type WithRef } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
@@ -67,7 +67,7 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(args: 
 		return {
 			supported: false,
 			privacyPreserving: true,
-			ref: refNotNecessary,
+			ref: hasRefs(support) ? support.ref : refNotNecessary,
 			...baseProps,
 		}
 	}
@@ -141,7 +141,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 		return {
 			supported: false,
 			privacyPreserving: true,
-			ref: refNotNecessary,
+			ref: hasRefs(scamUrlWarning) ? scamUrlWarning.ref : refNotNecessary,
 			...baseProps,
 		}
 	}
@@ -175,12 +175,6 @@ function evaluateScamAlerts(
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
 	const unlimitedApprovalWarning = rateUnlimitedApprovalWarning(scamAlerts)
 
-	ctx.addRef(
-		sendTransactionWarning,
-		contractTransactionWarning,
-		scamUrlWarning,
-		unlimitedApprovalWarning,
-	)
 	const metadata: ScamPreventionMetadata = {
 		scamAlerts,
 		sendTransactionWarning,
@@ -205,6 +199,8 @@ function evaluateScamAlerts(
 	for (const feature of requiredFeatures) {
 		feature.required = true
 	}
+	ctx.addRef(...requiredFeatures)
+
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
