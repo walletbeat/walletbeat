@@ -26,7 +26,7 @@ import {
 	type Support,
 	supported,
 } from '@/schema/features/support'
-import { mergeRefs, refNotNecessary, refs, type WithRef } from '@/schema/reference'
+import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
@@ -41,6 +41,8 @@ function evaluateTransactionBatching(
 		!isSupported<AccountType7702>(accountSupport.eip7702) &&
 		!isSupported<AccountType4337>(accountSupport.rawErc4337)
 	) {
+		ctx.addRef(accountSupport.eip7702, accountSupport.rawErc4337)
+
 		return ctx.build({
 			outcome: {
 				id: 'no_smart_account_support',
@@ -61,10 +63,6 @@ function evaluateTransactionBatching(
 				{{WALLET_NAME}} should support smart accounts, such as
 				${eipMarkdownLink(eip7702)} accounts.
 			`),
-			references: mergeRefs(
-				isSupported(accountSupport.eip7702) ? refs(accountSupport.eip7702) : [],
-				isSupported(accountSupport.rawErc4337) ? refs(accountSupport.rawErc4337) : [],
-			),
 		})
 	}
 
@@ -92,6 +90,8 @@ function evaluateTransactionBatching(
 	}
 
 	if (!isSupported<Support>(walletCall.atomicMultiTransactions)) {
+		ctx.addRef(walletCall.atomicMultiTransactions)
+
 		return ctx.build({
 			outcome: {
 				id: 'no_atomic_bundle_support',

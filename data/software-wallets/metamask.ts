@@ -88,7 +88,7 @@ export const metamask: SoftwareWallet = {
 		coinspectId: 'metamask',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-22',
+		lastUpdated: '2026-08-31',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -278,8 +278,21 @@ export const metamask: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'MetaMask is funded through transparent swap fees and venture capital with publicly disclosed funding rounds.',
+						"DeFiLlama publishes MetaMask's fee and revenue figures, broken down by product line (wallet swaps, perpetuals, predictions and MetaMask USD) and by chain.",
+					url: 'https://defillama.com/protocol/fees/metamask',
+				},
+				{
+					explanation:
+						'Consensys, which develops MetaMask, raised a $450 million Series D round led by ParaFi Capital in March 2022.',
+					label: 'Consensys Raises $450M Series D Funding',
 					url: 'https://consensys.io/blog/consensys-raises-450m-series-d-funding',
+				},
+				{
+					explanation:
+						'MetaMask discloses a 0.875% fee on its built-in swaps as a percentage via the Rate info tooltip.',
+					file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
+					label:
+						'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
 				},
 			],
 			revenueBreakdownIsPublic: true,
@@ -409,16 +422,55 @@ export const metamask: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: {
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+				[Variant.BROWSER]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation: 'The extension unlocks with a password or passkey.',
+								url: [
+									{
+										label: 'Extension unlock form source code',
+										url: 'https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/ui/pages/unlock-page/unlock-page.component.tsx#L698-L753',
+									},
+									{
+										label: 'Passkey unlock section of the extension unlock screen',
+										url: 'https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/ui/pages/unlock-page/unlock-page.component.tsx#L829-L831',
+									},
+									{
+										label: 'Passkey unlock build flag',
+										url: 'https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/builds.yml#L446-L447',
+									},
+								],
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
 					},
+					duressMode: notSupported,
 				},
-				duressMode: notSupported,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									"The app unlocks with fingerprint or face unlock, your phone's passcode or your wallet password.",
+								label: 'Authentication method selection in the mobile app source code',
+								url: 'https://github.com/MetaMask/metamask-mobile/blob/724b38f6f2777ba2bb6d88ccb4bd600220a89e2f/app/core/Authentication/Authentication.ts#L341-L390',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+					},
+					duressMode: notSupported,
+				},
 			},
 			hardwareWalletSupport: {
 				ref: [

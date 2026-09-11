@@ -6,7 +6,7 @@ export type Slice = {
 	weight: number
 	arcLabel: string
 	arcIconId?: WBIconID
-	titleText: string
+	ariaLabel: string
 	href?: string
 	gradient?: {
 		areaRadiusStops?: number[]

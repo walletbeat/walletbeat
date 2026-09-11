@@ -20,7 +20,7 @@ import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
-import { refNotNecessary, type WithRef } from '../../reference'
+import { hasRefs, refNotNecessary, type WithRef } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
@@ -74,7 +74,7 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(args: 
 			supported: false,
 			privacyPreserving: true,
 			conditionalOnly: false,
-			ref: refNotNecessary,
+			ref: hasRefs(support) ? support.ref : refNotNecessary,
 			...baseProps,
 		}
 	}
@@ -170,7 +170,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 			supported: false,
 			privacyPreserving: true,
 			conditionalOnly: false,
-			ref: refNotNecessary,
+			ref: hasRefs(scamUrlWarning) ? scamUrlWarning.ref : refNotNecessary,
 			...baseProps,
 		}
 	}
@@ -205,12 +205,6 @@ function evaluateScamAlerts(
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
 	const unlimitedApprovalWarning = rateUnlimitedApprovalWarning(scamAlerts)
 
-	ctx.addRef(
-		sendTransactionWarning,
-		contractTransactionWarning,
-		scamUrlWarning,
-		unlimitedApprovalWarning,
-	)
 	const metadata: ScamPreventionMetadata = {
 		scamAlerts,
 		sendTransactionWarning,
@@ -235,6 +229,8 @@ function evaluateScamAlerts(
 	for (const feature of requiredFeatures) {
 		feature.required = true
 	}
+	ctx.addRef(...requiredFeatures)
+
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
@@ -433,7 +429,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	},
 	question: sentence('Does the wallet warn the user about potential scams?'),
 	why: markdown(
-		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.',
+		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction. This is especially true for unlimited token approvals: if the approved contract is later exploited, attackers can use that approval to drain the funds a user approved, a class of exploit that has [stolen over $362M since 2020](https://revoke.cash/exploits).',
 	),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential

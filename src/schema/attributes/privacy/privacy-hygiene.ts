@@ -9,6 +9,7 @@ import {
 	collectedByDefault,
 	CollectionPolicy,
 	type DataCollection,
+	type DataCollectionByEntity,
 	DataCollectionPurpose,
 	PersonalInfo,
 	qualifiedDataCollection,
@@ -25,6 +26,7 @@ import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { type Entity, entityLinks, entityNames, uniqueEntities } from '../../entity'
+import { mergeRefs, refs, type WithRef } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 /**
@@ -230,9 +232,16 @@ interface AnalyticsTelemetryResult {
 	hasNoAnalytics: boolean
 }
 
+function withReferences(evaluation: Evaluation, ...evidence: Array<WithRef<unknown>>): Evaluation {
+	return {
+		...evaluation,
+		references: mergeRefs(evaluation.references, ...evidence.map(refs)),
+	}
+}
+
 /**
  * Evaluates usage analytics and crash reporting telemetry policy.
- * Calls `ctx.addRef` for each supported analytics feature.
+ * Attaches each analytics feature's refs to the sub-evaluation it supports.
  *
  * Usage analytics without consent is rated FAIL (sends behavioral data);
  * crash reporting without consent is rated PARTIAL (less sensitive, but still
@@ -248,18 +257,21 @@ function evaluateAnalyticsTelemetry(ctx: EvaluationContext): AnalyticsTelemetryR
 	const evaluations: Array<Evaluation> = []
 
 	if (usageAnalytics !== null && isSupported(usageAnalytics)) {
-		ctx.addRef(usageAnalytics)
-
 		if (collectedByDefault(usageAnalytics.policy)) {
-			evaluations.push(usageAnalyticsWithoutConsent(ctx, usageAnalytics.entity))
+			evaluations.push(
+				withReferences(usageAnalyticsWithoutConsent(ctx, usageAnalytics.entity), usageAnalytics),
+			)
 		}
 	}
 
 	if (crashReportsAnalytics !== null && isSupported(crashReportsAnalytics)) {
-		ctx.addRef(crashReportsAnalytics)
-
 		if (collectedByDefault(crashReportsAnalytics.policy)) {
-			evaluations.push(crashReportingWithoutConsent(ctx, crashReportsAnalytics.entity))
+			evaluations.push(
+				withReferences(
+					crashReportingWithoutConsent(ctx, crashReportsAnalytics.entity),
+					crashReportsAnalytics,
+				),
+			)
 		}
 	}
 
@@ -279,25 +291,27 @@ interface FlowScanResult {
 	hasAnalyticsInSomeFlow: boolean
 	browsingHistoryByDefaultEntities: Entity[]
 	walletConnectedDomainsByDefaultEntities: Entity[]
+	browsingHistoryRows: Array<WithRef<DataCollectionByEntity>>
+	walletConnectedDomainsRows: Array<WithRef<DataCollectionByEntity>>
+	evidenceRows: Array<WithRef<DataCollectionByEntity>>
 }
 
 /**
  * Scans all user flows in `dataCollection` for forbidden-by-default data and
- * analytics usage. Calls `ctx.addRef` on every collected-data entry that
- * involves analytics or forbidden data, so the evaluation evidence trail is
- * complete regardless of the final rating.
+ * analytics usage. Returns the evidence rows separately so the caller can
+ * attach only those that support the selected evaluation.
  *
  * Returns data-only flags; the caller is responsible for mapping these flags
  * to `Evaluation` objects.
  */
-function scanFlowsForForbiddenDataViolations(
-	dataCollection: DataCollection,
-	ctx: EvaluationContext,
-): FlowScanResult {
+function scanFlowsForForbiddenDataViolations(dataCollection: DataCollection): FlowScanResult {
 	let hasUnknownFlowData = false
 	let hasAnalyticsInSomeFlow = false
 	const browsingHistoryByDefaultEntities: Entity[] = []
 	const walletConnectedDomainsByDefaultEntities: Entity[] = []
+	const browsingHistoryRows: Array<WithRef<DataCollectionByEntity>> = []
+	const walletConnectedDomainsRows: Array<WithRef<DataCollectionByEntity>> = []
+	const evidenceRows: Array<WithRef<DataCollectionByEntity>> = []
 	const forbiddenInfos = userInfoEnums.items.filter(isForbiddenWithoutPriorConsentUserInfo)
 
 	for (const flow of userFlow.items) {
@@ -324,7 +338,7 @@ function scanFlowsForForbiddenDataViolations(
 			)
 
 			if (hasAnalyticsPurpose || collectsForbiddenData) {
-				ctx.addRef(collected)
+				evidenceRows.push(collected)
 			}
 
 			for (const info of forbiddenInfos) {
@@ -334,12 +348,16 @@ function scanFlowsForForbiddenDataViolations(
 
 				switch (info) {
 					case PersonalInfo.BROWSING_HISTORY_URLS:
+						browsingHistoryRows.push(collected)
+
 						if (!browsingHistoryByDefaultEntities.some(e => e.id === collected.byEntity.id)) {
 							browsingHistoryByDefaultEntities.push(collected.byEntity)
 						}
 
 						break
 					case WalletInfo.WALLET_CONNECTED_DOMAINS:
+						walletConnectedDomainsRows.push(collected)
+
 						if (
 							!walletConnectedDomainsByDefaultEntities.some(e => e.id === collected.byEntity.id)
 						) {
@@ -359,6 +377,9 @@ function scanFlowsForForbiddenDataViolations(
 		hasAnalyticsInSomeFlow,
 		browsingHistoryByDefaultEntities,
 		walletConnectedDomainsByDefaultEntities,
+		browsingHistoryRows,
+		walletConnectedDomainsRows,
+		evidenceRows,
 	}
 }
 
@@ -467,7 +488,7 @@ export const privacyHygiene: Attribute = {
 			return unrated(ctx)
 		}
 
-		const flowScan = scanFlowsForForbiddenDataViolations(dataCollection, ctx)
+		const flowScan = scanFlowsForForbiddenDataViolations(dataCollection)
 		const analytics = evaluateAnalyticsTelemetry(ctx)
 		const evaluations: Array<Evaluation> = []
 
@@ -476,17 +497,29 @@ export const privacyHygiene: Attribute = {
 
 		if (hasBrowsingHistory && hasWalletConnected) {
 			evaluations.push(
-				browsingHistoryAndWalletConnectedDomainsByDefault(
-					ctx,
-					flowScan.browsingHistoryByDefaultEntities,
-					flowScan.walletConnectedDomainsByDefaultEntities,
+				withReferences(
+					browsingHistoryAndWalletConnectedDomainsByDefault(
+						ctx,
+						flowScan.browsingHistoryByDefaultEntities,
+						flowScan.walletConnectedDomainsByDefaultEntities,
+					),
+					...flowScan.browsingHistoryRows,
+					...flowScan.walletConnectedDomainsRows,
 				),
 			)
 		} else if (hasBrowsingHistory) {
-			evaluations.push(browsingHistoryByDefault(ctx, flowScan.browsingHistoryByDefaultEntities))
+			evaluations.push(
+				withReferences(
+					browsingHistoryByDefault(ctx, flowScan.browsingHistoryByDefaultEntities),
+					...flowScan.browsingHistoryRows,
+				),
+			)
 		} else if (hasWalletConnected) {
 			evaluations.push(
-				walletConnectedDomainsByDefault(ctx, flowScan.walletConnectedDomainsByDefaultEntities),
+				withReferences(
+					walletConnectedDomainsByDefault(ctx, flowScan.walletConnectedDomainsByDefaultEntities),
+					...flowScan.walletConnectedDomainsRows,
+				),
 			)
 		}
 
@@ -506,6 +539,12 @@ export const privacyHygiene: Attribute = {
 		if (flowScan.hasUnknownFlowData) {
 			return unrated(ctx)
 		}
+
+		ctx.addRef(
+			ctx.features.privacy.analytics.usage,
+			ctx.features.privacy.analytics.crashReports,
+			...flowScan.evidenceRows,
+		)
 
 		if (analytics.hasNoAnalytics && !flowScan.hasAnalyticsInSomeFlow) {
 			return noTracking(ctx)

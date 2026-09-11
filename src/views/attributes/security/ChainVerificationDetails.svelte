@@ -3,7 +3,7 @@
 	import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
 	import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 	import type { FullyQualifiedReference } from '@/schema/reference'
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import { commaListPrefix } from '@/types/utils/text'
@@ -15,7 +15,7 @@
 		lightClients,
 		refs,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		lightClients?: NonEmptyArray<EthereumL1LightClient>
 		refs?: FullyQualifiedReference[]
 	} = $props()

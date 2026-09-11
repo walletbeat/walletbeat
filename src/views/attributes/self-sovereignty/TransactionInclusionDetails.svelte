@@ -2,7 +2,7 @@
 	// Types/constants
 	import type { L1BroadcastSupport } from '@/schema/attributes/self-sovereignty/transaction-inclusion'
 	import type { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 
 
@@ -14,7 +14,7 @@
 		supportForceWithdrawal = [],
 		unsupportedL2s = [],
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		supportsL1Broadcast?: L1BroadcastSupport
 		supportAnyL2Transactions?: TransactionSubmissionL2Type[]
 		supportForceWithdrawal?: TransactionSubmissionL2Type[]

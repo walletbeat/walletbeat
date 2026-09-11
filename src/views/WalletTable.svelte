@@ -237,7 +237,7 @@
 	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
 	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
-	import { isLabeledUrl } from '@/schema/url'
+	import { getUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
@@ -276,7 +276,7 @@
 
 
 	// Mobile filter helpers
-	const variantWbIconIds: Record<Variant, WBIconFontID> = {
+	const variantWbIconIds: Record<Variant, WBIconID> = {
 		[Variant.BROWSER]: 'wallet_browser',
 		[Variant.DESKTOP]: 'wallet_desktop',
 		[Variant.MOBILE]: 'wallet_mobile',
@@ -374,7 +374,7 @@
 
 	// Styles
 	import { scoreToColor, stageToColor } from '@/utils/colors'
-	import type { WBIconFontID } from '@/styles/wbicons'
+	import type { WBIconID } from '@/styles/wbicons'
 
 
 	// Flower visualization helpers
@@ -825,7 +825,7 @@
 						</div>
 					{/if}
 				{:else if column.id === 'displayName'}
-					{@const displayName = value}
+					{@const displayName = wallet.metadata.displayName}
 					{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
 					{@const supportedVariants = (
 						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
@@ -948,7 +948,7 @@
 													[]
 											),
 										]
-											.filter(Boolean)
+											.filter(tag => tag !== false && tag !== undefined)
 									) as tag (tag.label)}
 										<button
 											data-tag={tag.type}
@@ -1006,22 +1006,24 @@
 										View report
 									</a>
 
-									<hr>
+									{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+										<hr>
 
-									<a
-										href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<span aria-hidden="true">{@html GlobeIcon}</span>
-										Website
-									</a>
+										<a
+											href={getUrl(wallet.metadata.urls.websites[0])}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<span aria-hidden="true">{@html GlobeIcon}</span>
+											Website
+										</a>
+									{/if}
 
 									{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
 										<hr>
 
 										<a
-											href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
+											href={getUrl(wallet.metadata.urls.repositories[0])}
 											target="_blank"
 											rel="noopener noreferrer"
 										>
@@ -1082,8 +1084,10 @@
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
 								levels={overallRatingPieLevels(
-											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage || summaryVisualization === SummaryVisualization.Icon) ?
+											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Icon) ?
 												0.15
+											: summaryVisualization === SummaryVisualization.Stage ?
+												0.08
 											:
 												0.1
 								)}
@@ -1096,7 +1100,8 @@
 										return {
 											id: `attrGroup_${attrGroup.id}`,
 											arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
-										arcIconId: attrGroup.icon,
+											arcIconId: attrGroup.icon,
+											ariaLabel: attrGroup.displayName,
 											color: (
 												groupScore !== null ?
 													scoreToColor(groupScore.score)
@@ -1123,11 +1128,12 @@
 															color: ratingToColor(attribute.evaluation.outcome.rating),
 															weight: (
 																attrGroup.attributes.find(w => w.attribute.id === attributeId)
-																	?.weight
-																?? 1
-															),
-															arcLabel: '',
-															arcIconId: attribute.attribute.icon,
+																			?.weight
+																		?? 1
+																	),
+																	arcLabel: '',
+																	arcIconId: attribute.attribute.icon,
+																	ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 																opacity: 0.33,
 															},
@@ -1170,22 +1176,6 @@
 											height="40"
 											alt=""
 										/>
-									{:else if summaryVisualization === SummaryVisualization.Stage}
-										{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-											{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-											{@const maxStages = ladderEvaluation.ladder.stages.length}
-											{#if stageIndex >= 0}
-												<span
-													class="pie-center-stage-label"
-												>
-													{stageIndex}
-												</span>
-											{:else}
-												<span>❔</span>
-											{/if}
-										{:else}
-											<span>❔</span>
-										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(score)}
@@ -1362,6 +1352,7 @@
 												),
 												arcLabel: '',
 												arcIconId: attribute.attribute.icon,
+												ariaLabel: `${attribute.attribute.displayName}${tooltipSuffix ?? ''}: ${attribute.evaluation.outcome.rating}`,
 												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 													opacity: 0.33,
 												},
@@ -1521,7 +1512,8 @@
 												color: ratingToColor(attribute.evaluation.outcome.rating),
 												weight: 1,
 												arcLabel: '',
-												arcIconId: attribute.icon,
+												arcIconId: attribute.attribute.icon,
+												ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 											}
 										]
 									:
@@ -1576,6 +1568,16 @@
 							<a data-link="camouflaged" href={walletUrl}>{wallet.metadata.displayName}</a>
 						</h3>
 
+						{#if stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null}
+							<span class="mobile-card-stage">
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="medium"
+								/>
+							</span>
+						{/if}
+
 						<div class="mobile-card-variants">
 							{#each cardSupportedVariants as variant}
 								<button
@@ -1592,26 +1594,6 @@
 					</div>
 				</div>
 
-				<!-- Attribute group circles -->
-				<div class="mobile-attr-grid">
-					{#each displayedAttributeGroups as attrGroup}
-						{@const evalGroup = wallet.overall[attrGroup.id]}
-						{@const groupScore = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
-						<a
-							class="mobile-attr-item"
-							href={getWalletUrl(wallet, { variant: selectedVariant, attributeAnchor: attrGroup.id })}
-						>
-							<div
-								class="mobile-attr-circle"
-								style:--attr-color={groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)'}
-							>
-								<span data-icon="wbicons {attrGroup.icon}"></span>
-							</div>
-							<span class="mobile-attr-label">{attrGroup.displayName}</span>
-						</a>
-					{/each}
-				</div>
-
 				<!-- Full-size overall Pie -->
 				<div class="mobile-card-pie">
 					<Pie
@@ -1621,12 +1603,12 @@
 						levels={[
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.15,
+								innerRadiusFraction: 0.08,
 								gap: 5,
 								angleGap: 5,
 								offset: 4,
 								outerCornerRadius: 35,
-								innerCornerRadius: 20,
+								innerCornerRadius: 10,
 								labelSizeScale: 1.25,
 							},
 							{
@@ -1649,6 +1631,7 @@
 									id: `m_${wallet.metadata.id}_ag_${attrGroup.id}`,
 									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
 									arcIconId: attrGroup.icon,
+									ariaLabel: attrGroup.displayName,
 									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
 									gradient: attributeGroupFlowerGradient,
 									weight: 1,
@@ -1669,6 +1652,7 @@
 													),
 													arcLabel: '',
 													arcIconId: attribute.attribute.icon,
+													ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 													...attribute.evaluation.outcome.rating === Rating.EXEMPT && { opacity: 0.33 },
 												}))
 										),
@@ -1676,16 +1660,7 @@
 								}
 							})
 						}
-					>
-						{#snippet centerContentSnippet()}
-							{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-								{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-								{#if stageIndex >= 0}
-									<span class="pie-center-stage-label">{stageIndex}</span>
-								{/if}
-							{/if}
-						{/snippet}
-					</Pie>
+					/>
 				</div>
 			</div>
 		{/each}
@@ -1867,10 +1842,6 @@
 
 	.eip-tooltip-content {
 		width: 34rem;
-	}
-
-	.pie-center-stage-label {
-		color: var(--pie-center-color);
 	}
 
 	.pie-center-dot {
@@ -2058,6 +2029,7 @@
 	.mobile-name-and-variants {
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 		gap: 0.5rem;
 		flex: 1;
 		min-width: 0;
@@ -2075,6 +2047,10 @@
 			color: inherit;
 			text-decoration: none;
 		}
+	}
+
+	.mobile-card-stage {
+		flex-shrink: 0;
 	}
 
 	.mobile-card-variants {
@@ -2103,57 +2079,6 @@
 		&.active {
 			color: var(--accent);
 		}
-	}
-
-	.mobile-attr-grid {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 1.25rem 0.5rem;
-
-		/* First two items sit in row 1, centered across 6 columns */
-		.mobile-attr-item:nth-child(1) {
-			grid-column: 2 / span 2;
-		}
-		.mobile-attr-item:nth-child(2) {
-			grid-column: 4 / span 2;
-		}
-		/* Items 3-5 auto-fill row 2 spanning 2 columns each */
-		.mobile-attr-item:nth-child(n + 3) {
-			grid-column: span 2;
-		}
-	}
-
-	.mobile-attr-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.4rem;
-		text-decoration: none;
-	}
-
-	.mobile-attr-circle {
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		background: color-mix(in srgb, var(--attr-color) 20%, transparent);
-		color: var(--attr-color);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-
-		[data-icon~="wbicons"] {
-			font-size: 1.4rem;
-		}
-	}
-
-	.mobile-attr-label {
-		font-size: 0.6rem;
-		line-height: 1.3;
-		text-align: center;
-		color: var(--text-secondary);
-		max-width: 4.5rem;
-		overflow-wrap: break-word;
 	}
 
 	.mobile-card-pie {

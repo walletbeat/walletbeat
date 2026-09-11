@@ -32,6 +32,8 @@ function rateAppIsolation(
 	appIsolation: Exclude<AppIsolation, typeof appConnectionNotSupported>,
 ): Evaluation {
 	if (!isSupported(appIsolation.createInAppConnectionFlow)) {
+		ctx.addRef(appIsolation.createInAppConnectionFlow)
+
 		return ctx.build({
 			outcome: {
 				id: 'no_account_creation_in_connection_flow',
@@ -63,6 +65,8 @@ function rateAppIsolation(
 	ctx.addRef(appIsolation.createInAppConnectionFlow)
 
 	if (!isSupported(appIsolation.useAppSpecificLastConnectedAddresses)) {
+		ctx.addRef(appIsolation.useAppSpecificLastConnectedAddresses)
+
 		return ctx.build({
 			outcome: {
 				id: 'no_reuse_last_connection_addresses',

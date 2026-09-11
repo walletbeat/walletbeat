@@ -1,3 +1,4 @@
 bubblewrap
 curl
+rsync
 uidmap

@@ -84,7 +84,7 @@ export const rabby: SoftwareWallet = {
 		coinspectId: 'rabby-wallet',
 		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-22',
+		lastUpdated: '2026-08-31',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/android/app/src/main/AndroidManifest.xml',
@@ -365,16 +365,34 @@ export const rabby: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: {
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'The app unlocks with your wallet password or with fingerprint or face unlock.',
+								url: [
+									{
+										label: 'Password and biometric unlock in the mobile app unlock screen',
+										url: 'https://github.com/RabbyHub/rabby-mobile/blob/12a0247a21b2898fb1295e32ebe96a84524f7f58/apps/mobile/src/screens/Unlock/Unlock.tsx#L1091-L1153',
+									},
+									{
+										label: 'Keychain access control used to store the credential',
+										url: 'https://github.com/RabbyHub/rabby-mobile/blob/12a0247a21b2898fb1295e32ebe96a84524f7f58/apps/mobile/src/core/apis/keychainCommon.ts#L843-L857',
+									},
+								],
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: false,
+							[BasicUnlockMechanism.PASSWORD]: true,
+							[BasicUnlockMechanism.BIOMETRIC]: true,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
 					},
+					duressMode: notSupported,
 				},
-				duressMode: notSupported,
 			},
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {

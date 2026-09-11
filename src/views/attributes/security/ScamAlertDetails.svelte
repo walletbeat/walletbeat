@@ -6,8 +6,8 @@
 	import type { Outcome } from '@/schema/attributes'
 	import { isSupported } from '@/schema/features/support'
 	import { UnlimitedApprovalWarningCondition, unlimitedApprovalWarningConditionLabels } from '@/schema/features/security/scam-alerts'
-	import { toFullyQualified } from '@/schema/reference'
-	import type { RatedWallet } from '@/schema/wallet'
+	import { refs } from '@/schema/reference'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { commaListFormat } from '@/types/utils/text'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
@@ -17,7 +17,7 @@
 		wallet,
 		outcome,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		outcome: Outcome<ScamPreventionMetadata>
 	} = $props()
 
@@ -101,10 +101,8 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.metadata.scamAlerts.sendTransactionWarning) && outcome.metadata.scamAlerts.sendTransactionWarning.ref}
-					<ReferenceLinks
-						references={toFullyQualified(outcome.metadata.scamAlerts.sendTransactionWarning.ref)}
-					/>
+				{#if refs(outcome.metadata.sendTransactionWarning).length > 0}
+					<ReferenceLinks references={refs(outcome.metadata.sendTransactionWarning)} />
 				{/if}
 			</li>
 		{/if}
@@ -156,10 +154,8 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.metadata.scamAlerts.contractTransactionWarning) && outcome.metadata.scamAlerts.contractTransactionWarning.ref}
-					<ReferenceLinks
-						references={toFullyQualified(outcome.metadata.scamAlerts.contractTransactionWarning.ref)}
-					/>
+				{#if refs(outcome.metadata.contractTransactionWarning).length > 0}
+					<ReferenceLinks references={refs(outcome.metadata.contractTransactionWarning)} />
 				{/if}
 			</li>
 		{/if}
@@ -185,10 +181,8 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.metadata.scamAlerts.scamUrlWarning) && outcome.metadata.scamAlerts.scamUrlWarning.ref}
-					<ReferenceLinks
-						references={toFullyQualified(outcome.metadata.scamAlerts.scamUrlWarning.ref)}
-					/>
+				{#if refs(outcome.metadata.scamUrlWarning).length > 0}
+					<ReferenceLinks references={refs(outcome.metadata.scamUrlWarning)} />
 				{/if}
 			</li>
 		{/if}
@@ -210,10 +204,8 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.metadata.scamAlerts.unlimitedApprovalWarning) && outcome.metadata.scamAlerts.unlimitedApprovalWarning.ref}
-					<ReferenceLinks
-						references={toFullyQualified(outcome.metadata.scamAlerts.unlimitedApprovalWarning.ref)}
-					/>
+				{#if refs(outcome.metadata.unlimitedApprovalWarning).length > 0}
+					<ReferenceLinks references={refs(outcome.metadata.unlimitedApprovalWarning)} />
 				{/if}
 			</li>
 		{/if}
