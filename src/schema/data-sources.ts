@@ -1,8 +1,20 @@
 import coinspectUpstreamCommit from '@/data/coinspect/upstream-commit?raw'
 import { coinspect } from '@/data/entities/coinspect'
-import type { DataSource } from '@/schema/data-sources'
-import type { FullyQualifiedReference } from '@/schema/reference'
-import { assertCalendarDate } from '@/types/date'
+import type { Entity } from '@/schema/entity'
+import type { LabeledUrl, Url } from '@/schema/url'
+import { assertCalendarDate, type CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
+/**
+ * An external dataset that Walletbeat citations may be adapted from.
+ * The JSON export and UI id is `entity.id`; `DataSource` has no separate id.
+ */
+export interface DataSource {
+	entity: Entity
+	license: { name: string; url: Url }
+	/** Credit line shown in the UI; must indicate adaptation for CC BY. */
+	attributionText: string
+}
 
 export const coinspectDataSource: DataSource = {
 	entity: coinspect,
@@ -18,7 +30,12 @@ export function coinspectRef(args: {
 	report: { walletUID: string; date: string }
 	check: string
 	note: string
-}): FullyQualifiedReference {
+}): {
+	urls: NonEmptyArray<LabeledUrl>
+	explanation: string
+	lastRetrieved: CalendarDate
+	source: DataSource
+} {
 	const commit = coinspectUpstreamCommit.trim()
 	const url = `https://github.com/coinspect/wallet-security-ranking/blob/${commit}/current-reports/${args.report.walletUID}/${args.report.walletUID}.json`
 

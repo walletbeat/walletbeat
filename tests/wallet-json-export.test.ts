@@ -9,7 +9,7 @@ import {
 	isHardwareRatedWallet,
 	isSoftwareRatedWallet,
 } from '@/data/wallets'
-import { coinspectRef } from '@/schema/data-sources/coinspect'
+import { coinspectRef } from '@/schema/data-sources'
 import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
