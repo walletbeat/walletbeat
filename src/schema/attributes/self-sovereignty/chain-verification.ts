@@ -160,6 +160,8 @@ export const chainVerification: Attribute = {
 		}
 
 		if (!isSupported(l1Client)) {
+			ctx.addRef(l1Client)
+
 			return noChainVerification(ctx, ctx.features.chainConfigurability)
 		}
 

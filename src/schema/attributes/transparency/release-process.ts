@@ -462,24 +462,14 @@ export const releaseProcess: Attribute = {
 
 		let verifiabilityNeedsSourceCodeVisibility = false
 
-		if (basicSignals.changelog) {
-			ctx.addRef(hasPublicChangelog)
-		}
-
 		if (advancedSignals.builds) {
 			// Build-integrity claims require public source code to verify independently.
 			verifiabilityNeedsSourceCodeVisibility = true
-			ctx.addRef(rt.reproducibleBuilds, rt.hermeticBuilds)
-		}
-
-		if (advancedSignals.signing) {
-			ctx.addRef(artifactSigning)
 		}
 
 		if (basicSignals.locking) {
 			// Dependency locking can only be checked against the wallet's source tree.
 			verifiabilityNeedsSourceCodeVisibility = true
-			ctx.addRef(dependencyLocking)
 		}
 
 		const buildSignal = getBuildSignalLabel(rt.reproducibleBuilds, rt.hermeticBuilds)
@@ -501,6 +491,19 @@ export const releaseProcess: Attribute = {
 
 		if (verifiabilityNeedsSourceCodeVisibility && sourceVisible === null) {
 			return unrated(ctx)
+		}
+
+		ctx.addRef(hasPublicChangelog, artifactSigning, dependencyLocking)
+
+		if (advancedSignals.builds) {
+			ctx.addRef(
+				rt.reproducibleBuilds !== null && isSupported(rt.reproducibleBuilds)
+					? rt.reproducibleBuilds
+					: null,
+				rt.hermeticBuilds !== null && isSupported(rt.hermeticBuilds) ? rt.hermeticBuilds : null,
+			)
+		} else {
+			ctx.addRef(rt.reproducibleBuilds, rt.hermeticBuilds)
 		}
 
 		// Classification is group-based (basic pass + advanced level), not raw signal count.

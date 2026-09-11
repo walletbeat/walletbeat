@@ -215,6 +215,8 @@ function evaluateAccountRecoveryDrills(
 	recommendedDrillTypes: AccountRecoveryDrillType[],
 ): Evaluation<AccountRecoveryMetadata> {
 	if (isSupported(drills)) {
+		ctx.addRef(...drills.entries)
+
 		const missing = getMissingDrillTypes(drills, recommendedDrillTypes)
 		const configured = drills.entries.map(({ type, reminderEveryNDays }) => ({
 			type,
@@ -256,6 +258,8 @@ function evaluateAccountRecoveryDrills(
 			howToImprove: drillsHowToImprove(missing),
 		})
 	}
+
+	ctx.addRef(drills)
 
 	// For empty recommended drill types
 	if (!isNonEmptyArray(recommendedDrillTypes)) {
@@ -341,6 +345,8 @@ function evaluateAccountRecovery(
 	if (accountRecovery.drills === null) {
 		return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
 	}
+
+	ctx.addRef(accountRecovery.guardianRecovery)
 
 	const hasGuardianRecovery = isSupported(accountRecovery.guardianRecovery)
 	const recommendedDrillTypes = getRecommendedDrillTypes(accountSupport, hasGuardianRecovery)
@@ -741,11 +747,6 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 		// account recovery drills are expected of the wallet.
 		if (ctx.features.security.accountRecovery === null || ctx.features.accountSupport === null) {
 			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null, drills: null })
-		}
-
-		// Collect references
-		if (isSupported(ctx.features.security.accountRecovery.guardianRecovery)) {
-			ctx.addRef(ctx.features.security.accountRecovery.guardianRecovery)
 		}
 
 		return evaluateAccountRecovery(
