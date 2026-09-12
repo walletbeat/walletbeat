@@ -63,11 +63,6 @@
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
-	type WalletPageWallet<_AttributeGroupId extends string> =
-		Omit<RatedWallet<_AttributeGroupId>, 'ladders'> &
-		Partial<Pick<RatedWallet<_AttributeGroupId>, 'ladders'>>
-
-
 	// Props
 	const {
 		ladders,
@@ -78,7 +73,7 @@
 	}: {
 		ladders: Ladders<_AttributeGroupId>
 		attributeTree: AttributeTree<_AttributeGroupId>
-		wallet: WalletPageWallet<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId>
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
