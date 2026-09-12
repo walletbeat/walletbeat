@@ -582,14 +582,14 @@
 		data-scroll-item="inline-detached padding-match-start"
 	>
 		<div data-row="wrap">
-			<div class="wallet-title-row" data-row="start wrap" data-row-item="flexible">
+			<div class="wallet-title-row" data-row="start wrap">
 				<h1 data-sticky-breadcrumb="source">
 					<a
 						data-link="camouflaged"
 						class="wallet-name"
 						href="#top"
 						data-sticky-breadcrumb="item"
-						data-row="gap-1"
+						data-row="gap-2"
 					>
 						<img
 							class="wallet-icon"
@@ -658,31 +658,6 @@
 		</div>
 
 		<section class="wallet-overview" data-sticky-breadcrumb="support" data-row="wrap align-start">
-			{#if !hasSingleVariant(wallet.variants)}
-				<p data-row-item="flexible basis-4">
-					The ratings below may vary depending on the version.
-					{#if selectedVariant}
-						You are currently viewing the ratings for the
-						<strong>{variantToName(selectedVariant, false)}</strong> version.
-					{:else}
-						Select a version to see version-specific ratings.
-					{/if}
-				</p>
-			{/if}
-
-			{#if Variant.HARDWARE in wallet.variants}
-				{#if brandModels.length > 1}
-					<p data-row-item="flexible basis-4">
-						The ratings below may vary depending on the model.
-						{#if selectedModel}
-							You are currently viewing the ratings for the
-							<strong>{brandModels.find(m => m.modelId === selectedModel)?.modelName}</strong> model.
-						{:else}
-							Select a model to see model-specific ratings.
-						{/if}
-					</p>
-				{/if}
-			{/if}
 			<nav data-row="gap-2 start wrap" data-row-item="wrap-end">
 				<a
 					href={isLabeledUrl(wallet.metadata.urls?.websites[0])
