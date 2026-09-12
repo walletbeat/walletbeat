@@ -2485,11 +2485,7 @@
 				margin-inline-start: auto;
 			}
 			@media (width <= 1024px) {
-				.wallet-title-row {
-					animation: wallet-terminal auto linear forwards;
-					animation-timeline: --wallet-terminal;
-					animation-range: calc(100% - var(--navigation-mobile-blockSize)) 100%;
-				}
+				opacity: 1;
 				[data-sticky-breadcrumb~="end"] {
 					translate: calc(
 							var(---inlineDirection) * var(---breadcrumb-entry) *
