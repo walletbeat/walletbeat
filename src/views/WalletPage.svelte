@@ -19,16 +19,7 @@
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
-	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
-	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
-	import type { FundingDetailsProps } from '@/types/content/funding-details'
-	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
-	import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
-	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
-	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
-	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
-	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
-	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
+	import { evaluationDetailRenderData } from '@/types/content/evaluation-details'
 	import {
 		computePieSlices,
 		overallRatingPieLevels,
@@ -63,11 +54,6 @@
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
-	type WalletPageWallet<_AttributeGroupId extends string> =
-		Omit<RatedWallet<_AttributeGroupId>, 'ladders'> &
-		Partial<Pick<RatedWallet<_AttributeGroupId>, 'ladders'>>
-
-
 	// Props
 	const {
 		ladders,
@@ -78,7 +64,7 @@
 	}: {
 		ladders: Ladders<_AttributeGroupId>
 		attributeTree: AttributeTree<_AttributeGroupId>
-		wallet: WalletPageWallet<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId>
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
@@ -1044,32 +1030,31 @@
 						/>
 
 					{:else if evalAttr.evaluation.details}
-						{@const componentName = evalAttr.evaluation.details.component.component}
-						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
 						{@const outcome = evalAttr.evaluation.outcome}
+						{@const renderData = evaluationDetailRenderData(evalAttr.evaluation.details.component, outcome)}
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
-							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
-							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
-							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
-							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
-							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
-							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
-							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
+							{#if renderData.component === 'AddressCorrelationDetails'}
+								<AddressCorrelationDetails {...renderData.componentProps} {wallet} />
+							{:else if renderData.component === 'PrivateTransfersDetails'}
+								<PrivateTransfersDetails {...renderData.componentProps} {wallet} />
+							{:else if renderData.component === 'ChainVerificationDetails'}
+								<ChainVerificationDetails {...renderData.componentProps} {wallet} refs={references} />
+							{:else if renderData.component === 'ScamAlertDetails'}
+								<ScamAlertDetails {...renderData.componentProps} {wallet} outcome={renderData.outcome} />
+							{:else if renderData.component === 'SecurityAuditsDetails'}
+								<SecurityAuditsDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
+							{:else if renderData.component === 'TransactionInclusionDetails'}
+								<TransactionInclusionDetails {...renderData.componentProps} {wallet} />
+							{:else if renderData.component === 'FundingDetails'}
+								<FundingDetails {...renderData.componentProps} {wallet} />
+							{:else if renderData.component === 'AccountRecoveryDetails'}
+								<AccountRecoveryDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
+							{:else if renderData.component === 'AccountUnruggabilityDetails'}
+								<AccountUnruggabilityDetails {...renderData.componentProps} {wallet} metadata={renderData.outcome.metadata} />
+							{:else if renderData.component === 'UnratedAttribute'}
+								<UnratedAttribute {...renderData.componentProps} {wallet} />
 							{/if}
 						</div>
 

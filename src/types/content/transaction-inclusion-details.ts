@@ -11,16 +11,18 @@ export interface TransactionInclusionDetailsProps extends EvaluationData {
 	unsupportedL2s: TransactionSubmissionL2Type[]
 }
 
+export type TransactionInclusionDetailsBakedProps = Omit<
+	TransactionInclusionDetailsProps,
+	keyof EvaluationData
+>
+
 export interface TransactionInclusionDetailsContent {
 	component: 'TransactionInclusionDetails'
-	componentProps: TransactionInclusionDetailsProps
+	componentProps: TransactionInclusionDetailsBakedProps
 }
 
 export function transactionInclusionDetailsContent(
-	bakedProps: Omit<TransactionInclusionDetailsProps, keyof EvaluationData>,
+	bakedProps: TransactionInclusionDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<TransactionInclusionDetailsContent, keyof typeof bakedProps>(
-		'TransactionInclusionDetails',
-		bakedProps,
-	)
+	return component('TransactionInclusionDetails', bakedProps)
 }

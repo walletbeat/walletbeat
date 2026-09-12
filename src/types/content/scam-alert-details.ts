@@ -5,13 +5,18 @@ import { component, type Content } from '../content'
 
 export interface ScamAlertDetailsProps extends EvaluationData<ScamPreventionMetadata> {}
 
+export type ScamAlertDetailsBakedProps = Omit<
+	ScamAlertDetailsProps,
+	keyof EvaluationData<ScamPreventionMetadata>
+>
+
 export interface ScamAlertDetailsContent {
 	component: 'ScamAlertDetails'
-	componentProps: ScamAlertDetailsProps
+	componentProps: ScamAlertDetailsBakedProps
 }
 
 export function scamAlertsDetailsContent(
-	bakedProps: Omit<ScamAlertDetailsProps, keyof EvaluationData<ScamPreventionMetadata>>,
+	bakedProps: ScamAlertDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<ScamAlertDetailsContent, keyof typeof bakedProps>('ScamAlertDetails', bakedProps)
+	return component('ScamAlertDetails', bakedProps)
 }
