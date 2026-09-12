@@ -1,0 +1,69 @@
+{
+	"highlightFirstLine": 12,
+	"highlightLastLine": 55,
+	"segments": [
+		{
+			"lines": [
+				"import {"
+			],
+			"startLine": 5
+		},
+		{
+			"lines": [
+				"  serialize,",
+				"} from '@ethersproject/transactions';",
+				"import AppEth, { ledgerService } from '@ledgerhq/hw-app-eth';",
+				"import type Transport from '@ledgerhq/hw-transport';",
+				"import TransportWebHID from '@ledgerhq/hw-transport-webhid';",
+				"import {",
+				"  Address,",
+				"  ByteArray,",
+				"  Hex,",
+				"  bytesToHex,",
+				"  hashDomain,",
+				"  hashStruct,",
+				"  hexToBytes,",
+				"  stringToBytes,",
+				"} from 'viem';",
+				"",
+				"import { i18n } from '~/core/languages';",
+				"import {",
+				"  SigningMessage,",
+				"  isPersonalSignMessage,",
+				"  isTypedDataMessage,",
+				"} from '~/core/types/messageSigning';",
+				"import { sanitizeTypedData } from '~/core/utils/ethereum';",
+				"import { joinSignature } from '~/core/utils/hex';",
+				"import { getProvider } from '~/core/viem/clientToProvider';",
+				"import { logger } from '~/logger';",
+				"",
+				"import { popupClient } from './background';",
+				"",
+				"const getPath = async (address: Address) => {",
+				"  return await popupClient.wallet.path(address);",
+				"};",
+				"",
+				"export async function signTransactionFromLedger(",
+				"  transaction: TransactionRequest,",
+				"): Promise<Hex> {",
+				"  let transport;",
+				"  try {",
+				"    const { from: address } = transaction;",
+				"    try {",
+				"      transport = await TransportWebHID.openConnected();",
+				"      if (transport === null) {",
+				"        transport = await TransportWebHID.create();",
+				"      }",
+				"    } catch (e) {",
+				"      transport = await TransportWebHID.create();",
+				"    }",
+				"    const appEth = new AppEth(transport as Transport);",
+				"",
+				"    const path = await getPath(address as Address);",
+				"",
+				"    const baseTx: UnsignedTransaction = {"
+			],
+			"startLine": 8
+		}
+	]
+}

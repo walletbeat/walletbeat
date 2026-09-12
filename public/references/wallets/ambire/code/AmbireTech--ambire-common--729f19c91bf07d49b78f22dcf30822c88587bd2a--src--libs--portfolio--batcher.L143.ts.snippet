@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 143,
+	"highlightLastLine": 143,
+	"segments": [
+		{
+			"lines": [
+				"export default function batcher(",
+				"  fetch: Fetch,",
+				"  requestGenerator: RequestGenerator,",
+				"  options: {",
+				"    timeoutSettings?: {",
+				"      timeoutAfter: number",
+				"      timeoutErrorMessage: string",
+				"    }",
+				"    batchDebounce?: number",
+				"    dedupeByKeys?: string[]",
+				"  }",
+				"): Function {"
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"  return async (data: any): Promise<any> => {"
+			],
+			"startLine": 135
+		},
+		{
+			"lines": [
+				"    if (timeoutId) {",
+				"      clearTimeout(timeoutId)",
+				"    }",
+				"",
+				"    // Set a new timeout for the resolveQueue call",
+				"    timeoutId = setTimeout(resolveQueue, batchDebounce)",
+				"",
+				"    return new Promise((resolve, reject) => {",
+				"      queue.push({ resolve, reject, fetch, data })",
+				"    })"
+			],
+			"startLine": 138
+		}
+	]
+}

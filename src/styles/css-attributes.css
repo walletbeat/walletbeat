@@ -34,10 +34,20 @@ a {
 	text-decoration: none;
 	font-weight: 600;
 
-	transition-property: color, text-decoration;
+	transition-property: color, text-decoration, border-color;
 
 	&:hover {
 		text-decoration: underline;
+	}
+
+	&:has(svg) {
+		text-decoration: none;
+		border-block-end: 1px solid transparent;
+
+		&:hover {
+			text-decoration: none;
+			border-block-end-color: currentColor;
+		}
 	}
 
 	&[data-link~="camouflaged"] {

@@ -1,0 +1,61 @@
+{
+	"highlightFirstLine": 49,
+	"highlightLastLine": 68,
+	"segments": [
+		{
+			"lines": [
+				"export const useWalletBackups = () => {"
+			],
+			"startLine": 11
+		},
+		{
+			"lines": [
+				"  useEffect(() => {",
+				"    // if there's no backup info we set everything as backed up for old users",
+				"    if (",
+				"      needsInitialization &&",
+				"      walletsFromKeychain.length &&",
+				"      Object.keys(walletBackups).length === 0",
+				"    ) {",
+				"      walletsFromKeychain.map((wallet) => setWalletAlreadyBackedUp({ wallet }));",
+				"      setNeedsInitialization(false);",
+				"    }",
+				"  }, ["
+			],
+			"startLine": 32
+		},
+		{
+			"lines": [
+				"    setWalletAlreadyBackedUp,",
+				"    walletBackups,",
+				"    walletsFromKeychain,",
+				"  ]);",
+				"",
+				"  useEffect(() => {",
+				"    if (!reminded && walletsFromKeychain.length) {",
+				"      const needsBackupReminder = walletsFromKeychain.find((wallet) => {",
+				"        const walletBackup = getWalletBackup({ wallet });",
+				"        return !walletBackup?.backedUp;",
+				"      });",
+				"      if (needsBackupReminder) {",
+				"        setShowWalletBackupReminder(true);",
+				"      } else {",
+				"        popQueue();",
+				"      }",
+				"      setReminded();",
+				"    }",
+				"  }, [",
+				"    getWalletBackup,",
+				"    popQueue,",
+				"    reminded,",
+				"    setReminded,",
+				"    setShowWalletBackupReminder,",
+				"    walletsFromKeychain,",
+				"  ]);",
+				"",
+				"  return {"
+			],
+			"startLine": 45
+		}
+	]
+}

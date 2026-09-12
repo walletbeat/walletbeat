@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 414,
+	"highlightLastLine": 428,
+	"segments": [
+		{
+			"lines": [
+				"export function RequestAccounts() {"
+			],
+			"startLine": 395
+		},
+		{
+			"lines": [
+				"  const { data, isLoading, isError, error } = useQuery({"
+			],
+			"startLine": 405
+		},
+		{
+			"lines": [
+				"    queryFn: async () => {",
+				"      const currentWallet = await walletPort.request('uiGetCurrentWallet');",
+				"      const allWalletGroups = await walletPort.request('uiGetWalletGroups');",
+				"      const walletGroups = allWalletGroups?.filter((group) => {",
+				"        return group.walletContainer.wallets.some((wallet) =>",
+				"          isMatchForEcosystem(wallet.address, ecosystem)",
+				"        );",
+				"      });",
+				"",
+				"      const currentAddress = currentWallet?.address;",
+				"",
+				"      let wallet: typeof currentWallet = null;",
+				"      if (currentAddress && isMatchForEcosystem(currentAddress, ecosystem)) {",
+				"        wallet = currentWallet;",
+				"      } else {",
+				"        wallet =",
+				"          walletGroups",
+				"            ?.at(0)",
+				"            ?.walletContainer.wallets.find((wallet) =>",
+				"              isMatchForEcosystem(wallet.address, ecosystem)",
+				"            ) ?? null;",
+				"      }",
+				"      if (!wallet) {",
+				"        throw new NoWalletForEcosystemError(ecosystem);"
+			],
+			"startLine": 409
+		}
+	]
+}

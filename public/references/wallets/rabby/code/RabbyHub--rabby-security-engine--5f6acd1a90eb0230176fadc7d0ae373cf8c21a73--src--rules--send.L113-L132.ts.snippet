@@ -1,0 +1,57 @@
+{
+	"highlightFirstLine": 113,
+	"highlightLastLine": 132,
+	"segments": [
+		{
+			"lines": [
+				"const rules: RuleConfig[] = ["
+			],
+			"startLine": 3
+		},
+		{
+			"lines": [
+				"  {"
+			],
+			"startLine": 91
+		},
+		{
+			"lines": [
+				"    async getValue(ctx) {"
+			],
+			"startLine": 107
+		},
+		{
+			"lines": [
+				"      if (!cex) return false;",
+				"      return cex && !cex.isDeposit;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1033\",",
+				"    enable: true,",
+				"    valueDescription: \"Recipient address is in your whitelist\",",
+				"    descriptions: {",
+				"      safe: \"The recipient address is in your whitelist\",",
+				"    },",
+				"    valueDefine: {",
+				"      type: \"boolean\",",
+				"    },",
+				"    defaultThreshold: {",
+				"      safe: true,",
+				"    },",
+				"    customThreshold: {},",
+				"    requires: [\"send\"],",
+				"    async getValue(ctx) {",
+				"      const { onTransferWhitelist } = ctx.send!;",
+				"      return onTransferWhitelist;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1142\",",
+				"    enable: true,",
+				"    valueDescription: \"The recipient address is from your seed phrase\","
+			],
+			"startLine": 109
+		}
+	]
+}

@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 183,
+	"highlightLastLine": 197,
+	"segments": [
+		{
+			"lines": [
+				"export class NameRegistry extends Indexer {"
+			],
+			"startLine": 92
+		},
+		{
+			"lines": [
+				"  async search(prefix: string): Promise<DAccount[]> {"
+			],
+			"startLine": 170
+		},
+		{
+			"lines": [
+				"    return this.accounts"
+			],
+			"startLine": 172
+		},
+		{
+			"lines": [
+				"      .sort((a, b) => a.name.localeCompare(b.name))",
+				"      .slice(0, 10);",
+				"  }",
+				"",
+				"  /** Get call for registering a Daimo name to an address. */",
+				"  getRegisterNameCall(name: string): DaimoAccountCall {",
+				"    validateName(name);",
+				"    const nameHex = Buffer.from(name.padEnd(32, \"\\0\")).toString(\"hex\");",
+				"",
+				"    return {",
+				"      dest: nameRegistryProxyConfig.address,",
+				"      value: 0n,",
+				"      data: encodeFunctionData({",
+				"        abi: nameRegistryProxyConfig.abi,",
+				"        functionName: \"registerSelf\",",
+				"        args: [`0x${nameHex}`],",
+				"      }),",
+				"    };",
+				"  }",
+				"",
+				"  /** On successfully registering a name, cache it. */",
+				"  onSuccessfulRegister = (name: string, address: Address) => {",
+				"    this.cacheAccount({ name, addr: address, timestamp: now() });"
+			],
+			"startLine": 179
+		}
+	]
+}

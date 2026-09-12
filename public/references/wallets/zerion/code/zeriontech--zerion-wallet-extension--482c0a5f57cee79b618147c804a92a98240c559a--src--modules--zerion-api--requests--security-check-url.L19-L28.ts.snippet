@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 19,
+	"highlightLastLine": 28,
+	"segments": [
+		{
+			"lines": [
+				"interface Response {"
+			],
+			"startLine": 9
+		},
+		{
+			"lines": [
+				"  } | null;",
+				"  errors?: { title: string; detail: string }[];",
+				"}",
+				"",
+				"export function securityCheckUrl(",
+				"  this: ZerionApiContext,",
+				"  payload: Params,",
+				"  options?: ClientOptions",
+				") {",
+				"  const params = new URLSearchParams({ url: payload.url });",
+				"  const kyOptions = this.getKyOptions();",
+				"  const endpoint = `security/check-url/v1?${params}`;",
+				"  return ZerionHttpClient.get<Response>({ endpoint, ...options }, kyOptions);",
+				"}"
+			],
+			"startLine": 15
+		}
+	]
+}
