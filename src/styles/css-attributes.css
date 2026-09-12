@@ -1707,9 +1707,7 @@ ol {
 			---breadcrumb-sourceOffsetBlock: var(--card-borderWidth);
 		}
 		/* Fragment navigation shares the natural flow's arrival boundary. */
-		scroll-margin-block-start: calc(
-			var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-sourceOffsetBlock)
-		);
+		scroll-margin-block-start: var(---breadcrumb-parentBlockEnd);
 		/* Sizes belong to the scope; changing arrival progress belongs to its heading. */
 		animation: none auto linear both;
 		animation-name: var(---breadcrumb-sizeAnimationNames);
@@ -1827,7 +1825,7 @@ ol {
 					var(--stickyBreadcrumb-paddingBlock, 0.5rem)
 			);
 		}
-		/* Natural flow owns both snap boundaries without sticky clamping or the section's extent. */
+		/* The outer border starts arrival; the position box still owns its end. */
 		> [data-sticky-breadcrumb~="flow"] {
 			display: block;
 			content: '';
@@ -1836,9 +1834,9 @@ ol {
 			scroll-margin-block-start: 0;
 			pointer-events: none;
 			inset-inline-start: 0;
-			inset-block-start: calc(-1 * var(---breadcrumb-parentBlockEnd));
+			inset-block-start: calc(-1 * (var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock)));
 			inline-size: 1px;
-			block-size: calc(anchor-size(--breadcrumb-position block) + var(---breadcrumb-parentBlockEnd));
+			block-size: calc(anchor-size(--breadcrumb-position block) + var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock));
 			&::after {
 				content: '';
 				position: absolute;
@@ -2585,7 +2583,7 @@ ol {
 		 */
 		[data-sticky] {
 			/* Inputs */
-			--sticky-backgroundColor: light-dark(#f8edff, #130a2b3c);
+			--sticky-backgroundColor: light-dark(#f8edff3c, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
 			---sticky-background: var(--sticky-backgroundColor);
 			---sticky-backdropFilter: var(--sticky-backdropFilter);
@@ -2865,28 +2863,12 @@ ol {
 [data-collapsible],
 details {
 	&::details-content {
-		transition-property: content-visibility, height, opacity, filter, transform;
-
 		display: grid;
-		content-visibility: visible;
-		height: auto;
-		transform: perspective(100px);
-		transform-origin: center top;
-
-		/* @starting-style {
-			height: 0;
-			opacity: 0;
-			filter: blur(4px);
-			transform: perspective(1000px) rotateX(-1deg);
-		} */
+		transition-property: none;
 	}
 
 	&:not([open])::details-content {
-		content-visibility: hidden;
-		height: 0;
-		opacity: 0;
-		filter: blur(4px);
-		transform: perspective(1000px) rotateX(-1deg);
+		display: none;
 	}
 
 	> :where(summary) {
