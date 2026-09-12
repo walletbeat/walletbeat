@@ -303,6 +303,17 @@ import Footer from '@/views/Footer.astro'
 		from {
 			translate: 0 0;
 		}
+		to {
+			translate: calc(
+					var(---inlineDirection) * (var(---wallet-chainWrap) - 1) *
+						(
+							var(---breadcrumb-itemWidth) + var(--stickyBreadcrumb-markerSize) +
+								var(--stickyBreadcrumb-gap, 1rem)
+						) /
+						2
+				)
+				calc(-1 * var(---wallet-chainWrap) * var(--navigation-mobile-blockSize));
+		}
 	}
 	@keyframes wallet-source-offset {
 		from {
@@ -458,15 +469,6 @@ import Footer from '@/views/Footer.astro'
 				@media (prefers-reduced-motion: reduce) {
 					animation-timing-function: steps(1, end);
 				}
-				translate: calc(
-						var(---inlineDirection) * (var(---wallet-chainWrap) - 1) *
-							(
-								var(---breadcrumb-itemWidth) + var(--stickyBreadcrumb-markerSize) +
-									var(--stickyBreadcrumb-gap, 1rem)
-							) /
-							2
-					)
-					calc(-1 * var(---wallet-chainWrap) * var(--navigation-mobile-blockSize));
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"]
