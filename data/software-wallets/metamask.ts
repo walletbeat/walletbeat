@@ -121,7 +121,48 @@ export const metamask: SoftwareWallet = {
 				contract: metamask7702DelegatorContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: {
+					explanation:
+						'MetaMask derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+					url: [
+						{
+							label: 'Seed phrase and key derivation libraries',
+							url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L20-L34',
+						},
+						{
+							label: 'BIP-44 derivation path',
+							url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L38',
+						},
+						{
+							label: 'Deriving each account',
+							url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L208-L230',
+						},
+						{
+							label: 'Seed phrase export',
+							url: 'https://github.com/MetaMask/core/blob/f6ab836adc93670f41b2f1ec965f2122ac35331c/packages/keyring-controller/src/KeyringController.ts#L1116-L1131',
+						},
+						{
+							label: 'Private key export',
+							url: 'https://github.com/MetaMask/core/blob/f6ab836adc93670f41b2f1ec965f2122ac35331c/packages/keyring-controller/src/KeyringController.ts#L1141-L1157',
+						},
+						{
+							label: 'Browser extension depends on the keyring',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/package.json#L413',
+						},
+						{
+							label: 'Browser extension depends on the keyring controller',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/package.json#L434',
+						},
+						{
+							label: 'Mobile app depends on the keyring',
+							url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/package.json#L318',
+						},
+						{
+							label: 'Mobile app depends on the keyring controller',
+							url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/package.json#L249',
+						},
+					],
+				},
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
