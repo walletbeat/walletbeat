@@ -439,7 +439,7 @@ import Footer from '@/views/Footer.astro'
 					0,
 					sign(
 						var(---navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
-							var(--stickyBreadcrumb-gap, 1rem)/2 + var(---breadcrumb-itemWidth) + 2 *
+							var(--stickyBreadcrumb-gap, 1rem) + var(---breadcrumb-itemWidth) + 2 *
 							(
 								var(--navigation-controlInsetInline) +
 									max(
@@ -464,7 +464,7 @@ import Footer from '@/views/Footer.astro'
 						var(---inlineDirection) * (var(---wallet-chainWrap) - 1) *
 							(
 								var(---breadcrumb-itemWidth) + var(--stickyBreadcrumb-markerSize) +
-									var(--stickyBreadcrumb-gap, 1rem) / 2
+									var(--stickyBreadcrumb-gap, 1rem)
 							) /
 							2
 					)
@@ -481,7 +481,7 @@ import Footer from '@/views/Footer.astro'
 									100vw - var(---breadcrumb-itemWidth) + (1 - var(---wallet-chainWrap)) *
 										(
 											var(---navigation-logoInlineSize) + var(--stickyBreadcrumb-markerSize) +
-												var(--stickyBreadcrumb-gap, 1rem) / 2
+												var(--stickyBreadcrumb-gap, 1rem)
 										)
 								) /
 								2 - var(--scrollItem-paddingInlineStart)

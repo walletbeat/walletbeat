@@ -1448,6 +1448,7 @@ ol {
 		inset-inline-end: 100%;
 		inline-size: max-content;
 		padding-inline-end: 0.66rem;
+		font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
 		font-size: var(--stickyBreadcrumb-markerSize);
 		line-height: calc(1 / 0.7);
 
@@ -1653,9 +1654,9 @@ ol {
 			[data-sticky-breadcrumb~="item"] > a:first-child
 		)::before {
 		content: if(style(---breadcrumb-entry: 0): '#' ;style(---breadcrumb-wrap: 0): '›' ;else: '#');
-		inline-size: var(--stickyBreadcrumb-markerSize);
 		font-size: var(--stickyBreadcrumb-markerSize);
-		padding-inline-end: calc(var(--stickyBreadcrumb-gap, 1rem) / 2);
+		inline-size: calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem));
+		padding-inline: 0;
 		text-align: center;
 		transform-origin: 100% 50%;
 		animation: breadcrumb-icon-motion auto var(---breadcrumb-compactionEasing) both;
@@ -2684,11 +2685,6 @@ ol {
 								calc(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart))
 							);
 							opacity: var(---breadcrumb-wrap);
-							mask-image: linear-gradient(
-								to bottom,
-								black calc(100% - var(--stickyBreadcrumb-paddingBlock, 0.5rem)),
-								transparent
-							);
 						}
 					}
 				}
