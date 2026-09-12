@@ -1428,6 +1428,7 @@
 		---wallet-group-heading-font-size: 1.8rem;
 		---wallet-compact-icon-size: 32px;
 		---pie-compactSize: 100px;
+		---pie-clearanceSize: calc(var(---pie-compactSize) + var(--stickyBreadcrumb-gap, 1rem) / 2);
 		---wallet-compact-h3: 1rem;
 		&[data-sticky-breadcrumb] {
 			--stickyBreadcrumb-iconRatio: calc(var(---wallet-compact-icon-size) / var(---wallet-compact-h1));
@@ -1566,20 +1567,20 @@
 						/* The independent pie stays outside the popover's paint and hit region. */
 						clip-path: polygon(
 							0 0,
-							calc(100% - var(---pie-compactSize)) 0,
-							calc(100% - var(---pie-compactSize)) var(---pie-compactSize),
-							100% var(---pie-compactSize),
+							calc(100% - var(---pie-clearanceSize)) 0,
+							calc(100% - var(---pie-clearanceSize)) var(---pie-clearanceSize),
+							100% var(---pie-clearanceSize),
 							100% 100%,
 							0 100%
 						);
 						&:dir(rtl) {
 							clip-path: polygon(
-								var(---pie-compactSize) 0,
+								var(---pie-clearanceSize) 0,
 								100% 0,
 								100% 100%,
 								0 100%,
-								0 var(---pie-compactSize),
-								var(---pie-compactSize) var(---pie-compactSize)
+								0 var(---pie-clearanceSize),
+								var(---pie-clearanceSize) var(---pie-clearanceSize)
 							);
 						}
 						@supports (clip-path: shape(from 0 0, line to 1px 1px)) {
@@ -1591,19 +1592,23 @@
 									line to 100% 100%,
 									line to 0 100%,
 									close,
-									move to calc((1 + var(---inlineDirection)) / 2 * (100% - var(---pie-compactSize)))
-										calc(var(---pie-compactSize) / 2),
-									arc by var(---pie-compactSize) 0 of calc(var(---pie-compactSize) / 2) cw,
-									arc by calc(-1 * var(---pie-compactSize)) 0 of calc(var(---pie-compactSize) / 2) cw,
+									move to calc(
+										(1 + var(---inlineDirection)) / 2 * (100% - var(---pie-compactSize)) +
+										var(---pie-compactSize) - var(---pie-clearanceSize)
+									) calc(var(---pie-compactSize) / 2),
+									arc by calc(2 * var(---pie-clearanceSize) - var(---pie-compactSize)) 0 of
+										calc(var(---pie-clearanceSize) - var(---pie-compactSize) / 2) cw,
+									arc by calc(var(---pie-compactSize) - 2 * var(---pie-clearanceSize)) 0 of
+										calc(var(---pie-clearanceSize) - var(---pie-compactSize) / 2) cw,
 									close
 								);
 							}
 						}
 						:global(.navigation-items :is(summary, li > a)) {
-							---pie-inlineClearance: var(---pie-compactSize);
+							---pie-inlineClearance: var(---pie-clearanceSize);
 							timeline-scope: --pie-clearance;
 							view-timeline: --pie-clearance block;
-							view-timeline-inset: 0 calc(100% - var(---pie-compactSize));
+							view-timeline-inset: 0 calc(100% - var(---pie-clearanceSize));
 						}
 					}
 				}
@@ -1954,11 +1959,20 @@
 					view-timeline-axis: block;
 					view-timeline-inset: var(--navigation-mobile-blockSize) 0;
 
-					&:has(+ #wallet-toc:popover-open) .pie-navigation-geometry {
+					&:has(+ #wallet-toc:popover-open) .pie-navigation-geometry,
+					&:has(+ #wallet-toc:popover-open)::before {
 						animation-name: none;
 					}
 
-					.pie-navigation-geometry {
+					&::before {
+						display: block;
+						clip-path: circle(calc(var(---pie-size) / 2));
+						block-size: var(---pie-size);
+						---pie-backdropAnimation: breadcrumb-support-motion;
+						pointer-events: none;
+					}
+					.pie-navigation-geometry,
+					&::before {
 						position: fixed;
 						position-anchor: --navigation-row;
 						position-visibility: always;
@@ -1974,14 +1988,17 @@
 						animation:
 							wallet-pie-source auto linear both,
 							wallet-pie-compact auto linear both,
+							var(---pie-backdropAnimation, none) auto linear reverse both,
 							wallet-terminal auto linear forwards;
 						@media (prefers-reduced-motion: reduce) {
-							animation-timing-function: linear, steps(1, end), linear;
+							animation-timing-function: linear, steps(1, end), linear, linear;
 						}
 						animation-timeline:
-							--wallet-pie-source, var(--stickyBreadcrumb-entryTimeline), --wallet-terminal;
+							--wallet-pie-source, var(--stickyBreadcrumb-entryTimeline),
+							var(--stickyBreadcrumb-entryTimeline), --wallet-terminal;
 						animation-range:
 							cover 0% exit-crossing 0%,
+							contain 0% contain 100%,
 							contain 0% contain 100%,
 							calc(100% - var(--navigation-mobile-blockSize)) 100%;
 						/* The first sticky row owns the compact pie’s block-start edge. */
@@ -1990,7 +2007,6 @@
 						inline-size: anchor-size(--wallet-pie-source inline);
 						margin: 0;
 						transform-origin: 100% 0;
-
 						&:dir(rtl) {
 							transform-origin: 0 0;
 						}
@@ -2266,7 +2282,7 @@
 				animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
 				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
 				> :global(*) {
-					--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-compactSize));
+					--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-clearanceSize));
 				}
 			}
 			[data-sticky-breadcrumb~="root"]
@@ -2298,9 +2314,10 @@
 					0px,
 					calc(
 						100vw * (1 / var(---column-inlineFraction) - 1) +
-							var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace)
+							var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace) +
+						var(--stickyBreadcrumb-gap, 1rem) / 2
 					),
-					var(---pie-compactSize)
+					var(---pie-clearanceSize)
 				);
 			}
 			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]),
