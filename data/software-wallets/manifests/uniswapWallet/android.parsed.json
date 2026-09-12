@@ -1,0 +1,10 @@
+{
+	"usesPermissions": [
+		"android.permission.INTERNET",
+		"android.permission.CAMERA",
+		"android.permission.USE_BIOMETRIC",
+		"android.permission.USE_FINGERPRINT",
+		"android.permission.VIBRATE",
+		"com.google.android.gms.permission.AD_ID"
+	]
+}
