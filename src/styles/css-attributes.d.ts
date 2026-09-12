@@ -113,11 +113,12 @@ interface CssAttributes {
 	 * - composition: `span-start`
 	 *
 	 * ### CSS Variables
-	 * - `--column-sizeTimelines`: unique inline and block timeline names for the first row
+	 * - `--column-sizeTimelines`: column-scoped inline and block first-row timelines; defaults to --column-inline-size, --column-block-size
 	 * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
 	 * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
 	 * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
 	 * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
+	 * - `--column-iconGap`: inline gap after the leading icon; defaults to 0.625rem
 	 *
 	 * ### Examples
 	 * - Default column grid (`1em` gap, start-aligned content):
@@ -648,7 +649,7 @@ interface CssAttributes {
 	 * - `position`: real sticky heading container and source-height anchor
 	 * - `source`: untransformed intrinsic reservation for the item
 	 * - `item`: transformed real heading identity and native controls
-	 * - `support`: supporting content follows its natural scroll position and fades as the heading compacts
+	 * - `support`: supporting content follows its natural scroll position as the heading compacts
 	 * - `end`: independently sized in-flow metadata
 	 * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
 	 *

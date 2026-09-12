@@ -460,11 +460,12 @@ span svg {
  * - composition: `span-start`
  *
  * ### CSS Variables
- * - `--column-sizeTimelines`: unique inline and block timeline names for the first row
+ * - `--column-sizeTimelines`: column-scoped inline and block first-row timelines; defaults to --column-inline-size, --column-block-size
  * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
  * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
  * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
  * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
+ * - `--column-iconGap`: inline gap after the leading icon; defaults to 0.625rem
  *
  * ### Examples
  * - Default column grid (`1em` gap, start-aligned content):
@@ -606,6 +607,7 @@ span svg {
 }
 
 [data-column~="span-start"] {
+	--column-sizeTimelines: --column-inline-size, --column-block-size;
 	---column-spanSize: calc(
 		1lh + var(--column-supportLineHeight, 1rlh) + var(--column-supportGap, 0.5rem)
 	);
@@ -617,14 +619,14 @@ span svg {
 		flex-wrap: wrap;
 
 		a[data-row] {
-			gap: var(--column-supportGap, 0.5rem);
+			gap: var(--column-iconGap, 0.625rem);
 		}
 
 		/* Wrapped companions stay in the title column; the first link retains the icon slot. */
 		[data-sticky-breadcrumb~="item"][data-row~="wrap"]:has(> a > [data-icon]) {
-			padding-inline-start: calc(var(---column-spanSize) + var(--column-supportGap, 0.5rem));
+			padding-inline-start: calc(var(---column-spanSize) + var(--column-iconGap, 0.625rem));
 			> a:first-child {
-				margin-inline-start: calc(-1 * (var(---column-spanSize) + var(--column-supportGap, 0.5rem)));
+				margin-inline-start: calc(-1 * (var(---column-spanSize) + var(--column-iconGap, 0.625rem)));
 			}
 		}
 
@@ -658,7 +660,7 @@ span svg {
 
 	&:has(> [data-row] [data-icon]) > :not([data-row]) {
 		margin-inline-start: calc(
-			(1 - var(---column-break)) * (var(---column-spanSize) + var(--column-supportGap, 0.5rem))
+			(1 - var(---column-break)) * (var(---column-spanSize) + var(--column-iconGap, 0.625rem))
 		);
 	}
 }
@@ -1409,7 +1411,7 @@ ol {
  * - `position`: real sticky heading container and source-height anchor
  * - `source`: untransformed intrinsic reservation for the item
  * - `item`: transformed real heading identity and native controls
- * - `support`: supporting content follows its natural scroll position and fades as the heading compacts
+ * - `support`: supporting content follows its natural scroll position as the heading compacts
  * - `end`: independently sized in-flow metadata
  * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
  *
@@ -1543,16 +1545,6 @@ ol {
 		inherits: true;
 		initial-value: 0;
 	}
-	@property ---breadcrumb-exit {
-		syntax: '<number>';
-		inherits: true;
-		initial-value: 0;
-	}
-	@property ---breadcrumb-rowAnchor {
-		syntax: '<custom-ident>';
-		inherits: true;
-		initial-value: --breadcrumb-row;
-	}
 	@property --stickyBreadcrumb-sourcePaddingBlock {
 		syntax: '<length>';
 		inherits: true;
@@ -1595,12 +1587,12 @@ ol {
 			---breadcrumb-endBlock: 1;
 		}
 	}
-	@keyframes breadcrumb-support-motion {
+	@keyframes breadcrumb-backdrop {
 		from {
-			opacity: 1;
+			opacity: 0;
 		}
 		to {
-			opacity: 0;
+			opacity: 1;
 		}
 	}
 	@keyframes breadcrumb-support-scroll {
@@ -1609,6 +1601,20 @@ ol {
 		}
 		to {
 			translate: 0 -100vh;
+		}
+	}
+	/* Keep the compact row in place while its taller natural box leaves the sticky constraint. */
+	@keyframes breadcrumb-position-exit {
+		from {
+			translate: 0 0;
+		}
+		to {
+			translate: 0 max(0px, calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd)));
+		}
+	}
+	@keyframes breadcrumb-end-motion {
+		from {
+			translate: 0px 0px;
 		}
 	}
 	@keyframes breadcrumb-item-motion {
@@ -1657,11 +1663,10 @@ ol {
 	}
 	@keyframes breadcrumb-exit {
 		from {
-			---breadcrumb-exit: 0;
+			opacity: 1;
 		}
 		to {
-			---breadcrumb-exit: 1;
-			visibility: hidden;
+			opacity: 0;
 		}
 	}
 	[data-sticky-breadcrumb~="position"]
@@ -1670,9 +1675,9 @@ ol {
 			[data-sticky-breadcrumb~="item"] > a:first-child
 		)::before {
 		content: if(style(---breadcrumb-entry: 0): '#' ;style(---breadcrumb-wrap: 0): '›' ;else: '#');
-		font-size: var(--stickyBreadcrumb-markerSize);
-		inline-size: calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem));
-		padding-inline: 0;
+		font-size: if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): var(--stickyBreadcrumb-markerSize); else: 1em);
+		inline-size: if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem)); else: max-content);
+		padding-inline: 0 if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): 0px; else: 0.66rem);
 		text-align: center;
 		transform-origin: 100% 50%;
 		animation: breadcrumb-icon-motion auto var(---breadcrumb-compactionEasing) both;
@@ -1694,14 +1699,18 @@ ol {
 	}
 	[data-sticky-breadcrumb~="scope"] {
 		--stickyBreadcrumb-sizeTimelines:
-			var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-endTimelines);
+			var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-endTimelines),
+			--breadcrumb-row-inline, --breadcrumb-row-block;
 		position: relative;
 		container-type: inline-size;
 		anchor-scope:
-			--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact;
+			--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
 		timeline-scope: var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
+		view-timeline: --breadcrumb-exit block;
+		view-timeline-inset: 0;
 		---breadcrumb-sizeAnimationNames:
-			breadcrumb-item-inline, breadcrumb-item-block, breadcrumb-end-inline, breadcrumb-end-block;
+			breadcrumb-item-inline, breadcrumb-item-block, breadcrumb-end-inline, breadcrumb-end-block,
+			column-inline-size, column-block-size;
 		---breadcrumb-sourceOffsetBlock: 0px;
 		&[data-card~="border-accent"] {
 			---breadcrumb-sourceOffsetBlock: var(--card-borderWidth);
@@ -1716,7 +1725,6 @@ ol {
 		---breadcrumb-itemHeight: calc(100vh * (1 / var(---breadcrumb-itemBlock) - 1));
 		---breadcrumb-endWidth: calc(100vw * (1 / var(---breadcrumb-endInline) - 1));
 		---breadcrumb-endHeight: calc(100vh * (1 / var(---breadcrumb-endBlock) - 1));
-		---breadcrumb-parentRowAnchor: var(---breadcrumb-rowAnchor);
 		---breadcrumb-parentInlineEnd: var(---breadcrumb-inlineEnd);
 		---breadcrumb-parentBlockStart: var(---breadcrumb-blockStart);
 		---breadcrumb-parentBlockEnd: var(---breadcrumb-blockEnd);
@@ -1759,11 +1767,15 @@ ol {
 		> *,
 		&::after {
 			---breadcrumb-endGap: calc(var(---breadcrumb-hasEnd) * var(--stickyBreadcrumb-gap, 1rem));
+			---breadcrumb-availableInlineSize: min(
+				var(--stickyBreadcrumb-availableInlineSize, 100cqi),
+				calc(100cqi - var(--stickyBreadcrumb-sourcePaddingInline))
+			);
 			---breadcrumb-endWrap: clamp(
 				0,
 				sign(
-					var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap) -
-						var(--stickyBreadcrumb-availableInlineSize, 100cqi)
+					var(--stickyBreadcrumb-sourcePaddingInline) + var(---breadcrumb-itemWidth) +
+						var(---breadcrumb-endWidth) + var(---breadcrumb-endGap) - var(---breadcrumb-availableInlineSize)
 				),
 				1
 			);
@@ -1792,14 +1804,10 @@ ol {
 					0,
 					sign(
 						var(---breadcrumb-parentInlineEnd) + var(---breadcrumb-width) -
-							var(--stickyBreadcrumb-availableInlineSize, 100cqi)
+							var(---breadcrumb-availableInlineSize)
 					),
 					1
 				)
-			);
-			---breadcrumb-rowAnchor: if(
-				style(---breadcrumb-wrap: 1): var(--stickyBreadcrumb-entryTimeline)
-					;else: var(---breadcrumb-parentRowAnchor)
 			);
 			---breadcrumb-inlineStart: calc(
 				(1 - var(---breadcrumb-wrap)) * var(---breadcrumb-parentInlineEnd) +
@@ -1849,6 +1857,17 @@ ol {
 				scroll-snap-align: start;
 				scroll-margin-block-start: 0;
 			}
+			/* First-row measurements remain viewport-relative while the sticky box moves. */
+			&::before {
+				content: '';
+				position: fixed;
+				inset: 0 auto auto 0;
+				inline-size: anchor-size(--column-firstRow inline, 0px);
+				block-size: anchor-size(--column-firstRow block, 0px);
+				visibility: hidden;
+				view-timeline: --breadcrumb-row-inline inline, --breadcrumb-row-block block;
+				view-timeline-inset: 0;
+			}
 			view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
 			view-timeline-axis: block;
 			view-timeline-inset: 0 calc(100vh - var(---breadcrumb-blockEnd));
@@ -1865,32 +1884,35 @@ ol {
 			position: sticky;
 			inset-block-start: var(--sticky-insetBlockStart);
 			anchor-name: --breadcrumb-position;
-			opacity: calc(1 - var(---breadcrumb-exit));
+			anchor-scope: none;
+			&[data-column~="span-start"]:not([data-sticky~="backdrop-before"])::before {
+				content: none;
+			}
 			z-index: 1;
 			pointer-events: none;
-			/* The heading owns arrival, exit, and its optional first-row measurements. */
-			timeline-scope: var(--column-sizeTimelines, none);
 			animation:
-				column-inline-size auto linear both,
-				column-block-size auto linear both,
 				breadcrumb-entry auto linear both,
-				breadcrumb-exit auto linear both;
+				breadcrumb-exit auto linear both,
+				breadcrumb-position-exit auto linear both;
 			@media (prefers-reduced-motion: reduce) {
-				animation-timing-function: linear, linear, steps(1, end), steps(1, end);
+				animation-timing-function: steps(1, end), steps(1, end), linear;
 			}
 			animation-timeline:
-				var(--column-sizeTimelines, none, none), var(--stickyBreadcrumb-entryTimeline),
-				view(block var(--sticky-insetBlockStart) 0px);
+				var(--stickyBreadcrumb-entryTimeline),
+				--breadcrumb-exit, view(block var(--sticky-insetBlockStart) 0px);
 			animation-range:
-				normal,
-				normal,
 				contain 0% contain 100%,
-				exit 0% exit 100%;
+				exit calc(100% - var(---breadcrumb-blockEnd)) exit calc(100% - var(---breadcrumb-blockStart)),
+				exit 0% exit calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd));
 			&:is(summary):has(> [data-column~="span-start"]) {
 				align-items: start;
 				> [data-column~="span-start"] {
 					animation: none;
 					timeline-scope: none;
+					anchor-scope: none;
+					&::before {
+						content: none;
+					}
 				}
 			}
 
@@ -1902,19 +1924,13 @@ ol {
 				@container scroll-state(stuck: top) {
 					z-index: -2;
 				}
-				animation:
-					breadcrumb-support-motion auto cubic-bezier(0, 1, 0, 1) both,
-					breadcrumb-support-scroll auto linear both;
+				animation: breadcrumb-support-scroll auto linear both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 				/* Equal range and travel give natural 1:1 scrolling after the owner sticks. */
 				animation-range:
-					contain 0% contain 100%,
 					contain calc(var(---breadcrumb-parentBlockEnd) - var(--sticky-insetBlockStart))
 						contain calc(var(---breadcrumb-parentBlockEnd) - var(--sticky-insetBlockStart) + 100vh);
-				@media (prefers-reduced-motion: reduce) {
-					animation-timing-function: steps(1, end), linear;
-				}
-				visibility: if(style(---breadcrumb-entry: 1): hidden; else: visible);
+
 				pointer-events: auto;
 			}
 
@@ -1945,26 +1961,10 @@ ol {
 					inset: 0 auto auto 0;
 					visibility: hidden;
 					pointer-events: none;
-					anchor-name: if(
-						style(---breadcrumb-entry: 0) or
-							style(---breadcrumb-exit: 1): --breadcrumb-compact;else: --breadcrumb-compact,
-						var(---breadcrumb-rowAnchor)
-					);
+					anchor-name: --breadcrumb-compact;
 					inline-size: calc(
 						(anchor-size(--breadcrumb-source inline) + var(---breadcrumb-iconCorrection)) *
 							var(--stickyBreadcrumb-scale)
-					);
-					block-size: calc(
-						var(---breadcrumb-wrap) *
-							(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart)) +
-							(1 - var(---breadcrumb-wrap)) *
-							max(
-								var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-blockStart),
-								var(---breadcrumb-parentBlockEnd) - var(---breadcrumb-blockStart) +
-									var(---breadcrumb-entry) *
-									(var(---breadcrumb-blockEnd) - var(---breadcrumb-parentBlockEnd)) -
-									var(---breadcrumb-exit) * 100%
-							)
 					);
 				}
 			}
@@ -2057,55 +2057,25 @@ ol {
 				}
 			}
 			[data-sticky-breadcrumb~="end"] {
-				---breadcrumb-endEntry: min(
-					var(---breadcrumb-entry),
-					clamp(
-						0,
-						(
-								(1 - var(---breadcrumb-entry)) *
-									(
-										var(---breadcrumb-sourceRowWidth) - var(---breadcrumb-endWidth) -
-											(
-												var(---breadcrumb-itemWidth) / var(--stickyBreadcrumb-scale) -
-													var(---breadcrumb-iconCorrection)
-											)
-									) +
-									var(---breadcrumb-entry) * var(---breadcrumb-endGap)
-							) /
-							var(---breadcrumb-endGap),
-						1
-					)
-				);
 				---breadcrumb-endTranslateInline: calc(
-					var(---inlineDirection) * var(---breadcrumb-entry) *
-						(
-							var(---breadcrumb-inlineStart) + var(---breadcrumb-width) -
-								var(---breadcrumb-sourceRowWidth) - var(--stickyBreadcrumb-sourcePaddingInline)
-						)
+					var(---inlineDirection) * (var(---breadcrumb-inlineStart) + var(---breadcrumb-width) -
+						var(---breadcrumb-sourceRowWidth) - var(--stickyBreadcrumb-sourcePaddingInline))
 				);
 				:where(summary) & {
 					---breadcrumb-endTranslateInline: 0px;
 				}
-				translate: var(---breadcrumb-endTranslateInline)
-					calc(
-						var(---breadcrumb-entry) *
-							(
-								var(--stickyBreadcrumb-paddingBlock, 0.5rem) -
-									var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-blockStart) -
-									var(--sticky-insetBlockStart) + (1 + var(---breadcrumb-endWrap)) *
-									(var(---breadcrumb-rowHeight) - var(---breadcrumb-endHeight)) / 2 -
-									(1 + var(---breadcrumb-sourceEndWrap)) *
-									(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2
-							) +
-							var(---breadcrumb-sourceEndWrap) * (1 - var(---breadcrumb-endWrap)) *
-							(
-								(var(---breadcrumb-entry) - var(---breadcrumb-endEntry)) *
-									(var(---breadcrumb-sourceRowHeight) -
-										(var(---breadcrumb-itemHeight) + var(---breadcrumb-endHeight)) / 2) +
-									var(---breadcrumb-entry) * (1 - var(---breadcrumb-endEntry)) *
-										var(---breadcrumb-itemHeight) * (var(--stickyBreadcrumb-scale) - 1) / 2
-							)
-					);
+				translate: var(---breadcrumb-endTranslateInline) calc(
+					var(--stickyBreadcrumb-paddingBlock, 0.5rem) - var(--stickyBreadcrumb-sourcePaddingBlock) +
+					var(---breadcrumb-blockStart) - var(--sticky-insetBlockStart) +
+					(1 + var(---breadcrumb-endWrap)) * (var(---breadcrumb-rowHeight) - var(---breadcrumb-endHeight)) / 2 -
+					(1 + var(---breadcrumb-sourceEndWrap)) * (var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2
+				);
+				animation: breadcrumb-end-motion auto linear both;
+				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+				animation-range: contain 0% contain 100%;
+				@media (prefers-reduced-motion: reduce) {
+					animation-timing-function: steps(1, end);
+				}
 			}
 		}
 	}
@@ -2694,7 +2664,11 @@ ol {
 							block-size: calc(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart));
 							background: var(--sticky-background, var(---sticky-background));
 							backdrop-filter: var(---sticky-backdropFilter);
-							opacity: if(style(---breadcrumb-entry: 0): 0; else: var(---breadcrumb-wrap));
+							opacity: 0;
+							animation: breadcrumb-backdrop auto linear both;
+							animation-name: if(style(---breadcrumb-wrap: 1): breadcrumb-backdrop; else: none);
+							animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+							animation-range: contain 0% contain 100%;
 						}
 					}
 				}

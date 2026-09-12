@@ -776,7 +776,6 @@
 					data-sticky-breadcrumb="position"
 					data-sticky="block block-start backdrop-after backdrop-stuck"
 					data-column="span-start"
-					style:--column-sizeTimelines="--stages-row-inline, --stages-row-block"
 					data-scroll-item="inline-detached"
 				>
 					<div data-row="start">
@@ -920,7 +919,6 @@
 				data-column="span-start"
 				data-sticky-breadcrumb="position"
 				data-sticky="block block-start backdrop-after backdrop-stuck"
-				style:--column-sizeTimelines={`--${groupTargetId(attrGroup)}-row-inline, --${groupTargetId(attrGroup)}-row-block`}
 				data-scroll-item="inline-detached"
 			>
 				<div data-row="start wrap">
@@ -1033,9 +1031,12 @@
 				data-row
 				data-sticky-breadcrumb="position"
 				data-sticky="block block-start backdrop-before backdrop-stuck"
-				style:--column-sizeTimelines={`--${slugifyCamelCase(attribute.id)}-row-inline, --${slugifyCamelCase(attribute.id)}-row-block`}
 			>
-				<header data-row-item="flexible" data-column="span-start">
+				<header
+					data-row-item="flexible"
+					data-column="span-start"
+					style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
+				>
 					<div data-row="start wrap">
 						<div data-sticky-breadcrumb="source" data-row-item="flexible">
 							<h3 data-sticky-breadcrumb="item" data-row="start gap-2 wrap">
@@ -1683,6 +1684,10 @@
 	.container > article > button,
 	[data-sticky-breadcrumb~="root"] > footer {
 		display: none;
+		margin-block-end: var(--navigation-controlInsetInline);
+		&[data-sticky] {
+			--sticky-insetBlockEnd: var(--navigation-controlInsetInline);
+		}
 
 		@supports (scroll-target-group: auto) {
 			@supports selector(:target-current) {
@@ -1698,7 +1703,6 @@
 		margin-inline-end: var(--navigation-controlInsetInline);
 		&[data-sticky] {
 			z-index: 3;
-			--sticky-insetBlockEnd: var(--navigation-controlInsetInline);
 		}
 		@media (width <= 1024px) {
 			grid-area: Content;
@@ -1707,9 +1711,6 @@
 	.container > article > button {
 		margin-inline: var(--navigation-controlInsetInline);
 		align-self: end;
-		&[data-sticky] {
-			--sticky-insetBlockEnd: var(--navigation-controlInsetInline);
-		}
 		@media (width <= 1024px) {
 			align-self: start;
 		}
@@ -1981,7 +1982,7 @@
 						display: block;
 						clip-path: circle(calc(var(---pie-size) / 2));
 						block-size: var(---pie-size);
-						---pie-backdropAnimation: breadcrumb-support-motion auto linear reverse both;
+						---pie-backdropAnimation: breadcrumb-backdrop auto linear both;
 						pointer-events: none;
 					}
 					.pie-navigation-geometry,
@@ -2233,9 +2234,8 @@
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
-		/* Keyframe easing requires literal values; conditional values are not resolved here. */
-		/* Chromium resolves var() easing in range keyframes to linear; match the global Expo curves. */
-	@keyframes -global-pie-clearance {
+		/* Keyframe easing requires literal values. */
+		@keyframes -global-pie-clearance {
 			entry 0% {
 				transform: translateX(0);
 				animation-timing-function: steps(1, start);
@@ -2276,7 +2276,7 @@
 			[data-sticky-breadcrumb~="root"]
 				:global([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="root"])) {
 				&:dir(rtl) {
-					animation-direction: normal, normal, normal, normal, reverse;
+					animation-direction: normal, normal, normal, normal, normal, normal, reverse;
 				}
 				timeline-scope:
 					var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
@@ -2331,6 +2331,9 @@
 			}
 
 			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]) {
+				animation-name: breadcrumb-end-motion, pie-clearance;
+				animation-timeline: var(--stickyBreadcrumb-entryTimeline), --pie-clearance;
+				animation-range: contain 0% contain 100%, cover 0% cover 100%;
 				/* Native layout timing approximates transformed contact without resolving transformed anchors. */
 				timeline-scope: --pie-clearance;
 				view-timeline: --pie-clearance block;
@@ -2432,31 +2435,14 @@
 				var(--scrollItem-inlineDetached-maxPaddingMatchStart)
 			);
 			--stickyBreadcrumb-sourcePaddingInline: 0px;
-			--column-sizeTimelines: --wallet-row-inline, --wallet-row-block;
-			anchor-scope: --column-firstRow;
-			&::before {
-				content: '';
-				position: fixed;
-				inset: 0 auto auto 0;
-				visibility: hidden;
-				pointer-events: none;
-				inline-size: anchor-size(--column-firstRow inline);
-				block-size: anchor-size(--column-firstRow block);
-				view-timeline-name: var(--column-sizeTimelines);
-				view-timeline-axis: inline, block;
-				view-timeline-inset: 0;
-			}
 			.wallet-title-row {
 				anchor-name: --column-firstRow;
 			}
-			[data-sticky-breadcrumb~="end"] {
-				margin-inline-start: auto;
-			}
 			@media (width <= 1024px) {
-				opacity: 1;
+				animation-name: breadcrumb-entry, none, breadcrumb-position-exit;
 				[data-sticky-breadcrumb~="end"] {
 					translate: calc(
-							var(---inlineDirection) * var(---breadcrumb-entry) *
+							var(---inlineDirection) *
 								(
 									100cqi - var(---breadcrumb-sourceRowWidth) - var(--scrollItem-paddingInlineStart) -
 										var(--navigation-controlInsetInline) - 2rem -
@@ -2464,8 +2450,7 @@
 								)
 						)
 						calc(
-							var(---breadcrumb-entry) *
-								(
+							(
 									var(--navigation-mobile-blockSize) / 2 - var(---breadcrumb-blockStart) -
 										var(--stickyBreadcrumb-sourcePaddingBlock) -
 										(1 + var(---breadcrumb-sourceEndWrap)) *

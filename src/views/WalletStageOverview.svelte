@@ -126,9 +126,12 @@
 							data-row
 							data-sticky-breadcrumb="position"
 							data-sticky="block block-start backdrop-before backdrop-stuck"
-							style:--column-sizeTimelines={`--stage-${stageIndex}-row-inline, --stage-${stageIndex}-row-block`}
 						>
-							<header data-row-item="flexible" data-column="span-start">
+							<header
+								data-row-item="flexible"
+								data-column="span-start"
+								style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
+							>
 								<div data-row="start wrap">
 									<h3 data-row-item="flexible" data-sticky-breadcrumb="source">
 										<a
