@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import type { Support } from '../support'
 
@@ -90,13 +91,42 @@ export type SendTransactionWarning = WithRef<
 	}
 >
 
+/**
+ * A specific scenario in which a wallet may choose to warn the user before
+ * granting an unlimited/infinite ERC-20 token allowance, when it does not
+ * warn unconditionally.
+ */
+export enum UnlimitedApprovalWarningCondition {
+	/** The spender is an externally-owned account (EOA), not a contract. */
+	EOA = 'EOA',
+
+	/** The spender contract is not a known/verified contract. */
+	UNKNOWN_CONTRACTS = 'UNKNOWN_CONTRACTS',
+
+	/** The spender contract appears on a blocklist of known-scam contracts. */
+	BLACKLISTED_CONTRACTS = 'BLACKLISTED_CONTRACTS',
+
+	/** The spender contract was only recently deployed onchain. */
+	NEW_CONTRACTS = 'NEW_CONTRACTS',
+
+	/** The wallet has not seen the user interact with the spender contract before. */
+	CONTRACTS_NOT_INTERACTED_BEFORE = 'CONTRACTS_NOT_INTERACTED_BEFORE',
+}
+
 export type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Does the wallet warn the user before a transaction or signature that
-		 * grants unlimited/infinite token allowance?
+		 * Under which circumstances the wallet warns the user before a
+		 * transaction or signature that grants unlimited/infinite token
+		 * allowance.
+		 *
+		 * - `ALWAYS`: The wallet warns regardless of whether the spender is
+		 *   considered trusted/known.
+		 * - A non-empty array of `UnlimitedApprovalWarningCondition`: The
+		 *   wallet only warns in the listed scenarios, e.g. only when the
+		 *   spender is an untrusted/unknown contract.
 		 */
-		warnsOnUnlimitedApproval: boolean
+		warnsOnUnlimitedApproval: 'ALWAYS' | NonEmptyArray<UnlimitedApprovalWarningCondition>
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address
@@ -124,4 +154,17 @@ export interface ScamAlerts {
 	 * that grants unlimited/infinite ERC-20 token allowance?
 	 */
 	unlimitedApprovalWarning: Support<UnlimitedApprovalWarning>
+}
+
+export const unlimitedApprovalWarningConditionLabels: Record<
+	UnlimitedApprovalWarningCondition,
+	string
+> = {
+	[UnlimitedApprovalWarningCondition.EOA]: 'the spender is not a contract',
+	[UnlimitedApprovalWarningCondition.UNKNOWN_CONTRACTS]:
+		'the spender is an unknown/unverified contract',
+	[UnlimitedApprovalWarningCondition.BLACKLISTED_CONTRACTS]: 'the spender is a known-scam contract',
+	[UnlimitedApprovalWarningCondition.NEW_CONTRACTS]: 'the spender contract was recently deployed',
+	[UnlimitedApprovalWarningCondition.CONTRACTS_NOT_INTERACTED_BEFORE]:
+		"you haven't interacted with the spender contract before",
 }
