@@ -163,12 +163,12 @@
 			border-radius: 0.5em;
 			color: var(--text-primary);
 			clip-path: inset(
-				0 0 0 calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem))) round
+				-1px -1px -1px calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem)) - 1px) round
 					calc(var(--select-compact-progress) * var(--icon-size, 2rem) / 2)
 			);
 			&:dir(rtl) {
 				clip-path: inset(
-					0 calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem))) 0 0 round
+					-1px calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem)) - 1px) -1px -1px round
 						calc(var(--select-compact-progress) * var(--icon-size, 2rem) / 2)
 				);
 			}
@@ -187,7 +187,7 @@
 				opacity: calc(1 - var(--select-compact-progress));
 			}
 			&::after {
-				inset-inline-end: 0;
+				inset-inline-end: -1px;
 				inset-block-start: 50%;
 				translate: 0 -50%;
 				inline-size: var(--icon-size, 2rem);
