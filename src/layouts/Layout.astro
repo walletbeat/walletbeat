@@ -100,6 +100,9 @@ import Footer from '@/views/Footer.astro'
 			<defs>
 				<filter id='icon-luminance' x='0' width='300%' color-interpolation-filters='sRGB'>
 					<feColorMatrix type='luminanceToAlpha'></feColorMatrix>
+					<feComponentTransfer>
+						<feFuncA type='gamma' exponent='0.5'></feFuncA>
+					</feComponentTransfer>
 				</filter>
 			</defs>
 		</svg>
