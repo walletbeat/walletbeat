@@ -2549,6 +2549,7 @@ ol {
 		 *
 		 * ### CSS Variables
 		 * - `--sticky-backgroundColor`
+		 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces.
 		 * - `--sticky-backdropFilter`
 		 *
 		 * ### Examples
@@ -2634,7 +2635,7 @@ ol {
 					&[data-sticky~="backdrop-self"],
 					&[data-sticky~="backdrop-before"]::before,
 					&[data-sticky~="backdrop-after"]::after {
-						background: var(---sticky-background);
+						background: var(--sticky-background, var(---sticky-background));
 						backdrop-filter: var(---sticky-backdropFilter);
 					}
 				}
@@ -2643,12 +2644,7 @@ ol {
 					&[data-sticky~="backdrop-before"]::before,
 					&[data-sticky~="backdrop-after"]::after {
 						@container not scroll-state(stuck: none) {
-							background: var(---sticky-background);
-							backdrop-filter: var(---sticky-backdropFilter);
-						}
-
-						@supports not (container-type: scroll-state) {
-							background: var(---sticky-background);
+							background: var(--sticky-background, var(---sticky-background));
 							backdrop-filter: var(---sticky-backdropFilter);
 						}
 					}
@@ -2657,7 +2653,7 @@ ol {
 				&[data-sticky~="backdrop-self"],
 				&[data-sticky~="backdrop-before"]::before,
 				&[data-sticky~="backdrop-after"]::after {
-					transition-property: background-color, backdrop-filter;
+					transition-property: none;
 				}
 
 				&[data-sticky~="backdrop-before"]::before,
@@ -2668,22 +2664,21 @@ ol {
 					inset: 0;
 					border-radius: inherit;
 				}
-				&[data-sticky-breadcrumb~="position"] {
+				&[data-sticky-breadcrumb~="position"][data-sticky~="backdrop-stuck"] {
 					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size)
 						and (color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
 						&[data-sticky~="backdrop-before"]::before,
 						&[data-sticky~="backdrop-after"]::after {
-							/* The surface follows its sticky owner; only row height comes from the source. */
+							/* Arrival and row bounds belong to this breadcrumb, including native-query fallbacks. */
 							inset: auto;
 							inset-block-start: 0;
 							inset-inline-start: 0;
 							inline-size: 100%;
-							block-size: anchor-size(
-								var(---breadcrumb-rowAnchor) block,
-								calc(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart))
-							);
-							opacity: var(---breadcrumb-wrap);
+							block-size: calc(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart));
+							background: var(--sticky-background, var(---sticky-background));
+							backdrop-filter: var(---sticky-backdropFilter);
+							opacity: if(style(---breadcrumb-entry: 0): 0; else: var(---breadcrumb-wrap));
 						}
 					}
 				}

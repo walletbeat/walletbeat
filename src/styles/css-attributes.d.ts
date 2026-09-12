@@ -610,6 +610,7 @@ interface CssAttributes {
 	 *
 	 * ### CSS Variables
 	 * - `--sticky-backgroundColor`
+	 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces.
 	 * - `--sticky-backdropFilter`
 	 *
 	 * ### Examples

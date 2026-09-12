@@ -1799,6 +1799,7 @@
 		}
 
 		.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
+			--sticky-background: none;
 			/* Match Pie's inline-configured view box, including its padding. */
 			---pie-diameter: calc(2 * (var(--pie-maxR) + var(--pie-padding)));
 			/* Scale the canonical pixel-space diameter to the actual CSS length. */
