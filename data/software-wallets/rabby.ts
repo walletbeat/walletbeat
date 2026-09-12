@@ -475,7 +475,28 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/ui/views/NewUserImport/CreateSeedPhrase.tsx#L29-L30',
+						},
+						{
+							label: 'Browser extension recovery-phrase generation',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/background/service/keyring/index.ts#L371-L373',
+						},
+						{
+							label: 'Mobile app new-wallet screen',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/screens/Address/PreCreateSeedPhraseScreen.tsx#L93-L95',
+						},
+						{
+							label: 'Mobile app recovery-phrase generation',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2596',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
