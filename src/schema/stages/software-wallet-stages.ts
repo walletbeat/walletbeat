@@ -543,7 +543,9 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							if (!isSupported(feature)) {
+							const { approvalsManagement } = feature
+
+							if (!isSupported(approvalsManagement)) {
 								return {
 									rating: StageCriterionRating.FAIL,
 									explanation: sentence(
@@ -552,7 +554,7 @@ export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 								}
 							}
 
-							if (feature.erc20Approvals === SpendingApprovalsControl.CANNOT_INSPECT) {
+							if (approvalsManagement.erc20Approvals === SpendingApprovalsControl.CANNOT_INSPECT) {
 								return {
 									rating: StageCriterionRating.FAIL,
 									explanation: sentence(

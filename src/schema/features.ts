@@ -235,7 +235,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
-		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
+		permissionsManagement: VariantFeature<PermissionsManagementSupport>
 	}
 
 	/** Ecosystem features. */
@@ -412,7 +412,7 @@ export interface ResolvedFeatures {
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 		interoperability: ResolvedFeature<InteroperabilitySupport>
-		permissionsManagement: ResolvedFeature<Support<PermissionsManagementSupport>>
+		permissionsManagement: ResolvedFeature<PermissionsManagementSupport>
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>

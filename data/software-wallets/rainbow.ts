@@ -49,6 +49,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -1262,7 +1263,27 @@ export const rainbow: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Rainbow "Review & Swap" screen for a 1 USDC to ETH swap, showing the swap amounts and fees before confirming with "Swap USDC to ETH".',
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-swap-review.png',
+						label: 'Rainbow "Review & Swap" screen for a 1 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The onchain Approval event emitted for the swap shows value = 1000000, exactly 1 USDC, matching the swap amount.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-approve-exact-amount-event.png',
+						label:
+							'Decoded Approval event log showing a value of 1000000 (exactly 1 USDC) for the swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

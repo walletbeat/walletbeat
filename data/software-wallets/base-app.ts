@@ -25,7 +25,10 @@ import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
 } from '@/schema/features/security/scam-alerts'
-import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -432,12 +435,31 @@ export const baseApp: SoftwareWallet = {
 			// covers traditional ERC-20 token.approve() allowances and Permit2-style
 			// allowances. NFT (ERC-721 / ERC-1155) approvals are NOT surfaced in this
 			// view.
-			permissionsManagement: supported({
-				ref: refTodo,
-				erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-			}),
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Base App Trade screen for a $1.52 USDC to ETH swap, before tapping "Trade now". No approve step or approval amount is shown to the user here.',
+						file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-swap-review.png',
+						label: 'Base App Trade screen for a $1.52 USDC to ETH swap',
+						lastRetrieved: '2026-09-09',
+					},
+					{
+						explanation:
+							'The onchain Approval event emitted for that swap shows value 1524712, 1.524712 USDC (6 decimals), matching the $1.52 swap amount.',
+						file: 'public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png',
+						label:
+							'Decoded Approval event log showing a value of 1524712 (1.524712 USDC) for the swap',
+						lastRetrieved: '2026-09-09',
+					},
+				],
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+			},
 			// Base App is mobile-only and closed-source. It does not ship its own
 			// Ethereum P2P (devp2p) stack, transactions
 			// are broadcast via Coinbase's RPC infrastructure. Users cannot configure
