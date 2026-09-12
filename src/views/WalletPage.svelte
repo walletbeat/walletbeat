@@ -420,7 +420,8 @@
 		const states: string[] = []
 		const starts: string[] = []
 		const ends: string[] = []
-		const activeTimelines: string[] = []
+		const startAnchors: string[] = []
+		const endAnchors: string[] = []
 		const timelines: string[] = []
 		let previousAngle = 0
 
@@ -434,7 +435,8 @@
 				states.push(`wallet-pie-step auto linear(${step}, ${step}) forwards`)
 				starts.push(`${condition}: ${previousAngle}deg`)
 				ends.push(`${condition}: ${angle}deg`)
-				activeTimelines.push(`${condition}: ${timeline}`)
+				startAnchors.push(`${condition}: anchor(${timeline} top)`)
+				endAnchors.push(`${condition}: anchor(--${item.href.slice(1)}-end-block top)`)
 				timelines.push(timeline)
 				previousAngle = angle
 			}
@@ -444,7 +446,8 @@
 			states: states.join(', ') || 'none',
 			from: starts.length ? `if(${starts.join('; ')}; else: 0deg)` : '0deg',
 			to: ends.length ? `if(${ends.join('; ')}; else: 0deg)` : '0deg',
-			timeline: activeTimelines.length ? `if(${activeTimelines.join('; ')}; else: none)` : 'none',
+			start: startAnchors.length ? `if(${startAnchors.join('; ')}; else: 0px)` : '0px',
+			end: endAnchors.length ? `if(${endAnchors.join('; ')}; else: 0px)` : '0px',
 			timelines: timelines.join(', ') || undefined,
 		}
 	})
@@ -731,7 +734,6 @@
 			class="pie-navigation"
 			style:---pie-rotation-from={pieRotation.from}
 			style:---pie-rotation-to={pieRotation.to}
-			style:---pie-rotation-timeline={pieRotation.timeline}
 			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
 			style={`--pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
@@ -872,6 +874,12 @@
 		</footer>
 	{/if}
 	<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+	<span
+		class="pie-rotation-clock"
+		style:---pie-rotation-start={pieRotation.start}
+		style:---pie-rotation-end={pieRotation.end}
+		aria-hidden="true"
+	></span>
 </div>
 
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
@@ -1732,12 +1740,27 @@
 		}
 	}
 
-	.pie-navigation {
+	.pie-navigation,
+	.pie-rotation-clock {
 		display: none;
 	}
 
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(animation-timing-function: linear(0, 2)) and (color: if(style(---pie-rotation-step: 0): red)) {
+		/* A stable timeline survives resizing; existing snap markers own both endpoints. */
+		.pie-rotation-clock {
+			display: block;
+			position: absolute;
+			inset-block-start: var(---pie-rotation-start);
+			inset-block-end: var(---pie-rotation-end);
+			inline-size: 1px;
+			pointer-events: none;
+			animation: var(---pie-rotation-states);
+			animation-timeline: var(---pie-rotation-timelines);
+			animation-range: contain 0% contain 100%;
+			view-timeline: --wallet-pie-arrival block;
+			view-timeline-inset: 0 100%;
+		}
 		.pie-navigation {
 			animation: var(---pie-rotation-states), breadcrumb-entry auto steps(1, end) both;
 			animation-timeline: var(---pie-rotation-timelines, none), --wallet-entry;
@@ -1746,7 +1769,7 @@
 		.pie-navigation :global(.navigation-items),
 		.pie-navigation :global(.pie-navigation-icon) {
 			animation: wallet-pie-rotation auto var(--transition-easeOutExpo) both;
-			animation-timeline: var(---pie-rotation-timeline);
+			animation-timeline: --wallet-pie-arrival;
 			animation-range: contain 0% contain 100%;
 			@media (prefers-reduced-motion: reduce) {
 				animation-range: contain 100% contain 100%;
@@ -2039,10 +2062,10 @@
 
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
-			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links);
+			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival;
 		@media (width > 1024px) {
 			timeline-scope:
-				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
+				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival,
 				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline);
 		}
 	}

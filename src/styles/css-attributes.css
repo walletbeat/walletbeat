@@ -1827,6 +1827,7 @@ ol {
 		}
 		/* The outer border starts arrival; the position box still owns its end. */
 		> [data-sticky-breadcrumb~="flow"] {
+			anchor-name: var(--stickyBreadcrumb-entryTimeline);
 			display: block;
 			content: '';
 			position: absolute;
@@ -1840,12 +1841,13 @@ ol {
 			&::after {
 				content: '';
 				position: absolute;
-				inset-block-start: 100%;
+				anchor-name: var(--stickyBreadcrumb-endTimelines);
+				inset-block-start: calc(100% - var(---breadcrumb-blockEnd));
 				inset-inline-start: 0;
 				inline-size: 1px;
 				block-size: 1px;
 				scroll-snap-align: start;
-				scroll-margin-block-start: var(---breadcrumb-blockEnd);
+				scroll-margin-block-start: 0;
 			}
 			view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
 			view-timeline-axis: block;
