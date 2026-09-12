@@ -115,7 +115,52 @@ export const rabby: SoftwareWallet = {
 				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: {
+					explanation:
+						'Rabby derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+					url: [
+						{
+							label: "Rabby's keyring package, published from this commit",
+							url: 'https://github.com/MetaMask/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/package.json#L2-L3',
+						},
+						{
+							label: 'Seed phrase and key derivation libraries',
+							url: 'https://github.com/MetaMask/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L2-L27',
+						},
+						{
+							label: 'Default derivation path',
+							url: 'https://github.com/MetaMask/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L68',
+						},
+						{
+							label: 'BIP-39 seed derivation',
+							url: 'https://github.com/MetaMask/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L400-L405',
+						},
+						{
+							label: 'Key derivation from the seed',
+							url: 'https://github.com/MetaMask/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L135-L142',
+						},
+						{
+							label: 'Browser extension uses this keyring',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/package.json#L74',
+						},
+						{
+							label: 'Mobile app uses this keyring',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/package.json#L95',
+						},
+						{
+							label: 'Browser extension seed phrase and private key export',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/background/controller/wallet.ts#L4095-L4115',
+						},
+						{
+							label: 'Mobile app private key export',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/core/apis/privateKey.ts#L32-L42',
+						},
+						{
+							label: 'Mobile app seed phrase export',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/core/apis/mnemonic.ts#L84-L94',
+						},
+					],
+				},
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
