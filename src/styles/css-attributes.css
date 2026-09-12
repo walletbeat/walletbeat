@@ -1817,12 +1817,12 @@ ol {
 			content: '';
 			position: absolute;
 			scroll-snap-align: start;
-			scroll-margin-block-start: var(---breadcrumb-parentBlockEnd);
+			scroll-margin-block-start: 0;
 			pointer-events: none;
 			inset-inline-start: 0;
-			inset-block-start: 0;
+			inset-block-start: calc(-1 * var(---breadcrumb-parentBlockEnd));
 			inline-size: 1px;
-			block-size: anchor-size(--breadcrumb-position block);
+			block-size: calc(anchor-size(--breadcrumb-position block) + var(---breadcrumb-parentBlockEnd));
 			&::after {
 				content: '';
 				position: absolute;
@@ -1835,8 +1835,7 @@ ol {
 			}
 			view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
 			view-timeline-axis: block;
-			view-timeline-inset: var(---breadcrumb-parentBlockEnd)
-				calc(100vh - var(---breadcrumb-blockEnd));
+			view-timeline-inset: 0 calc(100vh - var(---breadcrumb-blockEnd));
 		}
 		> [data-sticky-breadcrumb~="position"],
 		> details > [data-sticky-breadcrumb~="position"] {
