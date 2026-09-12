@@ -17,8 +17,14 @@
  * ```
  */
 
+import type { DataSource } from '@/schema/data-sources'
 import type { CalendarDate } from '@/types/date'
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
+import {
+	assertNonEmptyArray,
+	isNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyGet,
+} from '@/types/utils/non-empty'
 
 import {
 	getUrlLabel,
@@ -115,6 +121,11 @@ export interface FullyQualifiedReference {
 
 	/** The date the reference was last retrieved. */
 	lastRetrieved?: CalendarDate
+
+	/**
+	 * External dataset this citation was adapted from, when applicable.
+	 */
+	source?: DataSource
 }
 
 /** Type predicate for FullyQualifiedReference. */
@@ -410,6 +421,10 @@ function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boo
 		return false
 	}
 
+	if (a.source?.entity.id !== b.source?.entity.id) {
+		return false
+	}
+
 	if (a.urls.length !== b.urls.length) {
 		return false
 	}
@@ -450,7 +465,10 @@ export function mergeRefs(
 		}
 	}
 
-	const byExplanation = new Map<string, FullyQualifiedReference>()
+	// Merge refs that share both an explanation and a data-source identity.
+	// Refs with the same explanation but different sources (including stamped
+	// vs. unstamped) stay separate so that per-source attribution survives.
+	const byExplanationAndSource = new Map<string, FullyQualifiedReference>()
 	const mergedRefs: FullyQualifiedReference[] = []
 
 	for (const ref of dedupedRefs) {
@@ -459,10 +477,11 @@ export function mergeRefs(
 			continue
 		}
 
-		const existing = byExplanation.get(ref.explanation)
+		const key = `${ref.source?.entity.id ?? ''}\u0000${ref.explanation}`
+		const existing = byExplanationAndSource.get(key)
 
 		if (existing === undefined) {
-			byExplanation.set(ref.explanation, ref)
+			byExplanationAndSource.set(key, ref)
 			continue
 		}
 
@@ -471,15 +490,93 @@ export function mergeRefs(
 		for (const url of ref.urls) {
 			newUrls = mergeLabeledUrls(newUrls, url)
 		}
-		byExplanation.set(ref.explanation, {
+		byExplanationAndSource.set(key, {
 			urls: newUrls,
 			explanation: ref.explanation,
 			lastRetrieved: existing.lastRetrieved ?? ref.lastRetrieved,
+			// `existing` and `ref` share the same source identity by key, so
+			// either `source` is usable; prefer `existing` for stable ordering.
+			...(existing.source !== undefined || ref.source !== undefined
+				? { source: existing.source ?? ref.source }
+				: {}),
 		})
 	}
-	byExplanation.forEach(ref => {
+	byExplanationAndSource.forEach(ref => {
 		mergedRefs.push(ref)
 	})
 
 	return mergedRefs
+}
+
+export interface DataSourceCredit {
+	source: DataSource
+	reportUrls: NonEmptyArray<LabeledUrl>
+}
+
+/**
+ * Group stamped references into one credit per data source.
+ * Unstamped refs are excluded. Credits and report URLs keep first-seen order.
+ */
+export function computeDataSourceCredits(
+	references: FullyQualifiedReference[],
+): DataSourceCredit[] {
+	const credits: DataSourceCredit[] = []
+	const indexBySourceId = new Map<string, number>()
+
+	for (const ref of references) {
+		if (ref.source === undefined) {
+			continue
+		}
+
+		const source = ref.source
+		const sourceId = source.entity.id
+		const reportLabel = `${source.entity.name} report`
+		const existingIndex = indexBySourceId.get(sourceId)
+
+		if (existingIndex === undefined) {
+			const reportUrls: LabeledUrl[] = []
+			const seenUrls = new Set<string>()
+
+			for (const { url } of ref.urls) {
+				if (seenUrls.has(url)) {
+					continue
+				}
+
+				seenUrls.add(url)
+				reportUrls.push({ label: reportLabel, url })
+			}
+
+			indexBySourceId.set(sourceId, credits.length)
+			credits.push({
+				source,
+				reportUrls: assertNonEmptyArray(reportUrls),
+			})
+			continue
+		}
+
+		const credit = credits[existingIndex]
+
+		if (credit === undefined) {
+			throw new Error(`missing data source credit at index ${existingIndex}`)
+		}
+
+		const seenUrls = new Set(credit.reportUrls.map(labeled => labeled.url))
+		const reportUrls: LabeledUrl[] = [...credit.reportUrls]
+
+		for (const { url } of ref.urls) {
+			if (seenUrls.has(url)) {
+				continue
+			}
+
+			seenUrls.add(url)
+			reportUrls.push({ label: reportLabel, url })
+		}
+
+		credits[existingIndex] = {
+			source: credit.source,
+			reportUrls: assertNonEmptyArray(reportUrls),
+		}
+	}
+
+	return credits
 }
