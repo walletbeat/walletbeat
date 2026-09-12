@@ -448,7 +448,8 @@
 			animation: animations.length ? `if(${animations.join('; ')}; else: none)` : 'none',
 			start: starts.length ? `if(${starts.join('; ')}; else: 0px)` : '0px',
 			end: ends.length ? `if(${ends.join('; ')}; else: 100%)` : '100%',
-			timelines: timelines.join(', ') || undefined,
+			// Layout owns the first timeline because the mobile site logo also consumes it.
+			timelines: timelines.slice(1).join(', ') || undefined,
 		}
 	})
 
@@ -1755,12 +1756,12 @@
 		.pie-navigation,
 		.pie-rotation-clock {
 			animation: var(---pie-rotation-states);
-			animation-timeline: var(---pie-rotation-timelines);
+			animation-timeline: --wallet-entry, var(---pie-rotation-timelines, none);
 			animation-range: contain 0% contain 0%;
 		}
 		.pie-navigation {
 			animation: var(---pie-rotation-states), breadcrumb-entry auto steps(1, end) both;
-			animation-timeline: var(---pie-rotation-timelines), --wallet-entry;
+			animation-timeline: --wallet-entry, var(---pie-rotation-timelines, none), --wallet-entry;
 			animation-range: contain 0% contain 100%;
 		}
 		:is([data-sticky-breadcrumb~="root"], .attribute-group, .attribute)
@@ -2078,10 +2079,10 @@
 
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
-			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-entry), --wallet-pie-travel;
+			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-pie-travel), --wallet-pie-travel;
 		@media (width > 1024px) {
 			timeline-scope:
-				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-entry), --wallet-pie-travel,
+				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-pie-travel), --wallet-pie-travel,
 				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline);
 		}
 	}
