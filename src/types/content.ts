@@ -1,4 +1,3 @@
-import type { OutcomeMetadata } from '../schema/attributes'
 import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
@@ -39,7 +38,7 @@ export type ComponentAndProps =
 	| TransactionInclusionDetailsContent
 	| AccountRecoveryDetailsContent
 	| AccountUnruggabilityDetailsContent
-	| UnratedAttributeContent<OutcomeMetadata>
+	| UnratedAttributeContent
 
 /**
  * Text-based content that may be displayed on the UI.
@@ -324,18 +323,21 @@ export function mdParagraph<_Strings extends Strings, _Text extends string = str
 /**
  * Custom content with a custom component type.
  */
-export function component<
-	C extends ComponentAndProps,
-	B extends keyof C['componentProps'],
-	// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
-	// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
->(componentName: C['component'], componentProps: Pick<C['componentProps'], B>): CustomContent {
+export function component<_Name extends string, _ComponentProps extends object>(
+	componentName: _Name,
+	componentProps: _ComponentProps,
+): {
+	contentType: ContentType.COMPONENT
+	component: {
+		component: _Name
+		componentProps: _ComponentProps
+	}
+} {
 	return {
 		contentType: ContentType.COMPONENT,
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- This is actually not safe; `componentProps` is actually only a `Partial` version here. This is meant to be merged later when rendering to make a complete `componentProps`.
 		component: {
 			component: componentName,
 			componentProps,
-		} as C,
+		},
 	}
 }
