@@ -496,7 +496,32 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/app/scripts/services/legacy-background-api-service.ts#L4090-L4096',
+						},
+						{
+							label: 'Mobile app new-wallet flow',
+							url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/app/core/Authentication/Authentication.ts#L331-L334',
+						},
+						{
+							label: 'Both apps create a new vault and keychain',
+							url: 'https://github.com/MetaMask/core/blob/f4ff5f5ab872f639b753ac8cad4542eaf6f2c29a/packages/multichain-account-service/src/MultichainAccountService.ts#L464-L471',
+						},
+						{
+							label: 'A new HD keyring gets a random recovery phrase',
+							url: 'https://github.com/MetaMask/core/blob/f6ab836adc93670f41b2f1ec965f2122ac35331c/packages/keyring-controller/src/KeyringController.ts#L2978-L2994',
+						},
+						{
+							label: 'Recovery-phrase generation',
+							url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L141-L143',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
