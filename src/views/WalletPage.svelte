@@ -1758,6 +1758,11 @@
 			animation-timeline: var(---pie-rotation-timelines);
 			animation-range: contain 0% contain 0%;
 		}
+		.pie-navigation {
+			animation: var(---pie-rotation-states), breadcrumb-entry auto steps(1, end) both;
+			animation-timeline: var(---pie-rotation-timelines), --wallet-entry;
+			animation-range: contain 0% contain 100%;
+		}
 		:is([data-sticky-breadcrumb~="root"], .attribute-group, .attribute)
 			> [data-sticky-breadcrumb~="flow"] {
 			anchor-name: var(---pie-startAnchor);
@@ -1874,7 +1879,9 @@
 			}
 
 			:global(.navigation-items details:has(> summary > a[data-link~="shared"]) > menu) {
-				display: if(style(---link-active: 1): block; else: none);
+				display: if(
+					style(---breadcrumb-entry: 1) and style(---link-active: 0): none; else: block
+				);
 			}
 
 			:global(.navigation-items menu::before),
