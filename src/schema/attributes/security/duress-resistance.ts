@@ -9,13 +9,21 @@ import {
 import {
 	type BasicUnlock,
 	BasicUnlockMechanism,
+	type BasicUnlockMechanismData,
 	basicUnlockMechanismName,
+	BasicUnlockMechanismSupport,
 	DuressAction,
 	duressActionDescription,
 	duressActionName,
 	type DuressMode,
 } from '@/schema/features/security/duress-resistance'
-import { isSupported, type Supported } from '@/schema/features/support'
+import {
+	isSupported,
+	notSupported,
+	type Support,
+	type Supported,
+	supported,
+} from '@/schema/features/support'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type AtLeastOneVariant, Variant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
@@ -41,10 +49,52 @@ function noLockScreen(ctx: EvaluationContext): Evaluation {
 	})
 }
 
+function isRequired(mechanism: Support<BasicUnlockMechanismData>): boolean {
+	return isSupported(mechanism) && mechanism.type === BasicUnlockMechanismSupport.REQUIRED
+}
+
+function hasRequiredNonBiometricMechanism(basicUnlock: WithRef<BasicUnlock>): boolean {
+	return (
+		isRequired(basicUnlock.mechanisms[BasicUnlockMechanism.PIN]) ||
+		isRequired(basicUnlock.mechanisms[BasicUnlockMechanism.PASSWORD]) ||
+		isRequired(basicUnlock.mechanisms[BasicUnlockMechanism.PATTERN])
+	)
+}
+
+function weakLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
+	const mechNames = commaListFormat(
+		Object.keys(basicUnlock.mechanisms)
+			.filter(m => isSupported(basicUnlock.mechanisms[m]))
+			.map(basicUnlockMechanismName),
+	)
+
+	return ctx.build({
+		outcome: {
+			id: 'weak_lock_only',
+			rating: Rating.FAIL,
+			displayName: 'Biometric-only or optional lock',
+			shortExplanation: sentence(
+				`{{WALLET_NAME}}'s lock screen (${mechNames}) does not require a PIN, password, or pattern.`,
+			),
+		},
+		details: markdown(
+			`{{WALLET_NAME}} protects access with ${mechNames}, but does not require a PIN,
+			password, or pattern. A biometric-only or merely optional lock offers no plausible
+			deniability. A forced PIN, password, or pattern entry leaves room for a decoy code
+			that unlocks a decoy wallet or wipes the device, indistinguishable to the attacker
+			from a genuine entry, and an attacker cannot tell a user who has forgotten their
+			credential from one who is only pretending to.`,
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should require a PIN, password, or pattern to unlock the wallet, in addition to any optional biometric convenience unlock. This keeps such entry methods normalized across wallets, preserving plausible deniability for wallets that support decoy codes.',
+		),
+	})
+}
+
 function basicLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m])
+			.filter(m => isSupported(basicUnlock.mechanisms[m]))
 			.map(basicUnlockMechanismName),
 	)
 
@@ -81,7 +131,7 @@ function hasDuressMode(
 ): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
-			.filter(m => basicUnlock.mechanisms[m])
+			.filter(m => isSupported(basicUnlock.mechanisms[m]))
 			.map(basicUnlockMechanismName),
 	)
 	const activeActions = Object.keys(duressMode.actions).filter(a => duressMode.actions[a])
@@ -130,9 +180,14 @@ export const duressResistance: Attribute = {
 
 		Wallets can mitigate this threat by:
 
-		1. **Lock screen (basic)**: Requiring a PIN, password, or biometric before granting access.
-		   This protects against opportunistic thieves and buys time, but a determined coercer can
-		   watch you unlock it.
+		1. **Lock screen (basic)**: Requiring a PIN, password, or pattern before granting access.
+		   Biometrics (Face ID, fingerprint) may be offered as an optional convenience, but must
+		   not be the only option, since they offer no plausible deniability. A forced
+		   PIN/password/pattern entry leaves room for a decoy code that unlocks a decoy wallet or
+		   wipes the device, indistinguishable to the attacker from a genuine entry, and an
+		   attacker cannot tell a user who has genuinely forgotten their credential from one who is
+		   only pretending to. Devices without biometric hardware would otherwise be left with no
+		   lock at all.
 
 		2. **Duress mode (stronger)**: A separate duress PIN or passphrase that, when entered,
 		   either opens a decoy wallet (providing plausible deniability) or wipes the device and
@@ -156,10 +211,12 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 						ref: refNotNecessary,
 					},
@@ -185,10 +242,12 @@ export const duressResistance: Attribute = {
 					EvaluationContext.forTest(() => duressResistance),
 					{
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 						ref: refNotNecessary,
 					},
@@ -199,6 +258,25 @@ export const duressResistance: Attribute = {
 			exampleRating(
 				mdParagraph('The wallet has no lock screen and is accessible to anyone who opens it.'),
 				noLockScreen(EvaluationContext.forTest(() => duressResistance)),
+			),
+			exampleRating(
+				mdParagraph(
+					'The wallet only offers a biometric unlock, with no PIN, password, or pattern required.',
+				),
+				weakLockOnly(
+					EvaluationContext.forTest(() => duressResistance),
+					{
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+						ref: refNotNecessary,
+					},
+				),
 			),
 		],
 	},
@@ -233,6 +311,10 @@ export const duressResistance: Attribute = {
 		}
 
 		ctx.addRef(feature.basicUnlock)
+
+		if (!hasRequiredNonBiometricMechanism(feature.basicUnlock)) {
+			return weakLockOnly(ctx, feature.basicUnlock)
+		}
 
 		if (!isSupported(feature.duressMode)) {
 			ctx.addRef(feature.duressMode)
