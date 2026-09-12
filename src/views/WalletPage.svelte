@@ -2008,7 +2008,7 @@
 						display: block;
 						clip-path: circle(calc(var(---pie-size) / 2));
 						block-size: var(---pie-size);
-						---pie-backdropAnimation: breadcrumb-support-motion;
+						---pie-backdropAnimation: breadcrumb-support-motion auto linear reverse both;
 						pointer-events: none;
 					}
 					.pie-navigation-geometry,
@@ -2028,8 +2028,8 @@
 						animation:
 							wallet-pie-source auto linear both,
 							wallet-pie-compact auto linear both,
-							var(---pie-backdropAnimation, none) auto linear reverse both,
-							wallet-terminal auto linear forwards;
+							var(---pie-backdropAnimation, none),
+							wallet-terminal auto linear;
 						@media (prefers-reduced-motion: reduce) {
 							animation-timing-function: linear, steps(1, end), linear, linear;
 						}
