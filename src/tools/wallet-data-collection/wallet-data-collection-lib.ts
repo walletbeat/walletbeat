@@ -624,6 +624,7 @@ export interface ExplainRequestOptions extends GlobalOptions {
 	domain: string
 	path: string | null
 	method: string | null
+	refererDomain: string | null
 	purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 	policy: CollectionPolicy | null
 	global: boolean | null
@@ -635,6 +636,7 @@ export const explainRequestOptions = new Options<ExplainRequestOptions>(
 		domain: stringOption,
 		path: optionalOption(stringOption),
 		method: optionalOption(stringOption),
+		refererDomain: optionalOption(stringOption),
 		purposes: optionOneOf(
 			enumSetOption(dataCollectionPurpose),
 			typedStringOption(
@@ -1339,6 +1341,7 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 				domain: opts.domain,
 				path: opts.path,
 				method: opts.method,
+				refererDomain: opts.refererDomain,
 				purposes: opts.purposes,
 				policy: opts.policy,
 			},
