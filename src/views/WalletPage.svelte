@@ -163,7 +163,7 @@
 			'--link-timelines',
 			[...destinations.values()].flatMap(names).join(', '),
 		)
-		const paintOwners = new Set<HTMLElement>()
+		const paintOwners = new Map<HTMLElement, string | null>()
 		const originals = localLinks.map(link => {
 			const original = link.getAttribute('data-link')
 			const index = destinations.get(link.href)
@@ -181,7 +181,8 @@
 				: null
 			for (const owner of [header, navigationOwner]) {
 				if (!owner || index === undefined) continue
-				paintOwners.add(owner)
+				if (!paintOwners.has(owner)) paintOwners.set(owner, owner.getAttribute('data-link'))
+				owner.setAttribute('data-link', 'state')
 				for (const state of states)
 					owner.style.setProperty(`--link-${state}`, `--link-${state}-${index}`)
 			}
@@ -207,7 +208,9 @@
 		})
 		return () => {
 			container.style.removeProperty('--link-timelines')
-			for (const owner of paintOwners) {
+			for (const [owner, original] of paintOwners) {
+				if (original === null) owner.removeAttribute('data-link')
+				else owner.setAttribute('data-link', original)
 				for (const state of states) owner.style.removeProperty(`--link-${state}`)
 			}
 			for (const { link, original } of originals) {
@@ -1880,10 +1883,12 @@
 				transform: none;
 			}
 
-			:global(.navigation-items details:has(> summary > a[data-link~="shared"]) > menu) {
-				display: if(
-					style(---breadcrumb-entry: 1) and style(---link-active: 0): none; else: block
+			:global(.navigation-items details > menu) {
+				opacity: if(style(---breadcrumb-entry: 0): 1; else: var(---link-active, 0));
+				visibility: if(
+					style(---breadcrumb-entry: 0) or style(---link-active: 1): visible; else: hidden
 				);
+				transition-property: opacity, visibility;
 			}
 
 			:global(.navigation-items menu::before),
@@ -1892,6 +1897,11 @@
 			:global(.navigation-items summary::marker) {
 				display: none;
 				content: none;
+			}
+
+			:global(.navigation-items details),
+			:global(.navigation-items li:has(> a)) {
+				z-index: if(style(---link-interacting: 1): 2; style(---link-current: 1): 1; else: 0);
 			}
 
 			:global(.navigation-items summary),
@@ -1906,6 +1916,7 @@
 			:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
 				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
 				scale: calc(1 + var(---link-active, 0) * (var(--hover-scale) - 1));
+				opacity: if(style(---link-interacting: 1): 1; style(---link-current: 1): 0.8; else: 1);
 
 				display: block;
 				position: absolute;
@@ -1920,7 +1931,8 @@
 				transform-origin: var(--pie-originX) var(--pie-originY);
 				transform: rotate(var(---slice-mid-angle)) translateY(calc(var(--slice-offset) * -1px));
 
-				transition-property: scale;
+				transition-property: scale, opacity;
+				transition-timing-function: var(--transition-easeOutExpo);
 				@media (prefers-reduced-motion: reduce) {
 					transition-duration: 0s;
 				}
@@ -1975,7 +1987,6 @@
 					 */
 		:global([data-sticky-breadcrumb~="root"] .pie-navigation .navigation-items a:target-current) {
 			scale: var(--hover-scale);
-			opacity: 1;
 			outline: none;
 		}
 
@@ -2055,20 +2066,6 @@
 					}
 				}
 			}
-		}
-	}
-
-	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --link) {
-		.attribute-group > header > [data-row],
-		.attribute > details > summary > header > [data-row],
-		.pie-navigation :global(details),
-		.pie-navigation :global(li:has(> a)) {
-			---link-active: 0;
-			animation:
-				link-active auto linear both,
-				link-active auto linear both,
-				link-active auto linear both;
-			animation-timeline: var(--link-hover, none), var(--link-focus, none), var(--link-current, none);
 		}
 	}
 

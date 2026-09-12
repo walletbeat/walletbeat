@@ -235,6 +235,7 @@ interface CssAttributes {
 	 * ### Tokens
 	 * - `camouflaged`, `contents`.
 	 * - `shared`: links with the same destination share native hover, focus and current presentation.
+	 * - `state`: consume shared destination state on a non-link paint owner without link chrome.
 	 *
 	 * ### CSS Variables
 	 * - `--text-primary`

@@ -10,6 +10,7 @@
  * ### Tokens
  * - `camouflaged`, `contents`.
  * - `shared`: links with the same destination share native hover, focus and current presentation.
+ * - `state`: consume shared destination state on a non-link paint owner without link chrome.
  *
  * ### CSS Variables
  * - `--text-primary`
@@ -30,7 +31,7 @@
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`
  */
-[data-link],
+[data-link]:not([data-link~="state"]),
 a {
 	color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
 	text-decoration: none;
@@ -62,28 +63,35 @@ a {
 
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --link)
 	and (color: if(style(---link-active: 1): red; else: blue)) {
-	[data-link~="shared"] {
+	:is([data-link~="shared"], [data-link~="state"]) {
 		---link-active: 0;
+		---link-interacting: 0;
+		---link-current: 0;
+		animation: none auto linear both;
+		animation-name:
+			if(style(--link-hover): link-active; else: none),
+			if(style(--link-focus): link-active; else: none),
+			if(style(--link-current): link-current; else: none);
+		animation-timeline: var(--link-hover, none), var(--link-focus, none), var(--link-current, none);
+	}
+	[data-link~="shared"] {
 		&:not([data-link~="camouflaged"]) {
 			text-decoration: if(style(---link-active: 1): underline; else: none);
 		}
 		---link-hover-source: none;
 		---link-focus-source: none;
 		---link-current-source: none;
-		animation:
-			link-active auto linear both,
-			link-active auto linear both,
-			link-active auto linear both;
-		animation-timeline: var(--link-hover, none), var(--link-focus, none), var(--link-current, none);
 		view-timeline-name:
 			var(---link-hover-source), var(---link-focus-source), var(---link-current-source);
 
 		&:hover {
 			---link-active: 1;
+			---link-interacting: 1;
 			---link-hover-source: var(--link-hover-sources, var(--link-hover));
 		}
 		&:focus-visible {
 			---link-active: 1;
+			---link-interacting: 1;
 			---link-focus-source: var(--link-focus-sources, var(--link-focus));
 		}
 	}
@@ -93,6 +101,14 @@ a {
 	from,
 	to {
 		---link-active: 1;
+		---link-interacting: 1;
+	}
+}
+@keyframes link-current {
+	from,
+	to {
+		---link-active: 1;
+		---link-current: 1;
 	}
 }
 

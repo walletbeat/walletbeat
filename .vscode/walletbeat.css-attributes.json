@@ -233,7 +233,7 @@
 		},
 		{
 			"name": "data-link",
-			"description": "## [data-link]\n\nShared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.\n\n### Tokens\n- `camouflaged`, `contents`.\n- `shared`: links with the same destination share native hover, focus and current presentation.\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n- `--link-hover`, `--link-focus`, `--link-current`: destination timeline names, scoped at the common ancestor.\n- `--link-hover-sources`, `--link-focus-sources`, `--link-current-sources`: own and ancestor destination names published by the real link.\n\n### Examples\n- Default link (`<a>` — no `[data-link]`):\n  ```html\n  <a href=\"https://example.com/article\">Read the article</a>\n  ```\n- `camouflaged` (inherits text color until hover):\n  ```html\n  <a data-link=\"camouflaged\" href=\"#footnote\">Footnote</a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`",
+			"description": "## [data-link]\n\nShared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.\n\n### Tokens\n- `camouflaged`, `contents`.\n- `shared`: links with the same destination share native hover, focus and current presentation.\n- `state`: consume shared destination state on a non-link paint owner without link chrome.\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n- `--link-hover`, `--link-focus`, `--link-current`: destination timeline names, scoped at the common ancestor.\n- `--link-hover-sources`, `--link-focus-sources`, `--link-current-sources`: own and ancestor destination names published by the real link.\n\n### Examples\n- Default link (`<a>` — no `[data-link]`):\n  ```html\n  <a href=\"https://example.com/article\">Read the article</a>\n  ```\n- `camouflaged` (inherits text color until hover):\n  ```html\n  <a data-link=\"camouflaged\" href=\"#footnote\">Footnote</a>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`",
 			"values": [
 				{
 					"name": "camouflaged",
@@ -246,6 +246,10 @@
 				{
 					"name": "shared",
 					"description": "`[data-link~=\"shared\"]`"
+				},
+				{
+					"name": "state",
+					"description": "`[data-link~=\"state\"]`"
 				}
 			]
 		},
