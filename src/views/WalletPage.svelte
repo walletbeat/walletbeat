@@ -418,41 +418,34 @@
 
 	const pieRotation = $derived.by(() => {
 		const states: string[] = []
-		const animations: string[] = []
 		const starts: string[] = []
 		const ends: string[] = []
+		const activeTimelines: string[] = []
 		const timelines: string[] = []
 		let previousAngle = 0
-		let previousId = 'wallet'
 
 		for (const group of pieNavigationItems) {
 			for (const item of [group, ...(group.children ?? [])]) {
 				if (!item.sliceStyle || !item.href?.startsWith('#')) continue
-
 				const angle = -90 - item.sliceStyle.midAngle
 				const step = states.length + 1
 				const condition = `style(---pie-rotation-step: ${step})`
-				const id = item.href.slice(1)
-
+				const timeline = `--${item.href.slice(1)}-entry`
 				states.push(`wallet-pie-step auto linear(${step}, ${step}) forwards`)
-				animations.push(
-					`${condition}: wallet-pie-rotation auto linear(${previousAngle}, ${angle}) both`,
-				)
-				starts.push(`${condition}: anchor(--${previousId}-start top)`)
-				ends.push(`${condition}: anchor(--${id}-start top)`)
-				timelines.push(`--${previousId}-entry`)
+				starts.push(`${condition}: ${previousAngle}deg`)
+				ends.push(`${condition}: ${angle}deg`)
+				activeTimelines.push(`${condition}: ${timeline}`)
+				timelines.push(timeline)
 				previousAngle = angle
-				previousId = id
 			}
 		}
 
 		return {
 			states: states.join(', ') || 'none',
-			animation: animations.length ? `if(${animations.join('; ')}; else: none)` : 'none',
-			start: starts.length ? `if(${starts.join('; ')}; else: 0px)` : '0px',
-			end: ends.length ? `if(${ends.join('; ')}; else: 100%)` : '100%',
-			// Layout owns the first timeline because the mobile site logo also consumes it.
-			timelines: timelines.slice(1).join(', ') || undefined,
+			from: starts.length ? `if(${starts.join('; ')}; else: 0deg)` : '0deg',
+			to: ends.length ? `if(${ends.join('; ')}; else: 0deg)` : '0deg',
+			timeline: activeTimelines.length ? `if(${activeTimelines.join('; ')}; else: none)` : 'none',
+			timelines: timelines.join(', ') || undefined,
 		}
 	})
 
@@ -564,7 +557,6 @@
 	id="top"
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-rotation-states={pieRotation.states}
-	style:---pie-startAnchor="--wallet-start"
 	data-sticky-breadcrumb="scope root"
 	style:--stickyBreadcrumb-itemTimelines="--wallet-item-inline, --wallet-item-block"
 	style:--stickyBreadcrumb-endTimelines="--wallet-end-inline, --wallet-end-block"
@@ -737,7 +729,9 @@
 		</header>
 		<nav
 			class="pie-navigation"
-			style:---pie-rotation-animation={pieRotation.animation}
+			style:---pie-rotation-from={pieRotation.from}
+			style:---pie-rotation-to={pieRotation.to}
+			style:---pie-rotation-timeline={pieRotation.timeline}
 			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
 			style={`--pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
@@ -878,12 +872,6 @@
 		</footer>
 	{/if}
 	<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
-	<span
-		class="pie-rotation-clock"
-		style:---pie-rotation-start={pieRotation.start}
-		style:---pie-rotation-end={pieRotation.end}
-		aria-hidden="true"
-	></span>
 </div>
 
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
@@ -943,7 +931,6 @@
 			style:--stickyBreadcrumb-itemTimelines={`--${groupTargetId(attrGroup)}-item-inline, --${groupTargetId(attrGroup)}-item-block`}
 			style:--stickyBreadcrumb-endTimelines={`--${groupTargetId(attrGroup)}-end-inline, --${groupTargetId(attrGroup)}-end-block`}
 			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
-			style:---pie-startAnchor={`--${groupTargetId(attrGroup)}-start`}
 			data-scroll-item="inline-detached padding-match-end flow"
 		>
 			<header
@@ -1053,7 +1040,6 @@
 		style:--stickyBreadcrumb-itemTimelines={`--${slugifyCamelCase(attribute.id)}-item-inline, --${slugifyCamelCase(attribute.id)}-item-block`}
 		style:--stickyBreadcrumb-endTimelines={`--${slugifyCamelCase(attribute.id)}-end-inline, --${slugifyCamelCase(attribute.id)}-end-block`}
 		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
-		style:---pie-startAnchor={`--${slugifyCamelCase(attribute.id)}-start`}
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
@@ -1698,10 +1684,10 @@
 	}
 	@keyframes -global-wallet-pie-rotation {
 		from {
-			rotate: calc(-1 * var(---slice-mid-angle));
+			rotate: calc(-1 * var(---slice-mid-angle) + var(---pie-rotationDirection, 1) * var(---pie-rotation-from));
 		}
 		to {
-			rotate: calc(-1 * var(---slice-mid-angle) + var(---pie-rotationDirection, 1) * 1deg);
+			rotate: calc(-1 * var(---slice-mid-angle) + var(---pie-rotationDirection, 1) * var(---pie-rotation-to));
 		}
 	}
 
@@ -1750,41 +1736,17 @@
 		display: none;
 	}
 
-	.pie-rotation-clock {
-		display: none;
-	}
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(animation-timing-function: linear(0, 2)) and (color: if(style(---pie-rotation-step: 0): red)) {
-		/* Both consumers select the same interval; only the clock owns its geometry. */
-		.pie-navigation,
-		.pie-rotation-clock {
-			animation: var(---pie-rotation-states);
-			animation-timeline: --wallet-entry, var(---pie-rotation-timelines, none);
-			animation-range: contain 0% contain 0%;
-		}
 		.pie-navigation {
 			animation: var(---pie-rotation-states), breadcrumb-entry auto steps(1, end) both;
-			animation-timeline: --wallet-entry, var(---pie-rotation-timelines, none), --wallet-entry;
+			animation-timeline: var(---pie-rotation-timelines, none), --wallet-entry;
 			animation-range: contain 0% contain 100%;
-		}
-		:is([data-sticky-breadcrumb~="root"], .attribute-group, .attribute)
-			> [data-sticky-breadcrumb~="flow"] {
-			anchor-name: var(---pie-startAnchor);
-		}
-		.pie-rotation-clock {
-			display: block;
-			position: absolute;
-			inset-block-start: var(---pie-rotation-start);
-			inset-block-end: var(---pie-rotation-end);
-			inline-size: 1px;
-			pointer-events: none;
-			view-timeline: --wallet-pie-travel block;
-			view-timeline-inset: 0 100%;
 		}
 		.pie-navigation :global(.navigation-items),
 		.pie-navigation :global(.pie-navigation-icon) {
-			animation: var(---pie-rotation-animation);
-			animation-timeline: --wallet-pie-travel;
+			animation: wallet-pie-rotation auto var(--transition-easeOutExpo) both;
+			animation-timeline: var(---pie-rotation-timeline);
 			animation-range: contain 0% contain 100%;
 			@media (prefers-reduced-motion: reduce) {
 				animation-range: contain 100% contain 100%;
@@ -2077,10 +2039,10 @@
 
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
-			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-pie-travel), --wallet-pie-travel;
+			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links);
 		@media (width > 1024px) {
 			timeline-scope:
-				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-pie-travel), --wallet-pie-travel,
+				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
 				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline);
 		}
 	}
@@ -2257,15 +2219,16 @@
 		inherits: true;
 		initial-value: 0px;
 	}
+	/* Chromium resolves var() easing in range keyframes to linear; match the global Expo curves. */
 	@keyframes -global-pie-clearance {
 		entry 0% {
 			transform: translateX(0);
-			animation-timing-function: linear(0, 0.6726, 0.8773, 0.9755, 1);
+			animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 		}
 		entry 100%,
 		exit 0% {
 			transform: translateX(calc(-1 * var(---inlineDirection) * var(---pie-inlineClearance)));
-			animation-timing-function: linear(0, 0.0245, 0.1227, 0.3274, 1);
+			animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
 		}
 		exit 100% {
 			transform: translateX(0);
@@ -2273,7 +2236,8 @@
 	}
 	@media (prefers-reduced-motion: reduce) {
 		/* Keyframe easing requires literal values; conditional values are not resolved here. */
-		@keyframes -global-pie-clearance {
+		/* Chromium resolves var() easing in range keyframes to linear; match the global Expo curves. */
+	@keyframes -global-pie-clearance {
 			entry 0% {
 				transform: translateX(0);
 				animation-timing-function: steps(1, start);
@@ -2362,7 +2326,7 @@
 			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]),
 			[data-sticky-breadcrumb~="root"] :global(#wallet-toc .navigation-item-after),
 			[data-sticky-breadcrumb~="root"] :global(#wallet-toc summary::after) {
-				/* Sampled circular easing keeps clearance on the compositor. */
+				/* Depart quickly and return late so both sides clear the pie. */
 				animation: pie-clearance auto linear both;
 				animation-timeline: --pie-clearance;
 				animation-range: cover 0% cover 100%;
