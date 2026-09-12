@@ -884,8 +884,20 @@ export const rainbow: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				// Source: Rainbow team responses via Walletbeat questionnaire
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension recovery-phrase generation',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L149',
+						},
+						{
+							label: 'Mobile app recovery-phrase generation',
+							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L656',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
