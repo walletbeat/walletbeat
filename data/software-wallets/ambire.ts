@@ -787,7 +787,31 @@ export const ambire: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation: "The browser extension generates the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src/common/modules/auth/hooks/useCreateNewSeedAccount/useCreateNewSeedAccount.ts#L29-L35',
+						},
+						{
+							label: 'The extension pins this ambire-common commit',
+							url: 'https://github.com/AmbireTech/extension/tree/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src',
+						},
+						{
+							label: 'Background process creates the new recovery phrase',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/main/main.ts#L2165-L2177',
+						},
+						{
+							label: 'Keystore generates the phrase',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/keystore/keystore.ts#L709-L711',
+						},
+						{
+							label: 'Recovery-phrase generation from local randomness',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/entropyGenerator/entropyGenerator.ts#L33-L39',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
