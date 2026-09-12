@@ -2038,11 +2038,13 @@
 
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
-			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival;
+			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival,
+			--breadcrumb-row-inline, --breadcrumb-row-block;
 		@media (width > 1024px) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival,
-				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline);
+				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
+				--breadcrumb-row-inline, --breadcrumb-row-block;
 		}
 	}
 
