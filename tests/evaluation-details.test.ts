@@ -93,4 +93,30 @@ describe('evaluationDetailRenderData', () => {
 			`Invalid outcome metadata for ${details.component}`,
 		)
 	})
+
+	it.each([
+		{
+			details: scamAlertDetails,
+			outcome: outcomeWithMetadata({ securityAudits: [] }),
+		},
+		{
+			details: securityAuditsDetails,
+			outcome: outcomeWithMetadata({ scamAlerts: null }),
+		},
+		{
+			details: accountRecoveryDetails,
+			outcome: outcomeWithMetadata({
+				minimumGuardianPolicy: null,
+				outcomes: null,
+			}),
+		},
+		{
+			details: accountUnruggabilityDetails,
+			outcome: outcomeWithMetadata({ securityAudits: [] }),
+		},
+	])('rejects incompatible outcome metadata for $details.component', ({ details, outcome }) => {
+		expect(() => evaluationDetailRenderData(details, outcome)).toThrow(
+			`Invalid outcome metadata for ${details.component}`,
+		)
+	})
 })

@@ -323,14 +323,21 @@ export function mdParagraph<_Strings extends Strings, _Text extends string = str
 /**
  * Custom content with a custom component type.
  */
-export function component<_Name extends string, _ComponentProps extends object>(
+type ComponentName = ComponentAndProps['component']
+
+type ComponentPropsFor<_Name extends ComponentName> = Extract<
+	ComponentAndProps,
+	{ component: _Name }
+>['componentProps']
+
+export function component<_Name extends ComponentName>(
 	componentName: _Name,
-	componentProps: _ComponentProps,
+	componentProps: ComponentPropsFor<NoInfer<_Name>>,
 ): {
 	contentType: ContentType.COMPONENT
 	component: {
 		component: _Name
-		componentProps: _ComponentProps
+		componentProps: ComponentPropsFor<NoInfer<_Name>>
 	}
 } {
 	return {

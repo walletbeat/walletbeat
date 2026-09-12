@@ -1,10 +1,6 @@
-import type { EvaluationData, OutcomeMetadata } from '@/schema/attributes'
+import type { OutcomeMetadata } from '@/schema/attributes'
 
 import { component, type Content } from '../content'
-
-export interface UnratedAttributeProps<
-	_OutcomeMetadata extends OutcomeMetadata,
-> extends EvaluationData<_OutcomeMetadata> {}
 
 export interface UnratedAttributeContent {
 	component: 'UnratedAttribute'

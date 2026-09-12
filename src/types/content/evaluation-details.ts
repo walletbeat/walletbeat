@@ -113,8 +113,10 @@ function requireOutcomeMetadata<_Metadata extends object>(
 
 /**
  * Join baked custom-component props with the evaluation data injected while rendering.
- * Metadata checks live at this boundary because EvaluationTree intentionally stores
- * attributes with heterogeneous outcome metadata under a common type.
+ * EvaluationTree intentionally stores attributes with heterogeneous outcome metadata
+ * under a common type. Outcomes originate from statically typed internal evaluations;
+ * these guards restore the component/outcome correlation erased at that boundary, not
+ * validate untrusted input.
  */
 export function evaluationDetailRenderData(
 	details: ComponentAndProps,
