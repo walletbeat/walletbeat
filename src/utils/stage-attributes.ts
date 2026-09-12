@@ -1,11 +1,10 @@
 import { attributeTree } from '@/schema/attribute-tree'
 import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
-import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
+import { allWalletLadders, type Ladders, WalletLadderType } from '@/schema/ladders'
 import {
 	getEvaluateFunctionAttributeId,
 	StageCriterionRating,
 	type StageEvaluatableWallet,
-	type WalletLadder,
 	type WalletStage,
 	type WalletStageCriterion,
 } from '@/schema/stages'
@@ -171,19 +170,29 @@ export function getAttributeCriteriaForWallet<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	ladders: Ladders<_AttributeGroupId>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: StageEvaluatableWallet<_AttributeGroupId>,
 ) {
 	return Object.entries(ladders)
-		.flatMap(([ladderType, ladder]) =>
-			ladder.stages.map((stage, stageIndex) => ({
+		.flatMap(entry => {
+			if (entry === undefined) {
+				return []
+			}
+
+			const [ladderType, ladder] = entry
+
+			if (ladder === undefined) {
+				return []
+			}
+
+			return ladder.stages.map((stage, stageIndex) => ({
 				ladderType,
 				ladder,
 				stage,
 				stageIndex,
-			})),
-		)
+			}))
+		})
 		.filter(({ ladder }) => ladder.applicableTo(wallet))
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.flatMap(({ ladderType, stage, stageIndex }) =>
@@ -214,7 +223,7 @@ export function getAttributeStagesForWallet<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	ladders: Ladders<_AttributeGroupId>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: RatedWallet<_AttributeGroupId>,
 ): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
