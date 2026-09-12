@@ -5,19 +5,18 @@ import { component, type Content } from '../content'
 
 export interface AccountRecoveryDetailsProps extends EvaluationDetailProps<AccountRecoveryMetadata> {}
 
+export type AccountRecoveryDetailsBakedProps = Omit<
+	AccountRecoveryDetailsProps,
+	keyof EvaluationDetailProps<AccountRecoveryMetadata>
+>
+
 export interface AccountRecoveryDetailsContent {
 	component: 'AccountRecoveryDetails'
-	componentProps: AccountRecoveryDetailsProps
+	componentProps: AccountRecoveryDetailsBakedProps
 }
 
 export function accountRecoveryDetailsContent(
-	bakedProps: Omit<
-		AccountRecoveryDetailsProps,
-		keyof EvaluationDetailProps<AccountRecoveryMetadata>
-	>,
+	bakedProps: AccountRecoveryDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<AccountRecoveryDetailsContent, keyof typeof bakedProps>(
-		'AccountRecoveryDetails',
-		bakedProps,
-	)
+	return component('AccountRecoveryDetails', bakedProps)
 }

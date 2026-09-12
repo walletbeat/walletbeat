@@ -11,16 +11,18 @@ export interface SecurityAuditsDetailsProps extends EvaluationDetailProps<Securi
 	bugBountyDetails: string
 }
 
+export type SecurityAuditsDetailsBakedProps = Omit<
+	SecurityAuditsDetailsProps,
+	keyof EvaluationDetailProps<SecurityAuditsMetadata>
+>
+
 export interface SecurityAuditsDetailsContent {
 	component: 'SecurityAuditsDetails'
-	componentProps: SecurityAuditsDetailsProps
+	componentProps: SecurityAuditsDetailsBakedProps
 }
 
 export function securityAuditsDetailsContent(
-	bakedProps: Omit<SecurityAuditsDetailsProps, keyof EvaluationDetailProps<SecurityAuditsMetadata>>,
+	bakedProps: SecurityAuditsDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<SecurityAuditsDetailsContent, keyof typeof bakedProps>(
-		'SecurityAuditsDetails',
-		bakedProps,
-	)
+	return component('SecurityAuditsDetails', bakedProps)
 }

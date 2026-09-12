@@ -7,13 +7,15 @@ export interface FundingDetailsProps extends EvaluationData {
 	monetization: Monetization
 }
 
+export type FundingDetailsBakedProps = Omit<FundingDetailsProps, keyof EvaluationData>
+
 export interface FundingDetailsContent {
 	component: 'FundingDetails'
-	componentProps: FundingDetailsProps
+	componentProps: FundingDetailsBakedProps
 }
 
 export function fundingDetailsContent(
-	bakedProps: Omit<FundingDetailsProps, keyof EvaluationData>,
+	bakedProps: FundingDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<FundingDetailsContent, keyof typeof bakedProps>('FundingDetails', bakedProps)
+	return component('FundingDetails', bakedProps)
 }
