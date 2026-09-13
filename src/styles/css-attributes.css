@@ -1446,6 +1446,7 @@ ol {
  * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
  * - `--stickyBreadcrumb-forceRow`: starts a row when 1
  * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
+ * - `--stickyBreadcrumb-exitAnimation`: row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
  * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
@@ -1683,11 +1684,9 @@ ol {
 	}
 	@keyframes breadcrumb-exit {
 		from {
-			opacity: 1;
 			transform: translateY(0px);
 		}
 		to {
-			opacity: 0;
 			transform: translateY(calc(var(---breadcrumb-blockStart) - var(---breadcrumb-blockEnd)));
 		}
 	}
@@ -1934,17 +1933,15 @@ ol {
 				pointer-events: none;
 				animation:
 					breadcrumb-entry auto steps(1, end) forwards,
-					breadcrumb-exit auto var(--transition-easeInOutExpo) both,
 					breadcrumb-position-exit auto linear both;
 				@media (prefers-reduced-motion: reduce) {
-					animation-timing-function: steps(1, end), steps(1, end), linear;
+					animation-timing-function: steps(1, end), linear;
 				}
 				animation-timeline:
 					var(--stickyBreadcrumb-entryTimeline),
-					--breadcrumb-exit, view(block var(--sticky-insetBlockStart) 0px);
+					view(block var(--sticky-insetBlockStart) 0px);
 				animation-range:
 					contain 0% contain 100%,
-					exit calc(100% - 2 * var(---breadcrumb-blockEnd) + var(---breadcrumb-blockStart) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)) exit calc(100% - var(---breadcrumb-blockEnd)),
 					exit 0% exit calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd));
 				&:is(summary):has(> [data-column~="span-start"]) {
 					align-items: start;
@@ -1957,6 +1954,13 @@ ol {
 							content: none;
 						}
 					}
+				}
+
+				/* Only the visual row departs; supporting content retains its ordinary opacity. */
+				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeInOutExpo) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
+				---breadcrumb-exitRange: exit calc(100% - 2 * var(---breadcrumb-blockEnd) + var(---breadcrumb-blockStart) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)) exit calc(100% - var(---breadcrumb-blockEnd));
+				@media (prefers-reduced-motion: reduce) {
+					--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto steps(1, start) reverse both;
 				}
 
 				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
@@ -1996,6 +2000,9 @@ ol {
 
 				[data-row]:has(> [data-sticky-breadcrumb~="source"]),
 				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
+					animation: var(--stickyBreadcrumb-exitAnimation);
+					animation-timeline: --breadcrumb-exit;
+					animation-range: var(---breadcrumb-exitRange);
 					---breadcrumb-iconCorrection: 0px;
 					&:has(
 						> [data-sticky-breadcrumb~="item"] > [data-icon],
@@ -2719,10 +2726,17 @@ ol {
 							background: var(---sticky-background);
 							backdrop-filter: var(---sticky-backdropFilter);
 							opacity: 0;
-							animation: breadcrumb-backdrop auto var(--transition-easeOutExpo) both;
-							animation-name: if(style(---breadcrumb-wrap: 1): breadcrumb-backdrop; else: none);
-							animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-							animation-range: contain 0% contain 100%;
+							@container style(---breadcrumb-wrap: 1) {
+								animation: breadcrumb-backdrop auto var(--transition-easeOutExpo) both;
+								animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+								animation-range: contain 0% contain 100%;
+								@container style(---breadcrumb-entry: 1) {
+									opacity: 1;
+									animation: var(--stickyBreadcrumb-exitAnimation);
+									animation-timeline: --breadcrumb-exit;
+									animation-range: var(---breadcrumb-exitRange);
+								}
+							}
 						}
 					}
 				}

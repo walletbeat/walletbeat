@@ -2406,7 +2406,7 @@
 				anchor-name: --column-firstRow;
 			}
 			@media (width <= 1024px) {
-				animation-name: breadcrumb-entry, none, breadcrumb-position-exit;
+				--stickyBreadcrumb-exitAnimation: none;
 				[data-sticky-breadcrumb~="end"] {
 					translate: calc(
 							var(---inlineDirection) *
