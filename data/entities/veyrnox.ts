@@ -16,8 +16,11 @@ export const veyrnoxEntity: WalletDeveloper & CorporateEntity = {
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/veyrnox',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: {
 		extension: 'png',
+		height: 512,
+		width: 512,
 	},
 	jurisdiction: 'United Kingdom',
 	linkedin: 'https://www.linkedin.com/company/veyrnoxwallet',

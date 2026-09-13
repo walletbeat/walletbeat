@@ -138,7 +138,5 @@ export const veyrnox: SoftwareWallet = {
 	},
 	variants: {
 		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
 	},
 }
