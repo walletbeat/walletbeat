@@ -1672,9 +1672,10 @@ ol {
 				scale(var(--stickyBreadcrumb-scale));
 		}
 	}
+	/* Before / arriving / compact are discrete states; native properties own visual progress. */
 	@keyframes breadcrumb-entry {
 		from {
-			---breadcrumb-entry: 0;
+			---breadcrumb-entry: 0.5;
 		}
 		to {
 			---breadcrumb-entry: 1;
@@ -1713,7 +1714,10 @@ ol {
 			padding-inline: 0 if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): 0px; else: 0.66rem);
 			text-align: center;
 			transform-origin: 100% 50%;
-			animation: breadcrumb-icon-motion auto var(--transition-easeInOutExpo) both;
+			animation:
+				breadcrumb-icon-motion auto var(--stickyBreadcrumb-inlineEasing, var(--transition-easeInOutExpo)) both,
+				breadcrumb-backdrop auto linear both;
+			animation-name: breadcrumb-icon-motion, if(style(---breadcrumb-entry: 0) or style(---breadcrumb-wrap: 1): none; else: breadcrumb-backdrop);
 			animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 			animation-range: contain 0% contain 100%;
 			@media (prefers-reduced-motion: reduce) {
@@ -1728,7 +1732,7 @@ ol {
 				:hover,
 				:focus-visible
 			)::before {
-			opacity: if(style(---breadcrumb-wrap: 0): var(---breadcrumb-entry) ;else: 0);
+			opacity: 0;
 		}
 		/* Measure both dimensions horizontally so vertical scrolling cannot tick size clocks. */
 		:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::before,
@@ -1929,7 +1933,7 @@ ol {
 				z-index: 1;
 				pointer-events: none;
 				animation:
-					breadcrumb-entry auto linear both,
+					breadcrumb-entry auto steps(1, end) forwards,
 					breadcrumb-exit auto var(--transition-easeInOutExpo) both,
 					breadcrumb-position-exit auto linear both;
 				@media (prefers-reduced-motion: reduce) {

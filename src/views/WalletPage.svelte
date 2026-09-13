@@ -1712,7 +1712,7 @@
 
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
 		.pie-navigation {
-			animation: breadcrumb-entry auto steps(1, end) both, var(---pie-rotation-states);
+			animation: breadcrumb-entry auto steps(1, end) forwards, var(---pie-rotation-states);
 			animation-timeline: --wallet-entry, var(---pie-rotation-timelines);
 			animation-range: contain 0% contain 100%;
 		}
@@ -1819,9 +1819,9 @@
 			}
 
 			:global(.navigation-items details > menu) {
-				opacity: if(style(---breadcrumb-entry: 0): 1; else: var(---link-active, 0));
+				opacity: if(style(---breadcrumb-entry: 1): var(---link-active, 0); else: 1);
 				visibility: if(
-					style(---breadcrumb-entry: 0) or style(---link-active: 1): visible; else: hidden
+					not style(---breadcrumb-entry: 1) or style(---link-active: 1): visible; else: hidden
 				);
 				transition-property: opacity, visibility;
 			}
@@ -1994,7 +1994,7 @@
 
 	@supports selector(:target-current) {
 		.pie-navigation :global(a:target-current) {
-			---link-current-source: if(style(---breadcrumb-entry: 0): none; else: var(--link-current-sources));
+			---link-current-source: if(style(---breadcrumb-entry: 1): var(--link-current-sources); else: none);
 		}
 	}
 

@@ -527,12 +527,12 @@ import Footer from '@/views/Footer.astro'
 				> [data-sticky-breadcrumb~="position"]
 				.wallet-name::before {
 				content: if(style(---breadcrumb-entry: 0) or style(---wallet-chainWrap: 1): '#' ;else: '›');
-			}
-			#layout:has([data-sticky-breadcrumb~="root"])
-				[data-sticky-breadcrumb~="root"]
-				> [data-sticky-breadcrumb~="position"]
-				.wallet-name:not(:hover, :focus-visible)::before {
-				opacity: calc(var(---breadcrumb-entry) * (1 - var(---wallet-chainWrap)));
+				animation-name:
+					breadcrumb-icon-motion,
+					if(
+						style(---breadcrumb-entry: 0) or style(---wallet-chainWrap: 1): none;
+							else: breadcrumb-backdrop
+					);
 			}
 		}
 	}
