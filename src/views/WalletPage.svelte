@@ -1647,7 +1647,6 @@
 				grid-template: 'Header' 'Overview' 'Nav' 'Content' / minmax(0, 1fr);
 			}
 			&[data-sticky-container] {
-				isolation: isolate;
 				@media (width > 1024px) {
 					--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
 				}
