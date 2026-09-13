@@ -111,6 +111,8 @@ interface EncodedWalletDataRequest {
 	domain: string
 	path: string
 	sessionTime: number
+	scheme?: string
+	referer?: string
 
 	/**
 	 * Encoded as omitted if empty, otherwise Record<key, string | string[]>.
@@ -132,7 +134,6 @@ interface EncodedWalletDataRequest {
 	content?: string | EncodedContentBase64
 
 	cookies?: EncodedMultiDict
-	refererDomain?: string
 	oddHeaders?: EncodedMultiDict
 	oddTrailers?: EncodedMultiDict
 
@@ -741,6 +742,18 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 	const path = expectString(obj.path, `${at}.path`)
 	const sessionTime = expectNumber(obj.sessionTime, `${at}.sessionTime`)
 
+	let scheme: string | undefined
+
+	if (obj.scheme !== undefined) {
+		scheme = expectString(obj.scheme, `${at}.scheme`)
+	}
+
+	let referer: string | undefined
+
+	if (obj.referer !== undefined) {
+		referer = expectString(obj.referer, `${at}.referer`)
+	}
+
 	let query: EncodedMultiDict | undefined
 
 	if (obj.query !== undefined) {
@@ -751,12 +764,6 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 
 	if (obj.cookies !== undefined) {
 		cookies = parseEncodedMultiDict(obj.cookies, `${at}.cookies`)
-	}
-
-	let refererDomain: string | undefined
-
-	if (obj.refererDomain !== undefined) {
-		refererDomain = expectString(obj.refererDomain, `${at}.refererDomain`)
 	}
 
 	let oddHeaders: EncodedMultiDict | undefined
@@ -834,9 +841,10 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		domain,
 		path,
 		sessionTime,
+		...(scheme ? { scheme } : {}),
+		...(referer ? { referer } : {}),
 		...(query && Object.keys(query).length ? { query } : {}),
 		...(cookies && Object.keys(cookies).length ? { cookies } : {}),
-		...(refererDomain ? { refererDomain } : {}),
 		...(oddHeaders && Object.keys(oddHeaders).length ? { oddHeaders } : {}),
 		...(oddTrailers && Object.keys(oddTrailers).length ? { oddTrailers } : {}),
 		...(content ? { content } : {}),
@@ -1916,9 +1924,8 @@ export class WalletDataStrings {
 
 			for (const origin of s.getOrigins().values()) {
 				const req = origin.request
-				const matcher = this.captureFile.findMatcherForReq(req)
 
-				if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
+				if (req.isNotWalletInitiated()) {
 					continue
 				}
 
@@ -2103,6 +2110,7 @@ export class WalletRequestReview {
 
 		if (this.extraPurposes.length === 0) {
 			this.extraPurposes = 'NOT_WALLET_INITIATED'
+			this.request.refreshNotWalletInitiatedByProxy()
 
 			return
 		}
@@ -2167,7 +2175,8 @@ export class WalletRequest {
 	public readonly jsonRpcMethods: string[]
 	public readonly content: string | null
 	public readonly cookies: UserDataDict
-	public readonly refererDomain: string | null
+	public readonly scheme: string | null
+	public readonly referer: string | null
 	public readonly oddHeaders: UserDataDict
 	public readonly oddTrailers: UserDataDict
 	public readonly responseStatus: number | null
@@ -2175,6 +2184,7 @@ export class WalletRequest {
 	private readonly _responsePayloadEncoded: EncodedResponsePayload | null
 	private readonly _responsePayload: DecodedResponsePayload | null
 	public readonly review: WalletRequestReview
+	public notWalletInitiatedByProxy: WalletRequest | null = null
 	private readonly _key: string
 
 	private constructor(args: {
@@ -2186,7 +2196,8 @@ export class WalletRequest {
 		jsonRpcMethods: string[]
 		content: string | null
 		cookies: UserDataDict
-		refererDomain: string | null
+		scheme: string | null
+		referer: string | null
 		oddHeaders: UserDataDict
 		oddTrailers: UserDataDict
 		responseStatus: number | null
@@ -2202,7 +2213,8 @@ export class WalletRequest {
 		this.jsonRpcMethods = args.jsonRpcMethods
 		this.content = args.content
 		this.cookies = args.cookies
-		this.refererDomain = args.refererDomain
+		this.scheme = args.scheme
+		this.referer = args.referer
 		this.oddHeaders = args.oddHeaders
 		this.oddTrailers = args.oddTrailers
 		this.responseStatus = args.responseStatus
@@ -2260,7 +2272,8 @@ export class WalletRequest {
 					)
 				})() ?? null,
 			cookies: decodeUserDataDict(req.cookies, `${at}.cookies`),
-			refererDomain: req.refererDomain ?? null,
+			scheme: req.scheme ?? null,
+			referer: req.referer ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, `${at}.oddHeaders`),
 			oddTrailers: decodeUserDataDict(req.oddTrailers, `${at}.oddTrailers`),
 			responseStatus: req.responseStatus ?? null,
@@ -2329,7 +2342,8 @@ export class WalletRequest {
 			...(jsonRpcMethod ? { jsonRpcMethod } : {}),
 			...(contentEncoded !== undefined ? { content: contentEncoded } : {}),
 			...(cookies ? { cookies } : {}),
-			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
+			...(this.scheme !== null ? { scheme: this.scheme } : {}),
+			...(this.referer !== null ? { referer: this.referer } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
 			...(oddTrailers ? { oddTrailers } : {}),
 			...(this.responseStatus !== null && this.responseStatus !== 200
@@ -2364,7 +2378,9 @@ export class WalletRequest {
 			this.jsonRpcMethods.length === 0 ? '' : ` rpc=${[...this.jsonRpcMethods].sort().join(',')}`
 
 		const content = this.content ? ` content=${this.content.toString()}` : ''
-		const refererDomain = this.refererDomain ? ` referer=${this.refererDomain.toString()}` : ''
+		const refererDomain = this.refererDomain()
+			? ` referer=${(this.refererDomain() ?? '').toString()}`
+			: ''
 
 		const responseStatus = this.responseStatus !== null ? ` status=${this.responseStatus}` : ''
 		const responsePayload =
@@ -2411,7 +2427,9 @@ export class WalletRequest {
 			return true
 		}
 
-		if (this.refererDomain !== null && this.refererDomain.includes(needle)) {
+		const refererDomain = this.refererDomain()
+
+		if (refererDomain !== null && refererDomain.includes(needle)) {
 			return true
 		}
 
@@ -2422,16 +2440,90 @@ export class WalletRequest {
 		return false
 	}
 
+	/**
+	 * True when this request is directly identified as NOT_WALLET_INITIATED,
+	 * either by a matching request matcher or by manual review.
+	 */
+	public isNotWalletInitiatedDirectly(): boolean {
+		const matcher = this._captureFile.findMatcherForReq(this)
+
+		if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
+			return true
+		}
+
+		return this.review.getExtraPurposes() === 'NOT_WALLET_INITIATED'
+	}
+
+	/**
+	 * True when this request is identified as NOT_WALLET_INITIATED, either
+	 * directly (via matcher or manual review) or by proxy via its referer header.
+	 */
+	public isNotWalletInitiated(): boolean {
+		return this.isNotWalletInitiatedDirectly() || this.notWalletInitiatedByProxy !== null
+	}
+
+	/**
+	 * The URL signature of this request: scheme (may be `null` for capture
+	 * files that predate scheme storage), host (domain) and path. Used for
+	 * NOT_WALLET_INITIATED by-proxy matching.
+	 */
+	public urlSignature(): { scheme: string | null; host: string; path: string } {
+		return { scheme: this.scheme, host: this.domain, path: this.path }
+	}
+
+	/**
+	 * The URL signature of this request's `Referer` header, parsed from the
+	 * full Referer URL stored in the `referer` field. Returns `null` when the
+	 * request has no Referer header or it cannot be parsed.
+	 */
+	public refererUrlSignature(): {
+		scheme: string | null
+		host: string | null
+		path: string
+	} | null {
+		if (this.referer === null) {
+			return null
+		}
+
+		try {
+			const url = new URL(this.referer)
+
+			return {
+				scheme: url.protocol.replace(/:$/, ''),
+				host: url.hostname,
+				path: url.pathname,
+			}
+		} catch {
+			return null
+		}
+	}
+
+	/**
+	 * The domain (hostname) of this request's `Referer` header, parsed from the
+	 * full Referer URL stored in the `referer` field. Returns `null` when the
+	 * request has no Referer header or it cannot be parsed.
+	 */
+	public refererDomain(): string | null {
+		return this.refererUrlSignature()?.host ?? null
+	}
+
+	/**
+	 * Refreshes the runtime-only `notWalletInitiatedByProxy` field across all
+	 * requests in this capture file.
+	 */
+	public refreshNotWalletInitiatedByProxy(): void {
+		this._captureFile.refreshNotWalletInitiatedByProxy()
+	}
+
 	public get key(): string {
 		return this._key
 	}
 
 	public domains(): NonEmptyArray<string> {
-		if (
-			this.refererDomain !== null &&
-			this.refererDomain.toLowerCase() !== this.domain.toLowerCase()
-		) {
-			return [this.domain, this.refererDomain]
+		const refererDomain = this.refererDomain()
+
+		if (refererDomain !== null && refererDomain.toLowerCase() !== this.domain.toLowerCase()) {
+			return [this.domain, refererDomain]
 		}
 
 		return [this.domain]
@@ -2704,11 +2796,7 @@ export class WalletCaptureFlow {
 	}
 
 	public async unreviewableRequests(strings: WalletDataStrings): Promise<WalletRequest[]> {
-		const filtered = this._requests.filter(req => {
-			const matcher = this.file.findMatcherForReq(req)
-
-			return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
-		})
+		const filtered = this._requests.filter(req => !req.isNotWalletInitiated())
 		const keepIndexes = await Promise.all(
 			filtered.map(async req => !(await req.isReadyForReview(strings))),
 		)
@@ -2718,11 +2806,7 @@ export class WalletCaptureFlow {
 
 	public unreviewedRequests(): WalletRequestReview[] {
 		return this._requests
-			.filter(req => {
-				const matcher = this.file.findMatcherForReq(req)
-
-				return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
-			})
+			.filter(req => !req.isNotWalletInitiated())
 			.map(req => req.review)
 			.filter(review => !review.isManuallyReviewed())
 	}
@@ -2937,6 +3021,8 @@ export class WalletCaptureFile {
 		for (const info of this.captureInfo) {
 			this.userData.addCaptureInfo(info)
 		}
+
+		this.refreshNotWalletInitiatedByProxy()
 	}
 
 	private toJSON(): EncodedWalletCaptureFile {
@@ -3062,6 +3148,11 @@ export class WalletCaptureFile {
 			const matcher = this.findMatcherForReq(request)
 			const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
 			const purposes = new Set<DataCollectionPurpose>()
+
+			// Not a wallet-initiated request (directly or by proxy); skip.
+			if (request.notWalletInitiatedByProxy !== null) {
+				continue
+			}
 
 			if (matcher !== null) {
 				if (matcher.purposes === 'NOT_WALLET_INITIATED') {
@@ -3723,6 +3814,128 @@ export class WalletCaptureFile {
 		return this.annotations.matches(request)
 	}
 
+	/**
+	 * Recomputes the runtime-only `notWalletInitiatedByProxy` field across all
+	 * requests in this capture file. A request is identified as
+	 * NOT_WALLET_INITIATED by proxy when its referer header matches the URL of
+	 * another request that is itself identified as NOT_WALLET_INITIATED (either
+	 * directly or by proxy), transitively.
+	 *
+	 * Throws if the expansion would mark a request as NOT_WALLET_INITIATED by
+	 * proxy that has been explicitly manually tagged as anything other than
+	 * NOT_WALLET_INITIATED.
+	 */
+	public refreshNotWalletInitiatedByProxy(): void {
+		const requests: WalletRequest[] = []
+
+		for (const f of recordedFlow.items) {
+			const flow = this.getFlow(f)
+
+			if (flow === null || flow === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const req of flow.requests) {
+				requests.push(req)
+			}
+		}
+
+		for (const req of requests) {
+			req.notWalletInitiatedByProxy = null
+		}
+
+		// Index requests by the URL their referer header points at (host + path).
+		// Each entry records the referer's scheme so it can be compared against
+		// the source request's scheme when available.
+		const byRefererUrl = new Map<
+			string,
+			Array<{ candidate: WalletRequest; scheme: string | null }>
+		>()
+
+		for (const req of requests) {
+			const ref = req.refererUrlSignature()
+
+			if (ref === null || ref.host === null) {
+				continue
+			}
+
+			const key = `${ref.host.toLowerCase()}\u0000${ref.path}`
+			const entry = { candidate: req, scheme: ref.scheme }
+			const arr = byRefererUrl.get(key)
+
+			if (arr === undefined) {
+				byRefererUrl.set(key, [entry])
+			} else {
+				arr.push(entry)
+			}
+		}
+
+		// Seeds the transitive expansion with directly-identified requests.
+		const queue: WalletRequest[] = requests.filter(req => req.isNotWalletInitiatedDirectly())
+		const expanded = new Set<WalletRequest>()
+
+		while (queue.length > 0) {
+			const source = queue.shift()
+
+			if (source === undefined || expanded.has(source)) {
+				continue
+			}
+
+			expanded.add(source)
+			const sourceUrl = source.urlSignature()
+			const key = `${sourceUrl.host.toLowerCase()}\u0000${sourceUrl.path}`
+			const entries = byRefererUrl.get(key)
+
+			if (entries === undefined) {
+				continue
+			}
+
+			for (const { candidate, scheme } of entries) {
+				if (candidate === source) {
+					continue
+				}
+
+				// The source request's scheme must match the referer's scheme when
+				// it is known (older capture files may not store it).
+				if (sourceUrl.scheme !== null && scheme !== sourceUrl.scheme) {
+					continue
+				}
+
+				// Already identified as NOT_WALLET_INITIATED directly: nothing to do.
+				if (candidate.isNotWalletInitiatedDirectly()) {
+					continue
+				}
+
+				// Already identified as NOT_WALLET_INITIATED by proxy: nothing to do.
+				if (candidate.notWalletInitiatedByProxy !== null) {
+					continue
+				}
+
+				// Contradiction: explicitly manually tagged as anything but
+				// NOT_WALLET_INITIATED.
+				const extraPurposes = candidate.review.getExtraPurposes()
+
+				if (Array.isArray(extraPurposes) && extraPurposes.length > 0) {
+					const refererUrl = candidate.refererUrlSignature()
+					const refererDescription =
+						refererUrl === null
+							? (candidate.refererDomain() ?? '<unknown>')
+							: `${refererUrl.scheme ?? ''}${refererUrl.host ?? ''}${refererUrl.path}`
+
+					throw new Error(
+						`Cannot identify request ${candidate.toString()} as NOT_WALLET_INITIATED by proxy: ` +
+							`its referer header (${refererDescription}) matches the URL of request ${source.toString()}, ` +
+							'which is identified as NOT_WALLET_INITIATED; however, the request has already been manually ' +
+							`tagged with purposes: ${extraPurposes.join(' & ')}.`,
+					)
+				}
+
+				candidate.notWalletInitiatedByProxy = source
+				queue.push(candidate)
+			}
+		}
+	}
+
 	public addRequestMatcher(
 		matcher: WalletRequestMatcher,
 		force: boolean,
@@ -3780,11 +3993,14 @@ export class WalletCaptureFile {
 			}
 		}
 
+		this.refreshNotWalletInitiatedByProxy()
+
 		return matched
 	}
 
 	public removeRequestMatcher(matcher: WalletRequestMatcher) {
 		this.annotations.remove(matcher)
+		this.refreshNotWalletInitiatedByProxy()
 	}
 
 	public addBenignString(str: string, global: boolean) {
@@ -3806,9 +4022,7 @@ export class WalletCaptureFile {
 			}
 
 			for (const req of flow.requests) {
-				const matcher = this.findMatcherForReq(req)
-
-				if (matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED') {
+				if (!req.isNotWalletInitiated()) {
 					await req.populateStringsInto(strings)
 				}
 			}

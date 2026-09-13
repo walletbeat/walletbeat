@@ -150,11 +150,13 @@ export class WalletRequestMatcher {
 
 		// If a referer domain selector is provided, require a referer header domain match.
 		if (this.refererDomain !== null) {
-			if (request.refererDomain === null) {
+			const requestRefererDomain = request.refererDomain()
+
+			if (requestRefererDomain === null) {
 				return false
 			}
 
-			if (!domainMatches(this.refererDomain, request.refererDomain)) {
+			if (!domainMatches(this.refererDomain, requestRefererDomain)) {
 				return false
 			}
 		}

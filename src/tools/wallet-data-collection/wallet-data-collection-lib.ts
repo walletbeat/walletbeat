@@ -1706,15 +1706,17 @@ function displayRequestInfo(
 		log(`${header('Cookies')}${formatUserDataDict(request.cookies)}`)
 	}
 
-	if (request.refererDomain !== null) {
-		const refResolved = entitiesForDomain(request.refererDomain)
+	const requestRefererDomain = request.refererDomain()
+
+	if (requestRefererDomain !== null) {
+		const refResolved = entitiesForDomain(requestRefererDomain)
 
 		if (refResolved === null) {
-			throw new Error(`no entity associated with referer domain ${request.refererDomain}`)
+			throw new Error(`no entity associated with referer domain ${requestRefererDomain}`)
 		}
 
 		log(
-			`${header('Referer')}${chalk.blue(request.refererDomain)} ${fadedOut('(')}${resolvedDomainNames(refResolved)}${fadedOut(')')}`,
+			`${header('Referer')}${chalk.blue(requestRefererDomain)} ${fadedOut('(')}${resolvedDomainNames(refResolved)}${fadedOut(')')}`,
 		)
 	}
 
@@ -3114,7 +3116,9 @@ function captureHasDomain(capture: WalletCaptureFile, domain: string): boolean {
 				return true
 			}
 
-			if (req.refererDomain !== null && domainMatches(domain, req.refererDomain)) {
+			const refererDomain = req.refererDomain()
+
+			if (refererDomain !== null && domainMatches(domain, refererDomain)) {
 				return true
 			}
 		}

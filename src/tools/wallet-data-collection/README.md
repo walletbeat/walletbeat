@@ -161,6 +161,8 @@ Requests can be assigned to the following purposes:
 - `ANALYTICS`: Wallet user analytics.
 - `NOT_WALLET_INITIATED`: Requests not actually initiated by the wallet (e.g. browser/OS built-in analytics).
 
+  When a request is identified as `NOT_WALLET_INITIATED` (either by a matcher or by manual review), any other request whose `Referer` header matches that request's URL (scheme + domain + path) is also automatically identified as `NOT_WALLET_INITIATED` _by proxy_, transitively. If such proxy propagation would mark a request as `NOT_WALLET_INITIATED` that has been explicitly manually tagged as anything other than `NOT_WALLET_INITIATED`, an error is raised instead.
+
 Purposes are case-insensitive on the command line.
 
 ##### Collection policy
