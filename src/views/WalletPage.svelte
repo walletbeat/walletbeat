@@ -795,6 +795,7 @@
 
 				<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
 				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/if}
 
@@ -849,6 +850,7 @@
 		</footer>
 	{/if}
 	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </div>
 
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
@@ -967,6 +969,7 @@
 				</div>
 			</div>
 			<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+			<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 		</section>
 	{/if}
 {/snippet}
@@ -1401,6 +1404,7 @@
 			</div>
 		</details>
 		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</section>
 {/snippet}
 
@@ -2437,6 +2441,11 @@
 				var(---wallet-compact-icon-size) / var(--wallet-icon-size)
 			);
 		}
+		[data-sticky-breadcrumb~="root"] {
+			@media (width <= 1024px) {
+				--stickyBreadcrumb-exitAnimation: none;
+			}
+		}
 		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] {
 			--stickyBreadcrumb-sourcePaddingBlock: min(
 				var(--scrollItem-paddingInlineMatch),
@@ -2447,7 +2456,6 @@
 				anchor-name: --column-firstRow;
 			}
 			@media (width <= 1024px) {
-				--stickyBreadcrumb-exitAnimation: none;
 				[data-sticky-breadcrumb~="end"] {
 					translate: calc(
 							var(---inlineDirection) *

@@ -1420,7 +1420,7 @@ ol {
  *
  * ### Placement
  * - A scope contains its position (directly or inside details), followed by content and a flow marker.
- * - The flow marker contains one measure element for independent horizontal size clocks.
+ * - The entry flow marker contains one measure element for independent horizontal size clocks.
  * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
  * - Closing details excludes its scope, summary and descendants from sticky motion and measurements.
  *
@@ -1433,6 +1433,7 @@ ol {
  * - `support`: clips its child content elements below the compact row while they follow their natural scroll position; wrap plain text in an element
  * - `end`: independently sized in-flow metadata
  * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
+ * - `exit`: combines with `flow` to mark the departure start and end from the section bottom
  * - `measure`: hidden dimension probes inside the flow marker
  *
  * ### CSS Variables
@@ -1448,7 +1449,7 @@ ol {
  * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
  * - `--stickyBreadcrumb-forceRow`: starts a row when 1
  * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
- * - `--stickyBreadcrumb-exitAnimation`: row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
+ * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
  * - `--stickyBreadcrumb-nativeBlockSize`: fixed native row size when measured compaction is unavailable; defaults to 5rem
@@ -1467,6 +1468,7 @@ ol {
  *     </header>
  *     <div>Section content</div>
  *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+ *     <span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
  *   </section>
  *   ```
  *
@@ -1766,6 +1768,11 @@ ol {
 			}
 		}
 		[data-sticky-breadcrumb~="scope"] {
+			/* Only the visual row departs; supporting content retains its ordinary opacity. */
+			--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeInOutExpo) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
+			@media (prefers-reduced-motion: reduce) {
+				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto steps(1, start) reverse both;
+			}
 			--stickyBreadcrumb-itemInlineTimeline: --breadcrumb-item-inline;
 			--stickyBreadcrumb-itemBlockTimeline: --breadcrumb-item-block;
 			--stickyBreadcrumb-endInlineTimeline: --breadcrumb-end-inline;
@@ -1894,7 +1901,6 @@ ol {
 			/* The outer border starts arrival; the position box still owns its end. */
 			> [data-sticky-breadcrumb~="flow"] {
 				display: block;
-				content: '';
 				position: absolute;
 				scroll-snap-align: start;
 				scroll-margin-block-start: 0;
@@ -1913,7 +1919,7 @@ ol {
 					scroll-snap-align: start;
 					scroll-margin-block-start: 0;
 				}
-				&::before {
+				&:not([data-sticky-breadcrumb~="exit"])::before {
 					content: '';
 					inline-size: anchor-size(--column-firstRow block, 0px);
 					view-timeline-name: --breadcrumb-row-block;
@@ -1921,6 +1927,15 @@ ol {
 				view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
 				view-timeline-axis: block;
 				view-timeline-inset: 0 calc(100vh - var(---breadcrumb-blockEnd));
+				&[data-sticky-breadcrumb~="exit"] {
+					inset-block-start: calc(100% + var(---breadcrumb-sourceOffsetBlock) - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight));
+					block-size: var(---breadcrumb-rowHeight);
+					view-timeline-name: none;
+					&::after {
+						inset-block-start: 100%;
+					}
+					display: if(style(--stickyBreadcrumb-exitAnimation: none): none; else: block);
+				}
 			}
 			> [data-sticky-breadcrumb~="position"],
 			> details > [data-sticky-breadcrumb~="position"] {
@@ -1959,12 +1974,7 @@ ol {
 					}
 				}
 
-				/* Only the visual row departs; supporting content retains its ordinary opacity. */
-				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeInOutExpo) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
-				---breadcrumb-exitRange: exit calc(100% - 2 * var(---breadcrumb-blockEnd) + var(---breadcrumb-blockStart) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)) exit calc(100% - var(---breadcrumb-blockEnd));
-				@media (prefers-reduced-motion: reduce) {
-					--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto steps(1, start) reverse both;
-				}
+				---breadcrumb-exitRange: exit calc(100% - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight)) exit calc(100% - var(---breadcrumb-blockEnd));
 
 				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
 				---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));

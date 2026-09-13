@@ -641,7 +641,7 @@ interface CssAttributes {
 	 *
 	 * ### Placement
 	 * - A scope contains its position (directly or inside details), followed by content and a flow marker.
-	 * - The flow marker contains one measure element for independent horizontal size clocks.
+	 * - The entry flow marker contains one measure element for independent horizontal size clocks.
 	 * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
 	 * - Closing details excludes its scope, summary and descendants from sticky motion and measurements.
 	 *
@@ -654,6 +654,7 @@ interface CssAttributes {
 	 * - `support`: clips its child content elements below the compact row while they follow their natural scroll position; wrap plain text in an element
 	 * - `end`: independently sized in-flow metadata
 	 * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
+	 * - `exit`: combines with `flow` to mark the departure start and end from the section bottom
 	 * - `measure`: hidden dimension probes inside the flow marker
 	 *
 	 * ### CSS Variables
@@ -669,7 +670,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
 	 * - `--stickyBreadcrumb-forceRow`: starts a row when 1
 	 * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
-	 * - `--stickyBreadcrumb-exitAnimation`: row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
+	 * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
 	 * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
 	 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
 	 * - `--stickyBreadcrumb-nativeBlockSize`: fixed native row size when measured compaction is unavailable; defaults to 5rem
@@ -688,6 +689,7 @@ interface CssAttributes {
 	 *     </header>
 	 *     <div>Section content</div>
 	 *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+	 *     <span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	 *   </section>
 	 *   ```
 	 *
