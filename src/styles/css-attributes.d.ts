@@ -116,6 +116,7 @@ interface CssAttributes {
 	 * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
 	 * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
 	 * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
+	 * - `--column-spanSize`: icon span override; defaults to the heading and supporting line heights plus their gap
 	 * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
 	 * - `--column-iconGap`: inline gap after the leading icon; defaults to 0.625rem
 	 *
@@ -671,14 +672,15 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-exitAnimation`: row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
 	 * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
 	 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
+	 * - `--stickyBreadcrumb-nativeBlockSize`: fixed native row size when measured compaction is unavailable; defaults to 5rem
 	 * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
 	 *
 	 * ### Examples
 	 * - Native heading and its natural-flow boundary:
 	 *   ```html
-	 *   <section id="section" data-sticky-breadcrumb="scope">
+	 *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope">
 	 *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
-	 *       <div data-row>
+	 *       <div data-row data-sticky="block block-start backdrop-self backdrop-always">
 	 *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
 	 *           <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
 	 *         </div>

@@ -463,6 +463,7 @@ span svg {
  * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
  * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
  * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
+ * - `--column-spanSize`: icon span override; defaults to the heading and supporting line heights plus their gap
  * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
  * - `--column-iconGap`: inline gap after the leading icon; defaults to 0.625rem
  *
@@ -614,8 +615,9 @@ span svg {
 
 [data-column~="span-start"] {
 	---column-sizeTimelines: --column-inline-size, --column-block-size;
-	---column-spanSize: calc(
-		1lh + var(--column-supportLineHeight, 1rlh) + var(--column-supportGap, 0.5rem)
+	---column-spanSize: var(
+		--column-spanSize,
+		calc(1lh + var(--column-supportLineHeight, 1rlh) + var(--column-supportGap, 0.5rem))
 	);
 	---column-break: 0;
 	---column-gap: var(--column-supportGap, 0.5rem);
@@ -1449,14 +1451,15 @@ ol {
  * - `--stickyBreadcrumb-exitAnimation`: row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
+ * - `--stickyBreadcrumb-nativeBlockSize`: fixed native row size when measured compaction is unavailable; defaults to 5rem
  * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
  *
  * ### Examples
  * - Native heading and its natural-flow boundary:
  *   ```html
- *   <section id="section" data-sticky-breadcrumb="scope">
+ *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope">
  *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
- *       <div data-row>
+ *       <div data-row data-sticky="block block-start backdrop-self backdrop-always">
  *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
  *           <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
  *         </div>
@@ -1504,7 +1507,7 @@ ol {
 
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-	(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
+	(color: if(style(---breadcrumb-wrap: 1): red)) {
 	@property --stickyBreadcrumb-scale {
 		syntax: '<number>';
 		inherits: true;
@@ -2640,6 +2643,21 @@ ol {
 
 			position: sticky;
 
+			&:is(details:not([open]) *) {
+				position: relative;
+				inset: auto;
+				z-index: auto;
+				container-type: normal;
+				&[data-sticky~="backdrop-self"] {
+					background: none;
+					backdrop-filter: none;
+				}
+				&[data-sticky~="backdrop-before"]::before,
+				&[data-sticky~="backdrop-after"]::after {
+					content: none;
+				}
+			}
+
 			&:not([data-sticky~="block"], [data-sticky~="inline"]),
 			&[data-sticky~="block"] {
 				inset-block-start: var(--sticky-insetBlockStart);
@@ -2690,6 +2708,10 @@ ol {
 					&[data-sticky~="backdrop-self"],
 					&[data-sticky~="backdrop-before"]::before,
 					&[data-sticky~="backdrop-after"]::after {
+						@supports not (container-type: scroll-state) {
+							background: var(---sticky-background);
+							backdrop-filter: var(---sticky-backdropFilter);
+						}
 						@container not scroll-state(stuck: none) {
 							background: var(---sticky-background);
 							backdrop-filter: var(---sticky-backdropFilter);
@@ -2714,7 +2736,7 @@ ol {
 				&[data-sticky-breadcrumb~="position"][data-sticky~="backdrop-stuck"]:not(details:not([open]) *) {
 					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size)
-						and (color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
+						and (color: if(style(---breadcrumb-wrap: 1): red)) {
 						&[data-sticky~="backdrop-before"]::before,
 						&[data-sticky~="backdrop-after"]::after {
 							/* Arrival and row bounds belong to this breadcrumb, including native-query fallbacks. */
@@ -2879,6 +2901,110 @@ ol {
 	}
 }
 
+[data-sticky-breadcrumb~="scope"][data-sticky-container]:not([data-sticky-breadcrumb~="root"]) {
+	--scrollItem-inlineDetached-maxSize: inherit;
+	--scrollItem-inlineDetached-paddingStart: inherit;
+	--scrollItem-inlineDetached-maxPaddingMatchStart: inherit;
+	--scrollItem-inlineDetached-paddingEnd: inherit;
+	--scrollItem-inlineDetached-maxPaddingMatchEnd: inherit;
+}
+
+@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+	(color: if(style(---breadcrumb-wrap: 1): red))) {
+	[data-sticky-breadcrumb~="scope"][data-sticky-container],
+	[data-sticky-breadcrumb~="scope"] [data-sticky-container]:has(> summary[data-sticky]) {
+		--sticky-paddingBlockStart: var(--stickyBreadcrumb-nativeBlockSize, 5rem);
+	}
+	[data-sticky-breadcrumb~="scope"][data-sticky-container],
+	[data-sticky-breadcrumb~="scope"] [data-sticky-container][id] {
+		scroll-margin-block-start: var(--sticky-insetBlockStart);
+		scroll-snap-align: start;
+	}
+
+	[data-sticky-breadcrumb~="position"] {
+		/* The real row sticks; descriptions retain their ordinary flow boxes. */
+		display: contents;
+		&::before,
+		&::after {
+			display: none;
+		}
+		&[data-column~="span-start"],
+		> [data-column~="span-start"] {
+			--column-spanSize: 1.5em;
+		}
+		> [data-column] {
+			display: contents;
+		}
+		> [data-sticky],
+		> [data-column] > [data-sticky] {
+			block-size: var(--sticky-paddingBlockStart);
+			padding-block: 0.5rem;
+			padding-inline: var(--card-padding, 0px);
+			align-content: center;
+		}
+		> [data-column] > :not([data-sticky]) {
+			padding-inline: var(--card-padding, 0px);
+		}
+	}
+
+	[data-sticky-breadcrumb~="scope"] [data-sticky-container] > summary[data-sticky] {
+		block-size: var(--sticky-paddingBlockStart);
+		padding-block: 0.5rem;
+	}
+
+	[data-sticky-breadcrumb~="scope"] > details:has(> [data-sticky-breadcrumb~="position"]) {
+		display: grid;
+		grid-template: auto auto auto / minmax(0, 1fr);
+		&::details-content {
+			grid-area: 3 / 1 / 4 / 2;
+		}
+		> [data-sticky-breadcrumb~="position"] {
+			/* Preserve the native focus/toggle box while its row sticks through the body track. */
+			display: grid;
+			grid-area: 1 / 1 / 4 / 2;
+			grid-template-rows: subgrid;
+			gap: 0;
+			position: static;
+			padding: 0;
+			pointer-events: none;
+			&:focus-visible {
+				outline: none;
+				> [data-column] > [data-sticky] {
+					outline: auto;
+				}
+			}
+			> [data-column] > * {
+				pointer-events: auto;
+				grid-row: 2;
+				&[data-sticky] {
+					grid-row: 1;
+				}
+			}
+		}
+	}
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	[data-sticky-breadcrumb~="scope"][data-sticky-container] {
+		isolation: auto;
+	}
+	[data-sticky-breadcrumb~="scope"] [data-sticky-breadcrumb~="position"] {
+		> [data-sticky~="block"][data-sticky~="block-start"],
+		> [data-column] > [data-sticky~="block"][data-sticky~="block-start"] {
+			position: static;
+			inset: auto;
+			z-index: auto;
+			container-type: normal;
+			max-block-size: none;
+			background: none;
+			backdrop-filter: none;
+		}
+	}
+}
+
 /**
  * Shared disclosure / accordion styling for native `<details>` and optional `[data-collapsible]` wrappers. Disclosure animation and summary chevron apply to `<details>`. `[data-collapsible]` documents the hook and can mark optional wrappers if you add them in markup.
  *
@@ -2914,9 +3040,6 @@ details {
 	&:not([open]) {
 		&::details-content {
 			display: none;
-		}
-		> summary[data-sticky] {
-			position: relative;
 		}
 	}
 

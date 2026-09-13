@@ -583,7 +583,7 @@
 		data-column="gap-6"
 		data-scroll-item="inline-detached padding-match-start"
 	>
-		<div data-row="wrap">
+		<div data-row="wrap" data-sticky="block block-start backdrop-self backdrop-always">
 			<div
 				class="wallet-title-row"
 				data-row="start wrap"
@@ -769,6 +769,7 @@
 			<section
 				id="stages"
 				data-sticky-breadcrumb="scope"
+				data-sticky-container
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
 			>
@@ -778,7 +779,7 @@
 					data-column="span-start"
 					data-scroll-item="inline-detached"
 				>
-					<div data-row="start">
+					<div data-row="start" data-sticky="block block-start backdrop-self backdrop-always">
 						<h2 data-sticky-breadcrumb="source">
 							<a
 								data-row="start"
@@ -904,6 +905,7 @@
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
 			data-sticky-breadcrumb="scope"
+			data-sticky-container
 			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
 			data-scroll-item="inline-detached padding-match-end flow"
 		>
@@ -913,7 +915,7 @@
 				data-sticky="block block-start backdrop-after backdrop-stuck"
 				data-scroll-item="inline-detached"
 			>
-				<div data-row="start wrap">
+				<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
 					<div data-sticky-breadcrumb="source" data-row-item="flexible">
 						<a
 							data-row="start"
@@ -1012,6 +1014,7 @@
 		class="attribute"
 		data-card="radius-8 padding-6 border-accent"
 		data-sticky-breadcrumb="scope"
+		data-sticky-container
 		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
@@ -1029,7 +1032,7 @@
 					data-column="span-start"
 					style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
 				>
-					<div data-row="start wrap">
+					<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
 						<div data-sticky-breadcrumb="source" data-row-item="flexible">
 							<h3 data-sticky-breadcrumb="item" data-row="start gap-2 wrap">
 								<a
@@ -1544,7 +1547,8 @@
 						}
 					}
 					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) {
+						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+						(color: if(style(---breadcrumb-wrap: 1): red)) {
 						/* The independent pie stays outside the popover's paint and hit region. */
 						clip-path: polygon(
 							0 0,
@@ -1620,6 +1624,46 @@
 		}
 	}
 
+	@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
+		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+		(color: if(style(---breadcrumb-wrap: 1): red))) {
+		.container {
+			---wallet-name-flow-font-size: 1.25rem;
+			---wallet-group-heading-font-size: 1.125rem;
+			---wallet-attribute-heading-font-size: 1rem;
+			--wallet-icon-size: 1.875rem;
+			grid-template: 'Header Nav' auto 'Overview Nav' auto 'Content Nav' 1fr / minmax(0, 1fr) auto;
+			> [data-sticky-breadcrumb~="position"] > [data-sticky] {
+				grid-area: Header;
+			}
+			.wallet-overview {
+				grid-area: Overview;
+			}
+			@media (width <= 1024px) {
+				grid-template: 'Header' 'Overview' 'Nav' 'Content' / minmax(0, 1fr);
+			}
+			&[data-sticky-container] {
+				isolation: isolate;
+				@media (width > 1024px) {
+					--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
+				}
+			}
+			@media (1024px < width < 1280px) {
+				--stickyBreadcrumb-nativeBlockSize: 7.5rem;
+			}
+			:global(h4) {
+				font-size: 0.875rem;
+				line-height: 1.25;
+			}
+		}
+		#stages > header {
+			font-size: var(---wallet-group-heading-font-size);
+			h2 {
+				font-size: 1em;
+			}
+		}
+	}
+
 	:global(#layout:has([data-sticky-breadcrumb~="root"])) {
 		/* Keep fixed controls attached to the viewport. */
 		--scrollContainer-perspective: none;
@@ -1632,11 +1676,6 @@
 		@media (width <= 1024px) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 		}
-	}
-
-	/* Fixed Wallet controls share the root navigation stacking context. */
-	:global(#layout:has([data-sticky-breadcrumb~="root"]) > #content > main) {
-		isolation: auto;
 	}
 
 	:global(#layout:has([data-sticky-breadcrumb~="root"]) > #content) {
@@ -1931,7 +1970,8 @@
 				align-self: center;
 
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) {
+					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+					(color: if(style(---breadcrumb-wrap: 1): red)) {
 					anchor-name: --wallet-pie-source;
 					view-timeline-name: --wallet-pie-source;
 					view-timeline-axis: block;
@@ -2235,7 +2275,8 @@
 	}
 
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) {
+		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+		(color: if(style(---breadcrumb-wrap: 1): red)) {
 		@media (width <= 1024px) {
 			@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
 				[data-sticky-breadcrumb~="root"]

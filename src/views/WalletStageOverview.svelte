@@ -117,6 +117,7 @@
 						? 'color-mix(in srgb, var(--accent) 10%, var(--background-primary))'
 						: 'color-mix(in srgb, var(--accent) 5%, var(--background-primary))'}
 					data-sticky-breadcrumb="scope"
+					data-sticky-container
 					style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-entry`}
 				>
 					<details open data-column="gap-0">
@@ -130,7 +131,7 @@
 								data-column="span-start"
 								style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
 							>
-								<div data-row="start wrap">
+								<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
 									<h3 data-row-item="flexible" data-sticky-breadcrumb="source">
 										<a
 											data-link="camouflaged"
