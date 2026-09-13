@@ -2409,7 +2409,7 @@
 						)
 						calc(
 							(
-									var(--navigation-mobile-blockSize) / 2 - var(---breadcrumb-blockStart) -
+									var(--navigation-mobile-blockSize) / 2 - var(--sticky-insetBlockStart) -
 										var(--stickyBreadcrumb-sourcePaddingBlock) -
 										(1 + var(---breadcrumb-sourceEndWrap)) *
 										(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2 -

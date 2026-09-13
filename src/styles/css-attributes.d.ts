@@ -666,6 +666,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem
 	 * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
 	 * - `--stickyBreadcrumb-forceRow`: starts a row when 1
+	 * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
 	 * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
 	 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
 	 * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner

@@ -1444,6 +1444,7 @@ ol {
  * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem
  * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
  * - `--stickyBreadcrumb-forceRow`: starts a row when 1
+ * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
  * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
@@ -1642,7 +1643,6 @@ ol {
 	@keyframes breadcrumb-item-motion {
 		from {
 			transform: translateX(0px) scale(1);
-			translate: 0px;
 		}
 	}
 	/* Projection divides by the parent's interpolated scale, exactly countering it.
@@ -2026,7 +2026,7 @@ ol {
 				> a > [data-icon] ~ *,
 				[data-icon]::before,
 				> img {
-					animation: breadcrumb-text-motion auto var(--transition-easeInOutExpo) both;
+					animation: breadcrumb-text-motion auto var(--stickyBreadcrumb-inlineEasing, var(--transition-easeInOutExpo)) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 					animation-range: contain 0% contain 100%;
 					@media (prefers-reduced-motion: reduce) {
@@ -2088,7 +2088,9 @@ ol {
 					);
 				translate: 0 var(---breadcrumb-translateBlock);
 				transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
-				animation: breadcrumb-item-motion auto var(--transition-easeInOutExpo) both;
+				animation:
+					breadcrumb-item-motion auto var(--stickyBreadcrumb-inlineEasing, var(--transition-easeInOutExpo)) both,
+					breadcrumb-end-motion auto var(--transition-easeInOutExpo) both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 				animation-range: contain 0% contain 100%;
 				@media (prefers-reduced-motion: reduce) {
