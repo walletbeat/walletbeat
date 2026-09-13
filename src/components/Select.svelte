@@ -102,7 +102,8 @@
 				height: 1lh;
 				background-color: currentColor;
 				mask: var(--icon-chevron) no-repeat center;
-				opacity: 0.66;
+				---select-opacity: 0.66;
+				opacity: var(---select-opacity);
 				transform: perspective(100px) rotateX(0deg);
 				transition: transform 0.2s ease;
 			}
@@ -152,78 +153,101 @@
 			}
 		}
 
-		select[data-icon~="circle"] {
-			--select-compact-progress: 0;
-			position: relative;
-			inline-size: auto;
-			block-size: auto;
-			min-block-size: var(--icon-size, 2rem);
-			padding: 0.66em;
-			border: 1px solid transparent;
-			border-radius: 0.5em;
-			color: var(--text-primary);
-			clip-path: inset(
-				-1px -1px -1px calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem)) - 1px) round
-					calc(var(--select-compact-progress) * var(--icon-size, 2rem) / 2)
-			);
-			&:dir(rtl) {
-				clip-path: inset(
-					-1px calc(var(--select-compact-progress) * (100% - var(--icon-size, 2rem)) - 1px) -1px -1px round
-						calc(var(--select-compact-progress) * var(--icon-size, 2rem) / 2)
+		@keyframes select-compact-translate {
+			from { translate: 0 0; }
+			to { translate: var(---select-compactTranslate) 0; }
+		}
+		@keyframes select-compact-fade {
+			from { opacity: var(---select-opacity, 1); }
+			to { opacity: 0; }
+		}
+
+		select {
+			&[data-icon~="circle"] {
+				position: relative;
+				inline-size: auto;
+				block-size: auto;
+				min-block-size: var(--icon-size, 2rem);
+				padding: 0.66em;
+				border: 1px solid transparent;
+				border-radius: 0.5em;
+				color: var(--text-primary);
+				background-color: transparent;
+				/* The hit area changes only after its label has disappeared. */
+				clip-path: if(
+					style(--select-compact: 1): inset(-1px -1px -1px calc(100% - var(--icon-size, 2rem) - 1px) round calc(var(--icon-size, 2rem) / 2));
+					else: inset(-1px)
 				);
-			}
-			/* Two border shapes share one real control and interpolate only their opacity. */
-			&::before,
-			&::after {
-				content: '';
-				position: absolute;
-				pointer-events: none;
-				border: 1px solid var(--icon-navigation-borderColor);
-			}
-			&::before {
-				inset: -1px;
-				border-color: var(--border-color);
-				border-radius: inherit;
-				opacity: calc(1 - var(--select-compact-progress));
-			}
-			&::after {
-				inset-inline-end: -1px;
-				inset-block-start: 50%;
-				translate: 0 -50%;
-				inline-size: var(--icon-size, 2rem);
-				block-size: var(--icon-size, 2rem);
-				border-radius: 50%;
-				opacity: var(--select-compact-progress);
-			}
-			> button > selectedcontent {
-				display: flex;
-				gap: 0.5rem;
-				translate: calc(
-						var(---inlineDirection, 1) * var(--select-compact-progress) *
-							(100% + 1.41em - var(--icon-size, 2rem) / 2)
-					)
-					0;
-				.select-label {
-					opacity: calc(1 - var(--select-compact-progress));
+				&:dir(rtl) {
+					clip-path: if(
+						style(--select-compact: 1): inset(-1px calc(100% - var(--icon-size, 2rem) - 1px) -1px -1px round calc(var(--icon-size, 2rem) / 2));
+						else: inset(-1px)
+					);
 				}
-				.select-icon:empty {
-					display: none;
+				/* One timeline drives native properties; the two surfaces retain their border widths. */
+				&::before,
+				&::after,
+				&::picker-icon,
+				> button > selectedcontent,
+				> button > selectedcontent .select-label {
+					animation-duration: auto;
+					animation-timing-function: var(--transition-easeInOutExpo);
+					animation-fill-mode: both;
+					animation-timeline: var(--select-compactTimeline, none);
+					animation-range: contain 0% contain 100%;
+					@media (prefers-reduced-motion: reduce) {
+						animation-timing-function: steps(1, end);
+					}
 				}
-				.select-icon :global(:is(img, svg)) {
-					inline-size: 1em;
-					block-size: 1em;
-					object-fit: contain;
+				&::before,
+				&::after {
+					content: '';
+					position: absolute;
+					z-index: -1;
+					pointer-events: none;
+					background-color: var(--background-primary);
+					border: 1px solid var(--icon-navigation-borderColor);
+					animation-name: select-compact-fade;
 				}
-			}
-			&::picker-icon {
-				translate: calc(
-						var(---inlineDirection, 1) * var(--select-compact-progress) *
-							(1.035em - var(--icon-size, 2rem) / 2)
-					)
-					0;
-			}
-			&:has(selectedcontent .select-icon:not(:empty))::picker-icon {
-				opacity: calc(0.66 * (1 - var(--select-compact-progress)));
+				&::before {
+					inset: -1px;
+					border-color: var(--border-color);
+					border-radius: inherit;
+				}
+				&::after {
+					inset-inline-end: -1px;
+					inset-block-start: 50%;
+					translate: 0 -50%;
+					inline-size: var(--icon-size, 2rem);
+					block-size: var(--icon-size, 2rem);
+					border-radius: 50%;
+					opacity: 0;
+					animation-direction: reverse;
+				}
+				> button > selectedcontent {
+					display: flex;
+					gap: 0.5rem;
+					---select-compactTranslate: calc(var(---inlineDirection, 1) * (100% + 1.41em - var(--icon-size, 2rem) / 2));
+					animation-name: select-compact-translate;
+					.select-label {
+						animation-name: select-compact-fade;
+					}
+					.select-icon:empty {
+						display: none;
+					}
+					.select-icon :global(:is(img, svg)) {
+						inline-size: 1em;
+						block-size: 1em;
+						object-fit: contain;
+					}
+				}
+				&::picker-icon {
+					---select-compactTranslate: calc(var(---inlineDirection, 1) * (1.035em - var(--icon-size, 2rem) / 2));
+					animation-name: select-compact-translate;
+				}
+				&:has(selectedcontent .select-icon:not(:empty))::picker-icon {
+					animation-name: select-compact-translate, select-compact-fade;
+				}
 			}
 		}
 

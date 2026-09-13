@@ -585,7 +585,11 @@
 		data-scroll-item="inline-detached padding-match-start"
 	>
 		<div data-row="wrap">
-			<div class="wallet-title-row" data-row="start wrap">
+			<div
+				class="wallet-title-row"
+				data-row="start wrap"
+				style="--select-compact: var(---breadcrumb-entry, 0); --select-compactTimeline: var(--stickyBreadcrumb-entryTimeline)"
+			>
 				<h1 data-sticky-breadcrumb="source">
 					<a
 						data-link="camouflaged"
@@ -608,7 +612,6 @@
 							<Select
 								bind:value={selectedVariant}
 								aria-label="Wallet version"
-								style="--select-compact-progress: var(---breadcrumb-entry, 0)"
 								data-icon="circle"
 								options={[
 									{
@@ -629,7 +632,6 @@
 								<Select
 									bind:value={selectedModel}
 									aria-label="Wallet model"
-									style="--select-compact-progress: var(---breadcrumb-entry, 0)"
 									data-icon="circle"
 									options={[
 										{ value: undefined, label: 'All models' },
