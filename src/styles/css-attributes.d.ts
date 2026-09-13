@@ -384,7 +384,7 @@ interface CssAttributes {
 	/**
 	 * ## [data-pressable]
 	 *
-	 * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.
+	 * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets. Sticky summaries retain their geometry and backdrop layering when pressed.
 	 *
 	 * ### Tokens
 	 * - `to-containing`
@@ -612,7 +612,7 @@ interface CssAttributes {
 	 *
 	 * ### CSS Variables
 	 * - `--sticky-backgroundColor`
-	 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces.
+	 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces; reduced transparency uses the shared color fallback.
 	 * - `--sticky-backdropFilter`
 	 *
 	 * ### Examples

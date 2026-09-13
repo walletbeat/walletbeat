@@ -174,7 +174,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 }
 
 /**
- * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.
+ * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets. Sticky summaries retain their geometry and backdrop layering when pressed.
  *
  * ### Tokens
  * - `to-containing`
@@ -223,7 +223,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	transition-property: opacity, scale;
 	transition-duration: var(--pressable-transitionOutDuration);
 
-	&:active:is(
+	&:active:not(summary[data-sticky]):is(
 			label:has(> input:is([type="checkbox"], [type="radio"]), button),
 			:not(
 				:has(
@@ -1620,10 +1620,6 @@ ol {
 	@keyframes breadcrumb-item-motion {
 		from {
 			transform: translateX(0px) scale(1);
-		}
-	}
-	@keyframes breadcrumb-item-block-motion {
-		from {
 			translate: 0px;
 		}
 	}
@@ -1680,7 +1676,7 @@ ol {
 		padding-inline: 0 if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): 0px; else: 0.66rem);
 		text-align: center;
 		transform-origin: 100% 50%;
-		animation: breadcrumb-icon-motion auto var(---breadcrumb-compactionEasing) both;
+		animation: breadcrumb-icon-motion auto var(--transition-easeInOutExpo) both;
 		animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 		animation-range: contain 0% contain 100%;
 		@media (prefers-reduced-motion: reduce) {
@@ -1878,9 +1874,6 @@ ol {
 				style(---breadcrumb-wrap: 0): var(---breadcrumb-parentBlockEnd)
 					;else: var(---breadcrumb-blockStart)
 			);
-			---breadcrumb-compactionEasing: if(
-				style(---breadcrumb-wrap: 0): var(--transition-easeOutExpo);else: linear
-			);
 			position: sticky;
 			inset-block-start: var(--sticky-insetBlockStart);
 			anchor-name: --breadcrumb-position;
@@ -1902,7 +1895,7 @@ ol {
 				--breadcrumb-exit, view(block var(--sticky-insetBlockStart) 0px);
 			animation-range:
 				contain 0% contain 100%,
-				exit calc(100% - var(---breadcrumb-blockEnd)) exit calc(100% - var(---breadcrumb-blockStart)),
+				exit calc(100% - 2 * var(---breadcrumb-blockEnd) + var(---breadcrumb-blockStart) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)) exit calc(100% - var(---breadcrumb-blockEnd)),
 				exit 0% exit calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd));
 			&:is(summary):has(> [data-column~="span-start"]) {
 				align-items: start;
@@ -1982,7 +1975,7 @@ ol {
 				> a > [data-icon] ~ *,
 				[data-icon]::before,
 				> img {
-					animation: breadcrumb-text-motion auto var(---breadcrumb-compactionEasing) both;
+					animation: breadcrumb-text-motion auto var(--transition-easeInOutExpo) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 					animation-range: contain 0% contain 100%;
 					@media (prefers-reduced-motion: reduce) {
@@ -2046,10 +2039,7 @@ ol {
 					);
 				translate: 0 var(---breadcrumb-translateBlock);
 				transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
-				/* Adjacent identities compact and clear the parent before the unchanged vertical arrival. */
-				animation:
-					breadcrumb-item-motion auto var(---breadcrumb-compactionEasing) both,
-					breadcrumb-item-block-motion auto linear both;
+				animation: breadcrumb-item-motion auto var(--transition-easeInOutExpo) both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 				animation-range: contain 0% contain 100%;
 				@media (prefers-reduced-motion: reduce) {
@@ -2070,7 +2060,7 @@ ol {
 					(1 + var(---breadcrumb-endWrap)) * (var(---breadcrumb-rowHeight) - var(---breadcrumb-endHeight)) / 2 -
 					(1 + var(---breadcrumb-sourceEndWrap)) * (var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2
 				);
-				animation: breadcrumb-end-motion auto linear both;
+				animation: breadcrumb-end-motion auto var(--transition-easeInOutExpo) both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 				animation-range: contain 0% contain 100%;
 				@media (prefers-reduced-motion: reduce) {
@@ -2535,7 +2525,7 @@ ol {
 		 *
 		 * ### CSS Variables
 		 * - `--sticky-backgroundColor`
-		 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces.
+		 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces; reduced transparency uses the shared color fallback.
 		 * - `--sticky-backdropFilter`
 		 *
 		 * ### Examples
@@ -2557,7 +2547,7 @@ ol {
 			/* Inputs */
 			--sticky-backgroundColor: light-dark(#f8edff3c, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
-			---sticky-background: var(--sticky-backgroundColor);
+			---sticky-background: var(--sticky-background, var(--sticky-backgroundColor));
 			---sticky-backdropFilter: var(--sticky-backdropFilter);
 
 			@media (prefers-reduced-transparency: reduce) {
@@ -2621,7 +2611,7 @@ ol {
 					&[data-sticky~="backdrop-self"],
 					&[data-sticky~="backdrop-before"]::before,
 					&[data-sticky~="backdrop-after"]::after {
-						background: var(--sticky-background, var(---sticky-background));
+						background: var(---sticky-background);
 						backdrop-filter: var(---sticky-backdropFilter);
 					}
 				}
@@ -2630,7 +2620,7 @@ ol {
 					&[data-sticky~="backdrop-before"]::before,
 					&[data-sticky~="backdrop-after"]::after {
 						@container not scroll-state(stuck: none) {
-							background: var(--sticky-background, var(---sticky-background));
+							background: var(---sticky-background);
 							backdrop-filter: var(---sticky-backdropFilter);
 						}
 					}
@@ -2662,10 +2652,10 @@ ol {
 							inset-inline-start: 0;
 							inline-size: 100%;
 							block-size: calc(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart));
-							background: var(--sticky-background, var(---sticky-background));
+							background: var(---sticky-background);
 							backdrop-filter: var(---sticky-backdropFilter);
 							opacity: 0;
-							animation: breadcrumb-backdrop auto linear both;
+							animation: breadcrumb-backdrop auto var(--transition-easeOutExpo) both;
 							animation-name: if(style(---breadcrumb-wrap: 1): breadcrumb-backdrop; else: none);
 							animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 							animation-range: contain 0% contain 100%;
