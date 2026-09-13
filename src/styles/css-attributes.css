@@ -1437,9 +1437,9 @@ ol {
  * - `measure`: hidden dimension probes inside the flow marker
  *
  * ### CSS Variables
- * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; default to --breadcrumb-item-inline and --breadcrumb-item-block in each scope
- * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; default to --breadcrumb-end-inline and --breadcrumb-end-block in each scope
- * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
+ * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, entry-derived names when globally scoped
+ * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, entry-derived names when globally scoped
+ * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
  * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
  * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
@@ -1458,7 +1458,7 @@ ol {
  * ### Examples
  * - Native heading and its natural-flow boundary:
  *   ```html
- *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope">
+ *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry">
  *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
  *       <div data-row data-sticky="block block-start backdrop-self backdrop-always">
  *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
@@ -1510,6 +1510,12 @@ ol {
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	/* Scope descendant clocks above their animation targets. Local clocks derive unique names from their arrival identity. */
+	@supports (timeline-scope: all) {
+		body {
+			timeline-scope: all;
+		}
+	}
 	@property --stickyBreadcrumb-scale {
 		syntax: '<number>';
 		inherits: true;
@@ -1752,7 +1758,7 @@ ol {
 		}
 		[data-sticky-breadcrumb~="measure"] {
 			inline-size: anchor-size(--column-firstRow inline, 0px);
-			view-timeline-name: --breadcrumb-row-inline;
+			view-timeline-name: var(---breadcrumb-rowInlineTimeline);
 			&::before,
 			&::after {
 				content: if(style(---breadcrumb-hasEnd: 1): '' ; else: none);
@@ -1776,16 +1782,29 @@ ol {
 			--stickyBreadcrumb-itemBlockTimeline: --breadcrumb-item-block;
 			--stickyBreadcrumb-endInlineTimeline: --breadcrumb-end-inline;
 			--stickyBreadcrumb-endBlockTimeline: --breadcrumb-end-block;
+			---breadcrumb-rowInlineTimeline: --breadcrumb-row-inline;
+			---breadcrumb-rowBlockTimeline: --breadcrumb-row-block;
+			---breadcrumb-exitTimeline: --breadcrumb-exit;
 			---breadcrumb-itemTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline);
 			---breadcrumb-sizeTimelines:
 				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline),
-				--breadcrumb-row-inline, --breadcrumb-row-block;
+				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
 			position: relative;
 			container-type: inline-size;
 			anchor-scope:
 				--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
 			timeline-scope: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
-			view-timeline: --breadcrumb-exit block;
+			@supports (timeline-scope: all) {
+				--stickyBreadcrumb-itemInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-inline");
+				--stickyBreadcrumb-itemBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-block");
+				--stickyBreadcrumb-endInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-inline");
+				--stickyBreadcrumb-endBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-block");
+				---breadcrumb-rowInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-inline");
+				---breadcrumb-rowBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-block");
+				---breadcrumb-exitTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-exit");
+				timeline-scope: var(--stickyBreadcrumb-entryTimeline);
+			}
+			view-timeline: var(---breadcrumb-exitTimeline) block;
 			view-timeline-inset: 0;
 			---breadcrumb-sizeAnimationNames:
 				breadcrumb-item-inline, breadcrumb-item-block, breadcrumb-end-inline, breadcrumb-end-block,
@@ -1921,7 +1940,7 @@ ol {
 				&:not([data-sticky-breadcrumb~="exit"])::before {
 					content: '';
 					inline-size: anchor-size(--column-firstRow block, 0px);
-					view-timeline-name: --breadcrumb-row-block;
+					view-timeline-name: var(---breadcrumb-rowBlockTimeline);
 				}
 				view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
 				view-timeline-axis: block;
@@ -2013,7 +2032,7 @@ ol {
 				[data-row]:has(> [data-sticky-breadcrumb~="source"]),
 				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
 					animation: var(--stickyBreadcrumb-exitAnimation);
-					animation-timeline: --breadcrumb-exit;
+					animation-timeline: var(---breadcrumb-exitTimeline);
 					animation-range: var(---breadcrumb-exitRange);
 					---breadcrumb-iconCorrection: 0px;
 					&:has(
@@ -2764,7 +2783,7 @@ ol {
 								@container style(---breadcrumb-entry: 1) {
 									opacity: 1;
 									animation: var(--stickyBreadcrumb-exitAnimation);
-									animation-timeline: --breadcrumb-exit;
+									animation-timeline: var(---breadcrumb-exitTimeline);
 									animation-range: var(---breadcrumb-exitRange);
 								}
 							}

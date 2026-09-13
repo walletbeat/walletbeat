@@ -330,6 +330,9 @@ import Footer from '@/views/Footer.astro'
 		@media (width <= 1024px) {
 			body:has([data-sticky-breadcrumb~="root"]) {
 				timeline-scope: --wallet-item-block;
+				@supports (timeline-scope: all) {
+					timeline-scope: all;
+				}
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) {
 				--navigation-mobile-blockSize: max(
@@ -347,6 +350,9 @@ import Footer from '@/views/Footer.astro'
 				timeline-scope:
 					--navigation-logo-inline, --navigation-controls-inline, --wallet-item-inline,
 					--wallet-end-inline, --wallet-end-block, --wallet-entry;
+				@supports (timeline-scope: all) {
+					timeline-scope: --wallet-entry;
+				}
 				animation: breadcrumb-item-block auto linear both;
 				animation-timeline: --wallet-item-block;
 			}

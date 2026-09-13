@@ -2045,12 +2045,18 @@
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
 			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
-			--breadcrumb-row-inline, --breadcrumb-row-block;
+			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
 		@media (width > 1024px) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
 				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
-				--breadcrumb-row-inline, --breadcrumb-row-block;
+				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+		}
+	}
+
+	@supports (timeline-scope: all) {
+		[data-sticky-breadcrumb~="root"] {
+			timeline-scope: var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links);
 		}
 	}
 
@@ -2288,17 +2294,25 @@
 					&:dir(rtl) {
 						animation-direction: normal, normal, normal, normal, normal, normal, reverse;
 					}
+					---pie-inlineTimeline: --pie-inline;
 					timeline-scope:
-						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
+						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), var(---pie-inlineTimeline);
+					@supports (timeline-scope: all) {
+						---pie-inlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-pie-inline");
+						timeline-scope: var(--stickyBreadcrumb-entryTimeline);
+					}
 					animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
-					animation-timeline: var(---breadcrumb-sizeTimelines), --pie-inline;
+					animation-timeline: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
 					> :global(*) {
 						--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-clearanceSize));
 					}
 				}
 				[data-sticky-breadcrumb~="root"]
 					:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
-					timeline-scope: var(---breadcrumb-sizeTimelines), --pie-inline;
+					timeline-scope: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
+					@supports (timeline-scope: all) {
+						timeline-scope: none;
+					}
 				}
 				[data-sticky-breadcrumb~="root"]
 					:global(
@@ -2317,8 +2331,9 @@
 					&:dir(rtl) {
 						animation-direction: normal, normal, reverse;
 					}
+					---pie-inlineTimeline: --pie-inline;
 					animation-name: column-inline-size, column-block-size, pie-inline;
-					animation-timeline: var(---column-sizeTimelines), --pie-inline;
+					animation-timeline: var(---column-sizeTimelines), var(---pie-inlineTimeline);
 				}
 				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="position"]) {
 					---pie-inlineClearance: clamp(
@@ -2343,11 +2358,16 @@
 				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]) {
 					animation-name: breadcrumb-end-motion, pie-clearance;
 					animation-timing-function: var(--transition-easeInOutExpo), linear;
-					animation-timeline: var(--stickyBreadcrumb-entryTimeline), --pie-clearance;
+					---pie-clearanceTimeline: --pie-clearance;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline), var(---pie-clearanceTimeline);
 					animation-range: contain 0% contain 100%, cover 0% cover 100%;
 					/* Native layout timing approximates transformed contact without resolving transformed anchors. */
 					timeline-scope: --pie-clearance;
-					view-timeline: --pie-clearance block;
+					view-timeline: var(---pie-clearanceTimeline) block;
+					@supports (timeline-scope: all) {
+						---pie-clearanceTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-pie-clearance");
+						timeline-scope: none;
+					}
 					view-timeline-inset: var(--navigation-mobile-blockSize)
 						calc(
 							100vh - var(--navigation-mobile-blockSize) -
@@ -2367,7 +2387,7 @@
 					inset-inline-start: calc(
 						anchor(--column-firstRow self-start) - var(--stickyBreadcrumb-sourcePaddingInline)
 					);
-					view-timeline: --pie-inline inline;
+					view-timeline: var(---pie-inlineTimeline, --pie-inline) inline;
 				}
 			}
 		}
@@ -2402,6 +2422,9 @@
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
 			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
 			timeline-scope: var(---breadcrumb-sizeTimelines);
+			@supports (timeline-scope: all) {
+				timeline-scope: none;
+			}
 		}
 		:is(#stages, .attribute-group) {
 			--stickyBreadcrumb-scale: calc(

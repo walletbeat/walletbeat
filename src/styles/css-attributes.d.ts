@@ -658,9 +658,9 @@ interface CssAttributes {
 	 * - `measure`: hidden dimension probes inside the flow marker
 	 *
 	 * ### CSS Variables
-	 * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; default to --breadcrumb-item-inline and --breadcrumb-item-block in each scope
-	 * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; default to --breadcrumb-end-inline and --breadcrumb-end-block in each scope
-	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
+	 * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, entry-derived names when globally scoped
+	 * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, entry-derived names when globally scoped
+	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
 	 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
 	 * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
 	 * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
@@ -679,7 +679,7 @@ interface CssAttributes {
 	 * ### Examples
 	 * - Native heading and its natural-flow boundary:
 	 *   ```html
-	 *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope">
+	 *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry">
 	 *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
 	 *       <div data-row data-sticky="block block-start backdrop-self backdrop-always">
 	 *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
