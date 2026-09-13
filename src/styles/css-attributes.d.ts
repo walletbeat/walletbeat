@@ -642,6 +642,7 @@ interface CssAttributes {
 	 * - A scope contains its position (directly or inside details), followed by content and a flow marker.
 	 * - The flow marker contains one measure element for independent horizontal size clocks.
 	 * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
+	 * - Closing details excludes its scope, summary and descendants from sticky motion and measurements.
 	 *
 	 * ### Tokens
 	 * - `scope`: natural section and animation-start fragment target containing a position and its following content

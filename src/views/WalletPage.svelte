@@ -421,9 +421,6 @@
 		const timelines: string[] = []
 		const styles: string[] = []
 		const prefix = `wallet-pie-${wallet.metadata.id.replace(/[^a-z0-9-]/gi, '-')}`
-		const rotation = (value: number) =>
-			`calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${value}deg)`
-		let previousAngle = 0
 
 		for (const group of pieNavigationItems) {
 			for (const item of [group, ...(group.children ?? [])]) {
@@ -433,9 +430,9 @@
 				const name = `${prefix}-${index}`
 				const timeline = `--${item.href.slice(1)}-entry`
 				styles.push(`
-					@keyframes ${name} { from { rotate: ${rotation(previousAngle)}; } to { rotate: ${rotation(angle)}; } }
+					@keyframes ${name} { to { rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${angle}deg); } }
 					@keyframes ${name}-current {
-						from { ---pie-currentIndex: ${index}; ---pie-restAngle: ${previousAngle}deg; }
+						from { ---pie-currentIndex: ${index}; }
 						to { ---pie-currentIndex: ${index}; ---pie-restAngle: ${angle}deg; }
 					}
 					@container style(---pie-currentIndex: ${index}) {
@@ -444,7 +441,6 @@
 				`)
 				states.push(`${name}-current auto steps(1, end) forwards`)
 				timelines.push(timeline)
-				previousAngle = angle
 			}
 		}
 
@@ -2241,91 +2237,93 @@
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) {
 		@media (width <= 1024px) {
-			[data-sticky-breadcrumb~="root"]
-				:global([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="root"])) {
-				&:dir(rtl) {
-					animation-direction: normal, normal, normal, normal, normal, normal, reverse;
+			@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
+				[data-sticky-breadcrumb~="root"]
+					:global([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="root"])) {
+					&:dir(rtl) {
+						animation-direction: normal, normal, normal, normal, normal, normal, reverse;
+					}
+					timeline-scope:
+						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
+					animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
+					animation-timeline: var(---breadcrumb-sizeTimelines), --pie-inline;
+					> :global(*) {
+						--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-clearanceSize));
+					}
 				}
-				timeline-scope:
-					var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
-				animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
-				animation-timeline: var(---breadcrumb-sizeTimelines), --pie-inline;
-				> :global(*) {
-					--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-clearanceSize));
+				[data-sticky-breadcrumb~="root"]
+					:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
+					timeline-scope: var(---breadcrumb-sizeTimelines), --pie-inline;
 				}
-			}
-			[data-sticky-breadcrumb~="root"]
-				:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
-				timeline-scope: var(---breadcrumb-sizeTimelines), --pie-inline;
-			}
-			[data-sticky-breadcrumb~="root"]
-				:global(
-					article summary:has(> [data-column~="span-start"]):not([data-sticky-breadcrumb~="position"])
-				) {
-				timeline-scope: --pie-inline;
-			}
-			[data-sticky-breadcrumb~="root"]
-				:global(
-					article
-						[data-column~="span-start"]:not(
-							[data-sticky-breadcrumb~="position"],
-							[data-sticky-breadcrumb~="position"] *
-						)
-				) {
-				&:dir(rtl) {
-					animation-direction: normal, normal, reverse;
+				[data-sticky-breadcrumb~="root"]
+					:global(
+						article summary:has(> [data-column~="span-start"]):not([data-sticky-breadcrumb~="position"])
+					) {
+					timeline-scope: --pie-inline;
 				}
-				animation-name: column-inline-size, column-block-size, pie-inline;
-				animation-timeline: var(---column-sizeTimelines), --pie-inline;
-			}
-			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="position"]) {
-				---pie-inlineClearance: clamp(
-					0px,
-					calc(
-						100vw * (1 / var(---column-inlineFraction) - 1) +
-							var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace) +
-						var(--stickyBreadcrumb-gap, 1rem) / 2
-					),
-					var(---pie-clearanceSize)
-				);
-			}
-			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]),
-			[data-sticky-breadcrumb~="root"] :global(#wallet-toc .navigation-item-after),
-			[data-sticky-breadcrumb~="root"] :global(#wallet-toc summary::after) {
-				/* Depart quickly and return late so both sides clear the pie. */
-				animation: pie-clearance auto linear both;
-				animation-timeline: --pie-clearance;
-				animation-range: cover 0% cover 100%;
-			}
-
-			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]) {
-				animation-name: breadcrumb-end-motion, pie-clearance;
-				animation-timing-function: var(--transition-easeInOutExpo), linear;
-				animation-timeline: var(--stickyBreadcrumb-entryTimeline), --pie-clearance;
-				animation-range: contain 0% contain 100%, cover 0% cover 100%;
-				/* Native layout timing approximates transformed contact without resolving transformed anchors. */
-				timeline-scope: --pie-clearance;
-				view-timeline: --pie-clearance block;
-				view-timeline-inset: var(--navigation-mobile-blockSize)
-					calc(
-						100vh - var(--navigation-mobile-blockSize) -
-							var(---pie-compactSize)
+				[data-sticky-breadcrumb~="root"]
+					:global(
+						article
+							[data-column~="span-start"]:not(
+								[data-sticky-breadcrumb~="position"],
+								[data-sticky-breadcrumb~="position"] *
+							)
+					) {
+					&:dir(rtl) {
+						animation-direction: normal, normal, reverse;
+					}
+					animation-name: column-inline-size, column-block-size, pie-inline;
+					animation-timeline: var(---column-sizeTimelines), --pie-inline;
+				}
+				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="position"]) {
+					---pie-inlineClearance: clamp(
+						0px,
+						calc(
+							100vw * (1 / var(---column-inlineFraction) - 1) +
+								var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace) +
+							var(--stickyBreadcrumb-gap, 1rem) / 2
+						),
+						var(---pie-clearanceSize)
 					);
-			}
+				}
+				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]),
+				[data-sticky-breadcrumb~="root"] :global(#wallet-toc .navigation-item-after),
+				[data-sticky-breadcrumb~="root"] :global(#wallet-toc summary::after) {
+					/* Depart quickly and return late so both sides clear the pie. */
+					animation: pie-clearance auto linear both;
+					animation-timeline: --pie-clearance;
+					animation-range: cover 0% cover 100%;
+				}
 
-			[data-sticky-breadcrumb~="root"]
-				:global(article [data-column~="span-start"] > [data-row]::after) {
-				content: '';
-				position: absolute;
-				visibility: hidden;
-				pointer-events: none;
-				inline-size: 0;
-				block-size: 0;
-				inset-block-start: 0;
-				inset-inline-start: calc(
-					anchor(--column-firstRow self-start) - var(--stickyBreadcrumb-sourcePaddingInline)
-				);
-				view-timeline: --pie-inline inline;
+				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]) {
+					animation-name: breadcrumb-end-motion, pie-clearance;
+					animation-timing-function: var(--transition-easeInOutExpo), linear;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline), --pie-clearance;
+					animation-range: contain 0% contain 100%, cover 0% cover 100%;
+					/* Native layout timing approximates transformed contact without resolving transformed anchors. */
+					timeline-scope: --pie-clearance;
+					view-timeline: --pie-clearance block;
+					view-timeline-inset: var(--navigation-mobile-blockSize)
+						calc(
+							100vh - var(--navigation-mobile-blockSize) -
+								var(---pie-compactSize)
+						);
+				}
+
+				[data-sticky-breadcrumb~="root"]
+					:global(article [data-column~="span-start"] > [data-row]::after) {
+					content: '';
+					position: absolute;
+					visibility: hidden;
+					pointer-events: none;
+					inline-size: 0;
+					block-size: 0;
+					inset-block-start: 0;
+					inset-inline-start: calc(
+						anchor(--column-firstRow self-start) - var(--stickyBreadcrumb-sourcePaddingInline)
+					);
+					view-timeline: --pie-inline inline;
+				}
 			}
 		}
 		@supports (appearance: base-select) {
