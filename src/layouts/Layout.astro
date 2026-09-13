@@ -335,6 +335,30 @@ import Footer from '@/views/Footer.astro'
 				}
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) {
+				/* Both-ended Expo reaches its midpoint at 25% so identity text clears before rising. */
+				---navigation-entryEasing: linear(
+					0,
+					0.000977 2.5%,
+					0.001953 5%,
+					0.003906 7.5%,
+					0.007812 10%,
+					0.015625 12.5%,
+					0.03125 15%,
+					0.0625 17.5%,
+					0.125 20%,
+					0.25 22.5%,
+					0.5 25%,
+					0.75 32.5%,
+					0.875 40%,
+					0.9375 47.5%,
+					0.96875 55%,
+					0.984375 62.5%,
+					0.992188 70%,
+					0.996094 77.5%,
+					0.998047 85%,
+					0.999023 92.5%,
+					1
+				);
 				--navigation-mobile-blockSize: max(
 					4.16rem,
 					calc(
@@ -407,7 +431,7 @@ import Footer from '@/views/Footer.astro'
 				[data-sticky-breadcrumb~="root"]
 				> [data-sticky-breadcrumb~="position"] {
 				--sticky-insetBlockStart: var(--navigation-mobile-blockSize);
-				--stickyBreadcrumb-inlineEasing: var(--transition-easeOutExpo);
+				--stickyBreadcrumb-inlineEasing: var(---navigation-entryEasing);
 			}
 			/* The navigation owns the surface shared by the mobile identity row. */
 			#layout:has([data-sticky-breadcrumb~="root"])
@@ -476,7 +500,7 @@ import Footer from '@/views/Footer.astro'
 			}
 			#layout:has([data-sticky-breadcrumb~="root"]) #nav > header > .logo {
 				anchor-name: --navigation-logo;
-				animation: wallet-scroll-entry auto var(--transition-easeOutExpo) both;
+				animation: wallet-scroll-entry auto var(---navigation-entryEasing) both;
 				animation-timeline: --wallet-entry;
 				animation-range: contain 0% contain 100%;
 				@media (prefers-reduced-motion: reduce) {

@@ -1448,7 +1448,7 @@ ol {
  * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem
  * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
  * - `--stickyBreadcrumb-forceRow`: starts a row when 1
- * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
+ * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to InOutExpo with an earlier horizontal lead for adjacent arrivals
  * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
  * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
  * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
@@ -1717,7 +1717,7 @@ ol {
 			text-align: center;
 			transform-origin: 100% 50%;
 			animation:
-				breadcrumb-icon-motion auto var(--stickyBreadcrumb-inlineEasing, var(--transition-easeInOutExpo)) both,
+				breadcrumb-icon-motion auto var(---breadcrumb-inlineEasing) both,
 				breadcrumb-backdrop auto linear both;
 			animation-name: breadcrumb-icon-motion, if(style(---breadcrumb-entry: 0) or style(---breadcrumb-wrap: 1): none; else: breadcrumb-backdrop);
 			animation-timeline: var(--stickyBreadcrumb-entryTimeline);
@@ -1950,6 +1950,11 @@ ol {
 			}
 			> [data-sticky-breadcrumb~="position"],
 			> details > [data-sticky-breadcrumb~="position"] {
+				/* Adjacent items clear their parent horizontally before entering its text line. */
+				---breadcrumb-inlineEasing: var(--stickyBreadcrumb-inlineEasing, if(
+					style(---breadcrumb-wrap: 0): cubic-bezier(0.5, 0, 0, 1);
+					else: var(--transition-easeInOutExpo)
+				));
 				--sticky-insetBlockStart: if(
 					style(---breadcrumb-wrap: 0): var(---breadcrumb-parentBlockEnd)
 						;else: var(---breadcrumb-blockStart)
@@ -2073,7 +2078,7 @@ ol {
 					> a > [data-icon] ~ *,
 					[data-icon]::before,
 					> img {
-						animation: breadcrumb-text-motion auto var(--stickyBreadcrumb-inlineEasing, var(--transition-easeInOutExpo)) both;
+						animation: breadcrumb-text-motion auto var(---breadcrumb-inlineEasing) both;
 						animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 						animation-range: contain 0% contain 100%;
 						@media (prefers-reduced-motion: reduce) {
@@ -2136,7 +2141,7 @@ ol {
 					translate: 0 var(---breadcrumb-translateBlock);
 					transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
 					animation:
-						breadcrumb-item-motion auto var(--stickyBreadcrumb-inlineEasing, var(--transition-easeInOutExpo)) both,
+						breadcrumb-item-motion auto var(---breadcrumb-inlineEasing) both,
 						breadcrumb-end-motion auto var(--transition-easeInOutExpo) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
 					animation-range: contain 0% contain 100%;

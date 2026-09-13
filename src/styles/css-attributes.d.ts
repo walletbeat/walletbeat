@@ -669,7 +669,7 @@ interface CssAttributes {
 	 * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem
 	 * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
 	 * - `--stickyBreadcrumb-forceRow`: starts a row when 1
-	 * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to the shared InOutExpo curve
+	 * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to InOutExpo with an earlier horizontal lead for adjacent arrivals
 	 * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
 	 * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
 	 * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
