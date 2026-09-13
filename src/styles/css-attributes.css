@@ -460,7 +460,6 @@ span svg {
  * - composition: `span-start`
  *
  * ### CSS Variables
- * - `--column-sizeTimelines`: column-scoped inline and block first-row timelines; defaults to --column-inline-size, --column-block-size
  * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
  * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
  * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
@@ -607,7 +606,7 @@ span svg {
 }
 
 [data-column~="span-start"] {
-	--column-sizeTimelines: --column-inline-size, --column-block-size;
+	---column-sizeTimelines: --column-inline-size, --column-block-size;
 	---column-spanSize: calc(
 		1lh + var(--column-supportLineHeight, 1rlh) + var(--column-supportGap, 0.5rem)
 	);
@@ -696,17 +695,17 @@ span svg {
 
 	[data-column~="span-start"] {
 		anchor-scope: --column-firstRow;
-		timeline-scope: var(--column-sizeTimelines);
+		timeline-scope: var(---column-sizeTimelines);
 		animation:
 			column-inline-size auto linear both,
 			column-block-size auto linear both;
-		animation-timeline: var(--column-sizeTimelines);
+		animation-timeline: var(---column-sizeTimelines);
 		/* At viewport start, a fixed size probe has view progress V / (V + D). */
 		---column-break: clamp(
 			0,
 			sign(
 				var(--column-wrapRatio, 4) - (100vw * (1 / var(---column-inlineFraction) - 1)) /
-					max(1px, 100vh * (1 / var(---column-blockFraction) - 1))
+					max(1px, 100vw * (1 / var(---column-blockFraction) - 1))
 			),
 			1
 		);
@@ -715,17 +714,26 @@ span svg {
 			anchor-name: --column-firstRow;
 		}
 
-		&::before {
-			content: '';
-			position: fixed;
-			inset: 0 auto auto 0;
-			inline-size: anchor-size(--column-firstRow inline);
-			block-size: anchor-size(--column-firstRow block);
-			visibility: hidden;
-			pointer-events: none;
-			view-timeline-name: var(--column-sizeTimelines);
-			view-timeline-axis: inline, block;
-			view-timeline-inset: 0;
+		&:not([data-sticky-breadcrumb~="position"]) {
+			&::before,
+			&::after {
+				content: '';
+				position: fixed;
+				inset: 0 auto auto 0;
+				block-size: 1px;
+				visibility: hidden;
+				pointer-events: none;
+				view-timeline-axis: inline;
+				view-timeline-inset: 0;
+			}
+			&::before {
+				inline-size: anchor-size(--column-firstRow inline);
+				view-timeline-name: --column-inline-size;
+			}
+			&::after {
+				inline-size: anchor-size(--column-firstRow block);
+				view-timeline-name: --column-block-size;
+			}
 		}
 	}
 }
@@ -1403,6 +1411,7 @@ ol {
  *
  * ### Placement
  * - A scope contains its position (directly or inside details), followed by content and a flow marker.
+ * - The flow marker contains one measure element for independent horizontal size clocks.
  * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
  *
  * ### Tokens
@@ -1414,10 +1423,11 @@ ol {
  * - `support`: supporting content follows its natural scroll position as the heading compacts
  * - `end`: independently sized in-flow metadata
  * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
+ * - `measure`: hidden dimension probes inside the flow marker
  *
  * ### CSS Variables
- * - `--stickyBreadcrumb-itemTimelines`: unique inline and block source clocks
- * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
+ * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; default to --breadcrumb-item-inline and --breadcrumb-item-block in each scope
+ * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; default to --breadcrumb-end-inline and --breadcrumb-end-block in each scope
  * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
  * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
@@ -1443,7 +1453,7 @@ ol {
  *       </div>
  *     </header>
  *     <div>Section content</div>
- *     <span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+ *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
  *   </section>
  *   ```
  *
@@ -1693,15 +1703,50 @@ ol {
 		)::before {
 		opacity: if(style(---breadcrumb-wrap: 0): var(---breadcrumb-entry) ;else: 0);
 	}
+	/* Measure both dimensions horizontally so vertical scrolling cannot tick size clocks. */
+	:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::before,
+	:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::after,
+	[data-sticky-breadcrumb~="measure"],
+	[data-sticky-breadcrumb~="flow"]::before {
+		position: fixed;
+		inset: 0 auto auto 0;
+		block-size: 1px;
+		visibility: hidden;
+		pointer-events: none;
+		view-timeline-axis: inline;
+		view-timeline-inset: 0;
+	}
+	[data-sticky-breadcrumb~="measure"] {
+		inline-size: anchor-size(--column-firstRow inline, 0px);
+		view-timeline-name: --breadcrumb-row-inline;
+		&::before,
+		&::after {
+			content: if(style(---breadcrumb-hasEnd: 1): '' ; else: none);
+		}
+		&::before {
+			inline-size: anchor-size(--breadcrumb-end inline, 0px);
+			view-timeline-name: var(--stickyBreadcrumb-endInlineTimeline);
+		}
+		&::after {
+			inline-size: anchor-size(--breadcrumb-end block, 0px);
+			view-timeline-name: var(--stickyBreadcrumb-endBlockTimeline);
+		}
+	}
 	[data-sticky-breadcrumb~="scope"] {
-		--stickyBreadcrumb-sizeTimelines:
-			var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-endTimelines),
+		--stickyBreadcrumb-itemInlineTimeline: --breadcrumb-item-inline;
+		--stickyBreadcrumb-itemBlockTimeline: --breadcrumb-item-block;
+		--stickyBreadcrumb-endInlineTimeline: --breadcrumb-end-inline;
+		--stickyBreadcrumb-endBlockTimeline: --breadcrumb-end-block;
+		---breadcrumb-itemTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline);
+		---breadcrumb-endTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline);
+		---breadcrumb-sizeTimelines:
+			var(---breadcrumb-itemTimelines), var(---breadcrumb-endTimelines),
 			--breadcrumb-row-inline, --breadcrumb-row-block;
 		position: relative;
 		container-type: inline-size;
 		anchor-scope:
 			--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
-		timeline-scope: var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
+		timeline-scope: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
 		view-timeline: --breadcrumb-exit block;
 		view-timeline-inset: 0;
 		---breadcrumb-sizeAnimationNames:
@@ -1716,11 +1761,11 @@ ol {
 		/* Sizes belong to the scope; changing arrival progress belongs to its heading. */
 		animation: none auto linear both;
 		animation-name: var(---breadcrumb-sizeAnimationNames);
-		animation-timeline: var(--stickyBreadcrumb-sizeTimelines);
+		animation-timeline: var(---breadcrumb-sizeTimelines);
 		---breadcrumb-itemWidth: calc(100vw * (1 / var(---breadcrumb-itemInline) - 1));
-		---breadcrumb-itemHeight: calc(100vh * (1 / var(---breadcrumb-itemBlock) - 1));
+		---breadcrumb-itemHeight: calc(100vw * (1 / var(---breadcrumb-itemBlock) - 1));
 		---breadcrumb-endWidth: calc(100vw * (1 / var(---breadcrumb-endInline) - 1));
-		---breadcrumb-endHeight: calc(100vh * (1 / var(---breadcrumb-endBlock) - 1));
+		---breadcrumb-endHeight: calc(100vw * (1 / var(---breadcrumb-endBlock) - 1));
 		---breadcrumb-parentInlineEnd: var(---breadcrumb-inlineEnd);
 		---breadcrumb-parentBlockStart: var(---breadcrumb-blockStart);
 		---breadcrumb-parentBlockEnd: var(---breadcrumb-blockEnd);
@@ -1739,29 +1784,17 @@ ol {
 			---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
 			---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
 		}
-		&::before,
-		&::after {
-			position: fixed;
-			inset: 0 auto auto 0;
-			visibility: hidden;
-			pointer-events: none;
-			view-timeline-axis: inline, block;
-			view-timeline-inset: 0;
-		}
 		&::before {
 			content: '';
 			inline-size: anchor-size(--breadcrumb-compact inline);
-			block-size: anchor-size(--breadcrumb-source block);
-			view-timeline-name: var(--stickyBreadcrumb-itemTimelines);
+			view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
 		}
 		&::after {
-			content: if(style(---breadcrumb-hasEnd: 1): '' ; else: none);
-			inline-size: anchor-size(--breadcrumb-end inline, 0px);
-			block-size: anchor-size(--breadcrumb-end block, 0px);
-			view-timeline-name: var(--stickyBreadcrumb-endTimelines);
+			content: '';
+			inline-size: anchor-size(--breadcrumb-source block);
+			view-timeline-name: var(--stickyBreadcrumb-itemBlockTimeline);
 		}
-		> *,
-		&::after {
+		> * {
 			---breadcrumb-endGap: calc(var(---breadcrumb-hasEnd) * var(--stickyBreadcrumb-gap, 1rem));
 			---breadcrumb-availableInlineSize: min(
 				var(--stickyBreadcrumb-availableInlineSize, 100cqi),
@@ -1831,7 +1864,6 @@ ol {
 		}
 		/* The outer border starts arrival; the position box still owns its end. */
 		> [data-sticky-breadcrumb~="flow"] {
-			anchor-name: var(--stickyBreadcrumb-entryTimeline);
 			display: block;
 			content: '';
 			position: absolute;
@@ -1845,7 +1877,6 @@ ol {
 			&::after {
 				content: '';
 				position: absolute;
-				anchor-name: var(--stickyBreadcrumb-endTimelines);
 				inset-block-start: calc(100% - var(---breadcrumb-blockEnd));
 				inset-inline-start: 0;
 				inline-size: 1px;
@@ -1853,16 +1884,10 @@ ol {
 				scroll-snap-align: start;
 				scroll-margin-block-start: 0;
 			}
-			/* First-row measurements remain viewport-relative while the sticky box moves. */
 			&::before {
 				content: '';
-				position: fixed;
-				inset: 0 auto auto 0;
-				inline-size: anchor-size(--column-firstRow inline, 0px);
-				block-size: anchor-size(--column-firstRow block, 0px);
-				visibility: hidden;
-				view-timeline: --breadcrumb-row-inline inline, --breadcrumb-row-block block;
-				view-timeline-inset: 0;
+				inline-size: anchor-size(--column-firstRow block, 0px);
+				view-timeline-name: --breadcrumb-row-block;
 			}
 			view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
 			view-timeline-axis: block;
@@ -1878,9 +1903,6 @@ ol {
 			inset-block-start: var(--sticky-insetBlockStart);
 			anchor-name: --breadcrumb-position;
 			anchor-scope: none;
-			&[data-column~="span-start"]:not([data-sticky~="backdrop-before"])::before {
-				content: none;
-			}
 			z-index: 1;
 			pointer-events: none;
 			animation:
@@ -1903,7 +1925,8 @@ ol {
 					animation: none;
 					timeline-scope: none;
 					anchor-scope: none;
-					&::before {
+					&::before,
+					&::after {
 						content: none;
 					}
 				}
@@ -2008,7 +2031,7 @@ ol {
 			[data-sticky-breadcrumb~="item"],
 			[data-sticky-breadcrumb~="end"] {
 				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
-				---breadcrumb-sourceRowHeight: calc(100vh * (1 / var(---column-blockFraction, 1) - 1));
+				---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));
 				---breadcrumb-sourceEndWrap: clamp(
 					0,
 					sign(

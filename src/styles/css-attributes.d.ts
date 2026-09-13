@@ -113,7 +113,6 @@ interface CssAttributes {
 	 * - composition: `span-start`
 	 *
 	 * ### CSS Variables
-	 * - `--column-sizeTimelines`: column-scoped inline and block first-row timelines; defaults to --column-inline-size, --column-block-size
 	 * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
 	 * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
 	 * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
@@ -641,6 +640,7 @@ interface CssAttributes {
 	 *
 	 * ### Placement
 	 * - A scope contains its position (directly or inside details), followed by content and a flow marker.
+	 * - The flow marker contains one measure element for independent horizontal size clocks.
 	 * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
 	 *
 	 * ### Tokens
@@ -652,10 +652,11 @@ interface CssAttributes {
 	 * - `support`: supporting content follows its natural scroll position as the heading compacts
 	 * - `end`: independently sized in-flow metadata
 	 * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
+	 * - `measure`: hidden dimension probes inside the flow marker
 	 *
 	 * ### CSS Variables
-	 * - `--stickyBreadcrumb-itemTimelines`: unique inline and block source clocks
-	 * - `--stickyBreadcrumb-endTimelines`: unique inline and block metadata clocks
+	 * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; default to --breadcrumb-item-inline and --breadcrumb-item-block in each scope
+	 * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; default to --breadcrumb-end-inline and --breadcrumb-end-block in each scope
 	 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline; `auto` at an item forces its compact presentation
 	 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
 	 * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
@@ -681,7 +682,7 @@ interface CssAttributes {
 	 *       </div>
 	 *     </header>
 	 *     <div>Section content</div>
-	 *     <span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+	 *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 	 *   </section>
 	 *   ```
 	 *

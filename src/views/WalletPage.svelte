@@ -562,8 +562,10 @@
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-rotation-states={pieRotation.states}
 	data-sticky-breadcrumb="scope root"
-	style:--stickyBreadcrumb-itemTimelines="--wallet-item-inline, --wallet-item-block"
-	style:--stickyBreadcrumb-endTimelines="--wallet-end-inline, --wallet-end-block"
+	style:--stickyBreadcrumb-itemInlineTimeline="--wallet-item-inline"
+	style:--stickyBreadcrumb-itemBlockTimeline="--wallet-item-block"
+	style:--stickyBreadcrumb-endInlineTimeline="--wallet-end-inline"
+	style:--stickyBreadcrumb-endBlockTimeline="--wallet-end-block"
 	style:--stickyBreadcrumb-entryTimeline="--wallet-entry"
 	class="container"
 	data-sticky-container
@@ -767,8 +769,6 @@
 				id="stages"
 				data-sticky-breadcrumb="scope"
 				data-scroll-item="inline-detached padding-match-end flow"
-				style:--stickyBreadcrumb-itemTimelines="--stages-item-inline, --stages-item-block"
-				style:--stickyBreadcrumb-endTimelines="--stages-end-inline, --stages-end-block"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
 			>
 				<header
@@ -792,7 +792,7 @@
 				</header>
 
 				<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
-				<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 			</section>
 		{/if}
 
@@ -846,7 +846,7 @@
 			>
 		</footer>
 	{/if}
-	<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 </div>
 
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
@@ -903,8 +903,6 @@
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
 			data-sticky-breadcrumb="scope"
-			style:--stickyBreadcrumb-itemTimelines={`--${groupTargetId(attrGroup)}-item-inline, --${groupTargetId(attrGroup)}-item-block`}
-			style:--stickyBreadcrumb-endTimelines={`--${groupTargetId(attrGroup)}-end-inline, --${groupTargetId(attrGroup)}-end-block`}
 			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
 			data-scroll-item="inline-detached padding-match-end flow"
 		>
@@ -963,7 +961,7 @@
 					{/each}
 				</div>
 			</div>
-			<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+			<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 		</section>
 	{/if}
 {/snippet}
@@ -1011,8 +1009,6 @@
 		class="attribute"
 		data-card="radius-8 padding-6 border-accent"
 		data-sticky-breadcrumb="scope"
-		style:--stickyBreadcrumb-itemTimelines={`--${slugifyCamelCase(attribute.id)}-item-inline, --${slugifyCamelCase(attribute.id)}-item-block`}
-		style:--stickyBreadcrumb-endTimelines={`--${slugifyCamelCase(attribute.id)}-end-inline, --${slugifyCamelCase(attribute.id)}-end-block`}
 		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
@@ -1396,7 +1392,7 @@
 				</div>
 			</div>
 		</details>
-		<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 	</section>
 {/snippet}
 
@@ -1996,7 +1992,7 @@
 		@media (width > 1024px) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
-				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
+				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
 				--breadcrumb-row-inline, --breadcrumb-row-block;
 		}
 	}
@@ -2234,16 +2230,16 @@
 					animation-direction: normal, normal, normal, normal, normal, normal, reverse;
 				}
 				timeline-scope:
-					var(--stickyBreadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
+					var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), --pie-inline;
 				animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
-				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
+				animation-timeline: var(---breadcrumb-sizeTimelines), --pie-inline;
 				> :global(*) {
 					--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-clearanceSize));
 				}
 			}
 			[data-sticky-breadcrumb~="root"]
 				:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
-				timeline-scope: var(--stickyBreadcrumb-sizeTimelines), --pie-inline;
+				timeline-scope: var(---breadcrumb-sizeTimelines), --pie-inline;
 			}
 			[data-sticky-breadcrumb~="root"]
 				:global(
@@ -2263,7 +2259,7 @@
 					animation-direction: normal, normal, reverse;
 				}
 				animation-name: column-inline-size, column-block-size, pie-inline;
-				animation-timeline: var(--column-sizeTimelines), --pie-inline;
+				animation-timeline: var(---column-sizeTimelines), --pie-inline;
 			}
 			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="position"]) {
 				---pie-inlineClearance: clamp(
@@ -2318,12 +2314,12 @@
 		@supports (appearance: base-select) {
 			[data-sticky-breadcrumb~="root"]:has(
 					> [data-sticky-breadcrumb~="position"] :global(select)
-				)::after {
+				) > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]::before {
 				inline-size: 2rem;
 			}
 			[data-sticky-breadcrumb~="root"]:has(
 					> [data-sticky-breadcrumb~="position"] :global(select ~ select)
-				)::after {
+				) > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]::before {
 				inline-size: calc(4rem + 0.5rem);
 			}
 		}
@@ -2345,7 +2341,7 @@
 		}
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
 			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
-			timeline-scope: var(--stickyBreadcrumb-sizeTimelines);
+			timeline-scope: var(---breadcrumb-sizeTimelines);
 		}
 		:is(#stages, .attribute-group) {
 			--stickyBreadcrumb-scale: calc(

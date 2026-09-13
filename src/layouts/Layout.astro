@@ -344,7 +344,7 @@ import Footer from '@/views/Footer.astro'
 				--navigation-mobile-blockSize: max(
 					4.16rem,
 					calc(
-						100vh * (1 / var(---breadcrumb-itemBlock) - 1) * var(---wallet-compact-h1) /
+						100vw * (1 / var(---breadcrumb-itemBlock) - 1) * var(---wallet-compact-h1) /
 							var(---wallet-name-flow-font-size) + 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem)
 					)
 				);
@@ -360,17 +360,24 @@ import Footer from '@/views/Footer.astro'
 				animation-timeline: --wallet-item-block;
 				scroll-timeline: --wallet-terminal block;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"])::before {
+			#layout:has([data-sticky-breadcrumb~="root"])::before,
+			#layout:has([data-sticky-breadcrumb~="root"])::after {
 				content: '';
 				position: fixed;
 				inset: 0 auto auto 0;
 				visibility: hidden;
 				pointer-events: none;
-				inline-size: anchor-size(--navigation-logo inline);
-				block-size: anchor-size(--navigation-controls inline);
-				view-timeline-name: --navigation-logo-inline, --navigation-controls-inline;
-				view-timeline-axis: inline, block;
+				block-size: 1px;
+				view-timeline-axis: inline;
 				view-timeline-inset: 0;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])::before {
+				inline-size: anchor-size(--navigation-logo inline);
+				view-timeline-name: --navigation-logo-inline;
+			}
+			#layout:has([data-sticky-breadcrumb~="root"])::after {
+				inline-size: anchor-size(--navigation-controls inline);
+				view-timeline-name: --navigation-controls-inline;
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])
 				[data-sticky-breadcrumb~="root"]
@@ -389,7 +396,7 @@ import Footer from '@/views/Footer.astro'
 				--stickyBreadcrumb-insetBlockStart: 0px;
 				---breadcrumb-parentBlockEnd: var(--navigation-mobile-blockSize);
 				animation-name: var(---breadcrumb-sizeAnimationNames), wallet-source-offset;
-				animation-timeline: var(--stickyBreadcrumb-sizeTimelines), --wallet-entry;
+				animation-timeline: var(---breadcrumb-sizeTimelines), --wallet-entry;
 				animation-range:
 					normal,
 					normal,
@@ -423,8 +430,7 @@ import Footer from '@/views/Footer.astro'
 			#layout:has(#wallet-toc:popover-open) #nav > header > .logo {
 				animation-timeline: auto;
 			}
-			#layout:has([data-sticky-breadcrumb~="root"]) [data-sticky-breadcrumb~="root"] > *,
-			#layout:has([data-sticky-breadcrumb~="root"]) [data-sticky-breadcrumb~="root"]::after {
+			#layout:has([data-sticky-breadcrumb~="root"]) [data-sticky-breadcrumb~="root"] > * {
 				---breadcrumb-blockStart: var(--stickyBreadcrumb-insetBlockStart);
 				---breadcrumb-blockEnd: var(--navigation-mobile-blockSize);
 				---breadcrumb-width: var(---breadcrumb-itemWidth);
@@ -457,7 +463,7 @@ import Footer from '@/views/Footer.astro'
 							(
 								var(--navigation-controlInsetInline) +
 									max(
-										calc(100vh * (1 / var(---navigation-controlsFraction) - 1)),
+										calc(100vw * (1 / var(---navigation-controlsFraction) - 1)),
 										2rem + 0.5rem + var(---breadcrumb-endWidth)
 									)
 							) -

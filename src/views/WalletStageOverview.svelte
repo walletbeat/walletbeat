@@ -117,8 +117,6 @@
 						? 'color-mix(in srgb, var(--accent) 10%, var(--background-primary))'
 						: 'color-mix(in srgb, var(--accent) 5%, var(--background-primary))'}
 					data-sticky-breadcrumb="scope"
-					style:--stickyBreadcrumb-itemTimelines={`--stage-${stageIndex}-item-inline, --stage-${stageIndex}-item-block`}
-					style:--stickyBreadcrumb-endTimelines={`--stage-${stageIndex}-end-inline, --stage-${stageIndex}-end-block`}
 					style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-entry`}
 				>
 					<details open data-column="gap-0">
@@ -272,7 +270,7 @@
 							{/if}
 						</div>
 					</details>
-					<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
+					<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
 				</section>
 			{/each}
 		</div>
