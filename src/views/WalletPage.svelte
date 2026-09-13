@@ -417,37 +417,28 @@
 	})
 
 	const pieRotation = $derived.by(() => {
-		const states: string[] = []
-		const starts: string[] = []
-		const ends: string[] = []
-		const startAnchors: string[] = []
-		const endAnchors: string[] = []
+		const animations: string[] = []
 		const timelines: string[] = []
+		const keyframes: string[] = []
 		let previousAngle = 0
 
 		for (const group of pieNavigationItems) {
 			for (const item of [group, ...(group.children ?? [])]) {
 				if (!item.sliceStyle || !item.href?.startsWith('#')) continue
 				const angle = -90 - item.sliceStyle.midAngle
-				const step = states.length + 1
-				const condition = `style(---pie-rotation-step: ${step})`
-				const timeline = `--${item.href.slice(1)}-entry`
-				states.push(`wallet-pie-step auto linear(${step}, ${step}) forwards`)
-				starts.push(`${condition}: ${previousAngle}deg`)
-				ends.push(`${condition}: ${angle}deg`)
-				startAnchors.push(`${condition}: anchor(${timeline} top)`)
-				endAnchors.push(`${condition}: anchor(--${item.href.slice(1)}-end-block top)`)
-				timelines.push(timeline)
+				const name = `wallet-pie-${wallet.metadata.id.replace(/[^a-z0-9-]/gi, '-')}-${animations.length}`
+				const rotation = (value: number) =>
+					`calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${value}deg)`
+				keyframes.push(`@keyframes ${name} { from { rotate: ${rotation(previousAngle)}; } to { rotate: ${rotation(angle)}; } }`)
+				animations.push(`${name} auto var(--transition-easeOutExpo) forwards`)
+				timelines.push(`--${item.href.slice(1)}-entry`)
 				previousAngle = angle
 			}
 		}
 
 		return {
-			states: states.join(', ') || 'none',
-			from: starts.length ? `if(${starts.join('; ')}; else: 0deg)` : '0deg',
-			to: ends.length ? `if(${ends.join('; ')}; else: 0deg)` : '0deg',
-			start: startAnchors.length ? `if(${startAnchors.join('; ')}; else: 0px)` : '0px',
-			end: endAnchors.length ? `if(${endAnchors.join('; ')}; else: 0px)` : '0px',
+			animations: animations.join(', ') || 'none',
+			keyframes: keyframes.join('\n'),
 			timelines: timelines.join(', ') || undefined,
 		}
 	})
@@ -500,6 +491,7 @@
 </script>
 
 <svelte:head>
+	<svelte:element this={'style'}>{pieRotation.keyframes}</svelte:element>
 	{@html '<script type="application/ld+json">' +
 		JSON.stringify({
 			'@context': 'https://schema.org',
@@ -559,7 +551,7 @@
 <div
 	id="top"
 	style:---pie-rotation-timelines={pieRotation.timelines}
-	style:---pie-rotation-states={pieRotation.states}
+	style:---pie-rotation-animations={pieRotation.animations}
 	data-sticky-breadcrumb="scope root"
 	style:--stickyBreadcrumb-itemTimelines="--wallet-item-inline, --wallet-item-block"
 	style:--stickyBreadcrumb-endTimelines="--wallet-end-inline, --wallet-end-block"
@@ -707,8 +699,6 @@
 		</header>
 		<nav
 			class="pie-navigation"
-			style:---pie-rotation-from={pieRotation.from}
-			style:---pie-rotation-to={pieRotation.to}
 			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
 			style={`--pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
@@ -848,12 +838,6 @@
 		</footer>
 	{/if}
 	<span data-sticky-breadcrumb="flow" aria-hidden="true"></span>
-	<span
-		class="pie-rotation-clock"
-		style:---pie-rotation-start={pieRotation.start}
-		style:---pie-rotation-end={pieRotation.end}
-		aria-hidden="true"
-	></span>
 </div>
 
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
@@ -1653,28 +1637,6 @@
 		isolation: auto;
 	}
 
-	@property ---pie-rotation-step {
-		syntax: '<integer>';
-		inherits: true;
-		initial-value: 0;
-	}
-	@keyframes -global-wallet-pie-step {
-		from {
-			---pie-rotation-step: 0;
-		}
-		to {
-			---pie-rotation-step: 1;
-		}
-	}
-	@keyframes -global-wallet-pie-rotation {
-		from {
-			rotate: calc(-1 * var(---slice-mid-angle) + var(---pie-rotationDirection, 1) * var(---pie-rotation-from));
-		}
-		to {
-			rotate: calc(-1 * var(---slice-mid-angle) + var(---pie-rotationDirection, 1) * var(---pie-rotation-to));
-		}
-	}
-
 	@property ---slice-mid-angle {
 		syntax: '<angle>';
 		inherits: true;
@@ -1716,36 +1678,20 @@
 		}
 	}
 
-	.pie-navigation,
-	.pie-rotation-clock {
+	.pie-navigation {
 		display: none;
 	}
 
-	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
-		(animation-timing-function: linear(0, 2)) and (color: if(style(---pie-rotation-step: 0): red)) {
-		/* A stable timeline survives resizing; existing snap markers own both endpoints. */
-		.pie-rotation-clock {
-			display: block;
-			position: absolute;
-			inset-block-start: var(---pie-rotation-start);
-			inset-block-end: var(---pie-rotation-end);
-			inline-size: 1px;
-			pointer-events: none;
-			animation: var(---pie-rotation-states);
-			animation-timeline: var(---pie-rotation-timelines);
-			animation-range: contain 0% contain 100%;
-			view-timeline: --wallet-pie-arrival block;
-			view-timeline-inset: 0 100%;
-		}
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
 		.pie-navigation {
-			animation: var(---pie-rotation-states), breadcrumb-entry auto steps(1, end) both;
-			animation-timeline: var(---pie-rotation-timelines, none), --wallet-entry;
+			animation: breadcrumb-entry auto steps(1, end) both;
+			animation-timeline: --wallet-entry;
 			animation-range: contain 0% contain 100%;
 		}
 		.pie-navigation :global(.navigation-items),
 		.pie-navigation :global(.pie-navigation-icon) {
-			animation: wallet-pie-rotation auto var(--transition-easeOutExpo) both;
-			animation-timeline: --wallet-pie-arrival;
+			animation: var(---pie-rotation-animations);
+			animation-timeline: var(---pie-rotation-timelines);
 			animation-range: contain 0% contain 100%;
 			@media (prefers-reduced-motion: reduce) {
 				animation-range: contain 100% contain 100%;
@@ -1899,7 +1845,7 @@
 				}
 			}
 
-			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)) {
+			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source)) {
 				scale: var(--hover-scale);
 				outline: none;
 			}
@@ -1940,15 +1886,6 @@
 			max-block-size: none;
 			container-type: normal;
 			pointer-events: none;
-		}
-
-		/*
-					 * Chromium currently fails to invalidate :target-current when it is
-					 * nested beneath the pie rule. Keep this state selector flat.
-					 */
-		:global([data-sticky-breadcrumb~="root"] .pie-navigation .navigation-items a:target-current) {
-			scale: var(--hover-scale);
-			outline: none;
 		}
 
 		@media (width <= 1024px) {
@@ -2032,17 +1969,17 @@
 
 	@supports selector(:target-current) {
 		.pie-navigation :global(a:target-current) {
-			---link-current-source: var(--link-current-sources);
+			---link-current-source: if(style(---breadcrumb-entry: 0): none; else: var(--link-current-sources));
 		}
 	}
 
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
-			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival,
+			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
 			--breadcrumb-row-inline, --breadcrumb-row-block;
 		@media (width > 1024px) {
 			timeline-scope:
-				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links), --wallet-pie-arrival,
+				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
 				var(--stickyBreadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
 				--breadcrumb-row-inline, --breadcrumb-row-block;
 		}
@@ -2334,6 +2271,7 @@
 
 			[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]) {
 				animation-name: breadcrumb-end-motion, pie-clearance;
+				animation-timing-function: var(--transition-easeInOutExpo), linear;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline), --pie-clearance;
 				animation-range: contain 0% contain 100%, cover 0% cover 100%;
 				/* Native layout timing approximates transformed contact without resolving transformed anchors. */
