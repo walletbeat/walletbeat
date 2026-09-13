@@ -491,6 +491,12 @@ span svg {
 	initial-value: 2px;
 }
 
+@property ---column-gap {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0px;
+}
+
 [data-column],
 [data-card] {
 	display: flex;
@@ -504,7 +510,8 @@ span svg {
 		flex-direction: row;
 	}
 
-	gap: 0.5em;
+	---column-gap: 0.5em;
+	gap: var(---column-gap);
 	align-content: start;
 
 	&[data-column~="start"] {
@@ -521,28 +528,28 @@ span svg {
 	}
 
 	&[data-column~="gap-0"] {
-		gap: 0em;
+		---column-gap: 0em;
 	}
 	&[data-column~="gap-1"] {
-		gap: 0.25em;
+		---column-gap: 0.25em;
 	}
 	&[data-column~="gap-2"] {
-		gap: 0.5em;
+		---column-gap: 0.5em;
 	}
 	&[data-column~="gap-3"] {
-		gap: 0.75em;
+		---column-gap: 0.75em;
 	}
 	&[data-column~="gap-4"] {
-		gap: 1em;
+		---column-gap: 1em;
 	}
 	&[data-column~="gap-5"] {
-		gap: 1.25em;
+		---column-gap: 1.25em;
 	}
 	&[data-column~="gap-6"] {
-		gap: 1.5em;
+		---column-gap: 1.5em;
 	}
 	&[data-column~="gap-8"] {
-		gap: 2em;
+		---column-gap: 2em;
 	}
 
 	/**
@@ -611,7 +618,7 @@ span svg {
 		1lh + var(--column-supportLineHeight, 1rlh) + var(--column-supportGap, 0.5rem)
 	);
 	---column-break: 0;
-	gap: var(--column-supportGap, 0.5rem);
+	---column-gap: var(--column-supportGap, 0.5rem);
 
 	> [data-row] {
 		gap: inherit;
@@ -1420,7 +1427,7 @@ ol {
  * - `position`: real sticky heading container and source-height anchor
  * - `source`: untransformed intrinsic reservation for the item
  * - `item`: transformed real heading identity and native controls
- * - `support`: supporting content follows its natural scroll position as the heading compacts
+ * - `support`: clips its child content elements below the compact row while they follow their natural scroll position; wrap plain text in an element
  * - `end`: independently sized in-flow metadata
  * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
  * - `measure`: hidden dimension probes inside the flow marker
@@ -1605,6 +1612,11 @@ ol {
 			opacity: 1;
 		}
 	}
+	@keyframes breadcrumb-support-offset {
+		from {
+			transform: translateY(0px);
+		}
+	}
 	@keyframes breadcrumb-support-scroll {
 		from {
 			translate: 0 0;
@@ -1738,9 +1750,8 @@ ol {
 		--stickyBreadcrumb-endInlineTimeline: --breadcrumb-end-inline;
 		--stickyBreadcrumb-endBlockTimeline: --breadcrumb-end-block;
 		---breadcrumb-itemTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline);
-		---breadcrumb-endTimelines: var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline);
 		---breadcrumb-sizeTimelines:
-			var(---breadcrumb-itemTimelines), var(---breadcrumb-endTimelines),
+			var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline),
 			--breadcrumb-row-inline, --breadcrumb-row-block;
 		position: relative;
 		container-type: inline-size;
@@ -1932,22 +1943,39 @@ ol {
 				}
 			}
 
+			---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
+			---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));
 			> :not([data-row], header[data-column~="span-start"], [data-sticky-breadcrumb~="source"]),
 			> header[data-column~="span-start"] > :not([data-row]),
 			[data-sticky-breadcrumb~="support"] {
-				/* Source copy stays above its surface until compaction carries it beneath the row. */
-				z-index: if(style(---breadcrumb-entry: 0): 0; else: -2);
-				@container scroll-state(stuck: top) {
-					z-index: -2;
-				}
-				animation: breadcrumb-support-scroll auto linear both;
+				/* A clipping plane follows the compact row; counter-motion preserves natural content travel. */
+				---breadcrumb-supportOffset: calc(
+					var(---breadcrumb-blockEnd) - var(--sticky-insetBlockStart) -
+					var(--stickyBreadcrumb-sourcePaddingBlock) - var(---breadcrumb-sourceRowHeight) - var(---column-gap)
+				);
+				clip-path: inset(0 -100vw -100vh);
+				transform: translateY(var(---breadcrumb-supportOffset));
+				animation: breadcrumb-support-offset auto var(--transition-easeInOutExpo) both;
 				animation-timeline: var(--stickyBreadcrumb-entryTimeline);
-				/* Equal range and travel give natural 1:1 scrolling after the owner sticks. */
-				animation-range:
-					contain calc(var(---breadcrumb-parentBlockEnd) - var(--sticky-insetBlockStart))
-						contain calc(var(---breadcrumb-parentBlockEnd) - var(--sticky-insetBlockStart) + 100vh);
-
+				animation-range: contain 0% contain 100%;
 				pointer-events: auto;
+				> * {
+					transform: translateY(calc(-1 * var(---breadcrumb-supportOffset)));
+					animation:
+						breadcrumb-support-offset auto var(--transition-easeInOutExpo) both,
+						breadcrumb-support-scroll auto linear both;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+					animation-range:
+						contain 0% contain 100%,
+						contain calc(var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock) - var(--sticky-insetBlockStart))
+							contain calc(var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock) - var(--sticky-insetBlockStart) + 100vh);
+				}
+				@media (prefers-reduced-motion: reduce) {
+					animation-timing-function: steps(1, end);
+					> * {
+						animation-timing-function: steps(1, end), linear;
+					}
+				}
 			}
 
 			[data-row]:has(> [data-sticky-breadcrumb~="source"]),
@@ -2030,8 +2058,6 @@ ol {
 			}
 			[data-sticky-breadcrumb~="item"],
 			[data-sticky-breadcrumb~="end"] {
-				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
-				---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));
 				---breadcrumb-sourceEndWrap: clamp(
 					0,
 					sign(

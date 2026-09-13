@@ -160,11 +160,13 @@
 									</div>
 								</div>
 								<div>
-									{#if isTypographicContent(s.description)}
-										<Typography content={s.description} />
-									{:else}
-										<p>{s.id}</p>
-									{/if}
+									<div>
+										{#if isTypographicContent(s.description)}
+											<Typography content={s.description} />
+										{:else}
+											<p>{s.id}</p>
+										{/if}
+									</div>
 								</div>
 							</header>
 						</summary>

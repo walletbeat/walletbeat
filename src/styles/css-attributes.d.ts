@@ -649,7 +649,7 @@ interface CssAttributes {
 	 * - `position`: real sticky heading container and source-height anchor
 	 * - `source`: untransformed intrinsic reservation for the item
 	 * - `item`: transformed real heading identity and native controls
-	 * - `support`: supporting content follows its natural scroll position as the heading compacts
+	 * - `support`: clips its child content elements below the compact row while they follow their natural scroll position; wrap plain text in an element
 	 * - `end`: independently sized in-flow metadata
 	 * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
 	 * - `measure`: hidden dimension probes inside the flow marker

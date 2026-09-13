@@ -942,10 +942,12 @@
 				</div>
 				{#if attrGroup.perWalletQuestion}
 					<div class="section-caption">
-						<Typography
-							content={attrGroup.perWalletQuestion}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
+						<div>
+							<Typography
+								content={attrGroup.perWalletQuestion}
+								strings={{ WALLET_NAME: wallet.metadata.displayName }}
+							/>
+						</div>
 					</div>
 				{/if}
 			</header>
@@ -1126,10 +1128,12 @@
 					</div>
 					{#if attribute.question}
 						<div class="subsection-caption">
-							<Typography
-								content={attribute.question}
-								strings={{ WALLET_NAME: wallet.metadata.displayName }}
-							/>
+							<div>
+								<Typography
+									content={attribute.question}
+									strings={{ WALLET_NAME: wallet.metadata.displayName }}
+								/>
+							</div>
 						</div>
 					{/if}
 				</header>
