@@ -434,12 +434,15 @@
 				const timeline = `--${item.href.slice(1)}-entry`
 				styles.push(`
 					@keyframes ${name} { from { rotate: ${rotation(previousAngle)}; } to { rotate: ${rotation(angle)}; } }
-					@keyframes ${name}-current { from, to { ---pie-currentIndex: ${index}; } }
+					@keyframes ${name}-current {
+						from { ---pie-currentIndex: ${index}; ---pie-restAngle: ${previousAngle}deg; }
+						to { ---pie-currentIndex: ${index}; ---pie-restAngle: ${angle}deg; }
+					}
 					@container style(---pie-currentIndex: ${index}) {
 						.pie-navigation-geometry { ---pie-rotation-name: ${name}; ---pie-rotation-timeline: ${timeline}; }
 					}
 				`)
-				states.push(`${name}-current auto steps(1, start) forwards`)
+				states.push(`${name}-current auto steps(1, end) forwards`)
 				timelines.push(timeline)
 				previousAngle = angle
 			}
@@ -1654,6 +1657,12 @@
 		initial-value: 0;
 	}
 
+	@property ---pie-restAngle {
+		syntax: '<angle>';
+		inherits: true;
+		initial-value: 0deg;
+	}
+
 	@property ---slice-mid-angle {
 		syntax: '<angle>';
 		inherits: true;
@@ -1697,6 +1706,12 @@
 
 	.pie-navigation {
 		display: none;
+	}
+
+	.pie-navigation :global(.navigation-items),
+	.pie-navigation :global(.pie-navigation-icon) {
+		/* Preserve completed orientation while a newly selected timeline is being attached. */
+		rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * var(---pie-restAngle));
 	}
 
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
@@ -1774,7 +1789,6 @@
 				block-size: calc(var(---pie-diameter) * 1px);
 				translate: -50% -50%;
 				scale: var(---pie-scale);
-				rotate: 0deg;
 				transform-origin: center;
 				pointer-events: none;
 				transition-property: none;
@@ -1890,7 +1904,6 @@
 				inset: var(--pie-originY) auto auto var(--pie-originX);
 				translate: -50% calc(-50% - var(--slice-labelR) * 1px);
 				---pie-rotationDirection: -1;
-				rotate: calc(-1 * var(---slice-mid-angle));
 				transition-property: filter;
 			}
 		}
