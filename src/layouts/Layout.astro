@@ -283,15 +283,6 @@ import Footer from '@/views/Footer.astro'
 		inherits: true;
 		initial-value: 0;
 	}
-	@keyframes wallet-terminal {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0;
-			visibility: hidden;
-		}
-	}
 	@property ---wallet-tocOpen {
 		syntax: '<number>';
 		inherits: true;
@@ -358,7 +349,6 @@ import Footer from '@/views/Footer.astro'
 					--wallet-end-inline, --wallet-end-block, --wallet-entry;
 				animation: breadcrumb-item-block auto linear both;
 				animation-timeline: --wallet-item-block;
-				scroll-timeline: --wallet-terminal block;
 			}
 			#layout:has([data-sticky-breadcrumb~="root"])::before,
 			#layout:has([data-sticky-breadcrumb~="root"])::after {

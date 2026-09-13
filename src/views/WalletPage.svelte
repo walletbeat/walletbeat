@@ -1970,19 +1970,17 @@
 						animation:
 							wallet-pie-source auto linear both,
 							wallet-pie-compact auto linear both,
-							var(---pie-backdropAnimation, none),
-							wallet-terminal auto linear;
+							var(---pie-backdropAnimation, none);
 						@media (prefers-reduced-motion: reduce) {
-							animation-timing-function: linear, steps(1, end), linear, linear;
+							animation-timing-function: linear, steps(1, end), linear;
 						}
 						animation-timeline:
 							--wallet-pie-source, var(--stickyBreadcrumb-entryTimeline),
-							var(--stickyBreadcrumb-entryTimeline), --wallet-terminal;
+							var(--stickyBreadcrumb-entryTimeline);
 						animation-range:
 							cover 0% exit-crossing 0%,
 							contain 0% contain 100%,
-							contain 0% contain 100%,
-							calc(100% - var(--navigation-mobile-blockSize)) 100%;
+							contain 0% contain 100%;
 						/* The first sticky row owns the compact pie’s block-start edge. */
 						inset-block-start: anchor(end);
 						inset-inline-start: anchor(--wallet-pie-source start);
