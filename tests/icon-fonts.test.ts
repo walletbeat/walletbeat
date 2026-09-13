@@ -10,9 +10,10 @@ import {
 describe('wbicons', async () => {
 	const wbicons = await SVGFont.create({
 		fontName: 'wbicons',
+		variants: ['complex'],
 		fontTypeName: 'WBIcon',
 		cssOutputDir: 'src/styles',
-		fontOutputDir: 'src/assets/fonts/wbicons',
+		fontOutputDir: 'src/assets/fonts',
 		svgIconsDir: 'resources/files/wbicons',
 		iconUnicodeSequences: wbIconEmojiSequences,
 	})
@@ -31,21 +32,34 @@ describe('wbicons', async () => {
 			`Every wbicon needs a unique unicode sequence so the font can map it back to its SVG glyph: ${JSON.stringify(repeatedUnicodeSequences)}`,
 		).toEqual({})
 	})
-	it('only renders data-icon values with the wbicons token', () => {
-		const css = generatedIconFontCSS('wbicons', [
-			':is(&[data-icon~="security"], [data-list-item-marker="security"]) {\n\t--icon-content: "🔒";\n\t--list-marker-fontFamily: var(--fontFamily-wbicons);\n}',
-		])
-
-		expect(css).toContain("[data-icon~='wbicons'] {")
-		expect(css).toContain(
-			'font-family: var(--fontFamily-wbicons);\n\tfont-style: normal;\n\t-webkit-font-smoothing: subpixel-antialiased;',
+	it('splits the generated CSS into per-variant and shared selector blocks', () => {
+		const css = generatedIconFontCSS(
+			['wbicons-complex'],
+			[
+				':is(&[data-icon~="security"], [data-list-item-marker="security"]) {\n\t--icon-content: "🔒";\n\t--list-marker-fontFamily: var(--fontFamily-wbicons-complex);\n}',
+			],
 		)
+
+		expect(css).toContain("[data-icon~='wbicons-complex'] {")
+		expect(css).toContain('font-family: var(--fontFamily-wbicons-complex);\n\tfont-style: normal;')
 		expect(css).toContain('&::before {\n\t\tcontent: var(--icon-content);')
 		expect(css).toContain(':is(&[data-icon~="security"], [data-list-item-marker="security"])')
-		expect(css).toContain('--list-marker-fontFamily: var(--fontFamily-wbicons);')
+		expect(css).toContain('--list-marker-fontFamily: var(--fontFamily-wbicons-complex);')
 		expect(css).not.toContain(':where(')
 		expect(css).toContain("&[data-icon~='emoji']")
 	})
+
+	it('emits a comma-separated shared selector list across all variants', () => {
+		const css = generatedIconFontCSS(
+			['wbicons-complex', 'wbicons-simple'],
+			["&[data-icon~='security'] {\n\t--icon-content: '🔒';\n}"],
+		)
+
+		expect(css).toContain("[data-icon~='wbicons-complex'], [data-icon~='wbicons-simple'] {")
+		expect(css).toContain("[data-icon~='wbicons-complex'] {")
+		expect(css).toContain("[data-icon~='wbicons-simple'] {")
+	})
+
 	it('has only monochrome files', async () => {
 		const results: Record<string, string[]> = await wbicons.nonMonochromeFiles()
 		const errorDetails = Object.entries(results)

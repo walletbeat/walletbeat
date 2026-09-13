@@ -331,7 +331,7 @@
 			</span>
 		{:else}
 			<span
-				data-icon="{iconShape} wbicons {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
+				data-icon="{iconShape} wbicons-complex {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
 			></span>
 		{/if}
 	{/if}

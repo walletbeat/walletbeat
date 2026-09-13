@@ -685,7 +685,7 @@
 							{#if item.icon}
 								<span
 									class="pie-navigation-icon"
-									data-icon="wbicons emoji {item.icon}"
+									data-icon="wbicons-complex emoji {item.icon}"
 								></span>
 							{/if}
 						{/snippet}
@@ -710,7 +710,7 @@
 					{#if item.icon}
 						<span
 							class="toc-icon"
-							data-icon="wbicons {item.icon}"
+							data-icon="wbicons-complex {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -783,7 +783,7 @@
 				>
 					<span
 						class="attribute-group-icon"
-						data-icon="wbicons {attrGroup.icon}"
+						data-icon="wbicons-complex {attrGroup.icon}"
 					></span>
 
 					<div
@@ -890,7 +890,7 @@
 				<header data-row-item="flexible" data-row="center gap-3">
 					<span
 						class="attribute-icon"
-						data-icon="wbicons {attribute.icon}"
+						data-icon="wbicons-complex {attribute.icon}"
 					></span>
 
 					<div

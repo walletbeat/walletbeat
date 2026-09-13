@@ -11,8 +11,18 @@ try {
 	cli
 		.option('--font-name', 'Name of the font to generate')
 		.option('--font-type-name', 'Name of the icon TypeScript type to generate')
-		.option('--svg-icons-dir', 'Directory containing SVG icons, repo-root-relative')
-		.option('--font-output-dir', 'Directory to output font files, repo-root-relative')
+		.option(
+			'--variants <variants>',
+			'Comma-separated list of font variant suffixes (e.g. "complex")',
+		)
+		.option(
+			'--svg-icons-dir',
+			'Base directory containing per-variant SVG icon subdirectories, repo-root-relative',
+		)
+		.option(
+			'--font-output-dir',
+			'Base directory to output per-variant font files, repo-root-relative',
+		)
 		.option('--css-output-dir', 'Directory to output CSS files, repo-root-relative')
 		.option('--force', 'Force regeneration even if up to date', { default: false })
 
@@ -21,6 +31,7 @@ try {
 	const opts = cli.options as {
 		fontName?: string
 		fontTypeName?: string
+		variants?: string
 		svgIconsDir?: string
 		fontOutputDir?: string
 		cssOutputDir?: string
@@ -33,6 +44,15 @@ try {
 
 	if (opts.fontTypeName === undefined || opts.fontTypeName === '') {
 		throw new Error('Error: --font-type-name is required\n')
+	}
+
+	const variants = (opts.variants ?? '')
+		.split(',')
+		.map(variant => variant.trim())
+		.filter(variant => variant !== '')
+
+	if (variants.length === 0) {
+		throw new Error('Error: --variants must be a non-empty comma-separated list of variant names\n')
 	}
 
 	if (opts.svgIconsDir === undefined || opts.svgIconsDir === '') {
@@ -49,6 +69,7 @@ try {
 
 	const font = await SVGFont.create({
 		fontName: opts.fontName,
+		variants,
 		fontTypeName: opts.fontTypeName,
 		svgIconsDir: opts.svgIconsDir,
 		fontOutputDir: opts.fontOutputDir,

@@ -139,105 +139,105 @@ const optimizedSvgHashes: Record<string, string> = {
 		'738f4da22092cbceef4bc4476f2eb85fdd0225734a156fd5011a46f95e10633d',
 	'resources/contracts/images/Walletbeat.svg':
 		'8fb03ae00cfd0cedcea4a2bc893e3a24e0c2c51441bc3c00bd641fbbe2e0ca40',
-	'resources/files/wbicons/about.svg':
+	'resources/files/wbicons/wbicons-complex/about.svg':
 		'a2dcf5a9d53f08b2df7e205810d9343d0a5c7594e2c8c7d5acbf7651a4e0ebd7',
-	'resources/files/wbicons/account_abstraction.svg':
+	'resources/files/wbicons/wbicons-complex/account_abstraction.svg':
 		'2ee992c8c5166ffe92fc5989b0cd3d4d56ae8c9b4cf5de50773d38656406a916',
-	'resources/files/wbicons/account_portability.svg':
+	'resources/files/wbicons/wbicons-complex/account_portability.svg':
 		'68642ea6066c5c67b3079e55a4d2798ba6b7f44fcff05e800870bad05f543010',
-	'resources/files/wbicons/account_recovery.svg':
+	'resources/files/wbicons/wbicons-complex/account_recovery.svg':
 		'17f35dbfdecab5e1515052b371b14a7345dd29e70742b577aeb1d6f8b2356f78',
-	'resources/files/wbicons/account_type.svg':
+	'resources/files/wbicons/wbicons-complex/account_type.svg':
 		'1ce46ef49a304bbdc2e53515af5421eafa65c7177ca4a7953784759805edee95',
-	'resources/files/wbicons/account_unruggability.svg':
+	'resources/files/wbicons/wbicons-complex/account_unruggability.svg':
 		'4c380c10f479956684033f5a7afb05359232cf95947e1b9376c571d2fd789620',
-	'resources/files/wbicons/address_resolution.svg':
+	'resources/files/wbicons/wbicons-complex/address_resolution.svg':
 		'0d5cdf2458a70a65aa26b43f772e334a43fd3fc4598dbfd94663457dee1477e2',
-	'resources/files/wbicons/app_isolation.svg':
+	'resources/files/wbicons/wbicons-complex/app_isolation.svg':
 		'd1c29e8349c8e526a86b7411715f255db2c521d579dfa31abe4349830515f1c4',
-	'resources/files/wbicons/browser_integration.svg':
+	'resources/files/wbicons/wbicons-complex/browser_integration.svg':
 		'e86334eec35848df425725fb0bd26ba4fe3cf61cfb01ca3d1aef47a7b11589a6',
-	'resources/files/wbicons/chain_abstraction.svg':
+	'resources/files/wbicons/wbicons-complex/chain_abstraction.svg':
 		'516950f59e43d845fda3668eeef18a48123cdefb126f1746bc2fa71eafe02ed2',
-	'resources/files/wbicons/chain_verification.svg':
+	'resources/files/wbicons/wbicons-complex/chain_verification.svg':
 		'a73400c40933e4f4111de6fa8b08ad466722b4add178857b501a3d721f455141',
-	'resources/files/wbicons/discuss.svg':
+	'resources/files/wbicons/wbicons-complex/discuss.svg':
 		'64a90f52b67ab16d031e5a82fc03a98e090abfdea283467473572115ac97189c',
-	'resources/files/wbicons/duress_resistance.svg':
+	'resources/files/wbicons/wbicons-complex/duress_resistance.svg':
 		'afe91fad2f34a4418c578fdb86d147c5531e77688ba6b3708ec4b095fe1cc09b',
-	'resources/files/wbicons/ecosystem.svg':
+	'resources/files/wbicons/wbicons-complex/ecosystem.svg':
 		'19f9aade6d7dca737d9e589befd1e3b57e43c4411f8285c246178d37f025f345',
-	'resources/files/wbicons/faq.svg':
+	'resources/files/wbicons/wbicons-complex/faq.svg':
 		'00f04ed96ea8d9df2d4775a3cd99d565ce5ee6ab6b0604af4e714a87c41cdf5f',
-	'resources/files/wbicons/fee_transparency.svg':
+	'resources/files/wbicons/wbicons-complex/fee_transparency.svg':
 		'94478f7bdacb29403ac4efef76c8dd2ac395089b4cb7c6fbc3350a0a8db83169',
-	'resources/files/wbicons/free_and_open_source_license.svg':
+	'resources/files/wbicons/wbicons-complex/free_and_open_source_license.svg':
 		'4912268c3bb2f8c7fbb07d86ff09e1b55be7fd5a11ae353be7b25a667b6d5462',
-	'resources/files/wbicons/funding_transparency.svg':
+	'resources/files/wbicons/wbicons-complex/funding_transparency.svg':
 		'da6d003c647fe2533550287a93ac4f3043e9032b4a3cabc83c74a02a2c72e962',
-	'resources/files/wbicons/hardware_wallet_interoperability.svg':
+	'resources/files/wbicons/wbicons-complex/hardware_wallet_interoperability.svg':
 		'66615982b2571d440c77d4e23c8d533ae9502761962f4974d32be72e068d9432',
-	'resources/files/wbicons/hardware_wallet_support.svg':
+	'resources/files/wbicons/wbicons-complex/hardware_wallet_support.svg':
 		'cdb6b861760a03bc2e1b61cfb898bc803a679d4bab7df775e1f4bd6edc64a6ec',
-	'resources/files/wbicons/l1_provider_independence.svg':
+	'resources/files/wbicons/wbicons-complex/l1_provider_independence.svg':
 		'829c56562a0f0d2046b3b40f75d68681bfdee31c98391e77a13f325a289d84ce',
-	'resources/files/wbicons/multi_address_privacy.svg':
+	'resources/files/wbicons/wbicons-complex/multi_address_privacy.svg':
 		'6e918b9b231232f97c9f2b53a8205464ac7e6bbb8d9896559e611724ce51295f',
-	'resources/files/wbicons/newsletter.svg':
+	'resources/files/wbicons/wbicons-complex/newsletter.svg':
 		'0f7aad48f875c196c314b9e1382577fd9f659d5304efc3d1244fd5a74aa6cba5',
-	'resources/files/wbicons/orderflow_transparency.svg':
+	'resources/files/wbicons/wbicons-complex/orderflow_transparency.svg':
 		'ebad5de9fbb10c92756502b6395b2c4b28f7f0221b97f814e9d4cb7c2d63f0a2',
-	'resources/files/wbicons/passkey_verification.svg':
+	'resources/files/wbicons/wbicons-complex/passkey_verification.svg':
 		'6bda437c9c800f8deec053708390d8ab91caa52c3c903a6e84bd6486728f3a80',
-	'resources/files/wbicons/permissions_management.svg':
+	'resources/files/wbicons/wbicons-complex/permissions_management.svg':
 		'93c2694d1c95528094e78e1bfffc4e383a2988085cfeb9fc156689c22f35cf59',
-	'resources/files/wbicons/privacy.svg':
+	'resources/files/wbicons/wbicons-complex/privacy.svg':
 		'b917b115f043c97b5cbb0f3927952d1a83686859331711b31a991b21c348eab3',
-	'resources/files/wbicons/privacy_hygiene.svg':
+	'resources/files/wbicons/wbicons-complex/privacy_hygiene.svg':
 		'6b7999c2e7d9df90b708f5090078fc48eb7a850ccb671389a53e2f22ef18cf53',
-	'resources/files/wbicons/private_token_transfers.svg':
+	'resources/files/wbicons/wbicons-complex/private_token_transfers.svg':
 		'45b8d8565808e41be7d1d0386427f7c862b8f7c5c97c58f4bdc53225607daabf',
-	'resources/files/wbicons/question_mark.svg':
+	'resources/files/wbicons/wbicons-complex/question_mark.svg':
 		'4eb010c8812b530d7218cb771c1b78b713e93a001b60545888e18b54978f3f5b',
-	'resources/files/wbicons/release_process_transparency.svg':
+	'resources/files/wbicons/wbicons-complex/release_process_transparency.svg':
 		'0e30adcdc2ff9a635aa860de9568a4f518867afc31d693bfde1ce4ce0f9089c1',
-	'resources/files/wbicons/repository.svg':
+	'resources/files/wbicons/wbicons-complex/repository.svg':
 		'4f4327cf7f86fca5b234c8118c18235b2101d013e1b10866c0cb5957df055265',
-	'resources/files/wbicons/scam_prevention.svg':
+	'resources/files/wbicons/wbicons-complex/scam_prevention.svg':
 		'a13510b01630b33d23a3f5a1cdc82fb9754d4e6d37a397a381f5c4cb94c4d08c',
-	'resources/files/wbicons/security.svg':
+	'resources/files/wbicons/wbicons-complex/security.svg':
 		'5dd8e9f9754a3f46358326dc7b6349b172e64b02c418d5c27192bc70eb6ef783',
-	'resources/files/wbicons/security_audits.svg':
+	'resources/files/wbicons/wbicons-complex/security_audits.svg':
 		'fca037410302f95cacf29cf8cf08384ce5e962cb3c57fcdae5371d76ef815165',
-	'resources/files/wbicons/security_best_practices.svg':
+	'resources/files/wbicons/wbicons-complex/security_best_practices.svg':
 		'e351752dfb5f635f02b6fac153f8adbc9b292c7edde70b614d310496f0280428',
-	'resources/files/wbicons/self_sovereignty.svg':
+	'resources/files/wbicons/wbicons-complex/self_sovereignty.svg':
 		'e2236a82ae8b231218dc84deef70e8ae58133f879e57987931c2d85ca9a4964a',
-	'resources/files/wbicons/transaction_batching.svg':
+	'resources/files/wbicons/wbicons-complex/transaction_batching.svg':
 		'6a0e957bd7ea8e89c1aad266abbe6db54a7b930c074a47f459ee62f56d5a53d8',
-	'resources/files/wbicons/transaction_inclusion.svg':
+	'resources/files/wbicons/wbicons-complex/transaction_inclusion.svg':
 		'c83cc5d0f722c7b8f98e020f3454d4647381c438a1935d3adbd540a595c1737f',
-	'resources/files/wbicons/transaction_legibility.svg':
+	'resources/files/wbicons/wbicons-complex/transaction_legibility.svg':
 		'8b59d5d7f3ba228edcf683d1781dbc2cd80729b1eb43283bef9eeb0c95234b8b',
-	'resources/files/wbicons/transparency.svg':
+	'resources/files/wbicons/wbicons-complex/transparency.svg':
 		'78574ce70233dba228c9098831e1ab06f1c1b224fc99887f15c4314f58a5dd3b',
-	'resources/files/wbicons/user_privacy.svg':
+	'resources/files/wbicons/wbicons-complex/user_privacy.svg':
 		'565c19f2edfb5426aa6a43744260ea36aff608035262febee187e7f54c9b5fa1',
-	'resources/files/wbicons/wallet_address_privacy.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_address_privacy.svg':
 		'ceb463bb11e17a665e9a37adae3c9df6bab485a1507cd9e9c830fd95398dbc2d',
-	'resources/files/wbicons/wallet_browser.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_browser.svg':
 		'5c8a54471d3ad7991437f6dd59ea922cf82d1e3686dc06b80f1f18e3aa11f8c7',
-	'resources/files/wbicons/wallet_desktop.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_desktop.svg':
 		'1dd4085eb52ef8843150565be052aceecbfed225c1677fc2e00f5820d852ac23',
-	'resources/files/wbicons/wallet_embedded.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_embedded.svg':
 		'161609e72969d6a40f5ee7ca7f41834bd29f10c16e502c6711ba32d69c2e2eb4',
-	'resources/files/wbicons/wallet_hardware.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_hardware.svg':
 		'9629f4e58078a5badf9175d39cd3a3e1e1a86bc2ea9c3032a9ae123ef7b7158a',
-	'resources/files/wbicons/wallet_mobile.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_mobile.svg':
 		'e3edf951b1dcdafa25611078c2d22cec23e00884ab2d43c0e9b09e2cd0b52170',
-	'resources/files/wbicons/wallet_software.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_software.svg':
 		'6e7e5da47259a97463b0f9373217846320294675bb7dba30018d4ac4f4ccbb91',
-	'resources/files/wbicons/wallet_test.svg':
+	'resources/files/wbicons/wbicons-complex/wallet_test.svg':
 		'cd3951d27fd220b5b1d6f3c116ce4465635bda5c0fb30d19bf7e9b61f0cc03dc',
 }
 

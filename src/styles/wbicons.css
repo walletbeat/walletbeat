@@ -1,6 +1,9 @@
-[data-icon~='wbicons'] {
-	font-family: var(--fontFamily-wbicons);
+[data-icon~='wbicons-complex'] {
+	font-family: var(--fontFamily-wbicons-complex);
 	font-style: normal;
+}
+
+[data-icon~='wbicons-complex'] {
 	-webkit-font-smoothing: subpixel-antialiased;
 	-moz-osx-font-smoothing: grayscale;
 
