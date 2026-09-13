@@ -2695,19 +2695,19 @@ ol {
 				}
 			}
 
-			&:not([data-sticky~="backdrop-none"]) {
-				&[data-sticky~="backdrop-always"] {
-					&[data-sticky~="backdrop-self"],
-					&[data-sticky~="backdrop-before"]::before,
-					&[data-sticky~="backdrop-after"]::after {
+			&:where(:not([data-sticky~="backdrop-none"])) {
+				&:where([data-sticky~="backdrop-always"]) {
+					&:where([data-sticky~="backdrop-self"]),
+					&:where([data-sticky~="backdrop-before"])::before,
+					&:where([data-sticky~="backdrop-after"])::after {
 						background: var(---sticky-background);
 						backdrop-filter: var(---sticky-backdropFilter);
 					}
 				}
-				&[data-sticky~="backdrop-stuck"] {
-					&[data-sticky~="backdrop-self"],
-					&[data-sticky~="backdrop-before"]::before,
-					&[data-sticky~="backdrop-after"]::after {
+				&:where([data-sticky~="backdrop-stuck"]) {
+					&:where([data-sticky~="backdrop-self"]),
+					&:where([data-sticky~="backdrop-before"])::before,
+					&:where([data-sticky~="backdrop-after"])::after {
 						@supports not (container-type: scroll-state) {
 							background: var(---sticky-background);
 							backdrop-filter: var(---sticky-backdropFilter);
@@ -2719,14 +2719,14 @@ ol {
 					}
 				}
 
-				&[data-sticky~="backdrop-self"],
-				&[data-sticky~="backdrop-before"]::before,
-				&[data-sticky~="backdrop-after"]::after {
+				&:where([data-sticky~="backdrop-self"]),
+				&:where([data-sticky~="backdrop-before"])::before,
+				&:where([data-sticky~="backdrop-after"])::after {
 					transition-property: none;
 				}
 
-				&[data-sticky~="backdrop-before"]::before,
-				&[data-sticky~="backdrop-after"]::after {
+				&:where([data-sticky~="backdrop-before"])::before,
+				&:where([data-sticky~="backdrop-after"])::after {
 					content: '';
 					z-index: -1;
 					position: absolute;
