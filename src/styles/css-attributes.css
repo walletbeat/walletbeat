@@ -1658,30 +1658,23 @@ ol {
 			transform: translateX(0px) scale(1);
 		}
 	}
-	/* Projection divides by the parent's interpolated scale, exactly countering it.
-	 * Matching transform lists keep every animated input linear and compositable. */
+	/* Relative child scales preserve the compact text/icon ratios without 3D projection. */
 	@keyframes breadcrumb-icon-motion {
 		from {
-			transform: perspective(1px) translateZ(0px) translateY(0px) scale(1)
-				var(---icon-paint-transform, translateX(0px));
+			transform: translateY(0px) scale(1) var(---icon-paint-transform, translateX(0px));
 		}
 		to {
-			transform: perspective(1px)
-				translateZ(calc((1 - var(--stickyBreadcrumb-scale)) * 1px))
-				translateY(var(---breadcrumb-iconTranslateBlock, 0px))
-				scale(var(--stickyBreadcrumb-iconScale, 1))
+			transform: translateY(calc(var(---breadcrumb-iconTranslateBlock, 0px) / var(--stickyBreadcrumb-scale)))
+				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)))
 				var(---icon-paint-transform, translateX(0px));
 		}
 	}
 	@keyframes breadcrumb-text-motion {
 		from {
-			transform: perspective(1px) translateZ(0px) translateX(0px) scale(1);
+			transform: translateX(0px);
 		}
 		to {
-			transform: perspective(1px)
-				translateZ(calc((1 - var(--stickyBreadcrumb-scale)) * 1px))
-				translateX(calc(var(---inlineDirection) * var(--stickyBreadcrumb-scale) * var(---breadcrumb-iconCorrection)))
-				scale(var(--stickyBreadcrumb-scale));
+			transform: translateX(calc(var(---inlineDirection) * var(---breadcrumb-iconCorrection)));
 		}
 	}
 	/* Before / arriving / compact are discrete states; native properties own visual progress. */
