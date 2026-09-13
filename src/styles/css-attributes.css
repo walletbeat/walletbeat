@@ -1771,7 +1771,7 @@ ol {
 			/* Only the visual row departs; supporting content retains its ordinary opacity. */
 			--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeInOutExpo) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
 			@media (prefers-reduced-motion: reduce) {
-				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto steps(1, start) reverse both;
+				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
 			}
 			--stickyBreadcrumb-itemInlineTimeline: --breadcrumb-item-inline;
 			--stickyBreadcrumb-itemBlockTimeline: --breadcrumb-item-block;
