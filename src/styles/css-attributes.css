@@ -1682,9 +1682,11 @@ ol {
 	@keyframes breadcrumb-exit {
 		from {
 			opacity: 1;
+			transform: translateY(0px);
 		}
 		to {
 			opacity: 0;
+			transform: translateY(calc(var(---breadcrumb-blockStart) - var(---breadcrumb-blockEnd)));
 		}
 	}
 	[data-sticky-breadcrumb~="position"]
@@ -1918,7 +1920,7 @@ ol {
 			pointer-events: none;
 			animation:
 				breadcrumb-entry auto linear both,
-				breadcrumb-exit auto linear both,
+				breadcrumb-exit auto var(--transition-easeInOutExpo) both,
 				breadcrumb-position-exit auto linear both;
 			@media (prefers-reduced-motion: reduce) {
 				animation-timing-function: steps(1, end), steps(1, end), linear;
