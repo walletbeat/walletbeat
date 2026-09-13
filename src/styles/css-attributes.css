@@ -1713,9 +1713,8 @@ ol {
 				[data-sticky-breadcrumb~="item"] > a:first-child
 			)::before {
 			content: if(style(---breadcrumb-entry: 0): '#' ;style(---breadcrumb-wrap: 0): '›' ;else: '#');
-			font-size: if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): var(--stickyBreadcrumb-markerSize); else: 1em);
-			inline-size: if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem)); else: max-content);
-			padding-inline: 0 if(style(---breadcrumb-wrap: 0) and not style(---breadcrumb-entry: 0): 0px; else: 0.66rem);
+			inline-size: if(style(---breadcrumb-wrap: 0) and (not style(---breadcrumb-entry: 0)): calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem)); else: max-content);
+			padding-inline: 0 if(style(---breadcrumb-wrap: 0) and (not style(---breadcrumb-entry: 0)): 0px; else: 0.66rem);
 			text-align: center;
 			transform-origin: 100% 50%;
 			animation:
