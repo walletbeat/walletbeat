@@ -1,3 +1,4 @@
+/** Set of icons mapped to their emoji. */
 export const wbIconEmojiSequences = {
 	about: 'ℹ️',
 	account_abstraction: '👤',
@@ -8,15 +9,25 @@ export const wbIconEmojiSequences = {
 	address_resolution: '📇',
 	app_isolation: '🏝️',
 	browser_integration: '🌐',
+	bug: '🐞',
+	by_rating: '⭐',
+	by_wallet: '👛',
 	chain_abstraction: '🌉',
 	chain_verification: '⚓',
+	checklist: '✅',
+	code_repository: '🐙',
+	contribute: '🤝',
+	dark_light_mode: '🌗',
 	discuss: '💬',
+	donation: '🎁',
 	duress_resistance: '🔧',
 	ecosystem: '🌳',
+	eip_trackers: '📌',
 	faq: '❓',
 	fee_transparency: '💸',
 	free_and_open_source_license: '❤️',
 	funding_transparency: '💰',
+	graduate: '🎓',
 	hardware_wallet_interoperability: '🧱',
 	hardware_wallet_support: '🗝️',
 	l1_provider_independence: '🏠',
@@ -25,6 +36,7 @@ export const wbIconEmojiSequences = {
 	orderflow_transparency: '🔀',
 	passkey_verification: '🫆',
 	permissions_management: '🔑',
+	poo: '💩',
 	privacy: '😎',
 	privacy_hygiene: '🧼',
 	private_token_transfers: '📨',
@@ -36,6 +48,13 @@ export const wbIconEmojiSequences = {
 	security_audits: '📜',
 	security_best_practices: '📋',
 	self_sovereignty: '🏰',
+	sharpener: '✏️',
+	stage_0: '🌱',
+	stage_0_5: '🌿',
+	stage_1: '🪴',
+	stage_2: '🌾',
+	stage_none: '🏜️',
+	stages: '🌸',
 	transaction_batching: '🧺',
 	transaction_inclusion: '📡',
 	transaction_legibility: '🧾',
@@ -53,3 +72,17 @@ export const wbIconEmojiSequences = {
 
 /** Icon ID for WBIcon. */
 export type WBIconID = keyof typeof wbIconEmojiSequences
+
+/** Icons that have only a single variant, mapped to that variant. */
+export const knownSingleVariantIcons: Partial<Record<WBIconID, string>> = {
+	bug: 'simple',
+	by_rating: 'simple',
+	by_wallet: 'simple',
+	checklist: 'simple',
+	contribute: 'simple',
+	eip_trackers: 'simple',
+	poo: 'simple',
+	stages: 'simple',
+	discuss: 'complex',
+	faq: 'complex',
+}

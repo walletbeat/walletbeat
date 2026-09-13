@@ -451,7 +451,7 @@
 									aria-label={variantToName(variant, true)}
 									onclick={() => toggleFilterById?.(filterId)}
 								>
-									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
+									<span data-icon="wbicons-complex {variantWbIconIds[variant]}"></span>
 								</button>
 								<span class="filter-circle-label">{variantToName(variant, false)}</span>
 							</div>
@@ -473,7 +473,7 @@
 								aria-label={label}
 								onclick={() => toggleFilterById?.(id)}
 							>
-								<span data-icon="wbicons account_type"></span>
+								<span data-icon="wbicons-complex account_type"></span>
 							</button>
 							<span class="filter-circle-label">{label}</span>
 						</div>
@@ -1407,7 +1407,7 @@
 							>
 								{#snippet centerContentSnippet()}
 									{#if summaryVisualization === SummaryVisualization.Icon}
-										<span class="pie-center-icon" data-icon="wbicons {attrGroup.icon}"></span>
+										<span class="pie-center-icon" data-icon="wbicons-complex {attrGroup.icon}"></span>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<span>
 											{formatScore(groupScore)}
@@ -1587,7 +1587,7 @@
 									aria-pressed={variant === selectedVariant}
 									onclick={() => toggleFilterById?.(`variant-${variant}`, true)}
 								>
-									<span data-icon="wbicons {variantWbIconIds[variant]}"></span>
+									<span data-icon="wbicons-complex {variantWbIconIds[variant]}"></span>
 								</button>
 							{/each}
 						</div>
@@ -1954,7 +1954,7 @@
 		cursor: pointer;
 		transition-property: background-color, border-color, color;
 
-		[data-icon~="wbicons"] {
+		[data-icon~="wbicons-complex"] {
 			font-size: 1.5rem;
 		}
 
@@ -2072,7 +2072,7 @@
 		padding: 0;
 		transition-property: color;
 
-		[data-icon~="wbicons"] {
+		[data-icon~="wbicons-complex"] {
 			font-size: 1.25rem;
 		}
 

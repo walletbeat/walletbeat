@@ -246,11 +246,11 @@ declare global {
 		/**
 		 * ## [data-icon]
 		 *
-		 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+		 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-complex`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
 		 *
 		 * ### Tokens
 		 * - shape: `circle`, `filled`
-		 * - source: `wbicons`
+		 * - source: `wbicons-complex`
 		 * - effect: `shadow`
 		 *
 		 * ### CSS Variables
@@ -262,7 +262,7 @@ declare global {
 		 * ### Examples
 		 * ```html
 		 * <span data-icon="&#x21b5;"></span>
-		 * <span data-icon="wbicons security"></span>
+		 * <span data-icon="wbicons-complex security"></span>
 		 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
 		 * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
 		 * ```
