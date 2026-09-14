@@ -210,7 +210,13 @@ describe('removeCSSOutline on all stroked SVGs under resources/', () => {
 
 			it('removes all stroke declarations', () => {
 				expect(output).not.toMatch(/stroke\s*:/)
-				expect(output).not.toMatch(/<style/)
+
+				// Any remaining <style> block must not declare stroke-related
+				// CSS properties (e.g. `stroke`, `stroke-width`). Non-stroke
+				// rules (e.g. `fill`) are allowed to stay in the block.
+				for (const styleBlock of output.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+					expect(styleBlock[1]).not.toMatch(/stroke(?:-[\w-]+)?\s*:/)
+				}
 			})
 
 			it('preserves the SVG root and original shape data', () => {

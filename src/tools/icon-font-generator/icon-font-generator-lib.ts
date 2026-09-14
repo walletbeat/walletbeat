@@ -765,6 +765,84 @@ export class SVGFont {
 		return createHash('sha256').update(hashInput).digest('hex')
 	}
 
+	/**
+	 * Enforce that every variant has the exact same set of glyph filenames.
+	 *
+	 * Throws if any variant is missing a glyph present in another, or has an
+	 * extraneous glyph not present in every other variant, listing exactly what
+	 * must be added/removed to complete the set.
+	 */
+	static async assertVariantGlyphParity(
+		svgIconsDir: string,
+		fontName: string,
+		variants: readonly string[],
+	) {
+		const fullFontNames = variants.map(variant => `${fontName}-${variant}`)
+		const glyphSets = await Promise.all(
+			fullFontNames.map(async fullFontName => {
+				const svgFiles = await SVGFont.readSvgFiles(path.join(svgIconsDir, fullFontName))
+
+				return [fullFontName, new Set(svgFiles.map(([fileName]) => fileName))] as const
+			}),
+		)
+
+		// The complete glyph set is the union of every variant (each variant must
+		// contain all of it). A glyph is "extra" in a variant when it is not shared
+		// by every variant, i.e. it is absent from the intersection.
+		const unionSet = new Set<string>()
+		const intersectionSet = new Set<string>()
+
+		for (const [index, [_fullFontName, glyphSet]] of glyphSets.entries()) {
+			if (index === 0) {
+				for (const glyph of glyphSet) {
+					intersectionSet.add(glyph)
+				}
+			} else {
+				for (const glyph of [...intersectionSet]) {
+					if (!glyphSet.has(glyph)) {
+						intersectionSet.delete(glyph)
+					}
+				}
+			}
+
+			for (const glyph of glyphSet) {
+				unionSet.add(glyph)
+			}
+		}
+
+		const problems: string[] = []
+
+		for (const [fullFontName, glyphSet] of glyphSets) {
+			const missing = [...unionSet].filter(glyph => !glyphSet.has(glyph))
+			const extraneous = [...glyphSet].filter(glyph => !intersectionSet.has(glyph))
+
+			if (missing.length > 0 || extraneous.length > 0) {
+				const details: string[] = []
+
+				if (missing.length > 0) {
+					details.push(`missing ${missing.length} glyph(s): ${missing.sort().join(', ')}`)
+				}
+
+				if (extraneous.length > 0) {
+					details.push(
+						`has ${extraneous.length} extra glyph(s) not in every variant: ${extraneous.sort().join(', ')}`,
+					)
+				}
+
+				problems.push(`  - ${fullFontName}: ${details.join('; ')}`)
+			}
+		}
+
+		if (problems.length > 0) {
+			throw new Error(
+				[
+					`Every variant of '${fontName}' must contain the exact same set of glyphs, but they differ:`,
+					...problems,
+				].join('\n'),
+			)
+		}
+	}
+
 	public static async create({
 		fontName,
 		variants,
@@ -787,6 +865,8 @@ export class SVGFont {
 		if (variants.length === 0) {
 			throw new Error(`No variants provided for font '${fontName}'`)
 		}
+
+		await SVGFont.assertVariantGlyphParity(svgIconsDir, fontName, variants)
 
 		const svgIconsDirAbs = path.join(repoRoot, svgIconsDir)
 		const fontOutputDirAbs = path.join(repoRoot, fontOutputDir)
@@ -923,9 +1003,13 @@ export class SVGFont {
 				let largestStagedSvgSize = 0
 
 				for (const entry of svgEntries) {
-					const stagedSvg = removeCSSOutline(
-						await fs.readFile(path.join(svgIconsDir, entry), 'utf-8'),
-					)
+					const stagedSvg = optimize(
+						removeCSSOutline(
+							optimize(await fs.readFile(path.join(svgIconsDir, entry), 'utf-8'), this.svgoConfig)
+								.data,
+						),
+						this.svgoConfig,
+					).data
 
 					largestStagedSvgSize = Math.max(largestStagedSvgSize, stagedSvg.length)
 					await fs.writeFile(path.join(stagingDir, entry), stagedSvg)

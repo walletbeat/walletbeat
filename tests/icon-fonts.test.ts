@@ -1,6 +1,11 @@
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { wbIconEmojiSequences } from '@/styles/wbicons'
+import { getRepositoryRoot } from '@/tests/utils/codebase'
 import {
 	generatedIconFontCSS,
 	repeatedIconFontUnicodeSequences,
@@ -10,7 +15,7 @@ import {
 describe('wbicons', async () => {
 	const wbicons = await SVGFont.create({
 		fontName: 'wbicons',
-		variants: ['complex'],
+		variants: ['complex', 'simple'],
 		fontTypeName: 'WBIcon',
 		cssOutputDir: 'src/styles',
 		fontOutputDir: 'src/assets/fonts',
@@ -70,5 +75,13 @@ describe('wbicons', async () => {
 			Object.keys(results).length,
 			`Found ${Object.keys(results).length} non-monochrome file(s):\n\n${errorDetails}`,
 		).toBe(0)
+	})
+
+	it('has the same glyph set across variants', async () => {
+		const parityDir = path.join(getRepositoryRoot(), 'resources/files/wbicons')
+
+		await expect(
+			SVGFont.assertVariantGlyphParity(parityDir, 'wbicons', ['complex', 'simple']),
+		).resolves.toBeUndefined()
 	})
 })

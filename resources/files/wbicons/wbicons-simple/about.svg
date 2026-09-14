@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_2"
+   data-name="Layer 2"
+   viewBox="0 0 508.86 398.58"
+   version="1.1"
+   sodipodi:docname="about.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="144.24978"
+     inkscape:cy="159.09903"
+     inkscape:window-width="2259"
+     inkscape:window-height="1178"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g3" />
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .cls-1 {
+        fill: none;
+        stroke: none;
+        stroke-miterlimit: 10;
+      }
+    </style>
+  </defs>
+  <g
+     id="Layer_1-2"
+     data-name="Layer 1">
+    <g
+       id="g3">
+      <path
+         d="M503.14,398.56H3.21c-3.9-14.81-4.03-26.54-1.55-42.08l34.06-1.19,3.31-263.15L258.09,0l215.56,89.42.65,266.4,29.15,2.14c6.59,10.8,7.92,25.16-.31,40.6ZM229.2,225.79l-2.33-58.7-96.87.99.84,74.18,77.88,1.26c3.96.06,11.68-1.59,14.55-2.86s6.1-10.41,5.92-14.87ZM393.07,241.57l-1.01-73.54-83.45-1.23c-4.84-.07-14.09,7.77-13.99,12.64l1.3,62.57,97.15-.44Z"
+         id="path1" />
+    </g>
+  </g>
+</svg>
