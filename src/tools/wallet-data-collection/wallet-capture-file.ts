@@ -349,6 +349,22 @@ function _isEthereumAddress(s: string): boolean {
 	return s.length === 42 && s.startsWith('0x', 0)
 }
 
+/**
+ * Splits `str` on occurrences of `existingStr`, like `String.prototype.split`,
+ * except that when `existingStr` is an Ethereum address, the match is done
+ * case-insensitively: EIP-55 checksum casing is a cosmetic convention, so
+ * `0xABC...` and `0xabc...` refer to the same address and should be treated
+ * as the same substring. Non-address substrings are matched as-is (case
+ * sensitively). Returns `null` when there is no match.
+ */
+function splitOnKnownSubstring(str: string, existingStr: string): string[] | null {
+	const bits = _isEthereumAddress(existingStr)
+		? str.split(new RegExp(escapeRegExp(existingStr), 'i'))
+		: str.split(existingStr)
+
+	return bits.length > 1 ? bits : null
+}
+
 function _extractEthereumValues(
 	text: string,
 ): { addresses: Erc55Address[]; txids: string[] } | null {
@@ -961,7 +977,7 @@ export class UserDataString {
  * A deduplicated set of UserDataString objects.
  */
 export class UserDataStringStore {
-	private readonly _index: Map<string, UserDataString> = new Map()
+	public readonly _index: Map<string, UserDataString> = new Map()
 
 	public static newStore(): UserDataStringStore {
 		return new UserDataStringStore()
@@ -1650,16 +1666,14 @@ export class WalletDataString {
 		const strLength = str.length
 		const substrings: (WalletDataStringBreadcrumb & { type: 'SUBSTRING' })[] = []
 
-		for (const existing of strings.longestFirstUserInfoOnlyStrings()) {
-			const existingStr = existing.str.str
-
+		for (const existingStr of strings.longestFirstUserInfoOnlyStrings()) {
 			if (existingStr.length >= strLength) {
 				continue
 			}
 
-			const bits = str.split(existingStr)
+			const bits = splitOnKnownSubstring(str, existingStr)
 
-			if (bits.length <= 1) {
+			if (bits === null) {
 				continue
 			}
 
@@ -1811,7 +1825,7 @@ export class WalletDataStrings {
 	public readonly captureFile: WalletCaptureFile
 	private _strings: Map<string, WalletDataString> = new Map()
 	private _highestScoreFirstStrings: WalletDataString[] | null = null
-	private _longestFirstStrings: WalletDataString[] | null = null
+	private _longestFirstStrings: string[] | null = null
 	private _highestFrequencyFirstStrings: WalletDataString[] | null = null
 
 	constructor(captureFile: WalletCaptureFile) {
@@ -1866,13 +1880,32 @@ export class WalletDataStrings {
 	}
 
 	/**
-	 * @returns The set of strings, ordered by longest string first. Useful for string matching.
+	 * @returns The set of strings known to carry user data, ordered by longest
+	 * string first. Useful for string matching. Includes strings discovered so
+	 * far in this capture as well as strings declared in the capture file's
+	 * `userData` store (e.g. via `--wallet-addresses` or `mark-string`) even if
+	 * they haven't yet surfaced as a standalone string in this run — e.g. a
+	 * wallet address that only ever appears embedded inside composite
+	 * chain-qualified account ID strings is still declared in `userData`, and
+	 * should be cross-checked against regardless of discovery order.
 	 */
-	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
+	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<string> {
 		if (this._longestFirstStrings === null) {
-			this._longestFirstStrings = Array.from(this._strings.values())
-				.filter(s => s.str.pieces.size > 0)
-				.sort((a, b) => b.str.str.length - a.str.str.length)
+			const candidates = new Set<string>()
+
+			for (const s of this._strings.values()) {
+				if (s.str.pieces.size > 0) {
+					candidates.add(s.str.str)
+				}
+			}
+
+			for (const ud of this.captureFile.userData._index.values()) {
+				if (ud.pieces.size > 0) {
+					candidates.add(ud.str)
+				}
+			}
+
+			this._longestFirstStrings = Array.from(candidates).sort((a, b) => b.length - a.length)
 		}
 
 		return this._longestFirstStrings
