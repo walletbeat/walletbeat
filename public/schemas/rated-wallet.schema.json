@@ -283,6 +283,36 @@
 					"items": {
 						"$ref": "#/$defs/referenceUrl"
 					}
+				},
+				"source": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["id", "name", "license", "attributionText"],
+					"description": "Provenance of this reference when it was adapted from an external data source. id is the data-source entity id. license.url is the license deed, not the report URL.",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"license": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["name", "url"],
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							}
+						},
+						"attributionText": {
+							"type": "string"
+						}
+					}
 				}
 			}
 		},

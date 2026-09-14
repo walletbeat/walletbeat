@@ -6,9 +6,15 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { Rating, ratingToText } from '@/schema/attributes'
-import { toFullyQualified } from '@/schema/reference'
+import {
+	computeDataSourceCredits,
+	dataCreditAnchorId,
+	type FullyQualifiedReference,
+	mergeRefs,
+	toFullyQualified,
+} from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
-import { gitCommitRefPinRegExp } from '@/schema/url'
+import { getUrl, gitCommitRefPinRegExp, isUrl } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
@@ -272,6 +278,16 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 						parts.push('#### References', '')
 
 						for (const ref of qualifiedRefs) {
+							// Inline data-credit link points to the consolidated
+							// "Data credits" section at the bottom of the page.
+							// Stamped references share this suffix so attribution
+							// stays close to the citation without repeating the
+							// full credit block per attribute.
+							const creditSuffix =
+								ref.source === undefined
+									? ''
+									: ` [Credit: ${ref.source.entity.name}](#${dataCreditAnchorId(ref.source.entity)})`
+
 							for (const labeledUrl of ref.urls) {
 								const prefix =
 									ref.explanation === undefined
@@ -286,7 +302,7 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 									.replace(/[[\]]/g, String.raw`\$&`)
 									.replace(gitCommitRefPinRegExp, '`$&`')
 
-								parts.push(`- ${prefix}[${label}](${labeledUrl.url})`)
+								parts.push(`- ${prefix}[${label}](${labeledUrl.url})${creditSuffix}`)
 							}
 						}
 
@@ -301,5 +317,49 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 		},
 	)
 
-	return [...headerLines, ...stageSection, ...groupLines.flat()].join('\n')
+	// Gather every stamped reference across every non-exempt attribute on the
+	// page, deduplicated by source, so the "Data credits" section is rendered
+	// exactly once at the bottom. Inline `[Credit: …](#anchor)` links in each
+	// attribute's References list scroll to the matching entry here.
+	const allPageRefs: FullyQualifiedReference[] = mergeRefs(
+		...mapNonExemptAttributeGroupsInTree(attributeTree, wallet.overall, (_attrGroup, evalGroup) =>
+			mapNonExemptGroupAttributes(evalGroup, evalAttr =>
+				toFullyQualified(evalAttr.evaluation.references),
+			).flat(),
+		).flat(),
+	)
+
+	const pageCredits = computeDataSourceCredits(allPageRefs)
+	const creditsSection: string[] = []
+
+	if (pageCredits.length > 0) {
+		creditsSection.push(pageCredits.length === 1 ? '## Data credit' : '## Data credits', '')
+
+		for (const credit of pageCredits) {
+			const sourceName = credit.source.entity.name
+			const sourceLabel = isUrl(credit.source.entity.url)
+				? `[${sourceName}](${getUrl(credit.source.entity.url)})`
+				: sourceName
+			const reportLinks = credit.reportUrls
+				.map(report => `[${report.label}](${report.url})`)
+				.join(', ')
+
+			// Inline anchor on the first line of the bullet lets inline
+			// `[Credit: …](#data-credit-…)` links jump to the entry when
+			// the markdown is rendered by hosts that do not auto-slug list
+			// items (GitHub only auto-slugs headings, not `- foo` items).
+			// Keeping the `<a>` inline avoids the empty `<p>` most CommonMark
+			// renderers emit around a standalone inline-HTML block.
+			creditsSection.push(
+				`- <a id="${dataCreditAnchorId(credit.source.entity)}"></a>${sourceLabel}`,
+				`  - Reports: ${reportLinks}`,
+				`  - License: [${credit.source.license.name}](${getUrl(credit.source.license.url)})`,
+				`  - ${credit.source.attributionText}`,
+			)
+		}
+
+		creditsSection.push('')
+	}
+
+	return [...headerLines, ...stageSection, ...groupLines.flat(), ...creditsSection].join('\n')
 }

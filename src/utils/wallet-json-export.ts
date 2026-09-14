@@ -70,6 +70,12 @@ export interface ReferenceUrlJsonExport {
 export interface ReferenceJsonExport {
 	explanation?: string
 	urls: ReferenceUrlJsonExport[]
+	source?: {
+		id: string
+		name: string
+		license: { name: string; url: string }
+		attributionText: string
+	}
 }
 
 /** Attribute-level metadata (same for every wallet). */
@@ -152,7 +158,7 @@ export interface RatedWalletJsonExport {
 	repository?: string
 }
 
-function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
+export function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
 	const qualified = toFullyQualified(references)
 
 	if (qualified.length === 0) {
@@ -162,6 +168,17 @@ function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] 
 	return qualified.map(ref => ({
 		...(ref.explanation !== undefined && { explanation: ref.explanation }),
 		urls: ref.urls.map(u => ({ label: u.label, url: u.url })),
+		...(ref.source !== undefined && {
+			source: {
+				id: ref.source.entity.id,
+				name: ref.source.entity.name,
+				license: {
+					name: ref.source.license.name,
+					url: getUrl(ref.source.license.url),
+				},
+				attributionText: ref.source.attributionText,
+			},
+		}),
 	}))
 }
 
