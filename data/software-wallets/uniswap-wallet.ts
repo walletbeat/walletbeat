@@ -35,6 +35,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
+import { mdParagraph } from '@/types/content'
 
 import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
 import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
@@ -149,16 +150,6 @@ export const uniswapWallet: SoftwareWallet = {
 						'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
 					file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
 					label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
-				},
-				{
-					explanation:
-						'`useUnitagsUsernameQuery` calls the Uniswap Unitags API, an offchain service, to resolve Uniswap handles.',
-					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/unitagsApi/useUnitagsUsernameQuery.ts',
-				},
-				{
-					explanation:
-						"In the Send flow, whatever text is typed is looked up two ways in parallel: `useAddressFromEns` (onchain ENS resolution) and `useUnitagsUsernameQuery` (Uniswap's own offchain Unitags API for Uniswap handles). The resolved address is then picked with `userInput` (raw address) first, `forwardLookupAddress` (the ENS result) second, and `recipientInputUnitagAddress` (the Unitag result) last.",
-					url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/web/src/pages/Swap/Send/state/hooks.tsx#L58-L86',
 				},
 				{
 					explanation:
@@ -485,6 +476,22 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 			atomicMultiTransactions: notSupported,
 		}),
+	},
+	overrides: {
+		attributes: {
+			ecosystem: {
+				addressResolution: {
+					note: mdParagraph(`
+						In the Send flow, Uniswap Wallet resolves the typed text two ways
+						in parallel: onchain ENS resolution via \`useAddressFromEns\`, and
+						Uniswap's own offchain Unitags API via \`useUnitagsUsernameQuery\`
+						(for Uniswap handles, a separate feature from ENS resolution). The
+						resolved address is picked with the raw address first, the ENS
+						result second, and the Unitag result last.
+					`),
+				},
+			},
+		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,
