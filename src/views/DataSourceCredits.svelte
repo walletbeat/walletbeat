@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import type { Entity } from '@/schema/entity'
 	import { computeDataSourceCredits, type FullyQualifiedReference } from '@/schema/reference'
 	import { getUrl, isUrl } from '@/schema/url'
 
@@ -22,6 +23,18 @@
 
 
 {#if credits.length > 0}
+	{#snippet sourceHeading(entity: Entity)}
+		{#if entity.icon !== 'NO_ICON'}
+			<span data-icon aria-hidden="true">
+				<img
+					src={`/images/entities/${entity.id}.${entity.icon.extension}`}
+					alt=""
+				/>
+			</span>
+		{/if}
+		<cite>{entity.name}</cite>
+	{/snippet}
+
 	<section
 		class="data-credits"
 		data-card="secondary"
@@ -41,11 +54,14 @@
 							href={getUrl(credit.source.entity.url)}
 							target="_blank"
 							rel="noopener noreferrer"
+							data-row="start gap-1"
 						>
-							<cite>{credit.source.entity.name}</cite>
+							{@render sourceHeading(credit.source.entity)}
 						</a>
 					{:else}
-						<cite>{credit.source.entity.name}</cite>
+						<span data-row="start gap-1">
+							{@render sourceHeading(credit.source.entity)}
+						</span>
 					{/if}
 
 					<ul data-list="gap-1">
@@ -94,6 +110,11 @@
 
 	cite {
 		font-style: normal;
+	}
+
+	a[data-row],
+	span[data-row] {
+		inline-size: fit-content;
 	}
 
 	.attribution {

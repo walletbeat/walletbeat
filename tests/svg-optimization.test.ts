@@ -34,6 +34,8 @@ const optimizedSvgHashes: Record<string, string> = {
 		'9cf63067389e60630f96d6c245a6a93da8d8e7d7fd5942b58e9405a3dc6677ae',
 	'public/images/entities/consensys.svg':
 		'4cdd9f55c31c2d01bc4949f8181ffdb9204925109d6e632d2255f524ba90cf1c',
+	'public/images/entities/coinspect.svg':
+		'd8c0af4e16bc630dac9b4944c95d128238f6c9b2a5a80f6ca403ce049dd03bde',
 	'public/images/entities/cyfrin.svg':
 		'63f1941e51ff174b89c52c84911f3b63df5e2db1e60cf5186af24c0d037c3df7',
 	'public/images/entities/daimo.svg':

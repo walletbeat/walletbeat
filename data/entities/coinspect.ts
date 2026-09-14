@@ -1,6 +1,6 @@
-import type { CorporateEntity } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
 
-export const coinspect: CorporateEntity = {
+export const coinspect: CorporateEntity & SecurityAuditor = {
 	id: 'coinspect',
 	name: 'Coinspect',
 	legalName: { name: 'Coinspect Security LLC', soundsDifferent: false },
@@ -17,7 +17,9 @@ export const coinspect: CorporateEntity = {
 	},
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-	icon: 'NO_ICON',
+	icon: {
+		extension: 'svg',
+	},
 	jurisdiction: { type: 'UNKNOWN' },
 	linkedin: 'https://www.linkedin.com/company/coinspect',
 	privacyPolicy: 'https://www.coinspect.com/legal/privacy/',
