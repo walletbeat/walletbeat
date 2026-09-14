@@ -17,7 +17,11 @@
 		error: '',
 	})
 
-	const walletConnectState = $state({
+	const walletConnectState = $state<{
+		isPending: boolean
+		result: unknown
+		error: string
+	}>({
 		isPending: false,
 		result: null,
 		error: '',

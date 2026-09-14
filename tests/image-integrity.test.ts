@@ -174,14 +174,29 @@ const BLOCKINESS_TEST: ImageTest = {
  * SVGs excluded from the optimization check.
  *
  * These are auto-generated (treasury charts refreshed on each transaction, and
- * the icon-font SVG emitted by the generator), so re-checking them on every
- * run would be wasteful and noisy.
+ * the icon-font SVGs emitted by the generator), so re-checking them on every
+ * run would be wasteful and noisy. The wbicons source SVGs are also excluded
+ * because they are optimized at font generation time.
  */
 const SVG_OPTIMIZATION_EXCLUDED: Set<string> = new Set([
 	'governance/treasury/treasury-expenses-over-time.svg',
 	'governance/treasury/treasury-expenses-breakdown.svg',
-	'src/assets/fonts/wbicons/wbicons.svg',
 ])
+
+/** Paths under which every SVG is excluded from the optimization check. */
+const SVG_OPTIMIZATION_EXCLUDED_PREFIXES: string[] = [
+	'src/assets/fonts/',
+	'resources/files/wbicons/',
+]
+
+/** Whether a file path is excluded from the SVG optimization check. */
+function isSvgOptimizationExcluded(filePath: string): boolean {
+	if (SVG_OPTIMIZATION_EXCLUDED.has(filePath)) {
+		return true
+	}
+
+	return SVG_OPTIMIZATION_EXCLUDED_PREFIXES.some(prefix => filePath.startsWith(prefix))
+}
 
 /** Lazily-loaded and cached SVGO config. */
 let svgoConfigPromise: Promise<Config> | undefined
@@ -203,7 +218,7 @@ function getSvgoConfig(): Promise<Config> {
 const SVG_OPTIMIZED_TEST: ImageTest = {
 	name: 'svg-optimized',
 	appliesTo: entry =>
-		extensionOf(entry.filePath) === '.svg' && !SVG_OPTIMIZATION_EXCLUDED.has(entry.filePath),
+		extensionOf(entry.filePath) === '.svg' && !isSvgOptimizationExcluded(entry.filePath),
 	run: async entry => {
 		const svgoConfig = await getSvgoConfig()
 		const result = optimize(entry.contents, {
@@ -238,8 +253,19 @@ const EMBEDDED_IMAGE_RATIO_THRESHOLD = 0.95
 const SVG_VECTOR_EXCLUDED: Set<string> = new Set([
 	'governance/treasury/treasury-expenses-over-time.svg',
 	'governance/treasury/treasury-expenses-breakdown.svg',
-	'src/assets/fonts/wbicons/wbicons.svg',
 ])
+
+/** Paths under which every SVG is excluded from the vector check (auto-generated font SVGs). */
+const SVG_VECTOR_EXCLUDED_PREFIXES: string[] = ['src/assets/fonts/']
+
+/** Whether a file path is excluded from the SVG vector check. */
+function isSvgVectorExcluded(filePath: string): boolean {
+	if (SVG_VECTOR_EXCLUDED.has(filePath)) {
+		return true
+	}
+
+	return SVG_VECTOR_EXCLUDED_PREFIXES.some(prefix => filePath.startsWith(prefix))
+}
 /**
  * Detect SVGs that are disguised raster images (mostly an embedded base64
  * data URI rather than genuine vector content). Applies to every SVG.
@@ -247,7 +273,7 @@ const SVG_VECTOR_EXCLUDED: Set<string> = new Set([
 const SVG_VECTOR_TEST: ImageTest = {
 	name: 'svg-vector',
 	appliesTo: entry =>
-		extensionOf(entry.filePath) === '.svg' && !SVG_VECTOR_EXCLUDED.has(entry.filePath),
+		extensionOf(entry.filePath) === '.svg' && !isSvgVectorExcluded(entry.filePath),
 	run: entry => {
 		const fileSize = entry.raw.byteLength
 		const dataUriRegex = /data:\s*([\w/.+-]+);[^,]*,([^"'>\s]+)/g

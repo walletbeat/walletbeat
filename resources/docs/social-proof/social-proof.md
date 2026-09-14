@@ -36,3 +36,5 @@ description: "A log of positive social media mentions as a result of Walletbeat'
 - https://x.com/josifhamed/status/2090701263700725900
 - https://x.com/borislavItskovv/status/2090563980549042476
 - https://x.com/casberi_app/status/2090578278969200828
+- https://x.com/BitgetWallet/status/2098287920767791242
+- http://x.com/TheCapHimself/status/2098191712950567263

@@ -13,7 +13,6 @@
 		type LevelConfig as PieLevelConfig,
 		type Slice as PieSlice,
 	} from './pie-geometry'
-	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -96,12 +95,15 @@
 
 	// Functions
 	const sliceFill = (slice: ComputedSlice) => {
-		if (!slice.children?.length || !slice.gradient) return slice.color
+		const children = slice.children
+		const gradient = slice.gradient
 
-		const colorWeights = slice.gradient.colors
+		if (!children?.length || !gradient) return slice.color
+
+		const colorWeights = gradient.colors
 			.map(color => ({
 				color,
-				weight: slice.children
+				weight: children
 					.filter(child => child.color === color)
 					.reduce((sum, child) => sum + child.weight, 0),
 			}))
@@ -110,10 +112,10 @@
 		if (colorWeights.length <= 1) {
 			const color = colorWeights[0]?.color ?? slice.color
 
-			return color === slice.gradient.transparentStopColor ? 'var(--rating-unrated)' : color
+			return color === gradient.transparentStopColor ? 'var(--rating-unrated)' : color
 		}
 
-		const areaRadiusStops = slice.gradient.areaRadiusStops
+		const areaRadiusStops = gradient.areaRadiusStops
 		const totalWeight = colorWeights.reduce((sum, entry) => sum + entry.weight, 0)
 		const minimumStopGap = Math.min(8, (slice.computed.outerR - slice.computed.innerR) / Math.max(colorWeights.length - 1, 1))
 		const stopPositions = colorWeights
@@ -155,7 +157,7 @@
 				[],
 			)
 
-		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === slice.gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), var(--rating-unrated)`
+		return `radial-gradient(in oklch circle at var(--pie-originX) var(--pie-originY), ${colorWeights.map(({ color }, index) => `${color === gradient.transparentStopColor ? 'transparent' : color} ${stopPositions[index]}px`).join(', ')}), var(--rating-unrated)`
 	}
 
 	const sliceBackdropFilter = (slice: ComputedSlice) => (
@@ -196,11 +198,10 @@
 		href={slice.href}
 
 		class="slice"
-		title={slice.titleText}
 
 		role="button"
 		tabindex="0"
-		aria-label={slice.titleText}
+		aria-label={slice.ariaLabel}
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
@@ -238,7 +239,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
+				<span class="label" aria-hidden="true" data-icon="wbicons-simple {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
