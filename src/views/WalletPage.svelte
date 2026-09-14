@@ -578,7 +578,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{@html Globe}
+							<span data-icon="wbicons-simple browser_integration"></span>
 							Website
 						</a>
 					{/if}
@@ -590,7 +590,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{@html Github}
+							<span data-icon="wbicons-simple code_repository"></span>
 							Source Code
 						</a>
 					{/if}
@@ -719,7 +719,7 @@
 							{#if item.icon}
 								<span
 									class="pie-navigation-icon"
-									data-icon="wbicons emoji {item.icon}"
+									data-icon="wbicons-simple {item.icon}"
 								></span>
 							{/if}
 						{/snippet}
@@ -744,7 +744,7 @@
 					{#if item.icon}
 						<span
 							class="toc-icon"
-							data-icon="wbicons {item.icon}"
+							data-icon="wbicons-simple {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -817,7 +817,7 @@
 				>
 					<span
 						class="attribute-group-icon"
-						data-icon="wbicons {attrGroup.icon}"
+						data-icon="wbicons-complex {attrGroup.icon}"
 					></span>
 
 					<div
@@ -924,7 +924,7 @@
 				<header data-row-item="flexible" data-row="center gap-3">
 					<span
 						class="attribute-icon"
-						data-icon="wbicons {attribute.icon}"
+						data-icon="wbicons-complex {attribute.icon}"
 					></span>
 
 					<div
@@ -1690,10 +1690,15 @@
 		&::before {
 			line-height: 1;
 			filter:
-				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 80%, transparent))
-				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 50%, transparent));
+				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 30%, transparent))
+				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 10%, transparent));
 			transition-property: filter;
 		}
+	}
+
+	.attribute-group-icon,
+	.attribute-icon {
+		font-size: 2.5rem;
 	}
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
