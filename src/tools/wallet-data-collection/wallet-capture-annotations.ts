@@ -18,14 +18,14 @@ import {
 	nonEmptySetFromArray,
 	setItems,
 } from '@/types/utils/non-empty'
-
 import {
 	expectArray,
 	expectOptionalString,
 	expectRecord,
 	expectString,
 	isSameJson,
-} from './json-utils'
+} from '@/utils/json'
+
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
