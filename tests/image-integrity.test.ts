@@ -13,7 +13,12 @@ import { describe, expect, it } from 'vitest'
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
 import { isSameJson } from '@/utils/json'
 
-import { CodebaseEntryType, GitIgnoredFiles, crawlCodebase, getRepositoryRoot } from './utils/codebase'
+import {
+	CodebaseEntryType,
+	crawlCodebase,
+	getRepositoryRoot,
+	GitIgnoredFiles,
+} from './utils/codebase'
 
 /**
  * Path to the JSON whitelist of image files already verified as passing every
@@ -680,7 +685,15 @@ describe('image integrity', () => {
 		const trackedFiles: Set<string> = new Set()
 
 		await crawlCodebase({
-			ignore: ['.git', await GitIgnoredFiles(), 'node_modules', 'dist', '.cache', '.astro', 'src/generated'],
+			ignore: [
+				'.git',
+				await GitIgnoredFiles(),
+				'node_modules',
+				'dist',
+				'.cache',
+				'.astro',
+				'src/generated',
+			],
 			complexTraversalFn: async (entryBase, getFullEntry) => {
 				if (entryBase.type !== CodebaseEntryType.FILE) {
 					return
