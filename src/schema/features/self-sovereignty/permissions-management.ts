@@ -37,9 +37,9 @@ export interface ApprovalsManagement {
  */
 export enum BuiltInSwapDefaultApprovalBehavior {
 	/**
-	 * The wallet requests only the amount needed for the swap/bridge before signing.
+	 * The wallet requests only the minimum amount needed for the swap/bridge before signing.
 	 */
-	EXACT_AMOUNT,
+	MINIMAL_AMOUNT,
 	/**
 	 * The wallet defaults to an unlimited approval, but the user can see and
 	 * edit the amount before signing.
@@ -84,8 +84,8 @@ export function hasBuiltInSwap(
 
 export function swapBehaviorDescription(behavior: BuiltInSwapDefaultApprovalBehavior): string {
 	switch (behavior) {
-		case BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT:
-			return 'requests only the amount needed for the swap'
+		case BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT:
+			return 'requests only the minimum amount needed for the swap'
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE:
 			return 'defaults to an unlimited approval, but lets the user edit the amount before signing'
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_DISCLOSED:
