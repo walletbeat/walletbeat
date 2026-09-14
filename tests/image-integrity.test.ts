@@ -1,6 +1,9 @@
+import { execFile } from 'node:child_process'
 import * as crypto from 'node:crypto'
 import * as fs from 'node:fs/promises'
+import * as os from 'node:os'
 import * as path from 'node:path'
+import { promisify } from 'node:util'
 
 import { format, resolveConfig } from 'prettier'
 import sharp from 'sharp'
@@ -303,8 +306,189 @@ const SVG_VECTOR_TEST: ImageTest = {
 	},
 }
 
+/** Parsed `viewBox` attribute. */
+interface ViewBox {
+	x: number
+	y: number
+	width: number
+	height: number
+}
+
+/** Which of the four rasterized borders the drawn content reaches. */
+interface TouchingBorders {
+	left: boolean
+	right: boolean
+	top: boolean
+	bottom: boolean
+}
+
+const execFileAsync = promisify(execFile)
+
+/** Parse the `viewBox` attribute of an SVG (null when absent/malformed). */
+function parseViewBox(contents: string): ViewBox | null {
+	const match = contents.match(/viewBox\s*=\s*"([^"]+)"/)
+
+	if (match === null) {
+		return null
+	}
+
+	const parts = match[1]
+		.trim()
+		.split(/[\s,]+/)
+		.map(Number)
+
+	if (parts.length !== 4 || parts.some(Number.isNaN)) {
+		return null
+	}
+
+	return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] }
+}
+
+/**
+ * Rasterize an SVG to a 2048×2048 PNG using the `inkscape` CLI, returning the
+ * raw PNG bytes.
+ */
+async function rasterizeSvgWithInkscape(svgPath: string): Promise<Buffer> {
+	const outPath = path.join(os.tmpdir(), `wbicon-${crypto.randomUUID()}.png`)
+	const args = [
+		'--export-type=png',
+		'--export-width=2048',
+		'--export-height=2048',
+		`--export-filename=${outPath}`,
+		svgPath,
+	]
+
+	// inkscape can transiently fail to connect to the session D-Bus bus on
+	// startup (Gio::DBus::Error) even when the bus is present; retry a couple of
+	// times to make the rasterization deterministic.
+	let lastError: unknown
+
+	try {
+		for (let attempt = 0; attempt < 3; attempt++) {
+			try {
+				await execFileAsync('inkscape', args, { timeout: 60000 })
+
+				return fs.readFile(outPath)
+			} catch (error) {
+				lastError = error
+			}
+		}
+
+		throw lastError
+	} finally {
+		// Always clean up the temporary PNG, whether rasterization succeeded or
+		// not. Ignore a missing file (e.g. inkscape never produced one).
+		try {
+			await fs.unlink(outPath)
+		} catch {
+			// Ignore: the file may not exist.
+		}
+	}
+}
+
+/** Detect which borders of a 2048×2048 rasterized icon the content touches. */
+async function detectTouchingBorders(pngBuffer: Buffer): Promise<TouchingBorders> {
+	const { data, info } = await sharp(pngBuffer)
+		.ensureAlpha()
+		.raw()
+		.toBuffer({ resolveWithObject: true })
+
+	const { width, height, channels } = info
+	const alphaIndex = 3
+	const alphaAt = (x: number, y: number): number => data[(y * width + x) * channels + alphaIndex]
+
+	let left = false
+	let right = false
+	let top = false
+	let bottom = false
+
+	for (let x = 0; x < width; x++) {
+		if (alphaAt(x, 0) > 0) {
+			top = true
+			break
+		}
+	}
+
+	for (let x = 0; x < width; x++) {
+		if (alphaAt(x, height - 1) > 0) {
+			bottom = true
+			break
+		}
+	}
+
+	for (let y = 0; y < height; y++) {
+		if (alphaAt(0, y) > 0) {
+			left = true
+			break
+		}
+	}
+
+	for (let y = 0; y < height; y++) {
+		if (alphaAt(width - 1, y) > 0) {
+			right = true
+			break
+		}
+	}
+
+	return { left, right, top, bottom }
+}
+
+/** Path prefix under which SVGs are expected to be square icon glyphs. */
+const WBICON_PREFIX = 'resources/files/wbicons/'
+
+/**
+ * Verify that the wbicons source SVGs are square (1:1) icon glyphs whose drawn
+ * content touches either the left and right borders or the top and bottom
+ * borders (or all four) when rasterized at 2048×2048, so they render as square
+ * icons that fill their frame.
+ */
+const WBICON_SQUARE_TEST: ImageTest = {
+	name: 'wbicon-square',
+	appliesTo: entry =>
+		extensionOf(entry.filePath) === '.svg' && entry.filePath.startsWith(WBICON_PREFIX),
+	run: async entry => {
+		const viewBox = parseViewBox(entry.contents)
+
+		if (viewBox === null) {
+			return { pass: false, detail: 'missing or malformed viewBox attribute' }
+		}
+
+		const ratio = viewBox.width / viewBox.height
+
+		if (Math.abs(ratio - 1) > 1e-6) {
+			return {
+				pass: false,
+				detail: `viewBox is ${viewBox.width}×${viewBox.height} (aspect ratio ${ratio.toFixed(4)}, not 1:1)`,
+			}
+		}
+
+		const png = await rasterizeSvgWithInkscape(path.join(getRepositoryRoot(), entry.filePath))
+		const borders = await detectTouchingBorders(png)
+		const count = [borders.left, borders.right, borders.top, borders.bottom].filter(Boolean).length
+		const opposing = (borders.left && borders.right) || (borders.top && borders.bottom)
+
+		if ((count === 2 && opposing) || count === 4) {
+			return { pass: true }
+		}
+
+		const sides = (['left', 'right', 'top', 'bottom'] as const)
+			.filter(side => borders[side])
+			.join(', ')
+
+		return {
+			pass: false,
+			detail: `content touches ${count} border(s): ${sides} (must touch exactly 2 opposing borders or all 4)`,
+		}
+	},
+}
+
 /** All integrity tests, in the order they should be reported. */
-const IMAGE_TESTS: ImageTest[] = [BLOCKINESS_TEST, SVG_OPTIMIZED_TEST, SVG_VECTOR_TEST]
+const IMAGE_TESTS: ImageTest[] = [
+	BLOCKINESS_TEST,
+	SVG_OPTIMIZED_TEST,
+	SVG_VECTOR_TEST,
+	WBICON_SQUARE_TEST,
+]
 
 /** A recorded failure of a specific test for a specific image. */
 interface ImageFailure {
