@@ -1,7 +1,11 @@
 <script lang="ts">
 	// Types/constants
 	import type { Entity } from '@/schema/entity'
-	import { computeDataSourceCredits, type FullyQualifiedReference } from '@/schema/reference'
+	import {
+		computeDataSourceCredits,
+		type DataSourceCredit,
+		type FullyQualifiedReference,
+	} from '@/schema/reference'
 	import { getUrl, isUrl } from '@/schema/url'
 
 
@@ -31,8 +35,29 @@
 					alt=""
 				/>
 			</span>
-		{/if}
-		<cite>{entity.name}</cite>
+		{/if}<cite>{entity.name}</cite>
+	{/snippet}
+
+	{#snippet labeledLink(href: string, label: string)}
+		<a
+			href={href}
+			target="_blank"
+			rel="noopener noreferrer"
+		><cite>{label}</cite><span>{@html ExternalLinkIcon}</span></a>
+	{/snippet}
+
+	{#snippet creditLine(credit: DataSourceCredit)}
+		{#if isUrl(credit.source.entity.url)}
+			<a
+				href={getUrl(credit.source.entity.url)}
+				target="_blank"
+				rel="noopener noreferrer"
+				data-link="camouflaged"
+				class="source-name"
+			>{@render sourceHeading(credit.source.entity)}</a>
+		{:else}
+			<span class="source-name">{@render sourceHeading(credit.source.entity)}</span>
+		{/if}<span>: </span>{#each credit.reportUrls as reportUrl, index (reportUrl.url)}{#if index > 0}<span>, </span>{/if}{@render labeledLink(reportUrl.url, reportUrl.label)}{/each}<span>, </span>{@render labeledLink(getUrl(credit.source.license.url), credit.source.license.name)}<span>. </span>{credit.source.attributionText}
 	{/snippet}
 
 	<section
@@ -46,52 +71,9 @@
 			{/if}
 		</h5>
 
-		<ul class="data-credits-list" data-list="gap-2">
+		<ul class="data-credits-list">
 			{#each credits as credit (credit.source.entity.id)}
-				<li data-list-item="gap-2">
-					{#if isUrl(credit.source.entity.url)}
-						<a
-							href={getUrl(credit.source.entity.url)}
-							target="_blank"
-							rel="noopener noreferrer"
-							data-row="start gap-1"
-						>
-							{@render sourceHeading(credit.source.entity)}
-						</a>
-					{:else}
-						<span data-row="start gap-1">
-							{@render sourceHeading(credit.source.entity)}
-						</span>
-					{/if}
-
-					<ul data-list="gap-1">
-						{#each credit.reportUrls as reportUrl (reportUrl.url)}
-							<li>
-								<a
-									href={reportUrl.url}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									<cite>{reportUrl.label}</cite>
-									<span>{@html ExternalLinkIcon}</span>
-								</a>
-							</li>
-						{/each}
-					</ul>
-
-					<p>
-						<a
-							href={getUrl(credit.source.license.url)}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<cite>{credit.source.license.name}</cite>
-							<span>{@html ExternalLinkIcon}</span>
-						</a>
-					</p>
-
-					<p class="attribution">{credit.source.attributionText}</p>
-				</li>
+				<li>{@render creditLine(credit)}</li>
 			{/each}
 		</ul>
 	</section>
@@ -112,12 +94,10 @@
 		font-style: normal;
 	}
 
-	a[data-row],
-	span[data-row] {
-		inline-size: fit-content;
-	}
-
-	.attribution {
-		margin: 0;
+	.source-name {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25em;
+		vertical-align: middle;
 	}
 </style>
