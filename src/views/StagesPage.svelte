@@ -193,7 +193,7 @@
 	}
 
 	.criteria-list {
-		--list-marker-fontFamily: var(--fontFamily-wbicons-complex);
+		--list-marker-fontFamily: var(--fontFamily-wbicons-simple);
 	}
 
 	details {

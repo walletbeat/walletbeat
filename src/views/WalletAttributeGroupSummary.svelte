@@ -57,7 +57,7 @@
 >
 	<header data-row="center gap-3 wrap">
 		<h3 data-row="gap-2">
-			<span data-icon="wbicons-complex {attributeGroup.icon}"></span> {attributeGroup.displayName}
+			<span data-icon="wbicons-simple {attributeGroup.icon}"></span> {attributeGroup.displayName}
 		</h3>
 
 		{#if summaryType === WalletAttributeGroupSummaryType.Score}
@@ -86,6 +86,10 @@
 
 			h3 {
 				font-weight: 600;
+			}
+
+			[data-icon~="wbicons-complex"], [data-icon~="wbicons-simple"] {
+				font-weight: 400;
 			}
 		}
 	}

@@ -1,11 +1,13 @@
 [data-icon~='wbicons-complex'] {
 	font-family: var(--fontFamily-wbicons-complex);
 	font-style: normal;
+	font-weight: 400;
 }
 
 [data-icon~='wbicons-simple'] {
 	font-family: var(--fontFamily-wbicons-simple);
 	font-style: normal;
+	font-weight: 400;
 }
 
 [data-icon~='wbicons-complex'], [data-icon~='wbicons-simple'] {

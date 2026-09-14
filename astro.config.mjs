@@ -93,5 +93,19 @@ export default defineConfig({
 				],
 			},
 		},
+		{
+			name: 'wbicons-simple',
+			cssVariable: '--fontFamily-wbicons-simple',
+			provider: fontProviders.local(),
+			options: {
+				variants: [
+					{
+						src: ['./src/assets/fonts/wbicons-simple/wbicons-simple.woff2'],
+						weight: '400',
+						style: 'normal',
+					},
+				],
+			},
+		},
 	],
 })

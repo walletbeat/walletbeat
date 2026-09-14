@@ -330,9 +330,7 @@
 				{@html (LUCIDE_ICONS as Record<string, string>)[item.icon]}
 			</span>
 		{:else}
-			<span
-				data-icon="{iconShape} wbicons-complex {item.iconVariant === 'emoji' ? 'emoji ' : ''}{item.icon}"
-			></span>
+			<span data-icon="{iconShape} wbicons-simple {item.icon}"></span>
 		{/if}
 	{/if}
 {/snippet}

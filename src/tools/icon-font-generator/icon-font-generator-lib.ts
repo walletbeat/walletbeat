@@ -601,6 +601,7 @@ export const generatedIconFontCSS = (
 				`[data-icon~='${fontVariant}'] {`,
 				`\tfont-family: var(--fontFamily-${fontVariant});`,
 				'\tfont-style: normal;',
+				'\tfont-weight: 400;',
 				'}',
 			].join('\n'),
 		)

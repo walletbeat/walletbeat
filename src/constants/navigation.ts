@@ -30,7 +30,6 @@ export type NavigationItem = {
 	id: string
 	title: string
 	icon?: NavigationIconID
-	iconVariant?: 'emoji'
 	accentColor?: string | null
 	href?: string
 	sliceStyle?: {
