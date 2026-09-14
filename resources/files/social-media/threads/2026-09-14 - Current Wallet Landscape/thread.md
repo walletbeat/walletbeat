@@ -62,7 +62,7 @@ Wallets must allow users to use a self-hosted node for these benefits to be real
 
 Blockchains' censorship resistance properties relies on disintermediation. Without the ability to use their own Ethereum nodes, users are forced to rely on intermediaries for interacting with the chain.
 
-![L1 Provider Independence Importance](./l1-provider-independence-test.png)
+![L1 Provider Independence Importance](./l1provider-independence-importance.png)
 
 ---
 
