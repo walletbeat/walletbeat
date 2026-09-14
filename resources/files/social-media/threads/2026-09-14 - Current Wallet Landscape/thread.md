@@ -49,7 +49,7 @@ Most wallets today have a partial rating, meaning that while they allow configur
 
 ---
 
-For a wallet to pass our L1 Provider Independence attibute, the user should be able to configure the L1 RPC provider before any requests are made to the default provider.
+For a wallet to pass our L1 Provider Independence attribute, the user should be able to configure the L1 RPC provider before any requests are made to the default provider.
 
 ![L1 Provider Independence test](./l1provider-independence-test.png)
 
