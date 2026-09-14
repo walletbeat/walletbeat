@@ -58,7 +58,7 @@ function approvalsManagementRating(control: SpendingApprovalsControl): ExplicitR
 /** Only an exact-amount-by-default approval passes; any unlimited default fails, whether disclosed or not. */
 function ratingForSwapApprovals(behavior: BuiltInSwapDefaultApprovalBehavior): ExplicitRating {
 	switch (behavior) {
-		case BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT:
+		case BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT:
 			return Rating.PASS
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE:
 		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_DISCLOSED:
@@ -278,7 +278,7 @@ export const permissionsManagement: Attribute = {
 						erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 						erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 					}),
-					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 				},
 			),
 		),
