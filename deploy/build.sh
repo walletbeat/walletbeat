@@ -13,11 +13,18 @@ set -euo pipefail
 # perceived path of these files and avoid this non-determinism.
 if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
 	if command -v bwrap >/dev/null 2>&1; then
-		tmpfs_arg=()
+		bwrap_args=()
 		if [[ "${WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY:-}" == "true" ]]; then
 			# Enforce that deps must be installed from scratch in the sandbox by
 			# mounting a tmpfs on top of `node_modules`:
-			tmpfs_arg=(--tmpfs /tmp/wb-build/node_modules)
+			bwrap_args+=(--tmpfs /tmp/wb-build/node_modules)
+		fi
+		if [[ -d "${HOME:-/non-existent}" ]] && [[ -n "${HOME:-}" ]] && [[ "${HOME:-}" != '/tmp' ]]; then
+			bwrap_args+=(--bind "${HOME:-/tmp}" "${HOME:-/tmp}")
+		elif [[ -d /home ]]; then
+			bwrap_args+=(--bind /home /home)
+		else
+			bwrap_args+=(--tmpfs /home)
 		fi
 		if [[ "${WALLETBEAT_ENV:-}" == "CI" ]]; then
 			sudo sysctl -w kernel.unprivileged_userns_clone=1 &>/dev/null || true
@@ -30,10 +37,9 @@ if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
 			--unshare-pid \
 			--unshare-uts \
 			--ro-bind / / \
-			--bind /tmp /tmp \
-			--bind "${HOME:-/tmp}" "${HOME:-/tmp}" \
+			--tmpfs /tmp \
 			--bind "$PWD" /tmp/wb-build \
-			"${tmpfs_arg[@]}" \
+			"${bwrap_args[@]}" \
 			--dev /dev \
 			--proc /proc \
 			--chdir /tmp/wb-build \
