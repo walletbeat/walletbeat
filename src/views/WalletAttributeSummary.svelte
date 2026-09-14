@@ -124,7 +124,6 @@
 					{#snippet TooltipContent()}
 						<WalletStageSummary
 							{wallet}
-							{ladders}
 							stage={firstStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}
