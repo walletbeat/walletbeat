@@ -19,18 +19,18 @@ We'll be looking at wallets such as @ambire, @MetaMask, @rainbowdotme, @Rabby_io
 ---
 
 🌸 Source Code Availability:
-Wallets are assessed based whether the license of their source code meets the Open Source Initiative's definition of open source. Examples of such licenses include MIT, Apache, BSD, and GPL.
+Wallets are assessed based whether the source code is available to the public. This allows anyone (including Walletbeat, as well as security auditors) to inspect what the wallet is doing.
 
-In this area the ecosystem is doing relatively well. Most of the Ethereum wallets right now are open source projects, so they all pass.
+In this area the ecosystem is doing relatively well. Most of the Ethereum wallets right now are open source projects, and therefore source-available, so they all pass.
 
 ![Source Code Availability](./source-code-availability.png)
 
 ---
 
-Why does this matter?
-Free & Open Source Software licensing allows a software project's source code to be freely used, modified and distributed. 
+On a related note, Walletbeat also looks at a wallet's source code license: is it FOSS?
+FOSS (Free & Open Source Software) licensing allows a software project's source code to be freely used, modified and distributed. 
 
-This allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities. 
+This enables better collaboration, more transparency into the software development practices that go into the project, and more guarantees for wallet users to fork, reuse, and remix the wallet's code.
 
 In short, it turns software projects into public goods.
 
@@ -38,20 +38,20 @@ In short, it turns software projects into public goods.
 
 ---
 
-🌸 L1 Provider Indepence:
+🌸 L1 Provider Independence:
 This is the attribute that allows users to configure their own L1 RPC provider before doing any requests.
 
-As you can see in our results, it's a mix of PASS, PARTIAL and FAIL. 
+As you can see in our results, it's a mix of PASS, PARTIAL, and FAIL. 
 
-Most wallets today've a partial rating, meaning that while they allow configurable RPCs, it would only be after a certain amount of requests made through the wallet's default provider 😣
+Most wallets today have a partial rating, meaning that while they allow configurable RPCs, it would only be after a certain amount of requests made through the wallet's default provider 😣
 
-![Support Own Node](./l1provider-independence.png)
+![L1 Provider Independence](./l1provider-independence.png)
 
 ---
 
 For a wallet to pass our L1 Provider Independence attibute, the user should be able to configure the L1 RPC provider before any requests are made to the default provider.
 
-![Support Own Node Test](./l1provider-independence-test.png)
+![L1 Provider Independence test](./l1provider-independence-test.png)
 
 ---
 
@@ -62,7 +62,7 @@ Wallets must allow users to use a self-hosted node for these benefits to be real
 
 Blockchains' censorship resistance properties relies on disintermediation. Without the ability to use their own Ethereum nodes, users are forced to rely on intermediaries for interacting with the chain.
 
-![Support Own Node Importance](./l1-provider-independence-test.png)
+![L1 Provider Independence Importance](./l1-provider-independence-test.png)
 
 ---
 
