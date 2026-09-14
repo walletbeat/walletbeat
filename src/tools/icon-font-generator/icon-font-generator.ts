@@ -1,6 +1,6 @@
 import { cac } from 'cac'
 
-import { wbIconEmojiSequences } from '@/styles/wbicons'
+import { knownSingleVariantIcons, wbIconEmojiSequences } from '@/styles/wbicons'
 import { getErrorMessage } from '@/types/errors'
 
 import { SVGFont } from './icon-font-generator-lib'
@@ -75,6 +75,7 @@ try {
 		fontOutputDir: opts.fontOutputDir,
 		cssOutputDir: opts.cssOutputDir,
 		iconUnicodeSequences: opts.fontName === 'wbicons' ? wbIconEmojiSequences : null,
+		knownSingleVariantIcons: opts.fontName === 'wbicons' ? knownSingleVariantIcons : null,
 	})
 
 	if ((opts.force === undefined || !opts.force) && font.isUpToDate()) {

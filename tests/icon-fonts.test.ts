@@ -1,10 +1,8 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { wbIconEmojiSequences } from '@/styles/wbicons'
+import { knownSingleVariantIcons, wbIconEmojiSequences } from '@/styles/wbicons'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 import {
 	generatedIconFontCSS,
@@ -21,6 +19,7 @@ describe('wbicons', async () => {
 		fontOutputDir: 'src/assets/fonts',
 		svgIconsDir: 'resources/files/wbicons',
 		iconUnicodeSequences: wbIconEmojiSequences,
+		knownSingleVariantIcons,
 	})
 
 	it('is up-to-date', () => {
@@ -81,7 +80,12 @@ describe('wbicons', async () => {
 		const parityDir = path.join(getRepositoryRoot(), 'resources/files/wbicons')
 
 		await expect(
-			SVGFont.assertVariantGlyphParity(parityDir, 'wbicons', ['complex', 'simple']),
+			SVGFont.assertVariantGlyphParity(
+				parityDir,
+				'wbicons',
+				['complex', 'simple'],
+				knownSingleVariantIcons,
+			),
 		).resolves.toBeUndefined()
 	})
 })

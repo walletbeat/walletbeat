@@ -1,3 +1,4 @@
+/** Set of icons mapped to their emoji. */
 export const wbIconEmojiSequences = {
 	about: 'ℹ️',
 	account_abstraction: '👤',
@@ -71,3 +72,18 @@ export const wbIconEmojiSequences = {
 
 /** Icon ID for WBIcon. */
 export type WBIconID = keyof typeof wbIconEmojiSequences
+
+/** Icons that have only a single variant, mapped to that variant. */
+export const knownSingleVariantIcons: Partial<Record<WBIconID, string>> = {
+	bug: 'simple',
+	by_rating: 'simple',
+	by_wallet: 'simple',
+	checklist: 'simple',
+	contribute: 'simple',
+	eip_trackers: 'simple',
+	poo: 'simple',
+	source_visibility: 'simple',
+	stages: 'simple',
+	discuss: 'complex',
+	faq: 'complex',
+}

@@ -253,16 +253,22 @@ const iconFontCSSRuleForIcon = (key: string, iconContent: string) =>
 export const generatedIconFontTypescript = (
 	fontTypeName: string,
 	iconUnicodeSequences: IconUnicodeSequences,
+	knownSingleVariantIcons: Record<string, string> = {},
 ) => {
 	const emojiSequencesName = `${fontTypeName
 		.replace(/^[A-Z]+(?=[A-Z][a-z])/, prefix => prefix.toLowerCase())
 		.replace(/^./, firstChar => firstChar.toLowerCase())}EmojiSequences`
+	const iconIdTypeName = `${fontTypeName}ID`
 
 	return [
+		'/** Set of icons mapped to their emoji. */',
 		`export const ${emojiSequencesName} = ${JSON.stringify(iconUnicodeSequences)} as const`,
 		'',
 		`/** Icon ID for ${fontTypeName}. */`,
-		`export type ${fontTypeName}ID = keyof typeof ${emojiSequencesName}`,
+		`export type ${iconIdTypeName} = keyof typeof ${emojiSequencesName}`,
+		'',
+		'/** Icons that have only a single variant, mapped to that variant. */',
+		`export const knownSingleVariantIcons: Partial<Record<${iconIdTypeName}, string>> = ${JSON.stringify(knownSingleVariantIcons)}`,
 		'',
 	].join('\n')
 }
@@ -644,6 +650,7 @@ export class SVGFont {
 	private readonly currentHash: string
 	private readonly svgoConfig: Config
 	private readonly iconUnicodeSequences: IconUnicodeSequences | null
+	private readonly knownSingleVariantIcons: Record<string, string> | null
 
 	private constructor(
 		fontName: string,
@@ -655,6 +662,7 @@ export class SVGFont {
 		svgoConfig: Config,
 		currentHash: string,
 		iconUnicodeSequences: IconUnicodeSequences | null,
+		knownSingleVariantIcons: Record<string, string> | null,
 	) {
 		this.fontName = fontName
 		this.variants = variants
@@ -665,6 +673,7 @@ export class SVGFont {
 		this.svgoConfig = svgoConfig
 		this.currentHash = currentHash
 		this.iconUnicodeSequences = iconUnicodeSequences
+		this.knownSingleVariantIcons = knownSingleVariantIcons
 	}
 
 	/** Full font names, e.g. `['wbicons-complex']` from base `wbicons` and variants `['complex']`. */
@@ -727,6 +736,7 @@ export class SVGFont {
 		fontTypeName: string,
 		svgoConfig: Config,
 		iconUnicodeSequences: IconUnicodeSequences | null,
+		knownSingleVariantIcons: Record<string, string> | null,
 	) {
 		const fullFontNames = variants.map(variant => `${fontName}-${variant}`)
 		const svgFilesByVariant = await Promise.all(
@@ -746,12 +756,17 @@ export class SVGFont {
 			JSON.stringify(generatedFontFormats),
 			iconFontGeneratorVersion,
 			JSON.stringify(iconUnicodeSequences),
+			JSON.stringify(knownSingleVariantIcons),
 			generatedIconFontCSS(fullFontNames, [
 				iconFontCSSRuleForIcon('__icon_name__', '__icon_content__'),
 			]),
-			generatedIconFontTypescript(fontTypeName, {
-				__icon_name__: '__icon_content__',
-			}),
+			generatedIconFontTypescript(
+				fontTypeName,
+				{
+					__icon_name__: '__icon_content__',
+				},
+				knownSingleVariantIcons ?? {},
+			),
 			String(svgFilesByVariant.length),
 		]
 
@@ -776,35 +791,88 @@ export class SVGFont {
 		svgIconsDir: string,
 		fontName: string,
 		variants: readonly string[],
+		knownSingleVariantIcons: Record<string, string> = {},
 	) {
+		// A single-variant glyph must map to a variant that actually exists, otherwise
+		// its "one variant" expectation is unsatisfiable.
+		for (const [glyphName, variantName] of Object.entries(knownSingleVariantIcons)) {
+			if (!variants.includes(variantName)) {
+				throw new Error(
+					`Single-variant icon '${glyphName}' is mapped to unknown variant '${variantName}' (valid variants: ${variants.join(', ')})`,
+				)
+			}
+		}
+
 		const fullFontNames = variants.map(variant => `${fontName}-${variant}`)
 		const glyphSets = await Promise.all(
 			fullFontNames.map(async fullFontName => {
 				const svgFiles = await SVGFont.readSvgFiles(path.join(svgIconsDir, fullFontName))
 
-				return [fullFontName, new Set(svgFiles.map(([fileName]) => fileName))] as const
+				// Glyph names are stored without the `.svg` extension so they match the
+				// bare keys of knownSingleVariantIcons.
+				return [
+					fullFontName,
+					new Set(svgFiles.map(([fileName]) => fileName.replace(/\.svg$/, ''))),
+				] as const
 			}),
 		)
 
-		// The complete glyph set is the union of every variant (each variant must
-		// contain all of it). A glyph is "extra" in a variant when it is not shared
-		// by every variant, i.e. it is absent from the intersection.
-		const unionSet = new Set<string>()
-		const intersectionSet = new Set<string>()
+		// Validate knownSingleVariantIcons itself against the actual glyph files:
+		// each entry must name a glyph that exists in exactly its designated variant
+		// and nowhere else. An entry naming a glyph that exists in no variant is
+		// extraneous; an entry naming a glyph that exists in more than one variant is
+		// not actually single-variant.
+		const glyphVariantsByGlyph = new Map<string, string[]>()
 
-		for (const [index, [_fullFontName, glyphSet]] of glyphSets.entries()) {
-			if (index === 0) {
-				for (const glyph of glyphSet) {
-					intersectionSet.add(glyph)
-				}
-			} else {
-				for (const glyph of [...intersectionSet]) {
-					if (!glyphSet.has(glyph)) {
-						intersectionSet.delete(glyph)
-					}
-				}
+		for (const [fullFontName, glyphSet] of glyphSets) {
+			const variantName = fullFontName.slice(fontName.length + 1)
+
+			for (const glyph of glyphSet) {
+				const variantsWithGlyph = glyphVariantsByGlyph.get(glyph) ?? []
+
+				variantsWithGlyph.push(variantName)
+				glyphVariantsByGlyph.set(glyph, variantsWithGlyph)
 			}
+		}
 
+		const singleVariantProblems: string[] = []
+
+		for (const [glyphName, designatedVariant] of Object.entries(knownSingleVariantIcons)) {
+			const variantsWithGlyph = glyphVariantsByGlyph.get(glyphName) ?? []
+
+			if (variantsWithGlyph.length === 0) {
+				singleVariantProblems.push(
+					`  - '${glyphName}' is listed as single-variant but exists in no variant (remove it from knownSingleVariantIcons)`,
+				)
+			} else if (variantsWithGlyph.length > 1) {
+				singleVariantProblems.push(
+					`  - '${glyphName}' is listed as single-variant but exists in multiple variants (${variantsWithGlyph
+						.sort((variantA, variantB) => variantA.localeCompare(variantB))
+						.join(', ')}); it must exist in only its designated variant`,
+				)
+			} else if (variantsWithGlyph[0] !== designatedVariant) {
+				singleVariantProblems.push(
+					`  - '${glyphName}' is designated to variant '${designatedVariant}' but only exists in variant '${variantsWithGlyph[0]}'`,
+				)
+			}
+		}
+
+		if (singleVariantProblems.length > 0) {
+			throw new Error(
+				[
+					`knownSingleVariantIcons for '${fontName}' does not match the actual single-variant glyphs:`,
+					...singleVariantProblems,
+				].join('\n'),
+			)
+		}
+
+		// The complete glyph set is the union of every variant. A glyph is
+		// "single-variant" when it has an entry in knownSingleVariantIcons: such a
+		// glyph must appear ONLY in its designated variant. Every other glyph must
+		// appear in EVERY variant.
+		const unionSet = new Set<string>()
+
+		for (const [_fullFontName, glyphSet] of glyphSets) {
 			for (const glyph of glyphSet) {
 				unionSet.add(glyph)
 			}
@@ -813,19 +881,38 @@ export class SVGFont {
 		const problems: string[] = []
 
 		for (const [fullFontName, glyphSet] of glyphSets) {
-			const missing = [...unionSet].filter(glyph => !glyphSet.has(glyph))
-			const extraneous = [...glyphSet].filter(glyph => !intersectionSet.has(glyph))
+			const variantName = fullFontName.slice(fontName.length + 1)
+			const shouldBePresent = new Set<string>()
+
+			for (const glyph of unionSet) {
+				if (knownSingleVariantIcons[glyph] === undefined) {
+					shouldBePresent.add(glyph)
+				}
+			}
+
+			for (const [glyphName, mappedVariant] of Object.entries(knownSingleVariantIcons)) {
+				if (mappedVariant === variantName) {
+					shouldBePresent.add(glyphName)
+				}
+			}
+
+			const missing = [...shouldBePresent].filter(glyph => !glyphSet.has(glyph))
+			const extraneous = [...glyphSet].filter(glyph => !shouldBePresent.has(glyph))
 
 			if (missing.length > 0 || extraneous.length > 0) {
 				const details: string[] = []
 
 				if (missing.length > 0) {
-					details.push(`missing ${missing.length} glyph(s): ${missing.sort().join(', ')}`)
+					details.push(
+						`missing ${missing.length} glyph(s): ${missing.sort((glyphA, glyphB) => glyphA.localeCompare(glyphB)).join(', ')}`,
+					)
 				}
 
 				if (extraneous.length > 0) {
 					details.push(
-						`has ${extraneous.length} extra glyph(s) not in every variant: ${extraneous.sort().join(', ')}`,
+						`has ${extraneous.length} extra glyph(s) not expected in this variant: ${extraneous
+							.sort((glyphA, glyphB) => glyphA.localeCompare(glyphB))
+							.join(', ')}`,
 					)
 				}
 
@@ -836,7 +923,7 @@ export class SVGFont {
 		if (problems.length > 0) {
 			throw new Error(
 				[
-					`Every variant of '${fontName}' must contain the exact same set of glyphs, but they differ:`,
+					`Every variant of '${fontName}' must contain the expected set of glyphs, but they differ:`,
 					...problems,
 				].join('\n'),
 			)
@@ -851,6 +938,7 @@ export class SVGFont {
 		fontOutputDir,
 		cssOutputDir,
 		iconUnicodeSequences = null,
+		knownSingleVariantIcons = null,
 	}: {
 		fontName: string
 		variants: readonly string[]
@@ -859,6 +947,7 @@ export class SVGFont {
 		fontOutputDir: string
 		cssOutputDir: string
 		iconUnicodeSequences?: IconUnicodeSequences | null
+		knownSingleVariantIcons?: Record<string, string> | null
 	}) {
 		const repoRoot = getRepositoryRoot()
 
@@ -866,7 +955,12 @@ export class SVGFont {
 			throw new Error(`No variants provided for font '${fontName}'`)
 		}
 
-		await SVGFont.assertVariantGlyphParity(svgIconsDir, fontName, variants)
+		await SVGFont.assertVariantGlyphParity(
+			svgIconsDir,
+			fontName,
+			variants,
+			knownSingleVariantIcons ?? {},
+		)
 
 		const svgIconsDirAbs = path.join(repoRoot, svgIconsDir)
 		const fontOutputDirAbs = path.join(repoRoot, fontOutputDir)
@@ -887,6 +981,7 @@ export class SVGFont {
 			fontTypeName,
 			svgoConfig,
 			iconUnicodeSequences,
+			knownSingleVariantIcons,
 		)
 
 		return new SVGFont(
@@ -899,6 +994,7 @@ export class SVGFont {
 			svgoConfig,
 			currentHash,
 			iconUnicodeSequences,
+			knownSingleVariantIcons,
 		)
 	}
 
@@ -983,8 +1079,10 @@ export class SVGFont {
 		// derived output directory. The generated CSS/TS are shared across variants.
 		const cssRules: string[] = []
 		const generatedIconUnicodeSequences: Record<string, string> = {}
+		const { knownSingleVariantIcons } = this
 
-		for (const fullFontName of this.fullFontNames) {
+		for (const [variantIndex, variant] of this.variants.entries()) {
+			const fullFontName = this.fullFontNames[variantIndex]
 			const svgIconsDir = this.svgIconsDirFor(fullFontName)
 			const fontOutputDir = this.fontOutputDirFor(fullFontName)
 
@@ -1000,12 +1098,32 @@ export class SVGFont {
 				// Remove CSS outlines as `svgtofont` does not respect them.
 				const svgEntries = (await fs.readdir(svgIconsDir)).filter(entry => entry.endsWith('.svg'))
 
-				let largestStagedSvgSize = 0
+				// Each variant stages its own SVG files plus, for every glyph that is
+				// known to exist only in another variant, the same SVG copied from that
+				// variant. This keeps every generated font containing every glyph even
+				// though the source SVG only lives in one variant directory.
+				const svgEntriesToStage = new Map<string, string>()
 
 				for (const entry of svgEntries) {
+					svgEntriesToStage.set(entry, svgIconsDir)
+				}
+
+				if (knownSingleVariantIcons !== null) {
+					for (const [glyphName, designatedVariant] of Object.entries(knownSingleVariantIcons)) {
+						if (designatedVariant !== variant) {
+							const designatedFullFontName = `${this.fontName}-${designatedVariant}`
+
+							svgEntriesToStage.set(`${glyphName}.svg`, this.svgIconsDirFor(designatedFullFontName))
+						}
+					}
+				}
+
+				let largestStagedSvgSize = 0
+
+				for (const [entry, sourceDir] of svgEntriesToStage) {
 					const stagedSvg = optimize(
 						removeCSSOutline(
-							optimize(await fs.readFile(path.join(svgIconsDir, entry), 'utf-8'), this.svgoConfig)
+							optimize(await fs.readFile(path.join(sourceDir, entry), 'utf-8'), this.svgoConfig)
 								.data,
 						),
 						this.svgoConfig,
@@ -1092,6 +1210,7 @@ export class SVGFont {
 		let typescriptContent = generatedIconFontTypescript(
 			this.fontTypeName,
 			generatedIconUnicodeSequences,
+			knownSingleVariantIcons ?? {},
 		)
 		const typescriptPath = path.join(this.cssOutputDir, `${this.fontName}.ts`)
 		const prettierConfig = await resolveConfig(typescriptPath)
