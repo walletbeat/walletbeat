@@ -197,6 +197,8 @@ function evaluateAccountUnruggability(
 		)
 	}
 
+	ctx.addRef(accountRecovery.guardianRecovery)
+
 	return ctx.build({
 		outcome: {
 			id: 'pass_no_guardian_recovery',
@@ -422,7 +424,9 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 
 		ctx.addRef(
 			ctx.features.security.keysHandling,
-			ctx.features.security.accountRecovery.guardianRecovery,
+			isSupported(ctx.features.security.accountRecovery.guardianRecovery)
+				? ctx.features.security.accountRecovery.guardianRecovery
+				: null,
 		)
 
 		return evaluateAccountUnruggability(
