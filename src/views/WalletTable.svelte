@@ -1100,7 +1100,8 @@
 										return {
 											id: `attrGroup_${attrGroup.id}`,
 											arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
-										arcIconId: attrGroup.icon,
+											arcIconId: attrGroup.icon,
+											ariaLabel: attrGroup.displayName,
 											color: (
 												groupScore !== null ?
 													scoreToColor(groupScore.score)
@@ -1127,11 +1128,12 @@
 															color: ratingToColor(attribute.evaluation.outcome.rating),
 															weight: (
 																attrGroup.attributes.find(w => w.attribute.id === attributeId)
-																	?.weight
-																?? 1
-															),
-															arcLabel: '',
-															arcIconId: attribute.attribute.icon,
+																			?.weight
+																		?? 1
+																	),
+																	arcLabel: '',
+																	arcIconId: attribute.attribute.icon,
+																	ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 																opacity: 0.33,
 															},
@@ -1350,6 +1352,7 @@
 												),
 												arcLabel: '',
 												arcIconId: attribute.attribute.icon,
+												ariaLabel: `${attribute.attribute.displayName}${tooltipSuffix ?? ''}: ${attribute.evaluation.outcome.rating}`,
 												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 													opacity: 0.33,
 												},
@@ -1509,7 +1512,8 @@
 												color: ratingToColor(attribute.evaluation.outcome.rating),
 												weight: 1,
 												arcLabel: '',
-												arcIconId: attribute.icon,
+												arcIconId: attribute.attribute.icon,
+												ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 											}
 										]
 									:
@@ -1627,6 +1631,7 @@
 									id: `m_${wallet.metadata.id}_ag_${attrGroup.id}`,
 									arcLabel: (groupScore !== null && groupScore.hasUnratedComponent) ? '*' : '',
 									arcIconId: attrGroup.icon,
+									ariaLabel: attrGroup.displayName,
 									color: groupScore !== null ? scoreToColor(groupScore.score) : 'var(--rating-unrated)',
 									gradient: attributeGroupFlowerGradient,
 									weight: 1,
@@ -1647,6 +1652,7 @@
 													),
 													arcLabel: '',
 													arcIconId: attribute.attribute.icon,
+													ariaLabel: `${attribute.attribute.displayName}: ${attribute.evaluation.outcome.rating}`,
 													...attribute.evaluation.outcome.rating === Rating.EXEMPT && { opacity: 0.33 },
 												}))
 										),

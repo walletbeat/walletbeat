@@ -745,10 +745,12 @@ export const accountPortability: Attribute = {
 		}
 
 		ctx.addRef(
-			ctx.features.accountSupport.eoa,
-			ctx.features.accountSupport.mpc,
-			ctx.features.accountSupport.rawErc4337,
-			ctx.features.accountSupport.eip7702,
+			isSupported(ctx.features.accountSupport.eoa) ? ctx.features.accountSupport.eoa : null,
+			isSupported(ctx.features.accountSupport.mpc) ? ctx.features.accountSupport.mpc : null,
+			isSupported(ctx.features.accountSupport.rawErc4337)
+				? ctx.features.accountSupport.rawErc4337
+				: null,
+			isSupported(ctx.features.accountSupport.eip7702) ? ctx.features.accountSupport.eip7702 : null,
 		)
 		const evaluations: Array<Evaluation> = []
 		let defaultEvaluation: Evaluation | null = null
