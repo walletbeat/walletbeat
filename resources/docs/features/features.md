@@ -3535,7 +3535,7 @@ How the wallet lets users inspect and revoke existing token approvals, broken do
 
 How a wallet's own built-in swap/bridge feature requests token approvals on the user's behalf by default.
 
-- `MINIMAL_AMOUNT` = `(auto)`: The wallet requests only the amount needed for the swap/bridge before signing.
+- `MINIMAL_AMOUNT` = `(auto)`: The wallet requests only the minimum amount needed for the swap/bridge before signing.
 - `UNLIMITED_BUT_EDITABLE` = `(auto)`: The wallet defaults to an unlimited approval, but the user can see and edit the amount before signing.
 - `UNLIMITED_BUT_DISCLOSED` = `(auto)`: The wallet defaults to an unlimited approval and discloses this to the user before signing, but does not let them edit the amount.
 - `UNLIMITED_AND_UNDISCLOSED` = `(auto)`: The wallet requests an unlimited approval by default without disclosing this to the user in the transaction confirmation UI.
