@@ -250,15 +250,25 @@ export const repeatedIconFontUnicodeSequences = (iconUnicodeSequences: IconUnico
 const iconFontCSSRuleForIcon = (key: string, iconContent: string) =>
 	[`&[data-icon~='${key}'] {`, `\t--icon-content: '${iconContent}';`, '}'].join('\n')
 
+/** Lowercase-camelCase a name so it can be used as an identifier base. */
+const identifierBaseName = (name: string) =>
+	name
+		.replace(/^[A-Z]+(?=[A-Z][a-z])/, prefix => prefix.toLowerCase())
+		.replace(/^./, firstChar => firstChar.toLowerCase())
+
 export const generatedIconFontTypescript = (
+	fontName: string,
 	fontTypeName: string,
+	variants: readonly string[],
 	iconUnicodeSequences: IconUnicodeSequences,
 	knownSingleVariantIcons: Record<string, string> = {},
 ) => {
-	const emojiSequencesName = `${fontTypeName
-		.replace(/^[A-Z]+(?=[A-Z][a-z])/, prefix => prefix.toLowerCase())
-		.replace(/^./, firstChar => firstChar.toLowerCase())}EmojiSequences`
+	const baseName = identifierBaseName(fontName)
+	const emojiSequencesName = `${identifierBaseName(fontTypeName)}EmojiSequences`
 	const iconIdTypeName = `${fontTypeName}ID`
+	const markersName = `${baseName}Markers`
+	const validIconIDsName = `${baseName}IDs`
+	const markers = variants.map(variant => `${fontName}-${variant}`)
 
 	return [
 		'/** Set of icons mapped to their emoji. */',
@@ -266,6 +276,12 @@ export const generatedIconFontTypescript = (
 		'',
 		`/** Icon ID for ${fontTypeName}. */`,
 		`export type ${iconIdTypeName} = keyof typeof ${emojiSequencesName}`,
+		'',
+		`/** The ${fontName} data-icon variant markers. */`,
+		`export const ${markersName} = new Set(${JSON.stringify(markers)})`,
+		'',
+		`/** Every valid ${iconIdTypeName} for the ${fontName} font. */`,
+		`export const ${validIconIDsName} = new Set(Object.keys(${emojiSequencesName}))`,
 		'',
 		'/** Icons that have only a single variant, mapped to that variant. */',
 		`export const knownSingleVariantIcons: Partial<Record<${iconIdTypeName}, string>> = ${JSON.stringify(knownSingleVariantIcons)}`,
@@ -762,7 +778,9 @@ export class SVGFont {
 				iconFontCSSRuleForIcon('__icon_name__', '__icon_content__'),
 			]),
 			generatedIconFontTypescript(
+				fontName,
 				fontTypeName,
+				variants,
 				{
 					__icon_name__: '__icon_content__',
 				},
@@ -1209,7 +1227,9 @@ export class SVGFont {
 
 		const generatedCSS = generatedIconFontCSS(this.fullFontNames, cssRules)
 		let typescriptContent = generatedIconFontTypescript(
+			this.fontName,
 			this.fontTypeName,
+			this.variants,
 			generatedIconUnicodeSequences,
 			knownSingleVariantIcons ?? {},
 		)

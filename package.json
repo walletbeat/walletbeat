@@ -10,7 +10,7 @@
 		"check:ci": "cross-env WALLETBEAT_ENV=CI pnpm run \"/^check:(all|ci:.*)$/\"",
 		"check:quick": "pnpm run \"/^check:(lint:quick|syntax|spelling:quiet|misc)$/\"",
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
-		"check:build:post": "tests/postbuild.sh",
+		"check:build:post": "tests/postbuild.sh && vitest --config tests/postbuild/vitest.postbuild.config.ts --cache --run",
 		"check:build:post:quiet": "cross-env QUIET=true pnpm run check:build:post",
 		"check:ci:bundle:size-delta": "bash tests/ci/bundle-size-delta.test.sh",
 		"check:ci:build-determinism": "bash tests/ci/build-determinism.test.sh",

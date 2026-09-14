@@ -73,6 +73,12 @@ export const wbIconEmojiSequences = {
 /** Icon ID for WBIcon. */
 export type WBIconID = keyof typeof wbIconEmojiSequences
 
+/** The wbicons data-icon variant markers. */
+export const wbiconsMarkers = new Set(['wbicons-complex', 'wbicons-simple'])
+
+/** Every valid WBIconID for the wbicons font. */
+export const wbiconsIDs = new Set(Object.keys(wbIconEmojiSequences))
+
 /** Icons that have only a single variant, mapped to that variant. */
 export const knownSingleVariantIcons: Partial<Record<WBIconID, string>> = {
 	bug: 'simple',
