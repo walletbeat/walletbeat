@@ -43,7 +43,7 @@ This attribute allows users to configure their own L1 RPC provider before making
 
 As you can see in our results, wallet ratings are a mix of PASS, PARTIAL, and FAIL.
 
-Most wallets today receive a partial rating. While they allow configurable RPCs, users can only configure them after the wallet has already made a certain number of requests through its default provider 😣
+Most wallets today receive a partial rating. While they allow configurable RPCs, users can only set them up after the wallet has already made a certain number of requests through its default provider 😣
 
 ![L1 Provider Independence](./l1provider-independence.png)
 
