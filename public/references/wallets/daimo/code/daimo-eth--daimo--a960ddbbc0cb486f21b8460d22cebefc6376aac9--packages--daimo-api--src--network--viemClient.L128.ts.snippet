@@ -1,0 +1,30 @@
+{
+	"highlightFirstLine": 128,
+	"highlightLastLine": 128,
+	"segments": [
+		{
+			"lines": [
+				"export class ViemClient {"
+			],
+			"startLine": 90
+		},
+		{
+			"lines": [
+				"  getEnsAddress = memoize(",
+				"    async ({ name }: { name: string }): Promise<Address | null> => {",
+				"      try {",
+				"        const result = await this.extApiCache.get(",
+				"          \"ens-get-addr\",",
+				"          name,",
+				"          () => {",
+				"            console.log(`[VIEM] getEnsAddress for '${name}'`);",
+				"            return this.l1Client.getEnsAddress({ name }).then((a) => a || \"\");",
+				"          },",
+				"          24 * 3600",
+				"        );",
+				"        return !result ? null : getAddress(result);"
+			],
+			"startLine": 120
+		}
+	]
+}
