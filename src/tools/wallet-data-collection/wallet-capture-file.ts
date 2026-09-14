@@ -46,7 +46,6 @@ import {
 } from '@/types/utils/non-empty'
 import { assertStringHasPrefix } from '@/types/utils/text'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
-
 import {
 	expectArray,
 	expectBoolean,
@@ -55,7 +54,8 @@ import {
 	expectString,
 	isSameJson,
 	stableJSONStringify,
-} from './json-utils'
+} from '@/utils/json'
+
 import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {

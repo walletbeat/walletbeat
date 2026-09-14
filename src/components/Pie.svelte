@@ -13,7 +13,6 @@
 		type LevelConfig as PieLevelConfig,
 		type Slice as PieSlice,
 	} from './pie-geometry'
-	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -199,11 +198,10 @@
 		href={slice.href}
 
 		class="slice"
-		title={slice.titleText}
 
 		role="button"
 		tabindex="0"
-		aria-label={slice.titleText}
+		aria-label={slice.ariaLabel}
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
@@ -241,7 +239,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
+				<span class="label" aria-hidden="true" data-icon="wbicons-simple {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
