@@ -1,6 +1,5 @@
 import {
 	type Attribute,
-	compareExplicitRatings,
 	type Evaluation,
 	EvaluationContext,
 	exampleRating,
@@ -56,172 +55,200 @@ function approvalsManagementRating(control: SpendingApprovalsControl): ExplicitR
 }
 
 /**
- * Only a minimal-amount-by-default approval passes — a default that covers
- * roughly what the swap needs, including a reasonable buffer for slippage.
- * Any unlimited default fails, whether disclosed or not.
+ * Evaluates the wallet's built-in swap/bridge approval defaults on their own.
+ * Returns `null` when there is nothing to complain about (no built-in swap,
+ * or a minimal-amount-by-default swap that covers roughly what the swap
+ * needs, including a reasonable buffer for slippage): any unlimited default
+ * fails, whether disclosed or not.
  */
-function ratingForSwapApprovals(behavior: BuiltInSwapDefaultApprovalBehavior): ExplicitRating {
-	switch (behavior) {
-		case BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT:
-			return Rating.PASS
-		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE:
-		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_DISCLOSED:
-		case BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED:
-			return Rating.FAIL
+function swapApprovalsEvaluation(
+	ctx: EvaluationContext,
+	builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior | 'NO_BUILT_IN_SWAP',
+): Evaluation | null {
+	if (
+		!hasBuiltInSwap(builtInSwapApprovals) ||
+		builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT
+	) {
+		return null
+	}
+
+	const undisclosed =
+		builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED
+
+	return ctx.build({
+		outcome: {
+			id: undisclosed ? 'undisclosed_unlimited_swap_approval' : 'disclosed_unlimited_swap_approval',
+			rating: Rating.FAIL,
+			displayName: undisclosed
+				? 'Silently requests unlimited swap approvals'
+				: 'Requests unlimited swap approvals',
+			shortExplanation: undisclosed
+				? sentence(
+						"{{WALLET_NAME}}'s built-in swaps can silently request unlimited token approvals.",
+					)
+				: sentence("{{WALLET_NAME}}'s built-in swaps default to an unlimited token approval."),
+		},
+		details: paragraph(
+			`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
+		),
+		impact: paragraph(
+			undisclosed
+				? 'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.'
+				: 'Users who do not notice or adjust the default before signing grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain.',
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should default to requesting only the amount needed for the swap (plus a reasonable slippage buffer), rather than an unlimited approval.',
+		),
+	})
+}
+
+/**
+ * Evaluates the wallet's approvals inspection/revocation support on its own.
+ * `passingSwapDetails`, when non-null, is appended to the PASS case's details
+ * to mention that the wallet's built-in swap also behaves well, without that
+ * fact changing the rating computed here.
+ */
+function approvalsManagementEvaluation(
+	ctx: EvaluationContext,
+	approvalsManagement: PermissionsManagementSupport['approvalsManagement'],
+	passingSwapDetails: string | null,
+): Evaluation {
+	if (!isSupported(approvalsManagement)) {
+		return ctx.build({
+			outcome: {
+				id: 'cannot_inspect_or_revoke',
+				rating: Rating.FAIL,
+				displayName: 'No approval management',
+				shortExplanation: sentence(
+					'{{WALLET_NAME}} does not let you inspect or revoke token approvals.',
+				),
+			},
+			details: paragraph(
+				'{{WALLET_NAME}} provides no way to inspect or revoke token approvals granted to other addresses.',
+			),
+			impact: paragraph(
+				'Without the ability to inspect and revoke approvals, users are exposed to risks from unlimited or unnecessary token approvals granted to other addresses.',
+			),
+			howToImprove: paragraph(
+				'{{WALLET_NAME}} should add the ability to view and revoke token approvals.',
+			),
+		})
+	}
+
+	const { erc20Approvals, erc721Approvals, erc1155Approvals } = approvalsManagement
+	const rating = approvalsManagementRating(
+		worstControl(erc20Approvals, erc721Approvals, erc1155Approvals),
+	)
+	const allSame = erc20Approvals === erc721Approvals && erc721Approvals === erc1155Approvals
+	const perStandardBreakdown = allSame
+		? null
+		: `
+			Per token standard:
+			- ERC-20 approvals: ${describeStandard(erc20Approvals)}
+			- ERC-721 approvals: ${describeStandard(erc721Approvals)}
+			- ERC-1155 approvals: ${describeStandard(erc1155Approvals)}
+		`
+	const perStandardDetails = perStandardBreakdown === null ? null : markdown(perStandardBreakdown)
+
+	switch (rating) {
+		case Rating.PASS: {
+			const approvalsText =
+				perStandardBreakdown ??
+				'{{WALLET_NAME}} allows you to view all existing token approvals granted to other addresses and revoke them directly from the wallet.'
+
+			return ctx.build({
+				outcome: {
+					id:
+						passingSwapDetails === null
+							? 'can_inspect_and_revoke'
+							: 'can_inspect_and_revoke_minimal_amount_swaps',
+					rating: Rating.PASS,
+					displayName:
+						passingSwapDetails === null
+							? 'Can inspect and revoke approvals'
+							: 'Can inspect and revoke approvals; minimal-amount swaps',
+					shortExplanation:
+						passingSwapDetails === null
+							? sentence('{{WALLET_NAME}} lets you inspect and revoke token approvals.')
+							: sentence(
+									'{{WALLET_NAME}} lets you inspect and revoke token approvals, and its built-in swaps only request the amount needed.',
+								),
+				},
+				details:
+					passingSwapDetails === null
+						? (perStandardDetails ?? paragraph(approvalsText))
+						: markdown(`
+							${approvalsText}
+
+							${passingSwapDetails}
+						`),
+			})
+		}
+
+		case Rating.PARTIAL:
+			return ctx.build({
+				outcome: {
+					id: 'can_inspect_not_revoke',
+					rating: Rating.PARTIAL,
+					displayName: 'Can inspect but not revoke approvals',
+					shortExplanation: sentence(
+						'{{WALLET_NAME}} lets you inspect token approvals but not revoke them.',
+					),
+				},
+				details:
+					perStandardDetails ??
+					paragraph(
+						'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
+					),
+				howToImprove: paragraph(
+					'{{WALLET_NAME}} should add the ability to revoke token approvals directly.',
+				),
+			})
+
+		case Rating.FAIL:
+			return ctx.build({
+				outcome: {
+					id: 'cannot_inspect_or_revoke',
+					rating: Rating.FAIL,
+					displayName: 'No approval management',
+					shortExplanation: sentence(
+						'{{WALLET_NAME}} does not let you inspect or revoke token approvals.',
+					),
+				},
+				details:
+					perStandardDetails ??
+					paragraph(
+						'{{WALLET_NAME}} provides no way to inspect or revoke token approvals granted to other addresses.',
+					),
+				impact: paragraph(
+					'Without the ability to inspect and revoke approvals, users are exposed to risks from unlimited or unnecessary token approvals granted to other addresses.',
+				),
+				howToImprove: paragraph(
+					'{{WALLET_NAME}} should add the ability to view and revoke token approvals.',
+				),
+			})
 	}
 }
 
 function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport): Evaluation {
 	const { approvalsManagement, builtInSwapApprovals } = control
 
-	const walletHasBuiltInSwap = hasBuiltInSwap(builtInSwapApprovals)
-	const approvalsSupported = isSupported(approvalsManagement)
-	const approvalsRating: ExplicitRating = approvalsSupported
-		? approvalsManagementRating(
-				worstControl(
-					approvalsManagement.erc20Approvals,
-					approvalsManagement.erc721Approvals,
-					approvalsManagement.erc1155Approvals,
-				),
-			)
-		: Rating.FAIL
-	const perStandardBreakdown = approvalsSupported
-		? (() => {
-				const { erc20Approvals, erc721Approvals, erc1155Approvals } = approvalsManagement
-				const allSame = erc20Approvals === erc721Approvals && erc721Approvals === erc1155Approvals
-
-				return allSame
-					? null
-					: `
-						Per token standard:
-						- ERC-20 approvals: ${describeStandard(erc20Approvals)}
-						- ERC-721 approvals: ${describeStandard(erc721Approvals)}
-						- ERC-1155 approvals: ${describeStandard(erc1155Approvals)}
-					`
-			})()
-		: null
-	const perStandardDetails = perStandardBreakdown === null ? null : markdown(perStandardBreakdown)
-
-	const swapRating = walletHasBuiltInSwap
-		? ratingForSwapApprovals(builtInSwapApprovals)
-		: 'NO_BUILT_IN_SWAP'
-	const overallRating =
-		swapRating === 'NO_BUILT_IN_SWAP'
-			? approvalsRating
-			: compareExplicitRatings(approvalsRating, swapRating) <= 0
-				? approvalsRating
-				: swapRating
-	const requestMinimalAmountByDefaultAdvice = paragraph(
-		'{{WALLET_NAME}} should default to requesting only the amount needed for the swap (plus a reasonable slippage buffer), rather than an unlimited approval.',
+	const swapEvaluation = swapApprovalsEvaluation(ctx, builtInSwapApprovals)
+	const passingSwapDetails =
+		swapEvaluation === null && hasBuiltInSwap(builtInSwapApprovals)
+			? `Its built-in swap/bridge feature also ${swapBehaviorDescription(builtInSwapApprovals)}.`
+			: null
+	const approvalsEvaluation = approvalsManagementEvaluation(
+		ctx,
+		approvalsManagement,
+		passingSwapDetails,
 	)
 
-	if (walletHasBuiltInSwap && swapRating === Rating.FAIL) {
-		const undisclosed =
-			builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED
-
-		return ctx.build({
-			outcome: {
-				id: undisclosed
-					? 'undisclosed_unlimited_swap_approval'
-					: 'disclosed_unlimited_swap_approval',
-				rating: Rating.FAIL,
-				displayName: undisclosed
-					? 'Silently requests unlimited swap approvals'
-					: 'Requests unlimited swap approvals',
-				shortExplanation: undisclosed
-					? sentence(
-							"{{WALLET_NAME}}'s built-in swaps can silently request unlimited token approvals.",
-						)
-					: sentence("{{WALLET_NAME}}'s built-in swaps default to an unlimited token approval."),
-			},
-			details: paragraph(
-				`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
-			),
-			impact: paragraph(
-				undisclosed
-					? 'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.'
-					: 'Users who do not notice or adjust the default before signing grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain.',
-			),
-			howToImprove: requestMinimalAmountByDefaultAdvice,
-		})
+	if (swapEvaluation === null) {
+		return approvalsEvaluation
 	}
 
-	if (overallRating === Rating.PASS) {
-		const approvalsText =
-			perStandardBreakdown ??
-			'{{WALLET_NAME}} allows you to view all existing token approvals granted to other addresses and revoke them directly from the wallet.'
-
-		if (walletHasBuiltInSwap) {
-			return ctx.build({
-				outcome: {
-					id: 'can_inspect_and_revoke_minimal_amount_swaps',
-					rating: Rating.PASS,
-					displayName: 'Can inspect and revoke approvals; minimal-amount swaps',
-					shortExplanation: sentence(
-						'{{WALLET_NAME}} lets you inspect and revoke token approvals, and its built-in swaps only request the amount needed.',
-					),
-				},
-				details: markdown(`
-					${approvalsText}
-
-					Its built-in swap/bridge feature also ${swapBehaviorDescription(builtInSwapApprovals)}.
-				`),
-			})
-		}
-
-		return ctx.build({
-			outcome: {
-				id: 'can_inspect_and_revoke',
-				rating: Rating.PASS,
-				displayName: 'Can inspect and revoke approvals',
-				shortExplanation: sentence('{{WALLET_NAME}} lets you inspect and revoke token approvals.'),
-			},
-			details: perStandardDetails ?? paragraph(approvalsText),
-		})
-	}
-
-	if (overallRating === Rating.PARTIAL) {
-		return ctx.build({
-			outcome: {
-				id: 'can_inspect_not_revoke',
-				rating: Rating.PARTIAL,
-				displayName: 'Can inspect but not revoke approvals',
-				shortExplanation: sentence(
-					'{{WALLET_NAME}} lets you inspect token approvals but not revoke them.',
-				),
-			},
-			details:
-				perStandardDetails ??
-				paragraph(
-					'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
-				),
-			howToImprove: paragraph(
-				'{{WALLET_NAME}} should add the ability to revoke token approvals directly.',
-			),
-		})
-	}
-
-	return ctx.build({
-		outcome: {
-			id: 'cannot_inspect_or_revoke',
-			rating: Rating.FAIL,
-			displayName: 'No approval management',
-			shortExplanation: sentence(
-				'{{WALLET_NAME}} does not let you inspect or revoke token approvals.',
-			),
-		},
-		details:
-			perStandardDetails ??
-			paragraph(
-				'{{WALLET_NAME}} provides no way to inspect or revoke token approvals granted to other addresses.',
-			),
-		impact: paragraph(
-			'Without the ability to inspect and revoke approvals, users are exposed to risks from unlimited or unnecessary token approvals granted to other addresses.',
-		),
-		howToImprove: paragraph(
-			'{{WALLET_NAME}} should add the ability to view and revoke token approvals.',
-		),
-	})
+	return pickWorstRating([swapEvaluation, approvalsEvaluation])
 }
 
 export const permissionsManagement: Attribute = {
