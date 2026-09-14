@@ -438,6 +438,32 @@ function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boo
 	return true
 }
 
+/**
+ * Combine data-source stamps when merging two refs that share an explanation.
+ * A missing source on one side inherits the other. Two distinct sources is an error.
+ */
+function mergeRefDataSources(
+	a: DataSource | undefined,
+	b: DataSource | undefined,
+	explanation: string,
+): DataSource | undefined {
+	if (a === undefined) {
+		return b
+	}
+
+	if (b === undefined) {
+		return a
+	}
+
+	if (a.entity.id !== b.entity.id) {
+		throw new Error(
+			`Cannot merge references that share explanation ${JSON.stringify(explanation)} but have different data sources (${a.entity.id} vs ${b.entity.id})`,
+		)
+	}
+
+	return a
+}
+
 /** Deduplicate and merge references in `refs`. */
 export function mergeRefs(
 	...refs: Array<References | ReferenceArray | FullyQualifiedReference | NoRef | undefined>
@@ -465,10 +491,10 @@ export function mergeRefs(
 		}
 	}
 
-	// Merge refs that share both an explanation and a data-source identity.
-	// Refs with the same explanation but different sources (including stamped
-	// vs. unstamped) stay separate so that per-source attribution survives.
-	const byExplanationAndSource = new Map<string, FullyQualifiedReference>()
+	// Merge refs that share an explanation. A stamped ref and an unstamped
+	// ref with the same explanation become one ref that keeps the data source.
+	// Two stamped refs with the same explanation must share a data source.
+	const byExplanation = new Map<string, FullyQualifiedReference>()
 	const mergedRefs: FullyQualifiedReference[] = []
 
 	for (const ref of dedupedRefs) {
@@ -477,11 +503,10 @@ export function mergeRefs(
 			continue
 		}
 
-		const key = `${ref.source?.entity.id ?? ''}\u0000${ref.explanation}`
-		const existing = byExplanationAndSource.get(key)
+		const existing = byExplanation.get(ref.explanation)
 
 		if (existing === undefined) {
-			byExplanationAndSource.set(key, ref)
+			byExplanation.set(ref.explanation, ref)
 			continue
 		}
 
@@ -490,18 +515,17 @@ export function mergeRefs(
 		for (const url of ref.urls) {
 			newUrls = mergeLabeledUrls(newUrls, url)
 		}
-		byExplanationAndSource.set(key, {
+
+		const source = mergeRefDataSources(existing.source, ref.source, ref.explanation)
+
+		byExplanation.set(ref.explanation, {
 			urls: newUrls,
 			explanation: ref.explanation,
 			lastRetrieved: existing.lastRetrieved ?? ref.lastRetrieved,
-			// `existing` and `ref` share the same source identity by key, so
-			// either `source` is usable; prefer `existing` for stable ordering.
-			...(existing.source !== undefined || ref.source !== undefined
-				? { source: existing.source ?? ref.source }
-				: {}),
+			...(source !== undefined ? { source } : {}),
 		})
 	}
-	byExplanationAndSource.forEach(ref => {
+	byExplanation.forEach(ref => {
 		mergedRefs.push(ref)
 	})
 
