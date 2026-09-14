@@ -721,7 +721,7 @@ export const metamask: SoftwareWallet = {
 					},
 				],
 				approvalsManagement: notSupported,
-				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			transactionSubmission: {
 				l1: {

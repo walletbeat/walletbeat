@@ -767,7 +767,7 @@ export const zerion: SoftwareWallet = {
 					},
 				],
 				approvalsManagement: notSupported,
-				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			transactionSubmission: {
 				l1: {

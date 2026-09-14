@@ -797,7 +797,7 @@ export const completedTemplate: SoftwareWallet = {
 					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 				}),
-				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			transactionSubmission: {
 				l1: {

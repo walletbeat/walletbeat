@@ -458,7 +458,7 @@ export const baseApp: SoftwareWallet = {
 					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
 					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
 				}),
-				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.EXACT_AMOUNT,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			// Base App is mobile-only and closed-source. It does not ship its own
 			// Ethereum P2P (devp2p) stack, transactions
