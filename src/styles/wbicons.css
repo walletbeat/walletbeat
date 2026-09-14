@@ -85,6 +85,10 @@
 		--icon-content: '✅';
 	}
 
+	&[data-icon~='code_repository'] {
+		--icon-content: '🐙';
+	}
+
 	&[data-icon~='contribute'] {
 		--icon-content: '🤝';
 	}
@@ -215,10 +219,6 @@
 
 	&[data-icon~='sharpener'] {
 		--icon-content: '✏️';
-	}
-
-	&[data-icon~='source_visibility'] {
-		--icon-content: '👀';
 	}
 
 	&[data-icon~='stage_0'] {
@@ -357,6 +357,10 @@
 		--icon-content: '✅';
 	}
 
+	&[data-icon~='code_repository'] {
+		--icon-content: '🐙';
+	}
+
 	&[data-icon~='contribute'] {
 		--icon-content: '🤝';
 	}
@@ -487,10 +491,6 @@
 
 	&[data-icon~='sharpener'] {
 		--icon-content: '✏️';
-	}
-
-	&[data-icon~='source_visibility'] {
-		--icon-content: '👀';
 	}
 
 	&[data-icon~='stage_0'] {
