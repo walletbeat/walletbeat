@@ -18,6 +18,7 @@
  */
 
 import type { DataSource } from '@/schema/data-sources'
+import type { Entity } from '@/schema/entity'
 import type { CalendarDate } from '@/types/date'
 import {
 	assertNonEmptyArray,
@@ -25,6 +26,7 @@ import {
 	type NonEmptyArray,
 	nonEmptyGet,
 } from '@/types/utils/non-empty'
+import { slugifyCamelCase } from '@/types/utils/text'
 
 import {
 	getUrlLabel,
@@ -535,6 +537,14 @@ export function mergeRefs(
 export interface DataSourceCredit {
 	source: DataSource
 	reportUrls: NonEmptyArray<LabeledUrl>
+}
+
+/**
+ * Anchor id (without leading '#') used to link inline reference credits to the
+ * consolidated data-credits section at the bottom of a wallet page.
+ */
+export function dataCreditAnchorId(entity: Entity): string {
+	return `data-credit-${slugifyCamelCase(entity.id)}`
 }
 
 /**

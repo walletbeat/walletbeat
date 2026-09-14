@@ -3,6 +3,7 @@
 	import type { Entity } from '@/schema/entity'
 	import {
 		computeDataSourceCredits,
+		dataCreditAnchorId,
 		type DataSourceCredit,
 		type FullyQualifiedReference,
 	} from '@/schema/reference'
@@ -73,7 +74,7 @@
 
 		<ul class="data-credits-list">
 			{#each credits as credit (credit.source.entity.id)}
-				<li>{@render creditLine(credit)}</li>
+				<li id={dataCreditAnchorId(credit.source.entity)}>{@render creditLine(credit)}</li>
 			{/each}
 		</ul>
 	</section>
@@ -84,6 +85,12 @@
 	.data-credits {
 		font-size: 0.875em;
 		line-height: 1.7;
+	}
+
+	.data-credits-list li {
+		/* Ensures inline `#data-credit-*` anchor links from reference
+		   markers do not land underneath the sticky page header. */
+		scroll-margin-block-start: 4em;
 	}
 
 	h5 {

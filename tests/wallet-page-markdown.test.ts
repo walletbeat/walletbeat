@@ -15,7 +15,12 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { ratingToText } from '@/schema/attributes'
-import { computeDataSourceCredits, toFullyQualified } from '@/schema/reference'
+import {
+	computeDataSourceCredits,
+	dataCreditAnchorId,
+	mergeRefs,
+	toFullyQualified,
+} from '@/schema/reference'
 import { getUrl, isUrl } from '@/schema/url'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { getWalletUrl } from '@/utils/urls'
@@ -138,7 +143,7 @@ describe('walletPageMarkdown', () => {
 				}
 			})
 
-			it('includes data credits only for stamped references in each attribute section', () => {
+			it('does not repeat data credits inside attribute sections', () => {
 				const attributes = mapNonExemptAttributeGroupsInTree(
 					attributeTreeForWallet(wallet),
 					wallet.overall,
@@ -148,31 +153,72 @@ describe('walletPageMarkdown', () => {
 				for (const evalAttr of attributes) {
 					const heading = `### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`
 					const section = attributeSection(md, heading)
-					const credits = computeDataSourceCredits(toFullyQualified(evalAttr.evaluation.references))
 
-					if (credits.length === 0) {
-						expect(section).not.toMatch(/^#### Data credits?$/m)
-						continue
+					// Per-attribute Data credit(s) subsections were consolidated
+					// into a single page-level section; attribute sections must
+					// no longer emit their own credit heading.
+					expect(section).not.toMatch(/^#### Data credits?$/m)
+				}
+			})
+
+			it('emits inline [Credit: …] links next to each stamped reference', () => {
+				const attributes = mapNonExemptAttributeGroupsInTree(
+					attributeTreeForWallet(wallet),
+					wallet.overall,
+					(_attrGroup, evalGroup) => mapNonExemptGroupAttributes(evalGroup, evalAttr => evalAttr),
+				).flat()
+
+				for (const evalAttr of attributes) {
+					for (const ref of toFullyQualified(evalAttr.evaluation.references)) {
+						if (ref.source === undefined) {
+							continue
+						}
+
+						const marker = `[Credit: ${ref.source.entity.name}](#${dataCreditAnchorId(ref.source.entity)})`
+
+						expect(md).toContain(marker)
 					}
+				}
+			})
 
-					expect(section).toContain(credits.length === 1 ? '#### Data credit' : '#### Data credits')
+			it('emits one page-level data credits section covering every stamped source', () => {
+				const allRefs = mergeRefs(
+					...mapNonExemptAttributeGroupsInTree(
+						attributeTreeForWallet(wallet),
+						wallet.overall,
+						(_attrGroup, evalGroup) =>
+							mapNonExemptGroupAttributes(evalGroup, evalAttr =>
+								toFullyQualified(evalAttr.evaluation.references),
+							).flat(),
+					).flat(),
+				)
+				const credits = computeDataSourceCredits(allRefs)
 
-					for (const credit of credits) {
-						const sourceName = credit.source.entity.name
-						const sourceLabel = isUrl(credit.source.entity.url)
-							? `[${sourceName}](${getUrl(credit.source.entity.url)})`
-							: sourceName
-						const reportLinks = credit.reportUrls
-							.map(report => `[${report.label}](${report.url})`)
-							.join(', ')
+				if (credits.length === 0) {
+					expect(md).not.toMatch(/^## Data credits?$/m)
 
-						expect(section).toContain(`- ${sourceLabel}`)
-						expect(section).toContain(`  - Reports: ${reportLinks}`)
-						expect(section).toContain(
-							`  - License: [${credit.source.license.name}](${getUrl(credit.source.license.url)})`,
-						)
-						expect(section).toContain(`  - ${credit.source.attributionText}`)
-					}
+					return
+				}
+
+				expect(md).toContain(credits.length === 1 ? '## Data credit' : '## Data credits')
+
+				for (const credit of credits) {
+					const sourceName = credit.source.entity.name
+					const sourceLabel = isUrl(credit.source.entity.url)
+						? `[${sourceName}](${getUrl(credit.source.entity.url)})`
+						: sourceName
+					const reportLinks = credit.reportUrls
+						.map(report => `[${report.label}](${report.url})`)
+						.join(', ')
+
+					expect(md).toContain(
+						`- <a id="${dataCreditAnchorId(credit.source.entity)}"></a>${sourceLabel}`,
+					)
+					expect(md).toContain(`  - Reports: ${reportLinks}`)
+					expect(md).toContain(
+						`  - License: [${credit.source.license.name}](${getUrl(credit.source.license.url)})`,
+					)
+					expect(md).toContain(`  - ${credit.source.attributionText}`)
 				}
 			})
 

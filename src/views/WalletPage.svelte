@@ -53,7 +53,7 @@
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
-	import { toFullyQualified } from '@/schema/reference'
+	import { mergeRefs, toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletStageAndLadder } from '@/utils/stage'
@@ -336,6 +336,33 @@
 	const overallScore = $derived(
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
+
+	// All fully-qualified references cited across every non-exempt attribute on
+	// this page. Fed into a single `<DataSourceCredits>` at the bottom of the
+	// page so stamped-source attribution is shown once (deduplicated by
+	// source) rather than repeated per attribute; inline `[Credit: …]`
+	// markers on each reference link scroll to the corresponding entry.
+	const allPageReferences = $derived.by(() => {
+		const refs = Object.values(attributeTree).flatMap(attrGroup => {
+			const evalGroup = evalTree[attrGroup.id]
+
+			if (!evalGroup) {
+				return []
+			}
+
+			return attrGroup.attributes.flatMap(({ attribute }) => {
+				const evalAttr = evalGroup[attribute.id]
+
+				if (evalAttr === undefined || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) {
+					return []
+				}
+
+				return toFullyQualified(evalAttr.evaluation.references)
+			})
+		})
+
+		return mergeRefs(...refs)
+	})
 
 
 	// Components
@@ -652,6 +679,12 @@
 				})}
 			{/if}
 		{/each}
+
+		{#if allPageReferences.length > 0}
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<DataSourceCredits references={allPageReferences} />
+			</div>
+		{/if}
 
 		{#if walletNews.length > 0 && newsIsVeryStale}
 			<hr />
@@ -1126,10 +1159,6 @@
 					cardBackground="secondary"
 				/>
 			{/if}
-
-			<DataSourceCredits
-				references={toFullyQualified(evalAttr.evaluation.references)}
-			/>
 
 			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
 				{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
