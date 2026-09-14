@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 92,
+	"highlightLastLine": 97,
+	"segments": [
+		{
+			"lines": [
+				"function seedToSolanaWallet(phrase: string): BareMnemonicWallet {"
+			],
+			"startLine": 83
+		},
+		{
+			"lines": [
+				"  const keypair = fromMnemonicToEd25519(mnemonic.phrase, mnemonic.path);",
+				"  return fromSolanaKeypair({ mnemonic, keypair });",
+				"}",
+				"",
+				"export function generateWalletsForEcosystems(",
+				"  ecosystems: BlockchainType[]",
+				"): BareMnemonicWallet[] {",
+				"  invariant(ecosystems.length > 0, 'Must provide at least one ecosystem');",
+				"  assertKnownEcosystems(ecosystems);",
+				"  const seedWallet = EthersV5Wallet.createRandom();",
+				"  const result: BareMnemonicWallet[] = [];",
+				"",
+				"  const toPriority = (value: BlockchainType) => BLOCKCHAIN_TYPES.indexOf(value);",
+				"  const sorted = sortBy(ecosystems, toPriority); // priority sorting"
+			],
+			"startLine": 88
+		}
+	]
+}

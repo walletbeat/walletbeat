@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 131,
+	"highlightLastLine": 133,
+	"segments": [
+		{
+			"lines": [
+				"export class MnemonicWalletContainer extends WalletContainerImpl {"
+			],
+			"startLine": 117
+		},
+		{
+			"lines": [
+				"  }: {",
+				"    wallets?: MnemonicSeed[];",
+				"    credentials: SessionCredentials;",
+				"    ecosystems?: BlockchainType[];",
+				"  }): Promise<MnemonicWalletContainer> {",
+				"    const initial = wallets?.length",
+				"      ? wallets",
+				"      : generateWalletsForEcosystems(ecosystems ?? ['evm']);",
+				"    const phrase = initial[0].mnemonic?.phrase;",
+				"    invariant(phrase, MISSING_MNEMONIC);",
+				"    const seedHash = await seedPhraseToHash(phrase);",
+				"    const walletContainer = new MnemonicWalletContainer(initial, seedHash);"
+			],
+			"startLine": 126
+		}
+	]
+}
