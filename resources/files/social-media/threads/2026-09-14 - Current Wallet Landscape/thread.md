@@ -39,11 +39,11 @@ In short, it turns software projects into public goods.
 ---
 
 🌸 L1 Provider Independence:
-This is the attribute that allows users to configure their own L1 RPC provider before doing any requests.
+This attribute allows users to configure their own L1 RPC provider before making any requests.
 
-As you can see in our results, it's a mix of PASS, PARTIAL, and FAIL. 
+As you can see in our results, wallet ratings are a mix of PASS, PARTIAL, and FAIL.
 
-Most wallets today have a partial rating, meaning that while they allow configurable RPCs, it would only be after a certain amount of requests made through the wallet's default provider 😣
+Most wallets today receive a partial rating. While they allow configurable RPCs, users can only configure them after the wallet has already made a certain number of requests through its default provider 😣
 
 ![L1 Provider Independence](./l1provider-independence.png)
 
