@@ -80,13 +80,27 @@ export default defineConfig({
 			},
 		},
 		{
-			name: 'wbicons',
-			cssVariable: '--fontFamily-wbicons',
+			name: 'wbicons-complex',
+			cssVariable: '--fontFamily-wbicons-complex',
 			provider: fontProviders.local(),
 			options: {
 				variants: [
 					{
-						src: ['./src/assets/fonts/wbicons/wbicons.woff2'],
+						src: ['./src/assets/fonts/wbicons-complex/wbicons-complex.woff2'],
+						weight: '400',
+						style: 'normal',
+					},
+				],
+			},
+		},
+		{
+			name: 'wbicons-simple',
+			cssVariable: '--fontFamily-wbicons-simple',
+			provider: fontProviders.local(),
+			options: {
+				variants: [
+					{
+						src: ['./src/assets/fonts/wbicons-simple/wbicons-simple.woff2'],
 						weight: '400',
 						style: 'normal',
 					},
