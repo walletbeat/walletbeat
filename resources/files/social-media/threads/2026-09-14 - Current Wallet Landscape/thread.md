@@ -10,7 +10,7 @@ Now, let's take a look at how these attributes are rated, based on different wal
 
 ---
 
-For this comparison, we'll be analysing three attributes:
+For this comparison, we'll be analyzing three attributes:
 - Source code availability
 - L1 provider independence
 - Private transfers
