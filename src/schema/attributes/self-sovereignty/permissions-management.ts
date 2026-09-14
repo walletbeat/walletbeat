@@ -55,7 +55,11 @@ function approvalsManagementRating(control: SpendingApprovalsControl): ExplicitR
 	}
 }
 
-/** Only an exact-amount-by-default approval passes; any unlimited default fails, whether disclosed or not. */
+/**
+ * Only a minimal-amount-by-default approval passes — a default that covers
+ * roughly what the swap needs, including a reasonable buffer for slippage.
+ * Any unlimited default fails, whether disclosed or not.
+ */
 function ratingForSwapApprovals(behavior: BuiltInSwapDefaultApprovalBehavior): ExplicitRating {
 	switch (behavior) {
 		case BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT:
@@ -107,8 +111,8 @@ function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport)
 			: compareExplicitRatings(approvalsRating, swapRating) <= 0
 				? approvalsRating
 				: swapRating
-	const requestExactAmountByDefaultAdvice = paragraph(
-		'{{WALLET_NAME}} should request only the amount needed for the swap by default, rather than an unlimited approval.',
+	const requestMinimalAmountByDefaultAdvice = paragraph(
+		'{{WALLET_NAME}} should default to requesting only the amount needed for the swap (plus a reasonable slippage buffer), rather than an unlimited approval.',
 	)
 
 	if (walletHasBuiltInSwap && swapRating === Rating.FAIL) {
@@ -138,7 +142,7 @@ function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport)
 					? 'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.'
 					: 'Users who do not notice or adjust the default before signing grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain.',
 			),
-			howToImprove: requestExactAmountByDefaultAdvice,
+			howToImprove: requestMinimalAmountByDefaultAdvice,
 		})
 	}
 
@@ -150,9 +154,9 @@ function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport)
 		if (walletHasBuiltInSwap) {
 			return ctx.build({
 				outcome: {
-					id: 'can_inspect_and_revoke_exact_amount_swaps',
+					id: 'can_inspect_and_revoke_minimal_amount_swaps',
 					rating: Rating.PASS,
-					displayName: 'Can inspect and revoke approvals; exact-amount swaps',
+					displayName: 'Can inspect and revoke approvals; minimal-amount swaps',
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} lets you inspect and revoke token approvals, and its built-in swaps only request the amount needed.',
 					),
@@ -253,11 +257,12 @@ export const permissionsManagement: Attribute = {
 		result across all token standards determines the overall rating.
 
 		Wallets that offer a built-in swap or bridge feature are also evaluated on
-		whether that feature requests an exact-amount approval by default. Only an
-		exact-amount default passes. A default of unlimited fails this attribute,
-		regardless of disclosure or whether the user can edit the amount down
-		before signing, even if the wallet otherwise supports inspecting and
-		revoking approvals well.
+		whether that feature requests only the approval needed for the swap by
+		default. A default that is limited to roughly the amount needed, to account
+		for reasonable buffer for price slippage, passes. A default of
+		unlimited fails this attribute, regardless of disclosure or whether the
+		user can edit the amount down before signing, even if the wallet
+		otherwise supports inspecting and revoking approvals well.
 
 		As Account Abstraction becomes more prevalent, this methodology
 		will also grow to encompass the management of more complex account permissions.
