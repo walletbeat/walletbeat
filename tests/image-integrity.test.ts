@@ -10,6 +10,13 @@ import sharp from 'sharp'
 import { type Config, loadConfig, optimize } from 'svgo'
 import { describe, expect, it } from 'vitest'
 
+import { decodeIcoImage, type IcoImage, parseIco } from '@/tools/image-integrity/ico-lib'
+import {
+	detectImageFormat,
+	FORMAT_FOR_EXTENSION,
+	isImageExtension,
+	RASTER_EXTENSIONS,
+} from '@/tools/image-integrity/image-integrity-lib'
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
 import { isSameJson } from '@/utils/json'
 
@@ -71,9 +78,6 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'resources/branding/x_dot_com_profile.400px.jpg',
 	'public/hero.jpg',
 ])
-
-/** File extensions that carry raster pixels and so can exhibit JPEG blockiness. */
-const RASTER_EXTENSIONS: Set<string> = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'])
 
 /** A single image file discovered by the crawler. */
 interface ImageFileEntry {
@@ -487,9 +491,70 @@ const WBICON_SQUARE_TEST: ImageTest = {
 	},
 }
 
+/** Extract a human-readable message from a thrown value. */
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error)
+}
+
+/**
+ * Detect the format of every embedded image inside an ICO container (PNG or
+ * uncompressed BMP), validating that each is a decodable, well-formed image.
+ */
+async function validateIcoFrames(entry: ImageFileEntry): Promise<ImageTestResult> {
+	let frames: IcoImage[]
+
+	try {
+		frames = parseIco(entry.raw)
+	} catch (error) {
+		return { pass: false, detail: `invalid ICO container: ${errorMessage(error)}` }
+	}
+
+	for (const frame of frames) {
+		try {
+			await decodeIcoImage(frame)
+		} catch (error) {
+			return {
+				pass: false,
+				detail: `embedded ${frame.format} image ${frame.width}x${frame.height} is invalid: ${errorMessage(error)}`,
+			}
+		}
+	}
+
+	return { pass: true }
+}
+
+/**
+ * Verify that each image is the format its file extension claims (a `.png` is
+ * a PNG, a `.jpg` is a JPEG, an `.svg` is an SVG, and so on), and that ICO
+ * containers hold valid, decodable embedded images.
+ */
+const FILE_FORMAT_TEST: ImageTest = {
+	name: 'file-format',
+	appliesTo: entry => isImageExtension(extensionOf(entry.filePath)),
+	run: async entry => {
+		const ext = extensionOf(entry.filePath)
+		const actual = detectImageFormat(entry.raw)
+		const expected = FORMAT_FOR_EXTENSION[ext]
+
+		if (actual !== expected) {
+			return {
+				pass: false,
+				detail: `magic bytes indicate ${actual ?? 'an unknown'} format, expected ${expected}`,
+			}
+		}
+
+		if (ext === '.ico') {
+			return validateIcoFrames(entry)
+		}
+
+		return { pass: true }
+	},
+}
+
 /** All integrity tests, in the order they should be reported. */
 const IMAGE_TESTS: ImageTest[] = [
 	BLOCKINESS_TEST,
+	FILE_FORMAT_TEST,
 	SVG_OPTIMIZED_TEST,
 	SVG_VECTOR_TEST,
 	WBICON_SQUARE_TEST,
@@ -699,9 +764,7 @@ describe('image integrity', () => {
 					return
 				}
 
-				const ext = extensionOf(entryBase.path)
-
-				if (!RASTER_EXTENSIONS.has(ext) && ext !== '.svg') {
+				if (!isImageExtension(extensionOf(entryBase.path))) {
 					return
 				}
 

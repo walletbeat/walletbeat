@@ -1,5 +1,7 @@
 import sharp from 'sharp'
 
+import { decodeIcoImage, isIco, parseIco } from './ico-lib'
+
 /**
  * Threshold on the smooth-region 8x8 blockiness ratio above which an image is
  * considered to be a low-quality JPEG.
@@ -215,6 +217,44 @@ export function computeBlockinessScore(
  * @returns The blockiness score and a boolean classification.
  */
 export async function detectBlockyJpeg(buffer: Uint8Array): Promise<JpegBlockinessResult> {
+	// ICO containers cannot be decoded directly by libvips, so analyze each
+	// embedded frame (PNG or BMP) and report the worst blockiness score.
+	if (isIco(buffer)) {
+		let frames
+
+		try {
+			frames = parseIco(buffer)
+		} catch {
+			return { score: 0, isTooBlocky: false }
+		}
+
+		if (frames.length === 0) {
+			return { score: 0, isTooBlocky: false }
+		}
+
+		let worst: JpegBlockinessResult = { score: 0, isTooBlocky: false }
+
+		for (const frame of frames) {
+			let raw
+
+			try {
+				raw = await decodeIcoImage(frame)
+			} catch {
+				// Skip a frame that cannot be decoded; the file-format test reports it.
+				continue
+			}
+
+			const score = computeBlockinessScore(raw.data, raw.width, raw.height, raw.channels)
+			const isTooBlocky = score >= BLOCKY_JPEG_THRESHOLD
+
+			if (score > worst.score) {
+				worst = { score, isTooBlocky }
+			}
+		}
+
+		return worst
+	}
+
 	const { data, info } = await sharp(Buffer.from(buffer))
 		.raw()
 		.toBuffer({ resolveWithObject: true })
