@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { type Outcome, Rating, Verifiability } from '@/schema/attributes'
-import { sentence } from '@/types/content'
+import { type Outcome, type OutcomeMetadata, Rating, Verifiability } from '@/schema/attributes'
+import { type ComponentAndProps, sentence } from '@/types/content'
 import type { AccountRecoveryDetailsContent } from '@/types/content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from '@/types/content/account-unruggability-details'
 import { evaluationDetailRenderData } from '@/types/content/evaluation-details'
@@ -25,6 +25,31 @@ const outcomeWithoutMetadata: Outcome = {
 	shortExplanation: sentence('{{WALLET_NAME}} test outcome.'),
 	rating: Rating.PASS,
 	verifiability: Verifiability.SELF_EVIDENT,
+}
+
+const _metadataRequirementByComponent = {
+	AccountRecoveryDetails: 'bound',
+	AccountUnruggabilityDetails: 'bound',
+	AddressCorrelationDetails: 'unbound',
+	ChainVerificationDetails: 'unbound',
+	FundingDetails: 'unbound',
+	PrivateTransfersDetails: 'unbound',
+	ScamAlertDetails: 'bound',
+	SecurityAuditsDetails: 'bound',
+	TransactionInclusionDetails: 'unbound',
+	UnratedAttribute: 'unbound',
+} as const satisfies Record<ComponentAndProps['component'], 'bound' | 'unbound'>
+
+type MetadataBoundComponentName = {
+	[
+		_Component in keyof typeof _metadataRequirementByComponent
+	]: (typeof _metadataRequirementByComponent)[_Component] extends 'bound' ? _Component : never
+}[keyof typeof _metadataRequirementByComponent]
+
+type MetadataBoundTestCase<_Component extends MetadataBoundComponentName> = {
+	details: Extract<ComponentAndProps, { component: _Component }>
+	validOutcome: Outcome<OutcomeMetadata>
+	incompatibleOutcome: Outcome<OutcomeMetadata>
 }
 
 const scamAlertDetails: ScamAlertDetailsContent = {
@@ -51,72 +76,67 @@ const accountUnruggabilityDetails: AccountUnruggabilityDetailsContent = {
 	componentProps: {},
 }
 
+const metadataBoundCases = {
+	ScamAlertDetails: {
+		details: scamAlertDetails,
+		validOutcome: outcomeWithMetadata({ scamAlerts: null }),
+		incompatibleOutcome: outcomeWithMetadata({ securityAudits: [] }),
+	},
+	SecurityAuditsDetails: {
+		details: securityAuditsDetails,
+		validOutcome: outcomeWithMetadata({ securityAudits: [] }),
+		incompatibleOutcome: outcomeWithMetadata({ scamAlerts: null }),
+	},
+	AccountRecoveryDetails: {
+		details: accountRecoveryDetails,
+		validOutcome: outcomeWithMetadata({
+			minimumGuardianPolicy: null,
+			outcomes: null,
+			drills: null,
+		}),
+		incompatibleOutcome: outcomeWithMetadata({
+			minimumGuardianPolicy: null,
+			outcomes: null,
+		}),
+	},
+	AccountUnruggabilityDetails: {
+		details: accountUnruggabilityDetails,
+		validOutcome: outcomeWithMetadata({
+			minimumGuardianPolicy: null,
+			outcomes: null,
+		}),
+		incompatibleOutcome: outcomeWithMetadata({ securityAudits: [] }),
+	},
+} satisfies {
+	[_Component in MetadataBoundComponentName]: MetadataBoundTestCase<_Component>
+}
+
 describe('evaluationDetailRenderData', () => {
-	it.each([
-		{
-			details: scamAlertDetails,
-			outcome: outcomeWithMetadata({ scamAlerts: null }),
-		},
-		{
-			details: securityAuditsDetails,
-			outcome: outcomeWithMetadata({ securityAudits: [] }),
-		},
-		{
-			details: accountRecoveryDetails,
-			outcome: outcomeWithMetadata({
-				minimumGuardianPolicy: null,
-				outcomes: null,
-				drills: null,
-			}),
-		},
-		{
-			details: accountUnruggabilityDetails,
-			outcome: outcomeWithMetadata({
-				minimumGuardianPolicy: null,
-				outcomes: null,
-			}),
-		},
-	])('joins $details.component with its validated outcome', ({ details, outcome }) => {
-		const renderData = evaluationDetailRenderData(details, outcome)
+	it.each(Object.values(metadataBoundCases))(
+		'joins $details.component with its validated outcome',
+		({ details, validOutcome }) => {
+			const renderData = evaluationDetailRenderData(details, validOutcome)
 
-		expect(renderData.component).toBe(details.component)
-		expect(renderData.outcome).toBe(outcome)
-	})
+			expect(renderData.component).toBe(details.component)
+			expect(renderData.outcome).toBe(validOutcome)
+		},
+	)
 
-	it.each([
-		scamAlertDetails,
-		securityAuditsDetails,
-		accountRecoveryDetails,
-		accountUnruggabilityDetails,
-	])('rejects missing outcome metadata for $component', details => {
-		expect(() => evaluationDetailRenderData(details, outcomeWithoutMetadata)).toThrow(
-			`Invalid outcome metadata for ${details.component}`,
-		)
-	})
+	it.each(Object.values(metadataBoundCases))(
+		'rejects missing outcome metadata for $details.component',
+		({ details }) => {
+			expect(() => evaluationDetailRenderData(details, outcomeWithoutMetadata)).toThrow(
+				`Invalid outcome metadata for ${details.component}`,
+			)
+		},
+	)
 
-	it.each([
-		{
-			details: scamAlertDetails,
-			outcome: outcomeWithMetadata({ securityAudits: [] }),
+	it.each(Object.values(metadataBoundCases))(
+		'rejects incompatible outcome metadata for $details.component',
+		({ details, incompatibleOutcome }) => {
+			expect(() => evaluationDetailRenderData(details, incompatibleOutcome)).toThrow(
+				`Invalid outcome metadata for ${details.component}`,
+			)
 		},
-		{
-			details: securityAuditsDetails,
-			outcome: outcomeWithMetadata({ scamAlerts: null }),
-		},
-		{
-			details: accountRecoveryDetails,
-			outcome: outcomeWithMetadata({
-				minimumGuardianPolicy: null,
-				outcomes: null,
-			}),
-		},
-		{
-			details: accountUnruggabilityDetails,
-			outcome: outcomeWithMetadata({ securityAudits: [] }),
-		},
-	])('rejects incompatible outcome metadata for $details.component', ({ details, outcome }) => {
-		expect(() => evaluationDetailRenderData(details, outcome)).toThrow(
-			`Invalid outcome metadata for ${details.component}`,
-		)
-	})
+	)
 })
