@@ -6,6 +6,11 @@
 
 set -euo pipefail
 
+IS_LINUX=false
+if ( hash uname &>/dev/null ) && [[ "$(uname -s)" == "Linux" ]]; then
+	IS_LINUX=true
+fi
+
 # Optional sandboxing via bubblewrap. This is essential to keep the build
 # deterministic, as Astro otherwise computes its resource hashes
 # (the `astro-island uid`s) based on the absolute path of where the files
@@ -13,11 +18,18 @@ set -euo pipefail
 # perceived path of these files and avoid this non-determinism.
 if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
 	if command -v bwrap >/dev/null 2>&1; then
-		tmpfs_arg=()
+		bwrap_args=()
 		if [[ "${WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY:-}" == "true" ]]; then
 			# Enforce that deps must be installed from scratch in the sandbox by
 			# mounting a tmpfs on top of `node_modules`:
-			tmpfs_arg=(--tmpfs /tmp/wb-build/node_modules)
+			bwrap_args+=(--tmpfs /tmp/wb-build/node_modules)
+		fi
+		if [[ -d "${HOME:-/non-existent}" ]] && [[ -n "${HOME:-}" ]] && [[ "${HOME:-}" != '/tmp' ]]; then
+			bwrap_args+=(--bind "${HOME:-/tmp}" "${HOME:-/tmp}")
+		elif [[ -d /home ]]; then
+			bwrap_args+=(--bind /home /home)
+		else
+			bwrap_args+=(--tmpfs /home)
 		fi
 		if [[ "${WALLETBEAT_ENV:-}" == "CI" ]]; then
 			sudo sysctl -w kernel.unprivileged_userns_clone=1 &>/dev/null || true
@@ -30,10 +42,9 @@ if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
 			--unshare-pid \
 			--unshare-uts \
 			--ro-bind / / \
-			--bind /tmp /tmp \
-			--bind "${HOME:-/tmp}" "${HOME:-/tmp}" \
+			--tmpfs /tmp \
 			--bind "$PWD" /tmp/wb-build \
-			"${tmpfs_arg[@]}" \
+			"${bwrap_args[@]}" \
 			--dev /dev \
 			--proc /proc \
 			--chdir /tmp/wb-build \
@@ -41,20 +52,22 @@ if [[ "${WALLETBEAT_RUNNING_IN_SANDBOX:-}" != "true" ]]; then
 			--setenv WALLETBEAT_RUNNING_IN_SANDBOX true \
 			-- bash "$0" "$@"
 	fi
-	if [[ "${WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY:-}" == "true" ]]; then
-		echo "bwrap is required to sandbox the build (WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY=true), but bwrap is not installed." >&2
-		exit 1
-	fi
-	if [[ "${WALLETBEAT_BUILD_MUST_BE_SANDBOXED:-}" == "true" ]]; then
-		echo "bwrap is required to sandbox the build (WALLETBEAT_BUILD_MUST_BE_SANDBOXED=true), but bwrap is not installed." >&2
-		exit 1
-	fi
-	if [[ "${WALLETBEAT_ENV:-}" == "CI" ]]; then
-		echo "bwrap is required to sandbox the build (WALLETBEAT_ENV=CI), but bwrap is not installed." >&2
-		exit 1
+	if [[ "$IS_LINUX" == true ]]; then
+		if [[ "${WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY:-}" == "true" ]]; then
+			echo "bwrap is required to sandbox the build (WALLETBEAT_MUST_INSTALL_DEPENDENCIES_CLEANLY=true), but bwrap is not installed." >&2
+			exit 1
+		fi
+		if [[ "${WALLETBEAT_BUILD_MUST_BE_SANDBOXED:-}" == "true" ]]; then
+			echo "bwrap is required to sandbox the build (WALLETBEAT_BUILD_MUST_BE_SANDBOXED=true), but bwrap is not installed." >&2
+			exit 1
+		fi
+		if [[ "${WALLETBEAT_ENV:-}" == "CI" ]]; then
+			echo "bwrap is required to sandbox the build (WALLETBEAT_ENV=CI), but bwrap is not installed." >&2
+			exit 1
+		fi
 	fi
 	# Otherwise, run build unsandboxed anyway.
-	if [[ "${WALLETBEAT_BUILD_TEST:-}" == true ]]; then
+	if [[ "${WALLETBEAT_BUILD_TEST:-}" == true ]] && [[ "$IS_LINUX" == false ]]; then
 		echo 'bwrap is not available; build will be non-deterministic.' >&2
 	fi
 fi
@@ -74,6 +87,9 @@ if [[ -n "${WALLETBEAT_BUILD_ATTEMPTS_LEFT:-}" ]]; then
 fi
 
 has_tty() {
+	if [[ "$IS_LINUX" == false ]]; then
+		return 1
+	fi
 	if [[ ! -e /dev/tty ]]; then
 		return 1
 	fi
@@ -89,22 +105,34 @@ do_build() {
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true script -q -e -f -c 'pnpm astro build' /dev/null 2>&1 | tee /dev/tty | sed -r "s/\x1B\[[0-9;]*[A-Za-z]//g"
 	elif has_tty; then
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/tty
-	elif [[ -w /dev/stderr ]]; then
-		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/stderr
 	else
+		local status_file
+		status_file="$(mktemp)"
 		while IFS= read -r line; do
 			echo "$line"
 			echo "$line" >&2
-		done < <(WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1)
+		done < <({
+			set +e
+			WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1
+			echo "$?" >"$status_file" 2>/dev/null
+		})
+		local build_status
+		build_status="$(cat "$status_file")"
+		rm -f "$status_file"
+		return "$build_status"
 	fi
 }
 
 need_rebuild=''
-while IFS= read -r line; do
-	if echo "$line" | grep -qE --line-buffered 'SRI hashes have changed|Unable to obtain SRI hash'; then
-		need_rebuild='SRI hashes need recomputing'
-	fi
-done < <(do_build)
+if [[ "$IS_LINUX" == true ]]; then
+	while IFS= read -r line; do
+		if echo "$line" | grep -qE --line-buffered 'SRI hashes have changed|Unable to obtain SRI hash'; then
+			need_rebuild='SRI hashes need recomputing'
+		fi
+	done < <(do_build)
+else
+	do_build
+fi
 
 if [[ -n "$need_rebuild" ]]; then
 	export WALLETBEAT_BUILD_ATTEMPTS_LEFT="$(($((attempts_left)) - 1))"

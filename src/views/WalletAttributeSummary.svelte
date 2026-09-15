@@ -101,7 +101,7 @@
 >
 	<header data-row="center gap-3 wrap">
 		<h4 data-row="gap-2">
-			<span data-icon="wbicons {attribute.attribute.icon}"></span>
+			<span data-icon="wbicons-simple {attribute.attribute.icon}"></span>
 			{attribute.attribute.displayName}
 		</h4>
 
@@ -124,7 +124,6 @@
 					{#snippet TooltipContent()}
 						<WalletStageSummary
 							{wallet}
-							{ladders}
 							stage={firstStage}
 							{ladderEvaluation}
 							showNextStageCriteria={false}

@@ -11,6 +11,7 @@ on:
       - opened
       - reopened
       - synchronize
+      - review_requested
 
 # Supersede in-flight runs for the same PR. Give every trunk commit its own
 # group so that each one receives a recorded result.
@@ -66,20 +67,35 @@ jobs:
           WALLETBEAT_ENV: CI
   check-full:
     name: 'Run all CI tests'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs:
       - check-quick
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
       - name: Install packages
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y $(cat deploy/debian-packages.txt)
         env:
           DEBIAN_FRONTEND: noninteractive
+      - name: Install packages (macOS)
+        if: runner.os == 'macOS'
+        run: brew install --cask $(cat deploy/macos-packages.txt)
+      - name: Install packages (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install $(cat deploy/windows-packages.txt) -y
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js
