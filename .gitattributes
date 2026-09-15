@@ -10,6 +10,7 @@
 *.html text eol=lf diff=html
 *.jpg binary
 *.json text eol=lf
+*.jsonc text eol=lf
 *.js text eol=lf
 *.jsx text eol=lf
 *.md text eol=lf diff=markdown

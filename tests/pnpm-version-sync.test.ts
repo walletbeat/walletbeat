@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import * as path from 'node:path'
 
+import semver from 'semver'
 import { describe, expect, it } from 'vitest'
 
 import { getRepositoryRoot } from './utils/codebase'
@@ -61,6 +62,35 @@ function findPnpmInPackageJson(): {
 	return { packageManagerVersion, pnpmEntries }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function findNodeEngines(): string {
+	const raw = fs.readFileSync(path.join(getRepositoryRoot(), 'package.json'), {
+		encoding: 'utf-8',
+	})
+	const parsed: unknown = JSON.parse(raw)
+
+	if (!isRecord(parsed)) {
+		throw new Error('package.json is not an object')
+	}
+
+	const engines = parsed.engines
+
+	if (!isRecord(engines)) {
+		throw new Error('package.json is missing an engines field')
+	}
+
+	const nodeRange = engines.node
+
+	if (typeof nodeRange !== 'string') {
+		throw new Error('package.json engines is missing a node field')
+	}
+
+	return nodeRange
+}
+
 describe('pnpm version sync', () => {
 	const { packageManagerVersion, pnpmEntries } = findPnpmInPackageJson()
 
@@ -84,5 +114,20 @@ describe('pnpm version sync', () => {
 				packageManagerVersion,
 			)
 		}
+	})
+
+	it('engines.node is a valid semver range', () => {
+		const nodeRange = findNodeEngines()
+
+		expect(semver.validRange(nodeRange)).not.toBeNull()
+	})
+
+	it('running node version satisfies engines.node', () => {
+		const nodeRange = findNodeEngines()
+
+		expect(
+			semver.satisfies(process.versions.node, nodeRange),
+			`running node ${process.versions.node} does not satisfy engines.node "${nodeRange}", please update your node version`,
+		).toBe(true)
 	})
 })
