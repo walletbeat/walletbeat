@@ -9,6 +9,8 @@ import { defineConfig, fontProviders } from 'astro/config'
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
 
+const isLinux = process.platform === 'linux'
+
 // https://astro.build/config
 export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
@@ -19,12 +21,16 @@ export default defineConfig({
 			? []
 			: [
 					sitemap(),
-					shield({
-						sri: {
-							enableMiddleware: false,
-							hashesModule: modulePath,
-						},
-					}),
+					...(isLinux
+						? [
+								shield({
+									sri: {
+										enableMiddleware: false,
+										hashesModule: modulePath,
+									},
+								}),
+							]
+						: []),
 				],
 	),
 	vite: {
