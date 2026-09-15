@@ -45,11 +45,15 @@ import Footer from '@/views/Footer.astro'
 		<ClientRouter />
 		<script is:inline>
 			// `color-scheme` override
-			const colorScheme = localStorage.getItem('theme')
-			if (colorScheme) {
-				document.documentElement.style.colorScheme = colorScheme
-				document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', colorScheme)
+			function applyStoredColorScheme() {
+				const colorScheme = localStorage.getItem('theme')
+				if (colorScheme) {
+					document.documentElement.style.colorScheme = colorScheme
+					document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', colorScheme)
+				}
 			}
+			applyStoredColorScheme()
+			document.addEventListener('astro:after-swap', applyStoredColorScheme)
 		</script>
 
 		{

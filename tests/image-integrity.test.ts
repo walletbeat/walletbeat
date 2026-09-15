@@ -10,10 +10,22 @@ import sharp from 'sharp'
 import { type Config, loadConfig, optimize } from 'svgo'
 import { describe, expect, it } from 'vitest'
 
+import { decodeIcoImage, type IcoImage, parseIco } from '@/tools/image-integrity/ico-lib'
+import {
+	detectImageFormat,
+	FORMAT_FOR_EXTENSION,
+	isImageExtension,
+	RASTER_EXTENSIONS,
+} from '@/tools/image-integrity/image-integrity-lib'
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
 import { isSameJson } from '@/utils/json'
 
-import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from './utils/codebase'
+import {
+	CodebaseEntryType,
+	crawlCodebase,
+	getRepositoryRoot,
+	GitIgnoredFiles,
+} from './utils/codebase'
 
 /**
  * Path to the JSON whitelist of image files already verified as passing every
@@ -67,9 +79,6 @@ const BLOCKY_ALLOWED_FILES: Set<string> = new Set([
 	'public/hero.jpg',
 ])
 
-/** File extensions that carry raster pixels and so can exhibit JPEG blockiness. */
-const RASTER_EXTENSIONS: Set<string> = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'])
-
 /** A single image file discovered by the crawler. */
 interface ImageFileEntry {
 	filePath: string
@@ -93,6 +102,8 @@ interface ImageTest {
 	appliesTo(entry: ImageFileEntry): boolean
 	/** Run the test against the image. */
 	run(entry: ImageFileEntry): Promise<ImageTestResult> | ImageTestResult
+	/** Whether this test requires the `inkscape` CLI. */
+	requiresInkscape: boolean
 }
 
 /** Extension of a path, lowercased ('' if none). */
@@ -124,6 +135,7 @@ function extractEmbeddedRasters(svgContents: string): { mime: string; buffer: Bu
  */
 const BLOCKINESS_TEST: ImageTest = {
 	name: 'blockiness',
+	requiresInkscape: false,
 	appliesTo: entry => {
 		if (BLOCKY_ALLOWED_FILES.has(entry.filePath)) {
 			return false
@@ -220,6 +232,7 @@ function getSvgoConfig(): Promise<Config> {
  */
 const SVG_OPTIMIZED_TEST: ImageTest = {
 	name: 'svg-optimized',
+	requiresInkscape: false,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.svg' && !isSvgOptimizationExcluded(entry.filePath),
 	run: async entry => {
@@ -275,6 +288,7 @@ function isSvgVectorExcluded(filePath: string): boolean {
  */
 const SVG_VECTOR_TEST: ImageTest = {
 	name: 'svg-vector',
+	requiresInkscape: false,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.svg' && !isSvgVectorExcluded(entry.filePath),
 	run: entry => {
@@ -323,6 +337,22 @@ interface TouchingBorders {
 }
 
 const execFileAsync = promisify(execFile)
+
+/** Whether the inkscape-dependent tests should run. */
+let inkscapeTestsEnabled = false
+
+/**
+ * Check whether the `inkscape` CLI is available on PATH.
+ */
+async function isInkscapeAvailable(): Promise<boolean> {
+	try {
+		await execFileAsync('inkscape', ['--version'])
+
+		return true
+	} catch {
+		return false
+	}
+}
 
 /** Parse the `viewBox` attribute of an SVG (null when absent/malformed). */
 function parseViewBox(contents: string): ViewBox | null {
@@ -444,6 +474,7 @@ const WBICON_PREFIX = 'resources/files/wbicons/'
  */
 const WBICON_SQUARE_TEST: ImageTest = {
 	name: 'wbicon-square',
+	requiresInkscape: true,
 	appliesTo: entry =>
 		extensionOf(entry.filePath) === '.svg' && entry.filePath.startsWith(WBICON_PREFIX),
 	run: async entry => {
@@ -482,9 +513,71 @@ const WBICON_SQUARE_TEST: ImageTest = {
 	},
 }
 
+/** Extract a human-readable message from a thrown value. */
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error)
+}
+
+/**
+ * Detect the format of every embedded image inside an ICO container (PNG or
+ * uncompressed BMP), validating that each is a decodable, well-formed image.
+ */
+async function validateIcoFrames(entry: ImageFileEntry): Promise<ImageTestResult> {
+	let frames: IcoImage[]
+
+	try {
+		frames = parseIco(entry.raw)
+	} catch (error) {
+		return { pass: false, detail: `invalid ICO container: ${errorMessage(error)}` }
+	}
+
+	for (const frame of frames) {
+		try {
+			await decodeIcoImage(frame)
+		} catch (error) {
+			return {
+				pass: false,
+				detail: `embedded ${frame.format} image ${frame.width}x${frame.height} is invalid: ${errorMessage(error)}`,
+			}
+		}
+	}
+
+	return { pass: true }
+}
+
+/**
+ * Verify that each image is the format its file extension claims (a `.png` is
+ * a PNG, a `.jpg` is a JPEG, an `.svg` is an SVG, and so on), and that ICO
+ * containers hold valid, decodable embedded images.
+ */
+const FILE_FORMAT_TEST: ImageTest = {
+	name: 'file-format',
+	requiresInkscape: false,
+	appliesTo: entry => isImageExtension(extensionOf(entry.filePath)),
+	run: async entry => {
+		const ext = extensionOf(entry.filePath)
+		const actual = detectImageFormat(entry.raw)
+		const expected = FORMAT_FOR_EXTENSION[ext]
+
+		if (actual !== expected) {
+			return {
+				pass: false,
+				detail: `magic bytes indicate ${actual ?? 'an unknown'} format, expected ${expected}`,
+			}
+		}
+
+		if (ext === '.ico') {
+			return validateIcoFrames(entry)
+		}
+
+		return { pass: true }
+	},
+}
+
 /** All integrity tests, in the order they should be reported. */
 const IMAGE_TESTS: ImageTest[] = [
 	BLOCKINESS_TEST,
+	FILE_FORMAT_TEST,
 	SVG_OPTIMIZED_TEST,
 	SVG_VECTOR_TEST,
 	WBICON_SQUARE_TEST,
@@ -511,6 +604,23 @@ function isCleanImageEntry(value: unknown): value is CleanImageEntry {
 		typeof value.hash === 'string' &&
 		Array.isArray(value.passedTests) &&
 		value.passedTests.every(item => typeof item === 'string')
+	)
+}
+
+/**
+ * Whether an existing cached whitelist entry is valid for the given tests: it
+ * exists, matches the image's current hash, and every named test has already
+ * passed for it.
+ */
+function hasValidCachedEntry(
+	existing: CleanImageEntry | undefined,
+	hash: string,
+	testNames: string[],
+): boolean {
+	return (
+		existing !== undefined &&
+		existing.hash === hash &&
+		testNames.every(testName => existing.passedTests.includes(testName))
 	)
 }
 
@@ -667,11 +777,14 @@ describe('image integrity', () => {
 	})
 
 	describe('repository images', async () => {
+		inkscapeTestsEnabled = process.env.WALLETBEAT_ENV === 'CI' || (await isInkscapeAvailable())
+
 		// The whitelist is mutated in place as the scan discovers clean, new,
 		// changed, or removed images, then written back to disk.
 		const whitelist = await loadCleanImageHashes()
 
 		const failures: ImageFailure[] = []
+		const inkscapeRequiredFailures: { filePath: string; test: string }[] = []
 		const scannedFiles: string[] = []
 		const skippedFiles: string[] = []
 		// Files that currently have at least one applicable integrity test.
@@ -680,15 +793,21 @@ describe('image integrity', () => {
 		const trackedFiles: Set<string> = new Set()
 
 		await crawlCodebase({
-			ignore: ['.git', 'node_modules', 'dist', '.cache', '.astro', 'src/generated'],
+			ignore: [
+				'.git',
+				await GitIgnoredFiles(),
+				'node_modules',
+				'dist',
+				'.cache',
+				'.astro',
+				'src/generated',
+			],
 			complexTraversalFn: async (entryBase, getFullEntry) => {
 				if (entryBase.type !== CodebaseEntryType.FILE) {
 					return
 				}
 
-				const ext = extensionOf(entryBase.path)
-
-				if (!RASTER_EXTENSIONS.has(ext) && ext !== '.svg') {
+				if (!isImageExtension(extensionOf(entryBase.path))) {
 					return
 				}
 
@@ -704,7 +823,27 @@ describe('image integrity', () => {
 					contents: entry.contents,
 				}
 
-				const applicableTests = IMAGE_TESTS.filter(test => test.appliesTo(imageEntry))
+				const appliedTests = IMAGE_TESTS.filter(test => test.appliesTo(imageEntry))
+
+				const hash = crypto.createHash('sha256').update(entry.raw).digest('hex')
+				const existing = whitelist[entry.path]
+
+				// When the inkscape CLI is unavailable, an inkscape-requiring
+				// test cannot run. If the image does not already have a valid
+				// cached entry for that test, the cache cannot be kept up to
+				// date, so the test must fail and instruct the user to install
+				// inkscape.
+				if (!inkscapeTestsEnabled) {
+					for (const test of appliedTests) {
+						if (test.requiresInkscape && !hasValidCachedEntry(existing, hash, [test.name])) {
+							inkscapeRequiredFailures.push({ filePath: entry.path, test: test.name })
+						}
+					}
+				}
+
+				const applicableTests = appliedTests.filter(
+					test => inkscapeTestsEnabled || !test.requiresInkscape,
+				)
 
 				// Images with no applicable tests have nothing to verify and
 				// are not tracked in the whitelist.
@@ -714,15 +853,12 @@ describe('image integrity', () => {
 
 				trackedFiles.add(entry.path)
 
-				const hash = crypto.createHash('sha256').update(entry.raw).digest('hex')
-				const existing = whitelist[entry.path]
-
-				// Skip if already verified clean, unchanged, and every currently
-				// applicable test has passed for it.
 				if (
-					existing !== undefined &&
-					existing.hash === hash &&
-					applicableTests.every(test => existing.passedTests.includes(test.name))
+					hasValidCachedEntry(
+						existing,
+						hash,
+						applicableTests.map(test => test.name),
+					)
 				) {
 					skippedFiles.push(entry.path)
 
@@ -795,6 +931,22 @@ describe('image integrity', () => {
 				expect(
 					failures.length,
 					`${failures.length} image file(s) fail one or more integrity tests. See error output for details.`,
+				).toBe(0)
+			}
+		})
+
+		it('no inkscape-requiring test is needed without inkscape installed', () => {
+			if (inkscapeRequiredFailures.length > 0) {
+				const message =
+					'The following images need an inkscape-requiring test to keep ' +
+					'verified-clean-images.json up to date, but the inkscape CLI is ' +
+					'not installed:\n\n' +
+					inkscapeRequiredFailures.map(f => `  ${f.filePath} (test: ${f.test})`).join('\n') +
+					'\n\nInstall the inkscape CLI and re-run the tests to verify these images.\n'
+
+				expect(
+					inkscapeRequiredFailures.length,
+					`${inkscapeRequiredFailures.length} image(s) require the inkscape CLI to be verified.\n${message}`,
 				).toBe(0)
 			}
 		})
