@@ -53,21 +53,29 @@ function approvalsManagementRating(control: SpendingApprovalsControl): ExplicitR
 			return Rating.FAIL
 	}
 }
-
 /**
  * Evaluates the wallet's built-in swap/bridge approval defaults on their own.
- * Returns `NO_SWAP_APPROVAL_ISSUE` when there is nothing to complain about;
- * any unlimited default fails, whether disclosed or not.
+ * Only called for wallets that have a built-in swap/bridge feature.
+ * Any unlimited default fails, whether disclosed or not.
  */
 function swapApprovalsEvaluation(
 	ctx: EvaluationContext,
-	builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior | 'NO_BUILT_IN_SWAP',
-): Evaluation | 'NO_SWAP_APPROVAL_ISSUE' {
-	if (
-		!hasBuiltInSwap(builtInSwapApprovals) ||
-		builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT
-	) {
-		return 'NO_SWAP_APPROVAL_ISSUE'
+	builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior,
+): Evaluation {
+	if (builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT) {
+		return ctx.build({
+			outcome: {
+				id: 'minimal_amount_swap_approval',
+				rating: Rating.PASS,
+				displayName: 'Requests minimal swap approvals',
+				shortExplanation: sentence(
+					"{{WALLET_NAME}}'s built-in swaps only request the amount needed.",
+				),
+			},
+			details: paragraph(
+				`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
+			),
+		})
 	}
 
 	const undisclosed =
@@ -117,15 +125,12 @@ function swapApprovalsEvaluation(
 }
 
 /**
- * Evaluates the wallet's approvals inspection/revocation support on its own.
- * `passingSwapDetails`, when non-null, is appended to the PASS case's details
- * to mention that the wallet's built-in swap also behaves well, without that
- * fact changing the rating computed here.
+ * Evaluates the wallet's approvals inspection/revocation support on its own,
+ * independent of the wallet's built-in swap/bridge approval behavior.
  */
 function approvalsManagementEvaluation(
 	ctx: EvaluationContext,
 	approvalsManagement: PermissionsManagementSupport['approvalsManagement'],
-	passingSwapDetails: string | null,
 ): Evaluation {
 	if (!isSupported(approvalsManagement)) {
 		return ctx.build({
@@ -172,30 +177,14 @@ function approvalsManagementEvaluation(
 
 			return ctx.build({
 				outcome: {
-					id:
-						passingSwapDetails === null
-							? 'can_inspect_and_revoke'
-							: 'can_inspect_and_revoke_minimal_amount_swaps',
+					id: 'can_inspect_and_revoke',
 					rating: Rating.PASS,
-					displayName:
-						passingSwapDetails === null
-							? 'Can inspect and revoke approvals'
-							: 'Can inspect and revoke approvals; minimal-amount swaps',
-					shortExplanation:
-						passingSwapDetails === null
-							? sentence('{{WALLET_NAME}} lets you inspect and revoke token approvals.')
-							: sentence(
-									'{{WALLET_NAME}} lets you inspect and revoke token approvals, and its built-in swaps only request the amount needed.',
-								),
+					displayName: 'Can inspect and revoke approvals',
+					shortExplanation: sentence(
+						'{{WALLET_NAME}} lets you inspect and revoke token approvals.',
+					),
 				},
-				details:
-					passingSwapDetails === null
-						? (perStandardDetails ?? paragraph(approvalsText))
-						: markdown(`
-							${approvalsText}
-
-							${passingSwapDetails}
-						`),
+				details: perStandardDetails ?? paragraph(approvalsText),
 			})
 		}
 
@@ -247,20 +236,13 @@ function approvalsManagementEvaluation(
 function evaluate(ctx: EvaluationContext, control: PermissionsManagementSupport): Evaluation {
 	const { approvalsManagement, builtInSwapApprovals } = control
 
-	const swapEvaluation = swapApprovalsEvaluation(ctx, builtInSwapApprovals)
-	const passingSwapDetails =
-		swapEvaluation === null && hasBuiltInSwap(builtInSwapApprovals)
-			? `Its built-in swap/bridge feature also ${swapBehaviorDescription(builtInSwapApprovals)}.`
-			: null
-	const approvalsEvaluation = approvalsManagementEvaluation(
-		ctx,
-		approvalsManagement,
-		passingSwapDetails,
-	)
+	const approvalsEvaluation = approvalsManagementEvaluation(ctx, approvalsManagement)
 
-	if (swapEvaluation === null) {
+	if (!hasBuiltInSwap(builtInSwapApprovals)) {
 		return approvalsEvaluation
 	}
+
+	const swapEvaluation = swapApprovalsEvaluation(ctx, builtInSwapApprovals)
 
 	return pickWorstRating([swapEvaluation, approvalsEvaluation])
 }
