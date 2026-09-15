@@ -751,22 +751,6 @@
 		"hash": "ed4669e5237fc7d067b2725e138c07d3d9f1e0378e6cf15f4363204ac275d877",
 		"passedTests": ["svg-optimized", "svg-vector"]
 	},
-	"resources/contracts/lib/openzeppelin-contracts/docs/modules/ROOT/images/tally-exec.png": {
-		"hash": "c948b18bf287315b3cef23c573a586306fbd04cbaba685492fd710df59c628a7",
-		"passedTests": ["blockiness"]
-	},
-	"resources/contracts/lib/openzeppelin-contracts/docs/modules/ROOT/images/tally-vote.png": {
-		"hash": "dc7c2b0f07cedbcc550be526a35fe72633a35f7cba8ca992a6a6ef2c9b9bc389",
-		"passedTests": ["blockiness"]
-	},
-	"resources/contracts/lib/solady/docs/assets/img/favicon.png": {
-		"hash": "4fc8b89a595b248af298e6550907f8ebc01af5411c59a1a0ff8d5f24c981e9a7",
-		"passedTests": ["blockiness"]
-	},
-	"resources/contracts/lib/solady/docs/assets/img/preview.png": {
-		"hash": "74a334749eed63d54b53b3a2df4c7448bc0a74a32052c97f7509c8439b9938d3",
-		"passedTests": ["blockiness"]
-	},
 	"resources/docs/contribute/images/navigate-to-type-definition.gif": {
 		"hash": "2dbf83000ab52904ac831c3ad669f78a25cc58317d94b25478b82d6ccf1f334a",
 		"passedTests": ["blockiness"]
