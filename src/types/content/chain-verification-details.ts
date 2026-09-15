@@ -8,16 +8,18 @@ export interface ChainVerificationDetailsProps extends EvaluationData {
 	lightClients: NonEmptyArray<EthereumL1LightClient>
 }
 
+export type ChainVerificationDetailsBakedProps = Omit<
+	ChainVerificationDetailsProps,
+	keyof EvaluationData
+>
+
 export interface ChainVerificationDetailsContent {
 	component: 'ChainVerificationDetails'
-	componentProps: ChainVerificationDetailsProps
+	componentProps: ChainVerificationDetailsBakedProps
 }
 
 export function chainVerificationDetailsContent(
-	bakedProps: Omit<ChainVerificationDetailsProps, keyof EvaluationData>,
+	bakedProps: ChainVerificationDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<ChainVerificationDetailsContent, keyof typeof bakedProps>(
-		'ChainVerificationDetails',
-		bakedProps,
-	)
+	return component('ChainVerificationDetails', bakedProps)
 }
