@@ -333,6 +333,22 @@ interface TouchingBorders {
 
 const execFileAsync = promisify(execFile)
 
+/** Whether the inkscape-dependent tests should run. */
+let inkscapeTestsEnabled = false
+
+/**
+ * Check whether the `inkscape` CLI is available on PATH.
+ */
+async function isInkscapeAvailable(): Promise<boolean> {
+	try {
+		await execFileAsync('inkscape', ['--version'])
+
+		return true
+	} catch {
+		return false
+	}
+}
+
 /** Parse the `viewBox` attribute of an SVG (null when absent/malformed). */
 function parseViewBox(contents: string): ViewBox | null {
 	const match = contents.match(/viewBox\s*=\s*"([^"]+)"/)
@@ -454,7 +470,9 @@ const WBICON_PREFIX = 'resources/files/wbicons/'
 const WBICON_SQUARE_TEST: ImageTest = {
 	name: 'wbicon-square',
 	appliesTo: entry =>
-		extensionOf(entry.filePath) === '.svg' && entry.filePath.startsWith(WBICON_PREFIX),
+		inkscapeTestsEnabled &&
+		extensionOf(entry.filePath) === '.svg' &&
+		entry.filePath.startsWith(WBICON_PREFIX),
 	run: async entry => {
 		const viewBox = parseViewBox(entry.contents)
 
@@ -737,6 +755,8 @@ describe('image integrity', () => {
 	})
 
 	describe('repository images', async () => {
+		inkscapeTestsEnabled = process.env.WALLETBEAT_ENV === 'CI' || (await isInkscapeAvailable())
+
 		// The whitelist is mutated in place as the scan discovers clean, new,
 		// changed, or removed images, then written back to disk.
 		const whitelist = await loadCleanImageHashes()
