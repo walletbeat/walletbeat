@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { getRepositoryRoot } from '@/tests/utils/codebase'
-import { type CalendarDate, daysBetween } from '@/types/date'
+import { type CalendarDate, daysBetween, isCalendarDate } from '@/types/date'
 
 /**
  * Result of running the metadata-update check.
@@ -58,11 +58,6 @@ const IGNORED_LINE_PATTERNS: RegExp[] = [
 ]
 
 const BLOCK_COMMENT_RE = /\/\*[\s\S]*?\*\//g
-
-/** Strict CalendarDate guard (YYYY-MM-DD with valid calendar ranges). */
-function isCalendarDate(s: string): s is CalendarDate {
-	return /^(20|21)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(s)
-}
 
 /** Run a git command (args passed without shell) and return stdout. */
 function git(args: string[], cwd: string): string {
