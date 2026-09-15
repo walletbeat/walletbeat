@@ -599,6 +599,42 @@
 		"hash": "d0710fd9547966ef17cb7104aca01bbb156d03a20667df6f2dc103aa665d4251",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png": {
+		"hash": "0dc4e32cf81c269c75da15d9196961ff0ed6a54c476826871272f5b9a5dc6dc8",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-eth-comprehensive.png": {
+		"hash": "9274ef5fb0c6abdf61572a30f14cb5e0a7696cfd9d086946e32dc72948ef240a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-no-hw-import.png": {
+		"hash": "21da0c5b7f4a26c157259437f69fb536a1bde7ea65ba20923e24209aae3074b9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-no-network-settings.png": {
+		"hash": "0966515114cb2337676c90ecb5f83686eb6ce96b80c26368cf9106f21408337c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-comprehensive.png": {
+		"hash": "01fc67641610484fce9feb86cf4aee08d8c97cbb0d688a9cbc8df59bd2ff9e18",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-default.png": {
+		"hash": "a54ad51a54c3db977f8df2f0be7f82b80026a8b57975c7f5c2964f3fca905528",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-tokens-aggregated.png": {
+		"hash": "2837d577fd17100a0dfafc8c0326cfae10a565afe72b18893e92a4a2412ba0a5",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png": {
+		"hash": "21b65ffc47d3e2eb025519c37fa5ebf9ab994609e76107f0ba0f3178183cb478",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png": {
+		"hash": "ade57eda19a08d0b0ce4d7fa1eecafb26d29c0af323092ae8a2571164f9994e9",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/zerion/screenshots/2026-07-24-zerion-address-book.png": {
 		"hash": "dd799d976a0d430a950300b386c829c9786fc6013f9c64879abf4999fa96d603",
 		"passedTests": ["blockiness", "file-format"]
