@@ -89,6 +89,13 @@ jobs:
           sudo apt-get install -y $(cat deploy/debian-packages.txt)
         env:
           DEBIAN_FRONTEND: noninteractive
+      - name: Install packages (macOS)
+        if: runner.os == 'macOS'
+        run: brew install --cask $(cat deploy/macos-packages.txt)
+      - name: Install packages (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install $(cat deploy/windows-packages.txt) -y
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Install Node.js
