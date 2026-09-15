@@ -509,7 +509,7 @@ export const metamask: SoftwareWallet = {
 							url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/app/core/Authentication/Authentication.ts#L331-L334',
 						},
 						{
-							label: 'Both apps create a new vault and keychain',
+							label: 'All MetaMask versions create a new vault and keychain',
 							url: 'https://github.com/MetaMask/core/blob/f4ff5f5ab872f639b753ac8cad4542eaf6f2c29a/packages/multichain-account-service/src/MultichainAccountService.ts#L464-L471',
 						},
 						{
