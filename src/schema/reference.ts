@@ -29,6 +29,7 @@ import {
 	mergeLabeledUrls,
 	type Url,
 } from './url'
+import type { allWallets } from '@/data/wallets'
 
 /**
  * A loose reference which can be converted to a FullyQualifiedReference.
@@ -368,6 +369,57 @@ export function hasRefs(maybeWithRef: unknown): maybeWithRef is WithRef<unknown>
 	)
 }
 
+/** A single collected reference with its wallet name, field path, and fully-qualified refs. */
+export interface CollectedRef {
+	walletName: string
+	fieldPath: string
+	fullyQualifiedRefs: ReturnType<typeof toFullyQualified>
+}
+
+/**
+ * Recursively traverse wallet data objects and collect every `ref` field,
+ * returning the wallet name, the period-delimited field path, and the
+ * fully-qualified references.
+ */
+export function collectAllRefs(wallets: typeof allWallets): CollectedRef[] {
+	const results: CollectedRef[] = []
+
+	const findRefs = (path: string[], x: unknown): void => {
+		if (x === undefined || x === null) {
+			return
+		}
+
+		if (Array.isArray(x)) {
+			for (let i = 0; i < x.length; i++) {
+				findRefs(path.concat([`[${i}]`]), x[i])
+			}
+
+			return
+		}
+
+		if (typeof x !== 'object') {
+			return
+		}
+
+		if (hasRefs(x)) {
+			results.push({
+				walletName: path[0],
+				fieldPath: path.join(''),
+				fullyQualifiedRefs: toFullyQualified(x.ref),
+			})
+		}
+
+		for (const [key, val] of Object.entries(x)) {
+			findRefs(path.length === 0 ? [key] : path.concat([`.${key}`]), val)
+		}
+	}
+
+	for (const [walletName, wallet] of Object.entries(wallets)) {
+		findRefs([walletName], wallet)
+	}
+
+	return results
+}
 /** Extract references out of `withRef`. */
 export function refs(withRef: WithRef<unknown>): FullyQualifiedReference[] {
 	if (isNoRef(withRef.ref)) {
