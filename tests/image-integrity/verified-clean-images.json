@@ -323,6 +323,10 @@
 		"hash": "d1d62700a57205d1038421630136ccd2f867afe3899ee708f4564c650f1738f3",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/ambire/screenshots/2026-09-08-ambire-swap-approve-exact-amount.png": {
+		"hash": "66132e40d5246c917b5cb9119fe0c1f8c372ab37c2987a352071099a0d3e04da",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
 		"hash": "d541c23897a2ad6b1738080fbbe283ce9d6fc9be980bf7bfdfedb3d98e712bad",
 		"passedTests": ["blockiness", "file-format"]
@@ -331,12 +335,28 @@
 		"hash": "77bd76042b6a90582a36aad4c8bebdaf67970f1ee5589e4693061a63f64ac061",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/base-app/screenshots/2026-09-09-base-app-approve-exact-amount-event.png": {
+		"hash": "3f3f87bf0703fef8e47c5f10765206418108e3cae600d51be4f3caeccc16ab75",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/base-app/screenshots/2026-09-09-base-app-swap-review.png": {
+		"hash": "5ebc900032369b879d677f403f6de24e08c08fb90313389b6214bd3dade08558",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg": {
 		"hash": "445435961148f77b094496ac18b00113079dac75557f8155948f4b90851b1ecc",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/gemwallet/screenshots/2026-09-04-security-face-id.jpg": {
 		"hash": "105fde93dc57accd4a3e20f0185ebd10f5f823ea3f680bbddec861b5627bb3db",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-09-09-gemwallet-approve-unlimited-calldata.png": {
+		"hash": "ee0a251c332d01e66d3575483ab2c0d24432f8089ffbb4cd83f04a4e92d180c1",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/gemwallet/screenshots/2026-09-09-gemwallet-swap-review.jpg": {
+		"hash": "f7633cc320119eb5dfe61606e7c1b378034e9c91b54c43f0ba6bddd6e2abf5cc",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png": {
@@ -383,6 +403,10 @@
 		"hash": "43b74085421b36fd5c9d4fe516d36d61f3aa2414ef80915698a0c28817d39d90",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png": {
+		"hash": "3991c753fad3c34f4f50d052f10e71ed51ef86628ee4616c25d4e9dfd0281c1b",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/phantom/screenshots/2026-08-26-address-resolution-confirm-send-ens-name.png": {
 		"hash": "3fb02e0db59554960da2b3ac11a708a56cde6b00f55cac8bc5e047733f35717c",
 		"passedTests": ["blockiness", "file-format"]
@@ -405,6 +429,14 @@
 	},
 	"public/references/wallets/phantom/screenshots/2026-08-26-token-dashboard.png": {
 		"hash": "df08da170b86fe3ebed74c12e72d14e6062cfdeae72a93891b01fcec35cbf04c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-09-09-phantom-approve-unlimited-calldata.png": {
+		"hash": "c8aa2291f921827b04f486a5ec3f4ea07a9ad7e4875e2d0aaf2b39d493eb4b51",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-09-09-phantom-swap-review.png": {
+		"hash": "20750b7d5638da9e5adfcf4d2495b9d9cf5ae0a2b8525ce7acbc83197499a220",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_1.png": {
@@ -453,6 +485,14 @@
 	},
 	"public/references/wallets/rabby/screenshots/2026-08-19-rabby-mobile-eth_accounts.jpg": {
 		"hash": "7d54988e9725b465e410567a9960746b4a1a123a87a1e3f05560bf756acc77bb",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png": {
+		"hash": "5ca786ee31483a81ab35b22473261eb623ec3f416b691d5989bb9320305d5fd8",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-swap-review.png": {
+		"hash": "d122334df8f19a8fb752e2bcfc4980a0d28ef6943518f15353e07e2a84c2156e",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
@@ -599,6 +639,14 @@
 		"hash": "d0710fd9547966ef17cb7104aca01bbb156d03a20667df6f2dc103aa665d4251",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-approve-exact-amount-event.png": {
+		"hash": "e0edf3a5ed83b80a1c270bca224666e09548a98957dd2480afeb80048fc008c8",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-swap-review.png": {
+		"hash": "8694f7a41e1857f124904b6d8e94d84b85793ae4f76f8b6008e3a68cc1d14d88",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "0dc4e32cf81c269c75da15d9196961ff0ed6a54c476826871272f5b9a5dc6dc8",
 		"passedTests": ["blockiness", "file-format"]
@@ -629,6 +677,14 @@
 	},
 	"public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png": {
 		"hash": "21b65ffc47d3e2eb025519c37fa5ebf9ab994609e76107f0ba0f3178183cb478",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-16-approve-unlimited-event.png": {
+		"hash": "7f1b24a9d35819e621982155436f4d60e1cbcf99a25a261a1710a53e5671fd45",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-16-swap-review.png": {
+		"hash": "80fce6947f210cf26ffa5a0bfebccc6429c16cd141ca4518602aaf8917b8d2cb",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png": {
@@ -709,6 +765,14 @@
 	},
 	"public/references/wallets/zerion/screenshots/2026-08-31-zerion-ios-security-settings.png": {
 		"hash": "0f6790b6ac67f2a9bda429e7de8af36b49f5a54c312797d75d4c9b1d57abb66a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-09-08-zerion-exact-approval.png": {
+		"hash": "6dfcdb6c8170f6e52dc34fcce6a481ebd3f88f71c6fde89a871f74f18e42a716",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-09-08-zerion-swap-review.png": {
+		"hash": "8c2f491286289acf6db053c4fec02d62e27eb764c3d519a49309eb4a049d97e5",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/zerion/screenshots/2026-09-11-zerion-offline-account-creation.png": {
