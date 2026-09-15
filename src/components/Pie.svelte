@@ -13,7 +13,6 @@
 		type LevelConfig as PieLevelConfig,
 		type Slice as PieSlice,
 	} from './pie-geometry'
-	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -240,7 +239,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
+				<span class="label" aria-hidden="true" data-icon="wbicons-simple {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
