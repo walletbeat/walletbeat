@@ -2,6 +2,7 @@ import type { EvaluationDetailProps } from '@/schema/attributes'
 import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits-bounties'
 
 import { component, type Content } from '../content'
+import { isRecord } from '../utils/record'
 
 export interface SecurityAuditsDetailsProps extends EvaluationDetailProps<SecurityAuditsMetadata> {
 	auditedInLastYear: boolean
@@ -19,6 +20,10 @@ export type SecurityAuditsDetailsBakedProps = Omit<
 export interface SecurityAuditsDetailsContent {
 	component: 'SecurityAuditsDetails'
 	componentProps: SecurityAuditsDetailsBakedProps
+}
+
+export function isSecurityAuditsMetadata(value: unknown): value is SecurityAuditsMetadata {
+	return isRecord(value) && Array.isArray(value.securityAudits)
 }
 
 export function securityAuditsDetailsContent(
