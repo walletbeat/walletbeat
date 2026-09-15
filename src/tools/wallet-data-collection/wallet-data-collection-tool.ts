@@ -212,7 +212,7 @@ cli
 		'Mark requests matching selectors as being done for specific purposes',
 	)
 	.usage(
-		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--policy=<collection_policy>] [--force=true]\n\n" +
+		"explain-request --domain=example.com [--path=...] [--method=...] [--referer-domain=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--policy=<collection_policy>] [--force=true]\n\n" +
 			trimWhitespacePrefix(`
 				Mark requests matching selectors as being done for specific purposes.
 				Use \`--purposes=NOT_WALLET_INITIATED\` if these requests were not initiated by the wallet,
@@ -228,6 +228,10 @@ cli
 	)
 	.option('--path <path>', 'Path to match. Globs (*) allowed.')
 	.option('--method <method>', 'JSON-RPC method to match. Globs (*) allowed.')
+	.option(
+		'--referer-domain <domain>',
+		'Referer domain to match. Matches the request referer domain and all its subdomains. Globs not allowed.',
+	)
 	.option(
 		'--purposes <purposes>|NOT_WALLET_INITIATED',
 		'Comma-separated set of request purposes, or NOT_WALLET_INITIATED if the request was not initiated by the wallet.',
