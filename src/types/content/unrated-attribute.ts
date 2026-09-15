@@ -4,7 +4,7 @@ import { component, type Content } from '../content'
 
 export interface UnratedAttributeContent {
 	component: 'UnratedAttribute'
-	componentProps: Record<never, never>
+	componentProps: Record<PropertyKey, never>
 }
 
 export function unratedAttributeContent<_OutcomeMetadata extends OutcomeMetadata>(): Content<{

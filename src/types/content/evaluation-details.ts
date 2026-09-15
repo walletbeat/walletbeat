@@ -5,10 +5,19 @@ import type { SecurityAuditsMetadata } from '@/schema/attributes/security/securi
 import type { AccountUnruggabilityMetadata } from '@/schema/attributes/self-sovereignty/account-unruggability'
 
 import type { ComponentAndProps } from '../content'
-import type { AccountRecoveryDetailsContent } from './account-recovery-details'
-import type { AccountUnruggabilityDetailsContent } from './account-unruggability-details'
-import type { ScamAlertDetailsContent } from './scam-alert-details'
-import type { SecurityAuditsDetailsContent } from './security-audits-details'
+import {
+	type AccountRecoveryDetailsContent,
+	isAccountRecoveryMetadata,
+} from './account-recovery-details'
+import {
+	type AccountUnruggabilityDetailsContent,
+	isAccountUnruggabilityMetadata,
+} from './account-unruggability-details'
+import { isScamPreventionMetadata, type ScamAlertDetailsContent } from './scam-alert-details'
+import {
+	isSecurityAuditsMetadata,
+	type SecurityAuditsDetailsContent,
+} from './security-audits-details'
 
 type MetadataBoundDetailsContent =
 	| ScamAlertDetailsContent
@@ -33,64 +42,6 @@ export type EvaluationDetailRenderData =
 			outcome: Outcome<AccountUnruggabilityMetadata>
 	  })
 	| UnboundEvaluationDetailRenderData
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function isScamPreventionMetadata(value: unknown): value is ScamPreventionMetadata {
-	if (!isRecord(value) || !Object.hasOwn(value, 'scamAlerts')) {
-		return false
-	}
-
-	if (value.scamAlerts === null) {
-		return true
-	}
-
-	return (
-		isRecord(value.scamAlerts) &&
-		isRecord(value.scamUrlWarning) &&
-		isRecord(value.sendTransactionWarning) &&
-		isRecord(value.contractTransactionWarning) &&
-		isRecord(value.unlimitedApprovalWarning)
-	)
-}
-
-function isSecurityAuditsMetadata(value: unknown): value is SecurityAuditsMetadata {
-	return isRecord(value) && Array.isArray(value.securityAudits)
-}
-
-function isAccountRecoveryMetadata(value: unknown): value is AccountRecoveryMetadata {
-	if (
-		!isRecord(value) ||
-		!Object.hasOwn(value, 'minimumGuardianPolicy') ||
-		!Object.hasOwn(value, 'outcomes') ||
-		!Object.hasOwn(value, 'drills')
-	) {
-		return false
-	}
-
-	const validGuardianPolicy =
-		value.minimumGuardianPolicy === null || isRecord(value.minimumGuardianPolicy)
-	const validOutcomes = value.outcomes === null || Array.isArray(value.outcomes)
-	const validDrills =
-		value.drills === null ||
-		(isRecord(value.drills) &&
-			Array.isArray(value.drills.configured) &&
-			Array.isArray(value.drills.missing))
-
-	return validGuardianPolicy && validOutcomes && validDrills
-}
-
-function isAccountUnruggabilityMetadata(value: unknown): value is AccountUnruggabilityMetadata {
-	return (
-		isRecord(value) &&
-		Object.hasOwn(value, 'minimumGuardianPolicy') &&
-		Object.hasOwn(value, 'outcomes') &&
-		(value.minimumGuardianPolicy === null || isRecord(value.minimumGuardianPolicy)) &&
-		(value.outcomes === null || Array.isArray(value.outcomes))
-	)
-}
 
 function outcomeHasMetadata<_Metadata extends object>(
 	outcome: Outcome<OutcomeMetadata>,

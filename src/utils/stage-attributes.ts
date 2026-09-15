@@ -177,13 +177,13 @@ export function getAttributeCriteriaForWallet<
 	return Object.entries(ladders)
 		.flatMap(entry => {
 			if (entry === undefined) {
-				return []
+				throw new Error('Ladder entry is undefined')
 			}
 
 			const [ladderType, ladder] = entry
 
 			if (ladder === undefined) {
-				return []
+				throw new Error(`Ladder ${ladderType} is undefined`)
 			}
 
 			return ladder.stages.map((stage, stageIndex) => ({
