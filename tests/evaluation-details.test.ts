@@ -27,6 +27,8 @@ const outcomeWithoutMetadata: Outcome = {
 	verifiability: Verifiability.SELF_EVIDENT,
 }
 
+// `bound` means the adapter must validate and narrow outcome metadata for this detail
+// renderer. `unbound` means it can pass the generic outcome through unchanged.
 const _metadataRequirementByComponent = {
 	AccountRecoveryDetails: 'bound',
 	AccountUnruggabilityDetails: 'bound',
