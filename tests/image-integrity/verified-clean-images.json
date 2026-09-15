@@ -951,6 +951,34 @@
 		"hash": "5e429c63752ff20962328403af6009ab66c1ba4b87610559396066362b08c1c2",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/august-cover.png": {
+		"hash": "faecf57f1ab97a04cfb7df916774ab82c99f34111a4500d1c2e097b9621a9655",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/bitbox-security-news.png": {
+		"hash": "77130f226b097f455d19aae599d70d2ca7220aeb51ba22d07852a12dfd9d1a69",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/let_wallets_bloom.png": {
+		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/rabby-security-news.png": {
+		"hash": "7aaf02b571450c9e71cd11614dc94e55393ea94f18eb189159e4b66ab3bb9b0f",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/safepal-security-news.png": {
+		"hash": "e980af248160280b75b784c4c1bffd9dfb15ec360f8e12aaf2e9b5d9364a5a9f",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/security-news1.png": {
+		"hash": "72c8bab7e75908c44d1f81e7a8614ef30de85eb18ec1fbfe65a73e860acb122d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-07 - August Monthly Update/trezor-security-news.png": {
+		"hash": "630f7b6bdbc2c95f467c2601672fda12958eeb6cc3e7d96a1eec18cd0cf78061",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/cover.png": {
 		"hash": "954f25e0833a635d1fcbb9ee83072d3e5b15c8ca12e78dbf602744258124d161",
 		"passedTests": ["blockiness", "file-format"]
