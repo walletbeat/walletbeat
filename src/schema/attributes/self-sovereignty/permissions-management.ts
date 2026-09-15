@@ -56,45 +56,59 @@ function approvalsManagementRating(control: SpendingApprovalsControl): ExplicitR
 
 /**
  * Evaluates the wallet's built-in swap/bridge approval defaults on their own.
- * Returns `null` when there is nothing to complain about (no built-in swap,
- * or a minimal-amount-by-default swap that covers roughly what the swap
- * needs, including a reasonable buffer for slippage): any unlimited default
- * fails, whether disclosed or not.
+ * Returns `NO_SWAP_APPROVAL_ISSUE` when there is nothing to complain about;
+ * any unlimited default fails, whether disclosed or not.
  */
 function swapApprovalsEvaluation(
 	ctx: EvaluationContext,
 	builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior | 'NO_BUILT_IN_SWAP',
-): Evaluation | null {
+): Evaluation | 'NO_SWAP_APPROVAL_ISSUE' {
 	if (
 		!hasBuiltInSwap(builtInSwapApprovals) ||
 		builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT
 	) {
-		return null
+		return 'NO_SWAP_APPROVAL_ISSUE'
 	}
 
 	const undisclosed =
 		builtInSwapApprovals === BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED
 
+	if (undisclosed) {
+		return ctx.build({
+			outcome: {
+				id: 'undisclosed_unlimited_swap_approval',
+				rating: Rating.FAIL,
+				displayName: 'Silently requests unlimited swap approvals',
+				shortExplanation: sentence(
+					"{{WALLET_NAME}}'s built-in swaps can silently request unlimited token approvals.",
+				),
+			},
+			details: paragraph(
+				`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
+			),
+			impact: paragraph(
+				'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.',
+			),
+			howToImprove: paragraph(
+				'{{WALLET_NAME}} should default to requesting only the amount needed for the swap (plus a reasonable slippage buffer), rather than an unlimited approval.',
+			),
+		})
+	}
+
 	return ctx.build({
 		outcome: {
-			id: undisclosed ? 'undisclosed_unlimited_swap_approval' : 'disclosed_unlimited_swap_approval',
+			id: 'disclosed_unlimited_swap_approval',
 			rating: Rating.FAIL,
-			displayName: undisclosed
-				? 'Silently requests unlimited swap approvals'
-				: 'Requests unlimited swap approvals',
-			shortExplanation: undisclosed
-				? sentence(
-						"{{WALLET_NAME}}'s built-in swaps can silently request unlimited token approvals.",
-					)
-				: sentence("{{WALLET_NAME}}'s built-in swaps default to an unlimited token approval."),
+			displayName: 'Requests unlimited swap approvals',
+			shortExplanation: sentence(
+				"{{WALLET_NAME}}'s built-in swaps default to an unlimited token approval.",
+			),
 		},
 		details: paragraph(
 			`{{WALLET_NAME}}'s built-in swap/bridge feature ${swapBehaviorDescription(builtInSwapApprovals)}.`,
 		),
 		impact: paragraph(
-			undisclosed
-				? 'Users may unknowingly grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain, without ever having agreed to it explicitly.'
-				: 'Users who do not notice or adjust the default before signing grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain.',
+			'Users who do not notice or adjust the default before signing grant unlimited spending authority over a token to a contract, exposing them to the same risk as an approval-based drain.',
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should default to requesting only the amount needed for the swap (plus a reasonable slippage buffer), rather than an unlimited approval.',
