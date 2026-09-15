@@ -176,6 +176,7 @@
 		"devp2p",
 		"dir",
 		"dirs",
+		"disintermediation",
 		"distinguishability",
 		"Dixence",
 		"Dlab",
@@ -754,6 +755,7 @@
 			"name": "Technical tokens",
 			"pattern": "/\\b[a-z0-9_-]+(?:\\.[a-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
 		},
+		{ "name": "Social media handles", "pattern": "/(?<![\\w])@[A-Za-z0-9_]+\\b/g" },
 		{
 			"name": "Mixed-case filenames",
 			"pattern": "/\\b(?=[a-z0-9_-]*[A-Z])[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*\\.(?:ai|alarms|app|be|c|dev|eth|example|fyi|global|graphql|im|inc|js|json|limo|lock|md|me|network|one|pdf|png|quest|rs|so|sol|storage|swiss|tech|ts|tsx|xml|xyz|yaml|yml)\\b/g"
@@ -779,6 +781,7 @@
 		"svgicons2svgfont",
 		"Technical tokens",
 		"tl;dr",
+		"Social media handles",
 		"Version numbers"
 	]
 }
