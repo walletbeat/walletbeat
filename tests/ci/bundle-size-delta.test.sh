@@ -107,7 +107,7 @@ measure_revision() {
 		log "No \`dist\` directory produced for $name."
 		return 1
 	fi
-	du -sb "$dir/dist" | awk '{print $1}'
+	du -sk "$dir/dist" | awk '{print $1 * 1024}'
 }
 
 log "Building reference ($REFERENCE_HEAD)..."
