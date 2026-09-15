@@ -953,47 +953,47 @@
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/cover.png": {
 		"hash": "954f25e0833a635d1fcbb9ee83072d3e5b15c8ca12e78dbf602744258124d161",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/l1provider-independence-importance.png": {
 		"hash": "c46791f58a521f054d8545c926650d179d245c1718f4cb87fe72adea73e187b5",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/l1provider-independence-test.png": {
 		"hash": "2438e97069e3d2bb7bcf40269d3c37ce6499d782244aad8a7c76cfba6eb12bcd",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/l1provider-independence.png": {
 		"hash": "0d1e9bf561e987d81d67ed3a52d27828f2e04f41bd65671904314e157b43cc4e",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/measure-crops.png": {
 		"hash": "1578ba5fb5cbf987e6b6f7b2bf6731e76348e365c54ff2091afbed476985e531",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/open-source-code.png": {
 		"hash": "82510521c2901b93c00c0f1ecacd8888020a2ef8d2c683e51e48a1c42f8d6f0c",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/our-socials.png": {
 		"hash": "f581114197809289b7e078034d23176748366a9a08ee70cc5a59b656ffa4257b",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/private-tech.png": {
 		"hash": "0831d95197657da13703c8b25fcdc616c92c9ef02e8efeff0e96b05f0fe301e7",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/private-token-transfers.png": {
 		"hash": "5a9b661a157cbe5c6af25e39d9272a33f1147773bd620e07e5ffa47e6edcb704",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/private-transfers.png": {
 		"hash": "6543523ff5057ac632106ce7990d556adee6c08e0a40240a8b363f18fa343396",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/social-media/threads/2026-09-14 - Current Wallet Landscape/source-code-availability.png": {
 		"hash": "348f2cbc4221ca5f3ed2bb51de4342a4a04cb7f9b93a0fb236392fb1e4f7d6d8",
-		"passedTests": ["blockiness"]
+		"passedTests": ["blockiness", "file-format"]
 	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
