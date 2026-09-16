@@ -1,7 +1,6 @@
 import type { WithRef } from '@/schema/reference'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-import type { Support } from '../support'
+import { featureSupported, type Support } from '../support'
 
 /**
  * Fields shared by every scam-alert warning: does the lookup process leak
@@ -92,41 +91,81 @@ export type SendTransactionWarning = WithRef<
 >
 
 /**
- * A specific scenario in which a wallet may choose to warn the user before
- * granting an unlimited/infinite ERC-20 token allowance, when it does not
- * warn unconditionally.
+ * Benchmark spenders for unlimited ERC-20 token approvals.
+ *
+ * Each entry is a concrete, pinned on-chain address.
+ * Instead of describing a category of spender, we grant unlimited
+ * approval to this specific address and evaluate whether the wallet warns.
  */
-export enum UnlimitedApprovalWarningCondition {
-	/** The spender is an externally-owned account (EOA), not a contract. */
-	EOA = 'EOA',
+export enum UnlimitedApprovalWarningBenchmarkSpenders {
+	/**
+	 * 0xc9C8C560BA80e840A71bE2F9409600B6133a119f: The Walletbeat staging
+	 * treasury address, an externally-owned account (EOA), not a contract.
+	 */
+	WALLETBEAT_EOA = 'WALLETBEAT_EOA',
 
-	/** The spender contract is not a known/verified contract. */
-	UNKNOWN_CONTRACTS = 'UNKNOWN_CONTRACTS',
+	/**
+	 * Uniswap V3 SwapRouter, 0xE592427A0AEce92De3Edee1F18E0157C05861564: A
+	 * verified, widely-used, reputable contract.
+	 */
+	UNISWAP_V3_ROUTER = 'UNISWAP_V3_ROUTER',
 
-	/** The spender contract appears on a blocklist of known-scam contracts. */
-	BLACKLISTED_CONTRACTS = 'BLACKLISTED_CONTRACTS',
+	/**
+	 * 0x9fA7bB759641FCd37fe4aE41f725e0f653f2C726, labeled "PinkDrainer:
+	 * Wallet 2" on Etherscan. Pink Drainer was a scam-as-a-service
+	 * operation that stole over $85M from more than 21,000 victims across
+	 * 2023–2024 before its operators shut it down in May 2024.
+	 * Stays valid as a benchmark as long as this address remains publicly flagged.
+	 */
+	PINK_PHISHING_ADDRESS = 'PINK_PHISHING_ADDRESS',
 
-	/** The spender contract was only recently deployed onchain. */
-	NEW_CONTRACTS = 'NEW_CONTRACTS',
+	/**
+	 * A contract the test wallet has never interacted with before. Any real
+	 * contract works, as long as the tester's wallet has no prior history
+	 * with it. Walletbeat's own testing contracts is a convenient
+	 * default, since it's guaranteed untouched until deliberately used for
+	 * this benchmark.
+	 */
+	CONTRACT_NOT_INTERACTED_BEFORE = 'CONTRACT_NOT_INTERACTED_BEFORE',
 
-	/** The wallet has not seen the user interact with the spender contract before. */
-	CONTRACTS_NOT_INTERACTED_BEFORE = 'CONTRACTS_NOT_INTERACTED_BEFORE',
+	/**
+	 * A contract that was only recently deployed onchain. Any real contract
+	 * works, as long as it was deployed shortly before testing.
+	 * Walletbeat's own testing contracts is a convenient default, since it
+	 * can be redeployed on demand.
+	 */
+	RECENTLY_DEPLOYED_CONTRACT = 'RECENTLY_DEPLOYED_CONTRACT',
+}
+
+/**
+ * Per-benchmark data on whether the wallet warns for that specific
+ * unlimited-approval spender.
+ *
+ * `null` means the benchmark has not been tested yet for the wallet.
+ */
+export type UnlimitedApprovalWarningBenchmarks = Record<
+	UnlimitedApprovalWarningBenchmarkSpenders,
+	Support | null
+>
+
+/**
+ * Shorthand for a wallet that warns on every unlimited-approval benchmark.
+ */
+export const allUnlimitedApprovalBenchmarksSupported: UnlimitedApprovalWarningBenchmarks = {
+	[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]: featureSupported,
 }
 
 export type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
-		 * Under which circumstances the wallet warns the user before a
-		 * transaction or signature that grants unlimited/infinite token
-		 * allowance.
-		 *
-		 * - `ALWAYS`: The wallet warns regardless of whether the spender is
-		 *   considered trusted/known.
-		 * - A non-empty array of `UnlimitedApprovalWarningCondition`: The
-		 *   wallet only warns in the listed scenarios, e.g. only when the
-		 *   spender is an untrusted/unknown contract.
+		 * Which unlimited-approval benchmark spenders the wallet is known to
+		 * warn on.
 		 */
-		warnsOnUnlimitedApproval: 'ALWAYS' | NonEmptyArray<UnlimitedApprovalWarningCondition>
+		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks
 
 		/**
 		 * Whether the spender/contract lookup process leaks the spender address
@@ -154,17 +193,4 @@ export interface ScamAlerts {
 	 * that grants unlimited/infinite ERC-20 token allowance?
 	 */
 	unlimitedApprovalWarning: Support<UnlimitedApprovalWarning>
-}
-
-export const unlimitedApprovalWarningConditionLabels: Record<
-	UnlimitedApprovalWarningCondition,
-	string
-> = {
-	[UnlimitedApprovalWarningCondition.EOA]: 'the spender is not a contract',
-	[UnlimitedApprovalWarningCondition.UNKNOWN_CONTRACTS]:
-		'the spender is an unknown/unverified contract',
-	[UnlimitedApprovalWarningCondition.BLACKLISTED_CONTRACTS]: 'the spender is a known-scam contract',
-	[UnlimitedApprovalWarningCondition.NEW_CONTRACTS]: 'the spender contract was recently deployed',
-	[UnlimitedApprovalWarningCondition.CONTRACTS_NOT_INTERACTED_BEFORE]:
-		"you haven't interacted with the spender contract before",
 }
