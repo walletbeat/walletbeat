@@ -17,6 +17,7 @@
  * ```
  */
 
+import type { allWallets } from '@/data/wallets'
 import type { CalendarDate } from '@/types/date'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
@@ -29,7 +30,6 @@ import {
 	mergeLabeledUrls,
 	type Url,
 } from './url'
-import type { allWallets } from '@/data/wallets'
 
 /**
  * A loose reference which can be converted to a FullyQualifiedReference.

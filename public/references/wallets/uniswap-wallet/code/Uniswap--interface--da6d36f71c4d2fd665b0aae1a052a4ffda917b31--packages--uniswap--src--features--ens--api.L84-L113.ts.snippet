@@ -1,0 +1,55 @@
+{
+	"highlightFirstLine": 84,
+	"highlightLastLine": 113,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 78
+		},
+		{
+			"lines": [
+				"  const text = resolver?.getText(key)",
+				"  return text ?? null",
+				"}",
+				"",
+				"async function getOnChainEnsFetch(params: EnsLookupParams): Promise<string | null> {",
+				"  const { type, nameOrAddress } = params",
+				"",
+				"  const provider = createProvider({ chainId: UniverseChainId.Mainnet, rpcType: RPCType.Public })",
+				"",
+				"  if (!provider) {",
+				"    return null",
+				"  }",
+				"",
+				"  // Set ENS V2 tunneling batch gateway for CCIP-read tunneling for universal resolver",
+				"  const withTunnel = provider as providers.JsonRpcProvider & {",
+				"    setTunnelingBatchGateways?: (urls: string[]) => void",
+				"  }",
+				"  withTunnel.setTunnelingBatchGateways?.([ENS_TUNNELING_BATCH_GATEWAY])",
+				"",
+				"  switch (type) {",
+				"    case EnsLookupType.Name:",
+				"      return await getNameFetch(nameOrAddress, provider)",
+				"    case EnsLookupType.Address:",
+				"      return await getAddressFetch(nameOrAddress, provider)",
+				"    case EnsLookupType.Avatar:",
+				"      return await getAvatarFetch(nameOrAddress, provider)",
+				"    case EnsLookupType.Description:",
+				"      return await getTextFetch({ key: 'description', name: nameOrAddress, provider })",
+				"    case EnsLookupType.TwitterUsername:",
+				"      return await getTextFetch({ key: 'com.twitter', name: nameOrAddress, provider })",
+				"    default:",
+				"      throw new Error(`Invalid ENS lookup type: ${type}`)",
+				"  }",
+				"}",
+				"",
+				"function useEnsQuery(type: EnsLookupType, nameOrAddress?: string | null) {",
+				"  return useQuery(",
+				"    persistableQueryOptions<string | null>({"
+			],
+			"startLine": 80
+		}
+	]
+}

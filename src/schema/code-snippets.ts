@@ -8,9 +8,7 @@ import { fullCommitHashRegExp, lineFragmentRegExp } from './url'
  * `public/references/wallets/<wallet-id>/code/`, named
  * `<org>--<repo>--<commit>--<path with '/' as '--'>.L<first>[-L<last>].<ext>.snippet`
  * (the source file's extension is kept right before `.snippet` so the language
- * remains identifiable when rendered). They hold the referenced lines plus a
- * small bounded window of surrounding context and enclosing scope headers,
- * never the whole file, so that storing them stays within fair use regardless of the source repository's license.
+ * remains identifiable when rendered).
  */
 export interface CodeSnippetSource {
 	org: string
