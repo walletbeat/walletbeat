@@ -7,12 +7,19 @@ import {
 } from '@/schema/attributes'
 import { WalletProfile } from '@/schema/features/profile'
 import {
+	allUnlimitedApprovalBenchmarksSupported,
 	type ScamAlertLeaks,
 	type ScamAlerts,
-	UnlimitedApprovalWarningCondition,
-	unlimitedApprovalWarningConditionLabels,
+	type UnlimitedApprovalWarningBenchmarks,
+	UnlimitedApprovalWarningBenchmarkSpenders,
 } from '@/schema/features/security/scam-alerts'
-import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	isSupported,
+	notSupported,
+	type Support,
+	supported,
+} from '@/schema/features/support'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -50,6 +57,61 @@ export type ScamPreventionMetadata =
 			}
 	  }
 	| { scamAlerts: null }
+
+/**
+ * Human-readable label for each unlimited-approval benchmark spender, used
+ * when explaining which spenders a wallet's warning does/doesn't cover.
+ *
+ */
+export const unlimitedApprovalWarningBenchmarkLabels: Record<
+	UnlimitedApprovalWarningBenchmarkSpenders,
+	string
+> = {
+	[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: 'the spender is not a contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]:
+		'the spender is a well-known, verified contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]:
+		'the spender is a known-scam contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+		'the spender contract was recently deployed',
+	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+		"you haven't interacted with the spender contract before",
+}
+
+/**
+ * Whether the wallet warns on unlimited approvals unconditionally, i.e. it
+ * warns on every benchmark spender. An untested (`null`) benchmark does not
+ * count as warned-on.
+ */
+export function warnsOnUnlimitedApprovalUnconditionally(
+	benchmarks: UnlimitedApprovalWarningBenchmarks,
+): boolean {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).every(benchmark =>
+		isSupported(benchmarks[benchmark] ?? notSupported),
+	)
+}
+
+/**
+ * The benchmark spenders the wallet is known to warn on.
+ */
+export function activeUnlimitedApprovalBenchmarks(
+	benchmarks: UnlimitedApprovalWarningBenchmarks,
+): UnlimitedApprovalWarningBenchmarkSpenders[] {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).filter(benchmark =>
+		isSupported(benchmarks[benchmark] ?? notSupported),
+	)
+}
+
+/**
+ * Whether at least one benchmark has not been tested yet (`null`) for the wallet
+ */
+export function hasUntestedUnlimitedApprovalBenchmark(
+	benchmarks: UnlimitedApprovalWarningBenchmarks,
+): boolean {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).some(
+		benchmark => benchmarks[benchmark] === null,
+	)
+}
 
 /**
  * Shared rating logic for scam-alert warnings whose privacy score is a
@@ -148,7 +210,7 @@ function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport 
 		privacyPreserving:
 			[support.leaksUserIp, support.leaksUserAddress, support.leaksSpenderAddress].filter(Boolean)
 				.length <= 1,
-		conditionalOnly: support.warnsOnUnlimitedApproval != 'ALWAYS',
+		conditionalOnly: !warnsOnUnlimitedApprovalUnconditionally(support.warnsOnUnlimitedApproval),
 		ref: support.ref,
 		...baseProps,
 	}
@@ -333,14 +395,26 @@ function evaluateScamAlerts(
 	if (
 		requiredFeatures.includes(unlimitedApprovalWarning) &&
 		isSupported(scamAlerts.unlimitedApprovalWarning) &&
-		scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval !== 'ALWAYS'
+		hasUntestedUnlimitedApprovalBenchmark(
+			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
+		)
+	) {
+		return unrated(ctx, metadata)
+	}
+
+	if (
+		requiredFeatures.includes(unlimitedApprovalWarning) &&
+		isSupported(scamAlerts.unlimitedApprovalWarning) &&
+		!warnsOnUnlimitedApprovalUnconditionally(
+			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
+		)
 	) {
 		// Warns about unlimited approvals, but only in certain scenarios
 		// (e.g. only for untrusted spenders) rather than unconditionally.
 		const conditions = commaListFormat(
-			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval.map(
-				condition => unlimitedApprovalWarningConditionLabels[condition],
-			),
+			activeUnlimitedApprovalBenchmarks(
+				scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
+			).map(benchmark => unlimitedApprovalWarningBenchmarkLabels[benchmark]),
 		)
 
 		return ctx.build({
@@ -598,7 +672,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						}),
 						unlimitedApprovalWarning: supported({
 							ref: refNotNecessary,
-							warnsOnUnlimitedApproval: 'ALWAYS',
+							warnsOnUnlimitedApproval: allUnlimitedApprovalBenchmarksSupported,
 							leaksSpenderAddress: false,
 							leaksUserAddress: false,
 							leaksUserIp: false,
@@ -640,7 +714,15 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						}),
 						unlimitedApprovalWarning: supported({
 							ref: refNotNecessary,
-							warnsOnUnlimitedApproval: [UnlimitedApprovalWarningCondition.UNKNOWN_CONTRACTS],
+							warnsOnUnlimitedApproval: {
+								[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+									notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+									notSupported,
+							},
 							leaksSpenderAddress: false,
 							leaksUserAddress: false,
 							leaksUserIp: false,
@@ -683,7 +765,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 					}),
 					unlimitedApprovalWarning: supported({
 						ref: refNotNecessary,
-						warnsOnUnlimitedApproval: 'ALWAYS',
+						warnsOnUnlimitedApproval: allUnlimitedApprovalBenchmarksSupported,
 						leaksSpenderAddress: false,
 						leaksUserAddress: false,
 						leaksUserIp: false,
