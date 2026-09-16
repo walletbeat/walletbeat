@@ -1,0 +1,69 @@
+How does Ambire stack up against Walletbeat’s attributes?
+
+What’s good, what could be better, and where are the gaps?
+
+A Walletbeat thread 🧵
+
+---
+
+In this thread, we'll be analyzing @Ambire and see how they adopt CROPS values.
+
+We'll be evaluating Ambire wallet across five dimensions: security, privacy, transparency, self sovereignty & ecosystem interoperability.
+
+---
+
+What’s good about Ambire’s security?
+
+Hardware Wallet support.
+
+Software wallets supporting hardware wallets means they offer the best of both worlds: a user-friendly interface with enhanced security. Ambire directly supports Ledger, Trezor, Gridplus, Keystone, and Keycard.
+
+---
+
+What could be better about Ambire’s security?
+
+- Security Audits & Bug bounties
+- Scam prevention
+- Transaction legibility
+
+Let's break it down
+
+---
+Security audits & bug bounties
+
+Ambire has an active bug bounty program and has undergone security audits.
+
+However, their latest audit was published on February 20, 2025, over a year ago.
+
+Walletbeat recommends regular security audits as part of maintaining confidence in the security of a wallet as its codebase evolves.
+
+There’s also room to improve the bug bounty process. Ambire currently doesn’t document a clear upgrade path for users when a critical security issue is discovered.
+
+---
+
+Scam prevention
+
+Ambire warns users when interacting with unknown addresses and known scams.
+
+However:
+
+⚠️ Scam checks can expose the user’s and recipient’s IP addresses to an external provider, creating potential correlation risks.
+
+⚠️ Unlimited approval warnings don’t cover all spenders.
+
+More comprehensive protection and privacy-preserving scam checks could improve this further.
+
+
+---
+
+Transaction legibility
+
+Ambire supports basic calldata display and EIP-712 signing, but there are still gaps:
+
+⚠️ Some complex transactions don’t clearly explain their outcomes
+⚠️ Nondeterministic outcomes aren’t detected
+✗ Nonce isn’t displayed
+✗ EIP-712/domain/message hashes aren’t shown
+✗ No ERC-8213 digest display
+
+There’s room to make transactions more transparent and verifiable.
