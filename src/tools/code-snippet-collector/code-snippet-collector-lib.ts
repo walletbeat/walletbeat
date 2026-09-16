@@ -11,7 +11,7 @@ import {
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
 import { collectAllRefs } from '@/schema/reference'
-import { CodebaseEntryType, crawlCodebase } from '@/tests/utils/codebase'
+import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/tests/utils/codebase'
 import { commonWhitespacePrefix } from '@/types/utils/text'
 
 /** Lines of context stored immediately before/after the referenced range. */
@@ -389,7 +389,7 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 					return
 				}
 
-				const storedFile = `${walletsReferencesDir}/${entry.path}`
+				const storedFile = normalizePath(`${walletsReferencesDir}/${entry.path}`)
 
 				if (expected.has(storedFile)) {
 					return
