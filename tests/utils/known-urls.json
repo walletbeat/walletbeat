@@ -1400,11 +1400,6 @@
 		"retrieved": "2026-04-02"
 	},
 	{
-		"url": "https://github.com/Uniswap",
-		"urlHash": "046a7fce9ef8ea6ac8c0d5854f920cb6639afa45",
-		"retrieved": "2026-04-02"
-	},
-	{
 		"url": "https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg",
 		"urlHash": "97d54b721f1af8144f69b9e89abfd76d8243a5a2",
 		"retrieved": "2026-04-02"
@@ -3358,5 +3353,175 @@
 		"url": "https://x.com/Trezor/status/2095807665603584085",
 		"urlHash": "0f0b7aafa66c29f05bd300d574091ef66c16a0d9",
 		"retrieved": "2026-09-10"
+	},
+	{
+		"url": "https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src/common/modules/auth/hooks/useCreateNewSeedAccount/useCreateNewSeedAccount.ts#L29-L35",
+		"urlHash": "6b0b4965200f896f9b91f0eed63bdbd13a03ad45",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/AmbireTech/extension/tree/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src",
+		"urlHash": "30d29544510d52e3bc8613112100011e3b74f5c6",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/main/main.ts#L2165-L2177",
+		"urlHash": "3fa29f8214e2f1d3ea27f9d02ffab002f17e2c37",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/keystore/keystore.ts#L709-L711",
+		"urlHash": "522258e0bde057538c27ed8b24c5b3e33a96bcc2",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/entropyGenerator/entropyGenerator.ts#L33-L39",
+		"urlHash": "c481cb8da7cfcb474f2f350980a06517d3cae627",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/app/scripts/services/legacy-background-api-service.ts#L4090-L4096",
+		"urlHash": "67f331092f65beb6e275ff47f24ba061e075c98b",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/app/core/Authentication/Authentication.ts#L331-L334",
+		"urlHash": "debdefcc5f95fb0f20529f71c529e82c2c4e2dc8",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/MetaMask/core/blob/f4ff5f5ab872f639b753ac8cad4542eaf6f2c29a/packages/multichain-account-service/src/MultichainAccountService.ts#L464-L471",
+		"urlHash": "1fda5e56f00eeb242b86a58cdcf9dd839928984c",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/MetaMask/core/blob/f6ab836adc93670f41b2f1ec965f2122ac35331c/packages/keyring-controller/src/KeyringController.ts#L2978-L2994",
+		"urlHash": "55bb48acd86dda93a77c0806223deb35bd07639b",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L141-L143",
+		"urlHash": "af9d964b4ff297762c92e3fe6904a7887da3632d",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/ui/views/NewUserImport/CreateSeedPhrase.tsx#L29-L30",
+		"urlHash": "43aea61b71e8443a157065033097acab484f3fa4",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/background/service/keyring/index.ts#L371-L373",
+		"urlHash": "f805152f6bd870d06666204a2593a6bef6418955",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/screens/Address/PreCreateSeedPhraseScreen.tsx#L93-L95",
+		"urlHash": "fda6f4f3906906bb7564280858b7911b6b82336e",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2596",
+		"urlHash": "529cd04d38121e7b1b05d1dcaf597905eafa7170",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface",
+		"urlHash": "c4cdfe4c809e2c8629e9ac1f3c84accaf105befd",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/android/app/src/main/AndroidManifest.xml",
+		"urlHash": "702b616e7d98f17bfa59ae19a94aba729a8f09a4",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://raw.githubusercontent.com/Uniswap/interface/main/apps/mobile/ios/Uniswap/Info.plist",
+		"urlHash": "4828ee3fa0b83c2e9eed6afabb163d41296657cf",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://developers.uniswap.org/docs/protocols/smart-wallet/overview",
+		"urlHash": "dc4ff6bd6e42f4f6739e3384b37222092357c29a",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/features/ens/api.ts#L84-L113",
+		"urlHash": "9c16b1a7bcd06cbb6ebf091e4689f1b6afe30f04",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/lockScreen/useUnlockWithPassword.ts#L1-L17",
+		"urlHash": "f4b45ffeec7c7e0fa17adc5f7689e512c03e9f25",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/biometricUnlock/biometricAuthUtils.ts#L18-L50",
+		"urlHash": "96c4b321fa05a33cd02787edee1954011ddc2305",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/features/biometrics/biometrics-utils.ts#L34-L84",
+		"urlHash": "41ea240683fea7f4e50249f4ec8dc18963e2cfee",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/Keyring.web.ts#L274-L284",
+		"urlHash": "a0a8cfb86ca320c556cfb1561958ceeb6b9297d2",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/Keyring.native.ts#L76-L78",
+		"urlHash": "afe16179645518ec0028f9c3535b80291443bbe9",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Uniswap/RNEthersRs/RNEthersRS.swift#L98-L119",
+		"urlHash": "2d84cd1a364a90210b369da0e3f82536ba885fbd",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/trailofbits/publications/blob/403930ed221a320151dad68b2ab2d66f27ba3036/reviews/2023-09-uniswap-wallet-securityreview.pdf",
+		"urlHash": "858e9a9f22967c6f184562837fefa395752b5a63",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/trailofbits/publications/blob/c9f97c0e83bde3d1e1dc7ccec0e9ac2260439f28/reviews/2024-02-uniswap-wallet-browserextension-securityreview.pdf",
+		"urlHash": "a82cab6d8cb597393d6ad37ea0793ee57ddd7cb6",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/wallet/Keyring/crypto.ts#L100-L118",
+		"urlHash": "de7b8630a2da2db41b415669ff49197e2355bf7a",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/android/app/src/main/java/com/uniswap/RnEthersRs.kt#L24-L34",
+		"urlHash": "534dd7141fd50399f9cff0f41da805591cc1db81",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/src/background/Wallet/Wallet.ts#L424-L437",
+		"urlHash": "8cce70af74e5b4d656a5fd013c37211c6eb7171e",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/src/background/Wallet/model/WalletContainer.ts#L131-L133",
+		"urlHash": "46c97b40dc693cbde8f1c9ac9629e4ee6fc1c0a8",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/src/shared/wallet/create.ts#L92-L97",
+		"urlHash": "5d7f2f5912adbd86823f060be58c59880a7505d3",
+		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://github.com/ethers-io/ethers.js/blob/01b5badbb616b29fd8b69ef7c3cc3833062da3d7/packages/wallet/src.ts/index.ts#L167-L178",
+		"urlHash": "c951a6a4c3c1ae431a4703a9fc19c01291ccdbcb",
+		"retrieved": "2026-09-16"
+	},
+	{
+					"url": "https://www.trailofbits.com/",
+					"urlHash": "6363c24c8d954e9f8f60259734ddb01237144ab0",
+					"retrieved": "2026-09-16"
 	}
 ]
