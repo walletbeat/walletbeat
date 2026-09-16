@@ -8,8 +8,8 @@ import {
 import { getRepositoryRoot } from './utils/codebase'
 
 describe('code snippets', () => {
-	it('has stored snippet files in sync with wallet data references', () => {
-		const problems = checkSnippets(getRepositoryRoot())
+	it('has stored snippet files in sync with wallet data references', async () => {
+		const problems = await checkSnippets(getRepositoryRoot())
 
 		if (problems.length > 0) {
 			const details = problems.map(p => `  [${p.kind}] ${p.snippetPath}: ${p.issue}`).join('\n')
@@ -21,11 +21,11 @@ describe('code snippets', () => {
 			const needsPrune = problems.some(p => p.kind === SnippetProblemKind.ORPHAN_SNIPPET)
 			const fixInstructions = [
 				needsFetch
-					? 'Run `pnpm collect:snippets -- --all` to fetch missing snippets ' +
+					? 'Run `pnpm collect:snippets -- all` to fetch missing snippets ' +
 						'and refetch any with stale or mismatched content.'
 					: null,
 				needsPrune
-					? 'Run `pnpm collect:snippets -- --prune` to delete orphaned snippet files.'
+					? 'Run `pnpm collect:snippets -- prune` to delete orphaned snippet files.'
 					: null,
 			]
 				.filter(instruction => instruction !== null)
