@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 12,
+	"highlightLastLine": 23,
+	"segments": [
+		{
+			"lines": [
+				"// const AesForked = NativeModules.AesForked;",
+				"",
+				"import type { EncryptorAdapter } from '@rabby-wallet/service-keyring';",
+				"",
+				"const algorithms = 'aes-256-cbc';",
+				"const algorithms_pbkdf2 = 'sha256';",
+				"",
+				"async function _generateSalt(byteCount = 32) {",
+				"  const saltStr = await Aes.randomKey(byteCount);",
+				"",
+				"  return btoa(saltStr);",
+				"}",
+				"",
+				"async function _generateKey(password: string, salt: string, lib?: string) {",
+				"  return Aes.pbkdf2(password, salt, 5000, 256, algorithms_pbkdf2);",
+				"}",
+				"",
+				"async function _keyFromPassword(password: string, salt: string, lib?: string) {",
+				"  return _generateKey(password, salt, lib);",
+				"}"
+			],
+			"startLine": 8
+		}
+	]
+}

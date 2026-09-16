@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 331,
+	"highlightLastLine": 334,
+	"segments": [
+		{
+			"lines": [
+				"class AuthenticationService {"
+			],
+			"startLine": 135
+		},
+		{
+			"lines": [
+				"  private createWalletVaultAndKeychain = async (",
+				"    password: string,",
+				"  ): Promise<void> => {",
+				"    await Engine.resetState();",
+				"",
+				"    const { MultichainAccountService } = Engine.context;",
+				"",
+				"    await MultichainAccountService.createMultichainAccountWallet({",
+				"      type: 'create',",
+				"      password,",
+				"    });",
+				"",
+				"    password = this.wipeSensitiveData();",
+				"  };",
+				""
+			],
+			"startLine": 324
+		}
+	]
+}

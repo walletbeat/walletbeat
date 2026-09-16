@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 24,
+	"highlightLastLine": 34,
+	"segments": [
+		{
+			"lines": [
+				"class RnEthersRs(applicationContext: Context) {",
+				"",
+				"  // Long represents the opaque pointer to the Rust LocalWallet struct.",
+				"  private val walletCache: MutableMap<String, Long> = mutableMapOf()",
+				"  private val keychain: SharedPreferences",
+				"",
+				"  init {",
+				"    val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)",
+				"    keychain = EncryptedSharedPreferences.create(",
+				"      \"preferences\",",
+				"      masterKeyAlias,",
+				"      applicationContext,",
+				"      EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,",
+				"      EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM",
+				"    )",
+				"  }",
+				"",
+				"  val mnemonicIds: List<String>",
+				"    get() = keychain.all.keys.filter {",
+				"        // MOB-3453 this will need to be updated after fixing prefixes"
+			],
+			"startLine": 19
+		}
+	]
+}

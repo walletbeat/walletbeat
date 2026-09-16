@@ -1,0 +1,105 @@
+{
+	"highlightFirstLine": 698,
+	"highlightLastLine": 753,
+	"segments": [
+		{
+			"lines": [
+				"class UnlockPageBase extends Component<UnlockPageProps, UnlockPageState> {"
+			],
+			"startLine": 137
+		},
+		{
+			"lines": [
+				"  render() {"
+			],
+			"startLine": 647
+		},
+		{
+			"lines": [
+				"    return ("
+			],
+			"startLine": 666
+		},
+		{
+			"lines": [
+				"      >"
+			],
+			"startLine": 675
+		},
+		{
+			"lines": [
+				"        <Box"
+			],
+			"startLine": 688
+		},
+		{
+			"lines": [
+				"          data-testid=\"unlock-page\"",
+				"          asChild",
+				"        >",
+				"          {showPasswordUnlockForm ? (",
+				"            <form onSubmit={this.handleSubmit}>",
+				"              <Box",
+				"                flexDirection={BoxFlexDirection.Column}",
+				"                className=\"w-full\"",
+				"                alignItems={BoxAlignItems.Center}",
+				"              >",
+				"                {this.renderLogoSection(isRehydrationFlow)}",
+				"                {isRehydrationFlow && (",
+				"                  <Text",
+				"                    data-testid=\"unlock-page-title\"",
+				"                    variant={TextVariant.DisplayMd}",
+				"                    className=\"mb-12\"",
+				"                    fontWeight={FontWeight.Medium}",
+				"                    color={TextColor.TextDefault}",
+				"                    textAlign={TextAlign.Center}",
+				"                  >",
+				"                    {t('welcomeBack')}",
+				"                  </Text>",
+				"                )}",
+				"                <Box",
+				"                  flexDirection={BoxFlexDirection.Row}",
+				"                  alignItems={BoxAlignItems.Start}",
+				"                  justifyContent={BoxJustifyContent.Center}",
+				"                  gap={2}",
+				"                  className=\"w-full\"",
+				"                >",
+				"                  <FormTextField",
+				"                    id=\"password\"",
+				"                    placeholder={",
+				"                      this.props.isSocialLoginFlow",
+				"                        ? t('enterYourPasswordSocialLoginFlow')",
+				"                        : t('enterYourPassword')",
+				"                    }",
+				"                    size={FormTextFieldSize.Lg}",
+				"                    inputProps={{",
+				"                      'data-testid': 'unlock-password',",
+				"                      'aria-label': t('password'),",
+				"                    }}",
+				"                    textFieldProps={{",
+				"                      disabled: isLocked,",
+				"                    }}",
+				"                    onChange={(event) =>",
+				"                      this.handleInputChange(",
+				"                        event as ChangeEvent<HTMLInputElement>,",
+				"                      )",
+				"                    }",
+				"                    type={TextFieldType.Password}",
+				"                    value={password}",
+				"                    error={Boolean(error)}",
+				"                    helpText={this.renderHelpText()}",
+				"                    autoComplete={false}",
+				"                    autoFocus",
+				"                    width={BlockSize.Full}",
+				"                    marginBottom={4}",
+				"                  />",
+				"                  {this.props.isPasskeyActive ? (",
+				"                    <UnlockPasskeyIconButton",
+				"                      disabled={isLocked || isSubmitting}",
+				"                      onClick={this.handleUnlockPasskeyFromPasswordForm}",
+				"                    />"
+			],
+			"startLine": 694
+		}
+	]
+}

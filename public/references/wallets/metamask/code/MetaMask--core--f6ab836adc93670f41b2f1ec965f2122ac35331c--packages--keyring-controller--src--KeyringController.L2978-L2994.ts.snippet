@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 2978,
+	"highlightLastLine": 2994,
+	"segments": [
+		{
+			"lines": [
+				"> {"
+			],
+			"startLine": 788
+		},
+		{
+			"lines": [
+				"  async #createKeyring(",
+				"    type: string,",
+				"    data?: unknown,",
+				"    metadata?: KeyringMetadata,",
+				"  ): Promise<KeyringEntry> {"
+			],
+			"startLine": 2953
+		},
+		{
+			"lines": [
+				"",
+				"    if (keyring.init) {",
+				"      await keyring.init();",
+				"    }",
+				"",
+				"    if (",
+				"      type === (KeyringTypes.hd as string) &&",
+				"      (!isObject(data) || !data.mnemonic)",
+				"    ) {",
+				"      if (!keyring.generateRandomMnemonic) {",
+				"        throw new KeyringControllerError(",
+				"          KeyringControllerErrorMessage.UnsupportedGenerateRandomMnemonic,",
+				"        );",
+				"      }",
+				"",
+				"      // NOTE: Not all keyrings implement this method in a asynchronous-way. Using `await` for",
+				"      // non-thenable will still be valid (despite not being really useful). It allows us to cover both",
+				"      // cases and allow retro-compatibility too.",
+				"      await keyring.generateRandomMnemonic();",
+				"      await keyring.addAccounts(1);",
+				"    }",
+				"",
+				"    // We now create the keyring V2 wrappers and store them in memory.",
+				"    const keyringBuilderV2 = this.#getKeyringV2BuilderForType(type);",
+				"    let keyringV2: KeyringV2 | undefined;"
+			],
+			"startLine": 2974
+		}
+	]
+}

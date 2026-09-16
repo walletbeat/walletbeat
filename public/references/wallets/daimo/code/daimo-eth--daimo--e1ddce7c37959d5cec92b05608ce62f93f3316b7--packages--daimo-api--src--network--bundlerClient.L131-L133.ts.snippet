@@ -1,0 +1,28 @@
+{
+	"highlightFirstLine": 131,
+	"highlightLastLine": 133,
+	"segments": [
+		{
+			"lines": [
+				"export class BundlerClient {"
+			],
+			"startLine": 37
+		},
+		{
+			"lines": [
+				"  }",
+				"}",
+				"",
+				"/** Requires DAIMO_BUNDLER_RPC_URL. */",
+				"export function getBundlerClientFromEnv(opIndexer?: OpIndexer) {",
+				"  return new BundlerClient(getEnvApi().DAIMO_BUNDLER_RPC, opIndexer);",
+				"}",
+				"",
+				"function packedUserOpFromHex(op: UserOpHex) {",
+				"  return {",
+				"    sender: op.sender,"
+			],
+			"startLine": 127
+		}
+	]
+}

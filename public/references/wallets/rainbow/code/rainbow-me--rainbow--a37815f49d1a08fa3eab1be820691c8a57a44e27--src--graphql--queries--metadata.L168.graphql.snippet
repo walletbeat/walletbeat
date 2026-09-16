@@ -1,0 +1,21 @@
+{
+	"highlightFirstLine": 168,
+	"highlightLastLine": 168,
+	"segments": [
+		{
+			"lines": [
+				"fragment simulationError on TransactionError {",
+				"  message",
+				"  type",
+				"}",
+				"",
+				"query simulateTransactions($chainId: Int!, $transactions: [Transaction!], $domain: String, $currency: String) {",
+				"  simulateTransactions(chainID: $chainId, transactions: $transactions, domain: $domain, currency: $currency) {",
+				"    error {",
+				"      ...simulationError",
+				"    }"
+			],
+			"startLine": 163
+		}
+	]
+}

@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 167,
+	"highlightLastLine": 178,
+	"segments": [
+		{
+			"lines": [
+				"export class Wallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner {"
+			],
+			"startLine": 30
+		},
+		{
+			"lines": [
+				"",
+				"    /**",
+				"     *  Static methods to create Wallet instances.",
+				"     */",
+				"    static createRandom(options?: any): Wallet {",
+				"        let entropy: Uint8Array = randomBytes(16);",
+				"",
+				"        if (!options) { options = { }; }",
+				"",
+				"        if (options.extraEntropy) {",
+				"            entropy = arrayify(hexDataSlice(keccak256(concat([ entropy, options.extraEntropy ])), 0, 16));",
+				"        }",
+				"",
+				"        const mnemonic = entropyToMnemonic(entropy, options.locale);",
+				"        return Wallet.fromMnemonic(mnemonic, options.path, options.locale);",
+				"    }",
+				"",
+				"    static fromEncryptedJson(json: string, password: Bytes | string, progressCallback?: ProgressCallback): Promise<Wallet> {",
+				"        return decryptJsonWallet(json, password, progressCallback).then((account) => {",
+				"            return new Wallet(account);"
+			],
+			"startLine": 163
+		}
+	]
+}

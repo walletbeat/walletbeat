@@ -1,0 +1,28 @@
+{
+	"highlightFirstLine": 2587,
+	"highlightLastLine": 2589,
+	"segments": [
+		{
+			"lines": [
+				"export class KeyringService extends RNEventEmitter {"
+			],
+			"startLine": 246
+		},
+		{
+			"lines": [
+				"",
+				"  /**",
+				"   * Mnemonic Phrase",
+				"   */",
+				"  generateMnemonic(): string {",
+				"    return bip39.generateMnemonic(import_english.wordlist);",
+				"  }",
+				"",
+				"  async generatePreMnemonic(): Promise<string> {",
+				"    if (!this.#password) {",
+				"      throw walletLockedError('generate_pre_mnemonic');"
+			],
+			"startLine": 2583
+		}
+	]
+}

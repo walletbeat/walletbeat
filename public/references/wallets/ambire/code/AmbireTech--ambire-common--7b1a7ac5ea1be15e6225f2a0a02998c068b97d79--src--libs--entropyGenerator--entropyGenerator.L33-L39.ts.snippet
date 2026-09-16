@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 33,
+	"highlightLastLine": 39,
+	"segments": [
+		{
+			"lines": [
+				"export class EntropyGenerator {"
+			],
+			"startLine": 7
+		},
+		{
+			"lines": [
+				"  generateRandomBytes(length: number, extraEntropy: string): Uint8Array {"
+			],
+			"startLine": 10
+		},
+		{
+			"lines": [
+				"",
+				"    return randomBytesGenerated",
+				"  }",
+				"",
+				"  generateRandomMnemonic(wordCount: 12 | 24, extraEntropy: string): Mnemonic {",
+				"    const wordCountToBytesLength = { 12: 16, 24: 32 }",
+				"    const bytesLength = wordCountToBytesLength[wordCount] || 16 // defaults to 12-word phrase",
+				"    const entropy = this.generateRandomBytes(bytesLength, extraEntropy)",
+				"    const mnemonic = Mnemonic.fromEntropy(entropy, '', LangEn.wordlist())",
+				"    return mnemonic",
+				"  }",
+				"",
+				"  #collectTimeEntropy(): void {",
+				"    // TODO: steps to add support for the mobile app:",
+				"    // 1. install the polyfill: `yarn add react-native-performance`"
+			],
+			"startLine": 29
+		}
+	]
+}
