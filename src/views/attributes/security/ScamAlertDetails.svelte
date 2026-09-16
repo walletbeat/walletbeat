@@ -1,11 +1,14 @@
 <script lang="ts">
 	// Types/constants
-	import type {
-		ScamPreventionMetadata,
+	import {
+		activeUnlimitedApprovalBenchmarks,
+		type ScamPreventionMetadata,
+		unlimitedApprovalWarningBenchmarkLabels,
+		warnsOnUnlimitedApprovalUnconditionally,
 	} from '@/schema/attributes/security/scam-prevention'
 	import type { Outcome } from '@/schema/attributes'
 	import { isSupported } from '@/schema/features/support'
-	import { UnlimitedApprovalWarningCondition, unlimitedApprovalWarningConditionLabels } from '@/schema/features/security/scam-alerts'
+	import type { UnlimitedApprovalWarningBenchmarks } from '@/schema/features/security/scam-alerts'
 	import { refs } from '@/schema/reference'
 	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -55,14 +58,16 @@
 	 * when it is not shown unconditionally.
 	 */
 	function unlimitedApprovalConditionClause(
-		warnsOnUnlimitedApproval: 'ALWAYS' | UnlimitedApprovalWarningCondition[],
+		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks,
 	): string {
-		if (warnsOnUnlimitedApproval === 'ALWAYS') {
+		if (warnsOnUnlimitedApprovalUnconditionally(warnsOnUnlimitedApproval)) {
 			return ''
 		}
 
 		return `, but only when ${commaListFormat(
-			warnsOnUnlimitedApproval.map(condition => unlimitedApprovalWarningConditionLabels[condition]),
+			activeUnlimitedApprovalBenchmarks(warnsOnUnlimitedApproval).map(
+				benchmark => unlimitedApprovalWarningBenchmarkLabels[benchmark],
+			),
 		)}, not unconditionally`
 	}
 </script>
