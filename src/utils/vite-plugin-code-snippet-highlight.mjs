@@ -123,6 +123,7 @@ export function codeSnippetHighlight() {
 			}
 
 			/** @type {import('../schema/code-snippets').StoredSnippetContent} */
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const content = JSON.parse(await fs.readFile(filePath, 'utf8'))
 			const language = snippetLanguage(filePath)
 			const highlighter = await getHighlighter()
