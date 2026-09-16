@@ -75,7 +75,7 @@ for (const [modulePath, rows] of Object.entries(
  * attempt at one (rendering shouldn't crash over a data problem the
  * `code-snippets-integrity` check already surfaces), or has no snippet stored
  * under `public/references/wallets/<wallet-id>/code/`
- * (run `pnpm collect:snippets -- --all` to fetch missing ones).
+ * (run `pnpm collect:snippets -- all` to fetch missing ones).
  */
 export function codeSnippetForUrl(url: string): ResolvedCodeSnippet | null {
 	let source: ReturnType<typeof parseGitHubBlobUrl>
