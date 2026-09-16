@@ -6,7 +6,7 @@ import svelte from '@astrojs/svelte'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig, fontProviders } from 'astro/config'
 
-import { codeSnippetHighlight } from './vite-plugin-code-snippet-highlight.mjs'
+import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
 
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')

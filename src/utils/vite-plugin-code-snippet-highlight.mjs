@@ -94,7 +94,7 @@ function snippetLanguage(filePath) {
 
 	if (!Object.hasOwn(extensionToLanguage, extension)) {
 		throw new Error(
-			`Unknown snippet extension "${extension}" in ${filePath}. Add it to extensionToLanguage in vite-plugin-code-snippet-highlight.mjs (as 'text' if it shouldn't be highlighted).`,
+			`Unknown snippet extension "${extension}" in ${filePath}. Add it to extensionToLanguage in src/utils/vite-plugin-code-snippet-highlight.mjs (as 'text' if it shouldn't be highlighted).`,
 		)
 	}
 
@@ -122,7 +122,7 @@ export function codeSnippetHighlight() {
 				return null
 			}
 
-			/** @type {import('./src/schema/code-snippets').StoredSnippetContent} */
+			/** @type {import('../schema/code-snippets').StoredSnippetContent} */
 			const content = JSON.parse(await fs.readFile(filePath, 'utf8'))
 			const language = snippetLanguage(filePath)
 			const highlighter = await getHighlighter()
@@ -134,7 +134,7 @@ export function codeSnippetHighlight() {
 				loadedLanguages.add(language)
 			}
 
-			/** @type {import('./src/schema/code-snippets').SnippetRow[]} */
+			/** @type {import('../schema/code-snippets').SnippetRow[]} */
 			const rows = []
 
 			content.segments.forEach((segment, segmentIndex) => {
