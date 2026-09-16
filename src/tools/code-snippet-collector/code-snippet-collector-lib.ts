@@ -37,6 +37,7 @@ export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
 	const occurrences: SnippetOccurrence[] = []
 
 	for (const collected of collectAllRefs(allWallets)) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- collected.walletName always comes from Object.entries(allWallets)'s own keys.
 		const walletId = allWallets[collected.walletName as keyof typeof allWallets].metadata.id
 
 		for (const fq of collected.fullyQualifiedRefs) {
