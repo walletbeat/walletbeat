@@ -301,11 +301,11 @@ export enum SnippetProblemKind {
 	 */
 	ORPHAN_SNIPPET = 'ORPHAN_SNIPPET',
 	/**
-	 * A stored snippet that isn't valid `StoredSnippetContent` JSON (including
-	 * the old flat-text format), or whose highlighted range doesn't match the
-	 * range in its filename.
+	 * A stored snippet whose content doesn't match what it should be: it isn't
+	 * valid `StoredSnippetContent` JSON (including the old flat-text format),
+	 * or its highlighted range doesn't match the range in its filename.
 	 */
-	STALE_CONTENT = 'STALE_CONTENT',
+	SNIPPET_CONTENT_MISMATCH = 'SNIPPET_CONTENT_MISMATCH',
 }
 
 export interface SnippetProblem {
@@ -356,7 +356,7 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 		if (parsed === null) {
 			problems.push({
 				issue: 'Snippet is not valid stored-snippet JSON (stale/old format).',
-				kind: SnippetProblemKind.STALE_CONTENT,
+				kind: SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 				snippetPath,
 			})
 			continue
@@ -370,7 +370,7 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 				issue:
 					`Snippet highlights lines ${parsed.highlightFirstLine}-${parsed.highlightLastLine} ` +
 					`but its filename declares ${occurrence.source.firstLine}-${occurrence.source.lastLine}.`,
-				kind: SnippetProblemKind.STALE_CONTENT,
+				kind: SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 				snippetPath,
 			})
 		}

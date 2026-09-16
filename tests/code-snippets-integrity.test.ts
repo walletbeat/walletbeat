@@ -16,7 +16,7 @@ describe('code snippets', () => {
 			const needsFetch = problems.some(
 				p =>
 					p.kind === SnippetProblemKind.MISSING_SNIPPET ||
-					p.kind === SnippetProblemKind.STALE_CONTENT,
+					p.kind === SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 			)
 			const needsPrune = problems.some(p => p.kind === SnippetProblemKind.ORPHAN_SNIPPET)
 			const fixInstructions = [
