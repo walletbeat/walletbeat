@@ -24,7 +24,7 @@ export const deBank: ChainDataProvider &
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/debank',
-	farcaster: 'https://warpcast.com/debankdefi',
+	farcaster: 'https://farcaster.xyz/debankdefi',
 	icon: {
 		extension: 'svg',
 	},

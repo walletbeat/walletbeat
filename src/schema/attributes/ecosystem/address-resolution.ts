@@ -278,7 +278,7 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		    associating its successive resolution queries by IP over time.
 
 		For addresses that **require** an offchain lookup (e.g. ENS names
-		using [offchain resolvers with CCIP-Read](https://docs.ens.domains/resolvers/ccip-read)),
+		using [offchain resolvers with CCIP-Read](https://docs.ens.domains/resolvers/ccip-read/)),
 		only the portion of the work necessary to _arrive at the conclusion_
 		that an offchain lookup is necessary is considered.
 		In other words, wallets must verify that the CCIP-Read

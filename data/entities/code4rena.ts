@@ -16,7 +16,7 @@ export const code4rena: CorporateEntity & SecurityAuditor = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/code4rena',
-	farcaster: 'https://warpcast.com/code4rena',
+	farcaster: 'https://farcaster.xyz/code4rena',
 	icon: {
 		extension: 'png',
 		height: 200,

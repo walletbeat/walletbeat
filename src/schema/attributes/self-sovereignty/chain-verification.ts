@@ -75,7 +75,7 @@ function noChainVerification(
 			${canConfigureL1 ? 'Users may work around this by setting a custom RPC endpoint for the L1 chain and running their own node or external light client.' : ''}
 		`),
 		howToImprove: mdParagraph(
-			'{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.',
+			'{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.',
 		),
 		references: [],
 	})
@@ -101,7 +101,7 @@ export const chainVerification: Attribute = {
 
 		To avoid this, Ethereum was designed to be verifiable on commodity
 		hardware. Using a
-		[light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/),
+		[light client](https://ethereum.org/developers/docs/nodes-and-clients/light-clients/),
 		this verification is possible without having to download the entire
 		blockchain.
 	`),
@@ -119,7 +119,7 @@ export const chainVerification: Attribute = {
 		exhaustive: true,
 		pass: exampleRating(
 			mdParagraph(
-				'The wallet verifies the integrity of the Ethereum L1 chain using a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/).',
+				'The wallet verifies the integrity of the Ethereum L1 chain using a [light client](https://ethereum.org/developers/docs/nodes-and-clients/light-clients/).',
 			),
 			supportsChainVerification(
 				EvaluationContext.forTest(() => chainVerification),

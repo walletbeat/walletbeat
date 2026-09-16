@@ -72,7 +72,7 @@ under the Free and Open-Source MIT license.
 ### Communications transparency
 
 Most discussions happen on [GitHub](https://github.com/walletbeat/walletbeat) via PRs, issues, and discussions.
-Community-facing communications are broadcasted on the [Walletbeat X account](https://x.com/walletbeat) and [Walletbeat Farcaster channel](https://warpcast.com/~/channel/walletbeat).
+Community-facing communications are broadcasted on the [Walletbeat X account](https://x.com/walletbeat) and [Walletbeat Farcaster channel](https://farcaster.xyz/~/channel/walletbeat.
 Walletbeat group chats exist on Farcaster and Signal. Communications between Walletbeat contributors and wallet entities [have public disclosure requirements](/governance/communications/policy/communications-policy.md) and [are listed here](/governance/communications/channels/communication-channels.md).
 
 ### Funding transparency
@@ -80,7 +80,7 @@ Walletbeat group chats exist on Farcaster and Signal. Communications between Wal
 Walletbeat has received the following funding:
 
 - **2025-03**: Received **577.02 USD** from **Ethereum Foundation** as part of
-  [Pectra Proactive Grant Round](https://esp.ethereum.foundation/pectra-pgr):
+  [Pectra Proactive Grant Round](https://esp.ethereum.foundation/):
   [Grant Proposal](/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round)
 - **2025-07**: Received **106,100 USD** from **Ethereum Foundation** as part of
   [Ethereum Foundation Trillion Dollar Security project](https://blog.ethereum.org/2025/08/20/trillion-dollar-sec-2):
@@ -95,7 +95,7 @@ See the [treasury transparency report](/governance/treasury/treasury-transparenc
 
 Walletbeat refuses and will continue to refuse funding from wallet-related entities.
 
-Walletbeat however was originally created and is currently hosted by [Fluidkey](https://fluidkey.com/),
+Walletbeat however was originally created and is currently hosted by [Fluidkey](https://www.fluidkey.com/),
 an incorporated company in Switzerland with a wallet offering. In order to maximize credible
 neutrality, Walletbeat's long-term ownership goal is to become an independent DAO or foundation
 (similar to L2BEAT) once Walletbeat reaches a higher level of maturity and a broader set of regular
