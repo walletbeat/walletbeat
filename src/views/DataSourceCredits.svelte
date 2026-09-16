@@ -44,7 +44,10 @@
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
-		><cite>{label}</cite><span>{@html ExternalLinkIcon}</span></a>
+		>
+			<cite>{label}</cite>
+			<span>{@html ExternalLinkIcon}</span>
+		</a>
 	{/snippet}
 
 	{#snippet creditLine(credit: DataSourceCredit)}
@@ -58,7 +61,7 @@
 			>{@render sourceHeading(credit.source.entity)}</a>
 		{:else}
 			<span class="source-name">{@render sourceHeading(credit.source.entity)}</span>
-		{/if}<span>: </span>{#each credit.reportUrls as reportUrl, index (reportUrl.url)}{#if index > 0}<span>, </span>{/if}{@render labeledLink(reportUrl.url, reportUrl.label)}{/each}<span>, </span>{@render labeledLink(getUrl(credit.source.license.url), credit.source.license.name)}<span>. </span>{credit.source.attributionText}
+		{/if}<span>:&nbsp;</span>{#each credit.reportUrls as reportUrl, index (reportUrl.url)}{#if index > 0}<span>,&nbsp;</span>{/if}{@render labeledLink(reportUrl.url, reportUrl.label)}{/each}<span>,&nbsp;</span>{@render labeledLink(getUrl(credit.source.license.url), credit.source.license.name)}<span>.&nbsp;</span>{credit.source.attributionText}
 	{/snippet}
 
 	<section
@@ -106,5 +109,9 @@
 		align-items: center;
 		gap: 0.25em;
 		vertical-align: middle;
+	}
+
+	.data-credits a:not(.source-name) > span {
+		margin-inline-end: -0.2em;
 	}
 </style>

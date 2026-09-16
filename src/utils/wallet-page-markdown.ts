@@ -278,11 +278,6 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 						parts.push('#### References', '')
 
 						for (const ref of qualifiedRefs) {
-							// Inline data-credit link points to the consolidated
-							// "Data credits" section at the bottom of the page.
-							// Stamped references share this suffix so attribution
-							// stays close to the citation without repeating the
-							// full credit block per attribute.
 							const creditSuffix =
 								ref.source === undefined
 									? ''

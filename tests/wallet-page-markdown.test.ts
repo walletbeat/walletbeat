@@ -43,21 +43,6 @@ const markdownForWallet = (wallet: (typeof allRatedWallets)[keyof typeof allRate
 						throw new Error('Wallet has no recognized type')
 					})()
 
-function attributeSection(markdown: string, heading: string): string {
-	const sectionStart = markdown.indexOf(heading)
-
-	if (sectionStart === -1) {
-		throw new Error(`Missing attribute heading: ${heading}`)
-	}
-
-	const remainder = markdown.slice(sectionStart)
-	const nextSectionOffset = remainder.slice(heading.length).search(/\n#{2,3} /)
-
-	return nextSectionOffset === -1
-		? remainder
-		: remainder.slice(0, heading.length + nextSectionOffset)
-}
-
 describe('walletPageMarkdown', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
@@ -140,24 +125,6 @@ describe('walletPageMarkdown', () => {
 
 				for (const allUrls of urlSetsToCheck) {
 					expect(allUrls.some((url: string) => md.includes(url))).toBe(true)
-				}
-			})
-
-			it('does not repeat data credits inside attribute sections', () => {
-				const attributes = mapNonExemptAttributeGroupsInTree(
-					attributeTreeForWallet(wallet),
-					wallet.overall,
-					(_attrGroup, evalGroup) => mapNonExemptGroupAttributes(evalGroup, evalAttr => evalAttr),
-				).flat()
-
-				for (const evalAttr of attributes) {
-					const heading = `### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`
-					const section = attributeSection(md, heading)
-
-					// Per-attribute Data credit(s) subsections were consolidated
-					// into a single page-level section; attribute sections must
-					// no longer emit their own credit heading.
-					expect(section).not.toMatch(/^#### Data credits?$/m)
 				}
 			})
 

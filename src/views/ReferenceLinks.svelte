@@ -177,8 +177,7 @@
 								<a
 									class="ref-credit"
 									href={`#${dataCreditAnchorId(source.entity)}`}
-									title={`Data source: ${source.entity.name} — see credits at bottom of page`}
-									aria-label={`Data source: ${source.entity.name} — see credits at bottom of page`}
+									title={`Data source: ${source.entity.name}`}
 								>
 									{#if source.entity.icon !== 'NO_ICON'}
 										<img

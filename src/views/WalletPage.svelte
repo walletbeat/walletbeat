@@ -337,11 +337,6 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
-	// All fully-qualified references cited across every non-exempt attribute on
-	// this page. Fed into a single `<DataSourceCredits>` at the bottom of the
-	// page so stamped-source attribution is shown once (deduplicated by
-	// source) rather than repeated per attribute; inline `[Credit: …]`
-	// markers on each reference link scroll to the corresponding entry.
 	const allPageReferences = $derived.by(() => {
 		const refs = Object.values(attributeTree).flatMap(attrGroup => {
 			const evalGroup = evalTree[attrGroup.id]
