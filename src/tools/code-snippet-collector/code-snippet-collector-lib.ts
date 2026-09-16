@@ -11,6 +11,8 @@ import {
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
 import { collectAllRefs } from '@/schema/reference'
+import { CodebaseEntryType, crawlCodebase } from '@/tests/utils/codebase'
+import { commonWhitespacePrefix } from '@/types/utils/text'
 
 /** Lines of context stored immediately before/after the referenced range. */
 const CONTEXT_LINE_COUNT = 4
@@ -314,50 +316,6 @@ export interface SnippetProblem {
 
 const walletsReferencesDir = path.join('public', 'references', 'wallets')
 
-/** Recursively list all repository-relative file paths under `dir`. */
-function listFilesRecursively(repoRoot: string, dir: string): string[] {
-	const absoluteDir = path.join(repoRoot, dir)
-
-	if (!fs.existsSync(absoluteDir)) {
-		return []
-	}
-
-	const files: string[] = []
-
-	for (const entry of fs.readdirSync(absoluteDir, { withFileTypes: true })) {
-		const entryPath = `${dir}/${entry.name}`
-
-		if (entry.isDirectory()) {
-			files.push(...listFilesRecursively(repoRoot, entryPath))
-		} else if (entry.isFile()) {
-			files.push(entryPath)
-		}
-	}
-
-	return files
-}
-
-/** Repository-relative paths of all files under wallets' code snippet directories. */
-export function listStoredSnippetFiles(repoRoot: string): string[] {
-	const walletsDir = path.join(repoRoot, walletsReferencesDir)
-
-	if (!fs.existsSync(walletsDir)) {
-		return []
-	}
-
-	const files: string[] = []
-
-	for (const entry of fs.readdirSync(walletsDir, { withFileTypes: true })) {
-		if (!entry.isDirectory()) {
-			continue
-		}
-
-		files.push(...listFilesRecursively(repoRoot, `public/references/wallets/${entry.name}/code`))
-	}
-
-	return files
-}
-
 /**
  * Offline consistency check between snippet URLs in wallet data files and
  * stored snippet files. Returns a list of problems; empty means in sync.
@@ -366,7 +324,7 @@ export function listStoredSnippetFiles(repoRoot: string): string[] {
  * by tests/github-ref-commit-hash.test.ts), so existence plus filename and
  * highlighted-range consistency is a complete synchronization check.
  */
-export function checkSnippets(repoRoot: string): SnippetProblem[] {
+export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]> {
 	const problems: SnippetProblem[] = []
 	const occurrences = findSnippetOccurrences(repoRoot)
 	const expected = new Map<string, SnippetOccurrence>()
@@ -417,15 +375,31 @@ export function checkSnippets(repoRoot: string): SnippetProblem[] {
 		}
 	}
 
-	for (const storedFile of listStoredSnippetFiles(repoRoot)) {
-		if (expected.has(storedFile)) {
-			continue
-		}
+	const walletsDir = path.join(repoRoot, walletsReferencesDir)
 
-		problems.push({
-			issue: 'No wallet data file references this snippet (anymore).',
-			kind: SnippetProblemKind.ORPHAN_SNIPPET,
-			snippetPath: storedFile,
+	if (fs.existsSync(walletsDir)) {
+		await crawlCodebase({
+			root: walletsDir,
+			ignore: [],
+			baseTraversalFn: entry => {
+				// Only files directly under a wallet's own code/ directory (not
+				// e.g. its screenshots/ directory).
+				if (entry.type !== CodebaseEntryType.FILE || entry.path.split('/')[1] !== 'code') {
+					return
+				}
+
+				const storedFile = `${walletsReferencesDir}/${entry.path}`
+
+				if (expected.has(storedFile)) {
+					return
+				}
+
+				problems.push({
+					issue: 'No wallet data file references this snippet (anymore).',
+					kind: SnippetProblemKind.ORPHAN_SNIPPET,
+					snippetPath: storedFile,
+				})
+			},
 		})
 	}
 
