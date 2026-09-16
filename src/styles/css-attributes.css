@@ -4,7 +4,6 @@
  * After editing annotations, regenerate editor hints by running `pnpm run generate:css-attributes`.
  */
 
-
 /**
  * Shared link styling with optional camouflaged mode. `<a>` gets accent link chrome by default (no `[data-link]`). Add `[data-link]` on non-anchor elements when you want the same treatment; on `<a>`, use `[data-link]` only for non-default modes such as `camouflaged`.
  *
@@ -40,7 +39,7 @@ a {
 		text-decoration: underline;
 	}
 
-	&[data-link~="camouflaged"] {
+	&[data-link~='camouflaged'] {
 		color: inherit;
 
 		&:hover {
@@ -49,7 +48,7 @@ a {
 		}
 	}
 
-	&[data-link~="contents"] {
+	&[data-link~='contents'] {
 		display: contents;
 
 		> * {
@@ -57,7 +56,6 @@ a {
 		}
 	}
 }
-
 
 /**
  * Shared button and form-control surface for native controls and optional `[data-input]` wrappers. Native `<button>`, `<select>`, `<input>`, and checkbox or radio `<label>`s use this chrome automatically. Add `[data-input]` on a wrapper or extra element when you want the same look outside those tags.
@@ -91,12 +89,7 @@ a {
 select,
 button,
 input,
-label:has(
-	> input:is(
-		[type="checkbox"],
-		[type="radio"]
-	)
-) {
+label:has(> input:is([type='checkbox'], [type='radio'])) {
 	cursor: pointer;
 
 	display: inline-flex;
@@ -121,15 +114,9 @@ label:has(
 }
 
 option,
-label:has(
-	> input:is(
-		[type="checkbox"],
-		[type="radio"]
-	)
-) {
+label:has(> input:is([type='checkbox'], [type='radio'])) {
 	padding: 0.6em 0.8em;
 }
-
 
 /**
  * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.
@@ -155,7 +142,7 @@ label:has(
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`
  */
 [data-pressable],
-[role="button"],
+[role='button'],
 :where(
 	summary,
 	a,
@@ -163,18 +150,12 @@ label:has(
 	option,
 	button,
 	input,
-	label:has(
-		> input:is(
-			[type="checkbox"],
-			[type="radio"]
-		),
-		button
-	),
+	label:has(> input:is([type='checkbox'], [type='radio']), button),
 	::scroll-marker
 ) {
 	position: relative;
 
-	&[data-pressable~="to-containing"] {
+	&[data-pressable~='to-containing'] {
 		position: static;
 
 		&::before {
@@ -188,37 +169,25 @@ label:has(
 	transition-duration: var(--pressable-transitionOutDuration);
 
 	&:active:is(
-		label:has(
-			> input:is(
-				[type="checkbox"],
-				[type="radio"]
-			),
-			button
-		),
-		:not(
-			:has(
-				:where(
-					[data-pressable],
-					[role="button"],
+			label:has(> input:is([type='checkbox'], [type='radio']), button),
+			:not(
+				:has(
 					:where(
-						summary,
-						a,
-						select,
-						option,
-						button,
-						input,
-						label:has(
-							> input:is(
-								[type="checkbox"],
-								[type="radio"]
-							),
-							button
+						[data-pressable],
+						[role='button'],
+						:where(
+							summary,
+							a,
+							select,
+							option,
+							button,
+							input,
+							label:has(> input:is([type='checkbox'], [type='radio']), button)
 						)
-					)
-				):active
+					):active
+				)
 			)
-		)
-	) {
+		) {
 		transition-duration: var(--pressable-transitionInDuration);
 		opacity: var(--pressable-pressed-opacity);
 		scale: var(--pressable-pressed-scale);
@@ -230,13 +199,12 @@ label:has(
 	scale: var(--pressable-pressed-scale);
 }
 
-
 /**
- * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+ * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-complex`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
  *
  * ### Tokens
  * - shape: `circle`, `filled`
- * - source: `wbicons`
+ * - source: `wbicons-complex`
  * - effect: `shadow`
  *
  * ### CSS Variables
@@ -248,7 +216,7 @@ label:has(
  * ### Examples
  * ```html
  * <span data-icon="&#x21b5;"></span>
- * <span data-icon="wbicons security"></span>
+ * <span data-icon="wbicons-complex security"></span>
  * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
  * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
  * ```
@@ -284,7 +252,7 @@ label:has(
 		content: var(--icon-content);
 	}
 
-	&[data-icon~="circle"] {
+	&[data-icon~='circle'] {
 		inline-size: var(--icon-size, 2rem);
 		block-size: var(--icon-size, 2rem);
 		border-radius: 50%;
@@ -304,19 +272,17 @@ label:has(
 		}
 	}
 
-	&[data-icon~="filled"] {
+	&[data-icon~='filled'] {
 		background-color: var(--accent);
 		border-color: transparent;
 	}
 
-	&[data-icon~="shadow"] {
+	&[data-icon~='shadow'] {
 		> :is(img, svg),
 		> span > :is(img, svg) {
 			object-fit: contain;
 			border-radius: 0.25em;
-			filter: drop-shadow(
-				0 0 4.66667px light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1))
-			);
+			filter: drop-shadow(0 0 4.66667px light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1)));
 		}
 	}
 }
@@ -329,15 +295,14 @@ span svg {
 	height: 1.15em;
 	vertical-align: -0.2em;
 
-	&[fill="none"] {
+	&[fill='none'] {
 		stroke: currentColor;
 	}
 
-	&:not([fill="none"]) {
+	&:not([fill='none']) {
 		fill: currentColor;
 	}
 }
-
 
 /**
  * Overlay direct children in one shared grid cell (`grid-area: stack`). Presence only (no tokens).
@@ -372,7 +337,6 @@ span svg {
 		grid-area: stack;
 	}
 }
-
 
 /**
  * One-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the
@@ -433,28 +397,28 @@ span svg {
 		justify-items: end;
 	}
 
-	&[data-column~="gap-0"] {
+	&[data-column~='gap-0'] {
 		gap: 0em;
 	}
-	&[data-column~="gap-1"] {
+	&[data-column~='gap-1'] {
 		gap: 0.25em;
 	}
-	&[data-column~="gap-2"] {
+	&[data-column~='gap-2'] {
 		gap: 0.5em;
 	}
-	&[data-column~="gap-3"] {
+	&[data-column~='gap-3'] {
 		gap: 0.75em;
 	}
-	&[data-column~="gap-4"] {
+	&[data-column~='gap-4'] {
 		gap: 1em;
 	}
-	&[data-column~="gap-5"] {
+	&[data-column~='gap-5'] {
 		gap: 1.25em;
 	}
-	&[data-column~="gap-6"] {
+	&[data-column~='gap-6'] {
 		gap: 1.5em;
 	}
-	&[data-column~="gap-8"] {
+	&[data-column~='gap-8'] {
 		gap: 2em;
 	}
 
@@ -505,7 +469,6 @@ span svg {
 	}
 }
 
-
 /**
  * Flex row primitive: alignment, gap, and wrap on `[data-row]`, `[data-badge]`, and `<summary>`. Child `[data-row-item]` tokens are documented on the nested row-item rule below; badge size tokens stay on `[data-badge]`.
  *
@@ -549,53 +512,53 @@ summary {
 		min-inline-size: 0;
 	}
 
-	&[data-row~="wrap"],
+	&[data-row~='wrap'],
 	&:where(summary) {
 		flex-wrap: wrap;
 	}
 
-	&[data-row~="start"] {
+	&[data-row~='start'] {
 		justify-content: start;
 	}
-	&[data-row~="center"] {
+	&[data-row~='center'] {
 		justify-content: center;
 	}
-	&[data-row~="end"] {
+	&[data-row~='end'] {
 		justify-content: end;
 	}
 
-	&[data-row~="align-start"] {
+	&[data-row~='align-start'] {
 		align-items: start;
 	}
-	&[data-row~="align-center"] {
+	&[data-row~='align-center'] {
 		align-items: center;
 	}
-	&[data-row~="align-end"] {
+	&[data-row~='align-end'] {
 		align-items: end;
 	}
 
-	&[data-row~="gap-0"] {
+	&[data-row~='gap-0'] {
 		gap: 0em;
 	}
-	&[data-row~="gap-1"] {
+	&[data-row~='gap-1'] {
 		gap: 0.25em;
 	}
-	&[data-row~="gap-2"] {
+	&[data-row~='gap-2'] {
 		gap: 0.5em;
 	}
-	&[data-row~="gap-3"] {
+	&[data-row~='gap-3'] {
 		gap: 0.75em;
 	}
-	&[data-row~="gap-4"] {
+	&[data-row~='gap-4'] {
 		gap: 1em;
 	}
-	&[data-row~="gap-5"] {
+	&[data-row~='gap-5'] {
 		gap: 1.25em;
 	}
-	&[data-row~="gap-6"] {
+	&[data-row~='gap-6'] {
 		gap: 1.5em;
 	}
-	&[data-row~="gap-8"] {
+	&[data-row~='gap-8'] {
 		gap: 2em;
 	}
 
@@ -629,45 +592,44 @@ summary {
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-row-item]`
 	 */
-	> [data-row-item~="flexible"] {
+	> [data-row-item~='flexible'] {
 		flex: 1;
 	}
 
-	> [data-row-item~="basis-1"] {
+	> [data-row-item~='basis-1'] {
 		flex-basis: 16ch;
 	}
-	> [data-row-item~="basis-2"] {
+	> [data-row-item~='basis-2'] {
 		flex-basis: 22ch;
 	}
-	> [data-row-item~="basis-3"] {
+	> [data-row-item~='basis-3'] {
 		flex-basis: 28ch;
 	}
-	> [data-row-item~="basis-4"] {
+	> [data-row-item~='basis-4'] {
 		flex-basis: 34ch;
 	}
-	> [data-row-item~="basis-5"] {
+	> [data-row-item~='basis-5'] {
 		flex-basis: 40ch;
 	}
-	> [data-row-item~="basis-6"] {
+	> [data-row-item~='basis-6'] {
 		flex-basis: 46ch;
 	}
-	> [data-row-item~="basis-full"] {
+	> [data-row-item~='basis-full'] {
 		flex-basis: 100%;
 	}
 
-	> [data-row-item~="wrap-start"],
-	&[data-row~="wrap-first-last"] > :first-child {
+	> [data-row-item~='wrap-start'],
+	&[data-row~='wrap-first-last'] > :first-child {
 		margin-inline-end: auto;
 	}
-	> [data-row-item~="wrap-center"] {
+	> [data-row-item~='wrap-center'] {
 		margin-inline: auto;
 	}
-	> [data-row-item~="wrap-end"],
-	&[data-row~="wrap-first-last"] > :last-child {
+	> [data-row-item~='wrap-end'],
+	&[data-row~='wrap-first-last'] > :last-child {
 		margin-inline-start: auto;
 	}
 }
-
 
 /**
  * Card surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.
@@ -713,63 +675,62 @@ summary {
 	border-radius: var(--card-radius);
 	padding: var(--card-padding);
 
-	&[data-card~="secondary"] {
+	&[data-card~='secondary'] {
 		--card-backgroundColor: var(--background-secondary);
 		border-color: var(--border-color);
 	}
 
-	&[data-card~="radius-1"] {
+	&[data-card~='radius-1'] {
 		--card-radius: 0.125em;
 	}
-	&[data-card~="radius-2"] {
+	&[data-card~='radius-2'] {
 		--card-radius: 0.25em;
 	}
-	&[data-card~="radius-3"] {
+	&[data-card~='radius-3'] {
 		--card-radius: 0.375em;
 	}
-	&[data-card~="radius-4"] {
+	&[data-card~='radius-4'] {
 		--card-radius: 0.5em;
 	}
-	&[data-card~="radius-6"] {
+	&[data-card~='radius-6'] {
 		--card-radius: 0.75em;
 	}
-	&[data-card~="radius-8"] {
+	&[data-card~='radius-8'] {
 		--card-radius: 1em;
 	}
 
-	&[data-card~="padding-0"] {
+	&[data-card~='padding-0'] {
 		--card-padding: 0em;
 	}
-	&[data-card~="padding-1"] {
+	&[data-card~='padding-1'] {
 		--card-padding: 0.25em;
 	}
-	&[data-card~="padding-2"] {
+	&[data-card~='padding-2'] {
 		--card-padding: 0.5em;
 	}
-	&[data-card~="padding-3"] {
+	&[data-card~='padding-3'] {
 		--card-padding: 0.75em;
 	}
-	&[data-card~="padding-4"] {
+	&[data-card~='padding-4'] {
 		--card-padding: 1em;
 	}
-	&[data-card~="padding-5"] {
+	&[data-card~='padding-5'] {
 		--card-padding: 1.25em;
 	}
-	&[data-card~="padding-6"] {
+	&[data-card~='padding-6'] {
 		--card-padding: 1.5em;
 	}
-	&[data-card~="padding-7"] {
+	&[data-card~='padding-7'] {
 		--card-padding: 1.75em;
 	}
-	&[data-card~="padding-8"] {
+	&[data-card~='padding-8'] {
 		--card-padding: 2em;
 	}
 
-	&[data-card~="border-accent"] {
+	&[data-card~='border-accent'] {
 		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
 	}
 }
-
 
 /**
  * Compact badge / chip surface with size modifiers. Chip uses the medium size when the attribute is present without a token.
@@ -823,15 +784,15 @@ summary {
 	font-weight: 600;
 	line-height: 1;
 
-	&[data-badge~="small"] {
+	&[data-badge~='small'] {
 		font-size: 0.75em;
 		padding: 0.4em 0.5em;
 	}
-	&[data-badge~="medium"] {
+	&[data-badge~='medium'] {
 		font-size: 0.875em;
 		padding: 0.45em 0.6em;
 	}
-	&[data-badge~="large"] {
+	&[data-badge~='large'] {
 		font-size: 1em;
 		padding: 0.5em 0.7em;
 	}
@@ -852,7 +813,6 @@ summary {
 		flex-basis: auto;
 	}
 }
-
 
 /**
  * Semantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.
@@ -921,7 +881,7 @@ summary {
 		}
 	}
 
-	&[data-tag~="wallet-type"] {
+	&[data-tag~='wallet-type'] {
 		--tag-backgroundColor: light-dark(oklch(0.95 0 0), oklch(0.25 0 0));
 		--tag-textColor: light-dark(oklch(0.65 0 0), oklch(0.8 0 0));
 		--tag-borderColor: light-dark(oklch(0.9 0 0), oklch(0.4 0 0));
@@ -930,7 +890,7 @@ summary {
 		--tag-hover-borderColor: light-dark(oklch(0.85 0 0), oklch(0.5 0 0));
 	}
 
-	&[data-tag~="account-type"] {
+	&[data-tag~='account-type'] {
 		--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
 		--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.7 0.25 145));
 		--tag-borderColor: light-dark(oklch(0.9 0.06 145), oklch(0.4 0.08 145));
@@ -939,7 +899,7 @@ summary {
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.5 0.1 145));
 	}
 
-	&[data-tag~="eip"] {
+	&[data-tag~='eip'] {
 		--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
 		--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.7 0.25 300));
 		--tag-borderColor: light-dark(oklch(0.9 0.06 300), oklch(0.4 0.08 300));
@@ -948,7 +908,7 @@ summary {
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.5 0.1 300));
 	}
 
-	&[data-tag~="eip-status"] {
+	&[data-tag~='eip-status'] {
 		--tag-backgroundColor: light-dark(oklch(0.95 0.03 250), oklch(0.25 0.05 250));
 		--tag-textColor: light-dark(oklch(0.65 0.15 250), oklch(0.7 0.25 250));
 		--tag-borderColor: light-dark(oklch(0.9 0.06 250), oklch(0.4 0.08 250));
@@ -957,7 +917,7 @@ summary {
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 250), oklch(0.5 0.1 250));
 	}
 
-	&[data-tag~="manufacture-type"] {
+	&[data-tag~='manufacture-type'] {
 		--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
 		--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.7 0.25 290));
 		--tag-borderColor: light-dark(oklch(0.9 0.06 290), oklch(0.4 0.08 290));
@@ -966,7 +926,7 @@ summary {
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.5 0.1 290));
 	}
 
-	&[data-tag~="eoa"] {
+	&[data-tag~='eoa'] {
 		--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
 		--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.7 0.25 145));
 		--tag-borderColor: light-dark(oklch(0.9 0.06 145), oklch(0.4 0.08 145));
@@ -975,7 +935,6 @@ summary {
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.5 0.1 145));
 	}
 }
-
 
 /**
  * List layout: grid gap and marker column on `[data-list]`, `ul`, or `ol`. Per-row spacing and custom markers are documented on the list-item child rule below.
@@ -1043,25 +1002,25 @@ ol {
 		padding-inline-start: calc(var(--card-padding) + var(--list-marker-inlineSize));
 	}
 
-	&[data-list~="gap-0"] {
+	&[data-list~='gap-0'] {
 		--list-gap: 0;
 	}
-	&[data-list~="gap-1"] {
+	&[data-list~='gap-1'] {
 		--list-gap: 0.25lh;
 	}
-	&[data-list~="gap-2"] {
+	&[data-list~='gap-2'] {
 		--list-gap: 0.5lh;
 	}
-	&[data-list~="gap-3"] {
+	&[data-list~='gap-3'] {
 		--list-gap: 0.75lh;
 	}
-	&[data-list~="gap-4"] {
+	&[data-list~='gap-4'] {
 		--list-gap: 1lh;
 	}
-	&[data-list~="gap-5"] {
+	&[data-list~='gap-5'] {
 		--list-gap: 1.25lh;
 	}
-	&[data-list~="gap-6"] {
+	&[data-list~='gap-6'] {
 		--list-gap: 1.5lh;
 	}
 
@@ -1100,32 +1059,29 @@ ol {
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
 	 */
-	&:not([data-list~='unstyled']) > :is(
-		li,
-		[data-list-item]
-	) {
+	&:not([data-list~='unstyled']) > :is(li, [data-list-item]) {
 		position: relative;
 		--listItem-gap: 0.25lh;
 
-		&[data-list-item~="gap-0"] {
+		&[data-list-item~='gap-0'] {
 			--listItem-gap: 0;
 		}
-		&[data-list-item~="gap-1"] {
+		&[data-list-item~='gap-1'] {
 			--listItem-gap: 0.25lh;
 		}
-		&[data-list-item~="gap-2"] {
+		&[data-list-item~='gap-2'] {
 			--listItem-gap: 0.5lh;
 		}
-		&[data-list-item~="gap-3"] {
+		&[data-list-item~='gap-3'] {
 			--listItem-gap: 0.75lh;
 		}
-		&[data-list-item~="gap-4"] {
+		&[data-list-item~='gap-4'] {
 			--listItem-gap: 1lh;
 		}
-		&[data-list-item~="gap-5"] {
+		&[data-list-item~='gap-5'] {
 			--listItem-gap: 1.25lh;
 		}
-		&[data-list-item~="gap-6"] {
+		&[data-list-item~='gap-6'] {
 			--listItem-gap: 1.5lh;
 		}
 
@@ -1139,23 +1095,23 @@ ol {
 		}
 
 		@supports not selector(::before::marker) { */
-			&::marker {
-				color: transparent;
-			}
+		&::marker {
+			color: transparent;
+		}
 
-			&::before {
-				position: absolute;
-				margin-inline-start: calc(-1 * var(--list-marker-inlineSize) - var(--list-markerGap));
-				width: var(--list-marker-inlineSize);
+		&::before {
+			position: absolute;
+			margin-inline-start: calc(-1 * var(--list-marker-inlineSize) - var(--list-markerGap));
+			width: var(--list-marker-inlineSize);
 
-				content: '●';
-				font-family: var(--list-marker-fontFamily, inherit);
-				font-size: 1em;
-				text-align: center;
-			}
-			&[data-list-item-marker]::before {
-				content: attr(data-list-item-marker);
-			}
+			content: '●';
+			font-family: var(--list-marker-fontFamily, inherit);
+			font-size: 1em;
+			text-align: center;
+		}
+		&[data-list-item-marker]::before {
+			content: attr(data-list-item-marker);
+		}
 		/* } */
 
 		padding-inline-start: var(--list-markerGap);
@@ -1165,7 +1121,6 @@ ol {
 		}
 	}
 }
-
 
 /**
  * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
@@ -1218,35 +1173,23 @@ ol {
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
  */
 @supports (
-	((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
-	(container-type: scroll-state) and
-	(position-anchor: --sticky-breadcrumb-scope) and
-	(inset-inline-start: anchor(--sticky-breadcrumb-item end))
+	((animation-timeline: scroll()) and (animation-range: 0% 100%)) and (container-type: scroll-state)
+		and (position-anchor: --sticky-breadcrumb-scope) and
+		(inset-inline-start: anchor(--sticky-breadcrumb-item end))
 ) {
-	[data-sticky-breadcrumb~="scope"] {
+	[data-sticky-breadcrumb~='scope'] {
 		---stickyBreadcrumb-exitAnimationRangeStart: exit-crossing
 			calc(
-				100%
-				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-				- var(
-					--stickyBreadcrumb-exitAnimationDistance,
-					var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-				)
+				100% - var(--stickyBreadcrumb-trackBlockEnd, 1lh) -
+					var(--stickyBreadcrumb-exitAnimationDistance, var(--stickyBreadcrumb-trackBlockEnd, 1lh))
 			);
 		---stickyBreadcrumb-exitAnimationRangeEnd: exit-crossing
-			calc(
-				100%
-				- var(--stickyBreadcrumb-trackBlockEnd, 1lh)
-			);
+			calc(100% - var(--stickyBreadcrumb-trackBlockEnd, 1lh));
 
 		anchor-scope:
-			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item),
-			--sticky-breadcrumb-position,
-			--sticky-breadcrumb-scope,
-			--sticky-breadcrumb-extra-position;
-		timeline-scope:
-			--sticky-breadcrumb-timeline,
-			--sticky-breadcrumb-scope-timeline;
+			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item), --sticky-breadcrumb-position,
+			--sticky-breadcrumb-scope, --sticky-breadcrumb-extra-position;
+		timeline-scope: --sticky-breadcrumb-timeline, --sticky-breadcrumb-scope-timeline;
 		view-timeline-name: --sticky-breadcrumb-scope-timeline;
 		view-timeline-axis: block;
 		view-timeline-inset: 0;
@@ -1262,7 +1205,7 @@ ol {
 		}
 	}
 
-	[data-sticky-breadcrumb~="position"] {
+	[data-sticky-breadcrumb~='position'] {
 		anchor-name: --sticky-breadcrumb-position;
 		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
 		view-timeline-name: --sticky-breadcrumb-timeline;
@@ -1270,10 +1213,10 @@ ol {
 		view-timeline-inset: 0;
 	}
 
-	[data-sticky-breadcrumb~="item"] {
+	[data-sticky-breadcrumb~='item'] {
 		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
 
-		&:not([data-sticky-breadcrumb~="root"]) {
+		&:not([data-sticky-breadcrumb~='root']) {
 			position-anchor: --sticky-breadcrumb-scope;
 			position-visibility: anchors-visible;
 
@@ -1282,16 +1225,15 @@ ol {
 				StickyBreadcrumbItemExitAnimation linear both,
 				StickyBreadcrumbItemVisibility 1ms steps(1, end) both;
 			animation-timeline:
-				--sticky-breadcrumb-timeline,
-				--sticky-breadcrumb-scope-timeline,
+				--sticky-breadcrumb-timeline, --sticky-breadcrumb-scope-timeline,
 				--sticky-breadcrumb-scope-timeline;
 			animation-range:
 				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
-				var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
+					var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
 				var(---stickyBreadcrumb-exitAnimationRangeStart)
-				var(---stickyBreadcrumb-exitAnimationRangeEnd),
+					var(---stickyBreadcrumb-exitAnimationRangeEnd),
 				var(---stickyBreadcrumb-exitAnimationRangeStart)
-				var(---stickyBreadcrumb-exitAnimationRangeEnd);
+					var(---stickyBreadcrumb-exitAnimationRangeEnd);
 		}
 	}
 
@@ -1299,12 +1241,12 @@ ol {
 		from {
 			position: fixed;
 			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-position top)
-				+ var(--stickyBreadcrumb-position-insetBlockStart, 0px)
+				anchor(--sticky-breadcrumb-position top) +
+					var(--stickyBreadcrumb-position-insetBlockStart, 0px)
 			);
 			inset-inline-start: calc(
-				anchor(--sticky-breadcrumb-position start)
-				+ var(--stickyBreadcrumb-position-insetInlineStart, 0px)
+				anchor(--sticky-breadcrumb-position start) +
+					var(--stickyBreadcrumb-position-insetInlineStart, 0px)
 			);
 			margin-inline-start: 0;
 			min-block-size: 0;
@@ -1312,15 +1254,11 @@ ol {
 		to {
 			position: fixed;
 			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-scope top)
-					+ var(--stickyBreadcrumb-item-blockOffset, 0px)
+				anchor(--sticky-breadcrumb-scope top) + var(--stickyBreadcrumb-item-blockOffset, 0px)
 			);
 			inset-inline-start: var(
 				--stickyBreadcrumb-item-insetInlineStart,
-				anchor(
-					var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item)
-						end
-				)
+				anchor(var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item) end)
 			);
 			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
 			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
@@ -1344,12 +1282,11 @@ ol {
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		[data-sticky-breadcrumb~="item"]:not([data-sticky-breadcrumb~="root"]) {
+		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
 			animation: none;
 		}
 	}
 }
-
 
 /**
  * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
@@ -1394,20 +1331,16 @@ ol {
 	--scrollContainer-sizeInline: 100cqi;
 	--scrollContainer-perspective: 900px;
 	--scrollContainer-scrollPaddingBlockStart: calc(
-		var(--sticky0-insetBlockStart)
-		+ var(--sticky0-paddingBlockStart)
+		var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart)
 	);
 	--scrollContainer-scrollPaddingBlockEnd: calc(
-		var(--sticky0-insetBlockEnd)
-		+ var(--sticky0-paddingBlockEnd)
+		var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd)
 	);
 	--scrollContainer-scrollPaddingInlineStart: calc(
-		var(--sticky0-insetInlineStart)
-		+ var(--sticky0-paddingInlineStart)
+		var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart)
 	);
 	--scrollContainer-scrollPaddingInlineEnd: calc(
-		var(--sticky0-insetInlineEnd)
-		+ var(--sticky0-paddingInlineEnd)
+		var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd)
 	);
 
 	/* Rules */
@@ -1416,24 +1349,22 @@ ol {
 	scrollbar-width: none;
 	touch-action: pan-x pan-y;
 	perspective: var(--scrollContainer-perspective);
-	scroll-padding-block:
-		var(--scrollContainer-scrollPaddingBlockStart)
+	scroll-padding-block: var(--scrollContainer-scrollPaddingBlockStart)
 		var(--scrollContainer-scrollPaddingBlockEnd);
-	scroll-padding-inline:
-		var(--scrollContainer-scrollPaddingInlineStart)
+	scroll-padding-inline: var(--scrollContainer-scrollPaddingInlineStart)
 		var(--scrollContainer-scrollPaddingInlineEnd);
 
-	&:not([data-scroll-container~="block"]):not([data-scroll-container~="inline"]) {
+	&:not([data-scroll-container~='block']):not([data-scroll-container~='inline']) {
 		container-type: size;
 		container-type: scroll-state size;
 		overflow: auto auto;
 	}
-	&[data-scroll-container~="block"] {
+	&[data-scroll-container~='block'] {
 		container-type: inline-size;
 		container-type: scroll-state inline-size;
 		overflow-y: auto;
 	}
-	&[data-scroll-container~="inline"] {
+	&[data-scroll-container~='inline'] {
 		container-type: block-size;
 		container-type: scroll-state block-size;
 		min-inline-size: 0;
@@ -1458,8 +1389,13 @@ ol {
 	--sticky0-paddingInlineStart: var(--sticky-paddingInlineStart);
 	--sticky0-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
-	--sticky0-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky0-insetBlockStart) - var(--sticky0-insetBlockEnd));
-	--sticky0-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky0-insetInlineStart) - var(--sticky0-insetInlineEnd));
+	--sticky0-sizeBlock: calc(
+		var(--scrollContainer-sizeBlock) - var(--sticky0-insetBlockStart) - var(--sticky0-insetBlockEnd)
+	);
+	--sticky0-sizeInline: calc(
+		var(--scrollContainer-sizeInline) - var(--sticky0-insetInlineStart) -
+			var(--sticky0-insetInlineEnd)
+	);
 
 	--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
 	--sticky-insetBlockEnd: var(--sticky0-insetBlockEnd);
@@ -1473,18 +1409,35 @@ ol {
 		:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 			--sticky-level: 1;
 
-			--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
-			--sticky1-insetBlockEnd: calc(var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd) + var(--sticky-marginBlockEnd));
-			--sticky1-insetInlineStart: calc(var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart) + var(--sticky-marginInlineStart));
-			--sticky1-insetInlineEnd: calc(var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+			--sticky1-insetBlockStart: calc(
+				var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) +
+					var(--sticky-marginBlockStart)
+			);
+			--sticky1-insetBlockEnd: calc(
+				var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd) + var(--sticky-marginBlockEnd)
+			);
+			--sticky1-insetInlineStart: calc(
+				var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart) +
+					var(--sticky-marginInlineStart)
+			);
+			--sticky1-insetInlineEnd: calc(
+				var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd) +
+					var(--sticky-marginInlineEnd)
+			);
 
 			--sticky1-paddingBlockStart: var(--sticky-paddingBlockStart);
 			--sticky1-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 			--sticky1-paddingInlineStart: var(--sticky-paddingInlineStart);
 			--sticky1-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
-			--sticky1-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky1-insetBlockStart) - var(--sticky1-insetBlockEnd));
-			--sticky1-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky1-insetInlineStart) - var(--sticky1-insetInlineEnd));
+			--sticky1-sizeBlock: calc(
+				var(--scrollContainer-sizeBlock) - var(--sticky1-insetBlockStart) -
+					var(--sticky1-insetBlockEnd)
+			);
+			--sticky1-sizeInline: calc(
+				var(--scrollContainer-sizeInline) - var(--sticky1-insetInlineStart) -
+					var(--sticky1-insetInlineEnd)
+			);
 
 			--sticky-insetBlockStart: var(--sticky1-insetBlockStart);
 			--sticky-insetBlockEnd: var(--sticky1-insetBlockEnd);
@@ -1497,18 +1450,36 @@ ol {
 			:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 				--sticky-level: 2;
 
-				--sticky2-insetBlockStart: calc(var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) + var(--sticky-marginBlockStart));
-				--sticky2-insetBlockEnd: calc(var(--sticky1-insetBlockEnd) + var(--sticky1-paddingBlockEnd) + var(--sticky-marginBlockEnd));
-				--sticky2-insetInlineStart: calc(var(--sticky1-insetInlineStart) + var(--sticky1-paddingInlineStart) + var(--sticky-marginInlineStart));
-				--sticky2-insetInlineEnd: calc(var(--sticky1-insetInlineEnd) + var(--sticky1-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+				--sticky2-insetBlockStart: calc(
+					var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) +
+						var(--sticky-marginBlockStart)
+				);
+				--sticky2-insetBlockEnd: calc(
+					var(--sticky1-insetBlockEnd) + var(--sticky1-paddingBlockEnd) +
+						var(--sticky-marginBlockEnd)
+				);
+				--sticky2-insetInlineStart: calc(
+					var(--sticky1-insetInlineStart) + var(--sticky1-paddingInlineStart) +
+						var(--sticky-marginInlineStart)
+				);
+				--sticky2-insetInlineEnd: calc(
+					var(--sticky1-insetInlineEnd) + var(--sticky1-paddingInlineEnd) +
+						var(--sticky-marginInlineEnd)
+				);
 
 				--sticky2-paddingBlockStart: var(--sticky-paddingBlockStart);
 				--sticky2-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 				--sticky2-paddingInlineStart: var(--sticky-paddingInlineStart);
 				--sticky2-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
-				--sticky2-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky2-insetBlockStart) - var(--sticky2-insetBlockEnd));
-				--sticky2-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky2-insetInlineStart) - var(--sticky2-insetInlineEnd));
+				--sticky2-sizeBlock: calc(
+					var(--scrollContainer-sizeBlock) - var(--sticky2-insetBlockStart) -
+						var(--sticky2-insetBlockEnd)
+				);
+				--sticky2-sizeInline: calc(
+					var(--scrollContainer-sizeInline) - var(--sticky2-insetInlineStart) -
+						var(--sticky2-insetInlineEnd)
+				);
 
 				--sticky-insetBlockStart: var(--sticky2-insetBlockStart);
 				--sticky-insetBlockEnd: var(--sticky2-insetBlockEnd);
@@ -1521,18 +1492,36 @@ ol {
 				:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 					--sticky-level: 3;
 
-					--sticky3-insetBlockStart: calc(var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) + var(--sticky-marginBlockStart));
-					--sticky3-insetBlockEnd: calc(var(--sticky2-insetBlockEnd) + var(--sticky2-paddingBlockEnd) + var(--sticky-marginBlockEnd));
-					--sticky3-insetInlineStart: calc(var(--sticky2-insetInlineStart) + var(--sticky2-paddingInlineStart) + var(--sticky-marginInlineStart));
-					--sticky3-insetInlineEnd: calc(var(--sticky2-insetInlineEnd) + var(--sticky2-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+					--sticky3-insetBlockStart: calc(
+						var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) +
+							var(--sticky-marginBlockStart)
+					);
+					--sticky3-insetBlockEnd: calc(
+						var(--sticky2-insetBlockEnd) + var(--sticky2-paddingBlockEnd) +
+							var(--sticky-marginBlockEnd)
+					);
+					--sticky3-insetInlineStart: calc(
+						var(--sticky2-insetInlineStart) + var(--sticky2-paddingInlineStart) +
+							var(--sticky-marginInlineStart)
+					);
+					--sticky3-insetInlineEnd: calc(
+						var(--sticky2-insetInlineEnd) + var(--sticky2-paddingInlineEnd) +
+							var(--sticky-marginInlineEnd)
+					);
 
 					--sticky3-paddingBlockStart: var(--sticky-paddingBlockStart);
 					--sticky3-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 					--sticky3-paddingInlineStart: var(--sticky-paddingInlineStart);
 					--sticky3-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
-					--sticky3-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky3-insetBlockStart) - var(--sticky3-insetBlockEnd));
-					--sticky3-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky3-insetInlineStart) - var(--sticky3-insetInlineEnd));
+					--sticky3-sizeBlock: calc(
+						var(--scrollContainer-sizeBlock) - var(--sticky3-insetBlockStart) -
+							var(--sticky3-insetBlockEnd)
+					);
+					--sticky3-sizeInline: calc(
+						var(--scrollContainer-sizeInline) - var(--sticky3-insetInlineStart) -
+							var(--sticky3-insetInlineEnd)
+					);
 
 					--sticky-insetBlockStart: var(--sticky3-insetBlockStart);
 					--sticky-insetBlockEnd: var(--sticky3-insetBlockEnd);
@@ -1542,21 +1531,40 @@ ol {
 					--sticky-sizeBlock: var(--sticky3-sizeBlock);
 					--sticky-sizeInline: var(--sticky3-sizeInline);
 
-					:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
+					:is(&)
+						[data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 						--sticky-level: 4;
 
-						--sticky4-insetBlockStart: calc(var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) + var(--sticky-marginBlockStart));
-						--sticky4-insetBlockEnd: calc(var(--sticky3-insetBlockEnd) + var(--sticky3-paddingBlockEnd) + var(--sticky-marginBlockEnd));
-						--sticky4-insetInlineStart: calc(var(--sticky3-insetInlineStart) + var(--sticky3-paddingInlineStart) + var(--sticky-marginInlineStart));
-						--sticky4-insetInlineEnd: calc(var(--sticky3-insetInlineEnd) + var(--sticky3-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+						--sticky4-insetBlockStart: calc(
+							var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) +
+								var(--sticky-marginBlockStart)
+						);
+						--sticky4-insetBlockEnd: calc(
+							var(--sticky3-insetBlockEnd) + var(--sticky3-paddingBlockEnd) +
+								var(--sticky-marginBlockEnd)
+						);
+						--sticky4-insetInlineStart: calc(
+							var(--sticky3-insetInlineStart) + var(--sticky3-paddingInlineStart) +
+								var(--sticky-marginInlineStart)
+						);
+						--sticky4-insetInlineEnd: calc(
+							var(--sticky3-insetInlineEnd) + var(--sticky3-paddingInlineEnd) +
+								var(--sticky-marginInlineEnd)
+						);
 
 						--sticky4-paddingBlockStart: var(--sticky-paddingBlockStart);
 						--sticky4-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 						--sticky4-paddingInlineStart: var(--sticky-paddingInlineStart);
 						--sticky4-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
-						--sticky4-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky4-insetBlockStart) - var(--sticky4-insetBlockEnd));
-						--sticky4-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky4-insetInlineStart) - var(--sticky4-insetInlineEnd));
+						--sticky4-sizeBlock: calc(
+							var(--scrollContainer-sizeBlock) - var(--sticky4-insetBlockStart) -
+								var(--sticky4-insetBlockEnd)
+						);
+						--sticky4-sizeInline: calc(
+							var(--scrollContainer-sizeInline) - var(--sticky4-insetInlineStart) -
+								var(--sticky4-insetInlineEnd)
+						);
 
 						--sticky-insetBlockStart: var(--sticky4-insetBlockStart);
 						--sticky-insetBlockEnd: var(--sticky4-insetBlockEnd);
@@ -1566,21 +1574,40 @@ ol {
 						--sticky-sizeBlock: var(--sticky4-sizeBlock);
 						--sticky-sizeInline: var(--sticky4-sizeInline);
 
-						:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
+						:is(&)
+							[data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
 							--sticky-level: 5;
 
-							--sticky5-insetBlockStart: calc(var(--sticky4-insetBlockStart) + var(--sticky4-paddingBlockStart) + var(--sticky-marginBlockStart));
-							--sticky5-insetBlockEnd: calc(var(--sticky4-insetBlockEnd) + var(--sticky4-paddingBlockEnd) + var(--sticky-marginBlockEnd));
-							--sticky5-insetInlineStart: calc(var(--sticky4-insetInlineStart) + var(--sticky4-paddingInlineStart) + var(--sticky-marginInlineStart));
-							--sticky5-insetInlineEnd: calc(var(--sticky4-insetInlineEnd) + var(--sticky4-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+							--sticky5-insetBlockStart: calc(
+								var(--sticky4-insetBlockStart) + var(--sticky4-paddingBlockStart) +
+									var(--sticky-marginBlockStart)
+							);
+							--sticky5-insetBlockEnd: calc(
+								var(--sticky4-insetBlockEnd) + var(--sticky4-paddingBlockEnd) +
+									var(--sticky-marginBlockEnd)
+							);
+							--sticky5-insetInlineStart: calc(
+								var(--sticky4-insetInlineStart) + var(--sticky4-paddingInlineStart) +
+									var(--sticky-marginInlineStart)
+							);
+							--sticky5-insetInlineEnd: calc(
+								var(--sticky4-insetInlineEnd) + var(--sticky4-paddingInlineEnd) +
+									var(--sticky-marginInlineEnd)
+							);
 
 							--sticky5-paddingBlockStart: var(--sticky-paddingBlockStart);
 							--sticky5-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 							--sticky5-paddingInlineStart: var(--sticky-paddingInlineStart);
 							--sticky5-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
-							--sticky5-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky5-insetBlockStart) - var(--sticky5-insetBlockEnd));
-							--sticky5-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky5-insetInlineStart) - var(--sticky5-insetInlineEnd));
+							--sticky5-sizeBlock: calc(
+								var(--scrollContainer-sizeBlock) - var(--sticky5-insetBlockStart) -
+									var(--sticky5-insetBlockEnd)
+							);
+							--sticky5-sizeInline: calc(
+								var(--scrollContainer-sizeInline) - var(--sticky5-insetInlineStart) -
+									var(--sticky5-insetInlineEnd)
+							);
 
 							--sticky-insetBlockStart: var(--sticky5-insetBlockStart);
 							--sticky-insetBlockEnd: var(--sticky5-insetBlockEnd);
@@ -1595,7 +1622,6 @@ ol {
 			}
 		}
 	}
-
 
 	/**
 	 * Sticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.
@@ -1640,7 +1666,7 @@ ol {
 		/* Rules */
 		isolation: isolate;
 
-		&:has(> [data-scroll-item~="inline-attached"]) {
+		&:has(> [data-scroll-item~='inline-attached']) {
 			inline-size: min-content;
 			min-inline-size: var(--sticky-sizeInline);
 		}
@@ -1681,7 +1707,7 @@ ol {
 		 */
 		[data-sticky] {
 			/* Inputs */
-			--sticky-backgroundColor: light-dark(#F8EDFF, #130a2b3c);
+			--sticky-backgroundColor: light-dark(#f8edff, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
 
 			&[data-card] {
@@ -1694,56 +1720,56 @@ ol {
 
 			position: sticky;
 
-			&:not(
-				[data-sticky~="block"],
-				[data-sticky~="inline"]
-			),
-			&[data-sticky~="block"] {
+			&:not([data-sticky~='block'], [data-sticky~='inline']),
+			&[data-sticky~='block'] {
 				inset-block-start: var(--sticky-insetBlockStart);
 				inset-block-end: var(--sticky-insetBlockEnd);
 
-				max-block-size: calc(var(--scrollContainer-sizeBlock) - var(--sticky-insetBlockStart) - var(--sticky-insetBlockEnd));
+				max-block-size: calc(
+					var(--scrollContainer-sizeBlock) - var(--sticky-insetBlockStart) -
+						var(--sticky-insetBlockEnd)
+				);
 
-				&[data-sticky~="block-start"] {
+				&[data-sticky~='block-start'] {
 					inset-block-end: auto;
 				}
 
-				&[data-sticky~="block-end"] {
+				&[data-sticky~='block-end'] {
 					inset-block-start: auto;
 				}
 			}
-			&:not(
-				[data-sticky~="block"],
-				[data-sticky~="inline"]
-			),
-			&[data-sticky~="inline"] {
+			&:not([data-sticky~='block'], [data-sticky~='inline']),
+			&[data-sticky~='inline'] {
 				inset-inline-start: var(--sticky-insetInlineStart);
 				inset-inline-end: var(--sticky-insetInlineEnd);
 
-				max-inline-size: calc(var(--scrollContainer-sizeInline) - var(--sticky-insetInlineStart) - var(--sticky-insetInlineEnd));
+				max-inline-size: calc(
+					var(--scrollContainer-sizeInline) - var(--sticky-insetInlineStart) -
+						var(--sticky-insetInlineEnd)
+				);
 
-				&[data-sticky~="inline-start"] {
+				&[data-sticky~='inline-start'] {
 					inset-inline-end: auto;
 				}
 
-				&[data-sticky~="inline-end"] {
+				&[data-sticky~='inline-end'] {
 					inset-inline-start: auto;
 				}
 			}
 
-			&:not([data-sticky~="backdrop-none"]) {
-				&[data-sticky~="backdrop-always"] {
-					&[data-sticky~="backdrop-self"],
-					&[data-sticky~="backdrop-before"]::before,
-					&[data-sticky~="backdrop-after"]::after {
+			&:not([data-sticky~='backdrop-none']) {
+				&[data-sticky~='backdrop-always'] {
+					&[data-sticky~='backdrop-self'],
+					&[data-sticky~='backdrop-before']::before,
+					&[data-sticky~='backdrop-after']::after {
 						background-color: var(--sticky-backgroundColor);
 						backdrop-filter: var(--sticky-backdropFilter);
 					}
 				}
-				&[data-sticky~="backdrop-stuck"] {
-					&[data-sticky~="backdrop-self"],
-					&[data-sticky~="backdrop-before"]::before,
-					&[data-sticky~="backdrop-after"]::after {
+				&[data-sticky~='backdrop-stuck'] {
+					&[data-sticky~='backdrop-self'],
+					&[data-sticky~='backdrop-before']::before,
+					&[data-sticky~='backdrop-after']::after {
 						@container not scroll-state(stuck: none) {
 							background-color: var(--sticky-backgroundColor);
 							backdrop-filter: var(--sticky-backdropFilter);
@@ -1756,9 +1782,9 @@ ol {
 					}
 				}
 
-				&[data-sticky~="backdrop-self"],
-				&[data-sticky~="backdrop-before"]::before,
-				&[data-sticky~="backdrop-after"]::after {
+				&[data-sticky~='backdrop-self'],
+				&[data-sticky~='backdrop-before']::before,
+				&[data-sticky~='backdrop-after']::after {
 					transition-property: background-color, backdrop-filter;
 
 					@media (prefers-reduced-transparency: reduce) {
@@ -1766,8 +1792,8 @@ ol {
 					}
 				}
 
-				&[data-sticky~="backdrop-before"]::before,
-				&[data-sticky~="backdrop-after"]::after {
+				&[data-sticky~='backdrop-before']::before,
+				&[data-sticky~='backdrop-after']::after {
 					content: '';
 					z-index: -1;
 					position: absolute;
@@ -1776,7 +1802,6 @@ ol {
 				}
 			}
 		}
-
 
 		/**
 		 * Scroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.
@@ -1809,11 +1834,20 @@ ol {
 		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`
 		 */
 		[data-scroll-item] {
-			&[data-scroll-item~="inline-detached"] {
+			&[data-scroll-item~='inline-detached'] {
 				/* Rules */
-				--scrollItem-paddingInlineStart: max(var(--scrollItem-inlineDetached-paddingStart), (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2);
-				--scrollItem-paddingInlineEnd: max(var(--scrollItem-inlineDetached-paddingEnd), (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2);
-				--scrollItem-paddingInlineMatch: min(var(--scrollItem-paddingInlineStart), var(--scrollItem-paddingInlineEnd));
+				--scrollItem-paddingInlineStart: max(
+					var(--scrollItem-inlineDetached-paddingStart),
+					(var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2
+				);
+				--scrollItem-paddingInlineEnd: max(
+					var(--scrollItem-inlineDetached-paddingEnd),
+					(var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2
+				);
+				--scrollItem-paddingInlineMatch: min(
+					var(--scrollItem-paddingInlineStart),
+					var(--scrollItem-paddingInlineEnd)
+				);
 
 				position: sticky;
 				inset-inline-start: var(--sticky-insetInlineStart);
@@ -1828,69 +1862,76 @@ ol {
 					--sticky-paddingInlineEnd: var(--scrollItem-paddingInlineEnd);
 				}
 
-				&[data-scroll-item~="padding-match-start"] {
-					padding-block-start: min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchStart));
+				&[data-scroll-item~='padding-match-start'] {
+					padding-block-start: min(
+						var(--scrollItem-paddingInlineMatch),
+						var(--scrollItem-inlineDetached-maxPaddingMatchStart)
+					);
 				}
 
-				&[data-scroll-item~="padding-match-end"] {
-					padding-block-end: min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchEnd));
+				&[data-scroll-item~='padding-match-end'] {
+					padding-block-end: min(
+						var(--scrollItem-paddingInlineMatch),
+						var(--scrollItem-inlineDetached-maxPaddingMatchEnd)
+					);
 				}
 
-				[data-scroll-item~="inline-detached"] {
+				[data-scroll-item~='inline-detached'] {
 					inline-size: auto;
-					max-inline-size: calc(100% + var(--scrollItem-paddingInlineStart) + var(--scrollItem-paddingInlineEnd));
+					max-inline-size: calc(
+						100% + var(--scrollItem-paddingInlineStart) + var(--scrollItem-paddingInlineEnd)
+					);
 					margin-inline-start: calc(-1 * var(--scrollItem-paddingInlineStart));
 					margin-inline-end: calc(-1 * var(--scrollItem-paddingInlineEnd));
 				}
 			}
-			&[data-scroll-item~="inline-attached"] {
+			&[data-scroll-item~='inline-attached'] {
 				display: grid;
 				inline-size: max-content;
 				min-inline-size: var(--sticky-sizeInline);
 
-				&[data-scroll-item~="underflow-start"] {
+				&[data-scroll-item~='underflow-start'] {
 					justify-content: safe start;
 				}
-				&[data-scroll-item~="underflow-center"] {
+				&[data-scroll-item~='underflow-center'] {
 					justify-content: safe center;
 				}
-				&[data-scroll-item~="underflow-end"] {
+				&[data-scroll-item~='underflow-end'] {
 					justify-content: safe end;
 				}
 
-				&[data-scroll-item~="overflow-start"] {
+				&[data-scroll-item~='overflow-start'] {
 					position: sticky;
 					inset-inline-end: var(--sticky-insetInlineEnd);
 					margin-inline-start: auto;
 				}
-				&[data-scroll-item~="overflow-center"] {
+				&[data-scroll-item~='overflow-center'] {
 					margin-inline: auto;
 				}
-				&[data-scroll-item~="overflow-end"] {
+				&[data-scroll-item~='overflow-end'] {
 					position: sticky;
 					inset-inline-start: var(--sticky-insetInlineStart);
 					margin-inline-end: auto;
 				}
 			}
 
-			&[data-scroll-item~="snap-block-start"] {
+			&[data-scroll-item~='snap-block-start'] {
 				scroll-snap-align: start;
 			}
-			&[data-scroll-item~="snap-block-end"] {
+			&[data-scroll-item~='snap-block-end'] {
 				scroll-snap-align: end;
 			}
 
-			&[data-scroll-item~="block-size-max"] {
+			&[data-scroll-item~='block-size-max'] {
 				block-size: max-content;
 			}
 
-			&[data-scroll-item~="inline-size-max"] {
+			&[data-scroll-item~='inline-size-max'] {
 				inline-size: max-content;
 			}
 		}
 	}
 }
-
 
 /**
  * Shared disclosure / accordion styling for native `<details>` and optional `[data-collapsible]` wrappers. Disclosure animation and summary chevron apply to `<details>`. `[data-collapsible]` documents the hook and can mark optional wrappers if you add them in markup.
@@ -1948,10 +1989,10 @@ details {
 		cursor: zoom-in;
 
 		@container (inline-size < 42ch) {
-			&:has(> :only-child[data-row~="wrap"]) {
+			&:has(> :only-child[data-row~='wrap']) {
 				justify-content: end;
 
-				> :only-child[data-row~="wrap"] {
+				> :only-child[data-row~='wrap'] {
 					display: contents;
 				}
 
@@ -2009,7 +2050,6 @@ details {
 	}
 }
 
-
 /**
  * Workarounds for unsupported features in Safari
  *
@@ -2019,16 +2059,16 @@ details {
 @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
 	[data-safari] {
 		/* @media queries not yet supported in .svg files */
-		&[data-safari~="invert-lightness"] {
+		&[data-safari~='invert-lightness'] {
 			transition-property: filter, outline-color;
 
-			:root[style*="color-scheme: dark;"] & {
+			:root[style*='color-scheme: dark;'] & {
 				filter: invert() hue-rotate(0.5turn);
 				outline-color: hsl(from var(--accent) calc(h + 0.5turn) s l);
 			}
 
 			@media (prefers-color-scheme: dark) {
-				:root:not([style*="color-scheme: light;"]) & {
+				:root:not([style*='color-scheme: light;']) & {
 					filter: invert() hue-rotate(0.5turn);
 					outline-color: hsl(from var(--accent) calc(h + 0.5turn) s l);
 				}

@@ -35,6 +35,7 @@ for test in "${TESTS[@]}"; do
 		success=false
 	fi
 done
+
 if [[ "$success" == false ]]; then
 	exit 1
 fi

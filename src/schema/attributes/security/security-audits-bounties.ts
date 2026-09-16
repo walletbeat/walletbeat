@@ -605,11 +605,6 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 				return noBugBountyProgram()
 			}
 
-			ctx.addRef(
-				bugBountyFeature,
-				isSupported(bugBountyFeature.legalProtections) ? bugBountyFeature.legalProtections : null,
-			)
-
 			return evaluateBugBountyProgram(bugBountyFeature)
 		})()
 
@@ -623,8 +618,6 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 			if (!isNonEmptyArray(auditsFeature)) {
 				return noAudits()
 			}
-
-			ctx.addRef(...auditsFeature)
 
 			const auditedInLastYear = isAuditedInLastYear(auditsFeature)
 			let hasUnaddressedFlaws = false
@@ -647,6 +640,18 @@ export const securityAuditsAndBounties: Attribute<SecurityAuditsMetadata> = {
 				securityAudits: auditsPart === 'UNRATED' ? [] : auditsPart.audits,
 			})
 		}
+
+		if (bugBountyFeature === null || auditsFeature === null) {
+			throw new Error('Rated audit and bug bounty features must be researched')
+		}
+
+		ctx.addRef(bugBountyFeature)
+
+		if (isSupported(bugBountyFeature)) {
+			ctx.addRef(bugBountyFeature.legalProtections)
+		}
+
+		ctx.addRef(...auditsFeature)
 
 		return combineEvaluation(ctx, auditsPart, bugBountyPart)
 	},
