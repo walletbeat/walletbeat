@@ -65,11 +65,12 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { EthereumL1LightClient } from '@/schema/features/security/light-client'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import type {
-	ContractTransactionWarning,
-	ScamUrlWarning,
-	SendTransactionWarning,
-	UnlimitedApprovalWarning,
+import {
+	allUnlimitedApprovalBenchmarksSupported,
+	type ContractTransactionWarning,
+	type ScamUrlWarning,
+	type SendTransactionWarning,
+	type UnlimitedApprovalWarning,
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
@@ -684,7 +685,7 @@ export const completedTemplate: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: 'ALWAYS',
+					warnsOnUnlimitedApproval: allUnlimitedApprovalBenchmarksSupported,
 				}),
 			},
 			securityBestPractices: {
