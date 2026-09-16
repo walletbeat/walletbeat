@@ -200,7 +200,7 @@ if (allMode) {
 			failures++
 			process.stderr.write(
 				`Error fetching ${occurrence.url} ` +
-					`(referenced from ${occurrence.dataFile}:${occurrence.line}): ` +
+					`(referenced from ${occurrence.walletId} at ${occurrence.fieldPath}): ` +
 					`${error instanceof Error ? error.message : String(error)}\n`,
 			)
 		}
@@ -210,13 +210,22 @@ if (allMode) {
 }
 
 if (urlArg !== undefined) {
-	const source = parseGitHubBlobUrl(urlArg)
+	let source: CodeSnippetSource
 
-	if (source === null) {
-		process.stderr.write(
-			'Error: not a commit-pinned, line-anchored GitHub blob URL.\n' +
-				'Expected: https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>[-L<last>]\n',
-		)
+	try {
+		const parsed = parseGitHubBlobUrl(urlArg)
+
+		if (typeof parsed === 'string') {
+			process.stderr.write(
+				'Error: not a commit-pinned, line-anchored GitHub blob URL.\n' +
+					'Expected: https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>[-L<last>]\n',
+			)
+			process.exit(1)
+		}
+
+		source = parsed
+	} catch (error) {
+		process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`)
 		process.exit(1)
 	}
 

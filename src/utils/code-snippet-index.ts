@@ -71,14 +71,22 @@ for (const [modulePath, rows] of Object.entries(
 
 /**
  * Resolve the stored code snippet for a reference URL, or null when the URL
- * is not a commit-pinned line-anchored GitHub blob URL or has no snippet
- * stored under `public/references/wallets/<wallet-id>/code/`
+ * is not a commit-pinned line-anchored GitHub blob URL, is a malformed
+ * attempt at one (rendering shouldn't crash over a data problem the
+ * `code-snippets-integrity` check already surfaces), or has no snippet stored
+ * under `public/references/wallets/<wallet-id>/code/`
  * (run `pnpm collect:snippets -- --all` to fetch missing ones).
  */
 export function codeSnippetForUrl(url: string): ResolvedCodeSnippet | null {
-	const source = parseGitHubBlobUrl(url)
+	let source: ReturnType<typeof parseGitHubBlobUrl>
 
-	if (source === null) {
+	try {
+		source = parseGitHubBlobUrl(url)
+	} catch {
+		return null
+	}
+
+	if (typeof source === 'string') {
 		return null
 	}
 

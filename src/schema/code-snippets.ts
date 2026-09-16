@@ -63,26 +63,36 @@ function snippetLineSuffix(source: CodeSnippetSource): string {
 	return `L${source.firstLine}-L${source.lastLine}`
 }
 
+type NotASnippetUrl = 'NOT_GITHUB_URL' | 'NOT_BLOB_URL' | 'NO_LINE_ANCHOR'
+
 /**
  * Parse a commit-pinned GitHub blob URL with a line anchor,
  * e.g. `https://github.com/org/repo/blob/<40-hex>/path/file.ts#L12-L34`.
  *
- * Returns null for anything else: non-GitHub URLs, non-blob URLs, URLs pinned
- * to a branch instead of a commit hash, URLs without a line anchor (those
- * reference a whole file, which is deliberately not stored locally), and
- * multi-range anchors such as `#L1,L5-L7`.
+ * Returns a `NotASnippetUrl` sentinel for URLs that are not even trying to be
+ * a snippet source (see `NotASnippetUrl`). Once a URL is a `/blob/...` link,
+ * anything wrong with it besides a missing line anchor — a missing file path,
+ * a branch/tag instead of a commit hash, or a nonsensical line range — throws,
+ * since a real GitHub blob link never produces those; they only come from a
+ * hand-edited or corrupted URL that needs fixing in the data.
  */
-export function parseGitHubBlobUrl(url: string): CodeSnippetSource | null {
+export function parseGitHubBlobUrl(url: string): CodeSnippetSource | NotASnippetUrl {
 	let parsed: URL
+
+	// Root-relative paths (file-based refs, resolved to "/public/some/path.pdf")
+	// are a legitimate non-GitHub reference type.
+	if (url.startsWith('/')) {
+		return 'NOT_GITHUB_URL'
+	}
 
 	try {
 		parsed = new URL(url)
 	} catch {
-		return null
+		throw new Error(`Not a valid URL: ${url}`)
 	}
 
 	if (parsed.hostname !== 'github.com' && parsed.hostname !== 'www.github.com') {
-		return null
+		return 'NOT_GITHUB_URL'
 	}
 
 	const segments = parsed.pathname
@@ -97,21 +107,22 @@ export function parseGitHubBlobUrl(url: string): CodeSnippetSource | null {
 		})
 	const [org, repo, view, ref, ...pathSegments] = segments
 
-	if (
-		org === undefined ||
-		repo === undefined ||
-		view !== 'blob' ||
-		ref === undefined ||
-		!fullCommitHashRegExp.test(ref) ||
-		pathSegments.length === 0
-	) {
-		return null
+	if (view !== 'blob') {
+		return 'NOT_BLOB_URL'
+	}
+
+	if (org === undefined || repo === undefined || ref === undefined || pathSegments.length === 0) {
+		throw new Error(`Malformed GitHub blob URL (missing org/repo/ref/path): ${url}`)
+	}
+
+	if (!fullCommitHashRegExp.test(ref)) {
+		throw new Error(`GitHub blob URL is pinned to "${ref}", not a 40-character commit hash: ${url}`)
 	}
 
 	const lineMatch = lineFragmentRegExp.exec(parsed.hash.replace(/^#/, ''))
 
 	if (lineMatch?.groups === undefined) {
-		return null
+		return 'NO_LINE_ANCHOR'
 	}
 
 	const firstLine = parseInt(lineMatch.groups.first, 10)
@@ -119,7 +130,9 @@ export function parseGitHubBlobUrl(url: string): CodeSnippetSource | null {
 		lineMatch.groups.last === undefined ? firstLine : parseInt(lineMatch.groups.last, 10)
 
 	if (firstLine < 1 || lastLine < firstLine) {
-		return null
+		throw new Error(
+			`GitHub blob URL has an invalid line range (L${firstLine}-L${lastLine}): ${url}`,
+		)
 	}
 
 	return {

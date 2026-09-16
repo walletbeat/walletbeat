@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
+import { allWallets } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
 	parseGitHubBlobUrl,
@@ -9,77 +10,49 @@ import {
 	type StoredSnippetContent,
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
+import { collectAllRefs } from '@/schema/reference'
 
 /** Lines of context stored immediately before/after the referenced range. */
 const CONTEXT_LINE_COUNT = 4
 
-/** One line-anchored, commit-pinned GitHub blob URL found in a wallet data file. */
+/** One line-anchored, commit-pinned GitHub blob URL found in a wallet's ref data. */
 export interface SnippetOccurrence {
 	walletId: string
 	source: CodeSnippetSource
-	/** The URL as written in the data file. */
+	/** The URL as written in the reference. */
 	url: string
-	/** Repository-relative path of the data file the URL appears in. */
-	dataFile: string
-	/** 1-based line number of the URL in the data file. */
-	line: number
+	/** Period-delimited field path (from the wallet root) the URL was found under. */
+	fieldPath: string
 	/** Repository-relative path of the snippet file this URL maps to. */
 	snippetPath: string
 }
 
 /**
- * Candidate GitHub URL, delimited by characters that cannot appear in one:
- * whitespace, string-literal quotes, backticks, and closing brackets.
+ * Find every line-anchored, commit-pinned GitHub blob URL among wallet data
+ * refs, paired with the wallet ID it was found under.
  */
-const gitHubUrlCandidateRegExp = /https:\/\/(?:www\.)?github\.com\/[^\s"'`<>)\]}]+/g
-
-/**
- * Find every line-anchored, commit-pinned GitHub blob URL in wallet data
- * files (`data/*-wallets/*.ts`, excluding `*.tmpl.ts` templates), paired with
- * the wallet ID derived from the data file name.
- */
-export function findSnippetOccurrences(repoRoot: string): SnippetOccurrence[] {
-	const dataDir = path.join(repoRoot, 'data')
+export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
 	const occurrences: SnippetOccurrence[] = []
 
-	const walletDirs = fs
-		.readdirSync(dataDir, { withFileTypes: true })
-		.filter(entry => entry.isDirectory() && entry.name.endsWith('-wallets'))
-		.map(entry => entry.name)
+	for (const collected of collectAllRefs(allWallets)) {
+		const walletId = allWallets[collected.walletName as keyof typeof allWallets].metadata.id
 
-	for (const walletDir of walletDirs) {
-		const dirPath = path.join(dataDir, walletDir)
-		const walletFiles = fs
-			.readdirSync(dirPath, { withFileTypes: true })
-			.filter(
-				entry => entry.isFile() && entry.name.endsWith('.ts') && !entry.name.endsWith('.tmpl.ts'),
-			)
-			.map(entry => entry.name)
+		for (const fq of collected.fullyQualifiedRefs) {
+			for (const urlEntry of fq.urls) {
+				const source = parseGitHubBlobUrl(urlEntry.url)
 
-		for (const walletFile of walletFiles) {
-			const walletId = walletFile.slice(0, -'.ts'.length)
-			const dataFile = `data/${walletDir}/${walletFile}`
-			const contents = fs.readFileSync(path.join(dirPath, walletFile), 'utf8')
-
-			contents.split('\n').forEach((lineText, lineIndex) => {
-				for (const match of lineText.matchAll(gitHubUrlCandidateRegExp)) {
-					const url = match[0]
-					const source = parseGitHubBlobUrl(url)
-
-					if (source === null) {
-						continue
-					}
-
-					occurrences.push({
-						dataFile,
-						line: lineIndex + 1,
-						snippetPath: snippetRelativePath(walletId, source),
-						source,
-						url,
-						walletId,
-					})
+				if (typeof source === 'string') {
+					continue
 				}
-			})
+
+				occurrences.push({
+					fieldPath: collected.fieldPath,
+					snippetPath: snippetRelativePath(walletId, source),
+					source,
+					url: urlEntry.url,
+					walletId,
+				})
+			}
 		}
 	}
 
@@ -401,7 +374,7 @@ export function checkSnippets(repoRoot: string): SnippetProblem[] {
 			problems.push({
 				issue:
 					`No stored snippet for ${occurrence.url} ` +
-					`(referenced from ${occurrence.dataFile}:${occurrence.line}).`,
+					`(referenced from ${occurrence.walletId} at ${occurrence.fieldPath}).`,
 				kind: SnippetProblemKind.MISSING_SNIPPET,
 				snippetPath,
 			})
