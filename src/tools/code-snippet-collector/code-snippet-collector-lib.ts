@@ -59,9 +59,19 @@ export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
 	return occurrences
 }
 
-/** Length of a line's leading whitespace, used as its indentation. */
-function indentationOf(line: string): number {
-	return /^[ \t]*/.exec(line)?.[0].length ?? 0
+/** A line's leading whitespace, used as its indentation. */
+function indentationOf(line: string): string {
+	return /^[ \t]*/.exec(line)?.[0] ?? ''
+}
+
+/**
+ * Whether `indent` is a shallower indentation that properly encloses
+ * `relativeTo`, i.e. `relativeTo`'s indentation actually starts with
+ * `indent`'s whitespace rather than merely being numerically shorter (which
+ * tabs/spaces mixing could otherwise make misleading).
+ */
+function isShallowerIndent(indent: string, relativeTo: string): boolean {
+	return indent.length < relativeTo.length && commonWhitespacePrefix(indent, relativeTo) === indent
 }
 
 /**
@@ -129,11 +139,11 @@ function findMultiLineStatementStart(lines: string[], endLine: number): number {
  * so e.g. a function's whole wrapped signature is captured, not just its
  * closing `): ReturnType => {` line.
  */
-function findScopeHeaderLines(lines: string[], belowLine: number, startIndent: number): number[] {
+function findScopeHeaderLines(lines: string[], belowLine: number, startIndent: string): number[] {
 	const headerLines: number[] = []
 	let minIndent = startIndent
 
-	for (let lineNumber = belowLine - 1; lineNumber >= 1 && minIndent > 0; lineNumber--) {
+	for (let lineNumber = belowLine - 1; lineNumber >= 1 && minIndent !== ''; lineNumber--) {
 		const line = lines[lineNumber - 1]
 		const trimmed = line.trim()
 
@@ -143,7 +153,7 @@ function findScopeHeaderLines(lines: string[], belowLine: number, startIndent: n
 
 		const indent = indentationOf(line)
 
-		if (indent < minIndent) {
+		if (isShallowerIndent(indent, minIndent)) {
 			const start = continuationLineRegExp.test(trimmed)
 				? findMultiLineStatementStart(lines, lineNumber)
 				: lineNumber
@@ -203,7 +213,7 @@ export function buildSnippetContent(fileText: string, source: CodeSnippetSource)
 	const firstNonBlankLine = lines
 		.slice(contextStart - 1, contextEnd)
 		.find(line => line.trim() !== '')
-	const startIndent = firstNonBlankLine === undefined ? 0 : indentationOf(firstNonBlankLine)
+	const startIndent = firstNonBlankLine === undefined ? '' : indentationOf(firstNonBlankLine)
 
 	const headerLines = findScopeHeaderLines(lines, contextStart, startIndent)
 
