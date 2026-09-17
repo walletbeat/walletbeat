@@ -67,3 +67,47 @@ Ambire supports basic calldata display and EIP-712 signing, but there are still 
 ✗ No ERC-8213 digest display
 
 There’s room to make transactions more transparent and verifiable.
+
+---
+
+What are the gaps in Ambire’s security?
+
+• Chain verification
+• Security best practices
+• Account recovery
+
+Let’s break them down 🧵
+
+
+---
+
+Chain verification
+
+Ambire does not independently verify the integrity of Ethereum L1 when retrieving chain state or simulating transactions.
+
+This means users rely on external providers for blockchain state, introducing a trust assumption that could potentially result in users signing transactions with unintended effects.
+
+
+---
+
+**Security best practices**
+
+Ambire uses standardized key-storage mechanisms and OS CSPRNG.
+
+However, its browser extension hardening could be improved.
+
+Ambire currently allows any installed extension to connect through `externally_connectable = ["*"]`.
+
+This means a malicious extension could potentially send wallet requests directly to Ambire.
+
+---
+
+Account recovery
+
+Ambire does not currently support guardian-based recovery.
+
+It also does not provide recovery checks such as periodic private-key or seed-phrase verification.
+
+These mechanisms can help users verify that their recovery credentials are still accessible before they actually need them.
+
+---
