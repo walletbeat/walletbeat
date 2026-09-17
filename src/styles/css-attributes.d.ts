@@ -315,6 +315,7 @@ declare global {
 		 * ### CSS Variables
 		 * - `--text-primary`
 		 * - `--accent`
+		 * - `--accent-textColor` — opt-in override. Set it alongside `--accent` on any element that scopes `--accent` to a large fill (rating blobs, icons, borders); links inside then use this legible variant instead of blending with the fill.
 		 *
 		 * ### Examples
 		 * - Default link (`<a>` — no `[data-link]`):
