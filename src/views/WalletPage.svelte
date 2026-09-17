@@ -53,7 +53,7 @@
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
-	import { toFullyQualified } from '@/schema/reference'
+	import { mergeRefs, toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletStageAndLadder } from '@/utils/stage'
@@ -337,6 +337,28 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
+	const allPageReferences = $derived.by(() => {
+		const refs = Object.values(attributeTree).flatMap(attrGroup => {
+			const evalGroup = evalTree[attrGroup.id]
+
+			if (!evalGroup) {
+				return []
+			}
+
+			return attrGroup.attributes.flatMap(({ attribute }) => {
+				const evalAttr = evalGroup[attribute.id]
+
+				if (evalAttr === undefined || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) {
+					return []
+				}
+
+				return toFullyQualified(evalAttr.evaluation.references)
+			})
+		})
+
+		return mergeRefs(...refs)
+	})
+
 
 	// Components
 	import { Github, Globe } from 'lucide-static'
@@ -349,6 +371,7 @@
 	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
+	import DataSourceCredits from '@/views/DataSourceCredits.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
@@ -651,6 +674,12 @@
 				})}
 			{/if}
 		{/each}
+
+		{#if allPageReferences.length > 0}
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<DataSourceCredits references={allPageReferences} />
+			</div>
+		{/if}
 
 		{#if walletNews.length > 0 && newsIsVeryStale}
 			<hr />

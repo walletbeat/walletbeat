@@ -59,6 +59,10 @@
 		"hash": "d451b6ab3368559fc2d6c03e89668bf745e91fc8417150c44ab7b11076c088e9",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
 	},
+	"public/images/entities/coinspect.svg": {
+		"hash": "306306a0df86401ff5efded77f81728185beecb432e84c58a1c1a54c483ce4c2",
+		"passedTests": ["svg-optimized", "svg-vector"]
+	},
 	"public/images/entities/consensys.svg": {
 		"hash": "abf592c0ebf3188511b275c654ce1b91927488621a071a5967fdeb13286558fb",
 		"passedTests": ["file-format", "svg-optimized", "svg-vector"]
