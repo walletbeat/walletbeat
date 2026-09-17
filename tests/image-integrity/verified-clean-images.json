@@ -967,6 +967,30 @@
 		"hash": "348f2cbc4221ca5f3ed2bb51de4342a4a04cb7f9b93a0fb236392fb1e4f7d6d8",
 		"passedTests": ["blockiness"]
 	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/hardware-wallet-support.png": {
+		"hash": "e6169d56955964189aecfa701b8bcbedd56dab85584c02fc0bb86c836ad512d6",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/security-attribute.png": {
+		"hash": "5781f255fdc75c5e868e433288956914b2e64a72515e5383486a1240869f1288",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/security-audits.png": {
+		"hash": "e43b6593c5c907567c6a485724175164126285c54f705c0189c836e1ffb52d95",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/transaction-legibility.png": {
+		"hash": "f3b86e42ebae55aafacd6e26666c454c0c95ef263c6cf1847fb90609f80f722b",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/walletbeat-cta.png": {
+		"hash": "fdb0787d4413fad3b03da44f53f765065edf139b62bf0a87ca5ec6a14c9002a5",
+		"passedTests": ["blockiness"]
+	},
+	"resources/files/social-media/threads/2026-09-16 - Security Attribute Deep Dive/walletbeat-five-categories.png": {
+		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
+		"passedTests": ["blockiness"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["svg-vector", "wbicon-square"]

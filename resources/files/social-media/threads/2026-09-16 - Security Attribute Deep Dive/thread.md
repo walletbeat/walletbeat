@@ -12,7 +12,7 @@ A Walletbeat thread 🧵
 
 Transaction legibility 🫆
 
-This means that as a user you should be able to understand what the transaction you're about to sign is going to do, before you sign it. 
+This means that, as a user, you should be able to understand what the transaction you're about to sign will do before you sign it.
 
 ![Transaction Legibility](./transaction-legibility.png)
 ---
@@ -27,7 +27,7 @@ The @ethereumfndn has launched the Clear Signing Initiative as a result of this 
 
 Scam Alerting 🚨
 
-Wallets have a responsability for alerting the users if they'are about to do something that looks deceitful, through a variety of heuristics. 
+Wallets have a responsibility to alert users if they are about to do something that looks deceitful, using a variety of heuristics. 
 
 Does the wallet warn the user about potential scams?
 
@@ -63,7 +63,7 @@ This combination offers the best of both worlds: a user-friendly interface with 
 
 Security Audits 
 
-Has the wallet's source code been been reviewed by security auditors, and does the wallet maintain an active bug bounty program?
+Has the wallet's source code been reviewed by security auditors?
 
 Wallets are high-stakes pieces of software that deal with sensitive user data and funds. 
 
