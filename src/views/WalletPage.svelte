@@ -1083,13 +1083,15 @@
 							/>
 						</div>
 					{/if}
-					{#if override?.note !== undefined}
+				</li>
+				{#if override?.note !== undefined}
+					<li data-list-item="gap-3" data-list-item-marker="👉">
 						<Typography
 							content={override.note}
 							strings={getWalletEvalStrings(wallet)}
 						/>
-					{/if}
-				</li>
+					</li>
+				{/if}
 			</ul>
 
 			{#if variantSpecificCaption}
