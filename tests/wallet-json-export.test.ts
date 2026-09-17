@@ -14,11 +14,8 @@ import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import {
-	ratedWalletJsonExport,
-	serializeReferences,
-	stageToExportString,
-} from '@/utils/wallet-json-export'
+import { serializeReferences } from '@/utils/structured-details/json'
+import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
 
 import { RatedWalletExportValidator } from './utils/assert-valid-json'
 

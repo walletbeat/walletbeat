@@ -553,7 +553,7 @@ export const completedTemplate: SoftwareWallet = {
 					ref: refTodo,
 					minimumGuardianPolicy: {
 						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-						descriptionMarkdown:
+						description:
 							'The recovery secret is split across three guardians. Any two of them can help recover the account.',
 						optionalGuardians: [
 							{

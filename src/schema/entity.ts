@@ -1,6 +1,7 @@
+import { type InlineSpan, inlineStrong } from '@/types/content/inline'
 import { commaListFormat } from '@/types/utils/text'
 
-import { type DomainUrl, isUrl, markdownUrlLink, type Url } from './url'
+import { type DomainUrl, getUrl, isUrl, markdownUrlLink, type Url } from './url'
 
 export enum EntityType {
 	chainDataProvider = 'chainDataProvider',
@@ -101,6 +102,14 @@ export type OffchainDataProvider = EntityWithType<EntityType.offchainDataProvide
 export type TransactionBroadcastProvider = EntityWithType<EntityType.transactionBroadcastProvider>
 export type SecurityAuditor = EntityWithType<EntityType.securityAuditor>
 export type WalletDeveloper = EntityWithType<EntityType.walletDeveloper>
+
+export function entityInlineLink(entity: Entity): InlineSpan {
+	const url = entityUrl(entity)
+
+	return url === null
+		? inlineStrong(entity.name)
+		: { kind: 'link', text: entity.name, url: getUrl(url), strong: true }
+}
 
 /**
  * A Markdown link to an Entity.

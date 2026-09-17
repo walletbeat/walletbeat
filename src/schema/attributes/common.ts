@@ -5,7 +5,6 @@ import {
 	type Sentence,
 	sentence,
 } from '@/types/content'
-import { unratedAttributeContent } from '@/types/content/unrated-attribute'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -47,7 +46,8 @@ export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 			shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
 			...(metadata && { metadata }),
 		} as unknown as Outcome<_OutcomeMetadata>,
-		details: unratedAttributeContent<_OutcomeMetadata>(),
+		// Unrated attributes carry no details: the rating, summary and methodology
+		// say everything. The web view adds a contribution call to action as UI chrome.
 	}
 }
 

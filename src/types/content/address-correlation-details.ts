@@ -1,29 +1,120 @@
-import type { EvaluationData } from '@/schema/attributes'
-import type {
-	AddressCorrelationMetadata,
-	WalletAddressLinkableBy,
-} from '@/schema/attributes/privacy/address-correlation'
+import type { Entity } from '@/schema/entity'
+import {
+	compareUserInfo,
+	type UserInfo,
+	userInfoName,
+} from '@/schema/features/privacy/data-collection'
+import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference'
+import { getUrl, isUrl } from '@/schema/url'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
-import { component, type Content } from '../content'
-import type { NonEmptyArray } from '../utils/non-empty'
+/**
+ * Who can correlate a wallet address with personal information.
+ * `onchain` means the association is published on a public chain.
+ */
+export type AddressCorrelationSource = { kind: 'onchain' } | { kind: 'entity'; entity: Entity }
 
-export interface AddressCorrelationDetailsProps extends EvaluationData<AddressCorrelationMetadata> {
-	linkables: NonEmptyArray<WalletAddressLinkableBy>
+export interface AddressCorrelationLeak {
+	source: AddressCorrelationSource
+
+	/** The correlated personal information, deduplicated and ordered worst-first. */
+	correlatedInfo: NonEmptyArray<UserInfo>
+
+	references: FullyQualifiedReference[]
 }
 
-export interface AddressCorrelationDetailsContent {
-	component: 'AddressCorrelationDetails'
-	componentProps: AddressCorrelationDetailsProps
+export interface AddressCorrelationDetails {
+	type: 'addressCorrelation'
+	leaks: AddressCorrelationLeak[]
 }
 
-export function addressCorrelationDetailsContent(
-	bakedProps: Omit<
-		AddressCorrelationDetailsProps,
-		keyof EvaluationData<AddressCorrelationMetadata>
-	>,
-): Content<{ WALLET_NAME: string }> {
-	return component<AddressCorrelationDetailsContent, keyof typeof bakedProps>(
-		'AddressCorrelationDetails',
-		bakedProps,
+export interface AddressCorrelationLinkable {
+	info: UserInfo
+	by: Entity | 'onchain'
+	refs: FullyQualifiedReference[]
+}
+
+function sourceKey(by: Entity | 'onchain'): string {
+	return by === 'onchain' ? 'onchain' : `entity:${by.id}`
+}
+
+/**
+ * Build the canonical address-correlation details.
+ *
+ * Sources keep the order in which their worst leak appears, onchain records
+ * last, matching how the evaluation ranks severity.
+ */
+export function buildAddressCorrelationDetails(
+	linkables: NonEmptyArray<AddressCorrelationLinkable>,
+): AddressCorrelationDetails {
+	const sorted = [...linkables].sort((linkableA, linkableB) =>
+		linkableA.by === 'onchain'
+			? 1
+			: linkableB.by === 'onchain'
+				? -1
+				: compareUserInfo(linkableA.info, linkableB.info),
 	)
+	const bySource = new Map<string, AddressCorrelationLinkable[]>()
+
+	for (const linkable of sorted) {
+		const key = sourceKey(linkable.by)
+		const forSource = bySource.get(key)
+
+		if (forSource === undefined) {
+			bySource.set(key, [linkable])
+		} else {
+			forSource.push(linkable)
+		}
+	}
+
+	const leaks: AddressCorrelationLeak[] = []
+
+	for (const forSource of bySource.values()) {
+		const [first, ...rest] = forSource
+		const correlatedInfo: NonEmptyArray<UserInfo> = [first.info]
+
+		for (const linkable of rest) {
+			if (!correlatedInfo.includes(linkable.info)) {
+				correlatedInfo.push(linkable.info)
+			}
+		}
+
+		leaks.push({
+			source: first.by === 'onchain' ? { kind: 'onchain' } : { kind: 'entity', entity: first.by },
+			correlatedInfo,
+			references: mergeRefs(...forSource.flatMap(linkable => linkable.refs)),
+		})
+	}
+
+	return { type: 'addressCorrelation', leaks }
+}
+
+export function correlatedInfoNames(leak: AddressCorrelationLeak): string[] {
+	return leak.correlatedInfo.map(info => userInfoName(info).long)
+}
+
+export const addressCorrelationIntro =
+	'By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:'
+
+function joinedList(items: string[]): string {
+	if (items.length <= 1) {
+		return items.join('')
+	}
+
+	return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+}
+
+export function addressCorrelationLeakSentence(leak: AddressCorrelationLeak): string {
+	const info = `**${joinedList(correlatedInfoNames(leak))}**`
+
+	if (leak.source.kind === 'onchain') {
+		return `An onchain record permanently associates your ${info} with your wallet address.`
+	}
+
+	const { entity } = leak.source
+	const privacyPolicy = isUrl(entity.privacyPolicy)
+		? ` ([Privacy policy](${getUrl(entity.privacyPolicy)}))`
+		: ''
+
+	return `**${entity.name}**${privacyPolicy} may link your wallet address to your ${info}.`
 }

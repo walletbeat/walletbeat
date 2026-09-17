@@ -1,19 +1,42 @@
-import type { EvaluationData } from '@/schema/attributes'
-import type { Monetization } from '@/schema/features/transparency/monetization'
+import {
+	type Monetization,
+	monetizationStrategies,
+	MonetizationStrategy,
+	monetizationStrategyIsUserAligned,
+	monetizationStrategyName,
+} from '@/schema/features/transparency/monetization'
 
-import { component, type Content } from '../content'
+export interface FundingStrategyDetail {
+	strategy: MonetizationStrategy
 
-export interface FundingDetailsProps extends EvaluationData {
-	monetization: Monetization
+	userAligned: boolean
 }
 
-export interface FundingDetailsContent {
-	component: 'FundingDetails'
-	componentProps: FundingDetailsProps
+export interface FundingDetails {
+	type: 'funding'
+	strategies: FundingStrategyDetail[]
+
+	revenueBreakdownIsPublic: boolean
 }
 
-export function fundingDetailsContent(
-	bakedProps: Omit<FundingDetailsProps, keyof EvaluationData>,
-): Content<{ WALLET_NAME: string }> {
-	return component<FundingDetailsContent, keyof typeof bakedProps>('FundingDetails', bakedProps)
+export function buildFundingDetails(monetization: Monetization): FundingDetails {
+	return {
+		type: 'funding',
+		strategies: monetizationStrategies(monetization)
+			.filter(({ value }) => value === true)
+			.map(({ strategy }) => ({
+				strategy,
+				userAligned: monetizationStrategyIsUserAligned(strategy),
+			})),
+		revenueBreakdownIsPublic: monetization.revenueBreakdownIsPublic,
+	}
+}
+
+export function fundingSentence(details: FundingDetails): string {
+	const sources =
+		details.strategies.length === 0
+			? 'unknown sources'
+			: details.strategies.map(({ strategy }) => monetizationStrategyName(strategy)).join(', ')
+
+	return `**{{WALLET_NAME}}** is funded by **${sources}**.`
 }
