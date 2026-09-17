@@ -16,7 +16,12 @@ import {
 import { StageCriterionRating, stageCriterionRatings } from '@/schema/stages'
 import { getUrl, gitCommitRefPinRegExp, isUrl } from '@/schema/url'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
-import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
+import {
+	getAttributeOverride,
+	type RatedWallet,
+	type ResolvedWallet,
+	VariantSpecificity,
+} from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
@@ -247,6 +252,15 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 
 				if (details.trim() !== '') {
 					parts.push(details, '')
+				}
+
+				const note = getAttributeOverride(wallet, attrGroup.id, attribute.id)?.note
+
+				if (note !== undefined) {
+					parts.push(
+						normalizeMarkdownBlankLines(renderContentToText(note, evalStrings, { trim: true })),
+						'',
+					)
 				}
 
 				if (evaluation.impact !== undefined) {
