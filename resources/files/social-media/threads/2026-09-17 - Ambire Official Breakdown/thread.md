@@ -194,3 +194,46 @@ Orderflow transparency
 Ambire doesn’t auction orderflow by default, but pre-inclusion transaction data is sent to Ambire, Pimlico and Biconomy through endpoints that aren’t documented and independently verifiable as non-extractive.
 
 Documenting and independently verifying these endpoints—or keeping this data local by default—would improve transparency.
+
+----
+
+What’s good about Ambire’s ecosystem interoperability?
+
+- Account Abstraction via ERC-4337 & EIP-7702
+- Browser integration standards
+- Atomic transaction batching
+- Hardware wallet interoperability
+
+Ambire is well aligned with several emerging Ethereum wallet standards.
+
+---
+
+What could be better about Ambire’s ecosystem interoperability?
+
+- Chain abstraction
+- Address resolution
+
+Let's break it down
+
+---
+
+Chain abstraction
+
+Ambire shows total portfolio value across chains, but doesn’t aggregate balances for individual tokens.
+
+For example, users can’t see their total USDC balance across multiple chains in one place.
+
+Aggregating token balances across chains would make multi-chain management simpler.
+
+---
+
+Address resolution
+
+Ambire supports human-readable ENS addresses such as `username.eth`.
+
+However, it doesn’t support chain-specific address formats such as:
+
+`user@l2chain.eth`
+`user.eth:l2chain`
+
+Adding support for chain-specific addresses could make cross-chain payments easier and reduce ambiguity about where funds are being sent.
