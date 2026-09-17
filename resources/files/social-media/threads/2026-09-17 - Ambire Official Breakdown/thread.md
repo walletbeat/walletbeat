@@ -111,3 +111,86 @@ It also does not provide recovery checks such as periodic private-key or seed-ph
 These mechanisms can help users verify that their recovery credentials are still accessible before they actually need them.
 
 ---
+
+What’s good about Ambire’s self-sovereignty?
+
+Ambire gives users strong control over their accounts.
+
+- L1 Provider Independence
+- Account portability
+- Account unruggability
+
+These reduce dependence on Ambire and help prevent account lock-in.
+
+---
+
+
+What could be better about Ambire’s self-sovereignty?
+
+- Transaction inclusion
+- Permissions management
+
+Let's break it down
+
+---
+
+Transaction inclusion
+
+Ambire requires users to trust intermediaries when withdrawing funds from L2s.
+
+Walletbeat recommends supporting force-withdrawal transactions that can be created and broadcast directly on Ethereum L1.
+
+This would reduce reliance on intermediaries when exiting an L2.
+
+---
+
+Permissions management
+
+Ambire currently doesn’t provide token approval management.
+
+Users cannot inspect or revoke their existing ERC-20, ERC-721 or ERC-1155 approvals from the wallet.
+
+Adding approval management would give users more control over permissions they’ve granted.
+
+
+---
+
+What’s good about Ambire’s transparency?
+
+Ambire is:
+
+- Open source under GPL-3.0
+- Transparent about its funding
+- Transparent about transaction fees
+
+It also publicly discloses how transaction data is handled before inclusion onchain.
+
+---
+
+What could be better about Ambire’s transparency?
+
+- Release process
+- Orderflow transparency
+
+Let's break it down
+
+----
+
+Release process
+
+Ambire has a public changelog and uses dependency locking.
+
+However, it doesn't currently use:
+
+- Artifact signing
+- Reproducible or hermetic builds
+
+Adding these would make it easier for users and independent parties to verify that released software corresponds to the published source.
+
+---
+
+Orderflow transparency
+
+Ambire doesn’t auction orderflow by default, but pre-inclusion transaction data is sent to Ambire, Pimlico and Biconomy through endpoints that aren’t documented and independently verifiable as non-extractive.
+
+Documenting and independently verifying these endpoints—or keeping this data local by default—would improve transparency.
