@@ -1084,6 +1084,14 @@
 						</div>
 					{/if}
 				</li>
+				{#if override?.note !== undefined}
+					<li data-list-item="gap-3" data-list-item-marker="👉">
+						<Typography
+							content={override.note}
+							strings={getWalletEvalStrings(wallet)}
+						/>
+					</li>
+				{/if}
 			</ul>
 
 			{#if variantSpecificCaption}
@@ -1276,7 +1284,7 @@
 								strings={getWalletEvalStrings(wallet)}
 							/>
 
-							{#if override}
+							{#if override?.howToImprove !== undefined}
 								<div class="note" data-card="padding-3" data-row="gap-4">
 									<div class="icon">ℹ️</div>
 									<p>
