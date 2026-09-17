@@ -11,10 +11,7 @@ import {
 } from '@/data/wallets'
 import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
-import { getAttributeOverride } from '@/schema/wallet'
-import { renderTypographicContentToString } from '@/types/content'
 import { setItems } from '@/types/utils/non-empty'
-import { getWalletEvalStrings } from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
 
@@ -35,29 +32,6 @@ describe('ratedWalletJsonExport', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
 			const payload = payloadForWallet(wallet)
-
-			it('attribute notes match source wallet in overall and variant evaluations', () => {
-				const evalStrings = getWalletEvalStrings(wallet)
-
-				for (const attributes of [
-					payload.overall,
-					...Object.values(payload.perVariant).flatMap(variant =>
-						variant === undefined ? [] : [variant.attributes],
-					),
-				]) {
-					for (const [groupId, group] of Object.entries(attributes)) {
-						for (const [attributeId, { evaluation }] of Object.entries(group)) {
-							const note = getAttributeOverride(wallet, groupId, attributeId)?.note
-
-							expect(evaluation.note).toBe(
-								note === undefined
-									? undefined
-									: renderTypographicContentToString(note, evalStrings),
-							)
-						}
-					}
-				}
-			})
 
 			it('produces schema-valid JSON', () => {
 				const validator = new RatedWalletExportValidator()

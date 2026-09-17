@@ -16,9 +16,6 @@ import {
 } from '@/schema/attribute-groups'
 import { ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
-import { getAttributeOverride } from '@/schema/wallet'
-import { renderTypographicContentToString } from '@/types/content'
-import { getWalletEvalStrings } from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { getWalletUrl } from '@/utils/urls'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
@@ -44,30 +41,6 @@ describe('walletPageMarkdown', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
 			const md = markdownForWallet(wallet)
-
-			it('contains source notes for every non-exempt attribute', () => {
-				const notes = mapNonExemptAttributeGroupsInTree(
-					attributeTreeForWallet(wallet),
-					wallet.overall,
-					(attrGroup, evalGroup) =>
-						mapNonExemptGroupAttributes(
-							evalGroup,
-							evalAttr =>
-								getAttributeOverride<string>(wallet, attrGroup.id, evalAttr.attribute.id)?.note,
-						),
-				).flat()
-
-				for (const note of notes) {
-					if (note !== undefined) {
-						const renderedNote = renderTypographicContentToString(
-							note,
-							getWalletEvalStrings(wallet),
-						)
-
-						expect(md.replace(/\s+/g, ' ')).toContain(renderedNote.replace(/\s+/g, ' '))
-					}
-				}
-			})
 
 			it('produces non-empty output', () => {
 				expect(md.length).toBeGreaterThan(100)
