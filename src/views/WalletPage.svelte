@@ -12,6 +12,7 @@
 		normalizeExampleRatings,
 		ratingIcons,
 		ratingToColor,
+		ratingToTextColor,
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
@@ -906,6 +907,7 @@
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		style:--accent-textColor={ratingToTextColor(evalAttr.evaluation.outcome.rating)}
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
