@@ -18,7 +18,7 @@ import type {
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
-import { hasRefs, refNotNecessary, type WithRef } from '../../reference'
+import { hasRefs, refNotNecessary, refs, type WithRef } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
@@ -103,7 +103,7 @@ export function buildScamPreventionDetails(
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [[warning.leaksRecipient, "the recipient's Ethereum address"]])
 				: undefined,
-			references: isSupported(warning) ? warning.ref : undefined,
+			references: refs(metadata.sendTransactionWarning),
 		})
 	}
 
@@ -139,7 +139,7 @@ export function buildScamPreventionDetails(
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [[warning.leaksContractAddress, 'the contract address']])
 				: undefined,
-			references: isSupported(warning) ? warning.ref : undefined,
+			references: refs(metadata.contractTransactionWarning),
 		})
 	}
 
@@ -157,7 +157,7 @@ export function buildScamPreventionDetails(
 						[warning.leaksVisitedUrl === 'DOMAIN_ONLY', 'the domain name of the app'],
 					])
 				: undefined,
-			references: isSupported(warning) ? warning.ref : undefined,
+			references: refs(metadata.scamUrlWarning),
 		})
 	}
 
@@ -172,7 +172,7 @@ export function buildScamPreventionDetails(
 			conclusion: isSupported(warning)
 				? leakConclusion(warning, [[warning.leaksSpenderAddress, 'the spender address']])
 				: undefined,
-			references: isSupported(warning) ? warning.ref : undefined,
+			references: refs(metadata.unlimitedApprovalWarning),
 		})
 	}
 
