@@ -3,7 +3,7 @@
 
 Wallets must support atomic batched transactions.
 
-Batched transactions through the WalletCall API enables better UX for common DeFi workflows, such as token approvals followed by a DeFi operation. 
+Batched transactions through the WalletCall API enable better UX for common DeFi workflows, such as token approvals followed by a DeFi operation. 
 
 Atomic batched transactions make such batched transactions safer and easier to understand for the user, as well as enabling advanced DeFi use-cases.
 
