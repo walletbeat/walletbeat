@@ -14,7 +14,10 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import type { UnlimitedApprovalWarning } from '@/schema/features/security/scam-alerts'
+import {
+	allUnlimitedApprovalBenchmarksSupported,
+	type UnlimitedApprovalWarning,
+} from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
@@ -401,7 +404,7 @@ export const gemwallet: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: true,
+					warnsOnUnlimitedApproval: allUnlimitedApprovalBenchmarksSupported,
 				}),
 			},
 			securityBestPractices: {
