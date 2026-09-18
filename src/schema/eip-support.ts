@@ -21,8 +21,15 @@ import {
 	type SoftwareWalletErc8213,
 } from './features/security/transaction-legibility'
 import { featureSupported, isSupported, notSupported, type Support } from './features/support'
-import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
-import { getVariants, type Variant } from './variants'
+import {
+	type FullyQualifiedReference,
+	hasRefs,
+	mergeRefs,
+	refs,
+	refTodo,
+	type WithRef,
+} from './reference'
+import { getVariants, Variant } from './variants'
 import { getVariantResolvedWallet, type RatedWallet } from './wallet'
 
 /**
@@ -418,6 +425,72 @@ export const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
 	return isSupported(support) ? EipSupportStatus.SUPPORTED : EipSupportStatus.NOT_SUPPORTED
 }
 
+/**
+ * Determine a rated wallet's per-variant EIP support, together with the
+ * references backing each variant's support determination. Variants the EIP
+ * does not apply to are omitted.
+ */
+function ratedWalletEipVariantSupport<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): Array<{ variant: Variant; status: EipSupportStatus; references: FullyQualifiedReference[] }> {
+	const { perVariant } = ratedWalletEipSupport(wallet, eipNumber)
+
+	return Object.values(Variant).flatMap(variant => {
+		const variantSupport = perVariant[variant]
+
+		if (variantSupport === undefined) {
+			return []
+		}
+
+		const status = eipSupportStatus(variantSupport)
+
+		if (status === EipSupportStatus.NOT_APPLICABLE) {
+			return []
+		}
+
+		return [
+			{
+				variant,
+				status,
+				references: typeof variantSupport === 'string' ? [] : refs(variantSupport),
+			},
+		]
+	})
+}
+
+/**
+ * Determine a rated wallet's EIP support grouped by status: one entry per
+ * distinct status the wallet's variants land in (e.g. a wallet supported on
+ * browser and mobile but unknown on desktop yields two entries), each
+ * carrying every variant that shares that status and the merged references
+ * backing it. This avoids showing the same wallet once per variant when all
+ * that differs is which platform(s) the status applies to.
+ */
+export function ratedWalletEipSupportByStatus<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): Array<{ status: EipSupportStatus; variants: Variant[]; references: FullyQualifiedReference[] }> {
+	const byStatus = new Map<
+		EipSupportStatus,
+		{ variants: Variant[]; references: FullyQualifiedReference[][] }
+	>()
+
+	for (const { variant, status, references } of ratedWalletEipVariantSupport(wallet, eipNumber)) {
+		const entry = byStatus.get(status) ?? { variants: [], references: [] }
+
+		entry.variants.push(variant)
+		entry.references.push(references)
+		byStatus.set(status, entry)
+	}
+
+	return Array.from(byStatus.entries()).map(([status, { variants, references }]) => ({
+		status,
+		variants,
+		references: mergeRefs(...references),
+	}))
+}
+
 /** Everything an EIP support table needs to render one wallet. */
 export interface EipSupportRow {
 	id: string
@@ -427,6 +500,23 @@ export interface EipSupportRow {
 	overall: EipSupportStatus
 	variants: Array<{ variant: Variant; status: EipSupportStatus }>
 	sourceUrls: Array<{ url: string; label: string }>
+}
+
+/**
+ * A single wallet's EIP support for one status, together with every variant
+ * that shares that status and the merged references backing it. A wallet
+ * appears once per distinct status among its variants (not once per
+ * variant), so a wallet supported on both browser and mobile yields a single
+ * card with both variants listed.
+ */
+export interface EipStatusSupportCard {
+	id: string
+	displayName: string
+	iconExtension: string
+	url: string
+	status: EipSupportStatus
+	variants: Variant[]
+	references: FullyQualifiedReference[]
 }
 
 /**

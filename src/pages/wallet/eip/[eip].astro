@@ -8,6 +8,8 @@ import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import {
 	ratedWalletEipSupport,
+	ratedWalletEipSupportByStatus,
+	type EipStatusSupportCard,
 	type EipSupportRow,
 	EipSupportStatus,
 	eipSupportStatus,
@@ -21,6 +23,7 @@ import { getWalletUrl } from '@/utils/urls'
 // Components
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
+import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
 import EipSupportTable from '@/views/EipSupportTable.svelte'
 import Navigation from '@/views/Navigation.astro'
 import GitHubIcon from 'lucide-static/icons/github.svg?raw'
@@ -72,7 +75,22 @@ function eipSupportRows(wallets: Array<RatedWallet<string>>): EipSupportRow[] {
 	})
 }
 
-const softwareRows = eipSupportRows(Object.values(ratedSoftwareWallets))
+/** Precompute the per-status EIP support cards at build time. */
+function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSupportCard[] {
+	return wallets.flatMap(wallet =>
+		ratedWalletEipSupportByStatus(wallet, eip.number).map(({ status, variants, references }) => ({
+			id: wallet.metadata.id,
+			displayName: wallet.metadata.displayName,
+			iconExtension: wallet.metadata.iconExtension,
+			url: getWalletUrl(wallet),
+			status,
+			variants,
+			references,
+		})),
+	)
+}
+
+const softwareCards = eipStatusSupportCards(Object.values(ratedSoftwareWallets))
 const hardwareRows = eipSupportRows(Object.values(ratedHardwareWallets))
 const embeddedRows = eipSupportRows(Object.values(ratedEmbeddedWallets))
 ---
@@ -91,10 +109,10 @@ const embeddedRows = eipSupportRows(Object.values(ratedEmbeddedWallets))
 		</header>
 
 		{
-			softwareRows.length > 0 && (
-				<EipSupportTable
+			softwareCards.length > 0 && (
+				<EipStatusSupportCards
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
-					rows={softwareRows}
+					cards={softwareCards}
 					client:visible
 				/>
 			)
