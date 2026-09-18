@@ -11,6 +11,15 @@
 		[EipSupportStatus.NOT_APPLICABLE]: 'var(--rating-neutral)',
 	}
 
+	// `--rating-unrated`/`--rating-neutral` are low-alpha, made for badge
+	// backgrounds; solid text needs its own, legible color.
+	const headingColor: Record<EipSupportStatus, string> = {
+		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
+		[EipSupportStatus.NOT_SUPPORTED]: 'var(--rating-fail)',
+		[EipSupportStatus.UNKNOWN]: 'var(--text-secondary)',
+		[EipSupportStatus.NOT_APPLICABLE]: 'var(--text-secondary)',
+	}
+
 	const statusSections: Array<{ status: EipSupportStatus; label: string }> = [
 		{ status: EipSupportStatus.SUPPORTED, label: 'Supported' },
 		{ status: EipSupportStatus.NOT_SUPPORTED, label: 'Not Supported' },
@@ -72,7 +81,7 @@
 </script>
 
 
-<section data-sticky-container data-column="gap-8">
+<section data-sticky-container data-column="gap-6">
 	{#if title}
 		<header
 			data-row="wrap"
@@ -86,13 +95,16 @@
 		{@const statusCards = cardsForStatus(status)}
 
 		{#if statusCards.length > 0}
-			<div data-column="gap-3">
-				<header data-scroll-item='inline-detached padding-match-start'>
-					<h3 data-support-status={status}>{statusLabel}</h3>
+			<div data-column="gap-4">
+				<header data-scroll-item='inline-detached'>
+					<h3
+						data-support-status={status}
+						style:--accent={headingColor[status]}
+					>{statusLabel}</h3>
 				</header>
 
 				<div data-scroll-item="inline-attached underflow-center overflow-start">
-					<div class="wallet-card-list" data-column="gap-3">
+					<div class="wallet-card-list" data-column="gap-5">
 						{#each statusCards as card (card.id)}
 							{@const hasReferences = card.references.length > 0}
 
@@ -184,14 +196,10 @@
 	}
 
 	h3 {
-		font-size: 0.95rem;
-		font-weight: 600;
+		font-size: 1.2rem;
+		font-weight: 700;
 		margin: 0;
-
-		&[data-support-status='UNKNOWN'],
-		&[data-support-status='NOT_APPLICABLE'] {
-			color: var(--text-secondary);
-		}
+		color: var(--accent);
 	}
 
 	.wallet-card {
@@ -239,13 +247,17 @@
 	}
 
 	.wallet-card-content {
-		padding-block-start: 0.75em;
+		padding-block-start: 0.5em;
 	}
 
-	/* Matches the "Updated <date>" secondary text on the wallet security news
-	   list (src/pages/news/index.astro `.metadata-dates`). */
+	/* Separated from the sources list by a divider so it reads as a distinct
+	   footer rather than another (unlabeled) list item. Matches the "Updated
+	   <date>" secondary text on the wallet security news list
+	   (src/pages/news/index.astro `.metadata-dates`). */
 	.card-meta {
 		align-items: center;
+		padding-block-start: 0.85em;
+		border-block-start: 1px solid var(--border-color);
 		font-size: 0.9em;
 		color: var(--text-secondary);
 	}
