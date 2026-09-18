@@ -2,6 +2,7 @@
 	// Types/constants
 	import { type EipStatusSupportCard, EipSupportStatus } from '@/schema/eip-support'
 	import { Variant } from '@/schema/variants'
+	import type { CalendarDate } from '@/types/date'
 
 	const statusColor: Record<EipSupportStatus, string> = {
 		[EipSupportStatus.SUPPORTED]: 'var(--rating-pass)',
@@ -22,6 +23,8 @@
 		[Variant.BROWSER, 'Browser Extension'],
 		[Variant.MOBILE, 'Mobile App'],
 		[Variant.DESKTOP, 'Desktop App'],
+		[Variant.HARDWARE, 'Hardware Wallet'],
+		[Variant.EMBEDDED, 'Embedded Wallet'],
 	]
 
 	const platformLabel = (variants: Variant[]): string =>
@@ -44,6 +47,24 @@
 	// Functions
 	const cardsForStatus = (status: EipSupportStatus): EipStatusSupportCard[] =>
 		cards.filter(card => card.status === status)
+
+	// The most recent date among the card's references, i.e. when this status
+	// was last verified.
+	const cardLastVerified = (card: EipStatusSupportCard): CalendarDate | undefined => {
+		const dates = card.references
+			.map(({ lastRetrieved }) => lastRetrieved)
+			.filter((date): date is CalendarDate => date !== undefined)
+
+		return dates.length > 0 ? dates.toSorted().at(-1) : undefined
+	}
+
+	const formatDate = (date: CalendarDate): string =>
+		new Date(date).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			timeZone: 'UTC',
+		})
 
 
 	// Components
@@ -101,13 +122,27 @@
 								style:--accent={statusColor[card.status]}
 							>
 								{#if hasReferences}
+									{@const lastVerified = cardLastVerified(card)}
+
 									<details data-card="radius-4 padding-4 border-accent" data-column="gap-0">
 										<summary data-row="center gap-3">
 											{@render WalletCardHeader()}
 										</summary>
 
-										<div class="wallet-card-content">
+										<div class="wallet-card-content" data-column="gap-3">
 											<ReferenceLinks references={card.references} cardBackground="secondary" />
+
+											<div class="card-meta" data-row="wrap gap-3">
+												{#if lastVerified}
+													<span class="last-verified">
+														As of <time datetime={lastVerified}>{formatDate(lastVerified)}</time>
+													</span>
+												{/if}
+
+												<a class="wallet-page-link" href={card.url}>
+													View {card.displayName}'s full rating →
+												</a>
+											</div>
 										</div>
 									</details>
 								{:else}
@@ -205,5 +240,17 @@
 
 	.wallet-card-content {
 		padding-block-start: 0.75em;
+	}
+
+	/* Matches the "Updated <date>" secondary text on the wallet security news
+	   list (src/pages/news/index.astro `.metadata-dates`). */
+	.card-meta {
+		align-items: center;
+		font-size: 0.9em;
+		color: var(--text-secondary);
+	}
+
+	.wallet-page-link {
+		white-space: nowrap;
 	}
 </style>
