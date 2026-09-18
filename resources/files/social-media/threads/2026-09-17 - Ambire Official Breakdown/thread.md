@@ -237,3 +237,59 @@ However, it doesn’t support chain-specific address formats such as:
 `user.eth:l2chain`
 
 Adding support for chain-specific addresses could make cross-chain payments easier and reduce ambiguity about where funds are being sent.
+
+---
+
+What could be better about Ambire’s privacy?
+
+Privacy is the attribute group where Ambire has the most room for improvement.
+
+Two areas are currently partial, while several others have significant gaps.
+
+Let’s break it down 🧵
+
+---
+
+How can Ambire's Wallet address privacy & Privacy hygiene improve?
+
+Let's break it down
+
+---
+
+Wallet address privacy
+
+Ambire relies on external providers for RPC, token discovery, and account information.
+
+Some requests can expose the user’s wallet address and IP address to these providers, creating potential correlation between a user and their onchain activity.
+
+---
+
+Privacy hygiene
+
+Ambire doesn’t consistently minimize the information shared with external providers.
+
+Privacy-preserving proxies could reduce these risks.
+
+---
+
+Where are the gaps in Ambire’s privacy?
+
+---
+
+Multi-address privacy
+
+Multiple wallet addresses can be exposed to the same provider, allowing them to be correlated.
+
+---
+
+
+Private token transfers
+
+Ambire doesn’t support private token transfers.
+
+---
+
+App isolation
+
+
+Ambire doesn’t provide app-specific accounts during the connection flow, making cross-app activity correlation possible.
