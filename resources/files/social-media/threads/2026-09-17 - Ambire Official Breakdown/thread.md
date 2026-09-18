@@ -246,14 +246,14 @@ Privacy is the attribute group where Ambire has the most room for improvement.
 
 Two areas are currently partial, while several others have significant gaps.
 
-Let’s break it down 🧵
-
 ---
 
-How can Ambire's Wallet address privacy & Privacy hygiene improve?
+What could be better?
+
+- Wallet address privacy
+- Privacy hygiene
 
 Let's break it down
-
 ---
 
 Wallet address privacy
@@ -273,6 +273,12 @@ Privacy-preserving proxies could reduce these risks.
 ---
 
 Where are the gaps in Ambire’s privacy?
+
+- Multi-address privacy
+- Private token transfers
+- App isolation
+
+Let's break it down
 
 ---
 
