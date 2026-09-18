@@ -6,17 +6,8 @@ import { eips } from '@/data/eips'
 import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
-import {
-	ratedWalletEipSupport,
-	ratedWalletEipSupportByStatus,
-	type EipStatusSupportCard,
-	type EipSupportRow,
-	EipSupportStatus,
-	eipSupportStatus,
-} from '@/schema/eip-support'
+import { ratedWalletEipSupportByStatus, type EipStatusSupportCard } from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
-import { refs } from '@/schema/reference'
-import { Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
 import { getWalletUrl } from '@/utils/urls'
 
@@ -24,7 +15,6 @@ import { getWalletUrl } from '@/utils/urls'
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
 import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
-import EipSupportTable from '@/views/EipSupportTable.svelte'
 import Navigation from '@/views/Navigation.astro'
 import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 
@@ -39,41 +29,6 @@ export const getStaticPaths = () =>
 type Props = { eip: Eip }
 
 const { eip } = Astro.props
-
-/** Precompute the EIP support table rows at build time. */
-function eipSupportRows(wallets: Array<RatedWallet<string>>): EipSupportRow[] {
-	return wallets.flatMap(wallet => {
-		const support = ratedWalletEipSupport(wallet, eip.number)
-		const overall = eipSupportStatus(support.overall)
-
-		if (overall === EipSupportStatus.NOT_APPLICABLE) {
-			return []
-		}
-
-		return [
-			{
-				id: wallet.metadata.id,
-				displayName: wallet.metadata.displayName,
-				iconExtension: wallet.metadata.iconExtension,
-				url: getWalletUrl(wallet),
-				overall,
-				variants: Object.values(Variant).flatMap(variant => {
-					const variantSupport = support.perVariant[variant]
-
-					return variantSupport === undefined
-						? []
-						: [{ variant, status: eipSupportStatus(variantSupport) }]
-				}),
-				sourceUrls:
-					typeof support.overall === 'string'
-						? []
-						: refs(support.overall).flatMap(ref =>
-								ref.urls.map(({ url, label }) => ({ url, label })),
-							),
-			},
-		]
-	})
-}
 
 /** Precompute the per-status EIP support cards at build time. */
 function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSupportCard[] {
@@ -91,8 +46,8 @@ function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSu
 }
 
 const softwareCards = eipStatusSupportCards(Object.values(ratedSoftwareWallets))
-const hardwareRows = eipSupportRows(Object.values(ratedHardwareWallets))
-const embeddedRows = eipSupportRows(Object.values(ratedEmbeddedWallets))
+const hardwareCards = eipStatusSupportCards(Object.values(ratedHardwareWallets))
+const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 ---
 
 <Layout
@@ -119,20 +74,20 @@ const embeddedRows = eipSupportRows(Object.values(ratedEmbeddedWallets))
 		}
 
 		{
-			hardwareRows.length > 0 && (
-				<EipSupportTable
+			hardwareCards.length > 0 && (
+				<EipStatusSupportCards
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
-					rows={hardwareRows}
+					cards={hardwareCards}
 					client:visible
 				/>
 			)
 		}
 
 		{
-			embeddedRows.length > 0 && (
-				<EipSupportTable
+			embeddedCards.length > 0 && (
+				<EipStatusSupportCards
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
-					rows={embeddedRows}
+					cards={embeddedCards}
 					client:visible
 				/>
 			)

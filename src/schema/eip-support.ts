@@ -491,17 +491,6 @@ export function ratedWalletEipSupportByStatus<_AttributeGroupId extends string>(
 	}))
 }
 
-/** Everything an EIP support table needs to render one wallet. */
-export interface EipSupportRow {
-	id: string
-	displayName: string
-	iconExtension: string
-	url: string
-	overall: EipSupportStatus
-	variants: Array<{ variant: Variant; status: EipSupportStatus }>
-	sourceUrls: Array<{ url: string; label: string }>
-}
-
 /**
  * A single wallet's EIP support for one status, together with every variant
  * that shares that status and the merged references backing it. A wallet
