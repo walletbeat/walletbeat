@@ -10,9 +10,9 @@ Less collected is less exposed.
 
 ---
 
-The wallet must collect no more user data than a web browser does by default.
+Wallets must collect no more user data than a web browser does by default.
 
-Wallets handle sensitive financial data. 
+They handle sensitive financial data. 
 
 Collecting excessive user data creates unnecessary privacy risks and undermines user trust.
 ---
