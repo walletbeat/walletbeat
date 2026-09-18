@@ -14,7 +14,7 @@ We look at your wallet's ability to protect you under physical threat.
 
 Explore the full criteria at our thread 🧵
 
-https://x.com/walletbeat/status/2087739731530715346
+https://x.com/walletbeat/status/2042570101338313070
 
 ---
 
