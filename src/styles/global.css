@@ -33,9 +33,9 @@
 	--rating-neutral-base: #BDC3C7;
 
 	/* Fill role: blobs, pies, badge backgrounds, borders. Light values are hand-tuned per hue. */
-	--rating-pass: light-dark(oklch(from var(--rating-pass-base) 0.793 0.154 h), var(--rating-pass-base));
-	--rating-partial: light-dark(oklch(from var(--rating-partial-base) 0.782 0.151 h), var(--rating-partial-base));
-	--rating-fail: light-dark(oklch(from var(--rating-fail-base) 0.690 0.169 h), var(--rating-fail-base));
+	--rating-pass: light-dark(oklch(from var(--rating-pass-base) 0.873 0.154 h), var(--rating-pass-base));
+	--rating-partial: light-dark(oklch(from var(--rating-partial-base) 0.862 0.151 h), var(--rating-partial-base));
+	--rating-fail: light-dark(oklch(from var(--rating-fail-base) 0.770 0.169 h), var(--rating-fail-base));
 	--rating-neutral: light-dark(oklch(from var(--rating-neutral-base) 0.697 0.013 h), var(--rating-neutral-base));
 
 	/* Text role: uniform L 0.52 clears WCAG AA (4.5:1) against --background-primary for every hue. */
