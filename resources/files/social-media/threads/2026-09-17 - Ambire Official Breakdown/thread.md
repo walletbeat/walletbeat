@@ -244,11 +244,14 @@ However, it doesn’t support chain-specific address formats such as:
 Adding support for chain-specific addresses could make cross-chain payments easier and reduce ambiguity about where funds are being sent.
 
 ---
-4/5 Privacy
+5/5 Privacy
 
-Privacy is the attribute group that out of five, Ambire lacks the most. Most of the attributes that Ambire has resolves to Partial or failure rating.
+Privacy is the attribute group where Ambire has the most room for improvement.
 
-Let's see where Ambire can do the most improvement on
+Most of the privacy attributes are rated Partial or Fail.
+
+Let’s look at where Ambire can improve the most.
+
 
 ---
 What could be better about Ambire’s privacy?
