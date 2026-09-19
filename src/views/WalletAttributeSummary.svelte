@@ -11,7 +11,7 @@
 	_OutcomeMetadata extends OutcomeMetadata
 ">
 	// Types/constants
-	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor } from '@/schema/attributes'
+	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor, ratingToTextColor } from '@/schema/attributes'
 	import { type Ladders } from '@/schema/ladders'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
@@ -98,6 +98,7 @@
 	data-card={isInTooltip ? 'radius p-sm border-accent' : undefined}
 	data-column
 	style:--accent={ratingToColor(attribute.evaluation.outcome.rating)}
+	style:--accent-textColor={ratingToTextColor(attribute.evaluation.outcome.rating)}
 >
 	<header data-row="center gap-3 wrap">
 		<h4 data-row="gap-2">

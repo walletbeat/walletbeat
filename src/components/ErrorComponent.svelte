@@ -67,7 +67,7 @@
 
 	.error-message {
 		font-size: 0.9rem;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		margin: 0;
 		word-break: break-word;
 	}
