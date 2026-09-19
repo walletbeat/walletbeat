@@ -32,13 +32,14 @@ Let's break it down
 ---
 Security audits & bug bounties
 
-Ambire has an active bug bounty program and has undergone security audits.
+Ambire has undergone security audits and has an established bug bounty program.
 
-However, their latest audit was published on February 20, 2025, over a year ago.
+Their latest audit was published on February 20, 2025, over a year ago.
 
-Walletbeat recommends regular security audits as part of maintaining confidence in the security of a wallet as its codebase evolves.
+However, Ambire has continued shipping significant features since then, including clear signing support and Safe account support.
 
-There’s also room to improve the bug bounty process. Ambire currently doesn’t document a clear upgrade path for users when a critical security issue is discovered.
+A new audit would help provide assurance as the codebase evolves.
+
 
 ---
 
