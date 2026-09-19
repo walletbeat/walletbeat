@@ -11,10 +11,11 @@ In this thread, we'll be analyzing @Ambire and see how they adopt CROPS values.
 We'll be evaluating Ambire wallet across five dimensions: security, privacy, transparency, self sovereignty & ecosystem interoperability.
 
 ---
+1/5 Security
 
 What’s good about Ambire’s security?
 
-Hardware Wallet support.
+- Hardware Wallet support.
 
 Software wallets supporting hardware wallets means they offer the best of both worlds: a user-friendly interface with enhanced security. Ambire directly supports Ledger, Trezor, Gridplus, Keystone, and Keycard.
 
@@ -111,6 +112,7 @@ It also does not provide recovery checks such as periodic private-key or seed-ph
 These mechanisms can help users verify that their recovery credentials are still accessible before they actually need them.
 
 ---
+2/5 Self-sovereignty
 
 What’s good about Ambire’s self-sovereignty?
 
@@ -154,6 +156,7 @@ Adding approval management would give users more control over permissions they�
 
 
 ---
+3/5 Transparency
 
 What’s good about Ambire’s transparency?
 
@@ -197,6 +200,8 @@ Documenting and independently verifying these endpoints—or keeping this data l
 
 ----
 
+4/5 Ecosystem alignment
+
 What’s good about Ambire’s ecosystem interoperability?
 
 - Account Abstraction via ERC-4337 & EIP-7702
@@ -208,7 +213,7 @@ Ambire is well aligned with several emerging Ethereum wallet standards.
 
 ---
 
-What could be better about Ambire’s ecosystem interoperability?
+What could be better about Ambire’s Ecosystem alignment?
 
 - Chain abstraction
 - Address resolution
@@ -239,7 +244,13 @@ However, it doesn’t support chain-specific address formats such as:
 Adding support for chain-specific addresses could make cross-chain payments easier and reduce ambiguity about where funds are being sent.
 
 ---
+4/5 Privacy
 
+Privacy is the attribute group that out of five, Ambire lacks the most. Most of the attributes that Ambire has resolves to Partial or failure rating.
+
+Let's see where Ambire can do the most improvement on
+
+---
 What could be better about Ambire’s privacy?
 
 Privacy is the attribute group where Ambire has the most room for improvement.
