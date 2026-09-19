@@ -313,3 +313,39 @@ App isolation
 
 
 Ambire doesn’t provide app-specific accounts during the connection flow, making cross-app activity correlation possible.
+
+---
+
+So, where does Ambire stand?
+
+Across Walletbeat’s five dimensions, Ambire has a mix of strengths and areas for improvement.
+
+Privacy is clearly the attribute group with the most gaps, with most criteria rated Partial or Fail.
+
+But there’s another side to the picture.
+
+---
+
+Self-sovereignty is where Ambire stands out.
+
+Ambire gives users strong control over their accounts, particularly through L1 provider independence.
+
+Users can choose and use their own RPC provider, before doing any requests.
+
+This is an important step toward reducing trust in the wallet provider itself.
+
+---
+
+Overall
+
+Ambire has strong foundations in self-sovereignty and ecosystem interoperability, with several areas where security and transparency can still improve.
+
+Privacy is the biggest area for improvement.
+
+A more detailed breakdown is available on @walletbeat.
+
+---
+
+Check it out here:
+
+https://beta.walletbeat.eth.limo
