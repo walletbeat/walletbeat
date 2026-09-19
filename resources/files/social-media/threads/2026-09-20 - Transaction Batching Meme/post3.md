@@ -7,7 +7,7 @@ Batched transactions through the WalletCall API enable better UX for common DeFi
 
 Atomic batched transactions make such batched transactions safer and easier to understand for the user, as well as enabling advanced DeFi use-cases.
 
-![Transaction Batching](./transaction-batching.png)
+![Transaction Batching](./transaction-batching.jpg)
 ---
 
 At Walletbeat, we use unlimited token approvals as part of our evaluation framework to test how wallets warn users about potentially dangerous transactions.
