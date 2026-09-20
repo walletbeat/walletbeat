@@ -20,10 +20,10 @@ The tool helps you walk through these steps.
 At a high level, all commands look like this:
 
 ```
-$ pnpm wallet-data-collection[:agent] --id='<wallet_id>' --variant='<wallet_variant>' <subcommand> [subcommand-specific flags...]
+pnpm wallet-data-collection[:agent] --id='<wallet_id>' --variant='<wallet_variant>' <subcommand> [subcommand-specific flags...]
 ```
 
-### Global flags:
+### Global flags
 
 - `--id`: ID of the wallet. This must already exist.
 - `--variant`: Variant of the wallet you are testing (`BROWSER`, `MOBILE`, `DESKTOP`).
@@ -36,7 +36,7 @@ The wallet network data capture file will be recorded at `data/{type}-wallets/co
 #### `capture` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> capture --flow='<flow>' [--wallet-addresses='<0xaddr1,0xaddr2,...>'] [--port='<mitmproxy port>']
+pnpm wallet-data-collection <global flags> capture --flow='<flow>' [--wallet-addresses='<0xaddr1,0xaddr2,...>'] [--port='<mitmproxy port>']
 ```
 
 Start `mitmproxy` listening on `--port` (default `8080`), capturing all network traffic received from this session as belonging to the given `--flow`.
@@ -60,7 +60,7 @@ The following flows are defined:
 #### `delete-capture` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> delete-capture --session=num
+pnpm wallet-data-collection <global flags> delete-capture --session=num
 ```
 
 Delete all data from a single capture session.
@@ -70,7 +70,7 @@ Session numbers are printed in the output of the `capture` subcommand.
 #### `capture-info` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> capture-info
+pnpm wallet-data-collection <global flags> capture-info
 ```
 
 After you have captured (or marked as not supported) **all** flows, run this to record
@@ -86,7 +86,7 @@ or append a new one.
 #### `check` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> check
+pnpm wallet-data-collection[:agent] <global flags> check
 ```
 
 Examine the capture file and flag any missing information that needs further triaging, including directions on how to address them.
@@ -95,7 +95,7 @@ No further flags required.
 #### `mark-flow-unsupported` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-flow-unsupported --flow='<flow>'
+pnpm wallet-data-collection <global flags> mark-flow-unsupported --flow='<flow>'
 ```
 
 Mark a flow as not being supported by the wallet, which means capturing its network traffic is impossible.
@@ -103,7 +103,7 @@ Mark a flow as not being supported by the wallet, which means capturing its netw
 #### `mark-domain` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> mark-domain --domain='<domain>' --entity='<entity ID>' [--intermediaries='<entity ID>,...']
+pnpm wallet-data-collection[:agent] <global flags> mark-domain --domain='<domain>' --entity='<entity ID>' [--intermediaries='<entity ID>,...']
 ```
 
 Mark a domain name and all its subdomains as operated by the given entity ID.
@@ -120,7 +120,7 @@ not on the apex domain; the most specific matching entry takes precedence when r
 #### `mark-domain-update` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> mark-domain-update --domain='<domain>' [--set-operator='<entity ID>'] [--set-intermediaries='<entity ID>,...'] [--add-intermediaries='<entity ID>,...'] [--remove-intermediaries='<entity ID>,...']
+pnpm wallet-data-collection[:agent] <global flags> mark-domain-update --domain='<domain>' [--set-operator='<entity ID>'] [--set-intermediaries='<entity ID>,...'] [--add-intermediaries='<entity ID>,...'] [--remove-intermediaries='<entity ID>,...']
 ```
 
 Update an existing domain mapping, e.g. when an intermediary is discovered later.
@@ -130,7 +130,7 @@ Update an existing domain mapping, e.g. when an intermediary is discovered later
 #### `explain-request` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>' --policy='<collection_policy>'
+pnpm wallet-data-collection[:agent] <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>' --policy='<collection_policy>'
 ```
 
 Mark requests matching the given `selectors` as being done for certain purposes (`purpose1`, `purpose2`), and with a given policy (`collection_policy`).
@@ -140,6 +140,7 @@ Mark requests matching the given `selectors` as being done for certain purposes 
 - `--domain='foo.com'`: Matches requests to `foo.com` and any subdomains of it. **The `--domain` selector must always be provided.**
 - `--path=/api`: Matches requests with path `/api`. Globs (`*`) are allowed, e.g. `--path=/path/*`. If `--path` is not provided, any path matches.
 - `--method=eth_getBalance`: Matches JSON-RPC requests with method `eth_getBalance`. Globs (`*`) are allowed as well. If `--method` is not provided, any request matches, including non-JSON-RPC requests.
+- `--referer-domain='foo.com'`: Matches requests whose `Referer` header domain is `foo.com` or any subdomain of it. If `--referer-domain` is not provided, any referer matches (including requests with no referer).
 
 ##### Purposes
 
@@ -160,6 +161,8 @@ Requests can be assigned to the following purposes:
 - `ANALYTICS`: Wallet user analytics.
 - `NOT_WALLET_INITIATED`: Requests not actually initiated by the wallet (e.g. browser/OS built-in analytics).
 
+  When a request is identified as `NOT_WALLET_INITIATED` (either by a matcher or by manual review), any other request whose `Referer` header matches that request's URL (scheme + domain + path) is also automatically identified as `NOT_WALLET_INITIATED` _by proxy_, transitively. If such proxy propagation would mark a request as `NOT_WALLET_INITIATED` that has been explicitly manually tagged as anything other than `NOT_WALLET_INITIATED`, an error is raised instead.
+
 Purposes are case-insensitive on the command line.
 
 ##### Collection policy
@@ -175,7 +178,7 @@ Valid policy options are:
 #### `review-strings` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> review-strings
+pnpm wallet-data-collection[:agent] <global flags> review-strings
 ```
 
 Review high-entropy strings from network capture to flag the user data they are carrying.
@@ -189,7 +192,7 @@ Alternatively, you can use the `mark-string` subcommand to mark a given string a
 #### `mark-string` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
+pnpm wallet-data-collection[:agent] <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>'
 ```
 
 Mark a string as conveying the given datatype. This is the same operation as the one `review-strings` does, but with a more machine-friendly interface. The string will be classified and stored in the capture file's user data store.
@@ -214,7 +217,7 @@ $ pnpm wallet-data-collection[:agent] <global flags> mark-string --string='CodeM
 #### `review-requests` subcommand
 
 ```
-$ pnpm wallet-data-collection[:agent] <global flags> review-requests
+pnpm wallet-data-collection[:agent] <global flags> review-requests
 ```
 
 Interactively go through requests to manually define their purpose and/or carried data.
