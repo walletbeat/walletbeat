@@ -181,7 +181,7 @@ declare global {
 		 * - effect: `shadow`
 		 *
 		 * ### CSS Variables
-		 * - `--icon-scale`: combined painted scale supplied by a transformed container (default `1`); icon detail follows effective size
+		 * - `--icon-scale`: scale supplied by a transformed container (default `1`); style-range queries include it in icon detail selection
 		 * - `--icon-content`
 		 * - `--icon-size`
 		 * - `--icon-navigation-borderColor`

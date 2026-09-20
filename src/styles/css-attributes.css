@@ -257,7 +257,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 
 @property ---icon-renderedSize {
 	syntax: "<length>";
-	inherits: true;
+	inherits: false;
 	initial-value: 0px;
 }
 
@@ -273,7 +273,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  * - effect: `shadow`
  *
  * ### CSS Variables
- * - `--icon-scale`: combined painted scale supplied by a transformed container (default `1`); icon detail follows effective size
+ * - `--icon-scale`: scale supplied by a transformed container (default `1`); style-range queries include it in icon detail selection
  * - `--icon-content`
  * - `--icon-size`
  * - `--icon-navigation-borderColor`
@@ -295,8 +295,8 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 
 	&:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"]) {
 		container-type: inline-size;
-		---icon-renderedSize: calc(var(--icon-size, 1em) * var(--icon-scale, 1));
 		&::before {
+			---icon-renderedSize: calc(var(--icon-size, 1em) * var(--icon-scale, 1));
 			font-family: var(--fontFamily-wbicons-simple);
 			@container (width > 24px) {
 				font-family: var(--fontFamily-wbicons-complex);
@@ -1651,6 +1651,15 @@ ol {
 				var(---icon-paint-transform, translateX(0px));
 		}
 	}
+	/* An unregistered scale changes discretely; transform motion keeps its own effect. */
+	@keyframes breadcrumb-icon-detail {
+		from {
+			--icon-scale: 1;
+		}
+		to {
+			--icon-scale: calc((var(---column-spanSize) + var(---breadcrumb-iconCorrection)) * var(--stickyBreadcrumb-scale) / var(--icon-size));
+		}
+	}
 	@keyframes breadcrumb-text-motion {
 		from {
 			transform: translateX(0px);
@@ -2080,6 +2089,9 @@ ol {
 							(1.5lh - var(---column-spanSize) - var(---breadcrumb-iconCorrection)) *
 								var(--stickyBreadcrumb-scale) / 2
 						);
+					}
+					[data-icon]:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"])::before {
+						animation-name: breadcrumb-icon-motion, breadcrumb-icon-detail;
 					}
 					[data-icon]::before {
 						transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
