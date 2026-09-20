@@ -132,6 +132,12 @@
 	font-size: min(3.2vw, 16px);
 
 	color-scheme: light dark;
+	&:has(#theme-toggle:checked) {
+		color-scheme: dark;
+		@media (prefers-color-scheme: dark) {
+			color-scheme: light;
+		}
+	}
 	color: var(--text-primary);
 	background-color: var(--background-primary);
 	outline-color: var(--accent);
@@ -139,6 +145,19 @@
 	transition-property: background-color, color;
 
 	touch-action: none;
+}
+
+:not(pre) > code {
+	overflow-wrap: anywhere;
+}
+
+/* Physical transforms follow the native inline direction of each direction owner. */
+:root,
+[dir] {
+	---inlineDirection: 1;
+	&:dir(rtl) {
+		---inlineDirection: -1;
+	}
 }
 
 label:has(> input) {
@@ -223,7 +242,6 @@ label:has(> input) {
 	transition-behavior: allow-discrete;
 }
 
-
 hr {
 	margin-inline: 10%;
 	border: none;
@@ -253,4 +271,5 @@ h5,
 h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
+	overflow-wrap: break-word;
 }
