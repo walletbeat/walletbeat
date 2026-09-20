@@ -9,11 +9,15 @@
  *
  * ### Tokens
  * - `camouflaged`, `contents`.
+ * - `shared`: links with the same destination share native hover, focus and current presentation.
+ * - `state`: consume shared destination state on a non-link paint owner without link chrome.
  *
  * ### CSS Variables
  * - `--text-primary`
  * - `--accent`
- * - `--accent-textColor` — opt-in override. Set it alongside `--accent` on any element that scopes `--accent` to a large fill (rating blobs, icons, borders); links inside then use this legible variant instead of blending with the fill.
+ * - `--accent-textColor`: legible text override for scopes whose accent supplies rating fills or borders.
+ * - `--link-hover`, `--link-focus`, `--link-current`: destination timeline names, scoped at the common ancestor.
+ * - `--link-hover-sources`, `--link-focus-sources`, `--link-current-sources`: own and ancestor destination names published by the real link.
  *
  * ### Examples
  * - Default link (`<a>` — no `[data-link]`):
@@ -28,7 +32,7 @@
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`
  */
-[data-link],
+[data-link]:not([data-link~="state"]),
 a {
 	color: var(--accent-textColor, color-mix(in oklch, var(--text-primary) 33%, var(--accent)));
 	text-decoration: none;
@@ -55,6 +59,57 @@ a {
 		> * {
 			grid-area: inherit;
 		}
+	}
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and (timeline-scope: --link)
+	and (color: if(style(---link-active: 1): red; else: blue)) {
+	:is([data-link~="shared"], [data-link~="state"]) {
+		---link-active: 0;
+		---link-interacting: 0;
+		---link-current: 0;
+		animation: none auto linear both;
+		animation-name:
+			if(style(--link-hover): link-active; else: none),
+			if(style(--link-focus): link-active; else: none),
+			if(style(--link-current): link-current; else: none);
+		animation-timeline: var(--link-hover, none), var(--link-focus, none), var(--link-current, none);
+	}
+	[data-link~="shared"] {
+		&:not([data-link~="camouflaged"]) {
+			text-decoration: if(style(---link-active: 1): underline; else: none);
+		}
+		---link-hover-source: none;
+		---link-focus-source: none;
+		---link-current-source: none;
+		view-timeline-name:
+			var(---link-hover-source), var(---link-focus-source), var(---link-current-source);
+
+		&:hover {
+			---link-active: 1;
+			---link-interacting: 1;
+			---link-hover-source: var(--link-hover-sources, var(--link-hover));
+		}
+		&:focus-visible {
+			---link-active: 1;
+			---link-interacting: 1;
+			---link-focus-source: var(--link-focus-sources, var(--link-focus));
+		}
+	}
+}
+
+@keyframes link-active {
+	from,
+	to {
+		---link-active: 1;
+		---link-interacting: 1;
+	}
+}
+@keyframes link-current {
+	from,
+	to {
+		---link-active: 1;
+		---link-current: 1;
 	}
 }
 
@@ -90,7 +145,7 @@ a {
 select,
 button,
 input,
-label:has(> input:is([type='checkbox'], [type='radio'])) {
+label:has(> input:is([type="checkbox"], [type="radio"])) {
 	cursor: pointer;
 
 	display: inline-flex;
@@ -115,12 +170,12 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 }
 
 option,
-label:has(> input:is([type='checkbox'], [type='radio'])) {
+label:has(> input:is([type="checkbox"], [type="radio"])) {
 	padding: 0.6em 0.8em;
 }
 
 /**
- * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.
+ * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets. Sticky summaries retain their geometry and backdrop layering when pressed.
  *
  * ### Tokens
  * - `to-containing`
@@ -151,7 +206,7 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 	option,
 	button,
 	input,
-	label:has(> input:is([type='checkbox'], [type='radio']), button),
+	label:has(> input:is([type="checkbox"], [type="radio"]), button),
 	::scroll-marker
 ) {
 	position: relative;
@@ -169,13 +224,13 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 	transition-property: opacity, scale;
 	transition-duration: var(--pressable-transitionOutDuration);
 
-	&:active:is(
-			label:has(> input:is([type='checkbox'], [type='radio']), button),
+	&:active:not(summary[data-sticky]):is(
+			label:has(> input:is([type="checkbox"], [type="radio"]), button),
 			:not(
 				:has(
 					:where(
 						[data-pressable],
-						[role='button'],
+						[role="button"],
 						:where(
 							summary,
 							a,
@@ -183,7 +238,7 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 							option,
 							button,
 							input,
-							label:has(> input:is([type='checkbox'], [type='radio']), button)
+							label:has(> input:is([type="checkbox"], [type="radio"]), button)
 						)
 					):active
 				)
@@ -201,11 +256,14 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 }
 
 /**
- * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-complex`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+ * ## [data-icon]
+ *
+ * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
  *
  * ### Tokens
  * - shape: `circle`, `filled`
- * - source: `wbicons-complex`
+ * - color: `accent`
+ * - source: `wbicons-simple`, `wbicons-complex`
  * - effect: `shadow`
  *
  * ### CSS Variables
@@ -228,6 +286,10 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 [data-icon] {
 	--icon-content: attr(data-icon);
 
+	&[data-icon~="accent"] {
+		color: var(--accent);
+	}
+
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -249,11 +311,15 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 		block-size: 100%;
 	}
 
+	&::before {
+		line-height: 1;
+	}
+
 	&:is(:empty)::before {
 		content: var(--icon-content);
 	}
 
-	&[data-icon~='circle'] {
+	&[data-icon~="circle"] {
 		inline-size: var(--icon-size, 2rem);
 		block-size: var(--icon-size, 2rem);
 		border-radius: 50%;
@@ -340,8 +406,10 @@ span svg {
 }
 
 /**
- * One-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the
- * same column/grid defaults before card-specific rules apply below. Single-column grid with theme gap and alignment defaults. Add space-separated tokens on `[data-column]`.
+ * ## [data-column]
+ * Vertical flex layout with alignment and gap tokens. `span-start` lets the first row’s leading
+ * icon span supporting copy; an extreme first-row aspect ratio moves that copy to full width.
+ * The first row remains a real box, independent of the supporting copy’s length.
  *
  * ### Applied to
  * - `[data-card]`
@@ -349,6 +417,15 @@ span svg {
  * ### Tokens
  * - alignment: `start`, `center`, `end`
  * - spacing: `gap-0`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `gap-6`, `gap-8`
+ * - composition: `span-start`
+ *
+ * ### CSS Variables
+ * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
+ * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
+ * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
+ * - `--column-spanSize`: icon span override; defaults to the heading and supporting line heights plus their gap
+ * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
+ * - `--column-iconGap`: inline gap after the leading icon; defaults to 0.625rem
  *
  * ### Examples
  * - Default column grid (`1em` gap, start-aligned content):
@@ -369,6 +446,18 @@ span svg {
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`
  */
+@property --card-borderWidth {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 2px;
+}
+
+@property ---column-gap {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0px;
+}
+
 [data-column],
 [data-card] {
 	display: flex;
@@ -382,52 +471,60 @@ span svg {
 		flex-direction: row;
 	}
 
-	gap: 0.5em;
+	---column-gap: 0.5em;
+	gap: var(---column-gap);
 	align-content: start;
 
-	&[data-column~='start'] {
+	&[data-column~="start"] {
 		align-items: start;
 		justify-items: start;
 	}
-	&[data-column~='center'] {
+	&[data-column~="center"] {
 		align-items: center;
 		justify-items: center;
 	}
-	&[data-column~='end'] {
+	&[data-column~="end"] {
 		align-items: end;
 		justify-items: end;
 	}
 
-	&[data-column~='gap-0'] {
-		gap: 0em;
+	&[data-column~="gap-0"] {
+		---column-gap: 0em;
 	}
-	&[data-column~='gap-1'] {
-		gap: 0.25em;
+	&[data-column~="gap-1"] {
+		---column-gap: 0.25em;
 	}
-	&[data-column~='gap-2'] {
-		gap: 0.5em;
+	&[data-column~="gap-2"] {
+		---column-gap: 0.5em;
 	}
-	&[data-column~='gap-3'] {
-		gap: 0.75em;
+	&[data-column~="gap-3"] {
+		---column-gap: 0.75em;
 	}
-	&[data-column~='gap-4'] {
-		gap: 1em;
+	&[data-column~="gap-4"] {
+		---column-gap: 1em;
 	}
-	&[data-column~='gap-5'] {
-		gap: 1.25em;
+	&[data-column~="gap-5"] {
+		---column-gap: 1.25em;
 	}
-	&[data-column~='gap-6'] {
-		gap: 1.5em;
+	&[data-column~="gap-6"] {
+		---column-gap: 1.5em;
 	}
-	&[data-column~='gap-8'] {
-		gap: 2em;
+	&[data-column~="gap-8"] {
+		---column-gap: 2em;
 	}
 
 	/**
-	 * Column child sizing tokens for direct children of `[data-column]` / `[data-card]`.
+	 * ## [data-column-item]
+	 *
+	 * Size and align a column child.
+	 *
+	 * ### Placement
+	 * - Direct children of `[data-column]` or `[data-card]`.
 	 *
 	 * ### Tokens
 	 * - growth: `flexible`
+	 * - basis: `basis-1`, `basis-2`, `basis-3`, `basis-4`
+	 * - alignment: `start`, `center`, `end`, `baseline`
 	 *
 	 * ### Examples
 	 * ```html
@@ -439,34 +536,174 @@ span svg {
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column-item]`
 	 */
-	[data-column-item~='flexible'] {
+	[data-column-item~="flexible"] {
 		flex: 1;
 	}
 
-	[data-column-item~='basis-1'] {
+	[data-column-item~="basis-1"] {
 		flex-basis: 16ch;
 	}
-	[data-column-item~='basis-2'] {
+	[data-column-item~="basis-2"] {
 		flex-basis: 22ch;
 	}
-	[data-column-item~='basis-3'] {
+	[data-column-item~="basis-3"] {
 		flex-basis: 28ch;
 	}
-	[data-column-item~='basis-4'] {
+	[data-column-item~="basis-4"] {
 		flex-basis: 34ch;
 	}
 
-	[data-column-item~='start'] {
+	[data-column-item~="start"] {
 		align-self: start;
 	}
-	[data-column-item~='center'] {
+	[data-column-item~="center"] {
 		align-self: center;
 	}
-	[data-column-item~='end'] {
+	[data-column-item~="end"] {
 		align-self: end;
 	}
-	[data-column-item~='baseline'] {
+	[data-column-item~="baseline"] {
 		align-self: baseline;
+	}
+}
+
+@property ---column-spanSize {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0px;
+}
+
+[data-column~="span-start"] {
+	---column-sizeTimelines: --column-inline-size, --column-block-size;
+	---column-spanSize: var(
+		--column-spanSize,
+		calc(1lh + var(--column-supportLineHeight, 1rlh) + var(--column-supportGap, 0.5rem))
+	);
+	---column-break: 0;
+	---column-gap: var(--column-supportGap, 0.5rem);
+
+	> [data-row] {
+		gap: inherit;
+		flex-wrap: wrap;
+
+		a[data-row] {
+			gap: var(--column-iconGap, 0.625rem);
+		}
+
+		/* Wrapped companions stay in the title column; the first link retains the icon slot. */
+		[data-sticky-breadcrumb~="item"][data-row~="wrap"]:has(> a > [data-icon]) {
+			padding-inline-start: calc(var(---column-spanSize) + var(--column-iconGap, 0.625rem));
+			> a:first-child {
+				margin-inline-start: calc(-1 * (var(---column-spanSize) + var(--column-iconGap, 0.625rem)));
+			}
+		}
+
+		> [data-row-item~="flexible"] {
+			flex-basis: max-content;
+		}
+
+		[data-icon] {
+			--icon-size: var(---column-spanSize);
+			line-height: inherit;
+			block-size: 1.5lh;
+			align-items: start;
+			justify-content: start;
+
+			&::before {
+				font-size: calc(
+					(1 - var(---column-break)) * var(---column-spanSize) + var(---column-break) * 1.5lh
+				);
+			}
+		}
+
+		> :not([data-icon], [data-row-item~="flexible"]) {
+			font-size: var(--column-supportFontSize, 1rem);
+		}
+	}
+
+	> :not([data-row]) {
+		font-size: var(--column-supportFontSize, 1rem);
+		line-height: var(--column-supportLineHeight, 1rlh);
+	}
+
+	&:has(> [data-row] [data-icon]) > :not([data-row]) {
+		margin-inline-start: calc(
+			(1 - var(---column-break)) * (var(---column-spanSize) + var(--column-iconGap, 0.625rem))
+		);
+	}
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	(width: anchor-size(--column-firstRow inline)) and (timeline-scope: --column-size) {
+	@property ---column-inlineFraction {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 1;
+	}
+	@property ---column-blockFraction {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 1;
+	}
+	@keyframes column-inline-size {
+		from {
+			---column-inlineFraction: 0;
+		}
+		to {
+			---column-inlineFraction: 1;
+		}
+	}
+	@keyframes column-block-size {
+		from {
+			---column-blockFraction: 0;
+		}
+		to {
+			---column-blockFraction: 1;
+		}
+	}
+
+	[data-column~="span-start"] {
+		anchor-scope: --column-firstRow;
+		timeline-scope: var(---column-sizeTimelines);
+		animation:
+			column-inline-size auto linear both,
+			column-block-size auto linear both;
+		animation-timeline: var(---column-sizeTimelines);
+		/* At viewport start, a fixed size probe has view progress V / (V + D). */
+		---column-break: clamp(
+			0,
+			sign(
+				var(--column-wrapRatio, 4) - (100vw * (1 / var(---column-inlineFraction) - 1)) /
+					max(1px, 100vw * (1 / var(---column-blockFraction) - 1))
+			),
+			1
+		);
+
+		> [data-row] {
+			anchor-name: --column-firstRow;
+		}
+
+		&:not([data-sticky-breadcrumb~="position"]) {
+			&::before,
+			&::after {
+				content: '';
+				position: fixed;
+				inset: 0 auto auto 0;
+				block-size: 1px;
+				visibility: hidden;
+				pointer-events: none;
+				view-timeline-axis: inline;
+				view-timeline-inset: 0;
+			}
+			&::before {
+				inline-size: anchor-size(--column-firstRow inline);
+				view-timeline-name: --column-inline-size;
+			}
+			&::after {
+				inline-size: anchor-size(--column-firstRow block);
+				view-timeline-name: --column-block-size;
+			}
+		}
 	}
 }
 
@@ -538,28 +775,28 @@ summary {
 		align-items: end;
 	}
 
-	&[data-row~='gap-0'] {
+	&[data-row~="gap-0"] {
 		gap: 0em;
 	}
-	&[data-row~='gap-1'] {
+	&[data-row~="gap-1"] {
 		gap: 0.25em;
 	}
-	&[data-row~='gap-2'] {
+	&[data-row~="gap-2"] {
 		gap: 0.5em;
 	}
-	&[data-row~='gap-3'] {
+	&[data-row~="gap-3"] {
 		gap: 0.75em;
 	}
-	&[data-row~='gap-4'] {
+	&[data-row~="gap-4"] {
 		gap: 1em;
 	}
-	&[data-row~='gap-5'] {
+	&[data-row~="gap-5"] {
 		gap: 1.25em;
 	}
-	&[data-row~='gap-6'] {
+	&[data-row~="gap-6"] {
 		gap: 1.5em;
 	}
-	&[data-row~='gap-8'] {
+	&[data-row~="gap-8"] {
 		gap: 2em;
 	}
 
@@ -645,6 +882,7 @@ summary {
  * - `--card-backgroundColor`
  * - `--card-radius`
  * - `--card-padding`
+ * - `--card-borderWidth`: accent border width; defaults to 2px
  *
  * ### Examples
  * - Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):
@@ -728,13 +966,13 @@ summary {
 		--card-padding: 2em;
 	}
 
-	&[data-card~='border-accent'] {
-		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
+	&[data-card~="border-accent"] {
+		border: var(--card-borderWidth) solid color-mix(in srgb, var(--accent) 90%, transparent);
 	}
 }
 
 /**
- * Compact badge / chip surface with size modifiers. Chip uses the medium size when the attribute is present without a token.
+ * Compact badge / chip surface with explicit size modifiers. Without a size token, text size is inherited and no badge padding is added.
  *
  * ### Tokens
  * - `small`, `medium`, `large`
@@ -745,7 +983,7 @@ summary {
  * - `--badge-textColor`
  *
  * ### Examples
- * - Default size (medium — omit token):
+ * - Default (inherited text size, no added padding):
  *   ```html
  *   <span data-badge>Status</span>
  *   ```
@@ -768,6 +1006,7 @@ summary {
 	--badge-backdropFilter: none;
 
 	display: inline-flex;
+	max-inline-size: 100%;
 	gap: 0.15em;
 	flex-shrink: 0;
 	flex-basis: auto;
@@ -979,15 +1218,16 @@ ol {
 	--list-marker-inlineSize: 1.15em;
 
 	/* Rules */
-	&:not([data-list~='unstyled']) {
+	&:not([data-list~="unstyled"]) {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--list-gap);
 		list-style-type: disc;
 		list-style-position: outside;
 		padding-inline-start: var(--list-marker-inlineSize);
 	}
 
-	&[data-list~='unstyled'] {
+	&[data-list~="unstyled"] {
 		list-style-type: none;
 		list-style-position: inside;
 		padding-inline-start: 0;
@@ -1060,7 +1300,7 @@ ol {
 	 * ### Source
 	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`
 	 */
-	&:not([data-list~='unstyled']) > :is(li, [data-list-item]) {
+	&:not([data-list~="unstyled"]) > :is(li, [data-list-item]) {
 		position: relative;
 		--listItem-gap: 0.25lh;
 
@@ -1110,6 +1350,14 @@ ol {
 			font-size: 1em;
 			text-align: center;
 		}
+		/**
+		 * ## [data-list-item-marker]
+		 *
+		 * Custom literal marker text for a list item.
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item-marker]`
+		 */
 		&[data-list-item-marker]::before {
 			content: attr(data-list-item-marker);
 		}
@@ -1124,174 +1372,799 @@ ol {
 }
 
 /**
- * Recursive scroll-driven sticky breadcrumbs. Each level publishes a configurable item anchor and
- * resolves its configurable parent anchor: root → section → subsection. A `position` preserves the
- * regular-layout origin and supplies its view timeline; a `scope` controls how long the fixed item
- * remains visible.
+ * ## [data-sticky-breadcrumb]
  *
- * This is a progressive enhancement. Without scroll-driven animations and anchor positioning,
- * every item remains in regular document flow.
+ * Native sticky breadcrumbs use independent source and metadata dimensions to compose compact rows.
+ * A source retains its intrinsic layout box while its real item receives paint transforms.
+ * Compose the position with `data-sticky` for native fallback and explicit backdrop placement.
+ *
+ * ### Placement
+ * - A scope contains its position (directly or inside details), followed by content and a flow marker.
+ * - The entry flow marker contains one measure element for independent horizontal size clocks.
+ * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
+ * - Closing details excludes its scope, summary and descendants from sticky motion and measurements.
  *
  * ### Tokens
- * - `root`: first breadcrumb item; publishes an anchor but is not repositioned
- * - `scope`: visibility boundary for descendant items
- * - `position`: regular-layout position anchor and view-timeline source
- * - `item`: breadcrumb link; recursively anchors to the nearest preceding item
+ * - `scope`: natural section and animation-start fragment target containing a position and its following content
+ * - `root`: starts a breadcrumb hierarchy
+ * - `position`: real sticky heading container and source-height anchor
+ * - `source`: untransformed intrinsic reservation for the item
+ * - `item`: transformed real heading identity and native controls
+ * - `support`: clips its child content elements below the compact row while they follow their natural scroll position; wrap plain text in an element
+ * - `end`: independently sized in-flow metadata
+ * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
+ * - `exit`: combines with `flow` to mark the departure start and end from the section bottom
+ * - `measure`: hidden dimension probes inside the flow marker
  *
  * ### CSS Variables
- * - `--stickyBreadcrumb-animationRangeStart`
- * - `--stickyBreadcrumb-animationRangeEnd`
- * - `--stickyBreadcrumb-gap`
- * - `--stickyBreadcrumb-position-minBlockSize`
- * - `--stickyBreadcrumb-position-insetBlockStart`
- * - `--stickyBreadcrumb-position-insetInlineStart`
- * - `--stickyBreadcrumb-item-insetBlockStart`
- * - `--stickyBreadcrumb-item-blockOffset`
- * - `--stickyBreadcrumb-item-insetInlineStart`
- * - `--stickyBreadcrumb-item-insetInlineEnd`
- * - `--stickyBreadcrumb-item-blockSize`
- * - `--stickyBreadcrumb-trackBlockEnd`
- * - `--stickyBreadcrumb-exitAnimationDistance`
- * - `--stickyBreadcrumb-itemAnchor`
- * - `--stickyBreadcrumb-parentAnchor`
+ * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, entry-derived names when globally scoped
+ * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, entry-derived names when globally scoped
+ * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
+ * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% entry-crossing 100%`
+ * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
+ * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
+ * - `--stickyBreadcrumb-iconScale`: final painted icon scale relative to its source; derived for glyphs, configurable on images
+ * - `--stickyBreadcrumb-gap`: compact item gap; defaults to 1rem
+ * - `--stickyBreadcrumb-markerSize`: physical separator slot between adjacent headings; defaults to 0px
+ * - `--stickyBreadcrumb-paddingBlock`: compact row padding; defaults to 0.5rem
+ * - `--stickyBreadcrumb-minBlockSize`: minimum compact identity height; defaults to 0px
+ * - `--stickyBreadcrumb-forceRow`: starts a row when 1
+ * - `--stickyBreadcrumb-inlineEasing`: horizontal motion and scaling curve; defaults to InOutExpo with an earlier horizontal lead for adjacent arrivals
+ * - `--stickyBreadcrumb-exitAnimation`: scope input for row and backdrop departure animations; `none` retains the row while its support content keeps scrolling
+ * - `--stickyBreadcrumb-availableInlineSize`: available compact row width; defaults to 100cqi
+ * - `--stickyBreadcrumb-insetBlockStart`: initial hierarchy inset
+ * - `--stickyBreadcrumb-nativeBlockSize`: fixed native row size when measured compaction is unavailable; defaults to 5rem
+ * - `--stickyBreadcrumb-sourcePaddingBlock`, `--stickyBreadcrumb-sourcePaddingInline`: padding at the real position owner
  *
- * ### Example
- * ```html
- * <a data-sticky-breadcrumb="root item"><h1>Page</h1></a>
- * <section data-sticky-breadcrumb="scope">
- *   <header data-sticky-breadcrumb="position">
- *     <a data-sticky-breadcrumb="item"><h2>Section</h2></a>
- *   </header>
- *   <section data-sticky-breadcrumb="scope">
- *     <header data-sticky-breadcrumb="position">
- *       <a data-sticky-breadcrumb="item"><h3>Subsection</h3></a>
+ * ### Examples
+ * - Native heading and its natural-flow boundary:
+ *   ```html
+ *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry">
+ *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
+ *       <div data-row data-sticky="block block-start backdrop-self backdrop-always">
+ *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
+ *           <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
+ *         </div>
+ *       </div>
  *     </header>
+ *     <div>Section content</div>
+ *     <span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+ *     <span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
  *   </section>
- * </section>
- * ```
+ *   ```
  *
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
  */
-@supports (
-	((animation-timeline: scroll()) and (animation-range: 0% 100%)) and (container-type: scroll-state)
-		and (position-anchor: --sticky-breadcrumb-scope) and
-		(inset-inline-start: anchor(--sticky-breadcrumb-item end))
-) {
-	[data-sticky-breadcrumb~='scope'] {
-		---stickyBreadcrumb-exitAnimationRangeStart: exit-crossing
-			calc(
-				100% - var(--stickyBreadcrumb-trackBlockEnd, 1lh) -
-					var(--stickyBreadcrumb-exitAnimationDistance, var(--stickyBreadcrumb-trackBlockEnd, 1lh))
-			);
-		---stickyBreadcrumb-exitAnimationRangeEnd: exit-crossing
-			calc(100% - var(--stickyBreadcrumb-trackBlockEnd, 1lh));
+[data-sticky-breadcrumb~="scope"]
+	:is(
+		a[data-sticky-breadcrumb~="item"],
+		[data-sticky-breadcrumb~="item"] > a:first-child,
+		h4 > a:first-child
+	) {
+	position: relative;
+	display: flex;
+	align-items: center;
 
-		anchor-scope:
-			var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item), --sticky-breadcrumb-position,
-			--sticky-breadcrumb-scope, --sticky-breadcrumb-extra-position;
-		timeline-scope: --sticky-breadcrumb-timeline, --sticky-breadcrumb-scope-timeline;
-		view-timeline-name: --sticky-breadcrumb-scope-timeline;
-		view-timeline-axis: block;
-		view-timeline-inset: 0;
+	&::before {
+		content: '#';
+		position: absolute;
+		inset-inline-end: 100%;
+		inline-size: max-content;
+		padding-inline-end: 0.66rem;
+		font-family: var(--fontFamily-avenir), 'Noto Color Emoji';
+		font-size: var(--stickyBreadcrumb-markerSize);
+		line-height: calc(1 / 0.7);
 
-		&::before {
-			content: '';
-			display: block;
-			position: sticky;
-			inset-block-start: var(--stickyBreadcrumb-item-insetBlockStart, 0px);
-			block-size: 1px;
-			margin-block-end: -1px;
-			anchor-name: --sticky-breadcrumb-scope;
+		transition-property: opacity;
+	}
+
+	&:not(:hover, :focus-visible)::before {
+		opacity: 0;
+	}
+}
+
+[data-sticky-breadcrumb~="flow"] {
+	display: none;
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	/* Scope descendant clocks above their animation targets. Local clocks derive unique names from their arrival identity. */
+	@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+		body {
+			timeline-scope: all;
 		}
 	}
-
-	[data-sticky-breadcrumb~='position'] {
-		anchor-name: --sticky-breadcrumb-position;
-		min-block-size: var(--stickyBreadcrumb-position-minBlockSize, auto);
-		view-timeline-name: --sticky-breadcrumb-timeline;
-		view-timeline-axis: block;
-		view-timeline-inset: 0;
+	@property --stickyBreadcrumb-scale {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 1;
 	}
-
-	[data-sticky-breadcrumb~='item'] {
-		anchor-name: var(--stickyBreadcrumb-itemAnchor, --sticky-breadcrumb-item);
-
-		&:not([data-sticky-breadcrumb~='root']) {
-			position-anchor: --sticky-breadcrumb-scope;
-			position-visibility: anchors-visible;
-
-			animation:
-				StickyBreadcrumbItemAnimation var(--transition-easeInOutExpo) both,
-				StickyBreadcrumbItemExitAnimation linear both,
-				StickyBreadcrumbItemVisibility 1ms steps(1, end) both;
-			animation-timeline:
-				--sticky-breadcrumb-timeline, --sticky-breadcrumb-scope-timeline,
-				--sticky-breadcrumb-scope-timeline;
-			animation-range:
-				var(--stickyBreadcrumb-animationRangeStart, entry calc(100vh - 6rem))
-					var(--stickyBreadcrumb-animationRangeEnd, entry calc(100vh - 3rem)),
-				var(---stickyBreadcrumb-exitAnimationRangeStart)
-					var(---stickyBreadcrumb-exitAnimationRangeEnd),
-				var(---stickyBreadcrumb-exitAnimationRangeStart)
-					var(---stickyBreadcrumb-exitAnimationRangeEnd);
-		}
+	@property ---breadcrumb-iconTranslateBlock {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
 	}
-
-	@keyframes StickyBreadcrumbItemAnimation {
+	@property ---breadcrumb-iconCorrection {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property ---breadcrumb-itemInline {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---breadcrumb-itemBlock {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---breadcrumb-endInline {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---breadcrumb-endBlock {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 1;
+	}
+	@property ---breadcrumb-inlineEnd {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property ---breadcrumb-blockStart {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property ---breadcrumb-blockEnd {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property ---breadcrumb-wrap {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 1;
+	}
+	@property ---breadcrumb-entry {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --stickyBreadcrumb-sourcePaddingBlock {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@property --stickyBreadcrumb-sourcePaddingInline {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	@keyframes breadcrumb-item-inline {
 		from {
-			position: fixed;
-			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-position top) +
-					var(--stickyBreadcrumb-position-insetBlockStart, 0px)
-			);
-			inset-inline-start: calc(
-				anchor(--sticky-breadcrumb-position start) +
-					var(--stickyBreadcrumb-position-insetInlineStart, 0px)
-			);
-			margin-inline-start: 0;
-			min-block-size: 0;
+			---breadcrumb-itemInline: 0;
 		}
 		to {
-			position: fixed;
-			inset-block-start: calc(
-				anchor(--sticky-breadcrumb-scope top) + var(--stickyBreadcrumb-item-blockOffset, 0px)
-			);
-			inset-inline-start: var(
-				--stickyBreadcrumb-item-insetInlineStart,
-				anchor(var(--stickyBreadcrumb-parentAnchor, --sticky-breadcrumb-item) end)
-			);
-			inset-inline-end: var(--stickyBreadcrumb-item-insetInlineEnd, auto);
-			margin-inline-start: var(--stickyBreadcrumb-gap, 1rem);
-			min-block-size: var(--stickyBreadcrumb-item-blockSize, 1lh);
+			---breadcrumb-itemInline: 1;
 		}
 	}
-
-	@keyframes StickyBreadcrumbItemVisibility {
+	@keyframes breadcrumb-item-block {
 		from {
-			visibility: visible;
+			---breadcrumb-itemBlock: 0;
 		}
 		to {
-			visibility: hidden;
+			---breadcrumb-itemBlock: 1;
 		}
 	}
-
-	@keyframes StickyBreadcrumbItemExitAnimation {
+	@keyframes breadcrumb-end-inline {
+		from {
+			---breadcrumb-endInline: 0;
+		}
 		to {
+			---breadcrumb-endInline: 1;
+		}
+	}
+	@keyframes breadcrumb-end-block {
+		from {
+			---breadcrumb-endBlock: 0;
+		}
+		to {
+			---breadcrumb-endBlock: 1;
+		}
+	}
+	@keyframes breadcrumb-backdrop {
+		from {
 			opacity: 0;
 		}
+		to {
+			opacity: 1;
+		}
+	}
+	@keyframes breadcrumb-support-offset {
+		from {
+			transform: translateY(0px);
+		}
+	}
+	@keyframes breadcrumb-support-scroll {
+		from {
+			translate: 0 0;
+		}
+		to {
+			translate: 0 -100vh;
+		}
+	}
+	/* Keep the compact row in place while its taller natural box leaves the sticky constraint. */
+	@keyframes breadcrumb-position-exit {
+		from {
+			translate: 0 0;
+		}
+		to {
+			translate: 0 max(0px, calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd)));
+		}
+	}
+	@keyframes breadcrumb-end-motion {
+		from {
+			translate: 0px 0px;
+		}
+	}
+	@keyframes breadcrumb-item-motion {
+		from {
+			transform: translateX(0px) scale(1);
+		}
+	}
+	/* Relative child scales preserve the compact text/icon ratios without 3D projection. */
+	@keyframes breadcrumb-icon-motion {
+		from {
+			transform: translateY(0px) scale(1) var(---icon-paint-transform, translateX(0px));
+		}
+		to {
+			transform: translateY(calc(var(---breadcrumb-iconTranslateBlock, 0px) / var(--stickyBreadcrumb-scale)))
+				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)))
+				var(---icon-paint-transform, translateX(0px));
+		}
+	}
+	@keyframes breadcrumb-text-motion {
+		from {
+			transform: translateX(0px);
+		}
+		to {
+			transform: translateX(calc(var(---inlineDirection) * var(---breadcrumb-iconCorrection)));
+		}
+	}
+	/* Before / arriving / compact are discrete states; native properties own visual progress. */
+	@keyframes breadcrumb-entry {
+		from {
+			---breadcrumb-entry: 0.5;
+		}
+		to {
+			---breadcrumb-entry: 1;
+		}
+	}
+	@keyframes breadcrumb-exit {
+		from {
+			transform: translateY(0px);
+		}
+		to {
+			transform: translateY(calc(var(---breadcrumb-blockStart) - var(---breadcrumb-blockEnd)));
+		}
+	}
+	/* Fragment targets retain their parent inset even when their disclosure is closed. */
+	[data-sticky-breadcrumb~="scope"] {
+		---breadcrumb-parentBlockEnd: var(---breadcrumb-blockEnd);
+		scroll-margin-block-start: var(---breadcrumb-parentBlockEnd);
+	}
+	[data-sticky-breadcrumb~="scope"] [id][data-sticky-container]:has(> [data-sticky]) {
+		scroll-snap-align: start;
+		scroll-margin-block-start: var(---breadcrumb-blockEnd);
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
-			animation: none;
+	/* Native disclosure state bounds sticky participation, including its visible summary. */
+	@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
+		[data-sticky-breadcrumb~="position"]
+			:is(
+				a[data-sticky-breadcrumb~="item"],
+				[data-sticky-breadcrumb~="item"] > a:first-child
+			)::before {
+			content: if(style(---breadcrumb-entry: 0): '#' ;style(---breadcrumb-wrap: 0): '›' ;else: '#');
+			inline-size: if(style(---breadcrumb-wrap: 0) and (not style(---breadcrumb-entry: 0)): calc(var(--stickyBreadcrumb-markerSize) + var(--stickyBreadcrumb-gap, 1rem)); else: max-content);
+			padding-inline: 0 if(style(---breadcrumb-wrap: 0) and (not style(---breadcrumb-entry: 0)): 0px; else: 0.66rem);
+			text-align: center;
+			transform-origin: 100% 50%;
+			animation:
+				breadcrumb-icon-motion auto var(---breadcrumb-inlineEasing) both,
+				breadcrumb-backdrop auto linear both;
+			animation-name: breadcrumb-icon-motion, if(style(---breadcrumb-entry: 0) or style(---breadcrumb-wrap: 1): none; else: breadcrumb-backdrop);
+			animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+			animation-range: var(--stickyBreadcrumb-entryRange);
+			@media (prefers-reduced-motion: reduce) {
+				animation-timing-function: steps(1, end);
+			}
+			transition-property: if(
+				style(---breadcrumb-entry: 0): opacity;style(---breadcrumb-wrap: 0): none;else: opacity
+			);
+		}
+		[data-sticky-breadcrumb~="position"]
+			:is(a[data-sticky-breadcrumb~="item"], [data-sticky-breadcrumb~="item"] > a:first-child):not(
+				:hover,
+				:focus-visible
+			)::before {
+			opacity: 0;
+		}
+		/* Measure both dimensions horizontally so vertical scrolling cannot tick size clocks. */
+		:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::before,
+		:is([data-sticky-breadcrumb~="scope"], [data-sticky-breadcrumb~="measure"])::after,
+		[data-sticky-breadcrumb~="measure"],
+		[data-sticky-breadcrumb~="flow"]::before {
+			position: fixed;
+			inset: 0 auto auto 0;
+			block-size: 1px;
+			visibility: hidden;
+			pointer-events: none;
+			view-timeline-axis: inline;
+			view-timeline-inset: 0;
+		}
+		[data-sticky-breadcrumb~="measure"] {
+			inline-size: anchor-size(--column-firstRow inline, 0px);
+			view-timeline-name: var(---breadcrumb-rowInlineTimeline);
+			&::before,
+			&::after {
+				content: if(style(---breadcrumb-hasEnd: 1): '' ; else: none);
+			}
+			&::before {
+				inline-size: anchor-size(--breadcrumb-end inline, 0px);
+				view-timeline-name: var(--stickyBreadcrumb-endInlineTimeline);
+			}
+			&::after {
+				inline-size: anchor-size(--breadcrumb-end block, 0px);
+				view-timeline-name: var(--stickyBreadcrumb-endBlockTimeline);
+			}
+		}
+		[data-sticky-breadcrumb~="scope"] {
+			--stickyBreadcrumb-entryRange: exit-crossing 0% entry-crossing 100%;
+			/* Only the visual row departs; supporting content retains its ordinary opacity. */
+			--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeInOutExpo) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
+			@media (prefers-reduced-motion: reduce) {
+				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
+			}
+			--stickyBreadcrumb-itemInlineTimeline: --breadcrumb-item-inline;
+			--stickyBreadcrumb-itemBlockTimeline: --breadcrumb-item-block;
+			--stickyBreadcrumb-endInlineTimeline: --breadcrumb-end-inline;
+			--stickyBreadcrumb-endBlockTimeline: --breadcrumb-end-block;
+			---breadcrumb-rowInlineTimeline: --breadcrumb-row-inline;
+			---breadcrumb-rowBlockTimeline: --breadcrumb-row-block;
+			---breadcrumb-exitTimeline: --breadcrumb-exit;
+			---breadcrumb-itemTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline);
+			---breadcrumb-sizeTimelines:
+				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline),
+				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+			position: relative;
+			container-type: inline-size;
+			anchor-scope:
+				--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
+			timeline-scope: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
+			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+				--stickyBreadcrumb-itemInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-inline");
+				--stickyBreadcrumb-itemBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-block");
+				--stickyBreadcrumb-endInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-inline");
+				--stickyBreadcrumb-endBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-block");
+				---breadcrumb-rowInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-inline");
+				---breadcrumb-rowBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-block");
+				---breadcrumb-exitTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-exit");
+				timeline-scope: var(--stickyBreadcrumb-entryTimeline);
+			}
+			view-timeline: var(---breadcrumb-exitTimeline) block;
+			view-timeline-inset: 0;
+			---breadcrumb-sizeAnimationNames:
+				breadcrumb-item-inline, breadcrumb-item-block, breadcrumb-end-inline, breadcrumb-end-block,
+				column-inline-size, column-block-size;
+			---breadcrumb-sourceOffsetBlock: 0px;
+			&[data-card~="border-accent"] {
+				---breadcrumb-sourceOffsetBlock: var(--card-borderWidth);
+			}
+			/* Sizes belong to the scope; changing arrival progress belongs to its heading. */
+			animation: none auto linear both;
+			animation-name: var(---breadcrumb-sizeAnimationNames);
+			animation-timeline: var(---breadcrumb-sizeTimelines);
+			---breadcrumb-itemWidth: calc(100vw * (1 / var(---breadcrumb-itemInline) - 1));
+			---breadcrumb-itemHeight: calc(100vw * (1 / var(---breadcrumb-itemBlock) - 1));
+			---breadcrumb-endWidth: calc(100vw * (1 / var(---breadcrumb-endInline) - 1));
+			---breadcrumb-endHeight: calc(100vw * (1 / var(---breadcrumb-endBlock) - 1));
+			---breadcrumb-parentInlineEnd: var(---breadcrumb-inlineEnd);
+			---breadcrumb-parentBlockStart: var(---breadcrumb-blockStart);
+			--stickyBreadcrumb-forceRow: 0;
+			--stickyBreadcrumb-minBlockSize: 0px;
+			---breadcrumb-hasEnd: 0;
+			&:has(
+				> [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="end"],
+				> details > [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="end"]
+			) {
+				---breadcrumb-hasEnd: 1;
+			}
+			&[data-sticky-breadcrumb~="root"] {
+				--stickyBreadcrumb-forceRow: 1;
+				---breadcrumb-parentInlineEnd: 0px;
+				---breadcrumb-parentBlockStart: var(--stickyBreadcrumb-insetBlockStart, 0px);
+				---breadcrumb-parentBlockEnd: var(--stickyBreadcrumb-insetBlockStart, 0px);
+			}
+			&::before {
+				content: '';
+				inline-size: anchor-size(--breadcrumb-compact inline);
+				view-timeline-name: var(--stickyBreadcrumb-itemInlineTimeline);
+			}
+			&::after {
+				content: '';
+				inline-size: anchor-size(--breadcrumb-source block);
+				view-timeline-name: var(--stickyBreadcrumb-itemBlockTimeline);
+			}
+			> * {
+				---breadcrumb-endGap: calc(var(---breadcrumb-hasEnd) * var(--stickyBreadcrumb-gap, 1rem));
+				---breadcrumb-availableInlineSize: min(
+					var(--stickyBreadcrumb-availableInlineSize, 100cqi),
+					calc(100cqi - var(--stickyBreadcrumb-sourcePaddingInline))
+				);
+				---breadcrumb-endWrap: clamp(
+					0,
+					sign(
+						var(--stickyBreadcrumb-sourcePaddingInline) + var(---breadcrumb-itemWidth) +
+							var(---breadcrumb-endWidth) + var(---breadcrumb-endGap) - var(---breadcrumb-availableInlineSize)
+					),
+					1
+				);
+				---breadcrumb-width: calc(
+					(1 - var(---breadcrumb-endWrap)) *
+						(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap)) +
+						var(---breadcrumb-endWrap) *
+						max(var(---breadcrumb-itemWidth), var(---breadcrumb-endWidth))
+				);
+				---breadcrumb-compactItemHeight: max(
+					calc(var(---breadcrumb-itemHeight) * var(--stickyBreadcrumb-scale)),
+					var(--stickyBreadcrumb-minBlockSize)
+				);
+				---breadcrumb-height: calc(
+					(1 - var(---breadcrumb-endWrap)) *
+						max(var(---breadcrumb-compactItemHeight), var(---breadcrumb-endHeight)) +
+						var(---breadcrumb-endWrap) *
+						(
+							var(---breadcrumb-compactItemHeight) + var(---breadcrumb-endHeight) +
+								var(---breadcrumb-endGap)
+						)
+				);
+				---breadcrumb-wrap: max(
+					var(--stickyBreadcrumb-forceRow),
+					clamp(
+						0,
+						sign(
+							var(---breadcrumb-parentInlineEnd) + var(---breadcrumb-width) -
+								var(---breadcrumb-availableInlineSize)
+						),
+						1
+					)
+				);
+				---breadcrumb-inlineStart: calc(
+					(1 - var(---breadcrumb-wrap)) * var(---breadcrumb-parentInlineEnd) +
+						var(---breadcrumb-wrap) * var(--stickyBreadcrumb-sourcePaddingInline)
+				);
+				---breadcrumb-inlineEnd: calc(
+					var(---breadcrumb-inlineStart) + var(---breadcrumb-width) +
+						var(--stickyBreadcrumb-gap, 1rem) + var(--stickyBreadcrumb-markerSize, 0px)
+				);
+				---breadcrumb-blockStart: calc(
+					(1 - var(---breadcrumb-wrap)) * var(---breadcrumb-parentBlockStart) +
+						var(---breadcrumb-wrap) * var(---breadcrumb-parentBlockEnd)
+				);
+				---breadcrumb-blockEnd: max(
+					var(---breadcrumb-parentBlockEnd),
+					calc(
+						var(---breadcrumb-blockStart) + var(---breadcrumb-height) + 2 *
+							var(--stickyBreadcrumb-paddingBlock, 0.5rem)
+					)
+				);
+				---breadcrumb-rowHeight: calc(
+					var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart) - 2 *
+						var(--stickyBreadcrumb-paddingBlock, 0.5rem)
+				);
+			}
+			/* The outer border starts arrival; the position box still owns its end. */
+			> [data-sticky-breadcrumb~="flow"] {
+				display: block;
+				position: absolute;
+				scroll-snap-align: start;
+				scroll-margin-block-start: 0;
+				pointer-events: none;
+				inset-inline-start: 0;
+				inset-block-start: calc(-1 * (var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock)));
+				inline-size: 1px;
+				block-size: calc(anchor-size(--breadcrumb-position block) + var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock));
+				&::after {
+					content: '';
+					position: absolute;
+					inset-block-start: calc(100% - var(---breadcrumb-blockEnd));
+					inset-inline-start: 0;
+					inline-size: 1px;
+					block-size: 1px;
+					scroll-snap-align: start;
+					scroll-margin-block-start: 0;
+				}
+				&:not([data-sticky-breadcrumb~="exit"])::before {
+					content: '';
+					inline-size: anchor-size(--column-firstRow block, 0px);
+					view-timeline-name: var(---breadcrumb-rowBlockTimeline);
+				}
+				view-timeline-name: var(--stickyBreadcrumb-entryTimeline);
+				view-timeline-axis: block;
+				view-timeline-inset: 0 calc(100vh - var(---breadcrumb-blockEnd));
+				&[data-sticky-breadcrumb~="exit"] {
+					inset-block-start: calc(100% + var(---breadcrumb-sourceOffsetBlock) - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight));
+					block-size: var(---breadcrumb-rowHeight);
+					view-timeline-name: none;
+					&::after {
+						inset-block-start: 100%;
+					}
+					display: if(style(--stickyBreadcrumb-exitAnimation: none): none; else: block);
+				}
+			}
+			> [data-sticky-breadcrumb~="position"],
+			> details > [data-sticky-breadcrumb~="position"] {
+				/* Each level owns its state before its local arrival clock starts. */
+				---breadcrumb-entry: 0;
+				/* Adjacent items clear their parent horizontally before entering its text line. */
+				---breadcrumb-inlineEasing: var(--stickyBreadcrumb-inlineEasing, if(
+					style(---breadcrumb-wrap: 0): cubic-bezier(0.5, 0, 0, 1);
+					else: var(--transition-easeInOutExpo)
+				));
+				--sticky-insetBlockStart: if(
+					style(---breadcrumb-wrap: 0): var(---breadcrumb-parentBlockEnd)
+						;else: var(---breadcrumb-blockStart)
+				);
+				position: sticky;
+				inset-block-start: var(--sticky-insetBlockStart);
+				anchor-name: --breadcrumb-position;
+				anchor-scope: none;
+				z-index: 1;
+				pointer-events: none;
+				animation:
+					breadcrumb-entry auto steps(1, end) forwards,
+					breadcrumb-position-exit auto linear both;
+				@media (prefers-reduced-motion: reduce) {
+					animation-timing-function: steps(1, end), linear;
+				}
+				animation-timeline:
+					var(--stickyBreadcrumb-entryTimeline),
+					view(block var(--sticky-insetBlockStart) 0px);
+				animation-range:
+					var(--stickyBreadcrumb-entryRange),
+					exit 0% exit calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd));
+				&:is(summary):has(> [data-column~="span-start"]) {
+					align-items: start;
+					> [data-column~="span-start"] {
+						animation: none;
+						timeline-scope: none;
+						anchor-scope: none;
+						&::before,
+						&::after {
+							content: none;
+						}
+					}
+				}
+
+				---breadcrumb-exitRange: exit calc(100% - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight)) exit calc(100% - var(---breadcrumb-blockEnd));
+
+				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
+				---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));
+				> :not([data-row], header[data-column~="span-start"], [data-sticky-breadcrumb~="source"]),
+				> header[data-column~="span-start"] > :not([data-row]),
+				[data-sticky-breadcrumb~="support"] {
+					/* A clipping plane follows the compact row; counter-motion preserves natural content travel. */
+					---breadcrumb-supportOffset: calc(
+						var(---breadcrumb-blockEnd) - var(--sticky-insetBlockStart) -
+						var(--stickyBreadcrumb-sourcePaddingBlock) - var(---breadcrumb-sourceRowHeight) - var(---column-gap)
+					);
+					clip-path: inset(0 -100vw -100vh);
+					transform: translateY(var(---breadcrumb-supportOffset));
+					animation: breadcrumb-support-offset auto var(--transition-easeInOutExpo) both;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+					animation-range: var(--stickyBreadcrumb-entryRange);
+					pointer-events: auto;
+					> * {
+						transform: translateY(calc(-1 * var(---breadcrumb-supportOffset)));
+						animation:
+							breadcrumb-support-offset auto var(--transition-easeInOutExpo) both,
+							breadcrumb-support-scroll auto linear both;
+						animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+						animation-range:
+							var(--stickyBreadcrumb-entryRange),
+							contain calc(var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock) - var(--sticky-insetBlockStart))
+								contain calc(var(---breadcrumb-parentBlockEnd) + var(---breadcrumb-sourceOffsetBlock) - var(--sticky-insetBlockStart) + 100vh);
+					}
+					@media (prefers-reduced-motion: reduce) {
+						animation-timing-function: steps(1, end);
+						> * {
+							animation-timing-function: steps(1, end), linear;
+						}
+					}
+				}
+
+				[data-row]:has(> [data-sticky-breadcrumb~="source"]),
+				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
+					animation: var(--stickyBreadcrumb-exitAnimation);
+					animation-timeline: var(---breadcrumb-exitTimeline);
+					animation-range: var(---breadcrumb-exitRange);
+					---breadcrumb-iconCorrection: 0px;
+					&:has(
+						> [data-sticky-breadcrumb~="item"] > [data-icon],
+						> [data-sticky-breadcrumb~="item"] > a > [data-icon],
+						> [data-sticky-breadcrumb~="source"] > [data-sticky-breadcrumb~="item"] > [data-icon],
+						> [data-sticky-breadcrumb~="source"] > [data-sticky-breadcrumb~="item"] > a > [data-icon]
+					) {
+						---breadcrumb-iconCorrection: calc(
+							var(--stickyBreadcrumb-iconRatio, calc(1.5lh / 1em)) * 1em - var(---column-spanSize)
+						);
+					}
+				}
+				[data-sticky-breadcrumb~="source"] {
+					display: flex;
+					flex: 0 1 auto;
+					min-inline-size: 0;
+					max-inline-size: 100%;
+					anchor-name: --breadcrumb-source;
+					/* Resolve compact width here, where the source line metrics are owned. */
+					&::before {
+						content: '';
+						position: absolute;
+						inset: 0 auto auto 0;
+						visibility: hidden;
+						pointer-events: none;
+						anchor-name: --breadcrumb-compact;
+						inline-size: calc(
+							(anchor-size(--breadcrumb-source inline) + var(---breadcrumb-iconCorrection)) *
+								var(--stickyBreadcrumb-scale)
+						);
+					}
+				}
+				[data-sticky-breadcrumb~="item"] {
+					min-inline-size: 0;
+					max-inline-size: 100%;
+					flex-grow: 0;
+					flex-basis: auto;
+					inline-size: fit-content;
+					pointer-events: auto;
+					transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
+					> [data-icon] ~ *,
+					> img ~ *,
+					> a:has(> [data-icon]) ~ *,
+					> a > [data-icon] ~ *,
+					[data-icon]::before,
+					> img {
+						animation: breadcrumb-text-motion auto var(---breadcrumb-inlineEasing) both;
+						animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+						animation-range: var(--stickyBreadcrumb-entryRange);
+						@media (prefers-reduced-motion: reduce) {
+							animation-timing-function: steps(1, end);
+						}
+					}
+					[data-icon]::before,
+					> img {
+						animation-name: breadcrumb-icon-motion;
+					}
+					[data-icon] {
+						/* Resolve native line height before the glyph changes its font size. */
+						---breadcrumb-iconTranslateBlock: calc(
+							(1.5lh - var(---column-spanSize) - var(---breadcrumb-iconCorrection)) *
+								var(--stickyBreadcrumb-scale) / 2
+						);
+					}
+					[data-icon]::before {
+						transform-origin: calc(50% - 50% * var(---inlineDirection)) 0;
+						--stickyBreadcrumb-iconScale: calc(
+							(var(---column-spanSize) + var(---breadcrumb-iconCorrection)) *
+								var(--stickyBreadcrumb-scale) / 1em
+						);
+					}
+				}
+				[data-sticky-breadcrumb~="end"] {
+					anchor-name: --breadcrumb-end;
+					pointer-events: auto;
+				}
+				[data-sticky-breadcrumb~="item"],
+				[data-sticky-breadcrumb~="end"] {
+					---breadcrumb-sourceEndWrap: clamp(
+						0,
+						sign(
+							var(---breadcrumb-sourceRowHeight) -
+								max(var(---breadcrumb-itemHeight), var(---breadcrumb-endHeight)) -
+								var(--column-supportGap, 0.5rem) / 2
+						),
+						1
+					);
+				}
+				[data-sticky-breadcrumb~="item"] {
+					---breadcrumb-translateInline: calc(
+							var(---inlineDirection) *
+								(var(---breadcrumb-inlineStart) - var(--stickyBreadcrumb-sourcePaddingInline))
+						);
+					---breadcrumb-translateBlock: calc(
+							(
+								var(--stickyBreadcrumb-paddingBlock, 0.5rem) -
+									var(--stickyBreadcrumb-sourcePaddingBlock) + var(---breadcrumb-blockStart) -
+									var(--sticky-insetBlockStart) + (1 - var(---breadcrumb-endWrap)) *
+									(
+										var(---breadcrumb-rowHeight) - var(---breadcrumb-itemHeight) *
+											var(--stickyBreadcrumb-scale)
+									) /
+									2 - (1 - var(---breadcrumb-sourceEndWrap)) *
+									(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-itemHeight)) / 2
+							)
+						);
+					translate: 0 var(---breadcrumb-translateBlock);
+					transform: translateX(var(---breadcrumb-translateInline)) scale(var(--stickyBreadcrumb-scale));
+					animation:
+						breadcrumb-item-motion auto var(---breadcrumb-inlineEasing) both,
+						breadcrumb-end-motion auto var(--transition-easeInOutExpo) both;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+					animation-range: var(--stickyBreadcrumb-entryRange);
+					@media (prefers-reduced-motion: reduce) {
+						animation-timing-function: steps(1, end);
+					}
+				}
+				[data-sticky-breadcrumb~="end"] {
+					---breadcrumb-endTranslateInline: calc(
+						var(---inlineDirection) * (var(---breadcrumb-inlineStart) + var(---breadcrumb-width) -
+							var(---breadcrumb-sourceRowWidth) - var(--stickyBreadcrumb-sourcePaddingInline))
+					);
+					:where(summary) & {
+						---breadcrumb-endTranslateInline: 0px;
+					}
+					translate: var(---breadcrumb-endTranslateInline) calc(
+						var(--stickyBreadcrumb-paddingBlock, 0.5rem) - var(--stickyBreadcrumb-sourcePaddingBlock) +
+						var(---breadcrumb-blockStart) - var(--sticky-insetBlockStart) +
+						(1 + var(---breadcrumb-endWrap)) * (var(---breadcrumb-rowHeight) - var(---breadcrumb-endHeight)) / 2 -
+						(1 + var(---breadcrumb-sourceEndWrap)) * (var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2
+					);
+					animation: breadcrumb-end-motion auto var(--transition-easeInOutExpo) both;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+					animation-range: var(--stickyBreadcrumb-entryRange);
+					@media (prefers-reduced-motion: reduce) {
+						animation-timing-function: steps(1, end);
+					}
+				}
+			}
+		}
+
+		/* Nested sticky content begins at the last occupied breadcrumb row. */
+		[data-sticky-breadcrumb~="scope"]
+			[data-sticky-container]
+			> [data-sticky]:not([data-sticky-breadcrumb]) {
+			--sticky-insetBlockStart: var(---breadcrumb-blockEnd);
+		}
+
+		[data-sticky-breadcrumb~="scope"] {
+			&[data-card] {
+				--stickyBreadcrumb-sourcePaddingBlock: var(--card-padding);
+				--stickyBreadcrumb-sourcePaddingInline: var(--card-padding);
+				> * {
+					--stickyBreadcrumb-paddingBlock: if(
+						style(---breadcrumb-wrap: 1): var(--stickyBreadcrumb-sourcePaddingBlock) ; else: 0.5rem
+					);
+				}
+			}
 		}
 	}
 }
 
 /**
+ * ## [data-scroll-container]
+ *
  * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
  * item attachment, overflow, and snap helpers. `[data-scroll-container]` sets scroll axes and scroll-state container queries. Nest `[data-sticky-container]` / `[data-sticky]` for sticky insets; use `[data-scroll-item]` on children for snap and padding tricks.
+ * Measured `--scrollContainer-sizeInline` and `--scrollContainer-sizeBlock` outputs expose the owning
+ * scroll viewport dimensions to descendants; they are not authored sizing inputs.
  *
  * ### Placement
  * - On scroll viewport roots and nested scroll regions that participate in the sticky inset chain (`[data-scroll-container]`).
@@ -1302,6 +2175,7 @@ ol {
  * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
  *
  * ### CSS Variables
+ * - `--scrollContainer-perspective`: perspective applied to the scroll region.
  * - `--scrollContainer-scrollPaddingBlockStart`, `--scrollContainer-scrollPaddingBlockEnd`
  * - `--scrollContainer-scrollPaddingInlineStart`, `--scrollContainer-scrollPaddingInlineEnd`
  *
@@ -1326,6 +2200,16 @@ ol {
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-container]`
  */
+@property --scrollContainer-sizeInline {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0px;
+}
+@property --scrollContainer-sizeBlock {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0px;
+}
 [data-scroll-container] {
 	/* Inputs */
 	--scrollContainer-sizeBlock: 100cqb;
@@ -1405,6 +2289,22 @@ ol {
 
 	--sticky-sizeBlock: var(--sticky0-sizeBlock);
 	--sticky-sizeInline: var(--sticky0-sizeInline);
+
+	/* Resolve viewport units against this scroller before nested size containers intervene. */
+	> * {
+		--scrollContainer-sizeInline: 100cqi;
+		--scrollContainer-sizeBlock: 100cqb;
+		--sticky0-sizeInline: calc(
+			var(--scrollContainer-sizeInline) - var(--sticky0-insetInlineStart) -
+				var(--sticky0-insetInlineEnd)
+		);
+		--sticky0-sizeBlock: calc(
+			var(--scrollContainer-sizeBlock) - var(--sticky0-insetBlockStart) -
+				var(--sticky0-insetBlockEnd)
+		);
+		--sticky-sizeInline: var(--sticky0-sizeInline);
+		--sticky-sizeBlock: var(--sticky0-sizeBlock);
+	}
 
 	@scope (&) to ([data-scroll-container] > *) {
 		:is(&) [data-sticky-container]:not(:is(&) [data-sticky-container] [data-sticky-container]) {
@@ -1689,10 +2589,11 @@ ol {
 		 *
 		 * ### CSS Variables
 		 * - `--sticky-backgroundColor`
+		 * - `--sticky-background`: optional complete background override; use `none` for filter-only surfaces; reduced transparency uses the shared color fallback.
 		 * - `--sticky-backdropFilter`
 		 *
 		 * ### Examples
-		 * - Default block-axis sticky (omit edge tokens when both block edges are fine):
+		 * - Default sticky on both axes (omit axis and edge tokens):
 		 *   ```html
 		 *   <header data-sticky>
 		 *     <h1>Title</h1>
@@ -1708,8 +2609,19 @@ ol {
 		 */
 		[data-sticky] {
 			/* Inputs */
-			--sticky-backgroundColor: light-dark(#f8edff, #130a2b3c);
+			--sticky-backgroundColor: light-dark(#f8edff3c, #130a2b3c);
 			--sticky-backdropFilter: blur(20px);
+			---sticky-background: var(--sticky-background, var(--sticky-backgroundColor));
+			---sticky-backdropFilter: var(--sticky-backdropFilter);
+
+			@media (prefers-reduced-transparency: reduce) {
+				---sticky-background: linear-gradient(
+						var(--sticky-backgroundColor),
+						var(--sticky-backgroundColor)
+					)
+					var(--background-primary);
+				---sticky-backdropFilter: none;
+			}
 
 			&[data-card] {
 				--sticky-backgroundColor: var(--card-backgroundColor);
@@ -1721,8 +2633,23 @@ ol {
 
 			position: sticky;
 
-			&:not([data-sticky~='block'], [data-sticky~='inline']),
-			&[data-sticky~='block'] {
+			&:is(details:not([open]) *) {
+				position: relative;
+				inset: auto;
+				z-index: auto;
+				container-type: normal;
+				&[data-sticky~="backdrop-self"] {
+					background: none;
+					backdrop-filter: none;
+				}
+				&[data-sticky~="backdrop-before"]::before,
+				&[data-sticky~="backdrop-after"]::after {
+					content: none;
+				}
+			}
+
+			&:not([data-sticky~="block"], [data-sticky~="inline"]),
+			&[data-sticky~="block"] {
 				inset-block-start: var(--sticky-insetBlockStart);
 				inset-block-end: var(--sticky-insetBlockEnd);
 
@@ -1739,8 +2666,8 @@ ol {
 					inset-block-start: auto;
 				}
 			}
-			&:not([data-sticky~='block'], [data-sticky~='inline']),
-			&[data-sticky~='inline'] {
+			&:not([data-sticky~="block"], [data-sticky~="inline"]),
+			&[data-sticky~="inline"] {
 				inset-inline-start: var(--sticky-insetInlineStart);
 				inset-inline-end: var(--sticky-insetInlineEnd);
 
@@ -1758,48 +2685,72 @@ ol {
 				}
 			}
 
-			&:not([data-sticky~='backdrop-none']) {
-				&[data-sticky~='backdrop-always'] {
-					&[data-sticky~='backdrop-self'],
-					&[data-sticky~='backdrop-before']::before,
-					&[data-sticky~='backdrop-after']::after {
-						background-color: var(--sticky-backgroundColor);
-						backdrop-filter: var(--sticky-backdropFilter);
+			&:where(:not([data-sticky~="backdrop-none"])) {
+				&:where([data-sticky~="backdrop-always"]) {
+					&:where([data-sticky~="backdrop-self"]),
+					&:where([data-sticky~="backdrop-before"])::before,
+					&:where([data-sticky~="backdrop-after"])::after {
+						background: var(---sticky-background);
+						backdrop-filter: var(---sticky-backdropFilter);
 					}
 				}
-				&[data-sticky~='backdrop-stuck'] {
-					&[data-sticky~='backdrop-self'],
-					&[data-sticky~='backdrop-before']::before,
-					&[data-sticky~='backdrop-after']::after {
-						@container not scroll-state(stuck: none) {
-							background-color: var(--sticky-backgroundColor);
-							backdrop-filter: var(--sticky-backdropFilter);
-						}
-
+				&:where([data-sticky~="backdrop-stuck"]) {
+					&:where([data-sticky~="backdrop-self"]),
+					&:where([data-sticky~="backdrop-before"])::before,
+					&:where([data-sticky~="backdrop-after"])::after {
 						@supports not (container-type: scroll-state) {
-							background-color: var(--sticky-backgroundColor);
-							backdrop-filter: var(--sticky-backdropFilter);
+							background: var(---sticky-background);
+							backdrop-filter: var(---sticky-backdropFilter);
+						}
+						@container not scroll-state(stuck: none) {
+							background: var(---sticky-background);
+							backdrop-filter: var(---sticky-backdropFilter);
 						}
 					}
 				}
 
-				&[data-sticky~='backdrop-self'],
-				&[data-sticky~='backdrop-before']::before,
-				&[data-sticky~='backdrop-after']::after {
-					transition-property: background-color, backdrop-filter;
-
-					@media (prefers-reduced-transparency: reduce) {
-						backdrop-filter: none;
-					}
+				&:where([data-sticky~="backdrop-self"]),
+				&:where([data-sticky~="backdrop-before"])::before,
+				&:where([data-sticky~="backdrop-after"])::after {
+					transition-property: none;
 				}
 
-				&[data-sticky~='backdrop-before']::before,
-				&[data-sticky~='backdrop-after']::after {
+				&:where([data-sticky~="backdrop-before"])::before,
+				&:where([data-sticky~="backdrop-after"])::after {
 					content: '';
 					z-index: -1;
 					position: absolute;
 					inset: 0;
 					border-radius: inherit;
+				}
+				&[data-sticky-breadcrumb~="position"][data-sticky~="backdrop-stuck"]:not(details:not([open]) *) {
+					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size)
+						and (color: if(style(---breadcrumb-wrap: 1): red)) {
+						&[data-sticky~="backdrop-before"]::before,
+						&[data-sticky~="backdrop-after"]::after {
+							/* Arrival and row bounds belong to this breadcrumb, including native-query fallbacks. */
+							inset: auto;
+							inset-block-start: 0;
+							inset-inline-start: 0;
+							inline-size: 100%;
+							block-size: calc(var(---breadcrumb-blockEnd) - var(---breadcrumb-blockStart));
+							background: var(---sticky-background);
+							backdrop-filter: var(---sticky-backdropFilter);
+							opacity: 0;
+							@container style(---breadcrumb-wrap: 1) {
+								animation: breadcrumb-backdrop auto var(--transition-easeOutExpo) both;
+								animation-timeline: var(--stickyBreadcrumb-entryTimeline);
+								animation-range: var(--stickyBreadcrumb-entryRange);
+								@container style(---breadcrumb-entry: 1) {
+									opacity: 1;
+									animation: var(--stickyBreadcrumb-exitAnimation);
+									animation-timeline: var(---breadcrumb-exitTimeline);
+									animation-range: var(---breadcrumb-exitRange);
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1812,6 +2763,7 @@ ol {
 		 *
 		 * ### Tokens
 		 * - width / bleed: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`
+		 * - `flow`: retain inline-detached sizing in normal flow without a sticky stacking context
 		 * - attached alignment: `underflow-start`, `underflow-center`, `underflow-end`, `overflow-start`, `overflow-center`, `overflow-end`
 		 * - snap / size: `snap-block-start`, `snap-block-end`, `block-size-max`, `inline-size-max`
 		 *
@@ -1854,6 +2806,11 @@ ol {
 				inset-inline-start: var(--sticky-insetInlineStart);
 				inset-inline-end: var(--sticky-insetInlineEnd);
 
+				&[data-scroll-item~="flow"] {
+					position: relative;
+					inset-inline: auto;
+				}
+
 				inline-size: var(--sticky-sizeInline);
 				padding-inline-start: var(--scrollItem-paddingInlineStart);
 				padding-inline-end: var(--scrollItem-paddingInlineEnd);
@@ -1863,14 +2820,14 @@ ol {
 					--sticky-paddingInlineEnd: var(--scrollItem-paddingInlineEnd);
 				}
 
-				&[data-scroll-item~='padding-match-start'] {
+				&[data-scroll-item~="padding-match-start"] {
 					padding-block-start: min(
 						var(--scrollItem-paddingInlineMatch),
 						var(--scrollItem-inlineDetached-maxPaddingMatchStart)
 					);
 				}
 
-				&[data-scroll-item~='padding-match-end'] {
+				&[data-scroll-item~="padding-match-end"] {
 					padding-block-end: min(
 						var(--scrollItem-paddingInlineMatch),
 						var(--scrollItem-inlineDetached-maxPaddingMatchEnd)
@@ -1934,6 +2891,111 @@ ol {
 	}
 }
 
+[data-sticky-breadcrumb~="scope"][data-sticky-container]:not([data-sticky-breadcrumb~="root"]) {
+	--scrollItem-inlineDetached-maxSize: inherit;
+	--scrollItem-inlineDetached-paddingStart: inherit;
+	--scrollItem-inlineDetached-maxPaddingMatchStart: inherit;
+	--scrollItem-inlineDetached-paddingEnd: inherit;
+	--scrollItem-inlineDetached-maxPaddingMatchEnd: inherit;
+}
+
+@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+	(color: if(style(---breadcrumb-wrap: 1): red))) {
+	[data-sticky-breadcrumb~="scope"][data-sticky-container],
+	[data-sticky-breadcrumb~="scope"] [data-sticky-container]:has(> summary[data-sticky]) {
+		--sticky-paddingBlockStart: var(--stickyBreadcrumb-nativeBlockSize, 5rem);
+	}
+	[data-sticky-breadcrumb~="scope"][data-sticky-container],
+	[data-sticky-breadcrumb~="scope"] [data-sticky-container][id] {
+		scroll-margin-block-start: var(--sticky-insetBlockStart);
+		scroll-snap-align: start;
+	}
+
+	[data-sticky-breadcrumb~="position"] {
+		/* The real row sticks; descriptions retain their ordinary flow boxes. */
+		display: contents;
+		&::before,
+		&::after {
+			display: none;
+		}
+		&[data-column~="span-start"],
+		> [data-column~="span-start"] {
+			--column-spanSize: 1.5em;
+		}
+		> [data-column] {
+			display: contents;
+		}
+		> [data-sticky],
+		> [data-column] > [data-sticky] {
+			block-size: var(--sticky-paddingBlockStart);
+			padding-block: 0.5rem;
+			padding-inline-start: var(--card-padding, var(--scrollItem-paddingInlineStart, 0px));
+			padding-inline-end: var(--card-padding, var(--scrollItem-paddingInlineEnd, 0px));
+			align-content: center;
+		}
+		> [data-column] > :not([data-sticky]) {
+			padding-inline: var(--card-padding, 0px);
+		}
+	}
+
+	[data-sticky-breadcrumb~="scope"] [data-sticky-container] > summary[data-sticky] {
+		block-size: var(--sticky-paddingBlockStart);
+		padding-block: 0.5rem;
+	}
+
+	[data-sticky-breadcrumb~="scope"] > details:has(> [data-sticky-breadcrumb~="position"]) {
+		display: grid;
+		grid-template: auto auto auto / minmax(0, 1fr);
+		&::details-content {
+			grid-area: 3 / 1 / 4 / 2;
+		}
+		> [data-sticky-breadcrumb~="position"] {
+			/* Preserve the native focus/toggle box while its row sticks through the body track. */
+			display: grid;
+			grid-area: 1 / 1 / 4 / 2;
+			grid-template-rows: subgrid;
+			gap: 0;
+			position: static;
+			padding: 0;
+			pointer-events: none;
+			&:focus-visible {
+				outline: none;
+				> [data-column] > [data-sticky] {
+					outline: auto;
+				}
+			}
+			> [data-column] > * {
+				pointer-events: auto;
+				grid-row: 2;
+				&[data-sticky] {
+					grid-row: 1;
+				}
+			}
+		}
+	}
+}
+
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	[data-sticky-breadcrumb~="scope"][data-sticky-container] {
+		isolation: auto;
+	}
+	[data-sticky-breadcrumb~="scope"] [data-sticky-breadcrumb~="position"] {
+		> [data-sticky~="block"][data-sticky~="block-start"],
+		> [data-column] > [data-sticky~="block"][data-sticky~="block-start"] {
+			position: static;
+			inset: auto;
+			z-index: auto;
+			container-type: normal;
+			max-block-size: none;
+			background: none;
+			backdrop-filter: none;
+		}
+	}
+}
+
 /**
  * Shared disclosure / accordion styling for native `<details>` and optional `[data-collapsible]` wrappers. Disclosure animation and summary chevron apply to `<details>`. `[data-collapsible]` documents the hook and can mark optional wrappers if you add them in markup.
  *
@@ -1962,46 +3024,20 @@ ol {
 [data-collapsible],
 details {
 	&::details-content {
-		transition-property: content-visibility, height, opacity, filter, transform;
-
 		display: grid;
-		content-visibility: visible;
-		height: auto;
-		transform: perspective(100px);
-		transform-origin: center top;
-
-		/* @starting-style {
-			height: 0;
-			opacity: 0;
-			filter: blur(4px);
-			transform: perspective(1000px) rotateX(-1deg);
-		} */
+		transition-property: none;
 	}
 
-	&:not([open])::details-content {
-		content-visibility: hidden;
-		height: 0;
-		opacity: 0;
-		filter: blur(4px);
-		transform: perspective(1000px) rotateX(-1deg);
+	&:not([open]) {
+		&::details-content {
+			display: none;
+		}
 	}
 
 	> :where(summary) {
+		---summary-markerSize: 0.75em;
+		---summary-markerRotation: 0deg;
 		cursor: zoom-in;
-
-		@container (inline-size < 42ch) {
-			&:has(> :only-child[data-row~='wrap']) {
-				justify-content: end;
-
-				> :only-child[data-row~='wrap'] {
-					display: contents;
-				}
-
-				&::after {
-					align-self: end;
-				}
-			}
-		}
 
 		> :only-child {
 			flex: 1;
@@ -2011,65 +3047,83 @@ details {
 			display: none;
 		}
 
-		&::after {
+		/* Keep the marker with the existing end cluster when the content row wraps. */
+		&:has(
+				> [data-row] > [data-row-item~="wrap-end"],
+				> [data-column~="span-start"] > [data-row] > [data-row-item~="wrap-end"]
+			)::after {
+			content: none;
+		}
+
+		&::after,
+		> [data-row] > [data-row-item~="wrap-end"]::after,
+		> [data-column~="span-start"] > [data-row] > [data-row-item~="wrap-end"]::after {
 			content: '';
 
 			flex-shrink: 0;
-			width: 0.75em;
-			height: 1lh;
+			inline-size: var(---summary-markerSize);
+			block-size: 1lh;
 
 			background-color: currentColor;
 			mask: var(--icon-chevron) no-repeat center;
 			opacity: 0.66;
 
-			transform: perspective(100px) rotateX(0deg);
-			transition-property: transform;
+			rotate: x var(---summary-markerRotation);
+			transition-property: rotate;
 		}
 	}
 
 	&[open] > summary {
+		---summary-markerRotation: 180deg;
 		cursor: zoom-out;
-
-		&::after {
-			transform: perspective(100px) rotateX(180deg);
-		}
-	}
-
-	&[data-card] {
-		padding: 0;
-		gap: 0 !important;
-
-		> summary {
-			padding: var(--card-padding);
-		}
-
-		&:has(> summary + :not(:last-child))::details-content,
-		> summary + :last-child {
-			padding: var(--card-padding);
-			padding-block-start: 0;
-		}
 	}
 }
 
-/**
- * Workarounds for unsupported features in Safari
- *
- * ### Source
- * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-safari]`
- */
+/* A card can own either the disclosure itself or its existing outer scope. */
+[data-card]:is(details, [data-collapsible], :has(> details)) {
+	padding: 0;
+	gap: 0 !important;
+	> details {
+		border-radius: inherit;
+	}
+	> summary,
+	> details > summary {
+		padding: var(--card-padding);
+	}
+	&:is(details, [data-collapsible]):has(> summary + :not(:last-child))::details-content,
+	> details:has(> summary + :not(:last-child))::details-content,
+	> summary + :last-child,
+	> details > summary + :last-child {
+		padding: var(--card-padding);
+		padding-block-start: 0;
+	}
+}
+
 @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
+	/**
+	 * ## [data-safari]
+	 *
+	 * Workarounds for unsupported features in Safari.
+	 *
+	 * ### Source
+	 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-safari]`
+	 */
 	[data-safari] {
 		/* @media queries not yet supported in .svg files */
 		&[data-safari~='invert-lightness'] {
 			transition-property: filter, outline-color;
 
-			:root[style*='color-scheme: dark;'] & {
+			:root:is([style*="color-scheme: dark;"], :has(#theme-toggle:checked)) & {
 				filter: invert() hue-rotate(0.5turn);
 				outline-color: hsl(from var(--accent) calc(h + 0.5turn) s l);
 			}
 
 			@media (prefers-color-scheme: dark) {
-				:root:not([style*='color-scheme: light;']) & {
+				:root:has(#theme-toggle:checked) & {
+					filter: none;
+					outline-color: inherit;
+				}
+				:root:not([style*="color-scheme: light;"]):not(:has(#theme-toggle:checked)) & {
 					filter: invert() hue-rotate(0.5turn);
 					outline-color: hsl(from var(--accent) calc(h + 0.5turn) s l);
 				}

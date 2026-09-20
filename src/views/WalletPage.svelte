@@ -1,6 +1,12 @@
-<script lang="ts" generics="
+<script
+	lang="ts"
+	generics="
 	_AttributeGroupId extends string
-">
+"
+>
+	import '../components/pie-shape.css'
+	import { attributeGroupFlowerGradient, sliceFill } from '@/components/pie-fill'
+
 	// Types/constants
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import {
@@ -15,7 +21,7 @@
 		ratingToTextColor,
 		Verifiability,
 	} from '@/schema/attributes'
-	import { hasSingleVariant, type Variant } from '@/schema/variants'
+	import { hasSingleVariant, Variant } from '@/schema/variants'
 	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
 	import type { Ladders } from '@/schema/ladders'
 	import type { AttributeTree, EvaluationTree } from '@/schema/attribute-groups'
@@ -40,13 +46,8 @@
 		type Slice,
 	} from '@/components/pie-geometry'
 
-
 	// Functions
-	import {
-		variants,
-		variantToName,
-		variantToRunsOn,
-	} from '@/constants/variants'
+	import { variants, variantToName, variantToRunsOn } from '@/constants/variants'
 	import type { NavigationItem } from '@/constants/navigation'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import {
@@ -63,11 +64,11 @@
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
-
-	type WalletPageWallet<_AttributeGroupId extends string> =
-		Omit<RatedWallet<_AttributeGroupId>, 'ladders'> &
+	type WalletPageWallet<_AttributeGroupId extends string> = Omit<
+		RatedWallet<_AttributeGroupId>,
+		'ladders'
+	> &
 		Partial<Pick<RatedWallet<_AttributeGroupId>, 'ladders'>>
-
 
 	// Props
 	const {
@@ -80,26 +81,24 @@
 		ladders: Ladders<_AttributeGroupId>
 		attributeTree: AttributeTree<_AttributeGroupId>
 		wallet: WalletPageWallet<_AttributeGroupId>
-		showStage?: boolean,
-		showScores?: boolean,
+		showStage?: boolean
+		showScores?: boolean
 	} = $props()
 
-
 	// State
+	import { onMount } from 'svelte'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { getUrl } from '@/schema/url'
 	import { IncidentStatus } from '@/types/content/news'
 	import { daysSince } from '@/types/date'
 	import { getNewsForWallet } from '@/data/news'
 
-	let queryParams = $state<URLSearchParams | undefined>(
-		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
-	)
+	let queryParams = $state<URLSearchParams>()
 
 	$effect(() => {
 		const queryString = queryParams?.toString()
 
-		if(queryString !== undefined && queryString !== globalThis.location.search.slice(1))
+		if (queryString !== undefined && queryString !== globalThis.location.search.slice(1))
 			globalThis.history.replaceState(
 				null,
 				'',
@@ -107,156 +106,340 @@
 			)
 	})
 
-	function openHashDetails() {
-		const id = decodeURIComponent(globalThis.location.hash.slice(1))
-		const target = id ? globalThis.document.getElementById(id) : null
+	function localHashTarget(hash: string) {
+		try {
+			return hash.length > 1
+				? globalThis.document.getElementById(decodeURIComponent(hash.slice(1)))
+				: null
+		} catch {
+			return null
+		}
+	}
 
-		if(target instanceof HTMLDetailsElement)
-			target.open = true
+	function currentNavigationLink(control: HTMLButtonElement) {
+		const root = control.closest('[data-sticky-breadcrumb~="root"]')
+		const links = Array.from(
+			root?.querySelectorAll<HTMLAnchorElement>('.pie-navigation a[href^="#"]') ?? [],
+		)
 
-		const containingDetails = target?.closest('details')
+		if (globalThis.CSS.supports('selector(:target-current)')) {
+			const current = root?.querySelector<HTMLAnchorElement>('.pie-navigation a:target-current')
+			if (current) return current
+		}
 
-		if(containingDetails)
+		const scrollContainer = root?.closest<HTMLElement>('[data-scroll-container]')
+		const scrollStart = scrollContainer?.getBoundingClientRect().top ?? 0
+		let current = links[0]
+
+		for (const link of links) {
+			const target = localHashTarget(link.hash)
+			if (!target) continue
+
+			const style = globalThis.getComputedStyle(target)
+			const start =
+				target.getBoundingClientRect().top - (Number.parseFloat(style.scrollMarginBlockStart) || 0)
+			if (start > scrollStart + 1) break
+			current = link
+		}
+
+		return current
+	}
+
+	function navigateAdjacentSection(control: HTMLButtonElement, direction: -1 | 1) {
+		const current = currentNavigationLink(control)
+		if (!current) return
+
+		const links = Array.from(
+			current.closest('.navigation-items')?.querySelectorAll<HTMLAnchorElement>('a[href^="#"]') ??
+				[],
+		)
+		links[links.indexOf(current) + direction]?.click()
+	}
+
+	function toggleCurrentSectionDetails(event: MouseEvent & { currentTarget: HTMLButtonElement }) {
+		const current = currentNavigationLink(event.currentTarget)
+		if (!current) return
+
+		const target = localHashTarget(current.hash)
+		const details = Array.from(
+			target?.closest('.attribute-group')?.querySelectorAll('details') ?? [],
+		)
+		const open = details.some(detail => !detail.open)
+
+		for (const detail of details) detail.open = open
+	}
+
+	// Resolve link identity once per rendered evaluation; CSS owns every presentation state.
+	function shareLinkDestinations(container: HTMLElement) {
+		const links = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href]'))
+		const destinations = new Map<string, number>()
+		const localLinks = links.filter(link => {
+			try {
+				const url = new URL(link.href)
+				return (
+					url.origin === location.origin &&
+					url.pathname === location.pathname &&
+					url.search === location.search &&
+					url.hash.length > 1
+				)
+			} catch {
+				return false
+			}
+		})
+		const counts = new Map<string, number>()
+		for (const link of localLinks) counts.set(link.href, (counts.get(link.href) ?? 0) + 1)
+		for (const [href, count] of counts) if (count > 1) destinations.set(href, destinations.size)
+		const states = ['hover', 'focus', 'current'] as const
+		const names = (index: number) => states.map(state => `--link-${state}-${index}`)
+		container.style.setProperty(
+			'--link-timelines',
+			[...destinations.values()].flatMap(names).join(', '),
+		)
+		const paintOwners = new Map<HTMLElement, string | null>()
+		const originals = localLinks.map(link => {
+			const original = link.getAttribute('data-link')
+			const index = destinations.get(link.href)
+			const target = localHashTarget(link.hash)
+			const header = target?.matches('.attribute-group, .attribute')
+				? target.querySelector<HTMLElement>('header > [data-row]')
+				: null
+			const navigationOwner = link.closest('.navigation-items')
+				? (link.closest('summary')?.parentElement ?? link.parentElement)
+				: null
+			for (const owner of [header, navigationOwner]) {
+				if (!owner || index === undefined) continue
+				if (!paintOwners.has(owner)) paintOwners.set(owner, owner.getAttribute('data-link'))
+				owner.setAttribute('data-link', 'state')
+				for (const state of states)
+					owner.style.setProperty(`--link-${state}`, `--link-${state}-${index}`)
+			}
+			const parent = target?.parentElement?.closest('.attribute-group')
+			const parentIndex = parent
+				? destinations.get(new URL(`#${parent.id}`, link.href).href)
+				: undefined
+			const sourceIndexes = [index, parentIndex].filter(
+				(value): value is number => value !== undefined,
+			)
+			if (sourceIndexes.length > 0) {
+				link.setAttribute('data-link', `${original ?? ''} shared`.trim())
+				for (const state of states) {
+					const ownIndex = index ?? parentIndex!
+					link.style.setProperty(`--link-${state}`, `--link-${state}-${ownIndex}`)
+					link.style.setProperty(
+						`--link-${state}-sources`,
+						sourceIndexes.map(value => `--link-${state}-${value}`).join(', '),
+					)
+				}
+			}
+			return { link, original }
+		})
+		return () => {
+			container.style.removeProperty('--link-timelines')
+			for (const [owner, original] of paintOwners) {
+				if (original === null) owner.removeAttribute('data-link')
+				else owner.setAttribute('data-link', original)
+				for (const state of states) owner.style.removeProperty(`--link-${state}`)
+			}
+			for (const { link, original } of originals) {
+				if (original === null) link.removeAttribute('data-link')
+				else link.setAttribute('data-link', original)
+				for (const state of states) {
+					link.style.removeProperty(`--link-${state}`)
+					link.style.removeProperty(`--link-${state}-sources`)
+				}
+			}
+		}
+	}
+
+	function openHashDetails(event?: Event) {
+		const target = localHashTarget(globalThis.location.hash)
+
+		if (target instanceof HTMLDetailsElement) target.open = true
+
+		let containingDetails = target?.parentElement?.closest('details')
+
+		while (containingDetails) {
 			containingDetails.open = true
+			containingDetails = containingDetails.parentElement?.closest('details')
+		}
+		// Fragment history belongs to the nested scroll container, after disclosure and font layout settle.
+		if ((!event || event.type === 'popstate') && target)
+			void globalThis.document.fonts.ready.then(() =>
+				globalThis.requestAnimationFrame(() =>
+					globalThis.requestAnimationFrame(() =>
+						target.scrollIntoView({ block: 'start', behavior: 'instant' }),
+					),
+				),
+			)
+	}
+
+	function alignHashAfterScroll(event: MouseEvent) {
+		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+		const link = (event.target as Element).closest<HTMLAnchorElement>('a[href]')
+		if (!link) return
+
+		const url = new URL(link.href)
+		if (
+			url.origin !== globalThis.location.origin ||
+			url.pathname !== globalThis.location.pathname ||
+			url.search !== globalThis.location.search ||
+			url.hash.length < 2
+		)
+			return
+
+		const target = localHashTarget(url.hash)
+		const scrollContainer = (event.currentTarget as HTMLElement).closest<HTMLElement>(
+			'[data-scroll-container]',
+		)
+		if (!target || !scrollContainer) return
+
+		scrollContainer.addEventListener(
+			'scrollend',
+			() => target.scrollIntoView({ block: 'start', behavior: 'instant' }),
+			{ once: true },
+		)
 	}
 
 	$effect(() => {
 		openHashDetails()
 		globalThis.addEventListener('hashchange', openHashDetails)
+		globalThis.addEventListener('popstate', openHashDetails)
 
 		return () => {
 			globalThis.removeEventListener('hashchange', openHashDetails)
+			globalThis.removeEventListener('popstate', openHashDetails)
 		}
 	})
 
 	// (Derived)
-	const walletNews = $derived.by(() =>
-		getNewsForWallet(wallet.metadata.id)
-	)
+	const walletNews = $derived.by(() => getNewsForWallet(wallet.metadata.id))
 
 	// News section behavior: determine prominence based on recency and resolution status
 	const allNewsResolved = $derived(
-		walletNews.length > 0 &&
-		walletNews.every(news => news.status === IncidentStatus.RESOLVED)
+		walletNews.length > 0 && walletNews.every(news => news.status === IncidentStatus.RESOLVED),
 	)
 
 	const latestNewsDate = $derived(
 		walletNews.length > 0
-			? walletNews.reduce((latest, news) =>
-				news.updatedAt > latest ? news.updatedAt : latest,
-				walletNews[0].updatedAt
-			)
-			: null
+			? walletNews.reduce(
+					(latest, news) => (news.updatedAt > latest ? news.updatedAt : latest),
+					walletNews[0].updatedAt,
+				)
+			: null,
 	)
 
-	const daysSinceLatestNews = $derived(
-		latestNewsDate ? daysSince(latestNewsDate) : null
-	)
+	const daysSinceLatestNews = $derived(latestNewsDate ? daysSince(latestNewsDate) : null)
 
 	// Collapse by default if all resolved and >30 days old
 	const newsIsStale = $derived(
-		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 30
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 30,
 	)
 
 	// Move to bottom if all resolved and >1 year old
 	const newsIsVeryStale = $derived(
-		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 365
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 365,
 	)
 
 	// Expand by default unless news is stale
-	const shouldExpandNews = $derived(
-		!newsIsStale
-	)
+	const shouldExpandNews = $derived(!newsIsStale)
 
-	let selectedVariant = $state<Variant | undefined>(
-		hasSingleVariant(wallet.variants) ?
-			undefined
-		:
-			queryParams?.get('variant') as Variant ?? undefined
-	)
+	let selectedVariant = $state<Variant>()
 
 	$effect(() => {
-		if(!hasSingleVariant(wallet.variants) && selectedVariant)
+		if (!hasSingleVariant(wallet.variants) && selectedVariant)
 			queryParams?.set('variant', selectedVariant)
-		else
-			queryParams?.delete('variant')
+		else queryParams?.delete('variant')
 	})
 
-	let selectedModel = $state(
-		queryParams?.get('model') ?? undefined
-	)
+	let selectedModel = $state<string>()
+	const brandModels = $derived(allHardwareModels.filter(m => m.brandId === wallet.metadata.id))
+
+	onMount(() => {
+		const params = new SvelteURLSearchParams(globalThis.location.search)
+		const variant = params.get('variant') as Variant | null
+
+		selectedVariant =
+			variant && variant in wallet.variants && !hasSingleVariant(wallet.variants)
+				? variant
+				: undefined
+		selectedModel = params.get('model') ?? undefined
+		queryParams = params
+	})
 
 	$effect(() => {
-		if(!selectedModel)
-			queryParams?.delete('model')
-		else
-			queryParams?.set('model', selectedModel)
+		if (!selectedModel) queryParams?.delete('model')
+		else queryParams?.set('model', selectedModel)
 	})
 
 	const evalTree = $derived(
-		(
-			selectedVariant &&
-				wallet.variants[selectedVariant]?.attributes
-			||
-				wallet.overall
-		) satisfies EvaluationTree<_AttributeGroupId>
+		((selectedVariant && wallet.variants[selectedVariant]?.attributes) ||
+			wallet.overall) satisfies EvaluationTree<_AttributeGroupId>,
 	)
 
-	const tocNavigationItems = $derived.by<NavigationItem[]>(() => (
-		evalTree ?
-			Object.values(attributeTree)
-				.flatMap(attrGroup => {
+	const groupTargetId = (group: AttributeGroup<_AttributeGroupId>) =>
+		`${slugifyCamelCase(group.id)}${group.attributes.some(({ attribute }) => attribute.id === group.id) ? '-overview' : ''}`
+
+	const tocNavigationItems = $derived.by<NavigationItem[]>(() =>
+		evalTree
+			? Object.values(attributeTree).flatMap(attrGroup => {
 					const evalGroup = evalTree[attrGroup.id]
 
 					if (!evalGroup) return []
 
-					return [{
-						id: `toc-${attrGroup.id}`,
-						title: attrGroup.displayName,
-						icon: attrGroup.icon,
-						iconVariant: 'emoji' as const,
-						accentColor: scoreToColor(
-							calculateAttributeGroupScore(attrGroup, evalGroup)?.score ?? null,
-						),
-						href: `#${slugifyCamelCase(attrGroup.id)}`,
-						children: attrGroup.attributes.flatMap(({ attribute }) => {
-							const evalAttr = evalGroup[attribute.id]
+					return [
+						{
+							id: `toc-${attrGroup.id}`,
+							title: attrGroup.displayName,
+							icon: attrGroup.icon,
+							iconVariant: 'emoji' as const,
+							accentColor: scoreToColor(
+								calculateAttributeGroupScore(attrGroup, evalGroup)?.score ?? null,
+							),
+							href: `#${groupTargetId(attrGroup)}`,
+							children: attrGroup.attributes.flatMap(({ attribute }) => {
+								const evalAttr = evalGroup[attribute.id]
 
-							if (!evalAttr || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) return []
+								if (!evalAttr || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) return []
 
-							return [{
-								id: `toc-${attrGroup.id}-${attribute.id}`,
-								title: attribute.displayName,
-								icon: attribute.icon,
-								iconVariant: 'emoji' as const,
-								accentColor: ratingToColor(evalAttr.evaluation.outcome.rating),
-								href: `#${slugifyCamelCase(attribute.id)}`,
-							}]
-						}),
-					}]
+								return [
+									{
+										id: `toc-${attrGroup.id}-${attribute.id}`,
+										title: attribute.displayName,
+										icon: attribute.icon,
+										iconVariant: 'emoji' as const,
+										accentColor: ratingToColor(evalAttr.evaluation.outcome.rating),
+										href: `#${slugifyCamelCase(attribute.id)}`,
+									},
+								]
+							}),
+						},
+					]
 				})
-		:
-			[]
-	))
+			: [],
+	)
 
 	const pieNavigationItems = $derived.by(() => {
 		const referenceSlices = tocNavigationItems.map<Slice>(group => {
 			const sourceGroup = Object.values(attributeTree).find(
-				candidate => `toc-${candidate.id}` === group.id
+				candidate => `toc-${candidate.id}` === group.id,
 			)
 
 			return {
 				id: group.id,
 				color: group.accentColor ?? 'transparent',
+				gradient: attributeGroupFlowerGradient,
 				weight: 1,
 				arcLabel: '',
 				ariaLabel: group.title,
 				children: (group.children ?? []).map(attribute => ({
 					id: attribute.id,
 					color: attribute.accentColor ?? 'transparent',
-					weight: sourceGroup?.attributes.find(
-						({ attribute: sourceAttribute }) => `#${slugifyCamelCase(sourceAttribute.id)}` === attribute.href
-					)?.weight ?? 1,
+					weight:
+						sourceGroup?.attributes.find(
+							({ attribute: sourceAttribute }) =>
+								`#${slugifyCamelCase(sourceAttribute.id)}` === attribute.href,
+						)?.weight ?? 1,
 					arcLabel: '',
 					ariaLabel: attribute.title,
 				})),
@@ -275,7 +458,9 @@
 
 			return {
 				...group,
-				sliceStyle: computedGroup?.computed,
+				sliceStyle: computedGroup
+					? { ...computedGroup.computed, fill: sliceFill(computedGroup) }
+					: undefined,
 				children: group.children?.map((attribute, attributeIndex) => ({
 					...attribute,
 					sliceStyle: computedGroup?.children?.[attributeIndex]?.computed,
@@ -284,25 +469,49 @@
 		})
 	})
 
-	const pieRotationItems = $derived(
-		pieNavigationItems.flatMap(group => [group, ...(group.children ?? [])])
-	)
-	const pieInitialSliceMidAngle = $derived(
-		pieRotationItems[0]?.sliceStyle?.midAngle ?? 0
-	)
-	const pieRotationSteps = $derived(
-		pieRotationItems.slice(1).map((item, index) => ({
-			href: item.href,
-			timeline: `--pie-section-${index + 1}`,
-			delta: (
-				(pieRotationItems[index]?.sliceStyle?.midAngle ?? 0)
-				- (item.sliceStyle?.midAngle ?? 0)
-			),
-		}))
-	)
-	const pieTimelineByHref = $derived(
-		new Map(pieRotationSteps.map(step => [step.href, step.timeline]))
-	)
+	const pieRotation = $derived.by(() => {
+		const states: string[] = []
+		const timelines: string[] = []
+		const styles: string[] = []
+		const prefix = `wallet-pie-${wallet.metadata.id.replace(/[^a-z0-9-]/gi, '-')}`
+		let previousAngle = 0
+
+		for (const group of pieNavigationItems) {
+			for (const item of [group, ...(group.children ?? [])]) {
+				if (!item.sliceStyle || !item.href?.startsWith('#')) continue
+				const angle = -90 - item.sliceStyle.midAngle
+				const index = states.length + 1
+				const name = `${prefix}-${index}`
+				const timeline = `--${item.href.slice(1)}-entry`
+				styles.push(`
+					@keyframes ${name} {
+						from { rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${previousAngle}deg); }
+						to { rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * ${angle}deg); }
+					}
+					@keyframes ${name}-current {
+						from { ---pie-currentIndex: ${index}; }
+						to { ---pie-currentIndex: ${index}; }
+					}
+					@container style(---pie-currentIndex: ${index}) {
+						.pie-navigation-geometry {
+							---pie-restAngle: ${angle}deg;
+							---pie-rotation-name: ${name};
+							---pie-rotation-timeline: ${timeline};
+						}
+					}
+				`)
+				states.push(`${name}-current auto steps(1, end) forwards`)
+				timelines.push(timeline)
+				previousAngle = angle
+			}
+		}
+
+		return {
+			states: states.join(', ') || 'none',
+			styles: styles.join('\n'),
+			timelines: timelines.join(', ') || undefined,
+		}
+	})
 
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
@@ -323,10 +532,8 @@
 						map.set(evalAttrId, [variant])
 						break
 					default:
-						if(map.has(evalAttrId))
-							map.get(evalAttrId)!.push(variant)
-						else
-							map.set(evalAttrId, [variant])
+						if (map.has(evalAttrId)) map.get(evalAttrId)!.push(variant)
+						else map.set(evalAttrId, [variant])
 				}
 			}
 		}
@@ -334,24 +541,17 @@
 		return map
 	})
 
-	const overallScore = $derived(
-		calculateOverallScore(attributeTree, wallet.overall, () => true),
-	)
-
+	const overallScore = $derived(calculateOverallScore(attributeTree, wallet.overall, () => true))
 	const allPageReferences = $derived.by(() => {
 		const refs = Object.values(attributeTree).flatMap(attrGroup => {
 			const evalGroup = evalTree[attrGroup.id]
 
-			if (!evalGroup) {
-				return []
-			}
+			if (!evalGroup) return []
 
 			return attrGroup.attributes.flatMap(({ attribute }) => {
 				const evalAttr = evalGroup[attribute.id]
 
-				if (evalAttr === undefined || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) {
-					return []
-				}
+				if (evalAttr === undefined || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) return []
 
 				return toFullyQualified(evalAttr.evaluation.references)
 			})
@@ -360,9 +560,8 @@
 		return mergeRefs(...refs)
 	})
 
-
 	// Components
-	import { Github, Globe } from 'lucide-static'
+	import { ListTree, ListCollapse } from 'lucide-static'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
 	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
@@ -383,256 +582,267 @@
 	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 	import NavigationItems from '@/views/NavigationItems.svelte'
-	import ScrollAngleSteps from '@/components/ScrollAngleSteps.svelte'
 </script>
 
-
 <svelte:head>
-	{@html (
-		'<script type="application/ld+json">'
-		+ JSON.stringify({
+	{@html '<script type="application/ld+json">' +
+		JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'FAQPage',
-			mainEntity: (
-				evalTree ?
-					Object.values(attributeTree)
-						.flatMap(attrGroup => (
-							attrGroup.attributes
-								.map(({ attribute }) => ({
-									evalAttr: (
-										evalTree[attrGroup.id][attribute.id]
-									),
-									attribute,
-								}))
-								.filter(({ evalAttr }) => (
-									evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT
-								))
-								.map(({ attribute }) => ({
-									'@type': 'Question',
-									name: renderStrings(
-										(
-											attribute.question.contentType === ContentType.MARKDOWN ?
-												attribute.question.markdown
-											: attribute.question.contentType === ContentType.TEXT ?
-												attribute.question.text
-											:
-												attribute.displayName
-										),
+			mainEntity: evalTree
+				? Object.values(attributeTree).flatMap(attrGroup =>
+						attrGroup.attributes
+							.map(({ attribute }) => ({
+								evalAttr: evalTree[attrGroup.id][attribute.id],
+								attribute,
+							}))
+							.filter(
+								({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT,
+							)
+							.map(({ attribute }) => ({
+								'@type': 'Question',
+								name: renderStrings(
+									attribute.question.contentType === ContentType.MARKDOWN
+										? attribute.question.markdown
+										: attribute.question.contentType === ContentType.TEXT
+											? attribute.question.text
+											: attribute.displayName,
+									{
+										WALLET_NAME: wallet.metadata.displayName,
+									},
+								),
+								acceptedAnswer: {
+									'@type': 'Answer',
+									text: renderStrings(
+										attribute.why.contentType === ContentType.MARKDOWN
+											? attribute.why.markdown
+											: attribute.why.contentType === ContentType.TEXT
+												? attribute.why.text
+												: 'No explanation available',
 										{
 											WALLET_NAME: wallet.metadata.displayName,
 										},
 									),
-									acceptedAnswer: {
-										'@type': 'Answer',
-										text: renderStrings(
-											(
-												attribute.why.contentType === ContentType.MARKDOWN ?
-													attribute.why.markdown
-												: attribute.why.contentType === ContentType.TEXT ?
-													attribute.why.text
-												:
-													'No explanation available'
-											),
-											{
-												WALLET_NAME: wallet.metadata.displayName,
-											},
-										),
-									},
-								}))
-						))
-					:
-						[]
-			),
+								},
+							})),
+					)
+				: [],
 			about: {
 				'@type': 'SoftwareApplication',
 				name: wallet.metadata.displayName,
-				url: (
-					wallet.metadata.urls?.websites?.[0] !== undefined ?
-						getUrl(wallet.metadata.urls.websites[0])
-					:
-						undefined
-				),
+				url:
+					typeof wallet.metadata.url === 'string' ? wallet.metadata.url : wallet.metadata.url?.url,
 				applicationCategory: 'Cryptocurrency Wallet',
-				operatingSystem: (
-					Object.keys(wallet.variants)
-						.map(variant => variantToRunsOn(variant))
-						.join(', ')
-				),
+				operatingSystem: Object.keys(wallet.variants)
+					.map(variant => variantToRunsOn(variant))
+					.join(', '),
 			},
-		})
-		+ '<\/script>'
-	)}
+		}) +
+		'<\/script>'}
 </svelte:head>
 
+<svelte:element this={'style'}>{pieRotation.styles}</svelte:element>
 
 <div
-	id="wallet-page"
+	id="top"
+	onclick={alignHashAfterScroll}
+	style:---pie-rotation-timelines={pieRotation.timelines}
+	style:---pie-rotation-states={pieRotation.states}
+	data-sticky-breadcrumb="scope root"
+	style:--stickyBreadcrumb-itemInlineTimeline="--wallet-item-inline"
+	style:--stickyBreadcrumb-itemBlockTimeline="--wallet-item-block"
+	style:--stickyBreadcrumb-endInlineTimeline="--wallet-end-inline"
+	style:--stickyBreadcrumb-endBlockTimeline="--wallet-end-block"
+	style:--stickyBreadcrumb-entryTimeline="--wallet-entry"
 	class="container"
 	data-sticky-container
-	style:timeline-scope={[
-		'--header-timeline',
-		...pieRotationSteps.map(step => step.timeline),
-	].join(', ')}
+	{@attach container => {
+		$effect(() => {
+			// Rebind semantic destinations after selection changes replace the rendered links.
+			void evalTree
+			void queryParams?.toString()
+			return shareLinkDestinations(container)
+		})
+	}}
 >
-	<article
-		data-column="gap-8"
+	<header
+		data-sticky-breadcrumb="position"
+		data-sticky="block block-start backdrop-after backdrop-stuck"
+		data-column="gap-6"
+		data-scroll-item="inline-detached padding-match-start"
 	>
-		<header
-			id="top"
-			data-column="gap-6"
-			data-scroll-item="inline-detached padding-match-start"
-		>
-			<div data-row="wrap">
-				<div
-					class="wallet-title-row"
-					data-row="wrap"
-					data-wallet-name={wallet.metadata.displayName}
-				>
+		<div data-row="wrap" data-sticky="block block-start backdrop-self backdrop-always">
+			<div
+				class="wallet-title-row"
+				data-row="start wrap"
+				style="--select-compact: var(---breadcrumb-entry, 0); --select-compactTimeline: var(--stickyBreadcrumb-entryTimeline)"
+			>
+				<h1 data-sticky-breadcrumb="source">
 					<a
 						data-link="camouflaged"
-						data-sticky-breadcrumb="root item"
 						class="wallet-name"
 						href="#top"
+						data-sticky-breadcrumb="item"
+						data-row="gap-2"
 					>
-						<h1 data-row="gap-2">
-							<img
-								class="wallet-icon"
-								alt={wallet.metadata.displayName}
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							/>
-							<span>{wallet.metadata.displayName}</span>
-						</h1>
-					</a>
-
-					{#if Object.keys(wallet.variants).length > 1}
-						<Select
-							bind:value={selectedVariant}
-							options={[
-								{
-									value: undefined,
-									label: 'All versions',
-								},
-								...(
-									Object.keys(wallet.variants)
-										.map(v => ({
-											value: v,
-											label: variants[v].label,
-											icon: variants[v].icon,
-										}))
-								),
-							]}
+						<img
+							class="wallet-icon"
+							alt={wallet.metadata.displayName}
+							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
 						/>
-					{/if}
-
-					{#if 'hardware' in wallet.variants}
-						{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
-						{#if brandModels.length > 1}
+						<span>{wallet.metadata.displayName}</span>
+					</a>
+				</h1>
+				{#if queryParams && (Object.keys(wallet.variants).length > 1 || (Variant.HARDWARE in wallet.variants && brandModels.length > 1))}
+					<div data-sticky-breadcrumb="end" data-row="gap-2">
+						{#if Object.keys(wallet.variants).length > 1}
 							<Select
-								bind:value={selectedModel}
+								bind:value={selectedVariant}
+								aria-label="Wallet version"
+								data-icon="circle"
 								options={[
-									{ value: undefined, label: 'All models' },
-									...brandModels.map(m => ({ value: m.id.split('.')[1], label: `${m.modelName}`, icon: m.iconUrl }))
+									{
+										value: undefined,
+										label: 'All versions',
+									},
+									...Object.keys(wallet.variants).map(v => ({
+										value: v,
+										label: variants[v].label,
+										icon: variants[v].icon,
+									})),
 								]}
 							/>
 						{/if}
-					{/if}
 
-				</div>
-
-				<div
-					class="wallet-summary-badges"
-					data-row-item="wrap-end"
-					data-row="gap-2"
-				>
-					{#if showStage}
-						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
-						{#if stage !== null && ladderEvaluation !== null}
-							<WalletStageBadge
-								{stage}
-								{ladderEvaluation}
-								size="large"
-							/>
-						{/if}
-					{/if}
-
-					{#if showScores}
-						<ScoreBadge score={overallScore} size="large" />
-					{/if}
-				</div>
-			</div>
-
-			<section
-				class="wallet-overview"
-				data-column="gap-6"
-			>
-				<nav data-row="gap-2 start wrap">
-					{#if wallet.metadata.urls?.websites?.[0] !== undefined}
-						<a
-							href={getUrl(wallet.metadata.urls.websites[0])}
-							data-badge="medium"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<span data-icon="wbicons-simple browser_integration"></span>
-							Website
-						</a>
-					{/if}
-
-					{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
-						<a
-							href={getUrl(wallet.metadata.urls.repositories[0])}
-							data-badge="medium"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<span data-icon="wbicons-simple code_repository"></span>
-							Source Code
-						</a>
-					{/if}
-				</nav>
-
-				<div
-					class="wallet-platforms"
-					data-card="padding-5"
-				>
-					<p>
-						<span class="platforms-label">Platforms: </span>
-						{#each Object.keys(wallet.variants) as variant, i}
-							{i > 0 ? ', ' : ''}<strong>{variantToRunsOn(variant)}</strong>
-						{/each}.
-					</p>
-
-					{#if !hasSingleVariant(wallet.variants)}
-						<p>
-							The ratings below may vary depending on the version.
-							{#if selectedVariant}
-								You are currently viewing the ratings for the
-								<strong>{variantToName(selectedVariant, false)}</strong> version.
-							{:else}
-								Select a version to see version-specific ratings.
+						{#if Variant.HARDWARE in wallet.variants}
+							{#if brandModels.length > 1}
+								<Select
+									bind:value={selectedModel}
+									aria-label="Wallet model"
+									data-icon="circle"
+									options={[
+										{ value: undefined, label: 'All models' },
+										...brandModels.map(m => ({
+											value: m.modelId,
+											label: `${m.modelName}`,
+											icon: m.iconUrl,
+										})),
+									]}
+								/>
 							{/if}
-						</p>
-					{/if}
-
-					{#if 'hardware' in wallet.variants}
-						{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
-						{#if brandModels.length > 1}
-							<p>
-								The ratings below may vary depending on the model.
-								{#if selectedModel}
-									You are currently viewing the ratings for the
-									<strong>{brandModels.find(m => m.id.split('.')[1] === selectedModel)?.modelName}</strong> model.
-								{:else}
-									Select a model to see model-specific ratings.
-								{/if}
-							</p>
 						{/if}
-					{/if}
-				</div>
-			</section>
-		</header>
+					</div>
+				{/if}
+			</div>
+			<div data-sticky-breadcrumb="support" data-row-item="wrap-end" data-row="gap-2">
+				{#if showStage}
+					{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
+					{#if stage !== null && ladderEvaluation !== null}
+						<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+					{/if}
+				{/if}
+
+				{#if showScores}
+					<ScoreBadge score={overallScore} size="large" />
+				{/if}
+			</div>
+		</div>
+
+		<section class="wallet-overview" data-sticky-breadcrumb="support" data-row="wrap align-start">
+			<nav data-row="gap-2 start wrap" data-row-item="wrap-end">
+				{#if wallet.metadata.urls?.websites?.[0] !== undefined}
+					<a
+						href={getUrl(wallet.metadata.urls.websites[0])}
+						data-badge="medium"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<span data-icon="wbicons-simple browser_integration"></span>
+						Website
+					</a>
+
+				{/if}
+
+				{#if wallet.metadata.urls?.repositories?.[0] !== undefined}
+					<a
+						href={getUrl(wallet.metadata.urls.repositories[0])}
+						data-badge="medium"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<span data-icon="wbicons-simple code_repository"></span>
+						Source Code
+					</a>
+				{/if}
+			</nav>
+		</section>
+	</header>
+
+	<aside
+		class="page-navigation"
+		data-scroll-container="block"
+		data-sticky-container
+		data-column="gap-0"
+	>
+		<header data-row="end">
+			<button
+				type="button"
+				data-icon="circle"
+				popovertarget="wallet-toc"
+				aria-label="Table of contents"
+				title="Table of contents"
+			>
+				{@html ListTree}
+			</button>
+		</header>
+		<nav
+			class="pie-navigation"
+			data-sticky="block-start backdrop-before backdrop-always"
+			aria-label="Attribute pie navigation"
+			style={`--pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
+		>
+			<div class="pie-navigation-geometry">
+				<NavigationItems
+					items={pieNavigationItems}
+					showSearch={false}
+					defaultOpen
+					ariaLabel="Attribute pie navigation"
+				>
+					{#snippet iconSnippet(item: NavigationItem)}
+						{#if item.icon}
+							<span class="pie-navigation-icon" data-icon="wbicons-simple {item.icon}"
+							></span>
+						{/if}
+					{/snippet}
+				</NavigationItems>
+			</div>
+		</nav>
+
+		<nav
+			id="wallet-toc"
+			popover="auto"
+			data-column
+			data-column-item="flexible"
+			data-sticky-container
+		>
+			<NavigationItems
+				items={pieNavigationItems}
+				showSearch={false}
+				defaultOpen
+				ariaLabel="Table of contents"
+				afterLabelSnippet={navigationBadgeSnippet}
+			>
+				{#snippet iconSnippet(item: NavigationItem, depth: number)}
+					{#if item.icon}
+						<span data-icon="wbicons-simple accent {item.icon}"></span>
+					{/if}
+				{/snippet}
+			</NavigationItems>
+		</nav>
+	</aside>
+
+	<article data-column="gap-8">
 		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
@@ -643,25 +853,36 @@
 		{#if showStage}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
-			<section id="stages" data-sticky-breadcrumb="scope">
+			<section
+				id="stages"
+				data-sticky-breadcrumb="scope"
+				data-sticky-container
+				data-scroll-item="inline-detached padding-match-end flow"
+				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
+			>
 				<header
-					data-sticky="block backdrop-none"
 					data-sticky-breadcrumb="position"
-					data-row
+					data-sticky="block block-start backdrop-after backdrop-stuck"
+					data-column="span-start"
 					data-scroll-item="inline-detached"
 				>
-					<a
-						data-link="camouflaged"
-						data-sticky-breadcrumb="item"
-						href="#stages"
-					>
-						<h2 id="stages">Stage Progress</h2>
-					</a>
+					<div data-row="start" data-sticky="block block-start backdrop-self backdrop-always">
+						<h2 data-sticky-breadcrumb="source">
+							<a
+								data-row="start"
+								data-sticky-breadcrumb="item"
+								data-link="camouflaged"
+								href="#stages"
+							>
+								Stage Progress
+							</a>
+						</h2>
+					</div>
 				</header>
 
-				<div data-scroll-item="inline-detached padding-match-end" data-column>
-					<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
-				</div>
+				<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/if}
 
@@ -689,67 +910,41 @@
 			</div>
 		{/if}
 
-	</article>
-
-	<aside
-		class="page-navigation"
-		data-scroll-container="block"
-		data-sticky-container
-		data-column="gap-0"
-	>
-		<nav
-			class="pie-navigation"
-			data-sticky="block-start backdrop-before backdrop-always"
-			aria-label="Attribute pie navigation"
-			style={`---group-count: ${tocNavigationItems.length}; ---initial-slice-mid-angle: ${pieInitialSliceMidAngle}deg; --pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
-		>
-			<div class="pie-navigation-geometry">
-				<ScrollAngleSteps steps={pieRotationSteps}>
-					<NavigationItems
-						items={pieNavigationItems}
-						showSearch={false}
-						defaultOpen
-						ariaLabel="Attribute pie navigation"
-					>
-						{#snippet iconSnippet(item: NavigationItem)}
-							{#if item.icon}
-								<span
-									class="pie-navigation-icon"
-									data-icon="wbicons-simple {item.icon}"
-								></span>
-							{/if}
-						{/snippet}
-					</NavigationItems>
-				</ScrollAngleSteps>
-			</div>
-		</nav>
-
-		<nav
-			data-column
-			data-column-item="flexible"
-			data-sticky-container
-		>
-			<NavigationItems
-				items={pieNavigationItems}
-				showSearch={false}
-				defaultOpen
-				ariaLabel="Table of contents"
-				afterLabelSnippet={navigationBadgeSnippet}
+		{#if queryParams && tocNavigationItems.length}
+			<button
+				type="button"
+				data-icon="circle"
+				data-sticky="block block-end backdrop-none"
+				aria-label="Expand or collapse all details in the current section"
+				title="Expand or collapse all details in the current section"
+				onclick={toggleCurrentSectionDetails}
+				><span aria-hidden="true">{@html ListCollapse}</span></button
 			>
-				{#snippet iconSnippet(item: NavigationItem, depth: number)}
-					{#if item.icon}
-						<span
-							class="toc-icon"
-							data-icon="wbicons-simple {item.icon}"
-						></span>
-					{/if}
-				{/snippet}
-			</NavigationItems>
-		</nav>
-
-	</aside>
+		{/if}
+	</article>
+	{#if queryParams && tocNavigationItems.length}
+		<footer data-row="end gap-2" data-sticky="block block-end backdrop-none">
+			<button
+				type="button"
+				data-icon="circle"
+				aria-label="Previous rating section or attribute"
+				title="Previous rating section or attribute"
+				onclick={event => navigateAdjacentSection(event.currentTarget, -1)}
+				><span aria-hidden="true">↑</span></button
+			>
+			<button
+				type="button"
+				data-icon="circle"
+				aria-label="Next rating section or attribute"
+				title="Next rating section or attribute"
+				onclick={event => navigateAdjacentSection(event.currentTarget, 1)}
+				><span aria-hidden="true">↓</span></button
+			>
+		</footer>
+	{/if}
+	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </div>
-
 
 {#snippet navigationBadgeSnippet(item: NavigationItem, depth: number)}
 	<WalletPageNavigationBadge
@@ -763,7 +958,6 @@
 		showStage={false}
 	/>
 {/snippet}
-
 
 {#snippet attributeGroupSnippet({
 	attrGroup,
@@ -787,92 +981,91 @@
 
 	{#if attributes.length > 0}
 		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
-		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
+		{@const scoreLevel =
+			score === null || score.score === null
+				? null
+				: score.score >= 0.7
+					? 'high'
+					: score.score >= 0.4
+						? 'medium'
+						: 'low'}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
-		<hr
-			class="attribute-group-timeline"
-			style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attrGroup.id)}`)}
-		/>
+		<hr />
 
 		<section
 			class="attribute-group"
-			id={slugifyCamelCase(attrGroup.id)}
+			id={groupTargetId(attrGroup)}
 			aria-label={attrGroup.displayName}
-			data-sticky-breadcrumb="scope"
 			data-score={scoreLevel}
 			style:--accent={scoreColor}
+			data-sticky-breadcrumb="scope"
+			data-sticky-container
+			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
+			data-scroll-item="inline-detached padding-match-end flow"
 		>
-			<div
-				class="attribute-group-stack"
-				data-scroll-item="inline-detached padding-match-end"
+			<header
+				data-column="span-start"
+				data-sticky-breadcrumb="position"
+				data-sticky="block block-start backdrop-after backdrop-stuck"
+				data-scroll-item="inline-detached"
 			>
-				<header
-					data-row="center gap-3"
-					data-scroll-item="inline-detached"
-				>
-					<span
-						class="attribute-group-icon"
-						data-icon="wbicons-complex {attrGroup.icon}"
-					></span>
-
-					<div
-						class="attribute-group-summary-layout"
-						data-row-item="flexible basis-2"
-						data-row="start gap-2 wrap"
-					>
-						<div
-							class="attribute-group-heading"
-							data-column="gap-1"
+				<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
+					<div data-sticky-breadcrumb="source" data-row-item="flexible">
+						<a
+							data-row="start"
+							data-sticky-breadcrumb="item"
+							data-link="camouflaged"
+							href={`#${groupTargetId(attrGroup)}`}
+							interestfor={groupTargetId(attrGroup)}
 						>
-							<div
-								class="attribute-group-heading-position"
-								data-sticky-breadcrumb="position"
-							>
-								<a
-									data-link="camouflaged"
-									data-sticky-breadcrumb="item"
-									href={`#${slugifyCamelCase(attrGroup.id)}`}
-									interestfor={slugifyCamelCase(attrGroup.id)}
-								>
-									<h2>
-										{attrGroup.displayName}
-									</h2>
-								</a>
-							</div>
+							<span
+								aria-hidden="true"
+								data-icon="wbicons-complex accent {attrGroup.icon}"
+							></span>
+							<h2>
+								{attrGroup.displayName}
+							</h2>
+						</a>
+					</div>
 
-							{#if attrGroup.perWalletQuestion}
-								<div class="section-caption">
-									<Typography
-										content={attrGroup.perWalletQuestion}
-										strings={{ WALLET_NAME: wallet.metadata.displayName }}
-									/>
-								</div>
-							{/if}
+					{#if showScores}
+						<ScoreBadge
+							{score}
+							size="medium"
+							data-sticky-breadcrumb="end"
+							data-row-item="wrap-end"
+						/>
+					{/if}
+				</div>
+				{#if attrGroup.perWalletQuestion}
+					<div class="section-caption">
+						<div>
+							<Typography
+								content={attrGroup.perWalletQuestion}
+								strings={{ WALLET_NAME: wallet.metadata.displayName }}
+							/>
 						</div>
-
-						{#if showScores}
-							<ScoreBadge {score} size="medium" />
-						{/if}
 					</div>
-				</header>
+				{/if}
+			</header>
 
-				<div data-column>
-					<div class="attributes" data-column="gap-5">
-						{#each attributes as { attribute, evalAttr }}
-							{@render attributeSnippet({
-								attrGroupId: attrGroup.id,
-								attribute,
-								evalAttr,
-							})}
-						{/each}
-					</div>
+			<div data-column>
+				<div class="attributes" data-column="gap-5">
+					{#each attributes as { attribute, evalAttr }}
+						{@render attributeSnippet({
+							attrGroupId: attrGroup.id,
+							attribute,
+							evalAttr,
+						})}
+					{/each}
 				</div>
 			</div>
+			<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+			<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 		</section>
 	{/if}
 {/snippet}
-
 
 {#snippet attributeSnippet({
 	attrGroupId,
@@ -884,132 +1077,116 @@
 	evalAttr: EvaluatedAttribute<OutcomeMetadata>
 })}
 	{@const relevantVariants = attrToRelevantVariants.get(attribute.id) ?? []}
+	{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 
 	{@const override = getAttributeOverride(wallet, attrGroupId, attribute.id)}
 
-	{@const howToImprove = override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove}
+	{@const howToImprove =
+		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove}
 
 	{@const variantSpecificCaption = (() => {
-		const thisVariantSpecificity = relevantVariants.length === 0 ? VariantSpecificity.ALL_SAME : relevantVariants.length === 1 ? VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT : VariantSpecificity.NOT_UNIVERSAL
+		const thisVariantSpecificity =
+			relevantVariants.length === 0
+				? VariantSpecificity.ALL_SAME
+				: relevantVariants.length === 1
+					? VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT
+					: VariantSpecificity.NOT_UNIVERSAL
 
 		switch (thisVariantSpecificity) {
 			case VariantSpecificity.ALL_SAME:
 				return null
 			case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
-				return selectedVariant ? `This rating is only relevant for the ${variantToName(selectedVariant, false)} version.` : null
+				return selectedVariant
+					? `This rating is only relevant for the ${variantToName(selectedVariant, false)} version.`
+					: null
 			default:
-				return selectedVariant ? `This rating is specific to the ${variantToName(selectedVariant, false)} version.` : 'This rating differs across versions. Select a specific version for details.'
+				return selectedVariant
+					? `This rating is specific to the ${variantToName(selectedVariant, false)} version.`
+					: 'This rating differs across versions. Select a specific version for details.'
 		}
 	})()}
 
 	<section
 		class="attribute"
+		data-card="radius-8 padding-6 border-accent"
+		data-sticky-breadcrumb="scope"
+		data-sticky-container
+		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 		style:--accent-textColor={ratingToTextColor(evalAttr.evaluation.outcome.rating)}
-		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
-		<details
-			open
-			data-card="radius-8 padding-6 border-accent"
-			data-column="gap-0"
-			data-sticky-breadcrumb="scope"
-		>
-			<summary data-row>
-				<header data-row-item="flexible" data-row="center gap-3">
-					<span
-						class="attribute-icon"
-						data-icon="wbicons-complex {attribute.icon}"
-					></span>
-
-					<div
-						class="attribute-summary-layout"
-						data-row-item="flexible basis-2"
-						data-row="start gap-2 wrap"
-					>
-						<div
-							class="attribute-heading"
-							data-row-item="flexible"
-							data-column="gap-2"
-						>
-							<div
-								class="attribute-heading-position"
-								data-sticky-breadcrumb="position"
-							>
+		<details open data-column="gap-0">
+			<summary
+				data-row
+				data-sticky-breadcrumb="position"
+				data-sticky="block block-start backdrop-before backdrop-stuck"
+			>
+				<header
+					data-row-item="flexible"
+					data-column="span-start"
+					style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
+				>
+					<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
+						<div data-sticky-breadcrumb="source" data-row-item="flexible">
+							<h3 data-sticky-breadcrumb="item" data-row="start gap-2 wrap">
 								<a
+									data-row="start"
 									data-link="camouflaged"
-									data-sticky-breadcrumb="item"
 									href={`#${slugifyCamelCase(attribute.id)}`}
 									interestfor={slugifyCamelCase(attribute.id)}
 								>
-									<h3>
-										{attribute.displayName}
-									</h3>
+									<span
+										aria-hidden="true"
+										data-icon="wbicons-complex accent {attribute.icon}"
+									></span>
+									<span>{attribute.displayName}</span>
 								</a>
-							</div>
-
-							{#if attribute.question}
-								<div class="subsection-caption">
-									<Typography
-										content={attribute.question}
-										strings={{ WALLET_NAME: wallet.metadata.displayName }}
-									/>
-								</div>
-							{/if}
-						</div>
-
-						<div
-							class="attribute-summary-companions-position"
-							data-row-item="wrap-end"
-						>
-							<div
-								class="attribute-summary-companions"
-								data-row="gap-2 wrap"
-							>
 								{#if showStage}
-								{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
+									{@const { ladderEvaluation, ladderType } = getWalletStageAndLadder(wallet)}
 
-								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
+									{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
 
-								{@const stageNumbers = (
-									ladderType &&
-										attributeStages
-											.find(stage => stage.ladderType === ladderType)
-											?.stageNumbers
-									||
-										[]
-								)}
+									{@const stageNumbers =
+										(ladderType &&
+											attributeStages.find(stage => stage.ladderType === ladderType)
+												?.stageNumbers) ||
+										[]}
 
-								{#if stageNumbers.length > 0}
-									{@const stageNumber = stageNumbers[0]}
-									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
-									{@const stageLabels = ladderEvaluation ? (
-										stageNumbers
-											.map(n => ladderEvaluation.ladder.stages[n])
-											.filter(s => s !== undefined)
-											.map(s => s.label.replace(/^Stage /, ''))
-									) : []}
+									{#if stageNumbers.length > 0}
+										{@const stageNumber = stageNumbers[0]}
+										{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+										{@const stageLabels = ladderEvaluation
+											? stageNumbers
+													.map(n => ladderEvaluation.ladder.stages[n])
+													.filter(s => s !== undefined)
+													.map(s => s.label.replace(/^Stage /, ''))
+											: []}
 
-									{#if stage}
-										<a
-											href={`#${stage.id}`}
-											data-link="camouflaged"
-											title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
-										>
-											<div
-												data-badge="small"
-												style:--accent="var(--accent-color)"
+										{#if stage}
+											<a
+												href={`#${stage.id}`}
+												data-link="camouflaged"
+												title={`This attribute is required for stage${stageLabels.length > 1 ? 's' : ''} ${stageLabels.join(', ')}`}
 											>
-												<small>Stage {stageLabels.join(', ')}</small>
-											</div>
-										</a>
+												<span data-badge="small" style:--accent="var(--accent-color)">
+													<small>Stage {stageLabels.join(', ')}</small>
+												</span>
+											</a>
+										{/if}
 									{/if}
 								{/if}
-								{/if}
-
-								{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
+							</h3>
+						</div>
+						<div
+							class="attribute-summary-companions"
+							data-sticky-breadcrumb="end"
+							data-row-item="wrap-end"
+							data-row="end gap-2 wrap"
+						>
+							{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
 								<div
 									class="variant-indicator"
 									data-badge="small"
@@ -1027,374 +1204,319 @@
 										</span>
 									{/each}
 								</div>
-								{/if}
+							{/if}
 
-								{#if true}
-								{@const verifiability = evalAttr.evaluation.outcome.verifiability}
-								{#if verifiability === Verifiability.UNVERIFIABLE}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)"
-									>Unverifiable</data>
-								{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
-									<data
-										data-row-item="wrap-end"
-										data-badge="medium"
-										value={verifiability}
-										style:--accent="var(--accent-color)"
-									>Unverifiable but audited</data>
-								{/if}
-								{/if}
-
+							{#if verifiability === Verifiability.UNVERIFIABLE}
 								<data
+									data-row-item="wrap-end"
 									data-badge="medium"
-									value={evalAttr.evaluation.outcome.rating}
-								>{evalAttr.evaluation.outcome.rating}</data>
-							</div>
+									value={verifiability}
+									style:--accent="var(--accent-color)">Unverifiable</data
+								>
+							{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
+								<data
+									data-row-item="wrap-end"
+									data-badge="medium"
+									value={verifiability}
+									style:--accent="var(--accent-color)">Unverifiable but audited</data
+								>
+							{/if}
+
+							<data data-badge="medium" value={evalAttr.evaluation.outcome.rating}
+								>{evalAttr.evaluation.outcome.rating}</data
+							>
 						</div>
 					</div>
+					{#if attribute.question}
+						<div class="subsection-caption">
+							<div>
+								<Typography
+									content={attribute.question}
+									strings={{ WALLET_NAME: wallet.metadata.displayName }}
+								/>
+							</div>
+						</div>
+					{/if}
 				</header>
 			</summary>
 			<div class="attribute-content" data-column="gap-6">
-
-			<ul
-				class="attribute-rating-details"
-				data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
-				data-card="padding-5"
-			>
-				<li
-					data-list-item="gap-3"
-					data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
+				<ul
+					class="attribute-rating-details"
+					data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
+					data-card="padding-5"
 				>
-					{#if isTypographicContent(evalAttr.evaluation.details)}
+					<li
+						data-list-item="gap-3"
+						data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
+					>
+						{#if isTypographicContent(evalAttr.evaluation.details)}
+							<Typography
+								content={evalAttr.evaluation.details}
+								strings={{ WALLET_NAME: wallet.metadata.displayName }}
+							/>
+						{:else if evalAttr.evaluation.details}
+							{@const componentName = evalAttr.evaluation.details.component.component}
+							{@const componentProps = evalAttr.evaluation.details.component.componentProps}
+							{@const outcome = evalAttr.evaluation.outcome}
+							{@const references =
+								evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
+
+							<div data-column>
+								{#if componentName === 'AddressCorrelationDetails'}
+									<AddressCorrelationDetails
+										{...componentProps as AddressCorrelationDetailsProps}
+										{wallet}
+									/>
+								{:else if componentName === 'PrivateTransfersDetails'}
+									<PrivateTransfersDetails
+										{...componentProps as PrivateTransfersDetailsProps}
+										{wallet}
+									/>
+								{:else if componentName === 'ChainVerificationDetails'}
+									<ChainVerificationDetails
+										{...componentProps as ChainVerificationDetailsProps}
+										{wallet}
+										refs={references}
+									/>
+								{:else if componentName === 'ScamAlertDetails'}
+									<ScamAlertDetails
+										{...componentProps as ScamAlertDetailsProps}
+										{wallet}
+										{outcome}
+									/>
+								{:else if componentName === 'SecurityAuditsDetails'}
+									<SecurityAuditsDetails
+										{...componentProps as SecurityAuditsDetailsProps}
+										{wallet}
+										metadata={outcome.metadata!}
+									/>
+								{:else if componentName === 'TransactionInclusionDetails'}
+									<TransactionInclusionDetails
+										{...componentProps as TransactionInclusionDetailsProps}
+										{wallet}
+									/>
+								{:else if componentName === 'FundingDetails'}
+									<FundingDetails {...componentProps as FundingDetailsProps} {wallet} />
+								{:else if componentName === 'AccountRecoveryDetails'}
+									<AccountRecoveryDetails
+										{...componentProps as AccountRecoveryDetailsProps}
+										{wallet}
+										metadata={outcome.metadata!}
+									/>
+								{:else if componentName === 'AccountUnruggabilityDetails'}
+									<AccountUnruggabilityDetails
+										{...componentProps as AccountUnruggabilityDetailsProps}
+										{wallet}
+										metadata={outcome.metadata!}
+									/>
+								{:else if componentName === 'UnratedAttribute'}
+									<UnratedAttribute
+										{...componentProps as UnratedAttributeProps<OutcomeMetadata>}
+										{wallet}
+									/>
+								{/if}
+							</div>
+						{:else}
+							<div data-column>
+								<Typography
+									content={{
+										contentType: ContentType.TEXT,
+										text: `No detailed evaluation available for ${attribute.displayName}`,
+									}}
+								/>
+							</div>
+						{/if}
+					</li>
+				</ul>
+
+				{#if variantSpecificCaption}
+					<div class="variant-caption">
+						{variantSpecificCaption}
+					</div>
+				{/if}
+
+				{#if evalAttr.evaluation.impact}
+					<div class="impact" data-column="gap-6">
 						<Typography
-							content={evalAttr.evaluation.details}
+							content={evalAttr.evaluation.impact}
 							strings={{ WALLET_NAME: wallet.metadata.displayName }}
 						/>
-
-					{:else if evalAttr.evaluation.details}
-						{@const componentName = evalAttr.evaluation.details.component.component}
-						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
-						{@const outcome = evalAttr.evaluation.outcome}
-						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
-
-						<div data-column>
-							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
-							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
-							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
-							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
-							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
-							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
-							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
-							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
-							{/if}
-						</div>
-
-					{:else}
-						<div data-column>
-							<Typography
-								content={{
-									contentType: ContentType.TEXT,
-									text: `No detailed evaluation available for ${attribute.displayName}`,
-								}}
-							/>
-						</div>
-					{/if}
-				</li>
-				{#if override?.note !== undefined}
-					<li data-list-item="gap-3" data-list-item-marker="👉">
-						<Typography
-							content={override.note}
-							strings={getWalletEvalStrings(wallet)}
-						/>
-					</li>
-				{/if}
-			</ul>
-
-			{#if variantSpecificCaption}
-				<div class="variant-caption">
-					{variantSpecificCaption}
-				</div>
-			{/if}
-
-			{#if evalAttr.evaluation.impact}
-				<div
-					class="impact"
-					data-column="gap-6"
-				>
-					<Typography
-						content={evalAttr.evaluation.impact}
-						strings={{ WALLET_NAME: wallet.metadata.displayName }}
-					/>
-				</div>
-			{/if}
-
-			{#if (
-				evalAttr.evaluation.references?.length &&
-				(
-					isTypographicContent(evalAttr.evaluation.details) ||
-					!(
-						// Custom components that render their own reference links
-						[
-							'ChainVerificationDetails',
-							'FundingDetails',
-							'ScamAlertDetails',
-							'SecurityAuditsDetails',
-						]
-							.includes(evalAttr.evaluation.details.component.component)
-					)
-				)
-			)}
-				<ReferenceLinks
-					references={toFullyQualified(evalAttr.evaluation.references)}
-					cardBackground="secondary"
-				/>
-			{/if}
-
-			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
-				{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
-
-				{@const supportedModels =
-					allHardwareModels.filter(m => (
-						supportedBrands.includes(m.brandId.toUpperCase())
-					))
-				}
-
-				<div class="supported-hardware-wallets" data-card="secondary padding-6">
-					<h4>Supported hardware wallets:</h4>
-					<div data-row="gap-2 wrap start">
-						{#each supportedModels.filter(m => !selectedModel || m.id === selectedModel) as model}
-							<a
-								href={`/${model.brandId}/?model=${model.modelId}`}
-								data-badge="medium"
-							>
-								<img src={model.iconUrl} alt={model.brandName} />
-								{model.modelName}
-							</a>
-						{/each}
 					</div>
-				</div>
-			{/if}
+				{/if}
 
-			<div class="attribute-accordions" data-column="gap-3">
-				<details open data-card="padding-5 secondary radius-4" data-column="gap-0" data-sticky-container>
-					<summary data-sticky="block block-start backdrop-self backdrop-always">
-						<h4>
-							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
-						</h4>
-					</summary>
+				{#if evalAttr.evaluation.references?.length && (isTypographicContent(evalAttr.evaluation.details) || !(// Custom components that render their own reference links
+							['ChainVerificationDetails', 'FundingDetails', 'ScamAlertDetails', 'SecurityAuditsDetails'].includes(evalAttr.evaluation.details.component.component)))}
+					<ReferenceLinks
+						references={toFullyQualified(evalAttr.evaluation.references)}
+						cardBackground="secondary"
+					/>
+				{/if}
 
-					<section data-column="gap-6">
-						{#if attribute.why}
-							<Typography
-								content={attribute.why}
-							/>
-						{:else}
-							<p>No explanation available.</p>
-						{/if}
-					</section>
-				</details>
+				{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
+					{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
 
-				<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
-					<summary data-sticky="block block-start backdrop-self backdrop-always">
-						<h4>
-							{getHowIsEvaluatedHeading(attribute)}
-						</h4>
-					</summary>
+					{@const supportedModels = allHardwareModels.filter(m =>
+						supportedBrands.includes(m.brandId.toUpperCase()),
+					)}
 
-					<section
-						class="attribute-rating-methodology"
-						data-column="gap-6"
+					<div class="supported-hardware-wallets" data-card="secondary padding-6">
+						<h4>Supported hardware wallets:</h4>
+						<div data-row="gap-2 wrap start">
+							{#each supportedModels.filter(m => !selectedModel || m.modelId === selectedModel) as model}
+								<a href={`/${model.brandId}/?model=${model.modelId}`} data-badge="medium">
+									<img src={model.iconUrl} alt={model.brandName} />
+									{model.modelName}
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<div class="attribute-accordions" data-column="gap-3">
+					<details
+						id={`${slugifyCamelCase(attribute.id)}-why`}
+						open
+						data-card="padding-5 secondary radius-4"
+						data-column="gap-0"
+						data-sticky-container
 					>
-						{#if attribute.methodology}
-							<Typography content={attribute.methodology} />
-						{:else}
-							<p>No methodology information available.</p>
-						{/if}
-
-						{#if attribute.ratingScale}
-							{#if attribute.ratingScale.display === 'simple'}
-								<aside
-									data-card="radius-4"
-								>
-									<Typography
-										content={attribute.ratingScale.content}
-									/>
-								</aside>
-							{:else}
-								<aside
-									data-card="radius-4"
-									data-column="gap-5"
-								>
-									{#if attribute.ratingScale.exhaustive}
-										<h5>A few examples:</h5>
-									{/if}
-
-									<ul data-list="gap-4">
-										{#each (
-											[
-												{
-													rating: Rating.PASS,
-													label: 'passing',
-													exampleRatings: attribute.ratingScale.pass,
-												},
-												{
-													rating: Rating.PARTIAL,
-													label: 'partial',
-													exampleRatings: attribute.ratingScale.partial,
-												},
-												{
-													rating: Rating.FAIL,
-													label: 'failing',
-													exampleRatings: attribute.ratingScale.fail,
-												},
-											]
-												.filter(({ exampleRatings }) => !!exampleRatings)
-												.map(({ rating, label, exampleRatings }) => ({
-													rating,
-													label,
-													exampleRatings: normalizeExampleRatings(exampleRatings),
-												}))
-												.filter(
-													(item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<OutcomeMetadata>> } => item.exampleRatings.length > 0,
-												)
-										) as { rating, label, exampleRatings }}
-											<li
-												data-list-item="gap-3"
-												data-list-item-marker={ratingIcons[rating]}
-											>
-												<p>A wallet would get a <strong>{label}</strong> rating if...</p>
-
-												<ul>
-													{#each exampleRatings as exampleRating}
-														<li>
-															{#if exampleRating.description.contentType === ContentType.MARKDOWN}
-																<Typography
-																	content={exampleRating.description}
-																/>
-															{:else}
-																{exampleRating.description.text}
-															{/if}
-														</li>
-													{/each}
-												</ul>
-											</li>
-										{/each}
-									</ul>
-								</aside>
-							{/if}
-						{/if}
-					</section>
-				</details>
-
-				{#if howToImprove}
-					<details open data-card="secondary padding-5 radius-4" data-column="gap-0" data-sticky-container>
-						<summary data-sticky="block block-start backdrop-self backdrop-always">
+						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
 							<h4>
-								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
+								<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}-why`}>
+									{evalAttr.evaluation.outcome.rating === Rating.PASS ||
+									evalAttr.evaluation.outcome.rating === Rating.UNRATED
+										? 'Why does this matter?'
+										: 'Why should I care?'}
+								</a>
 							</h4>
 						</summary>
 
-						<section data-column>
-							<Typography
-								content={howToImprove}
-								strings={getWalletEvalStrings(wallet)}
-							/>
-
-							{#if override?.howToImprove !== undefined}
-								<div class="note" data-card="padding-3" data-row="gap-4">
-									<div class="icon">ℹ️</div>
-									<p>
-										{`Note: This recommendation is specific to ${wallet.metadata.displayName} from the Walletbeat team, not our general recommendation for all wallets of this type.`}
-									</p>
-								</div>
+						<section data-column="gap-6">
+							{#if attribute.why}
+								<Typography content={attribute.why} />
+							{:else}
+								<p>No explanation available.</p>
 							{/if}
 						</section>
 					</details>
-				{/if}
-			</div>
+
+					<details
+						id={`${slugifyCamelCase(attribute.id)}-methodology`}
+						open
+						data-card="secondary padding-5 radius-4"
+						data-column="gap-0"
+						data-sticky-container
+					>
+						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
+							<h4>
+								<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}-methodology`}>
+									{getHowIsEvaluatedHeading(attribute)}
+								</a>
+							</h4>
+						</summary>
+
+						<section class="attribute-rating-methodology" data-column="gap-6">
+							{#if attribute.methodology}
+								<Typography content={attribute.methodology} />
+							{:else}
+								<p>No methodology information available.</p>
+							{/if}
+
+							{#if attribute.ratingScale}
+								{#if attribute.ratingScale.display === 'simple'}
+									<aside data-card="radius-4">
+										<Typography content={attribute.ratingScale.content} />
+									</aside>
+								{:else}
+									<aside data-card="radius-4" data-column="gap-5">
+										{#if attribute.ratingScale.exhaustive}
+											<h5>A few examples:</h5>
+										{/if}
+
+										<ul data-list="gap-4">
+											{#each [{ rating: Rating.PASS, label: 'passing', exampleRatings: attribute.ratingScale.pass }, { rating: Rating.PARTIAL, label: 'partial', exampleRatings: attribute.ratingScale.partial }, { rating: Rating.FAIL, label: 'failing', exampleRatings: attribute.ratingScale.fail }]
+												.filter(({ exampleRatings }) => !!exampleRatings)
+												.map( ({ rating, label, exampleRatings }) => ({ rating, label, exampleRatings: normalizeExampleRatings(exampleRatings) }) )
+												.filter((item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<OutcomeMetadata>> } => item.exampleRatings.length > 0) as { rating, label, exampleRatings }}
+												<li data-list-item="gap-3" data-list-item-marker={ratingIcons[rating]}>
+													<p>A wallet would get a <strong>{label}</strong> rating if...</p>
+
+													<ul>
+														{#each exampleRatings as exampleRating}
+															<li>
+																{#if exampleRating.description.contentType === ContentType.MARKDOWN}
+																	<Typography content={exampleRating.description} />
+																{:else}
+																	{exampleRating.description.text}
+																{/if}
+															</li>
+														{/each}
+													</ul>
+												</li>
+											{/each}
+										</ul>
+									</aside>
+								{/if}
+							{/if}
+						</section>
+					</details>
+
+					{#if howToImprove}
+						<details
+							id={`${slugifyCamelCase(attribute.id)}-improvement`}
+							open
+							data-card="secondary padding-5 radius-4"
+							data-column="gap-0"
+							data-sticky-container
+						>
+							<summary data-sticky="block block-start backdrop-before backdrop-stuck">
+								<h4>
+									<a
+										data-link="camouflaged"
+										href={`#${slugifyCamelCase(attribute.id)}-improvement`}
+									>
+										{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
+									</a>
+								</h4>
+							</summary>
+
+							<section data-column>
+								<Typography content={howToImprove} strings={getWalletEvalStrings(wallet)} />
+
+								{#if override}
+									<div class="note" data-card="padding-3" data-row="gap-4">
+										<div class="icon">ℹ️</div>
+										<p>
+											{`Note: This recommendation is specific to ${wallet.metadata.displayName} from the Walletbeat team, not our general recommendation for all wallets of this type.`}
+										</p>
+									</div>
+								{/if}
+							</section>
+						</details>
+					{/if}
+				</div>
 			</div>
 		</details>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</section>
 {/snippet}
 
-
 <style>
 	.container {
+		overflow-wrap: anywhere;
 		--wallet-icon-size: 3rem;
 		---wallet-content-inline-padding: 2rem;
-		---wallet-content-block-start: 2rem;
-		---wallet-icon-sticky-block-start: calc(
-			var(---wallet-page-block-offset)
-			+ var(---wallet-sticky-content-inset)
-		);
-		---wallet-content-inline-start: max(
-			var(---wallet-content-inline-padding),
-			(
-				var(--sticky-sizeInline)
-				- var(--scrollItem-inlineDetached-maxSize)
-			)
-			/ 2
-		);
-		---wallet-icon-sticky-inline-start: var(---wallet-content-inline-start);
-		---wallet-name-sticky-icon-size: 2rem;
-		---wallet-name-sticky-font-size: 1.8rem;
-		---wallet-name-flow-icon-size: 3rem;
-		---wallet-name-flow-font-size: 2.25rem;
-		---wallet-name-flow-gap: 0.5em;
+		---wallet-group-heading-font-size: 1.8rem;
+		---wallet-compact-icon-size: 32px;
+		---pie-compactSize: 100px;
+		---pie-clearanceSize: calc(var(---pie-compactSize) + var(--stickyBreadcrumb-gap, 1rem) / 2);
+		---wallet-compact-h3: 1rem;
+		&[data-sticky-breadcrumb] {
+			--stickyBreadcrumb-iconRatio: calc(var(---wallet-compact-icon-size) / var(---wallet-compact-h1));
+		}
 		---wallet-line-height: 1.6;
-		---wallet-breadcrumb-attribute-font-size: 1.17rem;
-		---wallet-breadcrumb-group-font-size: calc(
-			(
-				var(---wallet-breadcrumb-root-font-size)
-				+ var(---wallet-breadcrumb-attribute-font-size)
-			)
-			/ 2
-		);
-		---wallet-breadcrumb-gap: 1.5rem;
-		---wallet-breadcrumb-heading-icon-size: 1.5rem;
-		---wallet-breadcrumb-heading-icon-gap: 0.5rem;
-		---wallet-breadcrumb-icon-block-start: calc(
-			anchor(--sticky-breadcrumb-scope top)
-			+ (
-				var(---wallet-breadcrumb-block-size)
-				- var(---wallet-breadcrumb-heading-icon-size)
-			)
-			/ 2
-		);
-		---wallet-breadcrumb-icon-inline-start: calc(
-			anchor(var(--stickyBreadcrumb-parentAnchor) end)
-			+ var(---wallet-breadcrumb-gap)
-		);
-		---wallet-breadcrumb-companion-block-start: anchor(
-			--wallet-breadcrumb-surface center
-		);
-		---wallet-breadcrumb-companion-inline-end-clearance: 0px;
-		---wallet-breadcrumb-surface-background: light-dark(#F8EDFF, #130a2b);
-		---wallet-breadcrumb-layer-root: 20;
-		---wallet-breadcrumb-layer-group: 21;
-		---wallet-breadcrumb-layer-attribute: 22;
-		---wallet-attribute-heading-font-size: 1.17em;
-		---wallet-breadcrumb-animation-range-start: entry calc(100dvb - 6rem);
-		---wallet-breadcrumb-animation-range-end: entry calc(100dvb - 3rem);
-		---wallet-name-animation-distance: 7.5rem;
-		--border-radius-lg: 1rem;
-		--border-radius: 0.5rem;
-		--border-radius-sm: 0.25rem;
+		---wallet-attribute-heading-font-size: 1.17rem;
 
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 54rem;
@@ -1403,49 +1525,11 @@
 			--scrollItem-inlineDetached-paddingEnd: var(---wallet-content-inline-padding);
 			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
 			--sticky-marginInlineEnd: var(---wallet-page-navigation-inline-size);
+			isolation: auto;
 		}
 
 		display: grid;
-		grid-template:
-			'Content Nav'
-			/ minmax(0, 1fr) auto
-		;
-		@media (max-width: 1024px) {
-			&[data-sticky-container] {
-				--sticky-marginInlineStart: var(---wallet-page-navigation-inline-size);
-				--sticky-marginInlineEnd: 0px;
-			}
-
-			grid-template:
-				'Nav Content'
-				/ auto minmax(0, 1fr)
-			;
-		}
-		@media (max-width: 864px) {
-			---wallet-mobile-pie-size-rem: 8;
-			---wallet-mobile-pie-size: calc(
-				var(---wallet-mobile-pie-size-rem)
-				* 1rem
-			);
-			---wallet-breadcrumb-companion-inline-end-clearance: var(---wallet-mobile-pie-size);
-			---wallet-name-sticky-icon-size: 2.4rem;
-			---wallet-breadcrumb-gap: 1.25rem;
-			&[data-sticky-container] {
-				--sticky-marginInlineStart: 0px;
-			}
-
-			grid-template:
-				[Nav-start]
-				'Content'
-				[Nav-end]
-				/ [Nav-start] minmax(0, 1fr) [Nav-end]
-			;
-		}
-		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-breadcrumb-gap: 1rem;
-			---wallet-breadcrumb-heading-icon-size: 1.25rem;
-			---wallet-breadcrumb-heading-icon-gap: 0.25rem;
-		}
+		grid-template: 'Header Nav' auto 'Content Nav' 1fr / minmax(0, 1fr) auto;
 
 		line-height: var(---wallet-line-height);
 
@@ -1457,6 +1541,9 @@
 		}
 
 		.page-navigation {
+			> header {
+				display: none;
+			}
 			/* Nested scroll root: don't inherit page content's TOC clearance as sticky insets. */
 			--sticky-marginInlineStart: 0px;
 			--sticky-marginInlineEnd: 0px;
@@ -1472,9 +1559,6 @@
 			--sticky-insetBlockStart: 0px;
 			--sticky-insetBlockEnd: 0px;
 
-			--sticky-backgroundColor: var(--background-secondary);
-			anchor-name: --wallet-page-navigation;
-
 			grid-area: Nav;
 			z-index: 2;
 
@@ -1489,6 +1573,8 @@
 			box-shadow: 0 0 var(--separator-width) var(--border-color);
 
 			> nav:not(.pie-navigation) {
+				/* The desktop rail owns scrolling; the native popover does only on mobile. */
+				overflow: visible;
 				position: relative;
 				z-index: 0;
 				align-content: stretch;
@@ -1500,217 +1586,300 @@
 					--sticky-paddingBlockStart: 0.75rem;
 					--sticky-paddingBlockEnd: 0.75rem;
 				}
+
+				display: flex;
+
+				margin: 0;
+
+				border: 0;
+
+				color: inherit;
 			}
 
-			@media (max-width: 864px) {
-				display: contents;
+			@media (width <= 1024px) {
+				display: flex;
 				z-index: auto;
 				position: static;
 				background: none;
 				box-shadow: none;
 
-				> nav:not(.pie-navigation) {
-					z-index: 6;
+				inline-size: auto;
+
+				block-size: auto;
+
+				> header {
+					display: flex;
 					position: fixed;
-					inset-inline: 0 auto;
-					inset-block: calc(var(---wallet-page-block-offset) + 4rem) 0;
-					inline-size: var(---wallet-page-navigation-inline-size);
-					translate: -100% 0;
-					transition: translate 0.3s var(--ease-out-expo);
-					background-color: var(--background-secondary);
-					overflow-y: auto;
+					inset-inline-end: var(--navigation-controlInsetInline);
+					inset-block-start: calc((var(--navigation-mobile-blockSize) - 2rem) / 2);
+					z-index: 4;
+
+					& button {
+						--icon-size: 2rem;
+					}
+				}
+				> #wallet-toc {
+					position: fixed;
+					inset: var(--navigation-mobile-blockSize) 0 0;
+					inline-size: auto;
+					block-size: auto;
 					min-block-size: 0;
-					box-shadow: 0 0 var(--separator-width) var(--border-color);
+					overflow-y: auto;
+					background: var(--background-primary);
+					transition-property: filter, opacity, translate, display, overlay;
+					transition-behavior: allow-discrete;
+					filter: blur(0);
+					opacity: 1;
+					translate: 0 0 0;
+					&:not(:popover-open) {
+						display: none;
+						filter: blur(0.375rem);
+						opacity: 0;
+						translate: 0 -0.75rem 1.25rem;
+					}
+					@starting-style {
+						&:popover-open {
+							filter: blur(0.375rem);
+							opacity: 0;
+							translate: 0 -0.75rem 1.25rem;
+						}
+					}
+					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+						(color: if(style(---breadcrumb-wrap: 1): red)) {
+						/* The independent pie stays outside the popover's paint and hit region. */
+						clip-path: polygon(
+							0 0,
+							calc(100% - var(---pie-clearanceSize)) 0,
+							calc(100% - var(---pie-clearanceSize)) var(---pie-clearanceSize),
+							100% var(---pie-clearanceSize),
+							100% 100%,
+							0 100%
+						);
+						&:dir(rtl) {
+							clip-path: polygon(
+								var(---pie-clearanceSize) 0,
+								100% 0,
+								100% 100%,
+								0 100%,
+								0 var(---pie-clearanceSize),
+								var(---pie-clearanceSize) var(---pie-clearanceSize)
+							);
+						}
+						@supports (clip-path: shape(from 0 0, line to 1px 1px)) {
+							&,
+							&:dir(rtl) {
+								clip-path: shape(
+									evenodd from 0 0,
+									line to 100% 0,
+									line to 100% 100%,
+									line to 0 100%,
+									close,
+									move to calc(
+										(1 + var(---inlineDirection)) / 2 * (100% - var(---pie-compactSize)) +
+										var(---pie-compactSize) - var(---pie-clearanceSize)
+									) calc(var(---pie-compactSize) / 2),
+									arc by calc(2 * var(---pie-clearanceSize) - var(---pie-compactSize)) 0 of
+										calc(var(---pie-clearanceSize) - var(---pie-compactSize) / 2) cw,
+									arc by calc(var(---pie-compactSize) - 2 * var(---pie-clearanceSize)) 0 of
+										calc(var(---pie-clearanceSize) - var(---pie-compactSize) / 2) cw,
+									close
+								);
+							}
+						}
+						:global(.navigation-items :is(summary, li > a)) {
+							---pie-inlineClearance: var(---pie-clearanceSize);
+							timeline-scope: --pie-clearance;
+							view-timeline: --pie-clearance block;
+							view-timeline-inset: 0 calc(100% - var(---pie-clearanceSize));
+						}
+					}
 				}
+			}
+			&:has(#wallet-toc:popover-open) > header {
+				display: flex;
+			}
+			&[data-scroll-container] {
+				--scrollContainer-perspective: none;
+			}
+			&[data-sticky-container] {
+				isolation: auto;
+			}
+		}
 
-				&::after {
-					content: none;
-				}
+		row-gap: 2rem;
 
-				&:focus-within > nav:not(.pie-navigation) {
-					translate: 0 0;
+		@media (width <= 1024px) {
+			&[data-sticky-container] {
+				--sticky-marginInlineStart: 0px;
+				--sticky-marginInlineEnd: 0px;
+			}
+			grid-template: 'Header' 'Nav' 'Content' / minmax(0, 1fr);
+		}
+
+		> [data-sticky-breadcrumb~="position"] {
+			grid-area: Header;
+		}
+	}
+
+	@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
+		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+		(color: if(style(---breadcrumb-wrap: 1): red))) {
+		.container {
+			---wallet-name-flow-font-size: 1.25rem;
+			---wallet-group-heading-font-size: 1.125rem;
+			---wallet-attribute-heading-font-size: 1rem;
+			---wallet-detail-heading-font-size: 0.875rem;
+			---wallet-detail-heading-line-height: 1.25;
+			--wallet-icon-size: 1.875rem;
+			---wallet-native-lineSize: calc(var(---wallet-name-flow-font-size) * var(---wallet-line-height));
+			&[data-sticky-container],
+			:global([data-sticky-container]) {
+				---wallet-native-lines: 1;
+				--stickyBreadcrumb-nativeBlockSize: calc(var(---wallet-native-lines) * var(---wallet-native-lineSize) + 1rem);
+			}
+			:global([data-sticky-breadcrumb~="scope"]:has(> [data-sticky-breadcrumb~="position"] h2)) {
+				---wallet-native-lineSize: calc(var(---wallet-group-heading-font-size) * var(---wallet-line-height));
+				---wallet-native-lines: 1.5;
+			}
+			:global([data-sticky-breadcrumb~="scope"]:has(> details > [data-sticky-breadcrumb~="position"])) {
+				---wallet-native-lineSize: calc(var(---wallet-attribute-heading-font-size) * var(---wallet-line-height));
+				---wallet-native-lines: 1.5;
+			}
+			:global([data-sticky-container]:has(> summary h4)) {
+				---wallet-native-lineSize: calc(var(---wallet-detail-heading-font-size) * var(---wallet-detail-heading-line-height));
+				---wallet-native-lines: 3;
+			}
+			:global([data-sticky-breadcrumb~="position"] [data-row]),
+			:global(summary[data-sticky] > [data-row]) {
+				row-gap: 0.25rem;
+			}
+			grid-template: 'Header Nav' auto 'Overview Nav' auto 'Content Nav' 1fr / minmax(0, 1fr) auto;
+			> [data-sticky-breadcrumb~="position"] > [data-sticky] {
+				grid-area: Header;
+			}
+			.wallet-overview {
+				grid-area: Overview;
+			}
+			@media (width <= 1024px) {
+				grid-template: 'Header' 'Overview' 'Nav' 'Content' / minmax(0, 1fr);
+			}
+			&[data-sticky-container] {
+				@media (width > 1024px) {
+					--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
 				}
+			}
+			:global([data-column~="span-start"]:has(> [data-sticky] h3)) {
+				font-size: var(---wallet-attribute-heading-font-size);
+			}
+			:global(h4) {
+				font-size: var(---wallet-detail-heading-font-size);
+				line-height: var(---wallet-detail-heading-line-height);
+			}
+		}
+		#stages > header {
+			font-size: var(---wallet-group-heading-font-size);
+			h2 {
+				font-size: 1em;
 			}
 		}
 	}
 
-	:global(#layout:has(#wallet-page)) {
-		/*
-		 * A perspective establishes a containing block for fixed descendants.
-		 * Breadcrumbs must remain fixed to this scroll container, not its moving
-		 * contents.
-		 */
+	:global(#layout:has([data-sticky-breadcrumb~="root"])) {
+		/* Keep fixed controls attached to the viewport. */
 		--scrollContainer-perspective: none;
-		scroll-timeline-name: --wallet-page-scroll-timeline;
-		scroll-timeline-axis: block;
-		---wallet-page-navigation-inline-size-rem: 20;
-		---wallet-page-navigation-inline-size: calc(
-			var(---wallet-page-navigation-inline-size-rem)
-			* 1rem
-		);
+		---wallet-page-navigation-inline-size: min(20rem, 320px);
 		---wallet-page-block-offset: 0px;
-		---wallet-sticky-content-inset: 1rem;
-		---wallet-breadcrumb-root-font-size: 1.8rem;
-		---wallet-breadcrumb-block-size: calc(
-			var(---wallet-breadcrumb-root-font-size)
-			* 1.6
-		);
-		---wallet-breadcrumb-mobile-row-gap: 0.25rem;
-		---wallet-breadcrumb-surface-fade: 0.5rem;
-		/* Keep targeted content visibly separated from the soft backdrop edge. */
-		---wallet-anchor-scroll-gap: 1rem;
-		--scrollContainer-scrollPaddingBlockStart: calc(
-			var(---wallet-page-block-offset)
-			+ var(---wallet-sticky-content-inset)
-			+ var(---wallet-breadcrumb-block-size)
-			+ var(---wallet-breadcrumb-surface-fade)
-			+ var(---wallet-anchor-scroll-gap)
-		);
+		--scrollContainer-scrollPaddingBlockStart: 0px;
 
 		scroll-snap-type: block proximity;
 
-		@media (max-width: 1024px) {
+		@media (width <= 1024px) {
 			---wallet-page-block-offset: var(--navigation-mobile-blockSize);
 		}
-
-		@media (min-width: 865px) and (max-width: 1280px) {
-			---wallet-page-navigation-inline-size-rem: 16;
-			---wallet-breadcrumb-root-font-size: 1.5rem;
-		}
-
-		@media (max-width: 864px) {
-			--scrollContainer-scrollPaddingBlockStart: calc(
-				var(---wallet-page-block-offset)
-				+ var(---wallet-sticky-content-inset)
-				+ 2 * var(---wallet-breadcrumb-block-size)
-				+ var(---wallet-breadcrumb-mobile-row-gap)
-				+ var(---wallet-breadcrumb-surface-fade)
-				+ var(---wallet-anchor-scroll-gap)
-			);
-		}
 	}
 
-	:global(#wallet-page [id]) {
+	:global(#layout:has([data-sticky-breadcrumb~="root"]) > #content) {
 		scroll-snap-align: start;
+		@media (width <= 1024px) {
+			scroll-margin-block-start: var(--navigation-mobile-blockSize);
+		}
+		isolation: auto;
 	}
 
-	/*
-	 * The mobile navigation depth effect normally promotes `#content` with an
-	 * identity transform. That makes it the containing block for fixed
-	 * descendants, so fixed anchor-positioned breadcrumbs move with this scroll
-	 * root instead of the viewport. WalletPage's scroll-driven breadcrumbs need
-	 * the viewport containing block at every breakpoint.
-	 */
-	:global(#layout:has(#wallet-page) > #content) {
-		transform: none;
-		transform-style: flat;
-	}
-
-	/*
-	 * Keep the independently animated background from competing with the
-	 * anchor-positioned scroll animations for main-thread style updates.
-	 * The blobs remain rendered; only their decorative ambient motion pauses
-	 * while WalletPage is mounted.
-	 */
-	:global(body:has(#wallet-page) .background-blob *) {
-		animation-play-state: paused;
-	}
-
-	@property ---pie-rotate {
-		syntax: "<angle>";
+	@property ---pie-currentIndex {
+		syntax: '<integer>';
 		inherits: true;
-		initial-value: 0turn;
-	}
-
-	@property ---group-index {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---group-count {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---group-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 1turn;
-	}
-
-	@property ---group-start-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 0turn;
-	}
-
-	@property ---attribute-index {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---attribute-count {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
-	}
-
-	@property ---attribute-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 1turn;
-	}
-
-	@property ---slice-total-angle {
-		syntax: "<angle>";
-		inherits: true;
-		initial-value: 1turn;
+		initial-value: 0;
 	}
 
 	@property ---slice-mid-angle {
-		syntax: "<angle>";
+		syntax: '<angle>';
 		inherits: true;
 		initial-value: 0turn;
 	}
 
-	@property ---slice-scale {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 1;
+	.container > article > button,
+	[data-sticky-breadcrumb~="root"] > footer {
+		display: flex;
+		margin-block-end: var(--navigation-controlInsetInline);
+		&[data-sticky] {
+			--sticky-insetBlockEnd: var(--navigation-controlInsetInline);
+		}
+
+	}
+
+	[data-sticky-breadcrumb~="root"] > footer {
+		grid-area: Nav;
+		align-self: end;
+		justify-self: end;
+		margin-inline-end: var(--navigation-controlInsetInline);
+		&[data-sticky] {
+			z-index: 3;
+		}
+		@media (width <= 1024px) {
+			grid-area: Content;
+		}
+	}
+	.container > article > button {
+		margin-inline: var(--navigation-controlInsetInline);
+		margin-block-start: var(--icon-size, 2rem);
+		align-self: end;
+		@media (width <= 1024px) {
+			align-self: start;
+		}
 	}
 
 	.pie-navigation {
 		display: none;
 	}
 
-	:global(.toc-icon),
-	.attribute-group-icon,
-	.attribute-icon {
-		color: oklch(from var(--accent) l c h / 1);
-		flex: none;
-
-		&::before {
-			line-height: 1;
-			filter:
-				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 30%, transparent))
-				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 10%, transparent));
-			transition-property: filter;
+	.pie-navigation :global(.navigation-items),
+	.pie-navigation :global(.pie-navigation-icon) {
+		/* Preserve completed orientation while a newly selected timeline is being attached. */
+		rotate: calc(-1 * var(---slice-mid-angle, 0deg) + var(---pie-rotationDirection, 1) * var(---pie-restAngle, 0deg));
+	}
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
+		.pie-navigation {
+			animation: breadcrumb-entry auto steps(1, end) forwards, var(---pie-rotation-states);
+			animation-timeline: --wallet-entry, var(---pie-rotation-timelines);
+			animation-range: var(--stickyBreadcrumb-entryRange);
+		}
+		.pie-navigation :global(.navigation-items),
+		.pie-navigation :global(.pie-navigation-icon) {
+			/* Select one visible rotation track from the current heading clock. */
+			animation: var(---pie-rotation-name, none) auto var(--transition-easeOutExpo) forwards;
+			animation-timeline: var(---pie-rotation-timeline, none);
+			animation-range: var(--stickyBreadcrumb-entryRange);
+			@media (prefers-reduced-motion: reduce) {
+				animation-range: contain 100% contain 100%;
+			}
 		}
 	}
 
-	.attribute-group-icon,
-	.attribute-icon {
-		font-size: 2.5rem;
-	}
-
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
-
 		.container .page-navigation {
-			---pie-size-rem: var(---wallet-page-navigation-inline-size-rem);
-			---pie-size: calc(var(---pie-size-rem) * 1rem);
+			---pie-size: var(---wallet-page-navigation-inline-size);
 
 			box-sizing: border-box;
 			--sticky0-insetBlockStart: calc(var(---pie-size) + 0.5rem);
@@ -1718,24 +1887,22 @@
 		}
 
 		.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
+			--sticky-background: none;
 			/* Match Pie's inline-configured view box, including its padding. */
 			---pie-diameter: calc(2 * (var(--pie-maxR) + var(--pie-padding)));
-			---pie-origin-x: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-			---pie-origin-y: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-			/*
-			 * Unitless rem/pixel counts preserve Firefox's fallback without
-			 * duplicating the configured pie size.
-			 */
-			---pie-scale: calc(var(---pie-size-rem) / (var(---pie-diameter) / 16));
-			---pie-target-angle: 0.625turn;
-			---pie-rotate: calc(
-				var(---pie-target-angle)
-				- var(
-					---initial-slice-mid-angle,
-					calc(0.5turn / var(---group-count))
-				)
-			);
+			/* Scale the canonical pixel-space diameter to the actual CSS length. */
+			---pie-scale: calc(var(---pie-size) / (var(---pie-diameter) * 1px));
+			@supports not (scale: calc(1px / 1px)) {
+				/* Same length ratio for engines without typed division. */
+				---pie-scale: tan(atan2(var(---pie-size), calc(var(---pie-diameter) * 1px)));
+			}
 			--sticky-insetBlockStart: 0px;
+
+			@media (width <= 1024px) {
+				&::before {
+					display: none;
+				}
+			}
 
 			display: block;
 			z-index: 3;
@@ -1746,37 +1913,30 @@
 			inset-block-start: 0;
 			inset-inline: 0;
 			inline-size: 100%;
-			block-size: var(---pie-surface-size, var(---pie-size));
+			block-size: var(---pie-size);
 			max-inline-size: none;
 			max-block-size: none;
 			pointer-events: none;
 			border-radius: 0;
-			contain: layout style;
-			--sticky-backgroundColor: var(--background-secondary);
-			--sticky-backdropFilter: blur(1rem);
 
 			.pie-navigation-geometry {
 				position: relative;
 				inline-size: var(---pie-size);
 				block-size: var(---pie-size);
 				margin-inline: auto;
-				contain: strict;
 			}
 
 			:global(.navigation-items) {
+				overflow: clip;
 				position: absolute;
 				inset: 50% auto auto 50%;
 				inline-size: calc(var(---pie-diameter) * 1px);
 				block-size: calc(var(---pie-diameter) * 1px);
-				contain: strict;
 				translate: -50% -50%;
 				scale: var(---pie-scale);
-				transform: rotate(var(---pie-rotate)) translateZ(0);
 				transform-origin: center;
-				clip-path: circle(50%);
 				pointer-events: none;
-				isolation: isolate;
-				transition-property: transform;
+				transition-property: none;
 			}
 
 			:global(.navigation-items),
@@ -1801,6 +1961,20 @@
 				pointer-events: none;
 			}
 
+			:global(.navigation-items details::details-content) {
+				position: absolute;
+				inset: 0;
+				transform: none;
+			}
+
+			:global(.navigation-items details > menu) {
+				opacity: if(style(---breadcrumb-entry: 1): var(---link-active, 0); else: 1);
+				visibility: if(
+					not style(---breadcrumb-entry: 1) or style(---link-active: 1): visible; else: hidden
+				);
+				transition-property: opacity, visibility;
+			}
+
 			:global(.navigation-items menu::before),
 			:global(.navigation-items summary::before),
 			:global(.navigation-items summary::after),
@@ -1809,215 +1983,24 @@
 				content: none;
 			}
 
-			:global(.navigation-items menu[data-navigation-depth='0'] > li) {
-				---group-angle: calc(1turn / var(---group-count));
-				---group-start-angle: calc(
-					(var(---group-index) - 1) * var(---group-angle)
-				);
+			:global(.navigation-items details),
+			:global(.navigation-items li:has(> a)) {
+				z-index: if(style(---link-interacting: 1): 2; style(---link-current: 1): 1; else: 0);
 			}
 
-			:global(.navigation-items menu[data-navigation-depth='1'] > li) {
-				---attribute-angle: calc(
-					var(---group-angle) / var(---attribute-count)
-				);
-			}
-
-			@supports (top: calc(sibling-index() * 1px)) {
-				:global(.navigation-items menu[data-navigation-depth='0'] > li) {
-					---group-index: sibling-index();
-					---group-count: sibling-count();
-				}
-
-				:global(.navigation-items menu[data-navigation-depth='1'] > li) {
-					---attribute-index: sibling-index();
-					---attribute-count: sibling-count();
-				}
-			}
-
-			:global(.navigation-items summary) {
-				display: contents;
-			}
-
-			:global(.navigation-items summary > a) {
-				--slice-totalAngle: calc((1turn - 5deg * var(---group-count)) / var(---group-count));
-				--slice-midAngle: calc((1 - var(---group-index)) * 1turn / var(---group-count));
-				--slice-offset: 3;
-				--slice-outerR: 80;
-				--slice-innerR: 12;
-				--slice-gap: 4;
-				--slice-outerCornerRadius: 28;
-				--slice-innerCornerRadius: 16;
-				--slice-labelSize: 25;
-				--slice-labelSizeScale: 1.25;
-				---slice-label-offset: calc(
-					var(---slice-label-r) * 1px
-				);
-			}
-
-			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				--slice-totalAngle: var(---attribute-angle);
-				--slice-midAngle: calc(
-					var(
-						---attribute-start-angle,
-						calc(
-							var(---group-start-angle)
-							+ (var(---attribute-index) - 1) * var(---attribute-angle)
-						)
-					)
-					+ var(---attribute-angle) / 2
-				);
-				--slice-offset: 80;
-				--slice-outerR: 36;
-				--slice-innerR: 8;
-				--slice-gap: 0;
-				--slice-outerCornerRadius: 8;
-				--slice-innerCornerRadius: 8;
-				--slice-labelSize: 9;
-				--slice-labelSizeScale: 1;
-				---slice-label-offset: calc(
-					var(---slice-label-r) * 1px
-				);
-				--slice-arcSize: small;
-			}
-
-			/* Firefox lacks typed length division/multiplication outside shape(). */
-			@supports not (top: calc(sibling-index() * 1px)) {
-				:global(.navigation-items summary > a) {
-					---slice-label-offset: 52.313px;
-				}
-
-				:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-					---slice-label-offset: 10.99px;
+			:global(.navigation-items summary),
+			:global(.navigation-items menu[data-navigation-depth="1"] > li) {
+				filter: if(style(---link-active: 1): var(---pie-highlightFilter) ; else: none);
+				&:has(> a:is(:hover, :focus-visible, :interest-source)) {
+					filter: var(---pie-highlightFilter);
 				}
 			}
 
 			:global(.navigation-items summary > a),
-			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
-				---slice-total-angle: calc(var(--slice-totalAngle) * 1deg);
-				---slice-mid-angle: calc(
-					var(--slice-midAngle) * 1deg
-					+ var(---pie-start-angle, 0deg)
-				);
-				---slice-offset: var(--slice-offset);
-				---slice-gap: var(--slice-gap);
-				---slice-outer-r: var(--slice-outerR);
-				---slice-inner-r: var(--slice-innerR);
-				---slice-outer-corner-radius: var(--slice-outerCornerRadius);
-				---slice-inner-corner-radius: var(--slice-innerCornerRadius);
-				---slice-label-size: var(--slice-labelSize);
-				---slice-arc-size: var(--slice-arcSize, small);
-				---slice-scale: 1;
-				---slice-label-radius: calc(var(---slice-label-size) / 2);
-				---slice-label-r: clamp(
-					pow(
-						(
-							(var(---slice-outer-r) - var(---slice-label-radius))
-							* (var(---slice-inner-r) + var(---slice-label-radius))
-						),
-						0.5
-					),
-					(
-						2 / 3
-						* (
-							(
-								pow(var(---slice-outer-r), 3)
-								- pow(var(---slice-inner-r), 3)
-							)
-							/ (
-								pow(var(---slice-outer-r), 2)
-								- pow(var(---slice-inner-r), 2)
-							)
-						)
-						* (
-							sin(abs(var(---slice-total-angle)) / 2)
-							/ (abs(var(---slice-total-angle)) / 2rad)
-						)
-					),
-					var(---slice-outer-r) - var(---slice-label-radius)
-				);
-
-				---slice-half-angle: calc(abs(var(---slice-total-angle)) / 2);
-				---slice-half-gap: calc(var(---slice-gap) / 2);
-				---slice-outer-corner-r: max(
-					0,
-					min(
-						var(---slice-outer-corner-radius),
-						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-						max(
-							0,
-							(
-								(
-									sin(var(---slice-half-angle)) * var(---slice-outer-r)
-									- var(---slice-half-gap)
-								)
-								/ (1 + sin(var(---slice-half-angle)))
-							)
-						)
-					)
-				);
-				---slice-inner-corner-r: max(
-					0,
-					min(
-						var(---slice-inner-corner-radius),
-						calc((var(---slice-outer-r) - var(---slice-inner-r)) / 2),
-						max(
-							0,
-							(
-								(
-									sin(var(---slice-half-angle)) * var(---slice-inner-r)
-									- var(---slice-half-gap)
-								)
-								/ max(0.000001, 1 - sin(var(---slice-half-angle)))
-							)
-						)
-					)
-				);
-				---slice-outer-corner-offset: calc(
-					var(---slice-half-gap) + var(---slice-outer-corner-r)
-				);
-				---slice-inner-corner-offset: calc(
-					var(---slice-half-gap) + var(---slice-inner-corner-r)
-				);
-				---slice-outer-corner-center-r: calc(
-					var(---slice-outer-r) - var(---slice-outer-corner-r)
-				);
-				---slice-inner-corner-center-r: calc(
-					var(---slice-inner-r) + var(---slice-inner-corner-r)
-				);
-				---slice-outer-angle-inset: asin(
-					var(---slice-outer-corner-offset) / var(---slice-outer-corner-center-r)
-				);
-				---slice-inner-angle-inset: asin(
-					var(---slice-inner-corner-offset) / var(---slice-inner-corner-center-r)
-				);
-				---slice-outer-side-r: sqrt(
-					pow(var(---slice-outer-corner-center-r), 2)
-					- pow(var(---slice-outer-corner-offset), 2)
-				);
-				---slice-inner-side-r: sqrt(
-					pow(var(---slice-inner-corner-center-r), 2)
-					- pow(var(---slice-inner-corner-offset), 2)
-				);
-				---slice-angle-outer-start: calc(
-					var(---slice-outer-angle-inset) - var(---slice-half-angle)
-				);
-				---slice-angle-outer-end: calc(
-					var(---slice-half-angle) - var(---slice-outer-angle-inset)
-				);
-				---slice-angle-inner-end: calc(
-					var(---slice-half-angle) - var(---slice-inner-angle-inset)
-				);
-				---slice-angle-inner-start: calc(
-					var(---slice-inner-angle-inset) - var(---slice-half-angle)
-				);
-				---slice-outer-start-x: calc(
-					var(---pie-origin-x)
-					+ sin(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-				);
-				---slice-outer-start-y: calc(
-					var(---pie-origin-y)
-					- cos(var(---slice-angle-outer-start)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-				);
+			:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
+				---slice-mid-angle: calc(var(--slice-midAngle) * 1deg);
+				scale: calc(1 + var(---link-active, 0) * (var(--hover-scale) - 1));
+				opacity: if(style(---link-interacting: 1): 1; style(---link-current: 1): 0.8; else: 1);
 
 				display: block;
 				position: absolute;
@@ -2026,124 +2009,25 @@
 				block-size: 100%;
 				padding: 0;
 				border-radius: 0;
-				background: var(--accent, var(--background-tertiary));
+				background: var(--slice-fill, var(--accent, var(--background-tertiary)));
 				color: var(--text-primary);
-				opacity: 0.62;
 				pointer-events: auto;
-				transform-origin: var(---pie-origin-x) var(---pie-origin-y);
-				transform:
-					rotate(var(---slice-mid-angle))
-					scale(var(---slice-scale))
-					translateY(calc(var(---slice-offset) * -1px));
-				clip-path: shape(
-					from var(---slice-outer-start-x) var(---slice-outer-start-y),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ sin(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- cos(var(---slice-angle-outer-end)) * var(---slice-outer-r) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-outer-r) * var(---slice-unit, 1px)) cw var(---slice-arc-size, small),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-								- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit, 1px)) cw small,
-					line to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-								- cos(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ sin(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- cos(var(---slice-angle-inner-end)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit, 1px)) cw small,
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ sin(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- cos(var(---slice-angle-inner-start)) * var(---slice-inner-r) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-inner-r) * var(---slice-unit, 1px)) ccw var(---slice-arc-size, small),
-					arc to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								cos(var(---slice-half-angle)) * var(---slice-half-gap)
-								- sin(var(---slice-half-angle)) * var(---slice-inner-side-r)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-inner-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						)
-						of calc(var(---slice-inner-corner-r) * var(---slice-unit, 1px)) cw small,
-					line to
-						calc(
-							var(---pie-origin-x)
-							+ (
-								cos(var(---slice-half-angle)) * var(---slice-half-gap)
-								- sin(var(---slice-half-angle)) * var(---slice-outer-side-r)
-							) * var(---slice-unit, 1px)
-						)
-						calc(
-							var(---pie-origin-y)
-							- (
-								cos(var(---slice-half-angle)) * var(---slice-outer-side-r)
-								+ sin(var(---slice-half-angle)) * var(---slice-half-gap)
-							) * var(---slice-unit, 1px)
-						),
-					arc to var(---slice-outer-start-x) var(---slice-outer-start-y)
-						of calc(var(---slice-outer-corner-r) * var(---slice-unit, 1px)) cw small,
-					close
-				);
-				transition-property: opacity, ---slice-scale;
+				transform-origin: var(--pie-originX) var(--pie-originY);
+				transform: rotate(var(---slice-mid-angle)) translateY(calc(var(--slice-offset) * -1px));
+
+				transition-property: scale, opacity;
+				transition-timing-function: var(--transition-easeOutExpo);
+				@media (prefers-reduced-motion: reduce) {
+					transition-duration: 0s;
+				}
 			}
 
-			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current)),
-			:global(.navigation-items summary:has(~ menu a:target-current) > a) {
-				---slice-scale: 1.045;
-				opacity: 1;
+			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source)) {
+				scale: var(--hover-scale);
 				outline: none;
 			}
 
-			:global(.navigation-items menu[data-navigation-depth='1'] > li > a) {
+			:global(.navigation-items menu[data-navigation-depth="1"] > li > a) {
 				z-index: 1;
 			}
 
@@ -2159,751 +2043,156 @@
 			}
 
 			:global(.navigation-items a > .pie-navigation-icon) {
-				--icon-size: calc(var(---slice-label-size) * 1px);
-				color: #fff;
+				--icon-size: calc(var(--slice-labelSize) * 1px);
 
 				position: absolute;
-				inset: var(---pie-origin-y) auto auto var(---pie-origin-x);
-				translate: -50% calc(-50% - var(---slice-label-offset));
-				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
-				filter: var(
-					---linked-icon-filter,
-					opacity(0.75)
-						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
-				);
+				inset: var(--pie-originY) auto auto var(--pie-originX);
+				translate: -50% calc(-50% - var(--slice-labelR) * 1px);
+				---pie-rotationDirection: -1;
 				transition-property: filter;
 			}
-
-			:global(.navigation-items a:is(:hover, :focus-visible, :interest-source, :target-current) > .pie-navigation-icon) {
-				filter: none;
-			}
 		}
 
-		/*
-		 * Chromium currently fails to invalidate :target-current when it is
-		 * nested beneath the pie rule. Keep this state selector flat.
-		 */
-		:global(#wallet-page .pie-navigation .navigation-items a:target-current) {
-			---slice-scale: 1.075;
-			opacity: 1;
-			outline: none;
-
-			> .pie-navigation-icon {
-				filter: none;
-			}
+		:global([data-sticky-breadcrumb~="root"] .pie-navigation .navigation-items summary[data-sticky]) {
+			display: block;
+			position: absolute;
+			inset: 0;
+			inline-size: 100%;
+			block-size: 100%;
+			max-block-size: none;
+			container-type: normal;
+			pointer-events: none;
 		}
 
-		@media (max-width: 1024px) {
-			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				---pie-target-angle: 0.375turn;
-			}
-		}
-
-		@media (max-width: 864px) {
+		@media (width <= 1024px) {
 			.container .page-navigation {
 				padding-block-start: 0;
+				&[data-scroll-container] {
+					overflow: visible;
+				}
 				--sticky0-insetBlockStart: 0px;
 				--sticky-insetBlockStart: 0px;
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				---pie-size-rem: var(---wallet-mobile-pie-size-rem);
-				---pie-size: var(---wallet-mobile-pie-size);
-				---pie-surface-size: 4.25rem;
-				---pie-target-angle: 0.5turn;
+				position: relative;
+				inset: auto;
+				align-self: center;
 
-				z-index: calc(var(---wallet-breadcrumb-layer-attribute) + 1);
-				grid-area: Content;
-				justify-self: end;
-				inset-block-start: calc(var(---wallet-page-block-offset) + 0.125rem);
-				inset-inline: auto 0;
-				inline-size: var(---pie-size);
+				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+					(color: if(style(---breadcrumb-wrap: 1): red)) {
+					anchor-name: --wallet-pie-source;
+					view-timeline-name: --wallet-pie-source;
+					view-timeline-axis: block;
+					view-timeline-inset: var(--navigation-mobile-blockSize) 0;
 
-				&::before {
-					content: none;
-				}
+					&:has(+ #wallet-toc:popover-open) .pie-navigation-geometry,
+					&:has(+ #wallet-toc:popover-open)::before {
+						animation-name: none;
+					}
 
-				.pie-navigation-geometry {
-					margin: 0;
-					translate: 0 calc(var(---pie-surface-size) - var(---pie-size));
+					&::before {
+						display: block;
+						clip-path: circle(calc(var(---pie-size) / 2));
+						block-size: var(---pie-size);
+						---pie-backdropAnimation: breadcrumb-backdrop auto linear both;
+						pointer-events: none;
+					}
+					.pie-navigation-geometry,
+					&::before {
+						position: fixed;
+						position-anchor: --navigation-row;
+						position-visibility: always;
+						translate: 0 0;
+						/* A native TOC opening uses the same compact endpoint as scrolling. */
+						transform: translateX(
+								calc(
+									var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
+										var(---pie-compactSize) / var(---pie-size)
+								)
+							)
+							scale(calc(var(---pie-compactSize) / var(---pie-size)));
+						animation:
+							wallet-pie-source auto linear both,
+							wallet-pie-compact auto linear both,
+							var(---pie-backdropAnimation, none);
+						@media (prefers-reduced-motion: reduce) {
+							animation-timing-function: linear, steps(1, end), linear;
+						}
+						animation-timeline:
+							--wallet-pie-source, var(--stickyBreadcrumb-entryTimeline),
+							var(--stickyBreadcrumb-entryTimeline);
+						animation-range:
+							cover 0% exit-crossing 0%,
+							var(--stickyBreadcrumb-entryRange),
+							var(--stickyBreadcrumb-entryRange);
+						/* The first sticky row owns the compact pie’s block-start edge. */
+						inset-block-start: anchor(end);
+						inset-inline-start: anchor(--wallet-pie-source start);
+						inline-size: anchor-size(--wallet-pie-source inline);
+						margin: 0;
+						transform-origin: 100% 0;
+						&:dir(rtl) {
+							transform-origin: 0 0;
+						}
+					}
 				}
 			}
 		}
 	}
 
-	a:has(> :is(h1, h2, h3)) {
-		display: flex;
-		align-items: center;
-
-		&::before {
-			content: '# ';
-			display: inline-flex;
-			justify-content: end;
-			text-align: end;
-			width: 0;
-			padding-inline-end: 0.66rem;
-			margin-inline-start: -0.66rem;
-			font-size: 1.25rem;
-			line-height: calc(1 / 0.7);
-
-			transition-property: opacity;
-		}
-
-		&:not(:hover)::before {
-			opacity: 0;
+	@supports selector(:target-current) {
+		.pie-navigation :global(a:target-current) {
+			---link-current-source: var(--link-current-sources);
 		}
 	}
 
-	/*
-	 * Interest invokers expose state on their target, but not on the target's
-	 * other invokers. CSS cannot compare arbitrary attribute values, so these
-	 * target ↔ href pairs are the irreducible CSS-only bridge between both
-	 * NavigationItems trees and the matching in-page link.
-	 */
-	.container:has(#security:interest-target) :global(:is(a[href='#security'], summary:has(> a[href='#security']))),
-	.container:has(#security-audits:interest-target) :global(:is(a[href='#security-audits'], summary:has(> a[href='#security-audits']))),
-	.container:has(#scam-prevention:interest-target) :global(:is(a[href='#scam-prevention'], summary:has(> a[href='#scam-prevention']))),
-	.container:has(#chain-verification:interest-target) :global(:is(a[href='#chain-verification'], summary:has(> a[href='#chain-verification']))),
-	.container:has(#transaction-legibility:interest-target) :global(:is(a[href='#transaction-legibility'], summary:has(> a[href='#transaction-legibility']))),
-	.container:has(#hardware-wallet-support:interest-target) :global(:is(a[href='#hardware-wallet-support'], summary:has(> a[href='#hardware-wallet-support']))),
-	.container:has(#security-best-practices:interest-target) :global(:is(a[href='#security-best-practices'], summary:has(> a[href='#security-best-practices']))),
-	.container:has(#account-recovery:interest-target) :global(:is(a[href='#account-recovery'], summary:has(> a[href='#account-recovery']))),
-	.container:has(#duress-resistance:interest-target) :global(:is(a[href='#duress-resistance'], summary:has(> a[href='#duress-resistance']))),
-	.container:has(#bug-bounty-program:interest-target) :global(:is(a[href='#bug-bounty-program'], summary:has(> a[href='#bug-bounty-program']))),
-	.container:has(#supply-chain-factory:interest-target) :global(:is(a[href='#supply-chain-factory'], summary:has(> a[href='#supply-chain-factory']))),
-	.container:has(#firmware:interest-target) :global(:is(a[href='#firmware'], summary:has(> a[href='#firmware']))),
-	.container:has(#user-safety:interest-target) :global(:is(a[href='#user-safety'], summary:has(> a[href='#user-safety']))),
-	.container:has(#privacy:interest-target) :global(:is(a[href='#privacy'], summary:has(> a[href='#privacy']))),
-	.container:has(#address-correlation:interest-target) :global(:is(a[href='#address-correlation'], summary:has(> a[href='#address-correlation']))),
-	.container:has(#multi-address-correlation:interest-target) :global(:is(a[href='#multi-address-correlation'], summary:has(> a[href='#multi-address-correlation']))),
-	.container:has(#private-transfers:interest-target) :global(:is(a[href='#private-transfers'], summary:has(> a[href='#private-transfers']))),
-	.container:has(#app-isolation:interest-target) :global(:is(a[href='#app-isolation'], summary:has(> a[href='#app-isolation']))),
-	.container:has(#privacy-hygiene:interest-target) :global(:is(a[href='#privacy-hygiene'], summary:has(> a[href='#privacy-hygiene']))),
-	.container:has(#hardware-privacy:interest-target) :global(:is(a[href='#hardware-privacy'], summary:has(> a[href='#hardware-privacy']))),
-	.container:has(#self-sovereignty:interest-target) :global(:is(a[href='#self-sovereignty'], summary:has(> a[href='#self-sovereignty']))),
-	.container:has(#l1-provider-independence:interest-target) :global(:is(a[href='#l1-provider-independence'], summary:has(> a[href='#l1-provider-independence']))),
-	.container:has(#account-portability:interest-target) :global(:is(a[href='#account-portability'], summary:has(> a[href='#account-portability']))),
-	.container:has(#transaction-inclusion:interest-target) :global(:is(a[href='#transaction-inclusion'], summary:has(> a[href='#transaction-inclusion']))),
-	.container:has(#account-unruggability:interest-target) :global(:is(a[href='#account-unruggability'], summary:has(> a[href='#account-unruggability']))),
-	.container:has(#permissions-management:interest-target) :global(:is(a[href='#permissions-management'], summary:has(> a[href='#permissions-management']))),
-	.container:has(#transparency:interest-target) :global(:is(a[href='#transparency'], summary:has(> a[href='#transparency']))),
-	.container:has(#open-source:interest-target) :global(:is(a[href='#open-source'], summary:has(> a[href='#open-source']))),
-	.container:has(#source-visibility:interest-target) :global(:is(a[href='#source-visibility'], summary:has(> a[href='#source-visibility']))),
-	.container:has(#funding:interest-target) :global(:is(a[href='#funding'], summary:has(> a[href='#funding']))),
-	.container:has(#fee-transparency:interest-target) :global(:is(a[href='#fee-transparency'], summary:has(> a[href='#fee-transparency']))),
-	.container:has(#release-process:interest-target) :global(:is(a[href='#release-process'], summary:has(> a[href='#release-process']))),
-	.container:has(#reputation:interest-target) :global(:is(a[href='#reputation'], summary:has(> a[href='#reputation']))),
-	.container:has(#ecosystem:interest-target) :global(:is(a[href='#ecosystem'], summary:has(> a[href='#ecosystem']))),
-	.container:has(#account-abstraction:interest-target) :global(:is(a[href='#account-abstraction'], summary:has(> a[href='#account-abstraction']))),
-	.container:has(#address-resolution:interest-target) :global(:is(a[href='#address-resolution'], summary:has(> a[href='#address-resolution']))),
-	.container:has(#browser-integration:interest-target) :global(:is(a[href='#browser-integration'], summary:has(> a[href='#browser-integration']))),
-	.container:has(#chain-abstraction:interest-target) :global(:is(a[href='#chain-abstraction'], summary:has(> a[href='#chain-abstraction']))),
-	.container:has(#transaction-batching:interest-target) :global(:is(a[href='#transaction-batching'], summary:has(> a[href='#transaction-batching']))),
-	.container:has(#hardware-wallet-interoperability:interest-target) :global(:is(a[href='#hardware-wallet-interoperability'], summary:has(> a[href='#hardware-wallet-interoperability']))),
-	.container:has(#interoperability:interest-target) :global(:is(a[href='#interoperability'], summary:has(> a[href='#interoperability']))),
-	.container:has(#app-connection-support:interest-target) :global(:is(a[href='#app-connection-support'], summary:has(> a[href='#app-connection-support']))),
-	.container:has(#maintenance:interest-target) :global(:is(a[href='#maintenance'], summary:has(> a[href='#maintenance']))) {
-		---backgroundColor: var(--navItem-hover-backgroundColor);
-		---color: var(--accent);
-		---linked-icon-filter: none;
-		---slice-scale: 1.045;
+	[data-sticky-breadcrumb~="root"] {
+		timeline-scope:
+			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
+			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+		@media (width > 1024px) {
+			timeline-scope:
+				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
+				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
+				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+		}
+	}
 
-		color: var(--accent);
-		opacity: 1;
-		text-decoration: none;
+	@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+		[data-sticky-breadcrumb~="root"] {
+			timeline-scope: var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links);
+		}
 	}
 
 	@property --wallet-icon-size {
-		syntax: "<length>";
+		syntax: '<length>';
 		inherits: true;
 		initial-value: 0;
 	}
 
-	@property --wallet-breadcrumb-surface-opacity {
-		syntax: "<number>";
-		inherits: true;
-		initial-value: 0;
-	}
-
-	article {
+	[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] {
 		min-inline-size: 0;
 
-		> header#top {
-			z-index: var(---wallet-breadcrumb-layer-root);
-			view-timeline-name: --header-timeline;
-			view-timeline-axis: block;
-		}
-
 		.wallet-name {
+			overflow-wrap: break-word;
 			z-index: 2;
 			align-self: start;
 			inline-size: max-content;
 		}
 
 		.wallet-title-row {
-			anchor-name: --wallet-title-flow-position;
+			flex-basis: max-content;
 			min-block-size: max(
 				var(--wallet-icon-size),
-				calc(
-					var(---wallet-name-flow-font-size)
-					* var(---wallet-line-height)
-				)
+				calc(var(---wallet-name-flow-font-size) * var(---wallet-line-height))
 			);
-		}
-
-		@media (max-width: 864px) {
-			.wallet-summary-badges {
-				flex-basis: 100%;
-				justify-content: end;
-			}
 		}
 	}
 
-	@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
-		.attribute-group-timeline,
-		.attribute > details > summary {
-			view-timeline-name: var(---pie-timeline, none);
-			view-timeline-axis: block;
-		}
-
-		article {
-			a:has(> h2):not([data-sticky-breadcrumb~='item']) {
-				view-timeline-name: --heading-timeline;
-				view-timeline-axis: block;
-
-				animation: SectionHeadingAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: view();
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-
-				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
-					animation-timeline: --heading-timeline;
-					animation-range:
-						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
-				}
-			}
-		}
-
-		@keyframes SectionHeadingAnimation {
-			to {
-				margin-left: calc(var(--wallet-icon-size) + 1.25rem);
-			}
-		}
-
-		@keyframes SectionHeadingArrowAnimation {
-			from {
-				opacity: 0;
-			}
-			to {
-				content: '› ';
-				opacity: 1;
-			}
-		}
-	}
-
-	@supports (
-		((animation-timeline: scroll()) and (animation-range: 0% 100%)) and
-		(container-type: scroll-state) and
-		(position-anchor: --wallet-name) and
-		(inset-inline-start: anchor(--wallet-name end))
-	) {
-		.container {
-			--stickyBreadcrumb-gap: var(---wallet-breadcrumb-gap);
-			--stickyBreadcrumb-item-insetBlockStart: var(---wallet-icon-sticky-block-start);
-			--stickyBreadcrumb-item-blockSize: var(---wallet-breadcrumb-block-size);
-			--stickyBreadcrumb-trackBlockEnd: calc(
-				var(---wallet-icon-sticky-block-start)
-				+ var(---wallet-breadcrumb-block-size)
-				+ var(---wallet-breadcrumb-surface-fade)
-			);
-			--stickyBreadcrumb-animationRangeStart: var(---wallet-breadcrumb-animation-range-start);
-			--stickyBreadcrumb-animationRangeEnd: var(---wallet-breadcrumb-animation-range-end);
-		}
-
-		article > header#top .wallet-name {
-			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-root;
-		}
-
-		article > header#top .wallet-title-row::after {
-			content: attr(data-wallet-name) / '';
-			order: -1;
-			flex: none;
-			padding-inline-start: calc(
-				var(---wallet-name-flow-icon-size)
-				+ var(---wallet-name-flow-gap)
-			);
-
-			visibility: hidden;
-			font-size: var(---wallet-name-flow-font-size);
-			font-weight: 700;
-			white-space: nowrap;
-		}
-
-		:is(#stages, .attribute-group) {
-			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-group;
-			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-root;
-		}
-
-		.attribute {
-			--stickyBreadcrumb-itemAnchor: --wallet-breadcrumb-attribute;
-			--stickyBreadcrumb-parentAnchor: --wallet-breadcrumb-group;
-		}
-
-		[data-sticky-breadcrumb~='item']:not([data-sticky-breadcrumb~='root']) {
-			&::before {
-				position: absolute;
-				inset-block-start: 0;
-				inset-inline-start: calc(-1 * var(--stickyBreadcrumb-gap));
-				display: grid;
-				place-items: center;
-				inline-size: var(--stickyBreadcrumb-gap);
-				block-size: var(--stickyBreadcrumb-item-blockSize);
-				margin: 0;
-				line-height: 1;
-				text-box: trim-both cap alphabetic;
-				pointer-events: none;
-			}
-		}
-
-		article > header#top .wallet-name {
-			z-index: var(---wallet-breadcrumb-layer-root);
-			font-size: var(---wallet-name-flow-font-size);
-
-			animation: WalletNameAnimation var(--transition-easeOutExpo) both;
-			animation-timeline: --wallet-page-scroll-timeline;
-			animation-range: 0px var(---wallet-name-animation-distance);
-
-			&::after {
-				content: '';
-				z-index: -1;
-				pointer-events: none;
-				anchor-name: --wallet-breadcrumb-surface;
-
-				position: fixed;
-				inset-block-start: calc(
-					var(---wallet-page-block-offset)
-					- var(---wallet-breadcrumb-surface-fade)
-				);
-				inset-inline-start: 0;
-				inline-size: calc(
-					100vi
-					- var(---wallet-page-navigation-inline-size)
-				);
-				block-size: calc(
-					2 * var(---wallet-sticky-content-inset)
-					+ var(---wallet-breadcrumb-block-size)
-					+ 2 * var(---wallet-breadcrumb-surface-fade)
-				);
-
-				background-color: var(---wallet-breadcrumb-surface-background);
-				backdrop-filter: blur(20px);
-				-webkit-mask-image: linear-gradient(
-					to top,
-					transparent,
-					white var(---wallet-breadcrumb-surface-fade)
-				);
-				mask-image: linear-gradient(
-					to top,
-					transparent,
-					white var(---wallet-breadcrumb-surface-fade)
-				);
-				opacity: var(--wallet-breadcrumb-surface-opacity);
-
-				@media (max-width: 1024px) {
-					inset-inline-start: var(---wallet-page-navigation-inline-size);
-				}
-
-				@media (max-width: 864px) {
-					inset-inline-start: 0;
-					inline-size: 100vi;
-				}
-
-				@media (prefers-reduced-transparency: reduce) {
-					backdrop-filter: none;
-				}
-			}
-
-			h1 {
-				font-size: inherit;
-			}
-		}
-
-		#stages > header[data-sticky-breadcrumb~='position'] {
-			--stickyBreadcrumb-position-minBlockSize: 4.25rem;
-			--stickyBreadcrumb-position-insetBlockStart: 1rem;
-			--stickyBreadcrumb-position-insetInlineStart: max(
-				var(--scrollItem-inlineDetached-paddingStart),
-				(
-					anchor-size(--sticky-breadcrumb-position inline)
-					- var(--scrollItem-inlineDetached-maxSize)
-				)
-				/ 2
-			);
-
-			z-index: var(---wallet-breadcrumb-layer-group);
-
-			> [data-sticky-breadcrumb~='item'] {
-				z-index: var(---wallet-breadcrumb-layer-group);
-
-				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
-					animation-timeline: --sticky-breadcrumb-timeline;
-					animation-range:
-						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
-				}
-			}
-		}
-
-		.attribute-group-heading-position[data-sticky-breadcrumb~='position'] {
-			--stickyBreadcrumb-position-minBlockSize: 2.875rem;
-			--stickyBreadcrumb-position-insetInlineStart: 0px;
-
-			> [data-sticky-breadcrumb~='item'] {
-				z-index: var(---wallet-breadcrumb-layer-group);
-				position-visibility: always;
-
-				h2 {
-					animation: AttributeGroupBreadcrumbHeadingAnimation var(--transition-easeInOutExpo) both;
-					animation-timeline: --sticky-breadcrumb-timeline;
-					animation-range:
-						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
-				}
-
-				&::before {
-					animation: SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
-					animation-timeline: --sticky-breadcrumb-timeline;
-					animation-range:
-						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
-				}
-			}
-		}
-
-		.attribute-group-stack > header {
-			.section-caption,
-			.section-controls {
-				animation: AttributeGroupHeadingCompanionAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-			}
-		}
-
-		@keyframes AttributeGroupHeadingCompanionAnimation {
-			to {
-				visibility: hidden;
-				opacity: 0;
-			}
-		}
-
-		.attribute-heading-position[data-sticky-breadcrumb~='position'] {
-			--stickyBreadcrumb-position-minBlockSize: 1.875rem;
-			--stickyBreadcrumb-position-insetInlineStart: 0px;
-			--stickyBreadcrumb-item-insetInlineEnd: calc(
-				anchor(--wallet-breadcrumb-surface end)
-					+ var(---wallet-content-inline-start)
-					+ anchor-size(--sticky-breadcrumb-extra-position inline)
-					+ var(---wallet-breadcrumb-gap)
-					+ var(---wallet-breadcrumb-companion-inline-end-clearance)
-			);
-
-			@media (max-width: 864px) {
-				--stickyBreadcrumb-item-blockOffset: calc(
-					var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-				);
-				--stickyBreadcrumb-item-insetInlineStart: calc(
-					anchor(--wallet-breadcrumb-surface start)
-					+ var(---wallet-content-inline-start)
-				);
-				--stickyBreadcrumb-gap: 0px;
-			}
-
-			> [data-sticky-breadcrumb~='item'] {
-				z-index: var(---wallet-breadcrumb-layer-attribute);
-				min-inline-size: 0;
-
-				h3 {
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
-
-					animation:
-						BreadcrumbHeadingIconSpaceAnimation var(--transition-easeInOutExpo) both;
-					animation-timeline: --sticky-breadcrumb-timeline;
-					animation-range:
-						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
-				}
-
-				&::before {
-					animation:
-						SectionHeadingArrowAnimation var(--transition-easeInOutExpo) forwards;
-					animation-timeline: --sticky-breadcrumb-timeline;
-					animation-range:
-						var(---wallet-breadcrumb-animation-range-start)
-						var(---wallet-breadcrumb-animation-range-end);
-				}
-			}
-		}
-
-		.attribute > details {
-			.attribute-summary-companions-position {
-				anchor-name: --sticky-breadcrumb-extra-position;
-				inline-size: max-content;
-
-				> .attribute-summary-companions {
-					z-index: var(---wallet-breadcrumb-layer-attribute);
-				}
-			}
-
-			&[open] .attribute-summary-companions {
-				animation:
-					AttributeBreadcrumbCompanionsAnimation var(--transition-easeInOutExpo) forwards,
-					AttributeBreadcrumbCompanionsOutAnimation linear forwards;
-				animation-timeline:
-					--sticky-breadcrumb-timeline,
-					--sticky-breadcrumb-scope-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end),
-					var(---stickyBreadcrumb-exitAnimationRangeStart)
-					var(---stickyBreadcrumb-exitAnimationRangeEnd);
-			}
-
-			&:not([open]) {
-				.attribute-heading-position > [data-sticky-breadcrumb~='item'],
-				.attribute-heading-position > [data-sticky-breadcrumb~='item']::before,
-				.attribute-heading-position h3,
-				.attribute-summary-companions,
-				.attribute-icon,
-				.attribute-icon::before {
-					animation: none;
-				}
-			}
-		}
-
-		@keyframes AttributeBreadcrumbCompanionsAnimation {
-			from {
-				position: fixed;
-				position-anchor: --sticky-breadcrumb-extra-position;
-				inset-block-start: anchor(--sticky-breadcrumb-extra-position top);
-				inset-inline: anchor(--sticky-breadcrumb-extra-position start) auto;
-				translate: none;
-			}
-			to {
-				position: fixed;
-				position-anchor: --wallet-breadcrumb-surface;
-				inset-block-start: var(---wallet-breadcrumb-companion-block-start);
-				inset-inline:
-					auto
-					calc(
-						anchor(--wallet-breadcrumb-surface end)
-							+ var(---wallet-content-inline-start)
-							+ var(---wallet-breadcrumb-companion-inline-end-clearance)
-					);
-				translate: 0 -50%;
-			}
-		}
-
-		@keyframes AttributeBreadcrumbCompanionsOutAnimation {
-			from {
-				visibility: visible;
-				position: fixed;
-				opacity: 1;
-			}
-			99.999% {
-				position: fixed;
-			}
-			to {
-				visibility: hidden;
-				position: static;
-				opacity: 0;
-				translate: none;
-			}
-		}
-
-		@keyframes AttributeBreadcrumbOutAnimation {
-			to {
-				visibility: hidden;
-				opacity: 0;
-			}
-		}
-
-		:is(.attribute-group-icon, .attribute-icon) {
-			anchor-name: --breadcrumb-slice-icon-position;
-			anchor-scope: --breadcrumb-slice-icon-position;
-			contain: style;
-
-			&::before {
-				z-index: inherit;
-				display: inline-grid;
-				place-items: center;
-				line-height: 1;
-
-				animation: BreadcrumbSliceIconAnimation var(--transition-easeInOutExpo) both;
-				animation-timeline: --sticky-breadcrumb-timeline;
-				animation-range:
-					var(---wallet-breadcrumb-animation-range-start)
-					var(---wallet-breadcrumb-animation-range-end);
-			}
-		}
-
-		.attribute-group-icon {
-			z-index: var(---wallet-breadcrumb-layer-group);
-			---wallet-breadcrumb-icon-inline-start: calc(
-				anchor(--wallet-breadcrumb-root end)
-				+ var(---wallet-breadcrumb-gap)
-			);
-		}
-
-		.attribute-icon {
-			z-index: var(---wallet-breadcrumb-layer-attribute);
-			---wallet-breadcrumb-icon-inline-start: calc(
-				anchor(--wallet-breadcrumb-group end)
-				+ var(---wallet-breadcrumb-gap)
-			);
-			animation: AttributeBreadcrumbOutAnimation linear both;
-			animation-timeline: --sticky-breadcrumb-scope-timeline;
-			animation-range:
-				var(---stickyBreadcrumb-exitAnimationRangeStart)
-				var(---stickyBreadcrumb-exitAnimationRangeEnd);
-		}
-
-		@keyframes BreadcrumbSliceIconAnimation {
-			from {
-				position: fixed;
-				position-anchor: --breadcrumb-slice-icon-position;
-				inset-block-start: anchor(--breadcrumb-slice-icon-position top);
-				inset-inline-start: anchor(--breadcrumb-slice-icon-position start);
-				inline-size: anchor-size(--breadcrumb-slice-icon-position inline);
-				block-size: anchor-size(--breadcrumb-slice-icon-position block);
-				translate: none;
-			}
-			to {
-				position: fixed;
-				position-anchor: --sticky-breadcrumb-scope;
-				inset-block-start: var(---wallet-breadcrumb-icon-block-start);
-				inset-inline-start: var(---wallet-breadcrumb-icon-inline-start);
-				inline-size: var(---wallet-breadcrumb-heading-icon-size);
-				block-size: var(---wallet-breadcrumb-heading-icon-size);
-				font-size: var(---wallet-breadcrumb-heading-icon-size);
-				filter: none;
-				translate: none;
-			}
-		}
-
-		@keyframes BreadcrumbHeadingIconSpaceAnimation {
-			to {
-				font-size: var(---wallet-breadcrumb-attribute-font-size);
-				margin-inline-start: calc(
-					var(---wallet-breadcrumb-heading-icon-size)
-					+ var(---wallet-breadcrumb-heading-icon-gap)
-				);
-			}
-		}
-
-		@keyframes AttributeGroupBreadcrumbHeadingAnimation {
-			to {
-				font-size: var(---wallet-breadcrumb-group-font-size);
-				margin-inline-start: calc(
-					var(---wallet-breadcrumb-heading-icon-size)
-					+ var(---wallet-breadcrumb-heading-icon-gap)
-				);
-			}
-		}
-
-		@keyframes WalletNameAnimation {
-			from {
-				--wallet-icon-size: var(---wallet-name-flow-icon-size);
-				--wallet-breadcrumb-surface-opacity: 0;
-				position: fixed;
-				inset-block-start: anchor(--wallet-title-flow-position top);
-				inset-inline-start: anchor(--wallet-title-flow-position start);
-				margin-inline-start: 0;
-				font-size: var(---wallet-name-flow-font-size);
-			}
-			to {
-				--wallet-icon-size: var(---wallet-name-sticky-icon-size);
-				--wallet-breadcrumb-surface-opacity: 1;
-				position: fixed;
-				inset-block-start: var(---wallet-icon-sticky-block-start);
-				inset-inline-start: calc(
-					var(--sticky-insetInlineStart)
-						+ var(---wallet-content-inline-start)
-				);
-				margin-inline-start: 0;
-				font-size: var(---wallet-breadcrumb-root-font-size);
-			}
-		}
-
-		@media (max-width: 864px) {
-			.container {
-				--stickyBreadcrumb-trackBlockEnd: calc(
-					var(---wallet-icon-sticky-block-start)
-					+ 2 * var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-					+ var(---wallet-breadcrumb-surface-fade)
-				);
-				---wallet-breadcrumb-companion-block-start: calc(
-					anchor(--wallet-breadcrumb-surface top)
-					+ var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-					+ var(---wallet-breadcrumb-block-size) / 2
-				);
-			}
-
-			article > header#top .wallet-name::after {
-				block-size: calc(
-					2 * var(---wallet-sticky-content-inset)
-					+ 2 * var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-					+ 2 * var(---wallet-breadcrumb-surface-fade)
-				);
-			}
-
-			.attribute-icon {
-				---wallet-breadcrumb-icon-block-start: calc(
-					anchor(--sticky-breadcrumb-scope top)
-					+ var(---wallet-breadcrumb-block-size)
-					+ var(---wallet-breadcrumb-mobile-row-gap)
-					+ (
-						var(---wallet-breadcrumb-block-size)
-						- var(---wallet-breadcrumb-heading-icon-size)
-					)
-					/ 2
-				);
-				---wallet-breadcrumb-icon-inline-start: calc(
-					anchor(--wallet-breadcrumb-surface start)
-					+ var(---wallet-content-inline-start)
-				);
-			}
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			article > header#top .wallet-name {
-				animation: none;
-			}
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		article a:has(> h2),
-		article a:has(> h2)::before {
-			animation: none;
-		}
-	}
-
-	.wallet-name {
-		h1 {
-			font-size: var(---wallet-name-flow-font-size);
-		}
+	[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] h1 {
+		font-size: var(---wallet-name-flow-font-size);
 	}
 
 	.wallet-icon {
@@ -2916,16 +2205,6 @@
 		font-size: 0.9rem;
 	}
 
-	.platforms-label {
-		color: var(--accent);
-	}
-
-	#news {
-		> header {
-			padding-block: 1.2rem;
-		}
-	}
-
 	#stages {
 		> header {
 			padding-block: 1.2rem;
@@ -2933,81 +2212,34 @@
 	}
 
 	.attribute-group {
-		> .attribute-group-stack[data-scroll-item] {
-			/*
-			 * `inline-detached` uses sticky positioning for horizontal
-			 * alignment by default. This wrapper scrolls normally so its
-			 * fixed breadcrumb descendants can participate in the page-level
-			 * root/group/attribute stacking order.
-			 */
-			position: relative;
-			inset-inline: auto;
-		}
-
-		> .attribute-group-stack[data-scroll-item] > header[data-scroll-item] {
-			position: relative;
-			inset-inline: auto;
+		> header {
 			min-inline-size: 0;
 			padding-block: 1rem;
-
-			.attribute-group-summary-layout a:is(:hover, :focus-visible, :interest-source),
-			.attribute-group:interest-target > & .attribute-group-summary-layout a {
-				color: var(--accent);
-				text-decoration: none;
-			}
-
-			> .attribute-group-icon {
-				--icon-size: 1.75em;
-			}
-
-			> .attribute-group-summary-layout {
-				min-inline-size: 0;
-				gap: 0.5rem;
-
-				> .attribute-group-heading {
-					flex: 1 1 16rem;
-					min-inline-size: 0;
-				}
-
-				> :not(.attribute-group-heading) {
-					flex: none;
-				}
-			}
+			font-size: var(---wallet-group-heading-font-size);
 
 			h2 {
-				font-size: 1.8rem;
+				font-size: 1em;
 				font-weight: 700;
 			}
+		}
+	}
 
-			.section-controls {
-				display: flex;
-				align-items: center;
-				gap: 1rem;
+	[data-column~="span-start"] {
+		--column-supportLineHeight: calc(1rem * var(---wallet-line-height));
 
-				.section-score {
-					display: flex;
-					align-items: center;
-					gap: 0.25rem;
-					padding: 0.5rem 1.15rem;
-					border-radius: var(--border-radius);
-					font-weight: 500;
-					color: white;
-					font-size: 0.9rem;
-					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-					background-color: var(--accent, transparent);
-
-					.unrated-hint {
-						cursor: help;
-					}
-				}
-			}
+		a:is(:hover, :focus-visible, :interest-source) {
+			color: var(--accent);
+			text-decoration: none;
 		}
 
-		.section-caption {
+		> [data-row] > [data-icon]::before {
+			transition-property: filter;
+		}
+
+		> :is(.section-caption, .subsection-caption) {
 			opacity: 0.8;
 			color: var(--text-secondary);
 			text-wrap: pretty;
-
 			:global(p) {
 				margin: 0;
 			}
@@ -3019,19 +2251,10 @@
 
 		> details > summary > header {
 			min-inline-size: 0;
-
-			a:is(:hover, :focus-visible, :interest-source),
-			.attribute:interest-target & a:has(h3) {
-				color: var(--accent);
-				text-decoration: none;
-			}
-
-			> [data-row-item~='flexible'] {
-				min-inline-size: 0;
-			}
-
-			.attribute-icon {
-				--icon-size: 1.4em;
+			font-size: var(---wallet-attribute-heading-font-size);
+			h3 {
+				font-size: 1em;
+				font-weight: 600;
 			}
 		}
 
@@ -3045,36 +2268,6 @@
 			> summary {
 				min-inline-size: 0;
 				max-inline-size: 100%;
-
-				> header {
-					> .attribute-summary-layout {
-						min-inline-size: 0;
-						gap: 0.5rem;
-
-						> .attribute-heading {
-							min-inline-size: 0;
-
-							h3 {
-								font-size: var(---wallet-attribute-heading-font-size);
-								font-weight: 600;
-							}
-						}
-
-						> :not(.attribute-heading) {
-							flex: none;
-						}
-					}
-				}
-			}
-
-			.subsection-caption {
-				opacity: 0.8;
-				color: var(--text-secondary);
-				text-wrap: pretty;
-
-				:global(p) {
-					margin: 0;
-				}
 			}
 
 			.attribute-rating-details {
@@ -3088,7 +2281,7 @@
 				color: var(--text-secondary);
 				font-weight: 500;
 
-				&[data-rating='exempt'] {
+				&[data-rating="exempt"] {
 					opacity: 0.7;
 				}
 			}
@@ -3106,10 +2299,6 @@
 		}
 	}
 
-	.not-implemented {
-		opacity: 0.7;
-	}
-
 	.attribute-rating-methodology {
 		h5 {
 			font-size: 1rem;
@@ -3118,29 +2307,10 @@
 	}
 
 	.attribute-accordions {
-		---attribute-accordion-sticky-inset: calc(
-			var(---wallet-page-block-offset)
-			+ var(---wallet-sticky-content-inset)
-			+ var(---wallet-breadcrumb-block-size)
-			+ var(---wallet-breadcrumb-surface-fade)
-		);
-		@media (min-width: 865px) {
-			---attribute-accordion-sticky-inset: calc(
-				var(---wallet-page-block-offset)
-				+ 2 * var(---wallet-sticky-content-inset)
-				+ var(---wallet-breadcrumb-block-size)
-				+ var(---wallet-breadcrumb-surface-fade)
-			);
-		}
-
 		details {
-			--sticky-marginBlockStart: var(---attribute-accordion-sticky-inset);
-
 			overflow: visible;
 
 			summary {
-				--sticky-backgroundColor: var(--background-secondary);
-
 				h4 {
 					max-width: 60ch;
 					word-wrap: break-word;
@@ -3154,6 +2324,287 @@
 				p {
 					word-wrap: break-word;
 					overflow-wrap: break-word;
+				}
+			}
+		}
+	}
+
+	.pie-navigation-icon {
+		color: #fff;
+		filter: opacity(0.75) drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15));
+	}
+
+	@property ---pie-inlineSpace {
+		syntax: '<length>';
+		inherits: true;
+		initial-value: 0px;
+	}
+	/* Chromium resolves var() easing in range keyframes to linear; match the global Expo curves. */
+	@keyframes -global-pie-clearance {
+		entry 0% {
+			transform: translateX(0);
+			animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+		}
+		entry 100%,
+		exit 0% {
+			transform: translateX(calc(-1 * var(---inlineDirection) * var(---pie-inlineClearance)));
+			animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+		}
+		exit 100% {
+			transform: translateX(0);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		/* Keyframe easing requires literal values. */
+		@keyframes -global-pie-clearance {
+			entry 0% {
+				transform: translateX(0);
+				animation-timing-function: steps(1, start);
+			}
+			entry 100%,
+			exit 0% {
+				transform: translateX(calc(-1 * var(---inlineDirection) * var(---pie-inlineClearance)));
+				animation-timing-function: steps(1, end);
+			}
+			exit 100% {
+				transform: translateX(0);
+			}
+		}
+	}
+	@keyframes -global-pie-inline {
+		from {
+			---pie-inlineSpace: calc(-1 * var(---pie-compactSize));
+		}
+		to {
+			---pie-inlineSpace: calc(var(--scrollContainer-sizeInline) - var(---pie-compactSize));
+		}
+	}
+
+	@keyframes -global-wallet-pie-compact {
+		from {
+			transform: translateX(0) scale(1);
+		}
+	}
+	@keyframes -global-wallet-pie-source {
+		from {
+			translate: 0 calc(var(--scrollContainer-sizeBlock) - var(--navigation-mobile-blockSize));
+		}
+	}
+
+	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+		(color: if(style(---breadcrumb-wrap: 1): red)) {
+		@media (width <= 1024px) {
+			@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
+				[data-sticky-breadcrumb~="root"]
+					:global([data-sticky-breadcrumb~="scope"]:not([data-sticky-breadcrumb~="root"])) {
+					&:dir(rtl) {
+						animation-direction: normal, normal, normal, normal, normal, normal, reverse;
+					}
+					---pie-inlineTimeline: --pie-inline;
+					timeline-scope:
+						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), var(---pie-inlineTimeline);
+					@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+						---pie-inlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-pie-inline");
+						timeline-scope: var(--stickyBreadcrumb-entryTimeline);
+					}
+					animation-name: var(---breadcrumb-sizeAnimationNames), pie-inline;
+					animation-timeline: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
+					> :global(*) {
+						--stickyBreadcrumb-availableInlineSize: calc(100cqi - var(---pie-clearanceSize));
+					}
+				}
+				[data-sticky-breadcrumb~="root"]
+					:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
+					timeline-scope: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
+					@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+						timeline-scope: none;
+					}
+				}
+				[data-sticky-breadcrumb~="root"]
+					:global(
+						article summary:has(> [data-column~="span-start"]):not([data-sticky-breadcrumb~="position"])
+					) {
+					timeline-scope: --pie-inline;
+				}
+				[data-sticky-breadcrumb~="root"]
+					:global(
+						article
+							[data-column~="span-start"]:not(
+								[data-sticky-breadcrumb~="position"],
+								[data-sticky-breadcrumb~="position"] *
+							)
+					) {
+					&:dir(rtl) {
+						animation-direction: normal, normal, reverse;
+					}
+					---pie-inlineTimeline: --pie-inline;
+					animation-name: column-inline-size, column-block-size, pie-inline;
+					animation-timeline: var(---column-sizeTimelines), var(---pie-inlineTimeline);
+				}
+				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="position"]) {
+					---pie-inlineClearance: clamp(
+						0px,
+						calc(
+							100vw * (1 / var(---column-inlineFraction) - 1) +
+								var(--stickyBreadcrumb-sourcePaddingInline) - var(---pie-inlineSpace) +
+							var(--stickyBreadcrumb-gap, 1rem) / 2
+						),
+						var(---pie-clearanceSize)
+					);
+				}
+				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]),
+				[data-sticky-breadcrumb~="root"] :global(#wallet-toc .navigation-item-after),
+				[data-sticky-breadcrumb~="root"] :global(#wallet-toc summary::after) {
+					/* Depart quickly and return late so both sides clear the pie. */
+					animation: pie-clearance auto linear both;
+					animation-timeline: --pie-clearance;
+					animation-range: cover 0% cover 100%;
+				}
+
+				[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="end"]) {
+					animation-name: breadcrumb-end-motion, pie-clearance;
+					animation-timing-function: var(--transition-easeInOutExpo), linear;
+					---pie-clearanceTimeline: --pie-clearance;
+					animation-timeline: var(--stickyBreadcrumb-entryTimeline), var(---pie-clearanceTimeline);
+					animation-range: var(--stickyBreadcrumb-entryRange), cover 0% cover 100%;
+					/* Native layout timing approximates transformed contact without resolving transformed anchors. */
+					timeline-scope: --pie-clearance;
+					view-timeline: var(---pie-clearanceTimeline) block;
+					@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+						---pie-clearanceTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-pie-clearance");
+						timeline-scope: none;
+					}
+					view-timeline-inset: var(--navigation-mobile-blockSize)
+						calc(
+							100vh - var(--navigation-mobile-blockSize) -
+								var(---pie-compactSize)
+						);
+				}
+
+				[data-sticky-breadcrumb~="root"]
+					:global(article [data-column~="span-start"] > [data-row]::after) {
+					content: '';
+					position: absolute;
+					visibility: hidden;
+					pointer-events: none;
+					inline-size: 0;
+					block-size: 0;
+					inset-block-start: 0;
+					inset-inline-start: calc(
+						anchor(--column-firstRow self-start) - var(--stickyBreadcrumb-sourcePaddingInline)
+					);
+					view-timeline: var(---pie-inlineTimeline, --pie-inline) inline;
+				}
+			}
+		}
+		@supports (appearance: base-select) {
+			[data-sticky-breadcrumb~="root"]:has(
+					> [data-sticky-breadcrumb~="position"] :global(select)
+				) > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]::before {
+				inline-size: 2rem;
+			}
+			[data-sticky-breadcrumb~="root"]:has(
+					> [data-sticky-breadcrumb~="position"] :global(select ~ select)
+				) > [data-sticky-breadcrumb~="flow"] > [data-sticky-breadcrumb~="measure"]::before {
+				inline-size: calc(4rem + 0.5rem);
+			}
+		}
+		[data-sticky-breadcrumb~="root"] {
+			--stickyBreadcrumb-scale: calc(var(---wallet-compact-h1) / var(---wallet-name-flow-font-size));
+			--stickyBreadcrumb-insetBlockStart: var(--sticky-insetBlockStart);
+			--stickyBreadcrumb-minBlockSize: var(---wallet-compact-icon-size);
+			@media (width > 1024px) {
+				--stickyBreadcrumb-minBlockSize: max(
+					var(---wallet-compact-icon-size),
+					calc(var(--navigation-mobile-blockSize) - 2 * var(--stickyBreadcrumb-paddingBlock, 0.5rem))
+				);
+			}
+		}
+		[data-sticky-breadcrumb~="root"] :global(article [data-sticky-breadcrumb~="source"]) {
+			/* Reserve the pie cutout; row companions wrap before the title text. */
+			max-inline-size: calc(100% - var(---pie-inlineClearance, 0px));
+			margin-inline-end: var(---pie-inlineClearance, 0px);
+		}
+		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
+			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
+			timeline-scope: var(---breadcrumb-sizeTimelines);
+			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
+				timeline-scope: none;
+			}
+		}
+		:is(#stages, .attribute-group) {
+			--stickyBreadcrumb-scale: calc(
+				sqrt(var(---wallet-compact-h3) / var(---wallet-compact-h1)) *
+					var(---wallet-compact-h1) / var(---wallet-group-heading-font-size)
+			);
+			> header {
+				--stickyBreadcrumb-sourcePaddingBlock: 1rem;
+				--stickyBreadcrumb-sourcePaddingInline: 0px;
+			}
+			@media (width <= 1024px) {
+				--stickyBreadcrumb-forceRow: 1;
+			}
+		}
+		#stages > header {
+			font-size: var(---wallet-group-heading-font-size);
+			padding-block: 1rem;
+			h2 {
+				font-size: 1em;
+			}
+		}
+		.attribute {
+			--stickyBreadcrumb-scale: calc(
+				var(---wallet-compact-h3) / var(---wallet-attribute-heading-font-size)
+			);
+		}
+		[data-sticky-breadcrumb~="root"]
+			> [data-sticky-breadcrumb~="position"]
+			[data-sticky-breadcrumb~="source"] {
+			---breadcrumb-iconCorrection: calc(
+				var(---wallet-compact-icon-size) / var(--stickyBreadcrumb-scale) - var(--wallet-icon-size)
+			);
+		}
+		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] .wallet-icon {
+			transform-origin: calc(50% - 50% * var(---inlineDirection)) 50%;
+			--stickyBreadcrumb-iconScale: calc(
+				var(---wallet-compact-icon-size) / var(--wallet-icon-size)
+			);
+		}
+		[data-sticky-breadcrumb~="root"] {
+			@media (width <= 1024px) {
+				--stickyBreadcrumb-exitAnimation: none;
+			}
+		}
+		[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] {
+			--stickyBreadcrumb-sourcePaddingBlock: min(
+				var(--scrollItem-paddingInlineMatch),
+				var(--scrollItem-inlineDetached-maxPaddingMatchStart)
+			);
+			--stickyBreadcrumb-sourcePaddingInline: 0px;
+			.wallet-title-row {
+				anchor-name: --column-firstRow;
+			}
+			@media (width <= 1024px) {
+				[data-sticky-breadcrumb~="end"] {
+					translate: calc(
+							var(---inlineDirection) *
+								(
+									100cqi - var(---breadcrumb-sourceRowWidth) - var(--scrollItem-paddingInlineStart) -
+										var(--navigation-controlInsetInline) - 2rem -
+										0.5rem
+								)
+						)
+						calc(
+							(
+									var(--navigation-mobile-blockSize) / 2 - var(--sticky-insetBlockStart) -
+										var(--stickyBreadcrumb-sourcePaddingBlock) -
+										(1 + var(---breadcrumb-sourceEndWrap)) *
+										(var(---breadcrumb-sourceRowHeight) - var(---breadcrumb-endHeight)) / 2 -
+										var(---breadcrumb-endHeight) / 2
+								) -
+								var(---wallet-tocOpen) * var(---wallet-sourceOffset)
+						);
 				}
 			}
 		}
