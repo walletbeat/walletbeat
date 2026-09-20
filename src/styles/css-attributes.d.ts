@@ -172,15 +172,16 @@ declare global {
 		/**
 		 * ## [data-icon]
 		 *
-		 * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+		 * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 24px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
 		 *
 		 * ### Tokens
 		 * - shape: `circle`, `filled`
 		 * - color: `accent`
-		 * - source: `wbicons-simple`, `wbicons-complex`
+		 * - source: `wbicons-simple`, `wbicons-complex`, `emoji`
 		 * - effect: `shadow`
 		 *
 		 * ### CSS Variables
+		 * - `--icon-scale`: combined painted scale supplied by a transformed container (default `1`); icon detail follows effective size
 		 * - `--icon-content`
 		 * - `--icon-size`
 		 * - `--icon-navigation-borderColor`

@@ -255,18 +255,25 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	scale: var(--pressable-pressed-scale);
 }
 
+@property ---icon-renderedSize {
+	syntax: "<length>";
+	inherits: true;
+	initial-value: 0px;
+}
+
 /**
  * ## [data-icon]
  *
- * Shared icon primitive for font icons, inline SVGs, and image icons. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+ * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 24px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
  *
  * ### Tokens
  * - shape: `circle`, `filled`
  * - color: `accent`
- * - source: `wbicons-simple`, `wbicons-complex`
+ * - source: `wbicons-simple`, `wbicons-complex`, `emoji`
  * - effect: `shadow`
  *
  * ### CSS Variables
+ * - `--icon-scale`: combined painted scale supplied by a transformed container (default `1`); icon detail follows effective size
  * - `--icon-content`
  * - `--icon-size`
  * - `--icon-navigation-borderColor`
@@ -285,6 +292,20 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  */
 [data-icon] {
 	--icon-content: attr(data-icon);
+
+	&:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"]) {
+		container-type: inline-size;
+		---icon-renderedSize: calc(var(--icon-size, 1em) * var(--icon-scale, 1));
+		&::before {
+			font-family: var(--fontFamily-wbicons-simple);
+			@container (width > 24px) {
+				font-family: var(--fontFamily-wbicons-complex);
+			}
+			@supports (font-family: if(style(---icon-renderedSize > 24px): serif; else: sans-serif)) {
+				font-family: if(style(---icon-renderedSize > 24px): var(--fontFamily-wbicons-complex); else: var(--fontFamily-wbicons-simple));
+			}
+		}
+	}
 
 	&[data-icon~="accent"] {
 		color: var(--accent);

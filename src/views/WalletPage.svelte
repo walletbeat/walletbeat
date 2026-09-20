@@ -1934,6 +1934,7 @@
 				block-size: calc(var(---pie-diameter) * 1px);
 				translate: -50% -50%;
 				scale: var(---pie-scale);
+				--icon-scale: var(---pie-scale);
 				transform-origin: center;
 				pointer-events: none;
 				transition-property: none;
