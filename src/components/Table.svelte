@@ -94,7 +94,7 @@
 			),
 		)
 
-		#isColumnExpanded: Set<_ColumnId> = $state(
+		expandedColumnIds: SvelteSet<_ColumnId> = $state(
 			new SvelteSet()
 		)
 
@@ -103,7 +103,7 @@
 				columns: Column<_RowValue, _CellValue, _ColumnId>[],
 			): Column<_RowValue, _CellValue, _ColumnId>[] =>
 				columns.flatMap(column =>
-					column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+					column.subcolumns?.length && this.expandedColumnIds.has(column.id)
 						? getVisibleColumns(column.subcolumns)
 						: [column],
 				)
@@ -190,15 +190,11 @@
 		})
 
 		rowsSorted = $derived.by(() => {
-			if (!this.sortState) return this.rows
-
-			const { direction } = this.sortState
-
 			let result = this.rowsAscending
 
 			if(!result) return result
 
-			if (direction === SortDirection.Descending) {
+			if (this.sortState?.direction === SortDirection.Descending) {
 				result = result.toReversed()
 			}
 
@@ -207,7 +203,7 @@
 					const isRowADisplaced = this.rowIsDisabled!(rowValueA, this)
 					const isRowBDisplaced = this.rowIsDisabled!(rowValueB, this)
 
-					return isRowADisplaced ? 1 : isRowBDisplaced ? -1 : 0
+					return Number(isRowADisplaced) - Number(isRowBDisplaced)
 				})
 
 			return result
@@ -277,7 +273,7 @@
 			const initializeIsColumnExpanded = (columns: Column<_RowValue, _CellValue, _ColumnId>[]) => {
 				columns.forEach(column => {
 					if (column.isDefaultExpanded) {
-						this.#isColumnExpanded.add(column.id)
+						this.expandedColumnIds.add(column.id)
 					}
 
 					if (column.subcolumns?.length) {
@@ -314,14 +310,14 @@
 		}
 
 		isColumnExpanded = (columnId: _ColumnId) => (
-			this.#isColumnExpanded.has(columnId)
+			this.expandedColumnIds.has(columnId)
 		)
 
 		toggleIsColumnExpanded = (columnId: _ColumnId) => {
-			if(this.#isColumnExpanded.has(columnId))
-				this.#isColumnExpanded.delete(columnId)
+			if(this.expandedColumnIds.has(columnId))
+				this.expandedColumnIds.delete(columnId)
 			else
-				this.#isColumnExpanded.add(columnId)
+				this.expandedColumnIds.add(columnId)
 		}
 	}
 </script>
@@ -356,6 +352,9 @@
 
 		columns,
 		sortedColumn = $bindable(),
+		expandedColumnIds = $bindable(
+			new SvelteSet<_ColumnId>()
+		),
 
 		expandHeaderCells = true,
 
@@ -375,6 +374,7 @@
 
 		columns: _Column[]
 		sortedColumn?: _Column | undefined
+		expandedColumnIds?: SvelteSet<_ColumnId>
 
 		expandHeaderCells?: boolean
 
@@ -419,8 +419,17 @@
 		sortedColumn = table.sortedColumn
 	})
 
+	// Expansion is owned by the table; consumers observe it.
+	$effect(() => {
+		expandedColumnIds = table.expandedColumnIds
+	})
+
 
 	// Functions
+	import { flushSync, onMount } from 'svelte'
+	let interactive = $state(false)
+	onMount(() => { interactive = true })
+
 	const getColumnSpan = (column: _Column): number => (
 		!column.subcolumns?.length ?
 			1
@@ -437,18 +446,48 @@
 				)
 	)
 
+	let isSorting = $state(false)
+	type SortTransition = { finished: Promise<void> }
+	let sortRoot: (HTMLDivElement & {
+		startViewTransition?: (callback: () => void) => SortTransition
+	}) | undefined = $state()
+	let sortTransition: SortTransition | undefined
+	const toggleColumnSort = (columnId: _ColumnId) => {
+		const update = () => {
+			flushSync(() => table.toggleColumnSort(columnId))
+		}
+		const startViewTransition = sortRoot?.startViewTransition
 
-	// Transitions/animations
-	import { flip } from 'svelte/animate'
-	import { expoOut } from 'svelte/easing'
-	import { fly } from 'svelte/transition'
+		if (
+			!startViewTransition
+			|| !CSS.supports('view-transition-name: match-element')
+			|| matchMedia('(prefers-reduced-motion: reduce)').matches
+		) {
+			update()
+			return
+		}
+
+		isSorting = true
+		flushSync()
+		// Capture only this table. Other controls and top-layer panels stay live.
+		const transition = startViewTransition.call(sortRoot, update)
+		sortTransition = transition
+		const finish = () => {
+			if (sortTransition === transition) isSorting = false
+		}
+		void transition.finished.then(finish, finish)
+	}
+
+
 </script>
 
 
 <div
 	{...restProps}
+	bind:this={sortRoot}
 	id={tableId}
 	class="container {'class' in restProps ? restProps.class : ''}"
+	data-sorting={isSorting ? '' : undefined}
 >
 	<table>
 		<colgroup>
@@ -481,7 +520,7 @@
 						))
 				)}
 
-				<tr in:fly={{ y: '-50%', duration: 300, easing: expoOut }}>
+				<tr>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
 						{#if column}
 							{@render headerCell(column, level)}
@@ -511,7 +550,9 @@
 						:
 							undefined
 					}
+					data-table-column={String(column.id)}
 					data-header-level={level}
+					aria-sort={table.sortState?.columnId === column.id ? (table.sortState.direction === SortDirection.Ascending ? 'ascending' : 'descending') : undefined}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 					data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
@@ -537,7 +578,7 @@
 
 						<div data-sticky-container>
 							{#if isSortable}
-								<label class="sort-label" data-pressable="to-containing">
+								<div class="sort-label" data-pressable="to-containing">
 									<span data-sticky="backdrop-before backdrop-stuck">
 										{@render HeaderTitle()}
 
@@ -545,13 +586,14 @@
 											type="button"
 											aria-label={`Sort by ${column.name}`}
 											class="sort-button"
-											onclick={() => {
-												table.toggleColumnSort(column.id)
+											onclick={event => {
+												event.stopPropagation()
+												toggleColumnSort(column.id)
 											}}
-											disabled={!column.sort}
+											disabled={!interactive || !column.sort}
 										></button>
 									</span>
-								</label>
+								</div>
 							{:else}
 								<span data-sticky="backdrop-before backdrop-stuck">
 									{@render HeaderTitle()}
@@ -570,6 +612,7 @@
 							<button
 								type="button"
 								class="expansion-button"
+								disabled={!interactive}
 								data-sticky="backdrop-before backdrop-stuck"
 								onclick={() => {
 									table.toggleIsColumnExpanded(column.id)
@@ -616,7 +659,6 @@
 								row.focus()
 						}
 					}}
-					animate:flip={{ duration: 300, easing: expoOut }}
 					data-disabled={rowIsDisabled?.(row, table) ? '' : undefined}
 				>
 					{#each table.columnsVisible as column (column.id)}
@@ -626,6 +668,7 @@
 
 						<td
 							colspan={columnSpan}
+							data-table-column={String(column.id)}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 							data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
@@ -683,6 +726,21 @@
 			0 0 0 0
 			round calc(var(--table-cornerRadius) + var(--table-outerBorderWidth))
 		);
+
+		&[data-sorting] tbody tr {
+			view-transition-name: match-element;
+			view-transition-class: table-row;
+		}
+	}
+
+	.container::view-transition-old(root),
+	.container::view-transition-new(root) {
+		animation: none;
+	}
+
+	:global(::view-transition-group(*.table-row)) {
+		animation-duration: 300ms;
+		animation-timing-function: var(--transition-easeOutExpo);
 	}
 
 	:where(table) {
@@ -793,6 +851,8 @@
 								margin-inline-start: 0.5em;
 								display: inline-block;
 								padding: 0;
+								min-inline-size: 1.5em;
+								min-block-size: 1.5em;
 
 								background-color: transparent;
 								border: none;
@@ -827,12 +887,12 @@
 					}
 
 					&[data-expandable] {
-						--isExpanded: 0;
+						---table-isExpanded: 0;
 
 						cursor: pointer;
 
 						&[data-expanded] {
-							--isExpanded: 1;
+							---table-isExpanded: 1;
 						}
 
 						.expansion-button,
@@ -859,7 +919,7 @@
 								height: 1em;
 								background-color: currentColor;
 								mask-image: var(--icon-chevron);
-								transform: perspective(100px) rotateX(calc(var(--isExpanded) * -180deg));
+								transform: perspective(100px) rotateX(calc(var(---table-isExpanded) * -180deg));
 								transition-property: transform;
 							}
 						}
@@ -1012,7 +1072,8 @@
 
 			@container (width < 48rem) {
 				&[data-sticky] {
-					position: static !important;
+					/* Stop sticking without releasing the cell's containing block. */
+					position: relative !important;
 
 					&:before {
 						content: none !important;

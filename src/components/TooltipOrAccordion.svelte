@@ -1,7 +1,11 @@
 <script lang="ts">
 	// Types/constants
-	import type { Snippet, ComponentProps } from 'svelte'
+	import { onMount, type Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
+	import type {
+		TooltipButtonTriggerPlacement,
+		TooltipHoverTriggerPlacement,
+	} from '@/components/Tooltip.svelte'
 
 
 	// Props
@@ -10,9 +14,7 @@
 		showAccordionMarker = false,
 
 		tooltipMaxWidth,
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ESLint incorrectly infers `ComponentProps<...>['...']` as `any`
 		tooltipButtonTriggerPlacement = 'around',
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ESLint incorrectly infers `ComponentProps<...>['...']` as `any`
 		tooltipHoverTriggerPlacement = 'around',
 
 		children,
@@ -23,9 +25,9 @@
 		isExpanded: boolean
 		showAccordionMarker?: boolean
 
-	tooltipMaxWidth?: string
-	tooltipButtonTriggerPlacement?: ComponentProps<typeof Tooltip>['buttonTriggerPlacement']
-	tooltipHoverTriggerPlacement?: ComponentProps<typeof Tooltip>['hoverTriggerPlacement']
+		tooltipMaxWidth?: string
+		tooltipButtonTriggerPlacement?: TooltipButtonTriggerPlacement
+		tooltipHoverTriggerPlacement?: TooltipHoverTriggerPlacement
 
 		children: Snippet
 		ExpandedContent: Snippet<[{ isInTooltip?: boolean }]>
@@ -33,70 +35,81 @@
 
 
 	// Components
-	import BlockTransition from '@/components/BlockTransition.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 
-
-	// Transitions/animations
-	import { expoOut } from 'svelte/easing'
-	import { fade } from 'svelte/transition'
+	let enhanced = $state(false)
+	onMount(() => { enhanced = true })
 </script>
 
 
-<details
-	class="with-expanded-content"
-	bind:open={isExpanded}
-	{...restProps}
->
-	<summary
-		class:no-marker={!showAccordionMarker}
+{#snippet Disclosure(Trigger: Snippet, Popover: Snippet)}
+	<details
+		class="with-expanded-content"
+		bind:open={isExpanded}
+		{...restProps}
+		data-tooltip-enhanced={enhanced ? '' : undefined}
+		ontoggle={event => {
+			if (event.currentTarget.open)
+				event.currentTarget.querySelector<HTMLElement>(':scope > [popover]:popover-open')?.hidePopover()
+		}}
 	>
-		<Tooltip
-			isEnabled={!isExpanded}
-			buttonTriggerPlacement={tooltipButtonTriggerPlacement}
-			hoverTriggerPlacement={tooltipHoverTriggerPlacement}
-			style="
-				--popover-padding: 0;
-				--popover-backgroundColor: transparent;
-				--popover-borderColor: transparent;
-			"
-		>
-			{@render children()}
+		<summary class:no-marker={!showAccordionMarker}>
+			{@render Trigger()}
+		</summary>
+		{@render Popover()}
+	</details>
+{/snippet}
 
-			{#snippet TooltipContent()}
-				{#if !isExpanded}
-					<div
-						class="expanded-tooltip-content"
-						style:max-width={tooltipMaxWidth}
-					>
-						{@render ExpandedContent({ isInTooltip: true })}
-					</div>
-				{/if}
-			{/snippet}
-		</Tooltip>
-	</summary>
+<Tooltip
+	Layout={Disclosure}
+	buttonTriggerPlacement={tooltipButtonTriggerPlacement}
+	hoverTriggerPlacement={tooltipHoverTriggerPlacement}
+	style="
+		--popover-padding: 0;
+		--popover-backgroundColor: transparent;
+		--popover-borderColor: transparent;
+	"
+	onbeforetoggle={(event: ToggleEvent & { currentTarget: HTMLDivElement }) => {
+		if (event.newState === 'open' && event.currentTarget.parentElement?.matches('details[open]'))
+			event.preventDefault()
+	}}
+>
+	{@render children()}
 
-	{#if isExpanded}
+	{#snippet TooltipContent()}
 		<div
 			class="expanded-content"
-			transition:fade={{ duration: 200, easing: expoOut }}
+			style:--tooltip-maxWidth={tooltipMaxWidth ?? '16em'}
 		>
-			<BlockTransition>
-				{@render ExpandedContent({ isInTooltip: false })}
-			</BlockTransition>
+			{@render ExpandedContent({ isInTooltip: !isExpanded })}
 		</div>
-	{/if}
-</details>
+	{/snippet}
+</Tooltip>
 
 
 <style>
 	details {
 		display: grid;
+		&:not([data-tooltip-enhanced]) :global(summary [data-tooltip-trigger]) {
+			display: none;
+		}
+		&:not([open])::details-content {
+			display: contents;
+			content-visibility: visible;
+		}
 
 		transition-property: gap;
 
 		&[open] {
 			gap: 0.75em;
+			> :global([popover]:not(:popover-open)) {
+				display: block;
+				position: static;
+				inline-size: auto;
+			}
+			:global(summary [data-tooltip-trigger]) {
+				pointer-events: none;
+			}
 		}
 
 		summary {
@@ -113,7 +126,7 @@
 			}
 		}
 
-		.expanded-content {
+		&[open] .expanded-content {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 
@@ -124,9 +137,9 @@
 			font-size: 0.66em;
 			text-align: center;
 		}
+	}
 
-		.expanded-tooltip-content {
-			max-width: 16em;
-		}
+	details:not([open]) .expanded-content {
+		max-width: var(--tooltip-maxWidth, 16em);
 	}
 </style>
