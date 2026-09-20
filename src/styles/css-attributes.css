@@ -2169,11 +2169,6 @@ ol {
 			&[data-card] {
 				--stickyBreadcrumb-sourcePaddingBlock: var(--card-padding);
 				--stickyBreadcrumb-sourcePaddingInline: var(--card-padding);
-				> * {
-					--stickyBreadcrumb-paddingBlock: if(
-						style(---breadcrumb-wrap: 1): var(--stickyBreadcrumb-sourcePaddingBlock) ; else: 0.5rem
-					);
-				}
 			}
 		}
 	}
@@ -2950,7 +2945,7 @@ ol {
 		> [data-sticky],
 		> [data-column] > [data-sticky] {
 			block-size: var(--sticky-paddingBlockStart);
-			padding-block: 0.5rem;
+			padding-block: var(--stickyBreadcrumb-paddingBlock, 0.5rem);
 			padding-inline-start: var(--card-padding, var(--scrollItem-paddingInlineStart, 0px));
 			padding-inline-end: var(--card-padding, var(--scrollItem-paddingInlineEnd, 0px));
 			align-content: center;
@@ -2962,7 +2957,7 @@ ol {
 
 	[data-sticky-breadcrumb~="scope"] [data-sticky-container] > summary[data-sticky] {
 		block-size: var(--sticky-paddingBlockStart);
-		padding-block: 0.5rem;
+		padding-block: var(--stickyBreadcrumb-paddingBlock, 0.5rem);
 	}
 
 	[data-sticky-breadcrumb~="scope"] > details:has(> [data-sticky-breadcrumb~="position"]) {

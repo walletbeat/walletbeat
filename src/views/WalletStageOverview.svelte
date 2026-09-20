@@ -291,6 +291,7 @@
 <style>
 	[data-sticky-breadcrumb~="scope"] {
 		--stickyBreadcrumb-scale: calc(var(---wallet-compact-h3, 1rem) / 1.1rem);
+		--stickyBreadcrumb-paddingBlock: calc(0.5rem * var(---wallet-compact-h3, 1rem) / var(---wallet-compact-h1, 1.5rem));
 	}
 
 	:is(details, [data-sticky-breadcrumb~="scope"])[data-card] {

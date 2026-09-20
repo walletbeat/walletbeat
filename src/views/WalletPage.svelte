@@ -1732,23 +1732,28 @@
 			---wallet-detail-heading-font-size: 0.875rem;
 			---wallet-detail-heading-line-height: 1.25;
 			--wallet-icon-size: 1.875rem;
-			---wallet-native-lineSize: calc(var(---wallet-name-flow-font-size) * var(---wallet-line-height));
+			---wallet-native-fontSize: var(---wallet-name-flow-font-size);
+			---wallet-native-lines: 2;
 			&[data-sticky-container],
 			:global([data-sticky-container]) {
-				---wallet-native-lines: 1;
-				--stickyBreadcrumb-nativeBlockSize: calc(var(---wallet-native-lines) * var(---wallet-native-lineSize) + 1rem);
+				---wallet-native-scale: tan(atan2(var(---wallet-native-fontSize), var(---wallet-name-flow-font-size)));
+				--stickyBreadcrumb-nativeBlockSize: calc(max(
+					var(--navigation-mobile-blockSize),
+					var(---wallet-native-lines) * var(---wallet-name-flow-font-size) * var(---wallet-detail-heading-line-height) + 1rem
+				) * var(---wallet-native-scale));
+				--stickyBreadcrumb-paddingBlock: calc(0.5rem * var(---wallet-native-scale));
 			}
 			:global([data-sticky-breadcrumb~="scope"]:has(> [data-sticky-breadcrumb~="position"] h2)) {
-				---wallet-native-lineSize: calc(var(---wallet-group-heading-font-size) * var(---wallet-line-height));
-				---wallet-native-lines: 1.5;
+				---wallet-native-fontSize: var(---wallet-group-heading-font-size);
 			}
 			:global([data-sticky-breadcrumb~="scope"]:has(> details > [data-sticky-breadcrumb~="position"])) {
-				---wallet-native-lineSize: calc(var(---wallet-attribute-heading-font-size) * var(---wallet-line-height));
-				---wallet-native-lines: 1.5;
+				---wallet-native-fontSize: var(---wallet-attribute-heading-font-size);
+				@media (width < 560px) {
+					---wallet-native-lines: 3;
+				}
 			}
 			:global([data-sticky-container]:has(> summary h4)) {
-				---wallet-native-lineSize: calc(var(---wallet-detail-heading-font-size) * var(---wallet-detail-heading-line-height));
-				---wallet-native-lines: 3;
+				---wallet-native-fontSize: var(---wallet-detail-heading-font-size);
 			}
 			:global([data-sticky-breadcrumb~="position"] [data-row]),
 			:global(summary[data-sticky] > [data-row]) {
@@ -1772,9 +1777,11 @@
 			:global([data-column~="span-start"]:has(> [data-sticky] h3)) {
 				font-size: var(---wallet-attribute-heading-font-size);
 			}
+			:global(:is(h1, h2, h3, h4)) {
+				line-height: var(---wallet-detail-heading-line-height);
+			}
 			:global(h4) {
 				font-size: var(---wallet-detail-heading-font-size);
-				line-height: var(---wallet-detail-heading-line-height);
 			}
 		}
 		#stages > header {
@@ -2535,6 +2542,7 @@
 			}
 		}
 		:is(#stages, .attribute-group) {
+			--stickyBreadcrumb-paddingBlock: calc(0.5rem * sqrt(var(---wallet-compact-h3) / var(---wallet-compact-h1)));
 			--stickyBreadcrumb-scale: calc(
 				sqrt(var(---wallet-compact-h3) / var(---wallet-compact-h1)) *
 					var(---wallet-compact-h1) / var(---wallet-group-heading-font-size)
@@ -2555,6 +2563,7 @@
 			}
 		}
 		.attribute {
+			--stickyBreadcrumb-paddingBlock: calc(0.5rem * var(---wallet-compact-h3) / var(---wallet-compact-h1));
 			--stickyBreadcrumb-scale: calc(
 				var(---wallet-compact-h3) / var(---wallet-attribute-heading-font-size)
 			);
