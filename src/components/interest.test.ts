@@ -1,0 +1,184 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { interest } from './interest'
+
+class TestElement extends EventTarget {
+	hovered = false
+	focused = false
+	focusVisible = false
+	visible = true
+	invoker: TestElement | null = null
+	showPopover = vi.fn()
+	hidePopover = vi.fn()
+
+	querySelector() {
+		return this.invoker
+	}
+
+	checkVisibility() {
+		return this.visible
+	}
+
+	matches(selector: string) {
+		return selector === ':focus-visible' ? this.focusVisible : this.hovered || this.focused
+	}
+}
+
+class TestPointerEvent extends Event {
+	constructor(
+		type: string,
+		public pointerType = 'mouse',
+	) {
+		super(type)
+	}
+}
+
+class TestFocusEvent extends Event {}
+
+function htmlElement(node: TestElement) {
+	if (!(node instanceof HTMLElement)) {
+		throw new TypeError('Expected an HTML element in the test environment')
+	}
+
+	return node
+}
+
+describe('interest fallback lifecycle', () => {
+	let node: TestElement
+	let target: TestElement
+	let cleanup: ReturnType<typeof interest>
+
+	beforeEach(() => {
+		vi.useFakeTimers()
+		node = new TestElement()
+		target = new TestElement()
+		vi.stubGlobal('Element', TestElement)
+		vi.stubGlobal('HTMLElement', TestElement)
+		vi.stubGlobal('PointerEvent', TestPointerEvent)
+		vi.stubGlobal('FocusEvent', TestFocusEvent)
+		vi.stubGlobal('HTMLButtonElement', class extends TestElement {})
+		vi.stubGlobal('document', { getElementById: () => target })
+		cleanup = interest(htmlElement(node), { id: 'details' })
+	})
+
+	afterEach(() => {
+		cleanup?.destroy()
+		vi.useRealTimers()
+		vi.unstubAllGlobals()
+	})
+
+	it('requires sustained pointer interest rather than opening during a scroll crossing', () => {
+		node.hovered = true
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(499)
+		expect(target.showPopover).not.toHaveBeenCalled()
+		vi.advanceTimersByTime(1)
+		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
+	it('cancels pending entry when the pointer leaves', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(100)
+		node.dispatchEvent(new TestPointerEvent('pointerleave'))
+		vi.advanceTimersByTime(1000)
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('does not open a wrapper tooltip while CSS hides its native invoker', () => {
+		node.invoker = new TestElement()
+		node.invoker.visible = false
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(500)
+		expect(target.showPopover).not.toHaveBeenCalled()
+		node.invoker.visible = true
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(500)
+		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
+	it('checks native availability after the dwell, including a responsive layout change', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		node.visible = false
+		vi.advanceTimersByTime(500)
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('opens for visible keyboard focus without the pointer dwell', () => {
+		node.focusVisible = true
+		node.dispatchEvent(new TestFocusEvent('focusin'))
+		vi.advanceTimersByTime(0)
+		expect(target.showPopover).toHaveBeenCalledOnce()
+	})
+
+	it('ignores touch entry and focus that is not visibly keyboard-driven', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerenter', 'touch'))
+		node.dispatchEvent(new TestFocusEvent('focusin'))
+		vi.advanceTimersByTime(1000)
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('preserves an open target when the pointer moves into its content', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerleave'))
+		target.hovered = true
+		target.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(1000)
+		expect(target.hidePopover).not.toHaveBeenCalled()
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('lets native toggling supersede pending hover so Escape cannot be followed by a reopen', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		target.dispatchEvent(new Event('beforetoggle'))
+		vi.advanceTimersByTime(1000)
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('preserves keyboard focus within the target after the pointer leaves', () => {
+		target.focused = true
+		node.dispatchEvent(new TestPointerEvent('pointerleave'))
+		vi.advanceTimersByTime(1000)
+		expect(target.hidePopover).not.toHaveBeenCalled()
+	})
+
+	it('keeps a shared panel open when moving between its header invokers', () => {
+		const other = new TestElement()
+		const otherCleanup = interest(htmlElement(other), { id: 'details' })
+
+		try {
+			node.hovered = true
+			node.dispatchEvent(new TestPointerEvent('pointerenter'))
+			vi.advanceTimersByTime(500)
+			node.hovered = false
+			node.dispatchEvent(new TestPointerEvent('pointerleave'))
+			other.hovered = true
+			other.dispatchEvent(new TestPointerEvent('pointerenter'))
+			vi.advanceTimersByTime(200)
+			expect(target.hidePopover).not.toHaveBeenCalled()
+			other.hovered = false
+			other.dispatchEvent(new TestPointerEvent('pointerleave'))
+			vi.advanceTimersByTime(200)
+			expect(target.hidePopover).toHaveBeenCalledOnce()
+		} finally {
+			otherCleanup?.destroy()
+		}
+	})
+
+	it('does not install a second owner for a supported native interest invoker', () => {
+		cleanup?.destroy()
+		Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
+		vi.spyOn(node, 'matches').mockReturnValue(true)
+		cleanup = interest(htmlElement(node), { id: 'details' })
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		vi.advanceTimersByTime(1000)
+		expect(cleanup).toBeUndefined()
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+
+	it('cancels pending entry when the action is destroyed', () => {
+		node.dispatchEvent(new TestPointerEvent('pointerenter'))
+		cleanup?.destroy()
+		cleanup = undefined
+		vi.advanceTimersByTime(1000)
+		expect(target.showPopover).not.toHaveBeenCalled()
+	})
+})

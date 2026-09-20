@@ -85,7 +85,7 @@
 
 		// Events
 		onSliceClick?: (id: string) => void
-		onSliceMouseEnter?: (id: string) => void
+		onSliceMouseEnter?: (id: string, event: MouseEvent) => void
 		onSliceMouseLeave?: (id: string) => void
 		onSliceFocus?: (id: string) => void
 		onSliceBlur?: (id: string) => void
@@ -121,8 +121,8 @@
 		class="slice"
 		title={slice.arcIconId ? `${wbIconEmojiSequences[slice.arcIconId]} ${slice.ariaLabel}` : slice.ariaLabel}
 		aria-label={slice.ariaLabel}
-		onmouseenter={() => {
-			onSliceMouseEnter?.(slice.id)
+		onmouseenter={(event: MouseEvent) => {
+			onSliceMouseEnter?.(slice.id, event)
 		}}
 		onmouseleave={() => {
 			onSliceMouseLeave?.(slice.id)
