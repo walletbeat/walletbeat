@@ -23,6 +23,10 @@ const canTransition = () =>
 	CSS.supports('view-transition-name: match-element') &&
 	!matchMedia('(prefers-reduced-motion: reduce)').matches
 
+const isExpectedInterruption = (error: unknown) =>
+	error instanceof DOMException &&
+	(error.name === 'AbortError' || error.name === 'InvalidStateError')
+
 /** Build a deterministic, valid custom-ident without allowing part-boundary collisions. */
 export const viewTransitionName = (...parts: (number | string)[]) =>
 	`vt-${parts
@@ -109,6 +113,26 @@ export function startScopedViewTransition(
 		activeDocumentTransition = { document, scope, ...active }
 	}
 
+	let failureReported = false
+	const reportUnexpectedFailure = (error: unknown) => {
+		if (failureReported || isExpectedInterruption(error)) {
+			return
+		}
+
+		failureReported = true
+		const actionableError = error instanceof Error ? error : new Error(String(error))
+		const reporter = (globalThis as typeof globalThis & { reportError?: (error: unknown) => void })
+			.reportError
+
+		if (reporter) {
+			reporter(actionableError)
+		} else {
+			setTimeout(() => {
+				throw actionableError
+			}, 0)
+		}
+	}
+
 	const finish = () => {
 		if (activeByScope.get(scope) === active) {
 			activeByScope.delete(scope)
@@ -120,7 +144,12 @@ export function startScopedViewTransition(
 		}
 	}
 
-	void transition.finished.then(finish, finish)
+	void transition.ready.catch(reportUnexpectedFailure)
+	void transition.updateCallbackDone.catch(reportUnexpectedFailure)
+	void transition.finished.then(finish, error => {
+		finish()
+		reportUnexpectedFailure(error)
+	})
 
 	return transition
 }
