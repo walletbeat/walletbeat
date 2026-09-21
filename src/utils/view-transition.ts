@@ -2,15 +2,20 @@ type TransitionScope = HTMLElement & {
 	startViewTransition?: (update: () => void) => ViewTransition
 }
 
+type ActiveTransition = {
+	transition: ViewTransition
+	update: () => void
+}
+
 export type TransitionUpdateKind = 'sort' | 'columns' | 'filters'
 export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdateKind> = (
 	update: () => void,
 	kind?: Kind,
 ) => void
 
-const activeByScope = new WeakMap<HTMLElement, ViewTransition>()
+const activeByScope = new WeakMap<HTMLElement, ActiveTransition>()
 let activeDocumentTransition:
-	{ document: Document; scope: HTMLElement; transition: ViewTransition } | undefined
+	({ document: Document; scope: HTMLElement } & ActiveTransition) | undefined
 
 const canTransition = () =>
 	typeof document !== 'undefined' &&
@@ -44,39 +49,68 @@ export function startScopedViewTransition(
 	const elementStart = scope.startViewTransition
 	const previous = activeByScope.get(scope)
 
-	previous?.skipTransition()
-	activeByScope.delete(scope)
-
-	if (!elementStart && activeDocumentTransition?.document === document) {
-		activeDocumentTransition.transition.skipTransition()
-		activeDocumentTransition.scope.removeAttribute('data-view-transition-active')
-		activeByScope.delete(activeDocumentTransition.scope)
-		activeDocumentTransition = undefined
-	}
-
-	scope.toggleAttribute('data-view-transition-active', true)
-
-	let transition: ViewTransition
-
-	try {
-		transition = elementStart
-			? elementStart.call(scope, update)
-			: document.startViewTransition(update)
-	} catch {
+	if (previous) {
+		previous.transition.skipTransition()
+		previous.update()
+		activeByScope.delete(scope)
 		scope.removeAttribute('data-view-transition-active')
+
+		if (activeDocumentTransition?.transition === previous.transition) {
+			activeDocumentTransition = undefined
+		}
+
 		update()
 
 		return
 	}
 
-	activeByScope.set(scope, transition)
+	if (!elementStart && activeDocumentTransition?.document === document) {
+		const active = activeDocumentTransition
+
+		active.transition.skipTransition()
+		active.update()
+		active.scope.removeAttribute('data-view-transition-active')
+		activeByScope.delete(active.scope)
+		activeDocumentTransition = undefined
+		update()
+
+		return
+	}
+
+	scope.toggleAttribute('data-view-transition-active', true)
+
+	let updated = false
+	const applyUpdate = () => {
+		if (updated) {
+			return
+		}
+
+		updated = true
+		update()
+	}
+	let transition: ViewTransition
+
+	try {
+		transition = elementStart
+			? elementStart.call(scope, applyUpdate)
+			: document.startViewTransition(applyUpdate)
+	} catch {
+		scope.removeAttribute('data-view-transition-active')
+		applyUpdate()
+
+		return
+	}
+
+	const active = { transition, update: applyUpdate }
+
+	activeByScope.set(scope, active)
 
 	if (!elementStart) {
-		activeDocumentTransition = { document, scope, transition }
+		activeDocumentTransition = { document, scope, ...active }
 	}
 
 	const finish = () => {
-		if (activeByScope.get(scope) === transition) {
+		if (activeByScope.get(scope) === active) {
 			activeByScope.delete(scope)
 			scope.removeAttribute('data-view-transition-active')
 		}
