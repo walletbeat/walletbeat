@@ -43,7 +43,7 @@
 
 <div
 	class="wallet-overall-summary"
-	data-card={isInTooltip ? 'radius p-sm border-accent' : undefined}
+	data-card={isInTooltip ? 'popover border-accent' : undefined}
 	data-column
 	style:--accent={
 		score?.score !== undefined ?
