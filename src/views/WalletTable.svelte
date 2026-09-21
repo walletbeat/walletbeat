@@ -16,6 +16,7 @@
 	import { applyFilterSets, changeFilterChoice, resetFilterSets, type FilterChoice, type FilterSet } from '@/components/filters'
 	import { hasVisiblePopoverInvoker, interest } from '@/components/interest'
 	import type { Column } from '@/components/Table.svelte'
+	import { startScopedViewTransition, viewTransitionName } from '@/utils/view-transition'
 	import type { Ladders } from '@/schema/ladders'
 	import { variants } from '@/constants/variants'
 	import { eip7702 } from '@/data/eips/eip-7702'
@@ -584,9 +585,37 @@
 	let openFilterPanelId = $state<string>()
 
 	// Actions
-	import { onMount, type ComponentProps } from 'svelte'
+	import { flushSync, onMount, type ComponentProps } from 'svelte'
 	let interactive = $state(false)
+	let transitionRoot: HTMLElement | undefined = $state()
+	type TransitionKind = 'sort' | 'columns' | 'filters' | 'disclosure'
+	let transitionKind: TransitionKind | undefined = $state()
+	let activeTransition: ViewTransition | undefined
 	onMount(() => { interactive = true })
+
+	const transitionUpdate = (update: () => void, kind: TransitionKind = 'disclosure') => {
+		if (!transitionRoot) {
+			update()
+			return
+		}
+
+		flushSync(() => { transitionKind = kind })
+		const transition = startScopedViewTransition(transitionRoot, () => flushSync(update))
+
+		if (!transition) {
+			flushSync(() => { transitionKind = undefined })
+			return
+		}
+
+		activeTransition = transition
+		const finish = () => {
+			if (activeTransition === transition) {
+				activeTransition = undefined
+				transitionKind = undefined
+			}
+		}
+		void transition.finished.then(finish, finish)
+	}
 
 	let toggleAttributeFilterById: ComponentProps<typeof Filters<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>['toggleFilterById'] = $state()
 
@@ -594,14 +623,9 @@
 		const choice = walletFacetFilterSets.flatMap(set => set.choices).find(candidate => candidate.id === filterId)
 		if (!choice) return
 
-		activeChoices = changeFilterChoice(walletFacetFilterSets, activeChoices, choice, exclusive)
-	}
-
-	const toggleRowExpanded = (id: string) => {
-		if (expandedRowIds.has(id))
-			expandedRowIds.delete(id)
-		else
-			expandedRowIds.add(id)
+		transitionUpdate(() => {
+			activeChoices = changeFilterChoice(walletFacetFilterSets, activeChoices, choice, exclusive)
+		}, 'filters')
 	}
 
 	const isRowExpanded = (walletId: string) => (
@@ -653,6 +677,8 @@
 
 <section
 	id={viewId}
+	bind:this={transitionRoot}
+	data-view-transition-kind={transitionKind}
 	data-sticky-container
 	data-column="gap-6"
 >
@@ -808,6 +834,7 @@
 						filterSets={slot.filterSets}
 						bind:activeChoices={attributeActiveChoices}
 						bind:toggleFilterById={toggleAttributeFilterById}
+						{transitionUpdate}
 						closedAnchorPrefix={slot.clusterAnchorName}
 					/>
 				{:else}
@@ -818,6 +845,7 @@
 						contextFilterSets={walletFilterSets}
 						visibleSetIds={slot.kind === 'wallet' ? walletPanelSlot?.filterSets.map(set => set.id) : undefined}
 						bind:activeChoices
+						{transitionUpdate}
 						closedAnchorPrefix={slot.clusterAnchorName}
 					/>
 				{/if}
@@ -981,6 +1009,7 @@
 			}
 			bind:sortedColumn
 			bind:expandedColumnIds
+			{transitionUpdate}
 		>
 			{#snippet Cell({
 				row: wallet,
@@ -989,10 +1018,12 @@
 			})}
 				{@const isExpanded = isRowExpanded(wallet.metadata.id)}
 				{@const setIsExpanded = (open: boolean) => {
-					if (open)
-						expandedRowIds.add(wallet.metadata.id)
-					else
-						expandedRowIds.delete(wallet.metadata.id)
+					transitionUpdate(() => {
+						if (open)
+							expandedRowIds.add(wallet.metadata.id)
+						else
+							expandedRowIds.delete(wallet.metadata.id)
+					})
 				}}
 
 				{#if column.id === 'stage'}
@@ -1039,7 +1070,15 @@
 						showAccordionMarker
 						tooltipMaxWidth="20rem"
 					>
-						<div class="wallet-info" data-row="start">
+						<div
+							class="wallet-info"
+							data-row="start"
+							data-view-transition={transitionKind === 'columns' ? 'named' : undefined}
+							style:--view-transition-name={transitionKind === 'columns' ?
+								viewTransitionName(viewId, 'wallet', wallet.metadata.id)
+								: undefined}
+							style:--view-transition-class={transitionKind === 'columns' ? 'wallet-info' : undefined}
+						>
 							<span class="row-count" data-row="center"></span>
 
 							<span class="wallet-icon" data-icon="shadow">
@@ -1147,7 +1186,15 @@
 				{:else if column.id === 'displayName'}
 					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
 
-					<div class="wallet-info" data-row="start">
+					<div
+						class="wallet-info"
+						data-row="start"
+						data-view-transition={transitionKind === 'columns' ? 'named' : undefined}
+						style:--view-transition-name={transitionKind === 'columns' ?
+							viewTransitionName(viewId, 'wallet', wallet.metadata.id)
+							: undefined}
+						style:--view-transition-class={transitionKind === 'columns' ? 'wallet-info' : undefined}
+					>
 						<span class="row-count" data-row="center"></span>
 
 						<span class="wallet-icon" data-icon="shadow">
@@ -1226,6 +1273,8 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
+								transitionNamePrefix={transitionKind === 'columns' ? `${viewId}-wallet-${wallet.metadata.id}` : undefined}
+								transitionElements="pie"
 								layout={PieLayout.FullTop}
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
@@ -1442,6 +1491,8 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
+								transitionNamePrefix={transitionKind === 'columns' ? `${viewId}-wallet-${wallet.metadata.id}` : undefined}
+								transitionElements="pie"
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1624,6 +1675,8 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
+								transitionNamePrefix={transitionKind === 'columns' ? `${viewId}-wallet-${wallet.metadata.id}` : undefined}
+								transitionElements="pie"
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
@@ -2079,6 +2132,19 @@
 		background: none;
 		border: none;
 		padding: 0;
+	}
+
+	:global(::view-transition-group(*.wallet-info)),
+	:global(::view-transition-group(*.pie)) {
+		animation-duration: 300ms;
+		animation-timing-function: var(--transition-easeOutExpo);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		:global(::view-transition-group(*.wallet-info)),
+		:global(::view-transition-group(*.pie)) {
+			animation-duration: 0s;
+		}
 	}
 
 </style>
