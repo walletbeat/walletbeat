@@ -95,7 +95,7 @@
 
 <div
 	class="attribute-summary"
-	data-card={isInTooltip ? 'radius p-sm border-accent' : undefined}
+	data-card={isInTooltip ? 'popover border-accent' : undefined}
 	data-column
 	style:--accent={ratingToColor(attribute.evaluation.outcome.rating)}
 	style:--accent-textColor={ratingToTextColor(attribute.evaluation.outcome.rating)}

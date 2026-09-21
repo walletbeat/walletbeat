@@ -21,7 +21,7 @@
 		},
 		{
 			"name": "data-card",
-			"description": "## [data-card]\n\nCard surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.\n\n### Tokens\n- tone: `secondary`\n- radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`\n- padding: `padding-0` … `padding-8`\n- border: `border-accent`\n\n### CSS Variables\n- `--card-backgroundColor`\n- `--card-radius`\n- `--card-padding`\n- `--card-borderWidth`: accent border width; defaults to 2px\n\n### Examples\n- Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):\n  ```html\n  <article data-card>\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n- Secondary tone, larger padding, accent border (omit radius when default `radius-4` / `0.5em` is fine):\n  ```html\n  <article data-card=\"secondary padding-6 border-accent\">\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`",
+			"description": "## [data-card]\n\nCard surface: tone, radius, padding, and accent border via tokens. Card surface variables sit on the same column grid defaults as `[data-column]` / `[data-card]`.\n\n### Tokens\n- tone: `secondary`\n- radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`\n- padding: `padding-0` … `padding-8`\n- border: `border-accent`\n- context: `popover` applies the surface only inside an open popover; inline disclosure content keeps its ordinary spacing without JavaScript.\n\n### CSS Variables\n- `--card-backgroundColor`\n- `--card-radius`\n- `--card-padding`\n- `--card-borderWidth`: accent border width; defaults to 2px\n\n### Examples\n- Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):\n  ```html\n  <article data-card>\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n- Secondary tone, larger padding, accent border (omit radius when default `radius-4` / `0.5em` is fine):\n  ```html\n  <article data-card=\"secondary padding-6 border-accent\">\n    <h2>Card title</h2>\n    <p>Card body.</p>\n  </article>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`",
 			"values": [
 				{
 					"name": "border-accent",
@@ -62,6 +62,10 @@
 				{
 					"name": "padding-8",
 					"description": "`[data-card~=\"padding-8\"]`"
+				},
+				{
+					"name": "popover",
+					"description": "`[data-card~=\"popover\"]`"
 				},
 				{
 					"name": "radius-1",
