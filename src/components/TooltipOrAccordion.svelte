@@ -90,7 +90,7 @@
 <style>
 	details {
 		display: grid;
-		&:not([data-tooltip-enhanced]) :global(summary [data-tooltip-trigger]) {
+		&:not([data-tooltip-enhanced]) :global(summary > [data-stack] > [data-tooltip-trigger]) {
 			display: none;
 		}
 		&:not([open])::details-content {
@@ -107,8 +107,8 @@
 				position: static;
 				inline-size: auto;
 			}
-			:global(summary [data-tooltip-trigger]) {
-				pointer-events: none;
+			:global(summary > [data-stack] > [data-tooltip-trigger]) {
+				display: none;
 			}
 		}
 
