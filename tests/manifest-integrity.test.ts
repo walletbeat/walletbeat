@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { checkParsedManifests } from '@/tools/manifest-collector/manifest-checker'
-
-import { getRepositoryRoot } from './utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 describe('manifests', () => {
 	it('has up-to-date parsed manifest files', async () => {
