@@ -22,6 +22,12 @@ export const PieLayout = {
 	FullTop: 'FullTop',
 }
 
+export type PieTransitionElement = 'pie' | 'slices' | 'center'
+export type PieTransitionElements =
+	| PieTransitionElement
+	| `${PieTransitionElement} ${PieTransitionElement}`
+	| `${PieTransitionElement} ${PieTransitionElement} ${PieTransitionElement}`
+
 export type LevelConfig = {
 	outerRadiusFraction: number
 	innerRadiusFraction: number

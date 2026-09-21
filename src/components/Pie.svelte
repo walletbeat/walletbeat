@@ -1,6 +1,11 @@
 <script module lang="ts">
 	export { PieLayout } from './pie-geometry'
-	export type { LevelConfig, Slice } from './pie-geometry'
+	export type {
+		LevelConfig,
+		PieTransitionElement,
+		PieTransitionElements,
+		Slice,
+	} from './pie-geometry'
 </script>
 
 <script lang="ts">
@@ -15,6 +20,7 @@
 		PieLayout as PieLayoutValue,
 		type ComputedSlice,
 		type LevelConfig as PieLevelConfig,
+		type PieTransitionElements as PieTransitionElementsValue,
 		type Slice as PieSlice,
 	} from './pie-geometry'
 	import type { Snippet } from 'svelte'
@@ -34,6 +40,7 @@
 		radius = 47,
 		labelSize = radius / 4,
 		transitionNamePrefix,
+		transitionElements = 'pie slices center',
 		levels = [
 			{
 				outerRadiusFraction: 0.6,
@@ -82,6 +89,8 @@
 		labelSize?: number
 		/** Unique among mounted pies; reuse across mutually exclusive replacements. */
 		transitionNamePrefix?: string
+		/** Named parts; use `slices` when one pie may become several with a shared prefix. */
+		transitionElements?: PieTransitionElementsValue
 		levels?: PieLevelConfig[]
 
 		// State
@@ -102,6 +111,10 @@
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
+	const transitionedElements = $derived(new Set(transitionElements.split(' ')))
+	const transitionsPie = $derived(!!transitionNamePrefix && transitionedElements.has('pie'))
+	const transitionsSlices = $derived(!!transitionNamePrefix && transitionedElements.has('slices'))
+	const transitionsCenter = $derived(!!transitionNamePrefix && transitionedElements.has('center'))
 
 	const pieMetrics = $derived.by(() => {
 		const maxRadius = pieMaxRadius(radius, levels)
@@ -160,11 +173,11 @@
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 		data-slice-id={slice.id}
-		data-view-transition={transitionNamePrefix ? 'named' : undefined}
-		style:--view-transition-name={transitionNamePrefix ?
-			viewTransitionName(transitionNamePrefix, 'slice', slice.id)
+		data-view-transition={transitionsSlices ? 'named' : undefined}
+		style:--view-transition-name={transitionsSlices ?
+			viewTransitionName(transitionNamePrefix ?? '', 'slice', slice.id)
 			: undefined}
-		style:--view-transition-class={transitionNamePrefix ? 'pie-slice' : undefined}
+		style:--view-transition-class={transitionsSlices ? 'pie-slice' : undefined}
 		class:highlighted={highlightedSliceId === slice.id}
 	>
 		<span class="slice-shape">
@@ -195,13 +208,13 @@
 	<div
 		class="pie"
 		aria-label={title}
-		data-view-transition={transitionNamePrefix ? 'named' : undefined}
+		data-view-transition={transitionsPie ? 'named' : undefined}
 		style:width={`${pieMetrics.width}px`}
 		style:height={`${pieMetrics.height}px`}
-		style:--view-transition-name={transitionNamePrefix ?
-			viewTransitionName(transitionNamePrefix, 'pie')
+		style:--view-transition-name={transitionsPie ?
+			viewTransitionName(transitionNamePrefix ?? '', 'pie')
 			: undefined}
-		style:--view-transition-class={transitionNamePrefix ? 'pie' : undefined}
+		style:--view-transition-class={transitionsPie ? 'pie' : undefined}
 		data-stack
 	>
 		<div class="slices" data-stack>
@@ -212,11 +225,11 @@
 		<div
 			class="center"
 			data-stack
-			data-view-transition={transitionNamePrefix ? 'named' : undefined}
-			style:--view-transition-name={transitionNamePrefix ?
-				viewTransitionName(transitionNamePrefix, 'center')
+			data-view-transition={transitionsCenter ? 'named' : undefined}
+			style:--view-transition-name={transitionsCenter ?
+				viewTransitionName(transitionNamePrefix ?? '', 'center')
 				: undefined}
-			style:--view-transition-class={transitionNamePrefix ? 'pie-center' : undefined}
+			style:--view-transition-class={transitionsCenter ? 'pie-center' : undefined}
 		>
 			{#if centerContentSnippet}
 				{@render centerContentSnippet()}
