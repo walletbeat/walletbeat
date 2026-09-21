@@ -69,7 +69,7 @@ const processedMarkdown = stripMarkdownTitle(rewrittenMarkdown)
 			</hgroup>
 		</header>
 
-		<div data-scroll-item='inline-detached padding-match-end'>
+		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-4'>
 			<Typography client:visible content={processedMarkdown} />
 		</div>
 	</main>
@@ -98,6 +98,10 @@ const processedMarkdown = stripMarkdownTitle(rewrittenMarkdown)
 
 		div :global(ul) {
 			padding-inline-start: 1.5em;
+		}
+
+		div :global(:is(h2, h3)) {
+			margin-block-start: 1em;
 		}
 
 		div :global(hr) {
