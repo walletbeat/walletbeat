@@ -649,6 +649,11 @@
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-rotation-states={pieRotation.states}
 	data-sticky-breadcrumb="scope root navigation"
+	style:--stickyBreadcrumb-itemInlineTimeline="--breadcrumb-root-item-inline"
+	style:--stickyBreadcrumb-itemBlockTimeline="--breadcrumb-root-item-block"
+	style:--stickyBreadcrumb-endInlineTimeline="--breadcrumb-root-end-inline"
+	style:--stickyBreadcrumb-endBlockTimeline="--breadcrumb-root-end-block"
+	style:--stickyBreadcrumb-entryTimeline="--breadcrumb-root-entry"
 	class="container"
 	data-sticky-container
 	{@attach container => {
@@ -855,6 +860,7 @@
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
 			>
+				<span data-pie-compact-marker aria-hidden="true"></span>
 				<header
 					data-sticky-breadcrumb="position"
 					data-sticky="block block-start backdrop-after backdrop-stuck"
@@ -888,6 +894,7 @@
 				{@render attributeGroupSnippet({
 					attrGroup,
 					evalGroup,
+					pieCompactMarker: !showStage && pieNavigationItems[0]?.href === `#${groupTargetId(attrGroup)}`,
 				})}
 			{/if}
 		{/each}
@@ -957,9 +964,11 @@
 {#snippet attributeGroupSnippet({
 	attrGroup,
 	evalGroup,
+	pieCompactMarker = false,
 }: {
 	attrGroup: AttributeGroup<_AttributeGroupId>
 	evalGroup: EvaluationTree<_AttributeGroupId>[_AttributeGroupId]
+	pieCompactMarker?: boolean
 })}
 	{@const attributes = attrGroup.attributes
 		.map(({ attribute, weight }) => ({
@@ -999,6 +1008,7 @@
 			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
 			data-scroll-item="inline-detached padding-match-end flow"
 		>
+			{#if pieCompactMarker}<span data-pie-compact-marker aria-hidden="true"></span>{/if}
 			<header
 				data-column="span-start"
 				data-sticky-breadcrumb="position"
@@ -2100,11 +2110,13 @@
 		}
 
 		@media (width <= 1024px) {
-			.container
-				> article
-				> :nth-child(1 of [data-sticky-breadcrumb~="scope"])
-				> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])::after {
-				/* Reuse the snap marker to track only the pie's physical compression space. */
+			[data-pie-compact-marker] {
+				display: block;
+				inline-size: 1px;
+				block-size: 1px;
+				margin-block-end: -1px;
+				opacity: 0;
+				pointer-events: none;
 				view-timeline-name: --wallet-pie-compact;
 				view-timeline-axis: block;
 				view-timeline-inset:
@@ -2156,16 +2168,10 @@
 						position-visibility: always;
 						translate: 0 0;
 						/* A native TOC opening uses the same compact endpoint as scrolling. */
-						transform: translateX(
-								calc(
-									var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
-										var(---pie-compactSize) / var(---pie-size)
-								)
-							)
-							scale(calc(var(---pie-compactSize) / var(---pie-size)));
+						transform: translateX(0) scale(1);
 						animation:
 							wallet-pie-source auto linear both,
-							wallet-pie-compact auto linear both,
+							wallet-pie-compact auto var(--transition-easeInOutExpo) both,
 							var(---pie-backdropAnimation, none);
 						@media (prefers-reduced-motion: reduce) {
 							animation-timing-function: linear, steps(1, end), linear;
@@ -2176,8 +2182,11 @@
 							cover 0% exit-crossing 0%,
 							entry 0% exit 0%,
 							entry 0% exit 0%;
-						/* The first sticky row owns the compact pie’s block-start edge. */
-						inset-block-start: anchor(end);
+						/* The source owns initial placement; the first sticky row owns the compact edge. */
+						inset-block-start: if(
+							style(---breadcrumb-entry: 0): anchor(--wallet-pie-source top);
+							else: anchor(end)
+						);
 						inset-inline-start: anchor(--wallet-pie-source start);
 						inline-size: anchor-size(--wallet-pie-source inline);
 						margin: 0;
@@ -2453,9 +2462,14 @@
 	}
 
 	@keyframes -global-wallet-pie-compact {
-		from {
-			transform: translateX(0) scale(1);
-			animation-timing-function: var(--transition-easeInOutExpo);
+		to {
+			transform: translateX(
+					calc(
+						var(---inlineDirection) * (100% - var(---pie-size)) / 2 *
+							var(---pie-compactSize) / var(---pie-size)
+					)
+				)
+				scale(calc(var(---pie-compactSize) / var(---pie-size)));
 		}
 	}
 	@keyframes -global-wallet-pie-source {
