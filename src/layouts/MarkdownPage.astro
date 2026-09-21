@@ -16,24 +16,16 @@ type Props = {
 	metadata: MarkdownMetadata
 	repoRootRelativePath: `/${string}.md`
 	markdown: MarkdownContentWithFrontmatter<null, MarkdownFrontmatter>
-
-	/**
-	 * Whether the document may link to the project repository on GitHub.
-	 * Keep this false for documents whose repository links all have an on-site
-	 * equivalent, so that a missing rewrite fails the build instead of quietly
-	 * sending readers off-site.
-	 */
-	allowRepositoryLinks?: boolean
 }
 
-const { metadata, repoRootRelativePath, markdown, allowRepositoryLinks = false } = Astro.props
+const { metadata, repoRootRelativePath, markdown } = Astro.props
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import type { MarkdownContentWithFrontmatter } from '@/types/content'
 import { stripMarkdownTitle, rewriteMarkdownURLs } from '@/utils/markdown-utils'
 import { rewriteGovernanceRepoURL } from '@/utils/governance-pages'
-import { repositoryUrl } from '@/constants'
+import { repositoryBranch, repositoryUrl } from '@/constants'
 import Navigation from '@/views/Navigation.astro'
 import { defaultNavigationItems } from '@/constants/navigation'
 import Typography from '@/components/Typography.svelte'
@@ -46,8 +38,9 @@ const rewrittenMarkdown = rewriteMarkdownURLs(markdown, {
 		'/src/pages': '/',
 	},
 	repoRootRelativeURLRewriter: rewriteGovernanceRepoURL,
-	forbiddenURLPrefixes: allowRepositoryLinks ? undefined : [repositoryUrl],
-	whitelistURLs: [repositoryUrl],
+	// Repo file links must be rewritten to their on-site page; issues and the like stay on GitHub.
+	forbiddenURLPrefixes: [`${repositoryUrl}/blob/`, `${repositoryUrl}/tree/`],
+	whitelistURLs: [`${repositoryUrl}/blob/${repositoryBranch}/LICENSE`],
 })
 const processedMarkdown = stripMarkdownTitle(rewrittenMarkdown)
 ---

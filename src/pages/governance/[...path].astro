@@ -36,9 +36,4 @@ const content = parseMarkdownWithFrontmatter<{ title: string; description: strin
 } as const)
 ---
 
-<MarkdownPage
-	metadata={{}}
-	repoRootRelativePath={repoRootRelativePath}
-	markdown={content}
-	allowRepositoryLinks={true}
-/>
+<MarkdownPage metadata={{}} repoRootRelativePath={repoRootRelativePath} markdown={content} />
