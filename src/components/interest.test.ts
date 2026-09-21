@@ -163,15 +163,20 @@ describe('interest fallback lifecycle', () => {
 		}
 	})
 
-	it('does not install a second owner for a supported native interest invoker', () => {
+	it('leaves native interest ownership intact while repairing click activation', () => {
 		cleanup?.destroy()
 		Object.defineProperty(HTMLButtonElement.prototype, 'interestForElement', { value: null })
-		vi.spyOn(node, 'matches').mockReturnValue(true)
+		vi.spyOn(node, 'matches').mockImplementation(selector => selector.includes('button'))
 		cleanup = interest(htmlElement(node), { id: 'details' })
 		node.dispatchEvent(new TestPointerEvent('pointerenter'))
 		vi.advanceTimersByTime(1000)
-		expect(cleanup).toBeUndefined()
 		expect(target.showPopover).not.toHaveBeenCalled()
+		node.dispatchEvent(new Event('click'))
+		expect(target.showPopover).toHaveBeenCalledOnce()
+		cleanup?.destroy()
+		cleanup = undefined
+		node.dispatchEvent(new Event('click'))
+		expect(target.showPopover).toHaveBeenCalledOnce()
 	})
 
 	it('cancels pending entry when the action is destroyed', () => {
