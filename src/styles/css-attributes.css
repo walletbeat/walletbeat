@@ -1461,6 +1461,13 @@ ol {
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-breadcrumb]`
  */
+[data-sticky-breadcrumb~="root"] {
+	/* These dimensions also own the native fallback; enhanced timelines are added below. */
+	--stickyBreadcrumb-scale: calc(1.5rem / 2.25rem);
+	--stickyBreadcrumb-insetBlockStart: var(--navigation-mobile-blockSize);
+	--stickyBreadcrumb-nativeBlockSize: var(--navigation-mobile-blockSize);
+}
+
 [data-sticky-breadcrumb~="scope"]
 	:is(
 		a[data-sticky-breadcrumb~="item"],
@@ -1691,9 +1698,6 @@ ol {
 	}
 	[data-sticky-breadcrumb~="root"] {
 		--stickyBreadcrumb-entryTimeline: --breadcrumb-root-entry;
-		--stickyBreadcrumb-scale: calc(1.5rem / 2.25rem);
-		--stickyBreadcrumb-insetBlockStart: var(--navigation-mobile-blockSize);
-		--stickyBreadcrumb-nativeBlockSize: var(--navigation-mobile-blockSize);
 	}
 	/* Fragment targets retain their parent inset even when their disclosure is closed. */
 	[data-sticky-breadcrumb~="scope"] {
@@ -2004,7 +2008,12 @@ ol {
 
 				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
 				---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));
-				> :not([data-row], header[data-column~="span-start"], [data-sticky-breadcrumb~="source"]),
+				> :not(
+					[data-row],
+					header[data-column~="span-start"],
+					[data-sticky-breadcrumb~="source"],
+					:has([data-sticky-breadcrumb~="source"])
+				),
 				> header[data-column~="span-start"] > :not([data-row]),
 				[data-sticky-breadcrumb~="support"] {
 					/* Counter-motion preserves natural content travel while its container remains sticky. */
