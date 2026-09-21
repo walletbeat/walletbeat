@@ -12,20 +12,44 @@ export function interest(
 	node: HTMLElement,
 	{ id, hideDelay = 200 }: { id?: string; hideDelay?: number },
 ) {
-	if (
-		!id ||
-		('interestForElement' in HTMLButtonElement.prototype &&
-			node.matches('button[interestfor], a[interestfor]'))
-	) {
+	if (!id) {
 		return
 	}
 
-	let timer: ReturnType<typeof setTimeout> | undefined
 	const target = document.getElementById(id)
 
 	if (!target) {
 		return
 	}
+
+	// Firefox reflects `popover="hint"` but does not activate it from a
+	// popovertarget button on touch. Capture the click so an interactive child
+	// cannot suppress the actual around trigger by stopping propagation.
+	const showOnClick = () => {
+		if (!target.matches(':popover-open') && hasVisiblePopoverInvoker(node)) {
+			target.showPopover()
+		}
+	}
+	const hasClickInvoker = node.matches('button[popovertarget]')
+
+	if (hasClickInvoker) {
+		node.addEventListener('click', showOnClick, { capture: true })
+	}
+
+	if (
+		'interestForElement' in HTMLButtonElement.prototype &&
+		node.matches('button[interestfor], a[interestfor]')
+	) {
+		return {
+			destroy() {
+				if (hasClickInvoker) {
+					node.removeEventListener('click', showOnClick, { capture: true })
+				}
+			},
+		}
+	}
+
+	let timer: ReturnType<typeof setTimeout> | undefined
 
 	const sources = sourcesByTarget.get(target) ?? new Set<HTMLElement>()
 
@@ -83,6 +107,10 @@ export function interest(
 			clearTimeout(timer)
 			sources.delete(node)
 			target.removeEventListener('beforetoggle', keepOpen)
+
+			if (hasClickInvoker) {
+				node.removeEventListener('click', showOnClick, { capture: true })
+			}
 
 			for (const element of [node, target]) {
 				element.removeEventListener('pointerenter', element === node ? show : keepOpen)
