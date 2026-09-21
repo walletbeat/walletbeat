@@ -96,12 +96,17 @@
 			))
 	)
 
-	let filteredAttributes = $state<Array<{ attributeGroupId: string, attributeId: string, attribute: Attribute<OutcomeMetadata> }>>(
-		[]
-	)
+	const attributeFilterSets = $derived([{
+		id: 'stage',
+		label: 'Stage',
+		cardinality: 'inclusive' as const,
+		match: 'union' as const,
+		choices: stageFilterDefinitions,
+	}])
 	const filteredAttributeIds = $derived(
 		attributeActiveChoices.size > 0 ?
-			new Set(filteredAttributes.map(attribute => `${attribute.attributeGroupId}.${attribute.attributeId}`))
+			new Set(applyFilterSets(allAttributes, attributeFilterSets, attributeActiveChoices)
+				.map(attribute => `${attribute.attributeGroupId}.${attribute.attributeId}`))
 		:
 			null
 	)
@@ -548,14 +553,6 @@
 				[]
 	)
 	const attributeFilterSlots = $derived.by(() => {
-		const stageSet = {
-			id: 'stage',
-			label: 'Stage',
-			cardinality: 'inclusive' as const,
-			match: 'union' as const,
-			choices: stageFilterDefinitions,
-		}
-
 		if (hasNonApplicableStages || stageFilterDefinitions.length === 0 || !attributeRootColumnId) return []
 
 		return [{
@@ -564,7 +561,7 @@
 			panelId: `${viewId}-attribute-filters`,
 			anchorName: `--${viewId}-attribute-filters`,
 			clusterAnchorName: `--${viewId}-attribute-filter-cluster`,
-			filterSets: [stageSet],
+			filterSets: attributeFilterSets,
 		}]
 	})
 	const stageFilterSlots = stageStatusFilterSets.length ? [{
@@ -810,7 +807,6 @@
 						items={allAttributes}
 						filterSets={slot.filterSets}
 						bind:activeChoices={attributeActiveChoices}
-						bind:filteredItems={filteredAttributes}
 						bind:toggleFilterById={toggleAttributeFilterById}
 						closedAnchorPrefix={slot.clusterAnchorName}
 					/>
