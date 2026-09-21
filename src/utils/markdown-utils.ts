@@ -455,8 +455,8 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		repoRootRelativePath: `/${string}.md`
 
 		/**
-		 * Repo-root-relative path to a subtree where all Markdown files are
-		 * assumed to be unique to their specific subdirectory, and that there
+		 * Repo-root-relative path to a subtree where all Markdown files
+		 * are assumed to be unique to their specific subdirectory, and that there
 		 * exists an `index.astro` file next to them.
 		 * When a Markdown document links to a `.md` file that is found to be
 		 * somewhere under `repoRootPagesDir`, the last component of the URL is
@@ -481,6 +481,12 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		repoRootRelativePaths: Record<`/${string}`, `/${string}` | `https://${string}`>
 
 		/**
+		 * Optional project-specific rewrite for a resolved repo-root-relative URL.
+		 * Return null to fall through to the standard pages-directory and prefix mappings.
+		 */
+		repoRootRelativeURLRewriter?: (url: string) => string | null
+
+		/**
 		 * Set of URL prefixes that should never be present in the Markdown file, otherwise
 		 * this function will throw an error.
 		 * Useful to prevent Markdown files from containing links to GitHub that could be
@@ -500,6 +506,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		repoRootRelativePath,
 		repoRootRelativePaths,
 		repoRootPagesDir,
+		repoRootRelativeURLRewriter,
 		forbiddenURLPrefixes,
 		whitelistURLs,
 	} = options
@@ -630,6 +637,11 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 
 		// For absolute and relative paths, resolve and rewrite
 		let resolvedUrl = url.startsWith('/') ? url : resolveRelativeUrl(url)
+		const projectSpecificURL = repoRootRelativeURLRewriter?.(resolvedUrl)
+
+		if (projectSpecificURL !== undefined && projectSpecificURL !== null) {
+			return projectSpecificURL
+		}
 
 		// Handle repoRootPagesDir: if URL is under the pages dir, remove the last path component
 		// (assumes an index.astro file exists at that directory)
