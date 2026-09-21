@@ -7,8 +7,7 @@ import {
 	generateCssAttributesDts,
 	generateWalletbeatHtmlDataJson,
 } from '@/styles/generate/css-attributes-codegen-lib'
-
-import { getRepositoryRoot } from './utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 describe('css-attributes codegen', () => {
 	const repoRoot = getRepositoryRoot()

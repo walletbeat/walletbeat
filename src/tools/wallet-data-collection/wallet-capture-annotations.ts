@@ -8,7 +8,6 @@ import {
 	dataCollectionPurpose,
 } from '@/schema/features/privacy/data-collection'
 import { type AtLeastOneTrueVariant } from '@/schema/variants'
-import { escapeRegExp } from '@/tests/utils/codebase'
 import { isInVocabulary } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
 import {
@@ -19,6 +18,7 @@ import {
 	nonEmptySetFromArray,
 	setItems,
 } from '@/types/utils/non-empty'
+import { escapeRegExp } from '@/utils/codebase'
 import {
 	expectArray,
 	expectOptionalString,

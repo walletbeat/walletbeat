@@ -7,8 +7,9 @@ import * as zlib from 'node:zlib'
 
 import { describe, expect, it } from 'vitest'
 
+import { getRepositoryRoot } from '@/utils/codebase'
+
 import { removeCSSOutline } from '../src/tools/icon-font-generator/svg-stroke-removal'
-import { getRepositoryRoot } from './utils/codebase'
 
 /**
  * All SVG files under resources/ that contain CSS stroke declarations
