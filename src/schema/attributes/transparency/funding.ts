@@ -15,13 +15,12 @@ import {
 	monetizationStrategyIsUserAligned,
 	monetizationStrategyName,
 } from '@/schema/features/transparency/monetization'
-import { toFullyQualified } from '@/schema/reference'
 import {
 	verifiabilityRequiresAllOf,
 	verifiabilityRequiresAtLeastOneReference,
 } from '@/schema/verifiability'
 import { markdown, paragraph, sentence } from '@/types/content'
-import { fundingDetailsContent } from '@/types/content/funding-details'
+import { buildFundingDetails } from '@/types/content/funding-details'
 
 import { pickWorstRating, unrated } from '../common'
 
@@ -39,7 +38,7 @@ function transparent(
 			displayName: `Transparent funding (${sourceName})`,
 			shortExplanation: sentence('{{WALLET_NAME}} is transparently funded.'),
 		},
-		details: fundingDetailsContent({ monetization }),
+		details: buildFundingDetails(monetization),
 	})
 }
 
@@ -60,11 +59,11 @@ function extractive(
 				`{{WALLET_NAME}} is funded through user-extractive means${sourceName !== '' ? ` (${sourceName})` : ''}.`,
 			),
 		},
-		details: fundingDetailsContent({ monetization }),
+		details: buildFundingDetails(monetization),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should change its funding sources to non-user-extractive means such as transparent convenience fees, donations, or ecosystem grants.',
 		),
-		references: toFullyQualified(monetization.ref),
+		// Monetization references are already on the evaluation via `ctx.addRef`.
 	})
 }
 

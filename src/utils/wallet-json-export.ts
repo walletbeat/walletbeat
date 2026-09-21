@@ -6,17 +6,12 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import type {
+	ConcreteWalletEvalStrings,
 	EvaluatedAttribute,
 	OutcomeMetadata,
-	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
 import { type ResolvedFeatures } from '@/schema/features'
-import {
-	isNoRef,
-	isReferenceInput,
-	type ReferenceInput,
-	toFullyQualified,
-} from '@/schema/reference'
+import { isNoRef, isReferenceInput } from '@/schema/reference'
 import {
 	type WalletLadderEvaluation,
 	type WalletStage,
@@ -27,6 +22,7 @@ import { getVariants, type Variant } from '@/schema/variants'
 import { type AttributeOverride, getAttributeOverride, type RatedWallet } from '@/schema/wallet'
 import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
+import { isStructuredDetails } from '@/types/content/structured-details'
 import { setItems } from '@/types/utils/non-empty'
 import { getHowIsEvaluatedHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
@@ -37,8 +33,16 @@ import {
 	getCriterionAttributeId,
 	type StageCountsStatus,
 } from '@/utils/stage-attributes'
+import {
+	type ReferenceJsonExport,
+	serializeReferences,
+	serializeStructuredDetails,
+	type StructuredDetailsJsonExport,
+} from '@/utils/structured-details/json'
+import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
 
-const DETAILS_FALLBACK = 'See full details on the wallet page.'
+/** Attributes without details (e.g. unrated ones) export an empty legacy `details` string. */
+const DETAILS_FALLBACK = ''
 
 type StageExportInput = WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 
@@ -62,22 +66,6 @@ export function stageToExportString(stage: StageExportInput): string | null {
 	return stage.label
 }
 
-export interface ReferenceUrlJsonExport {
-	label: string
-	url: string
-}
-
-export interface ReferenceJsonExport {
-	explanation?: string
-	urls: ReferenceUrlJsonExport[]
-	source?: {
-		id: string
-		name: string
-		license: { name: string; url: string }
-		attributionText: string
-	}
-}
-
 /** Attribute-level metadata (same for every wallet). */
 export interface AttributeJsonExport {
 	attributeDisplayName: string
@@ -99,6 +87,7 @@ export interface RatingJsonExport {
 	shortExplanation: string
 	details: string
 	note?: string
+	structuredDetails?: StructuredDetailsJsonExport
 	impact?: string
 	howToImprove?: string
 	references?: ReferenceJsonExport[]
@@ -159,30 +148,6 @@ export interface RatedWalletJsonExport {
 	repository?: string
 }
 
-export function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
-	const qualified = toFullyQualified(references)
-
-	if (qualified.length === 0) {
-		return []
-	}
-
-	return qualified.map(ref => ({
-		...(ref.explanation !== undefined && { explanation: ref.explanation }),
-		urls: ref.urls.map(u => ({ label: u.label, url: u.url })),
-		...(ref.source !== undefined && {
-			source: {
-				id: ref.source.entity.id,
-				name: ref.source.entity.name,
-				license: {
-					name: ref.source.license.name,
-					url: getUrl(ref.source.license.url),
-				},
-				attributionText: ref.source.attributionText,
-			},
-		}),
-	}))
-}
-
 /**
  * Serialize ResolvedFeatures to a JSON-serializable plain object for export.
  * Ref fields are normalized to the same shape as attribute references.
@@ -232,7 +197,7 @@ function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
 
 function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	evaluatedAttribute: EvaluatedAttribute<_OutcomeMetadata>,
-	evalStrings: WalletNameAndPseudonymStrings,
+	evalStrings: ConcreteWalletEvalStrings,
 	note: AttributeOverride['note'],
 ): AttributeExportBlock {
 	const { attribute, evaluation } = evaluatedAttribute
@@ -247,6 +212,8 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 			methodology: renderTypographicContentToString(attribute.methodology, evalStrings),
 		},
 	}
+	const structuredDetails = isStructuredDetails(evaluation.details) ? evaluation.details : null
+	const detailsContext = { strings: evalStrings }
 
 	const ratingBlock: RatingJsonExport = {
 		rating: evaluation.outcome.rating,
@@ -254,8 +221,15 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 			evaluation.outcome.shortExplanation,
 			evalStrings,
 		),
-		details: renderContentToText(evaluation.details, evalStrings, {
-			fallback: DETAILS_FALLBACK,
+		// `details` stays required legacy Markdown; `structuredDetails` is the canonical payload.
+		details:
+			structuredDetails !== null
+				? renderStructuredDetailsMarkdown(structuredDetails, detailsContext)
+				: renderContentToText(evaluation.details, evalStrings, {
+						fallback: DETAILS_FALLBACK,
+					}),
+		...(structuredDetails !== null && {
+			structuredDetails: serializeStructuredDetails(structuredDetails, detailsContext),
 		}),
 	}
 
@@ -289,7 +263,7 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 function serializeEvaluationTree<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,
 	evalTree: EvaluationTree<_AttributeGroupId>,
-	evalStrings: WalletNameAndPseudonymStrings,
+	evalStrings: ConcreteWalletEvalStrings,
 	wallet: RatedWallet<_AttributeGroupId>,
 ): AttributeGroupsExport {
 	const result: AttributeGroupsExport = {}
@@ -322,7 +296,7 @@ function serializeEvaluationTree<_AttributeGroupId extends string>(
 function serializeStageCriteriaGroup<_AttributeGroupId extends string>(
 	group: WalletStageGroup<_AttributeGroupId>,
 	stageEvaluatableWallet: Omit<RatedWallet<_AttributeGroupId>, 'metadata' | 'ladders'>,
-	evalStrings: WalletNameAndPseudonymStrings,
+	evalStrings: ConcreteWalletEvalStrings,
 ): StageCriteriaGroupBreakdownItemJsonExport {
 	const description = renderContentToText(group.description, evalStrings, { trim: true })
 
