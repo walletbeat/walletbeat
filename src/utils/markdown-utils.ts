@@ -719,7 +719,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 				}
 			} else if (currentInCode) {
 				currentText += line + (isLastLine ? '' : '\n')
-			} else if (/^ {4,}/.test(line)) {
+			} else if (/^ {4,}/.test(line) && !/^ {4,}(?:[-+*]|\d+[.)])\s/.test(line)) {
 				// Indented code block (4+ spaces)
 				if (currentText) {
 					segments.push({ text: currentText, inCode: currentInCode })
