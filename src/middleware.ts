@@ -102,6 +102,7 @@ const shouldShieldByExtension: Record<string, boolean> = {
 	webm: false,
 	webp: false,
 	png: false,
+	gif: false,
 	ico: false,
 	svg: false,
 

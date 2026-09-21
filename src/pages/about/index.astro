@@ -1,21 +1,66 @@
 ---
-// Types
-import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
 
-// Layouts
-import MarkdownPage from '@/layouts/MarkdownPage.astro'
-
-// Data
-import about from './about.md?raw'
-
-const aboutContent = parseMarkdownWithFrontmatter<{ title: string; description: string }>(about, {
-	title: true,
-	description: true,
-} as const)
+import { Content, frontmatter } from './about.md'
 ---
 
-<MarkdownPage
-	metadata={{}}
-	repoRootRelativePath='/src/pages/about/about.md'
-	markdown={aboutContent}
-/>
+<Layout metadata={{ title: frontmatter.title, description: frontmatter.description }}>
+	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
+				<h1>{frontmatter.title}</h1>
+			</hgroup>
+		</header>
+
+		<div data-scroll-item='inline-detached padding-match-end'>
+			<Content />
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		&[data-sticky-container] {
+			--scrollItem-inlineDetached-maxSize: 58rem;
+			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
+			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
+		}
+
+		line-height: 1.4;
+
+		hgroup p {
+			font-size: 1.25rem;
+			font-style: italic;
+			color: var(--text-secondary);
+			opacity: 0.75;
+		}
+
+		p {
+			font-family: var(--fontFamily-avenir);
+		}
+
+		div {
+			line-height: 1.8;
+		}
+
+		div :global(ul) {
+			padding-inline-start: 1.5em;
+		}
+
+		div :global(hr) {
+			border: none;
+			border-top: 1px solid var(--border);
+			margin-block: 1rem;
+		}
+
+		h1,
+		h2,
+		h3 {
+			font-family: var(--fontFamily-spMonorium);
+		}
+	}
+</style>
