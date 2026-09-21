@@ -1889,9 +1889,12 @@
 						grid-column: 1;
 					}
 
-					&[data-table-column="displayName"],
-					&[data-table-column="stage"] {
+					&[data-table-column="displayName"] {
 						grid-column: 1 / -1;
+					}
+
+					&[data-table-column="stage"] {
+						grid-column: 2;
 					}
 
 					&[data-table-column="overall"] {
