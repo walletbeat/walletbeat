@@ -4,8 +4,7 @@ import {
 	checkSnippets,
 	SnippetProblemKind,
 } from '@/tools/code-snippet-collector/code-snippet-collector-lib'
-
-import { getRepositoryRoot } from './utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 describe('code snippets', () => {
 	it('has stored snippet files in sync with wallet data references', async () => {
