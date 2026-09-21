@@ -1880,6 +1880,10 @@
 		/* Block rows stop producing a max-content track to centre. */
 		@container wallet-table (width < 42rem) {
 			grid-template-columns: 100%;
+			inline-size: 100%;
+			max-inline-size: 100%;
+			min-inline-size: 0;
+			contain: inline-size;
 		}
 	}
 
@@ -1891,11 +1895,14 @@
 		 */
 		@container wallet-table (width < 42rem) {
 			.wallet-table {
+				--table-inlineSize: 100%;
+
 				table,
 				thead,
 				tbody {
 					display: block;
 					inline-size: 100%;
+					max-inline-size: 100%;
 					min-inline-size: 0;
 				}
 
@@ -1904,7 +1911,9 @@
 				}
 
 				thead tr {
-					display: flex;
+					display: grid;
+					grid-auto-flow: column;
+					grid-auto-columns: minmax(0, 1fr);
 					gap: 0.25rem;
 				}
 
@@ -1913,26 +1922,46 @@
 				}
 
 				thead th {
-					flex: 1 1 auto;
+					min-inline-size: 0;
+					overflow-wrap: anywhere;
+
+					.header-title {
+						inline-size: auto !important;
+						min-inline-size: 0 !important;
+					}
 				}
 
 				tbody tr {
 					display: grid;
-					grid-template-columns: 1fr auto;
+					grid-template-columns: repeat(2, minmax(0, 1fr));
 					align-items: center;
 					padding-block: 1rem;
-
-					&:has(td[data-table-column="displayName"]),
-					&:not(:has(td[data-table-column="overall"])) {
-						grid-template-columns: repeat(5, minmax(0, 1fr));
-					}
 				}
 
 				tbody td {
 					padding: 0;
 
+					&:not([data-table-column="wallet"], [data-table-column="stage"], [data-table-column="overall"], [data-table-column="displayName"]) {
+						display: grid;
+						justify-items: center;
+						align-self: stretch;
+						align-content: start;
+						gap: 0.35rem;
+						padding-block-start: 0.5rem;
+
+						&::before {
+							content: attr(data-table-column-name);
+							max-inline-size: 10rem;
+							font-size: 0.75rem;
+							font-weight: 600;
+							line-height: 1.15;
+							text-align: center;
+							text-wrap: balance;
+						}
+					}
+
 					&[data-table-column="wallet"] {
-						grid-column: 1;
+						grid-column: 1 / -1;
 					}
 
 					&[data-table-column="displayName"] {
@@ -1940,7 +1969,17 @@
 					}
 
 					&[data-table-column="stage"] {
-						grid-column: 2;
+						grid-column: 1 / -1;
+						display: flex;
+						align-items: center;
+						justify-self: center;
+						gap: 0.5rem;
+
+						&::before {
+							content: attr(data-table-column-name);
+							font-size: 0.75rem;
+							font-weight: 600;
+						}
 					}
 
 					&[data-table-column="overall"] {
