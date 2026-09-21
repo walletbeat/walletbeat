@@ -11,7 +11,7 @@ import {
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
 import { collectAllRefs } from '@/schema/reference'
-import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/tests/utils/codebase'
+import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 import { commonWhitespacePrefix } from '@/types/utils/text'
 
 /** Lines of context stored immediately before/after the referenced range. */

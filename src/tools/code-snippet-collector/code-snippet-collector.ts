@@ -8,7 +8,7 @@ import {
 	parseGitHubBlobUrl,
 	snippetRelativePath,
 } from '@/schema/code-snippets'
-import { getRepositoryRoot } from '@/tests/utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 import {
 	buildSnippetContent,
