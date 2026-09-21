@@ -26,7 +26,6 @@
 		contextFilterSets = filterSets,
 		visibleSetIds,
 		activeChoices = $bindable(new SvelteSet<FilterChoice<Item>>()),
-		filteredItems = $bindable(),
 		toggleFilter = $bindable(),
 		toggleFilterById = $bindable(),
 		transitionUpdate = directTransitionUpdate,
@@ -39,7 +38,6 @@
 		contextFilterSets?: FilterSet<Item>[]
 		visibleSetIds?: string[]
 		activeChoices?: Set<FilterChoice<Item>>
-		filteredItems?: Item[]
 		toggleFilter?: typeof _toggleFilter
 		toggleFilterById?: typeof _toggleFilterById
 		transitionUpdate?: FiltersTransitionUpdate
@@ -48,10 +46,6 @@
 
 	const filtered = (choices: Set<FilterChoice<Item>>) => applyFilterSets(items, contextFilterSets, choices)
 	const defaultChoices = $derived(resetFilterSets(filterSets, new Set()))
-
-	$effect(() => {
-		filteredItems = filtered(activeChoices)
-	})
 
 	const updateFilters = (update: () => void) => {
 		transitionUpdate(() => flushSync(update), 'filters')
