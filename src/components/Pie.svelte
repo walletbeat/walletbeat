@@ -7,6 +7,7 @@
 	import './pie-shape.css'
 	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { sliceFill, sliceLabelBackground } from './pie-fill'
+	import { viewTransitionName } from '@/utils/view-transition'
 	// Types
 	import {
 		computePieSlices,
@@ -32,6 +33,7 @@
 		padding = 0,
 		radius = 47,
 		labelSize = radius / 4,
+		transitionNamePrefix,
 		levels = [
 			{
 				outerRadiusFraction: 0.6,
@@ -78,6 +80,8 @@
 		radius?: number
 		padding?: number
 		labelSize?: number
+		/** Unique among mounted pies; reuse across mutually exclusive replacements. */
+		transitionNamePrefix?: string
 		levels?: PieLevelConfig[]
 
 		// State
@@ -156,6 +160,11 @@
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 		data-slice-id={slice.id}
+		data-view-transition={transitionNamePrefix ? 'named' : undefined}
+		style:--view-transition-name={transitionNamePrefix ?
+			viewTransitionName(transitionNamePrefix, 'slice', slice.id)
+			: undefined}
+		style:--view-transition-class={transitionNamePrefix ? 'pie-slice' : undefined}
 		class:highlighted={highlightedSliceId === slice.id}
 	>
 		<span class="slice-shape">
@@ -186,8 +195,13 @@
 	<div
 		class="pie"
 		aria-label={title}
+		data-view-transition={transitionNamePrefix ? 'named' : undefined}
 		style:width={`${pieMetrics.width}px`}
 		style:height={`${pieMetrics.height}px`}
+		style:--view-transition-name={transitionNamePrefix ?
+			viewTransitionName(transitionNamePrefix, 'pie')
+			: undefined}
+		style:--view-transition-class={transitionNamePrefix ? 'pie' : undefined}
 		data-stack
 	>
 		<div class="slices" data-stack>
@@ -195,7 +209,15 @@
 				{@render Slice(slice)}
 			{/each}
 		</div>
-		<div class="center" data-stack>
+		<div
+			class="center"
+			data-stack
+			data-view-transition={transitionNamePrefix ? 'named' : undefined}
+			style:--view-transition-name={transitionNamePrefix ?
+				viewTransitionName(transitionNamePrefix, 'center')
+				: undefined}
+			style:--view-transition-class={transitionNamePrefix ? 'pie-center' : undefined}
+		>
 			{#if centerContentSnippet}
 				{@render centerContentSnippet()}
 			{:else}

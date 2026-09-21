@@ -249,6 +249,68 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 }
 
 /**
+ * Stable element identity inside a same-document View Transition started by `startScopedViewTransition`. The wrapper temporarily marks the owning subtree with `[data-view-transition-active]`; only `item` and `named` descendants participate, so the document fallback does not capture unrelated UI.
+ *
+ * ### Tokens
+ * - `item`: preserves the identity of an element that survives the update.
+ * - `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`.
+ *
+ * ### CSS Variables
+ * - `--view-transition-name`: unique `<custom-ident>` required by `named`.
+ * - `--view-transition-class`: semantic animation class; defaults to `view-transition-item`.
+ *
+ * ### Examples
+ * - A keyed item that may move, enter, or leave during an update:
+ *   ```html
+ *   <li data-view-transition="item">Wallet row</li>
+ *   ```
+ * - A stable identity that survives replacement:
+ *   ```html
+ *   <li
+ *     data-view-transition="named"
+ *     style="--view-transition-name: wallet-row-metamask; --view-transition-class: wallet-row"
+ *   >MetaMask</li>
+ *   ```
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-view-transition]`
+ */
+[data-view-transition-active]:is([data-view-transition~='item']),
+[data-view-transition-active] [data-view-transition~='item'] {
+	view-transition-name: match-element;
+	view-transition-class: var(--view-transition-class, view-transition-item);
+}
+
+[data-view-transition-active]:is([data-view-transition~='named']),
+[data-view-transition-active] [data-view-transition~='named'] {
+	view-transition-name: var(--view-transition-name);
+	view-transition-class: var(--view-transition-class, view-transition-item);
+}
+
+/* Suppress only unowned scope roots; an explicit item or name wins. */
+[data-view-transition-active]:not(
+	[data-view-transition~='item'],
+	[data-view-transition~='named']
+),
+:root:has([data-view-transition-active]):not(
+	[data-view-transition~='item'],
+	[data-view-transition~='named']
+) {
+	view-transition-name: none;
+}
+
+::view-transition-group(*.view-transition-item) {
+	animation-duration: 300ms;
+	animation-timing-function: var(--transition-easeOutExpo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*.view-transition-item) {
+		animation-duration: 0s;
+	}
+}
+
+/**
  * Consistent press-state feedback across interactive elements. Dims and scales slightly while active so press feedback matches across controls and custom targets.
  * Native summaries own their feedback; breadcrumb summaries delegate it to their foreground row.
  *
