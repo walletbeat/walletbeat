@@ -192,6 +192,7 @@
 						data-list-item-marker={criterionRatingMeta.icon}
 						data-stage-criterion-rating={evaluation.rating}
 						style:--accent={criterionRatingMeta.color}
+						style:--accent-textColor={criterionRatingMeta.textColor}
 						title={criterionRatingMeta.label}
 					>
 						{#if attributeName}

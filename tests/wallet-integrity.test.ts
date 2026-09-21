@@ -15,9 +15,8 @@ import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
 import { getErrorMessage } from '@/types/errors'
+import { getRepositoryRoot } from '@/utils/codebase'
 import { toKebabCase } from '@/utils/kebab'
-
-import { getRepositoryRoot } from './utils/codebase'
 
 describe('wallets', () => {
 	const walletMaps: {

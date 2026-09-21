@@ -194,15 +194,15 @@
 	}
 
 	.summary.passed .summary-icon {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.summary.partial .summary-icon {
-		color: var(--rating-partial);
+		color: var(--rating-partial-text);
 	}
 
 	.summary.failed .summary-icon {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.summary-text p {
@@ -270,15 +270,15 @@
 	}
 
 	.step-result.passed .step-status {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.step-result.partial .step-status {
-		color: var(--rating-partial);
+		color: var(--rating-partial-text);
 	}
 
 	.step-result.failed .step-status {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.step-name {
@@ -319,11 +319,11 @@
 	}
 
 	.eip-result.passed .eip-status {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.eip-result.failed .eip-status {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.eip-number {
@@ -354,11 +354,11 @@
 	}
 
 	.check-row.passed .check-icon {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.check-row.failed .check-icon {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.check-name {

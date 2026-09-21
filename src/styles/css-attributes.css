@@ -13,6 +13,7 @@
  * ### CSS Variables
  * - `--text-primary`
  * - `--accent`
+ * - `--accent-textColor` — opt-in override. Set it alongside `--accent` on any element that scopes `--accent` to a large fill (rating blobs, icons, borders); links inside then use this legible variant instead of blending with the fill.
  *
  * ### Examples
  * - Default link (`<a>` — no `[data-link]`):
@@ -29,7 +30,7 @@
  */
 [data-link],
 a {
-	color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
+	color: var(--accent-textColor, color-mix(in oklch, var(--text-primary) 33%, var(--accent)));
 	text-decoration: none;
 	font-weight: 600;
 
@@ -53,7 +54,7 @@ a {
 		color: inherit;
 
 		&:hover {
-			color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
+			color: var(--accent-textColor, color-mix(in oklch, var(--text-primary) 33%, var(--accent)));
 			text-decoration: none;
 		}
 	}

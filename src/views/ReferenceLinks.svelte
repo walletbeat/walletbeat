@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Types/constants
-	import type { FullyQualifiedReference } from '@/schema/reference'
 	import { getUrlLabel, isRepoImageUrl, type LabeledUrl } from '@/schema/url'
 	import { codeSnippetForUrl, type ResolvedCodeSnippet } from '@/utils/code-snippet-index'
+	import { dataCreditAnchorId, type FullyQualifiedReference } from '@/schema/reference'
 
 
 	// Props
@@ -231,9 +231,29 @@
 						</figure>
 					{/if}
 
-					{#if ref.lastRetrieved}
-						<small class="last-retrieved">
-							Last retrieved <time datetime={ref.lastRetrieved}>{ref.lastRetrieved}</time>
+					{#if ref.lastRetrieved || ref.source}
+						<small class="ref-meta">
+							{#if ref.lastRetrieved}
+								<span class="last-retrieved">
+									Last retrieved <time datetime={ref.lastRetrieved}>{ref.lastRetrieved}</time>
+								</span>
+							{/if}
+							{#if ref.source}
+								{@const source = ref.source}
+								<a
+									class="ref-credit"
+									href={`#${dataCreditAnchorId(source.entity)}`}
+									title={`Data source: ${source.entity.name}`}
+								>
+									{#if source.entity.icon !== 'NO_ICON'}
+										<img
+											src={`/images/entities/${source.entity.id}.${source.entity.icon.extension}`}
+											alt=""
+										/>
+									{/if}
+									<cite>Credit: {source.entity.name}</cite>
+								</a>
+							{/if}
 						</small>
 					{/if}
 				{/snippet}
@@ -303,6 +323,23 @@
 	.last-retrieved {
 		color: var(--text-secondary);
 		font-size: 0.875em;
+	}
+
+	.ref-credit {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25em;
+		vertical-align: middle;
+
+		img {
+			block-size: 1em;
+			inline-size: 1em;
+			object-fit: contain;
+		}
+
+		cite {
+			font-style: normal;
+		}
 	}
 
 	.inline-image {

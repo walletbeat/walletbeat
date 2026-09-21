@@ -25,21 +25,25 @@
 			icon: '✅',
 			label: 'All criteria passed',
 			color: 'var(--rating-pass)',
+			textColor: 'var(--rating-pass-text)',
 		},
 		[StageStatus.PARTIAL]: {
 			icon: '🟡',
 			label: 'Some criteria passed',
 			color: 'var(--rating-partial)',
+			textColor: 'var(--rating-partial-text)',
 		},
 		[StageStatus.FAIL]: {
 			icon: '❌',
 			label: 'All criteria failed',
 			color: 'var(--rating-fail)',
+			textColor: 'var(--rating-fail-text)',
 		},
 		[StageStatus.UNRATED]: {
 			icon: '❔',
 			label: 'Some criteria unrated',
 			color: 'var(--rating-unrated)',
+			textColor: 'var(--rating-unrated)',
 		},
 	} as const satisfies Record<
 		StageStatus,
@@ -47,6 +51,7 @@
 			icon: string
 			label: string
 			color: string
+			textColor: string
 		}
 	>
 
@@ -176,6 +181,7 @@
 										open
 										data-card="padding-5 secondary radius-4"
 										style:--accent={stageStatuses[groupRating].color}
+										style:--accent-textColor={stageStatuses[groupRating].textColor}
 									>
 										<summary>
 											<div data-row="wrap">
@@ -220,6 +226,7 @@
 														<li
 															data-list-item-marker={criterionRatingMeta.icon}
 															style:--accent={criterionRatingMeta.color}
+															style:--accent-textColor={criterionRatingMeta.textColor}
 															data-stage-criterion-rating={criterionRating}
 															title={criterionRatingMeta.label}
 														>

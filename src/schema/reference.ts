@@ -18,8 +18,16 @@
  */
 
 import type { allWallets } from '@/data/wallets'
+import type { DataSource } from '@/schema/data-sources'
+import type { Entity } from '@/schema/entity'
 import type { CalendarDate } from '@/types/date'
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
+import {
+	assertNonEmptyArray,
+	isNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyGet,
+} from '@/types/utils/non-empty'
+import { slugifyCamelCase } from '@/types/utils/text'
 
 import {
 	getUrlLabel,
@@ -116,6 +124,11 @@ export interface FullyQualifiedReference {
 
 	/** The date the reference was last retrieved. */
 	lastRetrieved?: CalendarDate
+
+	/**
+	 * External dataset this citation was adapted from, when applicable.
+	 */
+	source?: DataSource
 }
 
 /** Type predicate for FullyQualifiedReference. */
@@ -462,6 +475,10 @@ function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boo
 		return false
 	}
 
+	if (a.source?.entity.id !== b.source?.entity.id) {
+		return false
+	}
+
 	if (a.urls.length !== b.urls.length) {
 		return false
 	}
@@ -473,6 +490,32 @@ function isRefEqual(a: FullyQualifiedReference, b: FullyQualifiedReference): boo
 	}
 
 	return true
+}
+
+/**
+ * Combine data-source stamps when merging two refs that share an explanation.
+ * A missing source on one side inherits the other. Two distinct sources is an error.
+ */
+function mergeRefDataSources(
+	a: DataSource | undefined,
+	b: DataSource | undefined,
+	explanation: string,
+): DataSource | undefined {
+	if (a === undefined) {
+		return b
+	}
+
+	if (b === undefined) {
+		return a
+	}
+
+	if (a.entity.id !== b.entity.id) {
+		throw new Error(
+			`Cannot merge references that share explanation ${JSON.stringify(explanation)} but have different data sources (${a.entity.id} vs ${b.entity.id})`,
+		)
+	}
+
+	return a
 }
 
 /** Deduplicate and merge references in `refs`. */
@@ -502,6 +545,9 @@ export function mergeRefs(
 		}
 	}
 
+	// Merge refs that share an explanation. A stamped ref and an unstamped
+	// ref with the same explanation become one ref that keeps the data source.
+	// Two stamped refs with the same explanation must share a data source.
 	const byExplanation = new Map<string, FullyQualifiedReference>()
 	const mergedRefs: FullyQualifiedReference[] = []
 
@@ -523,10 +569,14 @@ export function mergeRefs(
 		for (const url of ref.urls) {
 			newUrls = mergeLabeledUrls(newUrls, url)
 		}
+
+		const source = mergeRefDataSources(existing.source, ref.source, ref.explanation)
+
 		byExplanation.set(ref.explanation, {
 			urls: newUrls,
 			explanation: ref.explanation,
 			lastRetrieved: existing.lastRetrieved ?? ref.lastRetrieved,
+			...(source !== undefined ? { source } : {}),
 		})
 	}
 	byExplanation.forEach(ref => {
@@ -534,4 +584,85 @@ export function mergeRefs(
 	})
 
 	return mergedRefs
+}
+
+export interface DataSourceCredit {
+	source: DataSource
+	reportUrls: NonEmptyArray<LabeledUrl>
+}
+
+/**
+ * Anchor id (without leading '#') used to link inline reference credits to the
+ * consolidated data-credits section at the bottom of a wallet page.
+ */
+export function dataCreditAnchorId(entity: Entity): string {
+	return `data-credit-${slugifyCamelCase(entity.id)}`
+}
+
+/**
+ * Group stamped references into one credit per data source.
+ * Unstamped refs are excluded. Credits and report URLs keep first-seen order.
+ */
+export function computeDataSourceCredits(
+	references: FullyQualifiedReference[],
+): DataSourceCredit[] {
+	const credits: DataSourceCredit[] = []
+	const indexBySourceId = new Map<string, number>()
+
+	for (const ref of references) {
+		if (ref.source === undefined) {
+			continue
+		}
+
+		const source = ref.source
+		const sourceId = source.entity.id
+		const reportLabel = `${source.entity.name} report`
+		const existingIndex = indexBySourceId.get(sourceId)
+
+		if (existingIndex === undefined) {
+			const reportUrls: LabeledUrl[] = []
+			const seenUrls = new Set<string>()
+
+			for (const { url } of ref.urls) {
+				if (seenUrls.has(url)) {
+					continue
+				}
+
+				seenUrls.add(url)
+				reportUrls.push({ label: reportLabel, url })
+			}
+
+			indexBySourceId.set(sourceId, credits.length)
+			credits.push({
+				source,
+				reportUrls: assertNonEmptyArray(reportUrls),
+			})
+			continue
+		}
+
+		const credit = credits[existingIndex]
+
+		if (credit === undefined) {
+			throw new Error(`missing data source credit at index ${existingIndex}`)
+		}
+
+		const seenUrls = new Set(credit.reportUrls.map(labeled => labeled.url))
+		const reportUrls: LabeledUrl[] = [...credit.reportUrls]
+
+		for (const { url } of ref.urls) {
+			if (seenUrls.has(url)) {
+				continue
+			}
+
+			seenUrls.add(url)
+			reportUrls.push({ label: reportLabel, url })
+		}
+
+		credits[existingIndex] = {
+			source: credit.source,
+			reportUrls: assertNonEmptyArray(reportUrls),
+		}
+	}
+
+	return credits
 }
