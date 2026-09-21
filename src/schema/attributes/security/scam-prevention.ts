@@ -502,6 +502,7 @@ const allUnlimitedApprovalBenchmarksSupported: UnlimitedApprovalWarningBenchmark
 	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]: featureSupported,
 	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]: featureSupported,
 }
+
 export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	id: 'scamPrevention',
 	icon: 'scam_prevention',

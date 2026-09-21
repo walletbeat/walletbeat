@@ -1,6 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 
-import { featureSupported, type Support } from '../support'
+import { type Support } from '../support'
 
 /**
  * Fields shared by every scam-alert warning: does the lookup process leak
