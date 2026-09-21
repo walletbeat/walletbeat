@@ -134,7 +134,6 @@
 							<header
 								data-row-item="flexible"
 								data-column="span-start"
-								style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
 							>
 								<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
 									<h3 data-row-item="flexible" data-sticky-breadcrumb="source">
@@ -300,6 +299,8 @@
 
 	header[data-column~="span-start"] {
 		--column-supportLineHeight: calc(1rem * var(---wallet-line-height, 1.6));
+		--column-iconGap: var(---wallet-section-icon-gap, 0.875rem);
+		--column-supportGap: var(---wallet-section-support-gap, 0.1875rem);
 		font-size: 1.1em;
 		h3 {
 			font-size: 1em;

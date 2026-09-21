@@ -1127,7 +1127,6 @@
 				<header
 					data-row-item="flexible"
 					data-column="span-start"
-					style="--column-supportGap: 0.25rem; --column-iconGap: 0.75rem"
 				>
 					<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
 						<div data-sticky-breadcrumb="source" data-row-item="flexible">
@@ -1517,6 +1516,10 @@
 		}
 		---wallet-line-height: 1.6;
 		---wallet-attribute-heading-font-size: 1.17rem;
+		---wallet-section-icon-scale: 1.1;
+		---wallet-section-icon-gap: 0.875rem;
+		---wallet-section-source-support-gap: 0.5rem;
+		---wallet-section-support-gap: 0.1875rem;
 
 		&[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 54rem;
@@ -2254,7 +2257,17 @@
 		}
 	}
 
+	:is(.attribute-group > header, .attribute > details > summary > header)[data-column~="span-start"] {
+		--column-spanSize: calc(
+			(1lh + var(--column-supportLineHeight, 1rlh) + var(---wallet-section-source-support-gap)) *
+				var(---wallet-section-icon-scale)
+		);
+		--column-iconGap: var(---wallet-section-icon-gap);
+		--column-supportGap: var(---wallet-section-support-gap);
+	}
+
 	.attribute {
+		---wallet-section-source-support-gap: 0.25rem;
 		position: relative;
 
 		> details > summary > header {

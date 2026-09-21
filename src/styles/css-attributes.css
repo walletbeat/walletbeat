@@ -264,7 +264,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 /**
  * ## [data-icon]
  *
- * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 24px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+ * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 32px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
  *
  * ### Tokens
  * - shape: `circle`, `filled`
@@ -298,11 +298,11 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 		&::before {
 			---icon-renderedSize: calc(var(--icon-size, 1em) * var(--icon-scale, 1));
 			font-family: var(--fontFamily-wbicons-simple);
-			@container (width > 24px) {
+			@container (width > 32px) {
 				font-family: var(--fontFamily-wbicons-complex);
 			}
-			@supports (font-family: if(style(---icon-renderedSize > 24px): serif; else: sans-serif)) {
-				font-family: if(style(---icon-renderedSize > 24px): var(--fontFamily-wbicons-complex); else: var(--fontFamily-wbicons-simple));
+			@supports (font-family: if(style(---icon-renderedSize > 32px): serif; else: sans-serif)) {
+				font-family: if(style(---icon-renderedSize > 32px): var(--fontFamily-wbicons-complex); else: var(--fontFamily-wbicons-simple));
 			}
 		}
 	}
