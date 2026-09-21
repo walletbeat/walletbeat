@@ -82,4 +82,16 @@ describe('css-attributes codegen', () => {
 		expect(entries.get('data-column')?.docMarkdown).toContain('Column documentation.')
 		expect([...(entries.get('data-column')?.values ?? [])]).toEqual(['start'])
 	})
+
+	it('keeps runtime view-transition state out of the public attribute API', async () => {
+		const css = await fs.readFile(cssPath, 'utf8')
+		const entries = parseCssAttributes(css)
+
+		expect(entries.has('data-view-transition')).toBe(true)
+		expect(entries.has('data-view-transition-active')).toBe(false)
+		expect([...(entries.get('data-view-transition')?.values ?? [])].sort()).toEqual([
+			'item',
+			'named',
+		])
+	})
 })
