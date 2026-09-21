@@ -21,6 +21,7 @@ export interface RenderedMarkdownCollection {
 }
 
 export const RENDERED_MARKDOWN_COLLECTIONS = {
+	about: { name: 'about', repoDir: '/src/pages/about', urlPrefix: '/about' },
 	docs: { name: 'docs', repoDir: '/resources/docs', urlPrefix: '/docs' },
 	governance: { name: 'governance', repoDir: '/governance', urlPrefix: '/governance' },
 } as const satisfies Record<string, RenderedMarkdownCollection>
