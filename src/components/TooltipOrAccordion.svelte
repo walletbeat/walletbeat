@@ -145,4 +145,24 @@
 		max-width: var(--tooltip-maxWidth, 16em);
 		font-size: 0.66em;
 	}
+
+	/* The native disclosure is the no-JS owner. On compact viewports its existing
+	 * content surface becomes the same inset drawer used by the enhanced popover. */
+	@media (width <= 40rem) {
+		details[open] > :global([popover]:not(:popover-open)) {
+			display: block;
+			position: fixed;
+			z-index: 3;
+			inset: auto var(--tooltip-drawerMargin) var(--tooltip-drawerMargin);
+			margin: 0;
+			inline-size: auto;
+			max-block-size: var(--tooltip-drawerBlockSize);
+			overflow: auto;
+			padding: 0.75rem;
+			background-color: var(--background-primary);
+			border: 1px solid var(--border-color);
+			border-radius: 0.5rem;
+			box-shadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
+		}
+	}
 </style>
