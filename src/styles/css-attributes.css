@@ -1082,6 +1082,7 @@ summary:where(:not([data-column])) {
  * - radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`
  * - padding: `padding-0` … `padding-8`
  * - border: `border-accent`
+ * - context: `popover` applies the surface only inside an open popover; inline disclosure content keeps its ordinary spacing without JavaScript.
  *
  * ### CSS Variables
  * - `--card-backgroundColor`
@@ -1113,11 +1114,6 @@ summary:where(:not([data-column])) {
 	--card-backgroundColor: var(--background-primary);
 	--card-radius: 0.5em;
 	--card-padding: 1em;
-
-	/* Rules */
-	background-color: var(--card-backgroundColor);
-	border-radius: var(--card-radius);
-	padding: var(--card-padding);
 
 	&[data-card~='secondary'] {
 		--card-backgroundColor: var(--background-secondary);
@@ -1171,8 +1167,15 @@ summary:where(:not([data-column])) {
 		--card-padding: 2em;
 	}
 
-	&[data-card~="border-accent"] {
-		border: var(--card-borderWidth) solid color-mix(in srgb, var(--accent) 90%, transparent);
+	/* Rules */
+	&:where(:not([data-card~="popover"]), :popover-open, :popover-open *) {
+		background-color: var(--card-backgroundColor);
+		border-radius: var(--card-radius);
+		padding: var(--card-padding);
+
+		&[data-card~="border-accent"] {
+			border: var(--card-borderWidth) solid color-mix(in srgb, var(--accent) 90%, transparent);
+		}
 	}
 }
 

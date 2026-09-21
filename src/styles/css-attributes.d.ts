@@ -45,6 +45,7 @@ declare global {
 		 * - radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`
 		 * - padding: `padding-0` … `padding-8`
 		 * - border: `border-accent`
+		 * - context: `popover` applies the surface only inside an open popover; inline disclosure content keeps its ordinary spacing without JavaScript.
 		 *
 		 * ### CSS Variables
 		 * - `--card-backgroundColor`

@@ -92,9 +92,10 @@
 	{/snippet}
 
 	{#snippet Trigger()}
-	{#if buttonTriggerPlacement === 'behind'}
+	{#if buttonTriggerPlacement === 'behind' || Layout}
 		<div
 			data-stack
+			data-tooltip-placement={buttonTriggerPlacement}
 			data-tooltip-anchor={hoverTriggerPlacement === 'around' ? '' : undefined}
 			style:--tooltip-anchor={anchorName}
 			use:interest={{ id: wrapperInterest ? popoverId : undefined, hideDelay }}
@@ -104,7 +105,7 @@
 				{title}
 				aria-label={title ?? 'Show details'}
 				data-tooltip-trigger
-				style:--tooltip-anchor={hoverTriggerPlacement === 'button' ? anchorName : undefined}
+				style:--tooltip-anchor={hoverTriggerPlacement === 'button' ? anchorName : 'none'}
 				interestfor={wrapperInterest ? undefined : popoverId}
 				popovertarget={popoverId}
 				popovertargetaction="show"
@@ -170,6 +171,12 @@
 	[data-stack] > [data-tooltip-trigger] {
 		min-inline-size: 0;
 		min-block-size: 0;
+	}
+
+	/* A disclosure keeps its label outside the invoker, including before hydration.
+	   Around captures the whole surface; behind leaves foreground links and controls live. */
+	[data-tooltip-placement='around'] > [data-tooltip-trigger] {
+		z-index: 1;
 	}
 
 	[popover]:not(:global(details[open]) > *) {
