@@ -1,3 +1,6 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { defineHastPlugin } from 'satteri'
 
 import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
@@ -181,12 +184,19 @@ export function createUrlRewritePlugin() {
 
 				if (ctx.fileURL) {
 					try {
-						const filePath = ctx.fileURL.pathname
-						// Convert absolute file path to repo-relative path
+						// Convert the file URL to an OS-native path (handles Windows drive
+						// letters, where URL pathnames carry a leading slash that would
+						// otherwise break a plain string-prefix comparison).
+						const filePath = fileURLToPath(ctx.fileURL)
 						const repoRoot = process.cwd()
+						const relPath = path.relative(repoRoot, filePath)
 
-						if (filePath.startsWith(repoRoot)) {
-							sourceDir = '/' + filePath.slice(repoRoot.length).replace(/[^/]*$/, '')
+						// Only derive a source dir when the file lives under the repo root
+						// (i.e. `path.relative` does not escape it or span another drive).
+						if (relPath && !relPath.startsWith('..') && !path.isAbsolute(relPath)) {
+							const dir = path.dirname(relPath).split(path.sep).join('/')
+
+							sourceDir = '/' + dir
 
 							if (!sourceDir.endsWith('/')) {
 								sourceDir += '/'
