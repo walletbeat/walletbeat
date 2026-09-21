@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from './utils/codebase'
+import { CodebaseEntryType, crawlCodebase, getRepositoryRoot } from '@/utils/codebase'
 
 const REPO_ROOT = getRepositoryRoot()
 const DATA_DIR = `${REPO_ROOT}data/`

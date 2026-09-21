@@ -30,7 +30,6 @@ import {
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type AtLeastOneTrueVariant, Variant, variantEnum } from '@/schema/variants'
 import { type WalletType, walletTypes } from '@/schema/wallet-types'
-import { escapeRegExp } from '@/tests/utils/codebase'
 import { isInVocabulary, isLikelyEnglish } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
 import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
@@ -45,6 +44,7 @@ import {
 	setItems,
 } from '@/types/utils/non-empty'
 import { assertStringHasPrefix } from '@/types/utils/text'
+import { escapeRegExp } from '@/utils/codebase'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
 import {
 	expectArray,
