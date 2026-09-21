@@ -24,9 +24,6 @@ export const ratedWalletExportSchemaPath = 'schemas/rated-wallet.schema.json'
  */
 export const repositoryUrl = 'https://github.com/walletbeat/walletbeat'
 
-/**
- * Default branch of the project repository.
- */
 export const repositoryBranch = 'beta'
 
 /**
