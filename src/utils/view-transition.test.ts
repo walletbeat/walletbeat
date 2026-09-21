@@ -2,19 +2,27 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { startScopedViewTransition, viewTransitionName } from './view-transition'
 
-const transition = () => {
+const transition = ({
+	finished: finishedOverride,
+	ready = Promise.resolve(),
+	updateCallbackDone = Promise.resolve(),
+}: {
+	finished?: Promise<void>
+	ready?: Promise<void>
+	updateCallbackDone?: Promise<void>
+} = {}) => {
 	let finish!: () => void
 	const finished = new Promise<void>(resolve => {
 		finish = resolve
 	})
 
 	return {
-		finished,
+		finished: finishedOverride ?? finished,
 		finish,
-		ready: Promise.resolve(),
+		ready,
 		skipTransition: vi.fn(),
 		types: new Set<string>() as ViewTransitionTypeSet,
-		updateCallbackDone: Promise.resolve(),
+		updateCallbackDone,
 	} satisfies ViewTransition & { finish: () => void }
 }
 
@@ -162,6 +170,57 @@ describe('startScopedViewTransition', () => {
 
 		deferredUpdate()
 		expect(firstUpdate).toHaveBeenCalledOnce()
+	})
+
+	it('consumes expected interruption rejections from every transition promise', async () => {
+		installEnvironment()
+		const root = new TestScope()
+		const interruptedTransition = transition({
+			finished: Promise.reject(new DOMException('Skipped', 'AbortError')),
+			ready: Promise.reject(new DOMException('Invalid capture', 'InvalidStateError')),
+			updateCallbackDone: Promise.reject(new DOMException('Skipped', 'AbortError')),
+		})
+
+		Object.assign(root, {
+			startViewTransition: (update: () => void) => {
+				update()
+
+				return interruptedTransition
+			},
+		})
+
+		startScopedViewTransition(htmlElement(root), vi.fn())
+		await Promise.resolve()
+		await Promise.resolve()
+
+		expect(root.attributes).not.toContain('data-view-transition-active')
+	})
+
+	it('reports an unexpected transition failure once', async () => {
+		installEnvironment()
+		const reportError = vi.fn()
+		const failure = new Error('Update failed')
+		const root = new TestScope()
+		const failedTransition = transition({
+			finished: Promise.reject(failure),
+			updateCallbackDone: Promise.reject(failure),
+		})
+
+		vi.stubGlobal('reportError', reportError)
+		Object.assign(root, {
+			startViewTransition: (update: () => void) => {
+				update()
+
+				return failedTransition
+			},
+		})
+
+		startScopedViewTransition(htmlElement(root), vi.fn())
+		await Promise.resolve()
+		await Promise.resolve()
+
+		expect(reportError).toHaveBeenCalledOnce()
+		expect(reportError).toHaveBeenCalledWith(failure)
 	})
 })
 
