@@ -101,7 +101,7 @@
 		transition-property: gap;
 
 		&[open] {
-			gap: 0.75em;
+			gap: 1rem;
 			> :global([popover]:not(:popover-open)) {
 				display: block;
 				position: static;
@@ -133,13 +133,16 @@
 			inline-size: 0;
 			min-inline-size: 100%;
 			min-inline-size: -webkit-fill-available;
+			padding-block: 0.75rem;
 
-			font-size: 0.66em;
+			font-size: 1rem;
+			line-height: 1.5;
 			text-align: center;
 		}
 	}
 
 	details:not([open]) .expanded-content {
 		max-width: var(--tooltip-maxWidth, 16em);
+		font-size: 0.66em;
 	}
 </style>
