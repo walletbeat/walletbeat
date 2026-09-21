@@ -2,6 +2,12 @@ type TransitionScope = HTMLElement & {
 	startViewTransition?: (update: () => void) => ViewTransition
 }
 
+export type TransitionUpdateKind = 'sort' | 'columns' | 'filters'
+export type TransitionUpdate<Kind extends TransitionUpdateKind = TransitionUpdateKind> = (
+	update: () => void,
+	kind?: Kind,
+) => void
+
 const activeByScope = new WeakMap<HTMLElement, ViewTransition>()
 let activeDocumentTransition:
 	{ document: Document; scope: HTMLElement; transition: ViewTransition } | undefined
