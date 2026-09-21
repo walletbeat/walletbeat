@@ -802,6 +802,24 @@
 			]
 		},
 		{
+			"name": "data-view-transition",
+			"description": "## [data-view-transition]\n\nStable element identity inside a same-document View Transition started by `startScopedViewTransition`. The wrapper temporarily marks the owning subtree with `[data-view-transition-active]`; only `item` and `named` descendants participate, so the document fallback does not capture unrelated UI.\n\n### Tokens\n- `item`: preserves the identity of an element that survives the update.\n- `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`.\n\n### CSS Variables\n- `--view-transition-name`: unique `<custom-ident>` required by `named`.\n- `--view-transition-class`: semantic animation class; defaults to `view-transition-item`.\n\n### Examples\n- A keyed item that may move, enter, or leave during an update:\n  ```html\n  <li data-view-transition=\"item\">Wallet row</li>\n  ```\n- A stable identity that survives replacement:\n  ```html\n  <li\n    data-view-transition=\"named\"\n    style=\"--view-transition-name: wallet-row-metamask; --view-transition-class: wallet-row\"\n  >MetaMask</li>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-view-transition]`",
+			"values": [
+				{
+					"name": "item",
+					"description": "`[data-view-transition~=\"item\"]`"
+				},
+				{
+					"name": "named",
+					"description": "`[data-view-transition~=\"named\"]`"
+				}
+			]
+		},
+		{
+			"name": "data-view-transition-active",
+			"description": "## [data-view-transition-active]\n\nStable element identity inside a same-document View Transition started by `startScopedViewTransition`. The wrapper temporarily marks the owning subtree with `[data-view-transition-active]`; only `item` and `named` descendants participate, so the document fallback does not capture unrelated UI.\n\n### Tokens\n- `item`: preserves the identity of an element that survives the update.\n- `named`: matches equivalent old and new elements through the caller-supplied `--view-transition-name`.\n\n### CSS Variables\n- `--view-transition-name`: unique `<custom-ident>` required by `named`.\n- `--view-transition-class`: semantic animation class; defaults to `view-transition-item`.\n\n### Examples\n- A keyed item that may move, enter, or leave during an update:\n  ```html\n  <li data-view-transition=\"item\">Wallet row</li>\n  ```\n- A stable identity that survives replacement:\n  ```html\n  <li\n    data-view-transition=\"named\"\n    style=\"--view-transition-name: wallet-row-metamask; --view-transition-class: wallet-row\"\n  >MetaMask</li>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-view-transition]`"
+		},
+		{
 			"name": "data-visually-hidden",
 			"description": "## [data-visually-hidden]\n\nVisually hides an element while retaining its content in the accessibility tree and its accessible name.\n\n### Applied to\n- Any element whose text is replaced visually by an icon or other presentation.\n\n### Examples\n- Keep an icon-only control's name available to assistive technology:\n  ```html\n  <button type=\"button\"><span data-visually-hidden>Open menu</span>☰</button>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-visually-hidden]`"
 		}
