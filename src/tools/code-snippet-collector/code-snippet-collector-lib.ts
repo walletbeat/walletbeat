@@ -11,8 +11,8 @@ import {
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
 import { collectAllRefs } from '@/schema/reference'
-import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 import { commonWhitespacePrefix } from '@/types/utils/text'
+import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 
 /** Lines of context stored immediately before/after the referenced range. */
 const CONTEXT_LINE_COUNT = 4
@@ -236,47 +236,46 @@ export function buildSnippetContent(fileText: string, source: CodeSnippetSource)
 	return JSON.stringify(content, null, '\t') + '\n'
 }
 
-/**
- * Parse a stored `.snippet` file's contents, or return null when it isn't
- * valid JSON matching `StoredSnippetContent`'s shape (including the old
- * flat-text format this replaces).
- */
-export function parseStoredSnippetContent(contents: string): StoredSnippetContent | null {
-	let parsed: unknown
-
-	try {
-		parsed = JSON.parse(contents)
-	} catch {
-		return null
+/** Type predicate for a single segment's raw JSON shape. */
+function isStoredSnippetSegment(segment: unknown): segment is StoredSnippetSegment {
+	if (typeof segment !== 'object' || segment === null) {
+		return false
 	}
+
+	const { startLine, lines } = segment as Partial<StoredSnippetSegment>
+
+	return (
+		typeof startLine === 'number' &&
+		Array.isArray(lines) &&
+		lines.every(line => typeof line === 'string')
+	)
+}
+
+/**
+ * Parse a stored `.snippet` file's contents. Throws when it isn't valid JSON
+ * matching `StoredSnippetContent`'s shape (including the old flat-text
+ * format this replaces, which fails JSON parsing outright).
+ */
+export function parseStoredSnippetContent(contents: string): StoredSnippetContent {
+	const parsed: unknown = JSON.parse(contents)
 
 	if (typeof parsed !== 'object' || parsed === null) {
-		return null
+		throw new Error('Stored snippet JSON is not an object.')
 	}
 
-	const candidate = parsed as Partial<StoredSnippetContent>
+	const { highlightFirstLine, highlightLastLine, segments } =
+		parsed as Partial<StoredSnippetContent>
 
 	if (
-		typeof candidate.highlightFirstLine !== 'number' ||
-		typeof candidate.highlightLastLine !== 'number' ||
-		!Array.isArray(candidate.segments) ||
-		!candidate.segments.every(
-			(segment): segment is StoredSnippetSegment =>
-				typeof segment === 'object' &&
-				segment !== null &&
-				typeof segment.startLine === 'number' &&
-				Array.isArray(segment.lines) &&
-				segment.lines.every((line: unknown) => typeof line === 'string'),
-		)
+		typeof highlightFirstLine !== 'number' ||
+		typeof highlightLastLine !== 'number' ||
+		!Array.isArray(segments) ||
+		!segments.every(isStoredSnippetSegment)
 	) {
-		return null
+		throw new Error('Stored snippet JSON does not match the expected shape.')
 	}
 
-	return {
-		highlightFirstLine: candidate.highlightFirstLine,
-		highlightLastLine: candidate.highlightLastLine,
-		segments: candidate.segments,
-	}
+	return { highlightFirstLine, highlightLastLine, segments }
 }
 
 /** Fetch the full source file for a snippet from raw.githubusercontent.com. */
@@ -351,11 +350,13 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 		}
 
 		const contents = fs.readFileSync(absolutePath, 'utf8')
-		const parsed = parseStoredSnippetContent(contents)
+		let parsed: StoredSnippetContent
 
-		if (parsed === null) {
+		try {
+			parsed = parseStoredSnippetContent(contents)
+		} catch (error) {
 			problems.push({
-				issue: 'Snippet is not valid stored-snippet JSON (stale/old format).',
+				issue: `Snippet is not valid stored-snippet JSON: ${error instanceof Error ? error.message : String(error)}`,
 				kind: SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 				snippetPath,
 			})

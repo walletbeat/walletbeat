@@ -42,17 +42,22 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 
 	if (fs.existsSync(absolutePath)) {
 		const contents = fs.readFileSync(absolutePath, 'utf8')
-		const parsed = parseStoredSnippetContent(contents)
+		let reason = 'mismatched content'
 
-		if (
-			parsed !== null &&
-			parsed.highlightFirstLine === source.firstLine &&
-			parsed.highlightLastLine === source.lastLine
-		) {
-			return
+		try {
+			const parsed = parseStoredSnippetContent(contents)
+
+			if (
+				parsed.highlightFirstLine === source.firstLine &&
+				parsed.highlightLastLine === source.lastLine
+			) {
+				return
+			}
+		} catch (error) {
+			reason = error instanceof Error ? error.message : String(error)
 		}
 
-		process.stderr.write(`Refetching (stale or mismatched content): ${relativePath}\n`)
+		process.stderr.write(`Refetching (${reason}): ${relativePath}\n`)
 	}
 
 	const fileText = await fetchSourceFileCached(source)
