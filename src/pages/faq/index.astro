@@ -300,7 +300,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 						data-card='padding-5 radius-4'
 						data-sticky-container
 						data-sticky-breadcrumb='scope'
-						style={`--stickyBreadcrumb-entryTimeline: --faq-${index}-entry`}
+						style={`--stickyBreadcrumb-entryTimeline: --faq-${index}-entry; --stickyBreadcrumb-exitTimeline: --faq-${index}-exit`}
 					>
 						<summary
 							data-sticky='block block-start backdrop-before backdrop-stuck'
@@ -347,6 +347,9 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		--stickyBreadcrumb-forceRow: 1;
 		--stickyBreadcrumb-scale: calc(0.875rem / 1rem);
 		--stickyBreadcrumb-paddingBlock: calc(0.5rem * sqrt(1rem / 1.5rem));
+		--stickyBreadcrumb-nativeBlockSize: calc(
+			0.875rem * 1.4 + 2 * var(--stickyBreadcrumb-paddingBlock)
+		);
 	}
 
 	hgroup p {

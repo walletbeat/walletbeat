@@ -69,7 +69,7 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 							id={news.slug}
 							data-sticky-container
 							data-sticky-breadcrumb='scope'
-							style={`--stickyBreadcrumb-entryTimeline: --news-${index}-entry`}
+							style={`--stickyBreadcrumb-entryTimeline: --news-${index}-entry; --stickyBreadcrumb-exitTimeline: --news-${index}-exit`}
 						>
 							<details data-card='padding-6' data-column='gap-6'>
 								<summary
@@ -250,6 +250,9 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 		--stickyBreadcrumb-forceRow: 1;
 		--stickyBreadcrumb-scale: calc(sqrt(1.5rem * 1rem) / 1.5rem);
 		--stickyBreadcrumb-paddingBlock: calc(0.5rem * sqrt(1rem / 1.5rem));
+		--stickyBreadcrumb-nativeBlockSize: calc(
+			sqrt(1.5rem * 1rem) * 1.4 + 2 * var(--stickyBreadcrumb-paddingBlock)
+		);
 	}
 
 	article {

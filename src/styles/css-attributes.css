@@ -9,8 +9,7 @@
  *
  * ### Tokens
  * - `camouflaged`, `contents`.
- * - `shared`: links with the same destination share native hover, focus and current presentation.
- * - `state`: consume shared destination state on a non-link paint owner without link chrome.
+ * - `shared` and `state` are derived at runtime for same-destination links; do not author them.
  *
  * ### CSS Variables
  * - `--text-primary`
@@ -260,6 +259,11 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	inherits: false;
 	initial-value: 0px;
 }
+@property --icon-scale {
+	syntax: "<number>";
+	inherits: true;
+	initial-value: 1;
+}
 
 /**
  * ## [data-icon]
@@ -443,8 +447,6 @@ span svg {
  * - composition: `span-start`
  *
  * ### CSS Variables
- * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
- * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
  * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
  * - `--column-spanSize`: icon span override; defaults to the heading and supporting line heights plus their gap
  * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
@@ -469,18 +471,6 @@ span svg {
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`
  */
-@property --card-borderWidth {
-	syntax: '<length>';
-	inherits: true;
-	initial-value: 2px;
-}
-
-@property ---column-gap {
-	syntax: '<length>';
-	inherits: true;
-	initial-value: 0px;
-}
-
 [data-column],
 [data-card] {
 	display: flex;
@@ -590,12 +580,6 @@ span svg {
 	}
 }
 
-@property ---column-spanSize {
-	syntax: '<length>';
-	inherits: true;
-	initial-value: 0px;
-}
-
 [data-column~="span-start"] {
 	---column-sizeTimelines: --column-inline-size, --column-block-size;
 	---column-spanSize: var(
@@ -640,12 +624,12 @@ span svg {
 		}
 
 		> :not([data-icon], [data-row-item~="flexible"]) {
-			font-size: var(--column-supportFontSize, 1rem);
+			font-size: 1rem;
 		}
 	}
 
 	> :not([data-row]) {
-		font-size: var(--column-supportFontSize, 1rem);
+		font-size: 1rem;
 		line-height: var(--column-supportLineHeight, 1rlh);
 	}
 
@@ -696,7 +680,7 @@ span svg {
 		---column-break: clamp(
 			0,
 			sign(
-				var(--column-wrapRatio, 4) - (100vw * (1 / var(---column-inlineFraction) - 1)) /
+				4 - (100vw * (1 / var(---column-inlineFraction) - 1)) /
 					max(1px, 100vw * (1 / var(---column-blockFraction) - 1))
 			),
 			1
@@ -905,7 +889,6 @@ summary {
  * - `--card-backgroundColor`
  * - `--card-radius`
  * - `--card-padding`
- * - `--card-borderWidth`: accent border width; defaults to 2px
  *
  * ### Examples
  * - Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):
@@ -990,7 +973,7 @@ summary {
 	}
 
 	&[data-card~="border-accent"] {
-		border: var(--card-borderWidth) solid color-mix(in srgb, var(--accent) 90%, transparent);
+		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
 	}
 }
 
@@ -1424,7 +1407,7 @@ ol {
  * ### CSS Variables
  * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, canonical names at the root, entry-derived names when globally scoped
  * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, canonical names at the root, entry-derived names when globally scoped
- * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for a repeated animated scope; roots use the canonical root timeline; `auto` at an item forces its compact presentation
+ * - `--stickyBreadcrumb-entryTimeline`, `--stickyBreadcrumb-exitTimeline`: unique native entry and exit view timelines required for a repeated animated scope; roots use canonical timelines; `auto` at an item forces its compact presentation
  * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% entry-crossing 100%`
  * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
  * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
@@ -1444,7 +1427,7 @@ ol {
  * ### Examples
  * - Native heading and its natural-flow boundary:
  *   ```html
- *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry">
+ *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry; --stickyBreadcrumb-exitTimeline: --section-exit">
  *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
  *       <div data-row data-sticky="block block-start">
  *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
@@ -1477,6 +1460,10 @@ ol {
 	position: relative;
 	display: flex;
 	align-items: center;
+	&:where(h4 > a:first-child) {
+		/* The out-of-flow marker must not enlarge WebKit's horizontal scroll area. */
+		contain: inline-size;
+	}
 
 	&::before {
 		content: '#';
@@ -1502,7 +1489,7 @@ ol {
 
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
 	/* Scope descendant clocks above their animation targets. Local clocks derive unique names from their arrival identity. */
 	@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 		body {
@@ -1661,12 +1648,10 @@ ol {
 				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)));
 		}
 	}
-	/* The unregistered scale switches halfway to the 40% stop (~20% overall), near the 32px painted-size crossing. */
 	@keyframes breadcrumb-icon-detail {
 		from {
 			--icon-scale: 1;
 		}
-		40%,
 		to {
 			--icon-scale: calc((var(---column-spanSize) + var(---breadcrumb-iconCorrection)) * var(--stickyBreadcrumb-scale) / var(--icon-size));
 		}
@@ -1691,13 +1676,19 @@ ol {
 	@keyframes breadcrumb-exit {
 		from {
 			transform: translateY(0px);
+			opacity: 1;
+		}
+		20% {
+			opacity: 0;
 		}
 		to {
 			transform: translateY(calc(var(---breadcrumb-blockStart) - var(---breadcrumb-blockEnd)));
+			opacity: 0;
 		}
 	}
 	[data-sticky-breadcrumb~="root"] {
 		--stickyBreadcrumb-entryTimeline: --breadcrumb-root-entry;
+		--stickyBreadcrumb-exitTimeline: --breadcrumb-root-exit;
 	}
 	/* Fragment targets retain their parent inset even when their disclosure is closed. */
 	[data-sticky-breadcrumb~="scope"] {
@@ -1773,9 +1764,11 @@ ol {
 		[data-sticky-breadcrumb~="scope"] {
 			--stickyBreadcrumb-entryRange: exit-crossing 0% entry-crossing 100%;
 			/* Only the visual row departs; supporting content retains its ordinary opacity. */
-			--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeInOutExpo) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
+			--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto var(--transition-easeOutExpo) both;
+			---breadcrumb-backdropExitAnimation: breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
 			@media (prefers-reduced-motion: reduce) {
-				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both, breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
+				--stickyBreadcrumb-exitAnimation: breadcrumb-exit auto steps(1, end) both;
+				---breadcrumb-backdropExitAnimation: breadcrumb-backdrop auto var(--transition-easeInExpo) reverse both;
 			}
 			--stickyBreadcrumb-itemInlineTimeline: --breadcrumb-item-inline;
 			--stickyBreadcrumb-itemBlockTimeline: --breadcrumb-item-block;
@@ -1783,7 +1776,6 @@ ol {
 			--stickyBreadcrumb-endBlockTimeline: --breadcrumb-end-block;
 			---breadcrumb-rowInlineTimeline: --breadcrumb-row-inline;
 			---breadcrumb-rowBlockTimeline: --breadcrumb-row-block;
-			---breadcrumb-exitTimeline: --breadcrumb-exit;
 			---breadcrumb-itemTimelines: var(--stickyBreadcrumb-itemInlineTimeline), var(--stickyBreadcrumb-itemBlockTimeline);
 			---breadcrumb-sizeTimelines:
 				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-endInlineTimeline), var(--stickyBreadcrumb-endBlockTimeline),
@@ -1792,7 +1784,9 @@ ol {
 			container-type: inline-size;
 			anchor-scope:
 				--breadcrumb-source, --breadcrumb-end, --breadcrumb-position, --breadcrumb-compact, --column-firstRow;
-			timeline-scope: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline);
+			timeline-scope:
+				var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline),
+				var(--stickyBreadcrumb-exitTimeline);
 			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 				--stickyBreadcrumb-itemInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-inline");
 				--stickyBreadcrumb-itemBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-item-block");
@@ -1800,17 +1794,14 @@ ol {
 				--stickyBreadcrumb-endBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-end-block");
 				---breadcrumb-rowInlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-inline");
 				---breadcrumb-rowBlockTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-row-block");
-				---breadcrumb-exitTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-exit");
-				timeline-scope: var(--stickyBreadcrumb-entryTimeline);
+				timeline-scope: var(--stickyBreadcrumb-entryTimeline), var(--stickyBreadcrumb-exitTimeline);
 			}
-			view-timeline: var(---breadcrumb-exitTimeline) block;
-			view-timeline-inset: 0;
 			---breadcrumb-sizeAnimationNames:
 				breadcrumb-item-inline, breadcrumb-item-block, breadcrumb-end-inline, breadcrumb-end-block,
 				column-inline-size, column-block-size;
 			---breadcrumb-sourceOffsetBlock: 0px;
 			&[data-card~="border-accent"] {
-				---breadcrumb-sourceOffsetBlock: var(--card-borderWidth);
+				---breadcrumb-sourceOffsetBlock: 2px;
 			}
 			/* Sizes belong to the scope; changing arrival progress belongs to its heading. */
 			animation: none auto linear both;
@@ -1824,6 +1815,7 @@ ol {
 			---breadcrumb-parentBlockStart: var(---breadcrumb-blockStart);
 			--stickyBreadcrumb-forceRow: 0;
 			--stickyBreadcrumb-minBlockSize: 0px;
+			---breadcrumb-layerBase: 1000;
 			---breadcrumb-hasEnd: 0;
 			&:has(
 				> [data-sticky-breadcrumb~="position"] [data-sticky-breadcrumb~="end"],
@@ -1854,7 +1846,6 @@ ol {
 			}
 			> * {
 				---breadcrumb-endInlineGap: calc(var(---breadcrumb-hasEnd) * var(--stickyBreadcrumb-gap, 1rem));
-				---breadcrumb-endBlockGap: calc(var(---breadcrumb-hasEnd) * var(--column-supportGap, 0.5rem));
 				---breadcrumb-availableInlineSize: min(
 					var(--stickyBreadcrumb-availableInlineSize, 100cqi),
 					calc(100cqi - var(--stickyBreadcrumb-sourcePaddingInline))
@@ -1883,7 +1874,7 @@ ol {
 						var(---breadcrumb-endWrap) *
 						(
 							var(---breadcrumb-compactItemHeight) + var(---breadcrumb-endHeight) +
-								var(---breadcrumb-endBlockGap)
+								calc(var(---breadcrumb-hasEnd) * var(--column-supportGap, 0.5rem))
 						)
 				);
 				---breadcrumb-wrap: max(
@@ -1953,7 +1944,8 @@ ol {
 				&[data-sticky-breadcrumb~="exit"] {
 					inset-block-start: calc(100% + var(---breadcrumb-sourceOffsetBlock) - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight));
 					block-size: var(---breadcrumb-rowHeight);
-					view-timeline-name: none;
+					view-timeline-name: var(--stickyBreadcrumb-exitTimeline);
+					view-timeline-inset: 0;
 					&::after {
 						inset-block-start: 100%;
 					}
@@ -1966,7 +1958,7 @@ ol {
 				---breadcrumb-entry: 0;
 				/* Adjacent items clear their parent horizontally before entering its text line. */
 				---breadcrumb-inlineEasing: var(--stickyBreadcrumb-inlineEasing, if(
-					style(---breadcrumb-wrap: 0): cubic-bezier(0.5, 0, 0, 1);
+					style(---breadcrumb-wrap: 0): var(--transition-easeOutExpo);
 					else: var(--transition-easeInOutExpo)
 				));
 				--sticky-insetBlockStart: if(
@@ -1987,10 +1979,10 @@ ol {
 				}
 				animation-timeline:
 					var(--stickyBreadcrumb-entryTimeline),
-					view(block var(--sticky-insetBlockStart) 0px);
+					var(--stickyBreadcrumb-exitTimeline);
 				animation-range:
 					var(--stickyBreadcrumb-entryRange),
-					exit 0% exit calc(100% + var(--sticky-insetBlockStart) - var(---breadcrumb-blockEnd));
+					var(---breadcrumb-exitRange);
 				&:is(summary):has(> [data-column~="span-start"]) {
 					align-items: start;
 					> [data-column~="span-start"] {
@@ -2004,7 +1996,7 @@ ol {
 					}
 				}
 
-				---breadcrumb-exitRange: exit calc(100% - var(---breadcrumb-blockEnd) - var(---breadcrumb-rowHeight)) exit calc(100% - var(---breadcrumb-blockEnd));
+				---breadcrumb-exitRange: exit-crossing 0% exit-crossing 100%;
 
 				---breadcrumb-sourceRowWidth: calc(100vw * (1 / var(---column-inlineFraction, 1) - 1));
 				---breadcrumb-sourceRowHeight: calc(100vw * (1 / var(---column-blockFraction, 1) - 1));
@@ -2017,6 +2009,8 @@ ol {
 				> header[data-column~="span-start"] > :not([data-row]),
 				[data-sticky-breadcrumb~="support"] {
 					/* Counter-motion preserves natural content travel while its container remains sticky. */
+					position: relative;
+					z-index: -2;
 					---breadcrumb-supportOffset: calc(
 						var(---breadcrumb-blockEnd) - var(--sticky-insetBlockStart) -
 						var(--stickyBreadcrumb-sourcePaddingBlock) - var(---breadcrumb-sourceRowHeight) - var(---column-gap)
@@ -2048,7 +2042,7 @@ ol {
 				[data-row]:has(> [data-sticky-breadcrumb~="source"]),
 				[data-sticky-breadcrumb~="source"]:not([data-row] > [data-sticky-breadcrumb~="source"]) {
 					animation: var(--stickyBreadcrumb-exitAnimation);
-					animation-timeline: var(---breadcrumb-exitTimeline);
+					animation-timeline: var(--stickyBreadcrumb-exitTimeline);
 					animation-range: var(---breadcrumb-exitRange);
 					---breadcrumb-iconCorrection: 0px;
 					&:has(
@@ -2792,11 +2786,14 @@ ol {
 					position: absolute;
 					inset: 0;
 					border-radius: inherit;
+					pointer-events: none;
 				}
 				&[data-sticky-breadcrumb~="position"][data-sticky~="backdrop-stuck"]:not(details:not([open]) *) {
 					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size)
-						and (color: if(style(---breadcrumb-wrap: 1): red)) {
+						and (color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
+						/* Deeper rows stay below shallower backdrops; adjacent rows share an offset and paint in document order. */
+						z-index: calc(var(---breadcrumb-layerBase) - var(---breadcrumb-blockStart) / 1px);
 						&[data-sticky~="backdrop-before"]::before,
 						&[data-sticky~="backdrop-after"]::after {
 							/* Arrival and row bounds belong to this breadcrumb, including native-query fallbacks. */
@@ -2814,8 +2811,8 @@ ol {
 								animation-range: var(--stickyBreadcrumb-entryRange);
 								@container style(---breadcrumb-entry: 1) {
 									opacity: 1;
-									animation: var(--stickyBreadcrumb-exitAnimation);
-									animation-timeline: var(---breadcrumb-exitTimeline);
+									animation: var(---breadcrumb-backdropExitAnimation);
+									animation-timeline: var(--stickyBreadcrumb-exitTimeline);
 									animation-range: var(---breadcrumb-exitRange);
 								}
 							}
@@ -2824,7 +2821,6 @@ ol {
 				}
 			}
 		}
-
 		/**
 		 * Scroll/sticky subtree helpers on children of `[data-sticky-container]`: wide figures (`inline-detached` + padding match), attached rows, scroll snap, max intrinsic sizes, and overflow alignment. Many rules read `--sticky-sizeInline` and padding variables from the enclosing sticky layout.
 		 *
@@ -2971,7 +2967,11 @@ ol {
 
 @supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-	(color: if(style(---breadcrumb-wrap: 1): red))) {
+	(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state)) {
+	[data-sticky-breadcrumb~="scope"] [data-sticky] {
+		/* An outgoing inner row passes behind every outer fallback row it is leaving. */
+		z-index: calc(1000 - var(--sticky-level));
+	}
 	[data-sticky-breadcrumb~="scope"][data-sticky-container],
 	[data-sticky-breadcrumb~="scope"] [data-sticky-container]:has(> summary[data-sticky]) {
 		--sticky-paddingBlockStart: var(--stickyBreadcrumb-nativeBlockSize, 5rem);
@@ -3003,6 +3003,8 @@ ol {
 			padding-inline-start: var(--card-padding, var(--scrollItem-paddingInlineStart, 0px));
 			padding-inline-end: var(--card-padding, var(--scrollItem-paddingInlineEnd, 0px));
 			align-content: center;
+			background: var(---sticky-background);
+			backdrop-filter: var(---sticky-backdropFilter);
 		}
 		> [data-column] > :not([data-sticky]) {
 			padding-inline: var(--card-padding, 0px);
@@ -3013,7 +3015,6 @@ ol {
 		block-size: var(--sticky-paddingBlockStart);
 		padding-block: var(--stickyBreadcrumb-paddingBlock, 0.5rem);
 	}
-
 	[data-sticky-breadcrumb~="scope"] > details:has(> [data-sticky-breadcrumb~="position"]) {
 		display: grid;
 		grid-template: auto auto auto / minmax(0, 1fr);
@@ -3048,7 +3049,7 @@ ol {
 
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 	(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-	(color: if(style(---breadcrumb-wrap: 1): red)) {
+	(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
 	[data-sticky-breadcrumb~="scope"][data-sticky-container] {
 		isolation: auto;
 	}

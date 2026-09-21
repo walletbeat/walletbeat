@@ -171,24 +171,17 @@
 
 	// Resolve link identity once per rendered evaluation; CSS owns every presentation state.
 	function shareLinkDestinations(container: HTMLElement) {
-		const links = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href]'))
 		const destinations = new Map<string, number>()
-		const localLinks = links.filter(link => {
-			try {
-				const url = new URL(link.href)
-				return (
-					url.origin === location.origin &&
-					url.pathname === location.pathname &&
-					url.search === location.search &&
-					url.hash.length > 1
-				)
-			} catch {
-				return false
-			}
-		})
+		const localLinks = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href]')).filter(
+			link =>
+				link.origin === location.origin &&
+				link.pathname === location.pathname &&
+				link.search === location.search &&
+				link.hash.length > 1,
+		)
 		const counts = new Map<string, number>()
-		for (const link of localLinks) counts.set(link.href, (counts.get(link.href) ?? 0) + 1)
-		for (const [href, count] of counts) if (count > 1) destinations.set(href, destinations.size)
+		for (const link of localLinks) counts.set(link.hash, (counts.get(link.hash) ?? 0) + 1)
+		for (const [hash, count] of counts) if (count > 1) destinations.set(hash, destinations.size)
 		const states = ['hover', 'focus', 'current'] as const
 		const names = (index: number) => states.map(state => `--link-${state}-${index}`)
 		container.style.setProperty(
@@ -196,9 +189,10 @@
 			[...destinations.values()].flatMap(names).join(', '),
 		)
 		const paintOwners = new Map<HTMLElement, string | null>()
-		const originals = localLinks.map(link => {
+		const sharedLinks: { link: HTMLAnchorElement; original: string | null }[] = []
+		for (const link of localLinks) {
 			const original = link.getAttribute('data-link')
-			const index = destinations.get(link.href)
+			const index = destinations.get(link.hash)
 			const target = localHashTarget(link.hash)
 			const header = target?.matches('.attribute-group, .attribute')
 				? target.querySelector<HTMLElement>('header > [data-row]')
@@ -214,9 +208,7 @@
 					owner.style.setProperty(`--link-${state}`, `--link-${state}-${index}`)
 			}
 			const parent = target?.parentElement?.closest('.attribute-group')
-			const parentIndex = parent
-				? destinations.get(new URL(`#${parent.id}`, link.href).href)
-				: undefined
+			const parentIndex = parent ? destinations.get(`#${parent.id}`) : undefined
 			const sourceIndexes = [index, parentIndex].filter(
 				(value): value is number => value !== undefined,
 			)
@@ -230,9 +222,9 @@
 						sourceIndexes.map(value => `--link-${state}-${value}`).join(', '),
 					)
 				}
+				sharedLinks.push({ link, original })
 			}
-			return { link, original }
-		})
+		}
 		return () => {
 			container.style.removeProperty('--link-timelines')
 			for (const [owner, original] of paintOwners) {
@@ -240,7 +232,7 @@
 				else owner.setAttribute('data-link', original)
 				for (const state of states) owner.style.removeProperty(`--link-${state}`)
 			}
-			for (const { link, original } of originals) {
+			for (const { link, original } of sharedLinks) {
 				if (original === null) link.removeAttribute('data-link')
 				else link.setAttribute('data-link', original)
 				for (const state of states) {
@@ -854,6 +846,7 @@
 				data-sticky-container
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
+				style:--stickyBreadcrumb-exitTimeline="--stages-exit"
 			>
 				<span class="pie-compact-marker" aria-hidden="true"></span>
 				<header
@@ -998,6 +991,7 @@
 			data-sticky-breadcrumb="scope"
 			data-sticky-container
 			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
+			style:--stickyBreadcrumb-exitTimeline={`--${groupTargetId(attrGroup)}-exit`}
 			data-scroll-item="inline-detached padding-match-end flow"
 		>
 			{#if !showStage && pieNavigationItems[0]?.href === `#${groupTargetId(attrGroup)}`}
@@ -1111,6 +1105,7 @@
 		data-sticky-breadcrumb="scope"
 		data-sticky-container
 		style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-entry`}
+		style:--stickyBreadcrumb-exitTimeline={`--${slugifyCamelCase(attribute.id)}-exit`}
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
@@ -1379,6 +1374,7 @@
 						data-sticky-container
 						data-sticky-breadcrumb="scope"
 						style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-why-entry`}
+						style:--stickyBreadcrumb-exitTimeline={`--${slugifyCamelCase(attribute.id)}-why-exit`}
 					>
 						<summary
 							data-sticky="block block-start backdrop-before backdrop-stuck"
@@ -1417,6 +1413,7 @@
 						data-sticky-container
 						data-sticky-breadcrumb="scope"
 						style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-methodology-entry`}
+						style:--stickyBreadcrumb-exitTimeline={`--${slugifyCamelCase(attribute.id)}-methodology-exit`}
 					>
 						<summary
 							data-sticky="block block-start backdrop-before backdrop-stuck"
@@ -1490,6 +1487,7 @@
 							data-sticky-container
 							data-sticky-breadcrumb="scope"
 							style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-improvement-entry`}
+							style:--stickyBreadcrumb-exitTimeline={`--${slugifyCamelCase(attribute.id)}-improvement-exit`}
 						>
 							<summary
 								data-sticky="block block-start backdrop-before backdrop-stuck"
@@ -1640,7 +1638,7 @@
 
 				@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-					(color: if(style(---breadcrumb-wrap: 1): red))) {
+					(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state)) {
 					position: sticky;
 					inset-block-start: var(--navigation-mobile-blockSize);
 					align-self: start;
@@ -1685,7 +1683,7 @@
 					}
 					@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 						(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-						(color: if(style(---breadcrumb-wrap: 1): red)) {
+						(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
 						/* The independent pie stays outside the popover's paint and hit region. */
 						clip-path: polygon(
 							0 0,
@@ -1763,7 +1761,7 @@
 
 	@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-		(color: if(style(---breadcrumb-wrap: 1): red))) {
+		(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state)) {
 		.container {
 			---wallet-name-flow-font-size: 1.25rem;
 			---wallet-group-heading-font-size: 1.125rem;
@@ -1859,12 +1857,6 @@
 		initial-value: 0;
 	}
 
-	@property ---slice-mid-angle {
-		syntax: '<angle>';
-		inherits: true;
-		initial-value: 0turn;
-	}
-
 	.container > article > button,
 	[data-sticky-breadcrumb~="root"] > footer {
 		display: flex;
@@ -1951,7 +1943,8 @@
 			}
 
 			display: block;
-			z-index: 3;
+			/* Stay above the offset-derived breadcrumb layers while occupying their reserved cutout. */
+			z-index: calc(var(---breadcrumb-layerBase) + 1);
 			position: sticky;
 			align-self: start;
 			flex-shrink: 0;
@@ -2136,7 +2129,7 @@
 				}
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-					(color: if(style(---breadcrumb-wrap: 1): red)) {
+					(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
 					--sticky0-insetBlockStart: 0px;
 					--sticky-insetBlockStart: 0px;
 				}
@@ -2147,7 +2140,7 @@
 
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-					(color: if(style(---breadcrumb-wrap: 1): red)) {
+					(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
 					position: relative;
 					inset: auto;
 					anchor-name: --wallet-pie-source;
@@ -2212,12 +2205,14 @@
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
 			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
-			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), --wallet-pie-compact;
+			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline),
+			var(--stickyBreadcrumb-exitTimeline), --wallet-pie-compact;
 		@media (width > 1024px) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
 				var(---breadcrumb-itemTimelines), var(--stickyBreadcrumb-entryTimeline),
-				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+				var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline),
+				var(--stickyBreadcrumb-exitTimeline);
 		}
 	}
 
@@ -2227,12 +2222,6 @@
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
 				--wallet-pie-compact;
 		}
-	}
-
-	@property --wallet-icon-size {
-		syntax: '<length>';
-		inherits: true;
-		initial-value: 0;
 	}
 
 	[data-sticky-breadcrumb~="root"] > [data-sticky-breadcrumb~="position"] {
@@ -2483,7 +2472,7 @@
 
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-		(color: if(style(---breadcrumb-wrap: 1): red)) {
+		(color: if(style(---breadcrumb-wrap: 1): red)) and (container-type: scroll-state) {
 		@media (width <= 1024px) {
 			@scope (:root) to (details:not([open]), [data-sticky-breadcrumb~="scope"]:has(> details:not([open]))) {
 				[data-sticky-breadcrumb~="root"]
@@ -2493,7 +2482,8 @@
 					}
 					---pie-inlineTimeline: --pie-inline;
 					timeline-scope:
-						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-entryTimeline), var(---pie-inlineTimeline);
+						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-exitTimeline),
+						var(---pie-inlineTimeline);
 					@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 						---pie-inlineTimeline: ident(var(--stickyBreadcrumb-entryTimeline) "-pie-inline");
 						timeline-scope: var(--stickyBreadcrumb-entryTimeline);
@@ -2506,7 +2496,9 @@
 				}
 				[data-sticky-breadcrumb~="root"]
 					:global(:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"]) {
-					timeline-scope: var(---breadcrumb-sizeTimelines), var(---pie-inlineTimeline);
+					timeline-scope:
+						var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-exitTimeline),
+						var(---pie-inlineTimeline);
 					@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 						timeline-scope: none;
 					}
@@ -2618,7 +2610,7 @@
 		}
 		:is(.attribute-group, .attribute)[data-sticky-breadcrumb~="scope"] {
 			/* Arrival clocks are shared with the pie at their common wallet-page owner. */
-			timeline-scope: var(---breadcrumb-sizeTimelines);
+			timeline-scope: var(---breadcrumb-sizeTimelines), var(--stickyBreadcrumb-exitTimeline);
 			@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 				timeline-scope: none;
 			}

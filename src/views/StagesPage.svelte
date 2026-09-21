@@ -48,6 +48,7 @@
 				data-sticky-container
 				data-sticky-breadcrumb="scope"
 				style:--stickyBreadcrumb-entryTimeline={`--stages-page-stage-${index}-entry`}
+				style:--stickyBreadcrumb-exitTimeline={`--stages-page-stage-${index}-exit`}
 			>
 				<header
 					data-sticky="block block-start backdrop-before backdrop-stuck"

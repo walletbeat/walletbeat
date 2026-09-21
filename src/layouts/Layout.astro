@@ -144,14 +144,6 @@ import Footer from '@/views/Footer.astro'
 </html>
 
 <style>
-	/* Fixed metric timelines use viewport coordinates; content retains its native direction. */
-	:root:has([data-sticky-breadcrumb~="root"]) {
-		direction: ltr;
-		body:dir(rtl) {
-			direction: rtl;
-		}
-	}
-
 	#layout {
 		/* Constants */
 		--navigation-desktop-inlineSize: min(20rem, 320px);
@@ -317,7 +309,7 @@ import Footer from '@/views/Footer.astro'
 	/* The site logo and wallet identity share native widths and arrival at Layout. */
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 		(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
-		(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) {
+		(color: if(style(---breadcrumb-wrap: 1): red; else: blue)) and (container-type: scroll-state) {
 		@media (width <= 1024px) {
 			body:has([data-sticky-breadcrumb~="navigation"]) {
 				timeline-scope: --breadcrumb-root-item-block;

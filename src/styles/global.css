@@ -147,10 +147,6 @@
 	touch-action: none;
 }
 
-:not(pre) > code {
-	overflow-wrap: anywhere;
-}
-
 /* Physical transforms follow the native inline direction of each direction owner. */
 :root,
 [dir] {
@@ -271,5 +267,4 @@ h5,
 h6 {
 	text-box: trim-both auto;
 	text-wrap: balance;
-	overflow-wrap: break-word;
 }

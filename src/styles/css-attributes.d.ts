@@ -49,7 +49,6 @@ declare global {
 		 * - `--card-backgroundColor`
 		 * - `--card-radius`
 		 * - `--card-padding`
-		 * - `--card-borderWidth`: accent border width; defaults to 2px
 		 *
 		 * ### Examples
 		 * - Default surface (primary background, `0.5em` radius, `1em` padding — omit tokens):
@@ -116,8 +115,6 @@ declare global {
 		 * - composition: `span-start`
 		 *
 		 * ### CSS Variables
-		 * - `--column-wrapRatio`: first-row ratio below which copy spans the full width; defaults to 4
-		 * - `--column-supportFontSize`: supporting text and end-cluster size; defaults to 1rem
 		 * - `--column-supportLineHeight`: supporting text line height; defaults to 1rlh
 		 * - `--column-spanSize`: icon span override; defaults to the heading and supporting line heights plus their gap
 		 * - `--column-supportGap`: gap between the first row and supporting copy; defaults to 0.5rem
@@ -239,8 +236,7 @@ declare global {
 		 *
 		 * ### Tokens
 		 * - `camouflaged`, `contents`.
-		 * - `shared`: links with the same destination share native hover, focus and current presentation.
-		 * - `state`: consume shared destination state on a non-link paint owner without link chrome.
+		 * - `shared` and `state` are derived at runtime for same-destination links; do not author them.
 		 *
 		 * ### CSS Variables
 		 * - `--text-primary`
@@ -667,7 +663,7 @@ declare global {
 		 * ### CSS Variables
 		 * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, canonical names at the root, entry-derived names when globally scoped
 		 * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, canonical names at the root, entry-derived names when globally scoped
-		 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for a repeated animated scope; roots use the canonical root timeline; `auto` at an item forces its compact presentation
+		 * - `--stickyBreadcrumb-entryTimeline`, `--stickyBreadcrumb-exitTimeline`: unique native entry and exit view timelines required for a repeated animated scope; roots use canonical timelines; `auto` at an item forces its compact presentation
 		 * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% entry-crossing 100%`
 		 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
 		 * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights
@@ -687,7 +683,7 @@ declare global {
 		 * ### Examples
 		 * - Native heading and its natural-flow boundary:
 		 *   ```html
-		 *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry">
+		 *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry; --stickyBreadcrumb-exitTimeline: --section-exit">
 		 *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
 		 *       <div data-row data-sticky="block block-start">
 		 *         <div data-sticky-breadcrumb="source" data-row-item="flexible">

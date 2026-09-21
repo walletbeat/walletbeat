@@ -124,6 +124,7 @@
 					data-sticky-breadcrumb="scope"
 					data-sticky-container
 					style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-entry`}
+					style:--stickyBreadcrumb-exitTimeline={`--stage-${stageIndex}-exit`}
 				>
 					<details open data-column="gap-0">
 						<summary
@@ -197,6 +198,7 @@
 											data-sticky-container
 											data-sticky-breadcrumb="scope"
 											style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-group-${criteriaGroupIndex}-entry`}
+											style:--stickyBreadcrumb-exitTimeline={`--stage-${stageIndex}-group-${criteriaGroupIndex}-exit`}
 											data-card="padding-5 secondary radius-4"
 											style:--accent={stageStatuses[groupRating].color}
 											style:--accent-textColor={stageStatuses[groupRating].textColor}

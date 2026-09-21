@@ -30,6 +30,7 @@
 	data-sticky-container
 	data-sticky-breadcrumb="scope"
 	style:--stickyBreadcrumb-entryTimeline="--security-news-entry"
+	style:--stickyBreadcrumb-exitTimeline="--security-news-exit"
 >
 	<details
 		data-card="radius-8 padding-6 border-accent"
