@@ -81,11 +81,11 @@ Walletbeat has received the following funding:
 
 - **2025-03**: Received **577.02 USD** from **Ethereum Foundation** as part of
   [Pectra Proactive Grant Round](https://esp.ethereum.foundation/pectra-pgr):
-  [Grant Proposal](/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round)
+  [Grant Proposal](/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round/proposal/proposal.md)
 - **2025-07**: Received **106,100 USD** from **Ethereum Foundation** as part of
   [Ethereum Foundation Trillion Dollar Security project](https://blog.ethereum.org/2025/08/20/trillion-dollar-sec-2):
-  [Grant Proposal](/governance/grants/2025-07-ethereum-foundation-esp-grant-proposal)
-- **2026-05**: Received **5,585 USD** and **9.2302 ETH** from **Giveth**, **The DAO**, and public donations as part of Giveth Ethereum Security Round: [Application](/governance/grants/2026-04-giveth-ethereum-security-qf-round), [Project page](https://qf.giveth.io/project/walletbeat), [Funds raised](https://docs.google.com/spreadsheets/d/1s8mUBHZIu2CRUVzkJ29g8aUek9g1iwCmz5hgVgdmORA/edit?gid=0)
+  [Grant Proposal](/governance/grants/2025-07-ethereum-foundation-esp-grant-proposal/proposal.md)
+- **2026-05**: Received **5,585 USD** and **9.2302 ETH** from **Giveth**, **The DAO**, and public donations as part of Giveth Ethereum Security Round: [Application](/governance/grants/2026-04-giveth-ethereum-security-qf-round/project-info.md), [Project page](https://qf.giveth.io/project/walletbeat), [Funds raised](https://docs.google.com/spreadsheets/d/1s8mUBHZIu2CRUVzkJ29g8aUek9g1iwCmz5hgVgdmORA/edit?gid=0)
 
 If further funding becomes a necessity in the future, Walletbeat aims to raise funds through
 retroactive funding, ecosystem grants, and individual donations. Walletbeat will then update
