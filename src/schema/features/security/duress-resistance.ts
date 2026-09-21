@@ -35,14 +35,32 @@ export function basicUnlockMechanismName(m: BasicUnlockMechanism): string {
 }
 
 /**
+ * Whether a given unlock mechanism is supported, and if so, whether the
+ * wallet requires it or merely offers it as one of several optional choices.
+ */
+export enum BasicUnlockMechanismSupport {
+	/** The wallet supports this unlock mechanism as an optional choice. */
+	OPTIONAL = 'OPTIONAL',
+
+	/** The wallet requires this unlock mechanism to unlock the wallet. */
+	REQUIRED = 'REQUIRED',
+}
+
+/** Data about a supported unlock mechanism: whether it is required or optional. */
+export interface BasicUnlockMechanismData {
+	/** Whether the wallet requires this unlock mechanism, or merely offers it as an option. */
+	type: BasicUnlockMechanismSupport
+}
+
+/**
  * Information about how the wallet locks itself against unauthorized access.
  */
 export interface BasicUnlock {
 	/**
-	 * Which unlock mechanisms the wallet supports.
-	 * Set each mechanism to `true` if supported, `false` if not.
+	 * Which unlock mechanisms the wallet supports, and whether each one is
+	 * required or merely optional.
 	 */
-	mechanisms: Record<BasicUnlockMechanism, boolean>
+	mechanisms: Record<BasicUnlockMechanism, Support<BasicUnlockMechanismData>>
 }
 
 /**

@@ -349,17 +349,17 @@
 
 	.step-number.passed {
 		background: color-mix(in srgb, var(--rating-pass) 20%, transparent);
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.step-number.partial {
 		background: color-mix(in srgb, var(--rating-partial) 20%, transparent);
-		color: var(--rating-partial);
+		color: var(--rating-partial-text);
 	}
 
 	.step-number.failed {
 		background: color-mix(in srgb, var(--rating-fail) 20%, transparent);
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.step-number.running {
@@ -445,12 +445,12 @@
 	}
 
 	.check-status.status-pass {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 		background: color-mix(in srgb, var(--rating-pass) 20%, transparent);
 	}
 
 	.check-status.status-fail {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		background: color-mix(in srgb, var(--rating-fail) 20%, transparent);
 	}
 
@@ -486,7 +486,7 @@
 		font-size: 0.6rem;
 		padding: 0.1rem 0.3rem;
 		background: color-mix(in srgb, var(--rating-fail) 20%, transparent);
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		border-radius: 0.2rem;
 		font-weight: 600;
 		text-transform: uppercase;
@@ -631,7 +631,7 @@
 		border: 1px solid color-mix(in srgb, var(--rating-fail) 30%, transparent);
 		border-radius: 0.5rem;
 		font-size: 0.8rem;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.completion-banner {
@@ -646,13 +646,13 @@
 	.completion-banner.success {
 		background: color-mix(in srgb, var(--rating-pass) 10%, transparent);
 		border: 1px solid color-mix(in srgb, var(--rating-pass) 30%, transparent);
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.completion-banner.failed {
 		background: color-mix(in srgb, var(--rating-fail) 10%, transparent);
 		border: 1px solid color-mix(in srgb, var(--rating-fail) 30%, transparent);
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.banner-icon {

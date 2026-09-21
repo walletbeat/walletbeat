@@ -547,7 +547,7 @@
 						white-space: nowrap;
 						text-align: center;
 						line-height: 1;
-						color: currentColor;
+						color: #fff;
 						font-size: calc(var(--slice-labelSize) * 1px);
 						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
@@ -556,7 +556,7 @@
 				}
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
-					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
+					filter: opacity(0.75) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
 				}
 			}
 

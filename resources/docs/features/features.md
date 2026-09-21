@@ -155,7 +155,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
-		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
+		permissionsManagement: VariantFeature<PermissionsManagementSupport>
 	}
 
 	/** Ecosystem features. */
@@ -288,7 +288,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `selfSovereignty` (object)
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
-  - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
+  - `permissionsManagement` (`ResolvedFeature<PermissionsManagementSupport>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `orderflowPractices` (`ResolvedFeature<OrderflowPractices>`)
@@ -2212,11 +2212,28 @@ Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is
 
 ---
 
+### Enum: `BasicUnlockMechanismSupport`
+
+Whether a given unlock mechanism is supported, and if so, whether the wallet requires it or merely offers it as one of several optional choices.
+
+- `OPTIONAL` = `'OPTIONAL'`: The wallet supports this unlock mechanism as an optional choice.
+- `REQUIRED` = `'REQUIRED'`: The wallet requires this unlock mechanism to unlock the wallet.
+
+---
+
+### Interface: `BasicUnlockMechanismData`
+
+Data about a supported unlock mechanism: whether it is required or optional.
+
+- `type` (`BasicUnlockMechanismSupport`): Whether the wallet requires this unlock mechanism, or merely offers it as an option.
+
+---
+
 ### Interface: `BasicUnlock`
 
 Information about how the wallet locks itself against unauthorized access.
 
-- `mechanisms` (`Record<BasicUnlockMechanism, boolean>`): Which unlock mechanisms the wallet supports. Set each mechanism to `true` if supported, `false` if not.
+- `mechanisms` (`Record<BasicUnlockMechanism, Support<BasicUnlockMechanismData>>`): Which unlock mechanisms the wallet supports, and whether each one is required or merely optional.
 
 ---
 
@@ -3526,13 +3543,33 @@ The level of control a wallet provides over token approvals of a given standard.
 
 ---
 
-### Interface: `PermissionsManagement`
+### Interface: `ApprovalsManagement`
 
-How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+How the wallet lets users inspect and revoke existing token approvals, broken down by token standard.
 
 - `erc20Approvals` (`SpendingApprovalsControl`): ERC-20 token approvals granted to other addresses.
 - `erc721Approvals` (`SpendingApprovalsControl`): ERC-721 token approvals granted to other addresses.
 - `erc1155Approvals` (`SpendingApprovalsControl`): ERC-1155 token approvals granted to other addresses.
+
+---
+
+### Enum: `BuiltInSwapDefaultApprovalBehavior`
+
+How a wallet's own built-in swap/bridge feature requests token approvals on the user's behalf by default.
+
+- `MINIMAL_AMOUNT` = `(auto)`: The wallet requests only the minimum amount needed for the swap/bridge before signing.
+- `UNLIMITED_BUT_EDITABLE` = `(auto)`: The wallet defaults to an unlimited approval, but the user can see and edit the amount before signing.
+- `UNLIMITED_BUT_DISCLOSED` = `(auto)`: The wallet defaults to an unlimited approval and discloses this to the user before signing, but does not let them edit the amount.
+- `UNLIMITED_AND_UNDISCLOSED` = `(auto)`: The wallet requests an unlimited approval by default without disclosing this to the user in the transaction confirmation UI.
+
+---
+
+### Interface: `PermissionsManagement`
+
+How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+
+- `approvalsManagement` (`Support<ApprovalsManagement>`): Ability to inspect and revoke existing token approvals.
+- `builtInSwapApprovals` (`BuiltInSwapDefaultApprovalBehavior | 'NO_BUILT_IN_SWAP'`): How the wallet's own built-in swap/bridge feature requests token approvals on the user's behalf by default.
 
 ---
 

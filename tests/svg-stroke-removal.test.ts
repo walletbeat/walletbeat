@@ -7,8 +7,9 @@ import * as zlib from 'node:zlib'
 
 import { describe, expect, it } from 'vitest'
 
+import { getRepositoryRoot } from '@/utils/codebase'
+
 import { removeCSSOutline } from '../src/tools/icon-font-generator/svg-stroke-removal'
-import { getRepositoryRoot } from './utils/codebase'
 
 /**
  * All SVG files under resources/ that contain CSS stroke declarations
@@ -267,7 +268,7 @@ function findInkscape(): string[] | null {
 	for (const candidate of candidates) {
 		const result = spawnSync(candidate[0], [...candidate.slice(1), '--version'], {
 			encoding: 'utf8',
-			timeout: 30000,
+			timeout: 300000,
 		})
 
 		if (result.status === 0 && result.stdout.includes('Inkscape')) {
