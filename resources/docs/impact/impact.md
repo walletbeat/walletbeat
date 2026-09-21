@@ -20,3 +20,7 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
     - **Reaction**: Ambire's official update for flagging unlimited token approval credits Walletbeat contributor @0xmattmatt for the research.
 - **2026-08**: Walletbeat contributor polymutex points out that flagging IPFS gateways such as `.eth.limo` reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant).
   - **Reaction**: Ambire unflags IPFS gateways: https://x.com/borislavItskovv/status/2090563980549042476 & https://x.com/ambire/status/2090483593407529375
+- **2026-09**: Walletbeat asked: Can your wallet send and receive tokens without exposing your transaction history to others?: https://x.com/walletbeat/status/2099669827568996377 & https://x.com/walletbeat/status/2099669769343439312
+	- **Reaction**: Ambire announces they're fixing this very soon: https://x.com/ambire/status/2099770434400969010 
+  - **Reaction**: Ambire announces they're working hard to change soon their score on privacy transfers: https://x.com/0xSuperKalo/status/2099864981852262633 & https://x.com/0xSuperKalo/status/2099864981852262633 & https://x.com/0xSuperKalo/status/2099863323193827407
+	
