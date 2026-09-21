@@ -2173,6 +2173,24 @@ ol {
 				}
 			}
 		}
+		/* A closed disclosure excludes its scope box as well as its descendants. */
+		details:not([open])[data-sticky-breadcrumb~="scope"] {
+			animation: none;
+			anchor-scope: none;
+			timeline-scope: none;
+			container-type: normal;
+			&::before,
+			&::after {
+				content: none;
+				animation: none;
+				view-timeline-name: none;
+			}
+			[data-sticky-breadcrumb] {
+				animation: none;
+				anchor-name: none;
+				view-timeline-name: none;
+			}
+		}
 
 		/* Nested sticky content begins at the last occupied breadcrumb row. */
 		[data-sticky-breadcrumb~="scope"]
