@@ -1,0 +1,44 @@
+---
+// Types
+import { parseMarkdownWithFrontmatter } from '@/utils/markdown-utils'
+import { governanceDocPageURL, publishedGovernanceDocs } from '@/utils/governance-pages'
+
+// Layouts
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
+
+export async function getStaticPaths() {
+	const rawDocs = import.meta.glob('/governance/**/*.md', {
+		query: '?raw',
+		import: 'default',
+	}) as Record<string, () => Promise<string>>
+
+	return Promise.all(
+		publishedGovernanceDocs.map(async doc => {
+			const load = rawDocs[doc]
+
+			if (load === undefined) {
+				throw new Error(`Published governance document does not exist: ${doc}`)
+			}
+
+			return {
+				params: { path: governanceDocPageURL(doc).slice('/governance/'.length, -1) },
+				props: { repoRootRelativePath: doc, raw: await load() },
+			}
+		}),
+	)
+}
+
+const { repoRootRelativePath, raw } = Astro.props
+
+const content = parseMarkdownWithFrontmatter<{ title: string; description: string }>(raw, {
+	title: true,
+	description: true,
+} as const)
+---
+
+<MarkdownPage
+	metadata={{}}
+	repoRootRelativePath={repoRootRelativePath}
+	markdown={content}
+	allowRepositoryLinks={true}
+/>

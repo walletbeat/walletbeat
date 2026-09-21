@@ -16,45 +16,46 @@ type Props = {
 	metadata: MarkdownMetadata
 	repoRootRelativePath: `/${string}.md`
 	markdown: MarkdownContentWithFrontmatter<null, MarkdownFrontmatter>
+
+	/**
+	 * Whether the document may link to the project repository on GitHub.
+	 * Keep this false for documents whose repository links all have an on-site
+	 * equivalent, so that a missing rewrite fails the build instead of quietly
+	 * sending readers off-site.
+	 */
+	allowRepositoryLinks?: boolean
 }
 
-const { metadata, repoRootRelativePath, markdown } = Astro.props
+const { metadata, repoRootRelativePath, markdown, allowRepositoryLinks = false } = Astro.props
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import type { MarkdownContentWithFrontmatter } from '@/types/content'
 import { stripMarkdownTitle, rewriteMarkdownURLs } from '@/utils/markdown-utils'
+import { rewriteGovernanceRepoURL } from '@/utils/governance-pages'
+import { repositoryUrl } from '@/constants'
 import Navigation from '@/views/Navigation.astro'
 import { defaultNavigationItems } from '@/constants/navigation'
 import Typography from '@/components/Typography.svelte'
 
-const processedMarkdown = stripMarkdownTitle(
-	rewriteMarkdownURLs(markdown, {
-		repoRootRelativePath: repoRootRelativePath,
-		repoRootPagesDir: '/src/pages/',
-		repoRootRelativePaths: {
-			'/public': '/',
-			'/src/pages': '/',
-			'/governance': '/',
-		},
-		forbiddenURLPrefixes: ['https://github.com/walletbeat/walletbeat'],
-		whitelistURLs: [
-			'https://github.com/walletbeat/walletbeat',
-			'https://github.com/walletbeat/walletbeat/blob/beta/governance/communications/communications-policy.md', // Temporary
-			'https://github.com/walletbeat/walletbeat/blob/beta/governance/communications/communication-channels.md', // Temporary
-			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round', // Temporary
-			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2025-07-ethereum-foundation-esp-grant-proposal', // Temporary
-			'https://github.com/walletbeat/walletbeat/tree/beta/governance/grants/2026-04-giveth-ethereum-security-qf-round', // Temporary
-			'https://github.com/walletbeat/walletbeat/blob/beta/governance/treasury/treasury-transparency.md', // Temporary
-		],
-	}),
-)
+const rewrittenMarkdown = rewriteMarkdownURLs(markdown, {
+	repoRootRelativePath: repoRootRelativePath,
+	repoRootPagesDir: '/src/pages/',
+	repoRootRelativePaths: {
+		'/public': '/',
+		'/src/pages': '/',
+	},
+	repoRootRelativeURLRewriter: rewriteGovernanceRepoURL,
+	forbiddenURLPrefixes: allowRepositoryLinks ? undefined : [repositoryUrl],
+	whitelistURLs: [repositoryUrl],
+})
+const processedMarkdown = stripMarkdownTitle(rewrittenMarkdown)
 ---
 
 <Layout
 	metadata={{
 		title: metadata.title ?? markdown.frontmatter.title,
-		description: metadata.description,
+		description: metadata.description ?? markdown.frontmatter.description,
 		keywordsAfter: metadata.keywordsAfter,
 		keywordsBefore: metadata.keywordsBefore,
 	}}

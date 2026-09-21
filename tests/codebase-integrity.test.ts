@@ -517,6 +517,7 @@ describe('codebase integrity', () => {
 		/** Path components that are exempt from the check. */
 		const PATH_COMPONENT_WHITELIST = new Set<string>([
 			'eternalsafe.Containerfile',
+			'[...path].astro',
 			'[attrGroupId].astro',
 			'[eip].astro',
 			'[walletName]',
