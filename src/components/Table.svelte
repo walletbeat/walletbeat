@@ -649,6 +649,7 @@
 						<td
 							colspan={columnSpan}
 							data-table-column={String(column.id)}
+							data-table-column-name={column.name}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 							data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
@@ -711,7 +712,7 @@
 
 	:where(table) {
 		min-width: 100%;
-		width: max-content;
+		width: var(--table-inlineSize, max-content);
 		/* margin-inline: calc(-1 * var(--table-borderWidth)); */
 
 		border-collapse: separate;
