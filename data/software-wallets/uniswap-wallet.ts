@@ -10,7 +10,10 @@ import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
@@ -24,6 +27,7 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -352,10 +356,12 @@ export const uniswapWallet: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -368,10 +374,12 @@ export const uniswapWallet: SoftwareWallet = {
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/features/biometrics/biometrics-utils.ts#L34-L84',
 						},
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -438,7 +446,26 @@ export const uniswapWallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Uniswap Wallet swap review screen for a 1 USDC to ETH swap, before confirming with "Swap". No approve step or approval amount is shown to the user here.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-16-swap-review.png',
+						label: 'Uniswap Wallet swap review screen for a 1 USDC to ETH swap',
+						lastRetrieved: '2026-09-16',
+					},
+					{
+						explanation:
+							'The onchain Approval event emitted for that swap shows an unlimited approval to the `Permit2` contract, not the 1 USDC swap amount, and not disclosed anywhere in the swap review UI.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-16-approve-unlimited-event.png',
+						label: 'Decoded Approval event log showing an unlimited (max) approval value',
+						lastRetrieved: '2026-09-16',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_AND_UNDISCLOSED,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

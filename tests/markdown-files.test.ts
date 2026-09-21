@@ -3,14 +3,14 @@ import * as path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { extractMarkdownLinks } from '@/utils/markdown-utils'
-
 import {
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
 	getRepositoryRoot,
-} from './utils/codebase'
+} from '@/utils/codebase'
+import { extractMarkdownLinks } from '@/utils/markdown-utils'
+
 import { grammarLint, grammarLintMessages } from './utils/grammar'
 
 /**

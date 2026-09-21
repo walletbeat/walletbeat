@@ -18,14 +18,13 @@ import {
 	RASTER_EXTENSIONS,
 } from '@/tools/image-integrity/image-integrity-lib'
 import { detectBlockyJpeg } from '@/tools/image-integrity/jpeg-detector-lib'
-import { isSameJson } from '@/utils/json'
-
 import {
 	CodebaseEntryType,
 	crawlCodebase,
 	getRepositoryRoot,
 	GitIgnoredFiles,
-} from './utils/codebase'
+} from '@/utils/codebase'
+import { isSameJson } from '@/utils/json'
 
 /**
  * Path to the JSON whitelist of image files already verified as passing every

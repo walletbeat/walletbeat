@@ -18,7 +18,10 @@ import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -49,6 +52,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -754,7 +758,7 @@ export const rainbow: SoftwareWallet = {
 			},
 			bugBountyProgram: notSupported,
 			duressResistance: {
-				[Variant.BROWSER]: supported({
+				[Variant.BROWSER]: {
 					basicUnlock: {
 						ref: {
 							explanation: 'The extension is unlocked with a password.',
@@ -762,15 +766,17 @@ export const rainbow: SoftwareWallet = {
 							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx',
 						},
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
-				}),
-				[Variant.MOBILE]: supported({
+				},
+				[Variant.MOBILE]: {
 					basicUnlock: {
 						ref: [
 							{
@@ -792,14 +798,18 @@ export const rainbow: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
-				}),
+				},
 			},
 			hardwareWalletSupport: {
 				[Variant.BROWSER]: {
@@ -1262,7 +1272,27 @@ export const rainbow: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Rainbow "Review & Swap" screen for a 1 USDC to ETH swap, showing the swap amounts and fees before confirming with "Swap USDC to ETH".',
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-swap-review.png',
+						label: 'Rainbow "Review & Swap" screen for a 1 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The onchain Approval event emitted for the swap shows value = 1000000, exactly 1 USDC, matching the swap amount.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-approve-exact-amount-event.png',
+						label:
+							'Decoded Approval event log showing a value of 1000000 (exactly 1 USDC) for the swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

@@ -12,6 +12,7 @@
 		normalizeExampleRatings,
 		ratingIcons,
 		ratingToColor,
+		ratingToTextColor,
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
@@ -53,7 +54,7 @@
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
-	import { toFullyQualified } from '@/schema/reference'
+	import { mergeRefs, toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletStageAndLadder } from '@/utils/stage'
@@ -337,6 +338,28 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
+	const allPageReferences = $derived.by(() => {
+		const refs = Object.values(attributeTree).flatMap(attrGroup => {
+			const evalGroup = evalTree[attrGroup.id]
+
+			if (!evalGroup) {
+				return []
+			}
+
+			return attrGroup.attributes.flatMap(({ attribute }) => {
+				const evalAttr = evalGroup[attribute.id]
+
+				if (evalAttr === undefined || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) {
+					return []
+				}
+
+				return toFullyQualified(evalAttr.evaluation.references)
+			})
+		})
+
+		return mergeRefs(...refs)
+	})
+
 
 	// Components
 	import { Github, Globe } from 'lucide-static'
@@ -349,6 +372,7 @@
 	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
+	import DataSourceCredits from '@/views/DataSourceCredits.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
@@ -652,6 +676,12 @@
 			{/if}
 		{/each}
 
+		{#if allPageReferences.length > 0}
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<DataSourceCredits references={allPageReferences} />
+			</div>
+		{/if}
+
 		{#if walletNews.length > 0 && newsIsVeryStale}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
@@ -877,6 +907,7 @@
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		style:--accent-textColor={ratingToTextColor(evalAttr.evaluation.outcome.rating)}
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
@@ -1084,6 +1115,14 @@
 						</div>
 					{/if}
 				</li>
+				{#if override?.note !== undefined}
+					<li data-list-item="gap-3" data-list-item-marker="👉">
+						<Typography
+							content={override.note}
+							strings={getWalletEvalStrings(wallet)}
+						/>
+					</li>
+				{/if}
 			</ul>
 
 			{#if variantSpecificCaption}
@@ -1276,7 +1315,7 @@
 								strings={getWalletEvalStrings(wallet)}
 							/>
 
-							{#if override}
+							{#if override?.howToImprove !== undefined}
 								<div class="note" data-card="padding-3" data-row="gap-4">
 									<div class="icon">ℹ️</div>
 									<p>
@@ -2121,6 +2160,7 @@
 
 			:global(.navigation-items a > .pie-navigation-icon) {
 				--icon-size: calc(var(---slice-label-size) * 1px);
+				color: #fff;
 
 				position: absolute;
 				inset: var(---pie-origin-y) auto auto var(---pie-origin-x);
@@ -2128,7 +2168,7 @@
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
 				filter: var(
 					---linked-icon-filter,
-					contrast(0.5) brightness(3) opacity(0.7)
+					opacity(0.75)
 						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
 				);
 				transition-property: filter;
