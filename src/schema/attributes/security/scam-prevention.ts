@@ -7,7 +7,6 @@ import {
 } from '@/schema/attributes'
 import { WalletProfile } from '@/schema/features/profile'
 import {
-	allUnlimitedApprovalBenchmarksSupported,
 	type ScamAlertLeaks,
 	type ScamAlerts,
 	type UnlimitedApprovalWarningBenchmarks,
@@ -493,7 +492,16 @@ function evaluateScamAlerts(
 		details: scamAlertsDetailsContent({}),
 	})
 }
-
+/**
+ * Shorthand for a wallet that warns on every unlimited-approval benchmark.
+ */
+const allUnlimitedApprovalBenchmarksSupported: UnlimitedApprovalWarningBenchmarks = {
+	[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]: featureSupported,
+}
 export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	id: 'scamPrevention',
 	icon: 'scam_prevention',

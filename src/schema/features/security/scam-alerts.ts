@@ -148,17 +148,6 @@ export type UnlimitedApprovalWarningBenchmarks = Record<
 	Support | null
 >
 
-/**
- * Shorthand for a wallet that warns on every unlimited-approval benchmark.
- */
-export const allUnlimitedApprovalBenchmarksSupported: UnlimitedApprovalWarningBenchmarks = {
-	[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: featureSupported,
-	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
-	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
-	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]: featureSupported,
-	[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]: featureSupported,
-}
-
 export type UnlimitedApprovalWarning = WithRef<
 	ScamAlertLeaks & {
 		/**
