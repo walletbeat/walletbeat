@@ -1822,13 +1822,13 @@
 	}
 
 	.filter-popover:not([data-filter-kind="attribute"]) {
-		left: anchor(left);
+		left: max(0.5rem, anchor(left));
 		right: auto;
 	}
 
 	.filter-popover[data-filter-kind="attribute"] {
 		left: auto;
-		right: calc(100dvi - anchor(right));
+		right: 0.5rem;
 	}
 
 	.filter-popover:popover-open {
