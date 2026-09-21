@@ -20,11 +20,12 @@
 		[EipSupportStatus.NOT_APPLICABLE]: 'var(--text-secondary)',
 	}
 
-	const statusSections: Array<{ status: EipSupportStatus; label: string }> = [
+	const statusLabel: Array<{ status: EipSupportStatus; label: string }> = [
 		{ status: EipSupportStatus.SUPPORTED, label: 'Supported' },
 		{ status: EipSupportStatus.NOT_SUPPORTED, label: 'Not Supported' },
 		{ status: EipSupportStatus.UNKNOWN, label: 'Unknown' },
 	]
+
 
 	// Fixed display order and label, independent of the order variants were
 	// collected in.
@@ -56,6 +57,9 @@
 	// Functions
 	const cardsForStatus = (status: EipSupportStatus): EipStatusSupportCard[] =>
 		cards.filter(card => card.status === status)
+
+	const labelForStatus = (status: EipSupportStatus): string =>
+		statusLabel.find(entry => entry.status === status)?.label ?? status
 
 	// The most recent date among the card's references, i.e. when this status
 	// was last verified.
@@ -91,7 +95,7 @@
 		</header>
 	{/if}
 
-	{#each statusSections as { status, label: statusLabel } (status)}
+	{#each statusLabel as { status, label: label } (status)}
 		{@const statusCards = cardsForStatus(status)}
 
 		{#if statusCards.length > 0}
@@ -100,7 +104,7 @@
 					<h3
 						data-support-status={status}
 						style:--accent={headingColor[status]}
-					>{statusLabel}</h3>
+					>{label}</h3>
 				</header>
 
 				<div data-scroll-item="inline-attached underflow-center overflow-start">
@@ -118,12 +122,18 @@
 									/>
 								</span>
 
-								<div class="wallet-heading" data-row-item="flexible">
+								<div class="wallet-heading" data-row-item="flexible" data-row="start gap-2">
 									<h5>
 										<a data-link="camouflaged" href={card.url}>
 											{card.displayName}
 										</a>
 									</h5>
+
+									<span
+										class="status-tag"
+										data-badge="small"
+										style:--accent={headingColor[card.status]}
+									>{labelForStatus(card.status)}</span>
 								</div>
 
 								<span class="platform-label">{platformLabel(card.variants)}</span>
@@ -230,12 +240,25 @@
 		min-inline-size: 0;
 
 		h5 {
+			flex-shrink: 1;
 			font-size: 0.9rem;
 			font-weight: 600;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 		}
+	}
+
+	.status-tag {
+		--badge-backgroundColor: color-mix(in srgb, var(--accent) 14%, transparent);
+		--badge-borderColor: color-mix(in srgb, var(--accent) 20%, transparent);
+		--badge-textColor: var(--accent);
+
+		flex-shrink: 0;
+		font-size: 0.65em;
+		font-weight: 600;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
 	}
 
 	/* Matches the "Updated <date>" secondary text on the wallet security news
