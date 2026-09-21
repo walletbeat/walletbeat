@@ -3523,5 +3523,10 @@
 		"url": "https://www.trailofbits.com/",
 		"urlHash": "6363c24c8d954e9f8f60259734ddb01237144ab0",
 		"retrieved": "2026-09-16"
+	},
+	{
+		"url": "https://metamask.io/news/metamask-security-alerts-by-blockaid-the-new-normal-for-a-safer-transaction",
+		"urlHash": "3d3e2b7720dd6e2283e9a36a0f76a67bb4a7372e",
+		"retrieved": "2026-09-21"
 	}
 ]
