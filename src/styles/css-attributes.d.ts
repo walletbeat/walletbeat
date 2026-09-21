@@ -665,9 +665,9 @@ declare global {
 		 * - `measure`: hidden dimension probes inside the flow marker
 		 *
 		 * ### CSS Variables
-		 * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, canonical names at the root, entry-derived names when globally scoped
-		 * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, canonical names at the root, entry-derived names when globally scoped
-		 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for a repeated animated scope; roots use the canonical root timeline; `auto` at an item forces its compact presentation
+		 * - `--stickyBreadcrumb-itemInlineTimeline`, `--stickyBreadcrumb-itemBlockTimeline`: source dimension clocks; local names by default, entry-derived names when globally scoped
+		 * - `--stickyBreadcrumb-endInlineTimeline`, `--stickyBreadcrumb-endBlockTimeline`: metadata dimension clocks; local names by default, entry-derived names when globally scoped
+		 * - `--stickyBreadcrumb-entryTimeline`: unique native heading view timeline required for an animated scope; `auto` at an item forces its compact presentation
 		 * - `--stickyBreadcrumb-entryRange`: shared arrival range from the container's leading-edge contact through trailing-edge contact; defaults to `exit-crossing 0% entry-crossing 100%`
 		 * - `--stickyBreadcrumb-scale`: compact identity scale; defaults to 1
 		 * - `--stickyBreadcrumb-iconRatio`: compact glyph size relative to heading text; defaults to 1.5 line heights

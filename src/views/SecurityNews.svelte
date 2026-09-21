@@ -27,29 +27,22 @@
 	aria-label="Security News"
 	style:--accent="#e564bc"
 	data-rating="pass"
-	data-sticky-container
-	data-sticky-breadcrumb="scope"
-	style:--stickyBreadcrumb-entryTimeline="--security-news-entry"
 >
 	<details
 		data-card="radius-8 padding-6 border-accent"
 		data-column="gap-0"
 		open={shouldExpandNews}
 	>
-		<summary
-			data-row
-			data-sticky="block block-start backdrop-before backdrop-stuck"
-			data-sticky-breadcrumb="position"
-		>
+		<summary data-row>
 			<header data-row>
 				<div>
 					<div data-row="start gap-2">
-						<h3 data-row="start gap-2" data-sticky-breadcrumb="source">
-							<a data-link="camouflaged" data-row="start gap-2" data-sticky-breadcrumb="item" href="#security-news">
+						<a data-link="camouflaged" href="#security-news">
+							<h3 data-row="start gap-2">
 								<span data-icon="📰" aria-hidden="true"></span>
 								Security News
-							</a>
-						</h3>
+							</h3>
+						</a>
 					</div>
 
 					<div class="subsection-caption">
@@ -68,7 +61,6 @@
 				<data
 					data-badge="medium"
 					value="INFO"
-					data-sticky-breadcrumb="end"
 				>INFO</data>
 			</header>
 		</summary>
@@ -149,8 +141,6 @@
 			{/each}
 		</div>
 	</details>
-	<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
-	<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 </section>
 
 
