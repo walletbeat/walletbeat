@@ -175,7 +175,6 @@
 	{...restProps}
 	class="pie-container {'class' in restProps ? restProps.class : ''}"
 	data-layout={layout}
-	style:--pie-radius={radius}
 	style:--pie-padding={padding}
 	style:--pie-labelSize={labelSize}
 	style:--pie-maxR={pieMetrics.maxRadius}

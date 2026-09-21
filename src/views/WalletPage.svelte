@@ -649,11 +649,6 @@
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-rotation-states={pieRotation.states}
 	data-sticky-breadcrumb="scope root navigation"
-	style:--stickyBreadcrumb-itemInlineTimeline="--breadcrumb-root-item-inline"
-	style:--stickyBreadcrumb-itemBlockTimeline="--breadcrumb-root-item-block"
-	style:--stickyBreadcrumb-endInlineTimeline="--breadcrumb-root-end-inline"
-	style:--stickyBreadcrumb-endBlockTimeline="--breadcrumb-root-end-block"
-	style:--stickyBreadcrumb-entryTimeline="--breadcrumb-root-entry"
 	class="container"
 	data-sticky-container
 	{@attach container => {
@@ -800,7 +795,7 @@
 			class="pie-navigation"
 			data-sticky="block-start backdrop-before backdrop-always"
 			aria-label="Attribute pie navigation"
-			style={`--pie-radius: ${overallRatingPieRadius}; --pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
+			style={`--pie-padding: ${overallRatingPiePadding}; --pie-maxR: ${overallRatingPieMaxRadius}`}
 		>
 			<div class="pie-navigation-geometry">
 				<NavigationItems
@@ -860,7 +855,7 @@
 				data-scroll-item="inline-detached padding-match-end flow"
 				style:--stickyBreadcrumb-entryTimeline="--stages-entry"
 			>
-				<span data-pie-compact-marker aria-hidden="true"></span>
+				<span class="pie-compact-marker" aria-hidden="true"></span>
 				<header
 					data-sticky-breadcrumb="position"
 					data-sticky="block block-start backdrop-after backdrop-stuck"
@@ -894,7 +889,6 @@
 				{@render attributeGroupSnippet({
 					attrGroup,
 					evalGroup,
-					pieCompactMarker: !showStage && pieNavigationItems[0]?.href === `#${groupTargetId(attrGroup)}`,
 				})}
 			{/if}
 		{/each}
@@ -964,11 +958,9 @@
 {#snippet attributeGroupSnippet({
 	attrGroup,
 	evalGroup,
-	pieCompactMarker = false,
 }: {
 	attrGroup: AttributeGroup<_AttributeGroupId>
 	evalGroup: EvaluationTree<_AttributeGroupId>[_AttributeGroupId]
-	pieCompactMarker?: boolean
 })}
 	{@const attributes = attrGroup.attributes
 		.map(({ attribute, weight }) => ({
@@ -1008,7 +1000,9 @@
 			style:--stickyBreadcrumb-entryTimeline={`--${groupTargetId(attrGroup)}-entry`}
 			data-scroll-item="inline-detached padding-match-end flow"
 		>
-			{#if pieCompactMarker}<span data-pie-compact-marker aria-hidden="true"></span>{/if}
+			{#if !showStage && pieNavigationItems[0]?.href === `#${groupTargetId(attrGroup)}`}
+				<span class="pie-compact-marker" aria-hidden="true"></span>
+			{/if}
 			<header
 				data-column="span-start"
 				data-sticky-breadcrumb="position"
@@ -2110,7 +2104,7 @@
 		}
 
 		@media (width <= 1024px) {
-			[data-pie-compact-marker] {
+			.pie-compact-marker {
 				display: block;
 				inline-size: 1px;
 				block-size: 1px;

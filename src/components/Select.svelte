@@ -21,14 +21,12 @@
 
 	// Props
 	let {
-		id,
 		defaultValue,
 		value = $bindable(),
 		options,
 		optionContent,
 		...restProps
-	}: Omit<SvelteHTMLElements['select'], 'value'> & {
-		id?: string
+	}: Omit<SvelteHTMLElements['select'], 'value' | 'defaultValue'> & {
 		defaultValue?: _SelectValue
 		value?: _SelectValue
 		options: _SelectOption[]
@@ -36,7 +34,7 @@
 	} = $props()
 </script>
 
-<select {id} bind:value {...restProps}>
+<select bind:value {...restProps}>
 	{@render selectedContent()}
 	{#snippet selectedContent()}
 		<button
