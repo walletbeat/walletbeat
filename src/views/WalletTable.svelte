@@ -676,7 +676,6 @@
 <section
 	id={viewId}
 	bind:this={transitionRoot}
-	data-view-transition-kind={transitionKind}
 	data-sticky-container
 	data-column="gap-6"
 >
@@ -1272,8 +1271,6 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
-								transitionNamePrefix={transitionKind === 'columns' ? `${viewId}-wallet-${wallet.metadata.id}` : undefined}
-								transitionElements="pie"
 								layout={PieLayout.FullTop}
 								padding={overallRatingPiePadding}
 								radius={overallRatingPieRadius}
@@ -1490,8 +1487,6 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
-								transitionNamePrefix={transitionKind === 'columns' ? `${viewId}-wallet-${wallet.metadata.id}` : undefined}
-								transitionElements="pie"
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1674,8 +1669,6 @@
 							tooltipHoverTriggerPlacement="around"
 						>
 							<Pie
-								transitionNamePrefix={transitionKind === 'columns' ? `${viewId}-wallet-${wallet.metadata.id}` : undefined}
-								transitionElements="pie"
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
