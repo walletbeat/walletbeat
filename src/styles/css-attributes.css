@@ -1643,12 +1643,11 @@ ol {
 	/* Relative child scales preserve the compact text/icon ratios without 3D projection. */
 	@keyframes breadcrumb-icon-motion {
 		from {
-			transform: translateY(0px) scale(1) var(---icon-paint-transform, translateX(0px));
+			transform: translateY(0px) scale(1);
 		}
 		to {
 			transform: translateY(calc(var(---breadcrumb-iconTranslateBlock, 0px) / var(--stickyBreadcrumb-scale)))
-				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)))
-				var(---icon-paint-transform, translateX(0px));
+				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)));
 		}
 	}
 	/* An unregistered scale changes discretely; transform motion keeps its own effect. */
@@ -3063,7 +3062,6 @@ details {
 	}
 
 	> :where(summary) {
-		---summary-markerSize: 0.75em;
 		---summary-markerRotation: 0deg;
 		cursor: zoom-in;
 
@@ -3089,7 +3087,7 @@ details {
 			content: '';
 
 			flex-shrink: 0;
-			inline-size: var(---summary-markerSize);
+			inline-size: 0.75em;
 			block-size: 1lh;
 
 			background-color: currentColor;

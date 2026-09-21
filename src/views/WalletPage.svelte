@@ -1516,7 +1516,6 @@
 		}
 		---wallet-line-height: 1.6;
 		---wallet-attribute-heading-font-size: 1.17rem;
-		---wallet-section-icon-scale: 1.1;
 		---wallet-section-icon-gap: 0.875rem;
 		---wallet-section-source-support-gap: 0.5rem;
 		---wallet-section-support-gap: 0.1875rem;
@@ -2260,7 +2259,7 @@
 	:is(.attribute-group > header, .attribute > details > summary > header)[data-column~="span-start"] {
 		--column-spanSize: calc(
 			(1lh + var(--column-supportLineHeight, 1rlh) + var(---wallet-section-source-support-gap)) *
-				var(---wallet-section-icon-scale)
+				1.1
 		);
 		--column-iconGap: var(---wallet-section-icon-gap);
 		--column-supportGap: var(---wallet-section-support-gap);
