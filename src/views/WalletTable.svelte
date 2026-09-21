@@ -1097,8 +1097,8 @@
 							{@render VariantButtons({ wallet })}
 						</div>
 
-						{#snippet ExpandedContent({ isInTooltip })}
-							<div class="wallet-summary" data-card={isInTooltip ? '' : undefined} data-column="gap-4">
+						{#snippet ExpandedContent()}
+							<div class="wallet-summary" data-card="popover" data-column="gap-4">
 								{#if selectedVariant && !wallet.variants[selectedVariant]}
 									<p>
 										{wallet.metadata.displayName} does not have a {selectedVariant} version.
@@ -2038,7 +2038,7 @@
 		line-height: 1.6;
 		text-align: start;
 
-		&[data-card] {
+		:global(:popover-open) & {
 			font-size: 0.75em;
 		}
 
