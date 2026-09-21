@@ -331,6 +331,7 @@
 ">
 	// Types
 	import type { SvelteHTMLElements } from 'svelte/elements'
+	import type { TransitionUpdate } from '@/utils/view-transition'
 
 	type _TableState = TableState<_RowValue, _CellValue, _ColumnId>
 	type _Column = Column<_RowValue, _CellValue, _ColumnId>
@@ -338,6 +339,8 @@
 
 	// IDs
 	const id = $props.id()
+	type TableTransitionUpdate = TransitionUpdate<'sort' | 'columns'>
+	const directTransitionUpdate: TableTransitionUpdate = update => update()
 
 
 	// Props
@@ -357,6 +360,7 @@
 		),
 
 		expandHeaderCells = true,
+		transitionUpdate = directTransitionUpdate,
 
 		cellVerticalAlign,
 		Cell,
@@ -377,6 +381,7 @@
 		expandedColumnIds?: SvelteSet<_ColumnId>
 
 		expandHeaderCells?: boolean
+		transitionUpdate?: TableTransitionUpdate
 
 		Cell?: Snippet<[{
 			row: _RowValue
@@ -446,36 +451,10 @@
 				)
 	)
 
-	let isSorting = $state(false)
-	type SortTransition = { finished: Promise<void> }
-	let sortRoot: (HTMLDivElement & {
-		startViewTransition?: (callback: () => void) => SortTransition
-	}) | undefined = $state()
-	let sortTransition: SortTransition | undefined
 	const toggleColumnSort = (columnId: _ColumnId) => {
-		const update = () => {
+		transitionUpdate(() => {
 			flushSync(() => table.toggleColumnSort(columnId))
-		}
-		const startViewTransition = sortRoot?.startViewTransition
-
-		if (
-			!startViewTransition
-			|| !CSS.supports('view-transition-name: match-element')
-			|| matchMedia('(prefers-reduced-motion: reduce)').matches
-		) {
-			update()
-			return
-		}
-
-		isSorting = true
-		flushSync()
-		// Capture only this table. Other controls and top-layer panels stay live.
-		const transition = startViewTransition.call(sortRoot, update)
-		sortTransition = transition
-		const finish = () => {
-			if (sortTransition === transition) isSorting = false
-		}
-		void transition.finished.then(finish, finish)
+		}, 'sort')
 	}
 
 
@@ -484,10 +463,8 @@
 
 <div
 	{...restProps}
-	bind:this={sortRoot}
 	id={tableId}
 	class="container {'class' in restProps ? restProps.class : ''}"
-	data-sorting={isSorting ? '' : undefined}
 >
 	<table>
 		<colgroup>
@@ -614,9 +591,11 @@
 								class="expansion-button"
 								disabled={!interactive}
 								data-sticky="backdrop-before backdrop-stuck"
-								onclick={() => {
-									table.toggleIsColumnExpanded(column.id)
-								}}
+							onclick={() => {
+								transitionUpdate(() => {
+									flushSync(() => table.toggleIsColumnExpanded(column.id))
+								}, 'columns')
+							}}
 								title={isExpanded ? 'Collapse' : 'Expand'}
 								aria-label={isExpanded ? 'Collapse' : 'Expand'}
 							></button>
@@ -631,6 +610,7 @@
 				{@const rowId = getRowId?.(row, index)}
 
 				<tr
+					data-view-transition="item"
 					tabIndex={onRowClick ? 0 : undefined}
 					data-pressable={onRowClick ? '' : undefined}
 					onclick={() => {
@@ -727,20 +707,6 @@
 			round calc(var(--table-cornerRadius) + var(--table-outerBorderWidth))
 		);
 
-		&[data-sorting] tbody tr {
-			view-transition-name: match-element;
-			view-transition-class: table-row;
-		}
-	}
-
-	.container::view-transition-old(root),
-	.container::view-transition-new(root) {
-		animation: none;
-	}
-
-	:global(::view-transition-group(*.table-row)) {
-		animation-duration: 300ms;
-		animation-timing-function: var(--transition-easeOutExpo);
 	}
 
 	:where(table) {
