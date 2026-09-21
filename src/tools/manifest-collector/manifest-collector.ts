@@ -3,7 +3,7 @@ import * as path from 'node:path'
 
 import { allWallets, assertValidWalletName, type WalletName } from '@/data/wallets'
 import { getExtensionId } from '@/schema/extension-url'
-import { getRepositoryRoot } from '@/tests/utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
 import { checkParsedManifests } from './manifest-checker'

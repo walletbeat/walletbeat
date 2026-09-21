@@ -10,7 +10,7 @@ import ttf2eot from 'ttf2eot'
 import ttf2woff from 'ttf2woff'
 import ttf2woff2 from 'ttf2woff2'
 
-import { getRepositoryRoot } from '@/tests/utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 import { removeCSSOutline } from './svg-stroke-removal'
 
