@@ -689,7 +689,7 @@
 					</a>
 				</h1>
 				{#if queryParams && (Object.keys(wallet.variants).length > 1 || (Variant.HARDWARE in wallet.variants && brandModels.length > 1))}
-					<div data-sticky-breadcrumb="end" data-row="gap-2">
+					<div data-row="gap-2">
 						{#if Object.keys(wallet.variants).length > 1}
 							<Select
 								bind:value={selectedVariant}
@@ -1638,6 +1638,14 @@
 
 				block-size: auto;
 
+				@supports not ((animation-timeline: scroll()) and (animation-range: 0% 100%) and
+					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+					(color: if(style(---breadcrumb-wrap: 1): red))) {
+					position: sticky;
+					inset-block-start: var(--navigation-mobile-blockSize);
+					align-self: start;
+				}
+
 				> header {
 					display: flex;
 					position: fixed;
@@ -2126,18 +2134,22 @@
 				&[data-scroll-container] {
 					overflow: visible;
 				}
-				--sticky0-insetBlockStart: 0px;
-				--sticky-insetBlockStart: 0px;
+				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
+					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
+					(color: if(style(---breadcrumb-wrap: 1): red)) {
+					--sticky0-insetBlockStart: 0px;
+					--sticky-insetBlockStart: 0px;
+				}
 			}
 
 			.container .page-navigation > .pie-navigation[data-sticky][data-sticky] {
-				position: relative;
-				inset: auto;
 				align-self: center;
 
 				@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) and
 					(width: anchor-size(--breadcrumb-source inline)) and (timeline-scope: --breadcrumb-size) and
 					(color: if(style(---breadcrumb-wrap: 1): red)) {
+					position: relative;
+					inset: auto;
 					anchor-name: --wallet-pie-source;
 					view-timeline-name: --wallet-pie-source;
 					view-timeline-axis: block;
@@ -2176,11 +2188,8 @@
 							cover 0% exit-crossing 0%,
 							entry 0% exit 0%,
 							entry 0% exit 0%;
-						/* The source owns initial placement; the first sticky row owns the compact edge. */
-						inset-block-start: if(
-							style(---breadcrumb-entry: 0): anchor(--wallet-pie-source top);
-							else: anchor(end)
-						);
+						/* Stable layout anchor; the source timeline owns visual travel. */
+						inset-block-start: anchor(end);
 						inset-inline-start: anchor(--wallet-pie-source start);
 						inline-size: anchor-size(--wallet-pie-source inline);
 						margin: 0;
