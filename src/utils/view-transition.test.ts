@@ -106,6 +106,63 @@ describe('startScopedViewTransition', () => {
 		await Promise.resolve()
 		expect(root.attributes).not.toContain('data-view-transition-active')
 	})
+
+	it('applies both rapid element-scoped updates exactly once without starting a second transition', () => {
+		installEnvironment()
+		const root = new TestScope()
+		const scopedTransition = transition()
+		const firstUpdate = vi.fn()
+		const secondUpdate = vi.fn()
+		let deferredUpdate!: () => void
+		const startViewTransition = vi.fn((update: () => void) => {
+			deferredUpdate = update
+
+			return scopedTransition
+		})
+
+		Object.assign(root, { startViewTransition })
+
+		expect(startScopedViewTransition(htmlElement(root), firstUpdate)).toBe(scopedTransition)
+		expect(firstUpdate).not.toHaveBeenCalled()
+		expect(startScopedViewTransition(htmlElement(root), secondUpdate)).toBeUndefined()
+		expect(scopedTransition.skipTransition).toHaveBeenCalledOnce()
+		expect(startViewTransition).toHaveBeenCalledOnce()
+		expect(firstUpdate).toHaveBeenCalledOnce()
+		expect(secondUpdate).toHaveBeenCalledOnce()
+		expect(root.attributes).not.toContain('data-view-transition-active')
+
+		deferredUpdate()
+		expect(firstUpdate).toHaveBeenCalledOnce()
+	})
+
+	it('applies both rapid document-scoped updates exactly once across scopes', () => {
+		const documentTransition = installEnvironment()
+		const firstRoot = new TestScope()
+		const secondRoot = new TestScope()
+		const firstUpdate = vi.fn()
+		const secondUpdate = vi.fn()
+		let deferredUpdate!: () => void
+		const startViewTransition = vi.fn((update: () => void) => {
+			deferredUpdate = update
+
+			return documentTransition
+		})
+
+		Object.assign(document, { startViewTransition })
+
+		expect(startScopedViewTransition(htmlElement(firstRoot), firstUpdate)).toBe(documentTransition)
+		expect(firstUpdate).not.toHaveBeenCalled()
+		expect(startScopedViewTransition(htmlElement(secondRoot), secondUpdate)).toBeUndefined()
+		expect(documentTransition.skipTransition).toHaveBeenCalledOnce()
+		expect(startViewTransition).toHaveBeenCalledOnce()
+		expect(firstUpdate).toHaveBeenCalledOnce()
+		expect(secondUpdate).toHaveBeenCalledOnce()
+		expect(firstRoot.attributes).not.toContain('data-view-transition-active')
+		expect(secondRoot.attributes).not.toContain('data-view-transition-active')
+
+		deferredUpdate()
+		expect(firstUpdate).toHaveBeenCalledOnce()
+	})
 })
 
 describe('viewTransitionName', () => {
