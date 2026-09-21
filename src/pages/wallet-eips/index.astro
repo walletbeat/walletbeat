@@ -15,17 +15,37 @@ import { eips } from 'data/eips'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-sticky-breadcrumb='scope root'
+		data-column='gap-8'
+	>
+		<header
+			id='top'
+			data-scroll-item='inline-detached'
+			data-sticky='block block-start backdrop-after backdrop-stuck'
+			data-sticky-breadcrumb='position'
+		>
 			<hgroup data-column='gap-4'>
-				<h1>Wallet EIPs</h1>
-				<p>Ethereum standards tracked by Walletbeat and why they matter for wallets.</p>
+				<div data-row data-sticky='block block-start backdrop-self backdrop-always'>
+					<h1 data-sticky-breadcrumb='source'>
+						<a href='#top' data-link='camouflaged' data-sticky-breadcrumb='item'>Wallet EIPs</a>
+					</h1>
+				</div>
+				<p data-sticky-breadcrumb='support'>
+					<span>Ethereum standards tracked by Walletbeat and why they matter for wallets.</span>
+				</p>
 			</hgroup>
 		</header>
 
 		<div data-scroll-item='inline-detached padding-match-end'>
 			<WalletEipList eips={Object.values(eips)} client:visible />
 		</div>
+		<span data-sticky-breadcrumb='flow' aria-hidden='true'
+			><span data-sticky-breadcrumb='measure'></span></span
+		>
+		<span data-sticky-breadcrumb='flow exit' aria-hidden='true'></span>
 	</main>
 </Layout>
 

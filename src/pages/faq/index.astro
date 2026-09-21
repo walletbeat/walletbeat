@@ -266,29 +266,68 @@ import { defaultNavigationItems } from '@/constants/navigation'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
-		<header id='top' data-scroll-item='inline-detached padding-match-start'>
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-sticky-breadcrumb='scope root'
+		data-column='gap-8'
+	>
+		<header
+			id='top'
+			data-scroll-item='inline-detached'
+			data-sticky='block block-start backdrop-after backdrop-stuck'
+			data-sticky-breadcrumb='position'
+		>
 			<hgroup data-column='gap-2'>
-				<h1>Frequently Asked Questions</h1>
-				<p>Everything you need to know about Walletbeat and how we evaluate wallets.</p>
+				<div data-row data-sticky='block block-start backdrop-self backdrop-always'>
+					<h1 data-sticky-breadcrumb='source'>
+						<a href='#top' data-link='camouflaged' data-sticky-breadcrumb='item'
+							>Frequently Asked Questions</a
+						>
+					</h1>
+				</div>
+				<p data-sticky-breadcrumb='support'>
+					<span>Everything you need to know about Walletbeat and how we evaluate wallets.</span>
+				</p>
 			</hgroup>
 		</header>
 
 		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
 			{
-				frequentlyAskedQuestions.map(entry => (
-					<details id={entry.anchor} data-card='padding-5 radius-4'>
-						<summary>
-							<h4>{entry.question}</h4>
+				frequentlyAskedQuestions.map((entry, index) => (
+					<details
+						id={entry.anchor}
+						data-card='padding-5 radius-4'
+						data-sticky-container
+						data-sticky-breadcrumb='scope'
+						style={`--stickyBreadcrumb-entryTimeline: --faq-${index}-entry`}
+					>
+						<summary
+							data-sticky='block block-start backdrop-before backdrop-stuck'
+							data-sticky-breadcrumb='position'
+						>
+							<h4 data-sticky-breadcrumb='source'>
+								<a href={`#${entry.anchor}`} data-link='camouflaged' data-sticky-breadcrumb='item'>
+									{entry.question}
+								</a>
+							</h4>
 						</summary>
 
 						<div data-column='gap-5'>
 							<Typography client:visible content={entry.answer} />
 						</div>
+						<span data-sticky-breadcrumb='flow' aria-hidden='true'>
+							<span data-sticky-breadcrumb='measure' />
+						</span>
+						<span data-sticky-breadcrumb='flow exit' aria-hidden='true' />
 					</details>
 				))
 			}
 		</div>
+		<span data-sticky-breadcrumb='flow' aria-hidden='true'
+			><span data-sticky-breadcrumb='measure'></span></span
+		>
+		<span data-sticky-breadcrumb='flow exit' aria-hidden='true'></span>
 	</main>
 </Layout>
 
@@ -302,6 +341,12 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		}
 
 		line-height: 1.4;
+	}
+
+	details[data-sticky-breadcrumb~="scope"] {
+		--stickyBreadcrumb-forceRow: 1;
+		--stickyBreadcrumb-scale: calc(sqrt(1.5rem * 1rem) / 1rem);
+		--stickyBreadcrumb-paddingBlock: calc(0.5rem * sqrt(1rem / 1.5rem));
 	}
 
 	hgroup p {
