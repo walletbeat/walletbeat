@@ -866,7 +866,7 @@
 					data-column="span-start"
 					data-scroll-item="inline-detached"
 				>
-					<div data-row="start" data-sticky="block block-start backdrop-self backdrop-always">
+					<div data-row="start" data-sticky="block block-start">
 						<h2 data-sticky-breadcrumb="source">
 							<a
 								data-row="start"
@@ -1010,7 +1010,7 @@
 				data-sticky="block block-start backdrop-after backdrop-stuck"
 				data-scroll-item="inline-detached"
 			>
-				<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
+				<div data-row="start wrap" data-sticky="block block-start">
 					<div data-sticky-breadcrumb="source" data-row-item="flexible">
 						<a
 							data-row="start"
@@ -1021,7 +1021,7 @@
 						>
 							<span
 								aria-hidden="true"
-								data-icon="wbicons-complex accent {attrGroup.icon}"
+								data-icon="wbicons accent {attrGroup.icon}"
 							></span>
 							<h2>
 								{attrGroup.displayName}
@@ -1128,7 +1128,7 @@
 					data-row-item="flexible"
 					data-column="span-start"
 				>
-					<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
+					<div data-row="start wrap" data-sticky="block block-start">
 						<div data-sticky-breadcrumb="source" data-row-item="flexible">
 							<h3 data-sticky-breadcrumb="item" data-row="start gap-2 wrap">
 								<a
@@ -1139,7 +1139,7 @@
 								>
 									<span
 										aria-hidden="true"
-										data-icon="wbicons-complex accent {attribute.icon}"
+										data-icon="wbicons accent {attribute.icon}"
 									></span>
 									<span>{attribute.displayName}</span>
 								</a>

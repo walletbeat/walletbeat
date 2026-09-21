@@ -4,13 +4,13 @@
 	font-weight: 400;
 }
 
-[data-icon~='wbicons-simple'] {
+[data-icon~='wbicons'], [data-icon~='wbicons-simple'] {
 	font-family: var(--fontFamily-wbicons-simple);
 	font-style: normal;
 	font-weight: 400;
 }
 
-[data-icon~='wbicons-complex'], [data-icon~='wbicons-simple'] {
+[data-icon~='wbicons'], [data-icon~='wbicons-complex'], [data-icon~='wbicons-simple'] {
 	-webkit-font-smoothing: subpixel-antialiased;
 	-moz-osx-font-smoothing: grayscale;
 

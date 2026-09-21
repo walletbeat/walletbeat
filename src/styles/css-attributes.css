@@ -264,12 +264,12 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 /**
  * ## [data-icon]
  *
- * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 32px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+ * Shared icon primitive for font icons, inline SVGs, and image icons. `wbicons` selects detailed glyphs above 32px and simple glyphs otherwise; `wbicons-simple` and `wbicons-complex` force a source, while `emoji` preserves platform emoji. Add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
  *
  * ### Tokens
  * - shape: `circle`, `filled`
  * - color: `accent`
- * - source: `wbicons-simple`, `wbicons-complex`, `emoji`
+ * - source: `wbicons`, `wbicons-simple`, `wbicons-complex`, `emoji`
  * - effect: `shadow`
  *
  * ### CSS Variables
@@ -282,7 +282,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  * ### Examples
  * ```html
  * <span data-icon="&#x21b5;"></span>
- * <span data-icon="wbicons-complex security"></span>
+ * <span data-icon="wbicons security"></span>
  * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
  * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
  * ```
@@ -293,8 +293,10 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 [data-icon] {
 	--icon-content: attr(data-icon);
 
-	&:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"]) {
+	&:is([data-icon~="wbicons"], [data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"]) {
 		container-type: inline-size;
+	}
+	&[data-icon~="wbicons"]:not([data-icon~="emoji"]) {
 		&::before {
 			---icon-renderedSize: calc(var(--icon-size, 1em) * var(--icon-scale, 1));
 			font-family: var(--fontFamily-wbicons-simple);
@@ -1650,11 +1652,12 @@ ol {
 				scale(calc(var(--stickyBreadcrumb-iconScale, 1) / var(--stickyBreadcrumb-scale)));
 		}
 	}
-	/* An unregistered scale changes discretely; transform motion keeps its own effect. */
+	/* The unregistered scale switches halfway to the 40% stop (~20% overall), near the 32px painted-size crossing. */
 	@keyframes breadcrumb-icon-detail {
 		from {
 			--icon-scale: 1;
 		}
+		40%,
 		to {
 			--icon-scale: calc((var(---column-spanSize) + var(---breadcrumb-iconCorrection)) * var(--stickyBreadcrumb-scale) / var(--icon-size));
 		}
@@ -1833,7 +1836,8 @@ ol {
 				view-timeline-name: var(--stickyBreadcrumb-itemBlockTimeline);
 			}
 			> * {
-				---breadcrumb-endGap: calc(var(---breadcrumb-hasEnd) * var(--stickyBreadcrumb-gap, 1rem));
+				---breadcrumb-endInlineGap: calc(var(---breadcrumb-hasEnd) * var(--stickyBreadcrumb-gap, 1rem));
+				---breadcrumb-endBlockGap: calc(var(---breadcrumb-hasEnd) * var(--column-supportGap, 0.5rem));
 				---breadcrumb-availableInlineSize: min(
 					var(--stickyBreadcrumb-availableInlineSize, 100cqi),
 					calc(100cqi - var(--stickyBreadcrumb-sourcePaddingInline))
@@ -1842,13 +1846,13 @@ ol {
 					0,
 					sign(
 						var(--stickyBreadcrumb-sourcePaddingInline) + var(---breadcrumb-itemWidth) +
-							var(---breadcrumb-endWidth) + var(---breadcrumb-endGap) - var(---breadcrumb-availableInlineSize)
+							var(---breadcrumb-endWidth) + var(---breadcrumb-endInlineGap) - var(---breadcrumb-availableInlineSize)
 					),
 					1
 				);
 				---breadcrumb-width: calc(
 					(1 - var(---breadcrumb-endWrap)) *
-						(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endGap)) +
+						(var(---breadcrumb-itemWidth) + var(---breadcrumb-endWidth) + var(---breadcrumb-endInlineGap)) +
 						var(---breadcrumb-endWrap) *
 						max(var(---breadcrumb-itemWidth), var(---breadcrumb-endWidth))
 				);
@@ -1862,7 +1866,7 @@ ol {
 						var(---breadcrumb-endWrap) *
 						(
 							var(---breadcrumb-compactItemHeight) + var(---breadcrumb-endHeight) +
-								var(---breadcrumb-endGap)
+								var(---breadcrumb-endBlockGap)
 						)
 				);
 				---breadcrumb-wrap: max(
@@ -1990,12 +1994,11 @@ ol {
 				> :not([data-row], header[data-column~="span-start"], [data-sticky-breadcrumb~="source"]),
 				> header[data-column~="span-start"] > :not([data-row]),
 				[data-sticky-breadcrumb~="support"] {
-					/* A clipping plane follows the compact row; counter-motion preserves natural content travel. */
+					/* Counter-motion preserves natural content travel while its container remains sticky. */
 					---breadcrumb-supportOffset: calc(
 						var(---breadcrumb-blockEnd) - var(--sticky-insetBlockStart) -
 						var(--stickyBreadcrumb-sourcePaddingBlock) - var(---breadcrumb-sourceRowHeight) - var(---column-gap)
 					);
-					clip-path: inset(0 -100vw -100vh);
 					transform: translateY(var(---breadcrumb-supportOffset));
 					animation: breadcrumb-support-offset auto var(--transition-easeInOutExpo) both;
 					animation-timeline: var(--stickyBreadcrumb-entryTimeline);
@@ -2089,7 +2092,7 @@ ol {
 								var(--stickyBreadcrumb-scale) / 2
 						);
 					}
-					[data-icon]:is([data-icon~="wbicons-simple"], [data-icon~="wbicons-complex"]):not([data-icon~="emoji"])::before {
+					[data-icon~="wbicons"]:not([data-icon~="emoji"])::before {
 						animation-name: breadcrumb-icon-motion, breadcrumb-icon-detail;
 					}
 					[data-icon]::before {

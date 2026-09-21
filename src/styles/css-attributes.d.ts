@@ -172,12 +172,12 @@ declare global {
 		/**
 		 * ## [data-icon]
 		 *
-		 * Shared icon primitive for font icons, inline SVGs, and image icons. Font icons select detailed glyphs above 32px and simple glyphs otherwise; `emoji` preserves platform emoji. Add source-specific tokens such as `wbicons-simple`; add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
+		 * Shared icon primitive for font icons, inline SVGs, and image icons. `wbicons` selects detailed glyphs above 32px and simple glyphs otherwise; `wbicons-simple` and `wbicons-complex` force a source, while `emoji` preserves platform emoji. Add `circle` when the icon should render in a circular control; add `shadow` for image icons (e.g. wallet logos) that need a theme-aware halo to stay legible on both backgrounds.
 		 *
 		 * ### Tokens
 		 * - shape: `circle`, `filled`
 		 * - color: `accent`
-		 * - source: `wbicons-simple`, `wbicons-complex`, `emoji`
+		 * - source: `wbicons`, `wbicons-simple`, `wbicons-complex`, `emoji`
 		 * - effect: `shadow`
 		 *
 		 * ### CSS Variables
@@ -190,7 +190,7 @@ declare global {
 		 * ### Examples
 		 * ```html
 		 * <span data-icon="&#x21b5;"></span>
-		 * <span data-icon="wbicons-complex security"></span>
+		 * <span data-icon="wbicons security"></span>
 		 * <button data-icon="circle" type="button"><svg aria-hidden="true">...</svg></button>
 		 * <span data-icon="shadow"><img src="/images/wallets/rabby.svg" alt="Rabby" /></span>
 		 * ```
