@@ -872,6 +872,51 @@ declare global {
 		'data-sticky-container'?: string | boolean
 
 		/**
+		 * ## [data-tab-panel]
+		 *
+		 * Panel inside a direct grouped `<details>` child of `[data-tabs]`. Keep the panel inside its owning disclosure. Add `[data-scroll-container="block"]` for the shared scroll policy.
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tab-panel]`
+		 */
+		'data-tab-panel'?: string | boolean
+
+		/**
+		 * ## [data-tabs]
+		 *
+		 * Native grouped disclosures presented as tabs. Each direct `<details name="...">` owns its summary and panel; use a distinct name for each group. Native disclosure keyboard behavior and the ability to close the selected panel are retained.
+		 *
+		 * ### Tokens
+		 * - orientation: `vertical` (horizontal below 54rem)
+		 * - density: `compact`
+		 *
+		 * ### CSS Variables
+		 * - `--tabs-paddingBlock`: summary padding; defaults to 0.75em
+		 * - `--tabs-paddingInline`: summary padding; defaults to 1em
+		 * - `--tabs-list-size`: vertical label column; defaults to 19rem
+		 * - `--tabs-sizeBlock`: vertical viewport and panel height; defaults to 32rem
+		 *
+		 * ### Examples
+		 * - Native tabs with independent panel scrolling:
+		 *   ```html
+		 *   <div data-tabs="vertical" data-scroll-container="block">
+		 *     <details name="settings" open>
+		 *       <summary>Profile</summary>
+		 *       <section data-tab-panel data-scroll-container="block">...</section>
+		 *     </details>
+		 *     <details name="settings">
+		 *       <summary>Security</summary>
+		 *       <section data-tab-panel data-scroll-container="block">...</section>
+		 *     </details>
+		 *   </div>
+		 *   ```
+		 *
+		 * ### Source
+		 * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tabs]`
+		 */
+		'data-tabs'?: string | boolean
+
+		/**
 		 * ## [data-tag]
 		 *
 		 * Semantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.

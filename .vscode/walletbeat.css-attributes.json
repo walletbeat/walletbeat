@@ -754,6 +754,24 @@
 			"description": "## [data-sticky-container]\n\nSticky inset scope inside `[data-scroll-container]`: `isolation: isolate`, margin/padding inputs for the sticky math chain, and defaults for scroll-item “inline detached” clamp variables. Nest to deepen `--sticky-level` (`--sticky1-*` … `--sticky5-*`); descendants `[data-sticky]` and `[data-scroll-item]` consume the resolved insets and sizes.\n\n### Placement\n- Anywhere under an ancestor `[data-scroll-container]` that should define a nested sticky/scroll-item scope (often wrapping a column that contains `[data-sticky]` and `[data-scroll-item]`).\n\n### CSS Variables\n- `--sticky-marginBlockStart`, `--sticky-marginBlockEnd`, `--sticky-marginInlineStart`, `--sticky-marginInlineEnd`\n- `--sticky-paddingBlockStart`, `--sticky-paddingBlockEnd`, `--sticky-paddingInlineStart`, `--sticky-paddingInlineEnd`\n- `--scrollItem-inlineDetached-maxSize`, `--scrollItem-inlineDetached-paddingStart`, `--scrollItem-inlineDetached-maxPaddingMatchStart`, `--scrollItem-inlineDetached-paddingEnd`, `--scrollItem-inlineDetached-maxPaddingMatchEnd`\n\n### Examples\n- Nested sticky scope (pair with an ancestor `[data-scroll-container]` in real pages):\n  ```html\n  <aside data-sticky-container>\n    <nav data-sticky=\"block-start\">Sidebar</nav>\n  </aside>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`"
 		},
 		{
+			"name": "data-tab-panel",
+			"description": "## [data-tab-panel]\n\nPanel inside a direct grouped `<details>` child of `[data-tabs]`. Keep the panel inside its owning disclosure. Add `[data-scroll-container=\"block\"]` for the shared scroll policy.\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tab-panel]`"
+		},
+		{
+			"name": "data-tabs",
+			"description": "## [data-tabs]\n\nNative grouped disclosures presented as tabs. Each direct `<details name=\"...\">` owns its summary and panel; use a distinct name for each group. Native disclosure keyboard behavior and the ability to close the selected panel are retained.\n\n### Tokens\n- orientation: `vertical` (horizontal below 54rem)\n- density: `compact`\n\n### CSS Variables\n- `--tabs-paddingBlock`: summary padding; defaults to 0.75em\n- `--tabs-paddingInline`: summary padding; defaults to 1em\n- `--tabs-list-size`: vertical label column; defaults to 19rem\n- `--tabs-sizeBlock`: vertical viewport and panel height; defaults to 32rem\n\n### Examples\n- Native tabs with independent panel scrolling:\n  ```html\n  <div data-tabs=\"vertical\" data-scroll-container=\"block\">\n    <details name=\"settings\" open>\n      <summary>Profile</summary>\n      <section data-tab-panel data-scroll-container=\"block\">...</section>\n    </details>\n    <details name=\"settings\">\n      <summary>Security</summary>\n      <section data-tab-panel data-scroll-container=\"block\">...</section>\n    </details>\n  </div>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tabs]`",
+			"values": [
+				{
+					"name": "compact",
+					"description": "`[data-tabs~=\"compact\"]`"
+				},
+				{
+					"name": "vertical",
+					"description": "`[data-tabs~=\"vertical\"]`"
+				}
+			]
+		},
+		{
 			"name": "data-tag",
 			"description": "## [data-tag]\n\nSemantic tag / chip with category-based color families tied to theme variables. Omit a category token for the neutral palette; add one for a themed family.\n\n### Tokens\n- `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`\n\n### CSS Variables\n- `--tag-backgroundColor`\n- `--tag-textColor`\n- `--tag-borderColor`\n- `--tag-hover-backgroundColor`\n- `--tag-hover-textColor`\n- `--tag-hover-borderColor`\n\n### Examples\n- Neutral palette (omit category token):\n  ```html\n  <span data-tag>Label</span>\n  ```\n- `eip` family:\n  ```html\n  <button type=\"button\" data-tag=\"eip\">EIP-7702</button>\n  ```\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`",
 			"values": [
