@@ -649,11 +649,6 @@
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-rotation-states={pieRotation.states}
 	data-sticky-breadcrumb="scope root navigation"
-	style:--stickyBreadcrumb-itemInlineTimeline="--breadcrumb-root-item-inline"
-	style:--stickyBreadcrumb-itemBlockTimeline="--breadcrumb-root-item-block"
-	style:--stickyBreadcrumb-endInlineTimeline="--breadcrumb-root-end-inline"
-	style:--stickyBreadcrumb-endBlockTimeline="--breadcrumb-root-end-block"
-	style:--stickyBreadcrumb-entryTimeline="--breadcrumb-root-entry"
 	class="container"
 	data-sticky-container
 	{@attach container => {
