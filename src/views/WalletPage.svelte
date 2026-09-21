@@ -2105,6 +2105,21 @@
 		}
 
 		@media (width <= 1024px) {
+			.container
+				> article
+				> :nth-child(1 of [data-sticky-breadcrumb~="scope"])
+				> [data-sticky-breadcrumb~="flow"]:not([data-sticky-breadcrumb~="exit"])::after {
+				/* Reuse the snap marker to track only the pie's physical compression space. */
+				view-timeline-name: --wallet-pie-compact;
+				view-timeline-axis: block;
+				view-timeline-inset:
+					calc(var(--navigation-mobile-blockSize) + var(---pie-compactSize))
+					calc(
+						100vh - var(--navigation-mobile-blockSize) -
+							var(---wallet-page-navigation-inline-size)
+					);
+			}
+
 			.container .page-navigation {
 				padding-block-start: 0;
 				&[data-scroll-container] {
@@ -2161,12 +2176,11 @@
 							animation-timing-function: linear, steps(1, end), linear;
 						}
 						animation-timeline:
-							--wallet-pie-source, var(--stickyBreadcrumb-entryTimeline),
-							var(--stickyBreadcrumb-entryTimeline);
+							--wallet-pie-source, --wallet-pie-compact, --wallet-pie-compact;
 						animation-range:
 							cover 0% exit-crossing 0%,
-							var(--stickyBreadcrumb-entryRange),
-							var(--stickyBreadcrumb-entryRange);
+							entry 0% exit 0%,
+							entry 0% exit 0%;
 						/* The first sticky row owns the compact pie’s block-start edge. */
 						inset-block-start: anchor(end);
 						inset-inline-start: anchor(--wallet-pie-source start);
@@ -2191,7 +2205,7 @@
 	[data-sticky-breadcrumb~="root"] {
 		timeline-scope:
 			var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
-			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline);
+			var(---breadcrumb-rowInlineTimeline), var(---breadcrumb-rowBlockTimeline), --wallet-pie-compact;
 		@media (width > 1024px) {
 			timeline-scope:
 				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
@@ -2202,7 +2216,9 @@
 
 	@supports (timeline-scope: all) and (view-timeline-name: ident("a" "b")) {
 		[data-sticky-breadcrumb~="root"] {
-			timeline-scope: var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links);
+			timeline-scope:
+				var(--link-timelines, --wallet-links), var(---pie-rotation-timelines, --wallet-links),
+				--wallet-pie-compact;
 		}
 	}
 
@@ -2444,6 +2460,7 @@
 	@keyframes -global-wallet-pie-compact {
 		from {
 			transform: translateX(0) scale(1);
+			animation-timing-function: var(--transition-easeInOutExpo);
 		}
 	}
 	@keyframes -global-wallet-pie-source {
