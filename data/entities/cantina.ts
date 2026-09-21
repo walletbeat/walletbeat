@@ -27,5 +27,5 @@ export const cantina: CorporateEntity & SecurityAuditor = {
 	privacyPolicy: 'https://cantina.xyz/privacy-policy',
 	repoUrl: { type: 'NO_REPO' },
 	twitter: 'https://x.com/cantinaxyz',
-	url: 'https://cantina.xyz/',
+	url: 'https://cantina.xyz/welcome',
 }

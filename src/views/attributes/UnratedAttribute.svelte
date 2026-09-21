@@ -13,11 +13,11 @@
 
 	const githubUrl = $derived(
 		wallet.types.SOFTWARE ?
-			`https://github.com/walletbeat/walletbeat/tree/beta/data/software-wallets/${wallet.metadata.id}.ts`
+			`https://github.com/walletbeat/walletbeat/blob/beta/data/software-wallets/${wallet.metadata.id}.ts`
 		: wallet.types.HARDWARE ?
-			`https://github.com/walletbeat/walletbeat/tree/beta/data/hardware-wallets/${wallet.metadata.id}.ts`
+			`https://github.com/walletbeat/walletbeat/blob/beta/data/hardware-wallets/${wallet.metadata.id}.ts`
 		: wallet.types.EMBEDDED ?
-			`https://github.com/walletbeat/walletbeat/tree/beta/data/embedded-wallets/${wallet.metadata.id}.ts`
+			`https://github.com/walletbeat/walletbeat/blob/beta/data/embedded-wallets/${wallet.metadata.id}.ts`
 		:
 			''
 	)

@@ -16,7 +16,7 @@ export const certora: CorporateEntity & SecurityAuditor = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/certora',
-	farcaster: 'https://warpcast.com/certora',
+	farcaster: 'https://farcaster.xyz/certora',
 	icon: {
 		extension: 'png',
 		height: 200,

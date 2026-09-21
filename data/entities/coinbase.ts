@@ -16,7 +16,7 @@ export const coinbase: CorporateEntity & WalletDeveloper = {
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/coinbase',
-	farcaster: 'https://warpcast.com/coinbase',
+	farcaster: 'https://farcaster.xyz/coinbase',
 	icon: { extension: 'svg' },
 	jurisdiction: 'United States',
 	linkedin: 'https://www.linkedin.com/company/coinbase/',

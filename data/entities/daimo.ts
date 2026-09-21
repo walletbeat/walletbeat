@@ -16,7 +16,7 @@ export const daimoInc: CorporateEntity & WalletDeveloper = {
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/daimo',
-	farcaster: 'https://warpcast.com/daimo',
+	farcaster: 'https://farcaster.xyz/daimo',
 	icon: {
 		extension: 'svg',
 	},

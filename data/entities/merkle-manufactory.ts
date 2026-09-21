@@ -16,7 +16,7 @@ export const merkleManufactory: CorporateEntity = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/merkle-manufactory',
-	farcaster: 'https://warpcast.com/farcaster',
+	farcaster: 'https://farcaster.xyz/farcaster',
 	icon: 'NO_ICON',
 	jurisdiction: 'Los Angeles, California, United States',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
