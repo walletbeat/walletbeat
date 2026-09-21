@@ -455,8 +455,8 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		repoRootRelativePath: `/${string}.md`
 
 		/**
-		 * Repo-root-relative path to a subtree where all Markdown files
-		 * are assumed to be unique to their specific subdirectory, and that there
+		 * Repo-root-relative path to a subtree where all Markdown files are
+		 * assumed to be unique to their specific subdirectory, and that there
 		 * exists an `index.astro` file next to them.
 		 * When a Markdown document links to a `.md` file that is found to be
 		 * somewhere under `repoRootPagesDir`, the last component of the URL is
@@ -480,10 +480,7 @@ export function rewriteMarkdownURLs<_Strings extends Strings = null>(
 		 */
 		repoRootRelativePaths: Record<`/${string}`, `/${string}` | `https://${string}`>
 
-		/**
-		 * Optional project-specific rewrite for a resolved repo-root-relative URL.
-		 * Return null to fall through to the standard pages-directory and prefix mappings.
-		 */
+		/** Custom rewrite for repo-root-relative URLs; return null to use the standard rules. */
 		repoRootRelativeURLRewriter?: (url: string) => string | null
 
 		/**

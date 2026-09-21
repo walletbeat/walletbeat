@@ -38,7 +38,7 @@ const rewrittenMarkdown = rewriteMarkdownURLs(markdown, {
 		'/src/pages': '/',
 	},
 	repoRootRelativeURLRewriter: rewriteGovernanceRepoURL,
-	// Repo file links must be rewritten to their on-site page; issues and the like stay on GitHub.
+	// Repo files must be linked by relative path so they can resolve to site pages.
 	forbiddenURLPrefixes: [`${repositoryUrl}/blob/`, `${repositoryUrl}/tree/`],
 	whitelistURLs: [`${repositoryUrl}/blob/${repositoryBranch}/LICENSE`],
 })
