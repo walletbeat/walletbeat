@@ -135,7 +135,7 @@
 								data-row-item="flexible"
 								data-column="span-start"
 							>
-								<div data-row="start wrap" data-sticky="block block-start backdrop-self backdrop-always">
+								<div data-row="start wrap" data-sticky="block block-start">
 									<h3 data-row-item="flexible" data-sticky-breadcrumb="source">
 										<a
 											data-link="camouflaged"
@@ -184,7 +184,7 @@
 						>
 							{#if s.criteriaGroups}
 								<div data-column>
-									{#each s.criteriaGroups as criteriaGroup (criteriaGroup.id)}
+									{#each s.criteriaGroups as criteriaGroup, criteriaGroupIndex (criteriaGroup.id)}
 										{@const {
 											passedCount: groupPassedCount,
 											totalCount: groupTotalCount,
@@ -195,14 +195,26 @@
 											id={`${s.id}-${criteriaGroup.id}`}
 											open
 											data-sticky-container
+											data-sticky-breadcrumb="scope"
+											style:--stickyBreadcrumb-entryTimeline={`--stage-${stageIndex}-group-${criteriaGroupIndex}-entry`}
 											data-card="padding-5 secondary radius-4"
 											style:--accent={stageStatuses[groupRating].color}
 											style:--accent-textColor={stageStatuses[groupRating].textColor}
 										>
-											<summary data-sticky="block block-start backdrop-before backdrop-stuck">
+											<summary
+												data-sticky="block block-start backdrop-before backdrop-stuck"
+												data-sticky-breadcrumb="position"
+											>
 												<div data-row="wrap">
-													<h4 data-row-item="flexible basis-2">
-														<a data-link="camouflaged" href={`#${s.id}-${criteriaGroup.id}`}>
+													<h4
+														data-row-item="flexible basis-2"
+														data-sticky-breadcrumb="source"
+													>
+														<a
+															data-link="camouflaged"
+															data-sticky-breadcrumb="item"
+															href={`#${s.id}-${criteriaGroup.id}`}
+														>
 															{#if isTypographicContent(criteriaGroup.description)}
 																<Typography content={criteriaGroup.description} />
 															{:else}
@@ -210,7 +222,7 @@
 															{/if}
 														</a>
 													</h4>
-													<div data-row-item="wrap-end" data-row="gap-2">
+													<div data-row-item="wrap-end" data-row="gap-2" data-sticky-breadcrumb="end">
 														<span>{groupPassedCount}/{groupTotalCount}</span>
 														<data value={groupRating} title={stageStatuses[groupRating].label}>
 															{stageStatuses[groupRating].icon}
@@ -273,6 +285,8 @@
 													</ul>
 												</div>
 											{/if}
+											<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+											<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 										</details>
 									{/each}
 								</div>
@@ -291,6 +305,16 @@
 	[data-sticky-breadcrumb~="scope"] {
 		--stickyBreadcrumb-scale: calc(var(---wallet-compact-h3, 1rem) / 1.1rem);
 		--stickyBreadcrumb-paddingBlock: calc(0.5rem * var(---wallet-compact-h3, 1rem) / var(---wallet-compact-h1, 1.5rem));
+	}
+	details[data-sticky-breadcrumb~="scope"] {
+		--stickyBreadcrumb-scale: calc(
+			var(---wallet-compact-h3, 1rem) *
+				sqrt(var(---wallet-compact-h3, 1rem) / var(---wallet-compact-h1, 1.5rem)) / 1rem
+		);
+		--stickyBreadcrumb-paddingBlock: calc(
+			0.5rem * var(---wallet-compact-h3, 1rem) / var(---wallet-compact-h1, 1.5rem) *
+				sqrt(var(---wallet-compact-h3, 1rem) / var(---wallet-compact-h1, 1.5rem))
+		);
 	}
 
 	:is(details, [data-sticky-breadcrumb~="scope"])[data-card] {

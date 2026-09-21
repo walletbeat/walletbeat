@@ -648,12 +648,12 @@
 	onclick={alignHashAfterScroll}
 	style:---pie-rotation-timelines={pieRotation.timelines}
 	style:---pie-rotation-states={pieRotation.states}
-	data-sticky-breadcrumb="scope root"
-	style:--stickyBreadcrumb-itemInlineTimeline="--wallet-item-inline"
-	style:--stickyBreadcrumb-itemBlockTimeline="--wallet-item-block"
-	style:--stickyBreadcrumb-endInlineTimeline="--wallet-end-inline"
-	style:--stickyBreadcrumb-endBlockTimeline="--wallet-end-block"
-	style:--stickyBreadcrumb-entryTimeline="--wallet-entry"
+	data-sticky-breadcrumb="scope root navigation"
+	style:--stickyBreadcrumb-itemInlineTimeline="--breadcrumb-root-item-inline"
+	style:--stickyBreadcrumb-itemBlockTimeline="--breadcrumb-root-item-block"
+	style:--stickyBreadcrumb-endInlineTimeline="--breadcrumb-root-end-inline"
+	style:--stickyBreadcrumb-endBlockTimeline="--breadcrumb-root-end-block"
+	style:--stickyBreadcrumb-entryTimeline="--breadcrumb-root-entry"
 	class="container"
 	data-sticky-container
 	{@attach container => {
@@ -1378,10 +1378,19 @@
 						data-card="padding-5 secondary radius-4"
 						data-column="gap-0"
 						data-sticky-container
+						data-sticky-breadcrumb="scope"
+						style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-why-entry`}
 					>
-						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-							<h4>
-								<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}-why`}>
+						<summary
+							data-sticky="block block-start backdrop-before backdrop-stuck"
+							data-sticky-breadcrumb="position"
+						>
+							<h4 data-sticky-breadcrumb="source">
+								<a
+									data-link="camouflaged"
+									data-sticky-breadcrumb="item"
+									href={`#${slugifyCamelCase(attribute.id)}-why`}
+								>
 									{evalAttr.evaluation.outcome.rating === Rating.PASS ||
 									evalAttr.evaluation.outcome.rating === Rating.UNRATED
 										? 'Why does this matter?'
@@ -1397,6 +1406,8 @@
 								<p>No explanation available.</p>
 							{/if}
 						</section>
+						<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+						<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 					</details>
 
 					<details
@@ -1405,10 +1416,19 @@
 						data-card="secondary padding-5 radius-4"
 						data-column="gap-0"
 						data-sticky-container
+						data-sticky-breadcrumb="scope"
+						style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-methodology-entry`}
 					>
-						<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-							<h4>
-								<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}-methodology`}>
+						<summary
+							data-sticky="block block-start backdrop-before backdrop-stuck"
+							data-sticky-breadcrumb="position"
+						>
+							<h4 data-sticky-breadcrumb="source">
+								<a
+									data-link="camouflaged"
+									data-sticky-breadcrumb="item"
+									href={`#${slugifyCamelCase(attribute.id)}-methodology`}
+								>
 									{getHowIsEvaluatedHeading(attribute)}
 								</a>
 							</h4>
@@ -1458,6 +1478,8 @@
 								{/if}
 							{/if}
 						</section>
+						<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+						<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 					</details>
 
 					{#if howToImprove}
@@ -1467,11 +1489,17 @@
 							data-card="secondary padding-5 radius-4"
 							data-column="gap-0"
 							data-sticky-container
+							data-sticky-breadcrumb="scope"
+							style:--stickyBreadcrumb-entryTimeline={`--${slugifyCamelCase(attribute.id)}-improvement-entry`}
 						>
-							<summary data-sticky="block block-start backdrop-before backdrop-stuck">
-								<h4>
+							<summary
+								data-sticky="block block-start backdrop-before backdrop-stuck"
+								data-sticky-breadcrumb="position"
+							>
+								<h4 data-sticky-breadcrumb="source">
 									<a
 										data-link="camouflaged"
+										data-sticky-breadcrumb="item"
 										href={`#${slugifyCamelCase(attribute.id)}-improvement`}
 									>
 										{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
@@ -1491,6 +1519,8 @@
 									</div>
 								{/if}
 							</section>
+							<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+							<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 						</details>
 					{/if}
 				</div>
@@ -1871,7 +1901,7 @@
 	@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
 		.pie-navigation {
 			animation: breadcrumb-entry auto steps(1, end) forwards, var(---pie-rotation-states);
-			animation-timeline: --wallet-entry, var(---pie-rotation-timelines);
+			animation-timeline: --breadcrumb-root-entry, var(---pie-rotation-timelines);
 			animation-range: var(--stickyBreadcrumb-entryRange);
 		}
 		.pie-navigation :global(.navigation-items),
@@ -2328,6 +2358,17 @@
 
 	.attribute-accordions {
 		details {
+			&[data-sticky-breadcrumb~="scope"] {
+				--stickyBreadcrumb-scale: calc(
+					var(---wallet-compact-h3) * sqrt(var(---wallet-compact-h3) / var(---wallet-compact-h1)) /
+						var(---wallet-detail-heading-font-size)
+				);
+				--stickyBreadcrumb-paddingBlock: calc(
+					0.5rem * var(---wallet-compact-h3) / var(---wallet-compact-h1) *
+						sqrt(var(---wallet-compact-h3) / var(---wallet-compact-h1))
+				);
+			}
+
 			overflow: visible;
 
 			summary {

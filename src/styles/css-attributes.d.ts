@@ -645,7 +645,8 @@ declare global {
 		 * Compose the position with `data-sticky` for native fallback and explicit backdrop placement.
 		 *
 		 * ### Placement
-		 * - A scope contains its position (directly or inside details), followed by content and a flow marker.
+		 * - A scope contains its position (directly or inside details), followed by a natural content owner and a flow marker.
+		 * - Nested scopes belong inside that content owner so they inherit the parent's calculated compact row.
 		 * - The entry flow marker contains one measure element for independent horizontal size clocks.
 		 * - Source, item, support and end roles belong inside that position; nested scopes inherit the parent row.
 		 * - Closing details excludes its scope, summary and descendants from sticky motion and measurements.
@@ -653,10 +654,11 @@ declare global {
 		 * ### Tokens
 		 * - `scope`: natural section and animation-start fragment target containing a position and its following content
 		 * - `root`: starts a breadcrumb hierarchy
+		 * - `navigation`: lets a root identity compact into the mobile navigation row
 		 * - `position`: real sticky heading container and source-height anchor
 		 * - `source`: untransformed intrinsic reservation for the item
 		 * - `item`: transformed real heading identity and native controls
-		 * - `support`: clips its child content elements below the compact row while they follow their natural scroll position; wrap plain text in an element
+		 * - `support`: counter-translates child content so it follows its natural scroll position while its container remains sticky; wrap plain text in an element
 		 * - `end`: independently sized in-flow metadata
 		 * - `flow`: non-sticky entry clock with a completion snap target following the position and its content
 		 * - `exit`: combines with `flow` to mark the departure start and end from the section bottom
@@ -687,7 +689,7 @@ declare global {
 		 *   ```html
 		 *   <section id="section" data-sticky-container data-sticky-breadcrumb="scope" style="--stickyBreadcrumb-entryTimeline: --section-entry">
 		 *     <header data-sticky="block block-start backdrop-after backdrop-stuck" data-sticky-breadcrumb="position">
-		 *       <div data-row data-sticky="block block-start backdrop-self backdrop-always">
+		 *       <div data-row data-sticky="block block-start">
 		 *         <div data-sticky-breadcrumb="source" data-row-item="flexible">
 		 *           <a data-sticky-breadcrumb="item" href="#section"><h2>Section</h2></a>
 		 *         </div>
