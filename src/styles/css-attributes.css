@@ -299,6 +299,10 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	view-transition-name: none;
 }
 
+::view-transition {
+	pointer-events: none;
+}
+
 ::view-transition-group(*.view-transition-item) {
 	animation-duration: 300ms;
 	animation-timing-function: var(--transition-easeOutExpo);
