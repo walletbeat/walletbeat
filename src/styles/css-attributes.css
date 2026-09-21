@@ -249,7 +249,12 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 }
 
 /**
- * Stable element identity inside a same-document View Transition started by `startScopedViewTransition`. The wrapper temporarily marks the owning subtree with `[data-view-transition-active]`; only `item` and `named` descendants participate, so the document fallback does not capture unrelated UI.
+ * ## [data-view-transition]
+ *
+ * Stable element identity inside a same-document View Transition started by `startScopedViewTransition`. Callers mark transition participants with this attribute; the helper owns the temporary `[data-view-transition-active]` scope marker so the document fallback does not capture unrelated UI.
+ *
+ * ### Placement
+ * - On an element inside the scope passed to `startScopedViewTransition`, or on that scope element itself.
  *
  * ### Tokens
  * - `item`: preserves the identity of an element that survives the update.
@@ -257,7 +262,7 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  *
  * ### CSS Variables
  * - `--view-transition-name`: unique `<custom-ident>` required by `named`.
- * - `--view-transition-class`: semantic animation class; defaults to `view-transition-item`.
+ * - `--view-transition-class`: optional semantic animation class; defaults to `view-transition-item`.
  *
  * ### Examples
  * - A keyed item that may move, enter, or leave during an update:
@@ -275,26 +280,26 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
  * ### Source
  * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-view-transition]`
  */
-[data-view-transition-active]:is([data-view-transition~='item']),
-[data-view-transition-active] [data-view-transition~='item'] {
+[data-view-transition-active]:is([data-view-transition~="item"]),
+[data-view-transition-active] [data-view-transition~="item"] {
 	view-transition-name: match-element;
 	view-transition-class: var(--view-transition-class, view-transition-item);
 }
 
-[data-view-transition-active]:is([data-view-transition~='named']),
-[data-view-transition-active] [data-view-transition~='named'] {
+[data-view-transition-active]:is([data-view-transition~="named"]),
+[data-view-transition-active] [data-view-transition~="named"] {
 	view-transition-name: var(--view-transition-name);
 	view-transition-class: var(--view-transition-class, view-transition-item);
 }
 
 /* Suppress only unowned scope roots; an explicit item or name wins. */
 [data-view-transition-active]:not(
-	[data-view-transition~='item'],
-	[data-view-transition~='named']
+	[data-view-transition~="item"],
+	[data-view-transition~="named"]
 ),
 :root:has([data-view-transition-active]):not(
-	[data-view-transition~='item'],
-	[data-view-transition~='named']
+	[data-view-transition~="item"],
+	[data-view-transition~="named"]
 ) {
 	view-transition-name: none;
 }
