@@ -25,7 +25,7 @@ import Layout from '@/layouts/Layout.astro'
 import type { MarkdownContentWithFrontmatter } from '@/types/content'
 import { stripMarkdownTitle, rewriteMarkdownURLs } from '@/utils/markdown-utils'
 import { rewriteGovernanceRepoURL } from '@/utils/governance-pages'
-import { repositoryBranch, repositoryUrl } from '@/constants'
+import { repositoryUrl } from '@/constants'
 import Navigation from '@/views/Navigation.astro'
 import { defaultNavigationItems } from '@/constants/navigation'
 import Typography from '@/components/Typography.svelte'
@@ -40,7 +40,7 @@ const rewrittenMarkdown = rewriteMarkdownURLs(markdown, {
 	repoRootRelativeURLRewriter: rewriteGovernanceRepoURL,
 	// Repo files must be linked by relative path so they can resolve to site pages.
 	forbiddenURLPrefixes: [`${repositoryUrl}/blob/`, `${repositoryUrl}/tree/`],
-	whitelistURLs: [`${repositoryUrl}/blob/${repositoryBranch}/LICENSE`],
+	whitelistURLs: [`${repositoryUrl}/blob/beta/LICENSE`],
 })
 const processedMarkdown = stripMarkdownTitle(rewrittenMarkdown)
 ---

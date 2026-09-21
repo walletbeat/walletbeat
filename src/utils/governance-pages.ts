@@ -1,6 +1,6 @@
-import { repositoryBranch, repositoryUrl } from '@/constants'
+import { repositoryUrl } from '@/constants'
 
-const rawRepositoryURL = `https://raw.githubusercontent.com/walletbeat/walletbeat/${repositoryBranch}`
+const rawRepositoryURL = 'https://raw.githubusercontent.com/walletbeat/walletbeat/HEAD'
 
 /** Governance docs served as site pages. Links to other governance files go to GitHub. */
 export const publishedGovernanceDocs = [
@@ -41,5 +41,5 @@ export function rewriteGovernanceRepoURL(repoRootRelativeURL: string): string | 
 		return `${rawRepositoryURL}${path}${suffix}`
 	}
 
-	return `${repositoryUrl}/blob/${repositoryBranch}${path}${suffix}`
+	return `${repositoryUrl}/blob/HEAD${path}${suffix}`
 }
