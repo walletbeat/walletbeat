@@ -12,6 +12,7 @@
 		normalizeExampleRatings,
 		ratingIcons,
 		ratingToColor,
+		ratingToTextColor,
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
@@ -906,6 +907,7 @@
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		style:--accent-textColor={ratingToTextColor(evalAttr.evaluation.outcome.rating)}
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
@@ -2158,6 +2160,7 @@
 
 			:global(.navigation-items a > .pie-navigation-icon) {
 				--icon-size: calc(var(---slice-label-size) * 1px);
+				color: #fff;
 
 				position: absolute;
 				inset: var(---pie-origin-y) auto auto var(---pie-origin-x);
@@ -2165,7 +2168,7 @@
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
 				filter: var(
 					---linked-icon-filter,
-					contrast(0.5) brightness(3) opacity(0.7)
+					opacity(0.75)
 						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
 				);
 				transition-property: filter;
