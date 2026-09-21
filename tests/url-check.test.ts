@@ -8,10 +8,10 @@ import { describe, expect, it } from 'vitest'
 import { allWallets } from '@/data/wallets'
 import { hasRefs, toFullyQualified, type WithRef } from '@/schema/reference'
 import { getUrl, type Url } from '@/schema/url'
-import { getRepositoryRoot } from '@/tests/utils/codebase'
 import { type KnownValidUrl, knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
 import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 import { today } from '@/types/date'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 const newValidUrls: KnownValidUrl[] = []
 

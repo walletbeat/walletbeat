@@ -8,10 +8,10 @@ import path from 'path'
 import { allWallets } from '@/data/wallets'
 import { hasRefs, toFullyQualified } from '@/schema/reference'
 import { getUrl, labeledUrl, type Url } from '@/schema/url'
-import { getRepositoryRoot } from '@/utils/codebase'
 import { type KnownValidUrl, knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
 import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 import { today } from '@/types/date'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 /**
  * Validates all reference URLs found in wallet data, plus every external URL
