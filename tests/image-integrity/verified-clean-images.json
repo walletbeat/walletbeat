@@ -1127,6 +1127,30 @@
 		"hash": "348f2cbc4221ca5f3ed2bb51de4342a4a04cb7f9b93a0fb236392fb1e4f7d6d8",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-09-17 - Memes Posts/duress-resistance.jpg": {
+		"hash": "f05cb6214076f8cd85eba0f026f07d88c9828fef45005f4f16ec49b9ffd95672",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Memes Posts/minimal-data-collection.png": {
+		"hash": "140f949d356383e75d9ee4589a42aa8e235a739ec3d6731d10ac15473d836569",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Memes Posts/transaction-batching.png": {
+		"hash": "a94cde305fc920998b86a2fcc902b216fee59a4520b4e5413f82b31a3569c3e5",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Memes Posts/ux-meme.png": {
+		"hash": "bc44a03753b9092ba447ec9c0bc10a6f34bd7c469fbe2ba80fed56b048e629f9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Memes Posts/walletbeat-cta.png": {
+		"hash": "1a6b8f75976fe478368cc3785105fcad5d2b8301020309c1e6eb93da1b442d10",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-17 - Memes Posts/walletbeat-five-categories.png": {
+		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
