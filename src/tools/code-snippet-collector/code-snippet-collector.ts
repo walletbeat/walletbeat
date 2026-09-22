@@ -160,8 +160,6 @@ async function pruneOrphans(): Promise<void> {
 	}
 }
 
-
-
 cli
 	.command('url <blob-url>', 'Fetch the snippet for a single URL')
 	.option('--id <wallet_id>', 'Wallet ID this URL belongs to (inferred from data files if omitted)')
