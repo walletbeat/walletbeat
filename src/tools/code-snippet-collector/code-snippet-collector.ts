@@ -84,35 +84,83 @@ cli
 		'Scan data/*-wallets/*.ts for snippet URLs and fetch every snippet that is not stored yet',
 	)
 	.action(async () => {
-		const occurrences = findSnippetOccurrences(REPO_ROOT)
-		const bySnippetPath = new Map(
-			occurrences.map(occurrence => [occurrence.snippetPath, occurrence]),
-		)
-
-		if (bySnippetPath.size === 0) {
-			process.stderr.write('No line-anchored commit-pinned GitHub blob URLs found in data/.\n')
-			process.exit(0)
-		}
-
-		process.stderr.write(`Found ${bySnippetPath.size} unique snippet URL(s) in wallet data.\n`)
-
-		let failures = 0
-
-		for (const occurrence of bySnippetPath.values()) {
-			try {
-				await fetchAndStore(occurrence.walletId, occurrence.source)
-			} catch (error) {
-				failures++
-				process.stderr.write(
-					`Error fetching ${occurrence.url} ` +
-						`(referenced from ${occurrence.walletId} at ${occurrence.fieldPath}): ` +
-						`${error instanceof Error ? error.message : String(error)}\n`,
-				)
-			}
-		}
+		const failures = await fetchAllMissing()
 
 		process.exit(failures === 0 ? 0 : 1)
 	})
+
+cli.command('fix', 'Fetch every missing snippet and prune every orphaned one').action(async () => {
+	const failures = await fetchAllMissing()
+
+	await pruneOrphans()
+
+	process.exit(failures === 0 ? 0 : 1)
+})
+
+/** Fetch every snippet referenced from wallet data that is not stored yet. Returns the number of failures. */
+async function fetchAllMissing(): Promise<number> {
+	const occurrences = findSnippetOccurrences(REPO_ROOT)
+	const bySnippetPath = new Map(occurrences.map(occurrence => [occurrence.snippetPath, occurrence]))
+
+	if (bySnippetPath.size === 0) {
+		process.stderr.write('No line-anchored commit-pinned GitHub blob URLs found in data/.\n')
+
+		return 0
+	}
+
+	process.stderr.write(`Found ${bySnippetPath.size} unique snippet URL(s) in wallet data.\n`)
+
+	let failures = 0
+
+	for (const occurrence of bySnippetPath.values()) {
+		try {
+			await fetchAndStore(occurrence.walletId, occurrence.source)
+		} catch (error) {
+			failures++
+			process.stderr.write(
+				`Error fetching ${occurrence.url} ` +
+					`(referenced from ${occurrence.walletId} at ${occurrence.fieldPath}): ` +
+					`${error instanceof Error ? error.message : String(error)}\n`,
+			)
+		}
+	}
+
+	return failures
+}
+
+/** Delete stored snippet files that no wallet data file references anymore. */
+async function pruneOrphans(): Promise<void> {
+	const problems = (await checkSnippets(REPO_ROOT)).filter(
+		problem => problem.kind === SnippetProblemKind.ORPHAN_SNIPPET,
+	)
+
+	if (problems.length === 0) {
+		process.stderr.write('No orphaned snippet files to prune.\n')
+
+		return
+	}
+
+	for (const { snippetPath } of problems) {
+		fs.rmSync(path.join(REPO_ROOT, snippetPath))
+		process.stderr.write(`Deleted: ${snippetPath}\n`)
+
+		// Remove directories left empty by the deletion, up to the wallet's
+		// code/ directory itself.
+		let dir = path.dirname(path.join(REPO_ROOT, snippetPath))
+
+		while (
+			path
+				.relative(REPO_ROOT, dir)
+				.startsWith(path.join('public', 'references', 'wallets') + path.sep) &&
+			fs.readdirSync(dir).length === 0
+		) {
+			fs.rmdirSync(dir)
+			dir = path.dirname(dir)
+		}
+	}
+}
+
+
 
 cli
 	.command('url <blob-url>', 'Fetch the snippet for a single URL')
@@ -178,34 +226,7 @@ cli
 cli
 	.command('prune', 'Delete stored snippet files that no wallet data file references anymore')
 	.action(async () => {
-		const problems = (await checkSnippets(REPO_ROOT)).filter(
-			problem => problem.kind === SnippetProblemKind.ORPHAN_SNIPPET,
-		)
-
-		if (problems.length === 0) {
-			process.stderr.write('No orphaned snippet files to prune.\n')
-			process.exit(0)
-		}
-
-		for (const { snippetPath } of problems) {
-			fs.rmSync(path.join(REPO_ROOT, snippetPath))
-			process.stderr.write(`Deleted: ${snippetPath}\n`)
-
-			// Remove directories left empty by the deletion, up to the wallet's
-			// code/ directory itself.
-			let dir = path.dirname(path.join(REPO_ROOT, snippetPath))
-
-			while (
-				path
-					.relative(REPO_ROOT, dir)
-					.startsWith(path.join('public', 'references', 'wallets') + path.sep) &&
-				fs.readdirSync(dir).length === 0
-			) {
-				fs.rmdirSync(dir)
-				dir = path.dirname(dir)
-			}
-		}
-
+		await pruneOrphans()
 		process.exit(0)
 	})
 

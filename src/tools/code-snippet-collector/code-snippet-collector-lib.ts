@@ -378,6 +378,7 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 	}
 
 	const walletsDir = path.join(repoRoot, walletsReferencesDir)
+
 	await crawlCodebase({
 		root: walletsDir,
 		ignore: [],
