@@ -27,16 +27,13 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const zeus: SoftwareWallet = {
 	metadata: {
 		id: 'zeus',
 		displayName: 'Zeus',
 		tableName: 'Zeus',
-		blurb: paragraph(`
-			Zeus is a truly seedless and decentralized self-custodial Ethereum wallet.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-12',
@@ -54,7 +51,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Zeus derives a Hierarchical Deterministic Wallet from a username and password using the BIP32 standard. Users can also import wallets using either a 12-24 word phrase or a private key.',
+							'Zeus derives a Hierarchical Deterministic Wallet from a username and password using the BIP32 standard. Users can also import wallets using either a 12–24 word phrase or a private key.',
 						url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
 					},
 				],

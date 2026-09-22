@@ -1,0 +1,776 @@
+{
+    "wallet": "Okto",
+    "platform": "Ios",
+    "version": "3.72.002",
+    "date": "2025-12-03T21:55:33.249Z",
+    "walletUID": "okto-ios",
+    "walletMakerUID": "okto",
+    "scores": {
+        "categories": [
+            {
+                "categoryUID": "WSR-VERI",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-VERI-001.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-VERI-002.v1",
+                        "result": 50
+                    },
+                    {
+                        "checkUID": "WSR-VERI-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-VERI-007.v1",
+                        "result": 0
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PHYS",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PHYS-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-006~Mobile.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-004.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-005.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PHYS-003.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-PERM",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-PERM-010~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-002~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-009.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-007~Mobile.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-PERM-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-PERM-006.v1",
+                        "result": 100
+                    }
+                ]
+            },
+            {
+                "categoryUID": "WSR-THRE",
+                "checkResults": [
+                    {
+                        "checkUID": "WSR-THRE-001.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-002.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-003.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-004.v1",
+                        "result": 100
+                    },
+                    {
+                        "checkUID": "WSR-THRE-005.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-006.v1",
+                        "result": 0
+                    },
+                    {
+                        "checkUID": "WSR-THRE-007.v1",
+                        "result": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "results": [
+        {
+            "uid": "WSR-VERI-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-02f8c937.jpg",
+                        "okto-ios-3.72.002-24ba767a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet prevents transactions to addresses with invalid checksums, but does not clearly inform the user\u2014only briefly displaying an alert."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073195124
+        },
+        {
+            "uid": "WSR-PHYS-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-94cf24a8.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet permits both taking screenshots and copying the seed phrase to the clipboard without offering any warning about the associated risks and doesn't limit the time are present in the clipboard."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073281719
+        },
+        {
+            "uid": "WSR-PERM-010~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-e9bc8963.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires users to confirm all requests before processing them."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073303071
+        },
+        {
+            "uid": "WSR-PERM-002~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-aa15db95.jpg",
+                        "okto-ios-3.72.002-427a2a71.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "It forces the user to unlock the wallet for all the requests before processing them."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073324588
+        },
+        {
+            "uid": "WSR-THRE-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-e344db0e.jpg",
+                        "okto-ios-3.72.002-26c90e2a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet incorrectly shows a green checkmark on every connection dialog, falsely suggesting that all DApps are verified. This could mislead users into trusting unverified or potentially malicious DApps."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073341961
+        },
+        {
+            "uid": "WSR-THRE-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-f0b6ff08.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not alert the user when attempting to send a transaction to the Tornado Cash attacker address."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073368191
+        },
+        {
+            "uid": "WSR-PHYS-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-9a9bbed7.jpg",
+                        "okto-ios-3.72.002-69262f19.jpg",
+                        "okto-ios-3.72.002-22e3025a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet enforces a 6-digit passphrase but accepts simple ones like 123456 and lacks rate limiting for incorrect entries. Biometrics are enabled by default."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073390977
+        },
+        {
+            "uid": "WSR-PERM-001.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-d3a59821.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not provide a specific warning when signing Sign-In with Ethereum (SIWE) messages."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073439199
+        },
+        {
+            "uid": "WSR-THRE-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-48ae20e3.jpg",
+                        "okto-ios-3.72.002-bcada8fb.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet omits the dApp\u2019s URL-specific name and displays only the primary domain. For instance, if a phishing dApp is hosted on a Vercel subdomain, it misleadingly shows \u201cVercel\u201d as the origin. It also wrongly displays a green checkmark, suggesting the site is verified, which can easily mislead users into trusting malicious dApps."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073456176
+        },
+        {
+            "uid": "WSR-VERI-002.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "50%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-c28fbccc.jpg",
+                        "okto-ios-3.72.002-4103802c.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet displays clickable links in the transaction history but does not provide them during the transaction process."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073474354
+        },
+        {
+            "uid": "WSR-VERI-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-821ddeee.png",
+                        "okto-ios-3.72.002-af22ca7f.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not utilize transaction simulation and fails to display the incoming and outgoing assets of transactions."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073487949
+        },
+        {
+            "uid": "WSR-VERI-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-0cd530fa.png",
+                        "okto-ios-3.72.002-a18582d0.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn't parse EIP-712 objects for well-known contracts and protocols, such as OpenSea Seaport listings and ERC-20 Permits."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073507358
+        },
+        {
+            "uid": "WSR-THRE-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-190883c9.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet notifies users that the DApp will be able to view their balances and activity, as well as request transaction approvals."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073528397
+        },
+        {
+            "uid": "WSR-THRE-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-cb427ae7.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not display any message when interacting with an address for the first time."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763393432462
+        },
+        {
+            "uid": "WSR-THRE-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-7b9abf63.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet truncates the URL in the connection dialog, showing only the main domain of the DApp. This hides important details like subdomains, which phishing sites can exploit to mimic legitimate platforms. For example, it displays only \u201cVERCEL\u201d for https://arbitrum-token-bridge-cqjggprvn-offchain-labs.vercel.app/."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073560213
+        },
+        {
+            "uid": "WSR-PERM-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-5081c8b8.jpg",
+                        "okto-ios-3.72.002-2b8cf576.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet allows signing an EIP-712 object even when the chainID doesn\u2019t match the active chain and provides no warning about the mismatch."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073581155
+        },
+        {
+            "uid": "WSR-PERM-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-bebe0299.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet shows a list of all DApps currently connected via WalletConnect and offers an option to revoke access. It also features a timer that automatically disconnects DApps after a set duration."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073597074
+        },
+        {
+            "uid": "WSR-VERI-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-c53fd637.jpg",
+                        "okto-ios-3.72.002-f55ddd0e.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The approval screen lacks details such as the amount, token, effect, and spender, making it difficult for users to fully understand the transaction."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073612009
+        },
+        {
+            "uid": "WSR-PERM-009.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-62df181d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet skips user confirmation when attempting to switch the chain"
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1763137285681
+        },
+        {
+            "uid": "WSR-VERI-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-4aa8e482.jpg",
+                        "okto-ios-3.72.002-2d56d815.jpg",
+                        "okto-ios-3.72.002-8eb584fc.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The \u201cshow more\u201d button works as intended and reveals the full message, but it doesn\u2019t allow users to scroll through the content, and the message cannot be signed. For eth_signTypedData requests, such as Permit or OpenSea contracts, no data is shown."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073653290
+        },
+        {
+            "uid": "WSR-PERM-007~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-46723fe5.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "Every RPC endpoint still requires user confirmation before processing any request."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073671724
+        },
+        {
+            "uid": "WSR-PERM-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-f6ca3dec.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet lacks a built-in feature for token allowance revocation and does not redirect users to third-party services for this purpose."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073689098
+        },
+        {
+            "uid": "WSR-THRE-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-eeefcb9f.jpg",
+                        "okto-ios-3.72.002-9248856b.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn\u2019t display NFTs but does filter spam tokens, placing them in a separate \u201cSpam Tokens\u201d tab."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073706949
+        },
+        {
+            "uid": "WSR-PHYS-006~Mobile.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-258f1739.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet doesn\u2019t automatically lock after 1 minute of background activity or when the device is locked; it only locks upon being fully closed. There\u2019s no setting to adjust the auto-lock duration."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073723611
+        },
+        {
+            "uid": "WSR-VERI-007.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-4a10f58f.jpg",
+                        "okto-ios-3.72.002-bc316d5c.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The confirm button is always enabled."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073739470
+        },
+        {
+            "uid": "WSR-PHYS-004.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "0%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-6863bf0a.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet does not include a manual lock button but does provide an option to remove the account."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073757730
+        },
+        {
+            "uid": "WSR-PERM-006.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-3e21e305.jpg",
+                        "okto-ios-3.72.002-e9978e0d.png"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The eth_sign method is disabled by default, as the wallet uses personal_sign instead, converting the message to bytes."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073777950
+        },
+        {
+            "uid": "WSR-PHYS-005.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-13647683.jpg",
+                        "okto-ios-3.72.002-c5982469.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet requires biometric authentication or a passphrase to reveal the seed phrase."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073793142
+        },
+        {
+            "uid": "WSR-PHYS-003.v1",
+            "inputs": [
+                {
+                    "type": "select",
+                    "value": "100%"
+                },
+                {
+                    "type": "file",
+                    "value": [
+                        "okto-ios-3.72.002-35b9ba5b.jpg"
+                    ]
+                },
+                {
+                    "type": "textarea",
+                    "value": "The wallet shows a warning about the risks of sharing the recovery phrase, though it lacks detail and clarity."
+                }
+            ],
+            "tester": 2,
+            "lastUpdated": 1761073810696
+        }
+    ]
+}

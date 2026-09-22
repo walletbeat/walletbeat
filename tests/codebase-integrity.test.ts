@@ -7,7 +7,6 @@ import {
 	iconFontStartCharCode,
 	maxIconFontChars,
 } from '@/tools/icon-font-generator/icon-font-generator-lib'
-
 import {
 	type CodebaseEntry,
 	CodebaseEntryType,
@@ -18,7 +17,7 @@ import {
 	GitIgnoredFiles,
 	normalizePath,
 	type PathPredicate,
-} from './utils/codebase'
+} from '@/utils/codebase'
 
 /** File extensions that are allowed in the repository. */
 const ALLOWED_EXTENSIONS = new Set([
@@ -69,6 +68,7 @@ const ALLOWED_BARE_FILENAMES = new Set([
 	'Makefile',
 	'agentsignore',
 	'checkpoint',
+	'upstream-commit',
 	'torrc',
 	'.editorconfig',
 	'.gitattributes',

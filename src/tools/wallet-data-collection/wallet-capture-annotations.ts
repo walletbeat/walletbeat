@@ -8,8 +8,8 @@ import {
 	dataCollectionPurpose,
 } from '@/schema/features/privacy/data-collection'
 import { type AtLeastOneTrueVariant } from '@/schema/variants'
-import { escapeRegExp } from '@/tests/utils/codebase'
 import { isInVocabulary } from '@/tests/utils/grammar'
+import { getErrorMessage } from '@/types/errors'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -18,14 +18,15 @@ import {
 	nonEmptySetFromArray,
 	setItems,
 } from '@/types/utils/non-empty'
-
+import { escapeRegExp } from '@/utils/codebase'
 import {
 	expectArray,
 	expectOptionalString,
 	expectRecord,
 	expectString,
 	isSameJson,
-} from './json-utils'
+} from '@/utils/json'
+
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
@@ -37,6 +38,7 @@ export interface EncodedWalletRequestMatcher {
 	domain: string
 	path?: string
 	method?: string
+	refererDomain?: string
 	purposes?: NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 	policy?: CollectionPolicy
 }
@@ -74,6 +76,8 @@ const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [
 	/^chrome-extension:\/\/\w+$/,
 	// ISO-8601 timestamps (e.g. event/request timestamps) are not user-identifying on their own.
 	/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/,
+	// Strings of one or two word characters (letters, digits, underscore)
+	/^\w{1,2}$/,
 ]
 
 export interface SaveOptions {
@@ -91,6 +95,7 @@ export class WalletRequestMatcher {
 	private readonly domain: string
 	private readonly path: string | null
 	private readonly method: string | null
+	private readonly refererDomain: string | null
 	public readonly isGlobal: boolean
 	public readonly purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 	public readonly policy: CollectionPolicy | null
@@ -100,12 +105,14 @@ export class WalletRequestMatcher {
 			domain,
 			path,
 			method,
+			refererDomain,
 			purposes,
 			policy,
 		}: {
 			domain: string
 			path: string | null
 			method: string | null
+			refererDomain: string | null
 			purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 			policy: CollectionPolicy | null
 		},
@@ -131,6 +138,7 @@ export class WalletRequestMatcher {
 
 		this.path = path
 		this.method = method
+		this.refererDomain = refererDomain
 		this.purposes = purposes
 		this.policy = policy
 	}
@@ -138,6 +146,19 @@ export class WalletRequestMatcher {
 	public matches(request: WalletRequest): boolean {
 		if (!domainMatches(this.domain, request.domain)) {
 			return false
+		}
+
+		// If a referer domain selector is provided, require a referer header domain match.
+		if (this.refererDomain !== null) {
+			const requestRefererDomain = request.refererDomain()
+
+			if (requestRefererDomain === null) {
+				return false
+			}
+
+			if (!domainMatches(this.refererDomain, requestRefererDomain)) {
+				return false
+			}
 		}
 
 		if (!optionalGlobMatches(this.path, request.path)) {
@@ -171,6 +192,7 @@ export class WalletRequestMatcher {
 					}),
 			...(this.path === null ? {} : { path: this.path }),
 			...(this.method === null ? {} : { method: this.method }),
+			...(this.refererDomain === null ? {} : { refererDomain: this.refererDomain }),
 			...(this.policy === null ? {} : { policy: this.policy }),
 		}
 	}
@@ -197,14 +219,30 @@ export class WalletCaptureAnnotations {
 			const raw = fs.readFileSync(pathStr, 'utf8').trim()
 
 			if (raw !== '') {
-				const parsed: unknown = JSON.parse(raw)
+				let parsed: unknown
+
+				try {
+					parsed = JSON.parse(raw) as unknown
+				} catch (e) {
+					throw new Error(`Invalid JSON in annotations file ${pathStr}: ${getErrorMessage(e)}`, {
+						cause: e,
+					})
+				}
 
 				data = WalletCaptureAnnotations.parseEncoded(parsed, '$')
 			}
 		}
 
 		const globalRaw = fs.readFileSync(globalPath, 'utf8').trim()
-		const global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw), 'global$')
+		let global: EncodedWalletCaptureAnnotations
+
+		try {
+			global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw) as unknown, 'global$')
+		} catch (e) {
+			throw new Error(`Invalid JSON in annotations file ${globalPath}: ${getErrorMessage(e)}`, {
+				cause: e,
+			})
+		}
 
 		return new WalletCaptureAnnotations(pathStr, globalPath, data, global)
 	}
@@ -230,6 +268,7 @@ export class WalletCaptureAnnotations {
 			const domain = expectString(obj.domain, `${matcherAt}.domain`)
 			const pathOpt = expectOptionalString(obj.path, `${matcherAt}.path`)
 			const methodOpt = expectOptionalString(obj.method, `${matcherAt}.method`)
+			const refererDomainOpt = expectOptionalString(obj.refererDomain, `${matcherAt}.refererDomain`)
 
 			const purposes = (():
 				NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | undefined => {
@@ -264,6 +303,7 @@ export class WalletCaptureAnnotations {
 				domain,
 				path: pathOpt,
 				method: methodOpt,
+				refererDomain: refererDomainOpt,
 				purposes,
 				policy: policyOpt === undefined ? undefined : collectionPolicyEnum.assert(policyOpt),
 			}
@@ -298,6 +338,7 @@ export class WalletCaptureAnnotations {
 					domain: m.domain,
 					path: m.path ?? null,
 					method: m.method ?? null,
+					refererDomain: m.refererDomain ?? null,
 					purposes:
 						m.purposes === undefined
 							? null

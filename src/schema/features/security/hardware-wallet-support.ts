@@ -286,7 +286,7 @@ ${nonEmptyMap(
 ).join('')}${
 		otherSupported
 			? `
-* ... and others${sameConnectionTypeForAll === null ? walletSpecificMethod(HardwareWalletType.OTHER) : ''}
+* … and others${sameConnectionTypeForAll === null ? walletSpecificMethod(HardwareWalletType.OTHER) : ''}
 `
 			: ''
 	}

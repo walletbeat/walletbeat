@@ -17,7 +17,11 @@
 		error: '',
 	})
 
-	const walletConnectState = $state({
+	const walletConnectState = $state<{
+		isPending: boolean
+		result: unknown
+		error: string
+	}>({
 		isPending: false,
 		result: null,
 		error: '',
@@ -232,12 +236,12 @@
 	}
 
 	.result-box.error .result-label {
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.result-box.empty .result-label,
 	.result-box.success .result-label {
-		color: var(--rating-pass);
+		color: var(--rating-pass-text);
 	}
 
 	.empty-note {

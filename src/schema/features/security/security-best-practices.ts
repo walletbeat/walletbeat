@@ -13,7 +13,7 @@ export enum KeyStorageMechanism {
 
 	/**
 	 * The key is encrypted with a user-known secret before being stored on disk,
-	 * but the key derivation is non-standard or ad-hoc.
+	 * but the key derivation is nonstandard or ad-hoc.
 	 */
 	ENCRYPTED_WITH_USER_SECRET_WEAK_KDF = 'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF',
 
@@ -315,6 +315,9 @@ export enum AndroidPermission {
 	/** Modify global audio settings. */
 	MODIFY_AUDIO_SETTINGS = 'android.permission.MODIFY_AUDIO_SETTINGS',
 
+	/** Control device vibration. */
+	VIBRATE = 'android.permission.VIBRATE',
+
 	/** Bluetooth (Android < 12). */
 	BLUETOOTH = 'android.permission.BLUETOOTH',
 
@@ -341,6 +344,21 @@ export enum AndroidPermission {
 
 	/** Write files to shared external storage (legacy, pre-scoped-storage). */
 	WRITE_EXTERNAL_STORAGE = 'android.permission.WRITE_EXTERNAL_STORAGE',
+
+	/** Be notified when the user screenshots the app (Android 14+). */
+	DETECT_SCREEN_CAPTURE = 'android.permission.DETECT_SCREEN_CAPTURE',
+
+	/** Authenticate with biometric hardware (fingerprint, face, etc.). */
+	USE_BIOMETRIC = 'android.permission.USE_BIOMETRIC',
+
+	/** Legacy fingerprint authentication (superseded by USE_BIOMETRIC). */
+	USE_FINGERPRINT = 'android.permission.USE_FINGERPRINT',
+
+	/** Read images from shared media storage (scoped storage, Android 13+). */
+	READ_MEDIA_IMAGES = 'android.permission.READ_MEDIA_IMAGES',
+
+	/** Access the Google advertising ID — used for ad attribution/tracking. */
+	AD_ID = 'com.google.android.gms.permission.AD_ID',
 }
 
 export const androidPermissions = new Enum<AndroidPermission>({
@@ -350,6 +368,7 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.CAMERA]: true,
 	[AndroidPermission.RECORD_AUDIO]: true,
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: true,
+	[AndroidPermission.VIBRATE]: true,
 	[AndroidPermission.BLUETOOTH]: true,
 	[AndroidPermission.BLUETOOTH_ADMIN]: true,
 	[AndroidPermission.BLUETOOTH_CONNECT]: true,
@@ -359,6 +378,11 @@ export const androidPermissions = new Enum<AndroidPermission>({
 	[AndroidPermission.USE_FULL_SCREEN_INTENT]: true,
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: true,
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: true,
+	[AndroidPermission.DETECT_SCREEN_CAPTURE]: true,
+	[AndroidPermission.USE_BIOMETRIC]: true,
+	[AndroidPermission.USE_FINGERPRINT]: true,
+	[AndroidPermission.READ_MEDIA_IMAGES]: true,
+	[AndroidPermission.AD_ID]: true,
 })
 
 /**
@@ -384,6 +408,9 @@ export enum IosUsageDescription {
 	/** Location access while the app is in use, required for BLE on iOS. */
 	LOCATION_WHEN_IN_USE = 'NSLocationWhenInUseUsageDescription',
 
+	/** Location access at all times, including while in use. */
+	LOCATION_ALWAYS_AND_WHEN_IN_USE = 'NSLocationAlwaysAndWhenInUseUsageDescription',
+
 	/** Microphone access. */
 	MICROPHONE = 'NSMicrophoneUsageDescription',
 
@@ -392,6 +419,9 @@ export enum IosUsageDescription {
 
 	/** Read images from the photo library. */
 	PHOTO_LIBRARY = 'NSPhotoLibraryUsageDescription',
+
+	/** Prompt string for user notifications. */
+	USER_NOTIFICATIONS = 'NSUserNotificationsUsageDescription',
 }
 
 export const iosUsageDescriptions = new Enum<IosUsageDescription>({
@@ -400,9 +430,11 @@ export const iosUsageDescriptions = new Enum<IosUsageDescription>({
 	[IosUsageDescription.CAMERA]: true,
 	[IosUsageDescription.FACE_ID]: true,
 	[IosUsageDescription.LOCATION_WHEN_IN_USE]: true,
+	[IosUsageDescription.LOCATION_ALWAYS_AND_WHEN_IN_USE]: true,
 	[IosUsageDescription.MICROPHONE]: true,
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: true,
 	[IosUsageDescription.PHOTO_LIBRARY]: true,
+	[IosUsageDescription.USER_NOTIFICATIONS]: true,
 })
 
 /**

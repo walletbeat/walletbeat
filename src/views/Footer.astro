@@ -22,42 +22,49 @@ const socialLinks = [
 ] as const
 ---
 
-<footer data-row='center wrap align-center gap-6' data-scroll-item='inline-detached'>
-	<a href='/' data-link='camouflaged' data-row-item='wrap-center' aria-label='Walletbeat'>
-		<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
-	</a>
-
-	<p data-row-item='wrap-center basis-6'>
-		Made with 🌸 & 💗 by the {' '}
-		<a
-			href='https://github.com/walletbeat/walletbeat/graphs/contributors?all=1'
-			target='_blank'
-			rel='noreferrer'
-		>
-			Walletbeat contributors
+<footer data-column='gap-4' data-scroll-item='inline-detached'>
+	<div data-row='center wrap align-center gap-6'>
+		<a href='/' data-link='camouflaged' data-row-item='wrap-center' aria-label='Walletbeat'>
+			<img src='/logo.svg' alt='Walletbeat' data-safari='invert-lightness' />
 		</a>
-	</p>
 
-	<nav data-row='center' data-row-item='wrap-center' aria-label='Walletbeat links'>
-		<ul data-list='unstyled' data-row='center'>
-			{
-				socialLinks.map(link => (
-					<li>
-						<a
-							data-icon='circle'
-							href={link.href}
-							target='_blank'
-							rel='noreferrer'
-							aria-label={link.label}
-							title={link.label}
-						>
-							<span set:html={link.icon} />
-						</a>
-					</li>
-				))
-			}
-		</ul>
-	</nav>
+		<p data-row-item='wrap-center basis-6'>
+			Made with 🌸 & 💗 by the {' '}
+			<a
+				href='https://github.com/walletbeat/walletbeat/graphs/contributors?all=1'
+				target='_blank'
+				rel='noreferrer'
+			>
+				Walletbeat contributors
+			</a>
+		</p>
+
+		<nav data-row='center' data-row-item='wrap-center' aria-label='Walletbeat links'>
+			<ul data-list='unstyled' data-row='center'>
+				{
+					socialLinks.map(link => (
+						<li>
+							<a
+								data-icon='circle'
+								href={link.href}
+								target='_blank'
+								rel='noreferrer'
+								aria-label={link.label}
+								title={link.label}
+							>
+								<span set:html={link.icon} />
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</div>
+
+	<p class='disclaimer'>
+		Wallets listed on Walletbeat do not represent endorsements and are for informational purposes
+		only.
+	</p>
 </footer>
 
 <style>
@@ -83,6 +90,12 @@ const socialLinks = [
 			color: var(--footer-mutedColor);
 			font-size: 0.8125rem;
 			line-height: 1.4;
+		}
+
+		.disclaimer {
+			margin: 0;
+			max-inline-size: 42rem;
+			margin-inline: auto;
 		}
 	}
 </style>

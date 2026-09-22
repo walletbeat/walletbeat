@@ -9,7 +9,6 @@
 		"overall",
 		"perVariant",
 		"displayName",
-		"description",
 		"lastUpdated",
 		"stage",
 		"stageBreakdown"
@@ -46,10 +45,6 @@
 			"type": "string",
 			"minLength": 1,
 			"description": "Human-readable wallet name."
-		},
-		"description": {
-			"type": "string",
-			"description": "Short wallet description (rendered blurb)."
 		},
 		"lastUpdated": {
 			"type": "string",
@@ -244,7 +239,7 @@
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["rating", "shortExplanation", "details"],
-			"description": "Wallet-specific evaluation result for one attribute (rating, explanation, details, optional impact, howToImprove, references).",
+			"description": "Wallet-specific evaluation result for one attribute (rating, explanation, details, optional note, impact, howToImprove, references).",
 			"properties": {
 				"rating": {
 					"type": "string",
@@ -258,6 +253,10 @@
 				"details": {
 					"type": "string",
 					"description": "Longer explanation or summary of the evaluation; may be \"See full details on the wallet page.\" when details are not easily expressed in textual format."
+				},
+				"note": {
+					"type": "string",
+					"description": "Additional wallet-specific context or clarification about this attribute's rating."
 				},
 				"impact": {
 					"type": "string"
@@ -287,6 +286,36 @@
 					"minItems": 1,
 					"items": {
 						"$ref": "#/$defs/referenceUrl"
+					}
+				},
+				"source": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["id", "name", "license", "attributionText"],
+					"description": "Provenance of this reference when it was adapted from an external data source. id is the data-source entity id. license.url is the license deed, not the report URL.",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"license": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["name", "url"],
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							}
+						},
+						"attributionText": {
+							"type": "string"
+						}
 					}
 				}
 			}

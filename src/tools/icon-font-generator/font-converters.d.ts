@@ -9,3 +9,10 @@ declare module 'ttf2woff' {
 declare module 'ttf2woff2' {
 	export default function ttf2woff2(buffer: Uint8Array): Uint8Array
 }
+
+declare module 'sax' {
+	const sax: {
+		MAX_BUFFER_LENGTH: number
+	}
+	export default sax
+}

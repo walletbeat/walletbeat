@@ -244,7 +244,7 @@
 
 	.warning-text {
 		font-size: 0.8rem;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		margin: 0;
 		text-align: center;
 	}

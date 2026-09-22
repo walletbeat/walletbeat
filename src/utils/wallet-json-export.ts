@@ -24,7 +24,7 @@ import {
 } from '@/schema/stages'
 import { getUrl } from '@/schema/url'
 import { getVariants, type Variant } from '@/schema/variants'
-import { type RatedWallet } from '@/schema/wallet'
+import { type AttributeOverride, getAttributeOverride, type RatedWallet } from '@/schema/wallet'
 import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
 import { setItems } from '@/types/utils/non-empty'
@@ -37,7 +37,6 @@ import {
 	getCriterionAttributeId,
 	type StageCountsStatus,
 } from '@/utils/stage-attributes'
-import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
 
@@ -71,6 +70,12 @@ export interface ReferenceUrlJsonExport {
 export interface ReferenceJsonExport {
 	explanation?: string
 	urls: ReferenceUrlJsonExport[]
+	source?: {
+		id: string
+		name: string
+		license: { name: string; url: string }
+		attributionText: string
+	}
 }
 
 /** Attribute-level metadata (same for every wallet). */
@@ -93,6 +98,7 @@ export interface RatingJsonExport {
 	rating: string
 	shortExplanation: string
 	details: string
+	note?: string
 	impact?: string
 	howToImprove?: string
 	references?: ReferenceJsonExport[]
@@ -146,7 +152,6 @@ export interface RatedWalletJsonExport {
 	variants: Variant[]
 	walletId: string
 	displayName: string
-	description: string
 	lastUpdated: string
 	stage: string | null
 	stageBreakdown: StageBreakdownItemJsonExport[] | null
@@ -154,7 +159,7 @@ export interface RatedWalletJsonExport {
 	repository?: string
 }
 
-function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
+export function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
 	const qualified = toFullyQualified(references)
 
 	if (qualified.length === 0) {
@@ -164,6 +169,17 @@ function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] 
 	return qualified.map(ref => ({
 		...(ref.explanation !== undefined && { explanation: ref.explanation }),
 		urls: ref.urls.map(u => ({ label: u.label, url: u.url })),
+		...(ref.source !== undefined && {
+			source: {
+				id: ref.source.entity.id,
+				name: ref.source.entity.name,
+				license: {
+					name: ref.source.license.name,
+					url: getUrl(ref.source.license.url),
+				},
+				attributionText: ref.source.attributionText,
+			},
+		}),
 	}))
 }
 
@@ -217,6 +233,7 @@ function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
 function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	evaluatedAttribute: EvaluatedAttribute<_OutcomeMetadata>,
 	evalStrings: WalletNameAndPseudonymStrings,
+	note: AttributeOverride['note'],
 ): AttributeExportBlock {
 	const { attribute, evaluation } = evaluatedAttribute
 
@@ -240,6 +257,10 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 		details: renderContentToText(evaluation.details, evalStrings, {
 			fallback: DETAILS_FALLBACK,
 		}),
+	}
+
+	if (note !== undefined) {
+		ratingBlock.note = renderTypographicContentToString(note, evalStrings)
 	}
 
 	if (evaluation.impact !== undefined) {
@@ -269,6 +290,7 @@ function serializeEvaluationTree<_AttributeGroupId extends string>(
 	attributeTree: AttributeTree<_AttributeGroupId>,
 	evalTree: EvaluationTree<_AttributeGroupId>,
 	evalStrings: WalletNameAndPseudonymStrings,
+	wallet: RatedWallet<_AttributeGroupId>,
 ): AttributeGroupsExport {
 	const result: AttributeGroupsExport = {}
 
@@ -276,7 +298,15 @@ function serializeEvaluationTree<_AttributeGroupId extends string>(
 		mapNonExemptAttributeGroupsInTree(attributeTree, evalTree, (attrGroup, evalGroup) => {
 			const entries = mapNonExemptGroupAttributes(
 				evalGroup,
-				evalAttr => [evalAttr.attribute.id, serializeAttribute(evalAttr, evalStrings)] as const,
+				evalAttr =>
+					[
+						evalAttr.attribute.id,
+						serializeAttribute(
+							evalAttr,
+							evalStrings,
+							getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)?.note,
+						),
+					] as const,
 			)
 
 			return [attrGroup.id, Object.fromEntries(entries)]
@@ -376,13 +406,12 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 		types: setItems(wallet.types),
 		variants: setItems(getVariants(wallet.variants)),
 		displayName: metadata.displayName,
-		description: walletBlurbText(wallet),
 		lastUpdated: metadata.lastUpdated,
 		stage: stageExport,
 		stageBreakdown,
 		...(website !== undefined && { website }),
 		...(repository !== undefined && { repository }),
-		overall: serializeEvaluationTree(attributeTree, wallet.overall, evalStrings),
+		overall: serializeEvaluationTree(attributeTree, wallet.overall, evalStrings, wallet),
 		perVariant: {},
 	}
 
@@ -391,7 +420,12 @@ export function ratedWalletJsonExport<_AttributeGroupId extends string>(
 
 		if (resolved !== undefined) {
 			payload.perVariant[variant] = {
-				attributes: serializeEvaluationTree(attributeTree, resolved.attributes, evalStrings),
+				attributes: serializeEvaluationTree(
+					attributeTree,
+					resolved.attributes,
+					evalStrings,
+					wallet,
+				),
 				features: serializeResolvedFeatures(resolved.features),
 			}
 		}

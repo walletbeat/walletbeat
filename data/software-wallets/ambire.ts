@@ -25,7 +25,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -58,6 +61,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import {
 	featureSupported,
@@ -73,7 +77,6 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { ambireEntity } from '../entities/ambire'
@@ -209,10 +212,7 @@ export const ambire: SoftwareWallet = {
 		id: 'ambire',
 		displayName: 'Ambire',
 		tableName: 'Ambire',
-		blurb: paragraph(`
-			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
-			improving security and user experience.
-			`),
+		coinspectId: 'ambire',
 		contributors: [jiojosbg, nconsigny, mattmatt, polymutex, ren2140],
 		iconExtension: 'svg',
 		lastUpdated: '2026-07-22',
@@ -404,15 +404,43 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Ambire raised $2.5M in a round led by LAUNCHub Ventures in December 2021.',
+					label: 'We raised $2.5m in funding for Ambire Wallet',
+					url: 'https://blog.ambire.com/we-raised-2-5m-in-funding-for-ambire-wallet/',
+				},
+				{
+					explanation:
+						'Ambire was one of 18 projects awarded an Ethereum Foundation account abstraction grant in 2023.',
+					label: 'Ambire wins an EF account abstraction grant 2023',
+					url: 'https://blog.ambire.com/ambire-wins-an-ef-aa-grant/',
+				},
+				{
+					explanation: 'Ambire charges 0.5% on swaps and bridges.',
+					label: 'Ambire governance proposal: swap and bridge fee increase',
+					url: 'https://blog.ambire.com/swap-bridge-fee-increase/',
+				},
+				{
+					explanation:
+						'A public sale on Huobi in January 2022 offered 6 million $WALLET, 0.6% of the supply, at $0.03.',
+					label: 'Announcing the $WALLET token',
+					url: 'https://blog.ambire.com/announcing-the-wallet-token/',
+				},
+				{
+					explanation:
+						'723.9 million $WALLET are circulating of a 1 billion maximum supply, a float of about 72%, as of August 2026.',
+					url: 'https://www.coingecko.com/en/coins/ambire-wallet',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: false,
 				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
-				governanceTokenMostlyDistributed: false,
+				governanceTokenMostlyDistributed: true,
 				hiddenConvenienceFees: false,
-				publicOffering: false,
+				publicOffering: true,
 				selfFunded: true,
 				transparentConvenienceFees: true,
 				ventureCapital: true,
@@ -719,10 +747,12 @@ export const ambire: SoftwareWallet = {
 				basicUnlock: {
 					ref: refTodo,
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+						[BasicUnlockMechanism.PIN]: notSupported,
+						[BasicUnlockMechanism.PASSWORD]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: notSupported,
@@ -763,7 +793,31 @@ export const ambire: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation: "The browser extension generates the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src/common/modules/auth/hooks/useCreateNewSeedAccount/useCreateNewSeedAccount.ts#L29-L35',
+						},
+						{
+							label: 'The extension pins this ambire-common commit',
+							url: 'https://github.com/AmbireTech/extension/tree/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src',
+						},
+						{
+							label: 'Background process creates the new recovery phrase',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/main/main.ts#L2165-L2177',
+						},
+						{
+							label: 'Keystore generates the phrase',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/keystore/keystore.ts#L709-L711',
+						},
+						{
+							label: 'Recovery-phrase generation from local randomness',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/entropyGenerator/entropyGenerator.ts#L33-L39',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -921,7 +975,19 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Ambire\'s built-in swap confirmation screen shows a separate "Approve" line above the swap action itself. Swapping 1 USDC for ETH via 1inch, the Approve amount is exactly "1 USDC", matching the swap amount.',
+						file: 'public/references/wallets/ambire/screenshots/2026-09-08-ambire-swap-approve-exact-amount.png',
+						label: 'Ambire swap confirmation screen showing an Approve step for exactly 1 USDC.',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

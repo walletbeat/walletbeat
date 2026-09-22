@@ -34,7 +34,11 @@ function evaluateChainAbstraction(
 ): Evaluation {
 	const { crossChainBalances, bridging } = chainAbstraction
 
-	ctx.addRef(crossChainBalances, bridging.builtInBridging, bridging.suggestedBridging)
+	ctx.addRef(
+		crossChainBalances,
+		isSupported(bridging.builtInBridging) ? bridging.builtInBridging : null,
+		isSupported(bridging.suggestedBridging) ? bridging.suggestedBridging : null,
+	)
 
 	// FAIL conditions follow.
 
@@ -100,6 +104,8 @@ function evaluateChainAbstraction(
 	}
 
 	if (!isSupported(bridging.builtInBridging)) {
+		ctx.addRef(bridging.builtInBridging)
+
 		return ctx.build({
 			outcome: {
 				id: 'chain_abstraction_no_bridging',
@@ -250,6 +256,8 @@ function evaluateChainAbstraction(
 	}
 
 	if (!isSupported(bridging.suggestedBridging)) {
+		ctx.addRef(bridging.suggestedBridging)
+
 		return ctx.build({
 			outcome: {
 				id: 'chain_abstraction_no_suggested_bridging',
@@ -264,7 +272,7 @@ function evaluateChainAbstraction(
 				implementing:
 
 				- Global (cross-chain) account valuation.
-				- Cross-chain token balances ("How many Ether do I have
+				- Cross-chain token balances ("How much Ether do I have
 					across all chains?"), while still allowing the user to go into
 					per-chain balances if they wish.
 				- Cross-chain bridging with transparent fee breakdown and risk
@@ -294,7 +302,7 @@ function evaluateChainAbstraction(
 			implementing:
 
 			- Global (cross-chain) account valuation.
-			- Cross-chain token balances ("How many Ether do I have
+			- Cross-chain token balances ("How much Ether do I have
 				across all chains?"), while still allowing the user to go into
 				per-chain balances if they wish.
 			- Cross-chain bridging with transparent fee breakdown and risk

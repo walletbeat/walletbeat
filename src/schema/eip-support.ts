@@ -2,6 +2,8 @@ import { eips } from '@/data/eips'
 import { setContains, setItems } from '@/types/utils/non-empty'
 import { remap } from '@/types/utils/remap'
 
+import type { Rating } from './attributes'
+import type { EVMAddress } from './contracts'
 import type { EipNumber } from './eips'
 import type { ResolvedFeatures } from './features'
 import type { BrowserIntegrationEip } from './features/ecosystem/integration'
@@ -395,4 +397,73 @@ export function ratedWalletEipSupport<_AttributeGroupId extends string>(
 	}
 
 	return { overall: aggregateEipSupport(variantSupports), perVariant }
+}
+
+/** Serializable per-wallet row for EIP support tracker tables. */
+export const EipSupportStatus = {
+	SUPPORTED: 'SUPPORTED',
+	NOT_SUPPORTED: 'NOT_SUPPORTED',
+	UNKNOWN: 'UNKNOWN',
+	NOT_APPLICABLE: 'NOT_APPLICABLE',
+} as const
+
+export type EipSupportStatus = (typeof EipSupportStatus)[keyof typeof EipSupportStatus]
+
+/** Collapse an `EipSupport` value into its display status. */
+export const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
+	if (typeof support === 'string') {
+		return support === 'UNKNOWN' ? EipSupportStatus.UNKNOWN : EipSupportStatus.NOT_APPLICABLE
+	}
+
+	return isSupported(support) ? EipSupportStatus.SUPPORTED : EipSupportStatus.NOT_SUPPORTED
+}
+
+/** Everything an EIP support table needs to render one wallet. */
+export interface EipSupportRow {
+	id: string
+	displayName: string
+	iconExtension: string
+	url: string
+	overall: EipSupportStatus
+	variants: Array<{ variant: Variant; status: EipSupportStatus }>
+	sourceUrls: Array<{ url: string; label: string }>
+}
+
+/**
+ * The EIP-7702 adoption type of a wallet, used to group wallets in the
+ * EIP-7702 adoption tracker table.
+ */
+export const WalletTypeFor7702 = {
+	EIP7702: 'EIP7702',
+	EIP4337: 'EIP4337',
+	NON_7702_EOA: 'NON_7702_EOA',
+	OTHER: 'OTHER',
+} as const
+
+export type WalletTypeFor7702 = (typeof WalletTypeFor7702)[keyof typeof WalletTypeFor7702]
+
+/** Sort priority for the EIP-7702 adoption type column. */
+export const WalletTypeFor7702SortPriority = {
+	[WalletTypeFor7702.EIP7702]: 0,
+	[WalletTypeFor7702.EIP4337]: 1,
+	[WalletTypeFor7702.NON_7702_EOA]: 2,
+	[WalletTypeFor7702.OTHER]: 3,
+} as const
+
+/** Serializable display shape for a smart wallet contract. */
+export interface Eip7702Contract {
+	name: string
+	address: EVMAddress
+	sourceAvailable: boolean
+	sourceUrl: string | undefined
+}
+
+/** Serializable per-wallet row for the EIP-7702 adoption tracker table. */
+export interface Eip7702Row {
+	id: string
+	displayName: string
+	url: string
+	type: WalletTypeFor7702
+	contract: Eip7702Contract | 'UNKNOWN' | undefined
+	batching: Rating | undefined
 }

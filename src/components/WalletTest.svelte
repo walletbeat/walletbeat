@@ -801,6 +801,13 @@ Issued At: ${new Date().toISOString()}`;
 							onclick={() => (uiState.selectedTxId = tx.id)}
 						/>
 					{/each}
+					<WalletTesterNavigationItem
+						title="Custom Transaction"
+						description="Send your own calldata to any address"
+						isSelected={uiState.selectedTxId === 'custom-tx'}
+						isCompleted={!!transactionState.hashes['custom-tx']}
+						onclick={() => (uiState.selectedTxId = 'custom-tx')}
+					/>
 				{:else if uiState.activeTab === 'signatures'}
 					{#each testSignatures as sig (sig.id)}
 						<WalletTesterNavigationItem
@@ -959,6 +966,7 @@ Issued At: ${new Date().toISOString()}`;
 				{@const selectedTx = testTransactions.find(tx => tx.id === uiState.selectedTxId)}
 				<TransactionsTab
 					{selectedTx}
+					isCustom={uiState.selectedTxId === 'custom-tx'}
 					{transactionState}
 					{account}
 					onSendTransaction={handleSendTransaction}

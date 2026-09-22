@@ -3,13 +3,11 @@ import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { allRatedWallets } from '@/data/wallets'
 import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 function walletEntry(wallet: RatedWallet<string>, siteUrl: string): string {
-	const blurb = walletBlurbText(wallet)
 	const url = `${siteUrl}/${wallet.metadata.id}/index.html.md`
 
-	return `- [${wallet.metadata.displayName}](${url}): ${blurb}`
+	return `- [${wallet.metadata.displayName}](${url})`
 }
 
 export function llmsTxtBody(siteUrl: string): string {

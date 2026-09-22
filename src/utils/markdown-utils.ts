@@ -141,7 +141,7 @@ export function markdownBlockquote(text: string): string[] {
 
 /**
  * Collapse a possibly multi-line string into a single trimmed line.
- * Intended for short inline text only (e.g. blurbs, reference explanations).
+ * Intended for short inline text only (e.g. reference explanations).
  * Throws if the input contains multiline-only markdown (triple-backtick code
  * blocks or blockquote lines), since flattening those would produce invalid output.
  */

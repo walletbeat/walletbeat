@@ -18,7 +18,10 @@ import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -49,6 +52,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -69,7 +73,6 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
-import { paragraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import rainbowAndroidParsed from './manifests/rainbow/android.parsed.json'
@@ -81,12 +84,10 @@ export const rainbow: SoftwareWallet = {
 		id: 'rainbow',
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
-		blurb: paragraph(`
-			Rainbow Extension. Built for speed. Built for power. Built for You.
-		`),
+		coinspectId: 'rainbow',
 		contributors: [polymutex, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-08-02',
+		lastUpdated: '2026-09-03',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/rainbow-me/rainbow/develop/android/app/src/main/AndroidManifest.xml',
@@ -367,7 +368,26 @@ export const rainbow: SoftwareWallet = {
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation: 'Rainbow supports EIP-1193 and EIP-2700.',
+						url: [
+							{
+								label: 'Provider class in the Rainbow provider library',
+								url: 'https://github.com/rainbow-me/provider/blob/dfceaa7fb049cc486de43fc7af1bf68b458d39b9/src/RainbowProvider.ts#L12-L117',
+							},
+							{
+								label: 'Provider events emitted by the extension',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L40-L61',
+							},
+						],
+					},
+					{
+						explanation: 'Rainbow supports EIP-6963.',
+						label: 'EIP-6963 provider announcement in the extension source code',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/inpage/index.ts#L65-L80',
+					},
+				],
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
@@ -409,7 +429,7 @@ export const rainbow: SoftwareWallet = {
 				},
 				{
 					explanation:
-						'Rainbow sold RNBW tokens to the public on CoinList (11-18 December 2025): 30 million tokens (3% of supply) at $0.10, followed by an open Uniswap continuous auction at the 5 February 2026 TGE.',
+						'Rainbow sold RNBW tokens to the public on CoinList (11–18 December 2025): 30 million tokens (3% of supply) at $0.10, followed by an open Uniswap continuous auction at the 5 February 2026 TGE.',
 					url: 'https://coinlist.co/rainbow',
 				},
 			],
@@ -737,32 +757,157 @@ export const rainbow: SoftwareWallet = {
 				}),
 			},
 			bugBountyProgram: notSupported,
-			duressResistance: supported({
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+			duressResistance: {
+				[Variant.BROWSER]: {
+					basicUnlock: {
+						ref: {
+							explanation: 'The extension is unlocked with a password.',
+							label: 'Extension unlock screen source code',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/popup/pages/unlock/index.tsx',
+						},
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'Opening the mobile app requires the phone to authenticate the user first.',
+								label: 'App unlock check in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/isAuthenticated.ts#L16-L33',
+							},
+							{
+								explanation:
+									'That authentication is Face ID or Touch ID on iOS and fingerprint or face unlock on Android, with the phone passcode accepted in their place.',
+								label: 'Biometric unlock settings in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/keychain.ts#L399-L414',
+							},
+							{
+								explanation: 'On an Android phone with no screen lock set, the app asks for a PIN.',
+								label: 'PIN screen in the mobile app source code',
+								url: 'https://github.com/rainbow-me/rainbow/blob/e3df13be2e139357770c4dd20573fc96836bd1ee/src/features/local-auth/pinAuthentication.ts#L116-L123',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
+			},
+			hardwareWalletSupport: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'Rainbow documents connecting Ledger and Trezor devices to the extension.',
+							label: 'Connecting a hardware wallet to the Rainbow extension',
+							lastRetrieved: '2026-09-03',
+							url: 'https://rainbow.me/support/extension/connect-your-hardware-wallet',
+						},
+						{
+							explanation: 'The extension signs with Ledger devices over WebHID.',
+							label: 'Extension opening the Ledger device over WebHID to sign',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/handlers/ledger.ts#L12-L55',
+						},
+						{
+							explanation:
+								'The extension connects to Trezor devices over WebUSB, through Trezor Connect.',
+							url: [
+								{
+									label: 'Trezor Connect transports the extension configures',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/App.tsx#L53-L61',
+								},
+								{
+									label: 'Trezor Connect used by the extension to sign',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/popup/handlers/trezor.ts#L13-L75',
+								},
+								{
+									label: 'WebUSB permission page the extension ships for Trezor Connect',
+									url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/vendor/trezor-usb-permissions.js#L58-L67',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webHID],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.webUSB],
+						}),
 					},
 				},
-				duressMode: notSupported,
-			}),
-			hardwareWalletSupport: {
-				ref: refTodo,
-				wallets: {
-					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB, HardwareWalletConnection.bluetooth],
-					}),
-					[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
-					}),
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'Rainbow documents connecting Ledger devices to the mobile app over Bluetooth.',
+							label: 'Adding a wallet from Ledger to the Rainbow mobile app',
+							lastRetrieved: '2026-09-03',
+							url: 'https://rainbow.me/support/app/add-a-wallet-from-ledger-to-rainbow',
+						},
+						{
+							explanation: 'The mobile app signs with Ledger devices over Bluetooth Low Energy.',
+							label: 'Mobile app opening the Ledger device over Bluetooth to sign',
+							url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/features/hardware-wallet/utils/ledger.ts#L1-L48',
+						},
+						{
+							explanation: 'The mobile app does not connect to Trezor devices.',
+							url: [
+								{
+									label: 'Mobile app source code calling Trezor unsupported',
+									url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/analytics/userProperties.ts#L28-L29',
+								},
+								{
+									label: 'Account types the mobile app supports',
+									url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/src/helpers/walletTypes.ts#L1-L7',
+								},
+								{
+									label: 'Hardware wallet libraries in the mobile app dependencies',
+									url: 'https://github.com/rainbow-me/rainbow/blob/c838187d2d993c0ecff1281923fb8da705cf589d/package.json#L194-L195',
+								},
+							],
+						},
+					],
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.bluetooth],
+						}),
+					},
 				},
 			},
 			keysHandling: {
-				// Source: Rainbow team responses via Walletbeat questionnaire
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension recovery-phrase generation',
+							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L149',
+						},
+						{
+							label: 'Mobile app recovery-phrase generation',
+							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L656',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -1127,7 +1272,27 @@ export const rainbow: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Rainbow "Review & Swap" screen for a 1 USDC to ETH swap, showing the swap amounts and fees before confirming with "Swap USDC to ETH".',
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-swap-review.png',
+						label: 'Rainbow "Review & Swap" screen for a 1 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The onchain Approval event emitted for the swap shows value = 1000000, exactly 1 USDC, matching the swap amount.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-08-rainbow-approve-exact-amount-event.png',
+						label:
+							'Decoded Approval event log showing a value of 1000000 (exactly 1 USDC) for the swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -1329,7 +1494,7 @@ export const rainbow: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'The browser extension build job checks out an external repository (`rainbow-me/browser-extension-env`) and re-runs `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build. This means build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
+								'The browser extension build job checks out an external repository (`rainbow-me/browser-extension-env`) and reruns `yarn setup` (which runs `yarn install` and `yarn ds:install`) during the build. This means build inputs are fetched from the network rather than from a pre-fetched, integrity-verified input set.',
 							url: 'https://github.com/rainbow-me/browser-extension/blob/e600feb293b94aa16f7bb54aef9fa58f00c1422e/.github/workflows/build.yml',
 						},
 						{
@@ -1352,7 +1517,42 @@ export const rainbow: SoftwareWallet = {
 				reproducibleBuilds: notSupported,
 			},
 		},
-		walletCall: notSupported,
+		// EIP-5792 is supported by the browser extension only, and only for accounts with an EIP-7702 delegation.
+		walletCall: {
+			[Variant.BROWSER]: supported({
+				ref: [
+					{
+						explanation:
+							'The extension can execute EIP-5792 multicall transactions only if the account has been upgraded with EIP-7702.',
+						label: 'Batching support in the extension source code',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/entries/background/handlers/handleProviderRequest.ts#L429-L484',
+					},
+					{
+						explanation:
+							'Multicall transactions are atomic: they will either execute all transactions in the batch or revert.',
+						label: 'Batch execution in the extension source code',
+						url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/sendCalls/executeSendCallsBatch.ts#L23-L58',
+					},
+				],
+				atomicMultiTransactions: featureSupported,
+			}),
+			[Variant.MOBILE]: notSupportedWithRef({
+				ref: [
+					{
+						explanation:
+							'Asking the wallet to send a bundle of transactions from the Walletbeat test page in the Rainbow in-app browser returns an error saying the method is not supported.',
+						file: 'public/references/wallets/rainbow/screenshots/2026-08-20-wallet-call-mobile-batch-unsupported.png',
+						label: 'Walletbeat test page in the Rainbow in-app browser',
+						lastRetrieved: '2026-08-20',
+					},
+					{
+						explanation: 'The mobile app has no EIP-5792 Wallet Call API code in its source.',
+						label: 'Rainbow mobile app source code',
+						url: 'https://github.com/rainbow-me/rainbow/blob/bb6110b846ca6955125d490c0eb1f0812fccadf7/src/features/dapp-browser/services/handleProviderRequest.ts#L350-L362',
+					},
+				],
+			}),
+		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,

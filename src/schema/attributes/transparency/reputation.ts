@@ -47,19 +47,19 @@ export const reputation: Attribute<ReputationMetadata> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The wallet passes most reputation sub-criteria.'),
+				sentence('The wallet passes most reputation subcriteria.'),
 				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet passes some reputation sub-criteria.'),
+				sentence('The wallet passes some reputation subcriteria.'),
 				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The wallet fails most or all reputation sub-criteria.'),
+				sentence('The wallet fails most or all reputation subcriteria.'),
 				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
@@ -115,7 +115,7 @@ export const reputation: Attribute<ReputationMetadata> = {
 				},
 			},
 			details: paragraph(`{{WALLET_NAME}} reputation evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve subcriteria rated PARTIAL or FAIL.'),
 		})
 	},
 }

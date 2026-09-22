@@ -22,7 +22,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 - **Is your wallet designed for general use, or peer-to-peer payments, or some other specific use-case?**
 - **Which account types does your wallet support?** (check all that apply)
   - [ ] EOA (externally owned account — standard seed phrase wallet)
-  - [ ] MPC (multi-party computation — key is split across multiple parties)
+  - [ ] MPC (multiparty computation — key is split across multiple parties)
   - [ ] EIP-7702 (delegating an EOA to act as a smart contract)
   - [ ] ERC-4337 smart account
   - [ ] Safe multisig
@@ -40,7 +40,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 - **What recovery method(s) do you support?**
   - [ ] Guardian-based / social recovery
   - [ ] Cloud backup (iCloud, Google Drive, etc.)
-  - [ ] Multi-factor / passkey backup
+  - [ ] Multifactor / passkey backup
   - [ ] Not supported
   - [ ] Other:
 
@@ -112,7 +112,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
     - [ ] Decoy wallet — opens a separate wallet with different accounts and balances
     - [ ] Self-destruct — wipes the wallet, preventing access to funds
     - [ ] Onchain lockdown — freezes the smart contract to prevent unauthorized transfers
-    - [ ] Wipe and forward — wipes the wallet and forwards all funds to a pre-configured safe address
+    - [ ] Wipe and forward — wipes the wallet and forwards all funds to a preconfigured safe address
 
 ---
 

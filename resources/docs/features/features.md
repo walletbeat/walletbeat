@@ -128,7 +128,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
 
 A set of features for any software wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletSoftwareFeatures = WalletBaseFeatures & {
@@ -155,7 +155,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
-		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
+		permissionsManagement: VariantFeature<PermissionsManagementSupport>
 	}
 
 	/** Ecosystem features. */
@@ -202,7 +202,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 A set of features for any hardware wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletHardwareFeatures = WalletBaseFeatures & {
@@ -236,7 +236,7 @@ type WalletHardwareFeatures = WalletBaseFeatures & {
 
 A set of features for any embedded wallet.
 
-None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
+None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`). Use a named sentinel or empty array when the answer is known to be "none". See the `/data` encoding rule in `resources/docs/contribute/wallet-data/wallet-data.md`.
 
 ```typescript
 type WalletEmbeddedFeatures = WalletBaseFeatures & {
@@ -288,7 +288,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `selfSovereignty` (object)
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
-  - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
+  - `permissionsManagement` (`ResolvedFeature<PermissionsManagementSupport>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `orderflowPractices` (`ResolvedFeature<OrderflowPractices>`)
@@ -2212,11 +2212,28 @@ Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is
 
 ---
 
+### Enum: `BasicUnlockMechanismSupport`
+
+Whether a given unlock mechanism is supported, and if so, whether the wallet requires it or merely offers it as one of several optional choices.
+
+- `OPTIONAL` = `'OPTIONAL'`: The wallet supports this unlock mechanism as an optional choice.
+- `REQUIRED` = `'REQUIRED'`: The wallet requires this unlock mechanism to unlock the wallet.
+
+---
+
+### Interface: `BasicUnlockMechanismData`
+
+Data about a supported unlock mechanism: whether it is required or optional.
+
+- `type` (`BasicUnlockMechanismSupport`): Whether the wallet requires this unlock mechanism, or merely offers it as an option.
+
+---
+
 ### Interface: `BasicUnlock`
 
 Information about how the wallet locks itself against unauthorized access.
 
-- `mechanisms` (`Record<BasicUnlockMechanism, boolean>`): Which unlock mechanisms the wallet supports. Set each mechanism to `true` if supported, `false` if not.
+- `mechanisms` (`Record<BasicUnlockMechanism, Support<BasicUnlockMechanismData>>`): Which unlock mechanisms the wallet supports, and whether each one is required or merely optional.
 
 ---
 
@@ -2231,7 +2248,7 @@ Note: This enum is not limited to decoy wallets. As more wallets implement diffe
 - `DECOY_WALLET` = `'DECOY_WALLET'`: Opens a decoy wallet with a separate set of accounts, hiding the real wallet.
 - `SELF_DESTRUCT` = `'SELF_DESTRUCT'`: Wipes wallet data, preventing access to funds or private keys.
 - `ONCHAIN_LOCKDOWN` = `'ONCHAIN_LOCKDOWN'`: Freezes the smart contract onchain, preventing unauthorized transfers.
-- `WIPE_AND_FORWARD` = `'WIPE_AND_FORWARD'`: Wipes wallet data and forwards all funds to a pre-configured safe address.
+- `WIPE_AND_FORWARD` = `'WIPE_AND_FORWARD'`: Wipes wallet data and forwards all funds to a preconfigured safe address.
 
 ---
 
@@ -2342,7 +2359,7 @@ Where and how the private key (or key shares) are generated. To identify: check 
 
 - `FULLY_ON_USER_DEVICE` = `'FULLY_ON_USER_DEVICE'`: The key is generated entirely on the user's device. No key material leaves the device during generation. (e.g. A standard BIP-39 seed phrase wallet where the entropy is generated locally and the seed never touches a server.) To identify: this is the default for most traditional wallets. Confirm by checking that onboarding works fully offline and that no key material is sent to any server (inspect source code or network traffic during setup).
 - `FULLY_OFF_USER_DEVICE` = `'FULLY_OFF_USER_DEVICE'`: The key is generated entirely off the user's device — on a remote server or service — and then delivered to the user. (e.g. A custodial service that generates keys server-side and holds them on behalf of the user.) To identify: the wallet's documentation states that keys are generated server-side, or the wallet requires an internet connection and account login before any key material is available.
-- `MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE` = `'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE'`: The key is computed through a multi-party protocol where both the user's device and at least one remote party contribute randomness or key shares. No single party ever holds the complete key — not even the user's device. (e.g. An MPC wallet where the user's device and the wallet provider's server each generate a key share, and threshold signing is used so the full key is never assembled anywhere.) To identify: the wallet documentation explicitly describes MPC key generation involving the user's device as one of the parties.
+- `MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE` = `'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE'`: The key is computed through a multiparty protocol where both the user's device and at least one remote party contribute randomness or key shares. No single party ever holds the complete key — not even the user's device. (e.g. An MPC wallet where the user's device and the wallet provider's server each generate a key share, and threshold signing is used so the full key is never assembled anywhere.) To identify: the wallet documentation explicitly describes MPC key generation involving the user's device as one of the parties.
 
 ---
 
@@ -2352,8 +2369,8 @@ If the key is split between multiple parties, how does signing/reconstruction oc
 
 - `NON_MULTIPARTY` = `'NON_MULTIPARTY'`: The key is not split — it exists in full on the user's device. This is the standard model for traditional seed phrase wallets.
 - `ON_USER_DEVICE` = `'RECONSTRUCTED_ON_USER_DEVICE'`: The key shares are combined on the user's device to reconstruct the full key before signing. The key exists in full on-device momentarily. (e.g. A wallet that stores key shares with different guardians but fetches them all to the user's device and assembles the key locally at signing time.) To identify: the wallet documentation describes "client-side key reconstruction" or the source code shows shares being combined on-device.
-- `MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE` = `'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE'`: Signing is performed through a multi-party computation protocol that includes the user's device as one of the signing parties. The full key is never reconstructed — each party signs with its share. (e.g. An MPC wallet where the user's device holds one key share and the provider's server holds another; both participate in threshold signing for every transaction without ever combining their shares.) To identify: the wallet documentation describes "threshold signing", "MPC signing", or "distributed signing" where the user's device participates.
-- `MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE` = `'MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE'`: Signing is performed through a multi-party computation entirely on remote infrastructure — the user's device does not participate in the signing computation itself, only in authorizing it
+- `MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE` = `'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE'`: Signing is performed through a multiparty computation protocol that includes the user's device as one of the signing parties. The full key is never reconstructed — each party signs with its share. (e.g. An MPC wallet where the user's device holds one key share and the provider's server holds another; both participate in threshold signing for every transaction without ever combining their shares.) To identify: the wallet documentation describes "threshold signing", "MPC signing", or "distributed signing" where the user's device participates.
+- `MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE` = `'MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE'`: Signing is performed through a multiparty computation entirely on remote infrastructure — the user's device does not participate in the signing computation itself, only in authorizing it
 
   To identify: the wallet documentation describes server-side MPC signing where the user's device is not one of the signing parties.
 
@@ -2695,7 +2712,7 @@ type SecurityAudit = MustRef<{
 How the wallet stores the user's private key.
 
 - `ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF` = `'ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF'`: The key is encrypted with a user-known secret before being stored on disk, using a standardized key derivation function.
-- `ENCRYPTED_WITH_USER_SECRET_WEAK_KDF` = `'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF'`: The key is encrypted with a user-known secret before being stored on disk, but the key derivation is non-standard or ad-hoc.
+- `ENCRYPTED_WITH_USER_SECRET_WEAK_KDF` = `'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF'`: The key is encrypted with a user-known secret before being stored on disk, but the key derivation is nonstandard or ad-hoc.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
 - `PASSKEY_MANAGED` = `'PASSKEY_MANAGED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
@@ -2814,6 +2831,7 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `CAMERA` = `'android.permission.CAMERA'`: Camera access, typically for QR code scanning.
 - `RECORD_AUDIO` = `'android.permission.RECORD_AUDIO'`: Microphone access.
 - `MODIFY_AUDIO_SETTINGS` = `'android.permission.MODIFY_AUDIO_SETTINGS'`: Modify global audio settings.
+- `VIBRATE` = `'android.permission.VIBRATE'`: Control device vibration.
 - `BLUETOOTH` = `'android.permission.BLUETOOTH'`: Bluetooth (Android < 12).
 - `BLUETOOTH_ADMIN` = `'android.permission.BLUETOOTH_ADMIN'`: Bluetooth administration (Android < 12).
 - `BLUETOOTH_CONNECT` = `'android.permission.BLUETOOTH_CONNECT'`: Initiate connections to paired Bluetooth devices (Android 12+).
@@ -2823,6 +2841,11 @@ All permissions seen in any wallet manifest must be listed here, including non-s
 - `USE_FULL_SCREEN_INTENT` = `'android.permission.USE_FULL_SCREEN_INTENT'`: Display a full-screen intent, e.g. for incoming-call-style alerts.
 - `READ_EXTERNAL_STORAGE` = `'android.permission.READ_EXTERNAL_STORAGE'`: Read files from shared external storage (legacy, pre-scoped-storage).
 - `WRITE_EXTERNAL_STORAGE` = `'android.permission.WRITE_EXTERNAL_STORAGE'`: Write files to shared external storage (legacy, pre-scoped-storage).
+- `DETECT_SCREEN_CAPTURE` = `'android.permission.DETECT_SCREEN_CAPTURE'`: Be notified when the user screenshots the app (Android 14+).
+- `USE_BIOMETRIC` = `'android.permission.USE_BIOMETRIC'`: Authenticate with biometric hardware (fingerprint, face, etc.).
+- `USE_FINGERPRINT` = `'android.permission.USE_FINGERPRINT'`: Legacy fingerprint authentication (superseded by USE_BIOMETRIC).
+- `READ_MEDIA_IMAGES` = `'android.permission.READ_MEDIA_IMAGES'`: Read images from shared media storage (scoped storage, Android 13+).
+- `AD_ID` = `'com.google.android.gms.permission.AD_ID'`: Access the Google advertising ID — used for ad attribution/tracking.
 
 ---
 
@@ -2837,9 +2860,11 @@ All keys seen in any wallet plist must be listed here, including non-security-re
 - `CAMERA` = `'NSCameraUsageDescription'`: Camera access, typically for QR code scanning.
 - `FACE_ID` = `'NSFaceIDUsageDescription'`: Face ID biometric authentication.
 - `LOCATION_WHEN_IN_USE` = `'NSLocationWhenInUseUsageDescription'`: Location access while the app is in use, required for BLE on iOS.
+- `LOCATION_ALWAYS_AND_WHEN_IN_USE` = `'NSLocationAlwaysAndWhenInUseUsageDescription'`: Location access at all times, including while in use.
 - `MICROPHONE` = `'NSMicrophoneUsageDescription'`: Microphone access.
 - `PHOTO_LIBRARY_ADD` = `'NSPhotoLibraryAddUsageDescription'`: Save images to the photo library.
 - `PHOTO_LIBRARY` = `'NSPhotoLibraryUsageDescription'`: Read images from the photo library.
+- `USER_NOTIFICATIONS` = `'NSUserNotificationsUsageDescription'`: Prompt string for user notifications.
 
 ---
 
@@ -3518,13 +3543,33 @@ The level of control a wallet provides over token approvals of a given standard.
 
 ---
 
-### Interface: `PermissionsManagement`
+### Interface: `ApprovalsManagement`
 
-How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+How the wallet lets users inspect and revoke existing token approvals, broken down by token standard.
 
 - `erc20Approvals` (`SpendingApprovalsControl`): ERC-20 token approvals granted to other addresses.
 - `erc721Approvals` (`SpendingApprovalsControl`): ERC-721 token approvals granted to other addresses.
 - `erc1155Approvals` (`SpendingApprovalsControl`): ERC-1155 token approvals granted to other addresses.
+
+---
+
+### Enum: `BuiltInSwapDefaultApprovalBehavior`
+
+How a wallet's own built-in swap/bridge feature requests token approvals on the user's behalf by default.
+
+- `MINIMAL_AMOUNT` = `(auto)`: The wallet requests only the minimum amount needed for the swap/bridge before signing.
+- `UNLIMITED_BUT_EDITABLE` = `(auto)`: The wallet defaults to an unlimited approval, but the user can see and edit the amount before signing.
+- `UNLIMITED_BUT_DISCLOSED` = `(auto)`: The wallet defaults to an unlimited approval and discloses this to the user before signing, but does not let them edit the amount.
+- `UNLIMITED_AND_UNDISCLOSED` = `(auto)`: The wallet requests an unlimited approval by default without disclosing this to the user in the transaction confirmation UI.
+
+---
+
+### Interface: `PermissionsManagement`
+
+How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+
+- `approvalsManagement` (`Support<ApprovalsManagement>`): Ability to inspect and revoke existing token approvals.
+- `builtInSwapApprovals` (`BuiltInSwapDefaultApprovalBehavior | 'NO_BUILT_IN_SWAP'`): How the wallet's own built-in swap/bridge feature requests token approvals on the user's behalf by default.
 
 ---
 
@@ -3990,7 +4035,7 @@ type HasPublicChangelog = Support<MustRef<{}>>
 
 ### Type: `ReproducibleBuilds`
 
-Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts.
+Whether the wallet's release builds are reproducible, i.e. the same source revision and target can be rebuilt to produce bit-for-bit identical artifacts by an independent party.
 
 ```typescript
 type ReproducibleBuilds = Support<WithRef<{}>>

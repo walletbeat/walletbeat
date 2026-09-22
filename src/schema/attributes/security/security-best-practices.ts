@@ -591,8 +591,20 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
 	// Posts notifications such as transaction confirmations and price alerts (Android 13+).
 	[AndroidPermission.POST_NOTIFICATIONS]: Rating.PASS,
+	// Haptic feedback, e.g. on transaction confirmation. No security-sensitive access.
+	[AndroidPermission.VIBRATE]: Rating.PASS,
 	// Writes to shared storage, e.g. to export transaction receipts or QR codes.
 	[AndroidPermission.WRITE_EXTERNAL_STORAGE]: Rating.PASS,
+	// Delivers a callback when the user screenshots the app (Android 14+). It grants no access to
+	// screen contents, and wallets use it defensively, e.g. to warn a user who screenshots their
+	// recovery phrase.
+	[AndroidPermission.DETECT_SCREEN_CAPTURE]: Rating.PASS,
+	// Biometric authentication, used to unlock the wallet without a PIN.
+	[AndroidPermission.USE_BIOMETRIC]: Rating.PASS,
+	// Legacy fingerprint authentication (superseded by USE_BIOMETRIC), used to unlock the wallet without a PIN.
+	[AndroidPermission.USE_FINGERPRINT]: Rating.PASS,
+	// Read access to shared photo media (scoped storage, Android 13+), e.g. to attach an image to support requests.
+	[AndroidPermission.READ_MEDIA_IMAGES]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Launches full-screen UI over the lock screen from a notification (call/alarm pattern); it
@@ -610,6 +622,8 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
 	// Broad read of shared storage exposes private files.
 	[AndroidPermission.READ_EXTERNAL_STORAGE]: Rating.FAIL,
+	// Advertising ID access exists solely for ad attribution/tracking, not any wallet function.
+	[AndroidPermission.AD_ID]: Rating.FAIL,
 }
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
@@ -620,12 +634,17 @@ const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAI
 	[IosUsageDescription.FACE_ID]: Rating.PASS,
 	// Allows saving exported transaction receipts or QR codes to the photo library.
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: Rating.PASS,
+	// Prompt string for notifications such as transaction confirmations. It grants no access to
+	// user data; iOS gates notifications on a runtime request rather than this key.
+	[IosUsageDescription.USER_NOTIFICATIONS]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
 	// Microphone access enables covert audio recording of sensitive conversations near the device.
 	[IosUsageDescription.MICROPHONE]: Rating.FAIL,
 	// Precise GPS location can be used to profile and deanonymize users; not required for any wallet function.
 	[IosUsageDescription.LOCATION_WHEN_IN_USE]: Rating.FAIL,
+	// Background location access enables continuous user tracking; not required for any wallet function.
+	[IosUsageDescription.LOCATION_ALWAYS_AND_WHEN_IN_USE]: Rating.FAIL,
 	// Read access to the full photo library exposes private images; wallets only ever need to write, not read.
 	[IosUsageDescription.PHOTO_LIBRARY]: Rating.FAIL,
 	// Always-on Bluetooth enables passive device-tracking and proximity-based attacks even when the app runs in the background.
@@ -799,7 +818,7 @@ function evaluateKeysHandling(
 					),
 				},
 				details: markdown(`
-					{{WALLET_NAME}} uses multi-party computation, but key reconstruction
+					{{WALLET_NAME}} uses multiparty computation, but key reconstruction
 					can occur on external servers without the user's device being
 					involved. The at-rest security of the reconstructed key material on
 					the provider's infrastructure cannot be independently verified.
@@ -962,7 +981,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 			exampleRating(
 				mdParagraph(
-					'(Desktop app) The app derives keys using a weak, non-standard key derivation function.',
+					'(Desktop app) The app derives keys using a weak, nonstandard key derivation function.',
 				),
 				evaluateKeyStorage(
 					EvaluationContext.forTest(() => securityBestPractices),

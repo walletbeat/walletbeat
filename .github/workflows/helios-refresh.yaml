@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6.0.3
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y $(cat deploy/debian-packages.txt)
+        env:
+          DEBIAN_FRONTEND: noninteractive
       - name: Refresh Helios checkpoint
         run: ./deploy/helios/helios-update.sh --checkpoint-only
       - name: Commit checkpoint

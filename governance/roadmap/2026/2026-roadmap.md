@@ -38,12 +38,12 @@ At a high level:
 - This is critical, because without it, we'll forever face credibility challenges (egg on our face) when looking for further funding.
 - We do not need to finish everything, but we need at the minimum to show a _capacity for getting there_, i.e. an ability to execute.
 
-2. Priority #2 is to **increase the project's short-term and medium-term financial security**.
+1. Priority #2 is to **increase the project's short-term and medium-term financial security**.
 
 - This is necessary for the effort to continue uninterrupted. Going back to a volunteer-only, spare-time-only regime would set the project back quite a bit.
 - This is priority #2 only because priority #1 hinders it.
 
-3. Priority #3 is to **grow our ecosystem presence**.
+1. Priority #3 is to **grow our ecosystem presence**.
 
 - Social media presence is a necessary part of this, but not sufficient on its own.
 - We need investment and partnerships here. Any partnerships we draw here should be on the more mature side of Walletbeat, i.e. the software wallet side of things. More on this below.
@@ -125,7 +125,7 @@ Between now and the end of the year:
   - **Top 5 wallets** on the homepage have ≤10% "unrated" slices.
     - Owner: ren2140
   - We feel confident saying that we will **not change the software wallet stages** for the next 6 months
-    - (With the possible exception of the stage 2 criteria, which is OK because no wallet is even close to stage 1, so changes in stage 2 criteria in that timeframe won't affect wallets in practice.)
+    - (With the possible exception of the stage 2 criteria, which is okay because no wallet is even close to stage 1, so changes in stage 2 criteria in that timeframe won't affect wallets in practice.)
     - Owner: polymutex
   - All **`pre-launch` issues are closed** on the issue tracker.
     - Owner: polymutex
@@ -206,7 +206,7 @@ Between now and the end of the year:
   - ≥20% of treasury held in USDC.
 - By end of September 2026:
   - Existing hardware wallet attributes all refactored or deleted.
-  - Clear Signing re-launch happens _(may postpone further if delayed due to non-Walletbeat factors)_
+  - Clear Signing relaunch happens _(may postpone further if delayed due to non-Walletbeat factors)_
   - ≥50% of video footage is released.
   - Set of meme templates exists for social media.
   - At least ≥10k USD future funding secured; ≥30% of treasury held in USDC.
@@ -256,7 +256,7 @@ Funding today allows Walletbeat to employ one full-time developer, and 4 25%-ish
 
 In 2026, **the crypto industry is in a dire state**. All ecosystem participants are hurting for funding. There has been a decade of what in retrospect looks largely like capital misallocation by the ecosystem at large. The high selectiveness of the remaining active players means the bar is high, and clearing it yields much smaller funding than what meeting that same bar used to yield even a year ago. Therefore, Walletbeat must contend with the potential of running out of funds.
 
-Walletbeat losing funding implies a **loss of dynamism** and **lower execution bandwidth**. Walletbeat started as volunteer-based, spare-time project from the beginning. Operating without funding reverts it to that state. This wouldn't spell the end of the project, but it means reverting to a hobby project rather than an active ecosystem participant/"live player". This would mean, for example, that initiatives like Clear Signing or Kohaku wouldn't have Walletbeat acting as a neutral ecosystem observer mapping them to CROPS values and user benefits.
+Walletbeat losing funding implies a **loss of dynamism** and **lower execution bandwidth**. Walletbeat started as volunteer-based, spare-time project from the beginning. Operating without funding reverts it to that state. This wouldn't spell the end of the project, but it means reverting to a hobby project rather than an active ecosystem participant or "live player". This would mean, for example, that initiatives like Clear Signing or Kohaku wouldn't have Walletbeat acting as a neutral ecosystem observer mapping them to CROPS values and user benefits.
 
 The hope: Walletbeat sits **exactly at the intersection of CROPS and the Ethereum access layer**, both of which are EF priorities this year. Walletbeat's mission has been centered around cypherpunk values from the very beginning, prior to the "CROPS" acronym ever existing, and [back when privacy was definitely not on people's minds](https://x.com/polymutex/status/2078005764711485571). Thus, given the exact alignment of these goals, it is unlikely that the EF would _not_ fund Walletbeat in some capacity this year. Nonetheless, Walletbeat must look beyond the EF as sole funder; see above for all the ideas it will also pursue.
 

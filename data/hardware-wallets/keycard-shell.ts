@@ -7,7 +7,11 @@ import {
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -26,20 +30,13 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const keycardShell: HardwareWallet = {
 	metadata: {
 		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
-		blurb: paragraph(`
-			Keycard Shell is a modular, fully open-source, air-gapped hardware wallet that signs
-			via QR codes (ERC-4527). It has a built-in keypad, display, and camera, optional USB
-			(can be turned off), and uses removable Keycards for secure key storage and backups.
-			Keycard is a BIP-32 HD wallet running on JavaCard with EAL6+ secure element. Supports
-			BIP-39 and SLIP-39 seed phrases.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [phift, mmlado],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
@@ -155,10 +152,12 @@ export const keycardShell: HardwareWallet = {
 						'https://docs.keycard.tech/duress_pin',
 					],
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: true,
-						[BasicUnlockMechanism.PASSWORD]: false,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: supported({
@@ -243,7 +242,7 @@ export const keycardShell: HardwareWallet = {
 					},
 					{
 						explanation:
-							'Product page emphasizes human-readable transaction data and verifying tx data on-device display',
+							'Product page emphasizes human-readable transaction data and verifying transaction data on-device display',
 						url: 'https://get.keycard.tech/pages/keycard-shell',
 					},
 				],

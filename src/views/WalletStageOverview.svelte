@@ -9,7 +9,6 @@
 		type WalletLadderEvaluation,
 		type WalletStage,
 	} from '@/schema/stages'
-	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
@@ -26,21 +25,25 @@
 			icon: '✅',
 			label: 'All criteria passed',
 			color: 'var(--rating-pass)',
+			textColor: 'var(--rating-pass-text)',
 		},
 		[StageStatus.PARTIAL]: {
 			icon: '🟡',
 			label: 'Some criteria passed',
 			color: 'var(--rating-partial)',
+			textColor: 'var(--rating-partial-text)',
 		},
 		[StageStatus.FAIL]: {
 			icon: '❌',
 			label: 'All criteria failed',
 			color: 'var(--rating-fail)',
+			textColor: 'var(--rating-fail-text)',
 		},
 		[StageStatus.UNRATED]: {
 			icon: '❔',
 			label: 'Some criteria unrated',
 			color: 'var(--rating-unrated)',
+			textColor: 'var(--rating-unrated)',
 		},
 	} as const satisfies Record<
 		StageStatus,
@@ -48,6 +51,7 @@
 			icon: string
 			label: string
 			color: string
+			textColor: string
 		}
 	>
 
@@ -177,6 +181,7 @@
 										open
 										data-card="padding-5 secondary radius-4"
 										style:--accent={stageStatuses[groupRating].color}
+										style:--accent-textColor={stageStatuses[groupRating].textColor}
 									>
 										<summary>
 											<div data-row="wrap">
@@ -210,7 +215,8 @@
 												>
 													{#each criteriaGroup.criteria as criterion (criterion.id)}
 														{@const criterionEvaluation = ladderDefinition ? criterion.evaluate(wallet) : null}
-														{@const criterionRating = criterionEvaluation?.rating}
+														{@const criterionRating = criterionEvaluation?.rating ?? StageCriterionRating.UNRATED}
+														{@const criterionRatingMeta = stageCriterionRatings[criterionRating]}
 														{@const attributeId = getCriterionAttributeId(criterion)}
 														{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
 														{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
@@ -218,44 +224,35 @@
 														{@const attributeTitle = attribute?.displayName ?? attributeId}
 
 														<li
-															data-list-item-marker={attribute?.icon ? wbIconEmojiSequences[attribute.icon] : undefined}
-															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].color}
+															data-list-item-marker={criterionRatingMeta.icon}
+															style:--accent={criterionRatingMeta.color}
+															style:--accent-textColor={criterionRatingMeta.textColor}
 															data-stage-criterion-rating={criterionRating}
+															title={criterionRatingMeta.label}
 														>
-															<span data-row>
-																<span data-row-item="flexible">
-																	{#if attributeName}
-																		{#if attributeLink}
-																			<a href={attributeLink} title={attributeTitle}>
-																				<strong>{attributeName}</strong>
-																			</a>
-																		{:else}
-																			<strong>{attributeName}</strong>
-																		{/if}
-																		<span>
-																			—
-																			{#if isTypographicContent(criterion.description)}
-																				<Typography content={criterion.description} />
-																			{:else}
-																				{criterion.id}
-																			{/if}
-																		</span>
+															{#if attributeName}
+																{#if attributeLink}
+																	<a href={attributeLink} title={attributeTitle}>
+																		<strong>{attributeName}</strong>
+																	</a>
+																{:else}
+																	<strong>{attributeName}</strong>
+																{/if}
+																<span>
+																	—
+																	{#if isTypographicContent(criterion.description)}
+																		<Typography content={criterion.description} />
 																	{:else}
-																		{#if isTypographicContent(criterion.description)}
-																			<Typography content={criterion.description} />
-																		{:else}
-																			{criterion.id}
-																		{/if}
+																		{criterion.id}
 																	{/if}
 																</span>
-
-																<data
-																	value={criterionRating}
-																	title={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].label}
-																>
-																	{stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED)].icon}
-																</data>
-															</span>
+															{:else}
+																{#if isTypographicContent(criterion.description)}
+																	<Typography content={criterion.description} />
+																{:else}
+																	{criterion.id}
+																{/if}
+															{/if}
 														</li>
 													{/each}
 												</ul>

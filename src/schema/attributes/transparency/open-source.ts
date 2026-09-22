@@ -115,7 +115,7 @@ const unlicensed: (typeof openSource)['evaluate'] = ctx =>
 			),
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} does not have a valid license for its source code. This is most likely an accidental omission, but a lack of license means that even if {{WALLET_NAME}} is functionally identical to an open-source project, it may later decide to set its license to a proprietary license. Therefore, {{WALLET_NAME}} is assumed to not be Free & Open Source Software until it does have a valid license file.',
+			'{{WALLET_NAME}} does not have a valid license for its source code. This is most likely an accidental omission, but a lack of license means that even if {{WALLET_NAME}} is functionally identical to an open-source project, it may later decide to set its license to a proprietary license. Therefore, {{WALLET_NAME}} is assumed not to be Free & Open Source Software until it does have a valid license file.',
 		),
 		howToImprove: paragraph('{{WALLET_NAME}} should add a license file to its source code.'),
 	})
@@ -173,7 +173,7 @@ export const openSource: Attribute = {
 			),
 			exampleRating(
 				paragraph(
-					"The wallet's source code repository is missing a license file. The lack of a license file may be an accidental omission on the wallet developers' part, but also may indicate that the wallet may set its license to a proprietary license. Therefore, Walletbeat makes the conservative assumption that the wallet is not be Free & Open Open Source Software until it does have a valid license file.",
+					"The wallet's source code repository is missing a license file. The lack of a license file may be an accidental omission on the wallet developers' part, but also may indicate that the wallet may set its license to a proprietary license. Therefore, Walletbeat makes the conservative assumption that the wallet is not Free & Open Source Software until it does have a valid license file.",
 				),
 				unlicensed(EvaluationContext.forTest(() => openSource)),
 			),
