@@ -1,7 +1,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
-import { allWallets } from '@/data/wallets'
+import { allWallets, assertValidWalletName } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
 	parseGitHubBlobUrl,
@@ -37,8 +37,7 @@ export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
 	const occurrences: SnippetOccurrence[] = []
 
 	for (const collected of collectAllRefs(allWallets)) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- collected.walletName always comes from Object.entries(allWallets)'s own keys.
-		const walletId = allWallets[collected.walletName as keyof typeof allWallets].metadata.id
+		const walletId = allWallets[assertValidWalletName(collected.walletName)].metadata.id
 
 		for (const fq of collected.fullyQualifiedRefs) {
 			for (const urlEntry of fq.urls) {
@@ -378,6 +377,7 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 	}
 
 	const walletsDir = path.join(repoRoot, walletsReferencesDir)
+
 	await crawlCodebase({
 		root: walletsDir,
 		ignore: [],
