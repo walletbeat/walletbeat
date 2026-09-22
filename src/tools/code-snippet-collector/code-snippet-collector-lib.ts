@@ -4,6 +4,7 @@ import * as path from 'node:path'
 import { allWallets, assertValidWalletName } from '@/data/wallets'
 import {
 	type CodeSnippetSource,
+	isSnippetSource,
 	parseGitHubBlobUrl,
 	rawGitHubContentUrl,
 	snippetRelativePath,
@@ -45,7 +46,7 @@ export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
 			for (const urlEntry of fq.urls) {
 				const source = parseGitHubBlobUrl(urlEntry.url)
 
-				if (typeof source === 'string') {
+				if (!isSnippetSource(source)) {
 					continue
 				}
 

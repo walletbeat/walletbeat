@@ -1,5 +1,6 @@
 import {
 	type CodeSnippetSource,
+	isSnippetSource,
 	parseGitHubBlobUrl,
 	snippetFileName,
 	type SnippetRow,
@@ -86,7 +87,7 @@ export function codeSnippetForUrl(url: string): ResolvedCodeSnippet | null {
 		return null
 	}
 
-	if (typeof source === 'string') {
+	if (!isSnippetSource(source)) {
 		return null
 	}
 

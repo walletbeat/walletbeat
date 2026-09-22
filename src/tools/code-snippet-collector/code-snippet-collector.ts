@@ -5,6 +5,8 @@ import cac from 'cac'
 
 import {
 	type CodeSnippetSource,
+	describeNotASnippetUrl,
+	isSnippetSource,
 	parseGitHubBlobUrl,
 	snippetRelativePath,
 } from '@/schema/code-snippets'
@@ -170,10 +172,10 @@ cli
 		try {
 			const parsed = parseGitHubBlobUrl(blobUrl)
 
-			if (typeof parsed === 'string') {
+			if (!isSnippetSource(parsed)) {
+				process.stderr.write(`Error: ${describeNotASnippetUrl(parsed)}: ${blobUrl}\n`)
 				process.stderr.write(
-					'Error: not a commit-pinned, line-anchored GitHub blob URL.\n' +
-						'Expected: https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>[-L<last>]\n',
+					'Expected: https://github.com/<org>/<repo>/blob/<40-char-hash>/<path>#L<first>[-L<last>]\n',
 				)
 				process.exit(1)
 			}

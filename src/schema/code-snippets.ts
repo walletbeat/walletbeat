@@ -61,7 +61,7 @@ function snippetLineSuffix(source: CodeSnippetSource): string {
 	return `L${source.firstLine}-L${source.lastLine}`
 }
 
-type NotASnippetUrl = 'NOT_GITHUB_URL' | 'NOT_BLOB_URL' | 'NO_LINE_ANCHOR'
+export type NotASnippetUrl = 'NOT_GITHUB_URL' | 'NOT_BLOB_URL' | 'NO_LINE_ANCHOR'
 
 /**
  * Parse a commit-pinned GitHub blob URL with a line anchor,
@@ -140,6 +140,38 @@ export function parseGitHubBlobUrl(url: string): CodeSnippetSource | NotASnippet
 		org,
 		path: pathSegments.join('/'),
 		repo,
+	}
+}
+
+/** Type guard narrowing a `parseGitHubBlobUrl` result to an actual `CodeSnippetSource`. */
+export function isSnippetSource(
+	result: CodeSnippetSource | NotASnippetUrl,
+): result is CodeSnippetSource {
+	if (typeof result !== 'string') {
+		return true
+	}
+
+	switch (result) {
+		case 'NOT_GITHUB_URL':
+		case 'NOT_BLOB_URL':
+		case 'NO_LINE_ANCHOR':
+			return false
+		default:
+			throw new Error(`Unhandled NotASnippetUrl: ${result}`)
+	}
+}
+
+/** Human-readable reason a `parseGitHubBlobUrl` sentinel means the URL isn't a snippet source. */
+export function describeNotASnippetUrl(reason: NotASnippetUrl): string {
+	switch (reason) {
+		case 'NOT_GITHUB_URL':
+			return 'not a github.com URL'
+		case 'NOT_BLOB_URL':
+			return 'not a /blob/ URL'
+		case 'NO_LINE_ANCHOR':
+			return 'missing a line anchor (#L<first>[-L<last>])'
+		default:
+			throw new Error(`Unhandled NotASnippetUrl: ${reason}`)
 	}
 }
 
