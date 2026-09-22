@@ -433,30 +433,32 @@ export const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
 function ratedWalletEipVariantSupport<_AttributeGroupId extends string>(
 	wallet: RatedWallet<_AttributeGroupId>,
 	eipNumber: EipNumber,
-): Array<{ variant: Variant; status: EipSupportStatus; references: FullyQualifiedReference[] }> {
+): Partial<Record<Variant, { status: EipSupportStatus; references: FullyQualifiedReference[] }>> {
 	const { perVariant } = ratedWalletEipSupport(wallet, eipNumber)
+	const support: Partial<
+		Record<Variant, { status: EipSupportStatus; references: FullyQualifiedReference[] }>
+	> = {}
 
-	return Object.values(Variant).flatMap(variant => {
+	for (const variant of Object.values(Variant)) {
 		const variantSupport = perVariant[variant]
 
 		if (variantSupport === undefined) {
-			return []
+			continue
 		}
 
 		const status = eipSupportStatus(variantSupport)
 
 		if (status === EipSupportStatus.NOT_APPLICABLE) {
-			return []
+			continue
 		}
 
-		return [
-			{
-				variant,
-				status,
-				references: typeof variantSupport === 'string' ? [] : refs(variantSupport),
-			},
-		]
-	})
+		support[variant] = {
+			status,
+			references: typeof variantSupport === 'string' ? [] : refs(variantSupport),
+		}
+	}
+
+	return support
 }
 
 /**
@@ -470,25 +472,44 @@ function ratedWalletEipVariantSupport<_AttributeGroupId extends string>(
 export function ratedWalletEipSupportByStatus<_AttributeGroupId extends string>(
 	wallet: RatedWallet<_AttributeGroupId>,
 	eipNumber: EipNumber,
-): Array<{ status: EipSupportStatus; variants: Variant[]; references: FullyQualifiedReference[] }> {
-	const byStatus = new Map<
-		EipSupportStatus,
-		{ variants: Variant[]; references: FullyQualifiedReference[][] }
-	>()
+): Partial<
+	Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[] }>
+> {
+	const byStatus: Partial<
+		Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[][] }>
+	> = {}
 
-	for (const { variant, status, references } of ratedWalletEipVariantSupport(wallet, eipNumber)) {
-		const entry = byStatus.get(status) ?? { variants: [], references: [] }
+	const variantSupport = ratedWalletEipVariantSupport(wallet, eipNumber)
+
+	for (const variant of Object.values(Variant)) {
+		const support = variantSupport[variant]
+
+		if (support === undefined) {
+			continue
+		}
+
+		const entry = byStatus[support.status] ?? { variants: [], references: [] }
 
 		entry.variants.push(variant)
-		entry.references.push(references)
-		byStatus.set(status, entry)
+		entry.references.push(support.references)
+		byStatus[support.status] = entry
 	}
 
-	return Array.from(byStatus.entries()).map(([status, { variants, references }]) => ({
-		status,
-		variants,
-		references: mergeRefs(...references),
-	}))
+	const result: Partial<
+		Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[] }>
+	> = {}
+
+	for (const status of Object.values(EipSupportStatus)) {
+		const entry = byStatus[status]
+
+		if (entry === undefined) {
+			continue
+		}
+
+		result[status] = { variants: entry.variants, references: mergeRefs(...entry.references) }
+	}
+
+	return result
 }
 
 /**

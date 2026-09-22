@@ -6,7 +6,11 @@ import { eips } from '@/data/eips'
 import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
-import { ratedWalletEipSupportByStatus, type EipStatusSupportCard } from '@/schema/eip-support'
+import {
+	EipSupportStatus,
+	ratedWalletEipSupportByStatus,
+	type EipStatusSupportCard,
+} from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
 import type { RatedWallet } from '@/schema/wallet'
 import { getWalletUrl } from '@/utils/urls'
@@ -32,17 +36,27 @@ const { eip } = Astro.props
 
 /** Precompute the per-status EIP support cards at build time. */
 function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSupportCard[] {
-	return wallets.flatMap(wallet =>
-		ratedWalletEipSupportByStatus(wallet, eip.number).map(({ status, variants, references }) => ({
-			id: wallet.metadata.id,
-			displayName: wallet.metadata.displayName,
-			iconExtension: wallet.metadata.iconExtension,
-			url: getWalletUrl(wallet),
-			status,
-			variants,
-			references,
-		})),
-	)
+	return wallets.flatMap(wallet => {
+		const byStatus = ratedWalletEipSupportByStatus(wallet, eip.number)
+
+		return Object.values(EipSupportStatus).flatMap(status => {
+			const entry = byStatus[status]
+
+			return entry === undefined
+				? []
+				: [
+						{
+							id: wallet.metadata.id,
+							displayName: wallet.metadata.displayName,
+							iconExtension: wallet.metadata.iconExtension,
+							url: getWalletUrl(wallet),
+							status,
+							variants: entry.variants,
+							references: entry.references,
+						},
+					]
+		})
+	})
 }
 
 const softwareCards = eipStatusSupportCards(Object.values(ratedSoftwareWallets))
