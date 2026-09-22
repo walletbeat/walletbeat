@@ -18,7 +18,9 @@ Source availability allows anyone (including Walletbeat, as well as security aud
 ---
 Free and Open Source Licensing 📜
 
-Is the wallet's source code free and open source licensed? If so, it means that you have the freedom to mix, to share, to adapt that software. So it's important for code reuse and feasible to transfer mantainership if the team walks away.
+Is the wallet's source code free and open source licensed? 
+
+If so, it means that you have the freedom to mix, to share, to adapt that software. So it's important for code reuse and feasible to transfer maintainership if the team walks away.
 
 FOSS licensing also allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities.
 
@@ -38,7 +40,9 @@ A reliable and transparent source of funding is important to make sure its devel
 ---
 Fee Transparency 💸
 
-Does the wallet clearly display all transaction fees and their purpose? This is not just in transactions but also in built-in swaps, in bridges, and all that. Is it clear what you are actually paying?
+Does the wallet clearly display all transaction fees and their purpose? 
+
+This is not just in transactions but also in built-in swaps, in bridges, and all that. Is it clear what you are actually paying?
 
 The fees charged by the wallet must be made transparent to the user at all times.
 
@@ -47,9 +51,11 @@ The fees charged by the wallet must be made transparent to the user at all times
 ---
 Orderflow Transparency 🗺️
 
-What happens to the orderflow data that you're creating as you do transactions? Does the wallet transparently disclose how it monetizes your transaction data? Wallets can skim some value off of the MEV, and they should be transparent about what they do. 
+What happens to the orderflow data that you're creating as you do transactions? Does the wallet transparently disclose how it monetizes your transaction data? 
 
-This is very similar to the way that Payment for Order Flow disclosures works in TradFi. They have to disclose this, so wallets should too. The wallet must transparently disclose how it monetizes or shares transaction data before it is included onchain.
+Wallets can skim some value off of the MEV, and they should be transparent about what they do. 
+
+This is very similar to the way that Payment for Order Flow disclosures works in TradFi. They have to disclose this, so wallets should too.
 
 ![Orderflow Transparency](./orderflow_transparency.png)
 
