@@ -14,7 +14,10 @@ import {
 	BugBountyProgramAvailability,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -42,6 +45,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -444,10 +448,12 @@ export const metamask: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: false,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -463,10 +469,14 @@ export const metamask: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -496,7 +506,32 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/app/scripts/services/legacy-background-api-service.ts#L4090-L4096',
+						},
+						{
+							label: 'Mobile app new-wallet flow',
+							url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/app/core/Authentication/Authentication.ts#L331-L334',
+						},
+						{
+							label: 'All MetaMask versions create a new vault and keychain',
+							url: 'https://github.com/MetaMask/core/blob/f4ff5f5ab872f639b753ac8cad4542eaf6f2c29a/packages/multichain-account-service/src/MultichainAccountService.ts#L464-L471',
+						},
+						{
+							label: 'A new HD keyring gets a random recovery phrase',
+							url: 'https://github.com/MetaMask/core/blob/f6ab836adc93670f41b2f1ec965f2122ac35331c/packages/keyring-controller/src/KeyringController.ts#L2978-L2994',
+						},
+						{
+							label: 'Recovery-phrase generation',
+							url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L141-L143',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -709,7 +744,19 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'MetaMask mobile swap review screen for a 3 USDC to ETH swap, showing the quote, rate, network fee, slippage, and MetaMask fee. Does not itself show a separate approve step or its requested amount.',
+						file: 'public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png',
+						label: 'MetaMask mobile swap review screen for a 3 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

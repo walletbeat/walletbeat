@@ -60,28 +60,35 @@ export const stageCriterionRatings = {
 		icon: '✅',
 		label: 'Criterion passed',
 		color: 'var(--rating-pass)',
+		textColor: 'var(--rating-pass-text)',
 	},
 	[StageCriterionRating.FAIL]: {
 		icon: '❌',
 		label: 'Criterion failed',
 		color: 'var(--rating-fail)',
+		textColor: 'var(--rating-fail-text)',
 	},
 	[StageCriterionRating.EXEMPT]: {
 		icon: '➖',
 		label: 'Criterion exempt',
-		color: 'var(--rating-exempt)',
+		color: 'var(--rating-neutral)',
+		textColor: 'var(--rating-neutral-text)',
 	},
 	[StageCriterionRating.UNRATED]: {
 		icon: '❔',
 		label: 'Criterion unrated',
 		color: 'var(--rating-unrated)',
+		textColor: 'var(--rating-unrated)',
 	},
 } as const satisfies Record<
 	StageCriterionRating,
 	{
 		icon: string
 		label: string
+		/** Fill role: markers, badges, borders. */
 		color: string
+		/** Content role: legible against --background-primary in both schemes. */
+		textColor: string
 	}
 >
 
@@ -95,7 +102,7 @@ export type StageCriterionEvaluation = {
 } & (
 	| {
 			// If not unrated, the explanation must be provided.
-			rating: Omit<StageCriterionRating, StageCriterionRating.UNRATED>
+			rating: Exclude<StageCriterionRating, StageCriterionRating.UNRATED>
 
 			/** Explanation of the rating. */
 			explanation: Sentence<WalletNameStrings>

@@ -121,7 +121,12 @@ export function contentHashToCid(contentHash: Hex.Hex): string | null {
 
 const ETH_CALL_GAS = '0x100000' // 1_048_576
 
-async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Promise<Hex.Hex> {
+async function ethCall(
+	rpcUrl: string,
+	to: Address.Address,
+	data: Hex.Hex,
+	timeoutMs: number,
+): Promise<Hex.Hex> {
 	const response = await fetch(rpcUrl, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -131,6 +136,7 @@ async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Prom
 			params: [{ to, data, gas: ETH_CALL_GAS }, 'latest'],
 			id: 1,
 		}),
+		signal: AbortSignal.timeout(timeoutMs),
 	})
 
 	if (!response.ok) {
@@ -162,6 +168,7 @@ async function ethCall(rpcUrl: string, to: Address.Address, data: Hex.Hex): Prom
 export async function readEnsContentHashCid(
 	rpcUrl: string,
 	domain: string,
+	timeoutMs: number,
 ): Promise<string | null> {
 	const node = Ens.namehash(domain)
 	const resolverCalldata = AbiFunction.encodeData(resolverAbi, [node])
@@ -169,7 +176,7 @@ export async function readEnsContentHashCid(
 	let resolverData: Hex.Hex
 
 	try {
-		resolverData = await ethCall(rpcUrl, ENS_REGISTRY_ADDRESS, resolverCalldata)
+		resolverData = await ethCall(rpcUrl, ENS_REGISTRY_ADDRESS, resolverCalldata, timeoutMs)
 	} catch (error) {
 		throw prefixError('Failed to query ENS resolver', error)
 	}
@@ -185,7 +192,7 @@ export async function readEnsContentHashCid(
 	let contenthashData: Hex.Hex
 
 	try {
-		contenthashData = await ethCall(rpcUrl, resolverAddress, contenthashCalldata)
+		contenthashData = await ethCall(rpcUrl, resolverAddress, contenthashCalldata, timeoutMs)
 	} catch (error) {
 		throw prefixError('Failed to query ENS resolver content-hash', error)
 	}
@@ -200,9 +207,10 @@ export async function ensPointsToCid(
 	rpcUrl: string,
 	domain: string,
 	expectedCid: string,
+	timeoutMs: number,
 ): Promise<boolean> {
 	try {
-		const currentCid = await readEnsContentHashCid(rpcUrl, domain)
+		const currentCid = await readEnsContentHashCid(rpcUrl, domain, timeoutMs)
 
 		return currentCid === expectedCid
 	} catch (error) {

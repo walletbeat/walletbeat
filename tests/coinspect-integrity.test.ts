@@ -4,8 +4,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
-
-import { getRepositoryRoot } from './utils/codebase'
+import { getRepositoryRoot } from '@/utils/codebase'
 
 /**
  * Coinspect `walletMakerUID`s that Walletbeat does not track.

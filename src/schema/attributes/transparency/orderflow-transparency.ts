@@ -408,7 +408,7 @@ function evaluateAuctioningOrderflow(
 	}
 
 	if (!isSupported(practicesPage)) {
-		ctx.addRef(disclosure)
+		ctx.addRef(disclosure, practicesPage)
 
 		return ctx.build({
 			outcome: {

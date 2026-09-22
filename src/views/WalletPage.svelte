@@ -12,6 +12,7 @@
 		normalizeExampleRatings,
 		ratingIcons,
 		ratingToColor,
+		ratingToTextColor,
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
@@ -53,7 +54,7 @@
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
-	import { toFullyQualified } from '@/schema/reference'
+	import { mergeRefs, toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletStageAndLadder } from '@/utils/stage'
@@ -249,7 +250,7 @@
 				color: group.accentColor ?? 'transparent',
 				weight: 1,
 				arcLabel: '',
-				titleText: group.title,
+				ariaLabel: group.title,
 				children: (group.children ?? []).map(attribute => ({
 					id: attribute.id,
 					color: attribute.accentColor ?? 'transparent',
@@ -257,7 +258,7 @@
 						({ attribute: sourceAttribute }) => `#${slugifyCamelCase(sourceAttribute.id)}` === attribute.href
 					)?.weight ?? 1,
 					arcLabel: '',
-					titleText: attribute.title,
+					ariaLabel: attribute.title,
 				})),
 			}
 		})
@@ -306,7 +307,13 @@
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
-		for (const [variant, variantSpecificityMap] of Object.entries(wallet.variantSpecificity)) {
+		for (const entry of Object.entries(wallet.variantSpecificity)) {
+			if (!entry) continue
+
+			const [variant, variantSpecificityMap] = entry
+
+			if (!variantSpecificityMap) continue
+
 			for (const [evalAttrId, variantSpecificity] of variantSpecificityMap) {
 				switch (variantSpecificity) {
 					case VariantSpecificity.ALL_SAME:
@@ -331,6 +338,28 @@
 		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
+	const allPageReferences = $derived.by(() => {
+		const refs = Object.values(attributeTree).flatMap(attrGroup => {
+			const evalGroup = evalTree[attrGroup.id]
+
+			if (!evalGroup) {
+				return []
+			}
+
+			return attrGroup.attributes.flatMap(({ attribute }) => {
+				const evalAttr = evalGroup[attribute.id]
+
+				if (evalAttr === undefined || evalAttr.evaluation.outcome.rating === Rating.EXEMPT) {
+					return []
+				}
+
+				return toFullyQualified(evalAttr.evaluation.references)
+			})
+		})
+
+		return mergeRefs(...refs)
+	})
+
 
 	// Components
 	import { Github, Globe } from 'lucide-static'
@@ -343,6 +372,7 @@
 	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
 	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
+	import DataSourceCredits from '@/views/DataSourceCredits.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
 	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
@@ -544,7 +574,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{@html Globe}
+							<span data-icon="wbicons-simple browser_integration"></span>
 							Website
 						</a>
 					{/if}
@@ -556,7 +586,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{@html Github}
+							<span data-icon="wbicons-simple code_repository"></span>
 							Source Code
 						</a>
 					{/if}
@@ -646,6 +676,12 @@
 			{/if}
 		{/each}
 
+		{#if allPageReferences.length > 0}
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<DataSourceCredits references={allPageReferences} />
+			</div>
+		{/if}
+
 		{#if walletNews.length > 0 && newsIsVeryStale}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
@@ -679,7 +715,7 @@
 							{#if item.icon}
 								<span
 									class="pie-navigation-icon"
-									data-icon="wbicons emoji {item.icon}"
+									data-icon="wbicons-simple {item.icon}"
 								></span>
 							{/if}
 						{/snippet}
@@ -704,7 +740,7 @@
 					{#if item.icon}
 						<span
 							class="toc-icon"
-							data-icon="wbicons {item.icon}"
+							data-icon="wbicons-simple {item.icon}"
 						></span>
 					{/if}
 				{/snippet}
@@ -777,7 +813,7 @@
 				>
 					<span
 						class="attribute-group-icon"
-						data-icon="wbicons {attrGroup.icon}"
+						data-icon="wbicons-complex {attrGroup.icon}"
 					></span>
 
 					<div
@@ -871,6 +907,7 @@
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
 		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		style:--accent-textColor={ratingToTextColor(evalAttr.evaluation.outcome.rating)}
 		style:---pie-timeline={pieTimelineByHref.get(`#${slugifyCamelCase(attribute.id)}`)}
 		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 	>
@@ -884,7 +921,7 @@
 				<header data-row-item="flexible" data-row="center gap-3">
 					<span
 						class="attribute-icon"
-						data-icon="wbicons {attribute.icon}"
+						data-icon="wbicons-complex {attribute.icon}"
 					></span>
 
 					<div
@@ -1078,6 +1115,14 @@
 						</div>
 					{/if}
 				</li>
+				{#if override?.note !== undefined}
+					<li data-list-item="gap-3" data-list-item-marker="👉">
+						<Typography
+							content={override.note}
+							strings={getWalletEvalStrings(wallet)}
+						/>
+					</li>
+				{/if}
 			</ul>
 
 			{#if variantSpecificCaption}
@@ -1270,7 +1315,7 @@
 								strings={getWalletEvalStrings(wallet)}
 							/>
 
-							{#if override}
+							{#if override?.howToImprove !== undefined}
 								<div class="note" data-card="padding-3" data-row="gap-4">
 									<div class="icon">ℹ️</div>
 									<p>
@@ -1650,10 +1695,15 @@
 		&::before {
 			line-height: 1;
 			filter:
-				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 80%, transparent))
-				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 50%, transparent));
+				drop-shadow(0 0 0.28em color-mix(in oklch, var(--accent) 30%, transparent))
+				drop-shadow(0 0 0.08em color-mix(in oklch, var(--accent) 10%, transparent));
 			transition-property: filter;
 		}
+	}
+
+	.attribute-group-icon,
+	.attribute-icon {
+		font-size: 2.5rem;
 	}
 
 	@supports (clip-path: shape(from 0 0, line to 1px 1px, close)) {
@@ -2110,6 +2160,7 @@
 
 			:global(.navigation-items a > .pie-navigation-icon) {
 				--icon-size: calc(var(---slice-label-size) * 1px);
+				color: #fff;
 
 				position: absolute;
 				inset: var(---pie-origin-y) auto auto var(---pie-origin-x);
@@ -2117,7 +2168,7 @@
 				rotate: calc(-1 * (var(---pie-rotate) + var(---slice-mid-angle)));
 				filter: var(
 					---linked-icon-filter,
-					contrast(0.5) brightness(3) opacity(0.7)
+					opacity(0.75)
 						drop-shadow(1px 2px 3px rgb(0 0 0 / 0.15))
 				);
 				transition-property: filter;

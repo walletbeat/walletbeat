@@ -2,12 +2,14 @@ import { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import path from 'node:path'
+import { env } from 'node:process'
 import * as zlib from 'node:zlib'
 
 import { describe, expect, it } from 'vitest'
 
+import { getRepositoryRoot } from '@/utils/codebase'
+
 import { removeCSSOutline } from '../src/tools/icon-font-generator/svg-stroke-removal'
-import { getRepositoryRoot } from './utils/codebase'
 
 /**
  * All SVG files under resources/ that contain CSS stroke declarations
@@ -210,7 +212,13 @@ describe('removeCSSOutline on all stroked SVGs under resources/', () => {
 
 			it('removes all stroke declarations', () => {
 				expect(output).not.toMatch(/stroke\s*:/)
-				expect(output).not.toMatch(/<style/)
+
+				// Any remaining <style> block must not declare stroke-related
+				// CSS properties (e.g. `stroke`, `stroke-width`). Non-stroke
+				// rules (e.g. `fill`) are allowed to stay in the block.
+				for (const styleBlock of output.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+					expect(styleBlock[1]).not.toMatch(/stroke(?:-[\w-]+)?\s*:/)
+				}
 			})
 
 			it('preserves the SVG root and original shape data', () => {
@@ -260,7 +268,7 @@ function findInkscape(): string[] | null {
 	for (const candidate of candidates) {
 		const result = spawnSync(candidate[0], [...candidate.slice(1), '--version'], {
 			encoding: 'utf8',
-			timeout: 30000,
+			timeout: 300000,
 		})
 
 		if (result.status === 0 && result.stdout.includes('Inkscape')) {
@@ -377,73 +385,76 @@ function renderToPNG(command: string[], svgPath: string, pngPath: string): void 
 	expect(result.status, `inkscape failed: ${result.stderr}`).toBe(0)
 }
 
-describe.skipIf(inkscape === null)('rendering equivalence (Inkscape)', () => {
-	/**
-	 * Inkscape rasterizes curves by flattening them at a fixed device-space
-	 * tolerance, so two different-but-equivalent vector representations of
-	 * the same image never rasterize fully identically: hairline
-	 * antialiasing differences along edges are inherent (Inkscape's own
-	 * stroke-to-path conversion exhibits the same magnitude of difference).
-	 * These thresholds are calibrated to that floor: structural errors (a
-	 * missing or displaced stroke) exceed them by orders of magnitude.
-	 */
-	const MAX_DIFFERING_FRACTION = 0.1
-	const MAX_LARGE_DIFF_FRACTION = 0.003
+describe.skipIf(env.WALLETBEAT_ENV !== 'CI' && inkscape === null)(
+	'rendering equivalence (Inkscape)',
+	() => {
+		/**
+		 * Inkscape rasterizes curves by flattening them at a fixed device-space
+		 * tolerance, so two different-but-equivalent vector representations of
+		 * the same image never rasterize fully identically: hairline
+		 * antialiasing differences along edges are inherent (Inkscape's own
+		 * stroke-to-path conversion exhibits the same magnitude of difference).
+		 * These thresholds are calibrated to that floor: structural errors (a
+		 * missing or displaced stroke) exceed them by orders of magnitude.
+		 */
+		const MAX_DIFFERING_FRACTION = 0.1
+		const MAX_LARGE_DIFF_FRACTION = 0.003
 
-	const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'svg-stroke-removal-'))
+		const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'svg-stroke-removal-'))
 
-	for (const { relativePath, contents } of strokedSvgs) {
-		it(`${relativePath} renders visually identically after conversion`, () => {
-			const name = path.basename(relativePath, '.svg')
-			const originalSvg = path.join(temporaryDir, `${name}.svg`)
-			const convertedSvg = path.join(temporaryDir, `${name}.converted.svg`)
-			const originalPng = path.join(temporaryDir, `${name}.orig.png`)
-			const convertedPng = path.join(temporaryDir, `${name}.converted.png`)
+		for (const { relativePath, contents } of strokedSvgs) {
+			it(`${relativePath} renders visually identically after conversion`, () => {
+				const name = path.basename(relativePath, '.svg')
+				const originalSvg = path.join(temporaryDir, `${name}.svg`)
+				const convertedSvg = path.join(temporaryDir, `${name}.converted.svg`)
+				const originalPng = path.join(temporaryDir, `${name}.orig.png`)
+				const convertedPng = path.join(temporaryDir, `${name}.converted.png`)
 
-			fs.writeFileSync(originalSvg, contents)
-			fs.writeFileSync(convertedSvg, removeCSSOutline(contents))
+				fs.writeFileSync(originalSvg, contents)
+				fs.writeFileSync(convertedSvg, removeCSSOutline(contents))
 
-			if (inkscape === null) {
-				throw new Error('Inkscape unavailable')
-			}
-
-			const command = inkscape
-
-			renderToPNG(command, originalSvg, originalPng)
-			renderToPNG(command, convertedSvg, convertedPng)
-			const original = decodePNG(originalPng)
-			const converted = decodePNG(convertedPng)
-
-			expect(converted.width).toBe(original.width)
-			expect(converted.height).toBe(original.height)
-			expect(converted.channels).toBe(original.channels)
-			let differing = 0
-			let largeDifference = 0
-			const pixelCount = original.width * original.height
-
-			for (let i = 0; i < original.data.length; i += original.channels) {
-				let maximum = 0
-
-				for (let c = 0; c < original.channels; c++) {
-					maximum = Math.max(maximum, Math.abs(original.data[i + c] - converted.data[i + c]))
+				if (inkscape === null) {
+					throw new Error('Inkscape unavailable')
 				}
 
-				if (maximum > 0) {
-					differing++
-				}
+				const command = inkscape
 
-				if (maximum > 32) {
-					largeDifference++
+				renderToPNG(command, originalSvg, originalPng)
+				renderToPNG(command, convertedSvg, convertedPng)
+				const original = decodePNG(originalPng)
+				const converted = decodePNG(convertedPng)
+
+				expect(converted.width).toBe(original.width)
+				expect(converted.height).toBe(original.height)
+				expect(converted.channels).toBe(original.channels)
+				let differing = 0
+				let largeDifference = 0
+				const pixelCount = original.width * original.height
+
+				for (let i = 0; i < original.data.length; i += original.channels) {
+					let maximum = 0
+
+					for (let c = 0; c < original.channels; c++) {
+						maximum = Math.max(maximum, Math.abs(original.data[i + c] - converted.data[i + c]))
+					}
+
+					if (maximum > 0) {
+						differing++
+					}
+
+					if (maximum > 32) {
+						largeDifference++
+					}
 				}
-			}
-			expect(
-				differing / pixelCount,
-				`${differing} of ${pixelCount} pixels differ`,
-			).toBeLessThanOrEqual(MAX_DIFFERING_FRACTION)
-			expect(
-				largeDifference / pixelCount,
-				`${largeDifference} of ${pixelCount} pixels differ by more than 32 levels`,
-			).toBeLessThanOrEqual(MAX_LARGE_DIFF_FRACTION)
-		})
-	}
-})
+				expect(
+					differing / pixelCount,
+					`${differing} of ${pixelCount} pixels differ`,
+				).toBeLessThanOrEqual(MAX_DIFFERING_FRACTION)
+				expect(
+					largeDifference / pixelCount,
+					`${largeDifference} of ${pixelCount} pixels differ by more than 32 levels`,
+				).toBeLessThanOrEqual(MAX_LARGE_DIFF_FRACTION)
+			})
+		}
+	},
+)

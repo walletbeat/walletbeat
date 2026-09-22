@@ -15,7 +15,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -47,6 +50,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import {
 	featureSupported,
@@ -559,10 +563,14 @@ export const zerion: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: true,
-							[BasicUnlockMechanism.PASSWORD]: false,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.PASSWORD]: notSupported,
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -592,9 +600,52 @@ export const zerion: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
-				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
-				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							"The browser extension generates the recovery phrase on the user's device.",
+						url: [
+							{
+								label: 'Browser extension new-wallet request',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/src/background/Wallet/Wallet.ts#L424-L437',
+							},
+							{
+								label: 'A new wallet container generates its wallet',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/src/background/Wallet/model/WalletContainer.ts#L131-L133',
+							},
+							{
+								label: 'Random wallet creation',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/2c2b54239b58698195f53437754ed1d74606bc40/src/shared/wallet/create.ts#L92-L97',
+							},
+							{
+								label: 'Recovery-phrase generation from local randomness',
+								url: 'https://github.com/ethers-io/ethers.js/blob/01b5badbb616b29fd8b69ef7c3cc3833062da3d7/packages/wallet/src.ts/index.ts#L167-L178',
+							},
+						],
+					},
+					keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+					multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				},
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation:
+								'Zerion generates the recovery phrase on the device: a new account can still be created with the phone offline.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-11-zerion-offline-account-creation.png',
+							label: 'Zerion iOS 5.0.4 creating an account with airplane mode on and no network',
+							lastRetrieved: '2026-09-11',
+						},
+						{
+							explanation:
+								"Zerion states that the recovery phrase is stored on the user's device and that Zerion cannot access it.",
+							label: 'Zerion security page',
+							lastRetrieved: '2026-09-11',
+							url: 'https://zerion.io/security',
+						},
+					],
+					keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+					multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				},
 			},
 			lightClient: {
 				ethereumL1: notSupported,
@@ -747,7 +798,27 @@ export const zerion: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Zerion swap screen for a 1.21 USDC to ETH swap, before confirming with "Swap Now".',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-08-zerion-swap-review.png',
+						label: 'Zerion swap screen for a 1.21 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The decoded input data of the Approve transaction shows value 1210246, matching the 1.21 USDC swap amount.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-08-zerion-exact-approval.png',
+						label:
+							'Decoded Approve transaction calldata showing a value of 1210246 (1.210246 USDC)',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

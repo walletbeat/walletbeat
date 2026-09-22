@@ -25,7 +25,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -58,6 +61,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import {
 	featureSupported,
@@ -743,10 +747,12 @@ export const ambire: SoftwareWallet = {
 				basicUnlock: {
 					ref: refTodo,
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+						[BasicUnlockMechanism.PIN]: notSupported,
+						[BasicUnlockMechanism.PASSWORD]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: notSupported,
@@ -787,7 +793,31 @@ export const ambire: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation: "The browser extension generates the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/AmbireTech/extension/blob/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src/common/modules/auth/hooks/useCreateNewSeedAccount/useCreateNewSeedAccount.ts#L29-L35',
+						},
+						{
+							label: 'The extension pins this ambire-common commit',
+							url: 'https://github.com/AmbireTech/extension/tree/e7575c1c35d8a69bfb5a5b8173199c927036fddb/src',
+						},
+						{
+							label: 'Background process creates the new recovery phrase',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/main/main.ts#L2165-L2177',
+						},
+						{
+							label: 'Keystore generates the phrase',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/keystore/keystore.ts#L709-L711',
+						},
+						{
+							label: 'Recovery-phrase generation from local randomness',
+							url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/entropyGenerator/entropyGenerator.ts#L33-L39',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -945,7 +975,19 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'Ambire\'s built-in swap confirmation screen shows a separate "Approve" line above the swap action itself. Swapping 1 USDC for ETH via 1inch, the Approve amount is exactly "1 USDC", matching the swap amount.',
+						file: 'public/references/wallets/ambire/screenshots/2026-09-08-ambire-swap-approve-exact-amount.png',
+						label: 'Ambire swap confirmation screen showing an Approve step for exactly 1 USDC.',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

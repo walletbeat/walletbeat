@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { trimWhitespacePrefix } from '@/types/utils/text'
-
 import {
 	commonExclusions,
 	getCodebaseIndex,
 	type IndexedFile,
 	type IndexedFileData,
-} from './utils/codebase'
+} from '@/utils/codebase'
+
 import { getCSpellWords } from './utils/cspell'
 
 const cSpellWords = getCSpellWords()
