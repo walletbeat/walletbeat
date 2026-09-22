@@ -8,6 +8,7 @@ import {
 	parseGitHubBlobUrl,
 	snippetRelativePath,
 } from '@/schema/code-snippets'
+import { getErrorMessage } from '@/types/errors'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 import {
@@ -54,7 +55,7 @@ async function fetchAndStore(walletId: string, source: CodeSnippetSource): Promi
 				return
 			}
 		} catch (error) {
-			reason = error instanceof Error ? error.message : String(error)
+			reason = getErrorMessage(error)
 		}
 
 		process.stderr.write(`Refetching (${reason}): ${relativePath}\n`)
@@ -120,7 +121,7 @@ async function fetchAllMissing(): Promise<number> {
 			process.stderr.write(
 				`Error fetching ${occurrence.url} ` +
 					`(referenced from ${occurrence.walletId} at ${occurrence.fieldPath}): ` +
-					`${error instanceof Error ? error.message : String(error)}\n`,
+					`${getErrorMessage(error)}\n`,
 			)
 		}
 	}
@@ -179,7 +180,7 @@ cli
 
 			source = parsed
 		} catch (error) {
-			process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`)
+			process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 			process.exit(1)
 		}
 
@@ -233,7 +234,7 @@ cli.help()
 try {
 	cli.parse(process.argv, { run: true })
 } catch (error) {
-	process.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`)
+	process.stderr.write(`Error: ${getErrorMessage(error)}\n`)
 	process.exit(1)
 }
 

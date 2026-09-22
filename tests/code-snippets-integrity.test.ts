@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-	checkSnippets,
-	SnippetProblemKind,
-} from '@/tools/code-snippet-collector/code-snippet-collector-lib'
+import { checkSnippets } from '@/tools/code-snippet-collector/code-snippet-collector-lib'
 import { getRepositoryRoot } from '@/utils/codebase'
 
 describe('code snippets', () => {

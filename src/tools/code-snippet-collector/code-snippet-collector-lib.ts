@@ -11,6 +11,7 @@ import {
 	type StoredSnippetSegment,
 } from '@/schema/code-snippets'
 import { collectAllRefs } from '@/schema/reference'
+import { getErrorMessage } from '@/types/errors'
 import { commonWhitespacePrefix } from '@/types/utils/text'
 import { CodebaseEntryType, crawlCodebase, normalizePath } from '@/utils/codebase'
 
@@ -356,7 +357,7 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 			parsed = parseStoredSnippetContent(contents)
 		} catch (error) {
 			problems.push({
-				issue: `Snippet is not valid stored-snippet JSON: ${error instanceof Error ? error.message : String(error)}`,
+				issue: `Snippet is not valid stored-snippet JSON: ${getErrorMessage(error)}`,
 				kind: SnippetProblemKind.SNIPPET_CONTENT_MISMATCH,
 				snippetPath,
 			})
