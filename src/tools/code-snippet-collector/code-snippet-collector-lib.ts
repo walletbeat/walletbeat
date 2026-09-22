@@ -378,32 +378,29 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 	}
 
 	const walletsDir = path.join(repoRoot, walletsReferencesDir)
+	await crawlCodebase({
+		root: walletsDir,
+		ignore: [],
+		baseTraversalFn: entry => {
+			// Only files directly under a wallet's own code/ directory (not
+			// e.g. its screenshots/ directory).
+			if (entry.type !== CodebaseEntryType.FILE || entry.path.split('/')[1] !== 'code') {
+				return
+			}
 
-	if (fs.existsSync(walletsDir)) {
-		await crawlCodebase({
-			root: walletsDir,
-			ignore: [],
-			baseTraversalFn: entry => {
-				// Only files directly under a wallet's own code/ directory (not
-				// e.g. its screenshots/ directory).
-				if (entry.type !== CodebaseEntryType.FILE || entry.path.split('/')[1] !== 'code') {
-					return
-				}
+			const storedFile = normalizePath(`${walletsReferencesDir}/${entry.path}`)
 
-				const storedFile = normalizePath(`${walletsReferencesDir}/${entry.path}`)
+			if (expected.has(storedFile)) {
+				return
+			}
 
-				if (expected.has(storedFile)) {
-					return
-				}
-
-				problems.push({
-					issue: 'No wallet data file references this snippet (anymore).',
-					kind: SnippetProblemKind.ORPHAN_SNIPPET,
-					snippetPath: storedFile,
-				})
-			},
-		})
-	}
+			problems.push({
+				issue: 'No wallet data file references this snippet (anymore).',
+				kind: SnippetProblemKind.ORPHAN_SNIPPET,
+				snippetPath: storedFile,
+			})
+		},
+	})
 
 	return problems
 }
