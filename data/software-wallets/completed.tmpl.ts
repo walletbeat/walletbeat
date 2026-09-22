@@ -53,7 +53,11 @@ import {
 	type BugBountyProgramSupport,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -91,7 +95,10 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -603,10 +610,18 @@ export const completedTemplate: SoftwareWallet = {
 				basicUnlock: {
 					ref: refTodo,
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.BIOMETRIC]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PATTERN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
 					},
 				},
 				duressMode: supported({
@@ -787,12 +802,15 @@ export const completedTemplate: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: supported({
+			permissionsManagement: {
 				ref: refTodo,
-				erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-			}),
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

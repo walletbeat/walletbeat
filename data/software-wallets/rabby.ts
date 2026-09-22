@@ -14,7 +14,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -43,7 +46,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -385,10 +388,14 @@ export const rabby: SoftwareWallet = {
 							},
 						],
 						mechanisms: {
-							[BasicUnlockMechanism.PIN]: false,
-							[BasicUnlockMechanism.PASSWORD]: true,
-							[BasicUnlockMechanism.BIOMETRIC]: true,
-							[BasicUnlockMechanism.PATTERN]: false,
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
 						},
 					},
 					duressMode: notSupported,
@@ -475,7 +482,28 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/ui/views/NewUserImport/CreateSeedPhrase.tsx#L29-L30',
+						},
+						{
+							label: 'Browser extension recovery-phrase generation',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/background/service/keyring/index.ts#L371-L373',
+						},
+						{
+							label: 'Mobile app new-wallet screen',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/screens/Address/PreCreateSeedPhraseScreen.tsx#L93-L95',
+						},
+						{
+							label: 'Mobile app recovery-phrase generation',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2596',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -882,18 +910,25 @@ export const rabby: SoftwareWallet = {
 			// in-wallet-UI standard). Verified in-app. Mobile and desktop variants
 			// not independently verified, so left as null.
 			permissionsManagement: {
-				[Variant.BROWSER]: supported({
-					ref: refTodo,
-					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				}),
-				[Variant.MOBILE]: supported({
-					ref: refTodo,
-					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				}),
+				ref: [
+					{
+						explanation:
+							'Rabby browser extension swap review screen for a 1 USDC to ETH swap via 1inch, followed by tapping "Approve and Swap".',
+						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-swap-review.png',
+						label: 'Rabby browser extension swap review screen for a 1 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The decoded input data of the Approve transaction shows value 1000000, exactly 1 USDC, matching the swap amount.',
+						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png',
+						label:
+							'Decoded Approve transaction calldata showing spender and a value of 1000000 (exactly 1 USDC)',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			transactionSubmission: {
 				l1: {

@@ -7,7 +7,11 @@ import {
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+	DuressAction,
+} from '@/schema/features/security/duress-resistance'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	KeyGenerationLocation,
@@ -148,10 +152,12 @@ export const keycardShell: HardwareWallet = {
 						'https://docs.keycard.tech/duress_pin',
 					],
 					mechanisms: {
-						[BasicUnlockMechanism.PIN]: true,
-						[BasicUnlockMechanism.PASSWORD]: false,
-						[BasicUnlockMechanism.BIOMETRIC]: false,
-						[BasicUnlockMechanism.PATTERN]: false,
+						[BasicUnlockMechanism.PIN]: supported({
+							type: BasicUnlockMechanismSupport.REQUIRED,
+						}),
+						[BasicUnlockMechanism.PASSWORD]: notSupported,
+						[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+						[BasicUnlockMechanism.PATTERN]: notSupported,
 					},
 				},
 				duressMode: supported({

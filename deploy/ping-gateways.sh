@@ -42,6 +42,21 @@ ping_gateway() {
 	echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] Content verified on '$url'."
 }
 
+ipfs_check_cid() {
+	local cid="$1"
+	local url
+	if [[ ! "$cid" =~ ^[a-z2-7]+$ ]]; then
+		echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] CID '$cid' is not base32-lowercase alphanumeric; refusing to build check URL." >&2
+		return 1
+	fi
+	url="https://ipfs-check-backend.ipfs.io/check?cid=${cid}&multiaddr=&ipniIndexer=https%3A%2F%2Fcid.contact&timeoutSeconds=30&httpRetrieval=on"
+	if ! curl --fail --silent --show-error --max-time 40 "$url" | jq -e '([.[] | select(.DataAvailableOverBitswap.Found == true)] | length) >= 1 and ([.[] | select(.DataAvailableOverHTTP.Found == true)] | length) >= 1 and ([.[] | select(.DataAvailableOverBitswap.Found == true or .DataAvailableOverHTTP.Found == true)] | length) >= 3' >/dev/null; then
+		echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] CID '$cid' not reported as available by the IPFS check service." >&2
+		return 1
+	fi
+	echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] CID '$cid' reported as available by the IPFS check service."
+}
+
 if [[ -z "${DEPLOY_DIRECTORY:-}" ]]; then
 	echo 'Missing DEPLOY_DIRECTORY' >&2
 	exit 1
@@ -61,6 +76,12 @@ while true; do
 			ALL_GOOD_GATEWAYS=false
 		fi
 	done
+	echo "[$(date '+%+4Y-%m-%d %H:%M:%S')] Checking CID availability on the IPFS check service..." >&2
+	if ipfs_check_cid "$DIRECTORY_CID"; then
+		ONE_GOOD_GATEWAY=true
+	else
+		ALL_GOOD_GATEWAYS=false
+	fi
 	if [[ "$ALL_GOOD_GATEWAYS" == true ]]; then
 		echo "All gateways have the data. Success". >&2
 		exit 0

@@ -13,7 +13,6 @@
 		type LevelConfig as PieLevelConfig,
 		type Slice as PieSlice,
 	} from './pie-geometry'
-	import { wbIconEmojiSequences } from '@/styles/wbicons'
 	import type { Snippet } from 'svelte'
 	import type { HTMLAttributes } from 'svelte/elements'
 
@@ -199,11 +198,10 @@
 		href={slice.href}
 
 		class="slice"
-		title={slice.titleText}
 
 		role="button"
 		tabindex="0"
-		aria-label={slice.titleText}
+		aria-label={slice.ariaLabel}
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
@@ -241,7 +239,7 @@
 			class="slice-shape"
 		>
 			{#if slice.arcIconId}
-				<span class="label" aria-hidden="true" data-icon="emoji">{wbIconEmojiSequences[slice.arcIconId]}</span>
+				<span class="label" aria-hidden="true" data-icon="wbicons-simple {slice.arcIconId}"></span>
 			{:else}
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			{/if}
@@ -549,7 +547,7 @@
 						white-space: nowrap;
 						text-align: center;
 						line-height: 1;
-						color: currentColor;
+						color: #fff;
 						font-size: calc(var(--slice-labelSize) * 1px);
 						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
@@ -558,7 +556,7 @@
 				}
 
 				&:not(:hover, :focus-within) > .slice-shape > .label {
-					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
+					filter: opacity(0.75) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
 				}
 			}
 
