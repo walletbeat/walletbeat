@@ -37,7 +37,8 @@ export function findSnippetOccurrences(_repoRoot: string): SnippetOccurrence[] {
 	const occurrences: SnippetOccurrence[] = []
 
 	for (const collected of collectAllRefs(allWallets)) {
-		const walletId = allWallets[assertValidWalletName(collected.walletName)].metadata.id
+		const walletName = assertValidWalletName(collected.walletName)
+		const walletId = allWallets[walletName].metadata.id
 
 		for (const fq of collected.fullyQualifiedRefs) {
 			for (const urlEntry of fq.urls) {
@@ -377,7 +378,6 @@ export async function checkSnippets(repoRoot: string): Promise<SnippetProblem[]>
 	}
 
 	const walletsDir = path.join(repoRoot, walletsReferencesDir)
-
 	await crawlCodebase({
 		root: walletsDir,
 		ignore: [],
