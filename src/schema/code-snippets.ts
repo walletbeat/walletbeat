@@ -157,7 +157,7 @@ export function isSnippetSource(
 		case 'NO_LINE_ANCHOR':
 			return false
 		default:
-			throw new Error(`Unhandled NotASnippetUrl: ${result}`)
+			throw new Error(`Unhandled NotASnippetUrl: ${String(result)}`)
 	}
 }
 
@@ -171,7 +171,7 @@ export function describeNotASnippetUrl(reason: NotASnippetUrl): string {
 		case 'NO_LINE_ANCHOR':
 			return 'missing a line anchor (#L<first>[-L<last>])'
 		default:
-			throw new Error(`Unhandled NotASnippetUrl: ${reason}`)
+			throw new Error(`Unhandled NotASnippetUrl: ${String(reason)}`)
 	}
 }
 
