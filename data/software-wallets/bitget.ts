@@ -13,6 +13,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import {
 	CallDataDisplay,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -206,7 +207,57 @@ export const bitget: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'Bitget Wallet decodes a USDC approval as an authorization, showing the spender and amount.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-usdc-approval.png',
+							label: 'Bitget Wallet authorization confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'Bitget Wallet does not decode an Aave supply; it shows a generic signature confirmation.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png',
+							label: 'Bitget Wallet signature confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Bitget Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-safe-aave-supply.png',
+							label: 'Bitget Wallet signature confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Bitget Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Bitget Wallet signature confirmation for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'Bitget Wallet splits a batched USDC approval and Aave supply from an EOA into separate actions and decodes the approval, but does not decode the Aave supply properly: it is shown as "Swap 0.01 USDC for --".',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-batch-approve-supply.png',
+							label: 'Bitget Wallet batch authorization for a batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				erc8213: supported({
 					ref: refTodo,
 					calldataDisplay: {
