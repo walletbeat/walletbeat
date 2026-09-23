@@ -506,8 +506,8 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Uniswap Wallet shows the EIP-712 domain and message fields in a scrollable section, but not the type definitions. No domain hash, message hash or EIP-712 digest is shown.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-struct.png',
+								'Uniswap Wallet only lists the EIP-712 domain and message values as flattened key/value pairs, the EIP-712 struct itself is not shown. No domain hash, message hash or EIP-712 digest is shown.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png',
 							label: 'Uniswap Wallet signature request for an EIP-712 message',
 						},
 						{
@@ -524,7 +524,7 @@ export const uniswapWallet: SoftwareWallet = {
 						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 					messageSigningLegibility: {
-						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
