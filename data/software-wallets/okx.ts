@@ -10,6 +10,7 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import {
 	CallDataDisplay,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -191,7 +192,57 @@ export const okx: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'OKX Wallet decodes a USDC approval, showing the spender (Aave) and an editable amount.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-usdc-approval.png',
+							label: 'OKX Wallet approval confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode an Aave supply properly; it labels it as a deposit and shows the token amount, but the contract is shown as a raw address and the collateral recipient is not shown.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png',
+							label: 'OKX Wallet deposit confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it is shown as "Modify configuration".',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-aave-supply.png',
+							label: 'OKX Wallet confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it is shown as "Modify configuration".',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-batch-approve-supply.png',
+							label: 'OKX Wallet confirmation for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'OKX Wallet splits a batched USDC approval and Aave supply from an EOA into separate transactions and decodes the approval, but does not decode the Aave supply properly: it is only shown as a deposit of the token amount, without the collateral recipient.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-batch-approve-supply.png',
+							label:
+								'OKX Wallet multiple transactions confirmation for a batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				erc8213: supported({
 					ref: refTodo,
 					calldataDisplay: {
