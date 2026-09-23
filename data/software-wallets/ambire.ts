@@ -892,7 +892,38 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation: 'Ambire decodes a USDC approval, showing the spender and amount.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-usdc-approval.png',
+							label: 'Ambire transaction builder showing a decoded USDC approval',
+						},
+						{
+							explanation:
+								'Ambire decodes an Aave supply, showing the amount and collateral recipient.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-aave-supply.png',
+							label: 'Ambire transaction builder showing a decoded Aave supply',
+						},
+						{
+							explanation:
+								'Ambire decodes the inner Aave supply call nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-safe-aave-supply.png',
+							label: 'Ambire transaction builder showing a decoded Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Ambire decodes each call of a batched USDC approval and Aave supply from an EOA.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-batch-approve-supply.png',
+							label: 'Ambire transaction builder showing a decoded batched approve and supply',
+						},
+						{
+							explanation:
+								'Ambire decodes each inner call of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Ambire transaction builder showing a decoded Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
