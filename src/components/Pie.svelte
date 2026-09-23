@@ -111,6 +111,13 @@
 	const computedSlices = $derived(
 		computePieSlices({ slices, radius, levels, layout, centerFirstSlice, labelSize }),
 	)
+	const sliceUsesBackdropFilter = (slice: ComputedSlice): boolean =>
+		Boolean(
+			slice.gradient ||
+				slice.color === 'var(--rating-unrated)' ||
+				slice.children?.some(sliceUsesBackdropFilter),
+		)
+	const usesBackdropFilter = $derived(computedSlices.some(sliceUsesBackdropFilter))
 	const transitionedElements = $derived(new Set(transitionElements.split(' ')))
 	const transitionsPie = $derived(!!transitionNamePrefix && transitionedElements.has('pie'))
 	const transitionsSlices = $derived(!!transitionNamePrefix && transitionedElements.has('slices'))
@@ -167,9 +174,6 @@
 		style:--slice-opacity={slice.opacity ?? 1}
 		style:--slice-fill={sliceFill(slice)}
 		style:--slice-labelBackground={sliceLabelBackground(slice)}
-		style:--slice-backdropFilter={slice.gradient || slice.color === 'var(--rating-unrated)'
-			? 'var(--rating-unrated-backdropFilter)'
-			: 'none'}
 		style:--slice-labelSize={slice.computed.labelSize}
 		style:--slice-labelR={slice.computed.labelR}
 		data-slice-id={slice.id}
@@ -217,7 +221,11 @@
 		style:--view-transition-class={transitionsPie ? 'pie' : undefined}
 		data-stack
 	>
-		<div class="slices" data-stack>
+		<div
+			class="slices"
+			data-stack
+			style:--pie-backdropFilter={usesBackdropFilter ? 'var(--rating-unrated-backdropFilter)' : 'none'}
+		>
 			{#each computedSlices as slice (slice.id)}
 				{@render Slice(slice)}
 			{/each}
@@ -320,6 +328,12 @@
 
 			> .slices {
 				contain: content;
+				pointer-events: none;
+				backdrop-filter: var(--pie-backdropFilter, none);
+
+				@media (prefers-reduced-transparency: reduce) {
+					backdrop-filter: none;
+				}
 			}
 
 			.slice {
@@ -363,10 +377,6 @@
 
 				.slice-shape {
 					background: var(--slice-fill);
-
-					@media (prefers-reduced-transparency: reduce) {
-						backdrop-filter: none;
-					}
 
 					transform-origin: var(--pie-originX) var(--pie-originY);
 					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
