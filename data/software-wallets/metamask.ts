@@ -661,12 +661,37 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask decodes a USDC approval as a spending cap request, showing the spender, and amount.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-usdc-approval.png',
+							label: 'MetaMask spending cap request for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask does not decode an Aave supply; it only shows the simulated balance change and the contract being interacted with.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
+							label: 'MetaMask transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-aave-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-batch-approve-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
