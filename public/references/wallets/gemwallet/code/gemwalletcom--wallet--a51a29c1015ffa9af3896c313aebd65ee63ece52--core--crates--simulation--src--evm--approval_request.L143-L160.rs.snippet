@@ -1,0 +1,50 @@
+{
+	"highlightFirstLine": 143,
+	"highlightLastLine": 160,
+	"segments": [
+		{
+			"lines": [
+				"impl ApprovalRequest {"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"    pub(crate) fn build_simulation_result(self, warnings: Vec<SimulationWarning>) -> SimulationResult {"
+			],
+			"startLine": 133
+		},
+		{
+			"lines": [
+				"        {",
+				"            result.header = Some(approval_value.to_simulation_header(self.asset_id));",
+				"        }",
+				"",
+				"        result",
+				"    }",
+				"",
+				"    pub(crate) fn primary_warning(&self) -> SimulationWarning {",
+				"        let warning = match self.method {",
+				"            ApprovalMethod::Approve => SimulationWarningType::TokenApproval(SimulationWarningApproval {",
+				"                asset_id: self.asset_id.clone(),",
+				"                value: self.warning_approval_value(),",
+				"            }),",
+				"            ApprovalMethod::SetApprovalForAll => SimulationWarningType::NftCollectionApproval(self.asset_id.clone()),",
+				"            ApprovalMethod::Permit | ApprovalMethod::PermitSingle => SimulationWarningType::PermitApproval(SimulationWarningApproval {",
+				"                asset_id: self.asset_id.clone(),",
+				"                value: self.warning_approval_value(),",
+				"            }),",
+				"            ApprovalMethod::PermitBatch => SimulationWarningType::PermitBatchApproval(self.warning_approval_value()),",
+				"        };",
+				"",
+				"        SimulationWarning::new(",
+				"            match self.method {",
+				"                ApprovalMethod::Approve => SimulationSeverity::Low,",
+				"                ApprovalMethod::SetApprovalForAll | ApprovalMethod::Permit | ApprovalMethod::PermitSingle | ApprovalMethod::PermitBatch => SimulationSeverity::Warning,",
+				"            },",
+				"            warning,"
+			],
+			"startLine": 138
+		}
+	]
+}

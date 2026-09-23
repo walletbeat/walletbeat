@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 65,
+	"highlightLastLine": 80,
+	"segments": [
+		{
+			"lines": [
+				"const rainbowProvider = new RainbowProvider({"
+			],
+			"startLine": 37
+		},
+		{
+			"lines": [
+				"  onConstruct({ emit }) {"
+			],
+			"startLine": 40
+		},
+		{
+			"lines": [
+				"    }",
+				"  },",
+				"});",
+				"",
+				"if (shouldInjectProvider()) {",
+				"  // eslint-disable-next-line prefer-object-spread",
+				"  const providerCopy = Object.create(",
+				"    Object.getPrototypeOf(rainbowProvider),",
+				"    Object.getOwnPropertyDescriptors(rainbowProvider),",
+				"  );",
+				"  providerCopy.isMetaMask = false;",
+				"  announceProvider({",
+				"    info: {",
+				"      icon: RAINBOW_ICON_RAW_SVG,",
+				"      name: 'Rainbow',",
+				"      rdns: 'me.rainbow',",
+				"      uuid: uuid4(),",
+				"    },",
+				"    provider: providerCopy as RainbowProvider as EIP1193Provider,",
+				"  });",
+				"",
+				"  backgroundMessenger.reply(",
+				"    'rainbow_ethereumChainEvent',",
+				"    async ({"
+			],
+			"startLine": 61
+		}
+	]
+}

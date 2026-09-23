@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 141,
+	"highlightLastLine": 143,
+	"segments": [
+		{
+			"lines": [
+				"export class HdKeyring implements Keyring {"
+			],
+			"startLine": 112
+		},
+		{
+			"lines": [
+				"  /**",
+				"   * Initialize the keyring with a random mnemonic.",
+				"   *",
+				"   * @returns A promise that resolves when the process is complete.",
+				"   */",
+				"  async generateRandomMnemonic(): Promise<void> {",
+				"    await this.#initFromMnemonic(generateMnemonic(wordlist));",
+				"  }",
+				"",
+				"  /**",
+				"   * Return the serialized state of the keyring.",
+				"   *"
+			],
+			"startLine": 136
+		}
+	]
+}

@@ -1,0 +1,49 @@
+{
+	"highlightFirstLine": 350,
+	"highlightLastLine": 362,
+	"segments": [
+		{
+			"lines": [
+				"export const handleProviderRequestApp = ({ messenger, data, meta }: { messenger: Messenger; data: any; meta: any }) => {"
+			],
+			"startLine": 271
+		},
+		{
+			"lines": [
+				"  }) => {"
+			],
+			"startLine": 336
+		},
+		{
+			"lines": [
+				"    if (supportedChainId) {"
+			],
+			"startLine": 339
+		},
+		{
+			"lines": [
+				"      console.warn('PROVIDER TODO: TODO SEND NOTIFICATION');",
+				"    }",
+				"  };",
+				"",
+				"  handleProviderRequest({",
+				"    providerRequestTransport,",
+				"    isSupportedChain,",
+				"    getFeatureFlags,",
+				"    messengerProviderRequest,",
+				"    onAddEthereumChain,",
+				"    checkRateLimit,",
+				"    onSwitchEthereumChainNotSupported,",
+				"    onSwitchEthereumChainSupported,",
+				"    getProvider,",
+				"    getActiveSession,",
+				"    getChainNativeCurrency: chainId => useBackendNetworksStore.getState().getChainsNativeAsset()[chainId],",
+				"  });",
+				"",
+				"  messenger.dispatch({ data, meta });",
+				"};"
+			],
+			"startLine": 346
+		}
+	]
+}

@@ -1,0 +1,48 @@
+{
+	"highlightFirstLine": 98,
+	"highlightLastLine": 119,
+	"segments": [
+		{
+			"lines": [
+				"class RNEthersRS: NSObject {"
+			],
+			"startLine": 25
+		},
+		{
+			"lines": [
+				"  /**",
+				"   Generates a new mnemonic and retrieves associated public address. Stores new mnemonic in native keychain with the mnemonic ID key as the public address.",
+				"   ",
+				"   - returns: public address from the mnemonic's first derived private key",
+				"   */",
+				"  @objc(generateAndStoreMnemonic:reject:)",
+				"  func generateAndStoreMnemonic(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {",
+				"    let mnemonic_ptr = generate_mnemonic()",
+				"    let mnemonic_str = String(cString: mnemonic_ptr.mnemonic!)",
+				"    let address_str = String(cString: mnemonic_ptr.address!)",
+				"    let res = storeNewMnemonic(mnemonic: mnemonic_str, address: address_str)",
+				"    mnemonic_free(mnemonic_ptr)",
+				"    resolve(res)",
+				"  }",
+				"  ",
+				"  /**",
+				"   Stores mnemonic phrase in Native Keychain under the address",
+				"   ",
+				"   - returns: public address if successfully stored in native keychain",
+				"   */",
+				"  func storeNewMnemonic(mnemonic: String, address: String) -> String? {",
+				"    let checkStored = retrieveMnemonic(mnemonicId: address)",
+				"    ",
+				"    if checkStored == nil {",
+				"      let newMnemonicKey = keychainKeyForMnemonicId(mnemonicId: address);",
+				"      keychain.set(mnemonic, forKey: newMnemonicKey, withAccess: .accessibleWhenUnlockedThisDeviceOnly)",
+				"      return address",
+				"    }",
+				"    ",
+				"    return address",
+				"  }"
+			],
+			"startLine": 93
+		}
+	]
+}

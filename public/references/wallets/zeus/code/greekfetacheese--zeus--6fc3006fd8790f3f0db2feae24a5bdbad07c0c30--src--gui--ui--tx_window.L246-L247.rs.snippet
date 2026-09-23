@@ -1,0 +1,59 @@
+{
+	"highlightFirstLine": 246,
+	"highlightLastLine": 247,
+	"segments": [
+		{
+			"lines": [
+				"impl TxConfirmationWindow {"
+			],
+			"startLine": 44
+		},
+		{
+			"lines": [
+				"   pub fn show(&mut self, ctx: ZeusCtx, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 141
+		},
+		{
+			"lines": [
+				"      Window::new(\"Transaction Confirmation Window\")"
+			],
+			"startLine": 146
+		},
+		{
+			"lines": [
+				"         .show(ui.ctx(), |ui| {"
+			],
+			"startLine": 153
+		},
+		{
+			"lines": [
+				"            Frame::new().show(ui, |ui| {",
+				"               ui.vertical_centered(|ui| {"
+			],
+			"startLine": 160
+		},
+		{
+			"lines": [
+				"                  ui.allocate_ui(frame_size, |ui| {",
+				"                     frame.show(ui, |ui| {"
+			],
+			"startLine": 231
+		},
+		{
+			"lines": [
+				"",
+				"                        // Contract interaction",
+				"                        if analysis.contract_interact {",
+				"                           contract_interact(",
+				"                              ctx.clone(),",
+				"                              self.chain,",
+				"                              analysis.interact_to,",
+				"                              theme,",
+				"                              ui,",
+				"                           );"
+			],
+			"startLine": 242
+		}
+	]
+}

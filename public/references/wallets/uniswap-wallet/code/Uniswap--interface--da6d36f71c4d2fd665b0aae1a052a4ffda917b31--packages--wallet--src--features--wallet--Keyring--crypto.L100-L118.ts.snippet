@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 100,
+	"highlightLastLine": 118,
+	"segments": [
+		{
+			"lines": [
+				"export async function convertBase64SeedToCryptoKey(keyBase64: string): Promise<CryptoKey> {",
+				"  return convertBytesToCryptoKey(base64ToUint8(keyBase64))",
+				"}",
+				"",
+				"export async function getEncryptionKeyFromBuffer({",
+				"  buffer,",
+				"  secretPayload,",
+				"}: {",
+				"  buffer: BufferSource",
+				"  secretPayload: SecretPayload",
+				"}): Promise<CryptoKey> {",
+				"  const { iterations, hash } = secretPayload",
+				"  const salt = decodeFromStorage(secretPayload.salt)",
+				"",
+				"  // TODO: This should use Argon2 like ToB recommended for the mobile app",
+				"  // https://github.com/Uniswap/universe/blob/main/apps/mobile/ios/EncryptionHelper.swift",
+				"  return derivePbkdf2({",
+				"    password: buffer,",
+				"    salt,",
+				"    iterations,",
+				"    hash,",
+				"  })",
+				"}",
+				"",
+				"export async function getEncryptionKeyFromPassword({",
+				"  password,",
+				"  secretPayload,"
+			],
+			"startLine": 96
+		}
+	]
+}
