@@ -894,7 +894,7 @@ export const ambire: SoftwareWallet = {
 				erc7730: supported({
 					ref: [
 						{
-							explanation: 'Ambire decodes a USDC approval, showing the spender and amount.',
+							explanation: 'Ambire decodes a USDC approval, showing the spender, and amount.',
 							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-usdc-approval.png',
 							label: 'Ambire transaction builder showing a decoded USDC approval',
 						},

@@ -220,7 +220,7 @@ export const okx: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'OKX Wallet splits a batched USDC approval and Aave supply from an EOA into separate transactions and decodes the approval, but does not decode the Aave supply properly: it is only shown as a deposit of the token amount, without the collateral recipient.',
+								'OKX Wallet splits a batched USDC approval and Aave supply from an EOA into separate transactions and decodes the approval. But it does not decode the Aave supply properly: it is only shown as a deposit of the token amount, without the collateral recipient.',
 							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-batch-approve-supply.png',
 							label:
 								'OKX Wallet multiple transactions confirmation for a batched approve and supply',

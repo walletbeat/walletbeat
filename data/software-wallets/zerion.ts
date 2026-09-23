@@ -718,13 +718,12 @@ export const zerion: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Zerion decodes a USDC approval, showing the spender and the amount allowed to spend.',
+								'Zerion decodes a USDC approval, showing the spender, and the amount allowed to spend.',
 							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-usdc-approval.png',
 							label: 'Zerion approve confirmation for a USDC approval',
 						},
 						{
-							explanation:
-								'Zerion does not decode an Aave supply.',
+							explanation: 'Zerion does not decode an Aave supply.',
 							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-aave-supply.png',
 							label: 'Zerion send confirmation for an Aave supply',
 						},

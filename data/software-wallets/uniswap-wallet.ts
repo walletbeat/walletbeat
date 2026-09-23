@@ -465,13 +465,13 @@ export const uniswapWallet: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the execTransaction function.',
+								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the `execTransaction` function.',
 							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
-								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the execTransaction function.',
+								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the `execTransaction` function.',
 							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Uniswap Wallet transaction request for a Safe{Wallet} batched approve and supply',

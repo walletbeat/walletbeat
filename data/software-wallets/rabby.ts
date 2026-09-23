@@ -823,13 +823,13 @@ export const rabby: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Rabby decodes a USDC approval, showing the token amount, spender and protocol (Aave V3).',
+								'Rabby decodes a USDC approval, showing the token amount, spender, and protocol.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-usdc-approval.png',
 							label: 'Rabby token approval for a USDC approval',
 						},
 						{
 							explanation:
-								'Rabby decodes an Aave supply, showing the protocol (Aave V3), description and receiver.',
+								'Rabby decodes an Aave supply, showing the protocol, description, and receiver.',
 							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-aave-supply.png',
 							label: 'Rabby supply token confirmation for an Aave supply',
 						},
@@ -949,7 +949,7 @@ export const rabby: SoftwareWallet = {
 							'The decoded input data of the Approve transaction shows value 1000000, exactly 1 USDC, matching the swap amount.',
 						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png',
 						label:
-							'Decoded Approve transaction calldata showing spender and a value of 1000000 (exactly 1 USDC)',
+							'Decoded Approve transaction calldata showing spender, and a value of 1000000 (exactly 1 USDC)',
 						lastRetrieved: '2026-09-08',
 					},
 				],

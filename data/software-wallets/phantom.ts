@@ -336,7 +336,7 @@ export const phantom: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Phantom decodes a USDC approval, showing the spender and the amount it can transfer.',
+								'Phantom decodes a USDC approval, showing the spender, and the amount it can transfer.',
 							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-usdc-approval.png',
 							label: 'Phantom transaction confirmation for a USDC approval',
 						},

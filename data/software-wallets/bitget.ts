@@ -211,7 +211,7 @@ export const bitget: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Bitget Wallet decodes a USDC approval as an authorization, showing the spender and amount.',
+								'Bitget Wallet decodes a USDC approval as an authorization, showing the spender, and amount.',
 							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-usdc-approval.png',
 							label: 'Bitget Wallet authorization confirmation for a USDC approval',
 						},
@@ -236,7 +236,7 @@ export const bitget: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Bitget Wallet splits a batched USDC approval and Aave supply from an EOA into separate actions and decodes the approval, but does not decode the Aave supply properly: it is shown as "Swap 0.01 USDC for --".',
+								'Bitget Wallet splits a batched USDC approval and Aave supply from an EOA into separate actions and decodes the approval, but does not decode the Aave supply properly.',
 							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-batch-approve-supply.png',
 							label: 'Bitget Wallet batch authorization for a batched approve and supply',
 						},

@@ -664,7 +664,7 @@ export const metamask: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'MetaMask decodes a USDC approval as a spending cap request, showing the spender and amount.',
+								'MetaMask decodes a USDC approval as a spending cap request, showing the spender, and amount.',
 							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-usdc-approval.png',
 							label: 'MetaMask spending cap request for a USDC approval',
 						},
