@@ -26,6 +26,10 @@ import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
+import {
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+} from '@/schema/features/security/transaction-legibility'
 import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
@@ -443,7 +447,63 @@ export const uniswapWallet: SoftwareWallet = {
 					secureRng: SecureRngSource.LIBRARY_RNG,
 				},
 			},
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: refTodo,
+				erc4361: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation: 'Uniswap Wallet decodes a USDC approval, showing the approved amount.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png',
+							label: 'Uniswap Wallet transaction request for a USDC approval',
+						},
+						{
+							explanation:
+								'Uniswap Wallet does not decode an Aave supply; it only shows the amount sent.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
+							label: 'Uniswap Wallet transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the execTransaction function.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
+							label: 'Uniswap Wallet transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the execTransaction function.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Uniswap Wallet transaction request for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA; it only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
+							label: 'Uniswap Wallet transaction request for a batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				erc8213: null,
+				transactionDetailsDisplay: null,
+				transactionSimulations: null,
+			},
 		},
 		selfSovereignty: {
 			permissionsManagement: {
