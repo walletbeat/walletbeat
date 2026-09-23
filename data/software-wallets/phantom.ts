@@ -28,7 +28,10 @@ import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
+import {
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+} from '@/schema/features/security/transaction-legibility'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
@@ -329,7 +332,51 @@ export const phantom: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'Phantom decodes a USDC approval, showing the spender and the amount it can transfer.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-usdc-approval.png',
+							label: 'Phantom transaction confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'Phantom does not decode an Aave supply; it only shows the simulated balance change.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-aave-supply.png',
+							label: 'Phantom transaction confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Phantom does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-safe-aave-supply.png',
+							label: 'Phantom transaction confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Phantom does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Phantom transaction confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				erc8213: null,
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
