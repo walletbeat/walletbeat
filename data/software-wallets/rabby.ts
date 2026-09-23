@@ -820,12 +820,38 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Rabby decodes a USDC approval, showing the token amount, spender and protocol (Aave V3).',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-usdc-approval.png',
+							label: 'Rabby token approval for a USDC approval',
+						},
+						{
+							explanation:
+								'Rabby decodes an Aave supply, showing the protocol (Aave V3), description and receiver.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-aave-supply.png',
+							label: 'Rabby supply token confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows it as a multisig transaction submission.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-aave-supply.png',
+							label: 'Rabby multisig transaction confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows it as a multisig transaction submission.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Rabby multisig transaction confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
