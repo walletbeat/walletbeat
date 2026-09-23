@@ -106,13 +106,13 @@ jobs:
           ACCESS_TOKEN_4EVERLAND: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
       - name: Deploy on IPFS
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
-        run: ./deploy/deploy-omnipin.sh || true
+        run: ./deploy/deploy-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
       - name: Pin on 4EVERLAND
         if: steps.check-existing-pin.outputs.already-pinned != 'true'
-        run: ./deploy/pin-omnipin.sh || true
+        run: ./deploy/pin-omnipin.sh
         env:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
