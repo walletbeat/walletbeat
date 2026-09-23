@@ -27,8 +27,10 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import {
+	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
+	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
@@ -500,7 +502,34 @@ export const uniswapWallet: SoftwareWallet = {
 						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
 				}),
-				erc8213: null,
+				erc8213: supported({
+					ref: [
+						{
+							explanation:
+								'Uniswap Wallet shows the EIP-712 domain and message fields in a scrollable section, but not the type definitions. No domain hash, message hash or EIP-712 digest is shown.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-struct.png',
+							label: 'Uniswap Wallet signature request for an EIP-712 message',
+						},
+						{
+							explanation:
+								'Expanding the transaction details shows the function name and a truncated raw calldata hex `0x617b…0000` with a copy button. The full raw hex, formatted calldata and calldata digest are not shown.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-calldata.png',
+							label: 'Uniswap Wallet transaction details with truncated raw calldata',
+						},
+					],
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: null,
 				transactionSimulations: null,
 			},
