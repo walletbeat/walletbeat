@@ -383,7 +383,7 @@ export const phantom: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'Phantom shows the full EIP-712 struct, including the domain, message and type definitions, in an expandable "Message" section with a copy button. No domain hash, message hash or EIP-712 digest is shown.',
+								'Phantom shows the full EIP-712 struct, including the domain, message, and type definitions, in an expandable "Message" section with a copy button. No domain hash, message hash or EIP-712 digest is shown.',
 							file: 'public/references/wallets/phantom/screenshots/2026-09-24-phantom-erc8213-eip712-struct.png',
 							label: 'Phantom signature request for an EIP-712 message',
 						},

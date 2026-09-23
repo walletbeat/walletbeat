@@ -46,7 +46,7 @@ export const nufi: SoftwareWallet = {
 			eip7702: supported({
 				ref: {
 					explanation:
-						'The NuFi FAQ mentions the use the MetaMask DeleGator contract as smart account implementation.',
+						'The NuFi FAQ mentions the use the MetaMask Delegator contract as smart account implementation.',
 					label: 'NuFi support site',
 					url: 'https://support.nu.fi/support/solutions/articles/80001178239',
 				},

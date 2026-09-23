@@ -387,6 +387,18 @@
 		"hash": "1944555bd890a95ebe3c09b4e5ace86c77029db20fcf229d923e1f2523d9b1bb",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-calldata.png": {
+		"hash": "d28f2fedcc41660f6a8e3df7465ced80c75173da4129731b2674d9a4a196bc42",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-eip712-message.png": {
+		"hash": "9fb096e532077dcced12b7075fea3a2ef0009114bb465873c4b8580bef1316bf",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-eip712-struct.png": {
+		"hash": "8e91c6582df8cf056c56250644434d910798f176177ca1f37035a7bbb951e592",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/gemwallet/screenshots/2026-09-04-rpc-configurable.jpg": {
 		"hash": "445435961148f77b094496ac18b00113079dac75557f8155948f4b90851b1ecc",
 		"passedTests": ["blockiness", "file-format"]
@@ -487,6 +499,10 @@
 		"hash": "a7d5cc3076e7de90d423046e0dd0d0a5c87f20a2573cb59ff68b31c054636ba8",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/okx/screenshots/2026-09-24-okx-manage-approvals.png": {
+		"hash": "fd67d7f17798fcf9a7bab56868fd7beeffb18af8c5698bc127ef7f1a8c8b045b",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/phantom/screenshots/2026-08-26-address-resolution-confirm-send-ens-name.png": {
 		"hash": "3fb02e0db59554960da2b3ac11a708a56cde6b00f55cac8bc5e047733f35717c",
 		"passedTests": ["blockiness", "file-format"]
@@ -533,6 +549,14 @@
 	},
 	"public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-usdc-approval.png": {
 		"hash": "485991bcf0dc5a998bcf5edc8a185476e533863d0ab6778bbb1e722199150b33",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-09-24-phantom-erc8213-calldata.png": {
+		"hash": "fd3a83c3c26a9d8978a145eb45a51c1c0c4333b1328e6c7a6d09c83db768dc52",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/phantom/screenshots/2026-09-24-phantom-erc8213-eip712-struct.png": {
+		"hash": "6ccbf70f4806f2e4ec81e80f2844c483478b11604e551b38970569b61122753d",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_1.png": {
@@ -837,6 +861,14 @@
 	},
 	"public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png": {
 		"hash": "a5775de6f715004e526ce528b8f365cb80ee7527843ea7afa45246e7bbe97fb3",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-calldata.png": {
+		"hash": "8d26977c0f1d5ee8203241716fbf6e4a9ba091f567fc13efd364a62bb53a459b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png": {
+		"hash": "3ffdc886c3b65217c6a2c8951a12475f9dfb895694216a88fb4c65eee313bcb8",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png": {
