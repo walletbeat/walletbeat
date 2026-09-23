@@ -715,7 +715,32 @@ export const zerion: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Zerion decodes a USDC approval, showing the spender and the amount allowed to spend.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-usdc-approval.png',
+							label: 'Zerion approve confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'Zerion does not decode an Aave supply.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-aave-supply.png',
+							label: 'Zerion send confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows an execute call to the Safe address.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-aave-supply.png',
+							label: 'Zerion execute confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows an execute call to the Safe address.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-batch-approve-supply.png',
+							label: 'Zerion execute confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
