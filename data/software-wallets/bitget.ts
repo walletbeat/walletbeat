@@ -259,7 +259,26 @@ export const bitget: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Bitget Wallet shows the EIP-712 message fields by default, but not the domain or type definitions.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-eip712-message.png',
+							label: 'Bitget Wallet signature confirmation for an EIP-712 message',
+						},
+						{
+							explanation:
+								'The full EIP-712 struct, including the domain and type definitions, is shown after opening "Meta data". No domain hash, message hash or EIP-712 digest is shown.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-eip712-struct.png',
+							label: 'Bitget Wallet meta data view of an EIP-712 struct',
+						},
+						{
+							explanation:
+								'Opening "Meta data" on a transaction shows the function signature, parameter types (without values) and the raw calldata hex with a copy button. No calldata digest is shown.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-calldata.png',
+							label: 'Bitget Wallet meta data view of transaction calldata',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -267,7 +286,7 @@ export const bitget: SoftwareWallet = {
 						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 					messageSigningLegibility: {
-						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
