@@ -21,6 +21,10 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 
 export const okx: SoftwareWallet = {
 	metadata: {
@@ -270,7 +274,22 @@ export const okx: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'OKX Wallet has a "Manage approvals" screen listing token approvals by protocol, which can be selected and revoked.',
+						file: 'public/references/wallets/okx/screenshots/2026-09-24-okx-manage-approvals.png',
+						label: 'OKX Wallet manage approvals screen',
+					},
+				],
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
