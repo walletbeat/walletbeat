@@ -14,6 +14,10 @@ import {
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -21,10 +25,7 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 
 import { mattmatt } from '../contributors/0xmattmatt'
-import {
-	BuiltInSwapDefaultApprovalBehavior,
-	SpendingApprovalsControl,
-} from '@/schema/features/self-sovereignty/permissions-management'
+import { okx7702DelegatorContract } from '../wallet-contracts/okx-7702-delegator'
 
 export const okx: SoftwareWallet = {
 	metadata: {
@@ -49,8 +50,12 @@ export const okx: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: supported({
-				ref: refTodo,
-				contract: 'UNKNOWN',
+				ref: {
+					explanation:
+						'OKX Wallet upgrades the EOA via an EIP-7702 authorization delegating to its delegator contract.',
+					url: 'https://etherscan.io/tx/0x77cc7ba00cf03825ba3982662ca990c7458346fa659c2075dfcb75182c12e8a1',
+				},
+				contract: okx7702DelegatorContract,
 			}),
 			eoa: supported({
 				ref: refTodo,
