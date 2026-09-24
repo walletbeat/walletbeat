@@ -450,7 +450,14 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'The send confirmation shows the amount sent (in USD and ETH), the recipient address and label, the sending wallet and the network cost. The nonce and an explicit chain/network row are not shown.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-transaction-details-send.png',
+						label: 'Uniswap Wallet send confirmation',
+					},
+				],
 				erc4361: null,
 				erc7730: supported({
 					ref: [
@@ -530,7 +537,14 @@ export const uniswapWallet: SoftwareWallet = {
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 				}),
-				transactionDetailsDisplay: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.NOT_IN_UI,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
 				transactionSimulations: null,
 			},
 		},
