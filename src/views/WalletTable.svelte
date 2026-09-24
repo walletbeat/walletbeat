@@ -1912,8 +1912,7 @@
 
 				thead tr {
 					display: grid;
-					grid-auto-flow: column;
-					grid-auto-columns: minmax(0, 1fr);
+					grid-template-columns: repeat(auto-fit, minmax(min(7rem, 100%), 1fr));
 					gap: 0.25rem;
 				}
 
@@ -1923,6 +1922,7 @@
 
 				thead th {
 					min-inline-size: 0;
+					font-size: max(0.75rem, 12px);
 					overflow-wrap: anywhere;
 
 					.header-title {
