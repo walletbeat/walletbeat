@@ -27,10 +27,13 @@ import {
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
 import {
+	BasicBenchmarkTransactions,
 	CallDataDisplay,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
 import { type ChainConfigurability } from '@/schema/features/self-sovereignty/chain-configurability'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
@@ -462,6 +465,46 @@ export const uniswapWallet: SoftwareWallet = {
 						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-transaction-details-send.png',
 						label: 'Uniswap Wallet send confirmation',
 					},
+					{
+						explanation:
+							'Uniswap Wallet simulates an ERC-20 token transfer and shows the amount received.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
+						label: 'Uniswap Wallet simulation of an ERC-20 transfer',
+					},
+					{
+						explanation: 'Uniswap Wallet simulates an ERC-721 transfer and shows the NFT received.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
+						label: 'Uniswap Wallet simulation of an ERC-721 transfer',
+					},
+					{
+						explanation:
+							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer; the simulated result is empty.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
+						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
+					},
+					{
+						explanation: 'Uniswap Wallet simulates a USDC approval and shows the approved amount.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
+						label: 'Uniswap Wallet simulation of a USDC approval',
+					},
+					{
+						explanation:
+							'Uniswap Wallet simulates an Aave supply and shows the amount of USDC sent.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
+						label: 'Uniswap Wallet simulation of an Aave supply',
+					},
+					{
+						explanation:
+							'Uniswap Wallet detects a transaction that will fail and shows a "cannot estimate" error, disabling confirmation.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
+						label: 'Uniswap Wallet simulation of a failing transaction',
+					},
+					{
+						explanation:
+							'For a transaction with a nondeterministic outcome, Uniswap Wallet shows a single static simulated outcome, without warning that the outcome may differ.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
+						label: 'Uniswap Wallet simulation of a nondeterministic transaction',
+					},
 				],
 				erc4361: notSupportedWithRef({
 					ref: {
@@ -557,7 +600,45 @@ export const uniswapWallet: SoftwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				transactionSimulations: null,
+				transactionSimulations: supported({
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED, // Only receiving explained, transfer out nothing.
+					},
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						failure: 'DETECTED' as const,
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						nondeterminism: 'STATIC_SINGLE_OUTCOME' as const,
+					},
+				}),
 			},
 		},
 		selfSovereignty: {
