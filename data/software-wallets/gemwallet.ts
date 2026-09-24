@@ -17,7 +17,10 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import type { UnlimitedApprovalWarning } from '@/schema/features/security/scam-alerts'
+import {
+	type UnlimitedApprovalWarning,
+	UnlimitedApprovalWarningBenchmarkSpenders,
+} from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	KeyStorageMechanism,
@@ -407,7 +410,15 @@ export const gemwallet: SoftwareWallet = {
 					leaksSpenderAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
-					warnsOnUnlimitedApproval: true,
+					warnsOnUnlimitedApproval: {
+						[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
+							featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.CONTRACT_NOT_INTERACTED_BEFORE]:
+							featureSupported,
+					},
 				}),
 			},
 			securityBestPractices: {
