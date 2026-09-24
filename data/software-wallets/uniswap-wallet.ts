@@ -38,7 +38,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -458,7 +463,14 @@ export const uniswapWallet: SoftwareWallet = {
 						label: 'Uniswap Wallet send confirmation',
 					},
 				],
-				erc4361: null,
+				erc4361: notSupportedWithRef({
+					ref: {
+						explanation:
+							'Uniswap Wallet does not format SIWE requests for easy readability; it shows the raw message text in a generic signature request.',
+						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
+						label: 'Uniswap Wallet signature request for an ERC-4361 message',
+					},
+				}),
 				erc7730: supported({
 					ref: [
 						{
