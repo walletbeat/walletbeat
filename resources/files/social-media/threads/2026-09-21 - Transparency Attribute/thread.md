@@ -11,7 +11,7 @@ Source Availability 🍝
 
 Is the wallet's source code publicly available? You should be able to read the code of the wallet and understand what it does.
 
-Source availability allows anyone (including Walletbeat, as well as security auditors) to inspect what the wallet is doing. This is important for security, auditability and build reproductibility.
+Source availability allows anyone (including Walletbeat, as well as security auditors) to inspect what the wallet is doing. This is important for security, auditability, and build reproductibility.
 
 ![Source Availability](./source_availability.png)
 
@@ -55,7 +55,7 @@ What happens to the orderflow data that you're creating as you do transactions? 
 
 Wallets can skim some value off of the MEV, and they should be transparent about what they do. 
 
-This is very similar to the way that Payment for Order Flow disclosures works in TradFi. They have to disclose this, so wallets should too.
+This is very similar to the way that payment for order flow disclosures works in TradFi. They have to disclose this, so wallets should too.
 
 ![Orderflow Transparency](./orderflow_transparency.png)
 
@@ -66,7 +66,7 @@ Can users trust that the wallet's releases are built and distributed safely?
 
 The wallet release process must follow safety best practices.
 
- A well-defined release process with artifact signing, reproducible builds, and dependency locking reduces supply chain attack risk.
+A well-defined release process with artifact signing, reproducible builds, and dependency locking reduces supply chain attack risk.
 
 ![Release Process Transparency](./release_process_transparency.png)
 
@@ -75,6 +75,6 @@ There are a lot to care about in wallets.
 
 If you want to learn more about any one of them, you can go on any Walletbeat wallet page and look at the methodology and the rationale behind the attributes 👇
 
-http://beta.walletbeat.eth.limo
+https://beta.walletbeat.eth.limo/
 
 ![Walletbeat CTA](./walletbeat_cta.png)
