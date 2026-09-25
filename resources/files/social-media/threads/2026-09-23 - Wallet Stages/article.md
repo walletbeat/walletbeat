@@ -1,6 +1,6 @@
 Walletbeat is a rating system for Ethereum wallets. So we use a framework to evaluate wallets across five dimensions: Security, Privacy, Transparency, Ecosystem Alignment and Self-sovereignty. The same exact values that CROPS stands for.
 
-These are a lot of dimentions to care about wallets. As a wallet development team, this give you a lot of targets to hit: Where do you start? How do you make progress? How do you make sense of it all? This is where the Stage System comes in. 
+These are a lot of dimensions to care about wallets. As a wallet development team, this gives you a lot of targets to hit: Where do you start? How do you make progress? How do you make sense of it all? This is where the Stage System comes in. 
  
 
 
@@ -56,7 +56,7 @@ Wallets should alert users about known scams before transactions are made, helpi
 Standard security practices, such as storing keys in a secure enclave and requesting minimal permissions, protect users from key extraction attacks and malicious apps. These are baseline implementation requirements for a wallet that takes security seriously.
 
 - Account Recovery 🛟
-The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios, and must periodically prompt users to verify that their account recovery methods are still accessible
+The wallet must implement guardian-based account recovery that lets users recover their account in all likely catastrophic scenarios, and must periodically prompt users to verify that their account recovery methods are still accessible.
 
 The wallet offers a minimal level of privacy to its users:
 
