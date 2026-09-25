@@ -1,3 +1,5 @@
+![Wallet Stage Definitions](./cover.png)
+
 Walletbeat is a rating system for Ethereum wallets. We use a framework to evaluate wallets across five dimensions: Security, Privacy, Transparency, Ecosystem Alignment, and Self-sovereignty. The same values that CROPS stands for.
 
 There are many dimensions to consider when evaluating wallets. As a wallet development team, this gives you many targets to address: where do you start, how do you make progress, and how do you make sense of it all? This is where the Stage System comes in.
