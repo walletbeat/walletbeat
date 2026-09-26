@@ -3,6 +3,8 @@ import * as path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
+import { assertStringHasPrefix } from '@/types/utils/text'
 import {
 	CodebaseEntryType,
 	commonExclusions,
@@ -12,6 +14,50 @@ import {
 import { extractMarkdownLinks } from '@/utils/markdown-utils'
 
 import { grammarLint, grammarLintMessages } from './utils/grammar'
+
+/**
+ * Repo-root-relative directories whose markdown files are rendered as site
+ * pages (content collections). Links between these files must be
+ * repo-root-relative, not GitHub blob/tree URLs, so that they resolve to the
+ * on-site rendered HTML version during static generation.
+ */
+const RENDERED_MARKDOWN_DIRS = Object.values(RENDERED_MARKDOWN_COLLECTIONS).map(c =>
+	assertStringHasPrefix(c.repoDir, '/').slice(1),
+)
+
+/**
+ * Extract the repo-root-relative file path from a `github.com/walletbeat/walletbeat`
+ * blob or tree URL. Returns `null` when the URL is not a blob/tree URL for our repo
+ * or when no path is present.
+ *
+ * E.g. `https://github.com/walletbeat/walletbeat/blob/beta/governance/treasury/treasury-transparency.md`
+ * -> `governance/treasury/treasury-transparency.md`
+ */
+function repoRelativePathFromGithubUrl(url: string): string | null {
+	const prefix = 'https://github.com/walletbeat/walletbeat/'
+
+	if (!url.startsWith(prefix)) {
+		return null
+	}
+
+	const rest = url.slice(prefix.length)
+	const kindMatch = /^(blob|tree)\/([^/]+)\/(.+)$/.exec(rest)
+
+	if (!kindMatch) {
+		return null
+	}
+
+	return kindMatch[3]
+}
+
+/** Whether a repo-root-relative path refers to a rendered markdown file. */
+function isRenderedMarkdownPath(repoPath: string): boolean {
+	if (!repoPath.endsWith('.md')) {
+		return false
+	}
+
+	return RENDERED_MARKDOWN_DIRS.some(dir => repoPath.startsWith(dir + '/'))
+}
 
 /**
  * Markdown files that are allowed to fail grammar checks.
@@ -150,6 +196,34 @@ describe('markdown files', async () => {
 			})
 		})
 	}
+
+	describe('rendered markdown files link to in-repo rendered markdown via repo-root-relative paths', () => {
+		it('rejects GitHub blob/tree links to rendered markdown files', async () => {
+			const renderedMarkdownFiles = allMarkdownFiles.filter(filePath =>
+				RENDERED_MARKDOWN_DIRS.some(dir => filePath.startsWith(dir + '/')),
+			)
+
+			const violations: string[] = []
+
+			for (const filePath of renderedMarkdownFiles) {
+				const absPath = path.join(getRepositoryRoot(), filePath)
+				const content = await fs.readFile(absPath, 'utf-8')
+				const links = extractMarkdownLinks(content)
+
+				for (const { url, line } of links) {
+					const repoPath = repoRelativePathFromGithubUrl(url)
+
+					if (repoPath !== null && isRenderedMarkdownPath(repoPath)) {
+						violations.push(
+							`${filePath}:${line} links to ${url} (a rendered markdown file) via GitHub; use a repo-root-relative link instead (e.g. /${repoPath})`,
+						)
+					}
+				}
+			}
+
+			expect(violations).toEqual([])
+		})
+	})
 
 	describe('whitelist only contains files that actually fail', () => {
 		for (const whitelistedPath of GRAMMAR_CHECK_WHITELIST) {
