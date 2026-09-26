@@ -351,6 +351,14 @@
 		"hash": "1161c750e0940a4560569a3c8120498f7bb58b306424e6ab339af9ef063c50c3",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/ambire/screenshots/2026-09-26-ambire-private-key-export.png": {
+		"hash": "ea3d01f43b695bb443e0c1137a312812b2028f766f7bd3bf94f0beb71ea7d491",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/ambire/screenshots/2026-09-26-ambire-seed-phrase-export.png": {
+		"hash": "e2508820bceeb8a4798757bd13e0679a04bdd5f34de370d226a6cc2c3c2ee2a7",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
 		"hash": "d541c23897a2ad6b1738080fbbe283ce9d6fc9be980bf7bfdfedb3d98e712bad",
 		"passedTests": ["blockiness", "file-format"]
