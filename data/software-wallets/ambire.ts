@@ -246,7 +246,7 @@ export const ambire: SoftwareWallet = {
 			eoa: supported({
 				ref: {
 					explanation:
-						'Ambire derives accounts from a standard seed phrase, the phrase and individual private keys can be exported',
+						'Ambire derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
 					url: [
 						{
 							label: 'Standard derivation path',
@@ -275,7 +275,6 @@ export const ambire: SoftwareWallet = {
 					],
 				},
 				canExportPrivateKey: true,
-				canExportSeedPhrase: true,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
