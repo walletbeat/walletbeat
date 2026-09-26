@@ -631,6 +631,22 @@
 		"hash": "50823091bb6ee47b352398660dd336d91e5ac2a97e7d2b432dbc038b0b4a12ce",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-browser-private-key-export.png": {
+		"hash": "295703d03aa4ff8bfc0d80b4fd52b18fe4bef347a88c9a63f5aa90249317a98f",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-browser-seed-phrase-export.png": {
+		"hash": "a77335f97c15db50dfe23ffb238007491866f4b50044884904766d4cbc20b72b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-mobile-private-key-export.png": {
+		"hash": "bfe69a4774fbd551cc4f1bd131df2043ba2496786d6b0ae9a76f0cf600c2f658",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-mobile-seed-phrase-export.png": {
+		"hash": "ad8392e0831f43bca6ffba28b5527799a0dcd3574f9832039fe95ec023d522aa",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
 		"hash": "c42d787a0d410337e723cf46927c59e9dbf97fd187d9c7f135b2b5939b0c643f",
 		"passedTests": ["blockiness", "file-format"]
