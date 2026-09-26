@@ -105,13 +105,13 @@ export const zerion: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							"Zerion's mobile app derives accounts from a standard seed phrase: importing the public test phrase 'test test test test test test test test test test test junk' produces 0xf39f...2266, the address the BIP-39 and BIP-32 standards define for that phrase.",
+							"Zerion's mobile app derives accounts from a standard seed phrase: importing the public test phrase 'test test test test test test test test test test test junk' produces `0xf39f…2266`, the address the BIP-39 and BIP-32 standards define for that phrase.",
 						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-bip44-account-1.png',
 						label: 'Accounts found when importing the test recovery phrase',
 					},
 					{
 						explanation:
-							'Mobile accounts use the BIP-44 derivation path: the same phrase produces 0x7099...79c8 as the second account, the address BIP-44 defines at index 1.',
+							'Mobile accounts use the BIP-44 derivation path: the same phrase produces `0x7099…79c8` as the second account, the address BIP-44 defines at index 1.',
 						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-bip44-account-2.png',
 						label: 'The second account from the same import',
 					},
