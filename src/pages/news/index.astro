@@ -31,23 +31,52 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 >
 	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
 
-	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
+	<main
+		data-column-item='flexible'
+		data-sticky-container
+		data-sticky-breadcrumb='scope root'
+		data-column='gap-8'
+	>
+		<header
+			id='top'
+			data-scroll-item='inline-detached padding-match-start'
+			data-sticky='block block-start backdrop-after backdrop-stuck'
+			data-sticky-breadcrumb='position'
+		>
 			<hgroup data-column='gap-4'>
-				<h1>Wallet Security News</h1>
-				<p>Security incidents, vulnerabilities, and data breaches affecting Ethereum wallets</p>
+				<div data-row data-sticky='block block-start'>
+					<h1 data-sticky-breadcrumb='source'>
+						<a href='#top' data-link='camouflaged' data-sticky-breadcrumb='item'
+							>Wallet Security News</a
+						>
+					</h1>
+				</div>
+				<p data-sticky-breadcrumb='support'>
+					<span
+						>Security incidents, vulnerabilities, and data breaches affecting Ethereum wallets</span
+					>
+				</p>
 			</hgroup>
 		</header>
 
 		<hr />
 
 		{
-			allWalletSecurityNews.map(news => (
+			allWalletSecurityNews.map((news, index) => (
 				<>
 					<div data-scroll-item='inline-detached'>
-						<article id={news.slug}>
+						<article
+							id={news.slug}
+							data-sticky-container
+							data-sticky-breadcrumb='scope'
+							style={`--stickyBreadcrumb-entryTimeline: --news-${index}-entry; --stickyBreadcrumb-exitTimeline: --news-${index}-exit`}
+						>
 							<details data-card='padding-6' data-column='gap-6'>
-								<summary data-row='wrap wrap-first-last'>
+								<summary
+									data-row='wrap wrap-first-last'
+									data-sticky='block block-start backdrop-before backdrop-stuck'
+									data-sticky-breadcrumb='position'
+								>
 									{news.wallets.length > 0 && (
 										<div
 											class='wallet-links'
@@ -75,12 +104,17 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 										</div>
 									)}
 
-									<h2 data-row-item='flexible basis-3'>{news.title}</h2>
+									<h2 data-row-item='flexible basis-3' data-sticky-breadcrumb='source'>
+										<a href={`#${news.slug}`} data-link='camouflaged' data-sticky-breadcrumb='item'>
+											{news.title}
+										</a>
+									</h2>
 
 									<div
 										class='metadata-dates'
 										data-row-item='wrap-end flexible basis-3'
 										data-row='end wrap gap-1'
+										data-sticky-breadcrumb='end'
 									>
 										<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
 
@@ -167,6 +201,10 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 										</footer>
 									)}
 								</div>
+								<span data-sticky-breadcrumb='flow' aria-hidden='true'>
+									<span data-sticky-breadcrumb='measure' />
+								</span>
+								<span data-sticky-breadcrumb='flow exit' aria-hidden='true' />
 							</details>
 						</article>
 					</div>
@@ -185,6 +223,10 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 				>!
 			</p>
 		</section>
+		<span data-sticky-breadcrumb='flow' aria-hidden='true'
+			><span data-sticky-breadcrumb='measure'></span></span
+		>
+		<span data-sticky-breadcrumb='flow exit' aria-hidden='true'></span>
 	</main>
 </Layout>
 
@@ -197,12 +239,20 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 		}
 
 		line-height: 1.4;
-
 		hgroup p {
 			font-size: 1.1rem;
 			color: var(--text-secondary);
 			opacity: 0.85;
 		}
+	}
+
+	article[data-sticky-breadcrumb~="scope"] {
+		--stickyBreadcrumb-forceRow: 1;
+		--stickyBreadcrumb-scale: calc(sqrt(1.5rem * 1rem) / 1.5rem);
+		--stickyBreadcrumb-paddingBlock: calc(0.5rem * sqrt(1rem / 1.5rem));
+		--stickyBreadcrumb-nativeBlockSize: calc(
+			sqrt(1.5rem * 1rem) * 1.4 + 2 * var(--stickyBreadcrumb-paddingBlock)
+		);
 	}
 
 	article {

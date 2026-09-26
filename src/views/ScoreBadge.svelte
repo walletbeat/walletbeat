@@ -1,16 +1,18 @@
 <script lang="ts">
 	// Types/constants
 	import type { MaybeUnratedScore } from '@/schema/score'
+	import type { SvelteHTMLElements } from 'svelte/elements'
 
 
 	// Props
 	const {
 		score,
 		size = 'medium',
+		...restProps
 	}: {
 		score: MaybeUnratedScore
 		size?: 'small' | 'medium' | 'large'
-	} = $props()
+	} & Omit<SvelteHTMLElements['data'], 'value'> = $props()
 
 
 	// Functions
@@ -20,6 +22,7 @@
 
 {#if score !== null && score.score !== null}
 	<data
+		{...restProps}
 		data-badge={size}
 		value={score.score}
 		title={score.hasUnratedComponent ? '*contains unrated components' : undefined}
@@ -32,6 +35,7 @@
 	</data>
 {:else}
 	<data
+		{...restProps}
 		data-badge={size}
 		value="UNRATED"
 		title="*contains unrated components"
@@ -43,7 +47,7 @@
 
 <style>
 	data {
-		&[value='UNRATED'] {
+		&[value="UNRATED"] {
 			--accent: var(--rating-unrated);
 			--badge-backdropFilter: var(--rating-unrated-backdropFilter);
 		}

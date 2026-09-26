@@ -13,38 +13,56 @@
 
 <div
 	class="container"
-	data-sticky-container
 >
 	<article
-		data-scroll-container="block"
+		data-sticky-container
+		data-sticky-breadcrumb="scope root"
 		data-column="gap-8"
 	>
 		<header
 			id="top"
+			data-sticky-breadcrumb="position"
+			data-sticky="block block-start backdrop-after backdrop-stuck"
 			data-column="gap-4"
-			data-scroll-item="inline-detached padding-match-start"
+			data-scroll-item="inline-detached"
 		>
-			<h1>Wallet Stages</h1>
-			<p class="subtitle">
-				Stages describe the milestones Ethereum wallets should work toward. Each stage builds
-				on the previous, forming a roadmap for wallet teams to follow.
+			<div data-row data-sticky="block block-start backdrop-self backdrop-always">
+				<h1 data-sticky-breadcrumb="source">
+					<a data-link="camouflaged" data-sticky-breadcrumb="item" href="#top">Wallet Stages</a>
+				</h1>
+			</div>
+			<p class="subtitle" data-sticky-breadcrumb="support">
+				<span>
+					Stages describe the milestones Ethereum wallets should work toward. Each stage builds
+					on the previous, forming a roadmap for wallet teams to follow.
+				</span>
 			</p>
 		</header>
 
+		<div data-column="gap-8">
 		{#each softwareWalletLadder.stages as stage, index (stage.id)}
 			{@const stageColor = stageToColor(index, softwareWalletLadder.stages.length)}
 
-			<section id={stage.id}>
+			<section
+				id={stage.id}
+				data-sticky-container
+				data-sticky-breadcrumb="scope"
+				style:--stickyBreadcrumb-entryTimeline={`--stages-page-stage-${index}-entry`}
+				style:--stickyBreadcrumb-exitTimeline={`--stages-page-stage-${index}-exit`}
+			>
 				<header
-					data-sticky="block backdrop-before backdrop-stuck"
+					data-sticky="block block-start backdrop-before backdrop-stuck"
+					data-sticky-breadcrumb="position"
 					data-row
 					data-scroll-item="inline-detached"
 				>
-					<a
-						data-link="camouflaged"
-						href={`#${stage.id}`}
-					>
-						<h2 data-row="gap-3">
+					<h2 data-row="gap-3" data-sticky-breadcrumb="source">
+						<a
+							data-link="camouflaged"
+							data-row="gap-3"
+							data-sticky-breadcrumb="item"
+							href={`#${stage.id}`}
+						>
 							<data
 								data-badge="medium"
 								value={`STAGE_${index}`}
@@ -53,8 +71,8 @@
 								<strong>{stage.label}</strong>
 							</data>
 							{stage.name}
-						</h2>
-					</a>
+						</a>
+					</h2>
 				</header>
 
 				<div
@@ -125,15 +143,20 @@
 						</details>
 					{/each}
 				</div>
+				<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+				<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 			</section>
 		{/each}
+		</div>
+		<span data-sticky-breadcrumb="flow" aria-hidden="true"><span data-sticky-breadcrumb="measure"></span></span>
+		<span data-sticky-breadcrumb="flow exit" aria-hidden="true"></span>
 	</article>
 </div>
 
 
 <style>
 	.container {
-		&[data-sticky-container] {
+		> article[data-sticky-container] {
 			--scrollItem-inlineDetached-maxSize: 58rem;
 			--scrollItem-inlineDetached-paddingStart: 2rem;
 			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
@@ -144,15 +167,21 @@
 		line-height: 1.6;
 
 		article {
-			max-height: 100dvh;
-			overflow: auto;
 			padding-block-end: 4rem;
 			display: grid;
 		}
 	}
 
+	section[data-sticky-breadcrumb~="scope"] {
+		--stickyBreadcrumb-forceRow: 1;
+		--stickyBreadcrumb-scale: calc(sqrt(1.5rem * 1rem) / 1.3rem);
+		--stickyBreadcrumb-paddingBlock: calc(0.5rem * sqrt(sqrt(1.5rem * 1rem) / 1.5rem));
+		--stickyBreadcrumb-sourcePaddingBlock: 0.75rem;
+		--stickyBreadcrumb-nativeBlockSize: calc(var(--navigation-mobile-blockSize) * 1.3rem / 2.25rem);
+	}
+
 	h1 {
-		font-size: 2rem;
+		font-size: 2.25rem;
 	}
 
 	h2 {

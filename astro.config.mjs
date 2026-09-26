@@ -35,6 +35,9 @@ export default defineConfig({
 	),
 	vite: {
 		build: {
+			// Both bundled CSS compressors currently drop valid named-range keyframes or
+			// individual animation-timeline properties. Preserve the authored modern CSS.
+			cssMinify: false,
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
 		},

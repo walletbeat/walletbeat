@@ -113,13 +113,13 @@
 				{#snippet ReferenceContent()}
 					{#if ref.explanation}
 
-						<p class="explanation">
+						<div class="explanation">
 							{#if linkUrls.length === 1}
 								{@render Url(linkUrls[0])}
 								<br>
 							{/if}
 							<Typography content={markdown(ref.explanation)} />
-						</p>
+						</div>
 					{/if}
 
 					{#if linkUrls.length === 1}

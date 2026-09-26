@@ -74,7 +74,7 @@ export const wbIconEmojiSequences = {
 export type WBIconID = keyof typeof wbIconEmojiSequences
 
 /** The wbicons data-icon variant markers. */
-export const wbiconsMarkers = new Set(['wbicons-complex', 'wbicons-simple'])
+export const wbiconsMarkers = new Set(['wbicons', 'wbicons-complex', 'wbicons-simple'])
 
 /** Every valid WBIconID for the wbicons font. */
 export const wbiconsIDs = new Set(Object.keys(wbIconEmojiSequences))

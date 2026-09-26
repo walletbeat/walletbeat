@@ -1,4 +1,5 @@
 // Types
+import type { ComputedSlice } from '@/components/pie-geometry'
 import type { WBIconID } from '@/styles/wbicons'
 
 export type LucideNavigationIcon =
@@ -32,19 +33,7 @@ export type NavigationItem = {
 	icon?: NavigationIconID
 	accentColor?: string | null
 	href?: string
-	sliceStyle?: {
-		totalAngle: number
-		midAngle: number
-		offset: number
-		gap: number
-		outerR: number
-		innerR: number
-		outerCornerRadius: number
-		innerCornerRadius: number
-		labelSize: number
-		labelSizeScale: number
-		labelR: number
-	}
+	sliceStyle?: ComputedSlice['computed'] & { fill?: string }
 	children?: NavigationItem[]
 }
 
