@@ -131,44 +131,50 @@ export const rainbow: SoftwareWallet = {
 				contract: rainbowCaliburContract,
 			}),
 			eoa: supported({
-				ref: {
-					explanation:
-						'Rainbow derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
-					url: [
-						{
-							label: 'Browser extension derivation path',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L60',
-						},
-						{
-							label: 'Browser extension key derivation',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L69-L81',
-						},
-						{
-							label: 'Browser extension BIP-39 seed phrase generation',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L143-L150',
-						},
-						{
-							label: 'Browser extension seed phrase and private key export',
-							url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L214-L224',
-						},
-						{
-							label: 'Mobile app key derivation',
-							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/utils/wallet.ts#L48-L69',
-						},
-						{
-							label: 'Mobile app derivation path',
-							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L187',
-						},
-						{
-							label: 'Mobile app private key export',
-							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L571-L599',
-						},
-						{
-							label: 'Mobile app seed phrase export',
-							url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L1412-L1451',
-						},
-					],
-				},
+				ref: [
+					{
+						explanation:
+							'Rainbow derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Browser extension derivation path',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L60',
+							},
+							{
+								label: 'Browser extension key derivation',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L69-L81',
+							},
+							{
+								label: 'Browser extension BIP-39 seed phrase generation',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L143-L150',
+							},
+							{
+								label: 'Mobile app key derivation',
+								url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/utils/wallet.ts#L48-L69',
+							},
+							{
+								label: 'Mobile app derivation path',
+								url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L187',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
