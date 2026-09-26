@@ -9,6 +9,8 @@ import { defineConfig, fontProviders } from 'astro/config'
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
 
+const isLinux = process.platform === 'linux'
+
 // https://astro.build/config
 export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
@@ -19,12 +21,16 @@ export default defineConfig({
 			? []
 			: [
 					sitemap(),
-					shield({
-						sri: {
-							enableMiddleware: false,
-							hashesModule: modulePath,
-						},
-					}),
+					...(isLinux
+						? [
+								shield({
+									sri: {
+										enableMiddleware: false,
+										hashesModule: modulePath,
+									},
+								}),
+							]
+						: []),
 				],
 	),
 	vite: {
@@ -80,13 +86,27 @@ export default defineConfig({
 			},
 		},
 		{
-			name: 'wbicons',
-			cssVariable: '--fontFamily-wbicons',
+			name: 'wbicons-complex',
+			cssVariable: '--fontFamily-wbicons-complex',
 			provider: fontProviders.local(),
 			options: {
 				variants: [
 					{
-						src: ['./src/assets/fonts/wbicons/wbicons.woff2'],
+						src: ['./src/assets/fonts/wbicons-complex/wbicons-complex.woff2'],
+						weight: '400',
+						style: 'normal',
+					},
+				],
+			},
+		},
+		{
+			name: 'wbicons-simple',
+			cssVariable: '--fontFamily-wbicons-simple',
+			provider: fontProviders.local(),
+			options: {
+				variants: [
+					{
+						src: ['./src/assets/fonts/wbicons-simple/wbicons-simple.woff2'],
 						weight: '400',
 						style: 'normal',
 					},

@@ -6,14 +6,19 @@ import { eips } from '@/data/eips'
 import { ratedEmbeddedWallets } from '@/data/embedded-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
-import { ratedWalletEipSupport } from '@/schema/eip-support'
+import {
+	EipSupportStatus,
+	ratedWalletEipSupportByStatus,
+	type EipStatusSupportCard,
+} from '@/schema/eip-support'
 import { type Eip, eipShortLabel } from '@/schema/eips'
 import type { RatedWallet } from '@/schema/wallet'
+import { getWalletUrl } from '@/utils/urls'
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import EipDetails from '@/views/EipDetails.svelte'
-import EipSupportTable from '@/views/EipSupportTable.svelte'
+import EipStatusSupportCards from '@/views/EipStatusSupportCards.svelte'
 import Navigation from '@/views/Navigation.astro'
 import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 
@@ -29,16 +34,34 @@ type Props = { eip: Eip }
 
 const { eip } = Astro.props
 
-/** Whether the EIP applies to at least one of the given wallets. */
-function isApplicable(wallets: Array<RatedWallet<string>>): boolean {
-	return wallets.some(
-		wallet => ratedWalletEipSupport(wallet, eip.number).overall !== 'NOT_APPLICABLE',
-	)
+/** Precompute the per-status EIP support cards at build time. */
+function eipStatusSupportCards(wallets: Array<RatedWallet<string>>): EipStatusSupportCard[] {
+	return wallets.flatMap(wallet => {
+		const byStatus = ratedWalletEipSupportByStatus(wallet, eip.number)
+
+		return Object.values(EipSupportStatus).flatMap(status => {
+			const entry = byStatus[status]
+
+			return entry === undefined
+				? []
+				: [
+						{
+							id: wallet.metadata.id,
+							displayName: wallet.metadata.displayName,
+							iconExtension: wallet.metadata.iconExtension,
+							url: getWalletUrl(wallet),
+							status,
+							variants: entry.variants,
+							references: entry.references,
+						},
+					]
+		})
+	})
 }
 
-const softwareWallets = Object.values(ratedSoftwareWallets)
-const hardwareWallets = Object.values(ratedHardwareWallets)
-const embeddedWallets = Object.values(ratedEmbeddedWallets)
+const softwareCards = eipStatusSupportCards(Object.values(ratedSoftwareWallets))
+const hardwareCards = eipStatusSupportCards(Object.values(ratedHardwareWallets))
+const embeddedCards = eipStatusSupportCards(Object.values(ratedEmbeddedWallets))
 ---
 
 <Layout
@@ -55,33 +78,30 @@ const embeddedWallets = Object.values(ratedEmbeddedWallets)
 		</header>
 
 		{
-			isApplicable(softwareWallets) && (
-				<EipSupportTable
+			softwareCards.length > 0 && (
+				<EipStatusSupportCards
 					title={`Software Wallets by ${eipShortLabel(eip)} Support`}
-					eip={eip}
-					wallets={softwareWallets}
+					cards={softwareCards}
 					client:visible
 				/>
 			)
 		}
 
 		{
-			isApplicable(hardwareWallets) && (
-				<EipSupportTable
+			hardwareCards.length > 0 && (
+				<EipStatusSupportCards
 					title={`Hardware Wallets by ${eipShortLabel(eip)} Support`}
-					eip={eip}
-					wallets={hardwareWallets}
+					cards={hardwareCards}
 					client:visible
 				/>
 			)
 		}
 
 		{
-			isApplicable(embeddedWallets) && (
-				<EipSupportTable
+			embeddedCards.length > 0 && (
+				<EipStatusSupportCards
 					title={`Embedded Wallets by ${eipShortLabel(eip)} Support`}
-					eip={eip}
-					wallets={embeddedWallets}
+					cards={embeddedCards}
 					client:visible
 				/>
 			)

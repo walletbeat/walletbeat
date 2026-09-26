@@ -6,7 +6,7 @@ import {
 	type NonEmptyRecord,
 } from '@/types/utils/non-empty'
 
-/** Strings for content that may use {{WALLET_NAME}} only (e.g. details, blurb). */
+/** Strings for content that may use {{WALLET_NAME}} only (e.g. details). */
 export type WalletNameStrings = null | { WALLET_NAME: string }
 
 /** Strings for content that may use {{WALLET_NAME}} and/or pseudonym placeholders. */
@@ -23,7 +23,7 @@ export type WalletNameAndPseudonymStrings =
  * Used as return type of getWalletEvalStrings so it's assignable to Typography's
  * strings prop when content uses WalletNameAndPseudonymStrings (which is a union including null).
  */
-export interface ConcreteWalletEvalStrings {
+export type ConcreteWalletEvalStrings = {
 	WALLET_NAME: string
 	WALLET_PSEUDONYM_SINGULAR: string
 	WALLET_PSEUDONYM_PLURAL: string
@@ -33,7 +33,7 @@ import type { WBIconID } from '@/styles/wbicons'
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
-import { isMaybeSupported, isSupported, type Support } from './features/support'
+import { isMaybeSupported, type Support } from './features/support'
 import {
 	type FullyQualifiedReference,
 	hasRefs,
@@ -178,18 +178,25 @@ export function ratingToColor(rating: Rating): string {
 	}
 }
 
-export function borderRatingToColor(rating: Rating): string {
+/**
+ * Convert a rating to a color legible as text.
+ *
+ * Use this wherever the color lands on glyphs rather than on a fill, including
+ * `--accent` on any element that wraps a link: `[data-link], a` mixes `--accent`
+ * into its own text color, so the fill variants wash out there in light mode.
+ */
+export function ratingToTextColor(rating: Rating): string {
 	switch (rating) {
-		case Rating.FAIL:
-			return '#FB6682' // Red
-		case Rating.PARTIAL:
-			return '#FFCC73' // Yellow
 		case Rating.PASS:
-			return '#B5ED9D' // Green
+			return 'var(--rating-pass-text)'
+		case Rating.PARTIAL:
+			return 'var(--rating-partial-text)'
+		case Rating.FAIL:
+			return 'var(--rating-fail-text)'
 		case Rating.UNRATED:
-			return '#bdc3c7' // Gray
+			return 'var(--rating-unrated)'
 		case Rating.EXEMPT:
-			return '#bdc3c7' // Gray
+			return 'var(--rating-neutral-text)'
 	}
 }
 
@@ -736,8 +743,8 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 		}
 
 		if (isMaybeSupported(x)) {
-			if (isSupported(x)) {
-				this.addRef(...toFullyQualified(x.ref))
+			if (hasRefs(x)) {
+				this.addRef(...refs(x))
 			}
 
 			return

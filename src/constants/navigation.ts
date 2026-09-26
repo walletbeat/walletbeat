@@ -30,7 +30,6 @@ export type NavigationItem = {
 	id: string
 	title: string
 	icon?: NavigationIconID
-	iconVariant?: 'emoji'
 	accentColor?: string | null
 	href?: string
 	sliceStyle?: {
@@ -106,7 +105,7 @@ export const navigationRepository = {
 export const navigationTwitter = {
 	id: 'twitter',
 	icon: 'ICON_TWITTER',
-	title: 'X/Twitter',
+	title: 'X',
 	href: 'https://x.com/walletbeat',
 } as const satisfies NavigationItem
 

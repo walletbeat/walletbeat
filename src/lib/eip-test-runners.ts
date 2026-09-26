@@ -6,8 +6,15 @@ import type {
 	StepStatus,
 	TestStep,
 } from '../constants/test-eip-support'
+import { testTransactions } from '../constants/test-transactions-signatures'
 import type { Eip1193Provider } from '../types/eip'
 import { isRecord } from '../types/utils/record'
+
+// Reuse the same real (non-dummy) batch calls as the "Test Transactions" tab,
+// which is known to work against wallets like Rainbow. A no-op call to the
+// zero address was previously used here to probe support, but some wallets
+// appear to treat it differently from a real batch of calls.
+const batchTestCalls = testTransactions.find(tx => tx.id === 'multicall-1')?.calls ?? []
 
 /**
  * Context provided to EIP test step runners.
@@ -730,6 +737,12 @@ export async function runStep5BatchSend(step: TestStep, ctx: EIPTestContext): Pr
 
 		// v2.0.0 format includes version and atomicRequired fields
 		// v1.0.0 format is simpler without these fields
+		const calls = batchTestCalls.map(call => ({
+			to: call.to,
+			data: call.data,
+			value: call.value !== undefined ? `0x${call.value.toString(16)}` : '0x0',
+		}))
+
 		const params =
 			version === '2.0.0'
 				? {
@@ -737,25 +750,13 @@ export async function runStep5BatchSend(step: TestStep, ctx: EIPTestContext): Pr
 						chainId: chainIdHex,
 						from: connectedAddress,
 						atomicRequired: false,
-						calls: [
-							{
-								to: '0x0000000000000000000000000000000000000000',
-								data: '0x00',
-								value: '0x0',
-							},
-						],
+						calls,
 					}
 				: {
 						// v1.0.0 format (no version field, no atomicRequired)
 						chainId: chainIdHex,
 						from: connectedAddress,
-						calls: [
-							{
-								to: '0x0000000000000000000000000000000000000000',
-								data: '0x',
-								value: '0x0',
-							},
-						],
+						calls,
 					}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

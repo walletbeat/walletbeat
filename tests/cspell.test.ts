@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import { trimWhitespacePrefix } from '@/types/utils/text'
-
 import {
 	commonExclusions,
 	getCodebaseIndex,
 	type IndexedFile,
 	type IndexedFileData,
-} from './utils/codebase'
+} from '@/utils/codebase'
+
 import { getCSpellWords } from './utils/cspell'
 
 const cSpellWords = getCSpellWords()
@@ -181,6 +181,7 @@ describe('cSpell', async () => {
 			'Game7',
 			'Lattice1', // Product name; word extractor does not capture CamelCase+digits as single token
 			'LGPLv3', // License name; word extractor does not capture mixed case+digits as single token
+			'everland',
 		]
 
 		cSpellWords.map(word => {

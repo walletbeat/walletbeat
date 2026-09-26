@@ -179,7 +179,7 @@ function evaluateAccountUnruggability(
 					},
 				},
 				details: markdown(`
-					{{WALLET_NAME}} uses multi-party computation to derive the account's
+					{{WALLET_NAME}} uses multiparty computation to derive the account's
 					private key. However, this key can be reconstructed by external
 					services without your device being involved. This allows these
 					external services to conspire to reconstruct your private key, and
@@ -196,6 +196,8 @@ function evaluateAccountUnruggability(
 			accountRecovery.guardianRecovery.minimumGuardianPolicy,
 		)
 	}
+
+	ctx.addRef(accountRecovery.guardianRecovery)
 
 	return ctx.build({
 		outcome: {
@@ -422,7 +424,9 @@ export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 
 		ctx.addRef(
 			ctx.features.security.keysHandling,
-			ctx.features.security.accountRecovery.guardianRecovery,
+			isSupported(ctx.features.security.accountRecovery.guardianRecovery)
+				? ctx.features.security.accountRecovery.guardianRecovery
+				: null,
 		)
 
 		return evaluateAccountUnruggability(

@@ -15,5 +15,10 @@ declare namespace NodeJS {
 		 * Skips some slow checks.
 		 */
 		WALLETBEAT_PRECOMMIT_FAST?: string
+
+		/**
+		 * Set to "CI" in CI, can take other values in other contexts.
+		 */
+		WALLETBEAT_ENV?: string
 	}
 }

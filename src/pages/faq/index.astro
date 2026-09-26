@@ -269,7 +269,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 	<main data-column-item='flexible' data-sticky-container data-column='gap-8'>
 		<header id='top' data-scroll-item='inline-detached padding-match-start'>
 			<hgroup data-column='gap-2'>
-				<h1>Walletbeat FAQ</h1>
+				<h1>Frequently Asked Questions</h1>
 				<p>Everything you need to know about Walletbeat and how we evaluate wallets.</p>
 			</hgroup>
 		</header>
@@ -277,7 +277,7 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		<div data-scroll-item='inline-detached padding-match-end' data-column='gap-3'>
 			{
 				frequentlyAskedQuestions.map(entry => (
-					<details id={entry.anchor} data-card='padding-5'>
+					<details id={entry.anchor} data-card='padding-5 radius-4'>
 						<summary>
 							<h4>{entry.question}</h4>
 						</summary>
@@ -309,33 +309,30 @@ import { defaultNavigationItems } from '@/constants/navigation'
 		font-size: 1rem;
 	}
 
-	details {
+	details[data-card] {
 		border: var(--separator-width) solid var(--border-color);
-		border-radius: 0.5rem;
 
 		summary {
-			cursor: pointer;
 			list-style: none;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 1rem;
 
 			&::-webkit-details-marker {
 				display: none;
 			}
 
+			/* Pin the design-system chevron so it cannot fall back to a border-drawn one. */
 			&::after {
 				content: '';
-				width: 0.45em;
-				height: 0.45em;
-				border-right: 2px solid var(--text-secondary);
-				border-bottom: 2px solid var(--text-secondary);
-				transform: rotate(45deg);
 				flex-shrink: 0;
+				inline-size: 0.75em;
+				block-size: 1lh;
+				border: none;
+				background-color: currentColor;
+				mask: var(--icon-chevron) no-repeat center / contain;
+				-webkit-mask: var(--icon-chevron) no-repeat center / contain;
+				opacity: 0.66;
+				transform: rotate(0deg);
 				transition-property: transform;
 				transition-duration: 0.2s;
-				margin-block-end: 0.15em;
 			}
 
 			h4 {
@@ -345,13 +342,15 @@ import { defaultNavigationItems } from '@/constants/navigation'
 			}
 		}
 
-		&[open] > summary::after {
-			transform: rotate(-135deg);
-			margin-block-end: -0.15em;
+		&[open] > summary {
+			border-block-end: var(--separator-width) solid var(--border-color);
+
+			&::after {
+				transform: rotate(180deg);
+			}
 		}
 
 		> div {
-			margin-block-start: 1rem;
 			line-height: 1.8;
 		}
 

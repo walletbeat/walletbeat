@@ -35,17 +35,13 @@ import { notSupported, supported } from '@/schema/features/support'
 import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const gridplusWallet: HardwareWallet = {
 	metadata: {
 		id: 'gridplus',
 		displayName: 'GridPlus Wallet',
 		tableName: 'GridPlus',
-		blurb: paragraph(`
-			GridPlus Wallet is a secure hardware wallet that combines secure key storage
-			with convenient authentication methods.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
@@ -77,7 +73,7 @@ export const gridplusWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'The Lattice1 supports full BIP-32, BIP-39, and BIP-44 key derivation standards, along with custom derivation paths and non-standard formats such as Ledger Live, Ledger Legacy, and Solflare/Ledger derivation paths for Solana.',
+							'The Lattice1 supports full BIP-32, BIP-39, and BIP-44 key derivation standards, along with custom derivation paths and nonstandard formats such as Ledger Live, Ledger Legacy, and Solflare/Ledger derivation paths for Solana.',
 						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
 					},
 				],

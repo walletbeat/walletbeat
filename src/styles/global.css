@@ -26,13 +26,26 @@
 	--border-color: light-dark(#cecece, color-mix(in srgb, #c9a8e8 22%, #130a2b));
 	--icon-navigation-borderColor: light-dark(#100B1D80, #F1EEF780);
 
-	--rating-pass: light-dark(#B5ED9D99,#B5ED9D);
-	--rating-fail: light-dark(#FF969699,#FB6682);
-	--rating-partial: light-dark(#FFCC7399,#FFCC73);
-	--rating-neutral: #bdc3c7;
+	/* Opaque hue sources. Both roles below derive from these, so a hue change is one edit. */
+	--rating-pass-base: #B5ED9D;
+	--rating-partial-base: #FFCC73;
+	--rating-fail-base: #FB6682;
+	--rating-neutral-base: #BDC3C7;
+
+	/* Fill role: blobs, pies, badge backgrounds, borders. Light values are hand-tuned per hue. */
+	--rating-pass: light-dark(oklch(from var(--rating-pass-base) 0.873 0.154 h), var(--rating-pass-base));
+	--rating-partial: light-dark(oklch(from var(--rating-partial-base) 0.862 0.151 h), var(--rating-partial-base));
+	--rating-fail: light-dark(oklch(from var(--rating-fail-base) 0.770 0.169 h), var(--rating-fail-base));
+	--rating-neutral: light-dark(oklch(from var(--rating-neutral-base) 0.697 0.013 h), var(--rating-neutral-base));
+
+	/* Text role: uniform L 0.52 clears WCAG AA (4.5:1) against --background-primary for every hue. */
+	--rating-pass-text: light-dark(oklch(from var(--rating-pass-base) 0.52 c h), var(--rating-pass-base));
+	--rating-partial-text: light-dark(oklch(from var(--rating-partial-base) 0.52 c h), var(--rating-partial-base));
+	--rating-fail-text: light-dark(oklch(from var(--rating-fail-base) 0.52 c h), var(--rating-fail-base));
+	--rating-neutral-text: light-dark(oklch(from var(--rating-neutral-base) 0.52 c h), var(--rating-neutral-base));
+
 	--rating-unrated: light-dark(oklch(0.75 0.02 244.87 / 0.45), oklch(0.72 0.015 264.61 / 0.35));
 	--rating-unrated-backdropFilter: blur(6px);
-	--rating-icon-color: #000000;
 
 	--icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
 	--fontFamily-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";

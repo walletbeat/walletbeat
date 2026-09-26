@@ -2,99 +2,40 @@
 	// Types/constants
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
-	import type { EVMAddress, SmartWalletContract } from '@/schema/contracts'
-	import { AccountType } from '@/schema/features/account-support'
-	import type { Variant } from '@/schema/variants'
-	import type { RatedWallet } from '@/schema/wallet'
-	import { getWalletUrl } from '@/utils/urls'
+	import {
+		WalletTypeFor7702,
+		WalletTypeFor7702SortPriority,
+		type Eip7702Row,
+	} from '@/schema/eip-support'
 	import { Rating } from '@/schema/attributes'
-
-	const WalletTypeFor7702 = {
-		EIP7702: 'EIP7702',
-		EIP4337: 'EIP4337',
-		NON_7702_EOA: 'NON_7702_EOA',
-		OTHER: 'OTHER',
-	} as const
-
-	type WalletTypeFor7702 = (typeof WalletTypeFor7702)[keyof typeof WalletTypeFor7702]
-
-	const WalletTypeFor7702SortPriority = {
-		[WalletTypeFor7702.EIP7702]: 0,
-		[WalletTypeFor7702.EIP4337]: 1,
-		[WalletTypeFor7702.NON_7702_EOA]: 2,
-		[WalletTypeFor7702.OTHER]: 3,
-	} as const
 
 
 	// Props
 	let {
 		title,
-		softwareWallets,
+		rows,
 	}: {
 		title?: string
-		softwareWallets: RatedWallet<SoftwareAttributeGroupId>[]
+		rows: Eip7702Row[]
 	} = $props()
 
 
-	// Functions
-	import { isAccountTypeSupported } from '@/schema/features/account-support'
-	import { refs } from '@/schema/reference'
-	import { isLabeledUrl } from '@/schema/url'
-	import { getVariants } from '@/schema/variants'
-	import { getVariantResolvedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
-	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
-
-	const getWalletTypeFor7702 = (wallet: typeof softwareWallets[number]) => {
-		const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-		const hasErc4337 =
-			accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337)
-		const hasEip7702 =
-			accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702)
-		const hasEoa =
-			accountTypes !== null &&
-			(hasEip7702 || setContains<AccountType>(accountTypes, AccountType.eoa))
-
-		return hasEip7702
-			? WalletTypeFor7702.EIP7702
-			: hasErc4337
-				? WalletTypeFor7702.EIP4337
-				: hasEoa
-					? WalletTypeFor7702.NON_7702_EOA
-					: WalletTypeFor7702.OTHER
-	}
-
-	const getWalletContract = (wallet: typeof softwareWallets[number]): SmartWalletContract | 'UNKNOWN' | undefined => {
-		for (const variant of setItems<Variant>(getVariants(wallet.variants))) {
-			const variantWallet = getVariantResolvedWallet(wallet, variant)
-
-			if (variantWallet === null || variantWallet.features.accountSupport === null)
-				continue
-
-			if (isAccountTypeSupported(variantWallet.features.accountSupport.eip7702))
-				return variantWallet.features.accountSupport.eip7702.contract
-
-			if (isAccountTypeSupported(variantWallet.features.accountSupport.rawErc4337))
-				return variantWallet.features.accountSupport.rawErc4337.contract
-		}
-	}
-
-
 	// State
-	let activeFilters: Filters<typeof softwareWallets[number]>['$$prop_def']['activeFilters'] = $state(
+	let activeFilters: Filters<Eip7702Row>['$$prop_def']['activeFilters'] = $state(
 		new Set()
 	)
 
-	let filteredWallets: typeof softwareWallets[number][] = $state(
+	let filteredRows: Eip7702Row[] = $state(
 		[]
 	)
 
 
 	// Actions
-	let toggleFilterById: Filters<typeof softwareWallets[number]>['$$prop_def']['toggleFilterById'] = $state(
+	let toggleFilterById: Filters<Eip7702Row>['$$prop_def']['toggleFilterById'] = $state(
 		undefined
 	)
 
-	let toggleFilter: Filters<typeof softwareWallets[number]>['$$prop_def']['toggleFilter'] = $state(
+	let toggleFilter: Filters<Eip7702Row>['$$prop_def']['toggleFilter'] = $state(
 		undefined
 	)
 
@@ -104,10 +45,9 @@
 	import KeyIcon from 'lucide-static/icons/key.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
-	import Table, { SortDirection } from '@/components/Table.svelte'
+	import Table, { type Column, SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import EipDetails from '@/views/EipDetails.svelte'
-	import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 </script>
 
 
@@ -124,7 +64,7 @@
 		{/if}
 
 		<Filters
-			items={softwareWallets}
+			items={rows}
 			filterGroups={[
 				{
 					id: 'accountType',
@@ -136,25 +76,28 @@
 							id: 'accountType-eip7702',
 							label: 'EIP-7702',
 							icon: KeyIcon,
-							filterFunction: wallet => getWalletTypeFor7702(wallet) === WalletTypeFor7702.EIP7702,
+							filterFunction: (row: Eip7702Row) =>
+									row.type === WalletTypeFor7702.EIP7702,
 						},
 						{
 							id: 'accountType-erc4337',
 							label: 'ERC-4337',
 							icon: KeyIcon,
-							filterFunction: wallet => getWalletTypeFor7702(wallet) === WalletTypeFor7702.EIP4337,
+							filterFunction: (row: Eip7702Row) =>
+								row.type === WalletTypeFor7702.EIP4337,
 						},
 						{
 							id: 'accountType-eoa',
 							label: 'EOA',
 							icon: KeyIcon,
-							filterFunction: wallet => getWalletTypeFor7702(wallet) === WalletTypeFor7702.NON_7702_EOA,
+							filterFunction: (row: Eip7702Row) =>
+								row.type === WalletTypeFor7702.NON_7702_EOA,
 						},
 					],
 				},
 			]}
 			bind:activeFilters
-			bind:filteredItems={filteredWallets}
+			bind:filteredItems={filteredRows}
 			bind:toggleFilter
 			bind:toggleFilterById
 		/>
@@ -162,14 +105,14 @@
 
 	<div data-scroll-item="inline-attached underflow-center overflow-start">
 		<Table
-			rows={filteredWallets}
-			rowId={wallet => wallet.metadata.id}
+			rows={filteredRows}
+			rowId={(row: Eip7702Row) => row.id}
 
 			columns={[
 				{
 					id: 'wallet',
 					name: 'Wallet',
-					value: wallet => wallet.metadata.displayName,
+					value: (row: Eip7702Row) => row.displayName,
 					isSticky: true,
 					sort: {
 						defaultDirection: SortDirection.Ascending,
@@ -178,7 +121,7 @@
 				{
 					id: 'type',
 					name: 'Type',
-					value: wallet => WalletTypeFor7702SortPriority[getWalletTypeFor7702(wallet)],
+					value: (row: Eip7702Row) => WalletTypeFor7702SortPriority[row.type],
 					sort: {
 						isDefault: true,
 						defaultDirection: SortDirection.Ascending,
@@ -187,24 +130,24 @@
 				{
 					id: 'contract',
 					name: 'Contract',
-					value: wallet => getWalletContract(wallet),
+					value: (row: Eip7702Row) => row.contract,
 				},
 				{
 					id: 'batching',
 					name: 'Batching',
-					value: wallet => wallet.overall.ecosystem.transactionBatching?.evaluation?.outcome?.rating ?? undefined,
+					value: (row: Eip7702Row) => row.batching,
 				},
 			]}
 		>
-			{#snippet Cell({ row: wallet, column, value })}
+			{#snippet Cell({ row, column, value }: { row: Eip7702Row; column: Column<Eip7702Row>; value: unknown })}
 				{#if column.id === 'wallet'}
 					<div class="wallet-info" data-row>
 						<span class="row-count" data-row="center"></span>
 
 						<span class="wallet-icon" data-icon="shadow">
 							<img
-								src={`/images/wallets/${wallet.metadata.id}.svg`}
-								alt={wallet.metadata.displayName}
+								src={`/images/wallets/${row.id}.svg`}
+								alt={row.displayName}
 								onerror={event => {
 									if (event.currentTarget instanceof HTMLImageElement)
 										event.currentTarget.src = '/images/wallets/default.svg'
@@ -215,16 +158,16 @@
 						<div class="name">
 							<h3>
 								<a
-									href={getWalletUrl(wallet)}
+									href={row.url}
 								>
-									{wallet.metadata.displayName}
+									{row.displayName}
 								</a>
 							</h3>
 						</div>
 					</div>
 
 				{:else if column.id === 'type'}
-					{@const typeFor7702 = getWalletTypeFor7702(wallet)}
+					{@const typeFor7702 = row.type}
 
 					{#if typeFor7702 === WalletTypeFor7702.EIP7702}
 						<Tooltip
@@ -284,14 +227,14 @@
 					{/if}
 
 				{:else if column.id === 'contract'}
-					{@const contract = getWalletContract(wallet)}
+					{@const contract = row.contract}
 
 					{#if contract === undefined}
 						<span class="muted-text">–</span>
 					{:else if contract === 'UNKNOWN'}
 						<span class="muted-text">Unknown</span>
 					{:else}
-						{@const getContractUrl = (contractAddress: EVMAddress, anchor?: string) =>
+						{@const getContractUrl = (contractAddress: string, anchor?: string) =>
 							`https://etherscan.io/address/${contractAddress}${anchor ? `#${anchor}` : ''}`
 						}
 
@@ -308,18 +251,9 @@
 						</div>
 
 						<small>
-							{#if contract.sourceCode.available}
-								{@const sourceRefs = refs(contract.sourceCode)}
-								{@const sourceUrl =
-									isNonEmptyArray(sourceRefs) ?
-										nonEmptyGet(nonEmptyGet(sourceRefs).urls)
-									:
-										getContractUrl(contract.address, 'code')
-								}
-								{@const rawUrl = isLabeledUrl(sourceUrl) ? sourceUrl.url : sourceUrl}
-
+							{#if contract.sourceAvailable}
 								<a
-									href={rawUrl}
+									href={contract.sourceUrl}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="source-link"
@@ -334,7 +268,7 @@
 					{/if}
 
 				{:else if column.id === 'batching'}
-					{@const batchingRating = wallet.overall.ecosystem.transactionBatching?.evaluation?.outcome?.rating}
+					{@const batchingRating = row.batching}
 
 					{#if batchingRating === Rating.PASS}
 						✅

@@ -27,17 +27,13 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // 
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const safe: SoftwareWallet = {
 	metadata: {
 		id: 'safe',
 		displayName: 'Safe',
 		tableName: 'Safe',
-		blurb: paragraph(`
-			Safe (formerly Gnosis Safe) is a smart contract wallet focused on secure asset management
-			with multi-signature functionality for individuals and organizations.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',

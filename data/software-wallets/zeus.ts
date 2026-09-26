@@ -44,7 +44,6 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 export const zeus: SoftwareWallet = {
@@ -52,9 +51,7 @@ export const zeus: SoftwareWallet = {
 		id: 'zeus',
 		displayName: 'Zeus',
 		tableName: 'Zeus',
-		blurb: paragraph(`
-			Zeus is a truly seedless and decentralized self-custodial Ethereum wallet.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
 		lastUpdated: '2026-08-02',
@@ -72,7 +69,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Zeus derives a Hierarchical Deterministic Wallet from a username and password using the BIP32 standard. Users can also import wallets using either a 12-24 word phrase or a private key.',
+							'Zeus derives a Hierarchical Deterministic Wallet from a username and password using the BIP32 standard. Users can also import wallets using either a 12–24 word phrase or a private key.',
 						url: 'https://github.com/greekfetacheese/zeus#how-wallet-management-work-in-zeus',
 					},
 				],
@@ -264,7 +261,7 @@ export const zeus: SoftwareWallet = {
 							ref: [
 								{
 									explanation:
-										'Built-in Across bridge quotes fees from the Across suggested-fees API. Default URL is https://app.across.to/api/suggested-fees with use_api enabled by default, the user can change the API URL or disable the API in Across settings. The bridge deposit itself is submitted via the user-configured RPC.',
+										'Built-in Across bridge quotes fees from the Across suggested-fees API. Default URL is https://app.across.to/api/suggested-fees with `use_api` enabled by default, the user can change the API URL or disable the API in Across settings. The bridge deposit itself is submitted via the user-configured RPC.',
 									url: [
 										'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/across.rs',
 									] as NonEmptyArray<string>,
@@ -287,7 +284,7 @@ export const zeus: SoftwareWallet = {
 							ref: [
 								{
 									explanation:
-										'Railgun unshield defaults to a private broadcast path via the public Pimlico bundler URL (https://public.pimlico.io/v2/{chainId}/rpc). The user can point the bundler URL at a self-hosted Alto or use emergency self-broadcast.',
+										'Railgun unshield defaults to a private broadcast path via the public Pimlico bundler URL (`https://public.pimlico.io/v2/{chainId}/rpc`). The user can point the bundler URL at a self-hosted Alto or use emergency self-broadcast.',
 									url: [
 										'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/unshield.rs',
 										'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/src/gui/ui/dapps/railgun/shield.rs',

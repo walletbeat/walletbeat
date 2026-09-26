@@ -6,17 +6,13 @@ import { noDataExtraction } from '@/schema/features/security/transaction-legibil
 import { notSupported, notSupportedWithRef } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 export const fireflyWallet: HardwareWallet = {
 	metadata: {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
-		blurb: paragraph(`
-			Firefly Wallet is a hardware wallet that uses biometrics
-			for user authentication and secure private key management.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [nconsigny, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [

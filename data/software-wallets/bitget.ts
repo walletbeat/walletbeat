@@ -13,6 +13,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import {
 	CallDataDisplay,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -21,7 +22,6 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { mattmatt } from '../contributors/0xmattmatt'
 
@@ -30,9 +30,7 @@ export const bitget: SoftwareWallet = {
 		id: 'bitget',
 		displayName: 'Bitget Wallet',
 		tableName: 'Bitget',
-		blurb: paragraph(`
-			Bitget Wallet is a leading multi-chain decentralized wallet that is committed to providing a wide range of asset management and DeFi services for its users.
-		`),
+		coinspectId: 'bitget',
 		contributors: [mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2026-01-17',
@@ -209,9 +207,78 @@ export const bitget: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'Bitget Wallet decodes a USDC approval as an authorization, showing the spender, and amount.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-usdc-approval.png',
+							label: 'Bitget Wallet authorization confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'Bitget Wallet does not decode an Aave supply; it shows a generic signature confirmation.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-aave-supply.png',
+							label: 'Bitget Wallet signature confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Bitget Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-safe-aave-supply.png',
+							label: 'Bitget Wallet signature confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Bitget Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Bitget Wallet signature confirmation for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'Bitget Wallet splits a batched USDC approval and Aave supply from an EOA into separate actions and decodes the approval, but does not decode the Aave supply properly.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-23-bitget-erc7730-batch-approve-supply.png',
+							label: 'Bitget Wallet batch authorization for a batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Bitget Wallet shows the EIP-712 message fields by default, but not the domain or type definitions.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-eip712-message.png',
+							label: 'Bitget Wallet signature confirmation for an EIP-712 message',
+						},
+						{
+							explanation:
+								'The full EIP-712 struct, including the domain and type definitions, is shown after opening "Meta data". No domain hash, message hash or EIP-712 digest is shown.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-eip712-struct.png',
+							label: 'Bitget Wallet meta data view of an EIP-712 struct',
+						},
+						{
+							explanation:
+								'Opening "Meta data" on a transaction shows the function signature, parameter types (without values) and the raw calldata hex with a copy button. No calldata digest is shown.',
+							file: 'public/references/wallets/bitget/screenshots/2026-09-24-bitget-erc8213-calldata.png',
+							label: 'Bitget Wallet meta data view of transaction calldata',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
@@ -219,7 +286,7 @@ export const bitget: SoftwareWallet = {
 						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
 					},
 					messageSigningLegibility: {
-						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
 						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,

@@ -96,3 +96,17 @@ Date	From	To	Amount	Purpose	ID
 2026-08-01	treasury	teresa5	2075 USDC [labor:branding]	Payment for Walletbeat branding services	0xd917693cefaeab671f2d3d1df276e660a369e11e73146bf112301fc7a5f04237
 2026-08-01	treasury	ren2140	1000 USDC [labor:data_entry]	Compensation for wallet data entry	0x3f260b73cda41951e716113fcfe95a55653d2e725433fbfc7d836da477474937
 2026-08-01	treasury	mattmatt_sablier	6000 USDC [labor:dev]	Top-up of Sablier stream	0xc32ea4038a7562f141eef4cf0ccc20f9e1c9a579b80520c9cc8bb5596451525f
+2026-08-01	treasury	darrylyeo	6300 USDC [labor:dev,3mo]	Payment for UI refresh	0xd2fa8193a668653c9e81e75d70cd4bd9c2147fffbb269022dc3101c460c3223f
+2026-08-15	treasury	4everland_eoa	0.025 ETH [hosting-infra]	Seeding for 4everland EOA	0xe5bc4f12096f69a8dc7b2f768698951659d788931b24cac31211a882fac2c038
+2026-08-15	treasury	lucilajuliana.shefi.eth	1075 USDC [labor:comms] + 1075 USDC [labor:dev]	Payment for Lucila: Comms, UI/UX	0xadcb7062aec75b020561479d1a20afc95f593862ccf04dbd9ddb1395e972911f
+2026-08-15	treasury	treasury	2.75 WETH → 5170 USDC	Swap WETH to USDC on CoW swap	0xa5f7364f672e102ba8f4cf5f0ab532f392ecd941df266e7560a0f0e2e0c506ed
+2026-08-22	treasury	treasury	0	Approve 20 WETH for swapping on CoW Swap	0x5f74db6a2c3b53a93a6fefce53f85464ffd9af8f6f5755cb5237a739fb64d909
+2026-08-22	treasury	treasury	0	CoW Swap order creation	0x1087efdcb808d7fdea81926f93d7eb4e9008dce39d4375257afa20749458ce15
+2026-08-22	treasury	treasury	1.641313577910601550 WETH → 4000 USDC	CoW swap from WETH to USDC	0x4a03cd4b81c6ffdcd542179504e2a9bee2b96f7082a26368feec378e104c2636
+2026-08-28	treasury	teresa5	1500 USDC [labor:branding]	Payment for Walletbeat branding services	0x4dce90070cc09c743376818c1deb0fe1de51debb2b1516f33811ba2598a6c5bc
+2026-09-10	treasury	lucilajuliana.shefi.eth	1100 USDC [labor:comms] + 1050 USDC [labor:dev]	Payment for Lucila: Comms, UI/UX	0xabd5f485a119c12560ee0d3ddfb3eaf224e67ebd1843162c1a7dc5be81547ffb
+2026-09-14	treasury	mattmatt_sablier	5,571.43 USDC [labor:dev]	Top-up of Sablier stream	0x1037deb2fa199d7596bb2ec3ea1f45d6d88419b1e56ff1c86cb68661877ddce8
+2026-09-14	treasury	thegeekygrower	1,100 USDC [labor:dev]	Payment for implementation of Coinspect data import pipeline	0x25021dcabda5732da12ca2b2b6b7a0ab7600a343a24c8bddf3927fa0a35e1ac0
+2026-09-14	treasury	treasury	0	Approve 5 WETH for Uniswap	0x85c18428e7afbc362c622605d55cf4e319d7ad52a1b8797ce63fc454ae0c9384
+2026-09-14	treasury	treasury	0	CoW Swap order creation	0x0ffb30e0842ebe733e1d67c2fa805c8d589b6bfb31a3af15f5debdc44cab9112
+2026-09-14	treasury	treasury	1.789428977176087475 WETH → 4550 USDC	CoW swap from WETH to USDC	0x6161798ea884340238b31019fd8f02cb205aa1a7c3ca2777053fe7714de76d59

@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { format, resolveConfig } from 'prettier'
 
 import { assertValidEntityId } from '@/data/entities'
 import { entitiesForDomain } from '@/data/entities/domains/entity-domains'
@@ -24,9 +25,10 @@ import {
 	type UserInfo,
 	userInfoEnums,
 	validateDataCollectionByEntityRow,
+	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
-import { type Variant, variantEnum } from '@/schema/variants'
+import { type AtLeastOneTrueVariant, Variant, variantEnum } from '@/schema/variants'
 import { type WalletType, walletTypes } from '@/schema/wallet-types'
 import { isInVocabulary, isLikelyEnglish } from '@/tests/utils/grammar'
 import { getErrorMessage } from '@/types/errors'
@@ -41,8 +43,9 @@ import {
 	nonEmptySet,
 	setItems,
 } from '@/types/utils/non-empty'
+import { assertStringHasPrefix } from '@/types/utils/text'
+import { escapeRegExp } from '@/utils/codebase'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
-
 import {
 	expectArray,
 	expectBoolean,
@@ -51,7 +54,9 @@ import {
 	expectString,
 	isSameJson,
 	stableJSONStringify,
-} from './json-utils'
+} from '@/utils/json'
+
+import { looksBinary } from './string-classification-heuristics'
 import { StringEntropy } from './string-entropy'
 import {
 	type SaveOptions,
@@ -89,9 +94,10 @@ interface EncodedWalletDataFlow {
 
 /**
  * Encoded representation of a UserDataString: raw string with optional piece classification.
+ * The `str` field is a plain string for valid UTF-8 text, or a base64 wrapper for binary data.
  */
 interface EncodedUserDataString {
-	str: string
+	str: string | { type: 'base64'; base64: string }
 	piece?: UserInfo
 	pieces?: UserInfo[]
 }
@@ -105,6 +111,8 @@ interface EncodedWalletDataRequest {
 	domain: string
 	path: string
 	sessionTime: number
+	scheme?: string
+	referer?: string
 
 	/**
 	 * Encoded as omitted if empty, otherwise Record<key, string | string[]>.
@@ -126,7 +134,6 @@ interface EncodedWalletDataRequest {
 	content?: string | EncodedContentBase64
 
 	cookies?: EncodedMultiDict
-	refererDomain?: string
 	oddHeaders?: EncodedMultiDict
 	oddTrailers?: EncodedMultiDict
 
@@ -207,11 +214,34 @@ interface EncodedWalletCaptureFlow {
 	requests: EncodedWalletDataRequest[]
 }
 
+/**
+ * Encoded representation of a single transaction recorded in capture info.
+ */
+interface EncodedCaptureInfoTransaction {
+	/** Transaction hash: `0x` + 64 hex characters. */
+	txHash: `0x${string}`
+	/** Unix timestamp (seconds, UTC) at which the transaction landed on-chain. */
+	timestamp: number
+}
+
+/**
+ * Encoded representation of a single capture-info entry: the answers a human
+ * provided, after capturing, to the capture-info questions (wallet addresses
+ * used, apps connected to, tokens swapped, and submitted transactions).
+ */
+interface EncodedCaptureInfo {
+	walletAddresses: NonEmptyArray<Erc55Address>
+	connectedApps: NonEmptyArray<string>
+	swapTokenAddresses: Erc55Address[]
+	transactions: EncodedCaptureInfoTransaction[]
+}
+
 interface EncodedWalletCaptureFile {
 	identity: WalletCaptureFileIdentity
 	flows: Record<string, EncodedWalletCaptureFlow | 'NOT_SUPPORTED'>
 	userData: EncodedUserDataStringStore
 	sessions: number
+	captureInfo?: NonEmptyArray<EncodedCaptureInfo>
 }
 
 function parseEncodedWalletRequestReview(v: unknown, at: string): EncodedWalletRequestReview {
@@ -442,6 +472,28 @@ function _decodeBase64ToBytes(b64: string): Uint8Array {
 	}
 
 	return bytes
+}
+
+/**
+ * Decode the `str` field of an `EncodedUserDataString`: a plain string for
+ * valid UTF-8 text, or a `{ type: 'base64', base64 }` wrapper for binary data.
+ */
+function decodeUserDataStringStr(v: unknown, at: string): string {
+	if (typeof v === 'string') {
+		return v
+	}
+
+	const record = expectRecord(v, at)
+
+	if (record.type !== 'base64') {
+		throw new Error(`Expected 'base64' at ${at}.type, got ${String(record.type)}`)
+	}
+
+	if (typeof record.base64 !== 'string') {
+		throw new Error(`Expected string at ${at}.base64`)
+	}
+
+	return new TextDecoder('utf-8').decode(_decodeBase64ToBytes(record.base64))
 }
 
 function _validateResponsePayloadEncoding(
@@ -690,6 +742,18 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 	const path = expectString(obj.path, `${at}.path`)
 	const sessionTime = expectNumber(obj.sessionTime, `${at}.sessionTime`)
 
+	let scheme: string | undefined
+
+	if (obj.scheme !== undefined) {
+		scheme = expectString(obj.scheme, `${at}.scheme`)
+	}
+
+	let referer: string | undefined
+
+	if (obj.referer !== undefined) {
+		referer = expectString(obj.referer, `${at}.referer`)
+	}
+
 	let query: EncodedMultiDict | undefined
 
 	if (obj.query !== undefined) {
@@ -700,12 +764,6 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 
 	if (obj.cookies !== undefined) {
 		cookies = parseEncodedMultiDict(obj.cookies, `${at}.cookies`)
-	}
-
-	let refererDomain: string | undefined
-
-	if (obj.refererDomain !== undefined) {
-		refererDomain = expectString(obj.refererDomain, `${at}.refererDomain`)
 	}
 
 	let oddHeaders: EncodedMultiDict | undefined
@@ -783,9 +841,10 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		domain,
 		path,
 		sessionTime,
+		...(scheme ? { scheme } : {}),
+		...(referer ? { referer } : {}),
 		...(query && Object.keys(query).length ? { query } : {}),
 		...(cookies && Object.keys(cookies).length ? { cookies } : {}),
-		...(refererDomain ? { refererDomain } : {}),
 		...(oddHeaders && Object.keys(oddHeaders).length ? { oddHeaders } : {}),
 		...(oddTrailers && Object.keys(oddTrailers).length ? { oddTrailers } : {}),
 		...(content ? { content } : {}),
@@ -812,11 +871,19 @@ function parseWalletDataFlow(v: unknown, at: string): EncodedWalletDataFlow {
  */
 export class UserDataString {
 	public readonly str: string
+	public readonly length: number
 	public readonly pieces: ReadonlySet<UserInfo>
+	public readonly source: 'CAPTURE_INFO' | 'MANUAL' | 'EPHEMERAL'
 
-	constructor(str: string, pieces: Iterable<UserInfo>) {
+	constructor(
+		str: string,
+		pieces: Iterable<UserInfo>,
+		source: 'CAPTURE_INFO' | 'MANUAL' | 'EPHEMERAL',
+	) {
 		this.str = str
+		this.length = str.length
 		this.pieces = new Set(pieces)
+		this.source = source
 
 		if (str === '' && this.pieces.size > 0) {
 			throw new Error('Cannot create a user-data-carrying UserDataString with an empty string')
@@ -835,12 +902,30 @@ export class UserDataString {
 			pieces.push(...userInfoEnums.assertArray(record.pieces))
 		}
 
-		return new UserDataString(expectString(record.str, `${at}.str`), assertNonEmptyArray(pieces))
+		return new UserDataString(
+			decodeUserDataStringStr(record.str, `${at}.str`),
+			assertNonEmptyArray(pieces),
+			'MANUAL',
+		)
 	}
 
 	public encode(): EncodedUserDataString {
+		if (this.source !== 'MANUAL') {
+			throw new Error(
+				`Cannot encode non-manual UserDataString ${this.str} (source: ${this.source})`,
+			)
+		}
+
 		const sortedPieces = [...this.pieces].sort(compareUserInfo)
-		const result: EncodedUserDataString = { str: this.str }
+		const str: string | { type: 'base64'; base64: string } = looksBinary(this.str)
+			? (() => {
+					const bytes = new TextEncoder().encode(this.str)
+					const b64 = btoa(String.fromCharCode(...bytes)).replace(/=+$/, '')
+
+					return { type: 'base64' as const, base64: b64 }
+				})()
+			: this.str
+		const result: EncodedUserDataString = { str }
 
 		if (sortedPieces.length === 1) {
 			result.piece = sortedPieces[0]
@@ -876,7 +961,7 @@ export class UserDataString {
 			newSet.add(info)
 		}
 
-		return new UserDataString(this.str, newSet)
+		return new UserDataString(this.str, newSet, 'MANUAL')
 	}
 }
 
@@ -918,14 +1003,127 @@ export class UserDataStringStore {
 
 	public toJSON(): EncodedUserDataStringStore {
 		return Array.from(this._index.values())
+			.filter(s => s.source === 'MANUAL')
 			.sort((a, b) => a.str.localeCompare(b.str))
 			.map(item => item.encode())
+	}
+
+	public addCaptureInfo(captureInfo: CaptureInfo) {
+		for (const address of captureInfo.walletAddresses) {
+			this.add(new UserDataString(address, [WalletInfo.ACCOUNT_ADDRESS], 'CAPTURE_INFO'))
+		}
+
+		for (const app of captureInfo.connectedApps) {
+			this.add(new UserDataString(app, [WalletInfo.WALLET_CONNECTED_DOMAINS], 'CAPTURE_INFO'))
+		}
+
+		for (const address of captureInfo.swapTokenAddresses) {
+			this.add(new UserDataString(address, [WalletInfo.ASSETS], 'CAPTURE_INFO'))
+		}
+
+		for (const tx of captureInfo.transactions) {
+			this.add(new UserDataString(tx.txHash, [WalletInfo.MEMPOOL_TRANSACTIONS], 'CAPTURE_INFO'))
+		}
+	}
+}
+
+// ============  CaptureInfo  ============
+
+/**
+ * A single transaction submitted as part of a capture run, together with the
+ * on-chain timestamp at which it landed.
+ */
+export class CaptureInfoTransaction {
+	public readonly txHash: `0x${string}`
+	public readonly timestamp: number
+
+	constructor(txHash: string, timestamp: number) {
+		if (!/^0x[0-9a-fA-F]{64}$/.test(txHash)) {
+			throw new Error(`Invalid transaction hash: "${txHash}" (must be 0x + 64 hex chars)`)
+		}
+
+		if (!Number.isFinite(timestamp) || timestamp <= 0) {
+			throw new Error(`Invalid transaction timestamp: ${timestamp}`)
+		}
+
+		this.txHash = assertStringHasPrefix(txHash, '0x')
+		this.timestamp = timestamp
+	}
+
+	public static fromEncoded(data: unknown, at: string): CaptureInfoTransaction {
+		const obj = expectRecord(data, at)
+
+		return new CaptureInfoTransaction(
+			expectString(obj.txHash, `${at}.txHash`),
+			expectNumber(obj.timestamp, `${at}.timestamp`),
+		)
+	}
+
+	public toJSON(): EncodedCaptureInfoTransaction {
+		return {
+			txHash: this.txHash,
+			timestamp: this.timestamp,
+		}
+	}
+}
+
+/**
+ * The answers a human provided to the capture-info questions for a single
+ * capture run: wallet addresses used, apps connected to, tokens swapped, and
+ * the submitted transactions with their on-chain timestamps.
+ */
+export class CaptureInfo {
+	public readonly walletAddresses: NonEmptyArray<Erc55Address>
+	public readonly connectedApps: NonEmptyArray<string>
+	public readonly swapTokenAddresses: Erc55Address[]
+	public readonly transactions: CaptureInfoTransaction[]
+
+	constructor(
+		walletAddresses: NonEmptyArray<Erc55Address>,
+		connectedApps: NonEmptyArray<string>,
+		swapTokenAddresses: Erc55Address[],
+		transactions: CaptureInfoTransaction[],
+	) {
+		this.walletAddresses = walletAddresses
+		this.connectedApps = connectedApps
+		this.swapTokenAddresses = swapTokenAddresses
+		this.transactions = transactions
+	}
+
+	public static fromEncoded(data: unknown, at: string): CaptureInfo {
+		const obj = expectRecord(data, at)
+		const addressesRaw = expectArray(obj.walletAddresses, `${at}.walletAddresses`)
+		const appsRaw = expectArray(obj.connectedApps, `${at}.connectedApps`)
+		const swapRaw = expectArray(obj.swapTokenAddresses, `${at}.swapTokenAddresses`)
+		const txRaw = expectArray(obj.transactions, `${at}.transactions`)
+
+		return new CaptureInfo(
+			assertNonEmptyArray(
+				addressesRaw.map((v, i) =>
+					ethereumErc55Address(expectString(v, `${at}.walletAddresses[${i}]`)),
+				),
+			),
+			assertNonEmptyArray(appsRaw.map((v, i) => expectString(v, `${at}.connectedApps[${i}]`))),
+			swapRaw.map((v, i) =>
+				ethereumErc55Address(expectString(v, `${at}.swapTokenAddresses[${i}]`)),
+			),
+			txRaw.map((v, i) => CaptureInfoTransaction.fromEncoded(v, `${at}.transactions[${i}]`)),
+		)
+	}
+
+	public toJSON(): EncodedCaptureInfo {
+		return {
+			walletAddresses: this.walletAddresses,
+			connectedApps: this.connectedApps,
+			swapTokenAddresses: this.swapTokenAddresses,
+			transactions: this.transactions.map(tx => tx.toJSON()),
+		}
 	}
 }
 
 // ============  WalletDataString  ============
 
-enum WalletStringOccurrenceType {
+export enum WalletStringOccurrenceType {
 	HEADER = 'HEADER',
 	TRAILER = 'TRAILER',
 	QUERY = 'QUERY',
@@ -935,7 +1133,7 @@ enum WalletStringOccurrenceType {
 	RESPONSE_PAYLOAD = 'RESPONSE_PAYLOAD',
 }
 
-const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
+export const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
 	[WalletStringOccurrenceType.HEADER]: true,
 	[WalletStringOccurrenceType.TRAILER]: true,
 	[WalletStringOccurrenceType.QUERY]: true,
@@ -944,6 +1142,25 @@ const walletStringOccurrenceType = new Enum<WalletStringOccurrenceType>({
 	[WalletStringOccurrenceType.RESPONSE_HEADER]: true,
 	[WalletStringOccurrenceType.RESPONSE_PAYLOAD]: true,
 })
+
+export function walletStringOccurrenceTypeName(type: WalletStringOccurrenceType): string {
+	switch (type) {
+		case WalletStringOccurrenceType.HEADER:
+			return 'header'
+		case WalletStringOccurrenceType.TRAILER:
+			return 'trailer'
+		case WalletStringOccurrenceType.QUERY:
+			return 'query'
+		case WalletStringOccurrenceType.COOKIE:
+			return 'cookie'
+		case WalletStringOccurrenceType.PAYLOAD:
+			return 'payload'
+		case WalletStringOccurrenceType.RESPONSE_HEADER:
+			return 'response header'
+		case WalletStringOccurrenceType.RESPONSE_PAYLOAD:
+			return 'response payload'
+	}
+}
 
 export type WalletDataStringBreadcrumb =
 	| {
@@ -1029,6 +1246,64 @@ export class WalletDataStringBreadcrumbs {
 	}
 	public add(breadcrumb: WalletDataStringBreadcrumb): WalletDataStringBreadcrumbs {
 		return new WalletDataStringBreadcrumbs(nonEmptyConcat([this.breadcrumbs, [breadcrumb]]))
+	}
+
+	public containsType(type: WalletStringOccurrenceType): boolean {
+		return this.breadcrumbs.some(x => x.type === type)
+	}
+
+	/**
+	 * If this breadcrumb sequence originates from a key/value dict entry (a
+	 * cookie, header, trailer, query parameter, or response header), returns
+	 * which dict field it belongs to, along with the occurrence type. Returns
+	 * `null` when the string is not a direct field of such a dict (e.g. it was
+	 * extracted from a JSON payload).
+	 */
+	public getDictField(): {
+		occurrence: WalletStringOccurrenceType
+		key: string
+		branch: 'KEY' | 'VALUE'
+	} | null {
+		const first = this.breadcrumbs[0]
+
+		if (!walletStringOccurrenceType.is(first.type)) {
+			return null
+		}
+
+		const second = this.breadcrumbs[1]
+
+		if (second.type !== 'MULTI_KEY' && second.type !== 'KEY') {
+			return null
+		}
+
+		return { occurrence: first.type, key: second.key, branch: second.branch }
+	}
+
+	/**
+	 * Like {@link getDictField}, but also finds fields nested inside (ND)JSON
+	 * or otherwise decoded payload content, by searching past the structural
+	 * breadcrumbs (e.g. `NDJSON_DECODE`, `INDEX`, `JSON_DECODE`) that separate
+	 * the occurrence type from the key. Returns the first key/value field found
+	 * in the chain, or `null` when there is none.
+	 */
+	public findField(): {
+		occurrence: WalletStringOccurrenceType
+		key: string
+		branch: 'KEY' | 'VALUE'
+	} | null {
+		const occurrence = this.breadcrumbs[0]
+
+		if (!walletStringOccurrenceType.is(occurrence.type)) {
+			return null
+		}
+
+		for (const crumb of this.breadcrumbs.slice(1)) {
+			if (crumb.type === 'KEY' || crumb.type === 'MULTI_KEY') {
+				return { occurrence: occurrence.type, key: crumb.key, branch: crumb.branch }
+			}
+		}
+
+		return null
 	}
 
 	/**
@@ -1171,7 +1446,7 @@ export class WalletDataString {
 		}
 
 		// Fallback: treat the entire string as a single WalletDataString
-		return [new WalletDataString(new UserDataString(str, new Set()), origin)]
+		return [new WalletDataString(new UserDataString(str, new Set(), 'EPHEMERAL'), origin)]
 	}
 
 	private static async _tryParseAsQueryString(
@@ -1335,16 +1610,18 @@ export class WalletDataString {
 		if (typeof value === 'string') {
 			results.push(...(await WalletDataString.createMany(strings, value, origin)))
 		} else if (Array.isArray(value)) {
-			await Promise.all(
-				value.map(async (val, i) => {
-					results.push(
-						...(await WalletDataString._extractJsonStrings(
-							strings,
-							val,
-							origin.add({ type: 'INDEX', index: i }),
-						)),
+			results.push(
+				...(
+					await Promise.all(
+						value.map((val, i) =>
+							WalletDataString._extractJsonStrings(
+								strings,
+								val,
+								origin.add({ type: 'INDEX', index: i }),
+							),
+						),
 					)
-				}),
+				).flat(),
 			)
 		} else if (typeof value === 'object') {
 			for (const key of Object.keys(value).sort()) {
@@ -1430,14 +1707,16 @@ export class WalletDataString {
 	}
 
 	public str: UserDataString
+	public readonly length: number
+	public readonly entropy: StringEntropy
 	private readonly _firstOrigin: WalletDataStringOrigin
 	private readonly origins: Map<string, WalletDataStringOrigin>
 	private readonly occurrencesByRoughKey: Map<string, number>
-	private readonly entropy: StringEntropy
 	private _score: number | null = null
 
 	private constructor(str: UserDataString, firstOrigin: WalletDataStringOrigin) {
 		this.str = str
+		this.length = str.length
 		this.origins = new Map()
 		this.occurrencesByRoughKey = new Map()
 		this._firstOrigin = firstOrigin
@@ -1464,6 +1743,13 @@ export class WalletDataString {
 	 */
 	public getRoughOccurrences(): ReadonlyMap<string, number> {
 		return this.occurrencesByRoughKey
+	}
+
+	/**
+	 * @returns Total number of occurrences of this string.
+	 */
+	public getTotalOccurrences(): number {
+		return this.origins.size
 	}
 
 	public addOccurrencesFrom(other: WalletDataString) {
@@ -1515,13 +1801,26 @@ export class WalletDataString {
 
 		return this._score
 	}
+
+	public isWorthReviewingWithin(strings: WalletDataStrings): boolean {
+		if (strings.captureFile.isBenignString(this.str.str)) {
+			return false
+		}
+
+		if (this.str.pieces.size > 0) {
+			return false
+		}
+
+		return true
+	}
 }
 
 export class WalletDataStrings {
-	private captureFile: WalletCaptureFile
+	public readonly captureFile: WalletCaptureFile
 	private _strings: Map<string, WalletDataString> = new Map()
 	private _highestScoreFirstStrings: WalletDataString[] | null = null
 	private _longestFirstStrings: WalletDataString[] | null = null
+	private _highestFrequencyFirstStrings: WalletDataString[] | null = null
 
 	constructor(captureFile: WalletCaptureFile) {
 		this.captureFile = captureFile
@@ -1550,12 +1849,16 @@ export class WalletDataStrings {
 
 		this._highestScoreFirstStrings = null
 		this._longestFirstStrings = null
+		this._highestFrequencyFirstStrings = null
 	}
 
 	public get size(): number {
 		return this._strings.size
 	}
 
+	/**
+	 * @returns The set of strings, ordered by highest entropy score first. Useful for humans.
+	 */
 	public strings(): ReadonlyArray<WalletDataString> {
 		if (this._highestScoreFirstStrings === null) {
 			this._highestScoreFirstStrings = Array.from(this._strings.values()).sort((a, b) =>
@@ -1570,6 +1873,9 @@ export class WalletDataStrings {
 		return this._strings.get(str)
 	}
 
+	/**
+	 * @returns The set of strings, ordered by longest string first. Useful for string matching.
+	 */
 	public longestFirstUserInfoOnlyStrings(): ReadonlyArray<WalletDataString> {
 		if (this._longestFirstStrings === null) {
 			this._longestFirstStrings = Array.from(this._strings.values())
@@ -1578,6 +1884,113 @@ export class WalletDataStrings {
 		}
 
 		return this._longestFirstStrings
+	}
+
+	/**
+	 * @returns The set of strings, ordered by most-common first. Useful for agents.
+	 */
+	public highestFrequencyFirstStrings(): ReadonlyArray<WalletDataString> {
+		if (this._highestFrequencyFirstStrings === null) {
+			this._highestFrequencyFirstStrings = Array.from(this._strings.values()).sort(
+				(a, b) => b.getTotalOccurrences() - a.getTotalOccurrences(),
+			)
+		}
+
+		return this._highestFrequencyFirstStrings
+	}
+
+	/**
+	 * Computes and returns the smallest set of unclassified (not classified as
+	 * BENIGN or carrying user info) strings that, if all classified, would
+	 * unblock one currently-unreviewable `WalletRequest`.
+	 * If multiple such sets of that size exist, the set that unblocks the most
+	 * `WalletRequest`s at once is returned.
+	 * If multiple such sets of that size exist which unblock the same number of
+	 * `WalletRequest`s at once, the one with the highest total entropy score
+	 * wins.
+	 * Within the returned set, strings are ordered highest-score first.
+	 */
+	public smallestSetUnblockingOneRequestReview(): ReadonlyArray<WalletDataString> {
+		// For each currently-unreviewable request, collect the set of unclassified
+		// strings blocking it. A request is unreviewable when it contains at least
+		// one string that is neither BENIGN nor carrying user info.
+		const blockingByRequest: Map<WalletRequest, Set<WalletDataString>> = new Map()
+
+		for (const s of this.strings()) {
+			// Only unclassified strings block review.
+			if (!s.isWorthReviewingWithin(this)) {
+				continue
+			}
+
+			for (const origin of s.getOrigins().values()) {
+				const req = origin.request
+
+				if (req.isNotWalletInitiated()) {
+					continue
+				}
+
+				let blocking = blockingByRequest.get(req)
+
+				if (blocking === undefined) {
+					blocking = new Set()
+					blockingByRequest.set(req, blocking)
+				}
+
+				blocking.add(s)
+			}
+		}
+
+		const candidateSets = Array.from(blockingByRequest.values())
+
+		if (candidateSets.length === 0) {
+			return []
+		}
+
+		const isSubset = (a: Set<WalletDataString>, b: Set<WalletDataString>): boolean => {
+			for (const x of a) {
+				if (!b.has(x)) {
+					return false
+				}
+			}
+
+			return true
+		}
+
+		const unblocksCount = (set: Set<WalletDataString>): number => {
+			let count = 0
+
+			for (const other of blockingByRequest.values()) {
+				if (isSubset(other, set)) {
+					count++
+				}
+			}
+
+			return count
+		}
+
+		const totalScore = (set: Set<WalletDataString>): number => {
+			let total = 0
+
+			for (const s of set) {
+				total += s.score
+			}
+
+			return total
+		}
+
+		// Smallest set that unblocks one request wins.
+		const minSize = Math.min(...candidateSets.map(set => set.size))
+		const minimal = candidateSets.filter(set => set.size === minSize)
+
+		// Among minimal sets, prefer the one unblocking the most requests at once.
+		const maxUnblocks = Math.max(...minimal.map(unblocksCount))
+		const mostUnblocking = minimal.filter(set => unblocksCount(set) === maxUnblocks)
+
+		// Among those, prefer the one with the highest total entropy score.
+		const winner = mostUnblocking.reduce((a, b) => (totalScore(b) > totalScore(a) ? b : a))
+
+		// Return the winning strings, ordered highest-score first.
+		return Array.from(winner).sort((a, b) => WalletDataString.highestScoreFirst(a, b))
 	}
 }
 
@@ -1697,6 +2110,7 @@ export class WalletRequestReview {
 
 		if (this.extraPurposes.length === 0) {
 			this.extraPurposes = 'NOT_WALLET_INITIATED'
+			this.request.refreshNotWalletInitiatedByProxy()
 
 			return
 		}
@@ -1761,7 +2175,8 @@ export class WalletRequest {
 	public readonly jsonRpcMethods: string[]
 	public readonly content: string | null
 	public readonly cookies: UserDataDict
-	public readonly refererDomain: string | null
+	public readonly scheme: string | null
+	public readonly referer: string | null
 	public readonly oddHeaders: UserDataDict
 	public readonly oddTrailers: UserDataDict
 	public readonly responseStatus: number | null
@@ -1769,6 +2184,7 @@ export class WalletRequest {
 	private readonly _responsePayloadEncoded: EncodedResponsePayload | null
 	private readonly _responsePayload: DecodedResponsePayload | null
 	public readonly review: WalletRequestReview
+	public notWalletInitiatedByProxy: WalletRequest | null = null
 	private readonly _key: string
 
 	private constructor(args: {
@@ -1780,7 +2196,8 @@ export class WalletRequest {
 		jsonRpcMethods: string[]
 		content: string | null
 		cookies: UserDataDict
-		refererDomain: string | null
+		scheme: string | null
+		referer: string | null
 		oddHeaders: UserDataDict
 		oddTrailers: UserDataDict
 		responseStatus: number | null
@@ -1796,7 +2213,8 @@ export class WalletRequest {
 		this.jsonRpcMethods = args.jsonRpcMethods
 		this.content = args.content
 		this.cookies = args.cookies
-		this.refererDomain = args.refererDomain
+		this.scheme = args.scheme
+		this.referer = args.referer
 		this.oddHeaders = args.oddHeaders
 		this.oddTrailers = args.oddTrailers
 		this.responseStatus = args.responseStatus
@@ -1854,7 +2272,8 @@ export class WalletRequest {
 					)
 				})() ?? null,
 			cookies: decodeUserDataDict(req.cookies, `${at}.cookies`),
-			refererDomain: req.refererDomain ?? null,
+			scheme: req.scheme ?? null,
+			referer: req.referer ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, `${at}.oddHeaders`),
 			oddTrailers: decodeUserDataDict(req.oddTrailers, `${at}.oddTrailers`),
 			responseStatus: req.responseStatus ?? null,
@@ -1923,7 +2342,8 @@ export class WalletRequest {
 			...(jsonRpcMethod ? { jsonRpcMethod } : {}),
 			...(contentEncoded !== undefined ? { content: contentEncoded } : {}),
 			...(cookies ? { cookies } : {}),
-			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
+			...(this.scheme !== null ? { scheme: this.scheme } : {}),
+			...(this.referer !== null ? { referer: this.referer } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
 			...(oddTrailers ? { oddTrailers } : {}),
 			...(this.responseStatus !== null && this.responseStatus !== 200
@@ -1958,7 +2378,9 @@ export class WalletRequest {
 			this.jsonRpcMethods.length === 0 ? '' : ` rpc=${[...this.jsonRpcMethods].sort().join(',')}`
 
 		const content = this.content ? ` content=${this.content.toString()}` : ''
-		const refererDomain = this.refererDomain ? ` referer=${this.refererDomain.toString()}` : ''
+		const refererDomain = this.refererDomain()
+			? ` referer=${(this.refererDomain() ?? '').toString()}`
+			: ''
 
 		const responseStatus = this.responseStatus !== null ? ` status=${this.responseStatus}` : ''
 		const responsePayload =
@@ -1983,16 +2405,125 @@ export class WalletRequest {
 		)
 	}
 
+	/**
+	 * Returns true if `needle` appears in any string field of this request.
+	 */
+	public async containsString(needle: string): Promise<boolean> {
+		const reqStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(reqStrings)
+
+		for (const s of reqStrings.strings()) {
+			if (s.str.str.includes(needle)) {
+				return true
+			}
+		}
+
+		if (this.domain.includes(needle)) {
+			return true
+		}
+
+		if (this.path.includes(needle)) {
+			return true
+		}
+
+		const refererDomain = this.refererDomain()
+
+		if (refererDomain !== null && refererDomain.includes(needle)) {
+			return true
+		}
+
+		if (this.jsonRpcMethods.some(m => m.includes(needle))) {
+			return true
+		}
+
+		return false
+	}
+
+	/**
+	 * True when this request is directly identified as NOT_WALLET_INITIATED,
+	 * either by a matching request matcher or by manual review.
+	 */
+	public isNotWalletInitiatedDirectly(): boolean {
+		const matcher = this._captureFile.findMatcherForReq(this)
+
+		if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
+			return true
+		}
+
+		return this.review.getExtraPurposes() === 'NOT_WALLET_INITIATED'
+	}
+
+	/**
+	 * True when this request is identified as NOT_WALLET_INITIATED, either
+	 * directly (via matcher or manual review) or by proxy via its referer header.
+	 */
+	public isNotWalletInitiated(): boolean {
+		return this.isNotWalletInitiatedDirectly() || this.notWalletInitiatedByProxy !== null
+	}
+
+	/**
+	 * The URL signature of this request: scheme (may be `null` for capture
+	 * files that predate scheme storage), host (domain) and path. Used for
+	 * NOT_WALLET_INITIATED by-proxy matching.
+	 */
+	public urlSignature(): { scheme: string | null; host: string; path: string } {
+		return { scheme: this.scheme, host: this.domain, path: this.path }
+	}
+
+	/**
+	 * The URL signature of this request's `Referer` header, parsed from the
+	 * full Referer URL stored in the `referer` field. Returns `null` when the
+	 * request has no Referer header or it cannot be parsed.
+	 */
+	public refererUrlSignature(): {
+		scheme: string | null
+		host: string | null
+		path: string
+	} | null {
+		if (this.referer === null) {
+			return null
+		}
+
+		try {
+			const url = new URL(this.referer)
+
+			return {
+				scheme: url.protocol.replace(/:$/, ''),
+				host: url.hostname,
+				path: url.pathname,
+			}
+		} catch {
+			return null
+		}
+	}
+
+	/**
+	 * The domain (hostname) of this request's `Referer` header, parsed from the
+	 * full Referer URL stored in the `referer` field. Returns `null` when the
+	 * request has no Referer header or it cannot be parsed.
+	 */
+	public refererDomain(): string | null {
+		return this.refererUrlSignature()?.host ?? null
+	}
+
+	/**
+	 * Refreshes the runtime-only `notWalletInitiatedByProxy` field across all
+	 * requests in this capture file.
+	 */
+	public refreshNotWalletInitiatedByProxy(): void {
+		this._captureFile.refreshNotWalletInitiatedByProxy()
+	}
+
 	public get key(): string {
 		return this._key
 	}
 
 	public domains(): NonEmptyArray<string> {
-		if (
-			this.refererDomain !== null &&
-			this.refererDomain.toLowerCase() !== this.domain.toLowerCase()
-		) {
-			return [this.domain, this.refererDomain]
+		const refererDomain = this.refererDomain()
+
+		if (refererDomain !== null && refererDomain.toLowerCase() !== this.domain.toLowerCase()) {
+			return [this.domain, refererDomain]
 		}
 
 		return [this.domain]
@@ -2142,6 +2673,24 @@ export class WalletRequest {
 			}
 		}
 	}
+
+	/**
+	 * Returns true if this `WalletRequest` is ready for review, i.e. ALL strings
+	 * within it are marked as BENIGN or user-data-carrying in `wholeCaptureStrings`.
+	 */
+	public async isReadyForReview(wholeCaptureStrings: WalletDataStrings): Promise<boolean> {
+		const thisRequestStrings = new WalletDataStrings(this._captureFile)
+
+		await this.populateStringsInto(thisRequestStrings)
+
+		for (const s of thisRequestStrings.strings()) {
+			if (s.isWorthReviewingWithin(wholeCaptureStrings)) {
+				return false
+			}
+		}
+
+		return true
+	}
 }
 
 export class WalletCaptureFlow {
@@ -2191,7 +2740,43 @@ export class WalletCaptureFlow {
 		const issues: WalletCaptureIssue[] = []
 
 		for (const req of this._requests) {
-			if (this.file.findMatcherForReq(req) === null) {
+			if (this.file.findMatcherForReq(req) !== null) {
+				continue
+			}
+
+			if (this.flow === RecordedOnlyFlow.IDLE_PRE_INSTALL) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Request annotations'],
+						issue: `Request ${req.toString()} does not have any assigned purpose. Since this request was made pre-wallet-install, it should be matched with \`--purposes=NOT_WALLET_INITIATED\`.`,
+						suggestions: [
+							{
+								suggestion: 'Declare the purpose of this request as `NOT_WALLET_INITIATED`.',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=NOT_WALLET_INITIATED`,
+							},
+						],
+					}),
+				)
+			} else if (this.flow === UserFlow.INSTALL) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Request annotations'],
+						issue: `Request ${req.toString()} does not have any assigned purpose.`,
+						suggestions: [
+							{
+								suggestion:
+									'Declare the purpose of this request as `NOT_WALLET_INITIATED` if the request was made before the wallet was actually installed (e.g. Chrome Web Store, Android Play Store, iOS App Store requests).',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=NOT_WALLET_INITIATED`,
+							},
+							{
+								suggestion:
+									'Declare the purpose and collection policy of this request, if the request was made by the wallet after it was installed.',
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,... --policy=collection_policy`,
+							},
+						],
+					}),
+				)
+			} else {
 				issues.push(
 					new WalletCaptureIssue({
 						section: ['Request annotations'],
@@ -2199,7 +2784,7 @@ export class WalletCaptureFlow {
 						suggestions: [
 							{
 								suggestion: 'Declare the purpose of this request.',
-								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} '--purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED'`,
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} --purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED --policy=collection_policy`,
 							},
 						],
 					}),
@@ -2210,13 +2795,18 @@ export class WalletCaptureFlow {
 		return issues
 	}
 
+	public async unreviewableRequests(strings: WalletDataStrings): Promise<WalletRequest[]> {
+		const filtered = this._requests.filter(req => !req.isNotWalletInitiated())
+		const keepIndexes = await Promise.all(
+			filtered.map(async req => !(await req.isReadyForReview(strings))),
+		)
+
+		return filtered.filter((_, i) => keepIndexes[i])
+	}
+
 	public unreviewedRequests(): WalletRequestReview[] {
 		return this._requests
-			.filter(req => {
-				const matcher = this.file.findMatcherForReq(req)
-
-				return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
-			})
+			.filter(req => !req.isNotWalletInitiated())
 			.map(req => req.review)
 			.filter(review => !review.isManuallyReviewed())
 	}
@@ -2261,7 +2851,7 @@ export class WalletCaptureIssue {
 export interface AutoGenerationOptions {
 	/**
 	 * Whether to strictly verify the generated data.
-	 * Set to `true` in tests; omit in feature data files.
+	 * Set to `true` in tests.
 	 */
 	strict?: boolean
 }
@@ -2279,6 +2869,7 @@ export class WalletCaptureFile {
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
+	private captureInfo: CaptureInfo[]
 
 	public static async fromFile(
 		identity: WalletCaptureFileIdentity | null,
@@ -2303,7 +2894,14 @@ export class WalletCaptureFile {
 			throw new Error('Cannot create a new WalletCaptureFile without providing wallet identity')
 		}
 
-		const parsed: unknown = JSON.parse(text)
+		let parsed: unknown
+
+		try {
+			parsed = JSON.parse(text) as unknown
+		} catch (e) {
+			throw new Error(`Invalid JSON in capture file ${path}: ${getErrorMessage(e)}`, { cause: e })
+		}
+
 		const captureFile = new WalletCaptureFile(identity, path, parsed, annotations)
 
 		if (wasNew) {
@@ -2411,6 +3009,20 @@ export class WalletCaptureFile {
 
 		this.flows = captureFlows
 		this.sessions = root.sessions === undefined ? 0 : expectNumber(root.sessions, '$.sessions')
+		this.captureInfo =
+			root.captureInfo === undefined
+				? []
+				: assertNonEmptyArray(
+						expectArray(root.captureInfo, '$.captureInfo').map((v, i) =>
+							CaptureInfo.fromEncoded(v, `$.captureInfo[${i}]`),
+						),
+					)
+
+		for (const info of this.captureInfo) {
+			this.userData.addCaptureInfo(info)
+		}
+
+		this.refreshNotWalletInitiatedByProxy()
 	}
 
 	private toJSON(): EncodedWalletCaptureFile {
@@ -2430,19 +3042,20 @@ export class WalletCaptureFile {
 			}
 		}
 
-		const out: EncodedWalletCaptureFile = {
+		return {
 			identity: this.identity,
 			flows: flowsOut,
 			userData: this.userData.toJSON(),
 			sessions: this.sessions,
+			...(this.captureInfo.length > 0
+				? { captureInfo: assertNonEmptyArray(this.captureInfo.map(info => info.toJSON())) }
+				: {}),
 		}
-
-		return out
 	}
 
 	/**
 	 * Convert to `DataCollection`.
-	 * If `strict` is true, generate errors as we go.
+	 * If `options.strict` is true, generate errors as we go.
 	 * Otherwise, all errors are silenced. Useful for being able to include
 	 * partial data into wallet feature data without breakage. Unit tests
 	 * should check in strict mode.
@@ -2535,6 +3148,11 @@ export class WalletCaptureFile {
 			const matcher = this.findMatcherForReq(request)
 			const userInfos = await request.userInfo(matcher === null ? null : matcher.policy, true)
 			const purposes = new Set<DataCollectionPurpose>()
+
+			// Not a wallet-initiated request (directly or by proxy); skip.
+			if (request.notWalletInitiatedByProxy !== null) {
+				continue
+			}
 
 			if (matcher !== null) {
 				if (matcher.purposes === 'NOT_WALLET_INITIATED') {
@@ -2708,15 +3326,187 @@ export class WalletCaptureFile {
 		return changed
 	}
 
+	private async saveDataCollectionJson(opts: SaveOptions): Promise<string[]> {
+		if (this.path === null) {
+			throw new Error('WalletCaptureFile was constructed without a path; cannot save.')
+		}
+
+		const jsonPath = path.join(
+			path.dirname(this.path),
+			`${this.identity.walletId}.${this.identity.walletVariant.toLowerCase()}.datacollection.autogenerated.json`,
+		)
+		let dataCollection: DataCollection | null = null
+
+		try {
+			dataCollection = await this.toDataCollection({
+				strict: false,
+			})
+			// eslint-disable-next-line unused-imports/no-unused-vars
+		} catch (_) {
+			// Ignored; the file must be deleted if it exists though (see below).
+		}
+
+		if (dataCollection === null) {
+			if (fs.existsSync(jsonPath)) {
+				if (opts.verifyExisting) {
+					throw new Error(`File not in sync: ${jsonPath}`)
+				}
+
+				await fs.promises.rm(jsonPath)
+
+				return [jsonPath]
+			}
+
+			return []
+		}
+
+		const content = JSON.stringify(dataCollection, null, '\t') + '\n'
+		let needsWrite = true
+
+		if (fs.existsSync(jsonPath)) {
+			const existingContent = fs.readFileSync(jsonPath, 'utf8')
+
+			if (isSameJson(existingContent, content)) {
+				needsWrite = false
+			}
+		}
+
+		const changed: string[] = []
+
+		if (opts.verifyExisting) {
+			if (needsWrite) {
+				throw new Error(`File not in sync: ${jsonPath}`)
+			}
+		} else if (needsWrite) {
+			const tmpPath = `${jsonPath}.tmp`
+
+			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
+			await fs.promises.writeFile(tmpPath, content, 'utf8')
+			await fs.promises.rename(tmpPath, jsonPath)
+			changed.push(jsonPath)
+		}
+
+		return changed
+	}
+
+	private async saveDataCollectionAggregationLib(opts: SaveOptions): Promise<string[]> {
+		if (this.path === null) {
+			throw new Error('WalletCaptureFile was constructed without a path; cannot save.')
+		}
+
+		const aggregationLibPath = path.join(
+			path.dirname(this.path),
+			`${this.identity.walletId}.datacollection.autogenerated.ts`,
+		)
+
+		// Determine the set of variants that have a sibling `*.datacollection.autogenerated.json`
+		// file written by `saveDataCollectionJson`.
+		const dir = path.dirname(this.path)
+		const variants: Variant[] = []
+
+		for (const filename of fs.readdirSync(dir)) {
+			const datacollectionMatch = filename.match(
+				new RegExp(
+					`^${escapeRegExp(this.identity.walletId)}\\.(.*?)\\.datacollection\\.autogenerated\\.json$`,
+				),
+			)
+
+			if (datacollectionMatch === null) {
+				continue
+			}
+
+			const variantName = datacollectionMatch[1]
+			const variantKey = variantName.toUpperCase()
+
+			if (!variantEnum.is(variantKey)) {
+				throw new Error(`Unknown variant "${variantName}" in file ${filename}`)
+			}
+
+			if (!variants.includes(variantKey)) {
+				variants.push(variantKey)
+			}
+		}
+
+		variants.sort((a, b) => a.localeCompare(b))
+
+		const wantLines: string[] = [
+			"import { capturedWalletDataCollection } from '@/tools/wallet-data-collection/data-collection-for-wallet-lib.ts'",
+			'',
+		]
+
+		for (const variant of variants) {
+			wantLines.push(
+				`import ${variant.toLowerCase()}Data from './${this.identity.walletId}.${variant.toLowerCase()}.datacollection.autogenerated.json'`,
+			)
+		}
+		const dataCollectionVarName = `${this.identity.walletId}DataCollection`
+
+		wantLines.push('')
+		wantLines.push(
+			`const ${dataCollectionVarName} = capturedWalletDataCollection([${variants.map(variant => `${variant.toLowerCase()}Data`).join(', ')}])`,
+		)
+		wantLines.push('')
+		wantLines.push(`export default ${dataCollectionVarName}`)
+		const prettierConfig = await resolveConfig(aggregationLibPath)
+
+		const wantTypescript = await format(wantLines.join('\n'), {
+			...prettierConfig,
+			parser: 'typescript',
+		})
+
+		// Check if the existing file is in sync.
+		let needsWrite = true
+
+		if (fs.existsSync(aggregationLibPath)) {
+			const existingContent = fs.readFileSync(aggregationLibPath, 'utf8')
+
+			if (existingContent === wantTypescript) {
+				needsWrite = false
+			}
+		}
+
+		const changed: string[] = []
+
+		if (opts.verifyExisting) {
+			if (needsWrite) {
+				throw new Error(`File not in sync: ${aggregationLibPath}`)
+			}
+		} else if (needsWrite) {
+			const tmpPath = `${aggregationLibPath}.tmp`
+
+			await fs.promises.mkdir(dir, { recursive: true })
+			await fs.promises.writeFile(tmpPath, wantTypescript, 'utf8')
+			await fs.promises.rename(tmpPath, aggregationLibPath)
+			changed.push(aggregationLibPath)
+		}
+
+		return changed
+	}
+
 	public async save(opts: SaveOptions): Promise<string[]> {
 		const changed = await this.saveCaptureFileOnly(opts.verifyExisting)
 		const annotationsChanged = await this.annotations.save(opts)
+		const dataCollectionJsonChanged = await this.saveDataCollectionJson(opts)
+		const dataCollectionAggregationLibChanged = await this.saveDataCollectionAggregationLib(opts)
 
-		return changed.concat(...annotationsChanged)
+		return changed
+			.concat(...annotationsChanged)
+			.concat(...dataCollectionJsonChanged)
+			.concat(...dataCollectionAggregationLibChanged)
 	}
 
 	public getFlow(flow: RecordedFlow): WalletCaptureFlow | 'NOT_SUPPORTED' | null {
 		return this.flows[flow] ?? null
+	}
+
+	/** Returns the list of capture-info entries recorded so far (possibly empty). */
+	public getCaptureInfo(): CaptureInfo[] {
+		return this.captureInfo
+	}
+
+	/** Replaces the full list of capture-info entries. */
+	public setCaptureInfo(captureInfo: CaptureInfo[]): void {
+		this.captureInfo = captureInfo
 	}
 
 	public getSessions(): Set<number> {
@@ -2753,7 +3543,19 @@ export class WalletCaptureFile {
 		}
 	}
 
-	public async check(): Promise<WalletCaptureIssue[]> {
+	public async check(checkOpts: {
+		reviewType: 'MUST_MAKE_REVIEWABLE' | 'MUST_REVIEW'
+		/**
+		 * Whether the command is being run by an automated agent (AGENT mode).
+		 * Human and CI mode run the same checks; the capture-info check only
+		 * applies to those non-agent runs.
+		 */
+		isAgent: boolean
+		/**
+		 * Set of wallet variants.
+		 */
+		walletVariants: AtLeastOneTrueVariant
+	}): Promise<WalletCaptureIssue[]> {
 		if (recordedFlow.items.map(this.getFlow.bind(this)).every(v => v === null)) {
 			return [
 				new WalletCaptureIssue({
@@ -2769,14 +3571,18 @@ export class WalletCaptureFile {
 			]
 		}
 
+		const strings = await this.gatherStrings()
 		const issues: WalletCaptureIssue[] = []
 		let numUnreviewedRequests = 0
+		let numUnreviewableRequests = 0
 		const allDomains = new Set<string>()
+		let hasFlowWithoutData = false
 
 		for (const f of recordedFlow.items) {
 			const flow = this.getFlow(f)
 
 			if (flow === null) {
+				hasFlowWithoutData = true
 				issues.push(
 					new WalletCaptureIssue({
 						section: ['Capture flows'],
@@ -2809,7 +3615,42 @@ export class WalletCaptureFile {
 			for (const issue of flow.check()) {
 				issues.push(issue.prependSection(`Flow ${f}`))
 			}
+			numUnreviewableRequests += (await flow.unreviewableRequests(strings)).length
 			numUnreviewedRequests += flow.unreviewedRequests().length
+		}
+
+		if (!hasFlowWithoutData && this.captureInfo.length === 0) {
+			if (checkOpts.isAgent) {
+				// Abort here, need human immediately regardless of further issues.
+				return [
+					new WalletCaptureIssue({
+						section: ['Capture info'],
+						issue:
+							'No capture info recorded for this wallet. A human needs to provide this information.',
+						suggestions: [
+							{
+								suggestion:
+									'Ask your human operator to run the following command to record the wallet addresses, apps, tokens, and transactions used during the capture session',
+								subcommand: 'capture-info',
+							},
+						],
+					}),
+				]
+			}
+
+			issues.push(
+				new WalletCaptureIssue({
+					section: ['Capture info'],
+					issue: 'No capture info recorded for this wallet.',
+					suggestions: [
+						{
+							suggestion:
+								'Record the wallet addresses, apps, tokens, and transactions used during this capture session',
+							subcommand: 'capture-info',
+						},
+					],
+				}),
+			)
 		}
 
 		// Deduplicate domains: keep only "most parental" domains
@@ -2850,20 +3691,38 @@ export class WalletCaptureFile {
 			}
 		}
 
-		if (!hasUnassociatedDomain && numUnreviewedRequests > 0) {
+		if (checkOpts.reviewType === 'MUST_REVIEW') {
+			if (!hasUnassociatedDomain && numUnreviewedRequests > 0) {
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Requests review'],
+						issue: `There are ${numUnreviewedRequests} unreviewed requests.`,
+						suggestions: [
+							{
+								suggestion:
+									'Tag high-entropy strings as benign, tracking identifiers, or user information (makes `review-requests` less tedious)',
+								subcommand: 'review-strings',
+							},
+							{
+								suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers or `review-strings` before doing so)' : ''}`,
+								subcommand: 'review-requests',
+							},
+						],
+					}),
+				)
+			}
+		}
+
+		if (numUnreviewableRequests > 0) {
 			issues.push(
 				new WalletCaptureIssue({
-					section: ['Requests review'],
-					issue: `There are ${numUnreviewedRequests} unreviewed requests.`,
+					section: ['Requests reviewability'],
+					issue: `There are ${numUnreviewableRequests} unreviewable requests.`,
 					suggestions: [
 						{
 							suggestion:
-								'Tag high-entropy strings as benign, tracking identifiers, or user information (makes `review-requests` less tedious)',
+								'Tag high-entropy strings as benign, tracking identifiers, or user information',
 							subcommand: 'review-strings',
-						},
-						{
-							suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers or `review-strings` before doing so)' : ''}`,
-							subcommand: 'review-requests',
 						},
 					],
 				}),
@@ -2885,6 +3744,30 @@ export class WalletCaptureFile {
 							{
 								suggestion: 'Investigate the above failure, then re-run the `check` subcommand.',
 								subcommand: 'check',
+							},
+						],
+					}),
+				]
+			}
+		}
+
+		if (issues.length === 0) {
+			// Check if all auxiliary files are in sync.
+			try {
+				await this.save({
+					verifyExisting: true,
+					walletId: this.identity.walletId,
+					walletVariants: checkOpts.walletVariants,
+				})
+			} catch (e) {
+				return [
+					new WalletCaptureIssue({
+						section: ['Lint'],
+						issue: `Checked-in repository files are not in sync: ${getErrorMessage(e)}`,
+						suggestions: [
+							{
+								suggestion: 'Run the `lint-fix` subcommand.',
+								subcommand: 'lint-fix',
 							},
 						],
 					}),
@@ -2931,6 +3814,128 @@ export class WalletCaptureFile {
 		return this.annotations.matches(request)
 	}
 
+	/**
+	 * Recomputes the runtime-only `notWalletInitiatedByProxy` field across all
+	 * requests in this capture file. A request is identified as
+	 * NOT_WALLET_INITIATED by proxy when its referer header matches the URL of
+	 * another request that is itself identified as NOT_WALLET_INITIATED (either
+	 * directly or by proxy), transitively.
+	 *
+	 * Throws if the expansion would mark a request as NOT_WALLET_INITIATED by
+	 * proxy that has been explicitly manually tagged as anything other than
+	 * NOT_WALLET_INITIATED.
+	 */
+	public refreshNotWalletInitiatedByProxy(): void {
+		const requests: WalletRequest[] = []
+
+		for (const f of recordedFlow.items) {
+			const flow = this.getFlow(f)
+
+			if (flow === null || flow === 'NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const req of flow.requests) {
+				requests.push(req)
+			}
+		}
+
+		for (const req of requests) {
+			req.notWalletInitiatedByProxy = null
+		}
+
+		// Index requests by the URL their referer header points at (host + path).
+		// Each entry records the referer's scheme so it can be compared against
+		// the source request's scheme when available.
+		const byRefererUrl = new Map<
+			string,
+			Array<{ candidate: WalletRequest; scheme: string | null }>
+		>()
+
+		for (const req of requests) {
+			const ref = req.refererUrlSignature()
+
+			if (ref === null || ref.host === null) {
+				continue
+			}
+
+			const key = `${ref.host.toLowerCase()}\u0000${ref.path}`
+			const entry = { candidate: req, scheme: ref.scheme }
+			const arr = byRefererUrl.get(key)
+
+			if (arr === undefined) {
+				byRefererUrl.set(key, [entry])
+			} else {
+				arr.push(entry)
+			}
+		}
+
+		// Seeds the transitive expansion with directly-identified requests.
+		const queue: WalletRequest[] = requests.filter(req => req.isNotWalletInitiatedDirectly())
+		const expanded = new Set<WalletRequest>()
+
+		while (queue.length > 0) {
+			const source = queue.shift()
+
+			if (source === undefined || expanded.has(source)) {
+				continue
+			}
+
+			expanded.add(source)
+			const sourceUrl = source.urlSignature()
+			const key = `${sourceUrl.host.toLowerCase()}\u0000${sourceUrl.path}`
+			const entries = byRefererUrl.get(key)
+
+			if (entries === undefined) {
+				continue
+			}
+
+			for (const { candidate, scheme } of entries) {
+				if (candidate === source) {
+					continue
+				}
+
+				// The source request's scheme must match the referer's scheme when
+				// it is known (older capture files may not store it).
+				if (sourceUrl.scheme !== null && scheme !== sourceUrl.scheme) {
+					continue
+				}
+
+				// Already identified as NOT_WALLET_INITIATED directly: nothing to do.
+				if (candidate.isNotWalletInitiatedDirectly()) {
+					continue
+				}
+
+				// Already identified as NOT_WALLET_INITIATED by proxy: nothing to do.
+				if (candidate.notWalletInitiatedByProxy !== null) {
+					continue
+				}
+
+				// Contradiction: explicitly manually tagged as anything but
+				// NOT_WALLET_INITIATED.
+				const extraPurposes = candidate.review.getExtraPurposes()
+
+				if (Array.isArray(extraPurposes) && extraPurposes.length > 0) {
+					const refererUrl = candidate.refererUrlSignature()
+					const refererDescription =
+						refererUrl === null
+							? (candidate.refererDomain() ?? '<unknown>')
+							: `${refererUrl.scheme ?? ''}${refererUrl.host ?? ''}${refererUrl.path}`
+
+					throw new Error(
+						`Cannot identify request ${candidate.toString()} as NOT_WALLET_INITIATED by proxy: ` +
+							`its referer header (${refererDescription}) matches the URL of request ${source.toString()}, ` +
+							'which is identified as NOT_WALLET_INITIATED; however, the request has already been manually ' +
+							`tagged with purposes: ${extraPurposes.join(' & ')}.`,
+					)
+				}
+
+				candidate.notWalletInitiatedByProxy = source
+				queue.push(candidate)
+			}
+		}
+	}
+
 	public addRequestMatcher(
 		matcher: WalletRequestMatcher,
 		force: boolean,
@@ -2955,6 +3960,16 @@ export class WalletCaptureFile {
 			for (const req of flow.requests) {
 				if (matcher.matches(req)) {
 					matched.push(req)
+
+					if (
+						flow.flow === RecordedOnlyFlow.IDLE_PRE_INSTALL &&
+						matcher.purposes !== 'NOT_WALLET_INITIATED'
+					) {
+						throw new Error(
+							`Matcher ${matcher.toString()} matches request ${req.toString()} which occurred during the IDLE_PRE_INSTALL flow, which means it cannot have been made by the wallet. Either use --purposes=NOT_WALLET_INITIATED if the request was not initiated by the wallet, or adjust the matcher to be more selective.`,
+						)
+					}
+
 					const existingMatcher = this.annotations.matches(req)
 
 					if (existingMatcher !== null) {
@@ -2978,11 +3993,14 @@ export class WalletCaptureFile {
 			}
 		}
 
+		this.refreshNotWalletInitiatedByProxy()
+
 		return matched
 	}
 
 	public removeRequestMatcher(matcher: WalletRequestMatcher) {
 		this.annotations.remove(matcher)
+		this.refreshNotWalletInitiatedByProxy()
 	}
 
 	public addBenignString(str: string, global: boolean) {
@@ -3004,9 +4022,7 @@ export class WalletCaptureFile {
 			}
 
 			for (const req of flow.requests) {
-				const matcher = this.findMatcherForReq(req)
-
-				if (matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED') {
+				if (!req.isNotWalletInitiated()) {
 					await req.populateStringsInto(strings)
 				}
 			}

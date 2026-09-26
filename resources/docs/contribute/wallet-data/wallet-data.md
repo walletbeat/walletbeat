@@ -86,6 +86,27 @@ Wallet data is located in the top-level `/data` directory. All files are written
 
 _There is also a directory of wallet icons at `/public/images/wallets`._
 
+### How `/data` fields are encoded
+
+Fields in `/data` must be **written down**. When you add a new property to a wallet, entity, or contributor type, it must be required — not omitted, not `undefined`, and not marked optional with `?`.
+
+Use these three states:
+
+- **`null`** means "we have not researched this yet."
+- **A named sentinel** (`NO_WEBSITE`, `NO_AFFILIATION`, `NO_LOCK_MECHANISM`, …) **or an empty array** means "we checked; there is none / it does not apply."
+- **A concrete value** means "we know what it is."
+
+This is why searching `/data` for `null` finds incomplete research. Omitted fields are invisible.
+
+Examples:
+
+- `features.security.publicSecurityAudits: null` — we have not looked up audits yet. `[]` — we looked; the wallet has never been audited.
+- `Entity.url: { type: 'NO_WEBSITE' }` — this organization has no website. Do not leave `url` off the object.
+- `Contributor.affiliation: 'NO_AFFILIATION'` — this person has no wallet-development affiliation. Do not use `[]` or omit the field.
+- `WalletMetadata.coinspectId: { type: 'NO_COINSPECT_ID' }` — Coinspect does not list this wallet. `null` means we have not checked yet.
+
+This applies to wallet **features**, **entities**, **contributors**, and **new wallet metadata** fields. Some older `WalletMetadata` / `WalletUrls` properties are still optional (`pseudonymType?`, `urls?`, hardware-only fields); treat those as legacy and do not add more of that shape.
+
 ### **Step 1**: Add a new wallet's basic information to Walletbeat
 
 #### **Step 1.1**: Add an entry for the wallet development entity behind My Little Wallet
@@ -153,7 +174,7 @@ export const chainMonkey: Contributor = {
 
 - Create a copy of `/data/software-wallets/unrated.tmpl.ts` at `/data/software-wallets/my-little-wallet.ts`.
 - Rename the top-level object from `unratedTemplate` to `myLittleWallet`.
-- Change all `metadata.*` fields such as `id` (set to `'myLittleWallet'`), `displayName`, `blurb`, `lastUpdated` (set to today's date in `YYYY-MM-DD` format), `urls`, etc.
+- Change all `metadata.*` fields such as `id` (set to `'myLittleWallet'`), `displayName`, `lastUpdated` (set to today's date in `YYYY-MM-DD` format), `urls`, etc.
 - Find an SVG icon of the wallet and crop all the transparent edges out of the SVG. Save it as `/public/images/wallet/myLittleWallet.svg` (the filename matches the `metadata.id` field).
   - _(If you cannot find an SVG version of the icon, find a PNG or JPG version instead, crop it similarly, save it as `/public/images/wallet/myLittleWallet.png` or `/public/images/wallet/myLittleWallet.jpg`, and set `metadata.iconExtension` to `'png'` or `'jpg'` in the wallet data file.)_
 - Set yourself as the sole contributor in `metadata.contributors`.
@@ -170,10 +191,7 @@ export const myLittleWallet: SoftwareWallet<AttributeGroupId> = {
 		id: 'myLittleWallet',
 		displayName: 'My Little Wallet',
 		tableName: 'My Little Wallet',
-		blurb: paragraph(`
-			This is an example wallet that was made up for the sake of
-			this contributor guide.
-		`),
+		coinspectId: null,
 		contributors: [chainMonkey],
 		iconExtension: 'svg',
 		lastUpdated: '2077-01-01',
@@ -268,7 +286,7 @@ _This example walks through the use of the `VariantFeature` and `Support` types,
 
 This field relates to whether or not the wallet lets you use multiple addresses. It is a simple yes/no question.
 
-In your code editor, you should be able to click (perhaps `Ctrl+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
+In your code editor, you should be able to click (perhaps `Control+Click` or one of the right-click options, depending on your editor) on the `multiAddress` field inside the wallet data file to jump to the type definition of this `multiAddress` field. Use this technique to figure out how a type is defined:
 
 ![](../images/navigate-to-type-definition.gif 'Navigating to a type definition in VSCode')
 

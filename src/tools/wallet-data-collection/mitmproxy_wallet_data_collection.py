@@ -7,13 +7,11 @@ import json
 import logging
 import os
 import re
-import time
 import threading
+import time
 import urllib.parse
-from typing import Set, Tuple, Dict, Optional, List, Union
 
-from mitmproxy import ctx
-from mitmproxy import http
+from mitmproxy import ctx, http
 from mitmproxy.addonmanager import Loader
 
 
@@ -46,6 +44,7 @@ _KNOWN_BENIGN_HEADERS = frozenset(
         "Connection",
         "Origin",
         "Pragma",
+        "Referer",
         "Upgrade",
         "Upgrade-Insecure-Requests",
         "Vary",
@@ -136,10 +135,65 @@ class UserInfo(enum.StrEnum):
         return self.value.replace("_", "")
 
 
+def looks_binary(s: str) -> bool:
+    """Return whether `s` is non-UTF8 (cannot be losslessly represented as UTF-8)."""
+    try:
+        encoded = s.encode("utf-8")
+        decoded = encoded.decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return True
+    return decoded != s
+
+
+def _replace_lone_surrogates(s: str) -> str:
+    """Replace lone surrogates with U+FFFD, matching the Web TextEncoder behavior."""
+    out: list[str] = []
+    i = 0
+    while i < len(s):
+        o = ord(s[i])
+        if (
+            0xD800 <= o <= 0xDBFF
+            and i + 1 < len(s)
+            and 0xDC00 <= ord(s[i + 1]) <= 0xDFFF
+        ):
+            out.append(s[i : i + 2])
+            i += 2
+            continue
+        if 0xD800 <= o <= 0xDFFF:
+            out.append(chr(0xFFFD))
+        else:
+            out.append(s[i])
+        i += 1
+    return "".join(out)
+
+
+def _encode_user_data_string_str(s: str) -> str | dict:
+    """Encode a UserDataString str: a plain string for UTF-8 text, base64 for binary data."""
+    if looks_binary(s):
+        b64 = (
+            base64.b64encode(_replace_lone_surrogates(s).encode("utf-8"))
+            .decode("ascii")
+            .rstrip("=")
+        )
+        return {"type": "base64", "base64": b64}
+    return s
+
+
+def _decode_user_data_string_str(v: object) -> str:
+    """Decode a UserDataString str, handling both plain strings and base64 wrappers."""
+    if isinstance(v, str):
+        return v
+    if isinstance(v, dict) and v.get("type") == "base64":
+        b64 = v["base64"]
+        padded = b64 + "=" * ((4 - len(b64) % 4) % 4)
+        return base64.b64decode(padded).decode("utf-8")
+    raise ValueError(f"Invalid UserDataString str: {v!r}")
+
+
 class UserDataString:
     """A raw string paired with classified UserInfo pieces. Stored with deduplication."""
 
-    def __init__(self, str: str, pieces: Set[UserInfo]):
+    def __init__(self, str: str, pieces: set[UserInfo]):
         self.str = str
         self.pieces = pieces
 
@@ -153,13 +207,13 @@ class UserDataString:
 
     def __repr__(self) -> str:
         if len(self.pieces) == 0:
-            return f"{repr(self.str)} [no user data]"
+            return f"{self.str!r} [no user data]"
         pieces_str = " ".join(sorted(str(p) for p in self.pieces))
-        return f"{repr(self.str)} [{pieces_str}]"
+        return f"{self.str!r} [{pieces_str}]"
 
     def encode(self) -> dict:
-        data: dict = {"str": self.str}
-        sorted_pieces = list(sorted(str(p) for p in self.pieces))
+        data: dict = {"str": _encode_user_data_string_str(self.str)}
+        sorted_pieces = sorted(str(p) for p in self.pieces)
         if len(sorted_pieces) == 1:
             data["piece"] = sorted_pieces[0]
         elif len(sorted_pieces) > 1:
@@ -168,15 +222,15 @@ class UserDataString:
 
     @classmethod
     def decode(cls, data: dict) -> UserDataString:
-        pieces: Set[UserInfo] = set()
+        pieces: set[UserInfo] = set()
         if "piece" in data:
             pieces.add(UserInfo[data["piece"]])
         if "pieces" in data:
             for p in data["pieces"]:
                 pieces.add(UserInfo[p])
         if len(pieces) == 0:
-            raise ValueError(f"Invalid UserDataString: {repr(data)}")
-        return cls(str=data["str"], pieces=pieces)
+            raise ValueError(f"Invalid UserDataString: {data!r}")
+        return cls(str=_decode_user_data_string_str(data["str"]), pieces=pieces)
 
 
 class UserDataStringStore:
@@ -229,9 +283,9 @@ class UserDataStringStore:
 
 def _multidict_to_dict_of_tuples(
     multidict, filter_fn=None
-) -> Dict[str, Tuple[str, ...]]:
+) -> dict[str, tuple[str, ...]]:
     """Convert a MultiDictView to Dict[str, Tuple[str, ...]], preserving all values."""
-    result: Dict[str, List[str]] = {}
+    result: dict[str, list[str]] = {}
     items = multidict.items(multi=True) if hasattr(multidict, "items") else []
     for k, v in items:
         if filter_fn is not None and not filter_fn(k):
@@ -283,7 +337,7 @@ def _extract_ethereum_values(text: str) -> list[str] | None:
 
     if not found:
         return None
-    return list(sorted(found))
+    return sorted(found)
 
 
 def _collect_unique_keys_from_obj(obj: object) -> set[str]:
@@ -379,7 +433,7 @@ def _compact_unique_keys(
         keys = final_keys
 
     # Sort for deterministic output
-    keys_sorted = list(sorted(keys))
+    keys_sorted = sorted(keys)
 
     # Step D: Check if pipe-separated string fits in 1024 bytes
     as_string = False
@@ -444,7 +498,7 @@ def _encode_response_payload(text: str | None) -> str | dict | None:
         fmt = "json"
         keys = _collect_unique_keys_from_obj(parsed)
         if keys:
-            unique_keys = list(sorted(k for k in keys if k.isascii()))
+            unique_keys = sorted(k for k in keys if k.isascii())
     except (json.JSONDecodeError, TypeError, ValueError):
         # Attempt NDJSON
         if "\n" in text:
@@ -460,7 +514,7 @@ def _encode_response_payload(text: str | None) -> str | dict | None:
                     break
             if ndjson_ok and ndjson_lines and all_keys:
                 fmt = "ndjson"
-                unique_keys = list(sorted(k for k in all_keys if k.isascii()))
+                unique_keys = sorted(k for k in all_keys if k.isascii())
     if fmt == "unknown":
         # Attempt query string
         if "&" in text or "=" in text:
@@ -475,7 +529,7 @@ def _encode_response_payload(text: str | None) -> str | dict | None:
                     qs_keys.add(key)
                 if qs_keys:
                     fmt = "query"
-                    unique_keys = list(sorted(k for k in qs_keys if k.isascii()))
+                    unique_keys = sorted(k for k in qs_keys if k.isascii())
             except ValueError:
                 pass
 
@@ -521,7 +575,7 @@ class WalletRequest:
             return str(val)
 
         def _decode_str_multidict(k):
-            decoded: Dict[str, Tuple[str, ...]] = {}
+            decoded: dict[str, tuple[str, ...]] = {}
             for key, v in data.get(k, {}).items():
                 if isinstance(v, list):
                     decoded[key] = tuple(str(x) for x in v)
@@ -529,7 +583,7 @@ class WalletRequest:
                     decoded[key] = (str(v),)
             return decoded
 
-        json_rpc_method: Tuple[str, ...] = ()
+        json_rpc_method: tuple[str, ...] = ()
         if "jsonRpcMethod" in data:
             if isinstance(data["jsonRpcMethod"], list):
                 json_rpc_method = tuple(data["jsonRpcMethod"])
@@ -539,11 +593,12 @@ class WalletRequest:
         return cls(
             domain=data["domain"],
             path=data["path"],
+            scheme=data.get("scheme"),
+            referer=data.get("referer"),
             query=_decode_str_multidict("query"),
             json_rpc_method=json_rpc_method,
             content=_decode_content("content"),
             cookies=_decode_str_multidict("cookies"),
-            referer_domain=data.get("refererDomain"),
             odd_headers=_decode_str_multidict("oddHeaders"),
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
@@ -561,7 +616,7 @@ class WalletRequest:
         # upstream proxy) the latter is the raw IP address, which is useless for
         # attributing a request to an entity. `pretty_*` yields the real hostname.
         url = urllib.parse.urlparse(req.pretty_url)
-        json_rpc_method: Tuple[str, ...] = ()
+        json_rpc_method: tuple[str, ...] = ()
         text = req.get_text()
         if text is not None and text == "":
             text = None
@@ -579,18 +634,16 @@ class WalletRequest:
                     json_rpc_method = tuple(rpc["method"] for rpc in payload)
             except json.JSONDecodeError:
                 pass  # Not JSON-RPC
-        referer_domain: Optional[str] = None
-        if "Referer" in req.headers:
-            referer_domain = urllib.parse.urlparse(req.headers["Referer"]).hostname
 
         return cls(
             domain=url.hostname,
             path=url.path,
+            scheme=url.scheme,
+            referer=req.headers.get("Referer"),
             query=_multidict_to_dict_of_tuples(req.query),
             json_rpc_method=json_rpc_method,
             content=text,
             cookies=_multidict_to_dict_of_tuples(req.cookies),
-            referer_domain=referer_domain,
             odd_headers=_multidict_to_dict_of_tuples(
                 req.headers, filter_fn=lambda k: not is_benign_header(k)
             ),
@@ -607,35 +660,37 @@ class WalletRequest:
         self,
         domain: str,
         path: str,
-        query: Dict[str, Tuple[str, ...]],
-        json_rpc_method: Tuple[str, ...],
-        content: Optional[str],
-        cookies: Dict[str, Tuple[str, ...]],
-        referer_domain: Optional[str],
-        odd_headers: Dict[str, Tuple[str, ...]],
-        odd_trailers: Dict[str, Tuple[str, ...]],
+        query: dict[str, tuple[str, ...]],
+        json_rpc_method: tuple[str, ...],
+        content: str | None,
+        cookies: dict[str, tuple[str, ...]],
+        odd_headers: dict[str, tuple[str, ...]],
+        odd_trailers: dict[str, tuple[str, ...]],
         session_time: int,
-        review: Optional[object],
-        response_status: Optional[int] = None,
-        response_headers: Dict[str, Tuple[str, ...]] | None = None,
-        response_payload: Optional[str] = None,
+        review: object | None,
+        response_status: int | None = None,
+        response_headers: dict[str, tuple[str, ...]] | None = None,
+        response_payload: str | None = None,
+        scheme: str | None = None,
+        referer: str | None = None,
     ):
         self._domain = domain
         self._path = path
+        self._scheme = scheme
+        self._referer = referer
         self._query = query
         self._json_rpc_method = json_rpc_method
         self._content = content
         self._cookies = cookies
-        self._referer_domain = referer_domain
         self._odd_headers = odd_headers
         self._odd_trailers = odd_trailers
         self._session_time = session_time
         self._review = review
-        self._response_status: Optional[int] = response_status
-        self._response_headers: Dict[str, Tuple[str, ...]] = (
+        self._response_status: int | None = response_status
+        self._response_headers: dict[str, tuple[str, ...]] = (
             response_headers if response_headers is not None else {}
         )
-        self._response_payload: Optional[str] = response_payload
+        self._response_payload: str | None = response_payload
 
     @classmethod
     def set_response_data(
@@ -652,7 +707,7 @@ class WalletRequest:
         wallet_request._response_payload = text
 
     def __str__(self):
-        def _maybe_multidict(name: str, md: Dict[str, Tuple[str, ...]]) -> str:
+        def _maybe_multidict(name: str, md: dict[str, tuple[str, ...]]) -> str:
             if len(md) == 0:
                 return ""
             values = {}
@@ -667,24 +722,22 @@ class WalletRequest:
             if len(self._json_rpc_method) == 0
             else f" rpc={','.join(sorted(self._json_rpc_method))}"
         )
-        referer_domain = (
-            "" if self._referer_domain is None else f" referer={self._referer_domain}"
-        )
         content = "" if self._content is None else f" content={self._content}"
+        referer = "" if self._referer is None else f" referer={self._referer}"
         response_status = (
             "" if self._response_status is None else f" status={self._response_status}"
         )
         response_payload = (
             ""
             if self._response_payload is None or len(self._response_payload) == 0
-            else f" resp=[{str(len(self._response_payload))} bytes]"
+            else f" resp=[{len(self._response_payload)!s} bytes]"
         )
         return (
             f"{self._domain}: {self._path}"
             f"{_maybe_multidict('query', self._query)}"
             f"{json_rpc}{content}"
             f"{_maybe_multidict('cookie', self._cookies)}"
-            f"{referer_domain}"
+            f"{referer}"
             f"{_maybe_multidict('headers', self._odd_headers)}"
             f"{_maybe_multidict('trailers', self._odd_trailers)}"
             f"{response_status}"
@@ -699,7 +752,13 @@ class WalletRequest:
             "sessionTime": self._session_time,
         }
 
-        def _encode_multidict(name: str, md: Dict[str, Tuple[str, ...]]):
+        if self._scheme is not None:
+            data["scheme"] = self._scheme
+
+        if self._referer is not None:
+            data["referer"] = self._referer
+
+        def _encode_multidict(name: str, md: dict[str, tuple[str, ...]]):
             if len(md) == 0:
                 return
             encoded = {}
@@ -730,9 +789,6 @@ class WalletRequest:
 
         _encode_multidict("cookies", self._cookies)
 
-        if self._referer_domain is not None:
-            data["refererDomain"] = self._referer_domain
-
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
 
@@ -759,9 +815,9 @@ class WalletCaptureFlow:
             flow_obj._add_decoded(WalletRequest.decode(data=r))
         return flow_obj
 
-    def __init__(self, flow: Union[UxFlow, str]):
+    def __init__(self, flow: UxFlow | str):
         self._flow = flow
-        self._requests: List[WalletRequest] = []
+        self._requests: list[WalletRequest] = []
         self._needs_flushing = 0
         self._lock = threading.Lock()
 
@@ -807,17 +863,24 @@ class WalletCaptureFile:
         with open(self.path, "r") as f:
             try:
                 data = json.load(f)
-            except json.decoder.JSONDecodeError as e:
+            except json.decoder.JSONDecodeError:
                 if os.path.getsize(self.path) > 2:
-                    raise e
+                    raise
                 data = {}  # Empty file, reset data.
         self._identity = data.get("identity", "")
         if "userData" in data:
             self._user_data_store = UserDataStringStore.decode(data["userData"])
         else:
             self._user_data_store = UserDataStringStore.new()
-
-        self._flows: Dict[str, Union[WalletCaptureFlow, str]] = {}
+        capture_info = data.get("captureInfo")
+        if capture_info is not None:
+            assert isinstance(capture_info, list) and len(capture_info) > 0, (
+                "captureInfo must be a non-empty array when present"
+            )
+            self._capture_info = capture_info
+        else:
+            self._capture_info = []
+        self._flows: dict[str, WalletCaptureFlow | str] = {}
         for flow_name, flow_data in data.get("flows", {}).items():
             if isinstance(flow_data, str) and flow_data == "NOT_SUPPORTED":
                 self._flows[flow_name] = "NOT_SUPPORTED"
@@ -883,20 +946,23 @@ class WalletCaptureFile:
             ]
 
             # Serialize to string and verify ASCII-only before writing
-            content = json.dumps(
-                {
-                    "identity": self._identity,
-                    "flows": {
-                        flow_name: (
-                            "NOT_SUPPORTED"
-                            if isinstance(flow, str) and flow == "NOT_SUPPORTED"
-                            else flow.encode()
-                        )
-                        for flow_name, flow in self._flows.items()
-                    },
-                    "userData": self._user_data_store.encode(),
-                    "sessions": self._session_number,
+            out = {
+                "identity": self._identity,
+                "flows": {
+                    flow_name: (
+                        "NOT_SUPPORTED"
+                        if isinstance(flow, str) and flow == "NOT_SUPPORTED"
+                        else flow.encode()
+                    )
+                    for flow_name, flow in self._flows.items()
                 },
+                "userData": self._user_data_store.encode(),
+                "sessions": self._session_number,
+            }
+            if self._capture_info:
+                out["captureInfo"] = self._capture_info
+            content = json.dumps(
+                out,
                 indent="\t",
                 ensure_ascii=False,
             )
@@ -906,7 +972,7 @@ class WalletCaptureFile:
                 raise ValueError(
                     f"Non-ASCII character detected in JSON output for {self.path}. "
                     f"Found U+{ord(content[bad_idx]):04X} at offset {bad_idx}. "
-                    f"Surrounding context: {repr(context)}"
+                    f"Surrounding context: {context!r}"
                 )
 
             # Write to temp file then rename for atomicity
@@ -925,11 +991,11 @@ class WalletCaptureFile:
 
 class WalletDataCollectionAddon:
     def __init__(self):
-        self._wallet_id: Optional[str] = None
+        self._wallet_id: str | None = None
         self._wallet_type: str = "software"
-        self._wallet_variant: Optional[str] = None
-        self._current_ux_flow: Optional[UxFlow] = None
-        self._wallet_data: Optional[WalletCaptureFile] = None
+        self._wallet_variant: str | None = None
+        self._current_ux_flow: UxFlow | None = None
+        self._wallet_data: WalletCaptureFile | None = None
         self._configured = False
         self._data_path = os.path.join(
             os.path.dirname(
@@ -963,7 +1029,7 @@ class WalletDataCollectionAddon:
             if ux_flow_value:
                 valid_flows = [str(f) for f in UxFlow]
                 assert ux_flow_value in valid_flows, (
-                    f"Invalid ux_flow: {repr(ux_flow_value)}. "
+                    f"Invalid ux_flow: {ux_flow_value!r}. "
                     f"Must be one of: {', '.join(valid_flows)}."
                 )
                 logging.info("UX flow configured.")
@@ -1034,7 +1100,7 @@ class WalletDataCollectionAddon:
 
     def request(self, flow: http.HTTPFlow) -> None:
         assert self._wallet_data is not None and self._current_ux_flow is not None, (
-            f"Received a request before being fully configured! (wallet_data={str(self._wallet_data)}, current_ux_flow={str(self._current_ux_flow)})"
+            f"Received a request before being fully configured! (wallet_data={self._wallet_data!s}, current_ux_flow={self._current_ux_flow!s})"
         )
         req = flow.request
         req.anticache()

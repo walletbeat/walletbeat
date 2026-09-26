@@ -14,7 +14,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
 
@@ -23,9 +22,7 @@ export const nufi: SoftwareWallet = {
 		id: 'nufi',
 		displayName: 'NuFi',
 		tableName: 'NuFi',
-		blurb: paragraph(`
-			Powerful wallet for powerful users.
-		`),
+		coinspectId: 'nu-fi',
 		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',
@@ -49,7 +46,7 @@ export const nufi: SoftwareWallet = {
 			eip7702: supported({
 				ref: {
 					explanation:
-						'The NuFi FAQ mentions the use the MetaMask DeleGator contract as smart account implementation.',
+						'The NuFi FAQ mentions the use the MetaMask Delegator contract as smart account implementation.',
 					label: 'NuFi support site',
 					url: 'https://support.nu.fi/support/solutions/articles/80001178239',
 				},

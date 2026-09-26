@@ -5,7 +5,7 @@ import {
 	commonExclusions,
 	crawlCodebase,
 	getRepositoryRoot,
-} from './utils/codebase'
+} from '@/utils/codebase'
 
 const REPO_ROOT = getRepositoryRoot()
 

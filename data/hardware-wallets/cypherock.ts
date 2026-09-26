@@ -22,7 +22,6 @@ import { notSupported, notSupportedWithRef, supported } from '@/schema/features/
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { keylabs } from '../entities/keylabs'
 
@@ -31,9 +30,7 @@ export const cypherockWallet: HardwareWallet = {
 		id: 'cypherock',
 		displayName: 'Cypherock Wallet',
 		tableName: 'Cypherock',
-		blurb: paragraph(`
-			The Cypherock has a secure element (EAL6+ rated) and uses a unique card-tapping system for transaction authorization.
-		`),
+		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
@@ -83,7 +80,7 @@ export const cypherockWallet: HardwareWallet = {
 		monetization: {
 			ref: [
 				{
-					explanation: 'Hardware wallet startup Cypherock raises $1 Mn',
+					explanation: 'Hardware wallet startup Cypherock raises $1 million',
 					url: 'https://entrackr.com/2022/12/hardware-wallet-startup-cypherock-raises-1-mn/',
 				},
 			],

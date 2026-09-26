@@ -1,20 +1,12 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
-import {
-	CollectionPolicy,
-	DataCollectionPurpose,
-	EntityRole,
-	MultiAddressPolicy,
-	PersonalInfo,
-	RegularEndpoint,
-	UserFlow,
-	WalletInfo,
-} from '@/schema/features/privacy/data-collection'
+import { CollectionPolicy } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -22,7 +14,10 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -51,7 +46,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -74,7 +69,7 @@ import {
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
-import { paragraph } from '@/types/content'
+import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { cure53 } from '../entities/cure53'
@@ -82,24 +77,30 @@ import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
 import rabbyRawExtManifest from './manifests/rabby/acmacodkjbdgmoleebolmdjonilkdbch.manifest.json'
+import rabbyAndroidParsed from './manifests/rabby/android.parsed.json'
+import rabbyIosParsed from './manifests/rabby/ios.parsed.json'
 export const rabby: SoftwareWallet = {
 	metadata: {
 		id: 'rabby',
 		displayName: 'Rabby',
 		tableName: 'Rabby',
-		blurb: paragraph(`
-			Rabby is a user-friendly Ethereum wallet focusing on smooth UX and security.
-			It features an intuitive transaction preview feature and works on many chains.
-		`),
-		contributors: [polymutex, nconsigny, mattmatt],
+		coinspectId: 'rabby-wallet',
+		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-07-20',
+		lastUpdated: '2026-08-31',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://rabbykit.rabby.io/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
 			],
-			repositories: ['https://github.com/RabbyHub/Rabby'],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/RabbyHub/rabby-mobile/develop/apps/mobile/ios/RabbyMobile/Info.plist',
+			repositories: [
+				'https://github.com/RabbyHub/Rabby',
+				'https://github.com/RabbyHub/rabby-mobile',
+			],
 			socials: {
 				discord: 'https://discord.com/invite/seFBCWmUre',
 				x: 'https://x.com/Rabby_io',
@@ -319,102 +320,23 @@ export const rabby: SoftwareWallet = {
 					}),
 					useAppSpecificLastConnectedAddresses: notSupported,
 				},
-				[Variant.MOBILE]: null,
-				[Variant.DESKTOP]: null,
-			},
-			dataCollection: {
-				[Variant.BROWSER]: {
-					[UserFlow.INSTALL]: null,
-					[UserFlow.NATIVE_SWAP]: {
-						collected: [],
-					},
-					[UserFlow.SEND_ETHER]: {
-						collected: [],
-					},
-					[UserFlow.SEND_USDC]: null,
-					[UserFlow.ONBOARDING_NEW]: {
-						collected: [],
-						publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
-					},
-					[UserFlow.ONBOARDING_IMPORT]: null,
-					[UserFlow.MAKE_TRANSACTION]: {
-						collected: [],
-					},
-					[UserFlow.APP_CONNECTION]: {
-						collected: [
-							{
-								ref: [
-									{
-										explanation:
-											'Rabby checks whether the domain you are connecting your wallet to is on a scam list. It sends the domain along with Ethereum address in non-proxied HTTP requests for API methods `getOriginIsScam`, `getOriginPopularityLevel`, `getRecommendChains`, and others.',
-										label: 'Rabby API code on npmjs.com',
-										url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
-									},
-								],
-								// The code refers to this by `api.rabby.io`, but Rabby is wholly owned by DeBank.
-								byEntity: deBank,
-								dataCollection: {
-									[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-									[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
-									[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-									[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS, // Scam prevention dialog queries online service and sends domain name
-									endpoint: RegularEndpoint,
-									multiAddress: {
-										type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
-									},
-								},
-								purposes: [DataCollectionPurpose.SCAM_DETECTION],
-								role: EntityRole.OPERATOR,
-							},
-						],
-					},
-					[UserFlow.UNCLASSIFIED]: {
-						collected: [
-							{
-								ref: [
-									{
-										explanation: 'All wallet traffic goes through api.rabby.io without proxying.',
-										url: 'https://github.com/RabbyHub/Rabby/blob/356ed60957d61d508a89d71c63a33b7474d6b311/src/constant/index.ts#L468',
-									},
-									{
-										explanation: 'Balance refresh requests are made about the active address only.',
-										url: 'https://github.com/RabbyHub/Rabby/blob/356ed60957d61d508a89d71c63a33b7474d6b311/src/background/controller/wallet.ts#L1622',
-									},
-									{
-										explanation:
-											'Rabby uses self-hosted Matomo Analytics to track user actions within the wallet interface. While this tracking data does not contain wallet addresses, it goes to DeBank-owned servers much like Ethereum RPC requests do. This puts DeBank in a position to link user actions with wallet addresses through IP address correlation.',
-										url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
-									},
-								],
-								// The code refers to this by `api.rabby.io`, but Rabby is wholly owned by DeBank.
-								byEntity: deBank,
-								dataCollection: {
-									[PersonalInfo.CEX_ACCOUNT]: CollectionPolicy.NEVER, // There appears to be code to link to a Coinbase account but no way to reach it from the UI?
-									[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-									[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
-									[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
-									[WalletInfo.USER_ACTIONS]: CollectionPolicy.ALWAYS, // Matomo analytics
-									[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-									endpoint: RegularEndpoint,
-									multiAddress: {
-										type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
-									},
-								},
-								purposes: [
-									DataCollectionPurpose.CHAIN_DATA_LOOKUP,
-									DataCollectionPurpose.ANALYTICS,
-									DataCollectionPurpose.SWAP_QUOTE,
-									DataCollectionPurpose.TRANSACTION_BROADCAST,
-									DataCollectionPurpose.TRANSACTION_SIMULATION,
-								],
-								role: EntityRole.OPERATOR,
-							},
-						],
-					},
+				[Variant.MOBILE]: {
+					createInAppConnectionFlow: notSupported,
+					erc7846WalletConnect: notSupported,
+					ethAccounts: supported({
+						ref: {
+							explanation:
+								'Rabby Mobile only exposes the active account when eth_accounts is called.',
+							file: 'public/references/wallets/rabby/screenshots/2026-08-19-rabby-mobile-eth_accounts.jpg',
+							label: 'Walletbeat testing page shows Rabby Mobile only exposes the active account',
+						},
+						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+					}),
+					useAppSpecificLastConnectedAddresses: notSupported,
 				},
 				[Variant.DESKTOP]: null,
-				[Variant.MOBILE]: null,
 			},
+			dataCollection: null,
 			privacyPolicy: 'https://rabby.io/docs/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
@@ -446,16 +368,38 @@ export const rabby: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: {
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									'The app unlocks with your wallet password or with fingerprint or face unlock.',
+								url: [
+									{
+										label: 'Password and biometric unlock in the mobile app unlock screen',
+										url: 'https://github.com/RabbyHub/rabby-mobile/blob/12a0247a21b2898fb1295e32ebe96a84524f7f58/apps/mobile/src/screens/Unlock/Unlock.tsx#L1091-L1153',
+									},
+									{
+										label: 'Keychain access control used to store the credential',
+										url: 'https://github.com/RabbyHub/rabby-mobile/blob/12a0247a21b2898fb1295e32ebe96a84524f7f58/apps/mobile/src/core/apis/keychainCommon.ts#L843-L857',
+									},
+								],
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
 					},
+					duressMode: notSupported,
 				},
-				duressMode: notSupported,
 			},
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
@@ -538,7 +482,28 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/ui/views/NewUserImport/CreateSeedPhrase.tsx#L29-L30',
+						},
+						{
+							label: 'Browser extension recovery-phrase generation',
+							url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/src/background/service/keyring/index.ts#L371-L373',
+						},
+						{
+							label: 'Mobile app new-wallet screen',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/screens/Address/PreCreateSeedPhraseScreen.tsx#L93-L95',
+						},
+						{
+							label: 'Mobile app recovery-phrase generation',
+							url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2596',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -548,7 +513,10 @@ export const rabby: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+					ref: {
+						label: '[20210623] Rabby Chrome Extension Penetration Testing Report.pdf',
+						url: 'https://github.com/RabbyHub/Rabby/blob/4f0d175ea9fe0e1f75bdb95127501824aaabc72c/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+					},
 					auditDate: '2021-06-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -774,7 +742,73 @@ export const rabby: SoftwareWallet = {
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
 				desktop: 'NOT_A_DESKTOP_APP',
-				mobile: 'NOT_A_MOBILE_APP',
+				mobile: {
+					ref: [
+						{
+							explanation:
+								'Rabby keeps your recovery phrase on the device, encrypted with a key derived from your app password. The mobile app uses PBKDF2-HMAC-SHA256 at 5,000 rounds to a 256-bit key, and encrypts with AES-256-CBC.',
+							lastRetrieved: '2026-08-22',
+							url: [
+								{
+									label: 'Keyring service construction',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/core/services/startupCoreLoader.ts#L187-L188',
+								},
+								{
+									label: 'PBKDF2 parameters and AES mode',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/src/core/services/encryptor.ts#L12-L23',
+								},
+							],
+						},
+						// Rabby patched the seed-derivation step for speed, not for cryptographic
+						// reasons: commit 2694102dcd03 migrated off `react-native-quick-bip39` to
+						// `@scure/bip39` and patched `mnemonicToSeed(Sync)` back onto a native
+						// implementation "to keep same level performance as past". The parameters
+						// match BIP-39 either way: PBKDF2-SHA512, 2048 iterations, 64 bytes.
+						//
+						// The patch does drop upstream's NFKD normalization of the phrase before
+						// seed derivation. That is inert here because Rabby both generates and
+						// validates phrases against the English wordlist only, and those words are
+						// ASCII. It would not be inert if a non-English wordlist were ever added.
+						{
+							explanation:
+								'Rabby creates your recovery phrase on your device by taking the randomness from the operating system. It generates the phrase with `@scure/bip39`, drawing on `crypto.getRandomValues` as provided by `react-native-quick-crypto`. Rabby pins a patched build of `@scure/bip39` across the app; the patch replaces the step that turns a recovery phrase into the master key an account is derived from for efficiency gains.',
+							lastRetrieved: '2026-08-22',
+							url: [
+								{
+									label: 'Recovery phrase generation',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/packages/service-keyring/src/keyringService.ts#L2587-L2589',
+								},
+								{
+									label: 'Every `@scure/bip39` request pinned to the patched build',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/package.json#L92-L97',
+								},
+								{
+									label: 'The patch, which leaves `generateMnemonic` untouched',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/.yarn/patches/%40scure-bip39-npm-1.3.0-1d74c5c469.patch',
+								},
+								{
+									label: 'The patch was made "to keep same level performance as past"',
+									url: 'https://github.com/RabbyHub/rabby-mobile/commit/2694102dcd03',
+								},
+								{
+									label: '`@scure/bip39` 1.3.0 draws phrase entropy from `@noble/hashes`',
+									url: 'https://github.com/paulmillr/scure-bip39/blob/bcb06919feb3342ca116be125f126c8ad9052278/src/index.ts#L40-L44',
+								},
+								{
+									label: '`@noble/hashes` 1.4.0 sources that entropy from `crypto.getRandomValues`',
+									url: 'https://github.com/paulmillr/noble-hashes/blob/531daab72e8cef0dbaf2db134260c758a89a39ed/src/utils.ts#L249-L256',
+								},
+								{
+									label: 'Crypto provider installed at app startup',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/global.ts',
+								},
+							],
+						},
+					],
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					mobileAppHardening: parseMobileManifestJson(rabbyAndroidParsed, rabbyIosParsed),
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
 			},
 			transactionLegibility: {
 				ref: refTodo,
@@ -786,12 +820,38 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Rabby decodes a USDC approval, showing the token amount, spender, and protocol.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-usdc-approval.png',
+							label: 'Rabby token approval for a USDC approval',
+						},
+						{
+							explanation:
+								'Rabby decodes an Aave supply, showing the protocol, description, and receiver.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-aave-supply.png',
+							label: 'Rabby supply token confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows it as a multisig transaction submission.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-aave-supply.png',
+							label: 'Rabby multisig transaction confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows it as a multisig transaction submission.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Rabby multisig transaction confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
@@ -876,18 +936,25 @@ export const rabby: SoftwareWallet = {
 			// in-wallet-UI standard). Verified in-app. Mobile and desktop variants
 			// not independently verified, so left as null.
 			permissionsManagement: {
-				[Variant.BROWSER]: supported({
-					ref: refTodo,
-					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				}),
-				[Variant.MOBILE]: supported({
-					ref: refTodo,
-					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
-					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-					erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
-				}),
+				ref: [
+					{
+						explanation:
+							'Rabby browser extension swap review screen for a 1 USDC to ETH swap via 1inch, followed by tapping "Approve and Swap".',
+						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-swap-review.png',
+						label: 'Rabby browser extension swap review screen for a 1 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+					{
+						explanation:
+							'The decoded input data of the Approve transaction shows value 1000000, exactly 1 USDC, matching the swap amount.',
+						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png',
+						label:
+							'Decoded Approve transaction calldata showing spender, and a value of 1000000 (exactly 1 USDC)',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
 			},
 			transactionSubmission: {
 				l1: {

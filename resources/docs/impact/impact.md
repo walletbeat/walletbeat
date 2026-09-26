@@ -11,3 +11,15 @@ description: "A log of actions that wallets have taken as a result of Walletbeat
   - **Reaction**: Ambire fixes this in their next release: https://x.com/borislavItskovv/status/2081582575790006360
   - **Reaction**: WalletChan fixes this in their next release: https://x.com/walletbeat/status/2082293464071373094
   - **Reaction**: Ambire thanks Walletbeat for bringing this issue to their attention: https://x.com/ambire/status/2082816470560747558
+- 2026-08: Walletbeat contributor @0xMattmatt shows how multiple wallets handle address poisoning attacks, following a real-world incident where a victim lost ~$39,889 after copying a poisoned address from their transaction history.
+  - **Reaction**: WalletChan releases an update to warn users against address poisoning attacks: https://x.com/apoorveth/status/2098155766699946058
+  - **Reaction**: SafeWallet releases an update automatically flagging potential address poisoning attacks: https://x.com/safelabs_/status/2095159299244802208
+  - **Reaction**: Coinspect adds address poisoning protection to its Wallet Security Ranking: https://www.coinspect.com/blog/wallet-security-ranking-fourth-edition
+- **2026-08** - Walletbeat contributor 0xMattmatt shows how multiple wallets handle unlimited token approvals that caused a user to lose ~$500K: https://x.com/0xMattmatt/status/2089770628828237918
+  - **Reaction**: Ambire pushed an update to flag unlimited token approval for untrusted contracts also thanked Walletbeat for its work: https://x.com/borislavItskovv/status/2090566092808982840
+    - **Reaction**: Ambire's official update for flagging unlimited token approval credits Walletbeat contributor @0xmattmatt for the research.
+- **2026-08**: Walletbeat contributor polymutex points out that flagging IPFS gateways such as `.eth.limo` reduces incentives for Ethereum applications to move to IPFS (which would make them more secure and censorship-resistant).
+  - **Reaction**: Ambire unflags IPFS gateways: https://x.com/borislavItskovv/status/2090563980549042476 & https://x.com/ambire/status/2090483593407529375
+- **2026-09**: Walletbeat asked: Can your wallet send and receive tokens without exposing your transaction history to others?: https://x.com/walletbeat/status/2099669827568996377 & https://x.com/walletbeat/status/2099669769343439312
+  - **Reaction**: Ambire announces they're fixing this very soon: https://x.com/ambire/status/2099770434400969010
+  - **Reaction**: Ambire announces they're working hard to change soon their score on privacy transfers: https://x.com/0xSuperKalo/status/2099864981852262633 & https://x.com/0xSuperKalo/status/2099863323193827407

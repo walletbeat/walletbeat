@@ -3,14 +3,14 @@ import * as path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { extractMarkdownLinks } from '@/utils/markdown-utils'
-
 import {
 	CodebaseEntryType,
 	commonExclusions,
 	crawlCodebase,
 	getRepositoryRoot,
-} from './utils/codebase'
+} from '@/utils/codebase'
+import { extractMarkdownLinks } from '@/utils/markdown-utils'
+
 import { grammarLint, grammarLintMessages } from './utils/grammar'
 
 /**
@@ -167,5 +167,13 @@ describe('markdown files', async () => {
 				60000,
 			)
 		}
+	})
+
+	describe('whitelist never grows', () => {
+		const whitelistExpectedSizePleaseNeverIncreaseThis = 27 // If you ever find yourself wanting to increase this, you are doing something wrong. Fix the grammar problems instead.
+
+		it('has the expected size', () => {
+			expect(GRAMMAR_CHECK_WHITELIST.size).toBe(whitelistExpectedSizePleaseNeverIncreaseThis)
+		})
 	})
 })

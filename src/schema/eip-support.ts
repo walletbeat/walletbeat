@@ -2,6 +2,8 @@ import { eips } from '@/data/eips'
 import { setContains, setItems } from '@/types/utils/non-empty'
 import { remap } from '@/types/utils/remap'
 
+import type { Rating } from './attributes'
+import type { EVMAddress } from './contracts'
 import type { EipNumber } from './eips'
 import type { ResolvedFeatures } from './features'
 import type { BrowserIntegrationEip } from './features/ecosystem/integration'
@@ -19,8 +21,15 @@ import {
 	type SoftwareWalletErc8213,
 } from './features/security/transaction-legibility'
 import { featureSupported, isSupported, notSupported, type Support } from './features/support'
-import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
-import { getVariants, type Variant } from './variants'
+import {
+	type FullyQualifiedReference,
+	hasRefs,
+	mergeRefs,
+	refs,
+	refTodo,
+	type WithRef,
+} from './reference'
+import { getVariants, Variant } from './variants'
 import { getVariantResolvedWallet, type RatedWallet } from './wallet'
 
 /**
@@ -395,4 +404,166 @@ export function ratedWalletEipSupport<_AttributeGroupId extends string>(
 	}
 
 	return { overall: aggregateEipSupport(variantSupports), perVariant }
+}
+
+/** Serializable per-wallet row for EIP support tracker tables. */
+export const EipSupportStatus = {
+	SUPPORTED: 'SUPPORTED',
+	NOT_SUPPORTED: 'NOT_SUPPORTED',
+	UNKNOWN: 'UNKNOWN',
+	NOT_APPLICABLE: 'NOT_APPLICABLE',
+} as const
+
+export type EipSupportStatus = (typeof EipSupportStatus)[keyof typeof EipSupportStatus]
+
+/** Collapse an `EipSupport` value into its display status. */
+export const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
+	if (typeof support === 'string') {
+		return support === 'UNKNOWN' ? EipSupportStatus.UNKNOWN : EipSupportStatus.NOT_APPLICABLE
+	}
+
+	return isSupported(support) ? EipSupportStatus.SUPPORTED : EipSupportStatus.NOT_SUPPORTED
+}
+
+/**
+ * Determine a rated wallet's per-variant EIP support, together with the
+ * references backing each variant's support determination. Variants the EIP
+ * does not apply to are omitted.
+ */
+function ratedWalletEipVariantSupport<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): Partial<Record<Variant, { status: EipSupportStatus; references: FullyQualifiedReference[] }>> {
+	const { perVariant } = ratedWalletEipSupport(wallet, eipNumber)
+	const support: Partial<
+		Record<Variant, { status: EipSupportStatus; references: FullyQualifiedReference[] }>
+	> = {}
+
+	for (const variant of Object.values(Variant)) {
+		const variantSupport = perVariant[variant]
+
+		if (variantSupport === undefined) {
+			continue
+		}
+
+		const status = eipSupportStatus(variantSupport)
+
+		if (status === EipSupportStatus.NOT_APPLICABLE) {
+			continue
+		}
+
+		support[variant] = {
+			status,
+			references: typeof variantSupport === 'string' ? [] : refs(variantSupport),
+		}
+	}
+
+	return support
+}
+
+/**
+ * Determine a rated wallet's EIP support grouped by status: one entry per
+ * distinct status the wallet's variants land in (e.g. a wallet supported on
+ * browser and mobile but unknown on desktop yields two entries), each
+ * carrying every variant that shares that status and the merged references
+ * backing it. This avoids showing the same wallet once per variant when all
+ * that differs is which platform(s) the status applies to.
+ */
+export function ratedWalletEipSupportByStatus<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): Partial<
+	Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[] }>
+> {
+	const byStatus: Partial<
+		Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[][] }>
+	> = {}
+
+	const variantSupport = ratedWalletEipVariantSupport(wallet, eipNumber)
+
+	for (const variant of Object.values(Variant)) {
+		const support = variantSupport[variant]
+
+		if (support === undefined) {
+			continue
+		}
+
+		const entry = byStatus[support.status] ?? { variants: [], references: [] }
+
+		entry.variants.push(variant)
+		entry.references.push(support.references)
+		byStatus[support.status] = entry
+	}
+
+	const result: Partial<
+		Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[] }>
+	> = {}
+
+	for (const status of Object.values(EipSupportStatus)) {
+		const entry = byStatus[status]
+
+		if (entry === undefined) {
+			continue
+		}
+
+		result[status] = { variants: entry.variants, references: mergeRefs(...entry.references) }
+	}
+
+	return result
+}
+
+/**
+ * A single wallet's EIP support for one status, together with every variant
+ * that shares that status and the merged references backing it. A wallet
+ * appears once per distinct status among its variants (not once per
+ * variant), so a wallet supported on both browser and mobile yields a single
+ * card with both variants listed.
+ */
+export interface EipStatusSupportCard {
+	id: string
+	displayName: string
+	iconExtension: string
+	url: string
+	status: EipSupportStatus
+	variants: Variant[]
+	references: FullyQualifiedReference[]
+}
+
+/**
+ * The EIP-7702 adoption type of a wallet, used to group wallets in the
+ * EIP-7702 adoption tracker table.
+ */
+export const WalletTypeFor7702 = {
+	EIP7702: 'EIP7702',
+	EIP4337: 'EIP4337',
+	NON_7702_EOA: 'NON_7702_EOA',
+	OTHER: 'OTHER',
+} as const
+
+export type WalletTypeFor7702 = (typeof WalletTypeFor7702)[keyof typeof WalletTypeFor7702]
+
+/** Sort priority for the EIP-7702 adoption type column. */
+export const WalletTypeFor7702SortPriority = {
+	[WalletTypeFor7702.EIP7702]: 0,
+	[WalletTypeFor7702.EIP4337]: 1,
+	[WalletTypeFor7702.NON_7702_EOA]: 2,
+	[WalletTypeFor7702.OTHER]: 3,
+} as const
+
+/** Serializable display shape for a smart wallet contract. */
+export interface Eip7702Contract {
+	name: string
+	address: EVMAddress
+	sourceAvailable: boolean
+	sourceUrl: string | undefined
+}
+
+/** Serializable per-wallet row for the EIP-7702 adoption tracker table. */
+export interface Eip7702Row {
+	id: string
+	displayName: string
+	url: string
+	type: WalletTypeFor7702
+	contract: Eip7702Contract | 'UNKNOWN' | undefined
+	batching: Rating | undefined
 }

@@ -300,13 +300,13 @@
 
 	.disclaimer-icon {
 		font-size: 3rem;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.disclaimer-title {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		margin: 0;
 	}
 
@@ -542,7 +542,7 @@
 
 	.address-error {
 		font-size: 0.8rem;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 	}
 
 	.permit-details {
@@ -586,7 +586,7 @@
 		font-weight: 600;
 		width: fit-content;
 		background: color-mix(in srgb, var(--rating-partial) 15%, transparent);
-		color: var(--rating-partial);
+		color: var(--rating-partial-text);
 		border: 1px solid color-mix(in srgb, var(--rating-partial) 40%, transparent);
 		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
 			monospace;
@@ -615,7 +615,7 @@
 
 	.risk-badge.risk-known-scam {
 		background: color-mix(in srgb, var(--rating-fail) 15%, transparent);
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		border: 1px solid color-mix(in srgb, var(--rating-fail) 40%, transparent);
 	}
 
@@ -644,7 +644,7 @@
 
 	.warning-text {
 		font-size: 0.8rem;
-		color: var(--rating-fail);
+		color: var(--rating-fail-text);
 		margin: 0;
 		text-align: center;
 	}

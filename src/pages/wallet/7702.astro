@@ -4,6 +4,19 @@ import { defaultNavigationItems } from '@/constants/navigation'
 import { repositoryUrl } from '@/constants'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { markdown } from '@/types/content'
+import { AccountType, isAccountTypeSupported } from '@/schema/features/account-support'
+import { refs } from '@/schema/reference'
+import { isLabeledUrl } from '@/schema/url'
+import { getVariants, type Variant } from '@/schema/variants'
+import { WalletTypeFor7702, type Eip7702Row, type Eip7702Contract } from '@/schema/eip-support'
+import {
+	getVariantResolvedWallet,
+	type RatedWallet,
+	walletSupportedAccountTypes,
+} from '@/schema/wallet'
+import { getWalletUrl } from '@/utils/urls'
+import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
+import type { SmartWalletContract } from '@/schema/contracts'
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -11,6 +24,89 @@ import Eip7702Table from '@/views/Eip7702Table.svelte'
 import Navigation from '@/views/Navigation.astro'
 import Typography from '@/components/Typography.svelte'
 import GitHubIcon from 'lucide-static/icons/github.svg?raw'
+
+/** Classify a wallet's EIP-7702 adoption type at build time. */
+function getWalletTypeFor7702(wallet: RatedWallet<string>): WalletTypeFor7702 {
+	const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+	const hasErc4337 =
+		accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337)
+	const hasEip7702 =
+		accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702)
+	const hasEoa =
+		accountTypes !== null && (hasEip7702 || setContains<AccountType>(accountTypes, AccountType.eoa))
+
+	return hasEip7702
+		? WalletTypeFor7702.EIP7702
+		: hasErc4337
+			? WalletTypeFor7702.EIP4337
+			: hasEoa
+				? WalletTypeFor7702.NON_7702_EOA
+				: WalletTypeFor7702.OTHER
+}
+
+/** Extract the first contract referenced by a wallet at build time. */
+function getWalletContract(
+	wallet: RatedWallet<string>,
+): SmartWalletContract | 'UNKNOWN' | undefined {
+	for (const variant of setItems<Variant>(getVariants(wallet.variants))) {
+		const variantWallet = getVariantResolvedWallet(wallet, variant)
+
+		if (variantWallet === null || variantWallet.features.accountSupport === null) {
+			continue
+		}
+
+		if (isAccountTypeSupported(variantWallet.features.accountSupport.eip7702)) {
+			return variantWallet.features.accountSupport.eip7702.contract
+		}
+
+		if (isAccountTypeSupported(variantWallet.features.accountSupport.rawErc4337)) {
+			return variantWallet.features.accountSupport.rawErc4337.contract
+		}
+	}
+}
+
+const etherscanUrl = (address: string, anchor?: string) =>
+	`https://etherscan.io/address/${address}${anchor ? `#${anchor}` : ''}`
+
+/** Resolve a contract's source-code link, or undefined when unavailable. */
+function contractSourceUrl(contract: SmartWalletContract): string | undefined {
+	if (!contract.sourceCode.available) {
+		return undefined
+	}
+
+	const sourceRefs = refs(contract.sourceCode)
+	const url = isNonEmptyArray(sourceRefs)
+		? nonEmptyGet(nonEmptyGet(sourceRefs).urls)
+		: etherscanUrl(contract.address, 'code')
+
+	return isLabeledUrl(url) ? url.url : url
+}
+
+/** Precompute the EIP-7702 tracker table rows at build time. */
+function eip7702Rows(wallets: Array<RatedWallet<string>>): Eip7702Row[] {
+	return wallets.map(wallet => {
+		const contract = getWalletContract(wallet)
+
+		return {
+			id: wallet.metadata.id,
+			displayName: wallet.metadata.displayName,
+			url: getWalletUrl(wallet),
+			type: getWalletTypeFor7702(wallet),
+			contract:
+				contract === undefined || contract === 'UNKNOWN'
+					? contract
+					: ({
+							name: contract.name,
+							address: contract.address,
+							sourceAvailable: contract.sourceCode.available,
+							sourceUrl: contractSourceUrl(contract),
+						} satisfies Eip7702Contract),
+			batching: wallet.overall.ecosystem.transactionBatching?.evaluation?.outcome?.rating,
+		}
+	})
+}
+
+const softwareRows = eip7702Rows(Object.values(ratedSoftwareWallets))
 ---
 
 <Layout
@@ -35,11 +131,7 @@ import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 			/>
 		</header>
 
-		<Eip7702Table
-			title='Software Wallets by EIP-7702 Support'
-			softwareWallets={Object.values(ratedSoftwareWallets)}
-			client:visible
-		/>
+		<Eip7702Table title='Software Wallets by EIP-7702 Support' rows={softwareRows} client:visible />
 
 		<footer data-scroll-item='inline-detached padding-match-end' data-row='center'>
 			<p>

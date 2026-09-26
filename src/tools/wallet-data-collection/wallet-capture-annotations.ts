@@ -7,7 +7,9 @@ import {
 	type DataCollectionPurpose,
 	dataCollectionPurpose,
 } from '@/schema/features/privacy/data-collection'
-import { type AtLeastOneTrueVariant, Variant, variantEnum } from '@/schema/variants'
+import { type AtLeastOneTrueVariant } from '@/schema/variants'
+import { isInVocabulary } from '@/tests/utils/grammar'
+import { getErrorMessage } from '@/types/errors'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -16,14 +18,15 @@ import {
 	nonEmptySetFromArray,
 	setItems,
 } from '@/types/utils/non-empty'
-
+import { escapeRegExp } from '@/utils/codebase'
 import {
 	expectArray,
 	expectOptionalString,
 	expectRecord,
 	expectString,
 	isSameJson,
-} from './json-utils'
+} from '@/utils/json'
+
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
@@ -35,12 +38,9 @@ export interface EncodedWalletRequestMatcher {
 	domain: string
 	path?: string
 	method?: string
+	refererDomain?: string
 	purposes?: NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 	policy?: CollectionPolicy
-}
-
-function escapeRegExp(s: string): string {
-	return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 /**
@@ -57,7 +57,7 @@ function globToRegExp(glob: string): RegExp {
  *     matcher=infura.io matches infura.io and foo.infura.io
  * Matching is case-insensitive.
  */
-function domainMatches(matcherDomain: string, requestDomain: string): boolean {
+export function domainMatches(matcherDomain: string, requestDomain: string): boolean {
 	const m = matcherDomain.trim().toLowerCase()
 	const r = requestDomain.trim().toLowerCase()
 
@@ -72,7 +72,13 @@ function optionalGlobMatches(pattern: string | null, value: string): boolean {
 	return globToRegExp(pattern).test(value)
 }
 
-const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [/^chrome-extension:\/\/\w+$/]
+const GLOBAL_BENIGN_REGULAR_EXPRESSIONS: RegExp[] = [
+	/^chrome-extension:\/\/\w+$/,
+	// ISO-8601 timestamps (e.g. event/request timestamps) are not user-identifying on their own.
+	/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/,
+	// Strings of one or two word characters (letters, digits, underscore)
+	/^\w{1,2}$/,
+]
 
 export interface SaveOptions {
 	/** Verify existing file contents instead of saving. */
@@ -89,6 +95,7 @@ export class WalletRequestMatcher {
 	private readonly domain: string
 	private readonly path: string | null
 	private readonly method: string | null
+	private readonly refererDomain: string | null
 	public readonly isGlobal: boolean
 	public readonly purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 	public readonly policy: CollectionPolicy | null
@@ -98,12 +105,14 @@ export class WalletRequestMatcher {
 			domain,
 			path,
 			method,
+			refererDomain,
 			purposes,
 			policy,
 		}: {
 			domain: string
 			path: string | null
 			method: string | null
+			refererDomain: string | null
 			purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 			policy: CollectionPolicy | null
 		},
@@ -129,6 +138,7 @@ export class WalletRequestMatcher {
 
 		this.path = path
 		this.method = method
+		this.refererDomain = refererDomain
 		this.purposes = purposes
 		this.policy = policy
 	}
@@ -136,6 +146,19 @@ export class WalletRequestMatcher {
 	public matches(request: WalletRequest): boolean {
 		if (!domainMatches(this.domain, request.domain)) {
 			return false
+		}
+
+		// If a referer domain selector is provided, require a referer header domain match.
+		if (this.refererDomain !== null) {
+			const requestRefererDomain = request.refererDomain()
+
+			if (requestRefererDomain === null) {
+				return false
+			}
+
+			if (!domainMatches(this.refererDomain, requestRefererDomain)) {
+				return false
+			}
 		}
 
 		if (!optionalGlobMatches(this.path, request.path)) {
@@ -169,6 +192,7 @@ export class WalletRequestMatcher {
 					}),
 			...(this.path === null ? {} : { path: this.path }),
 			...(this.method === null ? {} : { method: this.method }),
+			...(this.refererDomain === null ? {} : { refererDomain: this.refererDomain }),
 			...(this.policy === null ? {} : { policy: this.policy }),
 		}
 	}
@@ -179,18 +203,13 @@ export class WalletRequestMatcher {
 }
 
 export class WalletCaptureAnnotations {
-	private readonly walletId: string
 	private readonly path: string | null
 	private readonly globalPath: string | null
 	private matchers: WalletRequestMatcher[]
 	private globalBenignStrings: Set<string>
 	private benignStrings: Set<string>
 
-	public static fromFile(
-		walletId: string,
-		pathStr: string,
-		globalPath: string,
-	): WalletCaptureAnnotations {
+	public static fromFile(pathStr: string, globalPath: string): WalletCaptureAnnotations {
 		let data: EncodedWalletCaptureAnnotations = {
 			matchers: [],
 			benignStrings: [],
@@ -200,27 +219,39 @@ export class WalletCaptureAnnotations {
 			const raw = fs.readFileSync(pathStr, 'utf8').trim()
 
 			if (raw !== '') {
-				const parsed: unknown = JSON.parse(raw)
+				let parsed: unknown
+
+				try {
+					parsed = JSON.parse(raw) as unknown
+				} catch (e) {
+					throw new Error(`Invalid JSON in annotations file ${pathStr}: ${getErrorMessage(e)}`, {
+						cause: e,
+					})
+				}
 
 				data = WalletCaptureAnnotations.parseEncoded(parsed, '$')
 			}
 		}
 
 		const globalRaw = fs.readFileSync(globalPath, 'utf8').trim()
-		const global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw), 'global$')
+		let global: EncodedWalletCaptureAnnotations
 
-		return new WalletCaptureAnnotations(walletId, pathStr, globalPath, data, global)
+		try {
+			global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw) as unknown, 'global$')
+		} catch (e) {
+			throw new Error(`Invalid JSON in annotations file ${globalPath}: ${getErrorMessage(e)}`, {
+				cause: e,
+			})
+		}
+
+		return new WalletCaptureAnnotations(pathStr, globalPath, data, global)
 	}
 
-	public static fromData(
-		walletId: string,
-		data: unknown,
-		globalData: unknown,
-	): WalletCaptureAnnotations {
+	public static fromData(data: unknown, globalData: unknown): WalletCaptureAnnotations {
 		const parsed = WalletCaptureAnnotations.parseEncoded(data, '$')
 		const global = WalletCaptureAnnotations.parseEncoded(globalData, '$')
 
-		return new WalletCaptureAnnotations(walletId, null, null, parsed, global)
+		return new WalletCaptureAnnotations(null, null, parsed, global)
 	}
 
 	private static parseEncoded(v: unknown, at: string): EncodedWalletCaptureAnnotations {
@@ -237,6 +268,7 @@ export class WalletCaptureAnnotations {
 			const domain = expectString(obj.domain, `${matcherAt}.domain`)
 			const pathOpt = expectOptionalString(obj.path, `${matcherAt}.path`)
 			const methodOpt = expectOptionalString(obj.method, `${matcherAt}.method`)
+			const refererDomainOpt = expectOptionalString(obj.refererDomain, `${matcherAt}.refererDomain`)
 
 			const purposes = (():
 				NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | undefined => {
@@ -271,6 +303,7 @@ export class WalletCaptureAnnotations {
 				domain,
 				path: pathOpt,
 				method: methodOpt,
+				refererDomain: refererDomainOpt,
 				purposes,
 				policy: policyOpt === undefined ? undefined : collectionPolicyEnum.assert(policyOpt),
 			}
@@ -294,7 +327,6 @@ export class WalletCaptureAnnotations {
 	}
 
 	private constructor(
-		walletId: string,
 		pathStr: string | null,
 		globalPath: string | null,
 		data: EncodedWalletCaptureAnnotations,
@@ -306,6 +338,7 @@ export class WalletCaptureAnnotations {
 					domain: m.domain,
 					path: m.path ?? null,
 					method: m.method ?? null,
+					refererDomain: m.refererDomain ?? null,
 					purposes:
 						m.purposes === undefined
 							? null
@@ -318,7 +351,6 @@ export class WalletCaptureAnnotations {
 			)
 		}
 
-		this.walletId = walletId
 		this.globalPath = globalPath
 		this.path = pathStr
 		this.matchers = global.matchers
@@ -358,6 +390,10 @@ export class WalletCaptureAnnotations {
 	}
 
 	public addBenignString(str: string, global: boolean) {
+		if (this.isBenign(str)) {
+			throw new Error(`string '${str}' is already considered benign`)
+		}
+
 		;(global ? this.globalBenignStrings : this.benignStrings).add(str)
 	}
 
@@ -366,6 +402,10 @@ export class WalletCaptureAnnotations {
 			if (benignRegexp.test(str)) {
 				return true
 			}
+		}
+
+		if (isInVocabulary(str)) {
+			return true
 		}
 
 		return this.globalBenignStrings.has(str) || this.benignStrings.has(str)
@@ -440,121 +480,6 @@ export class WalletCaptureAnnotations {
 				await fs.promises.rename(tmp, this.globalPath)
 				changed.push(this.globalPath)
 			}
-		}
-
-		const dataCollectionFilesChanged = await this.generateDataCollectionFile(dir, opts)
-
-		return changed.concat(...dataCollectionFilesChanged)
-	}
-
-	/**
-	 * Generates the wallet-data-collection.ts TypeScript file in the given directory.
-	 * This file imports the annotations and all variant capture files, then exports
-	 * the result of autoGenerateWalletDataCollection().
-	 */
-	async generateDataCollectionFile(dir: string, opts: SaveOptions): Promise<string[]> {
-		if (this.path === null) {
-			throw new Error('WalletCaptureAnnotations built without a path; cannot save.')
-		}
-
-		const basename = path.basename(this.path)
-
-		// Scan directory for variant capture files: {walletId}.{variant}.capture.json
-		let variantImports: {
-			variant: Variant
-			importName: string | null
-			filename: string | null
-		}[] = Object.keys(opts.walletVariants).map(variant => ({
-			variant,
-			importName: null,
-			filename: null,
-		}))
-
-		for (const filename of fs.readdirSync(dir)) {
-			const captureMatch = filename.match(
-				new RegExp(`^${escapeRegExp(this.walletId)}\\.(.*?)\\.capture\\.json$`),
-			)
-
-			if (captureMatch !== null) {
-				const variantName = captureMatch[1]
-				const variantKey = variantName.toUpperCase()
-
-				// Validate that it's a known variant
-				if (!variantEnum.is(variantKey)) {
-					throw new Error(`Unknown variant "${variantName}" in file ${filename}`)
-				}
-
-				variantImports = variantImports.map(vi => {
-					if (vi.variant !== variantKey) {
-						return vi
-					}
-
-					return {
-						variant: variantKey,
-						importName: `${variantName}Data`,
-						filename: `./${filename}`,
-					}
-				})
-			}
-		}
-		variantImports.sort((a, b) => a.variant.localeCompare(b.variant))
-
-		// Build the TypeScript file content
-		const lines: string[] = [
-			"import { autoGenerateWalletDataCollection } from '@/tools/wallet-data-collection/convert-to-feature-data'",
-			'',
-			`import annotations from './${basename}'`,
-		]
-
-		for (const vi of variantImports) {
-			if (vi.filename === null) {
-				continue
-			}
-
-			lines.push(`import ${vi.importName} from '${vi.filename}'`)
-		}
-
-		lines.push('')
-		lines.push('const walletDataCollection = autoGenerateWalletDataCollection({')
-		lines.push('\tannotations,')
-		lines.push('\tdata: {')
-
-		for (const vi of variantImports) {
-			lines.push(`\t\t${vi.variant}: ${vi.importName === null ? 'null' : vi.importName},`)
-		}
-
-		lines.push('\t},')
-		lines.push(`\twalletId: '${this.walletId}',`)
-		lines.push('})')
-		lines.push('')
-		lines.push('export default walletDataCollection')
-		lines.push('')
-
-		const tsContent = lines.join('\n')
-		const tsPath = path.join(dir, 'wallet-data-collection.ts')
-
-		// Check if content differs from what's on disk
-		let needsWriteTs = true
-		const changed: string[] = []
-
-		if (fs.existsSync(tsPath)) {
-			const existingContent = fs.readFileSync(tsPath, 'utf8')
-
-			if (existingContent === tsContent) {
-				needsWriteTs = false
-			}
-		}
-
-		if (opts.verifyExisting) {
-			if (needsWriteTs) {
-				throw new Error(`File not in sync: ${tsPath}`)
-			}
-		} else if (needsWriteTs) {
-			const tsTmp = `${tsPath}.tmp`
-
-			await fs.promises.writeFile(tsTmp, tsContent, 'utf8')
-			await fs.promises.rename(tsTmp, tsPath)
-			changed.push(tsPath)
 		}
 
 		return changed

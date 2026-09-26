@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
 	import type { AccountRecoveryMetadata } from '@/schema/attributes/security/account-recovery'
@@ -10,7 +10,7 @@
 		wallet,
 		metadata,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		metadata: AccountRecoveryMetadata
 	} = $props()
 

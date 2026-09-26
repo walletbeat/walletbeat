@@ -15,9 +15,8 @@ import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
 import { getErrorMessage } from '@/types/errors'
+import { getRepositoryRoot } from '@/utils/codebase'
 import { toKebabCase } from '@/utils/kebab'
-
-import { getRepositoryRoot } from './utils/codebase'
 
 describe('wallets', () => {
 	const walletMaps: {
@@ -175,7 +174,6 @@ describe('wallets', () => {
 						'global.annotations.json',
 					)
 					const annotations = WalletCaptureAnnotations.fromFile(
-						walletId,
 						annotationsPath,
 						globalAnnotationsPath,
 					)
@@ -187,7 +185,11 @@ describe('wallets', () => {
 						const captureFileObj = await WalletCaptureFile.fromFile(null, capturePath, annotations)
 
 						// TODO until data collection CLI is more complete.
-						/* const issues = */ await captureFileObj.check()
+						/* const issues = */ await captureFileObj.check({
+							reviewType: 'MUST_REVIEW',
+							isAgent: false,
+							walletVariants: wallet.variants,
+						})
 
 						/*
 						TODO until data collection CLI is more complete:

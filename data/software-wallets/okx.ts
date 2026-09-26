@@ -10,26 +10,29 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import {
 	CallDataDisplay,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { paragraph } from '@/types/content'
 
 import { mattmatt } from '../contributors/0xmattmatt'
+import { okx7702DelegatorContract } from '../wallet-contracts/okx-7702-delegator'
 
 export const okx: SoftwareWallet = {
 	metadata: {
 		id: 'okx',
 		displayName: 'OKX Wallet',
 		tableName: 'OKX',
-		blurb: paragraph(`
-OKX Wallet is a universal crypto wallet available on multiple platforms, including app, web, and extension
-		`),
+		coinspectId: 'okx',
 		contributors: [mattmatt],
 		iconExtension: 'png',
 		lastUpdated: '2026-01-28',
@@ -47,8 +50,12 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: supported({
-				ref: refTodo,
-				contract: 'UNKNOWN',
+				ref: {
+					explanation:
+						'OKX Wallet upgrades the EOA via an EIP-7702 authorization delegating to its delegator contract.',
+					url: 'https://etherscan.io/tx/0x77cc7ba00cf03825ba3982662ca990c7458346fa659c2075dfcb75182c12e8a1',
+				},
+				contract: okx7702DelegatorContract,
 			}),
 			eoa: supported({
 				ref: refTodo,
@@ -194,7 +201,57 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'OKX Wallet decodes a USDC approval, showing the spender (Aave) and an editable amount.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-usdc-approval.png',
+							label: 'OKX Wallet approval confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode an Aave supply properly; it labels it as a deposit and shows the token amount, but the contract is shown as a raw address and the collateral recipient is not shown.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png',
+							label: 'OKX Wallet deposit confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it is shown as "Modify configuration".',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-aave-supply.png',
+							label: 'OKX Wallet confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'OKX Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it is shown as "Modify configuration".',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-safe-batch-approve-supply.png',
+							label: 'OKX Wallet confirmation for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'OKX Wallet splits a batched USDC approval and Aave supply from an EOA into separate transactions and decodes the approval. But it does not decode the Aave supply properly: it is only shown as a deposit of the token amount, without the collateral recipient.',
+							file: 'public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-batch-approve-supply.png',
+							label:
+								'OKX Wallet multiple transactions confirmation for a batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				erc8213: supported({
 					ref: refTodo,
 					calldataDisplay: {
@@ -222,7 +279,22 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: null,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'OKX Wallet has a "Manage approvals" screen listing token approvals by protocol, which can be selected and revoked.',
+						file: 'public/references/wallets/okx/screenshots/2026-09-24-okx-manage-approvals.png',
+						label: 'OKX Wallet manage approvals screen',
+					},
+				],
+				approvalsManagement: supported({
+					erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+					erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					erc721Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+				}),
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.UNLIMITED_BUT_EDITABLE,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

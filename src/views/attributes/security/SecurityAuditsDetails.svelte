@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
+	import type { WalletMetadata } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 
@@ -51,7 +51,7 @@
 		hasUnaddressedFlaws,
 		bugBountyDetails,
 	}: {
-		wallet: RatedWallet
+		wallet: { metadata: WalletMetadata }
 		metadata: SecurityAuditsMetadata
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean

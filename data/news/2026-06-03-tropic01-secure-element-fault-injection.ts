@@ -24,7 +24,7 @@ export default {
 		fundsImpacted: false,
 	},
 	publishedAt: '2026-06-03',
-	severity: Severity.LOW,
+	severity: Severity.MEDIUM,
 	status: IncidentStatus.ONGOING,
 	summary:
 		"Laser fault injection found by Ledger's Donjon security team on the TROPIC01 secure element, used by Trezor Safe 7 devices. This does not amount to a full compromise of Trezor devices.",

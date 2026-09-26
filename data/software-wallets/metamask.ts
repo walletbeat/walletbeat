@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import { ren2140 } from '@/data/contributors/ren2140'
 import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -13,7 +14,10 @@ import {
 	BugBountyProgramAvailability,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
+import {
+	BasicUnlockMechanism,
+	BasicUnlockMechanismSupport,
+} from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -41,6 +45,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -65,7 +70,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
-import { mdParagraph, paragraph } from '@/types/content'
+import { mdParagraph } from '@/types/content'
 import { nonEmptySet } from '@/types/utils/non-empty'
 
 import { alphabet } from '../entities/alphabet'
@@ -84,14 +89,10 @@ export const metamask: SoftwareWallet = {
 		id: 'metamask',
 		displayName: 'MetaMask',
 		tableName: 'MetaMask',
-		blurb: paragraph(`
-			MetaMask is a popular multichain wallet created by Consensys and that has
-			been around for a long time. It is a jack-of-all-trades wallet that can
-			be extended through MetaMask Snaps.
-		`),
-		contributors: [polymutex, nconsigny, mattmatt],
+		coinspectId: 'metamask',
+		contributors: [polymutex, nconsigny, mattmatt, ren2140],
 		iconExtension: 'svg',
-		lastUpdated: '2026-05-06',
+		lastUpdated: '2026-08-31',
 		urls: {
 			androidManifestXml:
 				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
@@ -200,7 +201,7 @@ export const metamask: SoftwareWallet = {
 					explanation: `
 						MetaMask lets users set custom RPC endpoints for any network,
 						including mainnet. Before that, it contacts default endpoints
-						(mainnet.infura.io and some L2s) for non-sensitive RPCs
+						(mainnet.infura.io and some L2s) for nonsensitive RPCs
 						(\`eth_blockNumber\`, \`net_version\`).
 					`,
 					url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',
@@ -281,8 +282,21 @@ export const metamask: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'MetaMask is funded through transparent swap fees and venture capital with publicly disclosed funding rounds.',
+						"DeFiLlama publishes MetaMask's fee and revenue figures, broken down by product line (wallet swaps, perpetuals, predictions and MetaMask USD) and by chain.",
+					url: 'https://defillama.com/protocol/fees/metamask',
+				},
+				{
+					explanation:
+						'Consensys, which develops MetaMask, raised a $450 million Series D round led by ParaFi Capital in March 2022.',
+					label: 'Consensys Raises $450M Series D Funding',
 					url: 'https://consensys.io/blog/consensys-raises-450m-series-d-funding',
+				},
+				{
+					explanation:
+						'MetaMask discloses a 0.875% fee on its built-in swaps as a percentage via the Rate info tooltip.',
+					file: 'public/references/wallets/metamask/screenshots/2026-07-27-metamask-swap-rate.png',
+					label:
+						'MetaMask swap confirmation screen showing the 0.875% MetaMask fee disclosed via the Rate info tooltip',
 				},
 			],
 			revenueBreakdownIsPublic: true,
@@ -399,7 +413,7 @@ export const metamask: SoftwareWallet = {
 					type: LegalProtectionType.SAFE_HARBOR,
 					ref: {
 						explanation:
-							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here.',
+							'Metamask waives any relevant restriction in our Terms of Service ("ToS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here.',
 						url: 'https://hackerone.com/metamask/safe_harbor',
 					},
 				}),
@@ -412,16 +426,61 @@ export const metamask: SoftwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			duressResistance: {
-				basicUnlock: {
-					ref: refTodo,
-					mechanisms: {
-						[BasicUnlockMechanism.PIN]: false,
-						[BasicUnlockMechanism.PASSWORD]: true,
-						[BasicUnlockMechanism.BIOMETRIC]: true,
-						[BasicUnlockMechanism.PATTERN]: false,
+				[Variant.BROWSER]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation: 'The extension unlocks with a password or passkey.',
+								url: [
+									{
+										label: 'Extension unlock form source code',
+										url: 'https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/ui/pages/unlock-page/unlock-page.component.tsx#L698-L753',
+									},
+									{
+										label: 'Passkey unlock section of the extension unlock screen',
+										url: 'https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/ui/pages/unlock-page/unlock-page.component.tsx#L829-L831',
+									},
+									{
+										label: 'Passkey unlock build flag',
+										url: 'https://github.com/MetaMask/metamask-extension/blob/5c01524de33045157d1e344d989682993392d74f/builds.yml#L446-L447',
+									},
+								],
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: notSupported,
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
 					},
+					duressMode: notSupported,
 				},
-				duressMode: notSupported,
+				[Variant.MOBILE]: {
+					basicUnlock: {
+						ref: [
+							{
+								explanation:
+									"The app unlocks with fingerprint or face unlock, your phone's passcode or your wallet password.",
+								label: 'Authentication method selection in the mobile app source code',
+								url: 'https://github.com/MetaMask/metamask-mobile/blob/724b38f6f2777ba2bb6d88ccb4bd600220a89e2f/app/core/Authentication/Authentication.ts#L341-L390',
+							},
+						],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: notSupported,
+							[BasicUnlockMechanism.PASSWORD]: supported({
+								type: BasicUnlockMechanismSupport.REQUIRED,
+							}),
+							[BasicUnlockMechanism.BIOMETRIC]: supported({
+								type: BasicUnlockMechanismSupport.OPTIONAL,
+							}),
+							[BasicUnlockMechanism.PATTERN]: notSupported,
+						},
+					},
+					duressMode: notSupported,
+				},
 			},
 			hardwareWalletSupport: {
 				ref: [
@@ -447,7 +506,32 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			keysHandling: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						"The browser extension and the mobile app both generate the recovery phrase on the user's device.",
+					url: [
+						{
+							label: 'Browser extension new-wallet flow',
+							url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/app/scripts/services/legacy-background-api-service.ts#L4090-L4096',
+						},
+						{
+							label: 'Mobile app new-wallet flow',
+							url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/app/core/Authentication/Authentication.ts#L331-L334',
+						},
+						{
+							label: 'All MetaMask versions create a new vault and keychain',
+							url: 'https://github.com/MetaMask/core/blob/f4ff5f5ab872f639b753ac8cad4542eaf6f2c29a/packages/multichain-account-service/src/MultichainAccountService.ts#L464-L471',
+						},
+						{
+							label: 'A new HD keyring gets a random recovery phrase',
+							url: 'https://github.com/MetaMask/core/blob/f6ab836adc93670f41b2f1ec965f2122ac35331c/packages/keyring-controller/src/KeyringController.ts#L2978-L2994',
+						},
+						{
+							label: 'Recovery-phrase generation',
+							url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L141-L143',
+						},
+					],
+				},
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
@@ -577,12 +661,37 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask decodes a USDC approval as a spending cap request, showing the spender, and amount.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-usdc-approval.png',
+							label: 'MetaMask spending cap request for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask does not decode an Aave supply; it only shows the simulated balance change and the contract being interacted with.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
+							label: 'MetaMask transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-aave-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-batch-approve-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
@@ -660,7 +769,19 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			permissionsManagement: notSupported,
+			permissionsManagement: {
+				ref: [
+					{
+						explanation:
+							'MetaMask mobile swap review screen for a 3 USDC to ETH swap, showing the quote, rate, network fee, slippage, and MetaMask fee. Does not itself show a separate approve step or its requested amount.',
+						file: 'public/references/wallets/metamask/screenshots/2026-09-08-metamask-swap-review.png',
+						label: 'MetaMask mobile swap review screen for a 3 USDC to ETH swap',
+						lastRetrieved: '2026-09-08',
+					},
+				],
+				approvalsManagement: notSupported,
+				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+			},
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
@@ -803,7 +924,10 @@ export const metamask: SoftwareWallet = {
 					requiredReview: true,
 					tagsImmutable: true,
 				},
-				reproducibleBuilds: null,
+				// MetaMask rebuilds and compares its own Firefox releases, but the harness
+				// and reviewer instructions are private so it can't be independently
+				// reproduced. The mobile app publishes no reproducible-build tooling at all.
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
