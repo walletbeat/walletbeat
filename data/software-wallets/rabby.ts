@@ -46,7 +46,10 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
-import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
+import {
+	BuiltInSwapDefaultApprovalBehavior,
+	SpendingApprovalsControl,
+} from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -987,25 +990,40 @@ export const rabby: SoftwareWallet = {
 			// in-wallet-UI standard). Verified in-app. Mobile and desktop variants
 			// not independently verified, so left as null.
 			permissionsManagement: {
-				ref: [
-					{
-						explanation:
-							'Rabby browser extension swap review screen for a 1 USDC to ETH swap via 1inch, followed by tapping "Approve and Swap".',
-						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-swap-review.png',
-						label: 'Rabby browser extension swap review screen for a 1 USDC to ETH swap',
-						lastRetrieved: '2026-09-08',
-					},
-					{
-						explanation:
-							'The decoded input data of the Approve transaction shows value 1000000, exactly 1 USDC, matching the swap amount.',
-						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png',
-						label:
-							'Decoded Approve transaction calldata showing spender, and a value of 1000000 (exactly 1 USDC)',
-						lastRetrieved: '2026-09-08',
-					},
-				],
-				approvalsManagement: notSupported,
-				builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation:
+								'Rabby browser extension swap review screen for a 1 USDC to ETH swap via 1inch, followed by tapping "Approve and Swap".',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-swap-review.png',
+							label: 'Rabby browser extension swap review screen for a 1 USDC to ETH swap',
+							lastRetrieved: '2026-09-08',
+						},
+						{
+							explanation:
+								'The decoded input data of the Approve transaction shows value 1000000, exactly 1 USDC, matching the swap amount.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png',
+							label:
+								'Decoded Approve transaction calldata showing spender, and a value of 1000000 (exactly 1 USDC)',
+							lastRetrieved: '2026-09-08',
+						},
+					],
+					approvalsManagement: supported({
+						erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+						erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					}),
+					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+				},
+				[Variant.MOBILE]: {
+					ref: refTodo,
+					approvalsManagement: supported({
+						erc1155Approvals: SpendingApprovalsControl.CANNOT_INSPECT,
+						erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+						erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+					}),
+					builtInSwapApprovals: BuiltInSwapDefaultApprovalBehavior.MINIMAL_AMOUNT,
+				},
 			},
 			transactionSubmission: {
 				l1: {
