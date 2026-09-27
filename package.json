@@ -24,7 +24,7 @@
 		"check:misc:no-console-logging": "bash deploy/misc-tests/no_console_logging.sh",
 		"check:misc:no-fixme": "bash deploy/misc-tests/no_fixme.sh",
 		"check:misc:no-undefined-wallet-features": "bash deploy/misc-tests/no_undefined_in_wallet_features.sh",
-		"check:svelte": "svelte-check --tsconfig ./tsconfig.json",
+		"check:svelte": "pnpm run astro sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:spelling": "cspell lint .",
 		"check:spelling:reorder": "tests/cspell/reorder-cspell.sh",
 		"check:spelling:quiet": "cspell lint --quiet --no-progress .",
