@@ -487,6 +487,22 @@
 		"hash": "d434ed96a12fc37bea1cc899cc723792d13b10a63491c4f45e7cb94e40db8d2d",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-private-key-export.png": {
+		"hash": "cff1c1328521772d5e7af67443a7d4cb2111de9b17ffa35ea372f4612db6a185",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-seed-phrase-export.png": {
+		"hash": "eecae893ef0af7db59010f8c10a8e19f1b2c28d80bc844e6fca254ee2c9adb7d",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-private-key-export.png": {
+		"hash": "f527e258144c8c964ffcaf58586bbf21318e3048c0d44a761f90889b7c296ff7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-seed-phrase-export.png": {
+		"hash": "b754d388bcfcb25ecc8d38047713f75733d3d4d9ff7d3be48a543a2ef78fcf56",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png": {
 		"hash": "d3eb693850d07d2effe35a43f5e4f9938bf778937da73c2ad057632f29a4fb90",
 		"passedTests": ["blockiness", "file-format"]
