@@ -716,7 +716,7 @@
 				}
 			}
 
-			@container not scroll-state(stuck: none) {
+			@container scroll-state(not (stuck: none)) {
 				border-start-start-radius: 0;
 				border-start-end-radius: 0;
 			}
@@ -885,7 +885,7 @@
 					}
 				}
 
-				@container not scroll-state(stuck: none) {
+				@container scroll-state(not (stuck: none)) {
 					&:first-child {
 						border-start-start-radius: 0.5em !important;
 						border-start-end-radius: 0.5em !important;
