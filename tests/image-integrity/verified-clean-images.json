@@ -631,6 +631,14 @@
 		"hash": "50823091bb6ee47b352398660dd336d91e5ac2a97e7d2b432dbc038b0b4a12ce",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png": {
+		"hash": "46eb2dc2a126d9725078414a4bbf4727de44041718827641267e181cac0d7168",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png": {
+		"hash": "52a455bdcfcc345de2bca1971a863462829c34754a7f93948b16e701c034c10d",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
 		"hash": "c42d787a0d410337e723cf46927c59e9dbf97fd187d9c7f135b2b5939b0c643f",
 		"passedTests": ["blockiness", "file-format"]
