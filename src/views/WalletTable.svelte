@@ -47,6 +47,9 @@
 		summaryVisualization?: SummaryVisualization
 	} = $props()
 
+	const walletListUiId = $props.id()
+	const walletListSelectId = `wallet-list-select-${walletListUiId}`
+
 	const attributeGroupList = $derived(
 		Object.values(attributeTree)
 	)
@@ -142,8 +145,35 @@
 		new SvelteSet<Filter<RatedWallet<_AttributeGroupId>>>()
 	)
 
+	const stageZeroWallets = $derived(wallets.filter(wallet => walletQualifiesForStageZero(wallet)))
+
+	const otherWallets = $derived(wallets.filter(wallet => !walletQualifiesForStageZero(wallet)))
+
+	const tableHasStageLadder = $derived(
+		wallets.some(wallet => {
+			const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+			return stage !== 'NOT_APPLICABLE' && stage !== null && ladderEvaluation !== null
+		}),
+	)
+
+	const showStageListSelect = $derived(
+		tableHasStageLadder && stageZeroWallets.length > 0 && otherWallets.length > 0,
+	)
+
+	let walletListTab = $state<'stage-0' | 'others'>('stage-0')
+
+	const listedWallets = $derived(
+		!showStageListSelect ? wallets : walletListTab === 'others' ? otherWallets : stageZeroWallets,
+	)
+
+	const stageListSelectOptions = $derived([
+		{ value: 'stage-0' as const, label: `Stage 0+ (${stageZeroWallets.length})` },
+		{ value: 'others' as const, label: `Others (${otherWallets.length})` },
+	])
+
 	let filteredWallets = $derived(
-		wallets
+		listedWallets
 	)
 
 	const filteredWalletIds = $derived(
@@ -241,7 +271,7 @@
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletUrl } from '@/utils/urls'
-	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletStageAndLadder, walletQualifiesForStageZero } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
@@ -420,20 +450,31 @@
 				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0}
 					<div class="mobile-filter-group">
 						<legend>stages</legend>
-						<div class="mobile-filter-items">
-							{#each stageFilterDefinitions as stageFilter}
-								{@const isActive = activeStageFilterIds.has(stageFilter.id)}
-								<button
-									class="filter-circle"
-									class:active={isActive}
-									aria-pressed={isActive}
-									aria-label={stageFilter.label}
-									onclick={() => toggleAttributeFilterById?.(stageFilter.id)}
-								>
-									<span class="filter-circle-number">{stageFilter.label.split(' ').at(-1)}</span>
-								</button>
-							{/each}
-						</div>
+						{#if showStageListSelect}
+							<Select
+								id="{walletListSelectId}-mobile"
+								class="stage-list-select"
+								bind:value={walletListTab}
+								options={stageListSelectOptions}
+								aria-label="Show Stage 0+ wallets or Others"
+							/>
+						{/if}
+						{#if walletListTab !== 'others'}
+							<div class="mobile-filter-items">
+								{#each stageFilterDefinitions as stageFilter}
+									{@const isActive = activeStageFilterIds.has(stageFilter.id)}
+									<button
+										class="filter-circle"
+										class:active={isActive}
+										aria-pressed={isActive}
+										aria-label={stageFilter.label}
+										onclick={() => toggleAttributeFilterById?.(stageFilter.id)}
+									>
+										<span class="filter-circle-number">{stageFilter.label.split(' ').at(-1)}</span>
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
 				{/if}
 
@@ -491,7 +532,7 @@
 				data-row
 			>
 				<Filters
-					items={wallets}
+					items={listedWallets}
 					filterGroups={
 						[
 							{
@@ -635,7 +676,7 @@
 					bind:toggleFilterById
 				/>
 
-				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0}
+				{#if !hasNonApplicableStages && stageFilterDefinitions.length > 0 && walletListTab !== 'others'}
 					<Filters
 						items={allAttributes}
 						filterGroups={[
@@ -657,6 +698,44 @@
 		</div>
 	</header>
 
+	{#snippet StageListSelect(_ctx: { column: Column<RatedWallet<_AttributeGroupId>> })}
+		{@const stageListAnchorName = `--${walletListSelectId}`}
+		<button
+			type="button"
+			class="expansion-button"
+			popovertarget={walletListSelectId}
+			title="Show Stage 0+ wallets or Others"
+			aria-label="Show Stage 0+ wallets or Others"
+			style:anchor-name={stageListAnchorName}
+			onclick={event => event.stopPropagation()}
+		></button>
+		<div
+			id={walletListSelectId}
+			class="stage-list-menu"
+			popover="auto"
+			role="listbox"
+			aria-label="Show Stage 0+ wallets or Others"
+			style:position-anchor={stageListAnchorName}
+			style:position-area="block-end span-inline-end"
+		>
+			{#each stageListSelectOptions as option (option.value)}
+				<button
+					type="button"
+					role="option"
+					aria-selected={walletListTab === option.value}
+					onclick={event => {
+						walletListTab = option.value
+						const menu = event.currentTarget.closest('[popover]')
+						if (menu instanceof HTMLElement && 'hidePopover' in menu)
+							menu.hidePopover()
+					}}
+				>
+					{option.label}
+				</button>
+			{/each}
+		</div>
+	{/snippet}
+
 	<div
 		class="desktop-table-container"
 		data-scroll-item="inline-attached underflow-center overflow-start snap-block-start"
@@ -665,7 +744,7 @@
 			{tableId}
 			class="wallet-table"
 
-			rows={wallets}
+			rows={listedWallets}
 			rowId={wallet => wallet.metadata.id}
 			rowIsDisabled={wallet => (
 				!(
@@ -727,7 +806,10 @@
 
 						...(hasNonApplicableStages ? [] : [{
 							id: 'stage',
-							name: 'Stage',
+							name: showStageListSelect
+								? (walletListTab === 'others' ? 'Others' : 'Stage 0+')
+								: 'Stage',
+							HeaderExtra: showStageListSelect ? StageListSelect : undefined,
 							value: wallet => {
 								const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 								if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return undefined
@@ -1731,6 +1813,40 @@
 	.title-disclaimer {
 		font-size: 0.9rem;
 		color: var(--text-secondary);
+	}
+
+	:global(select.stage-list-select) {
+		font-weight: 600;
+	}
+
+	.stage-list-menu {
+		margin: 0;
+		padding: 0.25rem;
+		min-inline-size: 12rem;
+		inset: unset;
+
+		background: var(--background-primary);
+		border: 1px solid var(--border-color);
+		border-radius: 0.5rem;
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+
+		button {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			width: 100%;
+			font-weight: 600;
+
+			&[aria-selected='true'] {
+				background-color: var(--accent-backgroundColor);
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+		}
+	}
+
+	:global(.wallet-table .header-extra:has(.stage-list-menu:popover-open)) {
+		--isExpanded: 1;
 	}
 
 	.wallet-info {

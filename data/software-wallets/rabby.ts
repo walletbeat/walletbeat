@@ -115,7 +115,58 @@ export const rabby: SoftwareWallet = {
 				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Rabby derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: "Rabby's keyring package, version 4.3.7",
+								url: 'https://github.com/RabbyHub/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/package.json#L2-L3',
+							},
+							{
+								label: 'Seed phrase and key derivation libraries',
+								url: 'https://github.com/RabbyHub/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L2-L27',
+							},
+							{
+								label: 'Default derivation path',
+								url: 'https://github.com/RabbyHub/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L68',
+							},
+							{
+								label: 'BIP-39 seed derivation',
+								url: 'https://github.com/RabbyHub/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L400-L405',
+							},
+							{
+								label: 'Key derivation from the seed',
+								url: 'https://github.com/RabbyHub/eth-hd-keyring/blob/f0d4608eb8af7f1e58067d120ff23715ea213c03/index.ts#L135-L142',
+							},
+							{
+								label: 'Browser extension uses this keyring',
+								url: 'https://github.com/RabbyHub/Rabby/blob/f12cbb05eb7eed48ddb1c02dee887deff193ec55/package.json#L74',
+							},
+							{
+								label: 'Mobile app uses this keyring',
+								url: 'https://github.com/RabbyHub/rabby-mobile/blob/20a6d0af7c459691084aa470e04f09432f0ce1c7/apps/mobile/package.json#L95',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-09-26-rabby-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-09-26-rabby-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-09-26-rabby-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rabby/screenshots/2026-09-26-rabby-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -820,12 +871,38 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Rabby decodes a USDC approval, showing the token amount, spender, and protocol.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-usdc-approval.png',
+							label: 'Rabby token approval for a USDC approval',
+						},
+						{
+							explanation:
+								'Rabby decodes an Aave supply, showing the protocol, description, and receiver.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-aave-supply.png',
+							label: 'Rabby supply token confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Rabby does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows it as a multisig transaction submission.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-aave-supply.png',
+							label: 'Rabby multisig transaction confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Rabby does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows it as a multisig transaction submission.',
+							file: 'public/references/wallets/rabby/screenshots/2026-09-23-rabby-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Rabby multisig transaction confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
@@ -923,7 +1000,7 @@ export const rabby: SoftwareWallet = {
 							'The decoded input data of the Approve transaction shows value 1000000, exactly 1 USDC, matching the swap amount.',
 						file: 'public/references/wallets/rabby/screenshots/2026-09-08-rabby-browser-approve-exact-amount-calldata.png',
 						label:
-							'Decoded Approve transaction calldata showing spender and a value of 1000000 (exactly 1 USDC)',
+							'Decoded Approve transaction calldata showing spender, and a value of 1000000 (exactly 1 USDC)',
 						lastRetrieved: '2026-09-08',
 					},
 				],
@@ -932,7 +1009,26 @@ export const rabby: SoftwareWallet = {
 			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png',
+							label: 'Rabby browser extension Modify RPC URL page with a custom Ethereum RPC set',
+							lastRetrieved: '2026-09-27',
+						},
+						{
+							explanation: 'Rabby supports custom RPCs and sends transactions directly to them.',
+							url: [
+								{
+									label: 'Browser extension sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+								},
+								{
+									label: 'Mobile app sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1318-L1338',
+								},
+							],
+						},
+					],
 					selfBroadcastViaDirectGossip: notSupported,
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
@@ -941,7 +1037,40 @@ export const rabby: SoftwareWallet = {
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png',
+							label: 'Rabby browser extension Send chain picker listing Arbitrum and Base',
+							lastRetrieved: '2026-09-27',
+						},
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png',
+							label: 'Rabby mobile app chain picker listing Arbitrum and Base',
+							lastRetrieved: '2026-09-27',
+						},
+						{
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							url: [
+								{
+									label: 'Browser extension sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+								},
+								{
+									label: "Browser extension otherwise submits through Rabby's servers",
+									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1365-L1367',
+								},
+								{
+									label: 'Mobile app sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1318-L1338',
+								},
+								{
+									label: "Mobile app otherwise submits through Rabby's servers",
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1474-L1476',
+								},
+							],
+						},
+					],
 				},
 			},
 		},

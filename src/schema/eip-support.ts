@@ -21,8 +21,15 @@ import {
 	type SoftwareWalletErc8213,
 } from './features/security/transaction-legibility'
 import { featureSupported, isSupported, notSupported, type Support } from './features/support'
-import { hasRefs, mergeRefs, refTodo, type WithRef } from './reference'
-import { getVariants, type Variant } from './variants'
+import {
+	type FullyQualifiedReference,
+	hasRefs,
+	mergeRefs,
+	refs,
+	refTodo,
+	type WithRef,
+} from './reference'
+import { getVariants, Variant } from './variants'
 import { getVariantResolvedWallet, type RatedWallet } from './wallet'
 
 /**
@@ -418,15 +425,108 @@ export const eipSupportStatus = (support: EipSupport): EipSupportStatus => {
 	return isSupported(support) ? EipSupportStatus.SUPPORTED : EipSupportStatus.NOT_SUPPORTED
 }
 
-/** Everything an EIP support table needs to render one wallet. */
-export interface EipSupportRow {
+/**
+ * Determine a rated wallet's per-variant EIP support, together with the
+ * references backing each variant's support determination. Variants the EIP
+ * does not apply to are omitted.
+ */
+function ratedWalletEipVariantSupport<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): Partial<Record<Variant, { status: EipSupportStatus; references: FullyQualifiedReference[] }>> {
+	const { perVariant } = ratedWalletEipSupport(wallet, eipNumber)
+	const support: Partial<
+		Record<Variant, { status: EipSupportStatus; references: FullyQualifiedReference[] }>
+	> = {}
+
+	for (const variant of Object.values(Variant)) {
+		const variantSupport = perVariant[variant]
+
+		if (variantSupport === undefined) {
+			continue
+		}
+
+		const status = eipSupportStatus(variantSupport)
+
+		if (status === EipSupportStatus.NOT_APPLICABLE) {
+			continue
+		}
+
+		support[variant] = {
+			status,
+			references: typeof variantSupport === 'string' ? [] : refs(variantSupport),
+		}
+	}
+
+	return support
+}
+
+/**
+ * Determine a rated wallet's EIP support grouped by status: one entry per
+ * distinct status the wallet's variants land in (e.g. a wallet supported on
+ * browser and mobile but unknown on desktop yields two entries), each
+ * carrying every variant that shares that status and the merged references
+ * backing it. This avoids showing the same wallet once per variant when all
+ * that differs is which platform(s) the status applies to.
+ */
+export function ratedWalletEipSupportByStatus<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
+	eipNumber: EipNumber,
+): Partial<
+	Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[] }>
+> {
+	const byStatus: Partial<
+		Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[][] }>
+	> = {}
+
+	const variantSupport = ratedWalletEipVariantSupport(wallet, eipNumber)
+
+	for (const variant of Object.values(Variant)) {
+		const support = variantSupport[variant]
+
+		if (support === undefined) {
+			continue
+		}
+
+		const entry = byStatus[support.status] ?? { variants: [], references: [] }
+
+		entry.variants.push(variant)
+		entry.references.push(support.references)
+		byStatus[support.status] = entry
+	}
+
+	const result: Partial<
+		Record<EipSupportStatus, { variants: Variant[]; references: FullyQualifiedReference[] }>
+	> = {}
+
+	for (const status of Object.values(EipSupportStatus)) {
+		const entry = byStatus[status]
+
+		if (entry === undefined) {
+			continue
+		}
+
+		result[status] = { variants: entry.variants, references: mergeRefs(...entry.references) }
+	}
+
+	return result
+}
+
+/**
+ * A single wallet's EIP support for one status, together with every variant
+ * that shares that status and the merged references backing it. A wallet
+ * appears once per distinct status among its variants (not once per
+ * variant), so a wallet supported on both browser and mobile yields a single
+ * card with both variants listed.
+ */
+export interface EipStatusSupportCard {
 	id: string
 	displayName: string
 	iconExtension: string
 	url: string
-	overall: EipSupportStatus
-	variants: Array<{ variant: Variant; status: EipSupportStatus }>
-	sourceUrls: Array<{ url: string; label: string }>
+	status: EipSupportStatus
+	variants: Variant[]
+	references: FullyQualifiedReference[]
 }
 
 /**

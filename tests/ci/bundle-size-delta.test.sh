@@ -31,6 +31,21 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 CURRENT_HEAD="$(git -C "$ROOT" rev-parse HEAD)"
 
+EXPECT_LARGE_INCREASE=0
+EXPECT_LARGE_DECREASE=0
+CURRENT_HEAD_MSG="$(git -C "$ROOT" log -1 --format=%B "$CURRENT_HEAD" 2>/dev/null || true)"
+if [[ "$CURRENT_HEAD_MSG" == *"WALLETBEAT_EXPECTED_LARGE_SIZE_INCREASE"* ]]; then
+	EXPECT_LARGE_INCREASE=1
+	log "Commit declares an expected large size increase. Expecting a large size increase."
+fi
+if [[ "$CURRENT_HEAD_MSG" == *"WALLETBEAT_EXPECTED_LARGE_SIZE_DECREASE"* ]]; then
+	EXPECT_LARGE_DECREASE=1
+	log "Commit declares an expected large size decrease. Expecting a large size decrease."
+fi
+if [[ "$EXPECT_LARGE_INCREASE" -eq 0 ]] && [[ "$EXPECT_LARGE_DECREASE" -eq 0 ]]; then
+	log "Verifying that the bundle size has not changed significantly."
+fi
+
 # Print the reference commit to compare against: the tip of the reference
 # branch that is an ancestor of HEAD and is closest to it (fewest commits
 # between the branch tip and HEAD). Returns non-zero if no such branch exists.
@@ -125,15 +140,25 @@ fi
 log "Reference bundle size: $REFERENCE_SIZE bytes"
 log "Current bundle size: $CURRENT_SIZE bytes"
 
-awk -v cur="$CURRENT_SIZE" -v ref="$REFERENCE_SIZE" 'BEGIN {
+awk -v cur="$CURRENT_SIZE" -v ref="$REFERENCE_SIZE" -v expect_inc="$EXPECT_LARGE_INCREASE" -v expect_dec="$EXPECT_LARGE_DECREASE" 'BEGIN {
 	increase = (cur - ref) / ref;
 	decrease = (ref - cur) / ref;
-	if (increase > 0.10) {
-		printf "FAIL: current build is %.2f%% larger than reference (limit +10%%).\n", increase * 100;
+	if (expect_inc) {
+		if (increase < 0.10) {
+			printf "FAIL: expected a large size increase, but current build is only %.2f%% larger than reference (expected +10%% or more).\n", increase * 100;
+			exit 1;
+		}
+	} else if (increase > 0.10) {
+		printf "FAIL: current build is %.2f%% larger than reference (limit +10%%).\nAdd WALLETBEAT_EXPECTED_LARGE_SIZE_INCREASE to the commit message if this increase is intentional.\n", increase * 100;
 		exit 1;
 	}
-	if (decrease > 0.90) {
-		printf "FAIL: current build is %.2f%% smaller than reference (limit -90%%).\n", decrease * 100;
+	if (expect_dec) {
+		if (decrease < 0.90) {
+			printf "FAIL: expected a large size decrease, but current build is only %.2f%% smaller than reference (expected -90%% or more).\n", decrease * 100;
+			exit 1;
+		}
+	} else if (decrease > 0.90) {
+		printf "FAIL: current build is %.2f%% smaller than reference (limit -90%%).\nAdd WALLETBEAT_EXPECTED_LARGE_SIZE_DECREASE to the commit message if this decrease is intentional.\n", decrease * 100;
 		exit 1;
 	}
 	printf "OK: size delta within bounds (%.2f%%).\n", increase * 100;
