@@ -958,7 +958,26 @@ export const rabby: SoftwareWallet = {
 			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png',
+							label: 'Rabby browser extension Modify RPC URL page with a custom Ethereum RPC set',
+							lastRetrieved: '2026-09-27',
+						},
+						{
+							explanation: 'Rabby supports custom RPCs and sends transactions directly to them.',
+							url: [
+								{
+									label: 'Browser extension sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+								},
+								{
+									label: 'Mobile app sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1318-L1338',
+								},
+							],
+						},
+					],
 					selfBroadcastViaDirectGossip: notSupported,
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
