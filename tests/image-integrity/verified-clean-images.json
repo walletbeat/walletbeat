@@ -639,12 +639,28 @@
 		"hash": "50823091bb6ee47b352398660dd336d91e5ac2a97e7d2b432dbc038b0b4a12ce",
 		"passedTests": ["blockiness", "file-format"]
 	},
-	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png": {
-		"hash": "46eb2dc2a126d9725078414a4bbf4727de44041718827641267e181cac0d7168",
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-browser-private-key-export.png": {
+		"hash": "295703d03aa4ff8bfc0d80b4fd52b18fe4bef347a88c9a63f5aa90249317a98f",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-browser-seed-phrase-export.png": {
+		"hash": "a77335f97c15db50dfe23ffb238007491866f4b50044884904766d4cbc20b72b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-mobile-private-key-export.png": {
+		"hash": "bfe69a4774fbd551cc4f1bd131df2043ba2496786d6b0ae9a76f0cf600c2f658",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-26-rabby-mobile-seed-phrase-export.png": {
+		"hash": "ad8392e0831f43bca6ffba28b5527799a0dcd3574f9832039fe95ec023d522aa",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png": {
 		"hash": "f6de31a200b4327aa7ce6ba00f16c878c402d75f6313870aaa92f17d8e83777b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png": {
+		"hash": "46eb2dc2a126d9725078414a4bbf4727de44041718827641267e181cac0d7168",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png": {
