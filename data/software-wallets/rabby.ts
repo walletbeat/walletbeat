@@ -967,7 +967,40 @@ export const rabby: SoftwareWallet = {
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-send-chain-list.png',
+							label: 'Rabby browser extension Send chain picker listing Arbitrum and Base',
+							lastRetrieved: '2026-09-27',
+						},
+						{
+							file: 'public/references/wallets/rabby/screenshots/2026-09-27-rabby-mobile-chain-list.png',
+							label: 'Rabby mobile app chain picker listing Arbitrum and Base',
+							lastRetrieved: '2026-09-27',
+						},
+						{
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							url: [
+								{
+									label: 'Browser extension sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1209-L1216',
+								},
+								{
+									label: "Browser extension otherwise submits through Rabby's servers",
+									url: 'https://github.com/RabbyHub/Rabby/blob/e2b98a27e9ef979ab121e81e591fcf5ad79d6e19/src/background/controller/provider/controller.ts#L1365-L1367',
+								},
+								{
+									label: 'Mobile app sends through a custom RPC when one is set',
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1318-L1338',
+								},
+								{
+									label: "Mobile app otherwise submits through Rabby's servers",
+									url: 'https://github.com/RabbyHub/rabby-mobile/blob/56c05ddaaa4b5e6078a2524815e71c787affb85f/apps/mobile/src/core/controllers/provider.ts#L1474-L1476',
+								},
+							],
+						},
+					],
 				},
 			},
 		},
