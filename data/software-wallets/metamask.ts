@@ -121,7 +121,50 @@ export const metamask: SoftwareWallet = {
 				contract: metamask7702DelegatorContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'MetaMask derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Seed phrase and key derivation libraries',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L20-L34',
+							},
+							{
+								label: 'BIP-44 derivation path',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L38',
+							},
+							{
+								label: 'Deriving each account',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L208-L230',
+							},
+							{
+								label: 'Browser extension depends on the keyring',
+								url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/package.json#L413',
+							},
+							{
+								label: 'Mobile app depends on the keyring',
+								url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/package.json#L318',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -661,12 +704,37 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask decodes a USDC approval as a spending cap request, showing the spender, and amount.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-usdc-approval.png',
+							label: 'MetaMask spending cap request for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask does not decode an Aave supply; it only shows the simulated balance change and the contract being interacted with.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-aave-supply.png',
+							label: 'MetaMask transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-aave-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'MetaMask does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/metamask/screenshots/2026-09-23-metamask-erc7730-safe-batch-approve-supply.png',
+							label: 'MetaMask transaction request for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
-						decoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,

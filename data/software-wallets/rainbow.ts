@@ -131,7 +131,50 @@ export const rainbow: SoftwareWallet = {
 				contract: rainbowCaliburContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Rainbow derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Browser extension derivation path',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L60',
+							},
+							{
+								label: 'Browser extension key derivation',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L69-L81',
+							},
+							{
+								label: 'Browser extension BIP-39 seed phrase generation',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L143-L150',
+							},
+							{
+								label: 'Mobile app key derivation',
+								url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/utils/wallet.ts#L48-L69',
+							},
+							{
+								label: 'Mobile app derivation path',
+								url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L187',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -1189,7 +1232,38 @@ export const rainbow: SoftwareWallet = {
 					],
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Rainbow does not decode a USDC approval; it only shows the simulated approval amount, without the spender.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-usdc-approval.png',
+							label: 'Rainbow transaction request for a USDC approval',
+						},
+						{
+							explanation:
+								'Rainbow does not decode an Aave supply; it only shows the simulated amount sent.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-aave-supply.png',
+							label: 'Rainbow transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'Rainbow does not decode the Aave supply nested within a Safe{Wallet} transaction; the simulation shows no changes detected.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-aave-supply.png',
+							label: 'Rainbow transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Rainbow does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; the simulation shows no changes detected.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-batch-approve-supply.png',
+							label: 'Rainbow transaction request for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'Rainbow does not decode a batched USDC approval and Aave supply from an EOA; it only shows the simulated amounts sent and approved.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-batch-approve-supply.png',
+							label: 'Rainbow batch request for a batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
 					},

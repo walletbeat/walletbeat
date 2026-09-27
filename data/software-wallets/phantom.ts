@@ -28,7 +28,12 @@ import {
 	KeyStorageMechanism,
 	SecureRngSource,
 } from '@/schema/features/security/security-best-practices'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
+import {
+	CallDataDisplay,
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+	MessageSigningDetails,
+} from '@/schema/features/security/transaction-legibility'
 import { BuiltInSwapDefaultApprovalBehavior } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
@@ -329,8 +334,79 @@ export const phantom: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				erc4361: null,
-				erc7730: null,
-				erc8213: null,
+				erc7730: supported({
+					ref: [
+						{
+							explanation:
+								'Phantom decodes a USDC approval, showing the spender, and the amount it can transfer.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-usdc-approval.png',
+							label: 'Phantom transaction confirmation for a USDC approval',
+						},
+						{
+							explanation:
+								'Phantom does not decode an Aave supply; it only shows the simulated balance change.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-aave-supply.png',
+							label: 'Phantom transaction confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Phantom does not decode the Aave supply nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-safe-aave-supply.png',
+							label: 'Phantom transaction confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Phantom does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-23-phantom-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Phantom transaction confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							decoded: DataDisplayOptions.NOT_IN_UI,
+						},
+					[ComplexBenchmarkTransactions.AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: {
+						decoded: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
+				erc8213: supported({
+					ref: [
+						{
+							explanation:
+								'Phantom shows the full EIP-712 struct, including the domain, message, and type definitions, in an expandable "Message" section with a copy button. No domain hash, message hash or EIP-712 digest is shown.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-24-phantom-erc8213-eip712-struct.png',
+							label: 'Phantom signature request for an EIP-712 message',
+						},
+						{
+							explanation:
+								'Phantom shows the raw calldata hex in an expandable "Data" section with a copy button. No formatted calldata or calldata digest is shown.',
+							file: 'public/references/wallets/phantom/screenshots/2026-09-24-phantom-erc8213-calldata.png',
+							label: 'Phantom transaction details with raw calldata',
+						},
+					],
+					calldataDisplay: {
+						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[CallDataDisplay.FORMATTED]: DataDisplayOptions.NOT_IN_UI,
+						[CallDataDisplay.CALLDATA_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+					messageSigningLegibility: {
+						[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+						[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+						[MessageSigningDetails.EIP712_DIGEST]: DataDisplayOptions.NOT_IN_UI,
+					},
+				}),
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_OPTIONALLY,

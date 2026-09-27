@@ -30,6 +30,14 @@
 			]
 		>
 
+		HeaderExtra?: Snippet<
+			[
+				{
+					column: Column<_RowValue, _CellValue, _ColumnId>
+				},
+			]
+		>
+
 		Cell?: Snippet<
 			[
 				{
@@ -491,6 +499,7 @@
 				{@const isSortable = !!column.sort}
 				{@const isExpandable = !!column.subcolumns?.length}
 				{@const isExpanded = table.isColumnExpanded(column.id)}
+				{@const hasHeaderExtra = !!column.HeaderExtra}
 
 				<th
 					{colspan}
@@ -505,7 +514,7 @@
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 					data-sticky={column.isSticky ? 'inline backdrop-before backdrop-stuck' : undefined}
 					data-column-align={column.align ? column.align.toLowerCase() : undefined}
-					data-expandable={isExpandable ? '' : undefined}
+					data-expandable={isExpandable || hasHeaderExtra ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
 				>
 					<div
@@ -548,7 +557,14 @@
 							{/if}
 						</div>
 
-						{#if isExpandable}
+						{#if hasHeaderExtra}
+							<div
+								class="header-extra"
+								data-sticky="backdrop-before backdrop-stuck"
+							>
+								{@render column.HeaderExtra?.({ column })}
+							</div>
+						{:else if isExpandable}
 							<button
 								type="button"
 								class="expansion-button"
@@ -819,7 +835,8 @@
 							--isExpanded: 1;
 						}
 
-						.expansion-button {
+						.expansion-button,
+						.header-extra :global(.expansion-button) {
 							margin: var(--table-cell-padding);
 							margin-inline-start: calc(-2 * var(--table-cell-padding));
 
@@ -845,6 +862,11 @@
 								transform: perspective(100px) rotateX(calc(var(--isExpanded) * -180deg));
 								transition-property: transform;
 							}
+						}
+
+						.header-extra {
+							display: flex;
+							align-items: center;
 						}
 					}
 				}
