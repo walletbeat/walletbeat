@@ -244,9 +244,39 @@ export const ambire: SoftwareWallet = {
 				contract: ambireDelegatorContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Ambire derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Standard derivation path',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/consts/derivation.ts#L1-L6',
+							},
+							{
+								label: 'BIP-39 seed phrase generation',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/entropyGenerator/entropyGenerator.ts#L33-L39',
+							},
+							{
+								label: 'Key derivation from the seed phrase',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/keyIterator/keyIterator.ts#L22-L39',
+							},
+							{
+								label: 'Derivation path assigned to a new seed phrase',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/keystore/keystore.ts#L709-L717',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-09-26-ambire-seed-phrase-export.png',
+						label: 'Seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-09-26-ambire-private-key-export.png',
+						label: 'Private key export',
+					},
+				],
 				canExportPrivateKey: true,
-				canExportSeedPhrase: true,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
