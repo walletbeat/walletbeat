@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 135,
+	"highlightLastLine": 142,
+	"segments": [
+		{
+			"lines": [
+				"class HdKeyring extends SimpleKeyring {"
+			],
+			"startLine": 63
+		},
+		{
+			"lines": [
+				"  deserialize(opts: DeserializeOption = {} as any) {"
+			],
+			"startLine": 109
+		},
+		{
+			"lines": [
+				"",
+				"    return Promise.resolve([]);",
+				"  }",
+				"",
+				"  initFromMnemonic(mnemonic: string, passphrase?: string) {",
+				"    this.mnemonic = mnemonic;",
+				"    const seed = this.getSeed(mnemonic, passphrase);",
+				"    this.hdWallet = HDKey.fromMasterSeed(seed);",
+				"    if (!this.publicKey) {",
+				"      this.publicKey = this.calcBasePublicKey(this.hdWallet!);",
+				"    }",
+				"  }",
+				"",
+				"  private calcBasePublicKey(hdKey: HDKey) {",
+				"    return bytesToHex(",
+				"      hdKey.derive(this.getHDPathBase(HDPathType.BIP44)).publicKey!,"
+			],
+			"startLine": 131
+		}
+	]
+}

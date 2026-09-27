@@ -1,0 +1,58 @@
+{
+	"highlightFirstLine": 69,
+	"highlightLastLine": 81,
+	"segments": [
+		{
+			"lines": [
+				"export class HdKeychain implements IKeychain {"
+			],
+			"startLine": 48
+		},
+		{
+			"lines": [
+				"  constructor() {"
+			],
+			"startLine": 52
+		},
+		{
+			"lines": [
+				"    privates.set(this, {"
+			],
+			"startLine": 55
+		},
+		{
+			"lines": [
+				"      getWalletForAddress: (address: Address) => {",
+				"        return privates"
+			],
+			"startLine": 61
+		},
+		{
+			"lines": [
+				"          .wallets.find(",
+				"            ({ wallet }) =>",
+				"              wallet.address.toLowerCase() === address.toLowerCase(),",
+				"          )?.wallet;",
+				"      },",
+				"      deriveWallet: (index: number): RainbowHDKey => {",
+				"        const _privates = privates.get(this)!;",
+				"        if (!_privates.mnemonic) throw new Error('No mnemonic');",
+				"",
+				"        const seed = bip39.mnemonicToSeedSync(_privates.mnemonic);",
+				"        const hdNode = HDKey.fromMasterSeed(seed);",
+				"        const root = hdNode.derive(_privates.hdPath);",
+				"        const derivedWallet = root.deriveChild(index) as RainbowHDKey;",
+				"        const pkeyHex = bytesToHex(derivedWallet.privateKey as Uint8Array);",
+				"        const wallet = new Wallet(pkeyHex) as TWallet;",
+				"        derivedWallet.address = wallet.address;",
+				"        return derivedWallet;",
+				"      },",
+				"",
+				"      addAccount: (index: number): TWallet => {",
+				"        const _privates = privates.get(this)!;",
+				"        const derivedWallet = _privates.deriveWallet(index);"
+			],
+			"startLine": 64
+		}
+	]
+}
