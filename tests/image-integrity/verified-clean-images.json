@@ -631,6 +631,10 @@
 		"hash": "50823091bb6ee47b352398660dd336d91e5ac2a97e7d2b432dbc038b0b4a12ce",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rabby/screenshots/2026-09-27-rabby-browser-custom-rpc.png": {
+		"hash": "f6de31a200b4327aa7ce6ba00f16c878c402d75f6313870aaa92f17d8e83777b",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/rainbow/screenshots/2026-06-08-privacy-analytics-settings.png": {
 		"hash": "c42d787a0d410337e723cf46927c59e9dbf97fd187d9c7f135b2b5939b0c643f",
 		"passedTests": ["blockiness", "file-format"]
