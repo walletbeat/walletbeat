@@ -965,8 +965,7 @@ export const rabby: SoftwareWallet = {
 							lastRetrieved: '2026-09-27',
 						},
 						{
-							explanation:
-								"With a custom RPC set, Rabby sends transactions straight to it instead of through Rabby's servers.",
+							explanation: 'Rabby supports custom RPCs and sends transactions directly to them.',
 							url: [
 								{
 									label: 'Browser extension sends through a custom RPC when one is set',
