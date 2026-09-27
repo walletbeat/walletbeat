@@ -690,6 +690,13 @@ async function serializeCleanImageHashes(
 	})
 }
 
+/** Narrow an error to one carrying a `code` string property (e.g. Node fs errors). */
+function hasErrorCode(error: unknown): error is { code: string } {
+	return (
+		typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string'
+	)
+}
+
 /**
  * Persist the whitelist to disk, atomically, with sorted keys.
  */
@@ -711,7 +718,22 @@ async function saveCleanImageHashes(whitelist: Record<string, CleanImageEntry>):
 	const tmpPath = `${WHITELIST_PATH}.tmp`
 
 	await fs.writeFile(tmpPath, json, 'utf8')
-	await fs.rename(tmpPath, WHITELIST_PATH)
+
+	try {
+		await fs.rename(tmpPath, WHITELIST_PATH)
+	} catch (error) {
+		// Windows cannot atomically `rename` over an existing destination file
+		// (it throws EPERM/EACCES when the destination already exists), unlike
+		// POSIX where `rename(2)` replaces it. Fall back to removing the
+		// destination first, then renaming the temp file into place. Genuine
+		// errors (e.g. ENOENT, disk full) are rethrown rather than masked.
+		if (!hasErrorCode(error) || (error.code !== 'EPERM' && error.code !== 'EACCES')) {
+			throw error
+		}
+
+		await fs.rm(WHITELIST_PATH, { force: true })
+		await fs.rename(tmpPath, WHITELIST_PATH)
+	}
 }
 
 /** Generate a photo-like raw RGB image used as the basis for JPEG-derived fixtures. */
