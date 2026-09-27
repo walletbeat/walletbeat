@@ -3,6 +3,7 @@ import * as crypto from 'node:crypto'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import { env } from 'node:process'
 import { promisify } from 'node:util'
 
 import { format, resolveConfig } from 'prettier'
@@ -776,7 +777,9 @@ describe('image integrity', () => {
 	})
 
 	describe('repository images', async () => {
-		inkscapeTestsEnabled = process.env.WALLETBEAT_ENV === 'CI' || (await isInkscapeAvailable())
+		const isCi = env.WALLETBEAT_ENV === 'CI'
+
+		inkscapeTestsEnabled = isCi || (await isInkscapeAvailable())
 
 		// The whitelist is mutated in place as the scan discovers clean, new,
 		// changed, or removed images, then written back to disk.
@@ -790,6 +793,12 @@ describe('image integrity', () => {
 		// Only these are eligible for the whitelist; entries for anything else
 		// (deleted, or excluded from every test) are pruned below.
 		const trackedFiles: Set<string> = new Set()
+		// Paths whose whitelist entries were pruned because the image is no
+		// longer tracked (deleted, or excluded from every integrity test).
+		const prunedFiles: string[] = []
+		// Serialized snapshot of the whitelist as loaded from disk, used to
+		// detect whether the scan mutated it (i.e. the committed cache is stale).
+		const loadedWhitelistJson = await serializeCleanImageHashes(whitelist)
 
 		await crawlCodebase({
 			ignore: [
@@ -896,13 +905,25 @@ describe('image integrity', () => {
 		for (const key of Object.keys(whitelist)) {
 			if (!trackedFiles.has(key)) {
 				delete whitelist[key]
+				prunedFiles.push(key)
 			}
 		}
 
-		// Persist the self-updated whitelist. If this write fails, the test
-		// fails, which is the intended "succeed only if the JSON update succeeds"
-		// contract.
-		await saveCleanImageHashes(whitelist)
+		// Whether the scan changed the whitelist relative to what was committed
+		// on disk. A changed whitelist means the verified-clean cache is stale
+		// (a new, changed, removed, or newly-testable image).
+		const updatedWhitelistJson = await serializeCleanImageHashes(whitelist)
+		const whitelistChanged = !isSameJson(loadedWhitelistJson, updatedWhitelistJson)
+
+		// In CI the whitelist is a committed artifact: silently regenerating it
+		// would let a stale cache pass. When the cache is stale, persist nothing
+		// and let the CI check below fail with a regeneration message.
+		if (!isCi || !whitelistChanged) {
+			// Persist the self-updated whitelist. If this write fails, the test
+			// fails, which is the intended "succeed only if the JSON update succeeds"
+			// contract.
+			await saveCleanImageHashes(whitelist)
+		}
 
 		it('found image files to check', () => {
 			const total = scannedFiles.length + skippedFiles.length
@@ -950,7 +971,36 @@ describe('image integrity', () => {
 			}
 		})
 
+		it.runIf(isCi)('verified-clean cache is up to date in CI', () => {
+			if (!whitelistChanged) {
+				return
+			}
+
+			const changes = [
+				...scannedFiles.map(filePath => `  + ${filePath} (needs re-verification)`),
+				...prunedFiles.map(filePath => `  - ${filePath} (no longer tracked)`),
+			]
+
+			const message =
+				'\n`verified-clean-images.json` is out of date:\n\n' +
+				changes.join('\n') +
+				'\n\n' +
+				'The verified-clean cache is a committed artifact. Re-run the tests ' +
+				'locally to regenerate it, then commit the updated ' +
+				'`tests/image-integrity/verified-clean-images.json` file alongside the ' +
+				'image changes.\n'
+
+			expect(whitelistChanged, message).toBe(false)
+		})
+
 		it('whitelist was persisted and reflects the repository', async () => {
+			// In CI the whitelist is not persisted when stale (the dedicated
+			// cache-freshness check reports that instead), so there is nothing to
+			// round-trip against on disk.
+			if (isCi && whitelistChanged) {
+				return
+			}
+
 			// Round-trip: the file on disk must parse and match the in-memory
 			// whitelist that was just written, confirming the self-update worked.
 			const persisted = parseCleanImageHashes(await fs.readFile(WHITELIST_PATH, 'utf8'))
