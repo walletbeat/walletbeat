@@ -823,6 +823,22 @@
 		"hash": "58a33fb90e23d4d8ec5bbe09a99fbd750fe31f64870bb8adf4fd1715999d4c69",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-private-key-export.png": {
+		"hash": "b3df6f7424efb619c2fdd3310a3668c327a87102b4576b4f729af843322366d7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-seed-phrase-export.png": {
+		"hash": "e8a48da0e47bc4d42dcc646f3b120e07f51992459f2e3da2e6a2289f6836c056",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-private-key-export.png": {
+		"hash": "c11cce7500a7fd24557f01a87749d549194c476286099ecbbf73f31eacf05274",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-seed-phrase-export.png": {
+		"hash": "850a58668e1f87efd2d97979ce4acd6e4267b02a8fb2b608d0e8e6d5dfdb8001",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png": {
 		"hash": "0dc4e32cf81c269c75da15d9196961ff0ed6a54c476826871272f5b9a5dc6dc8",
 		"passedTests": ["blockiness", "file-format"]
