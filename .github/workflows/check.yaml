@@ -27,6 +27,8 @@ jobs:
         include:
           - name: 'Check: Astro'
             command: pnpm run check:astro
+          - name: 'Check: Svelte'
+            command: pnpm run check:svelte
           - name: 'Test: Vitest'
             command: pnpm run check:vitest
           - name: 'Lint: ESLint'
