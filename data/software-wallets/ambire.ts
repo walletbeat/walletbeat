@@ -269,11 +269,11 @@ export const ambire: SoftwareWallet = {
 					},
 					{
 						file: 'public/references/wallets/ambire/screenshots/2026-09-26-ambire-seed-phrase-export.png',
-						label: 'Ambire browser extension revealing a recovery phrase',
+						label: 'Seed phrase export',
 					},
 					{
 						file: 'public/references/wallets/ambire/screenshots/2026-09-26-ambire-private-key-export.png',
-						label: 'Ambire browser extension revealing an account private key',
+						label: 'Private key export',
 					},
 				],
 				canExportPrivateKey: true,
