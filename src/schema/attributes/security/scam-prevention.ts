@@ -385,49 +385,41 @@ function evaluateScamAlerts(
 
 	if (
 		requiredFeatures.includes(unlimitedApprovalWarning) &&
-		isSupported(scamAlerts.unlimitedApprovalWarning) &&
-		!allUnlimitedApprovalBenchmarksTested(
-			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
-		)
+		isSupported(scamAlerts.unlimitedApprovalWarning)
 	) {
-		return unrated(ctx, metadata)
-	}
+		const benchmarks = scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval
 
-	if (
-		requiredFeatures.includes(unlimitedApprovalWarning) &&
-		isSupported(scamAlerts.unlimitedApprovalWarning) &&
-		allUnlimitedApprovalBenchmarksTested(
-			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
-		) &&
-		!warnsOnUnlimitedApprovalUnconditionally(
-			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
-		)
-	) {
-		// Warns about unlimited approvals, but only in certain scenarios
-		// (e.g. only for untrusted spenders) rather than unconditionally.
-		const conditions = commaListFormat(
-			activeUnlimitedApprovalBenchmarks(
-				scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
-			).map(benchmark => unlimitedApprovalWarningBenchmarkLabels[benchmark]),
-		)
+		if (!allUnlimitedApprovalBenchmarksTested(benchmarks)) {
+			return unrated(ctx, metadata)
+		}
 
-		return ctx.build({
-			outcome: {
-				id: 'conditional_unlimited_approval_warning',
-				displayName: 'Selective unlimited approval warning',
-				rating: Rating.PARTIAL,
-				shortExplanation: sentence(
-					`{{WALLET_NAME}} only warns about unlimited token approvals when ${conditions}, not unconditionally.`,
+		if (!warnsOnUnlimitedApprovalUnconditionally(benchmarks)) {
+			// Warns about unlimited approvals, but only in certain scenarios
+			// (e.g. only for untrusted spenders) rather than unconditionally.
+			const conditions = commaListFormat(
+				activeUnlimitedApprovalBenchmarks(benchmarks).map(
+					benchmark => unlimitedApprovalWarningBenchmarkLabels[benchmark],
 				),
-				metadata,
-			},
-			details: scamAlertsDetailsContent({}),
-			howToImprove: markdown(`
-				{{WALLET_NAME}} should warn the user before granting an unlimited ERC-20 token approval regardless of whether the spender is trusted or known.
+			)
 
-				A trusted or previously-encountered contract is not necessarily a secure one, so limiting this warning to untrusted spenders or domains leaves the user exposed to unlimited approvals granted to contracts that later turn out to be compromised or malicious.
-			`),
-		})
+			return ctx.build({
+				outcome: {
+					id: 'conditional_unlimited_approval_warning',
+					displayName: 'Selective unlimited approval warning',
+					rating: Rating.PARTIAL,
+					shortExplanation: sentence(
+						`{{WALLET_NAME}} only warns about unlimited token approvals when ${conditions}, not unconditionally.`,
+					),
+					metadata,
+				},
+				details: scamAlertsDetailsContent({}),
+				howToImprove: markdown(`
+					{{WALLET_NAME}} should warn the user before granting an unlimited ERC-20 token approval regardless of whether the spender is trusted or known.
+
+					A trusted or previously-encountered contract is not necessarily a secure one, so limiting this warning to untrusted spenders or domains leaves the user exposed to unlimited approvals granted to contracts that later turn out to be compromised or malicious.
+				`),
+			})
+		}
 	}
 
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
