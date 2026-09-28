@@ -1,0 +1,69 @@
+{
+	"highlightFirstLine": 3620,
+	"highlightLastLine": 3626,
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 221
+		},
+		{
+			"lines": [
+				"  async #broadcast() {"
+			],
+			"startLine": 3481
+		},
+		{
+			"lines": [
+				"    if (rawTxnBroadcast.includes(accountOp.gasFeePayment.broadcastOption)) {"
+			],
+			"startLine": 3554
+		},
+		{
+			"lines": [
+				"      try {"
+			],
+			"startLine": 3573
+		},
+		{
+			"lines": [
+				"        for (let i = 0; i < txnLength; i++) {"
+			],
+			"startLine": 3594
+		},
+		{
+			"lines": [
+				"          const signedTxn = await this.#withHardwareWalletSigningRequest("
+			],
+			"startLine": 3608
+		},
+		{
+			"lines": [
+				"            () =>",
+				"              isDelegationBroadcast"
+			],
+			"startLine": 3610
+		},
+		{
+			"lines": [
+				"                : signer.signRawTransaction(rawTxn)",
+				"          )",
+				"",
+				"          if (isDelegationBroadcast) {",
+				"            multipleTxnsBroadcastRes.push({",
+				"              hash: await this.provider.send('eth_sendRawTransaction', [signedTxn])",
+				"            })",
+				"          } else {",
+				"            multipleTxnsBroadcastRes.push(",
+				"              await broadcastTransaction(this.provider, signedTxn, accountOp.chainId)",
+				"            )",
+				"          }",
+				"          if (txnLength > 1) this.update({ signedTransactionsCount: i + 1 })",
+				"",
+				"          // record the EOA txn only if isErc4337Enabled as"
+			],
+			"startLine": 3616
+		}
+	]
+}
