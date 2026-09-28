@@ -2,6 +2,7 @@
 	// Types/constants
 	import {
 		activeUnlimitedApprovalBenchmarks,
+		allUnlimitedApprovalBenchmarksTested,
 		type ScamPreventionMetadata,
 		unlimitedApprovalWarningBenchmarkLabels,
 		warnsOnUnlimitedApprovalUnconditionally,
@@ -60,6 +61,10 @@
 	function unlimitedApprovalConditionClause(
 		warnsOnUnlimitedApproval: UnlimitedApprovalWarningBenchmarks,
 	): string {
+		if (!allUnlimitedApprovalBenchmarksTested(warnsOnUnlimitedApproval)) {
+			return ', although Walletbeat has not yet determined under which conditions'
+		}
+
 		if (warnsOnUnlimitedApprovalUnconditionally(warnsOnUnlimitedApproval)) {
 			return ''
 		}

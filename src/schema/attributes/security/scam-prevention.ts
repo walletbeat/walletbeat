@@ -34,7 +34,6 @@ export type ScamAlertSupport = WithRef<{
 	supported: boolean
 	required: boolean
 	privacyPreserving: boolean
-	conditionalOnly: boolean
 	humanFeature: string
 	listFeature: string
 }>
@@ -79,36 +78,35 @@ export const unlimitedApprovalWarningBenchmarkLabels: Record<
 
 /**
  * Whether the wallet warns on unlimited approvals unconditionally, i.e. it
- * warns on every benchmark spender. An untested (`null`) benchmark does not
- * count as warned-on.
+ * warns on every benchmark spender.
  */
 export function warnsOnUnlimitedApprovalUnconditionally(
-	benchmarks: UnlimitedApprovalWarningBenchmarks,
+	benchmarks: Record<UnlimitedApprovalWarningBenchmarkSpenders, Support>,
 ): boolean {
 	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).every(benchmark =>
-		isSupported(benchmarks[benchmark] ?? notSupported),
+		isSupported(benchmarks[benchmark]),
 	)
 }
 
 /**
- * The benchmark spenders the wallet is known to warn on.
+ * The benchmark spenders the wallet warns on.
  */
 export function activeUnlimitedApprovalBenchmarks(
-	benchmarks: UnlimitedApprovalWarningBenchmarks,
+	benchmarks: Record<UnlimitedApprovalWarningBenchmarkSpenders, Support>,
 ): UnlimitedApprovalWarningBenchmarkSpenders[] {
 	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).filter(benchmark =>
-		isSupported(benchmarks[benchmark] ?? notSupported),
+		isSupported(benchmarks[benchmark]),
 	)
 }
 
 /**
- * Whether at least one benchmark has not been tested yet (`null`) for the wallet
+ * Whether every benchmark has been tested (none are `null`) for the wallet
  */
-export function hasUntestedUnlimitedApprovalBenchmark(
+export function allUnlimitedApprovalBenchmarksTested(
 	benchmarks: UnlimitedApprovalWarningBenchmarks,
-): boolean {
-	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).some(
-		benchmark => benchmarks[benchmark] === null,
+): benchmarks is Record<UnlimitedApprovalWarningBenchmarkSpenders, Support> {
+	return Object.values(UnlimitedApprovalWarningBenchmarkSpenders).every(
+		benchmark => benchmarks[benchmark] !== null,
 	)
 }
 
@@ -134,7 +132,6 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(args: 
 		return {
 			supported: false,
 			privacyPreserving: true,
-			conditionalOnly: false,
 			ref: hasRefs(support) ? support.ref : refNotNecessary,
 			...baseProps,
 		}
@@ -149,7 +146,6 @@ function rateLeakBasedWarning<F extends string, T extends ScamAlertLeaks>(args: 
 	return {
 		supported: true,
 		privacyPreserving: leakFlags(support).filter(Boolean).length <= 1,
-		conditionalOnly: false,
 		ref: support.ref,
 		...baseProps,
 	}
@@ -198,7 +194,6 @@ function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport 
 		return {
 			supported: false,
 			privacyPreserving: true,
-			conditionalOnly: false,
 			ref: refNotNecessary,
 			...baseProps,
 		}
@@ -209,7 +204,6 @@ function rateUnlimitedApprovalWarning(scamAlerts: ScamAlerts): ScamAlertSupport 
 		privacyPreserving:
 			[support.leaksUserIp, support.leaksUserAddress, support.leaksSpenderAddress].filter(Boolean)
 				.length <= 1,
-		conditionalOnly: !warnsOnUnlimitedApprovalUnconditionally(support.warnsOnUnlimitedApproval),
 		ref: support.ref,
 		...baseProps,
 	}
@@ -230,7 +224,6 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 		return {
 			supported: false,
 			privacyPreserving: true,
-			conditionalOnly: false,
 			ref: hasRefs(scamUrlWarning) ? scamUrlWarning.ref : refNotNecessary,
 			...baseProps,
 		}
@@ -238,7 +231,6 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 
 	return {
 		supported: true,
-		conditionalOnly: false,
 		privacyPreserving: ((): boolean => {
 			switch (scamUrlWarning.leaksVisitedUrl) {
 				case 'NO':
@@ -394,7 +386,7 @@ function evaluateScamAlerts(
 	if (
 		requiredFeatures.includes(unlimitedApprovalWarning) &&
 		isSupported(scamAlerts.unlimitedApprovalWarning) &&
-		hasUntestedUnlimitedApprovalBenchmark(
+		!allUnlimitedApprovalBenchmarksTested(
 			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
 		)
 	) {
@@ -404,6 +396,9 @@ function evaluateScamAlerts(
 	if (
 		requiredFeatures.includes(unlimitedApprovalWarning) &&
 		isSupported(scamAlerts.unlimitedApprovalWarning) &&
+		allUnlimitedApprovalBenchmarksTested(
+			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
+		) &&
 		!warnsOnUnlimitedApprovalUnconditionally(
 			scamAlerts.unlimitedApprovalWarning.warnsOnUnlimitedApproval,
 		)
