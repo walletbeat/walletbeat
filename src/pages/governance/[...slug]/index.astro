@@ -1,146 +1,37 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content'
-import Layout from '@/layouts/Layout.astro'
-import Navigation from '@/views/Navigation.astro'
-import { defaultNavigationItems } from '@/constants/navigation'
-import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
 import IndexPage from '@/layouts/IndexPage.astro'
-import { buildSlugToId, computeIndexEntries, normalizeSlug } from '@/utils/collection-utils'
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
+import { getCollection, getEntry } from 'astro:content'
+import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
+import {
+	buildCollectionPaths,
+	resolveCollectionPage,
+	resolveEntryId,
+} from '@/utils/collection-utils'
 
-const URL_PREFIX = RENDERED_MARKDOWN_COLLECTIONS.governance.urlPrefix
+const collection = RENDERED_MARKDOWN_COLLECTIONS.governance
 
-export async function getStaticPaths() {
-	const entries = await getCollection('governance')
-	const paths: { params: { slug?: string } }[] = []
-
-	// Path for each entry (strip filename — every dir holds exactly one .md)
-	for (const entry of entries) {
-		const slug = normalizeSlug(entry.id)
-
-		paths.push({ params: { slug } })
-	}
-
-	// Paths for each directory index (based on original entry ids)
-	const dirPaths = new Set<string>()
-
-	for (const entry of entries) {
-		const parts = entry.id.split('/')
-
-		for (let i = 1; i < parts.length; i++) {
-			dirPaths.add(parts.slice(0, i).join('/'))
-		}
-	}
-
-	// Root index
-	dirPaths.add('')
-
-	for (const dir of dirPaths) {
-		paths.push({ params: { slug: dir || undefined } })
-	}
-
-	return paths
-}
+export const getStaticPaths = async () => buildCollectionPaths(await getCollection('governance'))
 
 const { slug } = Astro.params
 const entries = await getCollection('governance')
-
-// Resolve a normalized slug back to the original collection entry id.
-const slugToId = buildSlugToId(entries)
-
-const entryId = slug ? (slugToId[slug] ?? slug) : undefined
+const entryId = resolveEntryId(entries, slug)
 const entry = entryId ? await getEntry('governance', entryId) : undefined
-
-const currentIndexEntries = computeIndexEntries(entries, slug ?? '', URL_PREFIX)
-const renderedContent = entry ? await render(entry) : undefined
-
-function humanizeDirName(name: string): string {
-	return name.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
-
-function parentUrl(s: string | undefined): string | undefined {
-	if (!s) {
-		return undefined
-	}
-	const parts = s.split('/')
-
-	if (parts.length <= 1) {
-		return undefined
-	}
-
-	return `${URL_PREFIX}/${parts.slice(0, -1).join('/')}/`
-}
+const page = await resolveCollectionPage(entry, entries, slug, collection)
 ---
 
 {
-	entry ? (
-		<Layout metadata={{ title: entry.data.title, description: entry.data.description }}>
-			<Navigation slot='nav' navigationItems={defaultNavigationItems} />
-
-			<main data-sticky-container data-column='gap-8'>
-				<header data-scroll-item='inline-detached padding-match-start'>
-					<hgroup data-column='gap-4'>
-						<h1>{entry.data.title}</h1>
-					</hgroup>
-				</header>
-
-				<div data-scroll-item='inline-detached padding-match-end'>
-					{renderedContent && <renderedContent.Content />}
-				</div>
-			</main>
-		</Layout>
+	page.kind === 'content' ? (
+		<MarkdownPage metadata={page.metadata}>
+			<page.content />
+		</MarkdownPage>
 	) : (
 		<IndexPage
-			metadata={{
-				title: slug ? humanizeDirName(slug.split('/').pop() ?? '') : 'Governance',
-				description: 'Walletbeat governance documents and decisions',
-			}}
-			entries={currentIndexEntries}
-			currentDir={slug ?? ''}
-			urlPrefix={URL_PREFIX}
-			parentUrl={parentUrl(slug)}
+			metadata={page.metadata}
+			entries={page.entries}
+			currentDir={page.currentDir}
+			urlPrefix={collection.urlPrefix}
+			parentUrl={page.parentUrl}
 		/>
 	)
 }
-
-<style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup p {
-			font-size: 1.25rem;
-			font-style: italic;
-			color: var(--text-secondary);
-			opacity: 0.75;
-		}
-
-		p {
-			font-family: var(--fontFamily-avenir);
-		}
-
-		div {
-			line-height: 1.8;
-		}
-
-		div :global(ul) {
-			padding-inline-start: 1.5em;
-		}
-
-		div :global(hr) {
-			border: none;
-			border-top: 1px solid var(--border);
-			margin-block: 1rem;
-		}
-
-		h1,
-		h2,
-		h3 {
-			font-family: var(--fontFamily-spMonorium);
-		}
-	}
-</style>

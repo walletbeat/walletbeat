@@ -1,66 +1,13 @@
 ---
-import Layout from '@/layouts/Layout.astro'
-import Navigation from '@/views/Navigation.astro'
-import { defaultNavigationItems } from '@/constants/navigation'
-
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
 import { Content, frontmatter } from './about.md'
 ---
 
-<Layout metadata={{ title: frontmatter.title, description: frontmatter.description }}>
-	<Navigation slot='nav' navigationItems={defaultNavigationItems} />
-
-	<main data-sticky-container data-column='gap-8'>
-		<header data-scroll-item='inline-detached padding-match-start'>
-			<hgroup data-column='gap-4'>
-				<h1>{frontmatter.title}</h1>
-			</hgroup>
-		</header>
-
-		<div data-scroll-item='inline-detached padding-match-end'>
-			<Content />
-		</div>
-	</main>
-</Layout>
-
-<style>
-	main {
-		&[data-sticky-container] {
-			--scrollItem-inlineDetached-maxSize: 58rem;
-			--scrollItem-inlineDetached-maxPaddingMatchStart: 5rem;
-			--scrollItem-inlineDetached-maxPaddingMatchEnd: 5rem;
-		}
-
-		line-height: 1.4;
-
-		hgroup p {
-			font-size: 1.25rem;
-			font-style: italic;
-			color: var(--text-secondary);
-			opacity: 0.75;
-		}
-
-		p {
-			font-family: var(--fontFamily-avenir);
-		}
-
-		div {
-			line-height: 1.8;
-		}
-
-		div :global(ul) {
-			padding-inline-start: 1.5em;
-		}
-
-		div :global(hr) {
-			border: none;
-			border-top: 1px solid var(--border);
-			margin-block: 1rem;
-		}
-
-		h1,
-		h2,
-		h3 {
-			font-family: var(--fontFamily-spMonorium);
-		}
-	}
-</style>
+<MarkdownPage
+	metadata={{
+		title: frontmatter.title,
+		description: frontmatter.description,
+	}}
+>
+	<Content />
+</MarkdownPage>

@@ -4,6 +4,7 @@ import { join, relative } from 'node:path'
 import type { APIRoute } from 'astro'
 
 import { NON_SERVED_EXTENSIONS } from '@/constants/rendered-collections'
+import { assertStringHasPrefix } from '@/types/utils/text'
 import { getAstroBuildTimeRepositoryRoot } from '@/utils/codebase.astro'
 
 /**
@@ -55,10 +56,10 @@ const CONTENT_TYPES: Record<string, string> = {
  * Return the lowercase file extension (including the leading dot) of a path,
  * or an empty string when the path has no extension.
  */
-function extensionOf(file: string): string {
+function extensionOf(file: string): `.${string}` | '' {
 	const dot = file.lastIndexOf('.')
 
-	return dot >= 0 ? file.slice(dot).toLowerCase() : ''
+	return dot >= 0 ? assertStringHasPrefix(file.slice(dot).toLowerCase(), '.') : ''
 }
 
 /**

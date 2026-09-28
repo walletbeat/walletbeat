@@ -5,7 +5,7 @@
  * site.
  */
 
-export interface RenderedMarkdownCollection {
+export type RenderedMarkdownCollection = {
 	/** Name of the Astro content collection (must match `content.config.ts`). */
 	name: string
 
@@ -18,12 +18,41 @@ export interface RenderedMarkdownCollection {
 	 * URL path prefix where the collection is rendered.
 	 */
 	urlPrefix: `/${string}`
-}
+} & (
+	| {
+			dirIndex: false
+	  }
+	| {
+			dirIndex: true
+			/**
+			 * Title of the collection's root index page.
+			 */
+			indexTitle: string
+			/**
+			 * Description of the collection's root index page.
+			 */
+			indexDescription: string
+	  }
+)
 
 export const RENDERED_MARKDOWN_COLLECTIONS = {
-	about: { name: 'about', repoDir: '/src/pages/about', urlPrefix: '/about' },
-	docs: { name: 'docs', repoDir: '/resources/docs', urlPrefix: '/docs' },
-	governance: { name: 'governance', repoDir: '/governance', urlPrefix: '/governance' },
+	about: { name: 'about', repoDir: '/src/pages/about', urlPrefix: '/about', dirIndex: false },
+	docs: {
+		name: 'docs',
+		repoDir: '/resources/docs',
+		urlPrefix: '/docs',
+		dirIndex: true,
+		indexTitle: 'Documentation',
+		indexDescription: 'Walletbeat documentation and guides',
+	},
+	governance: {
+		name: 'governance',
+		repoDir: '/governance',
+		urlPrefix: '/governance',
+		dirIndex: true,
+		indexTitle: 'Governance',
+		indexDescription: 'Walletbeat governance documents and decisions',
+	},
 } as const satisfies Record<string, RenderedMarkdownCollection>
 
 interface PathMapping {

@@ -1,7 +1,13 @@
-import type { CollectionEntry } from 'astro:content'
+import type { CollectionEntry, CollectionKey, RenderResult } from 'astro:content'
+import { render } from 'astro:content'
 
-/** Union of all content collection entry types used for docs and governance pages */
-type ContentCollectionEntry = CollectionEntry<'docs'> | CollectionEntry<'governance'>
+import type { RenderedMarkdownCollection } from '@/constants/rendered-collections'
+
+/** A content collection entry with the fields the index logic needs. */
+type IndexableCollectionEntry = {
+	id: string
+	data: { title: string; description?: string }
+}
 
 // ---------------------------------------------------------------------------
 // Index page entry representing a subdirectory or leaf file
@@ -46,7 +52,7 @@ export function normalizeSlug(id: string): string {
  * Entries whose id differs from their normalized slug (i.e. every entry inside
  * a subdirectory) gets a mapping. Entries at the root level are unchanged.
  */
-export function buildSlugToId(entries: ContentCollectionEntry[]): Record<string, string> {
+export function buildSlugToId(entries: IndexableCollectionEntry[]): Record<string, string> {
 	const slugToId: Record<string, string> = {}
 
 	for (const entry of entries) {
@@ -72,7 +78,7 @@ export function buildSlugToId(entries: ContentCollectionEntry[]): Record<string,
  * subdirectory overrides the humanized directory name.
  */
 export function computeIndexEntries(
-	allEntries: ContentCollectionEntry[],
+	allEntries: IndexableCollectionEntry[],
 	currentDir: string,
 	urlPrefix: string,
 ): IndexEntry[] {
@@ -155,7 +161,7 @@ export function computeIndexEntries(
  * with the given directory slug. Used to derive a description for index pages.
  */
 export function findIndexDescription(
-	allEntries: ContentCollectionEntry[],
+	allEntries: IndexableCollectionEntry[],
 	currentDir: string,
 ): string | null {
 	if (currentDir === '') {
@@ -174,4 +180,132 @@ export function findIndexDescription(
 	}
 
 	return null
+}
+
+/**
+ * Configuration needed to render a markdown collection as site pages. Only
+ * collections that render a directory index (`dirIndex: true`) can be
+ * resolved as a page, so this is the corresponding union branch.
+ */
+export type MarkdownCollectionConfig = RenderedMarkdownCollection & { dirIndex: true }
+
+/** A resolved content page: renders a single markdown entry. */
+export interface ResolvedCollectionContentPage {
+	kind: 'content'
+	metadata: { title: string; description?: string }
+	content: RenderResult['Content']
+}
+
+/** A resolved index page: lists the children of a directory. */
+export interface ResolvedCollectionIndexPage {
+	kind: 'index'
+	metadata: { title: string; description: string }
+	entries: IndexEntry[]
+	currentDir: string
+	parentUrl?: string
+}
+
+export type ResolvedCollectionPage = ResolvedCollectionContentPage | ResolvedCollectionIndexPage
+
+/**
+ * Build the `getStaticPaths` result for a markdown collection: one path per
+ * entry (its normalized slug) plus one path per directory index.
+ *
+ * `entries` must already be loaded via `getCollection` in the calling page.
+ */
+export function buildCollectionPaths(
+	entries: IndexableCollectionEntry[],
+): { params: { slug?: string } }[] {
+	const paths: { params: { slug?: string } }[] = []
+
+	for (const entry of entries) {
+		paths.push({ params: { slug: normalizeSlug(entry.id) } })
+	}
+
+	const dirPaths = new Set<string>()
+
+	for (const entry of entries) {
+		const parts = entry.id.split('/')
+
+		for (let i = 1; i < parts.length; i++) {
+			dirPaths.add(parts.slice(0, i).join('/'))
+		}
+	}
+
+	dirPaths.add('')
+
+	for (const dir of dirPaths) {
+		paths.push({ params: { slug: dir || undefined } })
+	}
+
+	return paths
+}
+
+/**
+ * Resolve a normalized slug back to the original collection entry id, or
+ * undefined when the slug has no matching entry (i.e. it is a directory).
+ */
+export function resolveEntryId(
+	entries: IndexableCollectionEntry[],
+	slug: string | undefined,
+): string | undefined {
+	if (!slug) {
+		return undefined
+	}
+
+	const slugToId = buildSlugToId(entries)
+
+	return slugToId[slug] ?? slug
+}
+
+/**
+ * Resolve a page to either a content page (a rendered markdown entry) or an
+ * index page (the children of a directory).
+ */
+export async function resolveCollectionPage<_Entry extends CollectionEntry<CollectionKey>>(
+	entry: _Entry | undefined,
+	entries: _Entry[],
+	slug: string | undefined,
+	collection: MarkdownCollectionConfig,
+): Promise<ResolvedCollectionPage> {
+	if (entry) {
+		const { Content } = await render(entry)
+
+		return {
+			kind: 'content',
+			metadata: { title: entry.data.title, description: entry.data.description },
+			content: Content,
+		}
+	}
+
+	const currentDir = slug ?? ''
+
+	return {
+		kind: 'index',
+		metadata: {
+			title: slug ? humanizeDirName(slug.split('/').pop() ?? '') : collection.indexTitle,
+			description: collection.indexDescription,
+		},
+		entries: computeIndexEntries(entries, currentDir, collection.urlPrefix),
+		currentDir,
+		parentUrl: parentUrl(collection.urlPrefix, slug),
+	}
+}
+
+/**
+ * URL of the parent directory index for a given slug, or undefined when there
+ * is no parent (root level).
+ */
+function parentUrl(urlPrefix: `/${string}`, s: string | undefined): string | undefined {
+	if (!s) {
+		return undefined
+	}
+
+	const parts = s.split('/')
+
+	if (parts.length <= 1) {
+		return undefined
+	}
+
+	return `${urlPrefix}/${parts.slice(0, -1).join('/')}/`
 }
