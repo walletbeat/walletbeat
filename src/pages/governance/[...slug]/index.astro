@@ -1,14 +1,11 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content'
-import { join } from 'node:path'
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/views/Navigation.astro'
 import { defaultNavigationItems } from '@/constants/navigation'
 import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
 import IndexPage from '@/layouts/IndexPage.astro'
 import { buildSlugToId, computeIndexEntries, normalizeSlug } from '@/utils/collection-utils'
-import { findImages, tryServeImage } from '@/utils/image-route-helpers'
-import { getAstroBuildTimeRepositoryRoot } from '@/utils/codebase.astro'
 
 const URL_PREFIX = RENDERED_MARKDOWN_COLLECTIONS.governance.urlPrefix
 
@@ -41,30 +38,7 @@ export async function getStaticPaths() {
 		paths.push({ params: { slug: dir || undefined } })
 	}
 
-	// Image paths — ensures Astro recognizes these as valid paths for this route,
-	// preventing the "no matching static path" warning and allowing onBeforeResponse
-	// to serve the images directly.
-	const imageFiles = findImages(
-		join(getAstroBuildTimeRepositoryRoot(), RENDERED_MARKDOWN_COLLECTIONS.governance.repoDir),
-	)
-
-	for (const imageFile of imageFiles) {
-		paths.push({ params: { slug: imageFile } })
-	}
-
 	return paths
-}
-
-export function onBeforeResponse({ request }: { request: Request }) {
-	const response = tryServeImage(
-		request,
-		URL_PREFIX,
-		join(getAstroBuildTimeRepositoryRoot(), RENDERED_MARKDOWN_COLLECTIONS.governance.repoDir),
-	)
-
-	if (response) {
-		return response
-	}
 }
 
 const { slug } = Astro.params

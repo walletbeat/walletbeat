@@ -1,56 +1,69 @@
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { defineHastPlugin } from 'satteri'
 
-import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
-
-// ---------------------------------------------------------------------------
-// URL rewrite plugin for Satteri HAST
-// ---------------------------------------------------------------------------
-
-const IMAGE_EXTENSIONS = new Set([
-	'.png',
-	'.jpg',
-	'.jpeg',
-	'.gif',
-	'.webp',
-	'.svg',
-	'.ico',
-	'.mp4',
-	'.webm',
-])
-
-const SKIP_PREFIXES = ['http://', 'https://', 'mailto:', 'tel:', '#', '//', 'data:']
-
-const FORBIDDEN_PREFIXES = [
-	'https://github.com/walletbeat/walletbeat/blob/',
-	'https://github.com/walletbeat/walletbeat/tree/',
-]
-
-const ALLOWED_URLS = new Set(['https://github.com/walletbeat/walletbeat'])
-
-interface PathMapping {
-	repoPrefix: `/${string}`
-	urlPrefix: `/${string}` | `https://${string}`
-	stripFilename: boolean
-}
-
-const MAPPINGS: PathMapping[] = [
-	...Object.values(RENDERED_MARKDOWN_COLLECTIONS).map((collection): PathMapping => ({
-		repoPrefix: `${collection.repoDir}/`,
-		urlPrefix: `${collection.urlPrefix}/`,
-		stripFilename: true,
-	})),
-	{ repoPrefix: '/public/', urlPrefix: '/', stripFilename: false },
-	{ repoPrefix: '/src/pages/', urlPrefix: '/', stripFilename: true },
-]
+import { githubBlobUrl } from '@/constants/github'
+import {
+	ALLOWED_GITHUB_URLS,
+	FORBIDDEN_GITHUB_PREFIXES,
+	IMAGE_EXTENSIONS,
+	NON_SERVED_EXTENSIONS,
+	PUBLISHED_URL_PREFIXES,
+	SERVED_REPO_DIRS,
+	SKIPPED_URL_PREFIXES,
+	URL_REWRITE_MAPPINGS,
+} from '@/constants/rendered-collections'
+import { assertStringHasPrefix } from '@/types/utils/text'
 
 function isImageExtension(path: string): boolean {
 	const lower = path.toLowerCase()
 
 	for (const ext of IMAGE_EXTENSIONS) {
 		if (lower.endsWith(ext)) {
+			return true
+		}
+	}
+
+	return false
+}
+
+/**
+ * Return the lowercase file extension (including the leading dot) of a path,
+ * or an empty string when the path has no extension.
+ */
+function extensionOf(url: string): `.${string}` | '' {
+	const lastSlash = url.lastIndexOf('/')
+	const basename = lastSlash >= 0 ? url.slice(lastSlash + 1) : url
+	const dot = basename.lastIndexOf('.')
+
+	return dot >= 0 ? assertStringHasPrefix(basename.slice(dot).toLowerCase(), '.') : ''
+}
+
+/**
+ * Whether a GitHub blob/tree URL points to a file with a non-served extension.
+ * Such GitHub links are allowed (they are the intended target for non-served
+ * files), whereas GitHub links to rendered content are forbidden.
+ */
+function isNonServedGithubUrl(url: string): boolean {
+	for (const prefix of FORBIDDEN_GITHUB_PREFIXES) {
+		if (!url.startsWith(prefix)) {
+			continue
+		}
+
+		// After the prefix the URL is `<branch>/<path>`.
+		const rest = url.slice(prefix.length)
+		const slash = rest.indexOf('/')
+
+		if (slash < 0) {
+			continue
+		}
+
+		const filePath = rest.slice(slash + 1)
+		const extension = extensionOf(filePath)
+
+		if (extension !== '' && NON_SERVED_EXTENSIONS.has(extension)) {
 			return true
 		}
 	}
@@ -108,42 +121,92 @@ function stripFilename(url: string): string {
 
 	const lastSlash = base.lastIndexOf('/')
 
-	if (lastSlash > 0) {
+	if (lastSlash > 0 && base.slice(lastSlash + 1).endsWith('.md')) {
 		return base.slice(0, lastSlash + 1) + suffix
 	}
 
 	return url
 }
 
-function rewriteUrl(url: string, sourceDir: string): string {
-	if (SKIP_PREFIXES.some(p => url.startsWith(p))) {
-		return url
+/**
+ * Rewrite a repo-relative URL to its published site URL.
+ *
+ * Returns the rewritten URL plus whether a source-tree mapping matched. When
+ * no mapping matches the resolved path, the path is returned unchanged
+ * (pass-through); the caller is responsible for flagging any such path that
+ * is not actually published by the site.
+ */
+export function rewriteUrl(url: string, sourceDir: string): { url: string; matched: boolean } {
+	if (SKIPPED_URL_PREFIXES.some(p => url.startsWith(p))) {
+		return { url, matched: false }
 	}
 
 	let resolved = url.startsWith('/') ? url : resolveRelativeUrl(url, sourceDir)
+	const extension = extensionOf(resolved)
 
-	// Strip filename for pages that map to index.astro routes
-	for (const mapping of MAPPINGS) {
-		if (mapping.stripFilename) {
-			resolved = stripFilename(resolved)
-		}
+	if (extension !== '' && NON_SERVED_EXTENSIONS.has(extension)) {
+		return { url: githubBlobUrl(resolved), matched: true }
 	}
 
-	// Apply prefix mappings (longest match first)
-	const sorted = [...MAPPINGS].sort((a, b) => b.repoPrefix.length - a.repoPrefix.length)
+	// Apply prefix mappings (longest match first).
+	const sorted = [...URL_REWRITE_MAPPINGS].sort((a, b) => b.repoPrefix.length - a.repoPrefix.length)
 
 	for (const mapping of sorted) {
 		if (resolved === mapping.repoPrefix || resolved.startsWith(mapping.repoPrefix)) {
+			if (mapping.stripFilename) {
+				resolved = stripFilename(resolved)
+			}
+
 			const suffix = resolved.slice(mapping.repoPrefix.length)
 			const suffixToUse =
 				mapping.urlPrefix.endsWith('/') && suffix.startsWith('/') ? suffix.slice(1) : suffix
 
-			return mapping.urlPrefix + suffixToUse
+			return { url: mapping.urlPrefix + suffixToUse, matched: true }
 		}
 	}
 
-	// Root path passes through
-	return resolved
+	// No mapping matched: either a published site path (pass through) or an
+	// in-repo file not served by the site (rewrite to a GitHub link).
+	if (isNonPublishedRepoPath(resolved, process.cwd())) {
+		return { url: githubBlobUrl(resolved), matched: true }
+	}
+
+	return { url: resolved, matched: false }
+}
+
+/**
+ * Whether a resolved repo-root-relative URL refers to a path that is NOT served
+ * by the site (e.g. a top-level repo file such as `/CONTRIBUTING.md`, a
+ * repo-internal directory such as `/.agents`, or a file under a non-collection
+ * directory such as `resources/talks`). Such in-repo links are rewritten to
+ * point at the file on GitHub rather than served by the site.
+ *
+ * @param resolved Resolved repo-root-relative URL (leading `/`).
+ * @param repoRoot Absolute path to the repository root.
+ */
+export function isNonPublishedRepoPath(resolved: string, repoRoot: string): boolean {
+	const rel = resolved.replace(/^\//, '')
+
+	if (!rel) {
+		return false
+	}
+
+	// Directories whose contents are served as site pages or published assets.
+	if (SERVED_REPO_DIRS.some(dir => rel === dir || rel.startsWith(dir + '/'))) {
+		return false
+	}
+
+	// Published rendered-collection URL prefixes (e.g. /about, /docs).
+	if (PUBLISHED_URL_PREFIXES.some(prefix => rel === prefix || rel.startsWith(prefix + '/'))) {
+		return false
+	}
+
+	// Assets served directly from `public/`.
+	if (existsSync(path.join(repoRoot, 'public', rel))) {
+		return false
+	}
+
+	return true
 }
 
 export function createUrlRewritePlugin() {
@@ -162,13 +225,17 @@ export function createUrlRewritePlugin() {
 					return
 				}
 
-				if (SKIP_PREFIXES.some(p => url.startsWith(p))) {
+				if (SKIPPED_URL_PREFIXES.some(p => url.startsWith(p))) {
 					return
 				}
 
 				// Check forbidden prefixes
-				for (const prefix of FORBIDDEN_PREFIXES) {
-					if (url.startsWith(prefix) && !ALLOWED_URLS.has(url)) {
+				for (const prefix of FORBIDDEN_GITHUB_PREFIXES) {
+					if (
+						url.startsWith(prefix) &&
+						!ALLOWED_GITHUB_URLS.has(url) &&
+						!isNonServedGithubUrl(url)
+					) {
 						ctx.report({
 							message: `Forbidden URL prefix: ${prefix} (URL: ${url})`,
 							node,
@@ -207,17 +274,15 @@ export function createUrlRewritePlugin() {
 					}
 				}
 
-				const rewritten = rewriteUrl(url, sourceDir)
+				const { url: rewritten } = rewriteUrl(url, sourceDir)
 
+				// An in-repo file not served by the site is rewritten to a GitHub link
+				// by `rewriteUrl`, so the property is always safe to set.
 				ctx.setProperty(node, propKey, rewritten)
 			},
 		},
 	})
 }
-
-// ---------------------------------------------------------------------------
-// Strip first H1 plugin — prevents duplicate H1 when layout already renders title
-// ---------------------------------------------------------------------------
 
 export function createStripFirstH1Plugin() {
 	return defineHastPlugin({
