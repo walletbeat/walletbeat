@@ -1,0 +1,40 @@
+{
+	"highlightFirstLine": 3262,
+	"highlightLastLine": 3267,
+	"segments": [
+		{
+			"lines": [
+				"> {"
+			],
+			"startLine": 726
+		},
+		{
+			"lines": [
+				"  async #publishTransaction(",
+				"    transactionMeta: TransactionMeta,",
+				"    { skipSubmitHistory }: { skipSubmitHistory?: boolean } = {},",
+				"  ): Promise<string> {"
+			],
+			"startLine": 3253
+		},
+		{
+			"lines": [
+				"",
+				"    if (!rawTx) {",
+				"      throw new Error('Missing raw transaction');",
+				"    }",
+				"",
+				"    const transactionHash = (await rpcRequest({",
+				"      messenger: this.messenger,",
+				"      networkClientId,",
+				"      method: 'eth_sendRawTransaction',",
+				"      params: [rawTx],",
+				"    })) as string;",
+				"",
+				"    if (skipSubmitHistory !== true) {",
+				"      this.#updateSubmitHistory(transactionMeta, transactionHash);"
+			],
+			"startLine": 3258
+		}
+	]
+}

@@ -1,0 +1,48 @@
+{
+	"highlightFirstLine": 125,
+	"highlightLastLine": 132,
+	"segments": [
+		{
+			"lines": [
+				"export class Delegation7702PublishHook {"
+			],
+			"startLine": 45
+		},
+		{
+			"lines": [
+				"  async #hook(",
+				"    transactionMeta: TransactionMeta,",
+				"    _signedTx: string,",
+				"  ): Promise<PublishHookResult> {"
+			],
+			"startLine": 72
+		},
+		{
+			"lines": [
+				"    if (!isSupported) {"
+			],
+			"startLine": 106
+		},
+		{
+			"lines": [
+				"",
+				"      return EMPTY_RESULT;",
+				"    }",
+				"",
+				"    if (",
+				"      (!selectedGasFeeToken || !gasFeeTokens?.length) &&",
+				"      !isGasFeeIncluded &&",
+				"      !isSponsored",
+				"    ) {",
+				"      log('Skipping as no selected gas fee token');",
+				"      return EMPTY_RESULT;",
+				"    }",
+				"",
+				"    const gasFeeToken =",
+				"      isGasFeeIncluded || isSponsored",
+				"        ? undefined"
+			],
+			"startLine": 121
+		}
+	]
+}

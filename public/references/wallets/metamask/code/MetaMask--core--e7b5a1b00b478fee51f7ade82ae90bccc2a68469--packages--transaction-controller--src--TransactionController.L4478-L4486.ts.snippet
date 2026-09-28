@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 4478,
+	"highlightLastLine": 4486,
+	"segments": [
+		{
+			"lines": [
+				"> {"
+			],
+			"startLine": 726
+		},
+		{
+			"lines": [
+				"  async #defaultPublishHook(",
+				"    {",
+				"      networkClientId,",
+				"      publishHookOverride,",
+				"      traceContext,",
+				"    }: {",
+				"      networkClientId: NetworkClientId;",
+				"      publishHookOverride?: PublishHook;",
+				"      traceContext?: TraceContext;",
+				"    },",
+				"    transactionMeta: TransactionMeta,",
+				"    signedTx: string,",
+				"  ): Promise<PublishHookResult> {"
+			],
+			"startLine": 4459
+		},
+		{
+			"lines": [
+				"    await this.#trace(",
+				"      { name: 'Publish', parentContext: traceContext },",
+				"      async () => {",
+				"        const publishHook = publishHookOverride ?? this.#publish;",
+				"",
+				"        ({ transactionHash } = await publishHook(transactionMeta, signedTx));",
+				"",
+				"        // eslint-disable-next-line require-atomic-updates",
+				"        transactionHash ??= await this.#publishTransaction({",
+				"          ...transactionMeta,",
+				"          networkClientId,",
+				"          rawTx: signedTx,",
+				"        });",
+				"      },",
+				"    );",
+				"",
+				"    log('Publish successful', transactionHash);"
+			],
+			"startLine": 4474
+		}
+	]
+}
