@@ -99,10 +99,10 @@ export type SendTransactionWarning = WithRef<
  */
 export enum UnlimitedApprovalWarningBenchmarkSpenders {
 	/**
-	 * 0xc9C8C560BA80e840A71bE2F9409600B6133a119f: The Walletbeat staging
-	 * treasury address, an externally-owned account (EOA), not a contract.
+	 * A publicly attributable Ethereum EOA belonging to an individual,
+	 * rather than a protocol, application, or contract
 	 */
-	WALLETBEAT_EOA = 'WALLETBEAT_EOA',
+	PUBLIC_EOA = 'PUBLIC_EOA',
 
 	/**
 	 * Uniswap V3 SwapRouter, 0xE592427A0AEce92De3Edee1F18E0157C05861564: A

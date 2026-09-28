@@ -411,7 +411,7 @@ export const gemwallet: SoftwareWallet = {
 					leaksUserAddress: false,
 					leaksUserIp: false,
 					warnsOnUnlimitedApproval: {
-						[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: featureSupported,
+						[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
 						[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
 						[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
 						[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:

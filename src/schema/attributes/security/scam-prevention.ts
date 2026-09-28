@@ -65,7 +65,7 @@ export const unlimitedApprovalWarningBenchmarkLabels: Record<
 	UnlimitedApprovalWarningBenchmarkSpenders,
 	string
 > = {
-	[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: 'the spender is not a contract',
+	[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: 'the spender is not a contract',
 	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]:
 		'the spender is a well-known, verified contract',
 	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]:
@@ -483,7 +483,7 @@ function evaluateScamAlerts(
  * Shorthand for a wallet that warns on every unlimited-approval benchmark.
  */
 const allUnlimitedApprovalBenchmarksSupported: UnlimitedApprovalWarningBenchmarks = {
-	[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: featureSupported,
+	[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: featureSupported,
 	[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: featureSupported,
 	[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
 	[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]: featureSupported,
@@ -711,7 +711,7 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 						unlimitedApprovalWarning: supported({
 							ref: refNotNecessary,
 							warnsOnUnlimitedApproval: {
-								[UnlimitedApprovalWarningBenchmarkSpenders.WALLETBEAT_EOA]: notSupported,
+								[UnlimitedApprovalWarningBenchmarkSpenders.PUBLIC_EOA]: notSupported,
 								[UnlimitedApprovalWarningBenchmarkSpenders.UNISWAP_V3_ROUTER]: notSupported,
 								[UnlimitedApprovalWarningBenchmarkSpenders.PINK_PHISHING_ADDRESS]: featureSupported,
 								[UnlimitedApprovalWarningBenchmarkSpenders.RECENTLY_DEPLOYED_CONTRACT]:
