@@ -1091,6 +1091,14 @@
 		"hash": "004bb61cf07ecd188f40ed83c9fbbff01a80b3cab2b799ef81c932ca50216e19",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/zerion/screenshots/2026-09-28-zerion-browser-custom-rpc.png": {
+		"hash": "3afd0db5fb44430c60bb919c3cd148fc483fd071807835f6c6b3cead3feca99b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/zerion/screenshots/2026-09-28-zerion-browser-network-list.png": {
+		"hash": "78439dc4dd0d79ad7f538f7d5d4f40658c16f0709c76715b80c007cdd62d9868",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/robot.png": {
 		"hash": "e79045fb9ca786cffb763c8bedccabc94161f2534418f7826c31f2a3e4210ce7",
 		"passedTests": ["blockiness", "file-format"]
