@@ -1,0 +1,101 @@
+{
+	"highlightFirstLine": 1091,
+	"highlightLastLine": 1153,
+	"segments": [
+		{
+			"lines": [
+				"}: UnlockRegressionScenarioProps) {"
+			],
+			"startLine": 443
+		},
+		{
+			"lines": [
+				"  return (",
+				"    <SilentTouchableView"
+			],
+			"startLine": 1073
+		},
+		{
+			"lines": [
+				"      <KeyboardAvoidingView"
+			],
+			"startLine": 1083
+		},
+		{
+			"lines": [
+				"        <View style={styles.topContainer}>",
+				"          <RcRabbyLogo style={styles.logo} width={125} height={134} />",
+				"        </View>",
+				"        <View style={styles.bodyContainer}>",
+				"          {usingPassword ? (",
+				"            <View style={styles.formWrapper}>",
+				"              <NextInput.Password",
+				"                clearable",
+				"                ref={passwordInputRef}",
+				"                fieldName={t('page.unlock.password.placeholder')}",
+				"                style={styles.inputContainer}",
+				"                inputStyle={styles.input}",
+				"                iconColor={colors2024['neutral-title-1']}",
+				"                inputProps={{",
+				"                  value: formik.values.password,",
+				"                  secureTextEntry: true,",
+				"                  inputMode: 'text',",
+				"                  returnKeyType: 'done',",
+				"                  ...makeTestIDProps(E2E_ID.unlock.passwordInput),",
+				"                  placeholderTextColor: colors2024['neutral-foot'],",
+				"                  onChangeText(text) {",
+				"                    formik.setFieldError('password', undefined);",
+				"                    formik.setFieldValue('password', text);",
+				"                  },",
+				"                }}",
+				"                hasError={Boolean(formik.errors.password)}",
+				"                tipText={formik.errors.password}",
+				"                tipIcon={",
+				"                  !formik.errors.password &&",
+				"                  formik.values.password && <YesIcon width={12} height={12} />",
+				"                }",
+				"              />",
+				"              <View",
+				"                style={[",
+				"                  styles.unlockButtonWrapper,",
+				"                  { height: safeSizes.footerHeight },",
+				"                ]}>",
+				"                <Button",
+				"                  loading={isUnlocking}",
+				"                  disabled={shouldDisabled}",
+				"                  type=\"primary\"",
+				"                  {...makeTestIDProps(E2E_ID.unlock.submit)}",
+				"                  buttonStyle={[styles.buttonShadow]}",
+				"                  containerStyle={[",
+				"                    styles.nextButtonContainer,",
+				"                    { height: safeSizes.nextButtonContainerHeight },",
+				"                  ]}",
+				"                  title={t('page.unlock.btn.unlock')}",
+				"                  onPress={evt => {",
+				"                    evt.stopPropagation();",
+				"                    cancelPendingBiometricUnlock();",
+				"                    formik.handleSubmit();",
+				"                    checkUnlocked();",
+				"                  }}",
+				"                />",
+				"              </View>",
+				"            </View>",
+				"          ) : (",
+				"            <View style={styles.biometricsWrapper}>",
+				"              <View style={styles.biometricsBtns}>",
+				"                <TouchableView",
+				"                  style={styles.biometricsBtn}",
+				"                  onPress={processUnlockWithBiometrics}>",
+				"                  <BiometricsIcon isFaceID={isFaceID} />",
+				"                </TouchableView>",
+				"              </View>",
+				"            </View>",
+				"          )}",
+				"        </View>",
+				"      </KeyboardAvoidingView>",
+				"      {couldSwitchingAuthentication && ("
+			],
+			"startLine": 1087
+		}
+	]
+}

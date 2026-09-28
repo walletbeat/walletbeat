@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 143,
+	"highlightLastLine": 150,
+	"segments": [
+		{
+			"lines": [
+				"export class HdKeychain implements IKeychain {"
+			],
+			"startLine": 48
+		},
+		{
+			"lines": [
+				"  async deserialize(opts?: SerializedHdKeychain) {"
+			],
+			"startLine": 136
+		},
+		{
+			"lines": [
+				"    if (opts?.hdPath) _privates.hdPath = opts.hdPath;",
+				"    this.imported = !!opts?.imported;",
+				"    if (opts?.accountsEnabled) _privates.accountsEnabled = opts.accountsEnabled;",
+				"    if (opts?.accountsDeleted) _privates.accountsDeleted = opts.accountsDeleted;",
+				"    if (opts?.mnemonic) {",
+				"      if (!bip39.validateMnemonic(opts.mnemonic, englishWordlist)) {",
+				"        throw new Error('Invalid mnemonic');",
+				"      }",
+				"      _privates.mnemonic = opts.mnemonic;",
+				"    } else {",
+				"      _privates.mnemonic = bip39.generateMnemonic(englishWordlist);",
+				"    }",
+				"",
+				"    // If we didn't explicit add a new account, we need attempt to autodiscover the rest",
+				"    if (opts?.autodiscover) {",
+				"      const { accountsEnabled } = await autoDiscoverAccounts({"
+			],
+			"startLine": 139
+		}
+	]
+}

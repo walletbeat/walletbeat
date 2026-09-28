@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 249,
+	"highlightLastLine": 256,
+	"segments": [
+		{
+			"lines": [
+				"export function wrapXOFConstructorWithOpts<H extends HashXOF<H>, T extends Object>(",
+				"  hashCons: (opts?: T) => HashXOF<H>",
+				") {"
+			],
+			"startLine": 237
+		},
+		{
+			"lines": [
+				"  return hashC;",
+				"}",
+				"",
+				"/**",
+				" * Secure PRNG. Uses `crypto.getRandomValues`, which defers to OS.",
+				" */",
+				"export function randomBytes(bytesLength = 32): Uint8Array {",
+				"  if (crypto && typeof crypto.getRandomValues === 'function') {",
+				"    return crypto.getRandomValues(new Uint8Array(bytesLength));",
+				"  }",
+				"  throw new Error('crypto.getRandomValues must be defined');",
+				"}"
+			],
+			"startLine": 245
+		}
+	]
+}

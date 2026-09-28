@@ -1,0 +1,41 @@
+{
+	"highlightFirstLine": 38,
+	"highlightLastLine": 53,
+	"segments": [
+		{
+			"lines": [
+				"export class JsonRpcProvider extends IJsonRpcProvider {"
+			],
+			"startLine": 15
+		},
+		{
+			"lines": [
+				"  public async disconnect(): Promise<void> {",
+				"    await this.close();",
+				"  }",
+				"",
+				"  public on(event: string, listener: any): void {",
+				"    this.events.on(event, listener);",
+				"  }",
+				"",
+				"  public once(event: string, listener: any): void {",
+				"    this.events.once(event, listener);",
+				"  }",
+				"",
+				"  public off(event: string, listener: any): void {",
+				"    this.events.off(event, listener);",
+				"  }",
+				"",
+				"  public removeListener(event: string, listener: any): void {",
+				"    this.events.removeListener(event, listener);",
+				"  }",
+				"",
+				"  public async request<Result = any, Params = any>(",
+				"    request: RequestArguments<Params>,",
+				"    context?: any,",
+				"  ): Promise<Result> {"
+			],
+			"startLine": 34
+		}
+	]
+}

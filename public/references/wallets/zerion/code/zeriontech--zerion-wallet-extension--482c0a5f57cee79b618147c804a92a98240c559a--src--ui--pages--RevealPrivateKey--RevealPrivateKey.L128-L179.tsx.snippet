@@ -1,0 +1,79 @@
+{
+	"highlightFirstLine": 128,
+	"highlightLastLine": 179,
+	"segments": [
+		{
+			"lines": [
+				"}) {"
+			],
+			"startLine": 39
+		},
+		{
+			"lines": [
+				"  return ("
+			],
+			"startLine": 69
+		},
+		{
+			"lines": [
+				"    </PageColumn>",
+				"  );",
+				"}",
+				"",
+				"export function RevealPrivateKey() {",
+				"  useBackgroundKind(whiteBackgroundKind);",
+				"",
+				"  const [params, setSearchParams] = useSearchParams();",
+				"",
+				"  const groupId = params.get('groupId');",
+				"  const address = params.get('address');",
+				"  invariant(groupId, 'groupId param is required for RevealPrivateKey view');",
+				"  invariant(address, 'address param is required for RevealPrivateKey view');",
+				"",
+				"  const navigate = useNavigate();",
+				"",
+				"  const { data: walletGroup, isLoading } = useWalletGroup({ groupId });",
+				"  if (isLoading || !walletGroup) {",
+				"    return null;",
+				"  }",
+				"  assertSignerContainer(walletGroup.walletContainer);",
+				"",
+				"  return (",
+				"    <>",
+				"      {params.has('step') == false ? (",
+				"        <PageColumn>",
+				"          <NavigationTitle title=\"Private Key Export\" />",
+				"          <PageTop />",
+				"          <VerifyUser",
+				"            text={'Verification is required to show your private key'}",
+				"            onSuccess={() =>",
+				"              setSearchParams(updateSearchParam('step', 'revealSecret'), {",
+				"                replace: true,",
+				"              })",
+				"            }",
+				"          />",
+				"          <PageBottom />",
+				"        </PageColumn>",
+				"      ) : null}",
+				"      {params.get('step') === 'revealSecret' ? (",
+				"        <Reveal",
+				"          groupId={groupId}",
+				"          address={address}",
+				"          onSessionExpired={() => {",
+				"            setSearchParams(updateSearchParam('step', 'verifyUser'), {",
+				"              replace: true,",
+				"            });",
+				"          }}",
+				"          onSubmit={() => {",
+				"            navigate('/');",
+				"          }}",
+				"        />",
+				"      ) : null}",
+				"    </>",
+				"  );",
+				"}"
+			],
+			"startLine": 124
+		}
+	]
+}

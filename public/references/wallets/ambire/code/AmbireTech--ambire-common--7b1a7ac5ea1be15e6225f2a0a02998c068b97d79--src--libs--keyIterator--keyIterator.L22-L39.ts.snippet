@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 22,
+	"highlightLastLine": 39,
+	"segments": [
+		{
+			"lines": [
+				"export function isValidPrivateKey(value: string): boolean {"
+			],
+			"startLine": 14
+		},
+		{
+			"lines": [
+				"  } catch {",
+				"    return false",
+				"  }",
+				"}",
+				"",
+				"export const getPrivateKeyFromSeed = (",
+				"  seed: string,",
+				"  seedPassphrase: string | null | undefined,",
+				"  keyIndex: number,",
+				"  hdPathTemplate: HD_PATH_TEMPLATE_TYPE",
+				") => {",
+				"  const mnemonic = Mnemonic.fromPhrase(seed, seedPassphrase)",
+				"  const wallet = HDNodeWallet.fromMnemonic(",
+				"    mnemonic,",
+				"    getHdPathFromTemplate(hdPathTemplate, keyIndex)",
+				"  )",
+				"",
+				"  if (wallet) {",
+				"    return wallet.privateKey",
+				"  }",
+				"",
+				"  throw new Error('Getting the private key from the seed phrase failed.')",
+				"}",
+				"",
+				"/**",
+				" * Serves for retrieving a range of addresses/keys from a given private key or seed phrase",
+				" */"
+			],
+			"startLine": 17
+		}
+	]
+}

@@ -1,0 +1,41 @@
+{
+	"highlightFirstLine": 40,
+	"highlightLastLine": 61,
+	"segments": [
+		{
+			"lines": [
+				"",
+				"const rainbowProvider = new RainbowProvider({",
+				"  backgroundMessenger,",
+				"  providerRequestTransport: providerRequestTransport,",
+				"  onConstruct({ emit }) {",
+				"    // RainbowInjectedProvider is also used in popup via RainbowConnector",
+				"    // here we don't need to listen to anything so we don't need these listeners",
+				"    if (isValidUrl(window.location.href)) {",
+				"      const host = getDappHost(window.location.href);",
+				"      backgroundMessenger?.reply(`accountsChanged:${host}`, async (address) => {",
+				"        emit('accountsChanged', [address]);",
+				"      });",
+				"      backgroundMessenger?.reply(",
+				"        `chainChanged:${host}`,",
+				"        async (chainId: number) => {",
+				"          emit('chainChanged', toHex(String(chainId)));",
+				"        },",
+				"      );",
+				"      backgroundMessenger?.reply(`disconnect:${host}`, async () => {",
+				"        emit('accountsChanged', []);",
+				"        emit('disconnect', []);",
+				"      });",
+				"      backgroundMessenger?.reply(`connect:${host}`, async (connectionInfo) => {",
+				"        emit('connect', connectionInfo);",
+				"      });",
+				"    }",
+				"  },",
+				"});",
+				"",
+				"if (shouldInjectProvider()) {"
+			],
+			"startLine": 36
+		}
+	]
+}

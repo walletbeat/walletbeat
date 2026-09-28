@@ -1,0 +1,65 @@
+{
+	"highlightFirstLine": 1318,
+	"highlightLastLine": 1338,
+	"segments": [
+		{
+			"lines": [
+				"class ProviderController extends BaseController {"
+			],
+			"startLine": 542
+		},
+		{
+			"lines": [
+				"  }) => {"
+			],
+			"startLine": 769
+		},
+		{
+			"lines": [
+				"    try {"
+			],
+			"startLine": 1105
+		},
+		{
+			"lines": [
+				"      try {"
+			],
+			"startLine": 1309
+		},
+		{
+			"lines": [
+				"        if (",
+				"          !findChain({ enum: chain })?.isTestnet ||",
+				"          isGasAccount ||",
+				"          isGasLess",
+				"        ) {",
+				"          if (",
+				"            (await customRPCServiceApi.hasCustomRPC(chain)) &&",
+				"            !isGasAccount &&",
+				"            !isGasLess",
+				"          ) {",
+				"            const rawTx = isTempoTx",
+				"              ? tempoSerializedRawTx",
+				"              : serializedSignedTx ||",
+				"                bytesToHex(",
+				"                  TransactionFactory.fromTxData(txDataWithRSV, {",
+				"                    common,",
+				"                  }).serialize(),",
+				"                );",
+				"            if (!rawTx) {",
+				"              throw new Error('tempo transaction serialize failed');",
+				"            }",
+				"            hash = await customRPCServiceApi.requestCustomRPC(",
+				"              chain,",
+				"              'eth_sendRawTransaction',",
+				"              [rawTx],",
+				"            );",
+				"            await onTransactionCreated({ hash, reqId, pushType });",
+				"          } else {",
+				"            const chainServerId = findChain({ enum: chain })!.serverId;",
+				"            const tempoSubmitTx = isTempoTx"
+			],
+			"startLine": 1313
+		}
+	]
+}

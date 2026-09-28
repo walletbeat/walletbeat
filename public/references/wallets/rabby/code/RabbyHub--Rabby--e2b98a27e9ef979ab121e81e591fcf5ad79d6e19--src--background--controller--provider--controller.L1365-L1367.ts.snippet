@@ -1,0 +1,80 @@
+{
+	"highlightFirstLine": 1365,
+	"highlightLastLine": 1367,
+	"segments": [
+		{
+			"lines": [
+				"class ProviderController extends BaseController {"
+			],
+			"startLine": 452
+		},
+		{
+			"lines": [
+				"  }) => {"
+			],
+			"startLine": 659
+		},
+		{
+			"lines": [
+				"    try {"
+			],
+			"startLine": 1025
+		},
+		{
+			"lines": [
+				"      try {"
+			],
+			"startLine": 1200
+		},
+		{
+			"lines": [
+				"        if (",
+				"          !findChain({ enum: chain })?.isTestnet ||",
+				"          isGasAccount ||",
+				"          isGasLess",
+				"        ) {"
+			],
+			"startLine": 1204
+		},
+		{
+			"lines": [
+				"          } else {"
+			],
+			"startLine": 1234
+		},
+		{
+			"lines": [
+				"            if (defaultRPC?.txPushToRPC && !isGasLess && !isGasAccount) {"
+			],
+			"startLine": 1297
+		},
+		{
+			"lines": [
+				"              if (fePushedError) {"
+			],
+			"startLine": 1352
+		},
+		{
+			"lines": [
+				"                } catch (bePushError) {"
+			],
+			"startLine": 1357
+		},
+		{
+			"lines": [
+				"                  });",
+				"                  throw fePushedError;",
+				"                }",
+				"              }",
+				"            } else {",
+				"              adoptBE7702Params();",
+				"              const res = await openapiService.submitTxV2(params);",
+				"              if (res.access_token) {",
+				"                void handleGasAccountLoginSuccess(",
+				"                  res.access_token,",
+				"                  currentAccount"
+			],
+			"startLine": 1361
+		}
+	]
+}
