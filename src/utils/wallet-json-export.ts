@@ -41,9 +41,6 @@ import {
 } from '@/utils/structured-details/json'
 import { renderStructuredDetailsMarkdown } from '@/utils/structured-details/markdown'
 
-/** Attributes without details (e.g. unrated ones) export an empty legacy `details` string. */
-const DETAILS_FALLBACK = ''
-
 type StageExportInput = WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 
 /**
@@ -214,19 +211,20 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	}
 	const structuredDetails = isStructuredDetails(evaluation.details) ? evaluation.details : null
 	const detailsContext = { strings: evalStrings }
+	const shortExplanation = renderTypographicContentToString(
+		evaluation.outcome.shortExplanation,
+		evalStrings,
+	)
 
 	const ratingBlock: RatingJsonExport = {
 		rating: evaluation.outcome.rating,
-		shortExplanation: renderTypographicContentToString(
-			evaluation.outcome.shortExplanation,
-			evalStrings,
-		),
+		shortExplanation,
 		// `details` stays required legacy Markdown; `structuredDetails` is the canonical payload.
 		details:
 			structuredDetails !== null
 				? renderStructuredDetailsMarkdown(structuredDetails, detailsContext)
 				: renderContentToText(evaluation.details, evalStrings, {
-						fallback: DETAILS_FALLBACK,
+						fallback: shortExplanation,
 					}),
 		...(structuredDetails !== null && {
 			structuredDetails: serializeStructuredDetails(structuredDetails, detailsContext),
