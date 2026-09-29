@@ -144,9 +144,9 @@ This would reduce reliance on intermediaries when exiting an L2.
 
 🔑 Permissions management
 
-Ambire's built-in swaps only request the exact amount needed, and batching lets dapps bundle a tight approval with the action that uses it.
+Ambire's built-in swaps only request the exact amount needed, and batching lets apps bundle a tight approval with the action that uses it.
 
-But older approvals, or ones granted to other dapps, stay live until revoked. Ambire users can't inspect or revoke existing ERC-20, ERC-721 or ERC-1155 approvals from the wallet.
+But older approvals, or ones granted to other apps, stay live until revoked. Ambire users can't inspect or revoke existing ERC-20, ERC-721 or ERC-1155 approvals from the wallet.
 
 ---
 
