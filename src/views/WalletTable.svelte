@@ -946,7 +946,7 @@
 								defaultDirection: SortDirection.Ascending,
 							},
 
-							isSticky: true,
+							isSticky: !isWalletExpanded,
 							subcolumns: walletChildColumns,
 							isDefaultExpanded: false,
 						} satisfies Column<RatedWallet<_AttributeGroupId>>,
