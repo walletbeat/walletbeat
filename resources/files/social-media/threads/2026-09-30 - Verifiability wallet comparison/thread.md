@@ -10,6 +10,25 @@ BONUS: Are they fully open source?
 
 ---
 
+Why does verifiability matter?
+
+Your wallets hold your private keys.
+
+If you can't inspect the code running your wallet, you're ultimately trusting the wallet provider to tell you what it does.
+
+Verifiable wallets should be the default.
+
+---
+Taking it a step further, wallets should raise the bar and do FOSS. What does that mean?
+
+Verifiable means a wallet's source code is available to inspect.
+
+FOSS goes further: users can freely use, modify, and distribute the code.
+
+This enables more collaboration, transparency, and security research.
+
+---
+
 @ambire
 
 ✅ Uses Free & Open Source license (Under GPL-3.0)
@@ -164,3 +183,16 @@ Mobile app: ❌ Proprietary (only the wallet core is open source, under Apache 2
 ![Zeus license](./zeus-license.png)
 
 ---
+
+15/18 wallets are verifiable.
+
+Of those, only 8/15 are fully Free & Open Source.
+
+Verifiability should be a basic requirement for any Ethereum wallet.
+
+And FOSS should be the standard.
+
+---
+
+Check out how your wallets stack up 👇
+https://beta.walletbeat.eth.limo/
