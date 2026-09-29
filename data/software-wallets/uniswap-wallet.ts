@@ -51,6 +51,7 @@ import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
 import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
 import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
 import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
+import type { ScamUrlWarning, SendTransactionWarning } from '@/schema/features/security/scam-alerts'
 
 const trailOfBitsAudits: SecurityAudit[] = [
 	{
@@ -421,7 +422,12 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: trailOfBitsAudits,
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: null,
+				scamUrlWarning: null,
+				sendTransactionWarning: null,
+				unlimitedApprovalWarning: notSupported,
+			},
 			securityBestPractices: {
 				browser: {
 					ref: [
