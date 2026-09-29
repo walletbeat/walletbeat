@@ -1,3 +1,5 @@
+import { createHash } from 'crypto'
+
 import { assertCalendarDate, type CalendarDate } from '@/types/date'
 
 import knownValidUrlsJson from './known-urls.json'
