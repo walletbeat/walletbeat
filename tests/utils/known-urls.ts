@@ -70,6 +70,26 @@ export function shouldSkipUrl(url: string): boolean {
 }
 
 /**
+ * Returns true if `href` should be fetched by the URL checks: not covered by
+ * {@link URLS_TO_SKIP}, and HTTPS. Repository-relative references (e.g.
+ * screenshots) and other non-HTTPS URLs cannot be fetched; they are
+ * validated by other means.
+ */
+export function isCheckableUrl(href: string): boolean {
+	return !shouldSkipUrl(href) && href.startsWith('https://')
+}
+
+/** The `urlHash` of a known-valid URL entry. */
+export function urlHash(href: string): string {
+	return createHash('sha1').update(href).digest('hex')
+}
+
+/** Serialize a known-valid URL entry the way it appears in known-urls.json. */
+export function serializeKnownValidUrl(entry: KnownValidUrl): string {
+	return JSON.stringify(entry, null, '\t')
+}
+
+/**
  * The list in known-urls.json exists to prevent hallucinated URLs from creeping
  * into the codebase. It exists because this problem has happened.
  * URLs must be retrieved successfully at least once, then added to that list to

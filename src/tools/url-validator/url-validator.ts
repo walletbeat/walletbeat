@@ -6,9 +6,16 @@ import pLimit from 'p-limit'
 import path from 'path'
 
 import { allWallets } from '@/data/wallets'
-import { hasRefs, toFullyQualified } from '@/schema/reference'
-import { getUrl, labeledUrl, type Url } from '@/schema/url'
-import { type KnownValidUrl, knownValidUrls, shouldSkipUrl } from '@/tests/utils/known-urls'
+import { collectAllRefs } from '@/schema/reference'
+import { getUrl, type Url } from '@/schema/url'
+import { fetchUrl } from '@/tests/utils/fetch-url'
+import {
+	isCheckableUrl,
+	type KnownValidUrl,
+	knownValidUrls,
+	serializeKnownValidUrl,
+	urlHash,
+} from '@/tests/utils/known-urls'
 import { findExternalUrlsInDist } from '@/tests/utils/scan-html-urls'
 import { today } from '@/types/date'
 import { getRepositoryRoot } from '@/utils/codebase'
