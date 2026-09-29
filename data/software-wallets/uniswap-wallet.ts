@@ -18,6 +18,7 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import type { SendTransactionWarning } from '@/schema/features/security/scam-alerts'
 import {
 	type SecurityAudit,
 	SecurityFlawSeverity,
@@ -51,7 +52,6 @@ import { uniswapCalibur } from '../wallet-contracts/uniswap-calibur'
 import uniswapAndroidParsed from './manifests/uniswapWallet/android.parsed.json'
 import uniswapIosParsed from './manifests/uniswapWallet/ios.parsed.json'
 import uniswapRawExtManifest from './manifests/uniswapWallet/nnpmfplkfogfpmcngplhnbdnnilmcdcg.manifest.json'
-import type { ScamUrlWarning, SendTransactionWarning } from '@/schema/features/security/scam-alerts'
 
 const trailOfBitsAudits: SecurityAudit[] = [
 	{
@@ -437,23 +437,29 @@ export const uniswapWallet: SoftwareWallet = {
 						},
 						{
 							explanation:
-								'Signature requests (personal_sign, eth_signTypedData) and wallet_sendCalls batches are scanned the same way through Blockaid\'s JSON-RPC scan endpoint, again including the account address and dapp domain.',
+								"Signature requests (personal_sign, eth_signTypedData) and wallet_sendCalls batches are scanned the same way through Blockaid's JSON-RPC scan endpoint, again including the account address and dapp domain.",
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/buildBlockaidScanJsonRpcRequest.ts#L18-L32',
 						},
 						{
 							explanation:
-								'The scan requests are POSTed to Blockaid endpoints (/v0/evm/transaction/scan, /v0/evm/json-rpc/scan) through a fetch client whose base URL is Uniswap\'s Blockaid proxy, authenticated with the Uniswap API key.',
+								"The scan requests are POSTed to Blockaid endpoints (/v0/evm/transaction/scan, /v0/evm/json-rpc/scan) through a fetch client whose base URL is Uniswap's Blockaid proxy, authenticated with the Uniswap API key.",
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/blockaidApi/BlockaidApiClient.ts#L5-L14',
 						},
 						{
 							explanation:
-								'The risk level shown to the user is the highest of Blockaid\'s result_type verdict, its feature types, and its classification string (Malicious maps to Critical, Warning to Warning).',
+								"The risk level shown to the user is the highest of Blockaid's result_type verdict, its feature types, and its classification string (Malicious maps to Critical, Warning to Warning).",
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/blockaidUtils.ts#L230-L272',
 						},
 						{
 							explanation:
-								'The contract name displayed for the target address is looked up from Blockaid\'s simulation address_details, i.e. a remote contract registry.',
+								"The contract name displayed for the target address is looked up from Blockaid's simulation address_details, i.e. a remote contract registry.",
 							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/blockaidUtils.ts#L476-L493',
+						},
+						{
+							explanation:
+								'A dapp approve request to a contract the user has never interacted with only shows a generic "Contract interaction" label, with no warning about the contract being new or recently deployed.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png',
+							label: 'Uniswap Wallet transaction request with no recent-contract warning',
 						},
 					],
 					contractRegistry: true,
