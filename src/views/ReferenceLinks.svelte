@@ -315,6 +315,7 @@
 	}
 
 	.source-location {
+		font-family: monospace;
 		font-weight: normal;
 		font-size: 0.85em;
 		color: var(--text-secondary);
