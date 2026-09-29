@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 400,
+	"highlightLastLine": 405,
+	"segments": [
+		{
+			"lines": [
+				"class HdKeyring extends SimpleKeyring {"
+			],
+			"startLine": 63
+		},
+		{
+			"lines": [
+				"  async setHDPathType(hdPathType: HDPathType) {",
+				"    const hdPath = this.getHDPathBase(hdPathType);",
+				"    this.setHdPath(hdPath);",
+				"  }",
+				"",
+				"  getSeed(mnemonic: string, passphrase?: string) {",
+				"    if (HdKeyring.checkMnemonicIsSlip39(mnemonic)) {",
+				"      this.isSlip39 = true;",
+				"      return this.slip39MnemonicToSeedSync(mnemonic, passphrase);",
+				"    }",
+				"    return bip39.mnemonicToSeedSync(mnemonic, passphrase);",
+				"  }",
+				"",
+				"  slip39MnemonicToSeedSync(mnemonic: string, passphrase?: string) {",
+				"    const secretShares = mnemonic.split('\\n');"
+			],
+			"startLine": 395
+		}
+	]
+}

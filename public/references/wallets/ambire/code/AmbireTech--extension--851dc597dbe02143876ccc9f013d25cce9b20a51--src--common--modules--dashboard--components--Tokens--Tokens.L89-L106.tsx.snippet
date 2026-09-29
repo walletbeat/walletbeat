@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 89,
+	"highlightLastLine": 106,
+	"segments": [
+		{
+			"lines": [
+				"}: Props) => {"
+			],
+			"startLine": 76
+		},
+		{
+			"lines": [
+				"  const {",
+				"    state: { portfolio, dashboardNetworkFilter }",
+				"  } = useController('SelectedAccountController')",
+				"  const { control, watch, setValue } = useForm({",
+				"    mode: 'all',",
+				"    defaultValues: {",
+				"      search: ''",
+				"    }",
+				"  })",
+				"",
+				"  const searchValue = watch('search')",
+				"",
+				"  const tokens = useMemo(() => {",
+				"    const tokenList = (portfolio?.tokens || []).filter((token) => {",
+				"      // Hide gas tank and borrowed defi tokens from the list",
+				"      if (token.flags.onGasTank || token.flags.defiTokenType === AssetType.Borrow) return false",
+				"",
+				"      if (!dashboardNetworkFilter) return true",
+				"      if (dashboardNetworkFilter === 'rewards') return token.flags.rewardsType",
+				"      if (dashboardNetworkFilter === 'gasTank') return token.flags.onGasTank",
+				"",
+				"      return token?.chainId?.toString() === dashboardNetworkFilter.toString()",
+				"    })",
+				"",
+				"    return tokenOrCollectionSearch({ networks, assets: tokenList, search: searchValue })",
+				"  }, [portfolio?.tokens, networks, searchValue, dashboardNetworkFilter])",
+				""
+			],
+			"startLine": 84
+		}
+	]
+}

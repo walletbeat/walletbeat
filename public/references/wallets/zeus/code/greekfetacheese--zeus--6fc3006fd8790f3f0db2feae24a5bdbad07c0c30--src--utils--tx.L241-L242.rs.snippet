@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 241,
+	"highlightLastLine": 242,
+	"segments": [
+		{
+			"lines": [
+				"pub async fn send_transaction(",
+				"   ctx: ZeusCtx,",
+				"   dapp: String,",
+				"   tx_analysis: Option<TransactionAnalysis>,",
+				"   chain: ChainId,",
+				"   mev_protect: bool,",
+				"   from: Address,",
+				"   interact_to: Address,",
+				"   call_data: Bytes,",
+				"   value: U256,",
+				"   authorization_list: Vec<SignedAuthorization>,",
+				") -> Result<(TransactionReceipt, TransactionRich), anyhow::Error> {"
+			],
+			"startLine": 101
+		},
+		{
+			"lines": [
+				"   SHARED_GUI.write(|gui| {"
+			],
+			"startLine": 228
+		},
+		{
+			"lines": [
+				"      gui.loading_window.reset();",
+				"      gui.request_repaint();",
+				"   });",
+				"",
+				"   // wait for the user to confirm or reject the transaction",
+				"   let mut confirmed = None;",
+				"   loop {",
+				"      tokio::time::sleep(std::time::Duration::from_millis(50)).await;",
+				"",
+				"      SHARED_GUI.read(|gui| {"
+			],
+			"startLine": 237
+		}
+	]
+}

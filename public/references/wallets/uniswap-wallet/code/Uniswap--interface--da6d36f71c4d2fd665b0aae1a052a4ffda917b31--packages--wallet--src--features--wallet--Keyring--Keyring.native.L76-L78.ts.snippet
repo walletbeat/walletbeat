@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 76,
+	"highlightLastLine": 78,
+	"segments": [
+		{
+			"lines": [
+				"class NativeKeyring implements IKeyring {"
+			],
+			"startLine": 21
+		},
+		{
+			"lines": [
+				"  retrieveMnemonicUnlocked(_address: string): Promise<string> {",
+				"    throw new NotImplementedError('retrieveMnemonic')",
+				"  }",
+				"",
+				"  // returns the mnemonicId (derived address at index 0) of the stored mnemonic",
+				"  generateAndStoreMnemonic(): Promise<string> {",
+				"    return RNEthersRS.generateAndStoreMnemonic()",
+				"  }",
+				"",
+				"  getAddressesForStoredPrivateKeys(): Promise<string[]> {",
+				"    return RNEthersRS.getAddressesForStoredPrivateKeys()",
+				"  }"
+			],
+			"startLine": 71
+		}
+	]
+}

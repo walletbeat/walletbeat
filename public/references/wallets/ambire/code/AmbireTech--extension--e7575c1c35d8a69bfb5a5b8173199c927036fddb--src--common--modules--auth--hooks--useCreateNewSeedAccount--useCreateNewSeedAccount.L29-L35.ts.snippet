@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 29,
+	"highlightLastLine": 35,
+	"segments": [
+		{
+			"lines": [
+				"export default function useCreateNewSeedAccount() {"
+			],
+			"startLine": 13
+		},
+		{
+			"lines": [
+				"",
+				"  const createNewSeedAccount = useCallback(() => {",
+				"    hasSeenLoading.current = false",
+				"    setIsCreating(true)",
+				"    mainDispatch({",
+				"      type: 'method',",
+				"      params: {",
+				"        method: 'accountPickerSetInitParamsFromNewSeed',",
+				"        args: [{ extraEntropy: getExtraEntropy() }]",
+				"      }",
+				"    })",
+				"  }, [getExtraEntropy, mainDispatch])",
+				"",
+				"  useEffect(() => {",
+				"    if (!isCreating) return"
+			],
+			"startLine": 25
+		}
+	]
+}

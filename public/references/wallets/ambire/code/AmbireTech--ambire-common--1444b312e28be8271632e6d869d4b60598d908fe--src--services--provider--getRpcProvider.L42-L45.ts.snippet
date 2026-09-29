@@ -1,0 +1,34 @@
+{
+	"highlightFirstLine": 42,
+	"highlightLastLine": 45,
+	"segments": [
+		{
+			"lines": [
+				"const getRpcProvider = (",
+				"  rpcUrls: NetworkInterface['rpcUrls'],",
+				"  chainId?: bigint | number,",
+				"  selectedRpcUrl?: string,",
+				"  options?: JsonRpcApiProviderOptions",
+				") => {"
+			],
+			"startLine": 30
+		},
+		{
+			"lines": [
+				"  }",
+				"",
+				"  let rpcUrl = rpcUrls[0]",
+				"",
+				"  if (selectedRpcUrl) {",
+				"    const prefUrl = rpcUrls.find((u) => u === selectedRpcUrl)",
+				"    if (prefUrl) rpcUrl = prefUrl",
+				"  }",
+				"",
+				"  if (!rpcUrl) {",
+				"    throw new Error('Invalid RPC URL provided')",
+				"  }"
+			],
+			"startLine": 38
+		}
+	]
+}

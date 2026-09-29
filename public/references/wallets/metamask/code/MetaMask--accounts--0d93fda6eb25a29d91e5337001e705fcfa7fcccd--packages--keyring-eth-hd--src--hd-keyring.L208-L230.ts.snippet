@@ -1,0 +1,54 @@
+{
+	"highlightFirstLine": 208,
+	"highlightLastLine": 230,
+	"segments": [
+		{
+			"lines": [
+				"export class HdKeyring implements Keyring {"
+			],
+			"startLine": 112
+		},
+		{
+			"lines": [
+				"  /**"
+			],
+			"startLine": 201
+		},
+		{
+			"lines": [
+				"   *",
+				"   * @param numberOfAccounts - The number of accounts to add.",
+				"   * @returns The addresses of the new accounts.",
+				"   */",
+				"  async addAccounts(numberOfAccounts = 1): Promise<Hex[]> {",
+				"    if (!this.root) {",
+				"      throw new Error('Eth-Hd-Keyring: No secret recovery phrase provided');",
+				"    }",
+				"",
+				"    const oldLen = this.#walletMap.size;",
+				"    const newAddresses: Hex[] = [];",
+				"    for (let i = oldLen; i < numberOfAccounts + oldLen; i++) {",
+				"      const hdKey = this.root.deriveChild(i);",
+				"      assert(hdKey.publicKey, 'Expected public key to be set');",
+				"",
+				"      const address = this.#addressFromPublicKey(hdKey.publicKey);",
+				"      const walletData: WalletData = {",
+				"        hdKey,",
+				"        address,",
+				"      };",
+				"",
+				"      this.#walletMap.set(address, walletData);",
+				"      newAddresses.push(address);",
+				"    }",
+				"",
+				"    return Promise.resolve(newAddresses);",
+				"  }",
+				"",
+				"  /**",
+				"   * Get the addresses of all accounts in the keyring.",
+				"   *"
+			],
+			"startLine": 204
+		}
+	]
+}

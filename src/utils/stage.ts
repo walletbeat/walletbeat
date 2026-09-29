@@ -118,3 +118,16 @@ export function getWalletStageAndLadder(wallet: RatedWalletStageSlice): {
 		ladderType: null,
 	}
 }
+
+/**
+ * Whether the wallet cleared at least Stage 0 on its applicable ladder.
+ *
+ * Stage 0 requires public source availability. Wallets that did not qualify
+ * (`QUALIFIED_FOR_NO_STAGES`) cannot be independently verified for many
+ * attributes, so they should not be ranked with Stage 0+ wallets.
+ */
+export function walletQualifiesForStageZero(wallet: RatedWalletStageSlice): boolean {
+	const { stage } = getWalletStageAndLadder(wallet)
+
+	return stage !== null && typeof stage === 'object'
+}

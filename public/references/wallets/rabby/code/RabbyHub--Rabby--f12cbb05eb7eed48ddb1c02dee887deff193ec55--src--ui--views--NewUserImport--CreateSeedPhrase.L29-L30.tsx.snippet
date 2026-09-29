@@ -1,0 +1,27 @@
+{
+	"highlightFirstLine": 29,
+	"highlightLastLine": 30,
+	"segments": [
+		{
+			"lines": [
+				"export const CreateSeedPhrase = () => {"
+			],
+			"startLine": 17
+		},
+		{
+			"lines": [
+				"",
+				"  const handleSubmit = useMemoizedFn(async (password: string) => {",
+				"    try {",
+				"      await wallet.boot(password);",
+				"      const seedPhrase = await wallet.generateMnemonic();",
+				"      await wallet.createKeyringWithMnemonics(seedPhrase, { hasBackup: false });",
+				"      const keyring = await wallet.getKeyringByMnemonic(seedPhrase, '');",
+				"      setStore({ seedPhrase, passphrase: '' });",
+				"",
+				"      const stashKeyringId = await wallet.getMnemonicKeyRingIdFromPublicKey("
+			],
+			"startLine": 25
+		}
+	]
+}

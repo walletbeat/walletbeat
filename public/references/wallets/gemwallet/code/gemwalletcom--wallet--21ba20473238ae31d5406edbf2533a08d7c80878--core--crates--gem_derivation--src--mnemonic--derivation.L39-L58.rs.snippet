@@ -1,0 +1,45 @@
+{
+	"highlightFirstLine": 39,
+	"highlightLastLine": 58,
+	"segments": [
+		{
+			"lines": [
+				"pub fn derive_accounts_from_mnemonic(phrase: &str, chains: Vec<Chain>) -> Result<Vec<Account>, AccountDerivationError> {"
+			],
+			"startLine": 19
+		},
+		{
+			"lines": [
+				"    }",
+				"    Ok(accounts)",
+				"}",
+				"",
+				"pub fn derive_private_key_from_mnemonic(phrase: &str, chain: Chain) -> Result<Zeroizing<Vec<u8>>, AccountDerivationError> {",
+				"    let seed = Mnemonic::seed(phrase)?;",
+				"    let entropy = Mnemonic::entropy(phrase)?;",
+				"    derive_private_key_by_chain(seed.as_slice(), entropy.as_slice(), chain).map(|derived| derived.private_key)",
+				"}",
+				"",
+				"fn unique_chains(chains: Vec<Chain>) -> Vec<Chain> {",
+				"    let mut unique = Vec::with_capacity(chains.len());",
+				"    for chain in chains {",
+				"        if !unique.contains(&chain) {",
+				"            unique.push(chain);",
+				"        }",
+				"    }",
+				"    unique",
+				"}",
+				"",
+				"fn derive_private_key_by_chain(seed: &[u8], entropy: &[u8], chain: Chain) -> Result<DerivedPrivateKey, AccountDerivationError> {",
+				"    let (private_key, extended_public_key) = match derivation_scheme(chain)? {",
+				"        DerivationScheme::Bip44 | DerivationScheme::Bip84 => {",
+				"            let private_key = bip32::derive_secp256k1_private_key(seed, default_derivation_path(chain))?;",
+				"            let extended_public_key = BitcoinChain::from_chain(chain)",
+				"                .map(|bitcoin_chain| bitcoin::derive_extended_public_key(seed, bitcoin_chain))",
+				"                .transpose()?;",
+				"            (private_key, extended_public_key)"
+			],
+			"startLine": 35
+		}
+	]
+}

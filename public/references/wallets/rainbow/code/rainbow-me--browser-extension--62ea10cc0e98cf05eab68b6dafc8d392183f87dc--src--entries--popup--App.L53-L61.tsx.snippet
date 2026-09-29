@@ -1,0 +1,34 @@
+{
+	"highlightFirstLine": 53,
+	"highlightLastLine": 61,
+	"segments": [
+		{
+			"lines": [
+				"export function App() {"
+			],
+			"startLine": 34
+		},
+		{
+			"lines": [
+				"  }, [prevChains, activeChains]);",
+				"",
+				"  React.useEffect(() => {",
+				"    // Init trezor once globally",
+				"    TrezorConnect?.init({",
+				"      manifest: {",
+				"        email: 'support@rainbow.me',",
+				"        appUrl: 'https://rainbow.me',",
+				"      },",
+				"      lazyLoad: true,",
+				"      transports: ['BridgeTransport', 'WebUsbTransport'],",
+				"      connectSrc: 'https://connect.trezor.io/9/',",
+				"    });",
+				"",
+				"    if (process.env.IS_DEV !== 'true') {",
+				"      document.addEventListener('contextmenu', (e) => e.preventDefault());",
+				"    }"
+			],
+			"startLine": 49
+		}
+	]
+}

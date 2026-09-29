@@ -131,7 +131,50 @@ export const rainbow: SoftwareWallet = {
 				contract: rainbowCaliburContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Rainbow derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Browser extension derivation path',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L60',
+							},
+							{
+								label: 'Browser extension key derivation',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L69-L81',
+							},
+							{
+								label: 'Browser extension BIP-39 seed phrase generation',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/5caa9e2aaef2e28367d2e5c06f0b95db98e40451/src/core/keychain/keychainTypes/hdKeychain.ts#L143-L150',
+							},
+							{
+								label: 'Mobile app key derivation',
+								url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/utils/wallet.ts#L48-L69',
+							},
+							{
+								label: 'Mobile app derivation path',
+								url: 'https://github.com/rainbow-me/rainbow/blob/8be7a792ef6258197a95ff275181cb2dc94e73da/src/model/wallet.ts#L187',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -1189,7 +1232,38 @@ export const rainbow: SoftwareWallet = {
 					],
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Rainbow does not decode a USDC approval; it only shows the simulated approval amount, without the spender.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-usdc-approval.png',
+							label: 'Rainbow transaction request for a USDC approval',
+						},
+						{
+							explanation:
+								'Rainbow does not decode an Aave supply; it only shows the simulated amount sent.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-aave-supply.png',
+							label: 'Rainbow transaction request for an Aave supply',
+						},
+						{
+							explanation:
+								'Rainbow does not decode the Aave supply nested within a Safe{Wallet} transaction; the simulation shows no changes detected.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-aave-supply.png',
+							label: 'Rainbow transaction request for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Rainbow does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; the simulation shows no changes detected.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-safe-batch-approve-supply.png',
+							label: 'Rainbow transaction request for a Safe{Wallet} batched approve and supply',
+						},
+						{
+							explanation:
+								'Rainbow does not decode a batched USDC approval and Aave supply from an EOA; it only shows the simulated amounts sent and approved.',
+							file: 'public/references/wallets/rainbow/screenshots/2026-09-23-rainbow-erc7730-batch-approve-supply.png',
+							label: 'Rainbow batch request for a batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.NOT_IN_UI,
 					},
@@ -1295,16 +1369,63 @@ export const rainbow: SoftwareWallet = {
 			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: {
+						explanation:
+							"Rainbow's browser extension sends custom RPC traffic through its own servers unless the node runs on the same computer at port 8545, and the mobile app has no custom RPC setting.",
+						url: [
+							{
+								label:
+									"Browser extension routes custom RPCs through Rainbow's servers except for a few local addresses",
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/providers/proxy.ts#L21-L38',
+							},
+							{
+								label:
+									'Browser extension swaps the custom RPC you set for a Rainbow server address',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientRpc.ts#L11-L33',
+							},
+							{
+								label:
+									"Browser extension connects through Rainbow's servers instead of directly to your custom RPC",
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientToProvider.ts#L20-L22',
+							},
+							{
+								label:
+									'Browser extension can only reach the computer it runs on and a fixed list of servers run by Rainbow and other companies',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
+							},
+							{
+								label:
+									'Browser extension tells the browser to block any server not on its allowed list, including a node on your home network',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/webpack.config.js#L30-L33',
+							},
+							{
+								label: "Mobile app only uses Rainbow's default RPC outside developer mode",
+								url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L137-L156',
+							},
+						],
+					},
 					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: featureSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: refTodo,
+					ref: {
+						explanation:
+							"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+						url: [
+							{
+								label: "Browser extension sends transactions through the network's RPC",
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/background/procedures/popup/wallet/sendTransaction.ts#L12-L15',
+							},
+							{
+								label: "Mobile app sends transactions through the network's RPC",
+								url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/model/wallet.ts#L159-L181',
+							},
+						],
+					},
 				},
 			},
 		},
