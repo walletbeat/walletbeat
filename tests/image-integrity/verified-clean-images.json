@@ -959,6 +959,14 @@
 		"hash": "3ffdc886c3b65217c6a2c8951a12475f9dfb895694216a88fb4c65eee313bcb8",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png": {
+		"hash": "9960dc700c5055436d5c6452ec6d1109f24cc8a8975f601214cf856546259052",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png": {
+		"hash": "dc9b4ba257889fe4291a0fae263ecab61be82ebefa2fb29099938af1d23909f6",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png": {
 		"hash": "ade57eda19a08d0b0ce4d7fa1eecafb26d29c0af323092ae8a2571164f9994e9",
 		"passedTests": ["blockiness", "file-format"]
