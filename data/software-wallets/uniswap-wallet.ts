@@ -464,7 +464,37 @@ export const uniswapWallet: SoftwareWallet = {
 					recentContractWarning: false,
 				}),
 				scamUrlWarning: null,
-				sendTransactionWarning: null,
+				sendTransactionWarning: supported<SendTransactionWarning>({
+					ref: [
+						{
+							explanation:
+								'Before a send, RecipientSelectSpeedBumps (used by both the extension and mobile Send flows) shows a new-address warning when the user has no prior Send transactions to that recipient and it is not one of their own accounts, plus separate warnings for smart contract, ERC-20 contract, view-only and self-send recipients.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/components/RecipientSearch/RecipientSelectSpeedBumps.tsx#L134-L153',
+						},
+						{
+							explanation:
+								"The prior-transaction check filters the wallet's locally stored transaction list for Send transactions to the recipient, with no network request.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/transactions/hooks/useAllTransactionsBetweenAddresses.ts#L10-L23',
+						},
+						{
+							explanation:
+								'The smart contract recipient check calls provider.getCode(recipient) on the chain RPC provider.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/features/address/useIsSmartContractAddress.tsx#L17-L38',
+						},
+						{
+							explanation:
+								'Sending to an address the user has not transacted with before shows a "New address" warning asking them to confirm the address before continuing.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png',
+							label: 'Uniswap Wallet "New address" warning in the Send flow',
+						},
+					],
+					addressPoisoningDetection: false,
+					leaksRecipient: true,
+					leaksUserAddress: false,
+					leaksUserIp: true,
+					newRecipientWarning: true,
+					userWhitelist: false,
+				}),
 				unlimitedApprovalWarning: notSupported,
 			},
 			securityBestPractices: {
