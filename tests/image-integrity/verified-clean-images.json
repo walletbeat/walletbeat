@@ -1463,6 +1463,78 @@
 		"hash": "324ca3cdfc8ffb46249a4734ea22c84dccf0752e1861738fa935ba255d6eea36",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/ambire-license.png": {
+		"hash": "1b32087208a30b5cb3c60327aea69af40d1c3b6ad373d7ebb5c0a52add51cb00",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/base-app-license.png": {
+		"hash": "ebf4b41f1e5baddf2a052f0361e5e421d111e8f8ba522dfc24ad76df72ad8150",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/bitget-license.png": {
+		"hash": "031aac6c110599cc3a128dbc22c8b426eb865be00039a8d7350fb8c9dc6bffd9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/bridge-wallet-license.png": {
+		"hash": "9ab38456b1eba2331f4760c2bce031a91da9584f6dd708a1138f460ce6d451be",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/daimo-license.png": {
+		"hash": "4d25fa3af8b9cf53f2a73e4659309841896e5f1fb36618c9f3d0063c415c5c91",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/gem-wallet-license.png": {
+		"hash": "50052c75895e8cbf53bab68adba4afff72507a2d74f2a77e740ce01ce7bb565a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/imtoken-license.png": {
+		"hash": "a3026d11640f1cc6339e65c0c50551139614fad7948e3ba6cc1275ecddf9c2c1",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/metamask-license.png": {
+		"hash": "bcc18fcc78f0881b0324976e022acad5c2ac79e53eb481ed3b50b61d28f14b5a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/nufi-license.png": {
+		"hash": "d38118f5d5b1ae3d42a63158cccf1b678152741b01d0c2ddb8be23f9ac0e7fda",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/okx-license.png": {
+		"hash": "fb02635b0e1467d0353e4965ea0e79d11f6f510ec4dc11cb9acfdf7ab771ca9f",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/phantom-license.png": {
+		"hash": "dbe587fbb5b4f85a4d38bcc4efbb630dc2abe5d17d3b0d740852b4205c09a653",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/pillarx-license.png": {
+		"hash": "18fce872bec547236aa6f8c5b220dcda0b442d3309b94d92082af0a887fabde9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/rabby-license.png": {
+		"hash": "8adc675102db58d317537d7219eb385dfca8e1846bdb15e439798876e214bb7c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/rainbow-license.png": {
+		"hash": "999888cbab0e98f031fff0658b395a36cf158695c8e04dc59536dc5627669d8a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/safe-license.png": {
+		"hash": "d6e1e7b9242db6ba5486a340a2ef4d46f95d099c467f4b9d1b6eee688c260075",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/uniswap-wallet-license.png": {
+		"hash": "ff8bfcb9d173257a592782a9469a2c2022424f7ba22761d7da8551b066aa3001",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/zerion-license.png": {
+		"hash": "522fcf43bb6bec667c85b498cfc4798028900dfca227dcbe8895bae11e2d5185",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"resources/files/social-media/threads/2026-09-30 - Verifiability wallet comparison/zeus-license.png": {
+		"hash": "94231df52313cd9af94429c8ecf3811be5c6f9840fe0d11ea30ec6b3ab1e4b82",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"resources/files/wbicons/wbicons-complex/about.svg": {
 		"hash": "93582a5f64674f1e25972f4751f1e8acb14272d7f209c70bd038dccb075a860d",
 		"passedTests": ["file-format", "svg-vector", "wbicon-square"]
