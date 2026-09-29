@@ -18,7 +18,7 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import type { SendTransactionWarning } from '@/schema/features/security/scam-alerts'
+import type { ScamUrlWarning, SendTransactionWarning } from '@/schema/features/security/scam-alerts'
 import {
 	type SecurityAudit,
 	SecurityFlawSeverity,
@@ -469,7 +469,38 @@ export const uniswapWallet: SoftwareWallet = {
 					previousContractInteractionWarning: false,
 					recentContractWarning: false,
 				}),
-				scamUrlWarning: null,
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							explanation:
+								'scanSite POSTs the dapp URL to Blockaid\'s /v0/site/scan endpoint (via Uniswap\'s proxy) and maps the result to Verified, Threat (is_malicious) or Unverified (unknown site or failed lookup).',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/api/src/clients/blockaid/createBlockaidApiClient.ts#L34-L66',
+						},
+						{
+							explanation:
+								'useBlockaidVerification queries scanSite on demand for the dapp URL (cached for five minutes), rather than downloading a blocklist, so every checked site is disclosed to the scanning service.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/hooks/useBlockaidVerification.ts#L19-L33',
+						},
+						{
+							explanation:
+								'In the extension, the dappUrl scanned is reduced to the origin of the requesting tab via extractBaseUrl (which returns URL.origin), so the path and query are not sent.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/dappRequests/DappRequestQueueContext.tsx#L72',
+						},
+						{
+							explanation:
+								'extractBaseUrl returns the parsed URL origin (scheme and host).',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/utilities/src/format/urls.ts#L177-L179',
+						},
+						{
+							explanation:
+								'On mobile, WalletConnect requests are scanned using the dapp-supplied metadata URL and the Blockaid result is merged with WalletConnect Verify.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/components/Requests/RequestModal/WalletConnectRequestModalContent.tsx#L94-L96',
+						},
+					],
+					leaksUserAddress: false,
+					leaksUserIp: true,
+					leaksVisitedUrl: 'DOMAIN_ONLY',
+				}),
 				sendTransactionWarning: supported<SendTransactionWarning>({
 					ref: [
 						{

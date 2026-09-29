@@ -1,0 +1,23 @@
+{
+	"highlightFirstLine": 94,
+	"highlightLastLine": 96,
+	"segments": [
+		{
+			"lines": [
+				"}: WalletConnectRequestModalContentProps): JSX.Element {",
+				"  const chainId = request.chainId",
+				"  const permitInfo = getPermitInfo(request)",
+				"  const nativeCurrency = getChainInfo(chainId).nativeCurrency",
+				"",
+				"  const { verificationStatus: blockaidStatus, isLoading: isVerificationLoading } = useBlockaidVerification(",
+				"    request.dappRequestInfo.url,",
+				"  )",
+				"  // Merge WC Verify + Blockaid; only apply the first-party override against the WC Verify",
+				"  // trusted origin — never the dapp-supplied metadata URL. Undefined while loading so the",
+				"  // badge/alert don't flash an intermediate state.",
+				"  const verificationStatus: DappVerificationStatus | undefined = isVerificationLoading"
+			],
+			"startLine": 89
+		}
+	]
+}
