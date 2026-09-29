@@ -1379,7 +1379,8 @@ export const rainbow: SoftwareWallet = {
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/providers/proxy.ts#L21-L38',
 							},
 							{
-								label: "Browser extension sends the custom RPC you set to Rainbow's servers first",
+								label:
+									'Browser extension swaps the custom RPC you set for a Rainbow server address',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientRpc.ts#L11-L33',
 							},
 							{
@@ -1389,12 +1390,12 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								label:
-									'Browser extension can only reach this computer and a fixed list of Rainbow and third-party servers',
+									'Browser extension can only reach the computer it runs on and a fixed list of Rainbow and third-party servers',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
 							},
 							{
 								label:
-									'Browser extension tells the browser to block any server not on its allowed list, including a node elsewhere on your home network',
+									'Browser extension tells the browser to block any server not on its allowed list, including a node on your home network',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/webpack.config.js#L30-L33',
 							},
 							{
