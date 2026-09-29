@@ -507,6 +507,22 @@
 		"hash": "b754d388bcfcb25ecc8d38047713f75733d3d4d9ff7d3be48a543a2ef78fcf56",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-custom-rpc.png": {
+		"hash": "136547e1dc97e8c2c89ff63a640e9695d2f0c89716006c5992a4c674f89cf8c6",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-network-list.png": {
+		"hash": "cfbce39864220e0ed613dc91265fc743d20c05bcb79ca8e5b2a7777d9b40a7f7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-add-network.png": {
+		"hash": "45b42b206c0c3a75416529d86c41153f87aabee3730dfef352fbc864594317fb",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-network-list.png": {
+		"hash": "7666e57b3f80b8f26b0e2a26edbf70a462025a7e5dab8e8963dfe00ffc2fc7c2",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png": {
 		"hash": "d3eb693850d07d2effe35a43f5e4f9938bf778937da73c2ad057632f29a4fb90",
 		"passedTests": ["blockiness", "file-format"]

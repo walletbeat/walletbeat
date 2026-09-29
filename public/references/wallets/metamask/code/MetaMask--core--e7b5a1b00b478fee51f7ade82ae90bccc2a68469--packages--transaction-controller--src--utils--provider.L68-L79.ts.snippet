@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 68,
+	"highlightLastLine": 79,
+	"segments": [
+		{
+			"lines": [
+				"}: {"
+			],
+			"startLine": 61
+		},
+		{
+			"lines": [
+				"  networkClientId?: NetworkClientId;",
+				"  method: string;",
+				"  params?: ProviderRequestParams;",
+				"}): Promise<unknown> {",
+				"  const resolvedNetworkClientId = getNetworkClientId({",
+				"    messenger,",
+				"    chainId,",
+				"    networkClientId,",
+				"  });",
+				"",
+				"  const networkClient = getNetworkClient(messenger, resolvedNetworkClientId);",
+				"  const { provider } = networkClient;",
+				"",
+				"  let response: unknown;",
+				"  try {",
+				"    response = await provider.request({ method, params });",
+				"  } catch (error) {",
+				"    throwWithRpcContext(error, {",
+				"      method,",
+				"      networkClient,"
+			],
+			"startLine": 64
+		}
+	]
+}
