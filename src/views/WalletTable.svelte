@@ -166,7 +166,7 @@
 		undefined
 	)
 
-	let expandedRowIds = $state(
+	let expandedDisclosureIds = $state(
 		new SvelteSet<string>()
 	)
 
@@ -628,9 +628,7 @@
 		}, 'filters')
 	}
 
-	const isRowExpanded = (walletId: string) => (
-		expandedRowIds.has(walletId)
-	)
+	const disclosureId = (walletId: string, columnId: unknown) => JSON.stringify([walletId, columnId])
 
 	$effect(() => {
 		if (
@@ -1015,13 +1013,14 @@
 				column,
 				value,
 			})}
-				{@const isExpanded = isRowExpanded(wallet.metadata.id)}
+				{@const cellDisclosureId = disclosureId(wallet.metadata.id, column.id)}
+				{@const isExpanded = expandedDisclosureIds.has(cellDisclosureId)}
 				{@const setIsExpanded = (open: boolean) => {
 					transitionUpdate(() => {
 						if (open)
-							expandedRowIds.add(wallet.metadata.id)
+							expandedDisclosureIds.add(cellDisclosureId)
 						else
-							expandedRowIds.delete(wallet.metadata.id)
+							expandedDisclosureIds.delete(cellDisclosureId)
 					})
 				}}
 
