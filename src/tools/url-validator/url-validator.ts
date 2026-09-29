@@ -194,22 +194,11 @@ async function main(): Promise<void> {
 	process.stdout.write('Building site to scan for hardcoded external URLs...\n')
 	execSync('pnpm run build', { cwd: REPO_ROOT, stdio: 'inherit' })
 
-	for (const [href] of findExternalUrlsInDist(DIST_DIR)) {
-		if (shouldSkipUrl(href)) {
-			continue
-		}
-
-		if (!href.startsWith('https://')) {
-			nonHttps++
-			continue
-		}
-
-		referenced.set(sha1(href), href)
-	}
-
-	if (nonHttps > 0) {
-		process.stdout.write(`Skipped ${nonHttps.toString()} non-HTTPS (repository-relative) URLs.\n`)
-	}
+	const hrefs = [...collectUrls().map(getUrl), ...findExternalUrlsInDist(DIST_DIR).keys()]
+	// hash -> href, deduplicated across all wallets and the built HTML.
+	const referenced = new Map(
+		hrefs.filter(isCheckableUrl).map(href => [urlHash(href), href] as const),
+	)
 
 	const knownHashes = new Set(knownValidUrls.map(known => known.urlHash))
 	const kept = knownValidUrls.filter(known => referenced.has(known.urlHash))

@@ -23,16 +23,7 @@ async function checkValidHref(href: string): Promise<void> {
 		return
 	}
 
-	// Repository-relative references (e.g. screenshots) and other non-HTTPS URLs
-	// cannot be fetched over HTTPS; they are validated by other means.
-	if (!href.startsWith('https://')) {
-		return
-	}
-
-	const h = createHash('sha1')
-
-	h.update(href)
-	const digest = h.digest('hex')
+	const digest = urlHash(href)
 	const existing = knownValidUrls.find(knownValidUrl => knownValidUrl.urlHash === digest)
 
 	if (existing !== undefined) {
@@ -281,12 +272,7 @@ describe('already-known valid URLs set', () => {
 		for (const knownValidUrl of knownValidUrls) {
 			describe(knownValidUrl.url, () => {
 				it('has valid hash', () => {
-					const h = createHash('sha1')
-
-					h.update(knownValidUrl.url)
-					const digest = h.digest('hex')
-
-					expect(knownValidUrl.urlHash).toEqual(digest)
+					expect(knownValidUrl.urlHash).toEqual(urlHash(knownValidUrl.url))
 				})
 			})
 		}
