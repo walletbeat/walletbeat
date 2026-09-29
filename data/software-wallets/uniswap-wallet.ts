@@ -423,7 +423,46 @@ export const uniswapWallet: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: trailOfBitsAudits,
 			scamAlerts: {
-				contractTransactionWarning: null,
+				contractTransactionWarning: supported({
+					ref: [
+						{
+							explanation:
+								'For every dapp transaction request, the wallet (shared by extension and mobile) builds a Blockaid scan request from the transaction and runs it before rendering the preview, then derives a risk level and readable sections from the scan result.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/components/dappRequests/DappTransactionScanningContent.tsx#L63-L84',
+						},
+						{
+							explanation:
+								'The Blockaid scan request contains the user account address (account_address and data.from), the target contract (data.to), calldata, value, and the dapp domain, with validation and simulation options enabled.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/buildBlockaidScanTransactionRequest.ts#L17-L35',
+						},
+						{
+							explanation:
+								'Signature requests (personal_sign, eth_signTypedData) and wallet_sendCalls batches are scanned the same way through Blockaid\'s JSON-RPC scan endpoint, again including the account address and dapp domain.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/buildBlockaidScanJsonRpcRequest.ts#L18-L32',
+						},
+						{
+							explanation:
+								'The scan requests are POSTed to Blockaid endpoints (/v0/evm/transaction/scan, /v0/evm/json-rpc/scan) through a fetch client whose base URL is Uniswap\'s Blockaid proxy, authenticated with the Uniswap API key.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/blockaidApi/BlockaidApiClient.ts#L5-L14',
+						},
+						{
+							explanation:
+								'The risk level shown to the user is the highest of Blockaid\'s result_type verdict, its feature types, and its classification string (Malicious maps to Critical, Warning to Warning).',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/blockaidUtils.ts#L230-L272',
+						},
+						{
+							explanation:
+								'The contract name displayed for the target address is looked up from Blockaid\'s simulation address_details, i.e. a remote contract registry.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/blockaidUtils.ts#L476-L493',
+						},
+					],
+					contractRegistry: true,
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: false,
+					recentContractWarning: false,
+				}),
 				scamUrlWarning: null,
 				sendTransactionWarning: null,
 				unlimitedApprovalWarning: notSupported,
