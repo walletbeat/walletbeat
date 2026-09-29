@@ -1390,7 +1390,7 @@ export const rainbow: SoftwareWallet = {
 							},
 							{
 								label:
-									'Browser extension can only reach the computer it runs on and a fixed list of Rainbow and third-party servers',
+									'Browser extension can only reach the computer it runs on and a fixed list of servers run by Rainbow and other companies',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
 							},
 							{

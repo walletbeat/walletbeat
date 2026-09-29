@@ -1,8 +1,4 @@
 {
-	"family-icon.png": {
-		"hash": "87c773dbe2f344290f354c695c93e10fdda2e2c2a5b422fbc5a3dd787fa8c4c4",
-		"passedTests": ["blockiness", "file-format"]
-	},
 	"governance/decisions/2026/travel-policy/airfare.png": {
 		"hash": "9e3f925773dddf1c696cad25a166a9b72a480c0f8bbcbb7b865cbdd2821b946f",
 		"passedTests": ["blockiness", "file-format"]
