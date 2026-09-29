@@ -1,17 +1,38 @@
 <script lang="ts">
 	// Types/constants
 	import { onMount, type Snippet } from 'svelte'
-	import type { HTMLAttributes } from 'svelte/elements'
+	import { readable } from 'svelte/store'
+	import type { HTMLDetailsAttributes } from 'svelte/elements'
 	import type {
 		TooltipButtonTriggerPlacement,
 		TooltipHoverTriggerPlacement,
 	} from '@/components/Tooltip.svelte'
+
+	// Keep one compact drawer open when a viewport narrows with several desktop disclosures expanded.
+	const compactDisclosures = readable(false, set => {
+		const media = matchMedia('(max-width: 40rem)')
+		const update = () => {
+			if (media.matches) {
+				const open = [...document.querySelectorAll<HTMLDetailsElement>('details.with-expanded-content[open]')]
+
+				for (const disclosure of open.slice(0, -1)) disclosure.open = false
+			}
+
+			set(media.matches)
+		}
+
+			update()
+			media.addEventListener('change', update)
+
+			return () => media.removeEventListener('change', update)
+	})
 
 
 	// Props
 	let {
 		isExpanded = $bindable(false),
 		showAccordionMarker = false,
+		name: disclosureName,
 
 		tooltipMaxWidth,
 		tooltipButtonTriggerPlacement = 'around',
@@ -21,7 +42,7 @@
 		ExpandedContent: ExpandedContent,
 
 		...restProps
-	}: HTMLAttributes<HTMLDetailsElement> & {
+	}: HTMLDetailsAttributes & {
 		isExpanded: boolean
 		showAccordionMarker?: boolean
 
@@ -38,7 +59,14 @@
 	import Tooltip from '@/components/Tooltip.svelte'
 
 	let enhanced = $state(false)
-	onMount(() => { enhanced = true })
+	let compact = $state(false)
+	onMount(() => {
+		const unsubscribe = compactDisclosures.subscribe(value => { compact = value })
+
+		enhanced = true
+
+		return unsubscribe
+	})
 </script>
 
 
@@ -47,6 +75,7 @@
 		class="with-expanded-content"
 		bind:open={isExpanded}
 		{...restProps}
+		name={enhanced && compact ? 'walletbeat-compact-disclosures' : disclosureName}
 		data-tooltip-enhanced={enhanced ? '' : undefined}
 		ontoggle={event => {
 			if (event.currentTarget.open)
@@ -146,10 +175,10 @@
 		font-size: 0.66em;
 	}
 
-	/* The native disclosure is the no-JS owner. On compact viewports its existing
-	 * content surface becomes the same inset drawer used by the enhanced popover. */
+	/* Without enhancement, open disclosures stay inline and cannot overlap.
+	 * Enhanced compact disclosures use one native name group and share a drawer. */
 	@media (width <= 40rem) {
-		details[open] > :global([popover]:not(:popover-open)) {
+		details[data-tooltip-enhanced][open] > :global([popover]:not(:popover-open)) {
 			display: block;
 			position: fixed;
 			z-index: 3;
