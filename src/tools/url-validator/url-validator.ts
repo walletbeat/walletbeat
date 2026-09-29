@@ -262,7 +262,7 @@ async function main(): Promise<void> {
 
 		for (const failure of failed) {
 			process.stderr.write(
-				`- ${failure.entry.url}\n  (${failure.outcome.detail})\n${serializeEntry(failure.entry)}\n`,
+				`- ${failure.entry.url}\n  (${failure.outcome.detail})\n${serializeKnownValidUrl(failure.entry)}\n`,
 			)
 		}
 

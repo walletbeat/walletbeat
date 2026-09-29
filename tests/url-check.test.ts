@@ -246,7 +246,7 @@ describe('already-known valid URLs set', () => {
 				? 'A new valid URL was detected, and needs to be added to the known-valid URL list to avoid re-fetching it on every run.'
 				: 'New valid URLs were detected, and need to be added to the known-valid URL list to avoid re-fetching them on every run.') +
 				'\n\nRun `pnpm validate-urls` to add them automatically, or add the following to tests/utils/known-urls.json:\n\n' +
-				newValidUrls.map(newValidUrl => JSON.stringify(newValidUrl, null, '\t')).join('\n'),
+				newValidUrls.map(serializeKnownValidUrl).join('\n'),
 		)
 	})
 	it('has no extraneous entries', () => {
