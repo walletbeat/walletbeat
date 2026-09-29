@@ -41,7 +41,6 @@ import { getRepositoryRoot } from '@/utils/codebase'
 const REPO_ROOT = getRepositoryRoot()
 const KNOWN_URLS_FILE = path.join(REPO_ROOT, 'tests', 'utils', 'known-urls.json')
 const DIST_DIR = path.join(REPO_ROOT, 'dist')
-const FETCH_TIMEOUT_MS = 15000
 const FETCH_CONCURRENCY = 4
 
 function sha1(value: string): string {
@@ -114,90 +113,12 @@ function collectUrls(): Url[] {
 	return urls
 }
 
-interface FetchOutcome {
-	ok: boolean
-	detail: string
-}
-
-/**
- * Fetch a URL with the same semantics as the URL check test:
- * a plain HTTPS request with default headers, considered valid on a 2xx
- * response carrying at least one byte of data. Redirects are not followed.
- */
-async function fetchUrl(href: string): Promise<FetchOutcome> {
-	return new Promise(resolve => {
-		let hasData = false
-
-		try {
-			const req = request(href, res => {
-				res.on('data', () => {
-					hasData = true
-				})
-				res.on('error', err => {
-					resolve({ ok: false, detail: `response error: ${err.message}` })
-				})
-				res.on('end', () => {
-					const statusCode = res.statusCode ?? 0
-					const redirect =
-						statusCode >= 300 && statusCode <= 399 && res.headers.location !== undefined
-							? ` redirecting to ${res.headers.location}`
-							: ''
-
-					if (statusCode >= 200 && statusCode <= 299 && hasData) {
-						resolve({ ok: true, detail: `HTTP ${statusCode.toString()}` })
-					} else {
-						resolve({
-							ok: false,
-							detail: `HTTP ${statusCode === 0 ? 'unknown' : statusCode.toString()}${redirect}${hasData ? '' : ' (received 0 bytes)'}`,
-						})
-					}
-				})
-			})
-
-			req.setTimeout(FETCH_TIMEOUT_MS, () => {
-				req.destroy(new Error(`timed out after ${(FETCH_TIMEOUT_MS / 1000).toString()}s`))
-			})
-			req.on('error', err => {
-				resolve({ ok: false, detail: err.message })
-			})
-			req.end()
-		} catch (err) {
-			resolve({ ok: false, detail: err instanceof Error ? err.message : String(err) })
-		}
-	})
-}
-
-function serializeEntry(entry: KnownValidUrl): string {
-	return JSON.stringify(entry, null, '\t')
-}
-
 /** Rewrite tests/utils/known-urls.json with the given entries. */
 async function rewriteKnownUrls(entries: KnownValidUrl[]): Promise<void> {
 	await writeFile(KNOWN_URLS_FILE, `${JSON.stringify(entries, null, '\t')}\n`, 'utf-8')
 }
 
 async function main(): Promise<void> {
-	// hash -> href, deduplicated across all wallets and the built HTML.
-	const referenced = new Map<string, string>()
-	let nonHttps = 0
-
-	for (const url of collectUrls()) {
-		if (shouldSkipUrl(getUrl(url))) {
-			continue
-		}
-
-		const href = labeledUrl(url).url
-
-		// Repository-relative references (e.g. screenshots) and other non-HTTPS
-		// URLs cannot be fetched; the URL check test skips them too.
-		if (!href.startsWith('https://')) {
-			nonHttps++
-			continue
-		}
-
-		referenced.set(sha1(href), href)
-	}
-
 	process.stdout.write('Building site to scan for hardcoded external URLs...\n')
 	execSync('pnpm run build', { cwd: REPO_ROOT, stdio: 'inherit' })
 
