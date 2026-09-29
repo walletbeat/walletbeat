@@ -1369,16 +1369,63 @@ export const rainbow: SoftwareWallet = {
 			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: {
+						explanation:
+							"Rainbow's browser extension sends custom RPC traffic through its own servers unless the node runs on the same computer at port 8545, and the mobile app has no custom RPC setting.",
+						url: [
+							{
+								label:
+									"Browser extension routes custom RPCs through Rainbow's servers except for a few local addresses",
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/providers/proxy.ts#L21-L38',
+							},
+							{
+								label:
+									'Browser extension swaps the custom RPC you set for a Rainbow server address',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientRpc.ts#L11-L33',
+							},
+							{
+								label:
+									"Browser extension connects through Rainbow's servers instead of directly to your custom RPC",
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientToProvider.ts#L20-L22',
+							},
+							{
+								label:
+									'Browser extension can only reach the computer it runs on and a fixed list of servers run by Rainbow and other companies',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
+							},
+							{
+								label:
+									'Browser extension tells the browser to block any server not on its allowed list, including a node on your home network',
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/webpack.config.js#L30-L33',
+							},
+							{
+								label: "Mobile app only uses Rainbow's default RPC outside developer mode",
+								url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L137-L156',
+							},
+						],
+					},
 					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: featureSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: refTodo,
+					ref: {
+						explanation:
+							"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+						url: [
+							{
+								label: "Browser extension sends transactions through the network's RPC",
+								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/entries/background/procedures/popup/wallet/sendTransaction.ts#L12-L15',
+							},
+							{
+								label: "Mobile app sends transactions through the network's RPC",
+								url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/model/wallet.ts#L159-L181',
+							},
+						],
+					},
 				},
 			},
 		},
