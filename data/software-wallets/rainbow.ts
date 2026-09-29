@@ -1379,25 +1379,26 @@ export const rainbow: SoftwareWallet = {
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/providers/proxy.ts#L21-L38',
 							},
 							{
-								label: "Browser extension applies Rainbow's routing to the custom RPC you set",
+								label: "Browser extension sends the custom RPC you set to Rainbow's servers first",
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientRpc.ts#L11-L33',
 							},
 							{
-								label: 'Browser extension creates its RPC connection from the routed address',
+								label:
+									"Browser extension connects through Rainbow's servers instead of directly to your custom RPC",
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/src/core/viem/clientToProvider.ts#L20-L22',
 							},
 							{
 								label:
-									'Browser extension may only connect to the same computer or Rainbow-approved hosts',
+									'Browser extension can only reach this computer and a fixed list of Rainbow and third-party servers',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/static/allowlist.json#L2-L27',
 							},
 							{
 								label:
-									"Browser extension's security policy is built from the allowed host list, which blocks local network addresses",
+									'Browser extension tells the browser to block any server not on its allowed list, including a node elsewhere on your home network',
 								url: 'https://github.com/rainbow-me/browser-extension/blob/62ea10cc0e98cf05eab68b6dafc8d392183f87dc/webpack.config.js#L30-L33',
 							},
 							{
-								label: "Mobile app uses Rainbow's default RPC outside developer mode",
+								label: "Mobile app only uses Rainbow's default RPC outside developer mode",
 								url: 'https://github.com/rainbow-me/rainbow/blob/b7da6becc0229396f53a5d4c838ac0cb1a0812a3/src/handlers/web3.ts#L137-L156',
 							},
 						],
