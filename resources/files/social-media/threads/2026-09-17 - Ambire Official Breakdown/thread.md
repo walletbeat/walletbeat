@@ -24,7 +24,7 @@ Software wallets supporting hardware wallets means they offer the best of both w
 
 What could be better about Ambire's security?
 
-🔏 Security audits & bug bounties
+📜 Security audits & bug bounties
 🚨 Scam prevention
 🔏 Transaction legibility
 
@@ -32,7 +32,7 @@ Let's break it down 👇
 
 ---
 
-🔏 Security audits & bug bounties
+📜 Security audits & bug bounties
 
 Ambire has undergone security audits and has an established bug bounty program.
 
@@ -132,7 +132,7 @@ Here's the breakdown 👇
 
 ---
 
-Transaction inclusion
+📡 Transaction inclusion
 
 Ambire requires users to trust intermediaries when withdrawing funds from L2s.
 
@@ -209,8 +209,8 @@ Ambire is well aligned with several emerging Ethereum wallet standards.
 
 What could be better about Ambire's ecosystem alignment?
 
-- 🌉 Chain abstraction
-- 📇 Address resolution
+🌉 Chain abstraction
+📇 Address resolution
 
 Here's what we found 👇
 
