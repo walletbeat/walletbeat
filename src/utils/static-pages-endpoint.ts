@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import path, { join, relative } from 'node:path'
 
 import type { APIRoute } from 'astro'
 
@@ -22,7 +22,7 @@ function findAllFiles(dir: string): string[] {
 			if (entry.isDirectory()) {
 				walk(fullPath)
 			} else if (entry.isFile()) {
-				results.push(relative(dir, fullPath))
+				results.push(relative(dir, fullPath).split(path.sep).join('/'))
 			}
 		}
 	}
