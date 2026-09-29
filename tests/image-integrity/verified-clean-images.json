@@ -1,4 +1,8 @@
 {
+	"family-icon.png": {
+		"hash": "87c773dbe2f344290f354c695c93e10fdda2e2c2a5b422fbc5a3dd787fa8c4c4",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"governance/decisions/2026/travel-policy/airfare.png": {
 		"hash": "9e3f925773dddf1c696cad25a166a9b72a480c0f8bbcbb7b865cbdd2821b946f",
 		"passedTests": ["blockiness", "file-format"]
@@ -869,18 +873,6 @@
 	},
 	"public/references/wallets/rainbow/screenshots/2026-09-26-rainbow-mobile-seed-phrase-export.png": {
 		"hash": "850a58668e1f87efd2d97979ce4acd6e4267b02a8fb2b608d0e8e6d5dfdb8001",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/rainbow/screenshots/2026-09-28-rainbow-browser-network-list.png": {
-		"hash": "7f94d1dcff31bd28611afd72ad508441a97685b0bcda5cbfe3e0c7dab6906441",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/rainbow/screenshots/2026-09-29-rainbow-browser-home-network-rpc-error.png": {
-		"hash": "e3870412ac0b429b3c2fe250551b1a951f97f9377a058182906cbf1eaa0ac6f8",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/rainbow/screenshots/2026-09-29-rainbow-browser-public-rpc-active.png": {
-		"hash": "9c8a20a08cd6c8e6cedd3f59dbe339aa7561538cb672bbdb2d5c701d99cad65a",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png": {
