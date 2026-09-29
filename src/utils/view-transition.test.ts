@@ -28,6 +28,10 @@ const transition = ({
 
 class TestScope {
 	attributes = new Set<string>()
+	parentElement: TestScope | null = null
+	scrollLeft = 0
+	scrollWidth = 0
+	clientWidth = 0
 	removeAttribute = vi.fn((name: string) => this.attributes.delete(name))
 	toggleAttribute = vi.fn((name: string, force?: boolean) => {
 		if (force === false) {
@@ -113,6 +117,40 @@ describe('startScopedViewTransition', () => {
 		await documentTransition.finished
 		await Promise.resolve()
 		expect(root.attributes).not.toContain('data-view-transition-active')
+	})
+
+	it('does not measure scroll when only document transitions are supported', () => {
+		const documentTransition = installEnvironment()
+		const root = new TestScope()
+
+		Object.defineProperty(root, 'scrollLeft', {
+			get: () => {
+				throw new Error('Unexpected layout read')
+			},
+		})
+
+		expect(startScopedViewTransition(htmlElement(root), vi.fn())).toBe(documentTransition)
+	})
+
+	it('uses the document transition when an ancestor is horizontally scrolled', () => {
+		const documentTransition = installEnvironment()
+		const scrollContainer = new TestScope()
+
+		scrollContainer.scrollWidth = 1653
+		scrollContainer.clientWidth = 1280
+		scrollContainer.scrollLeft = 373
+		const root = new TestScope()
+
+		root.parentElement = scrollContainer
+		const scopedStart = vi.fn()
+
+		Object.assign(root, { startViewTransition: scopedStart })
+		const update = vi.fn()
+
+		expect(startScopedViewTransition(htmlElement(root), update)).toBe(documentTransition)
+		expect(scopedStart).not.toHaveBeenCalled()
+		expect(update).toHaveBeenCalledOnce()
+		expect(scrollContainer.scrollLeft).toBe(373)
 	})
 
 	it('applies both rapid element-scoped updates exactly once without starting a second transition', () => {
