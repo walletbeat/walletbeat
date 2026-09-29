@@ -43,64 +43,13 @@ async function checkValidHref(href: string): Promise<void> {
 	}
 
 	if (newValidUrls.some(newValidUrl => href === newValidUrl.url)) {
-		expect(true).toBeDefined()
-
-		return new Promise(resolve => {
-			resolve()
-		})
+		return
 	}
 
-	const isValidStatusCode = (statusCode: undefined | number): boolean => {
-		if (statusCode === undefined) {
-			return false
-		}
+	const outcome = await fetchUrl(href)
 
-		return statusCode >= 200 && statusCode <= 299
-	}
-
-	// The promise must always resolve and never throw: an exception inside a
-	// socket event handler would prevent `resolve()` from running, leaving the
-	// test hanging until vitest's testTimeout (60s) kills it. Assertions happen
-	// after the outcome is known, below.
-	const failure = await new Promise<string | null>(resolve => {
-		let hasData = false
-		const req = request(href, res => {
-			res.on('data', () => {
-				hasData = true
-			})
-			res.on('error', err => {
-				resolve(`Request to ${href} failed; error: ${err}`)
-			})
-			res.on('end', () => {
-				if (isValidStatusCode(res.statusCode) && hasData) {
-					resolve(null)
-				} else {
-					resolve(
-						`Request to ${href} failed (HTTP status code: ${res.statusCode ?? 'unknown'})${hasData ? '' : ' (received 0 bytes)'}`,
-					)
-				}
-			})
-		})
-
-		// Without an explicit socket timeout, a host that accepts the connection but
-		// never responds would hang until vitest's testTimeout.
-		// Fail fast instead, like `pnpm validate-urls` does.
-		req.setTimeout(15000)
-		req.on('timeout', () => {
-			req.destroy()
-			resolve(`Request to ${href} timed out.`)
-		})
-		req.on('error', err => {
-			resolve(`Request to ${href} failed; error: ${err}`)
-		})
-		req.end()
-	})
-
-	expect(failure).toSatisfy(f => f === null, failure ?? '')
-
-	if (failure === null) {
-		newValidUrls.push({ url: href, urlHash: digest, retrieved: today() })
-	}
+	expect(outcome.ok, `Request to ${href} failed (${outcome.detail})`).toBe(true)
+	newValidUrls.push({ url: href, urlHash: digest, retrieved: today() })
 }
 
 /** Thin wrapper over `checkValidHref` for wallet-data references, which carry a `Url` rather than a plain string. */
