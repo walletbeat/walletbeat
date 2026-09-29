@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 1209,
+	"highlightLastLine": 1216,
+	"segments": [
+		{
+			"lines": [
+				"class ProviderController extends BaseController {"
+			],
+			"startLine": 452
+		},
+		{
+			"lines": [
+				"  }) => {"
+			],
+			"startLine": 659
+		},
+		{
+			"lines": [
+				"    try {"
+			],
+			"startLine": 1025
+		},
+		{
+			"lines": [
+				"      try {"
+			],
+			"startLine": 1200
+		},
+		{
+			"lines": [
+				"        if (",
+				"          !findChain({ enum: chain })?.isTestnet ||",
+				"          isGasAccount ||",
+				"          isGasLess",
+				"        ) {",
+				"          if (RPCService.hasCustomRPC(chain) && !isGasAccount && !isGasLess) {",
+				"            const tx = TransactionFactory.fromTxData(txDataWithRSV, { common });",
+				"            const rawTx = bytesToHex(tx.serialize());",
+				"            try {",
+				"              hash = await RPCService.requestCustomRPC(",
+				"                chain,",
+				"                'eth_sendRawTransaction',",
+				"                [rawTx]",
+				"              );",
+				"            } catch (e) {",
+				"              let errMsg = typeof e === 'object' ? e.message : e;",
+				"              if (RPCService.hasCustomRPC(chain)) {"
+			],
+			"startLine": 1204
+		}
+	]
+}

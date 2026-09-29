@@ -1,0 +1,35 @@
+{
+	"highlightFirstLine": 35,
+	"highlightLastLine": 50,
+	"segments": [
+		{
+			"lines": [
+				"import { Telemetry } from \"../server/telemetry\";",
+				"import { lazyCache } from \"../utils/cache\";",
+				"import { memoize } from \"../utils/func\";",
+				"",
+				"function getTransportFromEnv() {",
+				"  const l1RPCs = getEnvApi().DAIMO_API_L1_RPC_WS.split(\",\");",
+				"  const l2RPCs = getEnvApi().DAIMO_API_L2_RPC_WS.split(\",\");",
+				"",
+				"  console.log(`[VIEM] using transport RPCs L1: ${l1RPCs}, L2: ${l2RPCs}`);",
+				"",
+				"  const stringToTransport = (url: string) => {",
+				"    const rpc = url.startsWith(\"wss\") ? webSocket(url) : http(url);",
+				"    return addLogging(rpc, url);",
+				"  };",
+				"",
+				"  return {",
+				"    l1: fallback(l1RPCs.map(stringToTransport), { rank: true }),",
+				"    l2: fallback(l2RPCs.map(stringToTransport), { rank: true }),",
+				"  };",
+				"}",
+				"",
+				"// Log JSON RPC requests. This helps debug RPC errors.",
+				"function addLogging(transport: Transport, url: string) {",
+				"  return (args: Parameters<Transport>[0]) => {"
+			],
+			"startLine": 31
+		}
+	]
+}

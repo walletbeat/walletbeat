@@ -101,9 +101,56 @@ export const zerion: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: notSupported,
-			// BIP support is not verified
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							"Zerion's mobile app derives accounts from a standard seed phrase: importing the public test phrase 'test test test test test test test test test test test junk' produces `0xf39f…2266`, the address the BIP-39 and BIP-32 standards define for that phrase.",
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-bip44-account-1.png',
+						label: 'Accounts found when importing the test recovery phrase',
+					},
+					{
+						explanation:
+							'Mobile accounts use the BIP-44 derivation path: the same phrase produces `0x7099…79c8` as the second account, the address BIP-44 defines at index 1.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-bip44-account-2.png',
+						label: 'The second account from the same import',
+					},
+					{
+						explanation: 'Users can view the recovery phrase within the mobile app.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-recovery-phrase-backup.png',
+						label: 'Recovery Phrase listed under Backup in the iOS account group settings',
+					},
+					{
+						explanation: 'Users can view the private key within the mobile app.',
+						file: 'public/references/wallets/zerion/screenshots/2026-09-25-zerion-private-key-export.png',
+						label: 'Private Keys listed on the iOS account screen',
+					},
+					{
+						explanation: 'The browser extension derives accounts from a standard seed phrase.',
+						url: [
+							{
+								label: 'Accounts are derived from the recovery phrase',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/shared/wallet/create.ts#L72-L76',
+							},
+							{
+								label: 'Derivation path',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/shared/wallet/derivation-paths.ts#L6-L10',
+							},
+							{
+								label: 'That path is the default for Ethereum accounts',
+								url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/shared/wallet/derivation-paths.ts#L43-L44',
+							},
+						],
+					},
+					{
+						explanation: 'Users can view the private key within the browser extension.',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/RevealPrivateKey/RevealPrivateKey.tsx#L128-L179',
+					},
+					{
+						explanation: 'Users can view the recovery phrase within the browser extension.',
+						url: 'https://github.com/zeriontech/zerion-wallet-extension/blob/482c0a5f57cee79b618147c804a92a98240c559a/src/ui/pages/Backup/RecoveryPhrase.tsx#L28-L59',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -715,7 +762,31 @@ export const zerion: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'Zerion decodes a USDC approval, showing the spender, and the amount allowed to spend.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-usdc-approval.png',
+							label: 'Zerion approve confirmation for a USDC approval',
+						},
+						{
+							explanation: 'Zerion does not decode an Aave supply.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-aave-supply.png',
+							label: 'Zerion send confirmation for an Aave supply',
+						},
+						{
+							explanation:
+								'Zerion does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows an execute call to the Safe address.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-aave-supply.png',
+							label: 'Zerion execute confirmation for a Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Zerion does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows an execute call to the Safe address.',
+							file: 'public/references/wallets/zerion/screenshots/2026-09-23-zerion-erc7730-safe-batch-approve-supply.png',
+							label: 'Zerion execute confirmation for a Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},

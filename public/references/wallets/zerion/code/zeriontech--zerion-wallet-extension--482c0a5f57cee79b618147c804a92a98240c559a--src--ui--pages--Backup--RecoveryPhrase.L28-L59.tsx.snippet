@@ -1,0 +1,57 @@
+{
+	"highlightFirstLine": 28,
+	"highlightLastLine": 59,
+	"segments": [
+		{
+			"lines": [
+				"import {"
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"  useRecoveryPhrase,",
+				"} from './useRecoveryPhrase';",
+				"import { clipboardWarning } from './clipboardWarning';",
+				"",
+				"export function RecoveryPhrase({",
+				"  groupId,",
+				"  onNextStep,",
+				"  onSkip,",
+				"  onSessionExpired,",
+				"}: {",
+				"  groupId: string | null;",
+				"  onNextStep: () => void;",
+				"  onSkip?: () => void;",
+				"  onSessionExpired: () => void;",
+				"}) {",
+				"  const { isNarrowView } = useWindowSizeStore();",
+				"",
+				"  const isPendingWallet = !groupId;",
+				"  const existingRecoveryPhraseQuery = useRecoveryPhrase({",
+				"    groupId,",
+				"    enabled: !isPendingWallet,",
+				"  });",
+				"  const pendingRecoveryPhraseQuery = usePendingRecoveryPhrase({",
+				"    enabled: isPendingWallet,",
+				"  });",
+				"",
+				"  const {",
+				"    data: encoded,",
+				"    isLoading,",
+				"    isError,",
+				"    error,",
+				"  } = isPendingWallet",
+				"    ? pendingRecoveryPhraseQuery",
+				"    : existingRecoveryPhraseQuery;",
+				"",
+				"  const recoveryPhrase = encoded ? decodeMasked(encoded) : null;",
+				"",
+				"  useEffect(() => {",
+				"    if (isError && isSessionExpiredError(error)) {",
+				"      onSessionExpired();"
+			],
+			"startLine": 24
+		}
+	]
+}

@@ -1,0 +1,67 @@
+{
+	"highlightFirstLine": 131,
+	"highlightLastLine": 159,
+	"segments": [
+		{
+			"lines": [
+				"export class EOA7702 extends BaseAccount {"
+			],
+			"startLine": 23
+		},
+		{
+			"lines": [
+				"  getGasUsed(",
+				"    estimation: FullEstimationSummary | Error,",
+				"    options: {",
+				"      feeToken: TokenResult",
+				"      op: AccountOp",
+				"    }",
+				"  ): bigint {"
+			],
+			"startLine": 80
+		},
+		{
+			"lines": [
+				"    return this.accountState.isSmarterEoa",
+				"      ? BigInt(estimation.bundlerEstimation.callGasLimit)",
+				"      : BigInt(estimation.bundlerEstimation.callGasLimit) + this.ACTIVATOR_GAS_USED",
+				"  }",
+				"",
+				"  getBroadcastOption(",
+				"    feeOption: FeePaymentOption,",
+				"    options: {",
+				"      op: AccountOp",
+				"      isSponsored?: boolean",
+				"    }",
+				"  ): string {",
+				"    if (options.op.meta && options.op.meta.setDelegation !== undefined)",
+				"      return BROADCAST_OPTIONS.delegation",
+				"    if (options.isSponsored) return BROADCAST_OPTIONS.byBundler",
+				"",
+				"    const feeToken = feeOption.token",
+				"    if (isNative(feeToken)) {",
+				"      // if there's no native in the account, use the bundler as a broadcast method",
+				"      if (feeToken.amount === 0n) return BROADCAST_OPTIONS.byBundler",
+				"",
+				"      // if the call is only 1, broadcast normally",
+				"      if (options.op.calls.length === 1) return BROADCAST_OPTIONS.bySelf",
+				"",
+				"      // if already smart, executeBySender() on itself",
+				"      if (this.accountState.isSmarterEoa) return BROADCAST_OPTIONS.bySelf7702",
+				"",
+				"      // calls are more than 0 and it's not smart, delegation time",
+				"      return BROADCAST_OPTIONS.delegation",
+				"    }",
+				"",
+				"    // txn type 4 OR paying in token",
+				"    return BROADCAST_OPTIONS.byBundler",
+				"  }",
+				"",
+				"  // if the EOA is not yet smarter and the broadcast option is a bundler,",
+				"  // sign the authorization",
+				"  shouldSignAuthorization(broadcastOption: string): boolean {"
+			],
+			"startLine": 126
+		}
+	]
+}

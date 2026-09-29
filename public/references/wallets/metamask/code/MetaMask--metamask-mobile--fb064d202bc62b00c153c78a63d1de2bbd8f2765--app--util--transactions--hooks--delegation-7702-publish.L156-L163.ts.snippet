@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 156,
+	"highlightLastLine": 163,
+	"segments": [
+		{
+			"lines": [
+				"export class Delegation7702PublishHook {"
+			],
+			"startLine": 64
+		},
+		{
+			"lines": [
+				"  async #hook(",
+				"    transactionMeta: TransactionMeta,",
+				"    _signedTx: string,",
+				"  ): Promise<PublishHookResult> {"
+			],
+			"startLine": 111
+		},
+		{
+			"lines": [
+				"",
+				"    const { delegationAddress, upgradeContractAddress } =",
+				"      atomicBatchChainSupport;",
+				"",
+				"    if (",
+				"      (!selectedGasFeeToken || !gasFeeTokens?.length) &&",
+				"      !isGaslessBridge &&",
+				"      !isSponsored",
+				"    ) {",
+				"      log('Skipping as no selected gas fee token');",
+				"      return EMPTY_RESULT;",
+				"    }",
+				"",
+				"    const gasFeeToken =",
+				"      isGaslessBridge || isSponsored",
+				"        ? undefined"
+			],
+			"startLine": 152
+		}
+	]
+}

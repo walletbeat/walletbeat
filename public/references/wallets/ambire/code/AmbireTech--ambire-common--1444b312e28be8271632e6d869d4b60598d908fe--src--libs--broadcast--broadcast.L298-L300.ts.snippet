@@ -1,0 +1,28 @@
+{
+	"highlightFirstLine": 298,
+	"highlightLastLine": 300,
+	"segments": [
+		{
+			"lines": [
+				"export async function broadcastTransaction("
+			],
+			"startLine": 292
+		},
+		{
+			"lines": [
+				"  signedTx: string,",
+				"  chainId: bigint,",
+				"  counter: number = 0",
+				"): Promise<TransactionResponse> {",
+				"  if (counter > 2) throw new Error('broadcast failed')",
+				"  try {",
+				"    return provider.broadcastTransaction(signedTx)",
+				"  } catch (e) {",
+				"    console.log('broadcast failed: ', e)",
+				"    await waitBeforeRetry(chainId)",
+				"    return broadcastTransaction(provider, signedTx, chainId, counter + 1)"
+			],
+			"startLine": 294
+		}
+	]
+}

@@ -1,0 +1,21 @@
+{
+	"highlightFirstLine": 43,
+	"highlightLastLine": 44,
+	"segments": [
+		{
+			"lines": [
+				"",
+				"export type DerivationPathType = keyof typeof pathPatterns;",
+				"",
+				"/** Default account paths used for Ethereum wallets */",
+				"export const getAccountPathEthereum = (index: number) =>",
+				"  pathPatterns.bip44.fromIndex(index);",
+				"",
+				"/** This isn't the most elegant, but we can determine solana addresses based on derivation path */",
+				"export function isSolanaPath(path: string) {",
+				"  return ("
+			],
+			"startLine": 39
+		}
+	]
+}

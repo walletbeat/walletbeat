@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 2,
+	"highlightLastLine": 27,
+	"segments": [
+		{
+			"lines": [
+				"// import Wallet, { hdkey } from 'ethereumjs-wallet';",
+				"import { HDKey } from 'ethereum-cryptography/hdkey';",
+				"import SimpleKeyring from '@rabby-wallet/eth-simple-keyring';",
+				"import * as bip39 from '@scure/bip39';",
+				"import { wordlist } from '@scure/bip39/wordlists/english';",
+				"import * as sigUtil from 'eth-sig-util';",
+				"import {",
+				"  bytesToHex,",
+				"  publicToAddress,",
+				"  privateToPublic,",
+				"  hexToBytes,",
+				"} from '@ethereumjs/util';",
+				"import slip39 from 'slip39';",
+				"",
+				"// Options:",
+				"const type = 'HD Key Tree';",
+				"",
+				"enum HDPathType {",
+				"  LedgerLive = 'LedgerLive',",
+				"  Legacy = 'Legacy',",
+				"  BIP44 = 'BIP44',",
+				"}",
+				"",
+				"const HD_PATH_BASE = {",
+				"  [HDPathType.BIP44]: \"m/44'/60'/0'/0\",",
+				"  [HDPathType.Legacy]: \"m/44'/60'/0'\",",
+				"  [HDPathType.LedgerLive]: \"m/44'/60'/0'/0/0\",",
+				"};",
+				"",
+				"const HD_PATH_TYPE = {",
+				"  [HD_PATH_BASE[HDPathType.BIP44]]: HDPathType.BIP44,"
+			],
+			"startLine": 1
+		}
+	]
+}

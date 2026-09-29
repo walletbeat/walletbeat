@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 20,
+	"highlightLastLine": 22,
+	"segments": [
+		{
+			"lines": [
+				"export function clientToProvider(client: PublicClient): Provider {"
+			],
+			"startLine": 10
+		},
+		{
+			"lines": [
+				"  const network = {",
+				"    chainId: chain.id,",
+				"    name: chain.name,",
+				"    ensAddress: chain.contracts?.ensRegistry?.address,",
+				"  };",
+				"  // Use handleRpcUrl to get the RPC URL from the chain",
+				"  const rpcUrl = handleRpcUrl(chain);",
+				"  return new providers.JsonRpcProvider(rpcUrl, network) as Provider;",
+				"}",
+				"",
+				"export function clientToBatchedProvider(client: PublicClient): Provider {",
+				"  const { chain } = client;"
+			],
+			"startLine": 15
+		}
+	]
+}

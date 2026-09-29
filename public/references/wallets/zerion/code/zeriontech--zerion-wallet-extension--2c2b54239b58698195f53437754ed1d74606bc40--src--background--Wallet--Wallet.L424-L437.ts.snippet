@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 424,
+	"highlightLastLine": 437,
+	"segments": [
+		{
+			"lines": [
+				"export class Wallet {"
+			],
+			"startLine": 205
+		},
+		{
+			"lines": [
+				"",
+				"  // TODO: For now, I prefix methods with \"ui\" which return wallet data and are supposed to be called",
+				"  // from the UI (extension popup) thread. It's maybe better to refactor them",
+				"  // into a separate isolated class",
+				"  async uiGenerateMnemonic({",
+				"    params: { ecosystems },",
+				"  }: WalletMethodParams<{ ecosystems: BlockchainType[] }>) {",
+				"    this.ensureActiveSession(this.userCredentials);",
+				"    const walletContainer = await MnemonicWalletContainer.create({",
+				"      credentials: this.userCredentials,",
+				"      ecosystems: ecosystems,",
+				"    });",
+				"    this.pendingWallet = {",
+				"      origin: WalletOrigin.extension,",
+				"      groupId: null,",
+				"      walletContainer,",
+				"    };",
+				"    return walletContainer.wallets.map((wallet) => maskWallet(wallet));",
+				"  }",
+				"",
+				"  async uiImportPrivateKey({",
+				"    params: privateKey,"
+			],
+			"startLine": 420
+		}
+	]
+}

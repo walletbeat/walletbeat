@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 464,
+	"highlightLastLine": 471,
+	"segments": [
+		{
+			"lines": [
+				"export class MultichainAccountService {"
+			],
+			"startLine": 145
+		},
+		{
+			"lines": [
+				"  /**"
+			],
+			"startLine": 458
+		},
+		{
+			"lines": [
+				"   *",
+				"   * @param password - The password to encrypt the vault with.",
+				"   * @returns The new multichain account wallet.",
+				"   */",
+				"  async #createWalletByNewVault(",
+				"    password: string,",
+				"  ): Promise<MultichainAccountWallet<Bip44Account<KeyringAccount>>> {",
+				"    log(`Creating new wallet by creating a new vault and keychain...`);",
+				"    await this.#messenger.call(",
+				"      'KeyringController:createNewVaultAndKeychain',",
+				"      password,",
+				"    );",
+				"",
+				"    const entropySourceId = this.#getPrimaryEntropySourceId();",
+				"",
+				"    return new MultichainAccountWallet({"
+			],
+			"startLine": 460
+		}
+	]
+}

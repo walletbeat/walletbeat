@@ -1,0 +1,33 @@
+{
+	"highlightFirstLine": 72,
+	"highlightLastLine": 76,
+	"segments": [
+		{
+			"lines": [
+				"export function restoreBareWallet(",
+				"  wallet: Partial<BareWallet>",
+				"): BareWallet | BareMnemonicWallet {"
+			],
+			"startLine": 49
+		},
+		{
+			"lines": [
+				"  } else if (mnemonic) {",
+				"    if (isSolanaPath(mnemonic.path)) {",
+				"      const keypair = fromMnemonicToEd25519(mnemonic.phrase, mnemonic.path);",
+				"      return fromSolanaKeypair({ mnemonic, keypair });",
+				"    } else {",
+				"      const wallet = EthersV5Wallet.fromMnemonic(",
+				"        mnemonic.phrase,",
+				"        mnemonic.path",
+				"      );",
+				"      return fromEthersWallet(wallet);",
+				"    }",
+				"  } else {",
+				"    return fromEthersWallet(EthersV5Wallet.createRandom());",
+				"  }"
+			],
+			"startLine": 67
+		}
+	]
+}

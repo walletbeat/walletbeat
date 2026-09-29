@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 274,
+	"highlightLastLine": 284,
+	"segments": [
+		{
+			"lines": [
+				"*                    Currently only used on web."
+			],
+			"startLine": 241
+		},
+		{
+			"lines": [
+				"  /**",
+				"   * Generates a new mnemonic and retrieves associated public address. Stores new mnemonic in native keychain with the mnemonic ID key as the public address.",
+				"   * @param password the password to encrypt the mnemonic",
+				"   * @returns public address from the mnemonic's first derived private key",
+				"   */",
+				"  async generateAndStoreMnemonic(password: string): Promise<string> {",
+				"    const newWallet = Wallet.createRandom()",
+				"",
+				"    const mnemonic = newWallet.mnemonic.phrase",
+				"    const address = newWallet.address",
+				"",
+				"    if (!(await this.storeNewMnemonic({ mnemonic, password, address }))) {",
+				"      throw new Error(`${ErrorType.StoreMnemonicError}: Failed to generate and store mnemonic`)",
+				"    }",
+				"    return address",
+				"  }",
+				"",
+				"  private async storeNewMnemonic({",
+				"    mnemonic,",
+				"    password,"
+			],
+			"startLine": 269
+		}
+	]
+}

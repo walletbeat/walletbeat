@@ -244,9 +244,39 @@ export const ambire: SoftwareWallet = {
 				contract: ambireDelegatorContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Ambire derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Standard derivation path',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/consts/derivation.ts#L1-L6',
+							},
+							{
+								label: 'BIP-39 seed phrase generation',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/entropyGenerator/entropyGenerator.ts#L33-L39',
+							},
+							{
+								label: 'Key derivation from the seed phrase',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/libs/keyIterator/keyIterator.ts#L22-L39',
+							},
+							{
+								label: 'Derivation path assigned to a new seed phrase',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/7b1a7ac5ea1be15e6225f2a0a02998c068b97d79/src/controllers/keystore/keystore.ts#L709-L717',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-09-26-ambire-seed-phrase-export.png',
+						label: 'Seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/ambire/screenshots/2026-09-26-ambire-private-key-export.png',
+						label: 'Private key export',
+					},
+				],
 				canExportPrivateKey: true,
-				canExportSeedPhrase: true,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
@@ -892,7 +922,38 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				erc7730: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation: 'Ambire decodes a USDC approval, showing the spender, and amount.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-usdc-approval.png',
+							label: 'Ambire transaction builder showing a decoded USDC approval',
+						},
+						{
+							explanation:
+								'Ambire decodes an Aave supply, showing the amount and collateral recipient.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-aave-supply.png',
+							label: 'Ambire transaction builder showing a decoded Aave supply',
+						},
+						{
+							explanation:
+								'Ambire decodes the inner Aave supply call nested within a Safe{Wallet} transaction.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-safe-aave-supply.png',
+							label: 'Ambire transaction builder showing a decoded Safe{Wallet} Aave supply',
+						},
+						{
+							explanation:
+								'Ambire decodes each call of a batched USDC approval and Aave supply from an EOA.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-batch-approve-supply.png',
+							label: 'Ambire transaction builder showing a decoded batched approve and supply',
+						},
+						{
+							explanation:
+								'Ambire decodes each inner call of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply.',
+							file: 'public/references/wallets/ambire/screenshots/2026-09-23-ambire-erc7730-safe-batch-approve-supply.png',
+							label:
+								'Ambire transaction builder showing a decoded Safe{Wallet} batched approve and supply',
+						},
+					],
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						decoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					},
@@ -990,12 +1051,61 @@ export const ambire: SoftwareWallet = {
 			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/ambire/screenshots/2026-09-28-ambire-browser-network-settings.png',
+							label:
+								'Ambire browser extension Networks settings with a custom Ethereum RPC set, listing OP Mainnet, Base and Arbitrum',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							explanation: 'Ambire supports custom RPCs and sends transactions directly to them.',
+							url: [
+								{
+									label: 'Browser extension can use a custom RPC for each network',
+									url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/services/provider/getRpcProvider.ts#L42-L45',
+								},
+								{
+									label: 'Ambire connects to each network through the custom RPC',
+									url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/controllers/providers/providers.ts#L212-L215',
+								},
+								{
+									label: 'Bypassing the Ambire bundler when paying gas with ETH',
+									url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/libs/account/EOA7702.ts#L131-L159',
+								},
+								{
+									label: 'Transactions get routed to the custom RPC',
+									url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/controllers/signAccountOp/signAccountOp.ts#L3620-L3626',
+								},
+								{
+									label: 'The signed transaction is broadcast through the custom RPC',
+									url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/libs/broadcast/broadcast.ts#L298-L300',
+								},
+							],
+						},
+					],
 					selfBroadcastViaDirectGossip: notSupported,
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/ambire/screenshots/2026-09-28-ambire-browser-network-settings.png',
+							label:
+								'Ambire browser extension Networks settings with a custom Ethereum RPC set, listing OP Mainnet, Base and Arbitrum',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							url: [
+								{
+									label: "Browser extension sends the signed transaction through the network's RPC",
+									url: 'https://github.com/AmbireTech/ambire-common/blob/1444b312e28be8271632e6d869d4b60598d908fe/src/controllers/signAccountOp/signAccountOp.ts#L3620-L3626',
+								},
+							],
+						},
+					],
 					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
