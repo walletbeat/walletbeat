@@ -27,6 +27,16 @@ const isExpectedInterruption = (error: unknown) =>
 	error instanceof DOMException &&
 	(error.name === 'AbortError' || error.name === 'InvalidStateError')
 
+const hasHorizontalScroll = (scope: HTMLElement) => {
+	for (let element: HTMLElement | null = scope; element; element = element.parentElement) {
+		if (element.scrollLeft !== 0 && element.scrollWidth > element.clientWidth) {
+			return true
+		}
+	}
+
+	return false
+}
+
 /** Build a deterministic, valid custom-ident without allowing part-boundary collisions. */
 export const viewTransitionName = (...parts: (number | string)[]) =>
 	`vt-${parts
@@ -36,9 +46,9 @@ export const viewTransitionName = (...parts: (number | string)[]) =>
 		.join('--')}`
 
 /**
- * Run a synchronous UI update inside the narrowest supported same-document
- * view-transition scope. Browsers without element-scoped transitions fall
- * back to the document while the active marker keeps CSS capture local.
+ * Run a synchronous UI update inside an element-scoped View Transition when
+ * that does not risk clamping horizontal scroll. Otherwise, use a document
+ * transition while the active marker keeps CSS capture local.
  */
 export function startScopedViewTransition(
 	scope: TransitionScope,
@@ -50,7 +60,10 @@ export function startScopedViewTransition(
 		return
 	}
 
-	const elementStart = scope.startViewTransition
+	// An element-scoped capture can temporarily hide a descendant's overflow from
+	// its scrolling ancestor, clamping that ancestor's horizontal position.
+	const elementStart =
+		scope.startViewTransition && !hasHorizontalScroll(scope) ? scope.startViewTransition : undefined
 	const previous = activeByScope.get(scope)
 
 	if (previous) {
