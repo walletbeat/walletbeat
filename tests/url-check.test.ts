@@ -1,12 +1,10 @@
 import { execSync } from 'child_process'
-import { createHash } from 'crypto'
 import { existsSync } from 'fs'
-import { request } from 'https'
 import path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
-import { hasRefs, toFullyQualified, type WithRef } from '@/schema/reference'
+import { collectAllRefs } from '@/schema/reference'
 import { getUrl, type Url } from '@/schema/url'
 import { fetchUrl } from '@/tests/utils/fetch-url'
 import {
@@ -24,7 +22,7 @@ const newValidUrls: KnownValidUrl[] = []
 
 const verifiedUrls: KnownValidUrl[] = []
 
-/** Core validation logic, extracted so it can be shared by `checkValidUrl` (wallet-data `Url`s) and the built-HTML scan below (plain hrefs). */
+/** Core validation logic, shared by `checkValidUrl` (wallet-data `Url`s) and the built-HTML scan below (plain hrefs). */
 async function checkValidHref(href: string): Promise<void> {
 	if (!isCheckableUrl(href)) {
 		return
@@ -34,12 +32,9 @@ async function checkValidHref(href: string): Promise<void> {
 	const existing = knownValidUrls.find(knownValidUrl => knownValidUrl.urlHash === digest)
 
 	if (existing !== undefined) {
-		expect(existing).toBeDefined()
 		verifiedUrls.push(existing)
 
-		return new Promise(resolve => {
-			resolve()
-		})
+		return
 	}
 
 	if (newValidUrls.some(newValidUrl => href === newValidUrl.url)) {
@@ -76,7 +71,12 @@ function getDistDir(): string {
 }
 
 describe('reference URLs', () => {
-	for (const wallet of Object.values(allWallets)) {
+	const refsByWallet = Map.groupBy(
+		collectAllRefs(allWallets).filter(collected => collected.fullyQualifiedRefs.length > 0),
+		collected => collected.walletName,
+	)
+
+	for (const [walletName, wallet] of Object.entries(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
 			it('has valid websites', async () => {
 				for (const website of wallet.metadata.urls?.websites ?? []) {
@@ -122,43 +122,10 @@ describe('reference URLs', () => {
 					await checkValidUrl(other)
 				}
 			})
-			type FieldWithRef = {
-				path: string[]
-				withRef: WithRef<unknown>
-			}
-			const refFields: FieldWithRef[] = []
-			const findRefs = (path: string[], x: unknown) => {
-				if (x === undefined || x === null) {
-					return
-				}
 
-				if (Array.isArray(x)) {
-					x.map((item, index) => findRefs(path.concat([`[${index.toString()}]`]), item))
-
-					return
-				}
-
-				if (typeof x !== 'object') {
-					return
-				}
-
-				for (const [key, val] of Object.entries(x)) {
-					findRefs(path.length === 0 ? [key] : path.concat([`.${key}`]), val)
-				}
-
-				if (hasRefs(x) && toFullyQualified(x.ref).length > 0) {
-					refFields.push({
-						path,
-						withRef: x,
-					})
-				}
-			}
-
-			findRefs([], wallet)
-
-			for (const fieldWithRef of refFields) {
-				describe(fieldWithRef.path.join(''), () => {
-					for (const qualRef of toFullyQualified(fieldWithRef.withRef.ref)) {
+			for (const collected of refsByWallet.get(walletName) ?? []) {
+				describe(collected.fieldPath, () => {
+					for (const qualRef of collected.fullyQualifiedRefs) {
 						for (const qualRefUrl of qualRef.urls) {
 							describe(qualRefUrl.url, () => {
 								it('is valid URL', async () => {

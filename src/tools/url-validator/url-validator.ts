@@ -1,7 +1,5 @@
 import { execSync } from 'child_process'
-import { createHash } from 'crypto'
 import { writeFile } from 'fs/promises'
-import { request } from 'https'
 import pLimit from 'p-limit'
 import path from 'path'
 
@@ -43,45 +41,6 @@ const KNOWN_URLS_FILE = path.join(REPO_ROOT, 'tests', 'utils', 'known-urls.json'
 const DIST_DIR = path.join(REPO_ROOT, 'dist')
 const FETCH_CONCURRENCY = 4
 
-function sha1(value: string): string {
-	const h = createHash('sha1')
-
-	h.update(value)
-
-	return h.digest('hex')
-}
-
-/** Recursively collect all reference URLs attached to `x`, mirroring the URL check test. */
-function findRefUrls(x: unknown, urls: Url[]): void {
-	if (x === undefined || x === null) {
-		return
-	}
-
-	if (Array.isArray(x)) {
-		for (const item of x) {
-			findRefUrls(item, urls)
-		}
-
-		return
-	}
-
-	if (typeof x !== 'object') {
-		return
-	}
-
-	for (const val of Object.values(x)) {
-		findRefUrls(val, urls)
-	}
-
-	if (hasRefs(x)) {
-		for (const qualRef of toFullyQualified(x.ref)) {
-			for (const qualRefUrl of qualRef.urls) {
-				urls.push(qualRefUrl)
-			}
-		}
-	}
-}
-
 /** Collect every URL the URL check test would check, across all wallets. */
 function collectUrls(): Url[] {
 	const urls: Url[] = []
@@ -107,7 +66,12 @@ function collectUrls(): Url[] {
 		}
 
 		urls.push(...(wallet.metadata.urls?.others ?? []))
-		findRefUrls(wallet, urls)
+	}
+
+	for (const collected of collectAllRefs(allWallets)) {
+		for (const qualRef of collected.fullyQualifiedRefs) {
+			urls.push(...qualRef.urls)
+		}
 	}
 
 	return urls
