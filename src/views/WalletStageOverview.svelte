@@ -7,7 +7,6 @@
 		StageCriterionRating,
 		stageCriterionRatings,
 		type WalletLadderEvaluation,
-		type WalletStage,
 	} from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
@@ -63,7 +62,7 @@
 		ladderEvaluation,
 	}: {
 		wallet: RatedWallet<_AttributeGroupId>
-		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		stage: WalletLadderEvaluation<_AttributeGroupId>['stage'] | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 	} = $props()
 
@@ -153,7 +152,9 @@
 								data-row-item="wrap-end"
 								data-row="gap-2"
 							>
-									<span>{passedCount}/{totalCount}</span>
+									{#if totalCount > 0}
+										<span>{passedCount}/{totalCount}</span>
+									{/if}
 									<data value={stageRating} title={stageStatuses[stageRating].label}>
 										{stageStatuses[stageRating].icon}
 									</data>
@@ -196,7 +197,9 @@
 													data-row-item="wrap-end"
 													data-row="gap-2"
 												>
-													<span>{groupPassedCount}/{groupTotalCount}</span>
+													{#if groupTotalCount > 0}
+														<span>{groupPassedCount}/{groupTotalCount}</span>
+													{/if}
 													<data
 														value={groupRating}
 														title={stageStatuses[groupRating].label}

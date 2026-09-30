@@ -17,11 +17,7 @@ import {
 	type ReferenceInput,
 	toFullyQualified,
 } from '@/schema/reference'
-import {
-	type WalletLadderEvaluation,
-	type WalletStage,
-	type WalletStageGroup,
-} from '@/schema/stages'
+import { type WalletLadderEvaluation, type WalletStageGroup } from '@/schema/stages'
 import { getUrl } from '@/schema/url'
 import { getVariants, type Variant } from '@/schema/variants'
 import { type AttributeOverride, getAttributeOverride, type RatedWallet } from '@/schema/wallet'
@@ -40,23 +36,15 @@ import {
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
 
-type StageExportInput = WalletStage<string> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+type StageExportInput = WalletLadderEvaluation<string>['stage'] | null
 
 /**
  * Maps the wallet stage (from getWalletStageAndLadder) to the string used in JSON export.
  * Single source of truth for stage serialization.
  */
 export function stageToExportString(stage: StageExportInput): string | null {
-	if (stage === null) {
-		return null
-	}
-
-	if (stage === 'NOT_APPLICABLE') {
-		return 'NOT_APPLICABLE'
-	}
-
-	if (stage === 'QUALIFIED_FOR_NO_STAGES') {
-		return 'QUALIFIED_FOR_NO_STAGES'
+	if (stage === null || typeof stage === 'string') {
+		return stage
 	}
 
 	return stage.label

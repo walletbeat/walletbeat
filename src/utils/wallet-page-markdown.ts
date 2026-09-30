@@ -65,7 +65,9 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 			? 'Not applicable'
 			: stage === 'QUALIFIED_FOR_NO_STAGES'
 				? 'Qualified for no stages'
-				: stage.label
+				: stage === 'UNRATED'
+					? 'Unrated'
+					: stage.label
 
 	const headerLines: string[] = [
 		`# ${walletName} — Walletbeat Review`,
@@ -82,15 +84,17 @@ export function walletPageMarkdown<_AttributeGroupId extends string>(
 
 	const stageSection: string[] = []
 
-	if (typeof stage === 'object' && stage !== null) {
+	if (ladderEvaluation !== null && stage !== null && stage !== 'NOT_APPLICABLE') {
 		stageSection.push(
 			'## Stage',
 			'',
-			`[${stage.label}](${siteUrl}${getWalletUrl(wallet, { attributeAnchor: 'stages' })})`,
+			typeof stage === 'object'
+				? `[${stage.label}](${siteUrl}${getWalletUrl(wallet, { attributeAnchor: 'stages' })})`
+				: stageHeaderText,
 			'',
 		)
 
-		if (isTypographicContent(stage.description)) {
+		if (typeof stage === 'object' && isTypographicContent(stage.description)) {
 			const desc = normalizeMarkdownBlankLines(
 				trimWhitespacePrefix(
 					renderTypographicContentToString(stage.description, { WALLET_NAME: walletName }),

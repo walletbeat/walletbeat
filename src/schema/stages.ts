@@ -199,9 +199,10 @@ export interface WalletLadder<_AttributeGroupId extends string> {
 	 * (n-1) stages before it in this array, and passes all criteria of the
 	 * nth stage. If a wallet does not meet the nth stage, then further stages
 	 * are not evaluated.
-	 * If any evaluated stage criterion returns `UNRATED`, the wallet is not
-	 * rated on the entire ladder, even if prior stages resulted in a
-	 * non-`UNRATED` evaluation.
+	 * Exempt criteria count as passing. A failed criterion stops evaluation,
+	 * even if other criteria in that stage are unrated. If a reached stage has
+	 * unrated criteria and no failures, the entire ladder is unrated and further
+	 * stages are not evaluated, even if earlier stages were cleared.
 	 */
 	stages: NonEmptyArray<WalletStage<_AttributeGroupId>>
 
@@ -228,8 +229,14 @@ export type WalletLadderEvaluation<_AttributeGroupId extends string> = {
 	 *
 	 * A value of 'QUALIFIED_FOR_NO_STAGES' means the wallet did not
 	 * qualify for even the zeroth stage of the ladder.
+	 *
+	 * A value of 'UNRATED' means missing data prevents determining the
+	 * highest stage, with no known failure in the first unresolved stage.
 	 */
-	stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES'
+	stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | 'UNRATED'
+
+	/** The highest stage known to be cleared, or null if none was cleared. */
+	highestClearedStage: WalletStage<_AttributeGroupId> | null
 }
 
 export function stageCriterionEvaluationPerVariant<_AttributeGroupId extends string>(
@@ -428,7 +435,7 @@ export function evaluateWalletOnLadder<_AttributeGroupId extends string>(
 	ladder: WalletLadder<_AttributeGroupId>,
 ): WalletLadderEvaluation<_AttributeGroupId> {
 	if (!ladder.applicableTo(wallet)) {
-		return { ladder, stage: 'NOT_APPLICABLE' }
+		return { ladder, stage: 'NOT_APPLICABLE', highestClearedStage: null }
 	}
 
 	let clearedStage: WalletStage<_AttributeGroupId> | null = null
@@ -458,16 +465,32 @@ export function evaluateWalletOnLadder<_AttributeGroupId extends string>(
 			}
 		})()
 
+		if (stageEvaluations.some(evaluation => evaluation.rating === StageCriterionRating.FAIL)) {
+			break
+		}
+
+		if (stageEvaluations.some(evaluation => evaluation.rating === StageCriterionRating.UNRATED)) {
+			return { ladder, stage: 'UNRATED', highestClearedStage: clearedStage }
+		}
+
 		// This cannot vacuously pass, because `stageEvaluations` is guaranteed to be non-empty.
-		if (stageEvaluations.every(evaluation => evaluation.rating === StageCriterionRating.PASS)) {
+		if (
+			stageEvaluations.every(
+				evaluation =>
+					evaluation.rating === StageCriterionRating.PASS ||
+					evaluation.rating === StageCriterionRating.EXEMPT,
+			)
+		) {
 			clearedStage = stage
 			continue
 		}
+
+		break
 	}
 
 	if (clearedStage === null) {
-		return { ladder, stage: 'QUALIFIED_FOR_NO_STAGES' }
+		return { ladder, stage: 'QUALIFIED_FOR_NO_STAGES', highestClearedStage: null }
 	}
 
-	return { ladder, stage: clearedStage }
+	return { ladder, stage: clearedStage, highestClearedStage: clearedStage }
 }

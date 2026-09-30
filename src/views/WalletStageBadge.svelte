@@ -2,7 +2,7 @@
 	_AttributeGroupId extends string
 ">
 	// Types/constants
-	import { type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import type { WalletLadderEvaluation } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 
 
@@ -12,7 +12,7 @@
 		ladderEvaluation,
 		size = 'medium',
 	}: {
-		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		stage: WalletLadderEvaluation<_AttributeGroupId>['stage'] | null
 		ladderEvaluation: WalletLadderEvaluation<string> | null
 		size?: 'small' | 'medium' | 'large'
 	} = $props()
@@ -24,8 +24,8 @@
 			return 'NOT_APPLICABLE'
 		}
 
-		if (stage === 'QUALIFIED_FOR_NO_STAGES') {
-			return 'QUALIFIED_FOR_NO_STAGES'
+		if (typeof stage === 'string') {
+			return stage
 		}
 
 		return stage.id
@@ -59,6 +59,8 @@
 		N/A
 	{:else if stageValue === 'QUALIFIED_FOR_NO_STAGES'}
 		No Stage
+	{:else if stageValue === 'UNRATED'}
+		Unrated
 	{:else if stage && typeof stage === 'object'}
 		{stage.label}
 	{/if}
@@ -68,6 +70,7 @@
 <style>
 	data {
 		&[value='NO_STAGES'],
+		&[value='UNRATED'],
 		&[value='NOT_APPLICABLE'] {
 			--accent: var(--rating-unrated);
 			--badge-backdropFilter: var(--rating-unrated-backdropFilter);
@@ -80,4 +83,3 @@
 		}
 	}
 </style>
-
