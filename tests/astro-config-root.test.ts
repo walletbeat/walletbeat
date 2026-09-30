@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process'
+import { createRequire } from 'node:module'
 import * as path from 'node:path'
 import { promisify } from 'node:util'
 
@@ -8,6 +9,7 @@ import { getRepositoryRoot } from '@/utils/codebase'
 import { getAstroBuildTimeRepositoryRoot } from '@/utils/codebase.astro'
 
 const execFileAsync = promisify(execFile)
+const require = createRequire(import.meta.url)
 
 /**
  * This test verifies that `getAstroBuildTimeRepositoryRoot` returns the same
@@ -16,6 +18,9 @@ const execFileAsync = promisify(execFile)
 
 /** Absolute path to the repository root, derived from this test file's location. */
 const REPO_ROOT = getRepositoryRoot()
+
+/** Absolute path to the `tsx` CLI entrypoint. */
+const TSX_CLI = require.resolve('tsx/cli')
 
 /** Absolute path to the `src/utils/codebase.astro.ts` module. */
 function resolveAstroUtilModulePath(): string {
@@ -27,12 +32,11 @@ function resolveAstroUtilModulePath(): string {
  * working directory, returning the resolved repository root.
  */
 async function getAstroBuildTimeRootFromCwd(cwd: string): Promise<string> {
-	const tsxBin = path.join(REPO_ROOT, 'node_modules', '.bin', 'tsx')
 	const script = `
 import { getAstroBuildTimeRepositoryRoot } from ${JSON.stringify(resolveAstroUtilModulePath())};
 process.stdout.write(getAstroBuildTimeRepositoryRoot());
 `
-	const result = await execFileAsync(tsxBin, ['--eval', script], { cwd })
+	const result = await execFileAsync(process.execPath, [TSX_CLI, '--eval', script], { cwd })
 
 	return result.stdout.trim()
 }
