@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 63,
+	"highlightLastLine": 84,
+	"segments": [
+		{
+			"lines": [
+				"export function DappTransactionScanningContent({"
+			],
+			"startLine": 45
+		},
+		{
+			"lines": [
+				"  onChangeGasOverrides,",
+				"}: DappTransactionScanningContentProps): JSX.Element {",
+				"  const { to: toAddress, data } = transaction",
+				"",
+				"  // Build Blockaid scan request",
+				"  const blockaidRequest = useMemo<BlockaidScanTransactionRequest | null>(() => {",
+				"    return buildBlockaidScanTransactionRequest({",
+				"      chainId,",
+				"      account,",
+				"      transaction,",
+				"      dappUrl,",
+				"    })",
+				"  }, [chainId, account, transaction, dappUrl])",
+				"",
+				"  // Scan transaction with Blockaid",
+				"  const { scanResult, isLoading: isScanLoading } = useBlockaidTransactionScan(blockaidRequest, Boolean(blockaidRequest))",
+				"",
+				"  // Extract function name and contract name from simulation result",
+				"  const functionName = useMemo(() => extractFunctionName(scanResult), [scanResult])",
+				"  const contractName = useMemo(() => extractContractName(scanResult, toAddress), [scanResult, toAddress])",
+				"",
+				"  // Parse the Blockaid scan result into displayable sections",
+				"  const { sections, riskLevel } = useMemo(",
+				"    () => parseTransactionSections(scanResult ?? null, chainId),",
+				"    [scanResult, chainId],",
+				"  )",
+				"",
+				"  // Collapse Earn deposit/withdraw into a dedicated Depositing/Withdrawing row when detected",
+				"  const earnAwareSections = useEarnAwareSections({ sections, chainId })",
+				""
+			],
+			"startLine": 59
+		}
+	]
+}

@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 212,
+	"highlightLastLine": 215,
+	"segments": [
+		{
+			"lines": [
+				"export class ProvidersController extends EventEmitter implements IProvidersController {"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"  async setProvider(network: Network, opts?: { forceUpdate: boolean }) {"
+			],
+			"startLine": 171
+		},
+		{
+			"lines": [
+				"    const nextInitPromise = (async () => {"
+			],
+			"startLine": 194
+		},
+		{
+			"lines": [
+				"      } catch (error: any) {"
+			],
+			"startLine": 205
+		},
+		{
+			"lines": [
+				"        }",
+				"      }",
+				"",
+				"      try {",
+				"        nextProvider = getRpcProvider(network.rpcUrls, network.chainId, network.selectedRpcUrl, {",
+				"          batchMaxCount,",
+				"          batchMaxSize: network.rpcNoStateOverride ? batchMaxSize : undefined",
+				"        })",
+				"      } catch (error: any) {",
+				"        this.emitError({",
+				"          error,",
+				"          message: `Failed to initialize provider for ${network.name}`,"
+			],
+			"startLine": 208
+		}
+	]
+}

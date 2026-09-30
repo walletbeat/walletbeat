@@ -1,0 +1,23 @@
+{
+	"highlightFirstLine": 12,
+	"highlightLastLine": 15,
+	"segments": [
+		{
+			"lines": [
+				"import { walletOs } from '../os';",
+				"",
+				"export const sendTransactionHandler = walletOs.sendTransaction.handler(",
+				"  async ({ input: transactionRequest }) => {",
+				"    const provider = getProvider({",
+				"      chainId: transactionRequest.chainId,",
+				"    });",
+				"    const response = await sendTransaction(transactionRequest, provider).catch(",
+				"      (e) => {",
+				"        throw new ORPCError('SEND_TRANSACTION_FAILED', {",
+				"          message: 'Sending the transaction failed',",
+				"          cause: e,"
+			],
+			"startLine": 8
+		}
+	]
+}

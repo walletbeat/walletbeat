@@ -1,0 +1,48 @@
+{
+	"highlightFirstLine": 159,
+	"highlightLastLine": 181,
+	"segments": [
+		{
+			"lines": [
+				"export const walletInit = async (props: InitializeWalletParams): Promise<WalletInitialized> => {"
+			],
+			"startLine": 109
+		},
+		{
+			"lines": [
+				"",
+				"  return { isNew, walletAddress };",
+				"};",
+				"",
+				"export const sendTransaction = async ({",
+				"  transaction,",
+				"  existingWallet,",
+				"  provider,",
+				"}: TransactionRequestParam): Promise<null | {",
+				"  result?: Transaction;",
+				"  error?: any;",
+				"}> => {",
+				"  let isHardwareWallet = false;",
+				"  try {",
+				"    logger.debug('[wallet]: sending transaction', { transaction }, DebugContext.wallet);",
+				"    const wallet =",
+				"      existingWallet ||",
+				"      (await loadWallet({",
+				"        provider,",
+				"      }));",
+				"    // have to check inverse or we trigger unwanted BT permissions requests",
+				"    if (!(wallet instanceof Wallet)) {",
+				"      isHardwareWallet = true;",
+				"    }",
+				"    if (!wallet) return null;",
+				"    try {",
+				"      const result = await wallet.sendTransaction(transaction);",
+				"      logger.debug(`[wallet]: send - tx result`, { result }, DebugContext.wallet);",
+				"      return { result };",
+				"    } catch (error) {",
+				"      logger.error(new RainbowError(`[wallet]: Failed to send transaction`), { error });"
+			],
+			"startLine": 155
+		}
+	]
+}

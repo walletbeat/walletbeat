@@ -520,6 +520,8 @@ describe('codebase integrity', () => {
 			'[attrGroupId].astro',
 			'[eip].astro',
 			'[walletName]',
+			'[...slug]',
+			'[...path].[ext].ts',
 		])
 
 		const componentsFailed: string[] = []

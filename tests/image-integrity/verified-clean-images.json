@@ -359,6 +359,10 @@
 		"hash": "e2508820bceeb8a4798757bd13e0679a04bdd5f34de370d226a6cc2c3c2ee2a7",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/ambire/screenshots/2026-09-28-ambire-browser-network-settings.png": {
+		"hash": "127f3c43a41c825f72698832bd8f066903822a0d246cf7201b28e12c335af66b",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/base-app/screenshots/2026-06-19-multi-address-add-wallet-sheet.png": {
 		"hash": "d541c23897a2ad6b1738080fbbe283ce9d6fc9be980bf7bfdfedb3d98e712bad",
 		"passedTests": ["blockiness", "file-format"]
@@ -501,6 +505,22 @@
 	},
 	"public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-seed-phrase-export.png": {
 		"hash": "b754d388bcfcb25ecc8d38047713f75733d3d4d9ff7d3be48a543a2ef78fcf56",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-custom-rpc.png": {
+		"hash": "136547e1dc97e8c2c89ff63a640e9695d2f0c89716006c5992a4c674f89cf8c6",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-network-list.png": {
+		"hash": "cfbce39864220e0ed613dc91265fc743d20c05bcb79ca8e5b2a7777d9b40a7f7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-add-network.png": {
+		"hash": "45b42b206c0c3a75416529d86c41153f87aabee3730dfef352fbc864594317fb",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-network-list.png": {
+		"hash": "7666e57b3f80b8f26b0e2a26edbf70a462025a7e5dab8e8963dfe00ffc2fc7c2",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/okx/screenshots/2026-09-23-okx-erc7730-aave-supply.png": {
@@ -937,6 +957,14 @@
 	},
 	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png": {
 		"hash": "3ffdc886c3b65217c6a2c8951a12475f9dfb895694216a88fb4c65eee313bcb8",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png": {
+		"hash": "9960dc700c5055436d5c6452ec6d1109f24cc8a8975f601214cf856546259052",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png": {
+		"hash": "dc9b4ba257889fe4291a0fae263ecab61be82ebefa2fb29099938af1d23909f6",
 		"passedTests": ["blockiness", "file-format"]
 	},
 	"public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png": {

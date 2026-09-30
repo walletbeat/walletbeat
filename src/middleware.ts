@@ -99,13 +99,22 @@ const shouldShieldByExtension: Record<string, boolean> = {
 	// HTML and SRI-compatible resources:
 	html: true,
 	css: true,
+
+	// Images and media:
 	webm: false,
 	webp: false,
 	png: false,
+	gif: false,
 	ico: false,
 	svg: false,
 
-	// Fonts:
+	// Documents / data / etc, must be served raw:
+	pdf: false,
+	sty: false,
+	tsv: false,
+	sh: false,
+
+	// Fonts, served raw:
 	eot: false,
 	ttf: false,
 	woff: false,
