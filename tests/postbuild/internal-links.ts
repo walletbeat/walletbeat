@@ -10,8 +10,6 @@ enum HtmlLinkKind {
 }
 
 type HtmlLink = {
-	kind: HtmlLinkKind
-	normalizedUrl: string
 	originalUrl: string
 	sourceHtmlFile: string
 	sourceUrl: string
@@ -89,7 +87,7 @@ function urlsInHtml(html: string): string[] {
 	return urls
 }
 
-/** Recursively extract and classify `href` and `src` values from built HTML. */
+/** Recursively extract `href` and `src` values from built HTML. */
 function scanHtmlLinks(distDir: string): HtmlLink[] {
 	const absoluteDistDir = path.resolve(distDir)
 	const links: HtmlLink[] = []
@@ -100,11 +98,7 @@ function scanHtmlLinks(distDir: string): HtmlLink[] {
 		const html = fs.readFileSync(htmlFile, 'utf8')
 
 		for (const originalUrl of urlsInHtml(html)) {
-			const normalizedUrl = originalUrl.trim()
-
 			links.push({
-				kind: classifyUrl(normalizedUrl),
-				normalizedUrl,
 				originalUrl,
 				sourceHtmlFile,
 				sourceUrl,
@@ -158,6 +152,61 @@ function targetExists(distDir: string, resolvedTarget: string): boolean {
 	return exactFileExists || isFile(path.join(filePath, 'index.html'))
 }
 
+function resolveTarget(url: string, sourceUrl: string): string {
+	try {
+		return decodeURIComponent(
+			new URL(url, new URL(sourceUrl, 'https://walletbeat.invalid')).pathname,
+		)
+	} catch {
+		return url
+	}
+}
+
+/** Validate one URL's format without reading the build output. */
+export function validateInternalLinkFormat(url: string, sourceUrl: string): string[] {
+	const normalizedUrl = url.trim()
+	const kind = classifyUrl(normalizedUrl)
+
+	if (kind === HtmlLinkKind.PROTOCOL_RELATIVE) {
+		return ['Protocol-relative URLs are not allowed.']
+	}
+
+	if (kind !== HtmlLinkKind.INTERNAL) {
+		return []
+	}
+
+	const reasons: string[] = []
+
+	if (!normalizedUrl.startsWith('/')) {
+		reasons.push('Internal site URLs must be root-relative.')
+	}
+
+	const resolvedTarget = resolveTarget(normalizedUrl, sourceUrl)
+
+	if (!resolvedTarget.endsWith('/') && path.posix.extname(resolvedTarget) === '') {
+		reasons.push('Links to directory routes must end in a slash.')
+	}
+
+	return reasons
+}
+
+/** Resolve one internal URL and check its target, regardless of format policy. */
+export function resolveInternalLink(
+	url: string,
+	sourceUrl: string,
+	distDir: string,
+): { resolvedTarget: string; exists: boolean } | null {
+	const normalizedUrl = url.trim()
+
+	if (classifyUrl(normalizedUrl) !== HtmlLinkKind.INTERNAL) {
+		return null
+	}
+
+	const resolvedTarget = resolveTarget(normalizedUrl, sourceUrl)
+
+	return { resolvedTarget, exists: targetExists(path.resolve(distDir), resolvedTarget) }
+}
+
 function compareLinkLocations(
 	a: { sourceHtmlFile: string; originalUrl: string },
 	b: { sourceHtmlFile: string; originalUrl: string },
@@ -172,56 +221,22 @@ export function checkInternalLinks(distDir: string): InternalLinkCheckResult {
 	const absoluteDistDir = path.resolve(distDir)
 	const brokenLinks = new Map<string, BrokenInternalLink>()
 	const formatViolations = new Map<string, InternalLinkFormatViolation>()
-	const addFormatViolation = (
-		sourceHtmlFile: string,
-		originalUrl: string,
-		reason: string,
-	): void => {
-		const violation = { sourceHtmlFile, originalUrl, reason }
-		const key = `${sourceHtmlFile}\0${originalUrl}\0${reason}`
 
-		formatViolations.set(key, violation)
-	}
+	for (const { originalUrl, sourceHtmlFile, sourceUrl } of scanHtmlLinks(absoluteDistDir)) {
+		for (const reason of validateInternalLinkFormat(originalUrl, sourceUrl)) {
+			const violation = { sourceHtmlFile, originalUrl, reason }
+			const key = `${sourceHtmlFile}\0${originalUrl}\0${reason}`
 
-	for (const link of scanHtmlLinks(absoluteDistDir)) {
-		const { kind, normalizedUrl, originalUrl, sourceHtmlFile, sourceUrl } = link
+			formatViolations.set(key, violation)
+		}
 
-		if (kind === HtmlLinkKind.IGNORED || kind === HtmlLinkKind.EXTERNAL) {
+		const target = resolveInternalLink(originalUrl, sourceUrl, absoluteDistDir)
+
+		if (target === null || target.exists) {
 			continue
 		}
 
-		if (kind === HtmlLinkKind.PROTOCOL_RELATIVE) {
-			addFormatViolation(sourceHtmlFile, originalUrl, 'Protocol-relative URLs are not allowed.')
-
-			continue
-		}
-
-		if (!normalizedUrl.startsWith('/')) {
-			addFormatViolation(sourceHtmlFile, originalUrl, 'Internal site URLs must be root-relative.')
-		}
-
-		let resolvedTarget: string
-
-		try {
-			resolvedTarget = decodeURIComponent(
-				new URL(normalizedUrl, new URL(sourceUrl, 'https://walletbeat.invalid')).pathname,
-			)
-		} catch {
-			resolvedTarget = normalizedUrl
-		}
-
-		if (!resolvedTarget.endsWith('/') && path.posix.extname(resolvedTarget) === '') {
-			addFormatViolation(
-				sourceHtmlFile,
-				originalUrl,
-				'Links to directory routes must end in a slash.',
-			)
-		}
-
-		if (targetExists(absoluteDistDir, resolvedTarget)) {
-			continue
-		}
-
+		const { resolvedTarget } = target
 		const brokenLink = { sourceHtmlFile, originalUrl, resolvedTarget }
 		const key = `${sourceHtmlFile}\0${originalUrl}\0${resolvedTarget}`
 
