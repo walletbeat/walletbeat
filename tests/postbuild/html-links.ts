@@ -36,19 +36,6 @@ function findHtmlFiles(dir: string): string[] {
 	return htmlFiles.sort()
 }
 
-function decodeHtmlEntities(value: string): string {
-	return value
-		.replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number.parseInt(code, 10)))
-		.replace(/&#x([\da-f]+);/gi, (_, code: string) =>
-			String.fromCodePoint(Number.parseInt(code, 16)),
-		)
-		.replace(/&quot;/gi, '"')
-		.replace(/&apos;/gi, "'")
-		.replace(/&lt;/gi, '<')
-		.replace(/&gt;/gi, '>')
-		.replace(/&amp;/gi, '&')
-}
-
 function sourceUrlForHtmlFile(distDir: string, htmlFile: string): string {
 	const relativePath = path.relative(distDir, htmlFile).split(path.sep).join('/')
 
@@ -112,7 +99,7 @@ export function scanHtmlLinks(distDir: string): HtmlLink[] {
 		const html = fs.readFileSync(htmlFile, 'utf8')
 
 		for (const originalUrl of urlsInHtml(html)) {
-			const normalizedUrl = decodeHtmlEntities(originalUrl).trim()
+			const normalizedUrl = originalUrl.trim()
 
 			links.push({
 				kind: classifyUrl(normalizedUrl),
