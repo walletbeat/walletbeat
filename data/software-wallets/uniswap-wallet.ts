@@ -578,6 +578,18 @@ export const uniswapWallet: SoftwareWallet = {
 					},
 					{
 						explanation:
+							'For a contract call that sends no value, Uniswap Wallet shows the function name and raw data, but not the contract being called.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-no-value.png',
+						label: 'Uniswap Wallet transaction request for a mint without value',
+					},
+					{
+						explanation:
+							'For a contract call that sends ETH, Uniswap Wallet shows the contract being called under the expanded details.',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-with-value.png',
+						label: 'Uniswap Wallet transaction request for a mint that sends ETH',
+					},
+					{
+						explanation:
 							'Uniswap Wallet simulates an ERC-20 token transfer and shows the amount received.',
 						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
 						label: 'Uniswap Wallet simulation of an ERC-20 transfer',
@@ -708,7 +720,7 @@ export const uniswapWallet: SoftwareWallet = {
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					nonce: DataDisplayOptions.NOT_IN_UI,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					to: DataDisplayOptions.SHOWN_OPTIONALLY,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				transactionSimulations: supported({
@@ -822,6 +834,15 @@ export const uniswapWallet: SoftwareWallet = {
 						(for Uniswap handles, a separate feature from ENS resolution). The
 						resolved address is picked with the raw address first, the ENS
 						result second, and the Unitag result last.
+					`),
+				},
+			},
+			security: {
+				transactionLegibility: {
+					note: mdParagraph(`
+						Uniswap Wallet only shows the contract being called when the
+						transaction sends value. Contract calls that send no value show
+						the function name and raw data, but not the contract address.
 					`),
 				},
 			},
