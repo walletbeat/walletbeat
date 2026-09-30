@@ -4,7 +4,11 @@ import * as path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { checkInternalLinks } from './internal-links'
+import {
+	checkInternalLinks,
+	resolveInternalLink,
+	validateInternalLinkFormat,
+} from './internal-links'
 
 let fixtureDir: string
 
@@ -21,6 +25,121 @@ beforeEach(() => {
 
 afterEach(() => {
 	fs.rmSync(fixtureDir, { recursive: true, force: true })
+})
+
+describe('internal link formatting', () => {
+	it.each(['/', '/guide/', '/assets/app.js', '/guide/?view=compact#top', ' /guide/ '])(
+		'accepts %s without requiring a target to exist',
+		url => {
+			expect(validateInternalLinkFormat(url, '/docs/')).toEqual([])
+		},
+	)
+
+	it.each([
+		'',
+		'#section',
+		'https://example.com/',
+		'http://example.com/',
+		'mailto:a@b.com',
+		'tel:+123',
+		'data:image/png;base64,AA==',
+	])('ignores %s', url => {
+		expect(validateInternalLinkFormat(url, '/')).toEqual([])
+	})
+
+	it('rejects protocol-relative URLs', () => {
+		expect(validateInternalLinkFormat('//example.com/', '/')).toEqual([
+			'Protocol-relative URLs are not allowed.',
+		])
+	})
+
+	it('rejects page-relative URLs', () => {
+		expect(validateInternalLinkFormat('../../faq/', '/docs/reference/')).toEqual([
+			'Internal site URLs must be root-relative.',
+		])
+	})
+
+	it('checks trailing slashes on the pathname without queries or fragments', () => {
+		expect(validateInternalLinkFormat('/guide?view=compact#top', '/')).toEqual([
+			'Links to directory routes must end in a slash.',
+		])
+	})
+
+	it('reports both formatting violations for a relative page without a slash', () => {
+		expect(validateInternalLinkFormat('../faq', '/docs/')).toEqual([
+			'Internal site URLs must be root-relative.',
+			'Links to directory routes must end in a slash.',
+		])
+	})
+})
+
+describe('internal link resolution', () => {
+	it.each([
+		['/', '/'],
+		['/guide/', '/guide/'],
+		['/guide', '/guide'],
+		['../../guide/?view=compact#top', '/guide/'],
+		['./diagram.svg?v=2#icon', '/docs/reference/diagram.svg'],
+		[' /assets/my%20icon.svg ', '/assets/my icon.svg'],
+	])('resolves %s independently of format policy', (url, resolvedTarget) => {
+		writeFixture('index.html')
+		writeFixture('guide/index.html')
+		writeFixture('docs/reference/diagram.svg')
+		writeFixture('assets/my icon.svg')
+
+		expect(resolveInternalLink(url, '/docs/reference/', fixtureDir)).toEqual({
+			resolvedTarget,
+			exists: true,
+		})
+	})
+
+	it.each([
+		'',
+		'#section',
+		'//example.com/',
+		'https://example.com/',
+		'mailto:a@b.com',
+		'data:image/png;base64,AA==',
+	])('skips %s', url => {
+		expect(resolveInternalLink(url, '/', fixtureDir)).toBeNull()
+	})
+
+	it('reports the resolved target when missing', () => {
+		expect(resolveInternalLink('../missing/?q=1#top', '/docs/', fixtureDir)).toEqual({
+			resolvedTarget: '/missing/',
+			exists: false,
+		})
+	})
+
+	it('requires index.html for directory targets', () => {
+		writeFixture('empty/placeholder.txt')
+
+		expect(resolveInternalLink('/empty/', '/', fixtureDir)).toEqual({
+			resolvedTarget: '/empty/',
+			exists: false,
+		})
+	})
+
+	it('does not accept a file URL with an added slash', () => {
+		writeFixture('assets/app.js')
+
+		expect(resolveInternalLink('/assets/app.js/', '/', fixtureDir)).toEqual({
+			resolvedTarget: '/assets/app.js/',
+			exists: false,
+		})
+	})
+
+	it('rejects decoded paths escaping the build output', () => {
+		writeFixture('outside.txt')
+		const distDir = path.join(fixtureDir, 'dist')
+
+		fs.mkdirSync(distDir)
+
+		expect(resolveInternalLink(`/${encodeURIComponent('../outside.txt')}`, '/', distDir)).toEqual({
+			resolvedTarget: '/../outside.txt',
+			exists: false,
+		})
+	})
 })
 
 describe('internal build links', () => {
