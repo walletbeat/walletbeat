@@ -1583,6 +1583,7 @@ export const rainbow: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{

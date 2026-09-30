@@ -1135,6 +1135,7 @@ export const rabby: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/RabbyHub/Rabby/releases',

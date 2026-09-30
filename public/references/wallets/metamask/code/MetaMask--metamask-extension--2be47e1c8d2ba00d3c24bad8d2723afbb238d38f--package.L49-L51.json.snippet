@@ -1,0 +1,34 @@
+{
+	"highlightFirstLine": 49,
+	"highlightLastLine": 51,
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 1
+		},
+		{
+			"lines": [
+				"  \"scripts\": {"
+			],
+			"startLine": 23
+		},
+		{
+			"lines": [
+				"    \"start:flask\": \"yarn start --type flask\",",
+				"    \"start:beta\": \"yarn start --type beta\",",
+				"    \"start:flask:mv2\": \"yarn start:mv2 --type flask\",",
+				"    \"start:lavamoat\": \"yarn start --lavamoat\",",
+				"    \"dist\": \"yarn webpack:lavamoat:build --zip\",",
+				"    \"dist:mv2\": \"yarn webpack:lavamoat:build:mv2 --zip\",",
+				"    \"build\": \"yarn webpack:lavamoat:build\",",
+				"    \"build:dev\": \"yarn webpack\",",
+				"    \"circular-deps:check\": \"tsx development/circular-deps.ts check\",",
+				"    \"circular-deps:update\": \"tsx development/circular-deps.ts update\",",
+				"    \"start:test\": \"yarn env:e2e webpack --watch --test\","
+			],
+			"startLine": 45
+		}
+	]
+}

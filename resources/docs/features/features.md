@@ -112,6 +112,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `releaseTransparency` (object): Release transparency features.
     - `artifactSigning` (`VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>`)
     - `dependencyLocking` (`VariantFeature<DependencyLocking>`)
+    - `dependencySandboxing` (`VariantFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`VariantFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`VariantFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`VariantFeature<HermeticBuilds>`)
@@ -297,6 +298,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `releaseTransparency` (object)
     - `artifactSigning` (`ResolvedFeature<ArtifactSigning>`)
     - `dependencyLocking` (`ResolvedFeature<DependencyLocking>`)
+    - `dependencySandboxing` (`ResolvedFeature<DependencySandboxing>`)
     - `dependencyVulnerabilityScanning` (`ResolvedFeature<DependencyVulnerabilityScanning>`)
     - `hasPublicChangelog` (`ResolvedFeature<HasPublicChangelog>`)
     - `hermeticBuilds` (`ResolvedFeature<HermeticBuilds>`)
@@ -4120,6 +4122,16 @@ Whether dependency vulnerability scanning is configured in CI/release workflows 
 
 ```typescript
 type DependencyVulnerabilityScanning = Support<WithRef<{}>>
+```
+
+---
+
+### Type: `DependencySandboxing`
+
+Whether the wallet's release builds isolate external dependencies from each other and from the wallet's own code at runtime (e.g. via LavaMoat policies enforced with SES compartments), so that a compromised dependency cannot reach code or globals beyond what its policy grants.
+
+```typescript
+type DependencySandboxing = Support<WithRef<{}>>
 ```
 
 ---

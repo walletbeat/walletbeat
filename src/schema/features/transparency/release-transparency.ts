@@ -61,6 +61,14 @@ export type DependencyLocking = Support<WithRef<{}>>
 export type DependencyVulnerabilityScanning = Support<WithRef<{}>>
 
 /**
+ * Whether the wallet's release builds isolate external dependencies from
+ * each other and from the wallet's own code at runtime (e.g. via LavaMoat
+ * policies enforced with SES compartments), so that a compromised dependency
+ * cannot reach code or globals beyond what its policy grants.
+ */
+export type DependencySandboxing = Support<WithRef<{}>>
+
+/**
  * Observable repository-level change controls for the wallet's source
  * repository.
  */
