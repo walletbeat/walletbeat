@@ -1,0 +1,53 @@
+{
+	"highlightFirstLine": 34,
+	"highlightLastLine": 66,
+	"segments": [
+		{
+			"lines": [
+				"/**",
+				" * Maps a Blockaid API response to a DappVerificationStatus",
+				" * @param data The Blockaid API response",
+				" * @returns The corresponding DappVerificationStatus",
+				" */",
+				"function mapBlockaidResponseToStatus(data: BlockaidScanSiteResponse): DappVerificationStatus {",
+				"  if (data.status === 'miss') {",
+				"    return DappVerificationStatus.Unverified",
+				"  }",
+				"  return data.is_malicious ? DappVerificationStatus.Threat : DappVerificationStatus.Verified",
+				"}",
+				"",
+				"export function createBlockaidApiClient(ctx: { fetchClient: FetchClient }): BlockaidApiClient {",
+				"  async function scanSite(url: string): Promise<DappVerificationStatus> {",
+				"    const requestBody: BlockaidScanSiteRequest = { url }",
+				"",
+				"    const abortController = new AbortController()",
+				"    const timeoutId = setTimeout(() => abortController.abort(), BLOCKAID_TIMEOUT_MS)",
+				"",
+				"    try {",
+				"      const result = await ctx.fetchClient.post(BLOCKAID_API_PATHS.scanSite, {",
+				"        body: JSON.stringify(requestBody),",
+				"        signal: abortController.signal,",
+				"      })",
+				"",
+				"      const response = getBlockaidScanSiteResponseSchema().safeParse(result)",
+				"      if (!response.success) {",
+				"        logger.error(new Error('Blockaid API response schema validation failed'), {",
+				"          tags: { file: 'createBlockaidApiClient', function: 'scanSite' },",
+				"          extra: {",
+				"            url,",
+				"            validationError: response.error.message,",
+				"            receivedData: result,",
+				"          },",
+				"        })",
+				"        return DappVerificationStatus.Unverified",
+				"      }",
+				"      return mapBlockaidResponseToStatus(response.data)",
+				"    } catch (error) {",
+				"      // Log for observability but return safe default",
+				"      logger.error(error, {",
+				"        tags: {"
+			],
+			"startLine": 29
+		}
+	]
+}

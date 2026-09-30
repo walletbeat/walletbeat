@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 72,
+	"highlightLastLine": 72,
+	"segments": [
+		{
+			"lines": [
+				"export function DappRequestQueueProvider({ children }: PropsWithChildren): JSX.Element {"
+			],
+			"startLine": 42
+		},
+		{
+			"lines": [
+				"  useEffect(() => {"
+			],
+			"startLine": 60
+		},
+		{
+			"lines": [
+				"",
+				"    prevTotalRequestCountRef.current = totalRequestCount",
+				"  }, [totalRequestCount])",
+				"",
+				"  const dappUrl = extractBaseUrl(request?.senderTabInfo.url) || ''",
+				"  const frameUrl = extractBaseUrl(request?.senderTabInfo.frameUrl) || undefined",
+				"  const dappIconUrl = request?.senderTabInfo.favIconUrl || ''",
+				"",
+				"  let currentAccount = activeAccount"
+			],
+			"startLine": 68
+		}
+	]
+}
