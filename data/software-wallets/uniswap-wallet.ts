@@ -50,7 +50,7 @@ import {
 } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type MustRef, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { parseMobileManifestJson } from '@/tools/manifest-collector/mobile-manifest-parser'
@@ -804,13 +804,44 @@ export const uniswapWallet: SoftwareWallet = {
 			operationFees: null,
 			orderflowPractices: null,
 			releaseTransparency: {
-				artifactSigning: null,
-				dependencyLocking: null,
-				dependencyVulnerabilityScanning: null,
-				hasPublicChangelog: null,
+				artifactSigning: notSupported,
+				dependencyLocking: supported({
+					ref: [
+						{
+							explanation:
+								'The committed `bun.lock` pins exact versions for the `@uniswap/extension` workspace (`apps/extension`) and its transitive JavaScript dependencies.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock',
+						},
+						{
+							explanation:
+								'iOS: the committed `Podfile.lock` pins every CocoaPods dependency version and records the Podfile checksum used to resolve them.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/ios/Podfile.lock',
+						},
+						{
+							explanation:
+								'Android (and iOS JS layer): the committed `bun.lock` pins exact versions for the `apps/mobile` workspace, locking the React Native JavaScript dependencies bundled into the Android app. Native Gradle dependencies have no lockfile.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/bun.lock#L305-L502',
+						},
+					],
+				}),
+				dependencyVulnerabilityScanning: notSupported,
+				hasPublicChangelog: supported<MustRef<{}>>({
+					ref: [
+						{
+							explanation:
+								'Uniswap publishes GitHub releases with per-version notes for each platform, tagged `extension/<version>` and `mobile/<version>` alongside `web/<version>`.',
+							url: 'https://github.com/Uniswap/interface/releases',
+						},
+						{
+							explanation:
+								'On each push to main, the workflow reads the `VERSION` and `RELEASE` files, tags the commit, and creates a GitHub release whose body is the `RELEASE` notes.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/.github/workflows/tag_and_release.yml#L27-L54',
+						},
+					],
+				}),
 				hermeticBuilds: null,
 				repositoryChangeControls: null,
-				reproducibleBuilds: null,
+				reproducibleBuilds: notSupported,
 			},
 		},
 		walletCall: supported({
