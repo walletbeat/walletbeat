@@ -301,5 +301,9 @@ function parentUrl(urlPrefix: `/${string}`, s: string | undefined): string | und
 		return undefined
 	}
 
-	return `${urlPrefix}/${s.split('/').slice(0, -1).join('/')}/`
+	return `${urlPrefix}/${s
+		.split('/')
+		.slice(0, -1)
+		.filter(p => p !== '')
+		.join('/')}/`
 }
