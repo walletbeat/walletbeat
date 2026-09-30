@@ -4,7 +4,7 @@ import * as path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { findBrokenInternalLinks, findInternalLinkFormatViolations } from './internal-links'
+import { checkInternalLinks } from './internal-links'
 
 let fixtureDir: string
 
@@ -32,7 +32,9 @@ describe('internal build links', () => {
 		writeFixture('guide/index.html')
 		writeFixture('assets/app.js')
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([])
+		const { brokenLinks } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([])
 	})
 
 	it('resolves page-relative links while reporting their invalid format', () => {
@@ -43,8 +45,10 @@ describe('internal build links', () => {
 		writeFixture('faq/index.html')
 		writeFixture('docs/reference/diagram.svg')
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([])
-		expect(findInternalLinkFormatViolations(fixtureDir)).toEqual([
+		const { brokenLinks, formatViolations } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([])
+		expect(formatViolations).toEqual([
 			{
 				originalUrl: '../../faq/',
 				reason: 'Internal site URLs must be root-relative.',
@@ -67,7 +71,9 @@ describe('internal build links', () => {
 		writeFixture('guide/index.html')
 		writeFixture('assets/icon.svg')
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([])
+		const { brokenLinks } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([])
 	})
 
 	it('ignores external, protocol, data, and fragment-only URLs', () => {
@@ -84,8 +90,10 @@ describe('internal build links', () => {
 			].join(''),
 		)
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([])
-		expect(findInternalLinkFormatViolations(fixtureDir)).toEqual([])
+		const { brokenLinks, formatViolations } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([])
+		expect(formatViolations).toEqual([])
 	})
 
 	it('rejects protocol-relative URLs and directory routes without trailing slashes', () => {
@@ -95,8 +103,10 @@ describe('internal build links', () => {
 		)
 		writeFixture('guide/index.html')
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([])
-		expect(findInternalLinkFormatViolations(fixtureDir)).toEqual([
+		const { brokenLinks, formatViolations } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([])
+		expect(formatViolations).toEqual([
 			{
 				originalUrl: '//example.com/missing',
 				reason: 'Protocol-relative URLs are not allowed.',
@@ -117,7 +127,9 @@ describe('internal build links', () => {
 				"<img src='/images/missing.png?v=1'>",
 		)
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([
+		const { brokenLinks } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([
 			{
 				originalUrl: '../../missing/?mode=short#top',
 				resolvedTarget: '/missing/',
@@ -135,7 +147,9 @@ describe('internal build links', () => {
 		writeFixture('index.html', '<a href="/empty/">Empty directory</a>')
 		writeFixture('empty/placeholder.txt')
 
-		expect(findBrokenInternalLinks(fixtureDir)).toEqual([
+		const { brokenLinks } = checkInternalLinks(fixtureDir)
+
+		expect(brokenLinks).toEqual([
 			{
 				originalUrl: '/empty/',
 				resolvedTarget: '/empty/',
