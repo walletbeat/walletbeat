@@ -13,8 +13,14 @@
 	"SEND_ETHER": {
 		"collected": []
 	},
-	"SEND_USDC": null,
-	"NATIVE_SWAP": null,
+	"SEND_USDC": {
+		"collected": []
+	},
+	"NATIVE_SWAP": {
+		"collected": []
+	},
 	"MAKE_TRANSACTION": null,
-	"APP_CONNECTION": null
+	"APP_CONNECTION": {
+		"collected": []
+	}
 }
