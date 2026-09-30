@@ -25,5 +25,5 @@ export const sentry: CorporateEntity & OffchainDataProvider = {
 	privacyPolicy: 'https://sentry.io/privacy/',
 	repoUrl: 'https://github.com/getsentry',
 	twitter: 'https://x.com/sentry',
-	url: 'https://sentry.io/',
+	url: 'https://sentry.io/welcome/',
 }

@@ -16,7 +16,7 @@ export const ledger: CorporateEntity & WalletDeveloper = {
 		walletDeveloper: true,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/ledger-2',
-	farcaster: 'https://warpcast.com/ledgerofficial',
+	farcaster: 'https://farcaster.xyz/ledgerofficial',
 	icon: {
 		extension: 'svg',
 	},

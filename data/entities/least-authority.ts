@@ -16,7 +16,7 @@ export const leastAuthority: CorporateEntity & SecurityAuditor = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/least-authority-enterprises',
-	farcaster: 'https://warpcast.com/leastauthority',
+	farcaster: 'https://farcaster.xyz/leastauthority',
 	icon: {
 		extension: 'png',
 		height: 1043,

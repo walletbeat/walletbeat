@@ -16,7 +16,7 @@ export const diligence: CorporateEntity & SecurityAuditor = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/consensus-systems',
-	farcaster: 'https://warpcast.com/consensys',
+	farcaster: 'https://farcaster.xyz/consensys',
 	icon: {
 		extension: 'png',
 		height: 200,
@@ -27,5 +27,5 @@ export const diligence: CorporateEntity & SecurityAuditor = {
 	privacyPolicy: 'https://consensys.io/privacy-notice',
 	repoUrl: 'https://github.com/Consensys',
 	twitter: 'https://x.com/ConsensysAudits',
-	url: 'https://diligence.consensys.io/',
+	url: 'https://diligence.security//',
 }

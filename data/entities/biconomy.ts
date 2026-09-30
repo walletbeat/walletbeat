@@ -16,7 +16,7 @@ export const biconomy: CorporateEntity & TransactionBroadcastProvider = {
 		walletDeveloper: false,
 	},
 	crunchbase: 'https://www.crunchbase.com/organization/biconomy',
-	farcaster: 'https://warpcast.com/biconomy',
+	farcaster: 'https://farcaster.xyz/biconomy',
 	icon: {
 		extension: 'png',
 		height: 200,
