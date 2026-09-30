@@ -18,6 +18,7 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import type { ScamUrlWarning, SendTransactionWarning } from '@/schema/features/security/scam-alerts'
 import {
 	type SecurityAudit,
 	SecurityFlawSeverity,
@@ -429,7 +430,117 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: trailOfBitsAudits,
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: supported({
+					ref: [
+						{
+							explanation:
+								'For every app transaction request, the wallet (shared by extension and mobile) builds a Blockaid scan request from the transaction and runs it before rendering the preview, then derives a risk level and readable sections from the scan result.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/components/dappRequests/DappTransactionScanningContent.tsx#L63-L84',
+						},
+						{
+							explanation:
+								'The Blockaid scan request contains the user account address (`account_address` and `data.from`), the target contract (`data.to`), calldata, value, and the app domain, with validation and simulation options enabled.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/buildBlockaidScanTransactionRequest.ts#L17-L35',
+						},
+						{
+							explanation:
+								"Signature requests (`personal_sign`, `eth_signTypedData`) and `wallet_sendCalls` batches are scanned the same way through Blockaid's JSON-RPC scan endpoint, again including the account address and app domain.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/buildBlockaidScanJsonRpcRequest.ts#L18-L32',
+						},
+						{
+							explanation:
+								"The scan requests are sent as POST requests to Blockaid endpoints (`/v0/evm/transaction/scan`, `/v0/evm/json-rpc/scan`) through a fetch client whose base URL is Uniswap's Blockaid proxy, authenticated with the Uniswap API key.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/data/apiClients/blockaidApi/BlockaidApiClient.ts#L5-L14',
+						},
+						{
+							explanation:
+								"The risk level shown to the user is the highest of Blockaid's `result_type` verdict, its feature types, and its classification string (a Malicious verdict becomes Critical, and a Warning verdict stays Warning).",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/blockaidUtils.ts#L230-L272',
+						},
+						{
+							explanation:
+								"The contract name displayed for the target address is looked up from Blockaid's simulation `address_details`, i.e. a remote contract registry.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/utils/blockaidUtils.ts#L476-L493',
+						},
+						{
+							explanation:
+								'An app approve request to a contract the user has never interacted with only shows a generic "Contract interaction" label, with no warning about the contract being new or recently deployed.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png',
+							label: 'Uniswap Wallet transaction request with no recent-contract warning',
+						},
+					],
+					contractRegistry: true,
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: false,
+					recentContractWarning: false,
+				}),
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							explanation:
+								"The `scanSite` function sends the app URL to Blockaid's `/v0/site/scan` endpoint (via Uniswap's proxy) and maps the result to Verified, Threat (`is_malicious`) or Unverified (unknown site or failed lookup).",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/api/src/clients/blockaid/createBlockaidApiClient.ts#L34-L66',
+						},
+						{
+							explanation:
+								'`useBlockaidVerification` queries `scanSite` on demand for the app URL (cached for five minutes), rather than downloading a blocklist, so every checked site is disclosed to the scanning service.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/dappRequests/hooks/useBlockaidVerification.ts#L19-L33',
+						},
+						{
+							explanation:
+								'In the extension, the `dappUrl` scanned is reduced to the origin of the requesting tab via `extractBaseUrl` (which returns `URL.origin`), so the path and query are not sent.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/extension/src/app/features/dappRequests/DappRequestQueueContext.tsx#L72',
+						},
+						{
+							explanation: '`extractBaseUrl` returns the parsed URL origin (scheme and host).',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/utilities/src/format/urls.ts#L177-L179',
+						},
+						{
+							explanation:
+								'On mobile, WalletConnect requests are scanned using the app-supplied metadata URL and the Blockaid result is merged with WalletConnect Verify.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/apps/mobile/src/components/Requests/RequestModal/WalletConnectRequestModalContent.tsx#L94-L96',
+						},
+					],
+					leaksUserAddress: false,
+					leaksUserIp: true,
+					leaksVisitedUrl: 'DOMAIN_ONLY',
+				}),
+				sendTransactionWarning: supported<SendTransactionWarning>({
+					ref: [
+						{
+							explanation:
+								'Before a send, `RecipientSelectSpeedBumps` (used by both the extension and mobile Send flows) shows a new-address warning when the user has no prior Send transactions to that recipient and it is not one of their own accounts. It also shows separate warnings for smart contract, ERC-20 contract, view-only and self-send recipients.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/components/RecipientSearch/RecipientSelectSpeedBumps.tsx#L134-L153',
+						},
+						{
+							explanation:
+								"The prior-transaction check filters the wallet's locally stored transaction list for Send transactions to the recipient, with no network request.",
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/wallet/src/features/transactions/hooks/useAllTransactionsBetweenAddresses.ts#L10-L23',
+						},
+						{
+							explanation:
+								'The smart contract recipient check calls `provider.getCode(recipient)` on the chain RPC provider.',
+							url: 'https://github.com/Uniswap/interface/blob/da6d36f71c4d2fd665b0aae1a052a4ffda917b31/packages/uniswap/src/features/address/useIsSmartContractAddress.tsx#L17-L38',
+						},
+						{
+							explanation:
+								'Sending to an address the user has not transacted with before shows a "New address" warning asking them to confirm the address before continuing.',
+							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png',
+							label: 'Uniswap Wallet "New address" warning in the Send flow',
+						},
+					],
+					addressPoisoningDetection: false,
+					leaksRecipient: true,
+					leaksUserAddress: false,
+					leaksUserIp: true,
+					newRecipientWarning: true,
+					userWhitelist: false,
+				}),
+				unlimitedApprovalWarning: notSupported,
+			},
 			securityBestPractices: {
 				browser: {
 					ref: [

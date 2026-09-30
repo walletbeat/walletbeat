@@ -1,0 +1,46 @@
+{
+	"highlightFirstLine": 4090,
+	"highlightLastLine": 4096,
+	"segments": [
+		{
+			"lines": [
+				"export class LegacyBackgroundApiService {"
+			],
+			"startLine": 815
+		},
+		{
+			"lines": [
+				"  async #createNewVaultAndKeychainUnderLock(",
+				"    password: string,",
+				"  ): Promise<{ type: string; accounts: string[]; metadata: { id: string } }> {"
+			],
+			"startLine": 4058
+		},
+		{
+			"lines": [
+				"    if (isWalletResetInProgress) {"
+			],
+			"startLine": 4064
+		},
+		{
+			"lines": [
+				"",
+				"      this.#messenger.call('TransactionController:clearUnapprovedTransactions');",
+				"    }",
+				"",
+				"    await this.#messenger.call(",
+				"      'MultichainAccountService:createMultichainAccountWallet',",
+				"      {",
+				"        type: 'create',",
+				"        password,",
+				"      },",
+				"    );",
+				"",
+				"    // set is resetting wallet in progress to false, after new vault and keychain are created",
+				"    this.#messenger.call(",
+				"      'AppStateController:setIsWalletResetInProgress',"
+			],
+			"startLine": 4086
+		}
+	]
+}

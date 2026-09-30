@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 371,
+	"highlightLastLine": 373,
+	"segments": [
+		{
+			"lines": [
+				"export class KeyringService extends EventEmitter {"
+			],
+			"startLine": 194
+		},
+		{
+			"lines": [
+				"  async importPrivateKeys(",
+				"    privateKeys: string[]",
+				"  ): Promise<BatchImportPrivateKeysResult> {"
+			],
+			"startLine": 295
+		},
+		{
+			"lines": [
+				"    return {"
+			],
+			"startLine": 365
+		},
+		{
+			"lines": [
+				"      duplicateAddresses,",
+				"    };",
+				"  }",
+				"",
+				"  generateMnemonic(): string {",
+				"    return bip39.generateMnemonic(wordlist);",
+				"  }",
+				"",
+				"  async generatePreMnemonic(): Promise<string> {",
+				"    if (!this.isUnlocked()) {",
+				"      throw new Error(i18n.t('background.error.unlock'));"
+			],
+			"startLine": 367
+		}
+	]
+}

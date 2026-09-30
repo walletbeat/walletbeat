@@ -1,0 +1,37 @@
+---
+import IndexPage from '@/layouts/IndexPage.astro'
+import MarkdownPage from '@/layouts/MarkdownPage.astro'
+import { getCollection, getEntry } from 'astro:content'
+import { RENDERED_MARKDOWN_COLLECTIONS } from '@/constants/rendered-collections'
+import {
+	buildCollectionPaths,
+	resolveCollectionPage,
+	resolveEntryId,
+} from '@/utils/collection-utils'
+
+const collection = RENDERED_MARKDOWN_COLLECTIONS.docs
+
+export const getStaticPaths = async () => buildCollectionPaths(await getCollection('docs'))
+
+const { slug } = Astro.params
+const entries = await getCollection('docs')
+const entryId = resolveEntryId(entries, slug)
+const entry = entryId ? await getEntry('docs', entryId) : undefined
+const page = await resolveCollectionPage(entry, entries, slug, collection)
+---
+
+{
+	page.kind === 'content' ? (
+		<MarkdownPage metadata={page.metadata}>
+			<page.content />
+		</MarkdownPage>
+	) : (
+		<IndexPage
+			metadata={page.metadata}
+			entries={page.entries}
+			currentDir={page.currentDir}
+			urlPrefix={collection.urlPrefix}
+			parentUrl={page.parentUrl}
+		/>
+	)
+}

@@ -1,0 +1,45 @@
+{
+	"highlightFirstLine": 137,
+	"highlightLastLine": 156,
+	"segments": [
+		{
+			"lines": [
+				"export const getBatchedProvider = ({ chainId = ChainId.mainnet }: { chainId?: number }): JsonRpcBatchProvider => {"
+			],
+			"startLine": 117
+		},
+		{
+			"lines": [
+				"",
+				"  return provider;",
+				"};",
+				"",
+				"export const getProvider = ({ chainId = ChainId.mainnet }: { chainId?: number }): StaticJsonRpcProvider => {",
+				"  if (useConnectedToAnvilStore.getState().connectedToAnvil) {",
+				"    const provider = new StaticJsonRpcProvider(chainAnvil.rpcUrls.default.http[0], ChainId.mainnet);",
+				"    chainsProviders.set(chainId, provider);",
+				"",
+				"    return provider;",
+				"  }",
+				"",
+				"  const cachedProvider = chainsProviders.get(chainId);",
+				"",
+				"  const providerUrl = useBackendNetworksStore.getState().getDefaultChains()[chainId]?.rpcUrls?.default?.http?.[0];",
+				"",
+				"  if (cachedProvider && cachedProvider?.connection.url === providerUrl) {",
+				"    return cachedProvider;",
+				"  }",
+				"  const provider = new StaticJsonRpcProvider(providerUrl, chainId);",
+				"  chainsProviders.set(chainId, provider);",
+				"",
+				"  return provider;",
+				"};",
+				"",
+				"/**",
+				" * @desc check if hex string",
+				" * @param value The string to check"
+			],
+			"startLine": 133
+		}
+	]
+}

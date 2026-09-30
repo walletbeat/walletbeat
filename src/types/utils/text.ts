@@ -127,6 +127,17 @@ export function markdownListFormat(
 }
 
 /**
+ * The shorter of two whitespace-only strings, if it is a prefix of the
+ * longer one (or the strings are equal); otherwise `null`, meaning neither
+ * indentation encloses the other (e.g. mismatched tabs/spaces).
+ */
+export function commonWhitespacePrefix(a: string, b: string): string | null {
+	const [shorter, longer] = a.length <= b.length ? [a, b] : [b, a]
+
+	return longer.startsWith(shorter) ? shorter : null
+}
+
+/**
  * Trim longest shared whitespace prefix in all non-whitespace-only lines.
  * Also removes leading and trailing lines that are empty (whitespace-only),
  * so callers need not call `.trim()` on the result.
@@ -165,7 +176,7 @@ export function trimWhitespacePrefix(str: string): string {
 			return lines.join('\n') // No common whitespace prefix. Short circuit.
 		}
 
-		let whitespacePrefix = whitespacePrefixReg[0]
+		const whitespacePrefix = whitespacePrefixReg[0]
 
 		if (longestCommonPrefix === null) {
 			// First non-whitespace-only line.
@@ -174,17 +185,13 @@ export function trimWhitespacePrefix(str: string): string {
 			continue
 		}
 
-		if (whitespacePrefix.length > longestCommonPrefix.length) {
-			// Trim to match length of common prefix.
-			whitespacePrefix = whitespacePrefix.substring(0, longestCommonPrefix.length)
-		} else if (whitespacePrefix.length < longestCommonPrefix.length) {
-			// Trim to match length of current line prefix.
-			longestCommonPrefix = longestCommonPrefix.substring(0, whitespacePrefix.length)
-		}
+		const common = commonWhitespacePrefix(longestCommonPrefix, whitespacePrefix)
 
-		if (whitespacePrefix !== longestCommonPrefix) {
+		if (common === null) {
 			return lines.join('\n') // No common whitespace prefix. Short circuit.
 		}
+
+		longestCommonPrefix = common
 	}
 
 	if (longestCommonPrefix === null || longestCommonPrefix === '') {

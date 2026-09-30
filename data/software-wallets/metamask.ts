@@ -121,7 +121,50 @@ export const metamask: SoftwareWallet = {
 				contract: metamask7702DelegatorContract,
 			}),
 			eoa: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'MetaMask derives accounts from a standard seed phrase, and users can view both the phrase and individual private keys.',
+						url: [
+							{
+								label: 'Seed phrase and key derivation libraries',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L20-L34',
+							},
+							{
+								label: 'BIP-44 derivation path',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L38',
+							},
+							{
+								label: 'Deriving each account',
+								url: 'https://github.com/MetaMask/accounts/blob/0d93fda6eb25a29d91e5337001e705fcfa7fcccd/packages/keyring-eth-hd/src/hd-keyring.ts#L208-L230',
+							},
+							{
+								label: 'Browser extension depends on the keyring',
+								url: 'https://github.com/MetaMask/metamask-extension/blob/5979179c6350d275dfefa395d913e1948703b498/package.json#L413',
+							},
+							{
+								label: 'Mobile app depends on the keyring',
+								url: 'https://github.com/MetaMask/metamask-mobile/blob/2f91f0a57015982016402125485e724a2013b625/package.json#L318',
+							},
+						],
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-seed-phrase-export.png',
+						label: 'Browser extension seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-browser-private-key-export.png',
+						label: 'Browser extension private key export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-seed-phrase-export.png',
+						label: 'Mobile app seed phrase export',
+					},
+					{
+						file: 'public/references/wallets/metamask/screenshots/2026-09-26-metamask-mobile-private-key-export.png',
+						label: 'Mobile app private key export',
+					},
+				],
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
@@ -784,16 +827,84 @@ export const metamask: SoftwareWallet = {
 			},
 			transactionSubmission: {
 				l1: {
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-custom-rpc.png',
+							label: 'MetaMask browser extension Edit network page with a custom Ethereum RPC set',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-add-network.png',
+							label: 'MetaMask mobile app Add a network form with an RPC URL field',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							explanation: 'MetaMask supports custom RPCs and sends transactions directly to them.',
+							url: [
+								{
+									label: 'Browser extension only uses Smart Transactions on RPCs MetaMask allows',
+									url: 'https://github.com/MetaMask/metamask-extension/blob/795627f6e64b74bc461409d24f9aed7b9f7cc6c4/shared/lib/selectors/smart-transactions.ts#L172-L202',
+								},
+								{
+									label:
+										"Browser extension only uses MetaMask's relay when gas is paid with an ERC-20 token or sponsored",
+									url: 'https://github.com/MetaMask/metamask-extension/blob/795627f6e64b74bc461409d24f9aed7b9f7cc6c4/app/scripts/lib/transaction/hooks/delegation-7702-publish.ts#L125-L132',
+								},
+								{
+									label: 'Mobile app only uses Smart Transactions on RPCs MetaMask allows',
+									url: 'https://github.com/MetaMask/metamask-mobile/blob/fb064d202bc62b00c153c78a63d1de2bbd8f2765/app/util/smart-transactions/index.ts#L93-L113',
+								},
+								{
+									label:
+										"Mobile app only uses MetaMask's relay when gas is paid with an ERC-20 token or sponsored",
+									url: 'https://github.com/MetaMask/metamask-mobile/blob/fb064d202bc62b00c153c78a63d1de2bbd8f2765/app/util/transactions/hooks/delegation-7702-publish.ts#L156-L163',
+								},
+								{
+									label:
+										'For sends paid in ETH, MetaMask skips the relay and broadcasts the transaction through the RPC',
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/TransactionController.ts#L4478-L4486',
+								},
+								{
+									label: 'Transactions get routed to the custom RPC',
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/utils/provider.ts#L68-L79',
+								},
+								{
+									label: 'Transactions are submitted with `eth_sendRawTransaction`',
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/TransactionController.ts#L3262-L3267',
+								},
+							],
+						},
+					],
 					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					ref: refTodo,
+					ref: [
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-browser-network-list.png',
+							label: 'MetaMask browser extension network picker listing Base, Arbitrum and OP',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							file: 'public/references/wallets/metamask/screenshots/2026-09-28-metamask-mobile-network-list.png',
+							label: 'MetaMask mobile app Networks list with Base, Arbitrum and OP enabled',
+							lastRetrieved: '2026-09-28',
+						},
+						{
+							explanation:
+								"Arbitrum and OP Stack transactions only go to the network's sequencer; the app has no way to submit them via Ethereum.",
+							url: [
+								{
+									label: "Transactions are sent to the network's RPC",
+									url: 'https://github.com/MetaMask/core/blob/e7b5a1b00b478fee51f7ade82ae90bccc2a68469/packages/transaction-controller/src/utils/provider.ts#L68-L79',
+								},
+							],
+						},
+					],
 				},
 			},
 		},

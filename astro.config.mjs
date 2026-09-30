@@ -1,10 +1,17 @@
 // @ts-check
 import { resolve } from 'node:path'
 
+import { satteri } from '@astrojs/markdown-satteri'
 import sitemap from '@astrojs/sitemap'
 import svelte from '@astrojs/svelte'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig, fontProviders } from 'astro/config'
+
+import { codeSnippetHighlight } from './src/utils/vite-plugin-code-snippet-highlight.mjs'
+import {
+	createStripFirstH1Plugin,
+	createUrlRewritePlugin,
+} from './src/utils/satteri-url-rewrite-plugin'
 
 const rootDir = new URL('.', import.meta.url).pathname
 const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
@@ -38,6 +45,7 @@ export default defineConfig({
 			// Improve chunking strategy
 			chunkSizeWarningLimit: 1000,
 		},
+		plugins: [codeSnippetHighlight()],
 	},
 	fonts: [
 		{
@@ -114,4 +122,9 @@ export default defineConfig({
 			},
 		},
 	],
+	markdown: {
+		processor: satteri({
+			hastPlugins: [createUrlRewritePlugin(), createStripFirstH1Plugin()],
+		}),
+	},
 })
