@@ -1,0 +1,51 @@
+{
+	"highlightFirstLine": 73,
+	"highlightLastLine": 92,
+	"segments": [
+		{
+			"lines": [
+				"const rules: RuleConfig[] = ["
+			],
+			"startLine": 4
+		},
+		{
+			"lines": [
+				"  {"
+			],
+			"startLine": 44
+		},
+		{
+			"lines": [
+				"    async getValue(ctx) {",
+				"      const data = ctx.tokenApprove!;",
+				"      return data.deployDays;",
+				"    },",
+				"  },",
+				"  {",
+				"    id: \"1029\",",
+				"    enable: true,",
+				"    valueDescription: \"Spender address is a risky contract\",",
+				"    descriptions: {",
+				"      danger: \"The spender address is a risky contract\",",
+				"    },",
+				"    valueDefine: {",
+				"      type: \"boolean\",",
+				"    },",
+				"    defaultThreshold: {",
+				"      danger: true,",
+				"    },",
+				"    customThreshold: {},",
+				"    requires: [\"tokenApprove\"],",
+				"    async getValue(ctx) {",
+				"      const { isDanger } = ctx.tokenApprove!;",
+				"      return isDanger;",
+				"    },",
+				"  },",
+				"];",
+				"",
+				"export default rules;"
+			],
+			"startLine": 68
+		}
+	]
+}

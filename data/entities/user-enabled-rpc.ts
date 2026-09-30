@@ -6,9 +6,10 @@ import type {
 
 /**
  * Stand-in entity for external RPC endpoints the user chooses to enable.
- * Zeus ships a rotating list of default public RPCs.
- * none are used until the user enables one. Operators of those endpoints
- * (whoever they are at the time) learn connection metadata and chain queries.
+ * Zeus ships a rotating list of default public RPCs, but none of them are used
+ * until the user enables one in Network Settings. Operators of those endpoints
+ * (whoever they are at the time) learn connection metadata and chain queries
+ * only once an endpoint is enabled.
  */
 export const userEnabledRpcEndpoints: CorporateEntity &
 	ChainDataProvider &

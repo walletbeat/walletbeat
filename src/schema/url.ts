@@ -45,13 +45,13 @@ const wellKnownDomainsToLabels: Record<string, string> = {
 }
 
 /** A full 40-character git commit hash. */
-const fullCommitHashRegExp = /^[0-9a-f]{40}$/
+export const fullCommitHashRegExp = /^[0-9a-f]{40}$/
 
 /**
  * A GitHub line-anchor URL fragment: `L123`, `L123-L456`,
  * or the column-qualified form `L123C4-L456C7`.
  */
-const lineFragmentRegExp = /^L(?<first>\d+)(?:C\d+)?(?:-L(?<last>\d+)(?:C\d+)?)?$/
+export const lineFragmentRegExp = /^L(?<first>\d+)(?:C\d+)?(?:-L(?<last>\d+)(?:C\d+)?)?$/
 
 /** Format a GitHub line-anchor fragment as `L123` / `L123-456`, or null if not one. */
 function gitHubLineRange(fragment: string): string | null {

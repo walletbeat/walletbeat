@@ -11,11 +11,11 @@ export const erc4361: Eip = {
 	status: EipStatus.FINAL,
 	summaryMarkdown: `
 		Sign-In with Ethereum describes how Ethereum accounts authenticate with
-		off-chain services by signing a standard message format parameterized by
+		offchain services by signing a standard message format parameterized by
 		scope, session details, and security mechanisms (e.g., a nonce).
 		The goals of this specification are to provide a self-custodied
 		alternative to centralized identity providers, improve interoperability
-		across off-chain services for Ethereum-based authentication, and provide
+		across offchain services for Ethereum-based authentication, and provide
 		wallet vendors a consistent machine-readable message format to achieve
 		improved user experiences and consent management.
 	`,

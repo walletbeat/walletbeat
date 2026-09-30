@@ -1,0 +1,30 @@
+{
+	"highlightFirstLine": 110,
+	"highlightLastLine": 114,
+	"segments": [
+		{
+			"lines": [
+				"struct Settings {"
+			],
+			"startLine": 101
+		},
+		{
+			"lines": [
+				"   #[serde(default)]",
+				"   api_notice_shown: bool,",
+				"}",
+				"",
+				"impl Default for Settings {",
+				"   fn default() -> Self {",
+				"      Self {",
+				"         api_url: String::from(\"https://app.across.to/api/suggested-fees\"),",
+				"         use_api: true,",
+				"         fee_to_pay: 0.1,",
+				"         api_notice_shown: false,",
+				"      }",
+				"   }"
+			],
+			"startLine": 106
+		}
+	]
+}

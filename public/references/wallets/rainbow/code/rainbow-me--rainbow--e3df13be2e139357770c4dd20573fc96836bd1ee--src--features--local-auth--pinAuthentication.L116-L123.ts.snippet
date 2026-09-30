@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 116,
+	"highlightLastLine": 123,
+	"segments": [
+		{
+			"lines": [
+				"export async function authenticateWithPIN(): Promise<string | undefined> {"
+			],
+			"startLine": 92
+		},
+		{
+			"lines": [
+				"  return new Promise((resolve, reject) => {"
+			],
+			"startLine": 101
+		},
+		{
+			"lines": [
+				"    });",
+				"  });",
+				"}",
+				"",
+				"export async function shouldAuthenticateWithPIN(): Promise<boolean> {",
+				"  if (Platform.OS !== 'android') {",
+				"    return false;",
+				"  }",
+				"",
+				"  const hasPasscode = await kc.isPasscodeAuthAvailable();",
+				"  return !hasPasscode;",
+				"}",
+				"",
+				"export async function maybeAuthenticateWithPIN(): Promise<string | undefined> {",
+				"  if (!(await shouldAuthenticateWithPIN())) {",
+				"    return undefined;"
+			],
+			"startLine": 112
+		}
+	]
+}

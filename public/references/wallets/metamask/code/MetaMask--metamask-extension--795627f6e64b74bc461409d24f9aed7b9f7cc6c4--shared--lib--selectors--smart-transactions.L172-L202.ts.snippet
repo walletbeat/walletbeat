@@ -1,0 +1,56 @@
+{
+	"highlightFirstLine": 172,
+	"highlightLastLine": 202,
+	"segments": [
+		{
+			"lines": [
+				"const getAllowedRpcHosts = (state: RemoteFeatureFlagsState): string[] => {"
+			],
+			"startLine": 159
+		},
+		{
+			"lines": [
+				"  }",
+				"  return DEFAULT_SMART_TRANSACTIONS_ALLOWED_RPC_HOSTS;",
+				"};",
+				"",
+				"const getIsAllowedRpcUrlForSmartTransactions = (",
+				"  state: NetworkState & RemoteFeatureFlagsState,",
+				"  chainId?: string,",
+				") => {",
+				"  const effectiveChainId = chainId || getCurrentChainId(state);",
+				"  // Allow in non-production or if chain ID is on skip list.",
+				"  if (",
+				"    !isProduction() ||",
+				"    SKIP_STX_RPC_URL_CHECK_CHAIN_IDS.includes(effectiveChainId)",
+				"  ) {",
+				"    return true;",
+				"  }",
+				"",
+				"  // Get the default RPC endpoint directly for this chain ID",
+				"  const defaultRpcEndpoint = selectDefaultRpcEndpointByChainId(",
+				"    state,",
+				"    effectiveChainId,",
+				"  );",
+				"  const rpcUrl = defaultRpcEndpoint?.url;",
+				"  const hostname = rpcUrl && new URL(rpcUrl).hostname;",
+				"",
+				"  const allowedHosts = getAllowedRpcHosts(state);",
+				"  return Boolean(",
+				"    hostname &&",
+				"    allowedHosts.some((host) =>",
+				"      // A leading dot denotes a suffix/subdomain match (e.g. `.infura.io`",
+				"      // matches `mainnet.infura.io`); otherwise require an exact host match",
+				"      // so `mainnet.base.org` does not match `developer-access-mainnet.base.org`.",
+				"      host.startsWith('.') ? hostname.endsWith(host) : hostname === host,",
+				"    ),",
+				"  );",
+				"};",
+				"",
+				"export const getSmartTransactionsEnabled = (",
+				"  state: SmartTransactionsState,"
+			],
+			"startLine": 168
+		}
+	]
+}

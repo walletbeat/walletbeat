@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 171,
+	"highlightLastLine": 181,
+	"segments": [
+		{
+			"lines": [
+				"pub struct MiscConfig {"
+			],
+			"startLine": 164
+		},
+		{
+			"lines": [
+				"   pub fetch_token_icons: bool,",
+				"   /// When true, unknown contract names may be fetched from Sourcify.",
+				"   #[serde(default)]",
+				"   pub fetch_contract_names: bool,",
+				"   /// When true, Zeus may query GitHub for a newer release.",
+				"   #[serde(default)]",
+				"   pub check_for_updates: bool,",
+				"}",
+				"",
+				"impl MiscConfig {",
+				"   pub fn new() -> Self {",
+				"      Self {",
+				"         fetch_token_icons: false,",
+				"         fetch_contract_names: false,",
+				"         check_for_updates: false,",
+				"      }",
+				"   }",
+				"",
+				"   pub fn load_from_file() -> Result<Self, anyhow::Error> {"
+			],
+			"startLine": 167
+		}
+	]
+}

@@ -1,6 +1,8 @@
 import { greekfetacheese } from '@/data/contributors/greekfetacheese'
 import { across } from '@/data/entities/across'
+import { flashbots } from '@/data/entities/flashbots'
 import { github } from '@/data/entities/github'
+import { mevBlocker } from '@/data/entities/mev-blocker'
 import { pimlico } from '@/data/entities/pimlico'
 import { userEnabledRpcEndpoints } from '@/data/entities/user-enabled-rpc'
 import type { SoftwareWallet } from '@/data/software-wallets'
@@ -58,9 +60,51 @@ import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { OrderflowDisclosureLevel } from '@/schema/features/transparency/orderflow'
 import type { ArtifactSigningDetails } from '@/schema/features/transparency/release-transparency'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { type References, refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
+
+/**
+ * Refs shared by the MEV Protect transaction submission rows. Zeus offers the
+ * same two MEV Protect endpoints for swaps and for batched transactions.
+ */
+const mevProtectReferences: Record<string, References> = {
+	flashbots: [
+		{
+			explanation:
+				"When MEV Protect is on, Zeus sends the signed transaction to Flashbots Protect instead of the user's regular RPC. A user has to enable a MEV Protect endpoint in Network Settings before any transaction takes this path.",
+			url: [
+				'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L370-L383',
+				'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L369-L371',
+				'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send.rs#L316-L341',
+			] as NonEmptyArray<string>,
+		},
+		{
+			explanation:
+				'Flashbots Protect submits transactions to a private pipeline of builders instead of the public mempool. In fast mode it also shares full transaction information with searchers running in trusted execution environments. Flashbots states that it does not track, store, or log user information such as the IP address.',
+			url: [
+				'https://docs.flashbots.net/flashbots-protect/overview',
+				'https://docs.flashbots.net/flashbots-protect/quick-start',
+			] as NonEmptyArray<string>,
+		},
+	],
+	mevBlocker: [
+		{
+			explanation:
+				"When MEV Protect is on, Zeus sends the signed transaction to MEV Blocker instead of the user's regular RPC. A user has to enable a MEV Protect endpoint in Network Settings before any transaction takes this path.",
+			url: [
+				'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L370-L383',
+				'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L369-L371',
+				'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send.rs#L316-L341',
+			] as NonEmptyArray<string>,
+		},
+		{
+			explanation:
+				'MEV Blocker shares the transaction without its signature with searchers, who bid for the right to backrun it. Its documentation states that 90% of the winning bid is refunded to the transaction sender and that the remaining 10% goes to the validator. It also states that MEV Blocker takes no cut of that refund, and that connected builders pay weekly dues based on the value of the flow. Those builder dues are how the endpoint monetizes the order flow it receives.',
+			url: 'https://docs.mevblocker.io/concepts/order-flow-auction',
+		},
+	],
+}
 
 export const zeus: SoftwareWallet = {
 	metadata: {
@@ -70,7 +114,7 @@ export const zeus: SoftwareWallet = {
 		coinspectId: { type: 'NO_COINSPECT_ID' },
 		contributors: [greekfetacheese],
 		iconExtension: 'svg',
-		lastUpdated: '2026-09-26',
+		lastUpdated: '2026-09-30',
 		urls: {
 			docs: ['https://github.com/greekfetacheese/zeus'],
 			repositories: ['https://github.com/greekfetacheese/zeus'],
@@ -86,11 +130,11 @@ export const zeus: SoftwareWallet = {
 						explanation:
 							'Zeus signs EIP-7702 authorizations itself: the header exposes a delegate action that delegates the current account to any address that has contract code, and delegating to the zero address removes the delegation. Delegated accounts are tracked per chain and shown as delegated in the UI. Zeus also delegates on its own when an app requests an atomic batch, using the eth-infinitism `Simple7702Account` implementation as the target for `wallet_sendCalls` and for Railgun unshield operations.',
 						url: [
-							'https://github.com/greekfetacheese/zeus/blob/139be03ddeac6c64dd3e3c46fa0aa14bf293f7f0/src/core/tx/send.rs',
-							'https://github.com/greekfetacheese/zeus/blob/2074e6f655ab273af998b22e6680178b79185139/src/gui/ui/header.rs',
-							'https://github.com/greekfetacheese/zeus/blob/d903ab798ac49ae08dbad00c3a8d644432dfd178/src/core/tx/send_calls.rs',
-							'https://github.com/greekfetacheese/zeus/blob/2e6d51404a35080fd1ebe21b82cfd5ec3b21a300/crates/zeus-userop-kit/src/smart_account/simple_smart_account.rs',
-							'https://github.com/greekfetacheese/zeus/blob/3b96783f611f576c26bbc99d65ceecf506be7fa6/crates/zeus-eth/src/utils/address_book.rs',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send.rs#L444-L453',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/header.rs#L245-L250',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send_calls.rs#L52-L54',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-userop-kit/src/smart_account/simple_smart_account.rs#L13-L19',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-eth/src/utils/address_book.rs#L71-L75',
 						] as NonEmptyArray<string>,
 					},
 					{
@@ -128,7 +172,7 @@ export const zeus: SoftwareWallet = {
 				{
 					explanation:
 						'Zeus does not resolve human-readable addresses. The send screen accepts a raw address (or a 0zk address for private transfers) and performs no ENS, ERC-7828, or ERC-7831 lookup.',
-					url: 'https://github.com/greekfetacheese/zeus/blob/139be03ddeac6c64dd3e3c46fa0aa14bf293f7f0/src/gui/ui/send_crypto.rs',
+					url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/send_crypto.rs#L297-L310',
 				},
 			],
 			chainSpecificAddressing: {
@@ -151,7 +195,7 @@ export const zeus: SoftwareWallet = {
 						{
 							explanation:
 								'Zeus implements the built-in Across bridge UI in across.rs (risk banner and Network / Bridge / Total fee lines).',
-							url: 'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/across.rs',
+							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/across.rs#L443-L463',
 						},
 					],
 					feesLargerThan1bps: {
@@ -186,9 +230,9 @@ export const zeus: SoftwareWallet = {
 					explanation:
 						'Zeus ships with a list of default public RPC endpoints, but they are disabled by default so no RPC requests are made until the user enables a default endpoint or adds their own. Users can enable, disable, or remove defaults and use custom RPCs. The UI warns when a chain has no enabled or working RPC and links to Network Settings.',
 					url: [
-						'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/core/context/client.rs',
-						'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/panels/top_panel.rs',
-						'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
+						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L344-L357',
+						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/panels/top_panel.rs#L57-L78',
+						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L258-L261',
 					] as NonEmptyArray<string>,
 				},
 				{
@@ -204,7 +248,10 @@ export const zeus: SoftwareWallet = {
 					{
 						explanation:
 							'Users can add their own RPC endpoints, enable or disable defaults, and remove default RPCs they do not want.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
+						url: [
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L434-L435',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L339-L341',
+						] as NonEmptyArray<string>,
 					},
 				],
 			}),
@@ -245,7 +292,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Zeus is licensed under the MIT license.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/e2f12ad22ae24845f8f9bee1f0187be0a5bd07c8/LICENSE-MIT',
+						url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/LICENSE-MIT',
 					},
 				],
 				license: FOSSLicense.MIT,
@@ -281,7 +328,7 @@ export const zeus: SoftwareWallet = {
 						ref: [
 							{
 								explanation: 'Zeus exposes the address of the active account only.',
-								url: 'https://github.com/greekfetacheese/zeus/blob/8d51c76d1c6ccce5a4a845c34429a4f89ff9cdae/src/server.rs#L371',
+								url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/server.rs#L614-L616',
 							},
 						],
 						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
@@ -314,7 +361,38 @@ export const zeus: SoftwareWallet = {
 				},
 				[UserFlow.NATIVE_SWAP]: {
 					// Uniswap routing/simulation is local (revm), chain I/O is via user RPCs.
-					collected: [],
+					collected: [
+						{
+							ref: mevProtectReferences.mevBlocker,
+							byEntity: mevBlocker,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: mevProtectReferences.flashbots,
+							byEntity: flashbots,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
+						},
+					],
 				},
 				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
@@ -324,7 +402,7 @@ export const zeus: SoftwareWallet = {
 									explanation:
 										'Built-in Across bridge quotes fees from the Across suggested-fees API. Default URL is https://app.across.to/api/suggested-fees with `use_api` enabled by default, the user can change the API URL or disable the API in Across settings. The bridge deposit itself is submitted via the user-configured RPC.',
 									url: [
-										'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/across.rs',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/across.rs#L110-L114',
 									] as NonEmptyArray<string>,
 								},
 								{
@@ -354,8 +432,8 @@ export const zeus: SoftwareWallet = {
 									explanation:
 										'Railgun unshield defaults to a private broadcast path via the public Pimlico bundler URL (`https://public.pimlico.io/v2/{chainId}/rpc`). The user can point the bundler URL at a self-hosted Alto or use emergency self-broadcast.',
 									url: [
-										'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/unshield.rs',
-										'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/src/gui/ui/dapps/railgun/shield.rs',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/unshield.rs#L57-L59',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/shield.rs#L615-L618',
 									] as NonEmptyArray<string>,
 								},
 							],
@@ -364,6 +442,36 @@ export const zeus: SoftwareWallet = {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: mevProtectReferences.mevBlocker,
+							byEntity: mevBlocker,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
+								endpoint: RegularEndpoint,
+								multiAddress: {
+									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+								},
+							},
+							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+							role: EntityRole.OPERATOR,
+						},
+						{
+							ref: mevProtectReferences.flashbots,
+							byEntity: flashbots,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
@@ -384,28 +492,24 @@ export const zeus: SoftwareWallet = {
 							ref: [
 								{
 									explanation:
-										'Zeus ships its default external RPC endpoints disabled and lets the user add custom RPC URLs, so no chain traffic happens until at least one endpoint is enabled. Once an endpoint is enabled, which is required for normal chain use, that operator learns the user IP address and the usual RPC contents without any further privacy prompt. The background ETH balance refresh batches every configured wallet address into a single StateView getETHBalance call via batch::get_eth_balances, so one request can carry many addresses at once, while ERC-20 balance refreshes are per-owner. That batch is what makes the addresses correlatable to each other. The default host list can change between releases, so this row covers any user-enabled or custom RPC rather than naming individual providers. Users who only ever talk to their own node avoid external providers entirely.',
+										'Zeus ships its default external RPC endpoints disabled and lets the user add/remove custom RPC URLs, so no traffic happens until the user enables an endpoint in Network Settings. From then on that RPC provider answers chain queries and receives signed transactions, so it learns the user IP address and the usual RPC contents. Zeus updated ETH & ERC20 balances in batches, that means one single request will contain if not all most of the user wallet addresses and this can make these addresses correlatable to each other.',
 									url: [
-										'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/core/context/client.rs',
-										'https://github.com/greekfetacheese/zeus/blob/f6c258691b47fed5f47f0a47483a8bcf827f6464/src/gui/ui/settings/networks.rs',
-										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/src/core/context/balance_manager.rs',
-										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/crates/zeus-eth/src/utils/batch.rs',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L344-L357',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L258-L283',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/balance_manager.rs#L122-L127',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-eth/src/utils/batch.rs#L134-L152',
 									] as NonEmptyArray<string>,
 								},
 							],
 							byEntity: userEnabledRpcEndpoints,
 							dataCollection: {
-								// Defaults ship disabled (user must enable an endpoint first). Policy is
-								// BY_DEFAULT for the enabled-RPC operating mode: once any endpoint is on,
-								// chain/balance/broadcast traffic happens automatically without a separate
-								// privacy opt-in. Multi-address scorer only considers rows where
-								// ACCOUNT_ADDRESS is collected by default, OPT_IN would incorrectly hide
-								// the StateView multi-wallet ETH batch and yield a false PASS.
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.BALANCE]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.ASSETS]: CollectionPolicy.BY_DEFAULT,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.BY_DEFAULT,
+								// Endpoints ship disabled, so every field below is collected only
+								// after the user enables an endpoint in Network Settings.
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.BALANCE]: CollectionPolicy.OPT_IN,
+								[WalletInfo.ASSETS]: CollectionPolicy.OPT_IN,
+								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.OPT_IN,
 								endpoint: RegularEndpoint,
 								multiAddress: {
 									type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
@@ -425,9 +529,9 @@ export const zeus: SoftwareWallet = {
 									explanation:
 										'Zeus can check GitHub for a newer release on startup, but the check is off by default. It is offered as an unchecked "Check for Updates" box during onboarding, and can be changed at any time in settings. The only other external calls Zeus makes are the optional token icon downloads and the optional Sourcify contract name lookup, which are consented the same way and are also off by default.',
 									url: [
-										'https://github.com/greekfetacheese/zeus/blob/7319b288f306f9157156f6b0f20de378a3a45d8e/src/utils/self_update.rs',
-										'https://github.com/greekfetacheese/zeus/blob/7f1dfb05eb17263bedfd07ca05bd9c542dab41c6/src/gui/ui/auth.rs',
-										'https://github.com/greekfetacheese/zeus/blob/0bb887c65260c2a1cbb700470fd2d29cd6bc77ed/src/core/types.rs',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/utils/self_update.rs#L24-L28',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/auth.rs#L625-L632',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/types.rs#L171-L181',
 									] as NonEmptyArray<string>,
 								},
 								{
@@ -452,8 +556,9 @@ export const zeus: SoftwareWallet = {
 									explanation:
 										'Missing Railgun proving-circuit artifacts beyond the embedded hot-set are downloaded from the privacy-protocol-artifacts GitHub raw host during optional prefetch/use. Some common circuits are embedded in the binary and need no download.',
 									url: [
-										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/crates/zeus-railgun/src/circuit/remote_artifact_loader.rs',
-										'https://github.com/greekfetacheese/zeus/blob/dcf01cc56dae5b12ba3469fc36c935f5fa5348b4/src/utils/state.rs',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-railgun/src/circuit/remote_artifact_loader.rs#L590-L599',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/crates/zeus-railgun/src/circuit/remote_artifact_loader.rs#L243-L250',
+										'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/utils/state.rs#L679-L684',
 									] as NonEmptyArray<string>,
 								},
 								{
@@ -488,11 +593,11 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus has a fully native Railgun integration: local proving, local note decryption/merkle handling, and UTXO sync over the user-enabled RPC (RpcSyncer). A Subsquid syncer exists in the codebase but is not used by default and cannot be enabled from the UI. Users can shield ERC-20s, unshield ERC-20s, send private transfers to 0zk addresses, and merge notes. Unshield defaults to a privacy paymaster / bundler path (public Pimlico URL by default, user-customizable); optional self-broadcast is available for emergency withdrawals and is labeled as breaking anonymity. Private transfers and note merges are submitted from the user wallet.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/readme.md',
-								'https://github.com/greekfetacheese/zeus/blob/f21eb57f0af16eb43909ed8fa2941d82cc44d304/src/gui/ui/dapps/railgun/shield.rs',
-								'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/unshield.rs',
-								'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/dapps/railgun/transfer.rs',
-								'https://github.com/greekfetacheese/zeus/blob/2d3c2dc631e2352405f1ee0dbda96d49f54eaf2d/src/gui/ui/tx/events.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/shield.rs#L1054-L1063',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/unshield.rs#L70-L74',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/railgun/transfer.rs#L36-L43',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/events.rs#L664-L678',
 							] as NonEmptyArray<string>,
 						},
 					],
@@ -570,7 +675,7 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus currently does not have a scam alert mechanism, It simply shows with which contract you are interacting with. If it is a known contract a hyperlink with the contracts name is shown otherwise a truncated version of the contract address is shown (hyperlink). The user can also see all the decoded events to inspect the transaction.',
 							label: 'Contract interaction is shown in the transaction details',
-							url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/gui/ui/tx_window.rs#L246C1-L247C1',
+							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/tx_window.rs#L301C1-L304C1',
 						},
 					],
 				}),
@@ -579,7 +684,7 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							label: 'Before every transaction the user must confirm the action.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/6fc3006fd8790f3f0db2feae24a5bdbad07c0c30/src/utils/tx.rs#L241C1-L242C1',
+							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send.rs#L125C1-L142C1',
 						},
 						{
 							explanation:
@@ -609,8 +714,8 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'For transactions that did not originate from Zeus itself, the confirmation window renders the transaction title in the error color when the transaction is an unlimited approval or permit. The approval row shows the amount as `Unlimited` in the warning color.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/064cbb70706300c5a2e5e640816a68d1004eb80f/src/gui/ui/tx/confrim_window.rs',
-								'https://github.com/greekfetacheese/zeus/blob/851e1e0e700932dfbf297849fcd803e6d4ef506f/src/gui/ui/tx/events.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/confrim_window.rs#L363-L377',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/events.rs#L226-L252',
 							] as NonEmptyArray<string>,
 						},
 					],
@@ -628,8 +733,8 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus derives the master HD wallet from the username and password using Argon2Id with a fixed high-cost parameter set, and persists it in a vault encrypted with those same credentials. The stored key material is protected by a standardized key derivation function rather than an ad-hoc scheme. Zeus does not generate the master key from a random number generator: its entropy comes from the user credentials. The keys Zeus does generate itself, such as the Railgun database key and the wallet state key, use the operating system CSPRNG.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/7f1dfb05eb17263bedfd07ca05bd9c542dab41c6/src/core/vault.rs',
-								'https://github.com/greekfetacheese/zeus/blob/074bb7e82633e65d498176f67f8f3e957fffae0d/readme.md#how-the-wallet-recovery-works',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/vault.rs#L369-L387',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/readme.md#how-the-wallet-recovery-works',
 							] as NonEmptyArray<string>,
 						},
 					],
@@ -644,9 +749,9 @@ export const zeus: SoftwareWallet = {
 						explanation:
 							"Zeus simulates every transaction locally and shows the effect on the user's own account before signing. The confirmation window displays decoded events together with the resulting balance and approval changes. A transaction that would revert cannot be submitted at all, because the simulation returns the revert reason as an error.",
 						url: [
-							'https://github.com/greekfetacheese/zeus/blob/064cbb70706300c5a2e5e640816a68d1004eb80f/src/core/tx/analysis.rs',
-							'https://github.com/greekfetacheese/zeus/blob/a87a05bad4c3b53438584bcbf9667de1e08c8dc6/src/core/tx/approval_diff.rs',
-							'https://github.com/greekfetacheese/zeus/blob/30b0c641abe524f4e7e0e36af3e6356092b0128a/src/core/tx/sim_diff.rs',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/analysis.rs#L64-L70',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/approval_diff.rs#L1-L3',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/sim_diff.rs#L760-L769',
 						] as NonEmptyArray<string>,
 					},
 					{
@@ -661,8 +766,15 @@ export const zeus: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'A Sign-In With Ethereum request reaches Zeus as a generic `personal_sign` call. Zeus displays the message text but does not recognize or reformat a SIWE request.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/470ee192207be2a2e7740fa8c4f6278066366464/src/server.rs',
+								'Zeus shows a Sign-In With Ethereum request as the raw `personal_sign` message it receives, with no SIWE-specific formatting.',
+							file: 'public/references/wallets/zeus/screenshots/2026-09-30-zeus-siwe-personal-sign.png',
+							label:
+								'Zeus Sign Message window for a SIWE request, titled Personal Sign, showing the bare message text with its URI, Version, Chain ID, Nonce and Issued At lines, plus Sign and Cancel buttons',
+						},
+						{
+							explanation:
+								'A Sign-In With Ethereum request reaches Zeus as a generic `personal_sign` call, and the message is signed verbatim as opaque bytes.',
+							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/server.rs#L1344-L1352',
 						},
 					],
 				}),
@@ -672,14 +784,14 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus resolves ERC-7730 calldata descriptors by the contract being called, from a pinned clear signing registry, and shows the descriptor-driven description instead of raw calldata whenever a descriptor matches.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/d52e9b52e37fae48cf4e760488a8b1aedbe276ec/src/core/clear_signing/mod.rs',
-								'https://github.com/greekfetacheese/zeus/blob/d0ee95eb80a4d4d75a2769e9e17dfd01d3e41c3d/src/core/clear_signing/registry.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/clear_signing/mod.rs#L80-L96',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/clear_signing/registry.rs#L271-L276',
 							] as NonEmptyArray<string>,
 						},
 						{
 							explanation:
 								'The pinned registry ships an Aave `V3` Pool calldata descriptor, which is what resolves the Aave supply benchmark. It ships no descriptor for a plain ERC-20 `approve` on USDC, and Zeus has no handling of Safe `execTransaction` or `multiSend` inner calldata.',
-							url: 'https://github.com/greekfetacheese/zeus/blob/b5d8491e01f1346ccafa5e32cf48ecd1e6d890b5/src/core/clear_signing/registry_pins.rs',
+							url: 'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/clear_signing/registry_pins.rs#L181-L184',
 						},
 						{
 							explanation:
@@ -712,8 +824,8 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'The confirmation window shows the decoded call by default. The raw hex calldata is reachable behind the `Raw` action of the calldata window, there is no way to copy that calldata to the clipboard, and no calldata digest is shown.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/851e1e0e700932dfbf297849fcd803e6d4ef506f/src/gui/ui/tx/mod.rs',
-								'https://github.com/greekfetacheese/zeus/blob/064cbb70706300c5a2e5e640816a68d1004eb80f/src/gui/ui/tx/confrim_window.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/mod.rs#L657-L672',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/confrim_window.rs#L324-L337',
 							] as NonEmptyArray<string>,
 						},
 						{
@@ -800,16 +912,16 @@ export const zeus: SoftwareWallet = {
 						explanation:
 							'Zeus lists the ERC-20 and `Permit2` allowances it has recorded and lets the user revoke either kind from the approvals screen. An ERC-20 allowance is revoked with an approve transaction for a zero amount, and a `Permit2` allowance with a `Permit2` approve transaction for a zero amount. The list is scoped to local activity: it only tracks approvals observed in transactions that Zeus itself recorded, so approvals granted through other wallets do not appear.',
 						url: [
-							'https://github.com/greekfetacheese/zeus/blob/26ca417a3a2ed8bfc412ba20e617513b3da70167/src/gui/ui/approvals.rs',
-							'https://github.com/greekfetacheese/zeus/blob/644518bc1d8c2e82f9afc63dfbbf3b6f24c0b15f/src/core/context/approval_manager.rs',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/approvals.rs#L730-L759',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/approval_manager.rs#L116-L129',
 						] as NonEmptyArray<string>,
 					},
 					{
 						explanation:
 							"Zeus's built-in Uniswap swap approves the canonical `Permit2` contract with an unlimited token allowance (the maximum `U256` value), one time per token. The `Permit2` allowance it grants the swap router is for exactly the swap input amount and expires 30 days after signing; an existing allowance that is still sufficient and not expired is reused instead of signing again. The unlimited token approval is rendered before signing with its amount displayed as `Unlimited` and cannot be edited.",
 						url: [
-							'https://github.com/greekfetacheese/zeus/blob/74f456caf5b9953e4d69eeb5c9f7e6aa610af2f0/src/gui/ui/dapps/uniswap/swap.rs',
-							'https://github.com/greekfetacheese/zeus/blob/2074e6f655ab273af998b22e6680178b79185139/src/core/signature/mod.rs',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/dapps/uniswap/swap.rs#L1649-L1665',
+							'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/signature/mod.rs#L66-L87',
 						] as NonEmptyArray<string>,
 					},
 					{
@@ -963,8 +1075,8 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus shows a single "MEV Protect is enabled" or "MEV Protect is disabled" line with an on/off indicator in the transaction confirmation window, with no further orderflow detail. It appears for actions that involve slippage, such as swaps, and for unknown or EOA delegation actions. The MEV Protect flag is configured per RPC endpoint in Network Settings.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/064cbb70706300c5a2e5e640816a68d1004eb80f/src/gui/ui/tx/confrim_window.rs',
-								'https://github.com/greekfetacheese/zeus/blob/3b95dd32b3b7e949bd71c7969e4231d0faa9c540/src/gui/ui/settings/networks.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/tx/confrim_window.rs#L621-L638',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L369-L378',
 							] as NonEmptyArray<string>,
 						},
 						{
@@ -982,7 +1094,7 @@ export const zeus: SoftwareWallet = {
 						},
 					],
 					afterSingleAction: OrderflowDisclosureLevel.MENTIONED,
-					byDefault: OrderflowDisclosureLevel.MENTIONED,
+					byDefault: OrderflowDisclosureLevel.NONE,
 				},
 				practicesPage: notSupported,
 				userCanRemoveAuctioning: notSupportedWithRef({
@@ -991,8 +1103,8 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus does not auction orderflow, so there is no auctioning for the user to remove. Swap quotes and simulations are computed locally by the app, and transactions are submitted through the RPC endpoints the user chooses, or through a private MEV Protect endpoint when one is enabled.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/1586442ca4040477c5f79857602edb80341572a8/src/core/context/client.rs',
-								'https://github.com/greekfetacheese/zeus/blob/3b95dd32b3b7e949bd71c7969e4231d0faa9c540/src/gui/ui/settings/networks.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/context/client.rs#L716-L733',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/gui/ui/settings/networks.rs#L369-L378',
 							] as NonEmptyArray<string>,
 						},
 					],
@@ -1005,7 +1117,7 @@ export const zeus: SoftwareWallet = {
 							explanation:
 								'Zeus signs every release archive with `minisign`. The signature ships inside the archive as `signature.minisig` and covers the `zeus-gui` binary, and the built-in updater verifies it against a `minisign` public key embedded in the application before replacing the running binary, refusing the update if verification fails.',
 							url: [
-								'https://github.com/greekfetacheese/zeus/blob/7319b288f306f9157156f6b0f20de378a3a45d8e/src/utils/self_update.rs',
+								'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/utils/self_update.rs#L205-L217',
 								'https://github.com/greekfetacheese/zeus/releases',
 							] as NonEmptyArray<string>,
 						},
@@ -1041,8 +1153,8 @@ export const zeus: SoftwareWallet = {
 					explanation:
 						'Zeus implements the EIP-5792 Wallet Call API: `wallet_sendCalls`, `wallet_getCapabilities`, and `wallet_getCallsStatus` are handled by its RPC server, and it reports the `atomicBatch` capability with the `atomic` status `supported` on Ethereum. Batched calls execute through the delegated EIP-7702 account.',
 					url: [
-						'https://github.com/greekfetacheese/zeus/blob/470ee192207be2a2e7740fa8c4f6278066366464/src/server.rs',
-						'https://github.com/greekfetacheese/zeus/blob/d903ab798ac49ae08dbad00c3a8d644432dfd178/src/core/tx/send_calls.rs',
+						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/server.rs#L125-L127',
+						'https://github.com/greekfetacheese/zeus/blob/9b40cac346b786930bd3c969567e14d3eeaa4fcd/src/core/tx/send_calls.rs#L52-L61',
 					] as NonEmptyArray<string>,
 				},
 				{

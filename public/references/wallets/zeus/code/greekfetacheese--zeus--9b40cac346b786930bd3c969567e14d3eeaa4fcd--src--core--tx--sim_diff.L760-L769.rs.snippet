@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 760,
+	"highlightLastLine": 769,
+	"segments": [
+		{
+			"lines": [
+				"impl MeasuredDiffs {"
+			],
+			"startLine": 727
+		},
+		{
+			"lines": [
+				"   pub async fn resolve(",
+				"      self,",
+				"      ctx: ZeusCtx,",
+				"      chain: ChainId,",
+				"      native_before: U256,",
+				"      native_after: U256,",
+				"   ) -> Result<(BalanceDiff, ApprovalDiff), anyhow::Error> {"
+			],
+			"startLine": 729
+		},
+		{
+			"lines": [
+				"      Ok(resolve_raw_diffs(ctx, chain.id(), native_before, native_after, raw).await)",
+				"   }",
+				"}",
+				"",
+				"/// Fork, simulate, and attach signer balance / approval diffs.",
+				"pub async fn simulate_and_diff(",
+				"   ctx: ZeusCtx,",
+				"   chain: ChainId,",
+				"   from: Address,",
+				"   interact_to: Address,",
+				"   call_data: Bytes,",
+				"   value: U256,",
+				"   authorization_list: Vec<SignedAuthorization>,",
+				") -> Result<SimulatedTx, anyhow::Error> {",
+				"   let client = ctx.get_zeus_client();",
+				"",
+				"   let (block, block_id) = pinned_head(ctx.clone(), chain, BlockId::latest()).await?;",
+				""
+			],
+			"startLine": 756
+		}
+	]
+}

@@ -1,0 +1,44 @@
+{
+	"highlightFirstLine": 369,
+	"highlightLastLine": 387,
+	"segments": [
+		{
+			"lines": [
+				"impl Vault {"
+			],
+			"startLine": 216
+		},
+		{
+			"lines": [
+				"   pub fn remove_child(&mut self, address: Address) {",
+				"      self.hd_wallet.children.retain(|w| w.address() != address);",
+				"   }",
+				"",
+				"   pub fn recover_hd_wallet(&mut self, name: String) -> Result<(), anyhow::Error> {",
+				"      self.credentials.is_valid()?;",
+				"",
+				"      let version = if cfg!(feature = \"dev\") {",
+				"         let params = Argon2Params::new(DEV_M_COST, DEV_T_COST, DEV_P_COST);",
+				"         let method = DeriveMethod::BIP32;",
+				"         DeriveVersion::Custom(params, method)",
+				"      } else {",
+				"         DeriveVersion::V1",
+				"      };",
+				"",
+				"      let username = self.credentials.username.clone();",
+				"      let password = self.credentials.password.clone();",
+				"",
+				"      let name = if name.is_empty() { None } else { Some(name) };",
+				"",
+				"      let deriver = Deriver::new(version, Some(username), Some(password));",
+				"",
+				"      self.hd_wallet = deriver.new_hd_wallet(name)?;",
+				"",
+				"      Ok(())",
+				"   }",
+				""
+			],
+			"startLine": 365
+		}
+	]
+}

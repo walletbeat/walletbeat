@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 18,
+	"highlightLastLine": 50,
+	"segments": [
+		{
+			"lines": [
+				"",
+				"/**",
+				" * Authenticates with a biometric credential and returns both the credential and encryption key",
+				" */",
+				"export async function authenticateWithBiometricCredential({",
+				"  credentialId,",
+				"  transports,",
+				"  abortSignal,",
+				"}: {",
+				"  credentialId: string",
+				"  transports: AuthenticatorTransport[]",
+				"  abortSignal: AbortSignal",
+				"}): Promise<{ publicKeyCredential: PublicKeyCredential; encryptionKey: CryptoKey }> {",
+				"  // Convert stored credential ID back to binary format",
+				"  const credentialIdBuffer = base64ToUint8(credentialId)",
+				"",
+				"  const credential = await navigator.credentials.get({",
+				"    publicKey: {",
+				"      challenge: generateNew256BitRandomBuffer() as BufferSource,",
+				"      allowCredentials: [",
+				"        {",
+				"          type: 'public-key',",
+				"          id: credentialIdBuffer,",
+				"          transports,",
+				"        },",
+				"      ],",
+				"      userVerification: 'required',",
+				"      timeout: 15 * ONE_SECOND_MS,",
+				"    },",
+				"    signal: abortSignal,",
+				"  })",
+				"",
+				"  const publicKeyCredential = assertPublicKeyCredential(credential)",
+				"  const encryptionKey = await extractEncryptionKeyFromCredential(publicKeyCredential)",
+				"",
+				"  return { publicKeyCredential, encryptionKey }",
+				"}",
+				"",
+				"/**",
+				" * Extracts the encryption key from a WebAuthn credential response",
+				" */"
+			],
+			"startLine": 14
+		}
+	]
+}

@@ -11,19 +11,18 @@ export interface AddressCorrelationDetailsProps extends EvaluationData<AddressCo
 	linkables: NonEmptyArray<WalletAddressLinkableBy>
 }
 
+export type AddressCorrelationDetailsBakedProps = Omit<
+	AddressCorrelationDetailsProps,
+	keyof EvaluationData<AddressCorrelationMetadata>
+>
+
 export interface AddressCorrelationDetailsContent {
 	component: 'AddressCorrelationDetails'
-	componentProps: AddressCorrelationDetailsProps
+	componentProps: AddressCorrelationDetailsBakedProps
 }
 
 export function addressCorrelationDetailsContent(
-	bakedProps: Omit<
-		AddressCorrelationDetailsProps,
-		keyof EvaluationData<AddressCorrelationMetadata>
-	>,
+	bakedProps: AddressCorrelationDetailsBakedProps,
 ): Content<{ WALLET_NAME: string }> {
-	return component<AddressCorrelationDetailsContent, keyof typeof bakedProps>(
-		'AddressCorrelationDetails',
-		bakedProps,
-	)
+	return component('AddressCorrelationDetails', bakedProps)
 }

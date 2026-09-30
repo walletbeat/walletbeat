@@ -1,0 +1,55 @@
+{
+	"highlightFirstLine": 66,
+	"highlightLastLine": 87,
+	"segments": [
+		{
+			"lines": [
+				"impl Permit2Info {",
+				"   pub async fn new(",
+				"      ctx: ZeusCtx,",
+				"      chain: u64,",
+				"      token: &ERC20Token,",
+				"      amount: U256,",
+				"      owner: Address,",
+				"      spender: Address,",
+				"   ) -> Result<Self, anyhow::Error> {"
+			],
+			"startLine": 43
+		},
+		{
+			"lines": [
+				"      });",
+				"",
+				"      let (data, allowance) = tokio::try_join!(data_fut, allowance_fut)?;",
+				"",
+				"      let contract_need_approval = allowance < amount;",
+				"",
+				"      let current_time = TimeStamp::now_as_secs()?.timestamp();",
+				"",
+				"      let expired = u64::try_from(data.expiration)? < current_time;",
+				"      let needs_new_signature = U256::from(data.amount) < amount || expired;",
+				"",
+				"      #[cfg(feature = \"dev\")]",
+				"      {",
+				"         tracing::info!(\"AllowanceReturn {:?}\", data);",
+				"         tracing::info!(\"Permit2 Expired: {}\", expired);",
+				"         tracing::info!(",
+				"            \"Permit2 Contract Needs Approval: {}\",",
+				"            contract_need_approval",
+				"         );",
+				"         tracing::info!(",
+				"            \"Permit2 Needs New Signature: {}\",",
+				"            needs_new_signature",
+				"         );",
+				"      }",
+				"",
+				"      let expiration = U256::from(current_time + 30 * 24 * 60 * 60); // 30 days",
+				"      let sig_deadline = U256::from(current_time + 30 * 60); // 30 minutes",
+				"",
+				"      let value = if needs_new_signature {",
+				"         let v = generate_permit2_json_value("
+			],
+			"startLine": 62
+		}
+	]
+}

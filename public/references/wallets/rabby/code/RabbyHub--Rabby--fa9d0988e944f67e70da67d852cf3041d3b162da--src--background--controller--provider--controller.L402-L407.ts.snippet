@@ -1,0 +1,37 @@
+{
+	"highlightFirstLine": 402,
+	"highlightLastLine": 407,
+	"segments": [
+		{
+			"lines": [
+				"class ProviderController extends BaseController {"
+			],
+			"startLine": 157
+		},
+		{
+			"lines": [
+				"  }) => {"
+			],
+			"startLine": 351
+		},
+		{
+			"lines": [
+				"    delete approvalRes.sig;",
+				"    delete approvalRes.$account;",
+				"",
+				"    let is1559 = is1559Tx(approvalRes);",
+				"    const is7702 = is7702Tx(approvalRes);",
+				"",
+				"    if (is7702) {",
+				"      // todo",
+				"      throw new Error('not support 7702');",
+				"    }",
+				"",
+				"    if (",
+				"      is1559 &&",
+				"      approvalRes.maxFeePerGas === approvalRes.maxPriorityFeePerGas"
+			],
+			"startLine": 398
+		}
+	]
+}

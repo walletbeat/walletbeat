@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 1054,
+	"highlightLastLine": 1063,
+	"segments": [
+		{
+			"lines": [
+				"async fn shield(",
+				"   ctx: ZeusCtx,",
+				"   chain: ChainId,",
+				"   currency: Currency,",
+				"   amount: NumericValue,",
+				"   from: Address,",
+				"   recipient: String,",
+				") -> Result<(), anyhow::Error> {"
+			],
+			"startLine": 1011
+		},
+		{
+			"lines": [
+				"   SHARED_GUI.write(|gui| {",
+				"      gui.loading_window.open(\"Wait while magic happens\");",
+				"      gui.request_repaint();",
+				"   });",
+				"",
+				"   let amount_u128: u128 = amount.wei().try_into()?;",
+				"",
+				"   let shield_tx = {",
+				"      let mut rng = ChaCha12Rng::from_os_rng();",
+				"      let builder = railgun_provider.shield();",
+				"      let builder = if is_native {",
+				"         builder.shield_native(recipient.clone(), amount_u128)",
+				"      } else {",
+				"         builder.shield(",
+				"            recipient.clone(),",
+				"            AssetId::Erc20(token.address),",
+				"            amount_u128,",
+				"         )",
+				"      };"
+			],
+			"startLine": 1049
+		}
+	]
+}

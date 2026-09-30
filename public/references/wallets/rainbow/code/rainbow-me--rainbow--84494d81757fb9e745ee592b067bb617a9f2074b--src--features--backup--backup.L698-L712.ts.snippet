@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 698,
+	"highlightLastLine": 712,
+	"segments": [
+		{
+			"lines": [
+				"export async function checkIdentifierOnLaunch() {"
+			],
+			"startLine": 661
+		},
+		{
+			"lines": [
+				"  try {"
+			],
+			"startLine": 670
+		},
+		{
+			"lines": [
+				"    if (currentIdentifier.error) {"
+			],
+			"startLine": 677
+		},
+		{
+			"lines": [
+				"",
+				"      throw new Error('Unable to retrieve current identifier');",
+				"    }",
+				"",
+				"    // NOTE: This can only happen on a fresh install",
+				"    if (!currentIdentifier.value) {",
+				"      await kc.set(identifierForVendorKey, uuid);",
+				"      return;",
+				"    }",
+				"",
+				"    if (currentIdentifier.value === uuid) {",
+				"      return;",
+				"    }",
+				"",
+				"    return new Promise(resolve => {",
+				"      Navigation.handleAction(Routes.CHECK_IDENTIFIER_SCREEN, {",
+				"        step: walletBackupStepTypes.check_identifier,",
+				"        // NOTE: Just a reinstall, let's update the identifer and send them back to the app",
+				"        onSuccess: async () => {",
+				"          await kc.set(identifierForVendorKey, uuid);",
+				"          Navigation.goBack();",
+				"          resolve(true);",
+				"        },"
+			],
+			"startLine": 694
+		}
+	]
+}

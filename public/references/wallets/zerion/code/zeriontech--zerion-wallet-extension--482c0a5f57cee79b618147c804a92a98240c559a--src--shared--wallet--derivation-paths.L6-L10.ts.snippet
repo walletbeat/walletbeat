@@ -1,0 +1,24 @@
+{
+	"highlightFirstLine": 6,
+	"highlightLastLine": 10,
+	"segments": [
+		{
+			"lines": [
+				"// m/44'/60'/0'/0/x: BIP44, MetaMask, Jaxx, MyEtherWallet (default), TREZOR App, Exodus",
+				"// m/44'/60'/x'/0/0: BIP44, KeepKey, MetaMask (custom), Ledger Live",
+				"// m/44'/60'/0'/x: Electrum, MyEtherWallet (ledger), Ledger Chrome App, imToken",
+				"",
+				"const pathPatterns = {",
+				"  bip44: {",
+				"    regex: /(?:m\\/)?44'\\/60'\\/0'\\/0\\/(\\d+)/,",
+				"    fromIndex: (index: number) => `m/44'/60'/0'/0/${index}`,",
+				"  },",
+				"  ledgerLive: {",
+				"    regex: /(?:m\\/)?44'\\/60'\\/(\\d+)'\\/0\\/0/,",
+				"    fromIndex: (index: number) => `m/44'/60'/${index}'/0/0`,",
+				"  },"
+			],
+			"startLine": 2
+		}
+	]
+}

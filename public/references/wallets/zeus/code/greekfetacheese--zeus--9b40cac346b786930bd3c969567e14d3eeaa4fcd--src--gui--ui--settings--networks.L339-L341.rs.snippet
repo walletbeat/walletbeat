@@ -1,0 +1,53 @@
+{
+	"highlightFirstLine": 339,
+	"highlightLastLine": 341,
+	"segments": [
+		{
+			"lines": [
+				"impl NetworkSettings {"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"   fn list_ui(&mut self, ctx: &mut ZeusContext, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 106
+		},
+		{
+			"lines": [
+				"      ScrollArea::vertical().auto_shrink([false; 2]).content_margin(5).show(ui, |ui| {"
+			],
+			"startLine": 239
+		},
+		{
+			"lines": [
+				"         for (_url, rpc) in rpcs.iter_mut() {",
+				"            ui.horizontal(|ui| {"
+			],
+			"startLine": 243
+		},
+		{
+			"lines": [
+				"               rpc_col(ui, ACTIONS_W, ROW_H, |ui| {"
+			],
+			"startLine": 307
+		},
+		{
+			"lines": [
+				"                  ui.add_space(5.0);",
+				"",
+				"                  let button = Button::new(RichText::new(\"X\").size(theme.typography.normal))",
+				"                     .visuals(button_visuals);",
+				"                  if ui.add(button).clicked() {",
+				"                     let z_client = ctx.client.clone();",
+				"                     z_client.remove_rpc(chain, rpc.url.clone());",
+				"",
+				"                     RT.spawn_blocking(move || {",
+				"                        let ctx = SHARED_GUI.read(|gui| gui.ctx.clone());",
+				"                        ctx.save_zeus_client();"
+			],
+			"startLine": 335
+		}
+	]
+}

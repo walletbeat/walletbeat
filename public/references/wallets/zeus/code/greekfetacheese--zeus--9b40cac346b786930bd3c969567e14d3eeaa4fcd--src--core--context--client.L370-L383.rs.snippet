@@ -1,0 +1,33 @@
+{
+	"highlightFirstLine": 370,
+	"highlightLastLine": 383,
+	"segments": [
+		{
+			"lines": [
+				"impl Default for ZeusClient {",
+				"   fn default() -> Self {",
+				"      let mut rpc_map_by_chain = HashMap::new();",
+				"",
+				"      insert_chain_rpcs(",
+				"         &mut rpc_map_by_chain,",
+				"         1,",
+				"         &[",
+				"            \"wss://ethereum-rpc.publicnode.com\",",
+				"            \"wss://mainnet.gateway.tenderly.co\",",
+				"            \"https://ethereum-rpc.publicnode.com\",",
+				"            \"https://eth.blockrazor.xyz\",",
+				"         ],",
+				"         &[",
+				"            \"https://rpc.mevblocker.io\",",
+				"            \"https://rpc.flashbots.net/fast\",",
+				"         ],",
+				"      );",
+				"",
+				"      insert_chain_rpcs(",
+				"         &mut rpc_map_by_chain,",
+				"         10,"
+			],
+			"startLine": 366
+		}
+	]
+}

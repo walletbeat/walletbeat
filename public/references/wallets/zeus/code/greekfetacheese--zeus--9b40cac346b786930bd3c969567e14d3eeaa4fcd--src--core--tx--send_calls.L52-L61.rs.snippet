@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 52,
+	"highlightLastLine": 61,
+	"segments": [
+		{
+			"lines": [
+				"pub fn encode_execute_batch(calls: &[WalletCall]) -> Bytes {",
+				"   let calls = calls"
+			],
+			"startLine": 40
+		},
+		{
+			"lines": [
+				"      .collect();",
+				"   abi::BaseAccount::executeBatchCall::new((calls,)).abi_encode().into()",
+				"}",
+				"",
+				"/// Send one or more dapp calls. Multiple calls are packed into a single EIP-7702",
+				"/// `executeBatch` on [`SIMPLE_7702_ACCOUNT`].",
+				"pub async fn send_wallet_calls(",
+				"   ctx: ZeusCtx,",
+				"   source_is_zeus: bool,",
+				"   dapp: String,",
+				"   chain: ChainId,",
+				"   from: Address,",
+				"   calls: Vec<WalletCall>,",
+				") -> Result<(TransactionReceipt, TransactionRich), anyhow::Error> {",
+				"   if calls.is_empty() {",
+				"      return Err(anyhow!(\"no calls\"));",
+				"   }",
+				""
+			],
+			"startLine": 48
+		}
+	]
+}

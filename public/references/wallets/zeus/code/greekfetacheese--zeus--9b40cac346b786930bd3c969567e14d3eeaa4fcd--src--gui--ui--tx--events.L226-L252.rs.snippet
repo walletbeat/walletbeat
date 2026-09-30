@@ -1,0 +1,60 @@
+{
+	"highlightFirstLine": 226,
+	"highlightLastLine": 252,
+	"segments": [
+		{
+			"lines": [
+				"pub fn token_approval_event_ui(",
+				"   ctx: &mut ZeusContext,",
+				"   chain: ChainId,",
+				"   theme: &Theme,",
+				"   icons: Arc<Icons>,",
+				"   params: &TokenApproveParams,",
+				"   ui: &mut Ui,",
+				") {"
+			],
+			"startLine": 211
+		},
+		{
+			"lines": [
+				"   let amount_usd = params",
+				"      .amount_usd",
+				"      .clone()",
+				"      .unwrap_or_else(|| ctx.get_token_value_for_amount(params.amount.f64(), token));",
+				"",
+				"   let amount = if is_unlimited {",
+				"      \"Unlimited\"",
+				"   } else {",
+				"      params.amount.abbreviated()",
+				"   };",
+				"",
+				"   let show_usd_value = !is_unlimited;",
+				"   let tint = theme.image_tint_recommended;",
+				"   let icon_size = vec2(24.0, 24.0);",
+				"",
+				"   let icon = icons",
+				"      .currency_icon_x32(&Currency::from(params.token.clone()), tint)",
+				"      .fit_to_exact_size(icon_size);",
+				"   let mut text = if show_usd_value {",
+				"      RichText::new(format!(",
+				"         \"{:.10} {} ~ ${:.10}\",",
+				"         amount,",
+				"         params.token.symbol,",
+				"         amount_usd.abbreviated()",
+				"      ))",
+				"      .size(theme.typography.large)",
+				"   } else {",
+				"      RichText::new(format!(\"{:.10} {}\", amount, params.token.symbol)).size(theme.typography.large)",
+				"   };",
+				"",
+				"   if is_unlimited {",
+				"      text = text.color(theme.colors.warning);",
+				"   }",
+				"",
+				"   let label = Label::new(text, Some(icon)).interactive(false);",
+				"   ui.add(label);"
+			],
+			"startLine": 221
+		}
+	]
+}

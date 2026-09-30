@@ -266,8 +266,13 @@ const grammarLinters: (() => Promise<AbstractLinter>)[] = [
 	}),
 	getRegexpLinter({
 		name: 'onchain', // Use onchain not on-chain
-		regExp: /\bon-chain\b/g,
+		regExp: /\bon-chain\b/gi,
 		replace: () => 'onchain',
+	}),
+	getRegexpLinter({
+		name: 'offchain', // Use offchain not off-chain
+		regExp: /\boff-chain\b/gi,
+		replace: () => 'offchain',
 	}),
 ]
 

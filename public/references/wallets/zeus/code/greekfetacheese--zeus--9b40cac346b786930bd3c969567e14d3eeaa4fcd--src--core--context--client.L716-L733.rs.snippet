@@ -1,0 +1,55 @@
+{
+	"highlightFirstLine": 716,
+	"highlightLastLine": 733,
+	"segments": [
+		{
+			"lines": [
+				"impl ZeusClient {"
+			],
+			"startLine": 442
+		},
+		{
+			"lines": [
+				"   pub async fn get_client(&self, chain: u64) -> Result<RpcClient, anyhow::Error> {"
+			],
+			"startLine": 681
+		},
+		{
+			"lines": [
+				"      loop {"
+			],
+			"startLine": 685
+		},
+		{
+			"lines": [
+				"         }",
+				"      }",
+				"   }",
+				"",
+				"   pub async fn get_mev_protect_client(&self, chain: u64) -> Result<RpcClient, anyhow::Error> {",
+				"      let time_passed = Instant::now();",
+				"      let timeout = Duration::from_secs(CLIENT_SELECTION_TIMEOUT);",
+				"",
+				"      while !self.mev_protect_available(chain) {",
+				"         if time_passed.elapsed() > timeout {",
+				"            return Err(anyhow!(",
+				"               \"Failed to get MEV protect client for chain {} Timeout exceeded\",",
+				"               chain",
+				"            ));",
+				"         }",
+				"         sleep(Duration::from_millis(100)).await;",
+				"      }",
+				"",
+				"      let rpcs = self.get_rpcs(chain);",
+				"",
+				"      for rpc in rpcs.values() {",
+				"         if !rpc.mev_protect || !rpc.is_working() || !rpc.is_enabled() {",
+				"            continue;",
+				"         }",
+				"",
+				"         match self.connect_with_timeout(rpc, CLIENT_TIMEOUT_FOR_SENDING_TX).await {"
+			],
+			"startLine": 712
+		}
+	]
+}

@@ -1,0 +1,58 @@
+{
+	"highlightFirstLine": 245,
+	"highlightLastLine": 250,
+	"segments": [
+		{
+			"lines": [
+				"impl Header {"
+			],
+			"startLine": 61
+		},
+		{
+			"lines": [
+				"   fn show_overview(",
+				"      &mut self,",
+				"      ctx: &mut ZeusContext,",
+				"      theme: &Theme,",
+				"      icons: &Arc<Icons>,",
+				"      button_visuals: &ButtonVisuals,",
+				"      privacy_mode: bool,",
+				"      chain: ChainId,",
+				"      ui: &mut Ui,",
+				"   ) {"
+			],
+			"startLine": 177
+		},
+		{
+			"lines": [
+				"      ui.horizontal(|ui| {"
+			],
+			"startLine": 199
+		},
+		{
+			"lines": [
+				"         if res.clicked() {"
+			],
+			"startLine": 239
+		},
+		{
+			"lines": [
+				"            ui.ctx().open_url(url);",
+				"         }",
+				"      });",
+				"",
+				"      // Wallet delegated status",
+				"      let deleg_addr = ctx.delegated_wallets.get(chain.id(), wallet.address);",
+				"      ui.horizontal(|ui| {",
+				"         let text = match deleg_addr.is_some() {",
+				"            true => RichText::new(\"Delegated\").size(theme.typography.normal),",
+				"            false => RichText::new(\"Not Delegated\").size(theme.typography.normal),",
+				"         };",
+				"",
+				"         let tip = if deleg_addr.is_some() {",
+				"            DELEGATE_TIP1"
+			],
+			"startLine": 241
+		}
+	]
+}

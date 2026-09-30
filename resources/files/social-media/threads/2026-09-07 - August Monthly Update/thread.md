@@ -88,7 +88,7 @@ Phantom's rating expanded from an early stub to real coverage across security, p
 Tweet #11:
 New content produced:
 
-How the Coldcard MK3 seed generation bug worked: <https://x.com/walletbeat/status/2085075338129002939>
+How the Coldcard Mk3 seed generation bug worked: <https://x.com/walletbeat/status/2085075338129002939>
 
 How address poisoning tricks users into paying the wrong address twice:
 <https://x.com/walletbeat/status/2087739731530715346>

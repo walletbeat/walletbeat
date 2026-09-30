@@ -1,0 +1,23 @@
+{
+	"highlightFirstLine": 614,
+	"highlightLastLine": 616,
+	"segments": [
+		{
+			"lines": [
+				"fn request_accounts(",
+				"   ctx: ZeusCtx,",
+				"   origin: &str,",
+				"   payload: JsonRpcRequest,",
+				") -> Result<JsonRpcResponse, Infallible> {",
+				"   let current_wallet = ctx.current_wallet_info().address;",
+				"   let result = if ctx.is_dapp_connected(origin) {",
+				"      json!(vec![current_wallet.to_string()])",
+				"   } else {",
+				"      json!([])",
+				"   };",
+				"   Ok(JsonRpcResponse::ok(Some(result), payload.id))"
+			],
+			"startLine": 609
+		}
+	]
+}

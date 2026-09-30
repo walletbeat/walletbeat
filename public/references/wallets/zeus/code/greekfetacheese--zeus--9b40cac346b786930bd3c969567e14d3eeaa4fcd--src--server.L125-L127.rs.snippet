@@ -1,0 +1,24 @@
+{
+	"highlightFirstLine": 125,
+	"highlightLastLine": 127,
+	"segments": [
+		{
+			"lines": [
+				"impl RequestMethod {",
+				"   pub fn from_str(s: &str) -> Result<Self, anyhow::Error> {",
+				"      match s {",
+				"         \"wallet_addEthereumChain\" => Ok(RequestMethod::WalletAddEthereumChain),",
+				"         \"wallet_switchEthereumChain\" => Ok(RequestMethod::WalletSwitchEthereumChain),",
+				"         \"wallet_getPermissions\" => Ok(RequestMethod::WalletGetPermissions),",
+				"         \"wallet_getCapabilities\" => Ok(RequestMethod::WalletGetCapabilities),",
+				"         \"wallet_sendCalls\" => Ok(RequestMethod::WalletSendCalls),",
+				"         \"wallet_getCallsStatus\" => Ok(RequestMethod::WalletGetCallsStatus),",
+				"         \"wallet_requestPermissions\" => Ok(RequestMethod::WalletRequestPermissions),",
+				"         \"wallet_revokePermissions\" => Ok(RequestMethod::WalletRevokePermissions),",
+				"         \"eth_getTransactionByHash\" => Ok(RequestMethod::EthGetTransactionByHash),",
+				"         \"eth_getTransactionReceipt\" => Ok(RequestMethod::EthGetTransactionReceipt),"
+			],
+			"startLine": 119
+		}
+	]
+}

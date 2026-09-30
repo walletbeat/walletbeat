@@ -1,0 +1,61 @@
+{
+	"highlightFirstLine": 730,
+	"highlightLastLine": 759,
+	"segments": [
+		{
+			"lines": [
+				"impl ApprovalsUi {"
+			],
+			"startLine": 89
+		},
+		{
+			"lines": [
+				"   pub fn show(&mut self, ctx: &mut ZeusContext, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 328
+		},
+		{
+			"lines": [
+				"      });",
+				"   }",
+				"",
+				"   fn revoke(&mut self, row: ApprovalRow) {",
+				"      match row.kind {",
+				"         ApprovalKind::Erc20(params) => {",
+				"            let chain = row.chain;",
+				"            let token = params.token.clone();",
+				"            let owner = params.owner;",
+				"            let spender = params.spender;",
+				"            RT.spawn(async move {",
+				"               if let Err(e) = revoke_erc20_approval(chain, token, owner, spender).await {",
+				"                  tracing::error!(\"Failed to revoke ERC20 approval: {:?}\", e);",
+				"                  SHARED_GUI.write(|gui| {",
+				"                     gui.loading_window.reset();",
+				"                     gui.notification.reset();",
+				"                     gui.msg_window.open(format!(\"Revoke Failed: {}\", e));",
+				"                     gui.request_repaint();",
+				"                  });",
+				"               } else {",
+				"                  SHARED_GUI.write(|gui| {",
+				"                     gui.approvals.invalidate_cache();",
+				"                     gui.request_repaint();",
+				"                  });",
+				"               }",
+				"            });",
+				"         }",
+				"         ApprovalKind::Permit2(params) => {",
+				"            let chain = params.chain;",
+				"            let owner = params.owner;",
+				"            let token = params.token.clone();",
+				"            let spender = params.spender;",
+				"            RT.spawn(async move {",
+				"               if let Err(e) = revoke_permit2_approval(chain, owner, token, spender).await {",
+				"                  tracing::error!(\"Failed to revoke Permit2 approval: {:?}\", e);",
+				"                  SHARED_GUI.write(|gui| {",
+				"                     gui.loading_window.reset();",
+				"                     gui.notification.reset();"
+			],
+			"startLine": 726
+		}
+	]
+}

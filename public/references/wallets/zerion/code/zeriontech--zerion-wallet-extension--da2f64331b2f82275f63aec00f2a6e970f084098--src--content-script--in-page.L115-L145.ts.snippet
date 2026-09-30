@@ -1,0 +1,62 @@
+{
+	"highlightFirstLine": 115,
+	"highlightLastLine": 145,
+	"segments": [
+		{
+			"lines": [
+				"const proxiedProvider = new Proxy(patchedProvider, {"
+			],
+			"startLine": 93
+		},
+		{
+			"lines": [
+				"  set(target, prop, value, receiver) {"
+			],
+			"startLine": 103
+		},
+		{
+			"lines": [
+				"    }",
+				"  },",
+				"});",
+				"",
+				"window.ethereum = proxiedProvider;",
+				"",
+				"dappDetection.onChange(({ dappIsZerionAware }) => {",
+				"  if (dappIsZerionAware) {",
+				"    // Some libs (such as rainbow) access \"isZerion\" flag",
+				"    // to filter out wallets, and it doesn't mean the dapp is showing",
+				"    // the connect button for Zerion specifically. This is why we",
+				"    // do not turn off the page observer. But we might change this later.",
+				"    // pageObserver.stop();",
+				"  }",
+				"});",
+				"",
+				"try {",
+				"  Object.defineProperty(window, 'ethereum', {",
+				"    configurable: false, // explicitly set to false to disallow redefining the property by other wallets",
+				"    get() {",
+				"      if (isPaused && competingProviders.hasOtherProviders()) {",
+				"        return competingProviders.getFirstOtherProvider();",
+				"      }",
+				"      dappDetection.onAccessThroughWindow();",
+				"      return proxiedProvider;",
+				"    },",
+				"    set(value: EthereumProvider) {",
+				"      dappDetection.handleForeignProvider(value);",
+				"      competingProviders.handleForeignProvider({",
+				"        foreignProvider: value,",
+				"        ourProvider: provider,",
+				"      });",
+				"    },",
+				"  });",
+				"} catch {",
+				"  // eslint-disable-next-line no-console",
+				"  console.warn('Failed to set window.ethereum');",
+				"}",
+				""
+			],
+			"startLine": 111
+		}
+	]
+}

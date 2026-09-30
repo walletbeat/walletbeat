@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 122,
+	"highlightLastLine": 127,
+	"segments": [
+		{
+			"lines": [
+				"impl BalanceManagerHandle {"
+			],
+			"startLine": 46
+		},
+		{
+			"lines": [
+				"   pub async fn update_eth_balance(",
+				"      &self,",
+				"      ctx: ZeusCtx,",
+				"      chain: u64,",
+				"      owners: Vec<Address>,",
+				"      retry_if_unchanged: bool,",
+				"   ) -> Result<(), anyhow::Error> {",
+				"      if owners.is_empty() {",
+				"         return Ok(());",
+				"      }",
+				"",
+				"      let client = ctx.get_zeus_client();",
+				"      let batch_size = self.batch_size();",
+				"      let max_retries = self.max_retries();",
+				"      let retry_delay = self.retry_delay();",
+				"      let native = NativeCurrency::from(chain);",
+				"",
+				"      for chunk in owners.chunks(batch_size) {",
+				"         let chunk = chunk.to_vec();",
+				"         let old_balances: HashMap<Address, NumericValue> = if retry_if_unchanged {",
+				"            chunk.iter().map(|&owner| (owner, self.get_eth_balance(chain, owner))).collect()",
+				"         } else {"
+			],
+			"startLine": 110
+		}
+	]
+}
