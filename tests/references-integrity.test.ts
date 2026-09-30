@@ -1,4 +1,4 @@
-import { existsSync } from 'fs'
+import { existsSync, readdirSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { describe, expect, it } from 'vitest'
@@ -17,6 +17,8 @@ const currentDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(currentDir, '..')
 
 await warmupHarperLinter()
+
+const WALLET_REFERENCES_DIR = 'public/references/wallets'
 
 describe('RepoFileReference', () => {
 	describe('toFullyQualified with file references', () => {
@@ -159,4 +161,54 @@ describe('reference integrity', () => {
 			}
 		})
 	}
+})
+
+describe('wallet references directories', () => {
+	const walletIdByName = new Map<string, string>(
+		Object.entries(allWallets).map(([name, wallet]) => [name, wallet.metadata.id]),
+	)
+	const walletIds = new Set(walletIdByName.values())
+
+	// Checks the directories on disk. Fails on a stale or misnamed directory even if  no wallet data references it
+	// `public/references/wallets/uniswap/` should be `public/references-wallets/uniswap-wallet
+	it('every directory under public/references/wallets/ is named after a known wallet ID', () => {
+		const dirs = readdirSync(resolve(repoRoot, WALLET_REFERENCES_DIR), { withFileTypes: true })
+			.filter(entry => entry.isDirectory())
+			.map(entry => entry.name)
+
+		for (const dir of dirs) {
+			expect(
+				walletIds.has(dir),
+				`"${WALLET_REFERENCES_DIR}/${dir}/" does not match any wallet ID; ` +
+					"rename it to the wallet's `metadata.id`.",
+			).toBe(true)
+		}
+	})
+
+	// Checks the wallet data. Fails when a wallet's ref points into a directory other
+	// than its own `metadata.id`, even if that directory is a valid wallet ID
+	// `uniswapWallet` referencing a file under `public/references/wallets/metamask/`.
+	it("wallet file refs under public/references/wallets/ point to the wallet's own directory", () => {
+		const urlPrefix = `/${WALLET_REFERENCES_DIR.slice('public/'.length)}/`
+
+		for (const collected of collectAllRefs(allWallets)) {
+			const walletId = walletIdByName.get(collected.walletName)
+
+			for (const fq of collected.fullyQualifiedRefs) {
+				for (const { url } of fq.urls) {
+					if (!url.startsWith(urlPrefix)) {
+						continue
+					}
+
+					const dir = url.slice(urlPrefix.length).split('/')[0]
+
+					expect(
+						dir,
+						`${collected.fieldPath} references "public${url}", ` +
+							`which is not under "${WALLET_REFERENCES_DIR}/${walletId}/".`,
+					).toBe(walletId)
+				}
+			}
+		}
+	})
 })
