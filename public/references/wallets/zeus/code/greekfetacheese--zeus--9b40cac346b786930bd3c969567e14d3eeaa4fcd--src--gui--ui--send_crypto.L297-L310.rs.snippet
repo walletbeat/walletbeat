@@ -1,0 +1,75 @@
+{
+	"highlightFirstLine": 297,
+	"highlightLastLine": 310,
+	"segments": [
+		{
+			"lines": [
+				"impl SendCryptoUi {"
+			],
+			"startLine": 62
+		},
+		{
+			"lines": [
+				"   pub fn show(",
+				"      &mut self,",
+				"      ctx: &mut ZeusContext,",
+				"      icons: Arc<Icons>,",
+				"      theme: &Theme,",
+				"      token_selection: &mut TokenSelectionWindow,",
+				"      recipient_selection: &mut RecipientSelectionWindow,",
+				"      contacts_ui: &mut ContactsUi,",
+				"      ui: &mut Ui,",
+				"   ) {",
+				"      show_with_fade(ui, \"send_crypto_ui_fade\", self.open, |ui| {"
+			],
+			"startLine": 145
+		},
+		{
+			"lines": [
+				"         ui.vertical_centered(|ui| {",
+				"            frame.show(ui, |ui| {",
+				"               Frame::new().inner_margin(Margin::same(10)).show(ui, |ui| {"
+			],
+			"startLine": 163
+		},
+		{
+			"lines": [
+				"                  inner_frame.show(ui, |ui| {"
+			],
+			"startLine": 254
+		},
+		{
+			"lines": [
+				"                     ui.horizontal(|ui| {"
+			],
+			"startLine": 256
+		},
+		{
+			"lines": [
+				"                        }",
+				"                     });",
+				"",
+				"                     ui.horizontal(|ui| {",
+				"                        let hint = if recipient_privacy_mode {",
+				"                           RichText::new(\"Search contacts or enter a 0zk address\")",
+				"                              .size(theme.typography.normal)",
+				"                              .color(theme.colors.text_muted)",
+				"                        } else {",
+				"                           RichText::new(\"Search contacts or enter an address\")",
+				"                              .size(theme.typography.normal)",
+				"                              .color(theme.colors.text_muted)",
+				"                        };",
+				"",
+				"                        let address_edit = if recipient_privacy_mode {",
+				"                           &mut recipient_selection.recipient.zk_address",
+				"                        } else {",
+				"                           &mut recipient_selection.recipient.evm_address",
+				"                        };",
+				"",
+				"                        let res = ui.add(",
+				"                           SecureTextEdit::singleline(address_edit)"
+			],
+			"startLine": 293
+		}
+	]
+}

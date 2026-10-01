@@ -1,0 +1,60 @@
+{
+	"highlightFirstLine": 615,
+	"highlightLastLine": 618,
+	"segments": [
+		{
+			"lines": [
+				"impl ShieldUi {"
+			],
+			"startLine": 147
+		},
+		{
+			"lines": [
+				"   fn broadcast_options(&mut self, theme: &Theme, chain_id: u64, ui: &mut Ui) {"
+			],
+			"startLine": 577
+		},
+		{
+			"lines": [
+				"      Modal::new(id, &mut open)"
+			],
+			"startLine": 592
+		},
+		{
+			"lines": [
+				"         .show(ui.ctx(), |ui| {"
+			],
+			"startLine": 598
+		},
+		{
+			"lines": [
+				"            ui.add_enabled_ui(!self.self_broadcast, |ui| {"
+			],
+			"startLine": 602
+		},
+		{
+			"lines": [
+				"               ui.allocate_ui(ui_size, |ui| {",
+				"                  ui.horizontal_centered(|ui| {"
+			],
+			"startLine": 608
+		},
+		{
+			"lines": [
+				"",
+				"                     ui.add_space(8.0);",
+				"",
+				"                     let res = ui.add(",
+				"                        SecureTextEdit::singleline(&mut self.bundler_url)",
+				"                           .visuals(text_edit_visuals)",
+				"                           .hint_text(",
+				"                              RichText::new(\"https://public.pimlico.io/v2/{chainId}/rpc\")",
+				"                                 .size(theme.typography.small)",
+				"                                 .color(theme.colors.text_muted),",
+				"                           )",
+				"                           .desired_width(ui.available_width())"
+			],
+			"startLine": 611
+		}
+	]
+}

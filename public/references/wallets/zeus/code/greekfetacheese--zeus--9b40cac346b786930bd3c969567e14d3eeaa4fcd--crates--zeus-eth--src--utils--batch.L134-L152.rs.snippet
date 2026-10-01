@@ -1,0 +1,50 @@
+{
+	"highlightFirstLine": 134,
+	"highlightLastLine": 152,
+	"segments": [
+		{
+			"lines": [
+				"{"
+			],
+			"startLine": 90
+		},
+		{
+			"lines": [
+				"   Ok(AccountStorageRead {"
+			],
+			"startLine": 127
+		},
+		{
+			"lines": [
+				"      values,",
+				"   })",
+				"}",
+				"",
+				"/// Query the ETH balance for the given addresses",
+				"pub async fn get_eth_balances<P, N>(",
+				"   client: P,",
+				"   chain: u64,",
+				"   block: Option<BlockId>,",
+				"   addresses: Vec<Address>,",
+				") -> Result<Vec<ETHBalance>, anyhow::Error>",
+				"where",
+				"   P: Provider<N> + Clone + 'static,",
+				"   N: Network,",
+				"{",
+				"   if addresses.is_empty() {",
+				"      return Ok(Vec::new());",
+				"   }",
+				"   let block = block.unwrap_or(BlockId::latest());",
+				"   let address = zeus_stateview_v4(chain)?;",
+				"   let contract = ZeusStateViewV3::new(address, client);",
+				"   let balance = contract.getETHBalance(addresses).call().block(block).await?;",
+				"   Ok(balance)",
+				"}",
+				"",
+				"/// `eth_getCode` for many accounts in one JSON-RPC batch.",
+				"pub async fn get_account_codes<P, N>("
+			],
+			"startLine": 130
+		}
+	]
+}

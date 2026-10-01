@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 444,
+	"highlightLastLine": 453,
+	"segments": [
+		{
+			"lines": [
+				") -> Result<(), anyhow::Error> {",
+				"   let wallet = ctx.get_wallet(from).ok_or(anyhow!(\"Wallet not found\"))?.key;",
+				"   let client = ctx.get_zeus_client();",
+				"",
+				"   if !delegate_to.is_zero() {",
+				"      let code = client",
+				"         .request(chain.id(), |client| async move {",
+				"            client.get_code_at(delegate_to).await.map_err(|e| anyhow!(\"{:?}\", e))",
+				"         })",
+				"         .await?;",
+				"",
+				"      if code.is_empty() {",
+				"         return Err(anyhow!(",
+				"            \"Code is empty, you can only delegate to a smart contract address\"",
+				"         ));",
+				"      }",
+				"   }",
+				""
+			],
+			"startLine": 440
+		}
+	]
+}

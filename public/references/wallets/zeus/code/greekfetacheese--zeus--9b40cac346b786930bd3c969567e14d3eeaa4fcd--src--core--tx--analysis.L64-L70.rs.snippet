@@ -1,0 +1,32 @@
+{
+	"highlightFirstLine": 64,
+	"highlightLastLine": 70,
+	"segments": [
+		{
+			"lines": [
+				"pub struct TransactionAnalysis {"
+			],
+			"startLine": 28
+		},
+		{
+			"lines": [
+				"   /// `None` for wallet-connector / inferred swaps — those keep the log heuristic.",
+				"   #[serde(default)]",
+				"   onchain_swap_received: Option<OnchainSwapReceived>,",
+				"",
+				"   /// Signer ETH + ERC-20 deltas from simulation `balanceOf`, not logs.",
+				"   #[serde(default)]",
+				"   pub balance_diff: BalanceDiff,",
+				"",
+				"   /// Signer ERC-20 / Permit2 allowance deltas from simulation `allowance`, not logs.",
+				"   #[serde(default)]",
+				"   pub approval_diff: ApprovalDiff,",
+				"}",
+				"",
+				"/// Output-token amount the sender actually received, from `balanceOf` at",
+				"/// `tx_block - 1` vs latest. Survives buy/sell tax that logs cannot see."
+			],
+			"startLine": 60
+		}
+	]
+}

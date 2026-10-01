@@ -1,0 +1,42 @@
+{
+	"highlightFirstLine": 1649,
+	"highlightLastLine": 1665,
+	"segments": [
+		{
+			"lines": [
+				"async fn handle_approve("
+			],
+			"startLine": 1637
+		},
+		{
+			"lines": [
+				"   fork_db: ForkDB,",
+				") -> Result<ForkDB, anyhow::Error> {",
+				"   let mut new_fork_db = fork_db.clone();",
+				"",
+				"   if permit_info.needs_approval {",
+				"      let approval_logs;",
+				"      let approval_gas_used;",
+				"      let eth_balance_after;",
+				"",
+				"      let permit2 = address_book::permit2_contract(chain.id())?;",
+				"",
+				"      {",
+				"         let mut evm = new_evm(chain, Some(&block), fork_db);",
+				"         let time = Instant::now();",
+				"",
+				"         let res = simulate::approve_token(",
+				"            &mut evm,",
+				"            token.address,",
+				"            signer_address,",
+				"            permit2,",
+				"            U256::MAX,",
+				"         )?;",
+				"",
+				"         tracing::info!(",
+				"            \"Approval simulation took {} ms\","
+			],
+			"startLine": 1645
+		}
+	]
+}

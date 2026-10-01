@@ -1,0 +1,34 @@
+{
+	"highlightFirstLine": 369,
+	"highlightLastLine": 371,
+	"segments": [
+		{
+			"lines": [
+				"impl NetworkSettings {"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"   fn rpc_settings(&mut self, ctx: &mut ZeusContext, theme: &Theme, ui: &mut Ui) {"
+			],
+			"startLine": 354
+		},
+		{
+			"lines": [
+				"      }",
+				"",
+				"      let rpc = self.rpc_to_edit.as_mut().unwrap();",
+				"",
+				"      let text = RichText::new(\"MEV Protect\").size(theme.typography.normal);",
+				"      ui.label(text);",
+				"      let clicked = ui.checkbox(&mut rpc.mev_protect, \"\").clicked();",
+				"",
+				"      if clicked {",
+				"         let z_client = ctx.client.clone();",
+				"         z_client.write(|rpcs_map| {"
+			],
+			"startLine": 365
+		}
+	]
+}

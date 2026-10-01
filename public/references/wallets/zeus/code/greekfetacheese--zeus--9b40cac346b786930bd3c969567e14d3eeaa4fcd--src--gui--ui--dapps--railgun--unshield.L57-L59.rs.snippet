@@ -1,0 +1,23 @@
+{
+	"highlightFirstLine": 57,
+	"highlightLastLine": 59,
+	"segments": [
+		{
+			"lines": [
+				"use super::{",
+				"   ProvedCall, expect_single_event, prove, railgun_ready, resync_railgun_later, settle_railgun_op,",
+				"   simulate_proved,",
+				"};",
+				"",
+				"/// Default public Pimlico bundler RPC for a chain.",
+				"pub fn default_bundler_url(chain_id: u64) -> String {",
+				"   format!(\"https://public.pimlico.io/v2/{}/rpc\", chain_id)",
+				"}",
+				"",
+				"/// EIP-7702 designated delegated code: `0xef0100 || implementation`.",
+				"fn eip7702_delegated_code(implementation: Address) -> Bytes {"
+			],
+			"startLine": 52
+		}
+	]
+}

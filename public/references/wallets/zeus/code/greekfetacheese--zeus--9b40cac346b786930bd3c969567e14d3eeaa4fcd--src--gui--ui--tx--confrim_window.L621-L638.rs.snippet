@@ -1,0 +1,74 @@
+{
+	"highlightFirstLine": 621,
+	"highlightLastLine": 638,
+	"segments": [
+		{
+			"lines": [
+				"impl TxConfirmationWindow {"
+			],
+			"startLine": 59
+		},
+		{
+			"lines": [
+				"   pub fn show(&mut self, ctx: &mut ZeusContext, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 267
+		},
+		{
+			"lines": [
+				"      Modal::new(id, &mut open)"
+			],
+			"startLine": 276
+		},
+		{
+			"lines": [
+				"         .show(ui.ctx(), |ui| {"
+			],
+			"startLine": 281
+		},
+		{
+			"lines": [
+				"            ui.vertical_centered(|ui| {"
+			],
+			"startLine": 288
+		},
+		{
+			"lines": [
+				"               ui.allocate_ui(size, |ui| {",
+				"                  frame.show(ui, |ui| {"
+			],
+			"startLine": 562
+		},
+		{
+			"lines": [
+				"                     });",
+				"                  });",
+				"               });",
+				"",
+				"               let base_case = !main_event.is_other() && main_event.is_mev_vulnerable();",
+				"               let show_mev_protect = base_case || main_event.is_other_or_eoa_delegate();",
+				"",
+				"               if recalculate_tx_cost {",
+				"                  self.calculate_tx_cost(ctx, self.gas_used);",
+				"               }",
+				"",
+				"               if show_mev_protect {",
+				"                  let icon = if self.mev_protect {",
+				"                     Indicator::new(IndicatorState::On).size(12.0)",
+				"                  } else {",
+				"                     Indicator::new(IndicatorState::Off).size(12.0)",
+				"                  };",
+				"",
+				"                  let text = if self.mev_protect {",
+				"                     \"MEV Protect is enabled\"",
+				"                  } else {",
+				"                     \"MEV Protect is disabled\"",
+				"                  };",
+				"",
+				"                  let text = RichText::new(text).size(theme.typography.large);",
+				"                  let size = vec2(ui.available_width() * 0.3, 15.0);"
+			],
+			"startLine": 617
+		}
+	]
+}

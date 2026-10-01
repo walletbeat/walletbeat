@@ -1,0 +1,47 @@
+{
+	"highlightFirstLine": 57,
+	"highlightLastLine": 78,
+	"segments": [
+		{
+			"lines": [
+				"pub fn show(gui: &mut GUI, ctx: &mut ZeusContext, ui: &mut Ui) {"
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"",
+				"   ui.horizontal(|ui| {",
+				"      ui.set_min_height(200.0);",
+				"",
+				"      if !has_available_rpcs {",
+				"         ui.with_layout(Layout::left_to_right(Align::Min), |ui| {",
+				"            ui.set_width(available_width * 0.6);",
+				"",
+				"            frame.show(ui, |ui| {",
+				"               ui.set_max_height(50.0);",
+				"",
+				"               ui.with_layout(Layout::left_to_right(Align::Center), |ui| {",
+				"                  let text = format!(",
+				"                     \"No functional RPC for the {} network\",",
+				"                     chain.name()",
+				"                  );",
+				"                  let rich_text = RichText::new(text).size(theme.typography.normal);",
+				"                  ui.add(Label::new(rich_text, None).interactive(false));",
+				"",
+				"                  ui.add_space(10.0);",
+				"",
+				"                  let text = RichText::new(\"Network Settings\").size(theme.typography.normal);",
+				"                  let button = Button::new(text).visuals(theme.button_visuals());",
+				"                  if ui.add(button).clicked() {",
+				"                     gui.settings.open_network_settings(ctx);",
+				"                  }",
+				"               });",
+				"            });",
+				"         });",
+				"      }"
+			],
+			"startLine": 53
+		}
+	]
+}

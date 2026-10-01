@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 1344,
+	"highlightLastLine": 1352,
+	"segments": [
+		{
+			"lines": [
+				"async fn personal_sign(",
+				"   ctx: ZeusCtx,",
+				"   origin: String,",
+				"   payload: JsonRpcRequest,",
+				") -> Result<JsonRpcResponse, Infallible> {"
+			],
+			"startLine": 1302
+		},
+		{
+			"lines": [
+				"   if address != current_wallet {",
+				"      return Ok(JsonRpcResponse::error(UNAUTHORIZED, payload.id)); // Or a specific error like 4100",
+				"   }",
+				"",
+				"   // Decode the hex message to raw bytes. Signing uses these bytes verbatim, so",
+				"   // non-UTF-8 payloads are not corrupted by a UTF-8 round-trip.",
+				"   let message_bytes = match hex::decode(message_hex.strip_prefix(\"0x\").unwrap_or(message_hex)) {",
+				"      Ok(bytes) => bytes,",
+				"      Err(e) => {",
+				"         error!(\"Invalid hex message for personal_sign: {}\", e);",
+				"         return Ok(JsonRpcResponse::error(INVALID_PARAMS, payload.id));",
+				"      }",
+				"   };",
+				"",
+				"   let chain = ctx.chain();",
+				"   let signature = match sign_message(",
+				"      ctx,"
+			],
+			"startLine": 1340
+		}
+	]
+}

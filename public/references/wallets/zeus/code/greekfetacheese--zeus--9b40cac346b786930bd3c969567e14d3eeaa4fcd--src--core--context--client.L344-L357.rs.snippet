@@ -1,0 +1,39 @@
+{
+	"highlightFirstLine": 344,
+	"highlightLastLine": 357,
+	"segments": [
+		{
+			"lines": [
+				"fn insert_chain_rpcs("
+			],
+			"startLine": 337
+		},
+		{
+			"lines": [
+				"   urls: &[&str],",
+				"   mev_urls: &[&str],",
+				") {",
+				"   let mut rpcs = RpcMapByUrl::new();",
+				"   for url in urls {",
+				"      let url: Arc<str> = Arc::from(*url);",
+				"      rpcs.insert(",
+				"         Arc::clone(&url),",
+				"         Rpc::builder(url, chain_id).builtin().build(),",
+				"      );",
+				"   }",
+				"   for url in mev_urls {",
+				"      let url: Arc<str> = Arc::from(*url);",
+				"      rpcs.insert(",
+				"         Arc::clone(&url),",
+				"         Rpc::builder(url, chain_id).builtin().mev_protect().build(),",
+				"      );",
+				"   }",
+				"   map.insert(chain_id, rpcs);",
+				"}",
+				"",
+				"#[derive(Debug, Clone, Serialize, Deserialize)]"
+			],
+			"startLine": 340
+		}
+	]
+}

@@ -1,0 +1,27 @@
+{
+	"highlightFirstLine": 36,
+	"highlightLastLine": 43,
+	"segments": [
+		{
+			"lines": [
+				"};",
+				"",
+				"use super::{ProvedCall, prove, railgun_ready, settle_railgun_op, simulate_proved};",
+				"",
+				"/// Private transfer of notes from the current wallet's 0zk address to another 0zk address.",
+				"pub async fn private_transfer(",
+				"   ctx: ZeusCtx,",
+				"   chain: ChainId,",
+				"   currency: Currency,",
+				"   amount: NumericValue,",
+				"   from: Address,",
+				"   recipient_zk: String,",
+				"   memo: String,",
+				") -> Result<(), anyhow::Error> {",
+				"   if !currency.is_erc20() {",
+				"      return Err(anyhow!("
+			],
+			"startLine": 32
+		}
+	]
+}

@@ -1,0 +1,31 @@
+{
+	"highlightFirstLine": 271,
+	"highlightLastLine": 276,
+	"segments": [
+		{
+			"lines": [
+				"pub fn lookup_calldata_index_path(index: &Value, chain: u64, to: Address) -> Option<String> {"
+			],
+			"startLine": 262
+		},
+		{
+			"lines": [
+				"   }",
+				"   None",
+				"}",
+				"",
+				"pub async fn resolve_calldata_descriptor(chain: u64, to: Address) -> Option<(String, Descriptor)> {",
+				"   let index = fetch_calldata_index(false).await.ok()?;",
+				"   let path = lookup_calldata_index_path(&index, chain, to)?;",
+				"   let merged = load_merged(&path).await.ok()?;",
+				"   let descriptor = descriptor::parse_descriptor(&merged).ok()?;",
+				"   Some((path, descriptor))",
+				"}",
+				"",
+				"/// Best-effort human name from ERC-7730 metadata (calldata index, then EIP-712 index).",
+				"pub async fn resolve_contract_label(chain: u64, address: Address) -> Option<String> {"
+			],
+			"startLine": 267
+		}
+	]
+}

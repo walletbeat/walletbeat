@@ -1,0 +1,69 @@
+{
+	"highlightFirstLine": 625,
+	"highlightLastLine": 632,
+	"segments": [
+		{
+			"lines": [
+				"impl RecoverHDWallet {"
+			],
+			"startLine": 173
+		},
+		{
+			"lines": [
+				"   fn show_onboarding_external_data(&mut self, ctx: &mut ZeusContext, theme: &Theme, ui: &mut Ui) {"
+			],
+			"startLine": 559
+		},
+		{
+			"lines": [
+				"      Window::new(\"Recover_HD_Wallet_external_data\")"
+			],
+			"startLine": 562
+		},
+		{
+			"lines": [
+				"         .show(ui.ctx(), |ui| {"
+			],
+			"startLine": 568
+		},
+		{
+			"lines": [
+				"            ui.horizontal(|ui| {"
+			],
+			"startLine": 580
+		},
+		{
+			"lines": [
+				"               ui.vertical(|ui| {"
+			],
+			"startLine": 583
+		},
+		{
+			"lines": [
+				"                  let label = Label::sections(vec![text1, text2, text3], None)"
+			],
+			"startLine": 619
+		},
+		{
+			"lines": [
+				"                     .fill_width(true)",
+				"                     .interactive(false);",
+				"                  ui.add(label);",
+				"",
+				"                  let icons_text = RichText::new(\"Download Token Icons\").size(large);",
+				"                  ui.checkbox(&mut self.fetch_token_icons, icons_text);",
+				"",
+				"                  let names_text = RichText::new(\"Fetch Contract Names\").size(large);",
+				"                  ui.checkbox(&mut self.fetch_contract_names, names_text);",
+				"",
+				"                  let updates_text = RichText::new(\"Check for Updates\").size(large);",
+				"                  ui.checkbox(&mut self.check_for_updates, updates_text);",
+				"               });",
+				"            });",
+				"",
+				"            ui.add_space(20.0);"
+			],
+			"startLine": 621
+		}
+	]
+}

@@ -1,0 +1,36 @@
+{
+	"highlightFirstLine": 71,
+	"highlightLastLine": 75,
+	"segments": [
+		{
+			"lines": [
+				"pub fn railgun_implementation(chain_id: u64) -> Result<Address, anyhow::Error> {"
+			],
+			"startLine": 55
+		},
+		{
+			"lines": [
+				"   match chain {"
+			],
+			"startLine": 57
+		},
+		{
+			"lines": [
+				"      ChainId::Arbitrum => bail!(\"Railgun Implementation is not available on Arbitrum\"),",
+				"   }",
+				"}",
+				"",
+				"pub fn simple_7702_account(chain_id: u64) -> Result<Address, anyhow::Error> {",
+				"   let chain = ChainId::new(chain_id)?;",
+				"   match chain {",
+				"      ChainId::Ethereum => Ok(address!(",
+				"         \"0xe6Cae83BdE06E4c305530e199D7217f42808555B\"",
+				"      )),",
+				"      ChainId::EthereumSepolia => Ok(address!(",
+				"         \"0xe6Cae83BdE06E4c305530e199D7217f42808555B\"",
+				"      )),"
+			],
+			"startLine": 67
+		}
+	]
+}

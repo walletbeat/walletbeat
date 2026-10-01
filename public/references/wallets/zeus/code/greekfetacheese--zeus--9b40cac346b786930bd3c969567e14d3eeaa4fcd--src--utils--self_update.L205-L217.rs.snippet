@@ -1,0 +1,38 @@
+{
+	"highlightFirstLine": 205,
+	"highlightLastLine": 217,
+	"segments": [
+		{
+			"lines": [
+				"pub async fn update_zeus(download_url: &str, asset_name: &str) -> Result<(), anyhow::Error> {"
+			],
+			"startLine": 125
+		},
+		{
+			"lines": [
+				"",
+				"   let sig_file_path =",
+				"      sig_file_path.ok_or_else(|| anyhow!(\"Could not find signature file in ZIP\"))?;",
+				"",
+				"   let public_key = PublicKey::from_base64(PUBLIC_KEY)?;",
+				"   let content = std::fs::read(new_binary_path.clone())?;",
+				"   let signature = Signature::from_file(sig_file_path.clone())?;",
+				"",
+				"   match public_key.verify(&content, &signature, false) {",
+				"      Ok(_) => {",
+				"         tracing::info!(\"Signature verification successful\");",
+				"      }",
+				"      Err(e) => {",
+				"         tracing::error!(\"Signature verification failed: {:?}\", e);",
+				"         return Err(anyhow!(\"Signature verification failed\"));",
+				"      }",
+				"   }",
+				"",
+				"   #[cfg(unix)]",
+				"   {",
+				"      use std::os::unix::fs::PermissionsExt;"
+			],
+			"startLine": 201
+		}
+	]
+}

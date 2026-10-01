@@ -1,0 +1,62 @@
+{
+	"highlightFirstLine": 316,
+	"highlightLastLine": 341,
+	"segments": [
+		{
+			"lines": [
+				"pub async fn send_transaction_with(",
+				"   ctx: ZeusCtx,",
+				"   source_is_zeus: bool,",
+				"   opts: SendTxOptions,",
+				"   tx_analysis: Option<TransactionAnalysis>,",
+				"   chain: ChainId,",
+				"   from: Address,",
+				"   interact_to: Address,",
+				"   call_data: Bytes,",
+				"   value: U256,",
+				"   authorization_list: Vec<SignedAuthorization>,",
+				") -> Result<(TransactionReceipt, TransactionRich), anyhow::Error> {"
+			],
+			"startLine": 183
+		},
+		{
+			"lines": [
+				"",
+				"   let rpc = client.get_best_rpc(chain.id()).ok_or(anyhow!(\"No available RPC found\"))?;",
+				"   let tx_client = client.connect_with_timeout(&rpc, CLIENT_TIMEOUT_FOR_SENDING_TX).await?;",
+				"",
+				"   // If needed use MEV protect client, if not found prompt the user to continue",
+				"   let send_client = if opts.mev_protect {",
+				"      match ctx.get_mev_protect_client(chain.id()).await {",
+				"         Ok(mev_client) => mev_client,",
+				"         Err(_) => {",
+				"            SHARED_GUI.write(|gui| {",
+				"               let msg2 = \"Continue without MEV protection?\";",
+				"               if source_is_zeus {",
+				"                  gui.confirm_window.open(\"No available MEV protect RPC found\");",
+				"               } else {",
+				"                  gui.confirm_window.open_from_dapp(\"No available MEV protect RPC found\");",
+				"               }",
+				"               gui.confirm_window.set_msg2(msg2);",
+				"               gui.request_repaint();",
+				"            });",
+				"",
+				"            if !wait_confirm_window().await {",
+				"               return Err(anyhow!(\"Transaction rejected\"));",
+				"            }",
+				"",
+				"            tx_client",
+				"         }",
+				"      }",
+				"   } else {",
+				"      tx_client",
+				"   };",
+				"",
+				"   let receipt = send_tx(send_client, tx_params).await?;",
+				"   let tx_block = receipt.block_number.unwrap_or(0);",
+				"   let block_id = if tx_block > 0 {"
+			],
+			"startLine": 312
+		}
+	]
+}

@@ -1,0 +1,30 @@
+{
+	"highlightFirstLine": 70,
+	"highlightLastLine": 74,
+	"segments": [
+		{
+			"lines": [
+				"fn eip7702_delegated_code(implementation: Address) -> Bytes {"
+			],
+			"startLine": 63
+		},
+		{
+			"lines": [
+				"   code.extend_from_slice(implementation.as_slice());",
+				"   code.into()",
+				"}",
+				"",
+				"/// Unshield private notes to a public address.",
+				"///",
+				"/// - `self_broadcast = false` (default): Railgun privacy paymaster + bundler UserOp.",
+				"/// - `self_broadcast = true`: emergency path — submit proved `transact` from the user's EOA",
+				"///   (links submitter to recipient; breaks anonymity).",
+				"pub async fn unshield(",
+				"   ctx: ZeusCtx,",
+				"   chain: ChainId,",
+				"   currency: Currency,"
+			],
+			"startLine": 66
+		}
+	]
+}

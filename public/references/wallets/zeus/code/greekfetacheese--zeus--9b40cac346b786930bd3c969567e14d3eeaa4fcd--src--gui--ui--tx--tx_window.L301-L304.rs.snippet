@@ -1,0 +1,60 @@
+{
+	"highlightFirstLine": 301,
+	"highlightLastLine": 304,
+	"segments": [
+		{
+			"lines": [
+				"impl TxWindow {"
+			],
+			"startLine": 29
+		},
+		{
+			"lines": [
+				"   pub fn show(&mut self, ctx: &mut ZeusContext, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 108
+		},
+		{
+			"lines": [
+				"      Modal::new(id, &mut open)"
+			],
+			"startLine": 118
+		},
+		{
+			"lines": [
+				"         .show(ui.ctx(), |ui| {"
+			],
+			"startLine": 126
+		},
+		{
+			"lines": [
+				"            ui.vertical_centered(|ui| {"
+			],
+			"startLine": 130
+		},
+		{
+			"lines": [
+				"               ui.allocate_ui(frame_size, |ui| {",
+				"                  frame.show(ui, |ui| {"
+			],
+			"startLine": 294
+		},
+		{
+			"lines": [
+				"",
+				"                     let label = \"Sender\";",
+				"                     address(ctx, chain_id, label, tx.sender(), theme, ui);",
+				"",
+				"                     if tx.contract_interact {",
+				"                        let label = \"Contract interaction\";",
+				"                        address(ctx, chain_id, label, tx.interact_to(), theme, ui);",
+				"                     }",
+				"",
+				"                     value(ctx, chain_id, tx.value_sent.clone(), theme, ui);",
+				"",
+				"                     tx_cost(chain_id, &tx.tx_cost, &tx.tx_cost_usd, theme, ui);"
+			],
+			"startLine": 297
+		}
+	]
+}

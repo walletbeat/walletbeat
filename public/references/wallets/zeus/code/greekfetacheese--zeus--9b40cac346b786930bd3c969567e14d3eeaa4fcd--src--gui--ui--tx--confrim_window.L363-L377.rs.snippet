@@ -1,0 +1,64 @@
+{
+	"highlightFirstLine": 363,
+	"highlightLastLine": 377,
+	"segments": [
+		{
+			"lines": [
+				"impl TxConfirmationWindow {"
+			],
+			"startLine": 59
+		},
+		{
+			"lines": [
+				"   pub fn show(&mut self, ctx: &mut ZeusContext, theme: &Theme, icons: Arc<Icons>, ui: &mut Ui) {"
+			],
+			"startLine": 267
+		},
+		{
+			"lines": [
+				"      Modal::new(id, &mut open)"
+			],
+			"startLine": 276
+		},
+		{
+			"lines": [
+				"         .show(ui.ctx(), |ui| {"
+			],
+			"startLine": 281
+		},
+		{
+			"lines": [
+				"            ui.vertical_centered(|ui| {"
+			],
+			"startLine": 288
+		},
+		{
+			"lines": [
+				"               };",
+				"",
+				"               let mut title_text = RichText::new(action_name).size(theme.typography.heading);",
+				"",
+				"               if !self.source_is_zeus {",
+				"                  if main_event.is_permit() {",
+				"                     if main_event.permit_params().is_unlimited() {",
+				"                        title_text = title_text.color(theme.colors.error);",
+				"                     }",
+				"                  }",
+				"",
+				"                  if main_event.is_token_approval() {",
+				"                     if main_event.token_approval_params().is_unlimited() {",
+				"                        title_text = title_text.color(theme.colors.error);",
+				"                     }",
+				"                  }",
+				"               }",
+				"",
+				"               ui.label(title_text);",
+				"",
+				"               let completly_unknown = main_event.is_other() && self.clear_display.is_none();",
+				"               let has_more_than_one_diff =",
+				"                  analysis.balance_diff.len() > 1 || analysis.approval_diff.changes.len() > 1;"
+			],
+			"startLine": 359
+		}
+	]
+}

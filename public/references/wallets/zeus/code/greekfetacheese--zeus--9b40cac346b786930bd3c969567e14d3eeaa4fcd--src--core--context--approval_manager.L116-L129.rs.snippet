@@ -1,0 +1,40 @@
+{
+	"highlightFirstLine": 116,
+	"highlightLastLine": 129,
+	"segments": [
+		{
+			"lines": [
+				"impl ApprovalManagerHandle {"
+			],
+			"startLine": 44
+		},
+		{
+			"lines": [
+				"   pub fn retain_wallets(&self, wallets: &HashSet<Address>) -> (usize, usize) {",
+				"      self.write(|db| db.retain_wallets(wallets))",
+				"   }",
+				"}",
+				"",
+				"/// Approval cache persisted inside the encrypted vault.",
+				"///",
+				"/// Only tracks approvals observed from transactions Zeus itself recorded",
+				"/// (same local-first model as [`super::TxDBHandle`]).",
+				"#[derive(Debug, Default, Clone, Serialize, Deserialize)]",
+				"pub struct ApprovalManager {",
+				"   /// Latest ERC20 `Approval` per chain / owner / token / spender.",
+				"   #[serde(default, with = \"serde_hashmap\")]",
+				"   token_approvals: TokenApprovals,",
+				"",
+				"   /// Latest Permit2 `Permit` / `Approval` per chain / owner / token / spender.",
+				"   #[serde(default, with = \"serde_hashmap\")]",
+				"   permits: PermitApprovals,",
+				"}",
+				"",
+				"impl ApprovalManager {",
+				"   pub fn new() -> Self {",
+				"      Self {"
+			],
+			"startLine": 111
+		}
+	]
+}

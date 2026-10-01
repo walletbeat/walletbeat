@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 80,
+	"highlightLastLine": 96,
+	"segments": [
+		{
+			"lines": [
+				"pub async fn try_clear_sign_typed_data(",
+				"   ctx: ZeusCtx,",
+				"   _chain: u64,",
+				"   typed: &TypedData,",
+				") -> Option<ClearDisplay> {"
+			],
+			"startLine": 22
+		},
+		{
+			"lines": [
+				"   Some(format::format_eip712("
+			],
+			"startLine": 70
+		},
+		{
+			"lines": [
+				"      path,",
+				"   ))",
+				"}",
+				"",
+				"/// Try to clear-sign a contract call. Returns `None` on any miss/failure",
+				"/// so the caller can fall back to hex calldata.",
+				"pub async fn try_clear_sign_calldata(",
+				"   ctx: ZeusCtx,",
+				"   chain: u64,",
+				"   from: Address,",
+				"   to: Address,",
+				"   value: U256,",
+				"   calldata: &Bytes,",
+				") -> Option<ClearDisplay> {",
+				"   if calldata.len() < 4 {",
+				"      return None;",
+				"   }",
+				"   let mut selector = [0u8; 4];",
+				"   selector.copy_from_slice(&calldata[..4]);",
+				"",
+				"   let mut resolved = registry::resolve_calldata_descriptor(chain, to).await;",
+				"   let allowed = ctx.read(|ctx| ctx.misc_config.fetch_contract_names());",
+				"",
+				"   if resolved.is_none() && allowed {",
+				"      if let Some(impl_addr) = sourcify::implementation_address(chain, to).await {"
+			],
+			"startLine": 76
+		}
+	]
+}

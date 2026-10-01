@@ -1,0 +1,54 @@
+{
+	"highlightFirstLine": 664,
+	"highlightLastLine": 678,
+	"segments": [
+		{
+			"lines": [
+				"fn private_transfer_event_ui(",
+				"   ctx: &mut ZeusContext,",
+				"   chain: ChainId,",
+				"   theme: &Theme,",
+				"   icons: Arc<Icons>,",
+				"   params: &PrivateTransferParams,",
+				"   ui: &mut Ui,",
+				") {"
+			],
+			"startLine": 614
+		},
+		{
+			"lines": [
+				"   ui.allocate_ui(size, |ui| {",
+				"      ui.horizontal(|ui| {"
+			],
+			"startLine": 627
+		},
+		{
+			"lines": [
+				"         }",
+				"      });",
+				"   });",
+				"",
+				"   // Recipient 0zk",
+				"   ui.horizontal(|ui| {",
+				"      ui.with_layout(Layout::left_to_right(Align::Min), |ui| {",
+				"         let text = RichText::new(\"Recipient\").size(theme.typography.large);",
+				"         let label = Label::new(text, None).interactive(false);",
+				"         ui.add(label);",
+				"      });",
+				"",
+				"      ui.with_layout(Layout::right_to_left(Align::Min), |ui| {",
+				"         let recipient = &params.recipient;",
+				"         let wallet_opt = ctx.get_wallet_info_by_zk_address(recipient);",
+				"         let contact_opt = ctx.get_contact_by_zk_address(recipient);",
+				"",
+				"         let (text, evm_address_opt) = if let Some(wallet) = wallet_opt {",
+				"            let rich = RichText::new(wallet.name())",
+				"               .size(theme.typography.large)",
+				"               .color(theme.colors.info);",
+				"            (rich, Some(wallet.address.to_string()))",
+				"         } else if let Some(contact) = contact_opt {"
+			],
+			"startLine": 660
+		}
+	]
+}

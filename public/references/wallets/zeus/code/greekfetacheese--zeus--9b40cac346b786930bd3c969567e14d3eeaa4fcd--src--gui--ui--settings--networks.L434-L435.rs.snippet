@@ -1,0 +1,33 @@
+{
+	"highlightFirstLine": 434,
+	"highlightLastLine": 435,
+	"segments": [
+		{
+			"lines": [
+				"impl NetworkSettings {"
+			],
+			"startLine": 31
+		},
+		{
+			"lines": [
+				"   fn add_rpc(&mut self, theme: &Theme, ui: &mut Ui) {"
+			],
+			"startLine": 389
+		},
+		{
+			"lines": [
+				"      }",
+				"   }",
+				"}",
+				"",
+				"fn validate_rpc(chain: u64, url: String) {",
+				"   let rpc = Rpc::builder(url.clone(), chain).enabled().build();",
+				"",
+				"   RT.spawn(async move {",
+				"      let ctx = SHARED_GUI.read(|gui| gui.ctx.clone());",
+				""
+			],
+			"startLine": 430
+		}
+	]
+}

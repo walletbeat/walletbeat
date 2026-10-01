@@ -1,0 +1,29 @@
+{
+	"highlightFirstLine": 679,
+	"highlightLastLine": 684,
+	"segments": [
+		{
+			"lines": [
+				"pub async fn prefetch_railgun_circuits_if_allowed(ctx: &ZeusCtx) {"
+			],
+			"startLine": 648
+		},
+		{
+			"lines": [
+				"   ctx.write(|ctx| {",
+				"      ctx.railgun_status.set_circuits_download_in_progress(false);",
+				"   });",
+				"}",
+				"",
+				"async fn prefetch_railgun_circuits() -> Result<PrefetchReport, anyhow::Error> {",
+				"   let dir = railgun_dir()?;",
+				"   let prover = Groth16Prover::new(Some(dir))",
+				"      .with_embedded_circuits(crate::embedded::railgun::embedded_circuits())",
+				"      .with_allow_download(true);",
+				"   Ok(prover.prefetch_artifacts().await?)",
+				"}"
+			],
+			"startLine": 674
+		}
+	]
+}

@@ -1,0 +1,43 @@
+{
+	"highlightFirstLine": 125,
+	"highlightLastLine": 142,
+	"segments": [
+		{
+			"lines": [
+				"pub async fn confirm_tx("
+			],
+			"startLine": 116
+		},
+		{
+			"lines": [
+				"   opts: &SendTxOptions,",
+				") -> Result<ConfirmedTx, anyhow::Error> {",
+				"   let priority_fee = ctx.get_priority_fee(chain.id()).unwrap_or_default();",
+				"",
+				"   SHARED_GUI.write(|gui| {",
+				"      gui.tx_confirmation_window.open(",
+				"         ctx.clone(),",
+				"         source_is_zeus,",
+				"         opts.dapp.clone(),",
+				"         chain,",
+				"         analysis.clone(),",
+				"         priority_fee.f64().to_string(),",
+				"         opts.mev_protect,",
+				"         opts.sponsored,",
+				"      );",
+				"      gui.loading_window.reset();",
+				"      gui.bring_to_front();",
+				"   });",
+				"",
+				"   if !wait_tx_confirm().await {",
+				"      return Err(anyhow!(\"Transaction rejected\"));",
+				"   }",
+				"",
+				"   Ok(SHARED_GUI.read(|gui| ConfirmedTx {",
+				"      priority_fee: gui.tx_confirmation_window.get_priority_fee(),",
+				"      gas_limit: gui.tx_confirmation_window.get_gas_limit(),"
+			],
+			"startLine": 121
+		}
+	]
+}

@@ -1,0 +1,52 @@
+{
+	"highlightFirstLine": 590,
+	"highlightLastLine": 599,
+	"segments": [
+		{
+			"lines": [
+				"impl RemoteArtifactLoader {"
+			],
+			"startLine": 252
+		},
+		{
+			"lines": [
+				"   async fn load_compressed(",
+				"      &self,",
+				"      circuit_name: &str,",
+				"      filename: &str,",
+				"   ) -> Result<Vec<u8>, RemoteArtifactLoaderError> {"
+			],
+			"startLine": 524
+		},
+		{
+			"lines": [
+				"      if let Some(ref path) = disk_path {",
+				"         if path.exists() {"
+			],
+			"startLine": 562
+		},
+		{
+			"lines": [
+				"            }",
+				"         }",
+				"      }",
+				"",
+				"      // 4. Remote download",
+				"      if !self.allow_download() {",
+				"         return Err(RemoteArtifactLoaderError::DownloadDisabled {",
+				"            circuit: circuit_name.to_string(),",
+				"            file: filename.to_string(),",
+				"         });",
+				"      }",
+				"      debug!(\"Downloading from remote: {}\", url);",
+				"      let response = self.client.get(&url).send().await?;",
+				"      let status = response.status();",
+				"      if status.as_u16() == 404 || status.as_u16() == 410 {",
+				"         return Err(RemoteArtifactLoaderError::NotFound {",
+				"            url: url.clone(),",
+				"            status: status.as_u16(),"
+			],
+			"startLine": 586
+		}
+	]
+}

@@ -1,0 +1,85 @@
+{
+	"highlightFirstLine": 443,
+	"highlightLastLine": 463,
+	"segments": [
+		{
+			"lines": [
+				"impl AcrossBridge {"
+			],
+			"startLine": 159
+		},
+		{
+			"lines": [
+				"   pub fn show(",
+				"      &mut self,",
+				"      ctx: &mut ZeusContext,",
+				"      theme: &Theme,",
+				"      icons: Arc<Icons>,",
+				"      recipient_selection: &mut RecipientSelectionWindow,",
+				"      contacts_ui: &mut ContactsUi,",
+				"      ui: &mut Ui,",
+				"   ) {"
+			],
+			"startLine": 223
+		},
+		{
+			"lines": [
+				"      show_with_fade(ui, \"across_bridge_ui_fade\", self.open, |ui| {"
+			],
+			"startLine": 250
+		},
+		{
+			"lines": [
+				"         ui.vertical_centered(|ui| {",
+				"            frame.show(ui, |ui| {"
+			],
+			"startLine": 259
+		},
+		{
+			"lines": [
+				"               ui.vertical_centered(|ui| {"
+			],
+			"startLine": 263
+		},
+		{
+			"lines": [
+				"                  inner_frame.show(ui, |ui| {"
+			],
+			"startLine": 416
+		},
+		{
+			"lines": [
+				"                     });",
+				"                  });",
+				"",
+				"                  self.refresh_quote_cache(ctx);",
+				"                  let network_fee_text = format!(",
+				"                     \"Network≈ ${}\",",
+				"                     self.quote_cache.cost_usd.abbreviated()",
+				"                  );",
+				"                  let bridge_fee_text = format!(",
+				"                     \"Bridge≈ ${}\",",
+				"                     self.quote_cache.bridge_fee.abbreviated()",
+				"                  );",
+				"                  let total_text = format!(",
+				"                     \"Total≈ ${}\",",
+				"                     self.quote_cache.total_fee.abbreviated()",
+				"                  );",
+				"",
+				"                  inner_frame.show(ui, |ui| {",
+				"                     ui.spacing_mut().item_spacing = vec2(0.0, theme.spacing.xs);",
+				"",
+				"                     ui.label(RichText::new(network_fee_text).size(theme.typography.small));",
+				"",
+				"                     ui.label(RichText::new(bridge_fee_text).size(theme.typography.small));",
+				"",
+				"                     ui.label(RichText::new(total_text).size(theme.typography.small));",
+				"",
+				"                     if self.requesting {",
+				"                        ui.add(Spinner::new().size(20.0).color(theme.colors.text));",
+				"                     }"
+			],
+			"startLine": 439
+		}
+	]
+}
