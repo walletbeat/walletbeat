@@ -393,7 +393,12 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						'Uniswap Wallet only offers creating a new wallet or importing a recovery phrase, and can only store one recovery phrase at a time. It has no option to connect a hardware wallet.',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-hw-import.png',
+					label: 'Uniswap Wallet import flow without a hardware wallet option',
+				},
 				wallets: {},
 			},
 			keysHandling: {

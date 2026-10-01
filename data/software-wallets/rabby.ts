@@ -865,7 +865,43 @@ export const rabby: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Rabby shows the chain, approved amount, spender, and its protocol on a USDC approval.',
+						file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_2.png',
+						label: 'Rabby token approval request for USDC',
+					},
+					{
+						explanation:
+							'Rabby simulates an ETH transfer and shows the balance change, chain, recipient, and network fee, and warns about the recipient address.',
+						file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_3.png',
+						label: 'Rabby send token request for an ETH transfer',
+					},
+					{
+						explanation:
+							'Rabby simulates a transaction that always reverts and shows that the simulation failed.',
+						file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_7.png',
+						label: 'Rabby transaction request for a reverting transaction',
+					},
+					{
+						explanation:
+							'Rabby simulates a transaction that only sometimes reverts and shows a single failed simulation result.',
+						file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_8.png',
+						label: 'Rabby transaction request for a nondeterministic transaction',
+					},
+					{
+						explanation: 'Rabby simulates an ERC721 NFT mint and shows one unknown NFT received.',
+						file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_9.png',
+						label: 'Rabby transaction request for an NFT mint',
+					},
+					{
+						explanation:
+							'Rabby simulates a mint on an ERC1155 NFT contract and shows one unknown NFT received.',
+						file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_10.png',
+						label: 'Rabby transaction request for a second NFT mint',
+					},
+				],
 				erc4361: notSupportedWithRef({
 					ref: {
 						explanation: 'Rabby does not format SIWE requests for easy readability.',
@@ -919,7 +955,31 @@ export const rabby: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation: 'Rabby shows the fields of an EIP-712 typed data signature request.',
+							file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_1.png',
+							label: 'Rabby signature request for EIP-712 typed data',
+						},
+						{
+							explanation:
+								'Rabby decodes the calldata of a USDC approval into the function name and parameters in its ABI view.',
+							file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_4.png',
+							label: 'Rabby ABI view for a USDC approval',
+						},
+						{
+							explanation:
+								'Rabby decodes the calldata of an Aave supply into the function name and parameters in its ABI view.',
+							file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_5.png',
+							label: 'Rabby ABI view for an Aave supply',
+						},
+						{
+							explanation:
+								'Rabby shows the typed data of an EIP-712 signature request, with the raw request available under View Raw.',
+							file: 'public/references/wallets/rabby/screenshots/2026-02-27-transaction_legibility_6.png',
+							label: 'Rabby signature request with View Raw option',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.NOT_IN_UI,
