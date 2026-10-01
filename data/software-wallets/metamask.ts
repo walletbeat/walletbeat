@@ -695,7 +695,31 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 			transactionLegibility: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'MetaMask shows the amount, sender, recipient, network, network fee, and nonce on an ETH transfer request.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_2.png',
+						label: 'MetaMask transfer request for an ETH transfer',
+					},
+					{
+						explanation:
+							'MetaMask simulates a transaction that reverts and warns that it is likely to fail.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_6.png',
+						label: 'MetaMask transaction request warning that the transaction is likely to fail',
+					},
+					{
+						explanation: 'MetaMask simulates an ERC-721 mint and shows the NFT the user receives.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_8.png',
+						label: 'MetaMask transaction request for an ERC-721 mint',
+					},
+					{
+						explanation:
+							'MetaMask simulates an ERC-1155 mint and shows the token the user receives.',
+						file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_9.png',
+						label: 'MetaMask transaction request for an ERC-1155 mint',
+					},
+				],
 				erc4361: supported({
 					ref: {
 						explanation: 'MetaMask formats SIWE requests for easy readability.',
@@ -748,7 +772,32 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 				erc8213: supported({
-					ref: refTodo,
+					ref: [
+						{
+							explanation:
+								'MetaMask shows the EIP-712 primary type and message fields of a typed data signature request.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_1.png',
+							label: 'MetaMask signature request for EIP-712 typed data',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of a USDC approval into the function name, spender, and value, with a button to copy the raw data.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_3.png',
+							label: 'MetaMask decoded calldata for a USDC approval',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of a USDC transfer into the function name, recipient, and value.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_4.png',
+							label: 'MetaMask decoded calldata for a USDC transfer',
+						},
+						{
+							explanation:
+								'MetaMask decodes the calldata of an Aave supply into the function name and its parameters.',
+							file: 'public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_5.png',
+							label: 'MetaMask decoded calldata for an Aave supply',
+						},
+					],
 					calldataDisplay: {
 						[CallDataDisplay.RAW_HEX]: DataDisplayOptions.SHOWN_OPTIONALLY,
 						[CallDataDisplay.COPY_HEX_TO_CLIPBOARD]: DataDisplayOptions.SHOWN_OPTIONALLY,

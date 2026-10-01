@@ -224,6 +224,13 @@ export const rainbow: SoftwareWallet = {
 									'Rainbow browser extension "Rainbow Fee" note disclosing the bridge fee as 0.25%',
 								lastRetrieved: '2026-07-03',
 							},
+							{
+								explanation:
+									'The Rainbow browser extension "Review & Bridge" panel for a 1 USDC bridge lists the minimum received, the bridging provider (Relay), and an "Included Rainbow fee" of 0.0025 USDC.',
+								file: 'public/references/wallets/rainbow/screenshots/2026-06-26-chain-abstraction-browser.png',
+								label: 'Rainbow browser extension bridge Review panel for a 1 USDC bridge',
+								lastRetrieved: '2026-06-26',
+							},
 						],
 						feesLargerThan1bps: {
 							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,

@@ -167,7 +167,7 @@ export const uniswapWallet: SoftwareWallet = {
 				{
 					explanation:
 						'Entering an ENS name like vitalik.eth in the Send flow resolves it to the corresponding address, regardless of the destination chain.',
-					file: 'public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/non-chain-specific-ens-resolution.png',
 					label: 'Uniswap Wallet Send flow resolving vitalik.eth to an address',
 				},
 				{
@@ -193,12 +193,12 @@ export const uniswapWallet: SoftwareWallet = {
 					feesLargerThan1bps: {
 						ref: [
 							{
-								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-default.png',
+								file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-default.png',
 								label:
 									'Uniswap Wallet swap review screen, collapsed, showing only aggregated network cost',
 							},
 							{
-								file: 'public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-comprehensive.png',
+								file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-comprehensive.png',
 								label:
 									'Uniswap Wallet swap review screen, expanded, showing rate, network cost, slippage, and route',
 							},
@@ -214,12 +214,12 @@ export const uniswapWallet: SoftwareWallet = {
 			},
 			crossChainBalances: {
 				ref: {
-					file: 'public/references/wallets/uniswap/screenshots/2026-08-31-tokens-aggregated.png',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-tokens-aggregated.png',
 					label: 'Uniswap Wallet Tokens tab, showing aggregated per-token balances across chains',
 				},
 				ether: supported({
 					ref: {
-						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-eth-comprehensive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-eth-comprehensive.png',
 						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain ETH balances',
 					},
 					crossChainSumView: featureSupported,
@@ -229,7 +229,7 @@ export const uniswapWallet: SoftwareWallet = {
 				perChainAccountValue: notSupported,
 				usdc: supported({
 					ref: {
-						file: 'public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-usdc-comprehensive.png',
 						label: 'Uniswap Wallet Tokens tab, expanded, showing per-chain USDC balances',
 					},
 					crossChainSumView: notSupported,
@@ -241,7 +241,7 @@ export const uniswapWallet: SoftwareWallet = {
 			ref: {
 				explanation:
 					'The Settings screen has no network-management section, confirming the wallet does not let users add or configure chains or RPC endpoints.',
-				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-no-network-settings.png',
+				file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-network-settings.png',
 				label: 'Uniswap Wallet Settings screen, with no network management option',
 			},
 			customChainRpcEndpoint: notSupported,
@@ -401,7 +401,12 @@ export const uniswapWallet: SoftwareWallet = {
 				},
 			},
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: {
+					explanation:
+						'Uniswap Wallet only offers creating a new wallet or importing a recovery phrase, and can only store one recovery phrase at a time. It has no option to connect a hardware wallet.',
+					file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-hw-import.png',
+					label: 'Uniswap Wallet import flow without a hardware wallet option',
+				},
 				wallets: {},
 			},
 			keysHandling: {
@@ -466,7 +471,7 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'An app approve request to a contract the user has never interacted with only shows a generic "Contract interaction" label, with no warning about the contract being new or recently deployed.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png',
 							label: 'Uniswap Wallet transaction request with no recent-contract warning',
 						},
 					],
@@ -528,7 +533,7 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'Sending to an address the user has not transacted with before shows a "New address" warning asking them to confirm the address before continuing.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-29-uniswap-new-recipient-warning.png',
 							label: 'Uniswap Wallet "New address" warning in the Send flow',
 						},
 					],
@@ -573,7 +578,7 @@ export const uniswapWallet: SoftwareWallet = {
 					{
 						explanation:
 							'The send confirmation shows the amount sent (in USD and ETH), the recipient address and label, the sending wallet and the network cost. The nonce and an explicit chain/network row are not shown.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-transaction-details-send.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-transaction-details-send.png',
 						label: 'Uniswap Wallet send confirmation',
 					},
 					{
@@ -591,41 +596,41 @@ export const uniswapWallet: SoftwareWallet = {
 					{
 						explanation:
 							'Uniswap Wallet simulates an ERC-20 token transfer and shows the amount received.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png',
 						label: 'Uniswap Wallet simulation of an ERC-20 transfer',
 					},
 					{
 						explanation: 'Uniswap Wallet simulates an ERC-721 transfer and shows the NFT received.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png',
 						label: 'Uniswap Wallet simulation of an ERC-721 transfer',
 					},
 					{
 						explanation:
 							'Uniswap Wallet does not explain the outcome of an outgoing ERC-1155 transfer; the simulated result is empty.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png',
 						label: 'Uniswap Wallet simulation of an ERC-1155 transfer',
 					},
 					{
 						explanation: 'Uniswap Wallet simulates a USDC approval and shows the approved amount.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png',
 						label: 'Uniswap Wallet simulation of a USDC approval',
 					},
 					{
 						explanation:
 							'Uniswap Wallet simulates an Aave supply and shows the amount of USDC sent.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-aave-supply.png',
 						label: 'Uniswap Wallet simulation of an Aave supply',
 					},
 					{
 						explanation:
 							'Uniswap Wallet detects a transaction that will fail and shows a "cannot estimate" error, disabling confirmation.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png',
 						label: 'Uniswap Wallet simulation of a failing transaction',
 					},
 					{
 						explanation:
 							'For a transaction with a nondeterministic outcome, Uniswap Wallet shows a single static simulated outcome, without warning that the outcome may differ.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png',
 						label: 'Uniswap Wallet simulation of a nondeterministic transaction',
 					},
 				],
@@ -633,7 +638,7 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: {
 						explanation:
 							'Uniswap Wallet does not format SIWE requests for easy readability; it shows the raw message text in a generic signature request.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc4361-siwe.png',
 						label: 'Uniswap Wallet signature request for an ERC-4361 message',
 					},
 				}),
@@ -641,32 +646,32 @@ export const uniswapWallet: SoftwareWallet = {
 					ref: [
 						{
 							explanation: 'Uniswap Wallet decodes a USDC approval, showing the approved amount.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png',
 							label: 'Uniswap Wallet transaction request for a USDC approval',
 						},
 						{
 							explanation:
 								'Uniswap Wallet does not decode an Aave supply; it only shows the amount sent.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for an Aave supply',
 						},
 						{
 							explanation:
 								'Uniswap Wallet does not decode the Aave supply nested within a Safe{Wallet} transaction; it only shows a contract interaction with the `execTransaction` function.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png',
 							label: 'Uniswap Wallet transaction request for a Safe{Wallet} Aave supply',
 						},
 						{
 							explanation:
 								'Uniswap Wallet does not decode the inner calls of a Safe{Wallet} MultiSend batching a USDC approval and Aave supply; it only shows a contract interaction with the `execTransaction` function.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png',
 							label:
 								'Uniswap Wallet transaction request for a Safe{Wallet} batched approve and supply',
 						},
 						{
 							explanation:
 								'Uniswap Wallet does not decode a batched USDC approval and Aave supply from an EOA; it only shows a contract interaction with the execute function and a warning that the request contains multiple transactions.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png',
 							label: 'Uniswap Wallet transaction request for a batched approve and supply',
 						},
 					],
@@ -692,13 +697,13 @@ export const uniswapWallet: SoftwareWallet = {
 						{
 							explanation:
 								'Uniswap Wallet only lists the EIP-712 domain and message values as flattened key/value pairs, the EIP-712 struct itself is not shown. No domain hash, message hash or EIP-712 digest is shown.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png',
 							label: 'Uniswap Wallet signature request for an EIP-712 message',
 						},
 						{
 							explanation:
 								'Expanding the transaction details shows the function name and a truncated raw calldata hex `0x617b…0000` with a copy button. The full raw hex, formatted calldata and calldata digest are not shown.',
-							file: 'public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-calldata.png',
+							file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc8213-calldata.png',
 							label: 'Uniswap Wallet transaction details with truncated raw calldata',
 						},
 					],
@@ -770,14 +775,14 @@ export const uniswapWallet: SoftwareWallet = {
 					{
 						explanation:
 							'Uniswap Wallet swap review screen for a 1 USDC to ETH swap, before confirming with "Swap". No approve step or approval amount is shown to the user here.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-16-swap-review.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-16-swap-review.png',
 						label: 'Uniswap Wallet swap review screen for a 1 USDC to ETH swap',
 						lastRetrieved: '2026-09-16',
 					},
 					{
 						explanation:
 							'The onchain Approval event emitted for that swap shows an unlimited approval to the `Permit2` contract, not the 1 USDC swap amount, and not disclosed anywhere in the swap review UI.',
-						file: 'public/references/wallets/uniswap/screenshots/2026-09-16-approve-unlimited-event.png',
+						file: 'public/references/wallets/uniswap-wallet/screenshots/2026-09-16-approve-unlimited-event.png',
 						label: 'Decoded Approval event log showing an unlimited (max) approval value',
 						lastRetrieved: '2026-09-16',
 					},
@@ -849,7 +854,7 @@ export const uniswapWallet: SoftwareWallet = {
 			ref: {
 				explanation:
 					'An EIP-5792 wallet capability test shows `wallet_sendCalls` is supported, but atomicity support is not declared, so batched calls are not guaranteed atomic.',
-				file: 'public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png',
+				file: 'public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png',
 				label: 'EIP-5792 wallet capability test results for Uniswap Wallet',
 			},
 			atomicMultiTransactions: notSupported,

@@ -451,10 +451,6 @@
 		"hash": "dc9658c4794ca5dee71019bde7108be4d8c9a5bbb705817f568a9dda4a2c890b",
 		"passedTests": ["blockiness", "file-format"]
 	},
-	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_7.png": {
-		"hash": "135395666bcc767127575ec1cccf2d3de50a050d553a53a955ef3b92b6d4e553",
-		"passedTests": ["blockiness", "file-format"]
-	},
 	"public/references/wallets/metamask/screenshots/2026-02-23-transaction_legibility_8.png": {
 		"hash": "52406e2e1152eec025b8dbea1e7ec390ce09f839d8ddb3bb6a8999f69028ce1d",
 		"passedTests": ["blockiness", "file-format"]
@@ -891,6 +887,118 @@
 		"hash": "850a58668e1f87efd2d97979ce4acd6e4267b02a8fb2b608d0e8e6d5dfdb8001",
 		"passedTests": ["blockiness", "file-format"]
 	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-browser-tests.png": {
+		"hash": "0dc4e32cf81c269c75da15d9196961ff0ed6a54c476826871272f5b9a5dc6dc8",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-eth-comprehensive.png": {
+		"hash": "9274ef5fb0c6abdf61572a30f14cb5e0a7696cfd9d086946e32dc72948ef240a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-hw-import.png": {
+		"hash": "21da0c5b7f4a26c157259437f69fb536a1bde7ea65ba20923e24209aae3074b9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-no-network-settings.png": {
+		"hash": "0966515114cb2337676c90ecb5f83686eb6ce96b80c26368cf9106f21408337c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-comprehensive.png": {
+		"hash": "01fc67641610484fce9feb86cf4aee08d8c97cbb0d688a9cbc8df59bd2ff9e18",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-swap-info-default.png": {
+		"hash": "a54ad51a54c3db977f8df2f0be7f82b80026a8b57975c7f5c2964f3fca905528",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-tokens-aggregated.png": {
+		"hash": "2837d577fd17100a0dfafc8c0326cfae10a565afe72b18893e92a4a2412ba0a5",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-08-31-usdc-comprehensive.png": {
+		"hash": "21b65ffc47d3e2eb025519c37fa5ebf9ab994609e76107f0ba0f3178183cb478",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-16-approve-unlimited-event.png": {
+		"hash": "7f1b24a9d35819e621982155436f4d60e1cbcf99a25a261a1710a53e5671fd45",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-16-swap-review.png": {
+		"hash": "80fce6947f210cf26ffa5a0bfebccc6429c16cd141ca4518602aaf8917b8d2cb",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png": {
+		"hash": "6b1a110838a2b2a2f6563dfe1c6dd7512a82c343aa48781c821ecf0d67dd461a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png": {
+		"hash": "cdce06248c121bb216a7683170f7e3fa81e0d66181ee86e7ccb72a21e8759f30",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png": {
+		"hash": "3d80d7112a45967c8e4c61f19562bf2f9042ea8338bdce1052ef92fe25830cc6",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png": {
+		"hash": "e2d862b123c5ce1cdeb0229daff154722871ab11660cb4c25f0eaa974f1effde",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png": {
+		"hash": "a5775de6f715004e526ce528b8f365cb80ee7527843ea7afa45246e7bbe97fb3",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc4361-siwe.png": {
+		"hash": "67f89fe0bb9a65f507a068ded1c04f40c636c3f711fffc5e3ecd2c1b5da60e06",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc8213-calldata.png": {
+		"hash": "8d26977c0f1d5ee8203241716fbf6e4a9ba091f567fc13efd364a62bb53a459b",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png": {
+		"hash": "3ffdc886c3b65217c6a2c8951a12475f9dfb895694216a88fb4c65eee313bcb8",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-aave-supply.png": {
+		"hash": "21ae721fab84b20ad4f2b9fd95801ce8b91a75c40ac7652fe959bd550d6b4112",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png": {
+		"hash": "061e621f286a4edd00747aa6b755a2ab744c5beaa884420165ebb6d78fde0073",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png": {
+		"hash": "11d8c3687c146fce4896c99f84eb4740ebc81f107e939ddfba5f69675a786c0a",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png": {
+		"hash": "b00185bf922c93d1c9c894f34b4b438df5689ff1e9647ed3ed7d8c683982bbd7",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png": {
+		"hash": "073cba3eea23ee9cddf1992392ff41082916788d6a225f1058056c348e1f2d5c",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png": {
+		"hash": "fe1fbf5d8138f78606c0ba83ca713352e4799678e112aa5d1235aa91212087e5",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png": {
+		"hash": "24cfb0a80f44d0ab2b62ee14d867041722ab8d09a368c8854234e0a7d580cca9",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-24-uniswap-transaction-details-send.png": {
+		"hash": "8ee4006b08a71d33e71faa0283bda0f5683d484ef9d99eeaa81fb7b134448dc1",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png": {
+		"hash": "9960dc700c5055436d5c6452ec6d1109f24cc8a8975f601214cf856546259052",
+		"passedTests": ["blockiness", "file-format"]
+	},
+	"public/references/wallets/uniswap-wallet/screenshots/2026-09-29-uniswap-new-recipient-warning.png": {
+		"hash": "dc9b4ba257889fe4291a0fae263ecab61be82ebefa2fb29099938af1d23909f6",
+		"passedTests": ["blockiness", "file-format"]
+	},
 	"public/references/wallets/uniswap-wallet/screenshots/2026-09-30-uniswap-tx-details-no-value.png": {
 		"hash": "ff3f7ba4b419771e96da487f641b84d29ea2c03bd4df42254c10ca01d2acf806",
 		"passedTests": ["blockiness", "file-format"]
@@ -899,119 +1007,7 @@
 		"hash": "59f35bac223943ea1a7e3119c04986e32b784a6b3390c32946208044edfd5157",
 		"passedTests": ["blockiness", "file-format"]
 	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-browser-tests.png": {
-		"hash": "0dc4e32cf81c269c75da15d9196961ff0ed6a54c476826871272f5b9a5dc6dc8",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-eth-comprehensive.png": {
-		"hash": "9274ef5fb0c6abdf61572a30f14cb5e0a7696cfd9d086946e32dc72948ef240a",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-no-hw-import.png": {
-		"hash": "21da0c5b7f4a26c157259437f69fb536a1bde7ea65ba20923e24209aae3074b9",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-no-network-settings.png": {
-		"hash": "0966515114cb2337676c90ecb5f83686eb6ce96b80c26368cf9106f21408337c",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-comprehensive.png": {
-		"hash": "01fc67641610484fce9feb86cf4aee08d8c97cbb0d688a9cbc8df59bd2ff9e18",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-swap-info-default.png": {
-		"hash": "a54ad51a54c3db977f8df2f0be7f82b80026a8b57975c7f5c2964f3fca905528",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-tokens-aggregated.png": {
-		"hash": "2837d577fd17100a0dfafc8c0326cfae10a565afe72b18893e92a4a2412ba0a5",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-08-31-usdc-comprehensive.png": {
-		"hash": "21b65ffc47d3e2eb025519c37fa5ebf9ab994609e76107f0ba0f3178183cb478",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-16-approve-unlimited-event.png": {
-		"hash": "7f1b24a9d35819e621982155436f4d60e1cbcf99a25a261a1710a53e5671fd45",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-16-swap-review.png": {
-		"hash": "80fce6947f210cf26ffa5a0bfebccc6429c16cd141ca4518602aaf8917b8d2cb",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-aave-supply.png": {
-		"hash": "6b1a110838a2b2a2f6563dfe1c6dd7512a82c343aa48781c821ecf0d67dd461a",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-batch-approve-supply.png": {
-		"hash": "cdce06248c121bb216a7683170f7e3fa81e0d66181ee86e7ccb72a21e8759f30",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-aave-supply.png": {
-		"hash": "3d80d7112a45967c8e4c61f19562bf2f9042ea8338bdce1052ef92fe25830cc6",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-safe-batch-approve-supply.png": {
-		"hash": "e2d862b123c5ce1cdeb0229daff154722871ab11660cb4c25f0eaa974f1effde",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-23-uniswap-erc7730-usdc-approval.png": {
-		"hash": "a5775de6f715004e526ce528b8f365cb80ee7527843ea7afa45246e7bbe97fb3",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc4361-siwe.png": {
-		"hash": "67f89fe0bb9a65f507a068ded1c04f40c636c3f711fffc5e3ecd2c1b5da60e06",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-calldata.png": {
-		"hash": "8d26977c0f1d5ee8203241716fbf6e4a9ba091f567fc13efd364a62bb53a459b",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-erc8213-eip712-message.png": {
-		"hash": "3ffdc886c3b65217c6a2c8951a12475f9dfb895694216a88fb4c65eee313bcb8",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-aave-supply.png": {
-		"hash": "21ae721fab84b20ad4f2b9fd95801ce8b91a75c40ac7652fe959bd550d6b4112",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc1155-transfer.png": {
-		"hash": "061e621f286a4edd00747aa6b755a2ab744c5beaa884420165ebb6d78fde0073",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc20-receive.png": {
-		"hash": "11d8c3687c146fce4896c99f84eb4740ebc81f107e939ddfba5f69675a786c0a",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-erc721-receive.png": {
-		"hash": "b00185bf922c93d1c9c894f34b4b438df5689ff1e9647ed3ed7d8c683982bbd7",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-failed-transaction.png": {
-		"hash": "073cba3eea23ee9cddf1992392ff41082916788d6a225f1058056c348e1f2d5c",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-nondeterministic-transaction.png": {
-		"hash": "fe1fbf5d8138f78606c0ba83ca713352e4799678e112aa5d1235aa91212087e5",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-simulation-usdc-approval.png": {
-		"hash": "24cfb0a80f44d0ab2b62ee14d867041722ab8d09a368c8854234e0a7d580cca9",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-24-uniswap-transaction-details-send.png": {
-		"hash": "8ee4006b08a71d33e71faa0283bda0f5683d484ef9d99eeaa81fb7b134448dc1",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-contract-interaction-no-recent-warning.png": {
-		"hash": "9960dc700c5055436d5c6452ec6d1109f24cc8a8975f601214cf856546259052",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/2026-09-29-uniswap-new-recipient-warning.png": {
-		"hash": "dc9b4ba257889fe4291a0fae263ecab61be82ebefa2fb29099938af1d23909f6",
-		"passedTests": ["blockiness", "file-format"]
-	},
-	"public/references/wallets/uniswap/screenshots/non-chain-specific-ens-resolution.png": {
+	"public/references/wallets/uniswap-wallet/screenshots/non-chain-specific-ens-resolution.png": {
 		"hash": "ade57eda19a08d0b0ce4d7fa1eecafb26d29c0af323092ae8a2571164f9994e9",
 		"passedTests": ["blockiness", "file-format"]
 	},
