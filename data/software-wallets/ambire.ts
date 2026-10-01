@@ -1158,6 +1158,7 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported /* we have it but it is not public */,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/AmbireTech/extension/releases',

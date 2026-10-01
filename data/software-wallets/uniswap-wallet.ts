@@ -824,6 +824,7 @@ export const uniswapWallet: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported<MustRef<{}>>({
 					ref: [

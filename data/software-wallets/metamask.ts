@@ -978,6 +978,23 @@ export const metamask: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: {
+					[Variant.BROWSER]: supported({
+						ref: [
+							{
+								explanation:
+									'Production `build` and `dist` scripts run webpack under LavaMoat, enforcing a per-package policy on bundled dependencies.',
+								url: 'https://github.com/MetaMask/metamask-extension/blob/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/package.json#L49-L51',
+							},
+							{
+								explanation:
+									'Committed LavaMoat policies (with overrides) for each build type define what each dependency may access.',
+								url: 'https://github.com/MetaMask/metamask-extension/tree/2be47e1c8d2ba00d3c24bad8d2723afbb238d38f/lavamoat/webpack',
+							},
+						],
+					}),
+					[Variant.MOBILE]: null,
+				},
 				dependencyVulnerabilityScanning: supported({
 					ref: [
 						{

@@ -982,6 +982,7 @@ export const zerion: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/zeriontech/zerion-wallet-extension/releases',

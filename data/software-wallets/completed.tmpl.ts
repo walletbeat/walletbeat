@@ -882,6 +882,7 @@ export const completedTemplate: SoftwareWallet = {
 					signer: 'BOTH',
 				}),
 				dependencyLocking: supported({ ref: refTodo }),
+				dependencySandboxing: supported({ ref: refTodo }),
 				dependencyVulnerabilityScanning: supported({ ref: refTodo }),
 				hasPublicChangelog: supported({ ref: 'https://example.com/changelog' }),
 				hermeticBuilds: supported({ ref: refTodo }),
