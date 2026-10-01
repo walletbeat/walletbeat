@@ -575,6 +575,7 @@ export const gemwallet: SoftwareWallet = {
 						},
 					],
 				}),
+				dependencySandboxing: null,
 				dependencyVulnerabilityScanning: notSupported,
 				hasPublicChangelog: supported({
 					ref: 'https://github.com/gemwalletcom/wallet/releases',

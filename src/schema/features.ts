@@ -55,6 +55,7 @@ import type {
 	ArtifactSigningDetails,
 	ArtifactSigningPayload,
 	DependencyLocking,
+	DependencySandboxing,
 	DependencyVulnerabilityScanning,
 	HasPublicChangelog,
 	HermeticBuilds,
@@ -178,6 +179,7 @@ export interface WalletBaseFeatures {
 		releaseTransparency: {
 			artifactSigning: VariantFeature<Support<WithRef<Nullable<ArtifactSigningPayload>>>>
 			dependencyLocking: VariantFeature<DependencyLocking>
+			dependencySandboxing: VariantFeature<DependencySandboxing>
 			dependencyVulnerabilityScanning: VariantFeature<DependencyVulnerabilityScanning>
 			hasPublicChangelog: VariantFeature<HasPublicChangelog>
 			hermeticBuilds: VariantFeature<HermeticBuilds>
@@ -422,6 +424,7 @@ export interface ResolvedFeatures {
 		releaseTransparency: {
 			artifactSigning: ResolvedFeature<ArtifactSigning>
 			dependencyLocking: ResolvedFeature<DependencyLocking>
+			dependencySandboxing: ResolvedFeature<DependencySandboxing>
 			dependencyVulnerabilityScanning: ResolvedFeature<DependencyVulnerabilityScanning>
 			hasPublicChangelog: ResolvedFeature<HasPublicChangelog>
 			hermeticBuilds: ResolvedFeature<HermeticBuilds>
@@ -638,6 +641,10 @@ export function resolveFeatures(
 				dependencyLocking: baseFeat(
 					'transparency.releaseTransparency.dependencyLocking',
 					features => features.transparency.releaseTransparency.dependencyLocking,
+				),
+				dependencySandboxing: baseFeat(
+					'transparency.releaseTransparency.dependencySandboxing',
+					features => features.transparency.releaseTransparency.dependencySandboxing,
 				),
 				dependencyVulnerabilityScanning: baseFeat(
 					'transparency.releaseTransparency.dependencyVulnerabilityScanning',
